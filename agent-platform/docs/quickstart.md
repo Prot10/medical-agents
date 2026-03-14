@@ -43,7 +43,20 @@ uv run python agent-platform/scripts/run_single_case.py \
     agent-platform/tests/fixtures/sample_case.json
 ```
 
-## 5. Run tests
+## 5. Run the web dashboard
+
+```bash
+# Start the API server (loads all 100 cases on startup)
+uv run uvicorn neuroagent.api.app:app --host 0.0.0.0 --port 8888
+```
+
+Open `http://localhost:8888` in your browser. Select a case, choose a hospital, and click **Run Agent** to watch the reasoning in real time.
+
+> The dashboard works without a GPU for browsing cases and replaying saved traces. A running vLLM server is only needed for live agent execution.
+
+See [web-api.md](web-api.md) for the full API reference.
+
+## 6. Run tests
 
 ```bash
 uv run pytest agent-platform/tests/ -v

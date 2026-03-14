@@ -71,6 +71,15 @@ Wraps the OpenAI SDK. Key features:
 - Parses tool calls from OpenAI-style responses
 - Tracks token usage
 
+### Web Dashboard (`api/`)
+
+FastAPI server + React frontend for interactive agent visualization. See [web-api.md](web-api.md).
+
+- Real-time SSE streaming of agent execution (thinking, tool calls, results, assessment)
+- 7 specialized diagnostic result renderers (labs, MRI, ECG, EEG, CSF, literature, drugs)
+- Case browser, patient viewer, hospital/model selection, ground truth comparison
+- Trace save/replay for demos without a GPU
+
 ## Package structure
 
 ```
@@ -80,6 +89,7 @@ medical-agents/               # uv workspace root
 ├── agent-platform/           # Main agent package
 │   ├── src/neuroagent/
 │   │   ├── agent/            # Orchestrator, reasoning, reflection, planner
+│   │   ├── api/              # FastAPI web API + SSE streaming
 │   │   ├── llm/              # LLM client, prompts
 │   │   ├── tools/            # 7 diagnostic tools + mock server + registry
 │   │   ├── memory/           # ChromaDB patient memory
@@ -91,5 +101,9 @@ medical-agents/               # uv workspace root
 │   │   └── hospital_rules/   # Per-hospital YAML directories
 │   ├── scripts/              # CLI entry points
 │   └── tests/
+├── web/                      # React frontend dashboard
+│   ├── src/components/       # UI components (agent timeline, patient viewer, etc.)
+│   ├── docs/                 # API reference, component architecture
+│   └── dist/                 # Production build (served by FastAPI)
 └── dataset-generation/       # NeuroBench case generation (separate package)
 ```

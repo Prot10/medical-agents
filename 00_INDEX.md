@@ -24,6 +24,19 @@ medical-agents/
 │
 ├── 03_bibliography.md             ← 64 references organized thematically
 │
+├── agent-platform/docs/           ← Technical documentation
+│   ├── architecture.md            ← Agent architecture + package structure
+│   ├── hospital-rules.md          ← Hospital rule sets and pathways
+│   ├── models.md                  ← Supported LLM models and configs
+│   ├── quickstart.md              ← Setup and first run
+│   └── web-api.md                 ← Web dashboard API and SSE streaming
+│
+├── web/                           ← Interactive web dashboard
+│   ├── README.md                  ← Quick start, tech stack, project structure
+│   └── docs/
+│       ├── api.md                 ← Full REST + SSE API reference
+│       └── components.md          ← Frontend component architecture
+│
 └── nmi-paper-plan/                ← NMI paper strategy and implementation
     ├── 01_nmi_paper_plan.md       ← What goes into the NMI paper, structure,
     │                                 timeline, claims, venue strategy
@@ -56,5 +69,7 @@ medical-agents/
 **For presenting to doctors**: nmi-paper-plan/02_detailed_scenario_walkthrough.md
 
 **For starting implementation**: nmi-paper-plan/04 and 05 (in parallel)
+
+**For the web dashboard**: web/README.md → web/docs/api.md → web/docs/components.md
 
 **For references**: 03_bibliography.md
