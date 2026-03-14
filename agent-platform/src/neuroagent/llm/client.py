@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import time
 from dataclasses import dataclass, field
 from typing import Any
@@ -37,7 +38,7 @@ class LLMClient:
         self,
         base_url: str = "http://localhost:8000/v1",
         api_key: str = "not-needed",
-        model: str = "Qwen/Qwen3-32B",
+        model: str = "Qwen/Qwen3.5-9B",
         temperature: float = 0.0,
         max_tokens: int = 4096,
     ):
@@ -96,9 +97,31 @@ class LLMClient:
                 "total_tokens": response.usage.total_tokens,
             }
 
+        content = message.content
+        if content:
+            content = strip_think_tags(content)
+
         return LLMResponse(
-            content=message.content,
+            content=content,
             tool_calls=tool_calls,
             usage=usage,
             raw=response,
         )
+
+
+# Pre-compiled regex for stripping <think>...</think> blocks (Qwen3.x thinking mode)
+_THINK_PATTERN = re.compile(r"<think>.*?</think>\s*", flags=re.DOTALL)
+
+
+def strip_think_tags(text: str) -> str:
+    """Remove <think>...</think> blocks from model output.
+
+    Qwen3.x models in thinking mode wrap internal chain-of-thought reasoning
+    in <think>...</think> tags. This strips them so only the visible response
+    remains.  Also handles partial/unclosed tags (e.g. ``</think>`` without
+    a preceding ``<think>``).
+    """
+    text = _THINK_PATTERN.sub("", text)
+    # Handle orphaned closing tags (model sometimes omits opening <think>)
+    text = text.replace("</think>", "")
+    return text.strip()

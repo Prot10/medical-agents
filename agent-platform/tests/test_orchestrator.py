@@ -9,6 +9,7 @@ from neuroagent.agent.orchestrator import AgentConfig, AgentOrchestrator
 from neuroagent.agent.reasoning import AgentTrace, AgentTurn
 from neuroagent.agent.reflection import get_reflection_prompt
 from neuroagent.agent.planner import restrict_tools, get_forced_tool_order
+from neuroagent.llm.client import strip_think_tags
 from neuroagent.tools.tool_registry import ToolRegistry
 from neuroagent.tools.mock_server import MockServer
 from neuroagent_schemas import NeuroBenchCase
@@ -100,3 +101,44 @@ class TestPlanner:
         tools = ["a", "b", "c"]
         result = get_forced_tool_order(tools, strategy="reverse")
         assert result == ["c", "b", "a"]
+
+
+class TestStripThinkTags:
+    def test_full_think_block(self):
+        text = "<think>internal reasoning here</think>\n\nVisible output"
+        assert strip_think_tags(text) == "Visible output"
+
+    def test_multiline_think_block(self):
+        text = "<think>\nLine 1\nLine 2\nLine 3\n</think>\n\nAnswer"
+        assert strip_think_tags(text) == "Answer"
+
+    def test_orphaned_closing_tag(self):
+        text = "Some reasoning\n</think>\n\nActual response"
+        result = strip_think_tags(text)
+        assert "</think>" not in result
+        assert "Some reasoning" in result
+        assert "Actual response" in result
+
+    def test_no_think_tags(self):
+        text = "Normal response without any tags"
+        assert strip_think_tags(text) == text
+
+    def test_multiple_think_blocks(self):
+        text = "<think>first</think>middle<think>second</think>end"
+        assert strip_think_tags(text) == "middleend"
+
+    def test_empty_think_block(self):
+        text = "<think></think>content"
+        assert strip_think_tags(text) == "content"
+
+    def test_think_with_react_pattern(self):
+        """Real-world pattern: model outputs THINK label after think tags."""
+        text = (
+            "<think>\nLet me analyze the EEG results...\n</think>\n\n"
+            "**THINK**: The EEG shows right temporal sharp waves.\n\n"
+            "**ACT**:"
+        )
+        result = strip_think_tags(text)
+        assert "<think>" not in result
+        assert "</think>" not in result
+        assert "**THINK**" in result  # ReAct THINK label should remain
