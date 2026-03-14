@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # Helper script to serve models with vLLM for NeuroAgent evaluation.
-# Usage: ./serve_model.sh <model_name> [port]
+# Usage: ./serve_model.sh [model_name] [port]
 #
 # Supported models:
-#   qwen3.5-27b-awq    - Qwen3.5-27B AWQ quantized (primary, best tool calling)
-#   qwen3.5-27b-fp8    - Qwen3.5-27B FP8 (higher quality, needs more VRAM)
+#   qwen3.5-9b         - Qwen3.5-9B fp16 (DEFAULT — fast, good tool calling)
+#   qwen3.5-27b-awq    - Qwen3.5-27B AWQ quantized (higher quality, slower)
+#   qwen3.5-27b-fp8    - Qwen3.5-27B FP8 (highest quality, needs most VRAM)
 #   medgemma-27b        - MedGemma-27B-Text-IT GGUF Q4 (medical specialist)
 #   medgemma-4b         - MedGemma-1.5-4B-IT (fast medical, good for iteration)
 #   openbio-8b          - OpenBioLLM-8B (fast medical baseline)
@@ -18,7 +19,7 @@ export CUDA_MODULE_LOADING=LAZY
 export HF_HOME="${HF_HOME:-/home/aprotani/.cache/huggingface}"
 
 VLLM_VENV="${VLLM_VENV:-/home/aprotani/projects/medical-agents/.venv-vllm}"
-MODEL="${1:-qwen3.5-27b-awq}"
+MODEL="${1:-qwen3.5-9b}"
 PORT="${2:-8000}"
 
 # Use patched launcher to work around NVML/driver version mismatch
@@ -28,6 +29,15 @@ VLLM="$VLLM_VENV/bin/python $SCRIPT_DIR/vllm_serve.py"
 echo "Starting vLLM server for model: $MODEL on port $PORT"
 
 case "$MODEL" in
+  qwen3.5-9b)
+    $VLLM \
+      --model Qwen/Qwen3.5-9B \
+      --port "$PORT" \
+      --max-model-len 32768 \
+      --enable-auto-tool-choice \
+      --tool-call-parser qwen3_coder \
+      --gpu-memory-utilization 0.90
+    ;;
   qwen3.5-27b-awq)
     $VLLM \
       --model QuantTrio/Qwen3.5-27B-AWQ \
@@ -73,7 +83,7 @@ case "$MODEL" in
     ;;
   *)
     echo "Unknown model: $MODEL"
-    echo "Supported: qwen3.5-27b-awq, qwen3.5-27b-fp8, medgemma-27b, medgemma-4b, openbio-8b"
+    echo "Supported: qwen3.5-9b, qwen3.5-27b-awq, qwen3.5-27b-fp8, medgemma-27b, medgemma-4b, openbio-8b"
     exit 1
     ;;
 esac

@@ -16,7 +16,7 @@ console = Console()
 
 @app.command()
 def evaluate(
-    model: str = typer.Option("Qwen/Qwen3-32B", help="Orchestrator model name"),
+    model: str = typer.Option("Qwen/Qwen3.5-9B", help="Model name (must match vLLM --model)"),
     base_url: str = typer.Option("http://localhost:8000/v1", help="LLM API base URL"),
     api_key: str = typer.Option("not-needed", help="API key"),
     dataset: str = typer.Option("data/neurobench_v1", help="Dataset path"),

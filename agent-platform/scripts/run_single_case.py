@@ -18,7 +18,7 @@ console = Console()
 @app.command()
 def run(
     case_file: str = typer.Argument(help="Path to a NeuroBenchCase JSON file"),
-    model: str = typer.Option("Qwen/Qwen3-32B", help="Orchestrator model name"),
+    model: str = typer.Option("Qwen/Qwen3.5-9B", help="Model name (must match vLLM --model)"),
     base_url: str = typer.Option("http://localhost:8000/v1", help="LLM API base URL"),
     api_key: str = typer.Option("not-needed", help="API key"),
     enable_rules: bool = typer.Option(True, help="Enable hospital rules"),

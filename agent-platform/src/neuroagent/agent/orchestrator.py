@@ -25,7 +25,7 @@ class AgentConfig:
     # LLM settings
     base_url: str = "http://localhost:8000/v1"
     api_key: str = "not-needed"
-    model: str = "Qwen/Qwen3-32B"
+    model: str = "Qwen/Qwen3.5-9B"
     temperature: float = 0.0
     max_tokens: int = 4096
 
