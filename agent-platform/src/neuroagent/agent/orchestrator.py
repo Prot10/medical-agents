@@ -35,8 +35,10 @@ class AgentConfig:
     base_url: str = "http://localhost:8000/v1"
     api_key: str = "not-needed"
     model: str = "Qwen/Qwen3.5-9B"
-    temperature: float = 0.0
-    max_tokens: int = 4096
+    temperature: float = 1.0
+    max_tokens: int = 8192
+    top_p: float = 0.95
+    presence_penalty: float = 1.5
 
     # Agent behavior
     max_turns: int = 15
@@ -68,6 +70,8 @@ class AgentOrchestrator:
             model=config.model,
             temperature=config.temperature,
             max_tokens=config.max_tokens,
+            top_p=config.top_p,
+            presence_penalty=config.presence_penalty,
         )
         self.tools = tool_registry
         self.memory = memory
@@ -178,6 +182,133 @@ class AgentOrchestrator:
             self.memory.store_encounter(patient_id, trace)
 
         return trace
+
+    def run_streaming(
+        self,
+        patient_info: str,
+        patient_id: str | None = None,
+        case_id: str | None = None,
+    ):
+        """Run the agent and yield SSE event dicts at each step.
+
+        Same logic as run() but yields events instead of just recording them.
+        """
+        trace = AgentTrace(case_id=case_id)
+        trace.start_timer()
+
+        messages = self._build_initial_messages(patient_info, patient_id)
+        tool_definitions = self._get_tool_definitions()
+
+        turn_number = 0
+        for _ in range(self.config.max_turns):
+            response = self.llm.chat(
+                messages=messages,
+                tools=tool_definitions if tool_definitions else None,
+                tool_choice="auto" if tool_definitions else None,
+            )
+
+            turn_number += 1
+
+            if response.tool_calls:
+                # Record and yield thinking
+                trace.add_assistant_turn(
+                    turn_number=turn_number,
+                    content=response.content,
+                    tool_calls=[
+                        {"name": tc.name, "arguments": tc.arguments}
+                        for tc in response.tool_calls
+                    ],
+                    token_usage=response.usage,
+                )
+
+                yield {
+                    "type": "thinking",
+                    "turn_number": turn_number,
+                    "content": response.content or "",
+                    "token_usage": response.usage,
+                }
+
+                messages.append(self._format_assistant_message(response))
+
+                # Execute each tool call
+                for tc in response.tool_calls:
+                    yield {
+                        "type": "tool_call",
+                        "turn_number": turn_number,
+                        "tool_name": tc.name,
+                        "arguments": tc.arguments,
+                    }
+
+                    from ..tools.base import ToolCall
+                    tool_call = ToolCall(tool_name=tc.name, parameters=tc.arguments)
+                    result = self.tools.execute(tool_call)
+
+                    turn_number += 1
+                    trace.add_tool_turn(
+                        turn_number=turn_number,
+                        tool_name=tc.name,
+                        tool_result=result.model_dump(),
+                    )
+
+                    yield {
+                        "type": "tool_result",
+                        "turn_number": turn_number,
+                        "tool_name": tc.name,
+                        "success": result.success,
+                        "output": result.model_dump(),
+                    }
+
+                    from ..llm.prompts import format_tool_result
+                    messages.append(
+                        format_tool_result(
+                            tool_call_id=tc.id,
+                            tool_name=tc.name,
+                            result=result.model_dump(),
+                        )
+                    )
+
+                # Reflection
+                if self.config.enable_reflection:
+                    messages.append(get_reflection_prompt())
+                    yield {"type": "reflection", "turn_number": turn_number}
+
+            else:
+                # Final assessment
+                trace.add_assistant_turn(
+                    turn_number=turn_number,
+                    content=response.content,
+                    tool_calls=None,
+                    token_usage=response.usage,
+                )
+                final = _extract_assessment(response.content or "")
+                trace.set_final_response(final)
+
+                yield {
+                    "type": "assessment",
+                    "turn_number": turn_number,
+                    "content": response.content or "",
+                    "token_usage": response.usage,
+                }
+                break
+        else:
+            last_content = trace.turns[-1].content if trace.turns else ""
+            trace.set_final_response(
+                _extract_assessment(last_content or "")
+                or "[Agent did not reach a conclusion within turn limit]"
+            )
+
+        # Store encounter in patient memory
+        if self.memory and patient_id:
+            self.memory.store_encounter(patient_id, trace)
+
+        yield {
+            "type": "run_complete",
+            "total_tool_calls": trace.total_tool_calls,
+            "tools_called": trace.tools_called,
+            "total_tokens": trace.total_tokens,
+            "elapsed_time_seconds": trace.elapsed_time_seconds,
+            "final_response": trace.final_response,
+        }
 
     def run_all_info_upfront(
         self,
