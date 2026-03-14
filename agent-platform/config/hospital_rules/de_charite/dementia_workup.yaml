@@ -1,0 +1,27 @@
+name: "Demenz-Abklärung (DGN/DGPPN S3 Leitlinie)"
+description: "DGN/DGPPN dementia guideline. Comprehensive neuropsychological testing, CSF biomarkers recommended, structured diagnostic pathway."
+triggers: ["dementia", "cognitive_decline", "alzheimers", "memory_loss", "ftd", "nph"]
+steps:
+  - action: "interpret_labs"
+    timing: "initial_visit"
+    mandatory: true
+    tests: ["Blutbild", "Elektrolyte", "Glukose", "TSH", "B12", "Folsäure", "Leberwerte", "Nierenwerte", "CRP", "Lues_Serologie"]
+    note: "Lues screening still recommended in DGN guideline. HIV if risk factors present"
+  - action: "analyze_brain_mri"
+    timing: "within_4_weeks"
+    mandatory: true
+    sequences: ["T1_volumetric", "T2", "FLAIR", "SWI", "coronal_hippocampal"]
+    note: "cMRT with Hippocampus-Volumetrie. Scheltens-Score for medial temporal atrophy. Evaluate for microbleeds (CAA vs vascular)"
+  - action: "analyze_csf"
+    timing: "recommended"
+    mandatory: false
+    note: "Liquor-Biomarker (Aβ42, Aβ42/40, p-Tau181, t-Tau, NfL) empfohlen per DGN S3 for early/uncertain cases. Helps distinguish AD from FTD"
+  - action: "check_drug_interactions"
+    timing: "if_treatment_started"
+    mandatory: true
+    condition: "if_Antidementiva_initiated"
+contraindicated:
+  - "Starting Cholinesterase-Inhibitoren without baseline ECG and monitoring for bradycardia (especially with beta-blockers)"
+  - "Diagnosing Alzheimer-Demenz without excluding reversible causes (B12, TSH, NPH, Depression, Medikamentennebenwirkungen)"
+  - "Starting Memantin monotherapy in mild cognitive impairment (no evidence per DGN)"
+  - "Prescribing Neuroleptika for BPSD without documented Nutzen-Risiko-Abwägung and time-limited plan (increased mortality in dementia patients)"

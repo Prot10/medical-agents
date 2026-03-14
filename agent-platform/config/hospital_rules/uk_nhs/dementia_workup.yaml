@@ -1,0 +1,23 @@
+name: "Dementia Assessment Pathway (NICE NG97)"
+description: "NICE dementia guideline. Memory assessment service referral, structured cognitive testing (ACE-III/MoCA), targeted blood tests."
+triggers: ["dementia", "cognitive_decline", "alzheimers", "memory_loss", "ftd", "nph"]
+steps:
+  - action: "interpret_labs"
+    timing: "initial_visit"
+    mandatory: true
+    tests: ["FBC", "U&E", "calcium", "glucose", "TSH", "B12", "folate", "LFTs"]
+    note: "Do not routinely test for syphilis or HIV unless clinical suspicion. NICE recommends targeted, not exhaustive, screening"
+  - action: "analyze_brain_mri"
+    timing: "within_6_weeks"
+    mandatory: true
+    note: "Structural imaging (MRI preferred, CT acceptable) to exclude other pathology. Not required to repeat if recent imaging available"
+  - action: "check_drug_interactions"
+    timing: "if_treatment_started"
+    mandatory: true
+    condition: "if_cholinesterase_inhibitor_or_memantine_started"
+contraindicated:
+  - "Starting cholinesterase inhibitors without baseline pulse and ECG if cardiac history, bradycardia, or taking rate-limiting drugs"
+  - "Diagnosing dementia without formal cognitive assessment (ACE-III, MoCA, or 10-CS)"
+  - "Prescribing antipsychotics for BPSD without assessment of risk, documented non-pharmacological approaches, and time-limited review"
+  - "Starting donepezil without offering all three cholinesterase inhibitors as options per NICE TA217"
+  - "Requesting PET or CSF biomarkers without specialist recommendation from memory assessment service"

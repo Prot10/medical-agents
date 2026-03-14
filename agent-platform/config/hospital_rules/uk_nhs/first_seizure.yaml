@@ -1,0 +1,26 @@
+name: "First Seizure Pathway (NICE CG137)"
+description: "NICE epilepsy guideline. Specialist review within 2 weeks, EEG only after specialist assessment, mandatory DVLA notification."
+triggers: ["first_seizure", "new_onset_seizure", "first_epileptic_seizure"]
+steps:
+  - action: "interpret_labs"
+    timing: "immediate"
+    mandatory: true
+    tests: ["FBC", "U&E", "glucose", "calcium", "prolactin_if_diagnostic_uncertainty"]
+  - action: "analyze_eeg"
+    timing: "after_specialist_review"
+    mandatory: true
+    note: "EEG should be performed after first specialist assessment, not in A&E. Sleep-deprived EEG if routine is normal"
+  - action: "analyze_brain_mri"
+    timing: "within_4_weeks"
+    mandatory: true
+    note: "MRI preferred over CT. Not required urgently unless red flags (focal deficit, persistent altered consciousness, fever, trauma, anticoagulation)"
+  - action: "check_drug_interactions"
+    timing: "before_discharge"
+    mandatory: true
+    condition: "if_ASM_started"
+contraindicated:
+  - "Starting ASM in A&E after a single seizure without epilepsy specialist review (unless status epilepticus)"
+  - "Discharging without advising DVLA notification — Group 1 licence holders must not drive and must notify DVLA"
+  - "Starting carbamazepine without checking HLA-B*15:02 in Han Chinese or Thai descent"
+  - "Starting valproate in any woman or girl of childbearing potential without Pregnancy Prevention Programme"
+  - "Requesting urgent MRI for uncomplicated first seizure with normal examination"

@@ -1,0 +1,27 @@
+name: "Meningitis/Enzephalitis-Protokoll (DGN S2k Leitlinie)"
+description: "DGN meningitis guideline. Empiric antibiotics within 30 minutes, adjunctive dexamethasone, comprehensive CSF diagnostics."
+triggers: ["meningitis", "encephalitis", "autoimmune_encephalitis", "cns_infection"]
+steps:
+  - action: "interpret_labs"
+    timing: "immediate"
+    mandatory: true
+    tests: ["Blutbild_Diff", "CRP", "Procalcitonin", "Blutkulturen_x2", "Laktat", "Gerinnung", "Elektrolyte"]
+  - action: "analyze_csf"
+    timing: "immediate"
+    mandatory: true
+    note: "LP after cCT if Hirndruckzeichen. Erweiterte Liquordiagnostik: Zellzahl, Protein, Glukose (plus Serum), Laktat, Gram-Färbung, Kultur, multiplex PCR (HSV, VZV, Enteroviren, Pneumokokken, Meningokokken)"
+  - action: "analyze_brain_mri"
+    timing: "within_24h"
+    mandatory: true
+    sequences: ["T1_KM", "T2", "FLAIR", "DWI"]
+    note: "cMRT with contrast mandatory within 24h; evaluate for complications (abscess, ventriculitis, sinus thrombosis)"
+  - action: "analyze_eeg"
+    timing: "within_24h"
+    mandatory: true
+    condition: "if_vigilanzstörung_or_seizures"
+    note: "Continuous EEG monitoring if GCS <13 or nonconvulsive status epilepticus suspected"
+contraindicated:
+  - "Delaying empiric antibiotics (Ceftriaxon + Ampicillin if >50y or immunocompromised) for LP or imaging — treat within 30 minutes"
+  - "LP without prior CT if papilledema, focal signs, GCS <10, or coagulopathy"
+  - "Delaying Aciclovir when HSV-Enzephalitis suspected — start empirically before PCR results"
+  - "Omitting Dexamethason in suspected bacterial meningitis (give 10mg IV before or with first antibiotic dose, DGN recommends 4 days)"

@@ -1,0 +1,28 @@
+name: "Protocolo Meningite/Encefalite (ABN/MS Guia de Vigilância)"
+description: "ABN protocol aligned with Ministério da Saúde surveillance guide. Emphasis on notificação compulsória, empiric treatment, and endemic pathogen coverage."
+triggers: ["meningitis", "encephalitis", "autoimmune_encephalitis", "cns_infection"]
+steps:
+  - action: "interpret_labs"
+    timing: "immediate"
+    mandatory: true
+    tests: ["hemograma", "PCR", "hemocultura_x2", "eletrólitos", "glicemia", "função_renal", "coagulograma"]
+    note: "Procalcitonin desirable but not universally available in SUS"
+  - action: "analyze_csf"
+    timing: "immediate"
+    mandatory: true
+    note: "LP after CT if signs of raised ICP. Standard CSF: cellularity, protein, glucose (paired with serum), Gram stain, culture, latex agglutination. PCR panel if available (not universal in SUS — request from LACEN)"
+  - action: "analyze_brain_mri"
+    timing: "within_48h"
+    mandatory: true
+    sequences: ["T1_contrast", "T2", "FLAIR", "DWI"]
+    note: "CT with contrast acceptable if MRI unavailable within 48h"
+  - action: "analyze_eeg"
+    timing: "within_48h"
+    mandatory: true
+    condition: "if_altered_consciousness_or_seizures"
+contraindicated:
+  - "Delaying empiric antibiotics (ceftriaxone 2g IV q12h) for LP or imaging — administer within 1h of suspicion"
+  - "LP without prior CT if papilledema, focal signs, GCS <12, or immunocompromised"
+  - "Delaying empiric acyclovir when HSV encephalitis suspected"
+  - "Failing to submit notificação compulsória (SINAN) within 24h — meningitis is a mandatory reportable disease in Brazil"
+  - "Omitting dexamethasone in suspected pneumococcal meningitis (0.15 mg/kg q6h for 4 days)"

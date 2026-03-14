@@ -1,0 +1,27 @@
+name: "Akuter Schlaganfall — Stroke-Unit-Protokoll (DGN/DSG Leitlinie)"
+description: "DGN/DSG stroke guideline. Mandatory Stroke Unit admission, comprehensive neurosonology, extended thrombolysis window with perfusion imaging."
+triggers: ["stroke", "stroke_code", "acute_stroke", "ischemic_stroke", "hemorrhagic_stroke", "tia"]
+steps:
+  - action: "interpret_labs"
+    timing: "immediate"
+    mandatory: true
+    tests: ["Blutbild", "Gerinnung", "Elektrolyte", "Glukose", "Troponin", "TSH", "HbA1c", "Lipide"]
+    note: "HbA1c and lipids for secondary prevention planning"
+  - action: "analyze_brain_mri"
+    timing: "immediate"
+    mandatory: true
+    note: "cCT nativ sofort. MRT mit DWI/PWI within 6h for thrombectomy selection. Duplex-/Doppler-Sonographie der hirnversorgenden Gefäße mandatory within 24h"
+  - action: "analyze_ecg"
+    timing: "immediate"
+    mandatory: true
+    note: "12-lead ECG plus 72h Langzeit-EKG monitoring on Stroke Unit to detect paroxysmal AF"
+  - action: "check_drug_interactions"
+    timing: "before_treatment"
+    mandatory: true
+    condition: "if_thrombolysis_or_anticoagulation"
+contraindicated:
+  - "Administering IV Alteplase beyond 4.5h from symptom onset without CT-Perfusion or MRI-DWI/PWI mismatch evidence"
+  - "Anticoagulation in acute haemorrhagic stroke"
+  - "Treating acute ischaemic stroke outside a certified Stroke Unit (DSG-zertifizierte Stroke Unit)"
+  - "Discharging without prescribing secondary prevention (antiplatelet or anticoagulant as indicated)"
+  - "TIA without same-day imaging and 24h Stroke Unit observation per DSG recommendation"

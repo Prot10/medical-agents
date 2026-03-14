@@ -1,0 +1,27 @@
+name: "Código AVC — Protocolo de Emergência (SBAVC/ABN)"
+description: "SBAVC stroke protocol. Adapted for Brazilian Linha de Cuidado do AVC. tPA standard dose (0.9 mg/kg), emphasis on expanding access."
+triggers: ["stroke", "stroke_code", "acute_stroke", "ischemic_stroke", "hemorrhagic_stroke", "tia"]
+steps:
+  - action: "interpret_labs"
+    timing: "immediate"
+    mandatory: true
+    tests: ["hemograma", "coagulograma", "eletrólitos", "glicemia", "creatinina", "troponina"]
+    note: "Do not delay tPA for lab results — only glucose required before thrombolysis if no suspicion of coagulopathy"
+  - action: "analyze_brain_mri"
+    timing: "immediate"
+    mandatory: true
+    note: "TC de crânio sem contraste STAT (available 24h in all Unidades de AVC). MRI/angio-CT for thrombectomy selection if available. Many SUS hospitals have CT only"
+  - action: "analyze_ecg"
+    timing: "immediate"
+    mandatory: true
+    note: "ECG de 12 derivações. Holter 24h if AF suspected (limited availability — Holter 7d rare in SUS)"
+  - action: "check_drug_interactions"
+    timing: "before_treatment"
+    mandatory: true
+    condition: "if_thrombolysis_or_anticoagulation"
+contraindicated:
+  - "Administering alteplase beyond 4.5h from symptom onset without perfusion imaging evidence"
+  - "Anticoagulation in acute hemorrhagic stroke"
+  - "Treating acute stroke outside a designated Unidade de AVC when transfer is feasible (Portaria MS 665/2012)"
+  - "Discharging without secondary prevention prescription — aspirin + statin minimum per SBAVC"
+  - "Lowering BP aggressively in ischemic stroke (maintain <185/110 only if thrombolysis, otherwise permissive hypertension)"

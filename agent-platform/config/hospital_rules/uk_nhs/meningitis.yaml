@@ -1,0 +1,25 @@
+name: "Meningitis/Encephalitis Protocol (NICE CG102 / BIA Guidelines)"
+description: "NICE bacterial meningitis guideline. IV antibiotics within 1h of recognition, do not delay for LP."
+triggers: ["meningitis", "encephalitis", "autoimmune_encephalitis", "cns_infection"]
+steps:
+  - action: "interpret_labs"
+    timing: "immediate"
+    mandatory: true
+    tests: ["FBC", "U&E", "CRP", "glucose", "blood_cultures", "lactate", "coagulation_screen"]
+  - action: "analyze_csf"
+    timing: "immediate"
+    mandatory: true
+    note: "LP only after CT if signs of raised ICP. Do NOT delay antibiotics for LP. Include opening pressure, microscopy, culture, glucose, protein, PCR"
+  - action: "analyze_brain_mri"
+    timing: "within_24h"
+    mandatory: true
+    sequences: ["T1_contrast", "T2", "FLAIR", "DWI"]
+  - action: "analyze_eeg"
+    timing: "within_24h"
+    mandatory: true
+    condition: "if_altered_consciousness_or_seizures"
+contraindicated:
+  - "Delaying IV ceftriaxone (or cefotaxime) for LP or CT in suspected bacterial meningitis"
+  - "Performing LP if signs of raised intracranial pressure, GCS <12, focal neurological signs, or coagulopathy"
+  - "Delaying IV aciclovir when HSV encephalitis is suspected — start empirically pending PCR results"
+  - "Omitting dexamethasone in suspected pneumococcal meningitis (give before or with first antibiotic dose)"

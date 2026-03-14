@@ -1,0 +1,27 @@
+name: "Acute Stroke Pathway (NICE NG128)"
+description: "NICE stroke guideline with FAST pathway. CT within 1h, thrombolysis within 4.5h, thrombectomy within 6h (or 24h with perfusion imaging)."
+triggers: ["stroke", "stroke_code", "acute_stroke", "ischemic_stroke", "hemorrhagic_stroke", "tia"]
+steps:
+  - action: "interpret_labs"
+    timing: "immediate"
+    mandatory: true
+    tests: ["FBC", "U&E", "coagulation_screen", "glucose"]
+    note: "Do not delay thrombolysis for blood results except glucose and INR if on anticoagulants"
+  - action: "analyze_brain_mri"
+    timing: "immediate"
+    mandatory: true
+    note: "Non-contrast CT head immediately. MRI with DWI within 24h if diagnosis uncertain. CT angiography if thrombectomy candidate"
+  - action: "analyze_ecg"
+    timing: "within_12h"
+    mandatory: true
+    note: "ECG to identify AF; do not delay treatment for ECG"
+  - action: "check_drug_interactions"
+    timing: "before_treatment"
+    mandatory: true
+    condition: "if_thrombolysis_or_anticoagulation"
+contraindicated:
+  - "Administering alteplase beyond 4.5 hours from symptom onset"
+  - "Anticoagulation in acute haemorrhagic stroke"
+  - "Routine aggressive blood pressure lowering in acute ischaemic stroke unless thrombolysis candidate or BP >220/120"
+  - "Discharging TIA patients without same-day specialist assessment and 24h imaging"
+  - "Aspirin within 24h of thrombolysis"

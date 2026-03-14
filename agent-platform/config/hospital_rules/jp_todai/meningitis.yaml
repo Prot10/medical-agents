@@ -1,0 +1,27 @@
+name: "髄膜炎・脳炎プロトコル (日本神経感染症学会ガイドライン)"
+description: "Japanese Neuroinfection Society guideline. Empiric antibiotics within 1h, comprehensive CSF multiplex PCR panel standard."
+triggers: ["meningitis", "encephalitis", "autoimmune_encephalitis", "cns_infection"]
+steps:
+  - action: "interpret_labs"
+    timing: "immediate"
+    mandatory: true
+    tests: ["CBC_diff", "CRP", "procalcitonin", "blood_cultures_x2", "electrolytes", "renal_panel", "coagulation"]
+    note: "Procalcitonin helps distinguish bacterial from viral meningitis"
+  - action: "analyze_csf"
+    timing: "immediate"
+    mandatory: true
+    note: "LP after CT if raised ICP signs. Comprehensive CSF: cell count, protein, glucose (paired with serum), Gram stain, culture, multiplex PCR panel (HSV, VZV, enterovirus, TB), cytology. Autoimmune antibody panel if encephalitis suspected (NMDAR, LGI1, CASPR2)"
+  - action: "analyze_brain_mri"
+    timing: "within_24h"
+    mandatory: true
+    sequences: ["T1_contrast", "T2", "FLAIR", "DWI"]
+  - action: "analyze_eeg"
+    timing: "within_24h"
+    mandatory: true
+    condition: "if_altered_consciousness_or_seizures"
+    note: "Continuous EEG monitoring if GCS <12 — high index of suspicion for nonconvulsive status epilepticus"
+contraindicated:
+  - "Delaying empiric antibiotics (CTRX + VCM if resistant pneumococcus risk, + ABPC if >50y) for LP or imaging"
+  - "LP if CT shows mass effect, midline shift, or posterior fossa lesion"
+  - "Delaying IV acyclovir when HSV encephalitis suspected — start empirically, temporal lobe involvement on MRI is late sign"
+  - "Omitting dexamethasone in suspected bacterial meningitis (0.15 mg/kg q6h for 4 days, started before or with first antibiotic)"

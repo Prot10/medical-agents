@@ -1,0 +1,26 @@
+name: "Acute Stroke Code (AHA/ASA Guidelines)"
+description: "AHA/ASA stroke protocol. Door-to-needle <60 min for tPA, thrombectomy within 24h for large vessel occlusion."
+triggers: ["stroke", "stroke_code", "acute_stroke", "ischemic_stroke", "hemorrhagic_stroke", "tia"]
+steps:
+  - action: "interpret_labs"
+    timing: "immediate"
+    mandatory: true
+    tests: ["CBC", "BMP", "coagulation_panel", "glucose", "troponin", "lipid_panel"]
+  - action: "analyze_brain_mri"
+    timing: "immediate"
+    mandatory: true
+    note: "CT head without contrast STAT first; MRI with DWI/perfusion for thrombectomy selection"
+  - action: "analyze_ecg"
+    timing: "immediate"
+    mandatory: true
+    note: "Rule out atrial fibrillation and acute MI"
+  - action: "check_drug_interactions"
+    timing: "before_treatment"
+    mandatory: true
+    condition: "if_thrombolysis_or_anticoagulation_considered"
+contraindicated:
+  - "Administering IV alteplase beyond 4.5 hours from last known well without advanced perfusion imaging selection"
+  - "Anticoagulation in acute hemorrhagic stroke"
+  - "Lowering blood pressure below 185/110 before thrombolysis or aggressively in ischemic stroke (unless >220/120)"
+  - "Delaying CT head beyond 25 minutes from door arrival"
+  - "Performing thrombectomy beyond 24h without penumbral imaging evidence"

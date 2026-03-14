@@ -1,0 +1,25 @@
+name: "Meningitis/Encephalitis Protocol (IDSA Guidelines)"
+description: "IDSA-aligned CNS infection workup. Empiric antibiotics within 1h, do not delay treatment for diagnostic workup."
+triggers: ["meningitis", "encephalitis", "autoimmune_encephalitis", "cns_infection"]
+steps:
+  - action: "interpret_labs"
+    timing: "immediate"
+    mandatory: true
+    tests: ["CBC", "CMP", "CRP", "procalcitonin", "blood_cultures_x2", "lactate"]
+  - action: "analyze_csf"
+    timing: "immediate"
+    mandatory: true
+    note: "LP after CT if papilledema or focal signs. Include opening pressure, cell count, protein, glucose, gram stain, cultures, HSV PCR, crypto antigen"
+  - action: "analyze_brain_mri"
+    timing: "within_24h"
+    mandatory: true
+    sequences: ["T1_contrast", "T2", "FLAIR", "DWI"]
+  - action: "analyze_eeg"
+    timing: "within_24h"
+    mandatory: true
+    condition: "if_altered_mental_status_or_seizures"
+contraindicated:
+  - "Delaying empiric antibiotics and dexamethasone for LP or imaging in suspected bacterial meningitis"
+  - "Performing LP without prior CT if papilledema, focal neurological signs, or immunocompromised"
+  - "Delaying empiric IV acyclovir when HSV encephalitis is suspected"
+  - "Withholding dexamethasone in suspected pneumococcal meningitis"

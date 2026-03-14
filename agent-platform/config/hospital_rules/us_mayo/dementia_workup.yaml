@@ -1,0 +1,22 @@
+name: "Dementia Evaluation Pathway (AAN Practice Parameter)"
+description: "AAN-aligned dementia workup. Emphasizes ruling out reversible causes, cognitive testing, and biomarker evaluation."
+triggers: ["dementia", "cognitive_decline", "alzheimers", "memory_loss", "ftd", "nph"]
+steps:
+  - action: "interpret_labs"
+    timing: "initial_visit"
+    mandatory: true
+    tests: ["CBC", "CMP", "TSH", "B12", "folate", "RPR", "HIV", "ESR_CRP"]
+  - action: "analyze_brain_mri"
+    timing: "within_30d"
+    mandatory: true
+    sequences: ["T1_volumetric", "T2", "FLAIR", "DWI", "SWI"]
+    note: "Evaluate for atrophy pattern, white matter disease, NPH, subdural collections"
+  - action: "check_drug_interactions"
+    timing: "if_treatment_started"
+    mandatory: true
+    condition: "if_cholinesterase_inhibitor_or_memantine_started"
+contraindicated:
+  - "Starting cholinesterase inhibitors without baseline ECG in patients with cardiac history or bradycardia risk"
+  - "Diagnosing Alzheimer's without ruling out reversible causes (B12 deficiency, hypothyroidism, NPH, depression, medication effects)"
+  - "Starting memantine as monotherapy in mild cognitive impairment"
+  - "Prescribing antipsychotics for behavioral symptoms without documenting non-pharmacological interventions tried first (FDA black box warning)"
