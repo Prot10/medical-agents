@@ -1,0 +1,23 @@
+name: "Dementia Evaluation Pathway"
+description: "Standard workup for patients presenting with cognitive decline or suspected dementia"
+triggers: ["dementia", "cognitive_decline", "alzheimers", "memory_loss", "ftd", "nph"]
+steps:
+  - action: "interpret_labs"
+    timing: "initial_visit"
+    mandatory: true
+    tests: ["CBC", "BMP", "TSH", "B12", "folate", "RPR", "HIV"]
+  - action: "analyze_brain_mri"
+    timing: "within_30d"
+    mandatory: true
+    sequences: ["T1_volumetric", "T2", "FLAIR", "DWI", "SWI"]
+  - action: "search_medical_literature"
+    timing: "as_needed"
+    mandatory: false
+  - action: "check_drug_interactions"
+    timing: "if_treatment_started"
+    mandatory: true
+    condition: "if_cholinesterase_inhibitor_started"
+contraindicated:
+  - "Starting cholinesterase inhibitors without baseline ECG in patients with cardiac history"
+  - "Diagnosing Alzheimer's without ruling out reversible causes (B12, TSH, NPH, depression)"
+  - "Starting memantine as monotherapy in mild cognitive impairment"

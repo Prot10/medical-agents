@@ -1,0 +1,27 @@
+name: "Meningitis/Encephalitis Protocol"
+description: "Emergency workup for suspected CNS infection or autoimmune encephalitis"
+triggers: ["meningitis", "encephalitis", "autoimmune_encephalitis", "cns_infection"]
+steps:
+  - action: "interpret_labs"
+    timing: "immediate"
+    mandatory: true
+    tests: ["CBC", "BMP", "CRP", "procalcitonin", "blood_cultures"]
+  - action: "analyze_csf"
+    timing: "immediate"
+    mandatory: true
+    note: "Lumbar puncture AFTER CT/MRI if concern for raised ICP"
+  - action: "analyze_brain_mri"
+    timing: "within_24h"
+    mandatory: true
+    sequences: ["T1_contrast", "T2", "FLAIR", "DWI"]
+  - action: "analyze_eeg"
+    timing: "within_24h"
+    mandatory: true
+    condition: "if_altered_mental_status_or_seizures"
+  - action: "search_medical_literature"
+    timing: "as_needed"
+    mandatory: false
+contraindicated:
+  - "Delaying empiric antibiotics for lumbar puncture in bacterial meningitis"
+  - "Performing lumbar puncture without prior imaging if papilledema or focal neurological signs present"
+  - "Delaying empiric acyclovir when HSV encephalitis is suspected"

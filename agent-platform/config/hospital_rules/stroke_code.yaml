@@ -1,0 +1,26 @@
+name: "Acute Stroke Code"
+description: "Emergency protocol for suspected acute ischemic or hemorrhagic stroke"
+triggers: ["stroke", "stroke_code", "acute_stroke", "ischemic_stroke", "hemorrhagic_stroke", "tia"]
+steps:
+  - action: "interpret_labs"
+    timing: "immediate"
+    mandatory: true
+    tests: ["CBC", "BMP", "coagulation", "glucose", "troponin"]
+  - action: "analyze_brain_mri"
+    timing: "immediate"
+    mandatory: true
+    note: "CT head first if MRI not immediately available"
+  - action: "analyze_ecg"
+    timing: "immediate"
+    mandatory: true
+  - action: "check_drug_interactions"
+    timing: "before_treatment"
+    mandatory: true
+    condition: "if_thrombolysis_considered"
+  - action: "check_hospital_rules"
+    timing: "immediate"
+    mandatory: false
+contraindicated:
+  - "Administering tPA beyond 4.5 hours from symptom onset without advanced imaging selection"
+  - "Anticoagulation in acute hemorrhagic stroke"
+  - "Lowering blood pressure aggressively in ischemic stroke (unless >220/120 or thrombolysis planned)"
