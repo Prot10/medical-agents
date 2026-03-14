@@ -33,6 +33,9 @@ class AgentConfig:
     max_turns: int = 15
     enable_reflection: bool = True
 
+    # Hospital rules
+    hospital: str = "us_mayo"  # Hospital rule set: us_mayo, uk_nhs, de_charite, jp_todai, br_hcfmusp
+
     # Ablation controls
     allowed_tools: list[str] | None = None
     excluded_tools: list[str] | None = None

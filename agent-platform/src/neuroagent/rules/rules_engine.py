@@ -52,11 +52,28 @@ class ComplianceResult:
     completed_steps: list[str] = field(default_factory=list)
 
 
+AVAILABLE_HOSPITALS: dict[str, str] = {
+    "us_mayo": "Mayo Clinic, USA (AAN guidelines)",
+    "uk_nhs": "NHS England (NICE guidelines)",
+    "de_charite": "Charité Berlin, Germany (DGN guidelines)",
+    "jp_todai": "University of Tokyo Hospital (JSN/JES guidelines)",
+    "br_hcfmusp": "HC-FMUSP São Paulo, Brazil (ABN guidelines)",
+}
+
+
 class RulesEngine:
     """Load and enforce hospital clinical pathways."""
 
-    def __init__(self, rules_dir: str = "config/hospital_rules"):
-        self.rules_dir = Path(rules_dir)
+    def __init__(
+        self,
+        rules_dir: str = "config/hospital_rules",
+        hospital: str = "us_mayo",
+    ):
+        base = Path(rules_dir)
+        # Support both new (per-hospital subdirs) and legacy (flat dir) layouts
+        hospital_dir = base / hospital
+        self.rules_dir = hospital_dir if hospital_dir.is_dir() else base
+        self.hospital = hospital
         self.pathways: list[ClinicalPathway] = []
         if self.rules_dir.exists():
             self._load_pathways()
@@ -104,7 +121,11 @@ class RulesEngine:
         """Return a summary of available protocols for the system prompt."""
         if not self.pathways:
             return ""
-        lines = ["The following hospital protocols are available:"]
+        hospital_label = AVAILABLE_HOSPITALS.get(self.hospital, self.hospital)
+        lines = [
+            f"You are operating under the clinical protocols of **{hospital_label}**.",
+            "You MUST follow these protocols strictly. The following pathways apply:",
+        ]
         for p in self.pathways:
             triggers = ", ".join(p.triggers)
             lines.append(f"- **{p.name}**: {p.description} (triggers: {triggers})")

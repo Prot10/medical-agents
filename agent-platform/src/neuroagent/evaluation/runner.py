@@ -55,6 +55,7 @@ class EvaluationRunner:
         enable_memory: bool = False,
         enable_rules: bool = True,
         rules_dir: str = "config/hospital_rules",
+        hospital: str = "us_mayo",
     ) -> EvaluationResults:
         """Run agent on all cases in the specified split.
 
@@ -80,7 +81,7 @@ class EvaluationRunner:
         rules_engine = None
         if enable_rules:
             from ..rules.rules_engine import RulesEngine
-            rules_engine = RulesEngine(rules_dir)
+            rules_engine = RulesEngine(rules_dir, hospital=hospital)
 
         eval_results = EvaluationResults(
             config={
@@ -88,6 +89,7 @@ class EvaluationRunner:
                 "split": split,
                 "enable_memory": enable_memory,
                 "enable_rules": enable_rules,
+                "hospital": hospital,
             }
         )
 
@@ -139,6 +141,7 @@ class EvaluationRunner:
         case: NeuroBenchCase,
         enable_rules: bool = True,
         rules_dir: str = "config/hospital_rules",
+        hospital: str = "us_mayo",
     ) -> AgentTrace:
         """Run agent on a single case (for debugging)."""
         mock_server = MockServer(case)
@@ -147,7 +150,7 @@ class EvaluationRunner:
         rules_engine = None
         if enable_rules:
             from ..rules.rules_engine import RulesEngine
-            rules_engine = RulesEngine(rules_dir)
+            rules_engine = RulesEngine(rules_dir, hospital=hospital)
 
         agent = AgentOrchestrator(
             config=self.config,
