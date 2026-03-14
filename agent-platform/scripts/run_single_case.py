@@ -23,6 +23,7 @@ def run(
     api_key: str = typer.Option("not-needed", help="API key"),
     enable_rules: bool = typer.Option(True, help="Enable hospital rules"),
     rules_dir: str = typer.Option("config/hospital_rules", help="Hospital rules directory"),
+    hospital: str = typer.Option("us_mayo", help="Hospital rule set: us_mayo, uk_nhs, de_charite, jp_todai, br_hcfmusp"),
 ) -> None:
     """Run NeuroAgent on a single case and display the reasoning trace."""
     logging.basicConfig(
@@ -50,7 +51,7 @@ def run(
     config = AgentConfig(base_url=base_url, api_key=api_key, model=model)
     runner = EvaluationRunner(config=config, dataset_path="")
 
-    trace = runner.run_single_case(case, enable_rules=enable_rules, rules_dir=rules_dir)
+    trace = runner.run_single_case(case, enable_rules=enable_rules, rules_dir=rules_dir, hospital=hospital)
 
     # Display trace
     console.print("\n[bold]Agent Reasoning Trace[/bold]\n")

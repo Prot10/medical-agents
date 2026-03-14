@@ -69,6 +69,7 @@ def compare(
     ),
     enable_rules: bool = typer.Option(True, help="Enable hospital rules"),
     rules_dir: str = typer.Option("agent-platform/config/hospital_rules"),
+    hospital: str = typer.Option("us_mayo", help="Hospital rule set: us_mayo, uk_nhs, de_charite, jp_todai, br_hcfmusp"),
 ) -> None:
     """Run the same case against multiple models and compare results."""
     logging.basicConfig(
@@ -127,7 +128,7 @@ def compare(
 
             runner = EvaluationRunner(config=config, dataset_path="")
             trace = runner.run_single_case(
-                case, enable_rules=enable_rules, rules_dir=rules_dir,
+                case, enable_rules=enable_rules, rules_dir=rules_dir, hospital=hospital,
             )
 
             metrics = calculator.compute_all(trace, case.ground_truth)

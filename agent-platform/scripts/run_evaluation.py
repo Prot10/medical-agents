@@ -26,6 +26,7 @@ def evaluate(
     enable_memory: bool = typer.Option(False, help="Enable patient memory"),
     enable_rules: bool = typer.Option(True, help="Enable hospital rules"),
     rules_dir: str = typer.Option("config/hospital_rules", help="Hospital rules directory"),
+    hospital: str = typer.Option("us_mayo", help="Hospital rule set: us_mayo, uk_nhs, de_charite, jp_todai, br_hcfmusp"),
 ) -> None:
     """Run NeuroAgent evaluation on NeuroBench cases."""
     logging.basicConfig(
@@ -48,7 +49,7 @@ def evaluate(
 
     console.print(f"[bold]Running evaluation on {dataset} ({split} split)[/bold]")
     console.print(f"Model: {model}")
-    console.print(f"Memory: {enable_memory}, Rules: {enable_rules}")
+    console.print(f"Memory: {enable_memory}, Rules: {enable_rules}, Hospital: {hospital}")
 
     results = runner.run_evaluation(
         split=split,
@@ -56,6 +57,7 @@ def evaluate(
         enable_memory=enable_memory,
         enable_rules=enable_rules,
         rules_dir=rules_dir,
+        hospital=hospital,
     )
 
     # Compute metrics for each case
