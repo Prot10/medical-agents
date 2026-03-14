@@ -39,13 +39,19 @@ class LLMClient:
         base_url: str = "http://localhost:8000/v1",
         api_key: str = "not-needed",
         model: str = "Qwen/Qwen3.5-9B",
-        temperature: float = 0.0,
-        max_tokens: int = 4096,
+        temperature: float = 1.0,
+        max_tokens: int = 8192,
+        top_p: float = 0.95,
+        presence_penalty: float = 1.5,
+        extra_body: dict[str, Any] | None = None,
     ):
         self.client = OpenAI(base_url=base_url, api_key=api_key)
         self.model = model
         self.temperature = temperature
         self.max_tokens = max_tokens
+        self.top_p = top_p
+        self.presence_penalty = presence_penalty
+        self.extra_body = extra_body or {}
 
     def chat(
         self,
@@ -61,7 +67,11 @@ class LLMClient:
             "messages": messages,
             "temperature": temperature if temperature is not None else self.temperature,
             "max_tokens": max_tokens or self.max_tokens,
+            "top_p": self.top_p,
+            "presence_penalty": self.presence_penalty,
         }
+        if self.extra_body:
+            kwargs["extra_body"] = self.extra_body
         if tools:
             kwargs["tools"] = tools
             kwargs["tool_choice"] = tool_choice

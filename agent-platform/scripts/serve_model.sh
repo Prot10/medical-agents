@@ -4,11 +4,17 @@
 #
 # Supported models:
 #   qwen3.5-9b         - Qwen3.5-9B fp16 (DEFAULT — fast, good tool calling)
-#   qwen3.5-27b-awq    - Qwen3.5-27B AWQ quantized (higher quality, slower)
-#   qwen3.5-27b-fp8    - Qwen3.5-27B FP8 (highest quality, needs most VRAM)
-#   medgemma-27b        - MedGemma-27B-Text-IT GGUF Q4 (medical specialist)
-#   medgemma-4b         - MedGemma-1.5-4B-IT (fast medical, good for iteration)
-#   openbio-8b          - OpenBioLLM-8B (fast medical baseline)
+#   qwen3.5-27b-awq    - Qwen3.5-27B AWQ via Marlin kernels (best quality)
+#   medgemma-4b         - MedGemma-1.5-4B-IT bf16 (medical specialist, fast)
+#   medgemma-27b        - MedGemma-27B-Text-IT FP8 (medical specialist, best quality)
+#
+# Performance notes:
+#   - AWQ models use awq_marlin kernels (10x faster than plain awq GEMM)
+#   - Thinking mode is ENABLED for Qwen3.5 — reasons in <think> blocks;
+#     the reasoning-parser separates thinking from visible output
+#   - --language-model-only disables the vision encoder (text-only, saves VRAM)
+#   - Prefix caching enabled for repeated system prompts
+#   - CUDA graphs enabled (default) — first run takes 1-3 min to compile
 
 set -euo pipefail
 
@@ -26,64 +32,70 @@ PORT="${2:-8000}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VLLM="$VLLM_VENV/bin/python $SCRIPT_DIR/vllm_serve.py"
 
+# Common optimized flags for single-GPU A100-40GB
+COMMON_FLAGS=(
+  --port "$PORT"
+  --gpu-memory-utilization 0.95
+  --enable-prefix-caching
+  --dtype auto
+  --max-num-seqs 4
+)
+
+# Qwen3.5-specific flags: reasoning parser + tool calling + text-only
+QWEN35_FLAGS=(
+  --reasoning-parser qwen3
+  --enable-auto-tool-choice
+  --tool-call-parser qwen3_coder
+  --language-model-only
+)
+
 echo "Starting vLLM server for model: $MODEL on port $PORT"
 
 case "$MODEL" in
   qwen3.5-9b)
     $VLLM \
       --model Qwen/Qwen3.5-9B \
-      --port "$PORT" \
-      --max-model-len 32768 \
-      --enable-auto-tool-choice \
-      --tool-call-parser qwen3_coder \
-      --gpu-memory-utilization 0.90
+      "${COMMON_FLAGS[@]}" \
+      "${QWEN35_FLAGS[@]}" \
+      --max-model-len 131072
     ;;
   qwen3.5-27b-awq)
+    # CRITICAL: use awq_marlin, NOT awq — Marlin kernels are ~10x faster
     $VLLM \
       --model QuantTrio/Qwen3.5-27B-AWQ \
-      --port "$PORT" \
+      "${COMMON_FLAGS[@]}" \
+      "${QWEN35_FLAGS[@]}" \
       --max-model-len 32768 \
-      --enable-auto-tool-choice \
-      --tool-call-parser qwen3_coder \
-      --gpu-memory-utilization 0.90 \
-      --quantization awq
-    ;;
-  qwen3.5-27b-fp8)
-    $VLLM \
-      --model Qwen/Qwen3.5-27B-FP8 \
-      --port "$PORT" \
-      --max-model-len 16384 \
-      --enable-auto-tool-choice \
-      --tool-call-parser qwen3_coder \
-      --gpu-memory-utilization 0.95
-    ;;
-  medgemma-27b)
-    $VLLM \
-      --model unsloth/medgemma-27b-text-it-GGUF:Q4_K_M \
-      --port "$PORT" \
-      --max-model-len 32768 \
-      --tokenizer google/medgemma-27b-text-it \
-      --gpu-memory-utilization 0.90
+      --quantization awq_marlin
     ;;
   medgemma-4b)
+    # MedGemma 1.5 4B — Gemma 3 based, multimodal but we use text-only
+    # 8.6 GB bf16, fits easily with plenty of KV cache room
+    # Note: MedGemma does not support native tool calling; agent falls back
+    # to text-only diagnosis without tool use
     $VLLM \
       --model google/medgemma-1.5-4b-it \
-      --port "$PORT" \
-      --max-model-len 32768 \
-      --gpu-memory-utilization 0.90
-    ;;
-  openbio-8b)
-    $VLLM \
-      --model aaditya/Llama3-OpenBioLLM-8B \
-      --port "$PORT" \
+      "${COMMON_FLAGS[@]}" \
       --max-model-len 32768 \
       --enable-auto-tool-choice \
-      --tool-call-parser hermes \
-      --gpu-memory-utilization 0.90
+      --tool-call-parser hermes
+    ;;
+  medgemma-27b)
+    # MedGemma 27B Text — Gemma 3 based, text-only, FP8 dynamic quantization
+    # 27 GB in VRAM, ~8 GB left for KV cache — limited to 8K context
+    # Note: MedGemma does not support native tool calling; agent falls back
+    # to text-only diagnosis without tool use
+    $VLLM \
+      --model ig1/medgemma-27b-text-it-FP8-Dynamic \
+      "${COMMON_FLAGS[@]}" \
+      --max-num-seqs 2 \
+      --max-model-len 8192 \
+      --enable-auto-tool-choice \
+      --tool-call-parser hermes
     ;;
   *)
     echo "Unknown model: $MODEL"
-    echo "Supported: qwen3.5-9b, qwen3.5-27b-awq, qwen3.5-27b-fp8, medgemma-27b, medgemma-4b, openbio-8b"
+    echo "Supported: qwen3.5-9b, qwen3.5-27b-awq, medgemma-4b, medgemma-27b"
     exit 1
     ;;
 esac

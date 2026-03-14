@@ -25,15 +25,15 @@ class ModelEndpoint:
 
 # Pre-configured model endpoints (match serve_model.sh)
 MODELS = {
+    "qwen3.5-9b": ModelEndpoint(
+        name="Qwen3.5-9B",
+        base_url="http://localhost:8000/v1",
+        model="Qwen/Qwen3.5-9B",
+    ),
     "qwen3.5-27b-awq": ModelEndpoint(
         name="Qwen3.5-27B-AWQ",
         base_url="http://localhost:8000/v1",
         model="QuantTrio/Qwen3.5-27B-AWQ",
-    ),
-    "qwen3.5-27b-fp8": ModelEndpoint(
-        name="Qwen3.5-27B-FP8",
-        base_url="http://localhost:8000/v1",
-        model="Qwen/Qwen3.5-27B-FP8",
     ),
     "medgemma-27b": ModelEndpoint(
         name="MedGemma-27B-Text",
