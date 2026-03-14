@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from neuroagent.agent.orchestrator import AgentConfig, AgentOrchestrator
+from neuroagent.agent.orchestrator import AgentConfig, AgentOrchestrator, _extract_assessment
 from neuroagent.agent.reasoning import AgentTrace, AgentTurn
 from neuroagent.agent.reflection import get_reflection_prompt
 from neuroagent.agent.planner import restrict_tools, get_forced_tool_order
@@ -142,3 +142,48 @@ class TestStripThinkTags:
         assert "<think>" not in result
         assert "</think>" not in result
         assert "**THINK**" in result  # ReAct THINK label should remain
+
+
+class TestExtractAssessment:
+    def test_extracts_from_reasoning(self):
+        text = (
+            "**THINK**: Some reasoning here...\n\n"
+            "**ACT**: Provide final assessment.\n\n"
+            "### Primary Diagnosis\n"
+            "Focal epilepsy (Confidence: 0.95)\n\n"
+            "### Recommendations\n"
+            "1. Start levetiracetam"
+        )
+        result = _extract_assessment(text)
+        assert result.startswith("### Primary Diagnosis")
+        assert "THINK" not in result
+        assert "Focal epilepsy" in result
+        assert "levetiracetam" in result
+
+    def test_no_structured_section_returns_full(self):
+        text = "The diagnosis is focal epilepsy with DNET."
+        result = _extract_assessment(text)
+        assert result == text
+
+    def test_empty_string(self):
+        assert _extract_assessment("") == ""
+
+    def test_preserves_all_sections(self):
+        text = (
+            "Reasoning preamble\n\n"
+            "### Primary Diagnosis\nDiag\n\n"
+            "### Differential Diagnoses\n1. Alt1\n\n"
+            "### Key Evidence\n- Finding\n\n"
+            "### Recommendations\n1. Rec\n\n"
+            "### Red Flags / Alerts\n- Alert"
+        )
+        result = _extract_assessment(text)
+        assert "### Primary Diagnosis" in result
+        assert "### Red Flags" in result
+        assert "Reasoning preamble" not in result
+
+    def test_max_turns_no_structure(self):
+        """Edge case: agent hit max turns mid-reasoning, no structured output."""
+        text = "**THINK**: I need more data but I've run out of turns..."
+        result = _extract_assessment(text)
+        assert result == text.strip()

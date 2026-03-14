@@ -7,6 +7,8 @@ import logging
 from dataclasses import dataclass, field
 from typing import Any
 
+import re
+
 from ..llm.client import LLMClient, LLMResponse
 from ..llm.prompts import load_prompt, format_tool_result
 from ..tools.base import ToolCall, ToolResult
@@ -14,6 +16,13 @@ from ..tools.tool_registry import ToolRegistry
 from .planner import restrict_tools
 from .reasoning import AgentTrace
 from .reflection import get_reflection_prompt
+
+# Regex to extract the structured assessment section from the agent's final turn.
+# Matches from the first "### Primary Diagnosis" heading to end of string.
+_ASSESSMENT_PATTERN = re.compile(
+    r"(###\s*Primary Diagnosis.*)",
+    flags=re.DOTALL,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -151,13 +160,17 @@ class AgentOrchestrator:
                     tool_calls=None,
                     token_usage=response.usage,
                 )
-                trace.set_final_response(response.content or "")
+                trace.set_final_response(
+                    _extract_assessment(response.content or "")
+                )
                 break
         else:
             # Hit max_turns without finishing
             logger.warning("Agent hit max turns (%d) without concluding.", self.config.max_turns)
+            last_content = trace.turns[-1].content if trace.turns else ""
             trace.set_final_response(
-                trace.turns[-1].content or "[Agent did not reach a conclusion within turn limit]"
+                _extract_assessment(last_content or "")
+                or "[Agent did not reach a conclusion within turn limit]"
             )
 
         # Store encounter in patient memory
@@ -201,7 +214,9 @@ class AgentOrchestrator:
             tool_calls=None,
             token_usage=response.usage,
         )
-        trace.set_final_response(response.content or "")
+        trace.set_final_response(
+            _extract_assessment(response.content or "")
+        )
         return trace
 
     def _build_initial_messages(
@@ -271,7 +286,7 @@ evidence synthesis, and structured clinical reasoning.
 - You receive a patient's initial clinical information and must determine the diagnosis \
 through sequential investigation.
 - You have access to diagnostic tools (EEG, MRI, ECG, labs, CSF analysis), medical \
-literature search, drug interaction checking, and hospital protocol checking.
+literature search, and drug interaction checking.
 - You must decide WHICH tools to call and in WHAT ORDER based on clinical reasoning.
 
 ## Reasoning Process (ReAct Loop)
@@ -324,3 +339,20 @@ When you have gathered enough information, provide your final assessment as text
 - Consider patient safety at every step — flag contraindicated actions.
 - If results are inconsistent across modalities, note the discrepancy and reason about it.
 """
+
+
+def _extract_assessment(text: str) -> str:
+    """Extract the structured clinical assessment from the agent's final turn.
+
+    The agent's last message typically contains reasoning preamble (THINK/REFLECT)
+    followed by the structured assessment (### Primary Diagnosis ...).  This
+    function extracts only the structured part for ``final_response``.
+
+    If no structured heading is found, the full text is returned as-is.
+    """
+    if not text:
+        return text
+    m = _ASSESSMENT_PATTERN.search(text)
+    if m:
+        return m.group(1).strip()
+    return text.strip()

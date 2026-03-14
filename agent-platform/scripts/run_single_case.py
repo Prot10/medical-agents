@@ -55,8 +55,12 @@ def run(
 
     # Display trace
     console.print("\n[bold]Agent Reasoning Trace[/bold]\n")
-    for turn in trace.turns:
+    for i, turn in enumerate(trace.turns):
+        is_last_turn = i == len(trace.turns) - 1
         if turn.role == "assistant" and turn.content:
+            # Skip the final concluding turn here — it's shown below as "Final Assessment"
+            if is_last_turn and not turn.tool_calls and trace.final_response:
+                continue
             console.print(Panel(turn.content, title=f"Turn {turn.turn_number} — Agent"))
         if turn.tool_calls:
             for tc in turn.tool_calls:
