@@ -24,7 +24,10 @@ class ToolRegistry:
 
     @staticmethod
     def create_default_registry(mock_server=None) -> "ToolRegistry":
-        """Create a registry with all 8 default tools."""
+        """Create a registry with all 7 default diagnostic tools.
+
+        Hospital rules are injected into the system prompt (not a tool).
+        """
         from .eeg_analyzer import EEGAnalyzerTool
         from .mri_analyzer import MRIAnalyzerTool
         from .ecg_analyzer import ECGAnalyzerTool
@@ -32,13 +35,12 @@ class ToolRegistry:
         from .csf_analyzer import CSFAnalyzerTool
         from .literature_search import LiteratureSearchTool
         from .drug_interaction import DrugInteractionTool
-        from .hospital_rules_checker import HospitalRulesCheckerTool
 
         registry = ToolRegistry()
         for tool_cls in [
             EEGAnalyzerTool, MRIAnalyzerTool, ECGAnalyzerTool,
             LabInterpreterTool, CSFAnalyzerTool, LiteratureSearchTool,
-            DrugInteractionTool, HospitalRulesCheckerTool,
+            DrugInteractionTool,
         ]:
             registry.register(tool_cls(mock_server=mock_server))
         return registry
