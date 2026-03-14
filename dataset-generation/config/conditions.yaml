@@ -1,0 +1,831 @@
+# NeuroBench Condition Specifications — Expanded Set (10 conditions)
+# Each condition defines clinical parameters, expected findings per modality,
+# and difficulty variants for case generation.
+
+focal_epilepsy_temporal:
+  name: "Focal epilepsy — temporal lobe"
+  abbreviation: "FEPI-TEMP"
+  icd_code: "G40.109"
+  description: "Focal seizures originating from the temporal lobe, often with mesial temporal sclerosis or low-grade tumors"
+  typical_demographics:
+    age_range: [18, 60]
+    sex_bias: null
+  encounter_type: "inpatient"
+  required_modalities: [EEG, MRI, LABS]
+  optional_modalities: [ECG]
+  key_findings:
+    eeg:
+      straightforward:
+        - "Right or left anterior temporal sharp waves and spikes (F7/T3 or F8/T4)"
+        - "Intermittent temporal rhythmic delta activity (TIRDA)"
+        - "Background otherwise normal with symmetric 9-10 Hz posterior dominant rhythm"
+      moderate:
+        - "Rare temporal sharp transients, morphology not clearly epileptiform"
+        - "Subtle intermittent temporal slowing, laterality uncertain"
+        - "Background mildly disorganized"
+      diagnostic_puzzle:
+        - "Normal awake EEG"
+        - "Non-specific mild diffuse slowing only"
+        - "Possible wicket spikes (benign variant mimicking pathology)"
+    mri:
+      straightforward:
+        - "Hippocampal sclerosis with volume loss and T2/FLAIR hyperintensity"
+        - "OR: Low-grade tumor (DNET or ganglioglioma) in mesial temporal structures"
+      moderate:
+        - "Subtle hippocampal asymmetry on volumetrics"
+        - "Equivocal FLAIR signal change, could be artifact"
+      diagnostic_puzzle:
+        - "Normal MRI (MRI-negative focal epilepsy)"
+        - "Incidental non-specific white matter lesions (red herring)"
+    labs:
+      all_difficulties:
+        - "Basic metabolic panel: normal"
+        - "CBC: normal"
+        - "Post-ictal prolactin may be elevated (if drawn within 20 minutes)"
+        - "Antiepileptic drug levels: not on AEDs (first presentation) or subtherapeutic"
+  differential_diagnoses:
+    - diagnosis: "Psychogenic non-epileptic seizures (PNES)"
+      key_distinguishing: "No EEG correlate, atypical semiology, eyes closed during event"
+    - diagnosis: "Syncope (vasovagal or cardiac)"
+      key_distinguishing: "Prodrome of lightheadedness, no post-ictal confusion, brief myoclonus possible"
+    - diagnosis: "Migraine with aura"
+      key_distinguishing: "Visual/sensory symptoms spread slowly (>5 min), followed by headache"
+    - diagnosis: "Transient ischemic attack"
+      key_distinguishing: "Negative symptoms (weakness, numbness), older patient, vascular risk factors"
+  difficulty_variants:
+    straightforward:
+      presentation: "Classic temporal aura (déjà vu, epigastric rising) → focal to bilateral tonic-clonic seizure, witnessed. Clear MRI lesion."
+      expected_agent_confidence: 0.85
+    moderate:
+      presentation: "Recurrent episodes of altered awareness with automatisms, no clear aura recalled. Subtle MRI finding."
+      expected_agent_confidence: 0.65
+    diagnostic_puzzle:
+      presentation: "Episodes initially diagnosed as panic attacks — sudden fear, palpitations, depersonalization. Normal MRI, initially normal EEG."
+      expected_agent_confidence: 0.40
+  common_followups:
+    - trigger_action: "request_video_eeg"
+      tool_name: "analyze_eeg"
+      description: "Prolonged video-EEG monitoring to capture habitual events"
+    - trigger_action: "request_mri_epilepsy_protocol"
+      tool_name: "analyze_brain_mri"
+      description: "3T MRI with epilepsy protocol (thin coronal cuts through temporal lobes)"
+    - trigger_action: "request_neuropsych_testing"
+      tool_name: "interpret_labs"
+      description: "Neuropsychological testing for lateralizing cognitive deficits"
+    - trigger_action: "request_pet_scan"
+      tool_name: "analyze_brain_mri"
+      description: "FDG-PET showing temporal hypometabolism"
+    - trigger_action: "request_aed_levels"
+      tool_name: "interpret_labs"
+      description: "Antiepileptic drug serum levels"
+
+ischemic_stroke:
+  name: "Acute ischemic stroke"
+  abbreviation: "ISCH-STR"
+  icd_code: "I63.9"
+  description: "Acute ischemic cerebrovascular event with focal neurological deficits"
+  typical_demographics:
+    age_range: [45, 85]
+    sex_bias: "slight_male"
+  encounter_type: "emergency"
+  required_modalities: [MRI, LABS, ECG]
+  optional_modalities: [EEG]
+  key_findings:
+    mri:
+      straightforward:
+        - "Acute diffusion restriction (DWI bright, ADC dark) in left MCA territory"
+        - "Corresponding FLAIR hyperintensity (>4.5h onset)"
+        - "MRA: left MCA M1 occlusion or severe stenosis"
+      moderate:
+        - "Small acute DWI lesion in posterior circulation (brainstem/cerebellum)"
+        - "No large vessel occlusion on MRA"
+        - "Chronic small vessel ischemic changes complicating interpretation"
+      diagnostic_puzzle:
+        - "DWI negative initially (very early presentation <1h)"
+        - "Multiple small scattered DWI lesions suggesting embolic shower"
+        - "Finding mimicked by posterior reversible encephalopathy syndrome (PRES)"
+    labs:
+      all_difficulties:
+        - "CBC: normal or mild leukocytosis"
+        - "BMP: glucose may be elevated (stress response)"
+        - "Coagulation: PT/INR, PTT — normal (rules out coagulopathy)"
+        - "Lipid panel: may show hyperlipidemia"
+        - "HbA1c: may reveal undiagnosed diabetes"
+        - "Troponin: may be mildly elevated (cardiac source)"
+    ecg:
+      straightforward:
+        - "Atrial fibrillation with rapid ventricular response — clear cardioembolic source"
+      moderate:
+        - "Normal sinus rhythm, but with left atrial enlargement"
+      diagnostic_puzzle:
+        - "Normal sinus rhythm, no arrhythmia — cryptogenic stroke"
+  differential_diagnoses:
+    - diagnosis: "Hemorrhagic stroke"
+      key_distinguishing: "CT/MRI shows hemorrhage rather than ischemia"
+    - diagnosis: "Todd's paralysis (post-ictal)"
+      key_distinguishing: "History of seizure preceding weakness, resolves within hours"
+    - diagnosis: "Hemiplegic migraine"
+      key_distinguishing: "Younger patient, migraine history, symptoms resolve completely"
+    - diagnosis: "Hypoglycemia"
+      key_distinguishing: "Low glucose, focal deficits resolve with correction"
+    - diagnosis: "Brain tumor"
+      key_distinguishing: "Subacute onset, no DWI restriction, enhancing mass on MRI"
+  difficulty_variants:
+    straightforward:
+      presentation: "Sudden onset right hemiparesis and aphasia, last known well 2 hours ago. Known atrial fibrillation, not on anticoagulation."
+      expected_agent_confidence: 0.90
+    moderate:
+      presentation: "Wake-up stroke with subtle right-sided neglect and mild dysarthria. No prior AF known. Vascular risk factors present."
+      expected_agent_confidence: 0.70
+    diagnostic_puzzle:
+      presentation: "Young patient (35yo) with acute vertigo, diplopia, and ataxia. No traditional risk factors. Posterior circulation stroke mimicking vestibular neuritis."
+      expected_agent_confidence: 0.45
+  common_followups:
+    - trigger_action: "request_ct_angiography"
+      tool_name: "analyze_brain_mri"
+      description: "CTA head and neck for vascular evaluation"
+    - trigger_action: "request_echocardiogram"
+      tool_name: "interpret_labs"
+      description: "Transthoracic or transesophageal echocardiogram"
+    - trigger_action: "request_holter_monitor"
+      tool_name: "analyze_ecg"
+      description: "24-72h Holter monitor for paroxysmal AF"
+    - trigger_action: "request_hypercoagulability_panel"
+      tool_name: "interpret_labs"
+      description: "Factor V Leiden, protein C/S, antiphospholipid antibodies"
+    - trigger_action: "request_carotid_doppler"
+      tool_name: "analyze_brain_mri"
+      description: "Carotid duplex ultrasound for stenosis"
+
+autoimmune_encephalitis_nmdar:
+  name: "Anti-NMDA receptor encephalitis"
+  abbreviation: "NMDAR-ENC"
+  icd_code: "G04.81"
+  description: "Autoimmune encephalitis mediated by antibodies against the NMDA receptor, often associated with ovarian teratoma in young women"
+  typical_demographics:
+    age_range: [18, 40]
+    sex_bias: "female_predominant"
+  encounter_type: "emergency"
+  required_modalities: [EEG, MRI, LABS, CSF]
+  optional_modalities: [ECG]
+  key_findings:
+    eeg:
+      straightforward:
+        - "Extreme delta brush (EDB) pattern — pathognomonic"
+        - "Generalized rhythmic delta activity with superimposed beta"
+        - "Electrographic seizures, often subclinical"
+      moderate:
+        - "Generalized slowing with intermittent rhythmic delta"
+        - "Possible electrographic seizures but no extreme delta brush"
+        - "Disorganized background without clear epileptiform discharges"
+      diagnostic_puzzle:
+        - "Mild diffuse slowing only"
+        - "Normal EEG early in course"
+        - "Frontal intermittent rhythmic delta activity (FIRDA) — non-specific"
+    mri:
+      straightforward:
+        - "FLAIR hyperintensity in bilateral medial temporal lobes"
+        - "Possible cortical/subcortical signal abnormality"
+      moderate:
+        - "Subtle unilateral temporal FLAIR signal, could be artifact"
+        - "No enhancement, no mass effect"
+      diagnostic_puzzle:
+        - "Normal MRI (50% of anti-NMDAR encephalitis cases have normal MRI)"
+        - "Non-specific white matter changes only"
+    labs:
+      all_difficulties:
+        - "CBC: normal or mild lymphocytosis"
+        - "BMP: may show SIADH (hyponatremia)"
+        - "Inflammatory markers: CRP mildly elevated or normal"
+        - "Thyroid function: normal (rules out Hashimoto encephalopathy)"
+    csf:
+      straightforward:
+        - "Lymphocytic pleocytosis (WBC 20-100, >90% lymphocytes)"
+        - "Elevated protein (50-100 mg/dL)"
+        - "Normal glucose"
+        - "Positive anti-NMDAR antibodies (gold standard)"
+        - "Oligoclonal bands present"
+      moderate:
+        - "Mild pleocytosis (WBC 5-20)"
+        - "Protein borderline elevated"
+        - "Anti-NMDAR antibodies pending (takes days)"
+      diagnostic_puzzle:
+        - "Near-normal CSF initially (WBC <5, normal protein)"
+        - "Antibodies not yet resulted"
+        - "Could be mistaken for primary psychiatric disorder"
+  differential_diagnoses:
+    - diagnosis: "Viral encephalitis (HSV)"
+      key_distinguishing: "Temporal lobe predilection, fever, CSF HSV PCR positive, more acute"
+    - diagnosis: "Primary psychiatric disorder (first-break psychosis)"
+      key_distinguishing: "No seizures, no movement disorder, no autonomic instability, normal EEG"
+    - diagnosis: "Neuroleptic malignant syndrome"
+      key_distinguishing: "Exposure to antipsychotics, rigidity, very high CK, high fever"
+    - diagnosis: "CNS vasculitis"
+      key_distinguishing: "Vessel irregularities on angiography, multifocal strokes"
+    - diagnosis: "Hashimoto encephalopathy"
+      key_distinguishing: "Anti-TPO antibodies, thyroid dysfunction, responds to steroids"
+  difficulty_variants:
+    straightforward:
+      presentation: "24-year-old woman with subacute personality change, new-onset seizures, orofacial dyskinesias, and autonomic instability over 2 weeks. Viral prodrome."
+      expected_agent_confidence: 0.80
+    moderate:
+      presentation: "28-year-old woman with progressive confusion, insomnia, and one witnessed seizure over 3 weeks. Initially treated as psychiatric."
+      expected_agent_confidence: 0.55
+    diagnostic_puzzle:
+      presentation: "22-year-old woman brought by family for 'bizarre behavior' — paranoia, social withdrawal, insomnia for 1 week. No seizures yet. Appears psychiatric."
+      expected_agent_confidence: 0.30
+  common_followups:
+    - trigger_action: "request_nmdar_antibodies"
+      tool_name: "interpret_labs"
+      description: "Serum and CSF anti-NMDAR antibody panel"
+    - trigger_action: "request_pelvic_ultrasound"
+      tool_name: "interpret_labs"
+      description: "Pelvic ultrasound to rule out ovarian teratoma"
+    - trigger_action: "request_autoimmune_panel"
+      tool_name: "interpret_labs"
+      description: "Comprehensive autoimmune encephalitis antibody panel (LGI1, CASPR2, GABA-B, AMPA)"
+    - trigger_action: "request_ct_chest_abdomen_pelvis"
+      tool_name: "analyze_brain_mri"
+      description: "CT body for paraneoplastic workup"
+    - trigger_action: "request_repeat_lp"
+      tool_name: "analyze_csf"
+      description: "Repeat lumbar puncture if initial was early/equivocal"
+
+alzheimers_early:
+  name: "Early-stage Alzheimer's disease"
+  abbreviation: "ALZ-EARLY"
+  icd_code: "G30.0"
+  description: "Neurodegenerative dementia presenting with progressive episodic memory loss, typically in older adults"
+  typical_demographics:
+    age_range: [60, 85]
+    sex_bias: "slight_female"
+  encounter_type: "outpatient"
+  required_modalities: [MRI, LABS]
+  optional_modalities: [EEG, CSF]
+  key_findings:
+    mri:
+      straightforward:
+        - "Bilateral hippocampal atrophy (Scheltens grade 2-3)"
+        - "Medial temporal lobe volume loss on coronal images"
+        - "Mild diffuse cortical atrophy, temporoparietal predominant"
+        - "No acute infarcts, no mass lesions"
+      moderate:
+        - "Mild hippocampal atrophy (Scheltens grade 1-2), could be age-related"
+        - "Subtle temporoparietal volume loss"
+        - "Some periventricular white matter changes (vascular vs degenerative)"
+      diagnostic_puzzle:
+        - "Age-appropriate brain volume for stated age"
+        - "Prominent white matter disease suggesting vascular contribution"
+        - "Posterior-predominant atrophy (atypical AD — posterior cortical atrophy variant)"
+    labs:
+      all_difficulties:
+        - "CBC: normal"
+        - "BMP: normal"
+        - "Thyroid function (TSH): normal (rules out hypothyroid dementia)"
+        - "Vitamin B12: normal or low-normal"
+        - "Folate: normal"
+        - "RPR/VDRL: non-reactive (rules out neurosyphilis)"
+        - "HIV: negative"
+    eeg:
+      straightforward:
+        - "Slowed posterior dominant rhythm (7-8 Hz instead of 9-10 Hz)"
+        - "Increased theta activity diffusely"
+      moderate:
+        - "Borderline PDR at 8 Hz"
+        - "Mild excess theta, could be drowsiness"
+      diagnostic_puzzle:
+        - "Normal EEG (early stage)"
+    csf:
+      straightforward:
+        - "Decreased Aβ42 (< 500 pg/mL)"
+        - "Elevated phospho-tau (> 60 pg/mL)"
+        - "Elevated total tau (> 400 pg/mL)"
+        - "Aβ42/40 ratio decreased"
+      moderate:
+        - "Borderline Aβ42 levels"
+        - "Mildly elevated tau"
+      diagnostic_puzzle:
+        - "CSF not yet performed"
+        - "If done: equivocal biomarkers"
+  differential_diagnoses:
+    - diagnosis: "Normal aging / subjective cognitive decline"
+      key_distinguishing: "Neuropsych testing normal, no functional impairment"
+    - diagnosis: "Vascular dementia"
+      key_distinguishing: "Stepwise decline, prominent executive dysfunction, vascular risk factors, white matter disease"
+    - diagnosis: "Depression (pseudodementia)"
+      key_distinguishing: "Rapid onset, prominent mood symptoms, effort-dependent poor performance"
+    - diagnosis: "Frontotemporal dementia"
+      key_distinguishing: "Personality/behavior changes predominate, relatively preserved memory early"
+    - diagnosis: "Lewy body dementia"
+      key_distinguishing: "Visual hallucinations, parkinsonism, REM sleep behavior disorder, fluctuations"
+  difficulty_variants:
+    straightforward:
+      presentation: "72-year-old retired teacher with 2-year progressive memory decline. Forgets recent conversations, repeats questions. Family confirms functional decline. MMSE 22/30."
+      expected_agent_confidence: 0.80
+    moderate:
+      presentation: "68-year-old with subjective memory complaints for 1 year. Some word-finding difficulty. Still managing finances and driving. MMSE 26/30."
+      expected_agent_confidence: 0.55
+    diagnostic_puzzle:
+      presentation: "65-year-old presenting with progressive difficulty reading and navigating (posterior cortical atrophy variant). Memory relatively preserved. No typical AD presentation."
+      expected_agent_confidence: 0.35
+  common_followups:
+    - trigger_action: "request_neuropsych_testing"
+      tool_name: "interpret_labs"
+      description: "Comprehensive neuropsychological battery"
+    - trigger_action: "request_amyloid_pet"
+      tool_name: "analyze_brain_mri"
+      description: "Amyloid PET scan (florbetapir/florbetaben)"
+    - trigger_action: "request_fdg_pet"
+      tool_name: "analyze_brain_mri"
+      description: "FDG-PET showing temporoparietal hypometabolism"
+    - trigger_action: "request_csf_biomarkers"
+      tool_name: "analyze_csf"
+      description: "CSF Aβ42, phospho-tau, total tau"
+    - trigger_action: "request_genetic_testing"
+      tool_name: "interpret_labs"
+      description: "APOE genotyping, consider early-onset panel if <65"
+
+syncope_cardiac:
+  name: "Cardiac syncope"
+  abbreviation: "SYNC-CARD"
+  icd_code: "R55"
+  description: "Transient loss of consciousness due to cardiac arrhythmia or structural heart disease, often misdiagnosed as seizure"
+  typical_demographics:
+    age_range: [50, 80]
+    sex_bias: "slight_male"
+  encounter_type: "emergency"
+  required_modalities: [ECG, LABS, EEG]
+  optional_modalities: [MRI]
+  key_findings:
+    ecg:
+      straightforward:
+        - "Complete heart block (third-degree AV block) with ventricular escape rhythm at 35 bpm"
+        - "OR: Prolonged QTc >500ms"
+        - "OR: Brugada pattern (coved ST elevation V1-V3)"
+      moderate:
+        - "Second-degree AV block (Mobitz type II)"
+        - "OR: Bifascicular block (RBBB + left anterior fascicular block)"
+        - "Borderline QTc prolongation (480-500ms)"
+      diagnostic_puzzle:
+        - "Normal sinus rhythm on initial ECG"
+        - "Intermittent PVCs only"
+        - "Arrhythmia not captured (paroxysmal)"
+    labs:
+      all_difficulties:
+        - "CBC: normal"
+        - "BMP: electrolytes normal (rules out metabolic cause)"
+        - "Glucose: normal"
+        - "Troponin: normal or mildly elevated"
+        - "BNP: may be elevated if underlying heart failure"
+    eeg:
+      all_difficulties:
+        - "Normal EEG — no epileptiform abnormalities"
+        - "Normal background, normal posterior dominant rhythm"
+        - "No seizures captured during monitoring"
+    mri:
+      all_difficulties:
+        - "Normal brain MRI (if performed)"
+        - "No acute intracranial pathology"
+  differential_diagnoses:
+    - diagnosis: "Epileptic seizure"
+      key_distinguishing: "Epileptiform EEG, post-ictal confusion >5min, tongue bite, urinary incontinence"
+    - diagnosis: "Vasovagal syncope"
+      key_distinguishing: "Clear trigger (pain, prolonged standing, emotional), prodrome, young patient"
+    - diagnosis: "Orthostatic hypotension"
+      key_distinguishing: "Reproducible on tilt table, occurs on standing, medications (antihypertensives)"
+    - diagnosis: "Transient ischemic attack"
+      key_distinguishing: "Focal neurological symptoms, no LOC typically, vascular risk factors"
+    - diagnosis: "Psychogenic non-epileptic seizures"
+      key_distinguishing: "Eyes closed, prolonged, variable semiology, psychiatric comorbidity"
+  difficulty_variants:
+    straightforward:
+      presentation: "70-year-old man found on floor after witnessed syncopal episode. No seizure-like activity. No post-ictal confusion. History of palpitations. ECG shows complete heart block."
+      expected_agent_confidence: 0.85
+    moderate:
+      presentation: "62-year-old with recurrent episodes of sudden LOC without warning. Brief convulsive movements witnessed (convulsive syncope). On antihypertensives. ECG shows bifascicular block."
+      expected_agent_confidence: 0.60
+    diagnostic_puzzle:
+      presentation: "55-year-old with two episodes of LOC with 'shaking' — referred as 'new-onset seizures.' Episodes triggered by exertion. Normal initial ECG. Family history of sudden cardiac death."
+      expected_agent_confidence: 0.40
+  common_followups:
+    - trigger_action: "request_echocardiogram"
+      tool_name: "interpret_labs"
+      description: "Transthoracic echocardiogram for structural heart disease"
+    - trigger_action: "request_holter_monitor"
+      tool_name: "analyze_ecg"
+      description: "24-72h Holter or event monitor"
+    - trigger_action: "request_tilt_table"
+      tool_name: "interpret_labs"
+      description: "Tilt table testing for vasovagal mechanism"
+    - trigger_action: "request_exercise_stress_test"
+      tool_name: "analyze_ecg"
+      description: "Exercise stress test if exertional syncope"
+    - trigger_action: "request_cardiac_mri"
+      tool_name: "analyze_brain_mri"
+      description: "Cardiac MRI for structural evaluation (ARVC, HCM)"
+
+multiple_sclerosis:
+  name: "Multiple sclerosis — relapsing-remitting"
+  abbreviation: "MS-RR"
+  icd_code: "G35"
+  description: "Autoimmune demyelinating disease of the CNS with relapsing-remitting course, presenting with disseminated neurological symptoms"
+  typical_demographics:
+    age_range: [20, 45]
+    sex_bias: "female_predominant"
+  encounter_type: "inpatient"
+  required_modalities: [MRI, LABS, CSF]
+  optional_modalities: [EEG, ECG]
+  key_findings:
+    mri:
+      straightforward:
+        - "Multiple periventricular ovoid T2/FLAIR hyperintense lesions (Dawson fingers)"
+        - "At least one gadolinium-enhancing lesion (active inflammation)"
+        - "Juxtacortical and infratentorial lesions present"
+        - "Spinal cord lesion on sagittal imaging"
+        - "Meets McDonald 2017 criteria for DIS and DIT"
+      moderate:
+        - "Several non-specific white matter lesions, some periventricular"
+        - "No definite Dawson fingers morphology"
+        - "Single enhancing lesion, borderline size"
+        - "No clear spinal cord involvement on initial imaging"
+      diagnostic_puzzle:
+        - "Few scattered white matter lesions that could be vascular"
+        - "No enhancement (monophasic presentation)"
+        - "Findings overlap with migraine-related white matter changes"
+        - "Lesion distribution atypical (mostly subcortical)"
+    labs:
+      all_difficulties:
+        - "CBC: normal"
+        - "BMP: normal"
+        - "ANA: negative or low-titer positive (nonspecific)"
+        - "Vitamin B12: normal"
+        - "NMO-IgG (aquaporin-4 antibodies): negative"
+        - "MOG antibodies: negative"
+        - "ESR/CRP: usually normal"
+    csf:
+      straightforward:
+        - "Oligoclonal bands present (>=2 unique to CSF)"
+        - "Elevated IgG index (>0.7)"
+        - "Mild lymphocytic pleocytosis (5-25 cells)"
+        - "Normal glucose, mildly elevated protein"
+      moderate:
+        - "Oligoclonal bands present but only 2 bands"
+        - "IgG index borderline (0.6-0.7)"
+        - "Normal cell count"
+      diagnostic_puzzle:
+        - "No oligoclonal bands (occurs in ~5-10% of MS)"
+        - "Normal IgG index"
+        - "CSF entirely normal"
+  differential_diagnoses:
+    - diagnosis: "Neuromyelitis optica spectrum disorder (NMOSD)"
+      key_distinguishing: "AQP4 antibodies positive, longitudinally extensive transverse myelitis, optic neuritis predominant"
+    - diagnosis: "MOG antibody disease (MOGAD)"
+      key_distinguishing: "MOG antibodies positive, optic neuritis with disc edema, better recovery"
+    - diagnosis: "CNS vasculitis"
+      key_distinguishing: "Angiography abnormal, CSF pleocytosis, enhancing lesions in non-typical MS locations"
+    - diagnosis: "Migraine with white matter lesions"
+      key_distinguishing: "Lesions subcortical not periventricular, no enhancement, no CSF abnormalities"
+    - diagnosis: "Neurosarcoidosis"
+      key_distinguishing: "Leptomeningeal enhancement, elevated ACE, pulmonary findings"
+  difficulty_variants:
+    straightforward:
+      presentation: "28-year-old woman with acute optic neuritis (painful vision loss) and prior episode of limb numbness 6 months ago. Classic MRI and CSF."
+      expected_agent_confidence: 0.85
+    moderate:
+      presentation: "33-year-old woman with subacute bilateral leg weakness and urinary urgency. First clinical event but MRI suggests prior subclinical lesions."
+      expected_agent_confidence: 0.60
+    diagnostic_puzzle:
+      presentation: "25-year-old woman with episodic vertigo and fatigue. Non-specific white matter lesions on MRI. Symptoms attributed to anxiety and migraine."
+      expected_agent_confidence: 0.35
+  common_followups:
+    - trigger_action: "request_vep"
+      tool_name: "interpret_labs"
+      description: "Visual evoked potentials showing prolonged P100 latency"
+    - trigger_action: "request_spine_mri"
+      tool_name: "analyze_brain_mri"
+      description: "MRI cervical and thoracic spine with contrast"
+    - trigger_action: "request_oct"
+      tool_name: "interpret_labs"
+      description: "Optical coherence tomography showing RNFL thinning"
+    - trigger_action: "request_nmo_antibodies"
+      tool_name: "interpret_labs"
+      description: "Aquaporin-4 and MOG antibody testing"
+    - trigger_action: "request_repeat_mri_3months"
+      tool_name: "analyze_brain_mri"
+      description: "Follow-up MRI at 3 months to assess new lesion activity"
+
+bacterial_meningitis:
+  name: "Acute bacterial meningitis"
+  abbreviation: "BACT-MEN"
+  icd_code: "G00.9"
+  description: "Acute bacterial infection of the meninges, a neurological emergency requiring immediate empiric antibiotics"
+  typical_demographics:
+    age_range: [18, 70]
+    sex_bias: null
+  encounter_type: "emergency"
+  required_modalities: [LABS, CSF, MRI]
+  optional_modalities: [EEG, ECG]
+  key_findings:
+    csf:
+      straightforward:
+        - "Turbid/cloudy appearance"
+        - "Opening pressure elevated (>25 cmH2O)"
+        - "WBC 1000-5000, >90% neutrophils"
+        - "Protein markedly elevated (>200 mg/dL)"
+        - "Glucose very low (<20 mg/dL), ratio <0.4"
+        - "Gram stain positive (gram-positive diplococci = pneumococcus)"
+        - "CSF culture: Streptococcus pneumoniae"
+      moderate:
+        - "Mildly turbid CSF"
+        - "WBC 200-500, 70% neutrophils, 30% lymphocytes"
+        - "Protein 100-200 mg/dL"
+        - "Glucose 30-40 mg/dL (borderline)"
+        - "Gram stain negative (partially treated)"
+        - "CSF culture pending"
+      diagnostic_puzzle:
+        - "Clear CSF (early presentation or partially treated)"
+        - "WBC 50-100, mixed pleocytosis"
+        - "Protein mildly elevated (60-100 mg/dL)"
+        - "Glucose low-normal"
+        - "Gram stain negative, culture negative (prior antibiotics)"
+    labs:
+      all_difficulties:
+        - "CBC: leukocytosis with left shift (WBC 15-25K, >80% neutrophils)"
+        - "BMP: possible hyponatremia (SIADH)"
+        - "CRP: markedly elevated (>100 mg/L)"
+        - "Procalcitonin: elevated (>2 ng/mL)"
+        - "Coagulation: may show DIC (elevated PT/INR, low fibrinogen, elevated D-dimer)"
+        - "Blood cultures: positive in 50-70% of cases"
+        - "Lactate: elevated"
+    mri:
+      straightforward:
+        - "Diffuse leptomeningeal enhancement on post-contrast T1"
+        - "Possible subdural empyema or cerebritis"
+        - "Restricted diffusion in sulci (pus)"
+      moderate:
+        - "Subtle leptomeningeal enhancement"
+        - "No complications (no empyema, no infarcts)"
+      diagnostic_puzzle:
+        - "Normal MRI (early presentation)"
+        - "Subtle enhancement that could be post-LP artifact"
+  differential_diagnoses:
+    - diagnosis: "Viral meningitis"
+      key_distinguishing: "Lymphocytic pleocytosis, normal glucose, less toxic-appearing"
+    - diagnosis: "Viral encephalitis (HSV)"
+      key_distinguishing: "Temporal lobe involvement on MRI, seizures, personality change"
+    - diagnosis: "Subarachnoid hemorrhage"
+      key_distinguishing: "Sudden thunderclap headache, xanthochromia, RBCs in CSF"
+    - diagnosis: "Tuberculous meningitis"
+      key_distinguishing: "Subacute course, basilar enhancement, very low glucose, lymphocytic"
+    - diagnosis: "Fungal meningitis (cryptococcal)"
+      key_distinguishing: "Immunocompromised, subacute, positive India ink or CrAg"
+  difficulty_variants:
+    straightforward:
+      presentation: "45-year-old with acute onset severe headache, fever 39.5°C, neck stiffness, photophobia, and altered mental status over 12 hours. Classic meningeal signs."
+      expected_agent_confidence: 0.90
+    moderate:
+      presentation: "55-year-old post-splenectomy patient with headache, low-grade fever, and confusion over 24 hours. Partially treated with oral amoxicillin by PCP before presentation."
+      expected_agent_confidence: 0.65
+    diagnostic_puzzle:
+      presentation: "35-year-old with 3-day headache, mild neck stiffness, and subjective fevers. Afebrile in ED. Recent URI. Lumbar puncture shows mixed pleocytosis — viral vs early bacterial unclear."
+      expected_agent_confidence: 0.40
+  common_followups:
+    - trigger_action: "request_repeat_lp"
+      tool_name: "analyze_csf"
+      description: "Repeat LP at 48h to assess treatment response"
+    - trigger_action: "request_ct_head"
+      tool_name: "analyze_brain_mri"
+      description: "CT head before LP if focal deficits or papilledema"
+    - trigger_action: "request_blood_cultures"
+      tool_name: "interpret_labs"
+      description: "Blood cultures drawn before antibiotics"
+    - trigger_action: "request_pcr_panel"
+      tool_name: "interpret_labs"
+      description: "CSF meningitis/encephalitis PCR panel (FilmArray)"
+    - trigger_action: "request_audiometry"
+      tool_name: "interpret_labs"
+      description: "Audiometry to assess for sensorineural hearing loss (complication)"
+
+parkinsons:
+  name: "Parkinson's disease"
+  abbreviation: "PD"
+  icd_code: "G20"
+  description: "Neurodegenerative movement disorder characterized by asymmetric resting tremor, rigidity, bradykinesia, and postural instability"
+  typical_demographics:
+    age_range: [55, 80]
+    sex_bias: "slight_male"
+  encounter_type: "outpatient"
+  required_modalities: [MRI, LABS]
+  optional_modalities: [EEG, ECG]
+  key_findings:
+    mri:
+      straightforward:
+        - "Normal brain MRI for age (supports PD — no structural cause for parkinsonism)"
+        - "No vascular parkinsonism (no basal ganglia infarcts)"
+        - "No NPH features (no ventriculomegaly out of proportion to sulcal atrophy)"
+        - "Possible mild age-appropriate atrophy"
+      moderate:
+        - "Normal MRI but with some periventricular white matter changes"
+        - "Subtle ventricular enlargement (raises NPH differential)"
+      diagnostic_puzzle:
+        - "Cerebellar or pontine atrophy (suggesting MSA-C)"
+        - "OR: symmetric putaminal atrophy (suggesting MSA-P)"
+        - "OR: midbrain atrophy with hummingbird sign (suggesting PSP)"
+    labs:
+      all_difficulties:
+        - "CBC: normal"
+        - "BMP: normal"
+        - "Thyroid function: normal (rules out hypothyroid-related slowness)"
+        - "Ceruloplasmin: normal (rules out Wilson disease if age <50)"
+        - "Vitamin B12: normal"
+        - "RPR: negative"
+  differential_diagnoses:
+    - diagnosis: "Essential tremor"
+      key_distinguishing: "Action/postural tremor (not resting), bilateral, no rigidity/bradykinesia, FH positive"
+    - diagnosis: "Drug-induced parkinsonism"
+      key_distinguishing: "Symmetric, exposure to dopamine blockers (metoclopramide, antipsychotics)"
+    - diagnosis: "Multiple system atrophy (MSA)"
+      key_distinguishing: "Early autonomic failure, cerebellar signs, poor levodopa response, rapid progression"
+    - diagnosis: "Progressive supranuclear palsy (PSP)"
+      key_distinguishing: "Vertical gaze palsy, early falls, axial rigidity > limb, poor levodopa response"
+    - diagnosis: "Normal pressure hydrocephalus (NPH)"
+      key_distinguishing: "Gait apraxia (magnetic gait), urinary incontinence, dementia, ventriculomegaly"
+  difficulty_variants:
+    straightforward:
+      presentation: "65-year-old man with 2-year progressive right hand resting tremor, shuffling gait, and micrographia. Exam shows asymmetric cogwheel rigidity and bradykinesia."
+      expected_agent_confidence: 0.85
+    moderate:
+      presentation: "70-year-old man with 1-year gait instability and bilateral mild bradykinesia. No clear resting tremor. On metoclopramide for gastroparesis (confounding)."
+      expected_agent_confidence: 0.55
+    diagnostic_puzzle:
+      presentation: "60-year-old with symmetric parkinsonism, early postural instability, and orthostatic hypotension. Poor response to levodopa trial. Could be MSA or PSP."
+      expected_agent_confidence: 0.35
+  common_followups:
+    - trigger_action: "request_datscan"
+      tool_name: "analyze_brain_mri"
+      description: "DaTscan (dopamine transporter SPECT) showing reduced striatal uptake"
+    - trigger_action: "request_levodopa_challenge"
+      tool_name: "interpret_labs"
+      description: "Levodopa challenge test — response supports PD diagnosis"
+    - trigger_action: "request_autonomic_testing"
+      tool_name: "interpret_labs"
+      description: "Autonomic reflex testing (tilt table, QSART, thermoregulatory sweat test)"
+    - trigger_action: "request_neuropsych_testing"
+      tool_name: "interpret_labs"
+      description: "Neuropsychological testing for cognitive involvement"
+    - trigger_action: "request_sleep_study"
+      tool_name: "interpret_labs"
+      description: "Polysomnography to evaluate for REM sleep behavior disorder"
+
+brain_tumor_glioma:
+  name: "Brain tumor — high-grade glioma (GBM)"
+  abbreviation: "GLIO-HG"
+  icd_code: "C71.9"
+  description: "High-grade primary brain tumor (glioblastoma) presenting with progressive neurological symptoms, seizures, or signs of elevated intracranial pressure"
+  typical_demographics:
+    age_range: [45, 75]
+    sex_bias: "slight_male"
+  encounter_type: "inpatient"
+  required_modalities: [MRI, LABS, EEG]
+  optional_modalities: [ECG]
+  key_findings:
+    mri:
+      straightforward:
+        - "Large heterogeneously enhancing mass with central necrosis (ring-enhancing)"
+        - "Surrounding vasogenic edema with mass effect"
+        - "Midline shift"
+        - "Location: frontal or temporal lobe (most common)"
+        - "Restricted diffusion at enhancing rim (high cellularity)"
+        - "Elevated CBV on perfusion imaging"
+      moderate:
+        - "Irregular enhancing mass without classic ring pattern"
+        - "Moderate surrounding edema"
+        - "Minimal mass effect"
+        - "Location in eloquent cortex complicating surgical planning"
+      diagnostic_puzzle:
+        - "Non-enhancing infiltrative lesion (low-grade appearing but actually high-grade)"
+        - "Multifocal lesions mimicking metastases or CNS lymphoma"
+        - "OR: ring-enhancing lesion mimicking abscess or demyelination"
+    eeg:
+      straightforward:
+        - "Focal slowing over the tumor region (continuous polymorphic delta)"
+        - "Possible epileptiform discharges in peri-tumoral cortex"
+        - "Background asymmetry"
+      moderate:
+        - "Regional slowing, less well-localized"
+        - "No clear epileptiform discharges"
+      diagnostic_puzzle:
+        - "Generalized slowing without clear focal features"
+        - "OR: Focal findings contralateral to the lesion (false lateralization)"
+    labs:
+      all_difficulties:
+        - "CBC: normal"
+        - "BMP: normal"
+        - "Coagulation: normal (pre-surgical baseline)"
+        - "LDH: may be mildly elevated"
+        - "Liver and renal function: normal (baseline for chemotherapy)"
+  differential_diagnoses:
+    - diagnosis: "Brain metastasis"
+      key_distinguishing: "Multiple lesions at gray-white junction, known primary cancer, more spherical"
+    - diagnosis: "Brain abscess"
+      key_distinguishing: "Restricted diffusion centrally (pus), ring enhancement thin and smooth, fever, elevated WBC"
+    - diagnosis: "CNS lymphoma"
+      key_distinguishing: "Homogeneous enhancement, periventricular, immunocompromised, resolves with steroids"
+    - diagnosis: "Tumefactive demyelination"
+      key_distinguishing: "Open ring enhancement, young patient, less mass effect for size, MS history"
+    - diagnosis: "Low-grade glioma"
+      key_distinguishing: "Non-enhancing, slower growth, younger patient, FLAIR bright without necrosis"
+  difficulty_variants:
+    straightforward:
+      presentation: "58-year-old man with 3-week progressive headache, left arm weakness, and a new-onset seizure. CT shows a large right frontal mass with midline shift."
+      expected_agent_confidence: 0.90
+    moderate:
+      presentation: "52-year-old woman with 2-month personality change and word-finding difficulty. MRI shows an irregular left temporal enhancing lesion without classic necrosis."
+      expected_agent_confidence: 0.65
+    diagnostic_puzzle:
+      presentation: "48-year-old with new seizures. MRI shows a ring-enhancing lesion — could be GBM, abscess, or tumefactive MS. Recent dental infection adds confusion."
+      expected_agent_confidence: 0.40
+  common_followups:
+    - trigger_action: "request_mri_perfusion"
+      tool_name: "analyze_brain_mri"
+      description: "MRI perfusion showing elevated rCBV in enhancing rim"
+    - trigger_action: "request_mr_spectroscopy"
+      tool_name: "analyze_brain_mri"
+      description: "MR spectroscopy showing elevated choline, reduced NAA, lipid/lactate peak"
+    - trigger_action: "request_ct_chest_abdomen"
+      tool_name: "interpret_labs"
+      description: "CT chest/abdomen/pelvis to rule out primary cancer (metastasis workup)"
+    - trigger_action: "request_stereotactic_biopsy"
+      tool_name: "interpret_labs"
+      description: "Stereotactic biopsy with IDH, MGMT, 1p/19q molecular testing"
+    - trigger_action: "request_functional_mri"
+      tool_name: "analyze_brain_mri"
+      description: "fMRI for pre-surgical language/motor mapping"
+
+functional_neurological_disorder:
+  name: "Functional neurological disorder (conversion disorder)"
+  abbreviation: "FND"
+  icd_code: "F44.4"
+  description: "Neurological symptoms (weakness, tremor, seizures) not explained by organic disease, diagnosed by positive clinical signs, not by exclusion"
+  typical_demographics:
+    age_range: [20, 50]
+    sex_bias: "female_predominant"
+  encounter_type: "inpatient"
+  required_modalities: [EEG, MRI, LABS]
+  optional_modalities: [ECG, EMG_NCS]
+  key_findings:
+    eeg:
+      all_difficulties:
+        - "Normal EEG throughout, including during clinical events"
+        - "No epileptiform abnormalities"
+        - "Normal background, symmetric posterior dominant rhythm"
+        - "If events captured: no EEG change during clinical seizure-like episode (psychogenic non-epileptic seizure)"
+    mri:
+      all_difficulties:
+        - "Normal brain MRI"
+        - "No structural lesion explaining symptoms"
+        - "No evidence of stroke, demyelination, or mass"
+    labs:
+      all_difficulties:
+        - "CBC: normal"
+        - "BMP: normal"
+        - "Thyroid function: normal"
+        - "Post-event prolactin: NOT elevated (distinguishes from epileptic seizure)"
+        - "All screening labs normal"
+  differential_diagnoses:
+    - diagnosis: "Epileptic seizures"
+      key_distinguishing: "EEG correlate during event, stereotyped semiology, post-ictal confusion, elevated prolactin"
+    - diagnosis: "Multiple sclerosis"
+      key_distinguishing: "MRI white matter lesions, CSF oligoclonal bands, clinical dissemination"
+    - diagnosis: "Myasthenia gravis"
+      key_distinguishing: "Fatigable weakness, ptosis, diplopia, positive AChR antibodies, decremental response on RNS"
+    - diagnosis: "Stroke/TIA"
+      key_distinguishing: "Acute onset, vascular territory distribution, DWI restriction on MRI"
+    - diagnosis: "Early Parkinson's disease"
+      key_distinguishing: "Rest tremor, cogwheel rigidity, bradykinesia, asymmetric, progressive"
+  difficulty_variants:
+    straightforward:
+      presentation: "28-year-old woman with acute-onset right leg weakness and non-epileptic seizures captured on video-EEG. Hoover sign positive. Give-way weakness on exam. Recent psychosocial stressor."
+      expected_agent_confidence: 0.80
+    moderate:
+      presentation: "35-year-old woman with intermittent whole-body tremor and episodes of unresponsiveness. Some features overlap with epilepsy. Previous normal EEG but no events captured."
+      expected_agent_confidence: 0.55
+    diagnostic_puzzle:
+      presentation: "40-year-old woman with progressive bilateral leg weakness over weeks, wheelchair-bound. No clear positive functional signs initially. Extensive negative workup. Past history of fibromyalgia and chronic pain."
+      expected_agent_confidence: 0.35
+  common_followups:
+    - trigger_action: "request_video_eeg"
+      tool_name: "analyze_eeg"
+      description: "Prolonged video-EEG capturing habitual events with no EEG correlate"
+    - trigger_action: "request_emg_ncs"
+      tool_name: "interpret_labs"
+      description: "EMG/NCS showing normal motor and sensory conduction (rules out neuropathy/myopathy)"
+    - trigger_action: "request_spine_mri"
+      tool_name: "analyze_brain_mri"
+      description: "MRI cervical/thoracic spine — normal (rules out myelopathy)"
+    - trigger_action: "request_neuropsych_testing"
+      tool_name: "interpret_labs"
+      description: "Neuropsychological testing for comorbid cognitive complaints"
+    - trigger_action: "request_psychiatric_evaluation"
+      tool_name: "interpret_labs"
+      description: "Formal psychiatric evaluation for comorbid anxiety, depression, trauma history"
