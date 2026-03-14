@@ -1,0 +1,143 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Google Fonts loaded via index.html */
+
+@theme {
+  --color-background: #f8f7f4;
+  --color-foreground: #1a1a1a;
+  --color-card: #ffffff;
+  --color-card-foreground: #1a1a1a;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #1a1a1a;
+  --color-primary: #2563eb;
+  --color-primary-foreground: #f8fafc;
+  --color-secondary: #f0eeeb;
+  --color-secondary-foreground: #1a1a1a;
+  --color-muted: #f0eeeb;
+  --color-muted-foreground: #71717a;
+  --color-accent: #f0eeeb;
+  --color-accent-foreground: #1a1a1a;
+  --color-destructive: #dc2626;
+  --color-destructive-foreground: #f8fafc;
+  --color-border: #e4e2de;
+  --color-input: #e4e2de;
+  --color-ring: #2563eb;
+  --radius: 0.5rem;
+
+  /* Semantic tool colors */
+  --color-thinking: #6366f1;
+  --color-tool-call: #8b5cf6;
+  --color-tool-result: #059669;
+  --color-reflection: #d97706;
+  --color-assessment: #047857;
+}
+
+.dark {
+  --color-background: #0c0c0e;
+  --color-foreground: #e4e4e7;
+  --color-card: #121215;
+  --color-card-foreground: #e4e4e7;
+  --color-popover: #18181b;
+  --color-popover-foreground: #e4e4e7;
+  --color-primary: #818cf8;
+  --color-primary-foreground: #0c0c0e;
+  --color-secondary: #1c1c21;
+  --color-secondary-foreground: #e4e4e7;
+  --color-muted: #1c1c21;
+  --color-muted-foreground: #71717a;
+  --color-accent: #1c1c21;
+  --color-accent-foreground: #e4e4e7;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #fafafa;
+  --color-border: #27272a;
+  --color-input: #27272a;
+  --color-ring: #818cf8;
+
+  --color-thinking: #a5b4fc;
+  --color-tool-call: #c4b5fd;
+  --color-tool-result: #6ee7b7;
+  --color-reflection: #fbbf24;
+  --color-assessment: #34d399;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--color-muted-foreground); }
+
+/* Markdown prose in timeline */
+.prose h3 { font-size: 0.9rem; font-weight: 600; margin: 0.6em 0 0.2em; letter-spacing: -0.01em; }
+.prose h4 { font-size: 0.8rem; font-weight: 600; margin: 0.5em 0 0.15em; }
+.prose p { margin: 0 0 0.4em; line-height: 1.55; }
+.prose ul, .prose ol { margin: 0 0 0.4em 1em; padding: 0; }
+.prose li { margin-bottom: 0.15em; }
+.prose strong { font-weight: 600; }
+.prose code {
+  background: var(--color-muted);
+  padding: 0.1em 0.35em;
+  border-radius: 0.2rem;
+  font-size: 0.82em;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* Glow animation for running state */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+  50% { box-shadow: 0 0 12px 2px rgba(99, 102, 241, 0.15); }
+}
+.glow-pulse { animation: glow-pulse 2s ease-in-out infinite; }
+
+/* Timeline connector line */
+.timeline-line {
+  position: relative;
+}
+.timeline-line::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--color-border);
+}
+
+/* Smooth expand/collapse */
+.expandable-content {
+  overflow: hidden;
+  transition: max-height 0.2s ease-out, opacity 0.15s ease-out;
+}
+
+/* Subtle noise texture for dark mode depth */
+.dark .noise-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
