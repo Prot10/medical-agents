@@ -6,6 +6,7 @@ import { PatientViewer } from "@/components/patient/PatientViewer"
 import { AgentTimeline } from "@/components/agent/AgentTimeline"
 import { OraclePanel } from "@/components/agent/OraclePanel"
 import { DatasetDashboard } from "@/components/dataset/DatasetDashboard"
+import { PathwayEditorPanel } from "@/components/hospital/PathwayEditorPanel"
 import { useAppStore } from "@/stores/appStore"
 import { GripVertical, MoreHorizontal } from "lucide-react"
 
@@ -55,7 +56,13 @@ export function AppShell() {
           {/* Content panel */}
           <Panel defaultSize={55} minSize={30}>
             <div className="h-full overflow-hidden">
-              {activeSection === "dataset" ? <DatasetDashboard /> : <PatientViewer />}
+              {activeSection === "dataset" ? (
+                <DatasetDashboard />
+              ) : activeSection === "rules" ? (
+                <PathwayEditorPanel />
+              ) : (
+                <PatientViewer />
+              )}
             </div>
           </Panel>
           <HorizontalResizeHandle />

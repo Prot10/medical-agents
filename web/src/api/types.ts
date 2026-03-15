@@ -96,6 +96,29 @@ export interface PathwaySummary {
   triggers: string[]
 }
 
+// Hospital rules detail
+export interface PathwayStep {
+  action: string
+  timing: string
+  mandatory: boolean
+  condition: string | null
+  details: Record<string, unknown>
+}
+
+export interface PathwayDetail {
+  name: string
+  description: string
+  triggers: string[]
+  steps: PathwayStep[]
+  contraindicated: string[]
+}
+
+export interface HospitalRulesDetail {
+  id: string
+  name: string
+  pathways: PathwayDetail[]
+}
+
 // Model
 export interface ModelInfo {
   key: string

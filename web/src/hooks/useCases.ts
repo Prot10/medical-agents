@@ -45,6 +45,15 @@ export function useModels() {
   })
 }
 
+export function useHospitalRules(hospitalId: string) {
+  return useQuery({
+    queryKey: ["hospital-rules", hospitalId],
+    queryFn: () => api.getHospitalRules(hospitalId),
+    enabled: !!hospitalId,
+    staleTime: 30_000,
+  })
+}
+
 export function useCopilotStatus() {
   return useQuery({
     queryKey: ["copilot-status"],

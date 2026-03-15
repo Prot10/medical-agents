@@ -9,6 +9,7 @@ const SECTION_LABELS: Record<string, string> = {
   cases: "Patient Cases",
   dataset: "Dataset Analytics",
   traces: "Trace Replay",
+  rules: "Hospital Rules",
   settings: "Settings",
 }
 

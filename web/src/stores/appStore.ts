@@ -1,6 +1,6 @@
 import { create } from "zustand"
 
-export type ActiveSection = "cases" | "dataset" | "traces" | "settings"
+export type ActiveSection = "cases" | "dataset" | "traces" | "rules" | "settings"
 
 interface DatasetFilters {
   conditions: string[]
@@ -22,6 +22,11 @@ interface AppState {
   activeSection: ActiveSection
   datasetFilters: DatasetFilters
 
+  // Rules
+  rulesHospitalId: string
+  selectedPathwayIndex: number | null
+  isCreatingPathway: boolean
+
   // Oracle
   oracleOpen: boolean
   oracleTrigger: number  // increment to trigger evaluation
@@ -39,6 +44,9 @@ interface AppState {
   setSidebarWidth: (width: number) => void
   setActiveSection: (section: ActiveSection) => void
   setDatasetFilters: (filters: Partial<DatasetFilters>) => void
+  setRulesHospitalId: (id: string) => void
+  selectPathway: (index: number | null) => void
+  setIsCreatingPathway: (creating: boolean) => void
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -48,6 +56,9 @@ export const useAppStore = create<AppState>((set) => ({
   selectedEvaluatorModel: "",
   darkMode: false,
   showGroundTruth: false,
+  rulesHospitalId: "us_mayo",
+  selectedPathwayIndex: null,
+  isCreatingPathway: false,
   oracleOpen: false,
   oracleTrigger: 0,
   sidebarCollapsed: false,
@@ -73,4 +84,7 @@ export const useAppStore = create<AppState>((set) => ({
   setActiveSection: (section) => set({ activeSection: section }),
   setDatasetFilters: (filters) =>
     set((s) => ({ datasetFilters: { ...s.datasetFilters, ...filters } })),
+  setRulesHospitalId: (id) => set({ rulesHospitalId: id, selectedPathwayIndex: null, isCreatingPathway: false }),
+  selectPathway: (index) => set({ selectedPathwayIndex: index, isCreatingPathway: false }),
+  setIsCreatingPathway: (creating) => set({ isCreatingPathway: creating, selectedPathwayIndex: null }),
 }))
