@@ -47,6 +47,64 @@ Start a vLLM inference server first:
 
 Then select a case, choose your hospital and model, and click **Run Agent**.
 
+## Remote Access (CERN VM)
+
+If running on a headless VM (e.g., a CERN VM), use SSH tunnels to access the dashboard from your laptop.
+
+### On the VM
+
+```bash
+# Production mode (recommended for remote — single port, no hot reload)
+cd web && npm run build
+uv run uvicorn neuroagent.api.app:app --host 0.0.0.0 --port 8888
+
+# Dev mode (hot reload — requires tunneling two ports)
+cd web && npm run dev:remote                                            # frontend on :5173
+uv run uvicorn neuroagent.api.app:app --host 0.0.0.0 --port 8888       # backend on :8888
+```
+
+### On your laptop
+
+**Inside the CERN network:**
+
+```bash
+# Production (single tunnel)
+ssh -L 8888:localhost:8888 <user>@<vm>.cern.ch
+
+# Dev mode (two tunnels)
+ssh -L 5173:localhost:5173 -L 8888:localhost:8888 <user>@<vm>.cern.ch
+```
+
+**Outside the CERN network** (uses lxplus as jump host):
+
+```bash
+# Production (single tunnel)
+ssh -L 8888:localhost:8888 -J <user>@lxplus.cern.ch <user>@<vm>.cern.ch
+
+# Dev mode (two tunnels)
+ssh -L 5173:localhost:5173 -L 8888:localhost:8888 -J <user>@lxplus.cern.ch <user>@<vm>.cern.ch
+```
+
+Then open http://localhost:8888 (production) or http://localhost:5173 (dev).
+
+> **Tip:** Add an SSH config block to simplify this:
+>
+> ```ssh-config
+> # ~/.ssh/config
+> Host lxplus
+>     HostName lxplus.cern.ch
+>     User <your-cern-username>
+>
+> Host neuroagent-vm
+>     HostName <vm>.cern.ch
+>     User <your-cern-username>
+>     ProxyJump lxplus              # remove this line when inside CERN
+>     LocalForward 8888 localhost:8888
+>     LocalForward 5173 localhost:5173
+> ```
+>
+> Then just: `ssh neuroagent-vm` and open http://localhost:8888.
+
 ## Development
 
 ### Frontend dev server (with hot reload)
@@ -54,7 +112,8 @@ Then select a case, choose your hospital and model, and click **Run Agent**.
 ```bash
 cd web
 npm install
-npm run dev          # starts on http://localhost:5173
+npm run dev          # starts on http://localhost:5173 (local)
+npm run dev:remote   # starts on http://0.0.0.0:5173 (remote, binds all interfaces)
 ```
 
 The Vite dev server proxies `/api` requests to `localhost:8888`, so the FastAPI backend must be running.
