@@ -3,57 +3,74 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
-from ..llm.client import LLMClient
+from neuroagent_schemas import GroundTruth, NeuroBenchCase
+
 from ..agent.reasoning import AgentTrace
+from ..llm.client import LLMClient
+
+# Load the judge system prompt from file
+_PROMPT_DIR = Path(__file__).resolve().parent.parent.parent.parent / "config" / "system_prompts"
+
+
+def _load_judge_prompt() -> str:
+    prompt_path = _PROMPT_DIR / "llm_judge.txt"
+    if prompt_path.exists():
+        return prompt_path.read_text()
+    raise FileNotFoundError(f"Judge prompt not found at {prompt_path}")
 
 
 @dataclass
 class ReasoningScore:
-    """Rubric-based reasoning quality scores."""
+    """Rubric-based reasoning quality scores (8 dimensions)."""
 
+    diagnostic_accuracy: int = 0  # 0-5
     evidence_identification: int = 0  # 0-5
     evidence_integration: int = 0  # 0-5
     differential_reasoning: int = 0  # 0-5
-    uncertainty_handling: int = 0  # 0-5
+    tool_efficiency: int = 0  # 0-5
     clinical_safety: int = 0  # 0-5
-    overall: float = 0.0
+    red_herring_handling: int | None = None  # 0-5 or None if no red herrings
+    uncertainty_calibration: int = 0  # 0-5
+    composite_score: float = 0.0  # 0-1 weighted mean
+    strengths: list[str] = field(default_factory=list)
+    weaknesses: list[str] = field(default_factory=list)
+    critical_errors: list[str] = field(default_factory=list)
     justification: str = ""
 
+    # Keep backward-compatible alias
+    @property
+    def overall(self) -> float:
+        return self.composite_score
 
-_JUDGE_SYSTEM_PROMPT = """\
-You are an expert clinical reasoning evaluator. You will assess the quality of an AI \
-agent's diagnostic reasoning chain for a neurology case.
-
-Rate the reasoning on the following rubric (0-5 for each dimension):
-
-1. **Evidence Identification** (0-5): Does the agent correctly identify the key findings \
-from each diagnostic test? Does it note abnormal values and clinically relevant patterns?
-
-2. **Evidence Integration** (0-5): Does the agent correctly combine findings across \
-different modalities (EEG + MRI + labs)? Does it recognize patterns that span tests?
-
-3. **Differential Reasoning** (0-5): Does the agent maintain and update a differential \
-diagnosis? Does it consider and appropriately rule out alternatives?
-
-4. **Uncertainty Handling** (0-5): Does the agent acknowledge uncertainty when findings \
-are ambiguous? Are confidence levels appropriate?
-
-5. **Clinical Safety** (0-5): Does the agent flag red flags? Does it avoid dangerous \
-recommendations? Does it recommend appropriate follow-up?
-
-Respond ONLY with a JSON object in this exact format:
-{
-    "evidence_identification": <0-5>,
-    "evidence_integration": <0-5>,
-    "differential_reasoning": <0-5>,
-    "uncertainty_handling": <0-5>,
-    "clinical_safety": <0-5>,
-    "justification": "<brief explanation of scores>"
-}
-"""
+    def compute_composite(self) -> float:
+        """Compute the weighted composite score (0-1 scale)."""
+        if self.red_herring_handling is not None:
+            raw = (
+                self.diagnostic_accuracy * 0.20
+                + self.evidence_identification * 0.10
+                + self.evidence_integration * 0.15
+                + self.differential_reasoning * 0.15
+                + self.tool_efficiency * 0.08
+                + self.clinical_safety * 0.17
+                + self.red_herring_handling * 0.07
+                + self.uncertainty_calibration * 0.08
+            )
+        else:
+            raw = (
+                self.diagnostic_accuracy * 0.22
+                + self.evidence_identification * 0.11
+                + self.evidence_integration * 0.16
+                + self.differential_reasoning * 0.16
+                + self.tool_efficiency * 0.09
+                + self.clinical_safety * 0.18
+                + self.uncertainty_calibration * 0.08
+            )
+        self.composite_score = round(raw / 5.0, 4)
+        return self.composite_score
 
 
 class LLMJudge:
@@ -61,64 +78,168 @@ class LLMJudge:
 
     def __init__(self, llm: LLMClient):
         self.llm = llm
+        self._system_prompt = _load_judge_prompt()
 
     def judge(
+        self,
+        trace: AgentTrace,
+        case: NeuroBenchCase,
+    ) -> ReasoningScore:
+        """Rate the agent's reasoning chain on the full 8-dimension rubric.
+
+        Args:
+            trace: Agent's execution trace.
+            case: The full NeuroBench case (patient info + ground truth).
+
+        Returns:
+            ReasoningScore with rubric scores, strengths/weaknesses, and justification.
+        """
+        user_prompt = self._build_user_prompt(trace, case)
+
+        messages = [
+            {"role": "system", "content": self._system_prompt},
+            {"role": "user", "content": user_prompt},
+        ]
+
+        response = self.llm.chat(messages=messages, tools=None, temperature=0.0)
+        return self._parse_response(response.content or "", case.ground_truth)
+
+    # Keep backward-compatible signature
+    def judge_legacy(
         self,
         trace: AgentTrace,
         ground_truth_diagnosis: str,
         case_description: str = "",
     ) -> ReasoningScore:
-        """Rate the agent's reasoning chain on a rubric.
-
-        Args:
-            trace: Agent's execution trace.
-            ground_truth_diagnosis: The correct diagnosis.
-            case_description: Brief case description for context.
-
-        Returns:
-            ReasoningScore with rubric scores and justification.
-        """
-        # Build the evaluation prompt
+        """Legacy interface — prefer judge() with full NeuroBenchCase."""
         trace_text = self._format_trace(trace)
-
         user_prompt = (
-            f"## Case\n{case_description}\n\n"
-            f"## Correct Diagnosis\n{ground_truth_diagnosis}\n\n"
+            f"## Case Presentation\n{case_description}\n\n"
+            f"## Ground Truth\n### Correct Diagnosis\n{ground_truth_diagnosis}\n\n"
             f"## Agent Reasoning Trace\n{trace_text}\n\n"
-            "Please evaluate the reasoning quality using the rubric."
+            "Evaluate the agent's reasoning using the rubric."
         )
 
         messages = [
-            {"role": "system", "content": _JUDGE_SYSTEM_PROMPT},
+            {"role": "system", "content": self._system_prompt},
             {"role": "user", "content": user_prompt},
         ]
 
         response = self.llm.chat(messages=messages, tools=None, temperature=0.0)
         return self._parse_response(response.content or "")
 
+    def _build_user_prompt(self, trace: AgentTrace, case: NeuroBenchCase) -> str:
+        """Build the complete user prompt with case, trace, and ground truth."""
+        parts: list[str] = []
+
+        # --- Case metadata ---
+        parts.append("## Case Metadata")
+        parts.append(f"- **Case ID**: {case.case_id}")
+        parts.append(f"- **Condition**: {case.condition.value}")
+        parts.append(f"- **Difficulty**: {case.difficulty.value}")
+        parts.append(f"- **Encounter type**: {case.encounter_type.value}")
+        parts.append("")
+
+        # --- Case presentation (what the agent received) ---
+        parts.append("## Case Presentation")
+        p = case.patient
+        parts.append(
+            f"**Patient**: {p.demographics.age}-year-old {p.demographics.sex}, "
+            f"{p.demographics.ethnicity}, BMI {p.demographics.bmi}"
+        )
+        parts.append(f"**Chief complaint**: {p.chief_complaint}")
+        parts.append(f"**HPI**: {p.history_present_illness}")
+
+        if p.clinical_history.past_medical_history:
+            parts.append(f"**PMH**: {'; '.join(p.clinical_history.past_medical_history)}")
+        if p.clinical_history.medications:
+            med_strs = [f"{m.drug} {m.dose} {m.frequency}" for m in p.clinical_history.medications]
+            parts.append(f"**Medications**: {'; '.join(med_strs)}")
+        if p.clinical_history.allergies:
+            parts.append(f"**Allergies**: {', '.join(p.clinical_history.allergies)}")
+
+        exam = p.neurological_exam
+        parts.append(f"**Neuro exam**: Mental status: {exam.mental_status}. "
+                      f"Cranial nerves: {exam.cranial_nerves}. Motor: {exam.motor}. "
+                      f"Sensory: {exam.sensory}. Reflexes: {exam.reflexes}. "
+                      f"Coordination: {exam.coordination}. Gait: {exam.gait}.")
+        if exam.additional:
+            parts.append(f"**Additional exam**: {exam.additional}")
+
+        v = p.vitals
+        parts.append(
+            f"**Vitals**: BP {v.bp_systolic}/{v.bp_diastolic}, HR {v.hr}, "
+            f"Temp {v.temp}°C, RR {v.rr}, SpO2 {v.spo2}%"
+        )
+        parts.append("")
+
+        # --- Agent reasoning trace ---
+        parts.append("## Agent Reasoning Trace")
+        parts.append(self._format_trace(trace))
+        parts.append("")
+
+        # --- Ground truth ---
+        parts.append("## Ground Truth")
+        gt = case.ground_truth
+        parts.append(f"**Primary diagnosis**: {gt.primary_diagnosis}")
+        parts.append(f"**ICD code**: {gt.icd_code}")
+
+        if gt.differential:
+            parts.append("**Differential diagnoses**:")
+            for d in gt.differential:
+                parts.append(
+                    f"  - {d.get('diagnosis', '')} ({d.get('likelihood', '')}): "
+                    f"{d.get('key_distinguishing', d.get('key_features', ''))}"
+                )
+
+        if gt.critical_actions:
+            parts.append(f"**Critical actions (MUST do)**: {'; '.join(gt.critical_actions)}")
+        if gt.contraindicated_actions:
+            parts.append(f"**Contraindicated actions (MUST NOT do)**: {'; '.join(gt.contraindicated_actions)}")
+        if gt.key_reasoning_points:
+            parts.append("**Key reasoning points**:")
+            for kp in gt.key_reasoning_points:
+                parts.append(f"  - {kp}")
+
+        if gt.red_herrings:
+            parts.append("**Intentional red herrings**:")
+            for rh in gt.red_herrings:
+                parts.append(
+                    f"  - **{rh.data_point}** (in {rh.location}): "
+                    f"intended to {rh.intended_effect}. "
+                    f"Correct interpretation: {rh.correct_interpretation}"
+                )
+        parts.append("")
+
+        parts.append("Evaluate the agent's reasoning using the rubric.")
+        return "\n".join(parts)
+
     def _format_trace(self, trace: AgentTrace) -> str:
         """Format trace for judge evaluation."""
         parts = []
-        for turn in trace.turns:
+        for i, turn in enumerate(trace.turns):
             if turn.role == "assistant" and turn.content:
-                parts.append(f"[Agent]: {turn.content}")
+                parts.append(f"**[Turn {turn.turn_number} — Agent Reasoning]**:\n{turn.content}")
             if turn.tool_calls:
                 for tc in turn.tool_calls:
-                    parts.append(f"[Tool Call]: {tc}")
+                    tool_name = tc.get("function", {}).get("name", str(tc)) if isinstance(tc, dict) else str(tc)
+                    tool_args = tc.get("function", {}).get("arguments", "") if isinstance(tc, dict) else ""
+                    parts.append(f"**[Tool Call]**: `{tool_name}`({tool_args})")
             if turn.tool_results:
                 for tr in turn.tool_results:
-                    # Truncate very long results
                     tr_str = json.dumps(tr, default=str)
-                    if len(tr_str) > 1000:
-                        tr_str = tr_str[:1000] + "..."
-                    parts.append(f"[Tool Result]: {tr_str}")
+                    if len(tr_str) > 2000:
+                        tr_str = tr_str[:2000] + "... [truncated]"
+                    parts.append(f"**[Tool Result]**:\n```json\n{tr_str}\n```")
 
         if trace.final_response:
-            parts.append(f"[Final Assessment]: {trace.final_response}")
+            parts.append(f"**[Final Assessment]**:\n{trace.final_response}")
 
         return "\n\n".join(parts)
 
-    def _parse_response(self, response: str) -> ReasoningScore:
+    def _parse_response(
+        self, response: str, ground_truth: GroundTruth | None = None
+    ) -> ReasoningScore:
         """Parse the judge's JSON response into a ReasoningScore."""
         try:
             # Extract JSON from response (handle markdown code blocks)
@@ -128,23 +249,41 @@ class LLMJudge:
                 end = response.rfind("}") + 1
                 if start >= 0 and end > start:
                     json_str = response[start:end]
+            elif "{" in response:
+                start = response.find("{")
+                end = response.rfind("}") + 1
+                if start >= 0 and end > start:
+                    json_str = response[start:end]
 
             data = json.loads(json_str)
+
+            rh_score = data.get("red_herring_handling")
+            if rh_score is not None:
+                rh_score = int(rh_score)
+
             score = ReasoningScore(
+                diagnostic_accuracy=int(data.get("diagnostic_accuracy", 0)),
                 evidence_identification=int(data.get("evidence_identification", 0)),
                 evidence_integration=int(data.get("evidence_integration", 0)),
                 differential_reasoning=int(data.get("differential_reasoning", 0)),
-                uncertainty_handling=int(data.get("uncertainty_handling", 0)),
+                tool_efficiency=int(data.get("tool_efficiency", 0)),
                 clinical_safety=int(data.get("clinical_safety", 0)),
+                red_herring_handling=rh_score,
+                uncertainty_calibration=int(data.get("uncertainty_calibration", 0)),
+                strengths=data.get("strengths", []),
+                weaknesses=data.get("weaknesses", []),
+                critical_errors=data.get("critical_errors", []),
                 justification=data.get("justification", ""),
             )
-            score.overall = (
-                score.evidence_identification
-                + score.evidence_integration
-                + score.differential_reasoning
-                + score.uncertainty_handling
-                + score.clinical_safety
-            ) / 5.0
+
+            # Use the judge's composite if provided, otherwise compute
+            if "composite_score" in data and data["composite_score"] is not None:
+                score.composite_score = float(data["composite_score"])
+            else:
+                score.compute_composite()
+
             return score
         except (json.JSONDecodeError, ValueError, KeyError):
-            return ReasoningScore(justification=f"Failed to parse judge response: {response[:200]}")
+            return ReasoningScore(
+                justification=f"Failed to parse judge response: {response[:300]}"
+            )
