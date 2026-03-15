@@ -1,6 +1,7 @@
 import { useEffect } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { AppShell } from "@/components/layout/AppShell"
+import { ModelLoadingToast } from "@/components/model/ModelLoadingToast"
 import { useAppStore } from "@/stores/appStore"
 
 const queryClient = new QueryClient({
@@ -25,6 +26,7 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <DarkModeSync />
       <AppShell />
+      <ModelLoadingToast />
     </QueryClientProvider>
   )
 }

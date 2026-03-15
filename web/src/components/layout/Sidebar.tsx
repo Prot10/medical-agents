@@ -1,17 +1,24 @@
-import { useEffect } from "react"
-import { Stethoscope, BarChart3, History, PanelLeftClose, PanelLeft, Moon, Sun, ChevronDown, Hospital, Settings } from "lucide-react"
+import { useEffect, useRef, useCallback } from "react"
+import { Stethoscope, BarChart3, History, PanelLeftClose, PanelLeft, Moon, Sun, ChevronDown, Hospital, Settings, Shield, Play, Square } from "lucide-react"
+import { useQueryClient } from "@tanstack/react-query"
 import { useAppStore } from "@/stores/appStore"
 import { useModels, useHospitals } from "@/hooks/useCases"
+import { useModelLoadingStore } from "@/stores/modelLoadingStore"
+import type { LoadEvent } from "@/stores/modelLoadingStore"
 import { cn } from "@/lib/utils"
 import { CaseBrowser } from "@/components/cases/CaseBrowser"
 import { DatasetOverview } from "@/components/dataset/DatasetOverview"
 import { TraceBrowser } from "@/components/traces/TraceBrowser"
 import { SettingsPanel } from "@/components/settings/SettingsPanel"
+import { HospitalRulesBrowser } from "@/components/hospital/HospitalRulesBrowser"
+
+const MODEL_LOAD_BASE = "/api/v1"
 
 const NAV_ITEMS = [
   { id: "cases" as const, label: "Cases", icon: Stethoscope },
   { id: "dataset" as const, label: "Dataset", icon: BarChart3 },
   { id: "traces" as const, label: "Traces", icon: History },
+  { id: "rules" as const, label: "Rules", icon: Shield },
   { id: "settings" as const, label: "Settings", icon: Settings },
 ]
 
@@ -24,6 +31,9 @@ export function Sidebar() {
   } = useAppStore()
   const { data: models } = useModels()
   const { data: hospitals } = useHospitals()
+  const { isLoading, modelKey: loadingKey, startLoading, handleEvent, reset: resetLoading } = useModelLoadingStore()
+  const queryClient = useQueryClient()
+  const abortRef = useRef<AbortController | null>(null)
 
   // Auto-select first ready model if current selection is offline
   useEffect(() => {
@@ -35,12 +45,79 @@ export function Sidebar() {
     }
   }, [models, selectedModel, setModel])
 
+  const triggerLoad = useCallback(async (key: string) => {
+    const model = models?.find((m) => m.key === key)
+    if (!model || model.status === "ready") return
+
+    if (abortRef.current) abortRef.current.abort()
+    const controller = new AbortController()
+    abortRef.current = controller
+
+    startLoading(key, model.name)
+
+    try {
+      const response = await fetch(`${MODEL_LOAD_BASE}/models/${key}/load`, {
+        method: "POST",
+        signal: controller.signal,
+      })
+      if (!response.ok) {
+        handleEvent({ phase: "error", message: `Server error: ${response.status}` })
+        return
+      }
+      const reader = response.body?.getReader()
+      if (!reader) { handleEvent({ phase: "error", message: "No stream" }); return }
+
+      const decoder = new TextDecoder()
+      let buffer = ""
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        buffer += decoder.decode(value, { stream: true })
+        const parts = buffer.split("\n\n")
+        buffer = parts.pop()!
+        for (const part of parts) {
+          const line = part.trim()
+          if (!line.startsWith("data: ")) continue
+          try {
+            const event = JSON.parse(line.slice(6)) as LoadEvent
+            handleEvent(event)
+            if (event.phase === "ready" || event.phase === "error") {
+              queryClient.invalidateQueries({ queryKey: ["models"] })
+              abortRef.current = null
+            }
+          } catch { /* skip */ }
+        }
+      }
+      if (buffer.trim().startsWith("data: ")) {
+        try {
+          const event = JSON.parse(buffer.trim().slice(6)) as LoadEvent
+          handleEvent(event)
+          if (event.phase === "ready" || event.phase === "error")
+            queryClient.invalidateQueries({ queryKey: ["models"] })
+        } catch { /* skip */ }
+      }
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return
+      handleEvent({ phase: "error", message: err instanceof Error ? err.message : "Connection failed" })
+    }
+  }, [models, startLoading, handleEvent, queryClient])
+
+  const handleStopLoad = useCallback(() => {
+    if (abortRef.current) { abortRef.current.abort(); abortRef.current = null }
+    resetLoading()
+    fetch(`${MODEL_LOAD_BASE}/models/unload`, { method: "POST" }).catch(() => {})
+    queryClient.invalidateQueries({ queryKey: ["models"] })
+  }, [resetLoading, queryClient])
+
   const currentModel = models?.find((m) => m.key === selectedModel)
   const statusColor = {
     ready: "bg-emerald-500",
     loading: "bg-amber-500",
     offline: "bg-zinc-500",
   }[currentModel?.status ?? "offline"]
+  const canLoad = currentModel && currentModel.status !== "ready" && !isLoading
+  const isLoadingThis = isLoading && loadingKey === selectedModel
 
   return (
     <aside
@@ -98,6 +175,7 @@ export function Sidebar() {
             {activeSection === "cases" && <CaseBrowser />}
             {activeSection === "dataset" && <DatasetOverview />}
             {activeSection === "traces" && <TraceBrowser />}
+            {activeSection === "rules" && <HospitalRulesBrowser />}
             {activeSection === "settings" && <SettingsPanel />}
           </div>
         )}
@@ -110,27 +188,47 @@ export function Sidebar() {
             {/* Agent Model picker */}
             <div className="space-y-1">
               <label className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">Agent Model</label>
-              <div className="relative">
-                <select
-                  value={selectedModel}
-                  onChange={(e) => setModel(e.target.value)}
-                  className="w-full text-sm bg-sidebar-accent border border-sidebar-border rounded-lg px-2.5 py-1.5 text-sidebar-foreground focus:outline-none focus:ring-1 focus:ring-ring appearance-none pr-7"
-                >
-                  {models?.filter((m) => m.provider !== "copilot").map((m) => (
-                    <option key={m.key} value={m.key}>
-                      {m.name} {m.status !== "ready" ? `(${m.status})` : ""}
-                    </option>
-                  ))}
-                  {models?.some((m) => m.provider === "copilot") && (
-                    <optgroup label="GitHub Copilot">
-                      {models?.filter((m) => m.provider === "copilot").map((m) => (
-                        <option key={m.key} value={m.key}>{m.name}</option>
-                      ))}
-                    </optgroup>
-                  )}
-                </select>
-                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground pointer-events-none" />
-                <span className={`absolute left-2 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full ${statusColor}`} />
+              <div className="flex gap-1.5">
+                <div className="relative flex-1">
+                  <select
+                    value={selectedModel}
+                    onChange={(e) => setModel(e.target.value)}
+                    className="w-full text-sm bg-sidebar-accent border border-sidebar-border rounded-lg pl-6 pr-7 py-1.5 text-sidebar-foreground focus:outline-none focus:ring-1 focus:ring-ring appearance-none"
+                  >
+                    {models?.filter((m) => m.provider !== "copilot").map((m) => (
+                      <option key={m.key} value={m.key}>
+                        {m.name} {m.status !== "ready" ? `(${m.status})` : ""}
+                      </option>
+                    ))}
+                    {models?.some((m) => m.provider === "copilot") && (
+                      <optgroup label="GitHub Copilot">
+                        {models?.filter((m) => m.provider === "copilot").map((m) => (
+                          <option key={m.key} value={m.key}>{m.name}</option>
+                        ))}
+                      </optgroup>
+                    )}
+                  </select>
+                  <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground pointer-events-none" />
+                  <span className={`absolute left-2 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full ${statusColor} ${isLoadingThis ? "animate-pulse" : ""}`} />
+                </div>
+                {isLoadingThis ? (
+                  <button
+                    onClick={handleStopLoad}
+                    className="px-2 py-1.5 text-xs font-medium text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg hover:bg-red-500/15 transition-colors shrink-0"
+                    title="Stop loading"
+                  >
+                    <Square className="h-3.5 w-3.5 fill-current" />
+                  </button>
+                ) : canLoad ? (
+                  <button
+                    onClick={() => triggerLoad(selectedModel)}
+                    className="px-2.5 py-1.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-lg hover:bg-emerald-500/15 transition-colors shrink-0 flex items-center gap-1"
+                    title="Load this model"
+                  >
+                    <Play className="h-3 w-3 fill-current" />
+                    Load
+                  </button>
+                ) : null}
               </div>
             </div>
 

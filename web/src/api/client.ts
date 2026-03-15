@@ -1,4 +1,4 @@
-import type { CaseIndexEntry, CaseDetail, Hospital, ModelInfo, TraceSummary, AgentEvent } from "./types"
+import type { CaseIndexEntry, CaseDetail, Hospital, HospitalRulesDetail, PathwayDetail, ModelInfo, TraceSummary, AgentEvent } from "./types"
 
 const BASE = "/api/v1"
 
@@ -12,7 +12,23 @@ export const api = {
   getCases: () => fetchJSON<CaseIndexEntry[]>(`${BASE}/cases`),
   getCase: (id: string) => fetchJSON<CaseDetail>(`${BASE}/cases/${id}`),
   getHospitals: () => fetchJSON<Hospital[]>(`${BASE}/hospitals`),
-  getHospitalRules: (id: string) => fetchJSON<Record<string, unknown>>(`${BASE}/hospitals/${id}/rules`),
+  getHospitalRules: (id: string) => fetchJSON<HospitalRulesDetail>(`${BASE}/hospitals/${id}/rules`),
+  updatePathway: (hospitalId: string, index: number, data: PathwayDetail) =>
+    fetchJSON<PathwayDetail>(`${BASE}/hospitals/${hospitalId}/rules/${index}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    }),
+  createPathway: (hospitalId: string, data: PathwayDetail) =>
+    fetchJSON<PathwayDetail>(`${BASE}/hospitals/${hospitalId}/rules`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    }),
+  deletePathway: (hospitalId: string, index: number) =>
+    fetchJSON<{ status: string }>(`${BASE}/hospitals/${hospitalId}/rules/${index}`, {
+      method: "DELETE",
+    }),
   getModels: () => fetchJSON<ModelInfo[]>(`${BASE}/models`),
   // Copilot device flow
   copilotStartDeviceFlow: () => fetchJSON<{ device_code: string; user_code: string; verification_uri: string; expires_in: number; interval: number }>(`${BASE}/copilot/device-code`, { method: "POST" }),
@@ -22,6 +38,10 @@ export const api = {
   copilotLogout: () => fetchJSON<{ status: string }>(`${BASE}/copilot/logout`, { method: "POST" }),
   getTraces: () => fetchJSON<TraceSummary[]>(`${BASE}/traces`),
   getTrace: (id: string) => fetchJSON<{ case_id: string; events: AgentEvent[]; [key: string]: unknown }>(`${BASE}/traces/${id}`),
+  loadModel: (modelKey: string) =>
+    fetch(`${BASE}/models/${modelKey}/load`, { method: "POST" }),
+  unloadModel: () =>
+    fetchJSON<{ status: string; message: string }>(`${BASE}/models/unload`, { method: "POST" }),
 }
 
 /** Parse SSE events from a ReadableStream, calling onEvent for each. */
