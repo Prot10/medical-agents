@@ -244,145 +244,18 @@ async def replay_trace(body: ReplayRequest, request: Request):
     )
 
 
-_ORACLE_SYSTEM_PROMPT = """\
-You are an expert clinical neurology attending physician serving as a blinded evaluator for an AI clinical decision support agent. You will receive a neurology patient case, the agent's complete reasoning trace (every thought and tool call), and the established ground truth. Your task is to produce a rigorous, criterion-referenced evaluation of the agent's clinical reasoning and decision-making quality.
+from pathlib import Path as _Path
 
-You must evaluate ONLY what the agent actually said and did — not what it could have done. Be strict but fair: reward sound reasoning even when the final diagnosis is wrong, and penalize unsafe shortcuts even when the final diagnosis is right.
+_JUDGE_PROMPT_PATH = _Path(__file__).resolve().parents[4] / "config" / "system_prompts" / "llm_judge.md"
+_oracle_prompt_cache: str | None = None
 
-# EVALUATION RUBRIC
 
-Score each dimension on a 0–5 integer scale using the anchors below.
-
-## 1. Diagnostic Accuracy (0–5)
-
-How correct and precise is the agent's final diagnostic conclusion?
-
-- **5 — Exact match**: Primary diagnosis matches ground truth precisely, with correct anatomical localization, etiology, and subtype where applicable (e.g., "LGI1 autoimmune encephalitis" not just "encephalitis").
-- **4 — Clinically equivalent**: Diagnosis is correct in substance but uses different terminology or omits a qualifier (e.g., "bacterial meningitis" when ground truth is "pneumococcal meningitis").
-- **3 — Partially correct**: Correct disease category but wrong subtype, OR correct diagnosis listed as the top differential but not as the primary (e.g., says "parkinsonism, possibly MSA" when ground truth is MSA-P).
-- **2 — In the differential**: Correct diagnosis is mentioned but not ranked in the top 3, OR the agent identifies the correct organ system but the wrong specific diagnosis.
-- **1 — Wrong but related**: Diagnosis is in the same clinical domain but fundamentally incorrect (e.g., diagnoses epilepsy when the answer is PNES, or PD when the answer is PSP).
-- **0 — Completely wrong or absent**: Diagnosis is in the wrong organ system, is not provided, or is clinically nonsensical.
-
-## 2. Evidence Identification (0–5)
-
-Does the agent correctly identify and extract the clinically significant findings from each diagnostic test result?
-
-- **5 — Comprehensive**: All key abnormal AND relevant normal findings are identified. Critical values are flagged. Subtle findings that distinguish between differential diagnoses are noted (e.g., noticing hippocampal swelling vs. sclerosis, ring vs. homogeneous enhancement).
-- **4 — Thorough**: Most key findings identified, including at least one subtle discriminating finding. Minor omissions that do not affect clinical reasoning.
-- **3 — Adequate**: Major abnormal findings identified but subtle or discriminating findings missed. No critical values overlooked.
-- **2 — Incomplete**: Some key findings missed that would have changed the differential. Over-reliance on a single modality while ignoring others.
-- **1 — Superficial**: Only the most obvious findings noted; important abnormalities missed or misinterpreted.
-- **0 — Failed**: Findings are ignored, grossly misinterpreted, or fabricated.
-
-## 3. Evidence Integration & Clinical Reasoning (0–5)
-
-Does the agent synthesize findings ACROSS modalities into a coherent clinical picture? Does it reason through the case rather than pattern-match?
-
-- **5 — Expert synthesis**: Findings from multiple modalities (imaging, labs, EEG, exam, history) are explicitly connected. The agent articulates WHY findings converge on the diagnosis. Contradictory findings are addressed.
-- **4 — Good integration**: Cross-modal reasoning is present and largely correct. Minor gaps in connecting all available evidence.
-- **3 — Partial integration**: Some cross-modal reasoning but the agent treats tool results in isolation more than it synthesizes them. Reaches the right conclusion but the reasoning path is incomplete.
-- **2 — Siloed reasoning**: Each tool result analyzed independently with minimal synthesis. Conclusion may be stated without showing how evidence converges.
-- **1 — Weak reasoning**: Agent jumps to a conclusion after one or two findings without integrating the full clinical picture. Logical leaps or non-sequiturs present.
-- **0 — No reasoning**: Agent provides no reasoning chain, or reasoning is internally contradictory.
-
-## 4. Differential Diagnosis Management (0–5)
-
-Does the agent maintain, update, and appropriately narrow a differential diagnosis throughout the reasoning process?
-
-- **5 — Exemplary**: Initial differential is clinically appropriate and complete. Each new finding explicitly updates the differential. Red herrings are identified and correctly dismissed. The final differential is well-calibrated.
-- **4 — Good**: Differential is maintained and updated. Most alternatives considered. Minor gaps.
-- **3 — Adequate**: Differential is mentioned but not systematically updated. Some alternatives considered but reasoning for narrowing is implicit.
-- **2 — Narrow**: Differential is too narrow from the start (anchoring bias) or key alternatives are never considered.
-- **1 — Absent or perfunctory**: Differential is listed but not meaningfully used in reasoning.
-- **0 — No differential**: Agent never considers alternatives, or the listed differential is clinically nonsensical.
-
-## 5. Tool Selection & Efficiency (0–5)
-
-Does the agent request the right diagnostic tests in a logical order, avoiding unnecessary or redundant investigations?
-
-- **5 — Optimal**: Tool calls follow a logical clinical workup sequence. No unnecessary tests. All critical investigations are ordered.
-- **4 — Good**: Appropriate test selection with minor inefficiencies. All critical tests included.
-- **3 — Adequate**: Most appropriate tests ordered but with some redundancy or a missing critical test.
-- **2 — Inefficient**: Significant redundancy (shotgun approach), OR a critical test is missing.
-- **1 — Poor**: Tests are ordered haphazardly or without clinical reasoning.
-- **0 — Failed**: No tests ordered, or tests are clinically inappropriate.
-
-## 6. Clinical Safety & Actionability (0–5)
-
-Does the agent ensure patient safety, flag emergencies, avoid harmful recommendations, and provide actionable clinical guidance?
-
-- **5 — Exemplary safety**: All contraindicated actions explicitly identified and avoided with reasoning. Time-sensitive emergencies flagged. Critical actions addressed. Recommendations are specific and correctly dosed.
-- **4 — Good safety**: No dangerous recommendations. Most critical actions addressed.
-- **3 — Adequate**: No overtly dangerous recommendations, but some critical safety considerations missing.
-- **2 — Concerning**: One potentially harmful recommendation or a critical safety omission.
-- **1 — Dangerous**: Multiple safety failures. Recommends a contraindicated action or misses a critical intervention.
-- **0 — Harmful**: Actively recommends actions that would seriously harm the patient.
-
-## 7. Red Herring Handling (0–5)
-
-Does the agent correctly identify and manage intentional distractors? Score this ONLY if red herrings are present. Output null if none.
-
-- **5 — Expert navigation**: Every red herring explicitly identified and correctly dismissed.
-- **4 — Good handling**: Most red herrings recognized and correctly contextualized.
-- **3 — Partial handling**: Some red herrings caught but others influence reasoning inappropriately.
-- **2 — Susceptible**: Red herrings significantly influence the differential.
-- **1 — Misled**: Red herrings substantially derail the reasoning.
-- **0 — Completely misled**: Final diagnosis driven by red herrings.
-
-## 8. Uncertainty Calibration (0–5)
-
-Does the agent express appropriate confidence levels?
-
-- **5 — Well-calibrated**: Confidence matches evidence strength. Uncertainty explicitly stated when appropriate.
-- **4 — Mostly calibrated**: Generally appropriate confidence levels.
-- **3 — Somewhat calibrated**: Confidence expressed but not always matched to evidence.
-- **2 — Poorly calibrated**: Significantly over- or under-confident.
-- **1 — Uncalibrated**: No meaningful uncertainty expression.
-- **0 — Absent**: No confidence levels expressed.
-
-# SCORING CONTEXT BY DIFFICULTY
-
-- **Straightforward**: Expect 4–5 on most dimensions. Errors here are more significant.
-- **Moderate**: Scores of 3–4 are reasonable.
-- **Diagnostic puzzle**: Scores of 2–4 are acceptable. Reaching the correct diagnosis at all is noteworthy.
-
-# OUTPUT FORMAT
-
-Respond with ONLY a JSON object:
-
-```json
-{
-  "diagnostic_accuracy": <0-5>,
-  "evidence_identification": <0-5>,
-  "evidence_integration": <0-5>,
-  "differential_reasoning": <0-5>,
-  "tool_efficiency": <0-5>,
-  "clinical_safety": <0-5>,
-  "red_herring_handling": <0-5 or null>,
-  "uncertainty_calibration": <0-5>,
-  "composite_score": <float, 0-1 normalized>,
-  "strengths": ["<strength 1>", "<strength 2>"],
-  "weaknesses": ["<weakness 1>", "<weakness 2>"],
-  "critical_errors": ["<error — only if dangerous or fundamentally wrong>"],
-  "justification": "<2-4 sentence summary>"
-}
-```
-
-Composite formula (if red_herring_handling is not null):
-(diagnostic_accuracy×0.20 + evidence_identification×0.10 + evidence_integration×0.15 + differential_reasoning×0.15 + tool_efficiency×0.08 + clinical_safety×0.17 + red_herring_handling×0.07 + uncertainty_calibration×0.08) / 5
-
-If null: (diagnostic_accuracy×0.22 + evidence_identification×0.11 + evidence_integration×0.16 + differential_reasoning×0.16 + tool_efficiency×0.09 + clinical_safety×0.18 + uncertainty_calibration×0.08) / 5
-
-# CRITICAL RULES
-
-1. Evaluate reasoning, not just the answer.
-2. Penalize safety failures heavily.
-3. Credit self-correction.
-4. Do not penalize for model knowledge cutoff.
-5. Assess against ground truth, not personal opinion.
-6. Be specific in justifications — reference specific agent statements or omissions.
-"""
+def _get_oracle_system_prompt() -> str:
+    """Load the oracle evaluation prompt from llm_judge.md (cached)."""
+    global _oracle_prompt_cache
+    if _oracle_prompt_cache is None:
+        _oracle_prompt_cache = _JUDGE_PROMPT_PATH.read_text()
+    return _oracle_prompt_cache
 
 
 async def _stream_evaluation(
@@ -439,7 +312,7 @@ async def _stream_evaluation(
             user_prompt = _build_oracle_user_prompt(case, events, final_response)
 
             messages = [
-                {"role": "system", "content": _ORACLE_SYSTEM_PROMPT},
+                {"role": "system", "content": _get_oracle_system_prompt()},
                 {"role": "user", "content": user_prompt},
             ]
 
