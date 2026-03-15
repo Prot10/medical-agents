@@ -1,12 +1,18 @@
 import { useState } from "react"
 import {
   User, Activity, Heart, Thermometer, Wind, Droplets,
-  ChevronDown, ChevronRight, FileText, Stethoscope, ClipboardList, Target,
+  ChevronDown, ChevronRight, FileText, Stethoscope, ClipboardList, Target, ScanLine,
+  Brain, FlaskConical, Zap,
 } from "lucide-react"
 import { useCaseDetail } from "@/hooks/useCases"
 import { useAppStore } from "@/stores/appStore"
 import { cn } from "@/lib/utils"
 import { GroundTruthPanel } from "@/components/ground-truth/GroundTruthPanel"
+import { LabResultsTable } from "@/components/results/LabResultsTable"
+import { MRIFindings } from "@/components/results/MRIFindings"
+import { ECGReport } from "@/components/results/ECGReport"
+import { EEGReport } from "@/components/results/EEGReport"
+import { CSFResults } from "@/components/results/CSFResults"
 import { Badge } from "@/components/ui/Badge"
 import { Card } from "@/components/ui/Card"
 import { SectionLabel } from "@/components/ui/SectionLabel"
@@ -115,17 +121,145 @@ function NeuroExamSection({ exam }: { exam: Record<string, unknown> }) {
   )
 }
 
+const DIAGNOSTIC_TOOLS: Array<{
+  key: string
+  toolName: string
+  label: string
+  icon: React.ElementType
+  color: string
+}> = [
+  { key: "mri", toolName: "analyze_brain_mri", label: "Brain MRI", icon: Brain, color: "text-violet-500" },
+  { key: "eeg", toolName: "analyze_eeg", label: "EEG", icon: Zap, color: "text-blue-500" },
+  { key: "ecg", toolName: "analyze_ecg", label: "ECG", icon: Heart, color: "text-rose-500" },
+  { key: "labs", toolName: "interpret_labs", label: "Lab Results", icon: FlaskConical, color: "text-emerald-500" },
+  { key: "csf", toolName: "analyze_csf", label: "CSF Analysis", icon: Droplets, color: "text-cyan-500" },
+]
+
+function DiagnosticsSection({ initialOutputs, followupOutputs }: {
+  initialOutputs: Record<string, unknown>
+  followupOutputs: unknown[]
+}) {
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => {
+    // Auto-expand sections that have data
+    const initial: Record<string, boolean> = {}
+    for (const tool of DIAGNOSTIC_TOOLS) {
+      if (initialOutputs[tool.key]) initial[tool.key] = true
+    }
+    return initial
+  })
+
+  const toggle = (key: string) =>
+    setExpandedSections((s) => ({ ...s, [key]: !s[key] }))
+
+  // Collect followup outputs by tool
+  const followupsByTool: Record<string, unknown[]> = {}
+  if (Array.isArray(followupOutputs)) {
+    for (const fo of followupOutputs) {
+      const item = fo as Record<string, unknown>
+      const toolName = (item.tool_name as string) ?? ""
+      const key = DIAGNOSTIC_TOOLS.find((t) => t.toolName === toolName)?.key
+      if (key && item.output) {
+        if (!followupsByTool[key]) followupsByTool[key] = []
+        followupsByTool[key].push(item.output)
+      }
+    }
+  }
+
+  const hasAnyData = DIAGNOSTIC_TOOLS.some((t) => initialOutputs[t.key] || followupsByTool[t.key])
+
+  if (!hasAnyData) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-muted-foreground/30">
+        <ScanLine className="h-10 w-10 mb-3" />
+        <p className="text-base font-medium">No diagnostic data available</p>
+      </div>
+    )
+  }
+
+  const renderToolResult = (toolName: string, data: unknown) => {
+    const d = data as Record<string, unknown>
+    switch (toolName) {
+      case "analyze_brain_mri": return <MRIFindings data={d} />
+      case "analyze_eeg": return <EEGReport data={d} />
+      case "analyze_ecg": return <ECGReport data={d} />
+      case "interpret_labs": return <LabResultsTable data={d} />
+      case "analyze_csf": return <CSFResults data={d} />
+      default: return <pre className="text-sm font-mono text-muted-foreground whitespace-pre-wrap">{JSON.stringify(d, null, 2)}</pre>
+    }
+  }
+
+  return (
+    <div className="space-y-3">
+      {DIAGNOSTIC_TOOLS.map((tool) => {
+        const initialData = initialOutputs[tool.key] as Record<string, unknown> | null | undefined
+        const followups = followupsByTool[tool.key]
+        if (!initialData && !followups) return null
+
+        const isOpen = expandedSections[tool.key]
+        const Icon = tool.icon
+
+        return (
+          <div key={tool.key} className="rounded-xl border border-border overflow-hidden">
+            <button
+              onClick={() => toggle(tool.key)}
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-accent/30 transition-colors"
+            >
+              <div className={cn("h-8 w-8 rounded-lg flex items-center justify-center shrink-0", `${tool.color.replace("text-", "bg-")}/15`)}>
+                <Icon className={cn("h-4 w-4", tool.color)} />
+              </div>
+              <span className="text-base font-semibold">{tool.label}</span>
+              {followups && (
+                <Badge variant="info" className="ml-1">+{followups.length} follow-up</Badge>
+              )}
+              <span className="ml-auto text-muted-foreground">
+                {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+              </span>
+            </button>
+
+            {isOpen && (
+              <div className="px-4 pb-4 space-y-4 border-t border-border/40 pt-3">
+                {/* Initial output */}
+                {initialData && (
+                  <div>
+                    {followups && (
+                      <div className="text-sm font-semibold text-muted-foreground mb-2 uppercase tracking-wider">Initial</div>
+                    )}
+                    {renderToolResult(tool.toolName, initialData)}
+                  </div>
+                )}
+
+                {/* Follow-up outputs */}
+                {followups?.map((fo, i) => (
+                  <div key={i}>
+                    <div className="text-sm font-semibold text-muted-foreground mb-2 uppercase tracking-wider">
+                      Follow-up {followups.length > 1 ? `#${i + 1}` : ""}
+                    </div>
+                    {renderToolResult(tool.toolName, fo)}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 const TABS = [
   { id: "overview" as const, label: "Overview", icon: FileText },
   { id: "history" as const, label: "History", icon: ClipboardList },
   { id: "neuro" as const, label: "Neuro Exam", icon: Stethoscope },
+  { id: "diagnostics" as const, label: "Diagnostics", icon: ScanLine },
   { id: "ground_truth" as const, label: "Ground Truth", icon: Target },
 ]
+
+type TabId = "overview" | "history" | "neuro" | "diagnostics" | "ground_truth"
 
 export function PatientViewer() {
   const { selectedCaseId } = useAppStore()
   const { data: caseDetail, isLoading } = useCaseDetail(selectedCaseId)
-  const [activeTab, setActiveTab] = useState<"overview" | "history" | "neuro" | "ground_truth">("overview")
+  const [activeTab, setActiveTab] = useState<TabId>("overview")
 
   if (!selectedCaseId) {
     return (
@@ -312,6 +446,13 @@ export function PatientViewer() {
 
             {activeTab === "neuro" && (
               <NeuroExamSection exam={patient.neurological_exam} />
+            )}
+
+            {activeTab === "diagnostics" && (
+              <DiagnosticsSection
+                initialOutputs={caseDetail.initial_tool_outputs}
+                followupOutputs={caseDetail.followup_outputs}
+              />
             )}
 
             {activeTab === "ground_truth" && (
