@@ -1,6 +1,9 @@
-import { CheckCircle, XCircle, AlertTriangle } from "lucide-react"
+import { CheckCircle, XCircle, AlertTriangle, Target, ListChecks, Brain, ShieldAlert } from "lucide-react"
 import { useAgentStore } from "@/stores/agentStore"
 import { cn } from "@/lib/utils"
+import { Badge } from "@/components/ui/Badge"
+import { Card } from "@/components/ui/Card"
+import { SectionLabel } from "@/components/ui/SectionLabel"
 import type { GroundTruth } from "@/api/types"
 
 export function GroundTruthPanel({ groundTruth }: { groundTruth: GroundTruth }) {
@@ -10,57 +13,60 @@ export function GroundTruthPanel({ groundTruth }: { groundTruth: GroundTruth }) 
     .map((e) => e.tool_name!)
 
   return (
-    <div className="mt-3 border border-border rounded-lg p-3 space-y-3 bg-secondary/30">
+    <div className="space-y-5">
       {/* Primary Diagnosis */}
-      <div>
-        <Label>Primary Diagnosis</Label>
-        <p className="text-sm font-semibold">{groundTruth.primary_diagnosis}</p>
-        <p className="text-[10px] text-muted-foreground">ICD: {groundTruth.icd_code}</p>
-      </div>
+      <Card accent="success">
+        <SectionLabel icon={Target}>Primary Diagnosis</SectionLabel>
+        <p className="text-base font-bold">{groundTruth.primary_diagnosis}</p>
+        <Badge variant="info" className="mt-1">ICD: {groundTruth.icd_code}</Badge>
+      </Card>
 
       {/* Differential */}
-      {groundTruth.differential_diagnoses.length > 0 && (
+      {groundTruth.differential?.length > 0 && (
         <div>
-          <Label>Differential Diagnoses</Label>
-          <div className="space-y-1">
-            {groundTruth.differential_diagnoses.map((d, i) => (
-              <div key={i} className="text-xs">
-                <span className="font-medium">{d.diagnosis}</span>
-                <span className="text-muted-foreground"> ({d.likelihood})</span>
-                <span className="text-muted-foreground"> — {d.key_distinguishing}</span>
+          <SectionLabel icon={Brain}>Differential Diagnoses</SectionLabel>
+          <div className="space-y-2">
+            {groundTruth.differential.map((d, i) => (
+              <div key={i} className="flex items-start gap-2 text-base">
+                <Badge variant={d.likelihood.toLowerCase().includes("high") ? "warning" : "outline"} className="shrink-0 mt-0.5">
+                  {d.likelihood}
+                </Badge>
+                <div>
+                  <span className="font-medium">{d.diagnosis}</span>
+                  <span className="text-muted-foreground"> — {d.key_distinguishing}</span>
+                </div>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Optimal Actions Compliance */}
-      {groundTruth.optimal_actions.length > 0 && (
+      {/* Action Compliance */}
+      {groundTruth.optimal_actions?.length > 0 && (
         <div>
-          <Label>Action Compliance</Label>
-          <div className="space-y-0.5">
+          <SectionLabel icon={ListChecks}>Action Compliance</SectionLabel>
+          <div className="space-y-1.5">
             {groundTruth.optimal_actions.map((a, i) => {
               const done = toolsCalled.some((t) =>
                 a.action.toLowerCase().includes(t.toLowerCase()) ||
                 t.toLowerCase().includes(a.action.toLowerCase().split(" ")[0])
               )
               return (
-                <div key={i} className="flex items-start gap-1.5 text-xs">
+                <div key={i} className="flex items-start gap-2 text-base">
                   {done ? (
-                    <CheckCircle className="h-3.5 w-3.5 text-green-500 mt-0.5 shrink-0" />
+                    <CheckCircle className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                   ) : (
-                    <XCircle className="h-3.5 w-3.5 text-zinc-400 mt-0.5 shrink-0" />
+                    <XCircle className="h-4 w-4 text-muted-foreground/40 mt-0.5 shrink-0" />
                   )}
                   <span className={cn(!done && "text-muted-foreground")}>
                     {a.action}
-                    <span className={cn(
-                      "ml-1 text-[9px] px-1 py-0.5 rounded",
-                      a.category === "required" && "bg-blue-500/10 text-blue-500",
-                      a.category === "acceptable" && "bg-zinc-500/10 text-zinc-400",
-                    )}>
-                      {a.category}
-                    </span>
                   </span>
+                  <Badge
+                    variant={a.category === "required" ? "info" : "outline"}
+                    className="ml-auto shrink-0"
+                  >
+                    {a.category}
+                  </Badge>
                 </div>
               )
             })}
@@ -69,13 +75,13 @@ export function GroundTruthPanel({ groundTruth }: { groundTruth: GroundTruth }) 
       )}
 
       {/* Critical Actions */}
-      {groundTruth.critical_actions.length > 0 && (
+      {groundTruth.critical_actions?.length > 0 && (
         <div>
-          <Label>Critical Actions</Label>
-          <div className="space-y-0.5">
+          <SectionLabel icon={ShieldAlert}>Critical Actions</SectionLabel>
+          <div className="space-y-1.5">
             {groundTruth.critical_actions.map((a, i) => (
-              <div key={i} className="flex items-start gap-1.5 text-xs">
-                <AlertTriangle className="h-3.5 w-3.5 text-yellow-500 mt-0.5 shrink-0" />
+              <div key={i} className="flex items-start gap-2 text-base">
+                <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
                 <span>{a}</span>
               </div>
             ))}
@@ -84,24 +90,16 @@ export function GroundTruthPanel({ groundTruth }: { groundTruth: GroundTruth }) 
       )}
 
       {/* Key Reasoning Points */}
-      {groundTruth.key_reasoning_points.length > 0 && (
+      {groundTruth.key_reasoning_points?.length > 0 && (
         <div>
-          <Label>Key Reasoning Points</Label>
-          <ul className="text-xs text-muted-foreground list-disc ml-4 space-y-0.5">
+          <SectionLabel icon={Brain}>Key Reasoning Points</SectionLabel>
+          <ul className="text-base text-muted-foreground list-disc ml-5 space-y-1">
             {groundTruth.key_reasoning_points.map((p, i) => (
               <li key={i}>{p}</li>
             ))}
           </ul>
         </div>
       )}
-    </div>
-  )
-}
-
-function Label({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-1">
-      {children}
     </div>
   )
 }
