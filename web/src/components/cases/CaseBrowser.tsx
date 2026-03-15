@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react"
-import { Search } from "lucide-react"
+import { Search, Brain, Heart, Zap, Activity, FlaskConical, Pill, AlertCircle, Microscope, Stethoscope, HeartPulse } from "lucide-react"
+import { DifficultyStars } from "@/components/ui/DifficultyStars"
 import { useCases } from "@/hooks/useCases"
 import { useAppStore } from "@/stores/appStore"
 import { useAgentStore } from "@/stores/agentStore"
@@ -19,17 +20,19 @@ const CONDITION_LABELS: Record<string, string> = {
   cardiac_syncope: "Cardiac Syncope",
 }
 
-const DIFFICULTY_COLORS: Record<string, string> = {
-  straightforward: "bg-green-500/20 text-green-600 dark:text-green-400",
-  moderate: "bg-yellow-500/20 text-yellow-600 dark:text-yellow-400",
-  diagnostic_puzzle: "bg-red-500/20 text-red-600 dark:text-red-400",
+const CONDITION_ICONS: Record<string, React.ElementType> = {
+  alzheimers_early: Brain,
+  bacterial_meningitis: AlertCircle,
+  focal_epilepsy_temporal: Zap,
+  functional_neurological: Activity,
+  glioblastoma: Microscope,
+  ischemic_stroke: Heart,
+  multiple_sclerosis_rr: Stethoscope,
+  nmdar_encephalitis: FlaskConical,
+  parkinsons: Pill,
+  cardiac_syncope: HeartPulse,
 }
 
-const DIFFICULTY_SHORT: Record<string, string> = {
-  straightforward: "S",
-  moderate: "M",
-  diagnostic_puzzle: "P",
-}
 
 export function CaseBrowser() {
   const { data: cases, isLoading } = useCases()
@@ -65,81 +68,78 @@ export function CaseBrowser() {
 
   if (isLoading) {
     return (
-      <div className="p-4 text-sm text-muted-foreground">Loading cases...</div>
+      <div className="p-4 text-base text-muted-foreground">Loading cases...</div>
     )
   }
 
   return (
     <div className="flex flex-col h-full">
       {/* Search */}
-      <div className="p-2 border-b border-border">
+      <div className="p-3 border-b border-sidebar-border">
         <div className="relative">
-          <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search cases..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-7 pr-2 py-1.5 text-xs bg-secondary border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring"
+            className="w-full pl-8 pr-3 py-2 text-base bg-sidebar-accent border border-sidebar-border rounded-lg focus:outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground/50"
           />
         </div>
 
         {/* Difficulty filter chips */}
-        <div className="flex gap-1 mt-1.5">
+        <div className="flex gap-1.5 mt-2">
           {["straightforward", "moderate", "diagnostic_puzzle"].map((d) => (
             <button
               key={d}
               onClick={() => setFilterDifficulty(filterDifficulty === d ? null : d)}
               className={cn(
-                "text-[10px] px-1.5 py-0.5 rounded-full border border-border transition-colors",
+                "px-2 py-1 rounded-lg border transition-all",
                 filterDifficulty === d
-                  ? DIFFICULTY_COLORS[d]
-                  : "text-muted-foreground hover:bg-accent",
+                  ? "border-primary/30 bg-primary/5"
+                  : "border-sidebar-border hover:bg-sidebar-accent",
               )}
             >
-              {DIFFICULTY_SHORT[d]}
+              <DifficultyStars difficulty={d} />
             </button>
           ))}
-          <span className="text-[10px] text-muted-foreground ml-auto leading-5">
-            {Object.values(grouped).flat().length} cases
+          <span className="text-sm text-muted-foreground ml-auto leading-7 tabular-nums">
+            {Object.values(grouped).flat().length}
           </span>
         </div>
       </div>
 
       {/* Case list */}
       <div className="flex-1 overflow-y-auto">
-        {Object.entries(grouped).map(([condition, condCases]) => (
-          <div key={condition}>
-            <div className="sticky top-0 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-card/95 backdrop-blur-sm border-b border-border">
-              {CONDITION_LABELS[condition] ?? condition}
+        {Object.entries(grouped).map(([condition, condCases]) => {
+          const CondIcon = CONDITION_ICONS[condition] ?? Brain
+          return (
+            <div key={condition}>
+              <div className="sticky top-0 flex items-center gap-2 px-3 py-1.5 text-sm font-semibold uppercase tracking-wider text-muted-foreground bg-sidebar/95 backdrop-blur-sm border-b border-sidebar-border">
+                <CondIcon className="h-3.5 w-3.5" />
+                {CONDITION_LABELS[condition] ?? condition}
+              </div>
+              {condCases.map((c) => (
+                <button
+                  key={c.case_id}
+                  onClick={() => handleSelect(c.case_id)}
+                  className={cn(
+                    "w-full text-left px-3 py-2.5 border-b border-sidebar-border/50 transition-all hover:bg-sidebar-accent",
+                    selectedCaseId === c.case_id && "bg-primary/10 border-l-[3px] border-l-primary",
+                  )}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-base font-mono font-medium">{c.case_id}</span>
+                    <DifficultyStars difficulty={c.difficulty} />
+                  </div>
+                  <div className="text-base text-muted-foreground mt-1 line-clamp-1">
+                    {c.age}{c.sex === "male" ? "M" : "F"} — {c.chief_complaint}
+                  </div>
+                </button>
+              ))}
             </div>
-            {condCases.map((c) => (
-              <button
-                key={c.case_id}
-                onClick={() => handleSelect(c.case_id)}
-                className={cn(
-                  "w-full text-left px-2 py-1.5 border-b border-border/50 transition-colors hover:bg-accent",
-                  selectedCaseId === c.case_id && "bg-primary/10 border-l-2 border-l-primary",
-                )}
-              >
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-mono font-medium">{c.case_id}</span>
-                  <span
-                    className={cn(
-                      "text-[9px] px-1 rounded-full",
-                      DIFFICULTY_COLORS[c.difficulty],
-                    )}
-                  >
-                    {DIFFICULTY_SHORT[c.difficulty]}
-                  </span>
-                </div>
-                <div className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">
-                  {c.age}{c.sex === "male" ? "M" : "F"} — {c.chief_complaint}
-                </div>
-              </button>
-            ))}
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )

@@ -65,6 +65,25 @@ cd web && npm install && npm run dev    # dev server on :5173, proxies /api to :
 cd web && npm run build                 # production build → web/dist/
 ```
 
+### Local Mac Development (no GPU)
+
+vLLM requires CUDA and does not run on Mac. Use Ollama instead (Apple Silicon Metal acceleration).
+
+```bash
+# Install Ollama: https://ollama.com — then pull the model
+ollama pull qwen3.5:4b              # smallest Qwen3.5, ~3.4 GB download
+
+# Run a single case via CLI (bypass web API)
+uv run python agent-platform/scripts/run_single_case.py \
+  data/neurobench_v1/cases/ISCH-STR-S01.json \
+  --model qwen3.5:4b \
+  --base-url http://localhost:11434/v1
+```
+
+- Ollama exposes an OpenAI-compatible API at `http://localhost:11434/v1`
+- The `LLMClient` works unchanged — just pass different `base_url` and `model`
+- Ollama model names use tag format (e.g. `qwen3.5:4b`) not HuggingFace IDs
+
 ## Models
 
 4 models supported via vLLM, configured in `scripts/serve_model.sh`:

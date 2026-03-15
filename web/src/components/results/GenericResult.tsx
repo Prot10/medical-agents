@@ -9,42 +9,37 @@ interface Props {
 export function GenericResult({ data }: Props) {
   const [showRaw, setShowRaw] = useState(false)
 
-  // Try to render human-readable fields first
   const impression = extractString(data, "impression", "clinical_correlation", "summary", "interpretation")
   const findings = data.findings as unknown[] | undefined
 
   return (
-    <div className="space-y-1.5">
-      {/* Key metrics (if any top-level string/number fields) */}
+    <div className="space-y-2">
       {renderKeyMetrics(data)}
 
-      {/* Findings list */}
       {Array.isArray(findings) && findings.length > 0 && (
-        <div className="space-y-1">
+        <div className="space-y-1.5">
           {findings.map((f, i) => (
-            <div key={i} className="text-xs border border-border/50 rounded p-1.5">
+            <div key={i} className="text-base border border-border/50 rounded-lg p-2.5">
               {typeof f === "string" ? f : renderObject(f as Record<string, unknown>)}
             </div>
           ))}
         </div>
       )}
 
-      {/* Impression */}
       {impression && (
-        <div className="text-xs italic text-muted-foreground border-l-2 border-border pl-2">
+        <div className="text-base italic text-muted-foreground border-l-2 border-border pl-3">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{impression}</ReactMarkdown>
         </div>
       )}
 
-      {/* Raw toggle */}
       <button
         onClick={() => setShowRaw(!showRaw)}
-        className="text-[9px] text-muted-foreground hover:text-foreground transition-colors"
+        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
         {showRaw ? "Hide" : "Show"} raw JSON
       </button>
       {showRaw && (
-        <pre className="text-[10px] font-mono text-muted-foreground whitespace-pre-wrap break-words max-h-48 overflow-y-auto bg-secondary/50 rounded p-2">
+        <pre className="text-sm font-mono text-muted-foreground whitespace-pre-wrap break-words max-h-48 overflow-y-auto bg-secondary/50 rounded-lg p-3">
           {JSON.stringify(data, null, 2)}
         </pre>
       )}
@@ -67,7 +62,7 @@ function renderKeyMetrics(data: Record<string, unknown>) {
   if (metrics.length === 0) return null
 
   return (
-    <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[11px]">
+    <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-base">
       {metrics.slice(0, 10).map(([k, v]) => (
         <div key={k}>
           <span className="font-medium capitalize">{k.replace(/_/g, " ")}:</span>{" "}
@@ -80,7 +75,7 @@ function renderKeyMetrics(data: Record<string, unknown>) {
 
 function renderObject(obj: Record<string, unknown>) {
   return (
-    <div className="text-[11px] space-y-0.5">
+    <div className="text-base space-y-0.5">
       {Object.entries(obj).map(([k, v]) => (
         <div key={k}>
           <span className="font-medium capitalize">{k.replace(/_/g, " ")}:</span>{" "}

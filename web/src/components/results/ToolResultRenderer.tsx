@@ -13,12 +13,11 @@ interface Props {
 }
 
 export function ToolResultRenderer({ toolName, result }: Props) {
-  // The result wrapper has { tool_name, success, output, error_message }
   const output = (result.output as Record<string, unknown>) ?? result
 
   if (!result.success) {
     return (
-      <div className="text-xs text-red-400 italic">
+      <div className="text-base text-red-400 italic">
         {(result.error_message as string) ?? "Tool execution failed"}
       </div>
     )

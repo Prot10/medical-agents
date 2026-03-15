@@ -13,7 +13,7 @@ from fastapi.staticfiles import StaticFiles
 
 from neuroagent_schemas import NeuroBenchCase
 
-from .routes import cases, hospitals, agent, models, traces
+from .routes import cases, hospitals, agent, models, traces, copilot
 
 logger = logging.getLogger(__name__)
 
@@ -76,6 +76,7 @@ def create_app() -> FastAPI:
     app.include_router(models.router, prefix="/api/v1")
     app.include_router(agent.router, prefix="/api/v1")
     app.include_router(traces.router, prefix="/api/v1")
+    app.include_router(copilot.router, prefix="/api/v1")
 
     # Serve frontend static files in production
     if WEB_DIST.exists():

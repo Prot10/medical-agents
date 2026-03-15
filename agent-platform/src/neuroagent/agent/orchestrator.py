@@ -189,9 +189,20 @@ class AgentOrchestrator:
         patient_id: str | None = None,
         case_id: str | None = None,
     ):
-        """Run the agent and yield SSE event dicts at each step.
+        """Run the agent and yield SSE event dicts with real-time token streaming.
 
-        Same logic as run() but yields events instead of just recording them.
+        Yields delta events for thinking and assessment content so the frontend
+        can render tokens as they arrive.
+
+        Event types:
+          - thinking_delta: partial thinking text token
+          - thinking: complete thinking block (sent after all deltas)
+          - tool_call: tool invocation
+          - tool_result: tool output
+          - reflection: reflection marker
+          - assessment_delta: partial assessment text token
+          - assessment: complete assessment (sent after all deltas)
+          - run_complete: final summary
         """
         trace = AgentTrace(case_id=case_id)
         trace.start_timer()
@@ -201,16 +212,39 @@ class AgentOrchestrator:
 
         turn_number = 0
         for _ in range(self.config.max_turns):
-            response = self.llm.chat(
+            turn_number += 1
+
+            # Stream LLM response token-by-token
+            response = None
+            think_content = None
+            for event in self.llm.chat_stream(
                 messages=messages,
                 tools=tool_definitions if tool_definitions else None,
                 tool_choice="auto" if tool_definitions else None,
-            )
+            ):
+                if event["type"] == "think_delta":
+                    # Internal reasoning tokens (from <think> tags)
+                    yield {
+                        "type": "think_delta",
+                        "turn_number": turn_number,
+                        "delta": event["delta"],
+                    }
+                elif event["type"] == "content_delta":
+                    # Visible reasoning tokens
+                    yield {
+                        "type": "content_delta",
+                        "turn_number": turn_number,
+                        "delta": event["delta"],
+                    }
+                elif event["type"] == "done":
+                    response = event["response"]
+                    think_content = event.get("think_content")
 
-            turn_number += 1
+            if response is None:
+                break
 
             if response.tool_calls:
-                # Record and yield thinking
+                # Record thinking
                 trace.add_assistant_turn(
                     turn_number=turn_number,
                     content=response.content,
@@ -221,10 +255,25 @@ class AgentOrchestrator:
                     token_usage=response.usage,
                 )
 
+                # If the model didn't produce visible reasoning text (common with
+                # Ollama/Qwen3.5 which hides reasoning in <think> tags), extract
+                # reasoning from the clinical_context argument of tool calls.
+                reasoning = response.content or ""
+                if not reasoning and not think_content:
+                    contexts = []
+                    for tc in response.tool_calls:
+                        ctx = tc.arguments.get("clinical_context", "")
+                        if ctx:
+                            contexts.append(f"**{tc.name}**: {ctx}")
+                    if contexts:
+                        reasoning = "\n\n".join(contexts)
+
+                # Send complete thinking event (for replay/trace)
                 yield {
                     "type": "thinking",
                     "turn_number": turn_number,
-                    "content": response.content or "",
+                    "content": reasoning,
+                    "think_content": think_content or "",
                     "token_usage": response.usage,
                 }
 
@@ -239,7 +288,6 @@ class AgentOrchestrator:
                         "arguments": tc.arguments,
                     }
 
-                    from ..tools.base import ToolCall
                     tool_call = ToolCall(tool_name=tc.name, parameters=tc.arguments)
                     result = self.tools.execute(tool_call)
 
@@ -258,7 +306,6 @@ class AgentOrchestrator:
                         "output": result.model_dump(),
                     }
 
-                    from ..llm.prompts import format_tool_result
                     messages.append(
                         format_tool_result(
                             tool_call_id=tc.id,
@@ -273,7 +320,8 @@ class AgentOrchestrator:
                     yield {"type": "reflection", "turn_number": turn_number}
 
             else:
-                # Final assessment
+                # Final assessment — deltas were already streamed as thinking_delta,
+                # now re-emit them as assessment type for the complete record
                 trace.add_assistant_turn(
                     turn_number=turn_number,
                     content=response.content,
@@ -420,22 +468,41 @@ through sequential investigation.
 literature search, and drug interaction checking.
 - You must decide WHICH tools to call and in WHAT ORDER based on clinical reasoning.
 
+## CRITICAL: Visible Reasoning Before Every Action
+
+You MUST always write your clinical reasoning as text content BEFORE making any tool \
+calls. This is essential — your reasoning must be visible to the clinician reviewing \
+your work.
+
+**Before your first tool call**, write a brief clinical assessment covering:
+- Your initial impression based on the patient presentation
+- Your preliminary differential diagnosis
+- What investigations you want to order first and WHY
+
+**Before each subsequent tool call**, write your updated reasoning covering:
+- What you learned from the previous results
+- How the findings changed your differential
+- What you want to investigate next and WHY
+
+**Never call a tool without first writing your reasoning.** The text content and tool \
+calls are sent together — always include both.
+
 ## Reasoning Process (ReAct Loop)
 For each step, follow this pattern:
 
-**THINK**: State your current clinical reasoning.
-- What is the current differential diagnosis?
-- What information do you need next?
-- Why are you choosing this particular tool/test?
+1. **THINK** (write as text): State your current clinical reasoning.
+   - What is the current differential diagnosis?
+   - What information do you need next?
+   - Why are you choosing this particular tool/test?
 
-**ACT**: Call the appropriate tool with relevant parameters.
+2. **ACT**: Call the appropriate tool(s) with relevant parameters.
 
-**OBSERVE**: Review the tool results.
+3. **OBSERVE**: Review the tool results (provided by the system).
 
-**REFLECT**: Update your reasoning based on new information.
-- How do these findings change your differential?
-- What is the most likely diagnosis now?
-- Do you need more information or are you ready to conclude?
+4. **REFLECT** (write as text): Update your reasoning based on new information.
+   - How do these findings change your differential?
+   - What is the most likely diagnosis now?
+   - Do you need more information or are you ready to conclude?
 
 ## Output Format
 When you have gathered enough information, provide your final assessment as text \

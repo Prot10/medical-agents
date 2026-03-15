@@ -40,32 +40,57 @@ AVAILABLE_MODELS = [
 # Map HF model ID to our key
 _HF_TO_KEY = {m["hf_model_id"]: m["key"] for m in AVAILABLE_MODELS}
 
+# Backend endpoints to probe for running models
+_LLM_BACKENDS = [
+    ("http://localhost:8000", "vllm"),   # vLLM
+    ("http://localhost:11434", "ollama"),  # Ollama
+]
 
-async def _get_active_model(base_url: str = "http://localhost:8000") -> str | None:
-    """Probe the vLLM server to find which model is currently loaded."""
-    try:
-        async with httpx.AsyncClient(timeout=3.0) as client:
-            resp = await client.get(f"{base_url}/v1/models")
-            if resp.status_code == 200:
-                data = resp.json()
-                models = data.get("data", [])
-                if models:
-                    model_id = models[0].get("id", "")
-                    return _HF_TO_KEY.get(model_id, model_id)
-    except Exception:
-        pass
-    return None
+
+async def _get_active_models() -> list[dict]:
+    """Probe vLLM and Ollama to find which models are currently loaded."""
+    active: list[dict] = []
+    async with httpx.AsyncClient(timeout=3.0) as client:
+        for base_url, backend in _LLM_BACKENDS:
+            try:
+                resp = await client.get(f"{base_url}/v1/models")
+                if resp.status_code == 200:
+                    data = resp.json()
+                    for m in data.get("data", []):
+                        model_id = m.get("id", "")
+                        active.append({
+                            "key": _HF_TO_KEY.get(model_id, model_id),
+                            "model_id": model_id,
+                            "backend": backend,
+                            "base_url": f"{base_url}/v1",
+                        })
+            except Exception:
+                continue
+    return active
+
 
 
 @router.get("/models")
 async def list_models() -> list[dict]:
     """Return available models with their current status."""
-    active_key = await _get_active_model()
+    active_models = await _get_active_models()
+    active_keys = {m["key"] for m in active_models}
 
     result = []
+    # Add the static model list with status
     for m in AVAILABLE_MODELS:
-        status = "offline"
-        if active_key == m["key"]:
-            status = "ready"
+        status = "ready" if m["key"] in active_keys else "offline"
         result.append({**m, "status": status})
+
+    # Add any Ollama models not in the static list (e.g. qwen3.5:4b)
+    static_keys = {m["key"] for m in AVAILABLE_MODELS}
+    for am in active_models:
+        if am["key"] not in static_keys:
+            result.append({
+                "key": am["key"],
+                "name": am["model_id"],
+                "hf_model_id": am["model_id"],
+                "description": f"Ollama model ({am['backend']})",
+                "status": "ready",
+            })
     return result

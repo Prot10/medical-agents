@@ -1,23 +1,16 @@
-import { useEffect, useRef, useState } from "react"
-import { Play, Square, Download, Loader2, Zap, History } from "lucide-react"
+import { useEffect, useRef } from "react"
+import { Zap, Loader2 } from "lucide-react"
 import { useAgentStore } from "@/stores/agentStore"
 import { useAppStore } from "@/stores/appStore"
-import { useAgentRun } from "@/hooks/useAgentRun"
-import { useTraces, useReplay } from "@/hooks/useReplay"
-import { cn } from "@/lib/utils"
 import { ThinkingBlock } from "./ThinkingBlock"
 import { ToolCallCard } from "./ToolCallCard"
 import { ReflectionBlock } from "./ReflectionBlock"
 import { AssessmentPanel } from "./AssessmentPanel"
-import { TokenCounter } from "./TokenCounter"
+import { StreamingContent } from "./StreamingContent"
 
 export function AgentTimeline() {
-  const { selectedCaseId, selectedHospital, selectedModel } = useAppStore()
-  const { events, status, errorMessage, totalTokens, elapsedTime } = useAgentStore()
-  const { run, stop } = useAgentRun()
-  const { data: traces } = useTraces()
-  const { replay } = useReplay()
-  const [showReplayMenu, setShowReplayMenu] = useState(false)
+  const { selectedCaseId } = useAppStore()
+  const { events, status, errorMessage } = useAgentStore()
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -26,104 +19,21 @@ export function AgentTimeline() {
     }
   }, [events.length, status])
 
-  const handleRun = () => {
-    if (!selectedCaseId) return
-    run(selectedCaseId, selectedHospital, selectedModel)
-  }
-
-  const handleExport = () => {
-    const blob = new Blob([JSON.stringify(events, null, 2)], { type: "application/json" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = `trace_${selectedCaseId}_${Date.now()}.json`
-    a.click()
-    URL.revokeObjectURL(url)
-  }
-
   const renderedItems = buildRenderItems(events)
 
   return (
-    <div className="flex flex-col h-full noise-bg relative">
-      {/* Controls bar */}
-      <div className="flex items-center gap-2 px-3 py-2.5 border-b border-border bg-card/80 backdrop-blur-sm z-10">
-        {status === "running" ? (
-          <button
-            onClick={stop}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium bg-red-500/10 text-red-500 border border-red-500/20 rounded-md hover:bg-red-500/15 transition-colors"
-          >
-            <Square className="h-3 w-3 fill-current" />
-            Stop
-          </button>
-        ) : (
-          <button
-            onClick={handleRun}
-            disabled={!selectedCaseId}
-            className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-md transition-all",
-              selectedCaseId
-                ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm shadow-primary/20"
-                : "bg-muted text-muted-foreground cursor-not-allowed",
-            )}
-          >
-            <Play className="h-3 w-3 fill-current" />
-            Run Agent
-          </button>
-        )}
-
-        {/* Replay dropdown */}
-        {status !== "running" && traces && traces.length > 0 && (
-          <div className="relative">
-            <button
-              onClick={() => setShowReplayMenu(!showReplayMenu)}
-              className="flex items-center gap-1 px-2 py-1.5 text-[11px] text-muted-foreground hover:text-foreground rounded-md hover:bg-accent transition-colors"
-              title="Replay a saved trace"
-            >
-              <History className="h-3 w-3" />
-              Replay
-            </button>
-            {showReplayMenu && (
-              <div className="absolute top-full left-0 mt-1 w-56 bg-popover border border-border rounded-lg shadow-lg z-20 max-h-48 overflow-y-auto">
-                {traces.map((t) => (
-                  <button
-                    key={t.trace_id}
-                    onClick={() => {
-                      replay(t.trace_id)
-                      setShowReplayMenu(false)
-                    }}
-                    className="w-full text-left px-3 py-2 text-[11px] hover:bg-accent transition-colors border-b border-border/30 last:border-0"
-                  >
-                    <div className="font-mono font-medium">{t.case_id}</div>
-                    <div className="text-[9px] text-muted-foreground mt-0.5">
-                      {t.total_tool_calls} calls · {(t.total_tokens / 1000).toFixed(1)}k tokens · {t.elapsed_time_seconds.toFixed(1)}s
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
+    <div className="flex flex-col h-full noise-bg relative bg-card">
+      {/* Timeline header */}
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-card/80 backdrop-blur-sm z-10 shrink-0">
+        <div className="h-6 w-6 rounded-lg bg-primary/10 flex items-center justify-center">
+          <Zap className="h-3.5 w-3.5 text-primary" />
+        </div>
+        <span className="text-base font-semibold">Agent Timeline</span>
         {status === "running" && (
-          <div className="flex items-center gap-1.5 text-[10px] text-primary/60">
-            <Loader2 className="h-3 w-3 animate-spin" />
+          <div className="flex items-center gap-1.5 ml-2">
+            <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+            <span className="text-sm text-primary">Running...</span>
           </div>
-        )}
-
-        <div className="flex-1" />
-
-        {events.length > 0 && (
-          <TokenCounter tokens={totalTokens} time={elapsedTime} status={status} />
-        )}
-
-        {status === "complete" && (
-          <button
-            onClick={handleExport}
-            className="p-1.5 rounded-md hover:bg-accent transition-colors text-muted-foreground hover:text-foreground"
-            title="Export trace JSON"
-          >
-            <Download className="h-3.5 w-3.5" />
-          </button>
         )}
       </div>
 
@@ -131,29 +41,44 @@ export function AgentTimeline() {
       <div ref={scrollRef} className="flex-1 overflow-y-auto relative z-[1]">
         {events.length === 0 && status === "idle" && (
           <div className="flex flex-col items-center justify-center h-full text-muted-foreground/30">
-            <Zap className="h-10 w-10 mb-3" />
-            <p className="text-xs tracking-wide">
+            <div className="h-16 w-16 rounded-2xl bg-primary/5 flex items-center justify-center mb-4">
+              <Zap className="h-8 w-8 text-primary/20" />
+            </div>
+            <p className="text-base font-medium">
               {selectedCaseId ? "Ready to run" : "Select a case"}
+            </p>
+            <p className="text-sm text-muted-foreground/40 mt-1">
+              {selectedCaseId ? "Click Run Agent to start" : "Choose a case from the sidebar"}
             </p>
           </div>
         )}
 
         {renderedItems.length > 0 && (
-          <div className="p-3 space-y-2">
+          <div className="p-4 space-y-3">
             {renderedItems.map((item, i) => {
               switch (item.type) {
                 case "thinking":
-                  return <ThinkingBlock key={i} content={item.content} turnNumber={item.turnNumber} />
+                  return (
+                    <div key={i} className="space-y-3 animate-fade-in">
+                      {item.content && (
+                        <StreamingContent content={item.content} turnNumber={item.turnNumber} />
+                      )}
+                      {item.thinkContent && (
+                        <ThinkingBlock content={item.thinkContent} turnNumber={item.turnNumber} />
+                      )}
+                    </div>
+                  )
                 case "tool_pair":
                   return (
-                    <ToolCallCard
-                      key={i}
-                      toolName={item.toolName}
-                      arguments={item.arguments}
-                      result={item.result}
-                      success={item.success}
-                      turnNumber={item.turnNumber}
-                    />
+                    <div key={i} className="animate-slide-up">
+                      <ToolCallCard
+                        toolName={item.toolName}
+                        arguments={item.arguments}
+                        result={item.result}
+                        success={item.success}
+                        turnNumber={item.turnNumber}
+                      />
+                    </div>
                   )
                 case "tool_call_pending":
                   return (
@@ -168,26 +93,30 @@ export function AgentTimeline() {
                 case "reflection":
                   return <ReflectionBlock key={i} />
                 case "assessment":
-                  return <AssessmentPanel key={i} content={item.content} />
+                  return (
+                    <div key={i} className="animate-slide-up">
+                      <AssessmentPanel content={item.content} />
+                    </div>
+                  )
                 default:
                   return null
               }
             })}
 
             {status === "running" && (
-              <div className="flex items-center gap-2.5 py-3 pl-1">
-                <div className="relative h-2.5 w-2.5">
+              <div className="flex items-center gap-3 py-4 pl-2">
+                <div className="relative h-3 w-3">
                   <div className="absolute inset-0 rounded-full bg-primary animate-ping opacity-30" />
-                  <div className="relative h-2.5 w-2.5 rounded-full bg-primary" />
+                  <div className="relative h-3 w-3 rounded-full bg-primary" />
                 </div>
-                <span className="text-[11px] text-muted-foreground/60">Agent is thinking...</span>
+                <span className="text-base text-muted-foreground/60">Agent is thinking...</span>
               </div>
             )}
           </div>
         )}
 
         {errorMessage && (
-          <div className="m-3 p-3 rounded-lg border border-red-500/30 bg-red-500/5 text-[11px] text-red-500">
+          <div className="m-4 p-4 rounded-xl border border-red-500/30 bg-red-500/5 text-base text-red-500">
             {errorMessage}
           </div>
         )}
@@ -196,9 +125,9 @@ export function AgentTimeline() {
   )
 }
 
-// Build renderable items from raw events
+// Build renderable items from raw events (excludes delta events)
 type RenderItem =
-  | { type: "thinking"; content: string; turnNumber: number }
+  | { type: "thinking"; content: string; thinkContent: string; turnNumber: number }
   | { type: "tool_pair"; toolName: string; arguments: Record<string, unknown>; result: Record<string, unknown>; success: boolean; turnNumber: number }
   | { type: "tool_call_pending"; toolName: string; arguments: Record<string, unknown>; turnNumber: number }
   | { type: "reflection" }
@@ -210,8 +139,13 @@ function buildRenderItems(events: import("@/api/types").AgentEvent[]): RenderIte
   for (let i = 0; i < events.length; i++) {
     const ev = events[i]
 
-    if (ev.type === "thinking" && ev.content) {
-      items.push({ type: "thinking", content: ev.content, turnNumber: ev.turn_number ?? 0 })
+    if (ev.type === "thinking") {
+      items.push({
+        type: "thinking",
+        content: ev.content ?? "",
+        thinkContent: ev.think_content ?? "",
+        turnNumber: ev.turn_number ?? 0,
+      })
     } else if (ev.type === "tool_call") {
       const resultEvent = events.slice(i + 1).find(
         (e) => e.type === "tool_result" && e.tool_name === ev.tool_name

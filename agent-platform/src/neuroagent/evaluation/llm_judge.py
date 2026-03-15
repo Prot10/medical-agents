@@ -17,7 +17,7 @@ _PROMPT_DIR = Path(__file__).resolve().parent.parent.parent.parent / "config" / 
 
 
 def _load_judge_prompt() -> str:
-    prompt_path = _PROMPT_DIR / "llm_judge.txt"
+    prompt_path = _PROMPT_DIR / "llm_judge.md"
     if prompt_path.exists():
         return prompt_path.read_text()
     raise FileNotFoundError(f"Judge prompt not found at {prompt_path}")

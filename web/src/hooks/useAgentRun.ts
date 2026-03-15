@@ -8,7 +8,6 @@ export function useAgentRun() {
 
   const run = useCallback(
     async (caseId: string, hospital: string, model: string) => {
-      // Abort any existing run
       abortRef.current?.abort()
       const controller = new AbortController()
       abortRef.current = controller
