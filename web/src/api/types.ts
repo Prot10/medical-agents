@@ -63,7 +63,7 @@ export interface Vitals {
 export interface GroundTruth {
   primary_diagnosis: string
   icd_code: string
-  differential_diagnoses: DifferentialDiagnosis[]
+  differential: DifferentialDiagnosis[]
   optimal_actions: OptimalAction[]
   critical_actions: string[]
   contraindicated_actions: string[]
@@ -103,11 +103,14 @@ export interface ModelInfo {
   hf_model_id: string
   description: string
   status: "ready" | "loading" | "offline"
+  provider?: "local" | "github" | "copilot"
 }
 
 // Agent SSE Events
 export type AgentEventType =
   | "run_started"
+  | "think_delta"
+  | "content_delta"
   | "thinking"
   | "tool_call"
   | "tool_result"
@@ -120,6 +123,8 @@ export interface AgentEvent {
   type: AgentEventType
   turn_number?: number
   content?: string
+  think_content?: string
+  delta?: string
   tool_name?: string
   arguments?: Record<string, unknown>
   success?: boolean

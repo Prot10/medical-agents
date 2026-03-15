@@ -2,8 +2,8 @@ import type { CaseIndexEntry, CaseDetail, Hospital, ModelInfo, TraceSummary, Age
 
 const BASE = "/api/v1"
 
-async function fetchJSON<T>(url: string): Promise<T> {
-  const res = await fetch(url)
+async function fetchJSON<T>(url: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(url, init)
   if (!res.ok) throw new Error(`${res.status}: ${res.statusText}`)
   return res.json()
 }
@@ -14,7 +14,14 @@ export const api = {
   getHospitals: () => fetchJSON<Hospital[]>(`${BASE}/hospitals`),
   getHospitalRules: (id: string) => fetchJSON<Record<string, unknown>>(`${BASE}/hospitals/${id}/rules`),
   getModels: () => fetchJSON<ModelInfo[]>(`${BASE}/models`),
+  // Copilot device flow
+  copilotStartDeviceFlow: () => fetchJSON<{ device_code: string; user_code: string; verification_uri: string; expires_in: number; interval: number }>(`${BASE}/copilot/device-code`, { method: "POST" }),
+  copilotPollToken: (deviceCode: string) => fetchJSON<{ status: string; error?: string; interval?: number }>(`${BASE}/copilot/poll-token`, { method: "POST", body: JSON.stringify({ device_code: deviceCode }), headers: { "Content-Type": "application/json" } }),
+  copilotStatus: () => fetchJSON<{ authenticated: boolean; copilot_access: boolean }>(`${BASE}/copilot/status`),
+  copilotModels: () => fetchJSON<ModelInfo[]>(`${BASE}/copilot/models`),
+  copilotLogout: () => fetchJSON<{ status: string }>(`${BASE}/copilot/logout`, { method: "POST" }),
   getTraces: () => fetchJSON<TraceSummary[]>(`${BASE}/traces`),
+  getTrace: (id: string) => fetchJSON<{ case_id: string; events: AgentEvent[]; [key: string]: unknown }>(`${BASE}/traces/${id}`),
 }
 
 /** Parse SSE events from a ReadableStream, calling onEvent for each. */
@@ -63,11 +70,18 @@ export async function streamAgentRun(
   onEvent: (event: AgentEvent) => void,
   onError: (error: Error) => void,
   signal?: AbortSignal,
+  options?: { base_url?: string; api_key?: string },
 ): Promise<void> {
   const response = await fetch(`${BASE}/agent/run`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ case_id: caseId, hospital, model }),
+    body: JSON.stringify({
+      case_id: caseId,
+      hospital,
+      model,
+      ...(options?.base_url && { base_url: options.base_url }),
+      ...(options?.api_key && { api_key: options.api_key }),
+    }),
     signal,
   })
 
@@ -77,6 +91,37 @@ export async function streamAgentRun(
   }
 
   await consumeSSEStream(response, onEvent)
+}
+
+export async function streamEvaluation(
+  caseId: string,
+  model: string,
+  events: AgentEvent[],
+  finalResponse: string,
+  toolsCalled: string[],
+  onEvent: (event: Record<string, unknown>) => void,
+  onError: (error: Error) => void,
+  signal?: AbortSignal,
+): Promise<void> {
+  const response = await fetch(`${BASE}/agent/evaluate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      case_id: caseId,
+      model,
+      events,
+      final_response: finalResponse,
+      tools_called: toolsCalled,
+    }),
+    signal,
+  })
+
+  if (!response.ok) {
+    onError(new Error(`${response.status}: ${response.statusText}`))
+    return
+  }
+
+  await consumeSSEStream(response, onEvent as unknown as (event: AgentEvent) => void)
 }
 
 export async function replayTrace(
