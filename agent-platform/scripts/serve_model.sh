@@ -82,9 +82,8 @@ case "$MODEL" in
     ;;
   medgemma-27b)
     # MedGemma 27B Text — Gemma 3 based, text-only, FP8 dynamic quantization
-    # 27 GB in VRAM, ~8 GB left for KV cache — limited to 8K context
-    # Note: MedGemma does not support native tool calling; agent falls back
-    # to text-only diagnosis without tool use
+    # 27 GB in VRAM, ~8 GB for KV cache — limited to 8K context
+    # Note: MedGemma does not support native tool calling
     $VLLM \
       --model ig1/medgemma-27b-text-it-FP8-Dynamic \
       "${COMMON_FLAGS[@]}" \

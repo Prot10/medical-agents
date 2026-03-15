@@ -8,7 +8,7 @@ NeuroAgent uses [vLLM](https://docs.vllm.ai/) to serve LLMs locally via an OpenA
 |---|---|---|---|---|
 | `qwen3.5-9b` | `Qwen/Qwen3.5-9B` | ~18 GB | ~20 GB | **Default.** Fast (~70 tok/s on A100), good tool calling. Best for development. |
 | `qwen3.5-27b-awq` | `QuantTrio/Qwen3.5-27B-AWQ` | ~15 GB | ~22 GB | AWQ 4-bit via Marlin kernels (~55 tok/s). Best quality. |
-| `medgemma-27b` | `unsloth/medgemma-27b-text-it-GGUF:Q4_K_M` | ~15 GB | ~20 GB | Medical-domain specialist. Requires `huggingface-cli login` (gated). |
+| `medgemma-27b` | `ig1/medgemma-27b-text-it-FP8-Dynamic` | ~31 GB | ~33 GB | Medical specialist, FP8 quantized. Tight on A100-40GB (8K context limit). |
 | `medgemma-4b` | `google/medgemma-1.5-4b-it` | ~8 GB | ~10 GB | Small medical model. Fast iteration. Gated access. |
 | `openbio-8b` | `aaditya/Llama3-OpenBioLLM-8B` | ~16 GB | ~18 GB | Biomedical baseline. |
 
