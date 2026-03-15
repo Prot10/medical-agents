@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils"
 import { AlertTriangle, Shield } from "lucide-react"
+import { Badge } from "@/components/ui/Badge"
 
 interface Interaction {
   drug: string
@@ -21,30 +22,32 @@ export function DrugInteractions({ data }: { data: Record<string, unknown> }) {
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {proposed && (
-        <div className="text-[11px]">
+        <div className="text-base">
           <span className="font-medium">Proposed: </span>
           <span className="font-mono text-orange-500 dark:text-orange-400">{proposed}</span>
         </div>
       )}
 
       {interactions.length > 0 && (
-        <div className="space-y-1">
+        <div className="space-y-2">
           {interactions.map((ix, i) => (
             <div
               key={i}
               className={cn(
-                "rounded-md border p-2 text-[11px]",
+                "rounded-lg border p-3 text-base",
                 severityColors[ix.severity?.toLowerCase()] ?? "border-border",
               )}
             >
-              <div className="flex items-center gap-1.5">
-                <AlertTriangle className="h-3 w-3 shrink-0" />
-                <span className="font-medium">{ix.drug}</span>
-                <span className="text-[9px] uppercase tracking-wider ml-auto opacity-70">{ix.severity}</span>
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                <span className="font-semibold">{ix.drug}</span>
+                <Badge variant={ix.severity?.toLowerCase() === "major" ? "destructive" : "warning"} className="ml-auto text-xs">
+                  {ix.severity}
+                </Badge>
               </div>
-              <p className="text-[10px] mt-1 opacity-80">{ix.description}</p>
+              <p className="text-base mt-1.5 opacity-80">{ix.description}</p>
             </div>
           ))}
         </div>
@@ -52,11 +55,11 @@ export function DrugInteractions({ data }: { data: Record<string, unknown> }) {
 
       {contraindications.length > 0 && (
         <div>
-          <div className="text-[10px] font-semibold text-red-500 mb-0.5">Contraindications</div>
-          <ul className="space-y-0.5">
+          <div className="text-sm font-semibold text-red-500 mb-1.5">Contraindications</div>
+          <ul className="space-y-1">
             {contraindications.map((c, i) => (
-              <li key={i} className="flex items-start gap-1.5 text-[10px] text-red-400">
-                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
+              <li key={i} className="flex items-start gap-2 text-base text-red-400">
+                <span className="mt-1.5 h-2 w-2 rounded-full bg-red-500 shrink-0" />
                 {c}
               </li>
             ))}
@@ -66,20 +69,15 @@ export function DrugInteractions({ data }: { data: Record<string, unknown> }) {
 
       {alternatives.length > 0 && (
         <div>
-          <div className="flex items-center gap-1 text-[10px] font-semibold text-green-600 dark:text-green-400 mb-0.5">
-            <Shield className="h-3 w-3" />
+          <div className="flex items-center gap-1.5 text-sm font-semibold text-emerald-600 dark:text-emerald-400 mb-1.5">
+            <Shield className="h-3.5 w-3.5" />
             Alternatives
           </div>
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-1.5">
             {alternatives.map((a, i) => {
               const name = typeof a === "string" ? a : a.drug
               return (
-                <span
-                  key={i}
-                  className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20"
-                >
-                  {name}
-                </span>
+                <Badge key={i} variant="success">{name}</Badge>
               )
             })}
           </div>
