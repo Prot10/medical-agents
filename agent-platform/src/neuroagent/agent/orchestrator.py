@@ -243,14 +243,20 @@ class AgentOrchestrator:
             if response is None:
                 break
 
-            if response.tool_calls:
+            # Filter out hallucinated tool names (e.g. "Final Assessment")
+            valid_tool_calls = [
+                tc for tc in (response.tool_calls or [])
+                if tc.name in self.tools.tools
+            ]
+
+            if valid_tool_calls:
                 # Record thinking
                 trace.add_assistant_turn(
                     turn_number=turn_number,
                     content=response.content,
                     tool_calls=[
                         {"name": tc.name, "arguments": tc.arguments}
-                        for tc in response.tool_calls
+                        for tc in valid_tool_calls
                     ],
                     token_usage=response.usage,
                 )
@@ -261,7 +267,7 @@ class AgentOrchestrator:
                 reasoning = response.content or ""
                 if not reasoning and not think_content:
                     contexts = []
-                    for tc in response.tool_calls:
+                    for tc in valid_tool_calls:
                         ctx = tc.arguments.get("clinical_context", "")
                         if ctx:
                             contexts.append(f"**{tc.name}**: {ctx}")
@@ -280,7 +286,7 @@ class AgentOrchestrator:
                 messages.append(self._format_assistant_message(response))
 
                 # Execute each tool call
-                for tc in response.tool_calls:
+                for tc in valid_tool_calls:
                     yield {
                         "type": "tool_call",
                         "turn_number": turn_number,
