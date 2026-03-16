@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react"
-import { Search, Brain, Heart, Zap, Activity, FlaskConical, Pill, AlertCircle, Microscope, Stethoscope, HeartPulse } from "lucide-react"
+import { Search, Brain, Heart, Zap, Activity, FlaskConical, Pill, AlertCircle, Microscope, Stethoscope, HeartPulse, Database } from "lucide-react"
 import { DifficultyStars } from "@/components/ui/DifficultyStars"
-import { useCases } from "@/hooks/useCases"
+import { useCases, useDatasets, useActivateDataset } from "@/hooks/useCases"
 import { useAppStore } from "@/stores/appStore"
 import { useAgentStore } from "@/stores/agentStore"
 import { cn } from "@/lib/utils"
@@ -36,6 +36,8 @@ const CONDITION_ICONS: Record<string, React.ElementType> = {
 
 export function CaseBrowser() {
   const { data: cases, isLoading } = useCases()
+  const { data: datasets } = useDatasets()
+  const activateDataset = useActivateDataset()
   const { selectedCaseId, selectCase } = useAppStore()
   const resetAgent = useAgentStore((s) => s.reset)
   const [search, setSearch] = useState("")
@@ -74,8 +76,35 @@ export function CaseBrowser() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Search */}
+      {/* Dataset toggle + Search */}
       <div className="p-3 border-b border-sidebar-border">
+        {/* Dataset selector */}
+        {datasets && datasets.length > 1 && (
+          <div className="flex gap-1 mb-2">
+            {datasets.map((d) => (
+              <button
+                key={d.version}
+                onClick={() => {
+                  if (!d.active) {
+                    activateDataset.mutate(d.version)
+                    resetAgent()
+                  }
+                }}
+                disabled={activateDataset.isPending}
+                className={cn(
+                  "flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg border text-xs font-medium transition-all",
+                  d.active
+                    ? "border-primary/30 bg-primary/10 text-primary"
+                    : "border-sidebar-border hover:bg-sidebar-accent text-muted-foreground",
+                )}
+              >
+                <Database className="h-3 w-3" />
+                {d.name}
+              </button>
+            ))}
+          </div>
+        )}
+
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input

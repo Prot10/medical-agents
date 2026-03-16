@@ -1,5 +1,5 @@
-import { useEffect, useRef, useCallback } from "react"
-import { Stethoscope, BarChart3, History, PanelLeftClose, PanelLeft, Moon, Sun, ChevronDown, Hospital, Settings, Shield, Play, Square } from "lucide-react"
+import { useEffect, useRef, useCallback, useState } from "react"
+import { Stethoscope, BarChart3, History, PanelLeftClose, PanelLeft, Moon, Sun, ChevronDown, ChevronUp, Hospital, Settings, Shield, Play, Square } from "lucide-react"
 import { useQueryClient } from "@tanstack/react-query"
 import { useAppStore } from "@/stores/appStore"
 import { useModels, useHospitals } from "@/hooks/useCases"
@@ -112,7 +112,10 @@ export function Sidebar() {
     queryClient.invalidateQueries({ queryKey: ["models"] })
   }, [resetLoading, queryClient])
 
+  const [footerExpanded, setFooterExpanded] = useState(false)
+
   const currentModel = models?.find((m) => m.key === selectedModel)
+  const currentHospital = hospitals?.find((h) => h.id === selectedHospital)
   const statusColor = {
     ready: "bg-emerald-500",
     loading: "bg-amber-500",
@@ -183,115 +186,144 @@ export function Sidebar() {
         )}
       </div>
 
-      {/* Footer: Model + Hospital pickers + Dark mode */}
-      <div className={cn("border-t border-sidebar-border", sidebarCollapsed ? "px-2 py-2" : "px-3 py-3 space-y-2")}>
+      {/* Footer: Collapsible config + Dark mode */}
+      <div className={cn("border-t border-sidebar-border", sidebarCollapsed ? "px-2 py-2" : "")}>
         {!sidebarCollapsed ? (
           <>
-            {/* Agent Model picker */}
-            <div className="space-y-1">
-              <label className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">Agent Model</label>
-              <div className="flex gap-1.5">
-                <div className="relative flex-1">
-                  <select
-                    value={selectedModel}
-                    onChange={(e) => setModel(e.target.value)}
-                    className="w-full text-sm bg-sidebar-accent border border-sidebar-border rounded-lg pl-6 pr-7 py-1.5 text-sidebar-foreground focus:outline-none focus:ring-1 focus:ring-ring appearance-none"
-                  >
-                    {models?.filter((m) => m.provider !== "copilot").map((m) => (
-                      <option key={m.key} value={m.key}>
-                        {m.name} {m.status !== "ready" ? `(${m.status})` : ""}
-                      </option>
-                    ))}
-                    {models?.some((m) => m.provider === "copilot") && (
-                      <optgroup label="GitHub Copilot">
-                        {models?.filter((m) => m.provider === "copilot").map((m) => (
-                          <option key={m.key} value={m.key}>{m.name}</option>
+            {/* Compact summary bar — always visible */}
+            <button
+              onClick={() => setFooterExpanded((v) => !v)}
+              className="w-full flex items-center gap-2 px-3 py-2 hover:bg-sidebar-accent transition-colors text-sm"
+            >
+              <span className={cn("h-2 w-2 rounded-full shrink-0", statusColor, isLoadingThis && "animate-pulse")} />
+              <span className="truncate text-sidebar-foreground font-medium">
+                {currentModel?.name ?? selectedModel}
+              </span>
+              <span className="text-muted-foreground truncate">
+                {currentHospital?.name?.split("(")[0]?.split(",")[0]?.trim() ?? selectedHospital}
+              </span>
+              <span className="ml-auto shrink-0 text-muted-foreground">
+                {footerExpanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
+              </span>
+            </button>
+
+            {/* Expanded pickers */}
+            {footerExpanded && (
+              <div className="px-3 pb-3 space-y-2">
+                {/* Agent Model picker */}
+                <div className="space-y-1">
+                  <label className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">Agent Model</label>
+                  <div className="flex gap-1.5">
+                    <div className="relative flex-1">
+                      <select
+                        value={selectedModel}
+                        onChange={(e) => setModel(e.target.value)}
+                        className="w-full text-sm bg-sidebar-accent border border-sidebar-border rounded-lg pl-6 pr-7 py-1.5 text-sidebar-foreground focus:outline-none focus:ring-1 focus:ring-ring appearance-none"
+                      >
+                        {models?.filter((m) => m.provider !== "copilot").map((m) => (
+                          <option key={m.key} value={m.key}>
+                            {m.name} {m.status !== "ready" ? `(${m.status})` : ""}
+                          </option>
                         ))}
-                      </optgroup>
-                    )}
-                  </select>
-                  <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground pointer-events-none" />
-                  <span className={`absolute left-2 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full ${statusColor} ${isLoadingThis ? "animate-pulse" : ""}`} />
+                        {models?.some((m) => m.provider === "copilot") && (
+                          <optgroup label="GitHub Copilot">
+                            {models?.filter((m) => m.provider === "copilot").map((m) => (
+                              <option key={m.key} value={m.key}>{m.name}</option>
+                            ))}
+                          </optgroup>
+                        )}
+                      </select>
+                      <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground pointer-events-none" />
+                      <span className={`absolute left-2 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full ${statusColor} ${isLoadingThis ? "animate-pulse" : ""}`} />
+                    </div>
+                    {isLoadingThis ? (
+                      <button
+                        onClick={handleStopLoad}
+                        className="px-2 py-1.5 text-xs font-medium text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg hover:bg-red-500/15 transition-colors shrink-0"
+                        title="Stop loading"
+                      >
+                        <Square className="h-3.5 w-3.5 fill-current" />
+                      </button>
+                    ) : canLoad ? (
+                      <button
+                        onClick={() => triggerLoad(selectedModel)}
+                        className="px-2.5 py-1.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-lg hover:bg-emerald-500/15 transition-colors shrink-0 flex items-center gap-1"
+                        title="Load this model"
+                      >
+                        <Play className="h-3 w-3 fill-current" />
+                        Load
+                      </button>
+                    ) : null}
+                  </div>
                 </div>
-                {isLoadingThis ? (
-                  <button
-                    onClick={handleStopLoad}
-                    className="px-2 py-1.5 text-xs font-medium text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg hover:bg-red-500/15 transition-colors shrink-0"
-                    title="Stop loading"
-                  >
-                    <Square className="h-3.5 w-3.5 fill-current" />
-                  </button>
-                ) : canLoad ? (
-                  <button
-                    onClick={() => triggerLoad(selectedModel)}
-                    className="px-2.5 py-1.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-lg hover:bg-emerald-500/15 transition-colors shrink-0 flex items-center gap-1"
-                    title="Load this model"
-                  >
-                    <Play className="h-3 w-3 fill-current" />
-                    Load
-                  </button>
-                ) : null}
-              </div>
-            </div>
 
-            {/* Evaluator Model picker */}
-            <div className="space-y-1">
-              <label className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">Evaluator Model</label>
-              <div className="relative">
-                <select
-                  value={selectedEvaluatorModel}
-                  onChange={(e) => setEvaluatorModel(e.target.value)}
-                  className="w-full text-sm bg-sidebar-accent border border-sidebar-border rounded-lg px-2.5 py-1.5 text-sidebar-foreground focus:outline-none focus:ring-1 focus:ring-ring appearance-none pr-7"
-                >
-                  <option value="">Select evaluator...</option>
-                  {models?.filter((m) => m.provider !== "copilot").map((m) => (
-                    <option key={m.key} value={m.key}>
-                      {m.name} {m.status !== "ready" ? `(${m.status})` : ""}
-                    </option>
-                  ))}
-                  {models?.some((m) => m.provider === "copilot") && (
-                    <optgroup label="GitHub Copilot">
-                      {models?.filter((m) => m.provider === "copilot").map((m) => (
-                        <option key={m.key} value={m.key}>{m.name}</option>
+                {/* Evaluator Model picker */}
+                <div className="space-y-1">
+                  <label className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">Evaluator Model</label>
+                  <div className="relative">
+                    <select
+                      value={selectedEvaluatorModel}
+                      onChange={(e) => setEvaluatorModel(e.target.value)}
+                      className="w-full text-sm bg-sidebar-accent border border-sidebar-border rounded-lg px-2.5 py-1.5 text-sidebar-foreground focus:outline-none focus:ring-1 focus:ring-ring appearance-none pr-7"
+                    >
+                      <option value="">Select evaluator...</option>
+                      {models?.filter((m) => m.provider !== "copilot").map((m) => (
+                        <option key={m.key} value={m.key}>
+                          {m.name} {m.status !== "ready" ? `(${m.status})` : ""}
+                        </option>
                       ))}
-                    </optgroup>
-                  )}
-                </select>
-                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground pointer-events-none" />
-              </div>
-            </div>
+                      {models?.some((m) => m.provider === "copilot") && (
+                        <optgroup label="GitHub Copilot">
+                          {models?.filter((m) => m.provider === "copilot").map((m) => (
+                            <option key={m.key} value={m.key}>{m.name}</option>
+                          ))}
+                        </optgroup>
+                      )}
+                    </select>
+                    <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground pointer-events-none" />
+                  </div>
+                </div>
 
-            {/* Hospital picker */}
-            <div className="space-y-1">
-              <label className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">Hospital</label>
-              <div className="relative">
-                <select
-                  value={selectedHospital}
-                  onChange={(e) => setHospital(e.target.value)}
-                  className="w-full text-sm bg-sidebar-accent border border-sidebar-border rounded-lg px-2.5 py-1.5 text-sidebar-foreground focus:outline-none focus:ring-1 focus:ring-ring appearance-none pr-7"
-                >
-                  {hospitals?.map((h) => (
-                    <option key={h.id} value={h.id}>{h.name}</option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground pointer-events-none" />
+                {/* Hospital picker */}
+                <div className="space-y-1">
+                  <label className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">Hospital</label>
+                  <div className="relative">
+                    <select
+                      value={selectedHospital}
+                      onChange={(e) => setHospital(e.target.value)}
+                      className="w-full text-sm bg-sidebar-accent border border-sidebar-border rounded-lg px-2.5 py-1.5 text-sidebar-foreground focus:outline-none focus:ring-1 focus:ring-ring appearance-none pr-7"
+                    >
+                      {hospitals?.map((h) => (
+                        <option key={h.id} value={h.id}>{h.name}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground pointer-events-none" />
+                  </div>
+                </div>
               </div>
+            )}
+
+            {/* Dark mode toggle */}
+            <div className="px-3 pb-2">
+              <button
+                onClick={toggleDarkMode}
+                className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-sidebar-accent transition-colors text-muted-foreground hover:text-sidebar-foreground"
+                title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+              >
+                {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                <span className="text-sm">{darkMode ? "Light mode" : "Dark mode"}</span>
+              </button>
             </div>
           </>
-        ) : null}
-
-        {/* Dark mode toggle */}
-        <button
-          onClick={toggleDarkMode}
-          className={cn(
-            "flex items-center gap-2 rounded-lg hover:bg-sidebar-accent transition-colors text-muted-foreground hover:text-sidebar-foreground",
-            sidebarCollapsed ? "p-2 mx-auto" : "w-full px-2.5 py-1.5",
-          )}
-          title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
-        >
-          {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          {!sidebarCollapsed && <span className="text-sm">{darkMode ? "Light mode" : "Dark mode"}</span>}
-        </button>
+        ) : (
+          <button
+            onClick={toggleDarkMode}
+            className="p-2 mx-auto flex rounded-lg hover:bg-sidebar-accent transition-colors text-muted-foreground hover:text-sidebar-foreground"
+            title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
+        )}
       </div>
     </aside>
   )

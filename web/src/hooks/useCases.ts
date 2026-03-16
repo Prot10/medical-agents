@@ -1,6 +1,25 @@
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { api } from "@/api/client"
 import type { ModelInfo } from "@/api/types"
+
+export function useDatasets() {
+  return useQuery({
+    queryKey: ["datasets"],
+    queryFn: api.getDatasets,
+    staleTime: 30_000,
+  })
+}
+
+export function useActivateDataset() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (version: string) => api.activateDataset(version),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["datasets"] })
+      queryClient.invalidateQueries({ queryKey: ["cases"] })
+    },
+  })
+}
 
 export function useCases() {
   return useQuery({

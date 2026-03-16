@@ -1,4 +1,4 @@
-import type { CaseIndexEntry, CaseDetail, Hospital, HospitalRulesDetail, PathwayDetail, ModelInfo, TraceSummary, AgentEvent } from "./types"
+import type { CaseIndexEntry, CaseDetail, Hospital, HospitalRulesDetail, PathwayDetail, ModelInfo, TraceSummary, AgentEvent, DatasetInfo } from "./types"
 
 const BASE = "/api/v1"
 
@@ -9,6 +9,12 @@ async function fetchJSON<T>(url: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  getDatasets: () => fetchJSON<DatasetInfo[]>(`${BASE}/datasets`),
+  activateDataset: (version: string) =>
+    fetchJSON<{ status: string; version: string; case_count: number }>(
+      `${BASE}/datasets/${version}/activate`,
+      { method: "POST" },
+    ),
   getCases: () => fetchJSON<CaseIndexEntry[]>(`${BASE}/cases`),
   getCase: (id: string) => fetchJSON<CaseDetail>(`${BASE}/cases/${id}`),
   getHospitals: () => fetchJSON<Hospital[]>(`${BASE}/hospitals`),
@@ -37,6 +43,10 @@ export const api = {
   copilotModels: () => fetchJSON<ModelInfo[]>(`${BASE}/copilot/models`),
   copilotLogout: () => fetchJSON<{ status: string }>(`${BASE}/copilot/logout`, { method: "POST" }),
   getTraces: () => fetchJSON<TraceSummary[]>(`${BASE}/traces`),
+  deleteTrace: (id: string) =>
+    fetch(`${BASE}/traces/${id}`, { method: "DELETE" }).then((res) => {
+      if (!res.ok) throw new Error(`${res.status}: ${res.statusText}`)
+    }),
   getTrace: (id: string) => fetchJSON<{ case_id: string; events: AgentEvent[]; [key: string]: unknown }>(`${BASE}/traces/${id}`),
   loadModel: (modelKey: string) =>
     fetch(`${BASE}/models/${modelKey}/load`, { method: "POST" }),

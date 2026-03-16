@@ -168,10 +168,24 @@ export interface AgentEvent {
   message?: string
 }
 
+// Dataset
+export interface DatasetInfo {
+  version: string
+  name: string
+  description: string
+  case_count: number
+  active: boolean
+}
+
 // Trace (for replay)
 export interface TraceSummary {
   trace_id: string
   case_id: string
+  hospital: string
+  model: string
+  model_short: string
+  condition: string
+  difficulty: string
   total_tool_calls: number
   tools_called: string[]
   total_tokens: number

@@ -1,11 +1,12 @@
 import { useMemo } from "react"
-import { BarChart3, Users, Activity, Brain } from "lucide-react"
-import { useCases } from "@/hooks/useCases"
+import { BarChart3, Users, Activity, Brain, Database } from "lucide-react"
+import { useCases, useDatasets, useActivateDataset } from "@/hooks/useCases"
 import { Card, CardTitle } from "@/components/ui/Card"
 import { ConditionChart } from "./charts/ConditionChart"
 import { DifficultyDonut } from "./charts/DifficultyDonut"
 import { AgeHistogram } from "./charts/AgeHistogram"
 import { CaseHeatmap } from "./charts/CaseHeatmap"
+import { cn } from "@/lib/utils"
 import type { CaseIndexEntry } from "@/api/types"
 
 function StatCard({ icon: Icon, label, value, sub }: {
@@ -27,6 +28,10 @@ function StatCard({ icon: Icon, label, value, sub }: {
 
 export function DatasetDashboard() {
   const { data: cases, isLoading } = useCases()
+  const { data: datasets } = useDatasets()
+  const activateDataset = useActivateDataset()
+
+  const activeDataset = datasets?.find((d) => d.active)
 
   const stats = useMemo(() => {
     if (!cases) return null
@@ -47,10 +52,39 @@ export function DatasetDashboard() {
   return (
     <div className="h-full overflow-y-auto">
       <div className="p-6 space-y-6 max-w-5xl mx-auto">
-        {/* Header */}
-        <div>
-          <h2 className="text-xl font-bold tracking-tight">NeuroBench v1 Dataset</h2>
-          <p className="text-base text-muted-foreground mt-1">100 neurological cases across 10 conditions and 3 difficulty levels</p>
+        {/* Header + dataset selector */}
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-bold tracking-tight">
+              {activeDataset?.name ?? "NeuroBench"} Dataset
+            </h2>
+            <p className="text-base text-muted-foreground mt-1">
+              {activeDataset?.description ?? `${stats.total} neurological cases across ${stats.conditionCount} conditions and 3 difficulty levels`}
+            </p>
+          </div>
+          {datasets && datasets.length > 1 && (
+            <div className="flex gap-2 shrink-0">
+              {datasets.map((d) => (
+                <button
+                  key={d.version}
+                  onClick={() => {
+                    if (!d.active) activateDataset.mutate(d.version)
+                  }}
+                  disabled={activateDataset.isPending}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-medium transition-all",
+                    d.active
+                      ? "border-primary/30 bg-primary/10 text-primary"
+                      : "border-border hover:bg-accent text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  <Database className="h-3.5 w-3.5" />
+                  {d.name}
+                  <span className="text-xs opacity-60">{d.case_count}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Stat cards */}
