@@ -35,9 +35,11 @@ export function Sidebar() {
   const queryClient = useQueryClient()
   const abortRef = useRef<AbortController | null>(null)
 
-  // Auto-select first ready model if current selection is offline
+  // Auto-select first ready model only on initial load (not on every selection change)
+  const hasAutoSelected = useRef(false)
   useEffect(() => {
-    if (!models) return
+    if (!models || hasAutoSelected.current) return
+    hasAutoSelected.current = true
     const current = models.find((m) => m.key === selectedModel)
     if (!current || current.status !== "ready") {
       const firstReady = models.find((m) => m.status === "ready")
