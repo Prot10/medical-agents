@@ -103,6 +103,7 @@ export async function streamAgentRun(
       ...(options?.api_key && { api_key: options.api_key }),
     }),
     signal,
+    cache: "no-store",
   })
 
   if (!response.ok) {
@@ -134,6 +135,7 @@ export async function streamEvaluation(
       tools_called: toolsCalled,
     }),
     signal,
+    cache: "no-store",
   })
 
   if (!response.ok) {
@@ -155,6 +157,7 @@ export async function replayTrace(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ trace_id: traceId }),
     signal,
+    cache: "no-store",
   })
 
   if (!response.ok) {

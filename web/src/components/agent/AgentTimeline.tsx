@@ -10,14 +10,16 @@ import { StreamingContent } from "./StreamingContent"
 
 export function AgentTimeline() {
   const { selectedCaseId } = useAppStore()
-  const { events, status, errorMessage } = useAgentStore()
+  const { events, status, errorMessage, streamingContent, streamingThinkContent, streamingTurnNumber } = useAgentStore()
   const scrollRef = useRef<HTMLDivElement>(null)
+
+  const isStreaming = !!(streamingContent || streamingThinkContent)
 
   useEffect(() => {
     if (status === "running" && scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
-  }, [events.length, status])
+  }, [events.length, status, streamingContent, streamingThinkContent])
 
   const renderedItems = buildRenderItems(events)
 
@@ -39,7 +41,7 @@ export function AgentTimeline() {
 
       {/* Timeline content */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto relative z-[1]">
-        {events.length === 0 && status === "idle" && (
+        {events.length === 0 && status === "idle" && !isStreaming && (
           <div className="flex flex-col items-center justify-center h-full text-muted-foreground/30">
             <div className="h-16 w-16 rounded-2xl bg-primary/5 flex items-center justify-center mb-4">
               <Zap className="h-8 w-8 text-primary/20" />
@@ -53,21 +55,28 @@ export function AgentTimeline() {
           </div>
         )}
 
-        {renderedItems.length > 0 && (
+        {(renderedItems.length > 0 || isStreaming) && (
           <div className="p-4 space-y-3">
             {renderedItems.map((item, i) => {
               switch (item.type) {
-                case "thinking":
+                case "thinking": {
+                  // Collapse completed reasoning blocks (not the latest, or run is done)
+                  const shouldCollapse = i < renderedItems.length - 1 || status === "complete"
                   return (
                     <div key={i} className="space-y-3 animate-fade-in">
                       {item.content && (
-                        <StreamingContent content={item.content} turnNumber={item.turnNumber} />
+                        <StreamingContent
+                          content={item.content}
+                          turnNumber={item.turnNumber}
+                          collapsed={shouldCollapse}
+                        />
                       )}
                       {item.thinkContent && (
                         <ThinkingBlock content={item.thinkContent} turnNumber={item.turnNumber} />
                       )}
                     </div>
                   )
+                }
                 case "tool_pair":
                   return (
                     <div key={i} className="animate-slide-up">
@@ -103,7 +112,28 @@ export function AgentTimeline() {
               }
             })}
 
-            {status === "running" && (
+            {/* Live streaming blocks from delta buffers */}
+            {streamingContent && (
+              <div className="space-y-3 animate-fade-in">
+                <StreamingContent
+                  content={streamingContent}
+                  turnNumber={streamingTurnNumber}
+                  streaming
+                />
+              </div>
+            )}
+            {streamingThinkContent && (
+              <div className="space-y-3 animate-fade-in">
+                <ThinkingBlock
+                  content={streamingThinkContent}
+                  turnNumber={streamingTurnNumber}
+                  streaming
+                />
+              </div>
+            )}
+
+            {/* Thinking spinner — only when waiting (no active streaming) */}
+            {status === "running" && !isStreaming && (
               <div className="flex items-center gap-3 py-4 pl-2">
                 <div className="relative h-3 w-3">
                   <div className="absolute inset-0 rounded-full bg-primary animate-ping opacity-30" />
