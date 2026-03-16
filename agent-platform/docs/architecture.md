@@ -46,7 +46,7 @@ Key config: `AgentConfig` dataclass with model, hospital, max_turns, ablation co
 | `search_medical_literature` | Literature search |
 | `check_drug_interactions` | Drug interaction checking |
 
-In evaluation mode, all tools are backed by a `MockServer` that returns pre-generated outputs from `NeuroBenchCase` data.
+In evaluation mode, all tools are backed by a `MockServer` that returns pre-generated outputs from `NeuroBenchCase` data. See [tools.md](tools.md) for full parameter schemas, return types, and MockServer routing logic.
 
 ### Hospital Rules (`rules/`)
 
@@ -54,7 +54,7 @@ Clinical protocols loaded from YAML files, one directory per hospital. Injected 
 
 ### Patient Memory (`memory/`)
 
-ChromaDB-backed vector store for longitudinal patient encounters. Stores and retrieves past encounters for the same patient across cases.
+ChromaDB-backed vector store for longitudinal patient encounters. Stores and retrieves past encounters for the same patient across cases. See [patient-data.md](patient-data.md) for the complete patient data model, case structure, and memory system.
 
 ### Evaluation (`evaluation/`)
 
