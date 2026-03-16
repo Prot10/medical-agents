@@ -147,6 +147,8 @@ async def _stream_agent_events(
             "case_id": case.case_id,
             "hospital": hospital,
             "model": model_hf_id,
+            "condition": case.condition.value,
+            "difficulty": case.difficulty.value,
             "events": all_events,
             **{k: v for k, v in run_complete.items() if k != "type"},
         }
