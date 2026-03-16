@@ -1,170 +1,53 @@
 # CLAUDE.md
 
-## Project Overview
+## What is this project
 
-NeuroAgent is a tool-augmented LLM agent for neurological clinical decision support. It reasons through patient cases using a ReAct loop with 7 diagnostic tools, follows hospital-specific protocols, and maintains longitudinal patient memory. The project targets a Nature Machine Intelligence publication.
+NeuroAgent: tool-augmented LLM agent for neurological clinical decision support. ReAct loop + 7 diagnostic tools + hospital protocols + patient memory. Targeting Nature Machine Intelligence.
 
-## Repository Layout
+See README.md for full project docs, setup, and architecture.
 
-```
-medical-agents/                     # uv workspace root
-├── agent-platform/                 # Main Python package (neuroagent)
-│   ├── src/neuroagent/
-│   │   ├── agent/                  # Orchestrator (ReAct loop), reasoning, reflection
-│   │   ├── api/                    # FastAPI web server + SSE streaming
-│   │   ├── llm/                    # LLM client (OpenAI-compatible), prompts
-│   │   ├── tools/                  # 7 diagnostic tools + MockServer + ToolRegistry
-│   │   ├── rules/                  # Hospital rules engine (YAML pathways)
-│   │   ├── memory/                 # ChromaDB patient memory
-│   │   └── evaluation/             # Runner, metrics, noise injector, LLM judge
-│   ├── config/
-│   │   ├── agent_config.yaml       # Default agent/LLM/rules config
-│   │   ├── system_prompts/         # orchestrator.txt, reflection.txt
-│   │   └── hospital_rules/         # 5 hospital dirs (us_mayo, uk_nhs, de_charite, jp_todai, br_hcfmusp)
-│   ├── scripts/                    # CLI entry points
-│   └── tests/                      # pytest suite
-├── packages/neuroagent-schemas/    # Shared Pydantic models (NeuroBenchCase, patient, tool outputs)
-├── dataset-generation/             # NeuroBench case generation pipeline
-│   ├── src/neurobench_gen/         # Prompt builders, validators, statistics
-│   ├── config/                     # conditions.yaml, prompt templates (synthetic + seeded)
-│   ├── scripts/                    # Batch generation scripts
-│   └── docs/                       # external_case_sources.md (research on 22+ datasets)
-├── web/                            # React frontend dashboard
-│   ├── src/                        # Vite + React + TypeScript + Tailwind v4
-│   └── docs/                       # API reference, component architecture
-└── data/
-    ├── neurobench_v1/cases/        # 100 synthetic JSON case files (10 conditions × 10 cases)
-    ├── neurobench_v2/cases/        # 100 real-case-seeded JSON files (CC-BY 4.0 PMC sources)
-    └── traces/                     # Saved agent execution traces (auto-generated)
-```
+## Key paths
 
-## Setup & Common Commands
+- `agent-platform/src/neuroagent/` — main Python package
+- `packages/neuroagent-schemas/` — shared Pydantic models
+- `dataset-generation/` — NeuroBench case generation
+- `web/src/` — React frontend (Vite + TypeScript + Tailwind v4)
+- `data/neurobench_v{1,2}/cases/` — 200 benchmark cases (JSON)
+- `agent-platform/config/hospital_rules/{hospital}/*.yaml` — clinical pathways
+
+## Common commands
 
 ```bash
-# Install all packages (from repo root)
-uv sync --all-packages
-
-# Start vLLM inference server (requires GPU)
-cd agent-platform && ./scripts/serve_model.sh              # default: qwen3.5-9b
-cd agent-platform && ./scripts/serve_model.sh medgemma-27b # other models
-
-# Start web dashboard API (port 8888, serves frontend + API)
-uv run uvicorn neuroagent.api.app:app --host 0.0.0.0 --port 8888
-
-# Run a single case from CLI
-uv run python agent-platform/scripts/run_single_case.py data/neurobench_v1/cases/ISCH-STR-S01.json
-
-# Run full evaluation
-uv run python agent-platform/scripts/run_evaluation.py --split test --hospital us_mayo
-
-# Run tests
-uv run pytest agent-platform/tests/ -v
-
-# Frontend dev (from web/)
-cd web && npm install && npm run dev    # dev server on :5173, proxies /api to :8888
-cd web && npm run build                 # production build → web/dist/
+uv sync --all-packages                    # install everything
+cd web && npm run build                   # build frontend
+uv run uvicorn neuroagent.api.app:app --host 0.0.0.0 --port 8888  # start server
+cd web && npm run dev                     # frontend dev (local)
+cd web && npm run dev:remote              # frontend dev (remote VM, binds 0.0.0.0)
+uv run pytest agent-platform/tests/ -v   # tests
 ```
 
-### Local Mac Development (no GPU)
-
-vLLM requires CUDA and does not run on Mac. Use Ollama instead (Apple Silicon Metal acceleration).
-
-```bash
-# Install Ollama: https://ollama.com — then pull the model
-ollama pull qwen3.5:4b              # smallest Qwen3.5, ~3.4 GB download
-
-# Run a single case via CLI (bypass web API)
-uv run python agent-platform/scripts/run_single_case.py \
-  data/neurobench_v1/cases/ISCH-STR-S01.json \
-  --model qwen3.5:4b \
-  --base-url http://localhost:11434/v1
-```
-
-- Ollama exposes an OpenAI-compatible API at `http://localhost:11434/v1`
-- The `LLMClient` works unchanged — just pass different `base_url` and `model`
-- Ollama model names use tag format (e.g. `qwen3.5:4b`) not HuggingFace IDs
-
-## Models
-
-4 models supported via vLLM, configured in `scripts/serve_model.sh`:
-
-| Key | HF Model ID | GPU Memory | Notes |
-|-----|-------------|------------|-------|
-| `qwen3.5-9b` | `Qwen/Qwen3.5-9B` | ~18 GB | **Default**. Thinking mode + native tool calling. |
-| `qwen3.5-27b-awq` | `QuantTrio/Qwen3.5-27B-AWQ` | ~16 GB (AWQ) | Best quality. Marlin kernels for speed. |
-| `medgemma-4b` | `google/medgemma-1.5-4b-it` | ~9 GB | Medical specialist. Hermes tool-call parser. |
-| `medgemma-27b` | `ig1/medgemma-27b-text-it-FP8-Dynamic` | ~27 GB (FP8) | Medical specialist. Limited to 8K context. |
-
-- Qwen3.5 models use `--reasoning-parser qwen3` (extracts `<think>` tags) and `--tool-call-parser qwen3_coder`
-- MedGemma models use `--tool-call-parser hermes`
-- All served on single A100-40GB with 95% GPU memory utilization
-- LLM client (`llm/client.py`) strips `<think>` tags from Qwen output and parses OpenAI-style tool calls
-- Default sampling: temperature=1.0, top_p=0.95, presence_penalty=1.5, max_tokens=8192
-
-## Backend Architecture
-
-### Agent Orchestrator (`agent/orchestrator.py`)
-- ReAct loop: up to 15 turns of THINK → ACT (tool call) → OBSERVE → REFLECT
-- Two run modes: `run()` returns `AgentTrace`, `run_streaming()` yields SSE event dicts
-- System prompt = base prompt + hospital protocols (from RulesEngine) + patient memory (from ChromaDB)
-- Final assessment extracted via regex (`### Primary Diagnosis` heading)
-
-### 7 Diagnostic Tools
-`analyze_eeg`, `analyze_brain_mri`, `analyze_ecg`, `interpret_labs`, `analyze_csf`, `search_medical_literature`, `check_drug_interactions`
-
-All backed by `MockServer` in evaluation mode — returns pre-generated outputs from `NeuroBenchCase.initial_tool_outputs` and `followup_outputs`.
-
-### Hospital Rules (`rules/rules_engine.py`)
-- 5 hospitals: `us_mayo`, `uk_nhs`, `de_charite`, `jp_todai`, `br_hcfmusp`
-- Each has YAML pathway files (e.g., `stroke_code.yaml`) with steps, timing, mandatory flags, contraindications
-- Injected into the system prompt, not exposed as a tool
-- `check_compliance()` compares agent's tool calls against required/contraindicated actions
-
-### Web API (`api/`)
-- FastAPI on port 8888, serves REST endpoints + SSE streaming + static frontend
-- SSE streaming uses `asyncio.Queue` bridge between sync generator and async response (real-time, not batched)
-- Traces auto-saved to `data/traces/` for replay without GPU
-- Endpoints: `/api/v1/cases`, `/api/v1/hospitals`, `/api/v1/models`, `/api/v1/agent/run`, `/api/v1/agent/replay`, `/api/v1/traces`
-
-## Data
-
-### NeuroBench Dataset (200 cases total)
-
-Two complementary subsets, same schema, same 10 conditions:
-- `ISCH-STR` (ischemic stroke), `FEPI-TEMP` (focal epilepsy), `MS-RR` (relapsing MS), `ALZ-EARLY` (early Alzheimer's), `PD` (Parkinson's), `GLIO-HG` (glioblastoma), `BACT-MEN` (bacterial meningitis), `NMDAR-ENC` (NMDAR encephalitis), `FND` (functional neurological disorder), `SYNC-CARD` (cardiac syncope)
-
-**v1 (`data/neurobench_v1/cases/`)** — 100 fully synthetic cases
-- Generated by Claude via condition YAML specs + prompt template
-- Case IDs: `{CONDITION}-{S|M|P}{NUMBER}` (e.g., `ISCH-STR-S01`)
-
-**v2 (`data/neurobench_v2/cases/`)** — 100 real-case-seeded cases
-- Seeded from 94 unique peer-reviewed PMC case reports (CC-BY 4.0, via MedCaseReasoning dataset)
-- Clinical scenarios grounded in published cases; diagnostic test results separated from HPI into structured tool outputs
-- Includes red herrings and disguising information calibrated by difficulty level
-- Case IDs: `{CONDITION}-R{S|M|P}{NUMBER}` (e.g., `ISCH-STR-RS01`, R = real-seeded)
-- Each case's `metadata.source_pmcid` links back to the original publication
-
-Each case contains: patient profile, initial tool outputs (EEG/MRI/ECG/labs/CSF), conditional followup outputs (5-10), and comprehensive ground truth (diagnosis, differentials, optimal actions, critical/contraindicated actions, key reasoning points).
-
-Difficulty levels: straightforward (S), moderate (M), diagnostic puzzle (P).
-
-### Schemas (`packages/neuroagent-schemas/`)
-Pydantic models shared across packages: `NeuroBenchCase`, `PatientProfile`, `EEGReport`, `MRIReport`, `ECGReport`, `LabResults`, `CSFResults`, `LiteratureSearchResult`, `DrugInteractionResult`, `GroundTruth`.
-
-## Frontend (web/)
-
-Vite + React 18 + TypeScript + Tailwind CSS v4. 3-panel dashboard:
-- Left: Case browser (grouped by condition, search + difficulty filters)
-- Center: Patient viewer (vitals, history, neuro exam, ground truth)
-- Right: Agent execution timeline (thinking blocks, tool call cards, assessment)
-
-State: Zustand (agent streaming state) + TanStack Query (cached data). Dark/light mode. DM Sans + JetBrains Mono fonts.
-
-## Key Conventions
+## Conventions
 
 - Python: Pydantic v2 models, dataclasses for config, `from __future__ import annotations`
 - All tool outputs are Pydantic BaseModel instances serialized with `.model_dump()`
-- Case IDs follow pattern: `{CONDITION}-{DIFFICULTY}{NUMBER}` (v1, e.g., `ISCH-STR-S01`) or `{CONDITION}-R{DIFFICULTY}{NUMBER}` (v2, e.g., `ISCH-STR-RS01`)
-- Hospital rules are YAML files, one per clinical pathway
-- Frontend uses `@/` path alias for `src/`, all components are named exports
-- Commit style: `feat:`, `fix:`, `docs:` prefixes (conventional commits)
+- Case IDs: `{CONDITION}-{S|M|P}{NUMBER}` (v1) or `{CONDITION}-R{S|M|P}{NUMBER}` (v2)
+- Hospital rules: YAML files, one per clinical pathway, inside per-hospital subdirectories
+- Frontend: `@/` path alias for `src/`, named exports only, no default exports for components
+- State: Zustand for UI/streaming state, TanStack Query for server data
+- Commit style: conventional commits (`feat:`, `fix:`, `docs:`, `chore:`)
+
+## Models
+
+4 vLLM models on A100-40GB. Qwen3.5 uses `--reasoning-parser qwen3` + `--tool-call-parser qwen3_coder`. MedGemma uses `--tool-call-parser hermes`. On Mac use Ollama.
+
+LLM client (`llm/client.py`) strips `<think>` tags from Qwen and parses OpenAI-style tool calls. Default sampling: temperature=1.0, top_p=0.95, presence_penalty=1.5, max_tokens=8192.
+
+## Architecture notes
+
+- Agent orchestrator: ReAct loop up to 15 turns, system prompt = base + hospital rules + patient memory
+- Web API: FastAPI port 8888, serves REST + SSE streaming + static frontend from `web/dist/`
+- SSE streaming uses `asyncio.Queue` bridge between sync generator and async response
+- Model loading/unloading via `/api/v1/models/{key}/load` (SSE progress) and `/api/v1/models/unload`
+- Hospital rules CRUD via `/api/v1/hospitals/{id}/rules` endpoints
+- Traces auto-saved to `data/traces/` for replay without GPU
+- `MockServer` in evaluation mode returns pre-generated outputs from NeuroBench case files
