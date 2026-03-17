@@ -37,6 +37,7 @@ Tools are registered in `ToolRegistry` and their definitions are passed to the L
 
 - **Evaluation (MockServer)**: All tools are backed by `MockServer`, which looks up pre-generated outputs from `NeuroBenchCase.initial_tool_outputs` and `followup_outputs`. This is the current default.
 - **Live (future)**: Each tool would connect to a real model endpoint or external API. Currently raises `NotImplementedError`.
+- **v3 Realistic mode**: The v3 dataset (`data/neurobench_v3/`) strips interpretive fields from tool outputs. Fields like `clinical_significance`, `differential_by_imaging`, `recommended_actions`, and diagnostic `impression` text are nulled or rewritten to match what real clinical reports provide. This forces the agent to perform actual clinical reasoning rather than reading pre-digested answers. See "Tool Output Modes" below.
 
 ### Ablation controls
 
@@ -85,6 +86,8 @@ Analyze an electroencephalography recording for neurological abnormalities.
 
 **`EEGFinding` fields**: `type` (e.g., sharp_wave, slowing, periodic_discharge), `location` (e.g., "F8/T4, right anterior temporal"), `frequency`, `morphology`, `state` (awake/sleep), `clinical_correlation`.
 
+> **v3 realistic mode**: In the v3 dataset, `confidence` is set to 0.0 (not provided), `impression` is stripped of disease names (descriptive findings only + "Clinical correlation recommended."), `recommended_actions` is replaced with `["Clinical correlation recommended."]`, and all `EEGFinding.clinical_correlation` fields are set to `""`.
+
 ---
 
 ### 2. `analyze_brain_mri` — Brain MRI Analyzer
@@ -116,6 +119,8 @@ Analyze a brain MRI scan for structural abnormalities, volumetric changes, and d
 
 **`MRIFinding` fields**: `type` (e.g., mass_lesion, atrophy, white_matter_lesion), `location`, `size`, `signal_characteristics` (dict with T1/T2/FLAIR/DWI/contrast signals), `mass_effect`, `borders`.
 
+> **v3 realistic mode**: `differential_by_imaging` is `[]` (empty), `confidence` is 0.0, `recommended_actions` is `["Clinical correlation recommended."]`, `impression` is stripped of diagnosis names and treatment recommendations, and `additional_observations` entries containing diagnostic conclusions are removed.
+
 ---
 
 ### 3. `analyze_ecg` — ECG Analyzer
@@ -142,6 +147,8 @@ Analyze a 12-lead electrocardiogram for cardiac abnormalities relevant to neurol
 | `findings` | string[] | Specific abnormalities (ST changes, T-wave inversions, LVH, etc.). |
 | `interpretation` | string | Summary interpretation. |
 | `clinical_correlation` | string | How ECG findings relate to the neurological presentation. |
+
+> **v3 realistic mode**: `clinical_correlation` is `""` (empty). `interpretation` is stripped of disease-etiology commentary, keeping only rhythm/rate/interval descriptions.
 
 ---
 
@@ -170,6 +177,8 @@ Interpret laboratory results across multiple panels with reference ranges, abnor
 
 **`LabValue` fields**: `test` (name), `value` (float or string), `unit`, `reference_range`, `is_abnormal` (bool), `clinical_significance` (optional explanation).
 
+> **v3 realistic mode**: All `LabValue.clinical_significance` fields are `null`. `interpretation` is replaced with a terse list of abnormal values only (e.g., "Abnormal values: Sodium 126 mEq/L (L), Glucose 186 mg/dL (H)."). `abnormal_values_summary` entries are stripped of prose explanations, keeping only "Test: value unit (H/L)".
+
 ---
 
 ### 5. `analyze_csf` — CSF Analyzer
@@ -197,6 +206,8 @@ Analyze cerebrospinal fluid results including cell counts, chemistry, and specia
 | `glucose_ratio` | string | CSF glucose / serum glucose ratio. |
 | `special_tests` | dict[str, str] | Results of special tests: Gram stain, culture, HSV PCR, crypto antigen, oligoclonal bands, antibody panels, cytology, etc. |
 | `interpretation` | string | Clinical interpretation of the CSF profile. |
+
+> **v3 realistic mode**: `interpretation` is replaced with a terse numerical summary (e.g., "Opening pressure: 31 cmH2O. WBC: 392 (72% PMN/24% lymph). Protein: 153.2 mg/dL. Glucose: 30.7 mg/dL (ratio 0.24)."). No diagnostic commentary.
 
 ---
 
@@ -280,6 +291,46 @@ During evaluation, `MockServer` receives every `ToolCall` and returns pre-genera
 5. **No match**: Returns `ToolResult(success=False, error_message="No {tool} data available...")`, prompting the agent to reconsider whether the test is appropriate.
 
 All outputs are serialized via `model.model_dump()` (Pydantic v2) and returned as JSON dicts within `ToolResult.output`.
+
+---
+
+## Tool Output Modes: v1 (Enhanced) vs v3 (Realistic)
+
+The NeuroBench dataset exists in two output modes, both containing the same 200 cases (100 synthetic + 100 real-case-seeded):
+
+### v1 / v2: Enhanced tool outputs (original)
+
+Tool outputs include interpretive fields designed to make the task easier:
+- `LabValue.clinical_significance` explains WHY a value matters for the diagnosis
+- `MRIReport.differential_by_imaging` provides a ranked imaging differential
+- `EEGReport.impression` names specific diseases and recommends management
+- `CSFResults.interpretation` provides full diagnostic formulations
+- Numeric `confidence` scores (0.0-1.0) on imaging reports
+
+These outputs read like an attending physician's case discussion — the answer is partially embedded in the tool results. This mode is useful for:
+- Testing whether the agent can follow pre-digested clinical reasoning
+- Establishing an upper bound on diagnostic accuracy
+- Comparing tool-augmented vs. no-tool performance where tool outputs are maximally informative
+
+### v3: Realistic tool outputs (stripped)
+
+The same 200 cases with interpretive fields removed or rewritten to match real-world clinical reports:
+- Lab values show numbers, units, reference ranges, and H/L flags only — no clinical interpretation
+- MRI/EEG impressions describe findings without naming diseases or suggesting treatments
+- No imaging differentials, no confidence scores, no recommended actions beyond "Clinical correlation recommended."
+- CSF results are terse numerical summaries
+
+This mode tests genuine clinical reasoning: the agent must synthesize raw findings across modalities to reach a diagnosis, just as a real clinician would interpret reports from radiology, pathology, and the lab.
+
+**For the NMI paper**, the primary benchmark uses v3 (realistic). The v1→v3 accuracy delta is reported as an ablation showing the effect of interpretive tool outputs on agent performance.
+
+### Creating v3 from v1/v2
+
+```bash
+uv run python agent-platform/scripts/create_v3_dataset.py
+```
+
+This script reads both `data/neurobench_v1/cases/` and `data/neurobench_v2/cases/`, applies the stripping transformations, and writes 200 cleaned cases to `data/neurobench_v3/cases/`.
 
 ---
 

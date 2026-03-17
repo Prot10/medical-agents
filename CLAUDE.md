@@ -13,6 +13,7 @@ See README.md for full project docs, setup, and architecture.
 - `dataset-generation/` — NeuroBench case generation
 - `web/src/` — React frontend (Vite + TypeScript + Tailwind v4)
 - `data/neurobench_v{1,2}/cases/` — 200 benchmark cases (JSON)
+- `data/neurobench_v3/cases/` — 200 benchmark cases with realistic tool outputs (v1+v2 combined, stripped)
 - `agent-platform/config/hospital_rules/{hospital}/*.yaml` — clinical pathways
 
 ## Common commands
@@ -24,6 +25,8 @@ uv run uvicorn neuroagent.api.app:app --host 0.0.0.0 --port 8888  # start server
 cd web && npm run dev                     # frontend dev (local)
 cd web && npm run dev:remote              # frontend dev (remote VM, binds 0.0.0.0)
 uv run pytest agent-platform/tests/ -v   # tests
+./agent-platform/scripts/run_v3_full.sh                       # full model comparison (v3)
+uv run python agent-platform/scripts/create_v3_dataset.py     # regenerate v3 from v1+v2
 ```
 
 ## Conventions
@@ -35,6 +38,9 @@ uv run pytest agent-platform/tests/ -v   # tests
 - Frontend: `@/` path alias for `src/`, named exports only, no default exports for components
 - State: Zustand for UI/streaming state, TanStack Query for server data
 - Commit style: conventional commits (`feat:`, `fix:`, `docs:`, `chore:`)
+- Dataset versions: v1 (synthetic, enhanced outputs), v2 (real-seeded, enhanced), v3 (v1+v2 combined, realistic/stripped outputs)
+- Tool output modes: "enhanced" (v1/v2, interpretive fields present) vs "realistic" (v3, stripped to match real clinical reports)
+- Evaluation: `format_patient_info()` in `evaluation/runner.py` is the single source of truth for patient presentation formatting
 
 ## Models
 

@@ -431,7 +431,56 @@ The memory string is appended to the system prompt under a `## Patient History (
 
 ---
 
-## 5. Data Flow Summary
+## 5. Dataset Versions
+
+NeuroBench cases exist in three versions:
+
+| Version | Location | Cases | Tool Outputs | Purpose |
+|---------|----------|-------|-------------|---------|
+| **v1** | `data/neurobench_v1/cases/` | 100 synthetic | Enhanced (interpretive) | Original dataset; includes diversified demographics, fixed ICD codes, and 17 rewritten puzzle cases |
+| **v2** | `data/neurobench_v2/cases/` | 100 real-case-seeded | Enhanced (interpretive) | Seeded from PMC case reports (CC-BY 4.0); richer clinical detail |
+| **v3** | `data/neurobench_v3/cases/` | 200 (v1 + v2 combined) | **Realistic (stripped)** | Primary benchmark dataset for NMI paper; interpretive fields removed |
+
+### v3 Realistic Output Stripping
+
+v3 applies these transformations to tool outputs:
+
+| Field | v1/v2 (Enhanced) | v3 (Realistic) |
+|-------|-------------------|-----------------|
+| `LabValue.clinical_significance` | Explains diagnostic relevance | `null` |
+| `LabResults.interpretation` | Full clinical synthesis | Terse abnormal value list |
+| `MRIReport.differential_by_imaging` | Ranked differential | `[]` (empty) |
+| `MRIReport.confidence` | 0.0-1.0 numeric | 0.0 (not provided) |
+| `MRIReport.recommended_actions` | Clinical management plan | `["Clinical correlation recommended."]` |
+| `MRIReport.impression` | Names diagnoses + treatments | Descriptive findings only |
+| `EEGReport.impression` | Names diseases + management | EEG description only |
+| `EEGFinding.clinical_correlation` | Links to specific diseases | `""` (empty) |
+| `ECGReport.clinical_correlation` | Links to stroke mechanism | `""` (empty) |
+| `CSFResults.interpretation` | Diagnostic formulation | Terse numbers only |
+
+### Case ID Convention
+
+- **v1 synthetic**: `{CONDITION}-{S|M|P}{NUMBER}` (e.g., `ISCH-STR-S01`, `PD-P02`)
+- **v2 real-seeded**: `{CONDITION}-R{S|M|P}{NUMBER}` (e.g., `BACT-MEN-RS01`, `ALZ-EARLY-RP03`)
+- Both versions coexist in v3 with their original case IDs
+
+## 6. Red Herrings (Puzzle/Moderate Cases)
+
+The `GroundTruth` model includes a `red_herrings` field (added in the v1 refresh) for cases with intentional distractors:
+
+```python
+class RedHerring(BaseModel):
+    data_point: str        # what the misleading element is
+    location: str          # where it appears (e.g., "labs", "history", "mri")
+    intended_effect: str   # how it might mislead
+    correct_interpretation: str  # what the agent should conclude
+```
+
+Red herrings are annotated on 16 puzzle cases (all rewritten P02/P03 cases) and are used by the LLM judge to evaluate whether the agent correctly identifies and dismisses intentional distractors.
+
+---
+
+## 7. Data Flow Summary
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
@@ -474,7 +523,7 @@ The memory string is appended to the system prompt under a `## Patient History (
 
 ---
 
-## 6. Source Files
+## 8. Source Files
 
 | File | Description |
 |---|---|

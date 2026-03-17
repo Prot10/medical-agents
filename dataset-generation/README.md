@@ -22,9 +22,35 @@ MedCaseReasoning seed → build_prompt_seeded.py → prompt_template_seeded.md �
 
 Key difference: v2 cases separate diagnostic test results from the patient presentation, forcing the AI agent to call tools to discover evidence. Red herrings and disguising information are calibrated by difficulty level.
 
+### Pipeline 3: Realistic Tool Outputs (v3)
+
+v3 is NOT a new generation pipeline — it's a post-processing step that strips interpretive fields from v1 and v2 tool outputs to create realistic clinical reports. The v3 dataset combines all 200 cases (100 v1 + 100 v2) with stripped outputs.
+
+```
+v1/cases/ + v2/cases/ → create_v3_dataset.py → v3/cases/ (200 cases with realistic tool outputs)
+```
+
+**Why v3 exists**: An audit revealed that v1/v2 tool outputs contain interpretive fields that "give away the answer" — MRI impressions naming diseases, lab values explaining their diagnostic significance, EEG reports stating diagnoses. This inflates agent performance by testing reading comprehension instead of clinical reasoning. v3 strips these fields to match what real diagnostic reports provide.
+
+**Stripping script**: `agent-platform/scripts/create_v3_dataset.py`
+
+**Fields stripped or rewritten**:
+- `LabValue.clinical_significance` → `null`
+- `MRIReport.differential_by_imaging` → `[]`
+- `MRI/EEG confidence` → `0.0`
+- `MRI/EEG recommended_actions` → `["Clinical correlation recommended."]`
+- `MRI/EEG impression` → descriptive findings only (disease names removed)
+- `ECGReport.clinical_correlation` → `""`
+- `CSFResults.interpretation` → terse numerical summary
+
 ## Directory Structure
 
 ```
+data/
+├── neurobench_v1/cases/        # 100 synthetic cases (enhanced tool outputs)
+├── neurobench_v2/cases/        # 100 real-seeded cases (enhanced tool outputs)
+└── neurobench_v3/cases/        # 200 combined cases (realistic tool outputs)
+
 dataset-generation/
 ├── config/
 │   ├── conditions.yaml              # 10 neurological conditions with clinical specs
@@ -84,6 +110,7 @@ uv run --project dataset-generation python dataset-generation/scripts/dataset_st
 
 - **v1**: `{ABBREV}-{S|M|P}{NUMBER}` — e.g., `ISCH-STR-S01`, `MS-RR-P03`
 - **v2**: `{ABBREV}-R{S|M|P}{NUMBER}` — e.g., `ISCH-STR-RS01`, `MS-RR-RP03` (R = real-seeded)
+- **v3**: Contains both v1 and v2 cases with their original IDs, stripped tool outputs
 - Difficulty: S = straightforward, M = moderate, P = diagnostic puzzle
 - Distribution per condition: 4S + 3M + 3P = 10 cases
 
