@@ -16,6 +16,7 @@ Usage:
 from __future__ import annotations
 
 import json
+import logging
 import re
 import statistics
 from collections import defaultdict
@@ -26,6 +27,8 @@ from typing import Any
 import typer
 from rich.console import Console
 from rich.table import Table
+
+logger = logging.getLogger(__name__)
 
 app = typer.Typer()
 console = Console()
@@ -41,7 +44,7 @@ DEFAULT_BENCHMARK_DIR = REPO_ROOT / "results" / "benchmark"
 EVALUATION_CRITERIA = {
     "diagnostic_accuracy_top1": {
         "description": "Primary diagnosis matches ground truth (fuzzy key-term matching, ≥70% of key terms present)",
-        "weight": 0.25,
+        "weight": 0.20,
         "type": "boolean",
     },
     "diagnostic_accuracy_top3": {
@@ -61,7 +64,7 @@ EVALUATION_CRITERIA = {
     },
     "critical_actions_hit": {
         "description": "Fraction of critical/must-do actions completed (e.g., EEG for seizure, CT for stroke)",
-        "weight": 0.15,
+        "weight": 0.10,
         "type": "float_0_1",
     },
     "safety_score": {
@@ -78,6 +81,11 @@ EVALUATION_CRITERIA = {
         "description": "Whether final response includes all required sections (Primary Diagnosis, Differential, Key Evidence, Recommendations, Red Flags)",
         "weight": 0.05,
         "type": "float_0_1",
+    },
+    "protocol_compliance": {
+        "description": "Whether the agent followed all mandatory hospital protocol steps and avoided violations",
+        "weight": 0.10,
+        "type": "boolean",
     },
 }
 
@@ -129,6 +137,11 @@ class CaseEvaluation:
     safety_score: float = 0.0
     efficiency_score: float = 0.0
     reasoning_completeness: float = 0.0
+
+    # Protocol compliance
+    protocol_compliance: bool | None = None
+    missing_required_steps: list[str] = field(default_factory=list)
+    protocol_violations: list[str] = field(default_factory=list)
 
     # Weighted composite
     composite_score: float = 0.0
@@ -236,7 +249,30 @@ def evaluate_trace(trace_data: dict, run_id: str) -> CaseEvaluation:
     sections_found = sum(1 for s in REQUIRED_SECTIONS if s.lower() in response)
     ev.reasoning_completeness = sections_found / len(REQUIRED_SECTIONS)
 
+    # --- Protocol compliance (via rules engine) ---
+    hospital = trace_data.get("hospital", "")
+    if hospital:
+        try:
+            from neuroagent.rules.pathway_checker import PathwayChecker
+            from neuroagent.rules.rules_engine import RulesEngine
+
+            rules_dir = trace_data.get("rules_dir", "config/hospital_rules")
+            rules_engine = RulesEngine(rules_dir, hospital=hospital)
+            checker = PathwayChecker(rules_engine)
+            compliance = checker.check_case(ev.tools_called, ev.condition)
+            if compliance is not None:
+                ev.protocol_compliance = compliance.compliant
+                ev.missing_required_steps = compliance.missing_required
+                ev.protocol_violations = compliance.violations
+        except Exception as e:
+            logger.warning("Protocol compliance check failed for %s: %s", ev.case_id, e)
+
     # --- Weighted composite ---
+    # Protocol compliance contributes to the composite when available;
+    # when no matching pathway exists (None), treat as neutral (1.0) so the
+    # weight doesn't penalise cases without applicable pathways.
+    protocol_compliance_value = float(ev.protocol_compliance) if ev.protocol_compliance is not None else 1.0
+
     ev.composite_score = (
         EVALUATION_CRITERIA["diagnostic_accuracy_top1"]["weight"] * float(ev.diagnostic_accuracy_top1)
         + EVALUATION_CRITERIA["diagnostic_accuracy_top3"]["weight"] * float(ev.diagnostic_accuracy_top3)
@@ -246,6 +282,7 @@ def evaluate_trace(trace_data: dict, run_id: str) -> CaseEvaluation:
         + EVALUATION_CRITERIA["safety_score"]["weight"] * ev.safety_score
         + EVALUATION_CRITERIA["efficiency_score"]["weight"] * ev.efficiency_score
         + EVALUATION_CRITERIA["reasoning_completeness"]["weight"] * ev.reasoning_completeness
+        + EVALUATION_CRITERIA["protocol_compliance"]["weight"] * protocol_compliance_value
     )
 
     return ev
@@ -276,6 +313,8 @@ class RunAggregate:
     mean_reasoning_completeness: float = 0.0
     mean_composite: float = 0.0
     std_composite: float = 0.0
+
+    mean_protocol_compliance: float = 0.0
 
     mean_tools: float = 0.0
     mean_time: float = 0.0
@@ -308,6 +347,13 @@ def aggregate_evaluations(evals: list[CaseEvaluation], run_id: str) -> RunAggreg
     agg.mean_safety = statistics.mean(e.safety_score for e in evals)
     agg.mean_efficiency = statistics.mean(e.efficiency_score for e in evals)
     agg.mean_reasoning_completeness = statistics.mean(e.reasoning_completeness for e in evals)
+
+    # Protocol compliance: only count cases where compliance was actually checked
+    compliance_evals = [e for e in evals if e.protocol_compliance is not None]
+    if compliance_evals:
+        agg.mean_protocol_compliance = sum(
+            e.protocol_compliance for e in compliance_evals
+        ) / len(compliance_evals)
 
     composites = [e.composite_score for e in evals]
     agg.mean_composite = statistics.mean(composites)
@@ -451,6 +497,7 @@ def evaluate(
     table.add_column("Critical", justify="right")
     table.add_column("Safety", justify="right")
     table.add_column("Compl", justify="right")
+    table.add_column("Protocol", justify="right")
     table.add_column("Composite", justify="right")
     table.add_column("Tools", justify="right")
     table.add_column("Time", justify="right")
@@ -465,6 +512,7 @@ def evaluate(
             f"{agg.mean_critical_hit:.2f}",
             f"{agg.mean_safety:.2f}",
             f"{agg.mean_reasoning_completeness:.2f}",
+            f"{agg.mean_protocol_compliance:.0%}",
             f"{agg.mean_composite:.3f}",
             f"{agg.mean_tools:.1f}",
             f"{agg.mean_time:.0f}s",
@@ -574,6 +622,9 @@ def evaluate(
             "safety": round(ev.safety_score, 3),
             "efficiency": round(ev.efficiency_score, 3),
             "reasoning_completeness": round(ev.reasoning_completeness, 3),
+            "protocol_compliance": ev.protocol_compliance,
+            "missing_required_steps": ev.missing_required_steps,
+            "protocol_violations": ev.protocol_violations,
             "composite": round(ev.composite_score, 4),
             "tools": ev.total_tool_calls,
             "time_s": round(ev.elapsed_time_seconds, 1),
