@@ -164,9 +164,36 @@ class AgentOrchestrator:
                     tool_calls=None,
                     token_usage=response.usage,
                 )
-                trace.set_final_response(
-                    _extract_assessment(response.content or "")
-                )
+
+                assessment = _extract_assessment(response.content or "")
+
+                # If the model produced reasoning but no structured diagnosis,
+                # re-prompt once to get the required output format.
+                if assessment and not _ASSESSMENT_PATTERN.search(assessment):
+                    logger.info("No structured diagnosis found — re-prompting for format.")
+                    messages.append(self._format_assistant_message(response))
+                    messages.append({
+                        "role": "user",
+                        "content": (
+                            "You provided reasoning but did not include a structured "
+                            "diagnosis. Please provide your final assessment now using "
+                            "the required format starting with:\n\n"
+                            "### Primary Diagnosis\n[Diagnosis] (Confidence: X.XX)"
+                        ),
+                    })
+                    retry = self.llm.chat(messages=messages, tools=None)
+                    turn_number += 1
+                    trace.add_assistant_turn(
+                        turn_number=turn_number,
+                        content=retry.content,
+                        tool_calls=None,
+                        token_usage=retry.usage,
+                    )
+                    retry_assessment = _extract_assessment(retry.content or "")
+                    if retry_assessment:
+                        assessment = retry_assessment
+
+                trace.set_final_response(assessment)
                 break
         else:
             # Hit max_turns without finishing
@@ -405,7 +432,7 @@ class AgentOrchestrator:
         return trace
 
     def _build_initial_messages(
-        self, patient_info: str, patient_id: str | None
+        self, patient_info: str, patient_id: str | None,
     ) -> list[dict[str, Any]]:
         system = self._build_system_prompt(patient_id)
         return [
@@ -419,7 +446,7 @@ class AgentOrchestrator:
         except FileNotFoundError:
             base = _DEFAULT_SYSTEM_PROMPT
 
-        # Inject hospital rules context
+        # Inject ALL hospital rules — agent must determine which pathway applies
         if self.rules:
             context = self.rules.get_context()
             if context:

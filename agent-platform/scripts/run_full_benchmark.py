@@ -196,7 +196,8 @@ def make_agent(model_id: str, max_tokens: int, hospital: str, case_data: dict):
     rules = RulesEngine(str(AGENT_PLATFORM / "config" / "hospital_rules"), hospital=hospital)
 
     agent = AgentOrchestrator(config=config, tool_registry=registry, rules_engine=rules)
-    patient_info = EvaluationRunner(config=config, dataset_path="")._format_initial_info(case)
+    from neuroagent.evaluation.runner import format_patient_info
+    patient_info = format_patient_info(case)
 
     return agent, case, patient_info
 

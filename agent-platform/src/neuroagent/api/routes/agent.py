@@ -18,6 +18,7 @@ from ...agent.orchestrator import AgentConfig, AgentOrchestrator
 from ...agent.reasoning import AgentTrace, AgentTurn
 from ...evaluation.metrics import MetricsCalculator
 from ...evaluation.llm_judge import LLMJudge
+from ...evaluation.runner import format_patient_info
 from ...llm.client import LLMClient
 from ...rules.rules_engine import AVAILABLE_HOSPITALS, RulesEngine
 from ...tools.mock_server import MockServer
@@ -62,25 +63,8 @@ def _sse_event(data: dict) -> str:
     return f"data: {json.dumps(data, default=str)}\n\n"
 
 
-def _format_initial_info(case: NeuroBenchCase) -> str:
-    parts = [
-        f"Patient: {case.patient.demographics.age}-year-old {case.patient.demographics.sex}",
-        f"Chief complaint: {case.patient.chief_complaint}",
-        f"History of present illness: {case.patient.history_present_illness}",
-    ]
-    pmh = case.patient.clinical_history.past_medical_history
-    if pmh:
-        parts.append(f"Past medical history: {', '.join(pmh)}")
-    meds = case.patient.clinical_history.medications
-    if meds:
-        med_strs = [f"{m.drug} {m.dose} {m.frequency}" for m in meds]
-        parts.append(f"Current medications: {', '.join(med_strs)}")
-    allergies = case.patient.clinical_history.allergies
-    if allergies:
-        parts.append(f"Allergies: {', '.join(allergies)}")
-    parts.append(f"Neurological examination: {case.patient.neurological_exam.model_dump_json()}")
-    parts.append(f"Vitals: {case.patient.vitals.model_dump_json()}")
-    return "\n".join(parts)
+
+# _format_initial_info removed — use format_patient_info from evaluation.runner
 
 
 async def _stream_agent_events(
@@ -101,7 +85,7 @@ async def _stream_agent_events(
     agent = AgentOrchestrator(
         config=config, tool_registry=tool_registry, rules_engine=rules_engine,
     )
-    patient_info = _format_initial_info(case)
+    patient_info = format_patient_info(case)
 
     # Yield run_started immediately
     yield _sse_event({

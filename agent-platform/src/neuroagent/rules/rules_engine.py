@@ -118,22 +118,35 @@ class RulesEngine:
         )
 
     def get_context(self) -> str:
-        """Return a summary of available protocols for the system prompt."""
+        """Return a compact summary of ALL protocols for the system prompt.
+
+        All pathways are always injected — the agent must determine which
+        pathway applies based on the clinical presentation.  Selectively
+        injecting only the matching pathway would leak the diagnosis.
+
+        To save tokens, the format is compact: one line per pathway with
+        only mandatory steps and contraindicated actions (optional steps
+        omitted).
+        """
         if not self.pathways:
             return ""
+
         hospital_label = AVAILABLE_HOSPITALS.get(self.hospital, self.hospital)
         lines = [
             f"You are operating under the clinical protocols of **{hospital_label}**.",
-            "You MUST follow these protocols strictly. The following pathways apply:",
+            "Follow the protocol that matches the clinical presentation. Available pathways:",
         ]
         for p in self.pathways:
             triggers = ", ".join(p.triggers)
-            lines.append(f"- **{p.name}**: {p.description} (triggers: {triggers})")
-            for step in p.steps:
-                req = "MANDATORY" if step.mandatory else "optional"
-                lines.append(f"  - {step.action} ({step.timing}, {req})")
+            # Compact: pathway name + triggers on one line
+            lines.append(f"- **{p.name}** (triggers: {triggers})")
+            # Only mandatory steps (skip optional to save tokens)
+            mandatory_steps = [s for s in p.steps if s.mandatory]
+            if mandatory_steps:
+                step_names = ", ".join(f"{s.action} ({s.timing})" for s in mandatory_steps)
+                lines.append(f"  MANDATORY: {step_names}")
             if p.contraindicated:
-                lines.append(f"  - CONTRAINDICATED: {'; '.join(p.contraindicated)}")
+                lines.append(f"  CONTRAINDICATED: {'; '.join(p.contraindicated)}")
         return "\n".join(lines)
 
     def get_pathway(self, trigger: str) -> ClinicalPathway | None:

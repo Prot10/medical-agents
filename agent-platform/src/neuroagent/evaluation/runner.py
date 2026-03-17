@@ -83,6 +83,9 @@ class EvaluationRunner:
             from ..rules.rules_engine import RulesEngine
             rules_engine = RulesEngine(rules_dir, hospital=hospital)
 
+        # Store rules_engine so metrics computation can use it
+        self._rules_engine = rules_engine
+
         eval_results = EvaluationResults(
             config={
                 "model": self.config.model,
@@ -188,26 +191,65 @@ class EvaluationRunner:
 
     def _format_initial_info(self, case: NeuroBenchCase) -> str:
         """Format only what the doctor would tell the agent initially."""
-        parts = [
-            f"Patient: {case.patient.demographics.age}-year-old {case.patient.demographics.sex}",
-            f"Chief complaint: {case.patient.chief_complaint}",
-            f"History of present illness: {case.patient.history_present_illness}",
-        ]
+        return format_patient_info(case)
 
-        pmh = case.patient.clinical_history.past_medical_history
-        if pmh:
-            parts.append(f"Past medical history: {', '.join(pmh)}")
 
-        meds = case.patient.clinical_history.medications
-        if meds:
-            med_strs = [f"{m.drug} {m.dose} {m.frequency}" for m in meds]
-            parts.append(f"Current medications: {', '.join(med_strs)}")
+def format_patient_info(case: NeuroBenchCase) -> str:
+    """Format patient info as natural language for the agent.
 
-        allergies = case.patient.clinical_history.allergies
-        if allergies:
-            parts.append(f"Allergies: {', '.join(allergies)}")
+    Shared by the evaluation runner, web API, and comparison scripts.
+    """
+    p = case.patient
+    v = p.vitals
+    exam = p.neurological_exam
 
-        parts.append(f"Neurological examination: {case.patient.neurological_exam.model_dump_json()}")
-        parts.append(f"Vitals: {case.patient.vitals.model_dump_json()}")
+    parts = [
+        f"Patient: {p.demographics.age}-year-old {p.demographics.sex}",
+        f"Chief complaint: {p.chief_complaint}",
+        f"History of present illness: {p.history_present_illness}",
+    ]
 
-        return "\n".join(parts)
+    pmh = p.clinical_history.past_medical_history
+    if pmh:
+        parts.append(f"Past medical history: {'; '.join(pmh)}")
+
+    meds = p.clinical_history.medications
+    if meds:
+        med_strs = [f"{m.drug} {m.dose} {m.frequency} ({m.indication})" for m in meds]
+        parts.append(f"Current medications: {'; '.join(med_strs)}")
+
+    allergies = p.clinical_history.allergies
+    if allergies:
+        parts.append(f"Allergies: {', '.join(allergies)}")
+
+    fhx = p.clinical_history.family_history
+    if fhx:
+        parts.append(f"Family history: {'; '.join(fhx)}")
+
+    # Neurological exam as natural language (not JSON)
+    exam_parts = []
+    if exam.mental_status:
+        exam_parts.append(f"Mental status: {exam.mental_status}")
+    if exam.cranial_nerves:
+        exam_parts.append(f"Cranial nerves: {exam.cranial_nerves}")
+    if exam.motor:
+        exam_parts.append(f"Motor: {exam.motor}")
+    if exam.sensory:
+        exam_parts.append(f"Sensory: {exam.sensory}")
+    if exam.reflexes:
+        exam_parts.append(f"Reflexes: {exam.reflexes}")
+    if exam.coordination:
+        exam_parts.append(f"Coordination: {exam.coordination}")
+    if exam.gait:
+        exam_parts.append(f"Gait: {exam.gait}")
+    if exam.additional:
+        exam_parts.append(f"Additional: {exam.additional}")
+    parts.append("Neurological examination:\n" + "\n".join(f"  {e}" for e in exam_parts))
+
+    # Vitals as natural language
+    parts.append(
+        f"Vitals: BP {v.bp_systolic}/{v.bp_diastolic} mmHg, "
+        f"HR {v.hr} bpm, Temp {v.temp}°C, RR {v.rr}, SpO2 {v.spo2}%"
+    )
+
+    return "\n".join(parts)
