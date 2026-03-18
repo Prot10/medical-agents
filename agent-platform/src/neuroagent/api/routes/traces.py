@@ -42,6 +42,7 @@ def list_traces(request: Request) -> list[dict]:
                 "tools_called": data.get("tools_called", []),
                 "total_tokens": data.get("total_tokens", 0),
                 "elapsed_time_seconds": data.get("elapsed_time_seconds", 0),
+                "total_cost_usd": data.get("total_cost_usd", 0),
             })
         except Exception:
             continue

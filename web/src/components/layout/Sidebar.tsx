@@ -27,6 +27,7 @@ export function Sidebar() {
     sidebarCollapsed, toggleSidebar, activeSection, setActiveSection,
     darkMode, toggleDarkMode,
     selectedModel, setModel, selectedEvaluatorModel, setEvaluatorModel,
+    dualModelEnabled, setDualModel, specialistModel, setSpecialistModel,
     selectedHospital, setHospital,
   } = useAppStore()
   const { data: models } = useModels()
@@ -282,6 +283,37 @@ export function Sidebar() {
                     </select>
                     <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground pointer-events-none" />
                   </div>
+                </div>
+
+                {/* Dual-model specialist toggle */}
+                <div className="space-y-1">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={dualModelEnabled}
+                      onChange={(e) => setDualModel(e.target.checked)}
+                      className="h-3.5 w-3.5 rounded border-sidebar-border text-purple-500 focus:ring-purple-500"
+                    />
+                    <span className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">
+                      Specialist Co-Pilot
+                    </span>
+                  </label>
+                  {dualModelEnabled && (
+                    <div className="relative ml-5">
+                      <select
+                        value={specialistModel}
+                        onChange={(e) => setSpecialistModel(e.target.value)}
+                        className="w-full text-sm bg-sidebar-accent border border-sidebar-border rounded-lg px-2.5 py-1.5 text-sidebar-foreground focus:outline-none focus:ring-1 focus:ring-purple-500 appearance-none pr-7"
+                      >
+                        {models?.filter((m) => m.key !== selectedModel).map((m) => (
+                          <option key={m.key} value={m.key}>
+                            {m.name} {m.status !== "ready" ? `(${m.status})` : ""}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground pointer-events-none" />
+                    </div>
+                  )}
                 </div>
 
                 {/* Hospital picker */}

@@ -34,6 +34,16 @@ DATASETS = {
         "name": "NeuroBench v2",
         "description": "100 cases seeded from real PMC case reports",
     },
+    "v3": {
+        "path": DATA_ROOT / "neurobench_v3",
+        "name": "NeuroBench v3",
+        "description": "200 cases (v1+v2 combined) with realistic/stripped tool outputs",
+    },
+    "v4": {
+        "path": DATA_ROOT / "neurobench_v4",
+        "name": "NeuroBench v4",
+        "description": "200 cases with 12-tool schema and cost tracking (v3 migrated)",
+    },
 }
 
 

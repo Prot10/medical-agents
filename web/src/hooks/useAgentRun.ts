@@ -7,7 +7,12 @@ export function useAgentRun() {
   const abortRef = useRef<AbortController | null>(null)
 
   const run = useCallback(
-    async (caseId: string, hospital: string, model: string) => {
+    async (
+      caseId: string,
+      hospital: string,
+      model: string,
+      options?: { dual_model?: boolean; specialist_model?: string },
+    ) => {
       abortRef.current?.abort()
       const controller = new AbortController()
       abortRef.current = controller
@@ -22,6 +27,7 @@ export function useAgentRun() {
           appendEvent,
           (err) => setError(err.message),
           controller.signal,
+          options,
         )
       } catch (err) {
         if ((err as Error).name !== "AbortError") {

@@ -45,6 +45,8 @@ class RunRequest(BaseModel):
     model: str = "qwen3.5-9b"
     base_url: str | None = None   # custom LLM endpoint (e.g. GitHub Models)
     api_key: str | None = None    # API key for custom endpoint
+    dual_model: bool = False      # enable dual-model (orchestrator + specialist)
+    specialist_model: str = "medgemma-4b"  # specialist model key
 
 
 class EvaluateRequest(BaseModel):
@@ -67,6 +69,9 @@ def _sse_event(data: dict) -> str:
 # _format_initial_info removed — use format_patient_info from evaluation.runner
 
 
+SPECIALIST_PORT = 8001
+
+
 async def _stream_agent_events(
     case: NeuroBenchCase,
     hospital: str,
@@ -75,13 +80,34 @@ async def _stream_agent_events(
     rules_dir: str,
     traces_dir: Any,
     api_key: str = "not-needed",
+    dual_model: bool = False,
+    specialist_model_hf_id: str = "",
 ) -> AsyncIterator[str]:
     """Run agent in a thread, push events to an async queue for true SSE streaming."""
+
+    # Create specialist client if dual-model mode is enabled
+    specialist_client = None
+    if dual_model and specialist_model_hf_id:
+        specialist_client = LLMClient(
+            base_url=f"http://localhost:{SPECIALIST_PORT}/v1",
+            api_key="not-needed",
+            model=specialist_model_hf_id,
+            temperature=0.3,
+            max_tokens=4096,
+            presence_penalty=0.0,
+        )
+
     mock_server = MockServer(case)
-    tool_registry = ToolRegistry.create_default_registry(mock_server=mock_server)
+    tool_registry = ToolRegistry.create_default_registry(
+        mock_server=mock_server,
+        specialist_client=specialist_client,
+    )
     rules_engine = RulesEngine(rules_dir, hospital=hospital)
 
-    config = AgentConfig(base_url=base_url, model=model_hf_id, api_key=api_key)
+    config = AgentConfig(
+        base_url=base_url, model=model_hf_id, api_key=api_key,
+        specialist_enabled=dual_model,
+    )
     agent = AgentOrchestrator(
         config=config, tool_registry=tool_registry, rules_engine=rules_engine,
     )
@@ -94,6 +120,8 @@ async def _stream_agent_events(
         "hospital": hospital,
         "model": model_hf_id,
         "max_turns": config.max_turns,
+        "dual_model": dual_model,
+        "specialist_model": specialist_model_hf_id if dual_model else None,
     })
 
     # Use an async queue so events stream as they're produced
@@ -172,6 +200,13 @@ async def run_agent(body: RunRequest, request: Request):
         model_hf_id = body.model
         base_url = OLLAMA_BASE_URL
 
+    # Resolve specialist model for dual-model mode
+    specialist_hf_id = ""
+    if body.dual_model:
+        specialist_hf_id = MODEL_KEY_TO_HF.get(
+            body.specialist_model, body.specialist_model,
+        )
+
     return StreamingResponse(
         _stream_agent_events(
             case=case,
@@ -181,6 +216,8 @@ async def run_agent(body: RunRequest, request: Request):
             rules_dir=request.app.state.rules_dir,
             traces_dir=request.app.state.traces_dir,
             api_key=body.api_key or "not-needed",
+            dual_model=body.dual_model,
+            specialist_model_hf_id=specialist_hf_id,
         ),
         media_type="text/event-stream",
         headers={

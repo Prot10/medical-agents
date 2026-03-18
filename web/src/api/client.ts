@@ -100,7 +100,12 @@ export async function streamAgentRun(
   onEvent: (event: AgentEvent) => void,
   onError: (error: Error) => void,
   signal?: AbortSignal,
-  options?: { base_url?: string; api_key?: string },
+  options?: {
+    base_url?: string
+    api_key?: string
+    dual_model?: boolean
+    specialist_model?: string
+  },
 ): Promise<void> {
   const response = await fetch(`${BASE}/agent/run`, {
     method: "POST",
@@ -111,6 +116,10 @@ export async function streamAgentRun(
       model,
       ...(options?.base_url && { base_url: options.base_url }),
       ...(options?.api_key && { api_key: options.api_key }),
+      ...(options?.dual_model && { dual_model: true }),
+      ...(options?.dual_model && options?.specialist_model && {
+        specialist_model: options.specialist_model,
+      }),
     }),
     signal,
     cache: "no-store",

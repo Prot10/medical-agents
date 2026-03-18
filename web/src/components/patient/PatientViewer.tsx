@@ -2,7 +2,7 @@ import { useState } from "react"
 import {
   User, Activity, Heart, Thermometer, Wind, Droplets,
   ChevronDown, ChevronRight, FileText, Stethoscope, ClipboardList, Target, ScanLine,
-  Brain, FlaskConical, Zap,
+  Brain, FlaskConical, Zap, Scan, AudioWaveform, MonitorCheck, Radiation, ClipboardCheck,
 } from "lucide-react"
 import { useCaseDetail } from "@/hooks/useCases"
 import { useAppStore } from "@/stores/appStore"
@@ -133,6 +133,11 @@ const DIAGNOSTIC_TOOLS: Array<{
   { key: "ecg", toolName: "analyze_ecg", label: "ECG", icon: Heart, color: "text-rose-500" },
   { key: "labs", toolName: "interpret_labs", label: "Lab Results", icon: FlaskConical, color: "text-emerald-500" },
   { key: "csf", toolName: "analyze_csf", label: "CSF Analysis", icon: Droplets, color: "text-cyan-500" },
+  { key: "ct", toolName: "order_ct_scan", label: "CT Scan", icon: Scan, color: "text-slate-500" },
+  { key: "echo", toolName: "order_echocardiogram", label: "Echocardiogram", icon: AudioWaveform, color: "text-pink-500" },
+  { key: "cardiac_monitoring", toolName: "order_cardiac_monitoring", label: "Cardiac Monitoring", icon: MonitorCheck, color: "text-red-500" },
+  { key: "advanced_imaging", toolName: "order_advanced_imaging", label: "Advanced Imaging", icon: Radiation, color: "text-indigo-500" },
+  { key: "specialized_test", toolName: "order_specialized_test", label: "Specialized Test", icon: ClipboardCheck, color: "text-teal-500" },
 ]
 
 function DiagnosticsSection({ initialOutputs, followupOutputs }: {
@@ -184,6 +189,11 @@ function DiagnosticsSection({ initialOutputs, followupOutputs }: {
       case "analyze_ecg": return <ECGReport data={d} />
       case "interpret_labs": return <LabResultsTable data={d} />
       case "analyze_csf": return <CSFResults data={d} />
+      case "order_ct_scan":
+      case "order_echocardiogram":
+      case "order_cardiac_monitoring":
+      case "order_advanced_imaging":
+      case "order_specialized_test":
       default: return <pre className="text-sm font-mono text-muted-foreground whitespace-pre-wrap">{JSON.stringify(d, null, 2)}</pre>
     }
   }

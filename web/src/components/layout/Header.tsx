@@ -14,7 +14,7 @@ const SECTION_LABELS: Record<string, string> = {
 }
 
 export function Header() {
-  const { selectedCaseId, selectedHospital, selectedModel, selectedEvaluatorModel, activeSection, triggerOracle } = useAppStore()
+  const { selectedCaseId, selectedHospital, selectedModel, selectedEvaluatorModel, dualModelEnabled, specialistModel, activeSection, triggerOracle } = useAppStore()
   const status = useAgentStore((s) => s.status)
   const events = useAgentStore((s) => s.events)
   const totalTokens = useAgentStore((s) => s.totalTokens)
@@ -25,7 +25,10 @@ export function Header() {
 
   const handleRun = () => {
     if (!selectedCaseId) return
-    run(selectedCaseId, selectedHospital, selectedModel)
+    run(selectedCaseId, selectedHospital, selectedModel, {
+      dual_model: dualModelEnabled,
+      specialist_model: dualModelEnabled ? specialistModel : undefined,
+    })
   }
 
   const handleEvaluate = () => {

@@ -153,12 +153,15 @@ export interface AgentEvent {
   success?: boolean
   output?: Record<string, unknown>
   token_usage?: { prompt_tokens: number; completion_tokens: number; total_tokens: number }
+  // tool_result cost field
+  cost_usd?: number
   // run_complete fields
   total_tool_calls?: number
   tools_called?: string[]
   total_tokens?: number
   elapsed_time_seconds?: number
   final_response?: string
+  total_cost_usd?: number
   // run_started fields
   case_id?: string
   hospital?: string
@@ -190,4 +193,5 @@ export interface TraceSummary {
   tools_called: string[]
   total_tokens: number
   elapsed_time_seconds: number
+  total_cost_usd?: number
 }

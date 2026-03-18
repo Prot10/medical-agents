@@ -12,6 +12,8 @@ import type { PathwayDetail, PathwayStep } from "@/api/types"
 const TOOL_ACTIONS = [
   "analyze_eeg", "analyze_brain_mri", "analyze_ecg",
   "interpret_labs", "analyze_csf", "search_medical_literature", "check_drug_interactions",
+  "order_ct_scan", "order_echocardiogram", "order_cardiac_monitoring",
+  "order_advanced_imaging", "order_specialized_test",
 ]
 
 const TIMINGS = ["immediate", "within_24h", "initial", "before_treatment", "before_discharge", "if_treatment_started"]

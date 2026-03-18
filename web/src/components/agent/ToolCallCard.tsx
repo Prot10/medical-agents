@@ -2,6 +2,8 @@ import { useState } from "react"
 import {
   ChevronRight, ChevronDown, CheckCircle2, XCircle, Loader2,
   Brain, Activity, Heart, FlaskConical, Droplets, BookOpen, Pill,
+  Scan, AudioWaveform, MonitorCheck, Radiation, ClipboardCheck,
+  UserCheck,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ToolResultRenderer } from "@/components/results/ToolResultRenderer"
@@ -14,6 +16,12 @@ const TOOL_META: Record<string, { icon: React.ElementType; label: string; accent
   analyze_csf: { icon: Droplets, label: "CSF Analysis", accent: "text-cyan-500 dark:text-cyan-400", bgClass: "bg-cyan-500/15", color: "#06b6d4" },
   search_medical_literature: { icon: BookOpen, label: "Literature Search", accent: "text-amber-500 dark:text-amber-400", bgClass: "bg-amber-500/15", color: "#f59e0b" },
   check_drug_interactions: { icon: Pill, label: "Drug Interactions", accent: "text-orange-500 dark:text-orange-400", bgClass: "bg-orange-500/15", color: "#f97316" },
+  order_ct_scan: { icon: Scan, label: "CT Scan", accent: "text-slate-500 dark:text-slate-400", bgClass: "bg-slate-500/15", color: "#64748b" },
+  order_echocardiogram: { icon: AudioWaveform, label: "Echocardiogram", accent: "text-pink-500 dark:text-pink-400", bgClass: "bg-pink-500/15", color: "#ec4899" },
+  order_cardiac_monitoring: { icon: MonitorCheck, label: "Cardiac Monitoring", accent: "text-red-500 dark:text-red-400", bgClass: "bg-red-500/15", color: "#ef4444" },
+  order_advanced_imaging: { icon: Radiation, label: "Advanced Imaging", accent: "text-indigo-500 dark:text-indigo-400", bgClass: "bg-indigo-500/15", color: "#6366f1" },
+  order_specialized_test: { icon: ClipboardCheck, label: "Specialized Test", accent: "text-teal-500 dark:text-teal-400", bgClass: "bg-teal-500/15", color: "#14b8a6" },
+  consult_medical_specialist: { icon: UserCheck, label: "Specialist Consultation", accent: "text-purple-500 dark:text-purple-400", bgClass: "bg-purple-500/15", color: "#a855f7" },
 }
 
 interface ToolCallCardProps {

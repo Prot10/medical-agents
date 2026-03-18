@@ -6,6 +6,7 @@ import { CSFResults } from "./CSFResults"
 import { LiteratureResults } from "./LiteratureResults"
 import { DrugInteractions } from "./DrugInteractions"
 import { GenericResult } from "./GenericResult"
+import { SpecialistResult } from "./SpecialistResult"
 
 interface Props {
   toolName: string
@@ -38,6 +39,14 @@ export function ToolResultRenderer({ toolName, result }: Props) {
       return <LiteratureResults data={output} />
     case "check_drug_interactions":
       return <DrugInteractions data={output} />
+    case "order_ct_scan":
+    case "order_echocardiogram":
+    case "order_cardiac_monitoring":
+    case "order_advanced_imaging":
+    case "order_specialized_test":
+      return <GenericResult data={output} />
+    case "consult_medical_specialist":
+      return <SpecialistResult data={output} />
     default:
       return <GenericResult data={output} />
   }
