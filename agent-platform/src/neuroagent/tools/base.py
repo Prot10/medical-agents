@@ -16,6 +16,7 @@ class ToolResult(BaseModel):
     success: bool
     output: dict[str, Any] | None = None  # serialized tool output
     error_message: str | None = None
+    cost_usd: float | None = None  # populated by CostTracker
 
 
 class BaseTool(ABC):

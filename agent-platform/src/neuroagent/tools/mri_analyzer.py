@@ -7,29 +7,33 @@ from .mock_server import MockServer
 class MRIAnalyzerTool(BaseTool):
     name = "analyze_brain_mri"
     description = (
-        "Analyze a brain MRI scan for structural abnormalities. Returns "
-        "findings with locations, signal characteristics, volumetrics, "
-        "differential diagnoses, and clinical impression."
+        "Order and analyze a brain MRI scan. Specify the clinical protocol "
+        "(standard, epilepsy, stroke, tumor, ms, dementia) and whether "
+        "contrast (gadolinium) is needed. Returns findings with locations, "
+        "signal characteristics, volumetrics, and clinical impression. "
+        "Note: MRI is slower than CT — for emergency hemorrhage exclusion, "
+        "use order_ct_scan instead."
     )
     parameter_schema = {
         "type": "object",
         "properties": {
             "clinical_context": {
                 "type": "string",
-                "description": "Clinical context for the MRI interpretation.",
+                "description": "Clinical context and indication for the MRI.",
             },
-            "mri_file_path": {
+            "protocol": {
                 "type": "string",
-                "description": "Path to the MRI scan file.",
-            },
-            "sequences": {
-                "type": "array",
-                "items": {"type": "string"},
-                "description": "MRI sequences to analyze (e.g., T1, T2, FLAIR, DWI).",
+                "enum": ["standard", "epilepsy", "stroke", "tumor", "ms", "dementia"],
+                "description": (
+                    "MRI protocol to use. 'epilepsy': thin coronal hippocampal cuts (ILAE HARNESS-MRI). "
+                    "'stroke': DWI emphasis + MRA. 'tumor': includes perfusion-weighted sequences. "
+                    "'ms': sagittal FLAIR + post-contrast T1. 'dementia': volumetric with hippocampal assessment. "
+                    "'standard': general brain screen."
+                ),
             },
             "contrast": {
                 "type": "boolean",
-                "description": "Whether contrast-enhanced sequences are available.",
+                "description": "Whether gadolinium contrast is needed (e.g., for tumor, MS, infection).",
             },
         },
         "required": ["clinical_context"],

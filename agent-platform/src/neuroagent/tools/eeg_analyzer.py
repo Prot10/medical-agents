@@ -7,9 +7,11 @@ from .mock_server import MockServer
 class EEGAnalyzerTool(BaseTool):
     name = "analyze_eeg"
     description = (
-        "Analyze an EEG recording for neurological abnormalities. Returns "
-        "classification (normal/abnormal), detected findings with locations "
-        "and timestamps, activating procedure results, and clinical impression."
+        "Order and analyze an EEG recording. Specify the type: 'routine' "
+        "(20-40 min, ~$250), 'ambulatory' (24-72 hr home, ~$700), 'video' "
+        "(inpatient video-EEG, ~$1,200/day), or 'continuous_icu' (~$900/day). "
+        "Returns classification (normal/abnormal), detected findings with "
+        "locations, activating procedure results, and clinical impression."
     )
     parameter_schema = {
         "type": "object",
@@ -18,9 +20,16 @@ class EEGAnalyzerTool(BaseTool):
                 "type": "string",
                 "description": "Clinical context for the EEG interpretation.",
             },
-            "eeg_file_path": {
+            "eeg_type": {
                 "type": "string",
-                "description": "Path to the EEG recording file.",
+                "enum": ["routine", "ambulatory", "video", "continuous_icu"],
+                "description": (
+                    "Type of EEG study. 'routine': 20-40 min outpatient. "
+                    "'ambulatory': 24-72 hr home monitoring. "
+                    "'video': inpatient video-EEG monitoring (epilepsy surgery workup). "
+                    "'continuous_icu': ICU continuous EEG for status monitoring."
+                ),
+                "default": "routine",
             },
             "patient_age": {
                 "type": "integer",

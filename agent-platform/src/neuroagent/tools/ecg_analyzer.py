@@ -7,8 +7,9 @@ from .mock_server import MockServer
 class ECGAnalyzerTool(BaseTool):
     name = "analyze_ecg"
     description = (
-        "Analyze a 12-lead ECG for cardiac abnormalities. Returns rhythm "
-        "analysis, intervals, axis, findings, and clinical correlation."
+        "Analyze a 12-lead ECG (~$20). Returns rhythm analysis, intervals, "
+        "axis, findings, and clinical correlation. For prolonged cardiac "
+        "rhythm monitoring (Holter, event monitor), use order_cardiac_monitoring."
     )
     parameter_schema = {
         "type": "object",
@@ -16,10 +17,6 @@ class ECGAnalyzerTool(BaseTool):
             "clinical_context": {
                 "type": "string",
                 "description": "Clinical context for the ECG interpretation.",
-            },
-            "ecg_file_path": {
-                "type": "string",
-                "description": "Path to the ECG recording file.",
             },
         },
         "required": ["clinical_context"],

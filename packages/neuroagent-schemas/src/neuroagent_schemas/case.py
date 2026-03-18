@@ -10,13 +10,18 @@ from .enums import CaseDifficulty, EncounterType, NeurologicalCondition
 from .evaluation import GroundTruth
 from .patient import PatientProfile
 from .tool_outputs import (
+    AdvancedImagingReport,
+    CardiacMonitoringReport,
     CSFResults,
+    CTReport,
     DrugInteractionResult,
     ECGReport,
+    EchoReport,
     EEGReport,
     LabResults,
     LiteratureSearchResult,
     MRIReport,
+    SpecializedTestReport,
 )
 
 
@@ -28,6 +33,11 @@ class ToolOutputSet(BaseModel):
     ecg: ECGReport | None = None
     labs: LabResults | None = None
     csf: CSFResults | None = None
+    ct: CTReport | None = None
+    echo: EchoReport | None = None
+    cardiac_monitoring: CardiacMonitoringReport | None = None
+    advanced_imaging: AdvancedImagingReport | None = None
+    specialized_test: SpecializedTestReport | None = None
     literature_search: dict[str, LiteratureSearchResult] | None = None
     drug_interactions: dict[str, DrugInteractionResult] | None = None
 
@@ -43,6 +53,11 @@ class FollowUpToolOutput(BaseModel):
         | LabResults
         | CSFResults
         | ECGReport
+        | CTReport
+        | EchoReport
+        | CardiacMonitoringReport
+        | AdvancedImagingReport
+        | SpecializedTestReport
         | LiteratureSearchResult
         | DrugInteractionResult
     )
