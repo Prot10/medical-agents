@@ -2,7 +2,7 @@
 
 ## What is this project
 
-NeuroAgent: tool-augmented LLM agent for neurological clinical decision support. ReAct loop + 7 diagnostic tools + hospital protocols + patient memory. Targeting Nature Machine Intelligence.
+NeuroAgent: tool-augmented LLM agent for neurological clinical decision support. ReAct loop + 12 diagnostic tools + hospital protocols + patient memory + cost tracking. Targeting Nature Machine Intelligence.
 
 See README.md for full project docs, setup, and architecture.
 
@@ -14,7 +14,9 @@ See README.md for full project docs, setup, and architecture.
 - `web/src/` — React frontend (Vite + TypeScript + Tailwind v4)
 - `data/neurobench_v{1,2}/cases/` — 200 benchmark cases (JSON)
 - `data/neurobench_v3/cases/` — 200 benchmark cases with realistic tool outputs (v1+v2 combined, stripped)
+- `data/neurobench_v4/cases/` — 200 benchmark cases with 12-tool schema and cost tracking (v3 migrated)
 - `agent-platform/config/hospital_rules/{hospital}/*.yaml` — clinical pathways
+- `agent-platform/config/tool_costs.yaml` — per-tool cost registry (Medicare reference rates)
 
 ## Common commands
 
@@ -25,8 +27,10 @@ uv run uvicorn neuroagent.api.app:app --host 0.0.0.0 --port 8888  # start server
 cd web && npm run dev                     # frontend dev (local)
 cd web && npm run dev:remote              # frontend dev (remote VM, binds 0.0.0.0)
 uv run pytest agent-platform/tests/ -v   # tests
-./agent-platform/scripts/run_v3_full.sh                       # full model comparison (v3)
+./agent-platform/scripts/run_v3_full.sh                       # full model comparison (v3, 7 tools)
+./agent-platform/scripts/run_v4_full.sh                       # full model comparison (v4, 12 tools + cost)
 uv run python agent-platform/scripts/create_v3_dataset.py     # regenerate v3 from v1+v2
+uv run python agent-platform/scripts/migrate_v3_to_v4.py     # migrate v3→v4 (12-tool schema)
 ```
 
 ## Conventions
@@ -38,8 +42,10 @@ uv run python agent-platform/scripts/create_v3_dataset.py     # regenerate v3 fr
 - Frontend: `@/` path alias for `src/`, named exports only, no default exports for components
 - State: Zustand for UI/streaming state, TanStack Query for server data
 - Commit style: conventional commits (`feat:`, `fix:`, `docs:`, `chore:`)
-- Dataset versions: v1 (synthetic, enhanced outputs), v2 (real-seeded, enhanced), v3 (v1+v2 combined, realistic/stripped outputs)
-- Tool output modes: "enhanced" (v1/v2, interpretive fields present) vs "realistic" (v3, stripped to match real clinical reports)
+- Dataset versions: v1 (synthetic, enhanced outputs), v2 (real-seeded, enhanced), v3 (v1+v2 combined, realistic/stripped outputs), v4 (12-tool schema + cost tracking, migrated from v3)
+- Tool output modes: "enhanced" (v1/v2, interpretive fields present) vs "realistic" (v3/v4, stripped to match real clinical reports)
+- 12 tools: analyze_brain_mri, analyze_eeg, analyze_ecg, interpret_labs, analyze_csf, order_ct_scan, order_echocardiogram, order_cardiac_monitoring, order_advanced_imaging, order_specialized_test, search_medical_literature, check_drug_interactions
+- Cost tracking: `CostTracker` in `tools/cost_tracker.py`, config in `config/tool_costs.yaml`, Medicare PFS reference rates
 - Evaluation: `format_patient_info()` in `evaluation/runner.py` is the single source of truth for patient presentation formatting
 
 ## Models
