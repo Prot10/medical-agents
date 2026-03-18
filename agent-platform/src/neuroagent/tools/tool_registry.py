@@ -23,10 +23,21 @@ class ToolRegistry:
         return tool.execute(tool_call.parameters)
 
     @staticmethod
-    def create_default_registry(mock_server=None) -> "ToolRegistry":
-        """Create a registry with all 7 default diagnostic tools.
+    def create_default_registry(
+        mock_server=None,
+        specialist_client=None,
+    ) -> "ToolRegistry":
+        """Create a registry with all diagnostic tools.
 
-        Hospital rules are injected into the system prompt (not a tool).
+        Args:
+            mock_server: MockServer for evaluation mode (pre-generated outputs).
+            specialist_client: LLMClient for the specialist model (dual-model mode).
+                If provided, the ``consult_medical_specialist`` tool is registered
+                as the 13th tool.  If only mock_server is set, the specialist tool
+                delegates to mock_server like every other tool.
+
+        Returns:
+            ToolRegistry with 12 tools (single-model) or 13 tools (dual-model).
         """
         from .eeg_analyzer import EEGAnalyzerTool
         from .mri_analyzer import MRIAnalyzerTool
@@ -35,12 +46,27 @@ class ToolRegistry:
         from .csf_analyzer import CSFAnalyzerTool
         from .literature_search import LiteratureSearchTool
         from .drug_interaction import DrugInteractionTool
+        from .ct_scanner import CTScanTool
+        from .echocardiogram import EchocardiogramTool
+        from .cardiac_monitoring import CardiacMonitoringTool
+        from .advanced_imaging import AdvancedImagingTool
+        from .specialized_test import SpecializedTestTool
 
         registry = ToolRegistry()
         for tool_cls in [
             EEGAnalyzerTool, MRIAnalyzerTool, ECGAnalyzerTool,
             LabInterpreterTool, CSFAnalyzerTool, LiteratureSearchTool,
-            DrugInteractionTool,
+            DrugInteractionTool, CTScanTool, EchocardiogramTool,
+            CardiacMonitoringTool, AdvancedImagingTool, SpecializedTestTool,
         ]:
             registry.register(tool_cls(mock_server=mock_server))
+
+        # Specialist consultation tool — only when dual-model or mock evaluation
+        if specialist_client is not None or mock_server is not None:
+            from .medical_specialist import MedicalSpecialistTool
+            registry.register(MedicalSpecialistTool(
+                mock_server=mock_server,
+                specialist_client=specialist_client,
+            ))
+
         return registry

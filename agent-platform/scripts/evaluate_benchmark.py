@@ -54,7 +54,7 @@ EVALUATION_CRITERIA = {
     },
     "action_recall": {
         "description": "Fraction of optimal/required diagnostic actions the agent performed",
-        "weight": 0.15,
+        "weight": 0.12,
         "type": "float_0_1",
     },
     "action_precision": {
@@ -74,7 +74,7 @@ EVALUATION_CRITERIA = {
     },
     "efficiency_score": {
         "description": "Ratio of optimal actions to total tool calls (penalizes over-investigation)",
-        "weight": 0.05,
+        "weight": 0.03,
         "type": "float_0_1",
     },
     "reasoning_completeness": {
@@ -84,8 +84,13 @@ EVALUATION_CRITERIA = {
     },
     "protocol_compliance": {
         "description": "Whether the agent followed all mandatory hospital protocol steps and avoided violations",
-        "weight": 0.10,
+        "weight": 0.08,
         "type": "boolean",
+    },
+    "cost_efficiency": {
+        "description": "How efficiently the agent spent diagnostic budget vs optimal (1.0 = at or under optimal cost)",
+        "weight": 0.07,
+        "type": "float_0_1",
     },
 }
 
@@ -137,6 +142,10 @@ class CaseEvaluation:
     safety_score: float = 0.0
     efficiency_score: float = 0.0
     reasoning_completeness: float = 0.0
+
+    # Cost tracking
+    total_cost_usd: float = 0.0
+    cost_efficiency: float = 0.0
 
     # Protocol compliance
     protocol_compliance: bool | None = None
@@ -216,8 +225,12 @@ def evaluate_trace(trace_data: dict, run_id: str) -> CaseEvaluation:
     # Critical actions — these are free-text descriptions, match against tool names in response
     critical_descriptions = gt.get("critical_actions", [])
     # Extract tool names mentioned in critical action descriptions
-    tool_names_all = {"analyze_eeg", "analyze_brain_mri", "analyze_ecg", "interpret_labs",
-                      "analyze_csf", "search_medical_literature", "check_drug_interactions"}
+    tool_names_all = {
+        "analyze_eeg", "analyze_brain_mri", "analyze_ecg", "interpret_labs",
+        "analyze_csf", "search_medical_literature", "check_drug_interactions",
+        "order_ct_scan", "order_echocardiogram", "order_cardiac_monitoring",
+        "order_advanced_imaging", "order_specialized_test",
+    }
     critical_tools = set()
     for desc in critical_descriptions:
         desc_lower = str(desc).lower()
@@ -248,6 +261,25 @@ def evaluate_trace(trace_data: dict, run_id: str) -> CaseEvaluation:
     # --- Reasoning completeness ---
     sections_found = sum(1 for s in REQUIRED_SECTIONS if s.lower() in response)
     ev.reasoning_completeness = sections_found / len(REQUIRED_SECTIONS)
+
+    # --- Cost tracking ---
+    ev.total_cost_usd = trace_data.get("total_cost_usd", 0.0)
+    # Compute optimal cost from ground truth
+    try:
+        from neuroagent.tools.cost_tracker import CostTracker
+        tracker = CostTracker()
+        for action in gt.get("optimal_actions", []):
+            tool = action.get("tool_name", "") if isinstance(action, dict) else ""
+            if tool:
+                tracker.compute_cost(tool, {})
+        optimal_cost = tracker.total_cost_usd
+        if optimal_cost > 0:
+            overspend = max(0.0, ev.total_cost_usd - optimal_cost)
+            ev.cost_efficiency = max(0.0, 1.0 - overspend / (optimal_cost + 1))
+        elif ev.total_cost_usd == 0:
+            ev.cost_efficiency = 1.0
+    except Exception:
+        ev.cost_efficiency = 0.0
 
     # --- Protocol compliance (via rules engine) ---
     hospital = trace_data.get("hospital", "")
@@ -283,6 +315,7 @@ def evaluate_trace(trace_data: dict, run_id: str) -> CaseEvaluation:
         + EVALUATION_CRITERIA["efficiency_score"]["weight"] * ev.efficiency_score
         + EVALUATION_CRITERIA["reasoning_completeness"]["weight"] * ev.reasoning_completeness
         + EVALUATION_CRITERIA["protocol_compliance"]["weight"] * protocol_compliance_value
+        + EVALUATION_CRITERIA["cost_efficiency"]["weight"] * ev.cost_efficiency
     )
 
     return ev
@@ -315,6 +348,9 @@ class RunAggregate:
     std_composite: float = 0.0
 
     mean_protocol_compliance: float = 0.0
+
+    mean_cost_usd: float = 0.0
+    mean_cost_efficiency: float = 0.0
 
     mean_tools: float = 0.0
     mean_time: float = 0.0
@@ -354,6 +390,9 @@ def aggregate_evaluations(evals: list[CaseEvaluation], run_id: str) -> RunAggreg
         agg.mean_protocol_compliance = sum(
             e.protocol_compliance for e in compliance_evals
         ) / len(compliance_evals)
+
+    agg.mean_cost_usd = statistics.mean(e.total_cost_usd for e in evals)
+    agg.mean_cost_efficiency = statistics.mean(e.cost_efficiency for e in evals)
 
     composites = [e.composite_score for e in evals]
     agg.mean_composite = statistics.mean(composites)
@@ -498,6 +537,8 @@ def evaluate(
     table.add_column("Safety", justify="right")
     table.add_column("Compl", justify="right")
     table.add_column("Protocol", justify="right")
+    table.add_column("Cost$", justify="right")
+    table.add_column("CostEff", justify="right")
     table.add_column("Composite", justify="right")
     table.add_column("Tools", justify="right")
     table.add_column("Time", justify="right")
@@ -513,6 +554,8 @@ def evaluate(
             f"{agg.mean_safety:.2f}",
             f"{agg.mean_reasoning_completeness:.2f}",
             f"{agg.mean_protocol_compliance:.0%}",
+            f"${agg.mean_cost_usd:,.0f}",
+            f"{agg.mean_cost_efficiency:.2f}",
             f"{agg.mean_composite:.3f}",
             f"{agg.mean_tools:.1f}",
             f"{agg.mean_time:.0f}s",
@@ -625,6 +668,8 @@ def evaluate(
             "protocol_compliance": ev.protocol_compliance,
             "missing_required_steps": ev.missing_required_steps,
             "protocol_violations": ev.protocol_violations,
+            "cost_usd": round(ev.total_cost_usd, 2),
+            "cost_efficiency": round(ev.cost_efficiency, 3),
             "composite": round(ev.composite_score, 4),
             "tools": ev.total_tool_calls,
             "time_s": round(ev.elapsed_time_seconds, 1),

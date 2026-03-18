@@ -21,10 +21,10 @@ from ..agent.reasoning import AgentTrace
 _TOOL_ACTION_MAP: dict[str, list[str]] = {
     "analyze_eeg": ["eeg", "electroencephalogr", "video-eeg", "continuous eeg"],
     "analyze_brain_mri": [
-        "mri", "brain imaging", "neuroimaging", "ct head", "ct scan",
-        "cta", "mra", "diffusion", "flair", "dwi", "perfusion",
+        "mri", "brain mri", "brain imaging", "neuroimaging",
+        "diffusion", "flair", "dwi",
     ],
-    "analyze_ecg": ["ecg", "electrocardiogr", "12-lead", "cardiac monitor", "holter"],
+    "analyze_ecg": ["ecg", "electrocardiogr", "12-lead"],
     "interpret_labs": [
         "lab", "blood test", "cbc", "bmp", "metabolic panel", "coagulation",
         "blood culture", "troponin", "thyroid", "tsh", "b12", "hba1c",
@@ -40,14 +40,44 @@ _TOOL_ACTION_MAP: dict[str, list[str]] = {
         "drug interaction", "medication check", "contraindication",
         "prescri", "formulary", "interaction check",
     ],
+    "order_ct_scan": [
+        "ct scan", "ct head", "non-contrast ct", "ct brain",
+        "ct angiogr", "cta ", "cta,",
+    ],
+    "order_echocardiogram": [
+        "echocardiogr", "echocard", "transthoracic", "transesophageal",
+        "tte", "tee", "bubble study", "cardiac ultrasound",
+    ],
+    "order_cardiac_monitoring": [
+        "holter", "cardiac monitor", "event monitor", "telemetry",
+        "rhythm monitor",
+    ],
+    "order_advanced_imaging": [
+        "pet scan", "amyloid pet", "fdg-pet", "fdg pet", "datscan",
+        "dat scan", "perfusion", "spectroscopy", "carotid duplex",
+        "carotid doppler", "carotid ultrasound", "mra",
+    ],
+    "order_specialized_test": [
+        "neuropsych", "cognitive test", "mmse", "moca",
+        "emg", "nerve conduction", "electromyogr",
+        "evoked potential", "vep ", "ssep", "baep",
+        "tilt table", "tilt test",
+        "polysomnogr", "sleep study",
+        "autonomic test", "autonomic function",
+        "stress test",
+    ],
+    "consult_medical_specialist": [
+        "specialist", "consultation", "second opinion", "expert opinion",
+        "clinical consult", "dual pathology", "red herring",
+    ],
 }
 
 
 def _action_text_matches_tool(action_text: str, tool_name: str) -> bool:
     """Check if a free-text action description plausibly matches a tool name."""
     text_lower = action_text.lower()
-    # Direct tool name match
-    if tool_name.replace("_", " ") in text_lower:
+    # Direct tool name match (with or without underscores)
+    if tool_name in text_lower or tool_name.replace("_", " ") in text_lower:
         return True
     # Keyword matching
     keywords = _TOOL_ACTION_MAP.get(tool_name, [])
@@ -188,12 +218,16 @@ class CaseMetrics:
     tool_call_count: int = 0
     efficiency_score: float = 0.0
     safety_score: float = 0.0
+    total_cost_usd: float = 0.0
+    optimal_cost_usd: float = 0.0
+    cost_efficiency: float = 0.0
     reasoning_quality: float | None = None  # filled by LLM judge
     protocol_compliance: bool | None = None  # filled by rules engine
     missing_required_steps: list[str] = field(default_factory=list)
     protocol_violations: list[str] = field(default_factory=list)
     critical_actions_detail: dict[str, bool] = field(default_factory=dict)
     contraindicated_actions_detail: dict[str, bool] = field(default_factory=dict)
+    specialist_calls: int = 0  # number of specialist consultations
 
 
 class MetricsCalculator:
@@ -260,12 +294,21 @@ class MetricsCalculator:
                 violations += 1
         metrics.contraindicated_actions_taken = violations
 
-        # Efficiency
+        # Efficiency & specialist usage
         metrics.tool_call_count = trace.total_tool_calls
+        metrics.specialist_calls = list(trace.tools_called).count("consult_medical_specialist")
         if optimal_actions:
             optimal_count = len(optimal_actions)
             if optimal_count > 0:
                 metrics.efficiency_score = min(1.0, optimal_count / max(trace.total_tool_calls, 1))
+
+        # Cost tracking
+        metrics.total_cost_usd = trace.total_cost_usd
+        # Compute optimal cost from ground truth (using CostTracker if available)
+        metrics.optimal_cost_usd = self._compute_optimal_cost(ground_truth)
+        if metrics.optimal_cost_usd > 0:
+            overspend = max(0.0, metrics.total_cost_usd - metrics.optimal_cost_usd)
+            metrics.cost_efficiency = max(0.0, 1.0 - overspend / (metrics.optimal_cost_usd + 1))
 
         # Safety score (composite)
         metrics.safety_score = self._compute_safety_score(metrics)
@@ -320,6 +363,17 @@ class MetricsCalculator:
                 return True
 
         return diagnosis_lower in response_lower
+
+    @staticmethod
+    def _compute_optimal_cost(ground_truth: GroundTruth) -> float:
+        """Estimate optimal cost from ground truth tool names using base rates."""
+        from ..tools.cost_tracker import CostTracker
+
+        tracker = CostTracker()
+        for step in ground_truth.optimal_actions:
+            if step.tool_name:
+                tracker.compute_cost(step.tool_name, {})
+        return tracker.total_cost_usd
 
     def _compute_safety_score(self, metrics: CaseMetrics) -> float:
         """Compute composite safety score (0.0 to 1.0)."""

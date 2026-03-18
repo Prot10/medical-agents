@@ -1,11 +1,12 @@
-"""NeuroBench v3 comparison: multi-model, multi-seed evaluation.
+"""NeuroBench comparison: multi-model, multi-seed evaluation with cost tracking.
 
 Runs selected cases across model/mode configurations with N repeats (different
-temperature seeds) to measure diagnostic consistency.
+temperature seeds) to measure diagnostic consistency. Supports v3 (7-tool) and
+v4 (12-tool + cost tracking) datasets.
 
 Usage:
-    uv run python agent-platform/scripts/run_v3_comparison.py
-    uv run python agent-platform/scripts/run_v3_comparison.py --cases-per-difficulty 5 --repeats 3
+    uv run python agent-platform/scripts/run_v3_comparison.py --dataset v4
+    uv run python agent-platform/scripts/run_v3_comparison.py --cases-per-difficulty 30 --repeats 3
     uv run python agent-platform/scripts/run_v3_comparison.py --hospital us_mayo
 """
 
@@ -214,6 +215,8 @@ class CaseResult:
     protocol_violations: list[str]
     elapsed_seconds: float
     total_tokens: int
+    total_cost_usd: float = 0.0
+    cost_efficiency: float = 0.0
 
 
 # ---------------------------------------------------------------------------
@@ -377,6 +380,8 @@ def main(
                         protocol_violations=metrics.protocol_violations,
                         elapsed_seconds=round(elapsed, 1),
                         total_tokens=trace.total_tokens,
+                        total_cost_usd=round(metrics.total_cost_usd, 2),
+                        cost_efficiency=round(metrics.cost_efficiency, 3),
                     )
                     all_results.append(result)
 
@@ -402,9 +407,11 @@ def main(
                         json.dump({"completed": sorted(completed)}, f)
 
                     dx = "✓" if metrics.diagnostic_accuracy_top1 else "✗"
+                    cost_str = f"${metrics.total_cost_usd:,.0f}" if metrics.total_cost_usd > 0 else "$0"
                     console.print(
                         f"dx={dx}  tools={metrics.tool_call_count}  "
                         f"safety={metrics.safety_score:.2f}  "
+                        f"cost={cost_str}  "
                         f"{elapsed:.0f}s  {trace.total_tokens}tok"
                     )
 
@@ -493,13 +500,15 @@ def _print_comparison_table(results: list[CaseResult], cases: list[NeuroBenchCas
 
 
 def _print_difficulty_summary(results: list[CaseResult]):
-    """Print aggregate accuracy by difficulty and run."""
+    """Print aggregate accuracy by difficulty and run, including cost."""
     table = Table(title="Accuracy by Difficulty", show_lines=True)
     table.add_column("Run", style="bold")
     table.add_column("Straightforward")
     table.add_column("Moderate")
     table.add_column("Puzzle")
     table.add_column("Overall")
+    table.add_column("Avg Cost", justify="right")
+    table.add_column("Cost Eff", justify="right")
 
     run_names = sorted(set(r.run_name for r in results))
     for rn in run_names:
@@ -516,8 +525,12 @@ def _print_difficulty_summary(results: list[CaseResult]):
         if run_results:
             overall = sum(r.diagnostic_accuracy_top1 for r in run_results) / len(run_results)
             cells.append(f"[bold]{overall:.0%}[/bold] ({sum(r.diagnostic_accuracy_top1 for r in run_results)}/{len(run_results)})")
+            avg_cost = sum(r.total_cost_usd for r in run_results) / len(run_results)
+            avg_eff = sum(r.cost_efficiency for r in run_results) / len(run_results)
+            cells.append(f"${avg_cost:,.0f}")
+            cells.append(f"{avg_eff:.2f}")
         else:
-            cells.append("—")
+            cells.extend(["—", "—", "—"])
         table.add_row(rn, *cells)
 
     console.print(table)
@@ -585,6 +598,8 @@ def _save_case_comparisons(
                 "missing_required_steps": r.missing_required_steps,
                 "elapsed_seconds": r.elapsed_seconds,
                 "total_tokens": r.total_tokens,
+                "total_cost_usd": r.total_cost_usd,
+                "cost_efficiency": r.cost_efficiency,
             }
 
         with open(case_dir / f"{case_id}.json", "w") as f:
