@@ -1,22 +1,154 @@
-# Real-world USD cost estimates for diagnostic tests.
-# Sources: GoodRx, Sidecar Health, CostHelper (2024-2025 averages).
-# Used as relative weights in the cost-aware reward function.
+# Tool cost configuration — Medicare Physician Fee Schedule reference rates (USD, 2024)
+# Sources: CMS PFS, Medicare.gov procedure price lookup, published CPT code references
+# These are reference rates for cost-efficiency evaluation; actual costs vary by facility/region.
 
+tools:
+  analyze_brain_mri:
+    # CPT 70551 (without contrast), 70553 (with+without contrast)
+    base: 320
+    modifiers:
+      contrast: 126  # 320 + 126 = 446 for CPT 70553
+    # Protocol does not change billing — radiologist selects sequences
+    protocols:
+      standard: 0
+      epilepsy: 0
+      stroke: 0
+      tumor: 0
+      ms: 0
+      dementia: 0
+
+  analyze_eeg:
+    # CPT 95816 (routine), 95711/95717 (ambulatory), 95720-95726 (video-EEG)
+    by_type:
+      routine: 250
+      ambulatory: 700
+      video: 1200
+      continuous_icu: 900
+
+  analyze_ecg:
+    # CPT 93000 (12-lead global)
+    base: 20
+
+  interpret_labs:
+    # Per-panel costs from CMS Clinical Lab Fee Schedule
+    by_panel:
+      CBC: 15
+      BMP: 20
+      CMP: 30
+      LFT: 25
+      coagulation: 20
+      thyroid: 30
+      TSH: 25
+      lipid: 20
+      B12: 20
+      folate: 15
+      ESR: 10
+      CRP: 15
+      urinalysis: 10
+      troponin: 25
+      BNP: 40
+      HbA1c: 25
+      RPR: 15
+      HIV: 25
+      ceruloplasmin: 25
+      copper: 20
+      drug_screen: 30
+      prolactin: 25
+      AED_levels: 30
+      dementia_workup: 100
+      inflammatory_markers: 30
+      autoimmune_basic: 80
+      autoimmune_encephalitis: 2000
+      paraneoplastic: 2500
+      NMO_MOG: 500
+      genetic: 1500
+    default_panel: 25
+
+  analyze_csf:
+    # CPT 62270 (LP procedure) + basic studies
+    base: 250  # LP procedure + cell count, protein, glucose
+    by_special_test:
+      oligoclonal_bands: 25
+      IgG_index: 20
+      HSV_PCR: 200
+      meningitis_panel: 350
+      cytology: 40
+      flow_cytometry: 200
+      autoimmune_panel: 2000
+      14_3_3_protein: 100
+      RT_QuIC: 150
+      Abeta42: 150
+      phospho_tau: 150
+      total_tau: 100
+      NMDAR_antibodies: 300
+      MOG_antibodies: 250
+    default_test: 50
+
+  order_ct_scan:
+    # CPT 70450 (without contrast), 70460 (with contrast), 70496 (CTA head)
+    base: 200
+    modifiers:
+      contrast: 100
+      angiography: 200
+
+  order_echocardiogram:
+    # CPT 93306 (TTE), 93312 (TEE)
+    by_type:
+      TTE: 300
+      TEE: 600
+      bubble_study: 400
+
+  order_cardiac_monitoring:
+    # CPT 93224 (Holter 24h), 93226 (48h), 93291 (event monitor)
+    by_type:
+      holter_24h: 150
+      holter_48h: 200
+      event_monitor_30d: 300
+      telemetry: 100
+
+  order_advanced_imaging:
+    by_type:
+      amyloid_PET: 4000
+      FDG_PET: 2000
+      DaTscan: 5000
+      perfusion_MRI: 500
+      MR_spectroscopy: 500
+      carotid_duplex: 350
+
+  order_specialized_test:
+    by_type:
+      neuropsych_battery: 1200
+      emg_ncs: 600
+      vep: 200
+      ssep: 200
+      baep: 200
+      tilt_table: 300
+      polysomnography: 1000
+      autonomic_testing: 400
+      exercise_stress_test: 250
+
+  search_medical_literature:
+    base: 0
+
+  check_drug_interactions:
+    base: 0
+
+  consult_medical_specialist:
+    # CPT 99243 — Office consultation, moderate complexity
+    base: 75
+
+# Legacy flat costs (kept for backward compatibility with training rewards)
 tool_costs:
-  analyze_brain_mri: 2500    # Brain MRI with/without contrast
-  analyze_eeg: 800           # Routine EEG (30-60 min)
-  analyze_csf: 1500          # Lumbar puncture + CSF analysis + special tests
-  analyze_ecg: 150           # 12-lead ECG
-  interpret_labs: 300         # Standard lab panels (CBC, BMP, LFTs, TSH)
-  search_medical_literature: 0   # No patient cost
-  check_drug_interactions: 0     # No patient cost
-
-# Normalized relative weights (MRI = 1.0)
-relative_weights:
-  analyze_brain_mri: 1.00
-  analyze_eeg: 0.32
-  analyze_csf: 0.60
-  analyze_ecg: 0.06
-  interpret_labs: 0.12
-  search_medical_literature: 0.00
-  check_drug_interactions: 0.00
+  analyze_brain_mri: 320
+  analyze_eeg: 250
+  analyze_csf: 250
+  analyze_ecg: 20
+  interpret_labs: 25
+  order_ct_scan: 200
+  order_echocardiogram: 300
+  order_cardiac_monitoring: 150
+  order_advanced_imaging: 2000
+  order_specialized_test: 600
+  search_medical_literature: 0
+  check_drug_interactions: 0
+  consult_medical_specialist: 75

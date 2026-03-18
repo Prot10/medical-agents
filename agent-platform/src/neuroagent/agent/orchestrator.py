@@ -12,6 +12,7 @@ import re
 from ..llm.client import LLMClient, LLMResponse
 from ..llm.prompts import load_prompt, format_tool_result
 from ..tools.base import ToolCall, ToolResult
+from ..tools.cost_tracker import CostTracker
 from ..tools.tool_registry import ToolRegistry
 from .planner import restrict_tools
 from .reasoning import AgentTrace
@@ -52,6 +53,14 @@ class AgentConfig:
     excluded_tools: list[str] | None = None
     all_info_upfront: bool = False  # If True, give all tool outputs at once
 
+    # Dual-model specialist (optional — disabled by default for backward compat)
+    specialist_enabled: bool = False
+    specialist_base_url: str = "http://localhost:8001/v1"
+    specialist_model: str = "google/medgemma-1.5-4b-it"
+    specialist_api_key: str = "not-needed"
+    specialist_temperature: float = 0.3  # Lower temp for deterministic specialist
+    specialist_max_tokens: int = 4096
+
 
 class AgentOrchestrator:
     """Main agent implementing the ReAct loop for clinical reasoning."""
@@ -62,6 +71,7 @@ class AgentOrchestrator:
         tool_registry: ToolRegistry,
         memory: Any | None = None,  # PatientMemory (imported lazily to avoid circular deps)
         rules_engine: Any | None = None,  # RulesEngine
+        cost_tracker: CostTracker | None = None,
     ):
         self.config = config
         self.llm = LLMClient(
@@ -76,6 +86,7 @@ class AgentOrchestrator:
         self.tools = tool_registry
         self.memory = memory
         self.rules = rules_engine
+        self.cost_tracker = cost_tracker or CostTracker()
 
     def run(
         self,
@@ -95,6 +106,7 @@ class AgentOrchestrator:
         """
         trace = AgentTrace(case_id=case_id)
         trace.start_timer()
+        self.cost_tracker.reset()
 
         messages = self._build_initial_messages(patient_info, patient_id)
         tool_definitions = self._get_tool_definitions()
@@ -130,6 +142,10 @@ class AgentOrchestrator:
                 for tc in response.tool_calls:
                     tool_call = ToolCall(tool_name=tc.name, parameters=tc.arguments)
                     result = self.tools.execute(tool_call)
+
+                    # Track cost
+                    cost_entry = self.cost_tracker.compute_cost(tc.name, tc.arguments)
+                    result.cost_usd = cost_entry.cost_usd
 
                     turn_number += 1
                     trace.add_tool_turn(
@@ -204,6 +220,10 @@ class AgentOrchestrator:
                 or "[Agent did not reach a conclusion within turn limit]"
             )
 
+        # Finalize cost tracking
+        trace.total_cost_usd = self.cost_tracker.total_cost_usd
+        trace.cost_entries = [e.model_dump() for e in self.cost_tracker.entries]
+
         # Store encounter in patient memory
         if self.memory and patient_id:
             self.memory.store_encounter(patient_id, trace)
@@ -233,6 +253,7 @@ class AgentOrchestrator:
         """
         trace = AgentTrace(case_id=case_id)
         trace.start_timer()
+        self.cost_tracker.reset()
 
         messages = self._build_initial_messages(patient_info, patient_id)
         tool_definitions = self._get_tool_definitions()
@@ -324,6 +345,10 @@ class AgentOrchestrator:
                     tool_call = ToolCall(tool_name=tc.name, parameters=tc.arguments)
                     result = self.tools.execute(tool_call)
 
+                    # Track cost
+                    cost_entry = self.cost_tracker.compute_cost(tc.name, tc.arguments)
+                    result.cost_usd = cost_entry.cost_usd
+
                     turn_number += 1
                     trace.add_tool_turn(
                         turn_number=turn_number,
@@ -337,6 +362,7 @@ class AgentOrchestrator:
                         "tool_name": tc.name,
                         "success": result.success,
                         "output": result.model_dump(),
+                        "cost_usd": cost_entry.cost_usd,
                     }
 
                     messages.append(
@@ -378,6 +404,10 @@ class AgentOrchestrator:
                 or "[Agent did not reach a conclusion within turn limit]"
             )
 
+        # Finalize cost tracking
+        trace.total_cost_usd = self.cost_tracker.total_cost_usd
+        trace.cost_entries = [e.model_dump() for e in self.cost_tracker.entries]
+
         # Store encounter in patient memory
         if self.memory and patient_id:
             self.memory.store_encounter(patient_id, trace)
@@ -389,6 +419,7 @@ class AgentOrchestrator:
             "total_tokens": trace.total_tokens,
             "elapsed_time_seconds": trace.elapsed_time_seconds,
             "final_response": trace.final_response,
+            "total_cost_usd": trace.total_cost_usd,
         }
 
     def run_all_info_upfront(

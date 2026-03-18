@@ -9,13 +9,18 @@ from typing import Any
 import yaml
 
 
-# Default USD costs if config file not found
+# Default USD costs if config file not found (Medicare reference rates)
 DEFAULT_TOOL_COSTS: dict[str, float] = {
-    "analyze_brain_mri": 2500,
-    "analyze_eeg": 800,
-    "analyze_csf": 1500,
-    "analyze_ecg": 150,
-    "interpret_labs": 300,
+    "analyze_brain_mri": 320,
+    "analyze_eeg": 250,
+    "analyze_csf": 250,
+    "analyze_ecg": 20,
+    "interpret_labs": 25,
+    "order_ct_scan": 200,
+    "order_echocardiogram": 300,
+    "order_cardiac_monitoring": 150,
+    "order_advanced_imaging": 2000,
+    "order_specialized_test": 600,
     "search_medical_literature": 0,
     "check_drug_interactions": 0,
 }

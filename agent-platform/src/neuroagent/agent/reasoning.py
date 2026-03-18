@@ -27,6 +27,8 @@ class AgentTrace(BaseModel):
     tools_called: list[str] = []
     total_tokens: int = 0
     elapsed_time_seconds: float = 0.0
+    total_cost_usd: float = 0.0
+    cost_entries: list[dict] = []  # serialized ToolCostEntry list
     _start_time: float | None = None
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
