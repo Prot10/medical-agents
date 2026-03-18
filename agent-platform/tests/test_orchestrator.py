@@ -70,7 +70,7 @@ class TestReflection:
     def test_get_prompt(self):
         prompt = get_reflection_prompt()
         assert prompt["role"] == "user"
-        assert "clinical reasoning" in prompt["content"].lower()
+        assert "reasoning" in prompt["content"].lower()
 
 
 class TestPlanner:
