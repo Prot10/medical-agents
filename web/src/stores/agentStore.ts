@@ -16,6 +16,7 @@ interface AgentState {
   // Accumulated metrics
   totalTokens: number
   elapsedTime: number
+  totalCost: number
 
   // Actions
   startRun: () => void
@@ -33,9 +34,10 @@ export const useAgentStore = create<AgentState>((set) => ({
   streamingTurnNumber: 0,
   totalTokens: 0,
   elapsedTime: 0,
+  totalCost: 0,
 
   startRun: () =>
-    set({ status: "running", events: [], errorMessage: null, streamingContent: "", streamingThinkContent: "", streamingTurnNumber: 0, totalTokens: 0, elapsedTime: 0 }),
+    set({ status: "running", events: [], errorMessage: null, streamingContent: "", streamingThinkContent: "", streamingTurnNumber: 0, totalTokens: 0, elapsedTime: 0, totalCost: 0 }),
 
   appendEvent: (event) =>
     set((state) => {
@@ -58,9 +60,13 @@ export const useAgentStore = create<AgentState>((set) => ({
       const newEvents = [...state.events, event]
       let totalTokens = state.totalTokens
       let elapsedTime = state.elapsedTime
+      let totalCost = state.totalCost
 
       if (event.token_usage) {
         totalTokens += event.token_usage.total_tokens || 0
+      }
+      if (event.type === "tool_result" && event.cost_usd) {
+        totalCost += event.cost_usd
       }
 
       if (event.type === "thinking" || event.type === "assessment") {
@@ -69,6 +75,7 @@ export const useAgentStore = create<AgentState>((set) => ({
           events: newEvents,
           totalTokens,
           elapsedTime,
+          totalCost,
           streamingContent: "",
           streamingThinkContent: "",
           streamingTurnNumber: 0,
@@ -83,6 +90,7 @@ export const useAgentStore = create<AgentState>((set) => ({
           status: "complete" as const,
           totalTokens: event.total_tokens ?? totalTokens,
           elapsedTime: event.elapsed_time_seconds ?? elapsedTime,
+          totalCost: event.total_cost_usd ?? totalCost,
           streamingContent: "",
           streamingThinkContent: "",
           streamingTurnNumber: 0,
@@ -96,14 +104,15 @@ export const useAgentStore = create<AgentState>((set) => ({
           errorMessage: event.message ?? "Unknown error",
           totalTokens,
           elapsedTime,
+          totalCost,
         }
       }
 
-      return { events: newEvents, totalTokens, elapsedTime }
+      return { events: newEvents, totalTokens, elapsedTime, totalCost }
     }),
 
   setError: (msg) => set({ status: "error", errorMessage: msg }),
 
   reset: () =>
-    set({ status: "idle", events: [], errorMessage: null, streamingContent: "", streamingThinkContent: "", streamingTurnNumber: 0, totalTokens: 0, elapsedTime: 0 }),
+    set({ status: "idle", events: [], errorMessage: null, streamingContent: "", streamingThinkContent: "", streamingTurnNumber: 0, totalTokens: 0, elapsedTime: 0, totalCost: 0 }),
 }))

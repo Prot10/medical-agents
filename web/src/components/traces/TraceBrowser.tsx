@@ -207,6 +207,11 @@ export function TraceBrowser() {
                 <Clock className="h-3 w-3" />
                 {t.elapsed_time_seconds.toFixed(1)}s
               </span>
+              {t.total_cost_usd != null && t.total_cost_usd > 0 && (
+                <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                  ${t.total_cost_usd.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                </span>
+              )}
             </div>
 
             {/* Actions */}
