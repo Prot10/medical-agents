@@ -33,9 +33,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VLLM="$VLLM_VENV/bin/python $SCRIPT_DIR/vllm_serve.py"
 
 # Common optimized flags for single-GPU A100-40GB
+# GPU_MEMORY_UTILIZATION env var allows dual-model serving (split GPU memory)
+GPU_MEM="${GPU_MEMORY_UTILIZATION:-0.95}"
 COMMON_FLAGS=(
   --port "$PORT"
-  --gpu-memory-utilization 0.95
+  --gpu-memory-utilization "$GPU_MEM"
   --enable-prefix-caching
   --dtype auto
   --max-num-seqs 4
