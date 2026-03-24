@@ -740,16 +740,16 @@
         "proposed": "Ceftriaxone 2g IV q12h + Vancomycin 1g IV q12h + Dexamethasone 10mg IV q6h + Metformin 1000mg BID + Glipizide 5mg BID + Prednisolone 20mg daily",
         "interactions": [
           "Dexamethasone may reduce CSF penetration of vancomycin by reducing meningeal inflammation. Monitor vancomycin trough levels closely; consider adjunctive rifampin if vancomycin is required long-term.",
-          "Concurrent dexamethasone plus prednisolone will compound steroid side effects including severe hyperglycemia, immunosuppression, and gastric ulceration risk. Consider consolidating steroid therapy \u2014 dexamethasone for meningitis should take priority, and prednisolone for vasculitis should be tapered or held.",
+          "Concurrent dexamethasone plus prednisolone will compound steroid side effects including severe hyperglycemia, immunosuppression, and gastric ulceration risk. Consider consolidating steroid therapy — dexamethasone for meningitis should take priority, and prednisolone for vasculitis should be tapered or held.",
           "Metformin should be held given elevated creatinine (1.6 mg/dL), acute illness, and risk of lactic acidosis. Switch to insulin for glucose management.",
           "Glipizide in combination with high-dose steroids will be insufficient for glucose control. Transition to insulin sliding scale or drip."
         ],
         "contraindications": [
-          "Metformin is relatively contraindicated with creatinine >1.5 mg/dL and acute illness \u2014 hold and use insulin"
+          "Metformin is relatively contraindicated with creatinine >1.5 mg/dL and acute illness — hold and use insulin"
         ],
         "warnings": [
           "Monitor renal function with vancomycin; target trough 15-20 ug/mL for CNS infection; adjust for CKD baseline",
-          "Steroid-induced immunosuppression was likely the predisposing factor for this infection \u2014 discuss with rheumatology/immunology about reassessing the vasculitis diagnosis and steroid management",
+          "Steroid-induced immunosuppression was likely the predisposing factor for this infection — discuss with rheumatology/immunology about reassessing the vasculitis diagnosis and steroid management",
           "Monitor blood glucose every 4-6 hours given dual steroid effect and uncontrolled diabetes",
           "Consider stress ulcer prophylaxis with PPI given dual steroids and critical illness"
         ],
@@ -836,18 +836,28 @@
         "action": "Obtain urgent CT head to rule out mass lesion or raised ICP before lumbar puncture, given altered mental status",
         "tool_name": "order_ct_scan",
         "expected_finding": "Mild hydrocephalus and chronic infarcts, but no contraindication to LP",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "angiography": false,
+          "contrast": false
+        }
       },
       {
         "step": 3,
         "action": "Draw blood cultures (two sets) BEFORE initiating empiric IV antibiotics",
         "tool_name": "interpret_labs",
         "expected_finding": "Cultures will later return positive for Streptococcus pneumoniae",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP"
+          ]
+        }
       },
       {
         "step": 4,
-        "action": "Immediately administer empiric IV antibiotics \u2014 ceftriaxone 2g IV plus vancomycin 15-20 mg/kg IV plus ampicillin 2g IV (for Listeria coverage given immunosuppression and age >50) \u2014 and adjunctive dexamethasone 10 mg IV. Do NOT delay for LP or imaging.",
+        "action": "Immediately administer empiric IV antibiotics — ceftriaxone 2g IV plus vancomycin 15-20 mg/kg IV plus ampicillin 2g IV (for Listeria coverage given immunosuppression and age >50) — and adjunctive dexamethasone 10 mg IV. Do NOT delay for LP or imaging.",
         "tool_name": null,
         "expected_finding": "",
         "category": "required"
@@ -857,21 +867,39 @@
         "action": "Perform lumbar puncture with opening pressure measurement and send CSF for cell count, differential, protein, glucose, Gram stain, bacterial culture, fungal culture, AFB smear, cryptococcal antigen, TB PCR, cytology, and meningitis/encephalitis PCR panel",
         "tool_name": "analyze_csf",
         "expected_finding": "Turbid CSF with mixed but predominantly neutrophilic pleocytosis, markedly elevated protein, critically low glucose, elevated CSF lactate",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "special_tests": [
+            "meningitis_panel",
+            "cytology"
+          ]
+        }
       },
       {
         "step": 6,
         "action": "Obtain comprehensive labs including CBC, BMP, CRP, procalcitonin, lactate, and coagulation studies",
         "tool_name": "interpret_labs",
         "expected_finding": "Leukocytosis with bandemia, elevated inflammatory markers, hyponatremia, hyperglycemia, elevated lactate",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "coagulation",
+            "CRP"
+          ]
+        }
       },
       {
         "step": 7,
         "action": "Obtain brain MRI with contrast to assess meningeal disease extent and screen for complications",
         "tool_name": "analyze_brain_mri",
         "expected_finding": "Worsening leptomeningeal enhancement, mild hydrocephalus, chronic infarcts",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "standard",
+          "contrast": true
+        }
       },
       {
         "step": 8,
@@ -910,30 +938,30 @@
       }
     ],
     "critical_actions": [
-      "Do NOT delay empiric IV antibiotics \u2014 antibiotics must be given within 60 minutes of presentation in suspected bacterial meningitis, even in a patient with a prior diagnosis of vasculitis",
+      "Do NOT delay empiric IV antibiotics — antibiotics must be given within 60 minutes of presentation in suspected bacterial meningitis, even in a patient with a prior diagnosis of vasculitis",
       "Broaden empiric coverage to include ampicillin for Listeria in this immunosuppressed patient over age 50",
       "Administer adjunctive dexamethasone before or with the first dose of IV antibiotics",
       "Recognize that acute neurological deterioration with fever in an immunosuppressed patient warrants urgent infectious workup, not empiric escalation of immunosuppression",
       "Hold metformin in the setting of acute illness and rising creatinine to prevent lactic acidosis",
       "Obtain blood cultures before administering IV antibiotics",
-      "Critically reassess the prior CNS vasculitis diagnosis \u2014 the initial CSF profile (lymphocytic pleocytosis, very low glucose, elevated protein) was more consistent with chronic infectious meningitis than vasculitis"
+      "Critically reassess the prior CNS vasculitis diagnosis — the initial CSF profile (lymphocytic pleocytosis, very low glucose, elevated protein) was more consistent with chronic infectious meningitis than vasculitis"
     ],
     "contraindicated_actions": [
       "Escalating immunosuppressive therapy (additional cyclophosphamide or higher-dose steroids) without first ruling out infection",
       "Delaying antibiotics to wait for CT or LP results when bacterial meningitis is clinically suspected",
       "Assuming the prior vasculitis diagnosis is correct and treating this presentation as a vasculitis flare",
       "Continuing metformin in a patient with acute illness, elevated creatinine, and elevated lactate",
-      "Withholding dexamethasone in confirmed pneumococcal meningitis because the patient is already on steroids \u2014 adjunctive dexamethasone has specific meningitis-related benefit separate from immunosuppressive dosing",
+      "Withholding dexamethasone in confirmed pneumococcal meningitis because the patient is already on steroids — adjunctive dexamethasone has specific meningitis-related benefit separate from immunosuppressive dosing",
       "Performing lumbar puncture without first obtaining CT head in a patient with altered mental status"
     ],
     "key_reasoning_points": [
-      "The prior presentation 8 months ago with lymphocytic pleocytosis, very low CSF glucose, elevated protein, leptomeningeal enhancement, and ischemic strokes was diagnostically ambiguous \u2014 the differential should have included chronic infectious meningitis (TB, fungal) more prominently alongside vasculitis",
+      "The prior presentation 8 months ago with lymphocytic pleocytosis, very low CSF glucose, elevated protein, leptomeningeal enhancement, and ischemic strokes was diagnostically ambiguous — the differential should have included chronic infectious meningitis (TB, fungal) more prominently alongside vasculitis",
       "The current acute deterioration with fever, neutrophilic shift in CSF, and dramatically worsened CSF biochemistry (protein 313, glucose 11) occurring after immunosuppressive therapy strongly suggests an infectious complication rather than vasculitis progression",
       "Bandemia (8%) in the peripheral blood is a key distinguishing feature between true bacterial infection and steroid-induced leukocytosis, as steroids cause demargination of mature neutrophils but do not typically produce band forms",
       "CSF lactate of 9.1 mmol/L is a powerful discriminator for bacterial meningitis (sensitivity >90% at cutoff of 3.5 mmol/L), particularly valuable when Gram stain is negative",
-      "The CSF:serum glucose ratio of 0.04 is critically low and virtually diagnostic of bacterial meningitis \u2014 even in the setting of severe hyperglycemia (serum glucose 287), the CSF glucose of 11 mg/dL represents near-complete glucose consumption by bacteria",
+      "The CSF:serum glucose ratio of 0.04 is critically low and virtually diagnostic of bacterial meningitis — even in the setting of severe hyperglycemia (serum glucose 287), the CSF glucose of 11 mg/dL represents near-complete glucose consumption by bacteria",
       "Immunosuppression with corticosteroids and cyclophosphamide dramatically increases the risk of invasive pneumococcal disease and may have unmasked or enabled this infection",
-      "This case illustrates the danger of diagnostic anchoring to the prior vasculitis diagnosis \u2014 the current presentation must be evaluated independently, and the prior diagnosis itself should be questioned"
+      "This case illustrates the danger of diagnostic anchoring to the prior vasculitis diagnosis — the current presentation must be evaluated independently, and the prior diagnosis itself should be questioned"
     ]
   },
   "metadata": {

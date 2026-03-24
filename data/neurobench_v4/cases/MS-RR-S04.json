@@ -633,13 +633,13 @@
     }
   ],
   "ground_truth": {
-    "primary_diagnosis": "Multiple sclerosis \u2014 relapsing-remitting",
+    "primary_diagnosis": "Multiple sclerosis — relapsing-remitting",
     "icd_code": "G35",
     "differential": [
       {
         "diagnosis": "Neuromyelitis optica spectrum disorder (NMOSD)",
         "likelihood": "low",
-        "key_features": "AQP4 antibodies negative, short-segment spinal cord lesions (not longitudinally extensive), Dawson fingers morphology on brain MRI, oligoclonal bands positive \u2014 all favor MS over NMOSD"
+        "key_features": "AQP4 antibodies negative, short-segment spinal cord lesions (not longitudinally extensive), Dawson fingers morphology on brain MRI, oligoclonal bands positive — all favor MS over NMOSD"
       },
       {
         "diagnosis": "MOG antibody disease (MOGAD)",
@@ -674,7 +674,7 @@
         "step": 2,
         "action": "Perform comprehensive neurological examination",
         "tool_name": null,
-        "expected_finding": "Right RAPD, reduced visual acuity OD, spastic paraparesis, Lhermitte sign, Babinski signs bilaterally, ankle clonus \u2014 multifocal findings suggesting CNS demyelination",
+        "expected_finding": "Right RAPD, reduced visual acuity OD, spastic paraparesis, Lhermitte sign, Babinski signs bilaterally, ankle clonus — multifocal findings suggesting CNS demyelination",
         "category": "required"
       },
       {
@@ -682,7 +682,11 @@
         "action": "Order MRI brain and cervical/thoracic spine with gadolinium contrast",
         "tool_name": "analyze_brain_mri",
         "expected_finding": "Multiple periventricular, juxtacortical, infratentorial, and spinal cord lesions with Dawson fingers morphology, enhancing and non-enhancing lesions satisfying McDonald 2017 criteria for DIS and DIT",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "standard",
+          "contrast": true
+        }
       },
       {
         "step": 4,
@@ -696,14 +700,29 @@
         "action": "Order basic labs including CBC, BMP, ESR, CRP, ANA, vitamin B12, TSH",
         "tool_name": "interpret_labs",
         "expected_finding": "All within normal limits, helping exclude systemic inflammatory or metabolic causes",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "thyroid",
+            "B12",
+            "ESR",
+            "CRP"
+          ]
+        }
       },
       {
         "step": 6,
         "action": "Order NMO-IgG (aquaporin-4 antibodies) and MOG antibodies",
         "tool_name": "interpret_labs",
         "expected_finding": "Both negative, excluding NMOSD and MOGAD",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "NMO_MOG"
+          ]
+        }
       },
       {
         "step": 7,
@@ -717,7 +736,10 @@
         "action": "Order visual evoked potentials to confirm optic nerve demyelination",
         "tool_name": "order_specialized_test",
         "expected_finding": "Prolonged right P100 latency (128 ms) with reduced amplitude confirming right optic nerve demyelination",
-        "category": "acceptable"
+        "category": "acceptable",
+        "tool_parameters": {
+          "test_type": "vep"
+        }
       },
       {
         "step": 9,

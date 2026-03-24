@@ -173,8 +173,8 @@
         }
       ],
       "volumetrics": {
-        "lesion_volume": "Approximately 54 cm\u00b3 including enhancing and necrotic components",
-        "edema_volume": "Approximately 82 cm\u00b3 of perilesional FLAIR signal abnormality"
+        "lesion_volume": "Approximately 54 cm³ including enhancing and necrotic components",
+        "edema_volume": "Approximately 82 cm³ of perilesional FLAIR signal abnormality"
       },
       "additional_observations": [
         "No additional enhancing lesions identified elsewhere in the brain",
@@ -707,7 +707,7 @@
             "key_finding": "MGMT promoter methylation is a predictive biomarker for benefit from temozolomide; unmethylated patients derive less benefit but temozolomide is still included in standard of care"
           }
         ],
-        "summary": "The current standard of care for newly diagnosed glioblastoma is maximal safe surgical resection followed by the Stupp protocol: concurrent radiation therapy (60 Gy in 30 fractions) with daily temozolomide (75 mg/m\u00b2), followed by 6 cycles of adjuvant temozolomide (150-200 mg/m\u00b2, days 1-5 of 28-day cycle). Tumor-treating fields (TTFields/Optune) are recommended as an addition to maintenance temozolomide. MGMT promoter methylation status guides prognosis but does not currently change first-line therapy. For patients with unmethylated MGMT, the standard Stupp protocol remains recommended, though clinical trial enrollment should be considered."
+        "summary": "The current standard of care for newly diagnosed glioblastoma is maximal safe surgical resection followed by the Stupp protocol: concurrent radiation therapy (60 Gy in 30 fractions) with daily temozolomide (75 mg/m²), followed by 6 cycles of adjuvant temozolomide (150-200 mg/m², days 1-5 of 28-day cycle). Tumor-treating fields (TTFields/Optune) are recommended as an addition to maintenance temozolomide. MGMT promoter methylation status guides prognosis but does not currently change first-line therapy. For patients with unmethylated MGMT, the standard Stupp protocol remains recommended, though clinical trial enrollment should be considered."
       }
     },
     {
@@ -785,7 +785,11 @@
         "action": "Order MRI brain with and without gadolinium contrast to characterize the lesion",
         "tool_name": "analyze_brain_mri",
         "expected_finding": "Large heterogeneously enhancing mass with central necrosis, ring enhancement, surrounding edema, and midline shift consistent with high-grade glioma",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "tumor",
+          "contrast": true
+        }
       },
       {
         "step": 5,
@@ -799,28 +803,49 @@
         "action": "Order baseline labs including CBC, BMP, coagulation studies, liver function tests, and HbA1c",
         "tool_name": "interpret_labs",
         "expected_finding": "Normal CBC, coagulation, and hepatic function; mildly elevated glucose consistent with known diabetes",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "LFT",
+            "coagulation",
+            "HbA1c"
+          ]
+        }
       },
       {
         "step": 7,
         "action": "Request MR perfusion imaging to assess tumor vascularity and grade",
         "tool_name": "order_advanced_imaging",
         "expected_finding": "Elevated rCBV in enhancing rim consistent with high-grade tumor",
-        "category": "acceptable"
+        "category": "acceptable",
+        "tool_parameters": {
+          "imaging_type": "perfusion_MRI"
+        }
       },
       {
         "step": 8,
         "action": "Request MR spectroscopy to evaluate metabolite profile",
         "tool_name": "order_advanced_imaging",
         "expected_finding": "Elevated choline, reduced NAA, lipid/lactate peaks consistent with high-grade glioma",
-        "category": "acceptable"
+        "category": "acceptable",
+        "tool_parameters": {
+          "imaging_type": "MR_spectroscopy"
+        }
       },
       {
         "step": 9,
         "action": "Order CT chest/abdomen/pelvis to rule out primary malignancy elsewhere (metastasis workup)",
         "tool_name": "interpret_labs",
         "expected_finding": "No evidence of primary extracranial malignancy",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP"
+          ]
+        }
       },
       {
         "step": 10,
@@ -834,7 +859,11 @@
         "action": "Request functional MRI for pre-surgical motor and language mapping",
         "tool_name": "analyze_brain_mri",
         "expected_finding": "Motor cortex displaced by tumor, language lateralized to left hemisphere",
-        "category": "acceptable"
+        "category": "acceptable",
+        "tool_parameters": {
+          "protocol": "standard",
+          "contrast": false
+        }
       },
       {
         "step": 12,
@@ -886,7 +915,7 @@
   },
   "metadata": {
     "version": "1.0",
-    "condition_name": "Brain tumor \u2014 high-grade glioma (GBM)",
+    "condition_name": "Brain tumor — high-grade glioma (GBM)",
     "expected_agent_confidence": 0.9,
     "required_modalities": [
       "MRI",

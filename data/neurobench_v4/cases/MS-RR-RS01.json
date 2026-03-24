@@ -396,14 +396,14 @@
       "glucose": "58 mg/dL (reference: 40-70 mg/dL)",
       "glucose_ratio": "0.59 (serum glucose 98 mg/dL)",
       "special_tests": {
-        "Oligoclonal bands": "Positive \u2014 5 bands unique to CSF, not present in serum",
+        "Oligoclonal bands": "Positive — 5 bands unique to CSF, not present in serum",
         "IgG index": "0.78 (elevated; reference: <0.70)",
         "IgG synthesis rate": "10.8 mg/day (elevated; reference: <8.0 mg/day)",
         "Myelin basic protein": "5.2 ng/mL (mildly elevated; reference: <4.0 ng/mL)",
         "Cytology": "No malignant cells",
         "VDRL": "Nonreactive"
       },
-      "interpretation": "Opening pressure: 15 cmH2O. WBC: 12 cells/microL (reference: 0-5) (N/A PMN/N/A lymph). Protein: 48 mg/dL (reference: 15-45 mg/dL). Glucose: 58 mg/dL (reference: 40-70 mg/dL) (ratio 0.59 (serum glucose 98 mg/dL)). Oligoclonal bands: Positive \u2014 5 bands unique to CSF, not present in serum. IgG index: 0.78 (elevated; reference: <0.70). IgG synthesis rate: 10.8 mg/day (elevated; reference: <8.0 mg/day). Myelin basic protein: 5.2 ng/mL (mildly elevated; reference: <4.0 ng/mL). Cytology: No malignant cells. VDRL: Nonreactive."
+      "interpretation": "Opening pressure: 15 cmH2O. WBC: 12 cells/microL (reference: 0-5) (N/A PMN/N/A lymph). Protein: 48 mg/dL (reference: 15-45 mg/dL). Glucose: 58 mg/dL (reference: 40-70 mg/dL) (ratio 0.59 (serum glucose 98 mg/dL)). Oligoclonal bands: Positive — 5 bands unique to CSF, not present in serum. IgG index: 0.78 (elevated; reference: <0.70). IgG synthesis rate: 10.8 mg/day (elevated; reference: <8.0 mg/day). Myelin basic protein: 5.2 ng/mL (mildly elevated; reference: <4.0 ng/mL). Cytology: No malignant cells. VDRL: Nonreactive."
     },
     "literature_search": null,
     "drug_interactions": null
@@ -637,7 +637,7 @@
         ],
         "contraindications": [
           "Active hepatitis B infection (must screen HBsAg and anti-HBc before initiation)",
-          "Active severe infection \u2014 defer until resolved"
+          "Active severe infection — defer until resolved"
         ],
         "warnings": [
           "Screen for hepatitis B and tuberculosis before initiation",
@@ -682,7 +682,7 @@
     }
   ],
   "ground_truth": {
-    "primary_diagnosis": "Multiple sclerosis \u2014 relapsing-remitting (RRMS)",
+    "primary_diagnosis": "Multiple sclerosis — relapsing-remitting (RRMS)",
     "icd_code": "G35",
     "differential": [
       {
@@ -736,21 +736,42 @@
         "action": "Order MRI brain with gadolinium contrast, including DWI/ADC sequences to differentiate ischemic stroke from demyelination",
         "tool_name": "analyze_brain_mri",
         "expected_finding": "Multiple demyelinating lesions with Dawson fingers pattern, enhancing pontine lesion with T2 shine-through (not restricted diffusion), satisfying McDonald criteria for DIS and DIT",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "stroke",
+          "contrast": true
+        }
       },
       {
         "step": 4,
         "action": "Order basic labs including CBC, BMP, glucose, lipid panel, ESR, CRP, ANA, vitamin B12, NMO-IgG, and MOG antibodies",
         "tool_name": "interpret_labs",
         "expected_finding": "Normal CBC and BMP, mild dyslipidemia, normal inflammatory markers, negative AQP4 and MOG antibodies, low vitamin D",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "lipid",
+            "B12",
+            "ESR",
+            "CRP",
+            "NMO_MOG"
+          ]
+        }
       },
       {
         "step": 5,
         "action": "Perform lumbar puncture with CSF analysis including oligoclonal bands, IgG index, and VDRL",
         "tool_name": "analyze_csf",
         "expected_finding": "Oligoclonal bands present (5 bands), elevated IgG index, mild lymphocytic pleocytosis, negative VDRL",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "special_tests": [
+            "oligoclonal_bands",
+            "IgG_index"
+          ]
+        }
       },
       {
         "step": 6,
@@ -785,7 +806,11 @@
         "action": "Order MRI cervical and thoracic spine with contrast to complete disease burden assessment",
         "tool_name": "analyze_brain_mri",
         "expected_finding": "Short-segment cervical spinal cord lesion at C5-C6, consistent with MS",
-        "category": "acceptable"
+        "category": "acceptable",
+        "tool_parameters": {
+          "protocol": "standard",
+          "contrast": true
+        }
       },
       {
         "step": 11,
@@ -811,16 +836,16 @@
       "Initiate disease-modifying therapy after confirming MS diagnosis"
     ],
     "contraindicated_actions": [
-      "Do not administer IV tPA or thrombolytics \u2014 this is not an acute ischemic stroke despite initial suspicion",
+      "Do not administer IV tPA or thrombolytics — this is not an acute ischemic stroke despite initial suspicion",
       "Do not start chronic oral corticosteroids as maintenance therapy for MS",
-      "Do not perform brain biopsy \u2014 diagnosis is achievable with non-invasive McDonald criteria",
+      "Do not perform brain biopsy — diagnosis is achievable with non-invasive McDonald criteria",
       "Do not delay disease-modifying therapy while waiting for spontaneous remission",
       "Do not initiate natalizumab without first checking JC virus antibody status",
       "Do not discontinue antihypertensive medications during workup"
     ],
     "key_reasoning_points": [
       "The combination of bilateral horizontal gaze palsy and ipsilateral peripheral facial nerve palsy localizes to the left dorsal pons, specifically the paramedian pontine reticular formation and facial nerve nucleus or fascicle",
-      "Acute ischemic stroke must be excluded given the patient's age and vascular risk factors \u2014 DWI hyperintensity due to T2 shine-through (not restricted diffusion) on normal ADC maps effectively rules out acute ischemia",
+      "Acute ischemic stroke must be excluded given the patient's age and vascular risk factors — DWI hyperintensity due to T2 shine-through (not restricted diffusion) on normal ADC maps effectively rules out acute ischemia",
       "Periventricular lesions perpendicular to the ventricles (Dawson fingers) are pathognomonic for demyelinating disease and not seen in vascular white matter disease",
       "The simultaneous presence of enhancing and non-enhancing lesions on a single MRI satisfies dissemination in time under 2017 McDonald criteria",
       "Dissemination in space is met by lesions in periventricular, juxtacortical, and infratentorial locations",
@@ -835,7 +860,7 @@
     "source_pmcid": "PMC10914381",
     "source_license": "CC-BY 4.0",
     "generation_method": "real_case_seed",
-    "condition_name": "Multiple sclerosis \u2014 relapsing-remitting",
+    "condition_name": "Multiple sclerosis — relapsing-remitting",
     "difficulty_description": "Straightforward case with classic MRI findings (Dawson fingers, enhancing lesions meeting McDonald criteria) and positive CSF oligoclonal bands. The main diagnostic challenge is the atypical demographics (older male) raising initial suspicion for stroke, but DWI/ADC findings and characteristic lesion distribution clearly point to MS.",
     "expected_agent_confidence": 0.85
   }

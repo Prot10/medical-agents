@@ -374,7 +374,7 @@
         "Neutrophils 78.5% (elevated)",
         "Lymphocytes 12.3% (low)",
         "Bands 8% (left shift)",
-        "Sodium 131 mEq/L (low \u2014 SIADH?)",
+        "Sodium 131 mEq/L (low — SIADH?)",
         "CO2 22 mEq/L (slightly low)",
         "Glucose 108 mg/dL (mildly elevated)",
         "CRP 48.2 mg/L (elevated)",
@@ -461,23 +461,23 @@
               "test": "Susceptibility - Penicillin MIC",
               "value": "0.12 mcg/mL (intermediate)",
               "unit": "mcg/mL",
-              "reference_range": "Susceptible \u22640.06",
+              "reference_range": "Susceptible ≤0.06",
               "is_abnormal": true,
               "clinical_significance": null
             },
             {
               "test": "Susceptibility - Ceftriaxone",
-              "value": "Susceptible (MIC \u22640.5)",
+              "value": "Susceptible (MIC ≤0.5)",
               "unit": "",
-              "reference_range": "Susceptible \u22640.5",
+              "reference_range": "Susceptible ≤0.5",
               "is_abnormal": false,
               "clinical_significance": null
             },
             {
               "test": "Susceptibility - Vancomycin",
-              "value": "Susceptible (MIC \u22641.0)",
+              "value": "Susceptible (MIC ≤1.0)",
               "unit": "",
-              "reference_range": "Susceptible \u22641.0",
+              "reference_range": "Susceptible ≤1.0",
               "is_abnormal": false,
               "clinical_significance": null
             }
@@ -714,7 +714,7 @@
           "Ceftriaxone and vancomycin: no direct pharmacokinetic interaction but nephrotoxicity risk should be monitored"
         ],
         "contraindications": [
-          "Patient has sulfonamide allergy \u2014 trimethoprim-sulfamethoxazole should be avoided if needed empirically"
+          "Patient has sulfonamide allergy — trimethoprim-sulfamethoxazole should be avoided if needed empirically"
         ],
         "warnings": [
           "Dexamethasone should ideally be given before or with the first dose of antibiotics for maximal benefit in pneumococcal meningitis",
@@ -777,23 +777,23 @@
     "differential": [
       {
         "diagnosis": "Viral meningitis",
-        "likelihood": "Moderate initially \u2014 mixed pleocytosis and clear CSF mimic viral etiology, but low glucose ratio and elevated CSF lactate argue against it"
+        "likelihood": "Moderate initially — mixed pleocytosis and clear CSF mimic viral etiology, but low glucose ratio and elevated CSF lactate argue against it"
       },
       {
         "diagnosis": "Viral upper respiratory infection with tension headache",
-        "likelihood": "Moderate initially \u2014 recent URI symptoms and low-grade fever could represent uncomplicated viral illness, but progressive confusion and neck stiffness warrant further workup"
+        "likelihood": "Moderate initially — recent URI symptoms and low-grade fever could represent uncomplicated viral illness, but progressive confusion and neck stiffness warrant further workup"
       },
       {
         "diagnosis": "Acute sinusitis with secondary intracranial extension",
-        "likelihood": "Low-to-moderate \u2014 paranasal sinus disease on imaging and URI symptoms could suggest complicated sinusitis, but CSF profile is more consistent with hematogenous meningitis"
+        "likelihood": "Low-to-moderate — paranasal sinus disease on imaging and URI symptoms could suggest complicated sinusitis, but CSF profile is more consistent with hematogenous meningitis"
       },
       {
         "diagnosis": "Tuberculous meningitis",
-        "likelihood": "Low \u2014 subacute presentation and lymphocytic CSF could raise concern, but no risk factors, no basilar enhancement, and relatively acute course argue against TB"
+        "likelihood": "Low — subacute presentation and lymphocytic CSF could raise concern, but no risk factors, no basilar enhancement, and relatively acute course argue against TB"
       },
       {
         "diagnosis": "Fungal meningitis (cryptococcal)",
-        "likelihood": "Low \u2014 CSF cryptococcal antigen negative; patient is not classically immunocompromised (no HIV, no transplant), though underlying CVID could theoretically predispose"
+        "likelihood": "Low — CSF cryptococcal antigen negative; patient is not classically immunocompromised (no HIV, no transplant), though underlying CVID could theoretically predispose"
       }
     ],
     "optimal_actions": [
@@ -802,21 +802,38 @@
         "action": "Obtain CT head to rule out mass lesion or elevated ICP before lumbar puncture",
         "tool_name": "order_ct_scan",
         "expected_finding": "No acute intracranial abnormality, safe to proceed with LP",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "angiography": false,
+          "contrast": false
+        }
       },
       {
         "step": 2,
         "action": "Perform lumbar puncture and send CSF for cell count, protein, glucose, gram stain, culture, and lactate",
         "tool_name": "analyze_csf",
         "expected_finding": "Mixed pleocytosis, mildly elevated protein, borderline low glucose, negative gram stain (partially treated), elevated lactate",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "special_tests": [
+            "meningitis_panel"
+          ]
+        }
       },
       {
         "step": 3,
         "action": "Obtain basic labs including CBC, BMP, CRP, procalcitonin, and coagulation studies",
         "tool_name": "interpret_labs",
         "expected_finding": "Mild leukocytosis with left shift, elevated inflammatory markers, hyponatremia (SIADH), low total protein",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "coagulation",
+            "CRP"
+          ]
+        }
       },
       {
         "step": 4,
@@ -830,21 +847,37 @@
         "action": "Order CSF meningitis/encephalitis multiplex PCR panel to identify pathogen given negative gram stain",
         "tool_name": "interpret_labs",
         "expected_finding": "Streptococcus pneumoniae PCR positive",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP"
+          ]
+        }
       },
       {
         "step": 6,
         "action": "Draw blood cultures before starting IV antibiotics",
         "tool_name": "interpret_labs",
         "expected_finding": "Streptococcus pneumoniae bacteremia",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP"
+          ]
+        }
       },
       {
         "step": 7,
         "action": "Obtain brain MRI with contrast to evaluate for meningeal enhancement and complications",
         "tool_name": "analyze_brain_mri",
         "expected_finding": "Equivocal leptomeningeal enhancement, paranasal sinus disease",
-        "category": "acceptable"
+        "category": "acceptable",
+        "tool_parameters": {
+          "protocol": "standard",
+          "contrast": true
+        }
       },
       {
         "step": 8,
@@ -865,7 +898,12 @@
         "action": "Investigate underlying immunodeficiency given recurrent infections: order immunoglobulin levels, vaccine response titers, and HIV screening",
         "tool_name": "interpret_labs",
         "expected_finding": "Panhypogammaglobulinemia diagnostic of CVID",
-        "category": "acceptable"
+        "category": "acceptable",
+        "tool_parameters": {
+          "panels": [
+            "HIV"
+          ]
+        }
       },
       {
         "step": 11,
@@ -879,7 +917,13 @@
         "action": "Order audiometry to screen for sensorineural hearing loss as complication of pneumococcal meningitis",
         "tool_name": "interpret_labs",
         "expected_finding": "Mild right-sided sensorineural hearing loss",
-        "category": "acceptable"
+        "category": "acceptable",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP"
+          ]
+        }
       }
     ],
     "critical_actions": [
@@ -891,20 +935,20 @@
       "Identify the pattern of recurrent encapsulated organism infections and failed vaccine response as suggestive of underlying humoral immunodeficiency"
     ],
     "contraindicated_actions": [
-      "Discharging patient with diagnosis of viral meningitis or URI without adequate workup \u2014 the elevated CSF lactate and low glucose ratio mandate empiric bacterial coverage",
-      "Delaying antibiotics to obtain CSF or additional testing \u2014 time to antibiotics is a critical determinant of outcome in bacterial meningitis",
-      "Performing LP without prior CT in a patient with altered mental status \u2014 risk of herniation must be excluded",
-      "Prescribing oral antibiotics alone for suspected meningitis \u2014 IV antibiotics with adequate CNS penetration are required",
-      "Omitting dexamethasone in suspected pneumococcal meningitis \u2014 adjunctive steroids reduce mortality and hearing loss",
-      "Administering trimethoprim-sulfamethoxazole \u2014 patient has documented sulfonamide allergy"
+      "Discharging patient with diagnosis of viral meningitis or URI without adequate workup — the elevated CSF lactate and low glucose ratio mandate empiric bacterial coverage",
+      "Delaying antibiotics to obtain CSF or additional testing — time to antibiotics is a critical determinant of outcome in bacterial meningitis",
+      "Performing LP without prior CT in a patient with altered mental status — risk of herniation must be excluded",
+      "Prescribing oral antibiotics alone for suspected meningitis — IV antibiotics with adequate CNS penetration are required",
+      "Omitting dexamethasone in suspected pneumococcal meningitis — adjunctive steroids reduce mortality and hearing loss",
+      "Administering trimethoprim-sulfamethoxazole — patient has documented sulfonamide allergy"
     ],
     "key_reasoning_points": [
-      "The clear CSF with mixed pleocytosis and negative gram stain is misleading \u2014 prior oral antibiotic treatment (amoxicillin-clavulanate for 5 days) has partially treated the meningitis, reducing WBC counts, sterilizing initial gram stain/culture, and shifting the differential toward viral etiology",
+      "The clear CSF with mixed pleocytosis and negative gram stain is misleading — prior oral antibiotic treatment (amoxicillin-clavulanate for 5 days) has partially treated the meningitis, reducing WBC counts, sterilizing initial gram stain/culture, and shifting the differential toward viral etiology",
       "Elevated CSF lactate (3.8 mmol/L, >3.5 threshold) is the single most useful discriminator between bacterial and viral meningitis and is less affected by partial antibiotic treatment",
       "The CSF-to-serum glucose ratio of 0.35 (<0.4 normal threshold) is a strong indicator of bacterial etiology despite the borderline absolute glucose value of 38 mg/dL",
       "The patient's 2-year history of recurrent sinopulmonary infections, bronchiectasis, otitis media, pneumococcal pneumonia, and failure to respond to pneumococcal vaccination constitutes a classic presentation of Common Variable Immunodeficiency (CVID)",
       "Low total serum protein (5.2 g/dL) and hypoalbuminemia on initial labs are red flags for hypogammaglobulinemia, providing an early clue to the underlying immunodeficiency",
-      "The original 'asthma' diagnosis was incorrect \u2014 lack of bronchodilator reversibility, low exhaled nitric oxide, and absence of eosinophilia excluded true asthma; the wheezing was due to bronchiectasis from recurrent infections",
+      "The original 'asthma' diagnosis was incorrect — lack of bronchodilator reversibility, low exhaled nitric oxide, and absence of eosinophilia excluded true asthma; the wheezing was due to bronchiectasis from recurrent infections",
       "CVID predisposes to infections with encapsulated organisms (particularly S. pneumoniae), explaining the progression from recurrent pneumonia to invasive meningitis",
       "Hyponatremia (sodium 131) in the context of CNS infection should raise concern for SIADH, a common complication of bacterial meningitis"
     ]
@@ -915,7 +959,7 @@
     "source_license": "CC-BY 4.0",
     "generation_method": "real_case_seed",
     "condition_name": "Acute bacterial meningitis (Streptococcus pneumoniae) with underlying Common Variable Immunodeficiency",
-    "difficulty_description": "Diagnostic puzzle: presentation is masked by 5 days of prior oral antibiotic treatment, producing clear CSF with mixed pleocytosis and negative gram stain that initially mimics viral meningitis. The patient is afebrile in the ED (on acetaminophen), has only mild neck stiffness with equivocal meningeal signs, and prominent sinusitis on imaging provides an alternative explanation for symptoms. The critical clues \u2014 elevated CSF lactate, low glucose ratio, and the clinical pattern of recurrent encapsulated organism infections pointing to CVID \u2014 require careful integration across multiple data sources.",
+    "difficulty_description": "Diagnostic puzzle: presentation is masked by 5 days of prior oral antibiotic treatment, producing clear CSF with mixed pleocytosis and negative gram stain that initially mimics viral meningitis. The patient is afebrile in the ED (on acetaminophen), has only mild neck stiffness with equivocal meningeal signs, and prominent sinusitis on imaging provides an alternative explanation for symptoms. The critical clues — elevated CSF lactate, low glucose ratio, and the clinical pattern of recurrent encapsulated organism infections pointing to CVID — require careful integration across multiple data sources.",
     "expected_agent_confidence": 0.4
   }
 }

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from pydantic import BaseModel
 
 from .enums import ActionCategory
@@ -13,6 +15,7 @@ class ActionStep(BaseModel):
     tool_name: str | None = None
     expected_finding: str = ""
     category: ActionCategory
+    tool_parameters: dict[str, Any] = {}  # parameters for cost estimation
 
 
 class RedHerring(BaseModel):

@@ -63,7 +63,7 @@
       "reflexes": "Biceps 2+ bilaterally, triceps 2+ bilaterally, brachioradialis 2+ bilaterally. Patellar reflexes 3+ bilaterally (brisk). Achilles 2+ bilaterally. Left Babinski sign (extensor plantar response) present. Right plantar response flexor.",
       "coordination": "Finger-to-nose testing intact bilaterally without dysmetria. Heel-to-shin testing shows mild ataxia on the left. Rapid alternating movements intact.",
       "gait": "Ambulates independently. Mild left leg circumduction noted. Tandem gait mildly impaired with two missteps over 10 paces. Romberg sign positive with eyes closed.",
-      "additional": "Lhermitte sign present: electric shock sensation radiating down the spine and into the legs upon neck flexion. Uhthoff phenomenon reported by patient \u2014 visual symptoms worsen after hot showers."
+      "additional": "Lhermitte sign present: electric shock sensation radiating down the spine and into the legs upon neck flexion. Uhthoff phenomenon reported by patient — visual symptoms worsen after hot showers."
     },
     "vitals": {
       "bp_systolic": 109,
@@ -492,7 +492,7 @@
         ],
         "volumetrics": null,
         "additional_observations": [
-          "No longitudinally extensive transverse myelitis (LETM) \u2014 both lesions span less than 3 vertebral segments",
+          "No longitudinally extensive transverse myelitis (LETM) — both lesions span less than 3 vertebral segments",
           "No cord expansion or syrinx formation",
           "No conus medullaris abnormality",
           "Normal vertebral body alignment and heights",
@@ -780,7 +780,7 @@
     }
   ],
   "ground_truth": {
-    "primary_diagnosis": "Multiple sclerosis \u2014 relapsing-remitting",
+    "primary_diagnosis": "Multiple sclerosis — relapsing-remitting",
     "icd_code": "G35",
     "differential": [
       {
@@ -821,22 +821,44 @@
         "step": 2,
         "action": "Order brain and cervical spine MRI with and without gadolinium contrast",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Multiple periventricular ovoid lesions with Dawson fingers morphology, enhancing left optic nerve lesion, juxtacortical and infratentorial lesions, cervical cord lesion \u2014 satisfying McDonald 2017 DIS and DIT criteria",
-        "category": "required"
+        "expected_finding": "Multiple periventricular ovoid lesions with Dawson fingers morphology, enhancing left optic nerve lesion, juxtacortical and infratentorial lesions, cervical cord lesion — satisfying McDonald 2017 DIS and DIT criteria",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "standard",
+          "contrast": true
+        }
       },
       {
         "step": 3,
         "action": "Order comprehensive labs: CBC, BMP, ANA, NMO-IgG, MOG antibodies, vitamin B12, vitamin D, ESR/CRP, thyroid function",
         "tool_name": "interpret_labs",
         "expected_finding": "All normal except low vitamin D; AQP4 and MOG antibodies negative, ruling out NMOSD and MOGAD",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "thyroid",
+            "B12",
+            "ESR",
+            "CRP",
+            "NMO_MOG"
+          ]
+        }
       },
       {
         "step": 4,
         "action": "Perform lumbar puncture for CSF analysis including cell count, protein, glucose, oligoclonal bands, IgG index, and cytology",
         "tool_name": "analyze_csf",
         "expected_finding": "Mild lymphocytic pleocytosis, oligoclonal bands present, elevated IgG index, confirming intrathecal antibody synthesis",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "special_tests": [
+            "oligoclonal_bands",
+            "IgG_index",
+            "cytology"
+          ]
+        }
       },
       {
         "step": 5,
@@ -850,14 +872,21 @@
         "action": "Order visual evoked potentials to confirm and quantify optic nerve demyelination",
         "tool_name": "order_specialized_test",
         "expected_finding": "Prolonged P100 latency in left eye confirming optic nerve demyelination",
-        "category": "acceptable"
+        "category": "acceptable",
+        "tool_parameters": {
+          "test_type": "vep"
+        }
       },
       {
         "step": 7,
         "action": "Order thoracic spine MRI to assess for additional spinal cord lesions",
         "tool_name": "analyze_brain_mri",
         "expected_finding": "Additional short-segment thoracic cord lesion providing further evidence of dissemination in space",
-        "category": "acceptable"
+        "category": "acceptable",
+        "tool_parameters": {
+          "protocol": "tumor",
+          "contrast": false
+        }
       },
       {
         "step": 8,
@@ -871,7 +900,13 @@
         "action": "Perform pre-DMT safety screening: hepatitis B/C serologies, JC virus antibody index, varicella immunity, QuantiFERON, baseline lymphocyte count",
         "tool_name": "interpret_labs",
         "expected_finding": "Negative hepatitis serologies, low JC virus index, VZV immunity confirmed, negative QuantiFERON",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP"
+          ]
+        }
       },
       {
         "step": 10,
@@ -885,7 +920,11 @@
         "action": "Schedule follow-up MRI at 3 months to assess treatment response and establish new baseline",
         "tool_name": "analyze_brain_mri",
         "expected_finding": "Resolution of enhancement, monitoring for new lesion activity",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "standard",
+          "contrast": false
+        }
       },
       {
         "step": 12,

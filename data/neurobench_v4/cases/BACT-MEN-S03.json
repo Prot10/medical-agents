@@ -82,7 +82,7 @@
       "spo2": 95
     },
     "chief_complaint": "Severe headache, fever, and confusion over the past 12 hours",
-    "history_present_illness": "Mr. Javier Herrera is a 62-year-old right-handed man with a history of type 2 diabetes, chronic sinusitis, and mild right-sided hearing loss who presents to the emergency department via ambulance with approximately 12 hours of progressively worsening headache, fever, and altered mental status. His wife reports that he came home from work yesterday evening around 5 PM complaining of the worst headache of his life, which was diffuse and throbbing in character. He took ibuprofen 600 mg without relief. Over the ensuing hours, he developed shaking chills and his wife measured a temperature of 102.8\u00b0F (39.3\u00b0C) at 9 PM. He went to bed early but was restless and moaning throughout the night. By 3 AM, his wife noticed he was confused and not making sense when she tried to talk to him. He was complaining that the bedroom light was too bright and kept his eyes closed. He vomited twice between 3 AM and 5 AM, which was non-bloody and non-bilious. She called 911 at approximately 5:15 AM when she could not fully rouse him and he did not recognize their children. EMS found him febrile at 39.5\u00b0C with a heart rate of 122 and blood pressure of 148/82. He was transported emergently. In the ED, he is lethargic, photophobic, and in obvious distress. He is intermittently groaning and reaching for his head. Notably, the patient had been treated for an acute sinusitis exacerbation approximately 10 days ago with a course of amoxicillin-clavulanate, which he completed 3 days prior to this presentation. His wife denies any recent head trauma, seizure activity, rash, ear discharge, or known sick contacts with meningitis. She confirms his immunizations are up to date, though she is uncertain about meningococcal vaccination."
+    "history_present_illness": "Mr. Javier Herrera is a 62-year-old right-handed man with a history of type 2 diabetes, chronic sinusitis, and mild right-sided hearing loss who presents to the emergency department via ambulance with approximately 12 hours of progressively worsening headache, fever, and altered mental status. His wife reports that he came home from work yesterday evening around 5 PM complaining of the worst headache of his life, which was diffuse and throbbing in character. He took ibuprofen 600 mg without relief. Over the ensuing hours, he developed shaking chills and his wife measured a temperature of 102.8°F (39.3°C) at 9 PM. He went to bed early but was restless and moaning throughout the night. By 3 AM, his wife noticed he was confused and not making sense when she tried to talk to him. He was complaining that the bedroom light was too bright and kept his eyes closed. He vomited twice between 3 AM and 5 AM, which was non-bloody and non-bilious. She called 911 at approximately 5:15 AM when she could not fully rouse him and he did not recognize their children. EMS found him febrile at 39.5°C with a heart rate of 122 and blood pressure of 148/82. He was transported emergently. In the ED, he is lethargic, photophobic, and in obvious distress. He is intermittently groaning and reaching for his head. Notably, the patient had been treated for an acute sinusitis exacerbation approximately 10 days ago with a course of amoxicillin-clavulanate, which he completed 3 days prior to this presentation. His wife denies any recent head trauma, seizure activity, rash, ear discharge, or known sick contacts with meningitis. She confirms his immunizations are up to date, though she is uncertain about meningococcal vaccination."
   },
   "initial_tool_outputs": {
     "eeg": null,
@@ -825,7 +825,7 @@
         "step": 1,
         "action": "Rapid clinical assessment including vital signs, neurological examination with assessment for meningeal signs, and Glasgow Coma Scale scoring",
         "tool_name": null,
-        "expected_finding": "Fever 39.7\u00b0C, tachycardia, nuchal rigidity, positive Kernig and Brudzinski signs, GCS 12",
+        "expected_finding": "Fever 39.7°C, tachycardia, nuchal rigidity, positive Kernig and Brudzinski signs, GCS 12",
         "category": "required"
       },
       {
@@ -833,7 +833,13 @@
         "action": "Obtain stat blood cultures (2 sets from separate sites) BEFORE starting antibiotics",
         "tool_name": "interpret_labs",
         "expected_finding": "Blood cultures drawn; will eventually grow Streptococcus pneumoniae",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP"
+          ]
+        }
       },
       {
         "step": 3,
@@ -847,28 +853,49 @@
         "action": "Obtain non-contrast CT head to rule out mass lesion or elevated ICP before lumbar puncture (given altered mental status)",
         "tool_name": "order_ct_scan",
         "expected_finding": "No mass lesion or obstructive hydrocephalus; mild cerebral edema; paranasal sinus disease",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "angiography": false,
+          "contrast": false
+        }
       },
       {
         "step": 5,
         "action": "Perform lumbar puncture with opening pressure measurement, CSF cell count, protein, glucose, Gram stain, culture, and meningitis PCR panel",
         "tool_name": "analyze_csf",
         "expected_finding": "Turbid CSF, elevated opening pressure 32 cmH2O, WBC 3200 with 94% neutrophils, protein 348, glucose 14, Gram-positive diplococci on stain",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "special_tests": [
+            "meningitis_panel"
+          ]
+        }
       },
       {
         "step": 6,
         "action": "Obtain stat laboratory studies: CBC, BMP, coagulation panel, CRP, procalcitonin, lactate",
         "tool_name": "interpret_labs",
         "expected_finding": "Leukocytosis with left shift, hyponatremia (SIADH), elevated inflammatory markers, elevated lactate",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "coagulation",
+            "CRP"
+          ]
+        }
       },
       {
         "step": 7,
         "action": "Order brain MRI with contrast to evaluate for complications (empyema, abscess, cerebral venous sinus thrombosis, infarction)",
         "tool_name": "analyze_brain_mri",
         "expected_finding": "Diffuse leptomeningeal enhancement, DWI restriction in sulci, paranasal sinus disease, no complications",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "standard",
+          "contrast": true
+        }
       },
       {
         "step": 8,
@@ -903,7 +930,13 @@
         "action": "Obtain audiometry prior to discharge to screen for sensorineural hearing loss (common complication of pneumococcal meningitis)",
         "tool_name": "interpret_labs",
         "expected_finding": "Bilateral sensorineural hearing loss",
-        "category": "acceptable"
+        "category": "acceptable",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP"
+          ]
+        }
       },
       {
         "step": 13,

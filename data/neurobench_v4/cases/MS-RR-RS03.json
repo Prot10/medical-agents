@@ -360,7 +360,7 @@
       "glucose": "58 mg/dL (reference: 40-70 mg/dL)",
       "glucose_ratio": "0.66 (serum glucose 88 mg/dL)",
       "special_tests": {
-        "Oligoclonal bands": "Positive \u2014 5 bands unique to CSF, not present in matched serum sample",
+        "Oligoclonal bands": "Positive — 5 bands unique to CSF, not present in matched serum sample",
         "IgG index": "0.78 (elevated; reference: <0.70)",
         "IgG synthesis rate": "10.8 mg/day (elevated; reference: <8.0 mg/day)",
         "Myelin basic protein": "5.2 ng/mL (elevated; reference: <4.0 ng/mL)",
@@ -370,7 +370,7 @@
         "West Nile virus IgM": "Negative",
         "West Nile virus IgG": "Negative"
       },
-      "interpretation": "Opening pressure: 15 cmH2O. WBC: 12 cells/microL (reference: 0-5) (N/A PMN/N/A lymph). Protein: 48 mg/dL (reference: 15-45 mg/dL). Glucose: 58 mg/dL (reference: 40-70 mg/dL) (ratio 0.66 (serum glucose 88 mg/dL)). Oligoclonal bands: Positive \u2014 5 bands unique to CSF, not present in matched serum sample. IgG index: 0.78 (elevated; reference: <0.70). IgG synthesis rate: 10.8 mg/day (elevated; reference: <8.0 mg/day). Myelin basic protein: 5.2 ng/mL (elevated; reference: <4.0 ng/mL). Cytology: No malignant cells identified. VDRL: Non-reactive. HSV PCR: Negative. West Nile virus IgM: Negative. West Nile virus IgG: Negative."
+      "interpretation": "Opening pressure: 15 cmH2O. WBC: 12 cells/microL (reference: 0-5) (N/A PMN/N/A lymph). Protein: 48 mg/dL (reference: 15-45 mg/dL). Glucose: 58 mg/dL (reference: 40-70 mg/dL) (ratio 0.66 (serum glucose 88 mg/dL)). Oligoclonal bands: Positive — 5 bands unique to CSF, not present in matched serum sample. IgG index: 0.78 (elevated; reference: <0.70). IgG synthesis rate: 10.8 mg/day (elevated; reference: <8.0 mg/day). Myelin basic protein: 5.2 ng/mL (elevated; reference: <4.0 ng/mL). Cytology: No malignant cells identified. VDRL: Non-reactive. HSV PCR: Negative. West Nile virus IgM: Negative. West Nile virus IgG: Negative."
     },
     "literature_search": null,
     "drug_interactions": null
@@ -660,10 +660,10 @@
           "Screen for hepatitis B and C before initiation",
           "Premedicate with methylprednisolone 100 mg IV, diphenhydramine, and acetaminophen before each infusion",
           "Risk of infusion-related reactions, typically with first infusion",
-          "Increased risk of infections \u2014 monitor for signs and symptoms",
+          "Increased risk of infections — monitor for signs and symptoms",
           "Risk of progressive multifocal leukoencephalopathy (PML), though lower than with natalizumab",
           "Live vaccines should be administered at least 6 weeks before initiation",
-          "Not recommended during pregnancy \u2014 effective contraception recommended"
+          "Not recommended during pregnancy — effective contraception recommended"
         ],
         "formulary_status": "Formulary, prior authorization required, specialty pharmacy",
         "alternatives": [
@@ -700,7 +700,7 @@
     }
   ],
   "ground_truth": {
-    "primary_diagnosis": "Multiple sclerosis \u2014 relapsing-remitting (RRMS)",
+    "primary_diagnosis": "Multiple sclerosis — relapsing-remitting (RRMS)",
     "icd_code": "G35",
     "differential": [
       {
@@ -749,21 +749,42 @@
         "action": "Order MRI brain and cervical spine with gadolinium contrast",
         "tool_name": "analyze_brain_mri",
         "expected_finding": "Multiple demyelinating lesions in periventricular, juxtacortical, infratentorial, and spinal cord regions with enhancing and non-enhancing lesions meeting 2017 McDonald criteria for DIS and DIT",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "standard",
+          "contrast": true
+        }
       },
       {
         "step": 4,
         "action": "Order basic labs including CBC, BMP, ESR, CRP, ANA, vitamin B12, TSH, NMO-IgG, MOG antibodies, and ACE to exclude mimics",
         "tool_name": "interpret_labs",
         "expected_finding": "Normal labs except low vitamin D; negative AQP4, MOG antibodies, and normal ACE",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "thyroid",
+            "B12",
+            "ESR",
+            "CRP",
+            "NMO_MOG"
+          ]
+        }
       },
       {
         "step": 5,
         "action": "Perform lumbar puncture with CSF analysis including oligoclonal bands, IgG index, cell count, protein, glucose, and infectious studies",
         "tool_name": "analyze_csf",
         "expected_finding": "Oligoclonal bands present, elevated IgG index, mild lymphocytic pleocytosis, elevated myelin basic protein, negative infectious studies",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "special_tests": [
+            "oligoclonal_bands",
+            "IgG_index"
+          ]
+        }
       },
       {
         "step": 6,
@@ -791,14 +812,21 @@
         "action": "Order visual evoked potentials to document baseline optic nerve conduction",
         "tool_name": "order_specialized_test",
         "expected_finding": "Prolonged P100 latency in right eye confirming demyelinating optic neuropathy",
-        "category": "acceptable"
+        "category": "acceptable",
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        }
       },
       {
         "step": 10,
         "action": "Order MRI thoracic spine with contrast to complete spinal cord survey",
         "tool_name": "analyze_brain_mri",
         "expected_finding": "Additional short-segment spinal cord lesions at T4-T5 and T9",
-        "category": "acceptable"
+        "category": "acceptable",
+        "tool_parameters": {
+          "protocol": "standard",
+          "contrast": true
+        }
       },
       {
         "step": 11,
@@ -824,10 +852,10 @@
     ],
     "contraindicated_actions": [
       "Do not start chronic oral corticosteroids as maintenance therapy for MS (ineffective and carries significant long-term side effects)",
-      "Do not perform brain biopsy \u2014 diagnosis is readily achievable through non-invasive criteria (McDonald 2017)",
+      "Do not perform brain biopsy — diagnosis is readily achievable through non-invasive criteria (McDonald 2017)",
       "Do not delay disease-modifying therapy while waiting for spontaneous remission of optic neuritis",
       "Do not initiate natalizumab without first checking JC virus antibody status",
-      "Do not administer high-dose IV thiamine empirically without clinical evidence of Wernicke encephalopathy \u2014 this patient lacks risk factors for thiamine deficiency"
+      "Do not administer high-dose IV thiamine empirically without clinical evidence of Wernicke encephalopathy — this patient lacks risk factors for thiamine deficiency"
     ],
     "key_reasoning_points": [
       "The combination of acute right optic neuritis with a prior episode of bilateral lower extremity numbness 8 months ago establishes clinical dissemination in time with at least two distinct relapsing episodes",
@@ -846,7 +874,7 @@
     "source_pmcid": "PMC11040630",
     "source_license": "CC-BY 4.0",
     "generation_method": "real_case_seed",
-    "condition_name": "Multiple sclerosis \u2014 relapsing-remitting",
+    "condition_name": "Multiple sclerosis — relapsing-remitting",
     "difficulty_description": "Straightforward case with classic optic neuritis presentation, prior relapsing episode, and diagnostic MRI/CSF findings meeting McDonald 2017 criteria. Minimal confounders.",
     "expected_agent_confidence": 0.87,
     "condition_category": "demyelinating_disease",

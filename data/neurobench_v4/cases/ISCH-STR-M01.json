@@ -77,7 +77,7 @@
       }
     },
     "neurological_exam": {
-      "mental_status": "Alert, oriented to person and place but initially states the year as 2024. Mildly inattentive \u2014 makes errors on serial sevens (4 of 5 correct) and months backward (omits September). Speech is mildly dysarthric with slurred consonants but language comprehension and repetition are intact. Can name high-frequency objects but hesitates on low-frequency items. Follows two-step commands bilaterally.",
+      "mental_status": "Alert, oriented to person and place but initially states the year as 2024. Mildly inattentive — makes errors on serial sevens (4 of 5 correct) and months backward (omits September). Speech is mildly dysarthric with slurred consonants but language comprehension and repetition are intact. Can name high-frequency objects but hesitates on low-frequency items. Follows two-step commands bilaterally.",
       "cranial_nerves": "Pupils 3 mm bilaterally, reactive. Visual fields full to confrontation but extinguishes left visual stimulus on double simultaneous stimulation on the right. No obvious gaze preference at rest, but subtle incomplete rightward gaze on leftward saccades. Mild right lower facial flattening, not clearly a droop. Hearing grossly intact. Palate elevates symmetrically. Sternocleidomastoid and trapezius strength normal. Tongue midline.",
       "motor": "Right upper extremity: 4+/5 grip strength, 4/5 deltoid, 4+/5 wrist extension, subtle pronator drift on the right when eyes closed. Right lower extremity: 4+/5 hip flexion, 5-/5 knee extension, 4+/5 ankle dorsiflexion. Left upper and lower extremities: 5/5 strength throughout. No fasciculations.",
       "sensory": "Light touch intact bilaterally. Pinprick mildly diminished in a stocking distribution to mid-calf bilaterally (consistent with known neuropathy). Right-sided extinction on double simultaneous stimulation to light touch. Proprioception intact at great toes bilaterally.",
@@ -618,7 +618,7 @@
         "findings": [
           {
             "region": "Left internal carotid artery at the bifurcation",
-            "signal": "Peak_systolic_velocity: 225 cm/s; End_diastolic_velocity: 78 cm/s; ICA_CCA_ratio: 3.4; Estimated_stenosis: 60-69% (NASCET criteria); Plaque_morphology: Heterogeneous, predominantly hypoechoic plaque with irregular surface \u2014 features associated with higher embolic risk",
+            "signal": "Peak_systolic_velocity: 225 cm/s; End_diastolic_velocity: 78 cm/s; ICA_CCA_ratio: 3.4; Estimated_stenosis: 60-69% (NASCET criteria); Plaque_morphology: Heterogeneous, predominantly hypoechoic plaque with irregular surface — features associated with higher embolic risk",
             "description": "Carotid stenosis"
           },
           {
@@ -628,7 +628,7 @@
           }
         ],
         "quantitative_data": null,
-        "impression": "Moderate (60-69%) stenosis of the left internal carotid artery with heterogeneous, predominantly hypoechoic plaque and irregular surface morphology \u2014 features associated with higher embolic risk. This is a symptomatic stenosis ipsilateral to the acute infarct. Mild (<50%) stenosis of the right internal carotid artery with stable calcified plaque. Patent bilateral vertebral arteries. Clinical correlation recommended.",
+        "impression": "Moderate (60-69%) stenosis of the left internal carotid artery with heterogeneous, predominantly hypoechoic plaque and irregular surface morphology — features associated with higher embolic risk. This is a symptomatic stenosis ipsilateral to the acute infarct. Mild (<50%) stenosis of the right internal carotid artery with stable calcified plaque. Patent bilateral vertebral arteries. Clinical correlation recommended.",
         "recommended_actions": [
           "Clinical correlation recommended."
         ]
@@ -733,27 +733,45 @@
         "action": "Obtain emergent non-contrast CT head to exclude hemorrhage",
         "tool_name": "order_ct_scan",
         "expected_finding": "No hemorrhage, possible subtle early ischemic changes",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "angiography": false,
+          "contrast": false
+        }
       },
       {
         "step": 3,
         "action": "Obtain brain MRI with DWI and FLAIR to evaluate for acute infarction and assess DWI-FLAIR mismatch for possible thrombolysis eligibility",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "DWI restriction with FLAIR positivity in left MCA superior division territory, indicating infarct older than 4.5 hours \u2014 not eligible for IV thrombolysis based on tissue clock",
-        "category": "required"
+        "expected_finding": "DWI restriction with FLAIR positivity in left MCA superior division territory, indicating infarct older than 4.5 hours — not eligible for IV thrombolysis based on tissue clock",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "stroke",
+          "contrast": false
+        }
       },
       {
         "step": 4,
         "action": "Obtain stat labs including CBC, BMP, coagulation studies, lipid panel, HbA1c, and troponin",
         "tool_name": "interpret_labs",
         "expected_finding": "Elevated creatinine, hyperglycemia, poorly controlled HbA1c, suboptimal lipids, normal coagulation",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "coagulation",
+            "lipid",
+            "troponin",
+            "HbA1c"
+          ]
+        }
       },
       {
         "step": 5,
         "action": "Obtain 12-lead ECG",
         "tool_name": "analyze_ecg",
-        "expected_finding": "Sinus rhythm with left atrial enlargement and LVH \u2014 no AF on initial tracing but LAE raises suspicion",
+        "expected_finding": "Sinus rhythm with left atrial enlargement and LVH — no AF on initial tracing but LAE raises suspicion",
         "category": "required"
       },
       {
@@ -761,21 +779,31 @@
         "action": "Obtain CTA head and neck for vascular evaluation given suspected large artery etiology",
         "tool_name": "order_ct_scan",
         "expected_finding": "Moderate left ICA stenosis 60-70% with irregular plaque, focal left M2 stenosis",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "angiography": true,
+          "contrast": false
+        }
       },
       {
         "step": 7,
         "action": "Initiate continuous telemetry monitoring and order prolonged cardiac monitoring (Holter or event monitor) to detect paroxysmal atrial fibrillation",
         "tool_name": "order_cardiac_monitoring",
         "expected_finding": "Paroxysmal AF episodes detected, fundamentally changing stroke mechanism classification",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "monitor_type": "event_monitor_30d"
+        }
       },
       {
         "step": 8,
         "action": "Order transthoracic echocardiogram",
         "tool_name": "order_echocardiogram",
-        "expected_finding": "LVH, dilated left atrium, diastolic dysfunction \u2014 supportive of cardioembolic risk",
-        "category": "required"
+        "expected_finding": "LVH, dilated left atrium, diastolic dysfunction — supportive of cardioembolic risk",
+        "category": "required",
+        "tool_parameters": {
+          "echo_type": "TTE"
+        }
       },
       {
         "step": 9,
@@ -807,7 +835,7 @@
       }
     ],
     "critical_actions": [
-      "Establish last known well time to determine thrombolysis eligibility \u2014 recognize patient is outside standard IV tPA window",
+      "Establish last known well time to determine thrombolysis eligibility — recognize patient is outside standard IV tPA window",
       "Evaluate DWI-FLAIR mismatch on MRI to determine if tissue-clock-based thrombolysis is appropriate (it is not, given FLAIR positivity)",
       "Obtain vascular imaging (CTA or MRA) to identify large artery atherosclerotic disease as a potential stroke mechanism",
       "Initiate prolonged cardiac monitoring to detect paroxysmal atrial fibrillation, despite normal sinus rhythm on initial ECG",
@@ -816,7 +844,7 @@
       "Recognize the right-sided neglect on examination as evidence of a left parietal stroke"
     ],
     "contraindicated_actions": [
-      "Administering IV alteplase without confirming DWI-FLAIR mismatch in a wake-up stroke \u2014 FLAIR is already positive in this case, indicating the infarct is outside the safe thrombolysis window",
+      "Administering IV alteplase without confirming DWI-FLAIR mismatch in a wake-up stroke — FLAIR is already positive in this case, indicating the infarct is outside the safe thrombolysis window",
       "Aggressively lowering blood pressure below 140/90 in the acute phase (may worsen cerebral perfusion to penumbral tissue)",
       "Failing to pursue prolonged cardiac monitoring and assuming stroke is purely atherosclerotic based on normal sinus rhythm on initial ECG",
       "Discharging patient on aspirin alone without investigating for paroxysmal atrial fibrillation",
@@ -825,7 +853,7 @@
     "key_reasoning_points": [
       "Wake-up stroke with unknown exact onset time requires tissue-based imaging (DWI-FLAIR mismatch) rather than time-based criteria to determine thrombolysis eligibility",
       "FLAIR positivity in this case indicates the infarct is older than 4.5 hours, making IV thrombolysis inadvisable despite the desire to treat",
-      "Normal sinus rhythm on initial ECG does not exclude paroxysmal atrial fibrillation \u2014 left atrial enlargement on ECG and dilated LA on echo are red flags requiring prolonged monitoring",
+      "Normal sinus rhythm on initial ECG does not exclude paroxysmal atrial fibrillation — left atrial enlargement on ECG and dilated LA on echo are red flags requiring prolonged monitoring",
       "The discovery of paroxysmal AF on Holter monitoring fundamentally changes the stroke mechanism from presumed large artery atherosclerotic to cardioembolic or mixed, with major therapeutic implications (anticoagulation vs. antiplatelet alone)",
       "The combination of symptomatic left ICA stenosis and newly discovered paroxysmal AF creates a mixed-mechanism scenario requiring both anticoagulation and vascular surgical consultation",
       "Subtle right-sided neglect (line bisection deviation, visual extinction) localizes the lesion to the left parietal lobe, consistent with the MRI findings in the left MCA superior division territory",

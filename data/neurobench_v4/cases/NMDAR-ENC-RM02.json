@@ -57,8 +57,8 @@
       }
     },
     "neurological_exam": {
-      "mental_status": "GCS 12/15 (E3 V4 M5). Alert but disoriented to time, place, and situation. Fluctuating attention \u2014 intermittently follows simple commands, then becomes unresponsive to verbal stimuli. Speech is disorganized with paraphasic errors and perseveration. Attempts at conversation reveal paranoid ideation and visual hallucinations (reports seeing insects on the walls). Unable to perform serial 7s or spell WORLD backwards. Short-term memory severely impaired; cannot recall any of 3 objects at 1 minute.",
-      "cranial_nerves": "Pupils 4 mm bilaterally, reactive to light. Extraocular movements intact with occasional slow saccades. No nystagmus. Facial sensation intact to light touch bilaterally. Intermittent involuntary orolingual-facial dyskinesias observed \u2014 lip smacking, jaw clenching, and tongue protrusions occurring every 10-15 seconds. Hearing grossly intact. Palate elevates symmetrically. Sternocleidomastoid and trapezius strength 5/5 bilaterally. Tongue midline without fasciculations.",
+      "mental_status": "GCS 12/15 (E3 V4 M5). Alert but disoriented to time, place, and situation. Fluctuating attention — intermittently follows simple commands, then becomes unresponsive to verbal stimuli. Speech is disorganized with paraphasic errors and perseveration. Attempts at conversation reveal paranoid ideation and visual hallucinations (reports seeing insects on the walls). Unable to perform serial 7s or spell WORLD backwards. Short-term memory severely impaired; cannot recall any of 3 objects at 1 minute.",
+      "cranial_nerves": "Pupils 4 mm bilaterally, reactive to light. Extraocular movements intact with occasional slow saccades. No nystagmus. Facial sensation intact to light touch bilaterally. Intermittent involuntary orolingual-facial dyskinesias observed — lip smacking, jaw clenching, and tongue protrusions occurring every 10-15 seconds. Hearing grossly intact. Palate elevates symmetrically. Sternocleidomastoid and trapezius strength 5/5 bilaterally. Tongue midline without fasciculations.",
       "motor": "Tone mildly increased in bilateral upper extremities with intermittent rigidity. Strength 4+/5 throughout bilateral upper and lower extremities, limited by cooperation. Involuntary choreoathetoid movements of bilateral hands and intermittent dystonic posturing of the left wrist noted. No asterixis.",
       "sensory": "Withdraws to pain in all four extremities. Light touch and pinprick testing unreliable due to patient agitation and fluctuating cooperation.",
       "reflexes": "Deep tendon reflexes 2+ and symmetric throughout. Plantar responses flexor bilaterally. No clonus.",
@@ -166,7 +166,7 @@
           "size": "Equivocal, approximately 6 mm",
           "signal_characteristics": {
             "T2": "Questionable mild hyperintensity",
-            "FLAIR": "Equivocal \u2014 may represent artifact versus true signal change"
+            "FLAIR": "Equivocal — may represent artifact versus true signal change"
           },
           "mass_effect": "None",
           "borders": "Indeterminate"
@@ -747,7 +747,7 @@
       "output": {
         "proposed": "Risperidone 1 mg twice daily for agitation",
         "interactions": [
-          "Risperidone + Levothyroxine: Minor interaction \u2014 risperidone may slightly decrease thyroid hormone levels; monitor TSH",
+          "Risperidone + Levothyroxine: Minor interaction — risperidone may slightly decrease thyroid hormone levels; monitor TSH",
           "Risperidone + Levetiracetam: No clinically significant pharmacokinetic interaction; both can lower seizure threshold awareness"
         ],
         "contraindications": [
@@ -755,7 +755,7 @@
           "Risperidone contributes to QTc prolongation (current QTc 448 ms); avoid combining with other QTc-prolonging agents"
         ],
         "warnings": [
-          "Antipsychotics are generally NOT recommended as first-line for agitation in suspected autoimmune encephalitis \u2014 benzodiazepines preferred",
+          "Antipsychotics are generally NOT recommended as first-line for agitation in suspected autoimmune encephalitis — benzodiazepines preferred",
           "May mask or exacerbate neuropsychiatric symptoms, complicating clinical assessment",
           "Risk of dystonic reactions and NMS-like presentations, which can confuse the clinical picture"
         ],
@@ -834,42 +834,75 @@
         "action": "Order EEG to evaluate for subclinical seizures and encephalopathic patterns",
         "tool_name": "analyze_eeg",
         "expected_finding": "Generalized slowing, GRDA, possible subclinical seizures; no extreme delta brush (moderate difficulty)",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "eeg_type": "routine"
+        }
       },
       {
         "step": 3,
         "action": "Order brain MRI with contrast to evaluate structural and inflammatory changes",
         "tool_name": "analyze_brain_mri",
         "expected_finding": "Multifocal T2/FLAIR signal changes in periventricular white matter and basal ganglia; atypical for HSV",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "standard",
+          "contrast": true
+        }
       },
       {
         "step": 4,
         "action": "Perform lumbar puncture with CSF analysis including cell count, protein, glucose, viral PCR panel, and send for anti-NMDAR antibodies",
         "tool_name": "analyze_csf",
         "expected_finding": "Mild lymphocytic pleocytosis, borderline elevated protein, negative viral PCR, oligoclonal bands present",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "special_tests": [
+            "autoimmune_panel",
+            "NMDAR_antibodies"
+          ]
+        }
       },
       {
         "step": 5,
         "action": "Order comprehensive laboratory workup including CBC, BMP, thyroid function, inflammatory markers, CK, toxicology screen",
         "tool_name": "interpret_labs",
         "expected_finding": "Mild hyponatremia suggesting SIADH, mild leukocytosis, mildly elevated TSH (confounding), negative toxicology",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "thyroid",
+            "drug_screen",
+            "inflammatory_markers"
+          ]
+        }
       },
       {
         "step": 6,
         "action": "Request anti-NMDA receptor antibody testing in serum and CSF",
         "tool_name": "interpret_labs",
         "expected_finding": "Positive anti-NMDAR IgG in both serum and CSF, confirming diagnosis",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "autoimmune_encephalitis"
+          ]
+        }
       },
       {
         "step": 7,
         "action": "Order pelvic imaging (ultrasound or CT) to screen for ovarian teratoma",
         "tool_name": "interpret_labs",
         "expected_finding": "Left ovarian complex cystic-solid lesion consistent with mature cystic teratoma",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP"
+          ]
+        }
       },
       {
         "step": 8,
@@ -916,7 +949,7 @@
       "ICU admission for autonomic monitoring and airway protection"
     ],
     "contraindicated_actions": [
-      "Continuing or escalating antipsychotic medications (risperidone, haloperidol) \u2014 may worsen dyskinesias and mimic NMS",
+      "Continuing or escalating antipsychotic medications (risperidone, haloperidol) — may worsen dyskinesias and mimic NMS",
       "Discharging the patient for outpatient follow-up without initiating immunotherapy and workup",
       "Attributing the presentation solely to a primary psychiatric disorder without ruling out autoimmune encephalitis",
       "Administering carbamazepine or phenytoin for seizure control without checking drug interactions (QTc prolongation risk, hepatic enzyme induction may affect immunotherapy)",
@@ -925,7 +958,7 @@
     "key_reasoning_points": [
       "The triad of psychiatric symptoms, new-onset seizures, and orofacial dyskinesias in a young woman should prompt immediate consideration of anti-NMDA receptor encephalitis",
       "A preceding viral prodrome is common in anti-NMDAR encephalitis and does not exclude an autoimmune etiology",
-      "The poor response to risperidone is a clinical clue \u2014 primary psychosis would be expected to show at least partial response to antipsychotics",
+      "The poor response to risperidone is a clinical clue — primary psychosis would be expected to show at least partial response to antipsychotics",
       "CSF lymphocytic pleocytosis with oligoclonal bands points to intrathecal immune activation rather than a primary psychiatric or metabolic etiology",
       "The MRI pattern of periventricular and basal ganglia involvement differs from the medial temporal lobe predilection seen in HSV encephalitis and LGI1 antibody encephalitis",
       "Mildly elevated TSH with known Hashimoto thyroiditis is a confounding factor but insufficient to explain the clinical syndrome; however, autoimmune thyroiditis increases the pre-test probability of other autoimmune conditions",

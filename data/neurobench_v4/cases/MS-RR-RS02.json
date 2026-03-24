@@ -359,13 +359,13 @@
       "glucose": "58.3 mg/dL (reference: 40-70 mg/dL)",
       "glucose_ratio": "0.64 (serum glucose 91 mg/dL)",
       "special_tests": {
-        "Oligoclonal bands": "Positive \u2014 5 bands unique to CSF, not present in matched serum sample",
+        "Oligoclonal bands": "Positive — 5 bands unique to CSF, not present in matched serum sample",
         "IgG index": "0.78 (elevated; reference: <0.70)",
         "IgG synthesis rate": "10.8 mg/day (elevated; reference: <8.0 mg/day)",
         "Myelin basic protein": "5.2 ng/mL (elevated; reference: <4.0 ng/mL)",
         "Cytology": "No malignant cells identified"
       },
-      "interpretation": "Opening pressure: 14 cmH2O. WBC: 12 cells/microL (reference: 0-5) (N/A PMN/N/A lymph). Protein: 44.2 mg/dL (reference: 15-45 mg/dL). Glucose: 58.3 mg/dL (reference: 40-70 mg/dL) (ratio 0.64 (serum glucose 91 mg/dL)). Oligoclonal bands: Positive \u2014 5 bands unique to CSF, not present in matched serum sample. IgG index: 0.78 (elevated; reference: <0.70). IgG synthesis rate: 10.8 mg/day (elevated; reference: <8.0 mg/day). Myelin basic protein: 5.2 ng/mL (elevated; reference: <4.0 ng/mL). Cytology: No malignant cells identified."
+      "interpretation": "Opening pressure: 14 cmH2O. WBC: 12 cells/microL (reference: 0-5) (N/A PMN/N/A lymph). Protein: 44.2 mg/dL (reference: 15-45 mg/dL). Glucose: 58.3 mg/dL (reference: 40-70 mg/dL) (ratio 0.64 (serum glucose 91 mg/dL)). Oligoclonal bands: Positive — 5 bands unique to CSF, not present in matched serum sample. IgG index: 0.78 (elevated; reference: <0.70). IgG synthesis rate: 10.8 mg/day (elevated; reference: <8.0 mg/day). Myelin basic protein: 5.2 ng/mL (elevated; reference: <4.0 ng/mL). Cytology: No malignant cells identified."
     },
     "literature_search": null,
     "drug_interactions": null
@@ -610,11 +610,11 @@
           "Known hypersensitivity to ocrelizumab or murine proteins"
         ],
         "warnings": [
-          "Infusion-related reactions common with first dose \u2014 premedicate with methylprednisolone 100 mg IV, diphenhydramine, and acetaminophen",
-          "Increased risk of infections due to B-cell depletion \u2014 screen for hepatitis B and tuberculosis before starting",
+          "Infusion-related reactions common with first dose — premedicate with methylprednisolone 100 mg IV, diphenhydramine, and acetaminophen",
+          "Increased risk of infections due to B-cell depletion — screen for hepatitis B and tuberculosis before starting",
           "Live or live-attenuated vaccines should be administered at least 6 weeks before initiation",
           "Monitor immunoglobulin levels periodically during treatment",
-          "Discuss contraception \u2014 limited pregnancy data, recommend effective contraception during treatment and for 6 months after last dose"
+          "Discuss contraception — limited pregnancy data, recommend effective contraception during treatment and for 6 months after last dose"
         ],
         "formulary_status": "Formulary, prior authorization required, specialty pharmacy distribution",
         "alternatives": [
@@ -675,7 +675,7 @@
     }
   ],
   "ground_truth": {
-    "primary_diagnosis": "Multiple sclerosis \u2014 relapsing-remitting (RRMS)",
+    "primary_diagnosis": "Multiple sclerosis — relapsing-remitting (RRMS)",
     "icd_code": "G35",
     "differential": [
       {
@@ -724,21 +724,41 @@
         "action": "Order MRI brain and spinal cord with gadolinium contrast",
         "tool_name": "analyze_brain_mri",
         "expected_finding": "Multiple demyelinating lesions meeting McDonald 2017 DIS criteria across all 4 characteristic locations, with enhancing and non-enhancing lesions meeting DIT criteria",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "standard",
+          "contrast": true
+        }
       },
       {
         "step": 4,
         "action": "Order basic labs including CBC, BMP, ESR, CRP, ANA, vitamin B12, NMO-IgG, and MOG antibodies to exclude mimics",
         "tool_name": "interpret_labs",
         "expected_finding": "Normal labs except low vitamin D; negative AQP4 and MOG antibodies excluding NMOSD and MOGAD",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "B12",
+            "ESR",
+            "CRP",
+            "NMO_MOG"
+          ]
+        }
       },
       {
         "step": 5,
         "action": "Perform lumbar puncture with CSF analysis including oligoclonal bands and IgG index",
         "tool_name": "analyze_csf",
         "expected_finding": "Oligoclonal bands present, elevated IgG index and synthesis rate, mild lymphocytic pleocytosis, elevated myelin basic protein",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "special_tests": [
+            "oligoclonal_bands",
+            "IgG_index"
+          ]
+        }
       },
       {
         "step": 6,
@@ -766,14 +786,23 @@
         "action": "Order visual evoked potentials to document residual optic nerve demyelination from prior episode",
         "tool_name": "order_specialized_test",
         "expected_finding": "Prolonged P100 latency in right eye confirming prior demyelinating optic neuropathy",
-        "category": "acceptable"
+        "category": "acceptable",
+        "tool_parameters": {
+          "test_type": "vep"
+        }
       },
       {
         "step": 10,
         "action": "Order optical coherence tomography to quantify retinal nerve fiber layer thinning",
         "tool_name": "interpret_labs",
         "expected_finding": "RNFL thinning in the right eye consistent with prior optic neuritis",
-        "category": "acceptable"
+        "category": "acceptable",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP"
+          ]
+        }
       },
       {
         "step": 11,
@@ -799,7 +828,7 @@
     ],
     "contraindicated_actions": [
       "Do not start chronic oral corticosteroids as maintenance therapy for MS (not effective for relapse prevention and harmful long-term)",
-      "Do not perform brain biopsy \u2014 diagnosis is achievable with non-invasive McDonald criteria",
+      "Do not perform brain biopsy — diagnosis is achievable with non-invasive McDonald criteria",
       "Do not delay disease-modifying therapy while waiting for spontaneous remission of the current relapse",
       "Do not initiate natalizumab without first checking JC virus antibody status",
       "Do not administer live vaccines while planning B-cell-depleting therapy (e.g., ocrelizumab)"
@@ -820,7 +849,7 @@
     "source_pmcid": "PMC9589462",
     "source_license": "CC-BY 4.0",
     "generation_method": "real_case_seed",
-    "condition_name": "Multiple sclerosis \u2014 relapsing-remitting",
+    "condition_name": "Multiple sclerosis — relapsing-remitting",
     "difficulty_description": "Straightforward case with classic MS presentation: prior optic neuritis followed by acute myelitis, classic MRI findings (Dawson fingers, short-segment cord lesions, enhancing and non-enhancing lesions), positive CSF oligoclonal bands, and negative NMOSD/MOGAD antibodies. Minimal confounders.",
     "expected_agent_confidence": 0.85
   }

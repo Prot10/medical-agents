@@ -89,7 +89,7 @@
       "spo2": 96
     },
     "chief_complaint": "Progressive headache, left arm weakness, and a new-onset seizure",
-    "history_present_illness": "Mr. Kenji Watanabe is a 71-year-old right-handed retired mathematics teacher who presents to the emergency department after experiencing a witnessed generalized tonic-clonic seizure at home approximately two hours ago. His wife reports that over the past three weeks he has been complaining of progressively worsening right-sided headaches that are worst in the morning upon waking and occasionally awaken him from sleep. He initially attributed these to tension headaches and self-treated with over-the-counter ibuprofen with only partial relief. Over the past ten days, she has noticed increasing difficulty with his left hand \u2014 he has been dropping objects, had trouble buttoning his shirt, and his handwriting has become noticeably clumsier. She also reports subtle personality changes over the past two weeks, describing him as more irritable and less engaged in conversation than usual. Three days ago he began complaining of intermittent blurry vision, particularly in his left visual field, noting he bumped into a doorframe on his left side. This morning, while eating breakfast, his wife witnessed him suddenly stiffen, drop his fork, and fall from his chair onto the floor with rhythmic jerking of all four extremities lasting approximately 90 seconds. He was briefly unresponsive afterward and gradually became confused and drowsy. EMS was called and upon their arrival approximately 10 minutes later, he was postictal with slurred speech and marked left-sided weakness. He was transported to the emergency department where he has gradually become more alert over the past hour. He has no prior history of seizures. He denies recent head trauma, fever, neck stiffness, or weight loss, although his wife notes his appetite has been reduced over the past two weeks and he may have lost a few pounds."
+    "history_present_illness": "Mr. Kenji Watanabe is a 71-year-old right-handed retired mathematics teacher who presents to the emergency department after experiencing a witnessed generalized tonic-clonic seizure at home approximately two hours ago. His wife reports that over the past three weeks he has been complaining of progressively worsening right-sided headaches that are worst in the morning upon waking and occasionally awaken him from sleep. He initially attributed these to tension headaches and self-treated with over-the-counter ibuprofen with only partial relief. Over the past ten days, she has noticed increasing difficulty with his left hand — he has been dropping objects, had trouble buttoning his shirt, and his handwriting has become noticeably clumsier. She also reports subtle personality changes over the past two weeks, describing him as more irritable and less engaged in conversation than usual. Three days ago he began complaining of intermittent blurry vision, particularly in his left visual field, noting he bumped into a doorframe on his left side. This morning, while eating breakfast, his wife witnessed him suddenly stiffen, drop his fork, and fall from his chair onto the floor with rhythmic jerking of all four extremities lasting approximately 90 seconds. He was briefly unresponsive afterward and gradually became confused and drowsy. EMS was called and upon their arrival approximately 10 minutes later, he was postictal with slurred speech and marked left-sided weakness. He was transported to the emergency department where he has gradually become more alert over the past hour. He has no prior history of seizures. He denies recent head trauma, fever, neck stiffness, or weight loss, although his wife notes his appetite has been reduced over the past two weeks and he may have lost a few pounds."
   },
   "initial_tool_outputs": {
     "eeg": {
@@ -763,14 +763,26 @@
         "action": "Obtain emergent non-contrast CT head to evaluate for mass lesion, hemorrhage, or midline shift",
         "tool_name": "order_ct_scan",
         "expected_finding": "Large right frontal mass with surrounding edema and midline shift",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "angiography": false,
+          "contrast": false
+        }
       },
       {
         "step": 3,
         "action": "Obtain stat labs including CBC, BMP, coagulation studies, hepatic panel, and LDH",
         "tool_name": "interpret_labs",
         "expected_finding": "Normal baseline labs suitable for pre-surgical workup; mild hyperglycemia",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "LFT",
+            "coagulation"
+          ]
+        }
       },
       {
         "step": 4,
@@ -791,14 +803,21 @@
         "action": "Obtain brain MRI with and without gadolinium contrast to characterize the mass",
         "tool_name": "analyze_brain_mri",
         "expected_finding": "Large heterogeneously enhancing right frontoparietal mass with central necrosis, ring enhancement, and significant mass effect consistent with high-grade glioma",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "tumor",
+          "contrast": true
+        }
       },
       {
         "step": 7,
         "action": "Obtain EEG to characterize seizure focus and assess for subclinical seizure activity",
         "tool_name": "analyze_eeg",
         "expected_finding": "Focal slowing over right frontoparietal region with epileptiform discharges in peri-tumoral cortex",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "eeg_type": "routine"
+        }
       },
       {
         "step": 8,
@@ -812,21 +831,34 @@
         "action": "Order CT chest, abdomen, and pelvis to rule out primary malignancy (metastasis workup)",
         "tool_name": "interpret_labs",
         "expected_finding": "No evidence of systemic malignancy, supporting primary brain tumor diagnosis",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP"
+          ]
+        }
       },
       {
         "step": 10,
         "action": "Obtain MR perfusion to confirm elevated rCBV in enhancing components",
         "tool_name": "order_advanced_imaging",
         "expected_finding": "Elevated rCBV ratio in enhancing rim, consistent with high-grade neoplasm",
-        "category": "acceptable"
+        "category": "acceptable",
+        "tool_parameters": {
+          "imaging_type": "perfusion_MRI"
+        }
       },
       {
         "step": 11,
         "action": "Obtain functional MRI for pre-surgical motor and language mapping given proximity to motor cortex",
         "tool_name": "analyze_brain_mri",
         "expected_finding": "Motor cortex displaced but identifiable near tumor margin; language lateralized to contralateral hemisphere",
-        "category": "acceptable"
+        "category": "acceptable",
+        "tool_parameters": {
+          "protocol": "standard",
+          "contrast": false
+        }
       },
       {
         "step": 12,
@@ -867,7 +899,7 @@
   "metadata": {
     "version": "1.0",
     "created_by": "neurobench_generator",
-    "condition_name": "Brain tumor \u2014 high-grade glioma (GBM)",
+    "condition_name": "Brain tumor — high-grade glioma (GBM)",
     "difficulty_description": "Straightforward - classic presentation with progressive headache, left arm weakness, new-onset seizure, and a large right frontoparietal mass with midline shift on imaging",
     "expected_agent_confidence": "0.9",
     "clinical_pearls": [

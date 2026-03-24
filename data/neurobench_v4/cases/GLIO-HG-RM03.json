@@ -380,10 +380,10 @@
       },
       "interpretation": "Abnormal values: Hemoglobin 11.2 g/dL (L), Hematocrit 34.1 % (L), MCV 76.5 fL (L), ESR 28 mm/hr (H), CRP 5.2 mg/L (H).",
       "abnormal_values_summary": [
-        "Hemoglobin 11.2 g/dL (low) \u2014 mild anemia",
+        "Hemoglobin 11.2 g/dL (low) — mild anemia",
         "Hematocrit 34.1% (low)",
-        "MCV 76.5 fL (low) \u2014 microcytic",
-        "ESR 28 mm/hr (elevated) \u2014 non-specific",
+        "MCV 76.5 fL (low) — microcytic",
+        "ESR 28 mm/hr (elevated) — non-specific",
         "CRP 5.2 mg/L (borderline elevated)"
       ]
     },
@@ -561,7 +561,7 @@
         "findings": [
           {
             "region": "Pre-surgical fMRI assessment",
-            "signal": "motor_cortex: Primary motor cortex activation identified bilaterally. No overlap between tumor and primary motor areas.; language_areas: Not applicable \u2014 posterior fossa location is remote from cortical language areas; cerebellar_function: Right cerebellar activation during motor tasks is absent in the region of the tumor. Compensatory left cerebellar activation observed.",
+            "signal": "motor_cortex: Primary motor cortex activation identified bilaterally. No overlap between tumor and primary motor areas.; language_areas: Not applicable — posterior fossa location is remote from cortical language areas; cerebellar_function: Right cerebellar activation during motor tasks is absent in the region of the tumor. Compensatory left cerebellar activation observed.",
             "description": "Functional motor and language mapping"
           }
         ],
@@ -612,19 +612,19 @@
         "contraindications": [
           "Hypersensitivity to temozolomide or dacarbazine",
           "Severe hepatic or renal impairment (current labs show normal function)",
-          "Pregnancy \u2014 temozolomide is Category D; effective contraception required"
+          "Pregnancy — temozolomide is Category D; effective contraception required"
         ],
         "warnings": [
           "Myelosuppression: Monitor CBC weekly during concurrent phase, prior to each cycle during adjuvant phase. Absolute neutrophil count must be >1.5 x10^9/L and platelets >100 x10^9/L before each cycle.",
-          "Monitor for lymphopenia \u2014 PCP prophylaxis with trimethoprim-sulfamethoxazole recommended during concurrent phase. NOTE: Patient has sulfonamide allergy \u2014 use pentamidine inhalation or dapsone as alternative.",
+          "Monitor for lymphopenia — PCP prophylaxis with trimethoprim-sulfamethoxazole recommended during concurrent phase. NOTE: Patient has sulfonamide allergy — use pentamidine inhalation or dapsone as alternative.",
           "Hepatotoxicity: Monitor liver function tests periodically",
-          "Pre-existing anemia should be addressed \u2014 optimize iron supplementation before initiating myelosuppressive chemotherapy"
+          "Pre-existing anemia should be addressed — optimize iron supplementation before initiating myelosuppressive chemotherapy"
         ],
         "formulary_status": "Formulary approved, prior authorization required",
         "alternatives": [
-          "Lomustine (CCNU) \u2014 alternative nitrosourea if temozolomide not tolerated",
-          "Bevacizumab \u2014 may be considered for recurrent disease",
-          "Tumor Treating Fields (TTFields/Optune) \u2014 approved for supratentorial GBM, limited data for posterior fossa"
+          "Lomustine (CCNU) — alternative nitrosourea if temozolomide not tolerated",
+          "Bevacizumab — may be considered for recurrent disease",
+          "Tumor Treating Fields (TTFields/Optune) — approved for supratentorial GBM, limited data for posterior fossa"
         ]
       }
     },
@@ -687,42 +687,69 @@
         "action": "Obtain brain MRI with and without contrast to characterize the posterior fossa mass lesions",
         "tool_name": "analyze_brain_mri",
         "expected_finding": "Heterogeneously enhancing masses in the right cerebellar hemisphere and vermis with central necrosis, intratumoral hemorrhage, and obstructive hydrocephalus",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "tumor",
+          "contrast": true
+        }
       },
       {
         "step": 2,
         "action": "Obtain EEG to evaluate for subclinical seizure activity and assess cortical dysfunction",
         "tool_name": "analyze_eeg",
         "expected_finding": "Posterior-predominant intermittent slowing consistent with posterior fossa structural pathology",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "eeg_type": "routine"
+        }
       },
       {
         "step": 3,
         "action": "Order comprehensive laboratory workup including CBC, BMP, coagulation panel, hepatic panel as pre-surgical baseline",
         "tool_name": "interpret_labs",
         "expected_finding": "Mild microcytic anemia consistent with iron deficiency; normal coagulation and organ function for surgical clearance",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "LFT",
+            "coagulation"
+          ]
+        }
       },
       {
         "step": 4,
         "action": "Request MRI perfusion imaging to assess vascularity and support differentiation between high-grade glioma, metastasis, and other posterior fossa masses",
         "tool_name": "order_advanced_imaging",
         "expected_finding": "Elevated rCBV in the enhancing rim favoring high-grade neoplasm",
-        "category": "acceptable"
+        "category": "acceptable",
+        "tool_parameters": {
+          "imaging_type": "perfusion_MRI"
+        }
       },
       {
         "step": 5,
         "action": "Request MR spectroscopy for metabolic characterization of the lesion",
         "tool_name": "order_advanced_imaging",
         "expected_finding": "Elevated choline, reduced NAA, lipid/lactate peaks consistent with high-grade glioma",
-        "category": "acceptable"
+        "category": "acceptable",
+        "tool_parameters": {
+          "imaging_type": "MR_spectroscopy"
+        }
       },
       {
         "step": 6,
         "action": "Order CT chest, abdomen, and pelvis to rule out primary extracranial malignancy (metastatic workup)",
         "tool_name": "interpret_labs",
         "expected_finding": "No evidence of extracranial primary malignancy, supporting primary CNS tumor",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP"
+          ]
+        }
       },
       {
         "step": 7,
@@ -736,7 +763,13 @@
         "action": "Obtain tissue diagnosis through stereotactic biopsy or surgical resection with molecular testing (IDH, MGMT, 1p/19q, EGFR, TERT)",
         "tool_name": "interpret_labs",
         "expected_finding": "Glioblastoma, IDH-wildtype, WHO Grade 4 with MGMT promoter methylation",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP"
+          ]
+        }
       },
       {
         "step": 9,
@@ -754,29 +787,29 @@
       }
     ],
     "critical_actions": [
-      "Obtain brain MRI with contrast to characterize the posterior fossa mass \u2014 CT alone is insufficient for surgical planning and differentiation of posterior fossa tumors",
-      "Urgently address obstructive hydrocephalus \u2014 neurosurgical consultation for possible external ventricular drain or ventriculostomy before definitive tumor surgery",
-      "Obtain tissue diagnosis via biopsy or resection \u2014 do not treat empirically based on imaging alone",
+      "Obtain brain MRI with contrast to characterize the posterior fossa mass — CT alone is insufficient for surgical planning and differentiation of posterior fossa tumors",
+      "Urgently address obstructive hydrocephalus — neurosurgical consultation for possible external ventricular drain or ventriculostomy before definitive tumor surgery",
+      "Obtain tissue diagnosis via biopsy or resection — do not treat empirically based on imaging alone",
       "Perform metastatic workup (CT chest/abdomen/pelvis) to rule out extracranial primary malignancy before assuming primary CNS tumor",
-      "Request molecular testing including IDH status, MGMT promoter methylation, and 1p/19q codeletion on tissue \u2014 these guide treatment decisions and prognosis",
-      "Note the sulfonamide allergy when planning PCP prophylaxis during temozolomide treatment \u2014 use alternative agents such as pentamidine or dapsone"
+      "Request molecular testing including IDH status, MGMT promoter methylation, and 1p/19q codeletion on tissue — these guide treatment decisions and prognosis",
+      "Note the sulfonamide allergy when planning PCP prophylaxis during temozolomide treatment — use alternative agents such as pentamidine or dapsone"
     ],
     "contraindicated_actions": [
-      "Performing lumbar puncture in the setting of obstructive hydrocephalus and posterior fossa mass effect \u2014 risk of transtentorial or tonsillar herniation",
-      "Empirically treating with high-dose corticosteroids before imaging \u2014 could obscure diagnosis if CNS lymphoma is in the differential",
+      "Performing lumbar puncture in the setting of obstructive hydrocephalus and posterior fossa mass effect — risk of transtentorial or tonsillar herniation",
+      "Empirically treating with high-dose corticosteroids before imaging — could obscure diagnosis if CNS lymphoma is in the differential",
       "Delaying neurosurgical consultation in the presence of obstructive hydrocephalus and signs of elevated intracranial pressure",
       "Administering trimethoprim-sulfamethoxazole for PCP prophylaxis given the documented sulfonamide allergy",
       "Initiating temozolomide without confirming histopathological diagnosis and molecular markers",
       "Ignoring the pre-existing iron deficiency anemia before myelosuppressive chemotherapy"
     ],
     "key_reasoning_points": [
-      "Posterior fossa masses in young adults require a broad differential including hemangioblastoma, medulloblastoma, ependymoma, pilocytic astrocytoma, and metastases \u2014 cerebellar GBM is rare but must be considered when imaging shows infiltrative margins with heterogeneous enhancement and necrosis",
+      "Posterior fossa masses in young adults require a broad differential including hemangioblastoma, medulloblastoma, ependymoma, pilocytic astrocytoma, and metastases — cerebellar GBM is rare but must be considered when imaging shows infiltrative margins with heterogeneous enhancement and necrosis",
       "The irregular contours, heterogeneous ring enhancement with central necrosis, and intratumoral hemorrhage on MRI are characteristic of GBM and help distinguish it from hemangioblastoma (cystic with mural nodule) and metastases (well-defined borders with disproportionate edema)",
       "Obstructive hydrocephalus from fourth ventricle compression is a neurosurgical emergency requiring urgent management before definitive tumor surgery",
       "Negative metastatic workup (CT chest/abdomen/pelvis) supports a primary CNS neoplasm rather than cerebellar metastasis, despite the family history of breast and ovarian cancer which may raise clinical suspicion for metastatic disease",
       "Family history of breast and ovarian cancer (maternal side) is a red herring for the brain lesion diagnosis but should prompt genetic counseling for BRCA testing independent of the current neurological presentation",
-      "MGMT promoter methylation status is critical for treatment planning \u2014 methylated MGMT predicts better response to temozolomide, which is part of the standard Stupp protocol for GBM",
-      "The sulfonamide allergy is clinically significant because standard PCP prophylaxis during temozolomide treatment uses trimethoprim-sulfamethoxazole \u2014 the agent must recognize this and recommend alternatives"
+      "MGMT promoter methylation status is critical for treatment planning — methylated MGMT predicts better response to temozolomide, which is part of the standard Stupp protocol for GBM",
+      "The sulfonamide allergy is clinically significant because standard PCP prophylaxis during temozolomide treatment uses trimethoprim-sulfamethoxazole — the agent must recognize this and recommend alternatives"
     ]
   },
   "metadata": {
@@ -784,7 +817,7 @@
     "source_pmcid": "PMC3538693",
     "source_license": "CC-BY 4.0",
     "generation_method": "real_case_seed",
-    "condition_name": "Brain tumor \u2014 high-grade glioma (GBM)",
+    "condition_name": "Brain tumor — high-grade glioma (GBM)",
     "difficulty_description": "Moderate difficulty due to atypical patient age (young adult) for GBM, posterior fossa location which is uncommon for GBM, family history of breast/ovarian cancer acting as a red herring for metastatic disease, and imaging differential that includes hemangioblastoma and other posterior fossa tumors. The diagnosis requires integrating imaging characteristics with clinical context and ruling out alternative etiologies.",
     "expected_agent_confidence": 0.65
   }

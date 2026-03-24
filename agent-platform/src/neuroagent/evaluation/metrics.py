@@ -366,13 +366,18 @@ class MetricsCalculator:
 
     @staticmethod
     def _compute_optimal_cost(ground_truth: GroundTruth) -> float:
-        """Estimate optimal cost from ground truth tool names using base rates."""
+        """Estimate optimal cost from ground truth optimal actions.
+
+        Uses ``tool_parameters`` when available for accurate modifier-aware
+        costing (e.g. MRI+contrast, video EEG).  Falls back to base rates
+        for actions without explicit parameters.
+        """
         from ..tools.cost_tracker import CostTracker
 
         tracker = CostTracker()
         for step in ground_truth.optimal_actions:
             if step.tool_name:
-                tracker.compute_cost(step.tool_name, {})
+                tracker.compute_cost(step.tool_name, step.tool_parameters)
         return tracker.total_cost_usd
 
     def _compute_safety_score(self, metrics: CaseMetrics) -> float:

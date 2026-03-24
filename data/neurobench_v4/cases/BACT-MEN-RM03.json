@@ -84,7 +84,7 @@
       "reflexes": "Biceps 2+ bilaterally, triceps 2+ bilaterally, brachioradialis 2+ bilaterally, patellar 3+ bilaterally, Achilles 1+ bilaterally. Plantar responses are extensor (upgoing) on the left and equivocal on the right.",
       "coordination": "Finger-to-nose mildly dysmetric bilaterally, though limited by decreased alertness. Heel-to-shin not reliably performed.",
       "gait": "Previously noted to have a shuffling, small-step gait with difficulty turning on prior clinic visits. Currently unable to stand unassisted due to somnolence and unsteadiness. Required wheelchair transport to the emergency department.",
-      "additional": "Nuchal rigidity present \u2014 moderate resistance to passive neck flexion. Kernig sign positive bilaterally. Brudzinski sign positive \u2014 involuntary hip and knee flexion with passive neck flexion. No petechiae or purpura on skin examination. No lymphadenopathy. Small well-healed left upper quadrant surgical scar consistent with prior splenectomy."
+      "additional": "Nuchal rigidity present — moderate resistance to passive neck flexion. Kernig sign positive bilaterally. Brudzinski sign positive — involuntary hip and knee flexion with passive neck flexion. No petechiae or purpura on skin examination. No lymphadenopathy. Small well-healed left upper quadrant surgical scar consistent with prior splenectomy."
     },
     "vitals": {
       "bp_systolic": 148,
@@ -425,7 +425,7 @@
       "glucose_ratio": "0.14 (serum glucose 227 mg/dL)",
       "special_tests": {
         "Gram_stain": "No organisms identified (negative)",
-        "Bacterial_culture": "Pending \u2014 final results at 48 hours",
+        "Bacterial_culture": "Pending — final results at 48 hours",
         "India_ink": "Negative",
         "Cryptococcal_antigen": "Negative",
         "AFB_stain": "Negative",
@@ -499,7 +499,7 @@
           "Blood Cultures": [
             {
               "test": "Aerobic bottle",
-              "value": "Streptococcus pneumoniae (penicillin MIC 0.06 ug/mL \u2014 susceptible)",
+              "value": "Streptococcus pneumoniae (penicillin MIC 0.06 ug/mL — susceptible)",
               "unit": "",
               "reference_range": "No growth expected",
               "is_abnormal": true,
@@ -549,7 +549,7 @@
             }
           ]
         },
-        "interpretation": "Abnormal values: Aerobic bottle Streptococcus pneumoniae (penicillin MIC 0.06 ug/mL \u2014 susceptible)  (H), Time to positivity 14 hours hours (H).",
+        "interpretation": "Abnormal values: Aerobic bottle Streptococcus pneumoniae (penicillin MIC 0.06 ug/mL — susceptible)  (H), Time to positivity 14 hours hours (H).",
         "abnormal_values_summary": [
           "Blood culture positive: Streptococcus pneumoniae (aerobic bottle, 14 hours) (H)",
           "Penicillin susceptible (MIC 0.06 ug/mL)"
@@ -726,10 +726,10 @@
         "contraindications": [],
         "warnings": [
           "Dexamethasone may mask fever, complicating clinical monitoring of treatment response",
-          "May worsen hyperglycemia in diabetic patients \u2014 frequent blood glucose monitoring recommended",
+          "May worsen hyperglycemia in diabetic patients — frequent blood glucose monitoring recommended",
           "Hold metformin during acute illness with elevated creatinine to reduce risk of lactic acidosis"
         ],
-        "formulary_status": "Available \u2014 standard formulary",
+        "formulary_status": "Available — standard formulary",
         "alternatives": []
       }
     },
@@ -789,7 +789,7 @@
       },
       {
         "diagnosis": "Carcinomatous meningitis",
-        "likelihood": "Low \u2014 no known malignancy, leptomeningeal enhancement now explained by infection, but was reasonably considered on imaging differential"
+        "likelihood": "Low — no known malignancy, leptomeningeal enhancement now explained by infection, but was reasonably considered on imaging differential"
       }
     ],
     "optimal_actions": [
@@ -798,7 +798,11 @@
         "action": "Obtain CT head to rule out mass lesion or herniation risk before lumbar puncture",
         "tool_name": "order_ct_scan",
         "expected_finding": "Communicating hydrocephalus without mass lesion, safe to proceed with LP",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "angiography": false,
+          "contrast": false
+        }
       },
       {
         "step": 2,
@@ -812,35 +816,64 @@
         "action": "Perform lumbar puncture with CSF analysis including cell count, protein, glucose, Gram stain, culture, and opening pressure",
         "tool_name": "analyze_csf",
         "expected_finding": "Turbid CSF, elevated opening pressure, neutrophilic pleocytosis, elevated protein, low glucose, positive pneumococcal antigen",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "special_tests": [
+            "meningitis_panel"
+          ]
+        }
       },
       {
         "step": 4,
         "action": "Obtain blood cultures before starting antibiotics",
         "tool_name": "interpret_labs",
         "expected_finding": "Streptococcus pneumoniae bacteremia",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP"
+          ]
+        }
       },
       {
         "step": 5,
         "action": "Order comprehensive blood work including CBC, BMP, inflammatory markers, coagulation studies, and blood glucose",
         "tool_name": "interpret_labs",
         "expected_finding": "Leukocytosis with left shift, elevated CRP and procalcitonin, hyponatremia, hyperglycemia",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "coagulation",
+            "inflammatory_markers"
+          ]
+        }
       },
       {
         "step": 6,
         "action": "Order brain MRI with contrast to evaluate for complications such as empyema, cerebritis, or infarction",
         "tool_name": "analyze_brain_mri",
         "expected_finding": "Leptomeningeal enhancement with communicating hydrocephalus, no abscess or empyema",
-        "category": "required"
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "standard",
+          "contrast": true
+        }
       },
       {
         "step": 7,
         "action": "Order CSF meningitis/encephalitis multiplex PCR panel for rapid pathogen identification",
         "tool_name": "interpret_labs",
         "expected_finding": "Streptococcus pneumoniae detected",
-        "category": "acceptable"
+        "category": "acceptable",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP"
+          ]
+        }
       },
       {
         "step": 8,
@@ -868,7 +901,13 @@
         "action": "Order audiometry to assess for sensorineural hearing loss as complication of pneumococcal meningitis",
         "tool_name": "interpret_labs",
         "expected_finding": "Bilateral sensorineural hearing loss, worse on left",
-        "category": "acceptable"
+        "category": "acceptable",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP"
+          ]
+        }
       }
     ],
     "critical_actions": [
@@ -891,11 +930,11 @@
       "The subacute presentation with gait disturbance and cognitive decline initially mimics normal pressure hydrocephalus, which was the initial working diagnosis based on imaging findings of communicating hydrocephalus",
       "The acute deterioration with fever, meningeal signs, and altered sensorium signals a new or previously unrecognized infectious process superimposed on the chronic presentation",
       "The patient's asplenic status (post-splenectomy for ITP) and diabetes create significant immunocompromise, particularly for encapsulated organisms like Streptococcus pneumoniae",
-      "Prior partial treatment with oral amoxicillin-clavulanate explains the negative Gram stain but does not exclude bacterial meningitis \u2014 the latex agglutination test for pneumococcal antigen remains positive despite antibiotics",
+      "Prior partial treatment with oral amoxicillin-clavulanate explains the negative Gram stain but does not exclude bacterial meningitis — the latex agglutination test for pneumococcal antigen remains positive despite antibiotics",
       "CSF profile showing neutrophilic pleocytosis, markedly elevated protein, and critically low glucose with very low CSF-to-serum glucose ratio (0.14) is characteristic of bacterial meningitis",
       "The communicating hydrocephalus may be secondary to meningeal inflammation impairing CSF resorption, rather than representing idiopathic NPH",
-      "Cryptococcal and tuberculous meningitis must be excluded in an immunocompromised patient with subacute meningitis and hydrocephalus \u2014 negative India ink, cryptococcal antigen, AFB stain, and TB PCR effectively exclude these",
-      "Source case (PMC10598285) was cryptococcal meningitis presenting as NPH \u2014 this case uses the same initial diagnostic challenge but pivots to bacterial meningitis confirmed by pneumococcal antigen"
+      "Cryptococcal and tuberculous meningitis must be excluded in an immunocompromised patient with subacute meningitis and hydrocephalus — negative India ink, cryptococcal antigen, AFB stain, and TB PCR effectively exclude these",
+      "Source case (PMC10598285) was cryptococcal meningitis presenting as NPH — this case uses the same initial diagnostic challenge but pivots to bacterial meningitis confirmed by pneumococcal antigen"
     ]
   },
   "metadata": {
