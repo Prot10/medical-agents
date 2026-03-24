@@ -53,14 +53,6 @@ class AgentConfig:
     excluded_tools: list[str] | None = None
     all_info_upfront: bool = False  # If True, give all tool outputs at once
 
-    # Dual-model specialist (optional — disabled by default for backward compat)
-    specialist_enabled: bool = False
-    specialist_base_url: str = "http://localhost:8001/v1"
-    specialist_model: str = "google/medgemma-1.5-4b-it"
-    specialist_api_key: str = "not-needed"
-    specialist_temperature: float = 0.3  # Lower temp for deterministic specialist
-    specialist_max_tokens: int = 4096
-
 
 class AgentOrchestrator:
     """Main agent implementing the ReAct loop for clinical reasoning."""
@@ -440,6 +432,7 @@ class AgentOrchestrator:
         """
         trace = AgentTrace(case_id=case_id)
         trace.start_timer()
+        self.cost_tracker.reset()
 
         combined = (
             f"{patient_info}\n\n"

@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
 from ..llm.client import LLMClient
-from .base import BaseTool, ToolCall, ToolResult
+from .base import BaseTool, ToolResult
+from .mock_server import MockServer
 
 _PROMPT_DIR = Path(__file__).resolve().parent.parent.parent.parent / "config" / "system_prompts"
 
@@ -90,13 +90,13 @@ class MedicalSpecialistTool(BaseTool):
 
     def __init__(
         self,
-        mock_server: Any | None = None,
+        mock_server: MockServer | None = None,
         specialist_client: LLMClient | None = None,
     ):
         self.mock_server = mock_server
         self.specialist_client = specialist_client
 
-    def execute(self, parameters: dict) -> ToolResult:
+    def execute(self, parameters: dict[str, Any]) -> ToolResult:
         # Evaluation mode — delegate to MockServer
         if self.mock_server is not None:
             return self.mock_server.get_output(self.name, parameters)

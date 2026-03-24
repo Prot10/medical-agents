@@ -65,8 +65,6 @@ class LLMClient:
         self.top_p = top_p
         self.presence_penalty = presence_penalty
         self.extra_body = extra_body or {}
-        # Detect Ollama backend (native API has thinking support)
-        self._is_ollama = "11434" in base_url
 
     def chat(
         self,

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import time
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 
 
 class AgentTurn(BaseModel):

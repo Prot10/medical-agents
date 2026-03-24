@@ -193,7 +193,6 @@ def test_live_dual_model():
     config = AgentConfig(
         base_url="http://localhost:8000/v1",
         model="Qwen/Qwen3.5-9B",
-        specialist_enabled=True,
     )
     agent = AgentOrchestrator(
         config=config,

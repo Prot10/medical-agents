@@ -106,7 +106,6 @@ async def _stream_agent_events(
 
     config = AgentConfig(
         base_url=base_url, model=model_hf_id, api_key=api_key,
-        specialist_enabled=dual_model,
     )
     agent = AgentOrchestrator(
         config=config, tool_registry=tool_registry, rules_engine=rules_engine,

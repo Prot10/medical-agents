@@ -85,7 +85,7 @@ class MockServer:
 
         return None
 
-    def _synthesize_specialist_opinion(self, parameters: dict[str, Any]) -> BaseModel | None:
+    def _synthesize_specialist_opinion(self, parameters: dict[str, Any]) -> ToolResult:
         """Synthesize a specialist opinion from the case's ground truth.
 
         In evaluation mode, the specialist "knows" the correct reasoning and
@@ -93,7 +93,6 @@ class MockServer:
         what a real specialist consultation would provide.
         """
         gt = self.case.ground_truth
-        question = parameters.get("specific_question", "")
 
         # Build a helpful (but not answer-giving) specialist response
         parts = ["### Specialist Opinion"]
