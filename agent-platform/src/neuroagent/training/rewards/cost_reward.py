@@ -23,6 +23,7 @@ DEFAULT_TOOL_COSTS: dict[str, float] = {
     "order_specialized_test": 600,
     "search_medical_literature": 0,
     "check_drug_interactions": 0,
+    "consult_medical_specialist": 75,
 }
 
 

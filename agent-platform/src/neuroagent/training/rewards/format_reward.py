@@ -34,6 +34,12 @@ class FormatReward:
         "analyze_csf",
         "search_medical_literature",
         "check_drug_interactions",
+        "order_ct_scan",
+        "order_echocardiogram",
+        "order_cardiac_monitoring",
+        "order_advanced_imaging",
+        "order_specialized_test",
+        "consult_medical_specialist",
     })
 
     def compute(
