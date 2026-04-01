@@ -1,4 +1,4 @@
-# NeuroBench Condition Specifications — Expanded Set (10 conditions)
+# NeuroBench Condition Specifications — Expanded Set (20 conditions)
 # Each condition defines clinical parameters, expected findings per modality,
 # and difficulty variants for case generation.
 
@@ -829,3 +829,1022 @@ functional_neurological_disorder:
     - trigger_action: "request_psychiatric_evaluation"
       tool_name: "interpret_labs"
       description: "Formal psychiatric evaluation for comorbid anxiety, depression, trauma history"
+
+guillain_barre:
+  name: "Guillain-Barré syndrome (AIDP)"
+  abbreviation: "GBS"
+  icd_code: "G61.0"
+  description: "Acute inflammatory demyelinating polyradiculoneuropathy causing ascending flaccid paralysis, often triggered by preceding infection"
+  typical_demographics:
+    age_range: [20, 70]
+    sex_bias: "slight_male"
+  encounter_type: "emergency"
+  required_modalities: [LABS, CSF, specialized_test]
+  optional_modalities: [MRI, ECG]
+  key_findings:
+    labs:
+      all_difficulties:
+        - "CBC: may show mild leukocytosis"
+        - "BMP: normal electrolytes; hyponatremia (SIADH) possible in severe cases"
+        - "Campylobacter jejuni serology: positive in ~30% (post-infectious trigger)"
+        - "CMV, EBV, Mycoplasma serology: possible antecedent infection"
+        - "Anti-ganglioside antibodies: anti-GM1 (motor-predominant), anti-GQ1b (Miller-Fisher)"
+        - "ESR/CRP: mildly elevated or normal"
+    csf:
+      straightforward:
+        - "Opening pressure normal"
+        - "Albumino-cytologic dissociation: elevated protein (100-400 mg/dL) with WBC <10 cells"
+        - "Glucose: normal"
+        - "No organisms on Gram stain/culture"
+      moderate:
+        - "Mildly elevated protein (50-100 mg/dL) with normal cell count"
+        - "Early presentation: CSF protein may be normal in first 1-2 weeks"
+      diagnostic_puzzle:
+        - "CSF protein only borderline elevated (45-55 mg/dL)"
+        - "Mild pleocytosis (10-30 cells) — consider HIV-associated GBS"
+        - "Normal CSF early in acute phase"
+    specialized_test:
+      straightforward:
+        - "Nerve conduction studies (NCS): markedly prolonged distal motor latencies"
+        - "Reduced or absent motor nerve conduction velocities (<70% lower limit of normal)"
+        - "Absent or prolonged F-waves and H-reflex (early proximal demyelination)"
+        - "Reduced CMAP amplitudes bilaterally"
+        - "Sensory NCS: absent or reduced SNAPs"
+        - "EMG: reduced recruitment without fibrillations acutely (early AIDP)"
+      moderate:
+        - "Mild NCS slowing, borderline demyelinating criteria"
+        - "Asymmetric nerve involvement"
+        - "Early study: only prolonged distal latencies, F-waves not yet absent"
+      diagnostic_puzzle:
+        - "AMSAN variant: normal motor conduction velocities, severely reduced CMAP amplitudes (axonal)"
+        - "Miller-Fisher variant: isolated cranial nerve findings, minimal limb NCS abnormality"
+        - "Equivocal NCS in first 48-72 hours — may need repeat study at 1-2 weeks"
+    mri:
+      straightforward:
+        - "Enhancement of cauda equina nerve roots on contrast MRI spine (lumbosacral)"
+        - "Enhancement of cranial nerves (VII, IX, X) in severe cases"
+      moderate:
+        - "Subtle nerve root enhancement on lumbosacral MRI"
+        - "No significant cord signal change"
+      diagnostic_puzzle:
+        - "Normal spine MRI (enhancement not always present)"
+        - "Cord T2 signal changes raising concern for myelitis (differentiates from transverse myelitis)"
+    ecg:
+      all_difficulties:
+        - "Sinus tachycardia (autonomic dysfunction)"
+        - "OR: sinus bradycardia requiring temporary pacing in severe autonomic involvement"
+        - "T-wave changes or QTc prolongation possible in dysautonomia"
+        - "Arrhythmias (AF, ventricular ectopy) in severe autonomic instability"
+  differential_diagnoses:
+    - diagnosis: "Transverse myelitis"
+      key_distinguishing: "Spinal cord T2 signal on MRI, sensory level, upper motor neuron signs, sphincter dysfunction"
+    - diagnosis: "CIDP (chronic inflammatory demyelinating polyneuropathy)"
+      key_distinguishing: "Onset >8 weeks, relapsing-remitting course, responds to long-term immunotherapy"
+    - diagnosis: "Botulism"
+      key_distinguishing: "Descending paralysis, cranial nerve palsies first, autonomic involvement, no sensory symptoms, toxin assay"
+    - diagnosis: "Tick paralysis"
+      key_distinguishing: "Ascending paralysis, tick found on scalp, resolves rapidly after tick removal"
+    - diagnosis: "Spinal cord compression"
+      key_distinguishing: "Back pain, upper motor neuron signs below level, MRI shows compression"
+  difficulty_variants:
+    straightforward:
+      presentation: "35-year-old with progressive ascending leg weakness and areflexia over 5 days, preceded by campylobacter gastroenteritis 2 weeks prior. Unable to walk. Classic albumino-cytologic dissociation."
+      expected_agent_confidence: 0.88
+    moderate:
+      presentation: "50-year-old with 10-day history of bilateral foot numbness, progressive leg weakness, and facial diplegia. Respiratory function mildly reduced. LP shows borderline protein."
+      expected_agent_confidence: 0.62
+    diagnostic_puzzle:
+      presentation: "28-year-old with acute diplopia, ataxia, and areflexia — no limb weakness (Miller-Fisher variant). Initial workup focused on brainstem stroke. Anti-GQ1b pending."
+      expected_agent_confidence: 0.38
+  common_followups:
+    - trigger_action: "request_repeat_ncs"
+      tool_name: "order_specialized_test"
+      description: "Repeat NCS at 1-2 weeks to fully characterize demyelinating vs axonal subtype"
+    - trigger_action: "request_respiratory_monitoring"
+      tool_name: "interpret_labs"
+      description: "Serial FVC and NIF for respiratory failure monitoring (intubation threshold: FVC <20 mL/kg)"
+    - trigger_action: "request_anti_ganglioside_panel"
+      tool_name: "interpret_labs"
+      description: "Anti-GM1, anti-GD1a, anti-GQ1b, anti-GD1b antibody panel"
+    - trigger_action: "request_spine_mri_contrast"
+      tool_name: "order_advanced_imaging"
+      description: "MRI lumbosacral spine with gadolinium for nerve root enhancement"
+    - trigger_action: "request_cardiac_monitoring"
+      tool_name: "order_cardiac_monitoring"
+      description: "Continuous telemetry for autonomic dysrhythmias"
+
+myasthenia_gravis:
+  name: "Myasthenia gravis"
+  abbreviation: "MG"
+  icd_code: "G70.0"
+  description: "Autoimmune disorder of the neuromuscular junction caused by antibodies against AChR or MuSK, presenting with fatigable weakness"
+  typical_demographics:
+    age_range: [20, 70]
+    sex_bias: "female_predominant"
+  encounter_type: "inpatient"
+  required_modalities: [LABS, specialized_test, CT]
+  optional_modalities: [MRI]
+  key_findings:
+    labs:
+      straightforward:
+        - "Anti-AChR (acetylcholine receptor) antibodies: positive (present in ~85% generalized MG)"
+        - "Binding, blocking, and modulating antibody titers elevated"
+        - "Thyroid function: may show concurrent autoimmune thyroid disease"
+        - "CBC, BMP: normal"
+        - "Anti-striated muscle antibodies: positive (associated with thymoma)"
+      moderate:
+        - "Anti-AChR antibodies: borderline positive or weakly positive"
+        - "Anti-MuSK antibodies: positive in ~40% of AChR-negative patients"
+        - "Thyroid peroxidase antibodies: positive (concurrent autoimmunity)"
+      diagnostic_puzzle:
+        - "Seronegative MG: anti-AChR and anti-MuSK both negative (~10% of generalized MG)"
+        - "Anti-LRP4 antibodies may be detectable in seronegative cases"
+        - "Paraneoplastic antibody panel to exclude thymoma-related seronegativity"
+    specialized_test:
+      straightforward:
+        - "Repetitive nerve stimulation (RNS) at 3 Hz: decremental CMAP response ≥10% (pathognomonic)"
+        - "Single-fiber EMG (SFEMG): increased jitter and blocking (most sensitive test, >95% sensitivity)"
+        - "Post-exercise facilitation then exhaustion pattern"
+        - "Tensilon (edrophonium) test: dramatic improvement of ptosis/ophthalmoplegia"
+      moderate:
+        - "RNS at 3 Hz: borderline decrement 8-10%"
+        - "SFEMG: mildly increased jitter without blocking"
+        - "Fatigable ptosis and diplopia on sustained upgaze (>60 seconds)"
+      diagnostic_puzzle:
+        - "Ocular MG: normal repetitive stimulation on limb muscles"
+        - "RNS negative, SFEMG not yet performed"
+        - "Lambert-Eaton-like facilitation pattern causing diagnostic confusion (rare MG variant)"
+    ct:
+      straightforward:
+        - "Anterior mediastinal mass on CT chest: thymoma (well-encapsulated or invasive)"
+        - "Thymoma present in ~15% of MG patients"
+        - "Enhancing anterior mediastinal mass consistent with Type B2 thymoma"
+      moderate:
+        - "Thymic hyperplasia on CT chest (enlarged but not mass-like)"
+        - "Indeterminate anterior mediastinal density requiring PET or biopsy"
+      diagnostic_puzzle:
+        - "Normal CT chest (no thymic pathology)"
+        - "Age-involuted thymus — no residual tissue identified"
+    mri:
+      all_difficulties:
+        - "Normal brain MRI (rules out brainstem lesion causing cranial nerve palsies)"
+        - "No enhancement of cranial nerves"
+        - "No structural cause for ophthalmoplegia (rules out cavernous sinus lesion)"
+  differential_diagnoses:
+    - diagnosis: "Lambert-Eaton myasthenic syndrome (LEMS)"
+      key_distinguishing: "Proximal limb weakness > ocular symptoms, incremental CMAP on high-rate RNS, anti-VGCC antibodies, associated with SCLC"
+    - diagnosis: "Botulism"
+      key_distinguishing: "Descending paralysis, fixed dilated pupils, no fatigability pattern, toxin assay positive"
+    - diagnosis: "Brainstem stroke"
+      key_distinguishing: "Acute onset, DWI restriction on MRI, other brainstem signs, non-fatigable diplopia"
+    - diagnosis: "Multiple sclerosis"
+      key_distinguishing: "MRI white matter lesions, CSF oligoclonal bands, internuclear ophthalmoplegia"
+    - diagnosis: "Thyroid ophthalmopathy (Graves)"
+      key_distinguishing: "Proptosis, lid retraction, anti-thyroid antibodies, restricted EOM on MRI orbits"
+  difficulty_variants:
+    straightforward:
+      presentation: "35-year-old woman with 3-month progressive ptosis, diplopia worsening at end of day, and proximal arm fatigue. AChR antibodies markedly elevated. Chest CT shows anterior mediastinal mass."
+      expected_agent_confidence: 0.88
+    moderate:
+      presentation: "52-year-old man with fatigable bilateral ptosis and dysphagia over 4 months. AChR antibody borderline positive. RNS shows 9% decrement."
+      expected_agent_confidence: 0.62
+    diagnostic_puzzle:
+      presentation: "45-year-old woman with fluctuating dysarthria and dysphagia over 6 months, initially attributed to anxiety. AChR and MuSK antibodies negative. SFEMG not yet performed."
+      expected_agent_confidence: 0.35
+  common_followups:
+    - trigger_action: "request_sfemg"
+      tool_name: "order_specialized_test"
+      description: "Single-fiber EMG of orbicularis oculi or extensor digitorum communis"
+    - trigger_action: "request_repetitive_stimulation"
+      tool_name: "order_specialized_test"
+      description: "3 Hz repetitive nerve stimulation of multiple muscle groups"
+    - trigger_action: "request_musk_antibodies"
+      tool_name: "interpret_labs"
+      description: "Anti-MuSK and anti-LRP4 antibody testing for seronegative MG"
+    - trigger_action: "request_pulmonary_function"
+      tool_name: "interpret_labs"
+      description: "Spirometry and NIF for bulbar/respiratory involvement (myasthenic crisis risk)"
+    - trigger_action: "request_thymectomy_evaluation"
+      tool_name: "order_ct_scan"
+      description: "CT chest for thymoma staging and surgical planning"
+
+subarachnoid_hemorrhage:
+  name: "Aneurysmal subarachnoid hemorrhage"
+  abbreviation: "SAH"
+  icd_code: "I60.9"
+  description: "Life-threatening intracranial hemorrhage into the subarachnoid space, most commonly from rupture of an intracranial aneurysm"
+  typical_demographics:
+    age_range: [40, 70]
+    sex_bias: "slight_female"
+  encounter_type: "emergency"
+  required_modalities: [CT, LABS, CSF, advanced_imaging]
+  optional_modalities: [ECG]
+  key_findings:
+    ct:
+      straightforward:
+        - "Hyperdense blood in basal cisterns (suprasellar, sylvian fissures, interhemispheric)"
+        - "Fisher grade 3-4: thick subarachnoid clot and/or intraventricular blood"
+        - "Hydrocephalus (acute communicating) due to CSF outflow obstruction"
+        - "Possible intracerebral extension or subdural hematoma"
+        - "CT sensitivity >98% within 6 hours of ictus"
+      moderate:
+        - "Thin subarachnoid blood — Fisher grade 2"
+        - "Blood in Sylvian fissure only, no hydrocephalus"
+        - "Sentinel bleed: small subarachnoid or focal hyperdensity"
+      diagnostic_puzzle:
+        - "CT negative (occurs in ~5% of SAH, especially >6-12 hours after ictus)"
+        - "Subtle sulcal effacement without obvious hyperdensity"
+        - "CT artifact or isodense blood in anemic patient"
+    csf:
+      straightforward:
+        - "Grossly bloody CSF, non-clearing across tubes 1-4"
+        - "Xanthochromia (yellow CSF) on spectrophotometry — definitive for SAH when CT negative"
+        - "Elevated RBC count (>100,000/μL)"
+        - "Elevated protein due to blood breakdown"
+        - "Opening pressure elevated"
+      moderate:
+        - "Bloody tap with partial clearing (tubes 1-4) — traumatic tap vs SAH"
+        - "Xanthochromia present but CT was negative"
+      diagnostic_puzzle:
+        - "LP done <2 hours after ictus: xanthochromia not yet developed"
+        - "Traumatic tap with equivocal clearing across tubes"
+        - "Late presentation (>2 weeks): RBCs cleared, only xanthochromia remains"
+    labs:
+      all_difficulties:
+        - "CBC: leukocytosis (stress response)"
+        - "BMP: hyponatremia (cerebral salt wasting or SIADH post-SAH)"
+        - "Coagulation: PT/INR, PTT — baseline before intervention"
+        - "Troponin: elevated in 20-30% (neurogenic myocardial injury, Takotsubo)"
+        - "BNP: may be elevated (neurogenic cardiac injury)"
+        - "Glucose: elevated (stress hyperglycemia)"
+    advanced_imaging:
+      straightforward:
+        - "CT angiography (CTA): saccular aneurysm identified at anterior communicating artery (most common)"
+        - "OR: posterior communicating artery aneurysm with irregular lobulation"
+        - "Aneurysm neck and dome measurements for endovascular planning"
+        - "No vasospasm acutely"
+      moderate:
+        - "CTA: small aneurysm (<5 mm) at MCA bifurcation, difficult to characterize"
+        - "Possible second incidental aneurysm — identify ruptured vs unruptured"
+      diagnostic_puzzle:
+        - "CTA negative: no aneurysm seen (perimesencephalic SAH pattern on CT — benign)"
+        - "Multiple aneurysms: determining which one bled"
+        - "Mycotic or fusiform aneurysm — atypical morphology"
+    ecg:
+      all_difficulties:
+        - "Diffuse deep T-wave inversions (neurogenic T-waves)"
+        - "QTc prolongation"
+        - "ST-segment changes mimicking STEMI (subarachnoid-induced cardiac injury)"
+        - "Sinus tachycardia, possible atrial or ventricular arrhythmias"
+  differential_diagnoses:
+    - diagnosis: "Thunderclap migraine"
+      key_distinguishing: "Normal CT, normal LP (no xanthochromia), personal or family history of migraine, recurrent episodes"
+    - diagnosis: "RCVS (reversible cerebral vasoconstriction syndrome)"
+      key_distinguishing: "Recurrent thunderclap headaches over days-weeks, angiographic beading, resolves within 3 months"
+    - diagnosis: "Bacterial meningitis"
+      key_distinguishing: "CSF neutrophilic pleocytosis, low glucose, fever, no xanthochromia, positive culture"
+    - diagnosis: "Intracerebral hemorrhage"
+      key_distinguishing: "Parenchymal blood on CT, focal neurological deficits, hypertension"
+    - diagnosis: "Pituitary apoplexy"
+      key_distinguishing: "Sellar mass on MRI, visual field defects, hormonal abnormalities, blood within pituitary"
+  difficulty_variants:
+    straightforward:
+      presentation: "52-year-old woman with sudden 'worst headache of my life' while exerting at gym, vomiting, neck stiffness, and photophobia. Hunt-Hess grade 2. CT shows Fisher grade 3 SAH in basal cisterns."
+      expected_agent_confidence: 0.92
+    moderate:
+      presentation: "45-year-old man with severe headache 8 hours ago, now mildly improved. CT done at OSH was reportedly 'negative.' Transferred for further evaluation. LP shows xanthochromia."
+      expected_agent_confidence: 0.68
+    diagnostic_puzzle:
+      presentation: "38-year-old woman with sudden severe headache 4 days ago, 'just a headache,' now has mild meningism. CT negative. Considering whether to perform LP. Headache partially treated."
+      expected_agent_confidence: 0.42
+  common_followups:
+    - trigger_action: "request_digital_subtraction_angiography"
+      tool_name: "order_advanced_imaging"
+      description: "Conventional DSA gold standard for aneurysm characterization and endovascular treatment"
+    - trigger_action: "request_transcranial_doppler"
+      tool_name: "order_specialized_test"
+      description: "Daily TCD monitoring for vasospasm (days 4-14 post-SAH)"
+    - trigger_action: "request_ct_perfusion"
+      tool_name: "order_ct_scan"
+      description: "CT perfusion for delayed cerebral ischemia due to vasospasm"
+    - trigger_action: "request_echocardiogram"
+      tool_name: "order_echocardiogram"
+      description: "Echocardiogram for neurogenic cardiac injury and Takotsubo cardiomyopathy"
+    - trigger_action: "request_repeat_cta"
+      tool_name: "order_advanced_imaging"
+      description: "Repeat CTA or MRA at 3-6 months post-treatment to check for aneurysm remnant"
+
+migraine_with_aura:
+  name: "Migraine with typical aura"
+  abbreviation: "MIG-AURA"
+  icd_code: "G43.1"
+  description: "Recurrent disabling headache with reversible focal neurological aura (visual, sensory, or language), requiring exclusion of secondary causes"
+  typical_demographics:
+    age_range: [18, 50]
+    sex_bias: "female_predominant"
+  encounter_type: "outpatient"
+  required_modalities: [MRI, LABS]
+  optional_modalities: [EEG, ECG]
+  key_findings:
+    mri:
+      straightforward:
+        - "Normal brain MRI (primary function: exclusion of secondary causes)"
+        - "No acute infarction on DWI"
+        - "No structural lesion (AVM, tumor, cavernoma)"
+        - "Possible incidental non-specific subcortical white matter lesions (migraine-related)"
+        - "No leptomeningeal enhancement"
+      moderate:
+        - "Small non-specific subcortical white matter T2 hyperintensities"
+        - "No DWI restriction (excludes stroke)"
+        - "Normal vascular anatomy on MRA"
+      diagnostic_puzzle:
+        - "DWI restriction in posterior territory (migrainous infarction vs TIA)"
+        - "Cerebellar T2 lesion — CADASIL pattern in young patient"
+        - "Posterior fossa AVM or cavernoma presenting with aura-like episodes"
+    labs:
+      all_difficulties:
+        - "CBC: normal"
+        - "BMP: normal"
+        - "ESR/CRP: normal (rules out vasculitis)"
+        - "ANA, antiphospholipid antibodies: negative (rules out autoimmune/thrombophilic cause)"
+        - "Coagulation: normal (rules out thrombophilia)"
+        - "Fasting lipids: may show hyperlipidemia (vascular risk in complex migraine)"
+        - "TSH: normal"
+    eeg:
+      straightforward:
+        - "Normal background with symmetric posterior dominant rhythm"
+        - "Posterior intermittent rhythmic delta activity (PIRDA) during or after migraine"
+        - "No epileptiform abnormalities"
+      moderate:
+        - "Mild intermittent posterior slowing — non-specific"
+        - "Normal between attacks"
+      diagnostic_puzzle:
+        - "Focal posterior slowing mimicking seizure focus"
+        - "Occipital spikes (rare, may represent Panayiotopoulos vs migrainous)"
+    ecg:
+      all_difficulties:
+        - "Normal sinus rhythm (patent foramen ovale screen: requires bubble echo, not ECG)"
+        - "No arrhythmia"
+  differential_diagnoses:
+    - diagnosis: "Transient ischemic attack"
+      key_distinguishing: "Sudden onset, negative symptoms (visual field cut vs spreading scotoma), older age, vascular risk factors, DWI restriction"
+    - diagnosis: "Focal seizure with visual phenomena"
+      key_distinguishing: "Stereotyped, brief (<1-2 min), structured hallucinations rather than spreading scotoma, EEG abnormality"
+    - diagnosis: "AVM or cavernoma"
+      key_distinguishing: "Structural lesion on MRI, fixed neurological findings, hemorrhage history"
+    - diagnosis: "MELAS (mitochondrial disease)"
+      key_distinguishing: "Stroke-like episodes, elevated lactate, maternal inheritance, MRI non-vascular territory signal"
+    - diagnosis: "Brain tumor"
+      key_distinguishing: "Progressive symptoms, mass on MRI with enhancement, no aura spreading pattern"
+  difficulty_variants:
+    straightforward:
+      presentation: "28-year-old woman with 5-year history of typical visual aura (fortification spectra spreading over 20-30 min) followed by unilateral throbbing headache with nausea. ICHD-3 criteria met."
+      expected_agent_confidence: 0.85
+    moderate:
+      presentation: "35-year-old woman presenting with new-onset right arm tingling spreading to face over 10 minutes then severe headache. First episode — requires secondary cause exclusion. MRI normal."
+      expected_agent_confidence: 0.62
+    diagnostic_puzzle:
+      presentation: "42-year-old woman with episodic expressive language difficulty lasting 15-20 minutes with subsequent headache. TIA vs migraine with aphasic aura. DWI negative on MRI."
+      expected_agent_confidence: 0.38
+  common_followups:
+    - trigger_action: "request_mra_head_neck"
+      tool_name: "order_advanced_imaging"
+      description: "MRA head and neck to exclude vascular malformation or dissection"
+    - trigger_action: "request_bubble_echo"
+      tool_name: "order_echocardiogram"
+      description: "Bubble echocardiogram to screen for patent foramen ovale (PFO) in stroke-like migraine"
+    - trigger_action: "request_prolonged_eeg"
+      tool_name: "analyze_eeg"
+      description: "Prolonged EEG or video-EEG if seizure-migraine overlap cannot be excluded"
+    - trigger_action: "request_thrombophilia_panel"
+      tool_name: "interpret_labs"
+      description: "Thrombophilia panel in complex aura or migrainous infarction workup"
+    - trigger_action: "request_mitochondrial_workup"
+      tool_name: "interpret_labs"
+      description: "Lactate, pyruvate, mtDNA sequencing if MELAS suspected"
+
+frontotemporal_dementia:
+  name: "Behavioral variant frontotemporal dementia"
+  abbreviation: "FTD"
+  icd_code: "G31.09"
+  description: "Neurodegenerative syndrome with early prominent behavioral and executive dysfunction due to frontal and anterior temporal lobe degeneration"
+  typical_demographics:
+    age_range: [50, 70]
+    sex_bias: null
+  encounter_type: "outpatient"
+  required_modalities: [MRI, LABS, advanced_imaging]
+  optional_modalities: [specialized_test]
+  key_findings:
+    mri:
+      straightforward:
+        - "Frontotemporal atrophy — bilateral frontal and anterior temporal lobe volume loss"
+        - "Relatively preserved parietal and occipital cortex (distinguishes from Alzheimer's)"
+        - "Knife-blade atrophy of frontal gyri on coronal sequences"
+        - "Caudate atrophy may be present"
+        - "No mass lesion, no infarcts"
+      moderate:
+        - "Asymmetric frontal atrophy (right > left) with relatively preserved medial temporal lobes"
+        - "Mild to moderate bifrontal volume loss, could overlap with normal aging"
+        - "Some periventricular white matter changes"
+      diagnostic_puzzle:
+        - "Minimal structural atrophy — early FTD, especially in young-onset"
+        - "Asymmetric temporal atrophy mimicking early Alzheimer's (semantic dementia variant)"
+        - "Normal MRI in 10-15% of bvFTD (especially C9orf72 expansion carriers)"
+    labs:
+      all_difficulties:
+        - "CBC: normal"
+        - "BMP: normal"
+        - "Thyroid function (TSH): normal"
+        - "Vitamin B12: normal"
+        - "RPR: negative"
+        - "HIV: negative"
+        - "Copper/ceruloplasmin: normal (rules out Wilson disease in young-onset)"
+        - "Heavy metal screen: normal"
+        - "CSF 14-3-3: negative (rules out CJD)"
+    advanced_imaging:
+      straightforward:
+        - "FDG-PET: severe frontal and anterior temporal hypometabolism"
+        - "Relative preservation of posterior cortex (posterior cingulate sign absent — differs from Alzheimer's)"
+        - "Bilateral frontotemporal hypometabolism with subcortical involvement"
+      moderate:
+        - "FDG-PET: asymmetric right frontotemporal hypometabolism"
+        - "Mild bilateral frontal hypometabolism — needs clinical correlation"
+      diagnostic_puzzle:
+        - "FDG-PET: frontal hypometabolism subtle, borderline"
+        - "Amyloid PET: negative (supports FTD over Alzheimer's) — key distinguishing step"
+    specialized_test:
+      straightforward:
+        - "Neuropsychological testing: severely impaired executive function (go/no-go, trails B)"
+        - "Relatively preserved episodic memory initially (differs from Alzheimer's)"
+        - "Social cognition deficits: impaired faux pas, theory of mind tasks"
+        - "Language: effortful speech in PNFA or semantic loss in SD variant"
+      moderate:
+        - "Neuropsychological: prominent executive dysfunction with some episodic memory impairment"
+        - "Borderline performance on frontal lobe tasks"
+      diagnostic_puzzle:
+        - "Neuropsychological: mixed pattern, cannot clearly differentiate from Alzheimer's"
+        - "Normal or near-normal on structured testing despite behavioral changes (poor sensitivity)"
+  differential_diagnoses:
+    - diagnosis: "Alzheimer's disease"
+      key_distinguishing: "Episodic memory predominant, hippocampal > frontal atrophy, amyloid PET positive, CSF Aβ42 low"
+    - diagnosis: "Primary psychiatric disorder (bipolar, schizophrenia)"
+      key_distinguishing: "Onset often before age 40, no atrophy on MRI, normal FDG-PET, no progressive course"
+    - diagnosis: "Normal pressure hydrocephalus (NPH)"
+      key_distinguishing: "Gait apraxia, urinary incontinence, ventriculomegaly disproportionate to atrophy"
+    - diagnosis: "Creutzfeldt-Jakob disease (CJD)"
+      key_distinguishing: "Rapid progression (<1 year), myoclonus, cortical ribboning on DWI, CSF 14-3-3 positive"
+    - diagnosis: "Primary progressive aphasia"
+      key_distinguishing: "Language-predominant, asymmetric left perisylvian atrophy, preserved behavior early"
+  difficulty_variants:
+    straightforward:
+      presentation: "58-year-old accountant with 2-year personality change: disinhibition, compulsive eating, loss of empathy, poor hygiene. Frontal atrophy on MRI, severe frontal hypometabolism on FDG-PET."
+      expected_agent_confidence: 0.82
+    moderate:
+      presentation: "64-year-old with 1-year progressive apathy, social withdrawal, and perseverative behavior. Mild frontal atrophy. Psychiatrist considers depression. Neuropsych shows executive impairment."
+      expected_agent_confidence: 0.58
+    diagnostic_puzzle:
+      presentation: "54-year-old with 18-month behavioral changes. Normal MRI. Referred as 'depression vs personality disorder.' FDG-PET shows subtle frontal hypometabolism. C9orf72 genetic testing pending."
+      expected_agent_confidence: 0.32
+  common_followups:
+    - trigger_action: "request_amyloid_pet"
+      tool_name: "order_advanced_imaging"
+      description: "Amyloid PET — negative result supports FTD over Alzheimer's disease"
+    - trigger_action: "request_genetic_panel"
+      tool_name: "interpret_labs"
+      description: "FTD genetic panel: C9orf72 repeat expansion, GRN, MAPT mutations (especially with family history)"
+    - trigger_action: "request_csf_biomarkers"
+      tool_name: "analyze_csf"
+      description: "CSF Aβ42, tau, phospho-tau, NfL to support or exclude Alzheimer's pathology"
+    - trigger_action: "request_comprehensive_neuropsych"
+      tool_name: "order_specialized_test"
+      description: "Comprehensive neuropsychological battery including social cognition measures"
+    - trigger_action: "request_tau_pet"
+      tool_name: "order_advanced_imaging"
+      description: "Tau PET (flortaucipir) to characterize underlying proteinopathy"
+
+status_epilepticus:
+  name: "Status epilepticus"
+  abbreviation: "SE"
+  icd_code: "G41.9"
+  description: "Prolonged or repetitive seizure activity (≥5 min for convulsive SE) without full recovery between episodes, requiring emergency treatment"
+  typical_demographics:
+    age_range: [18, 75]
+    sex_bias: null
+  encounter_type: "emergency"
+  required_modalities: [EEG, LABS, CT]
+  optional_modalities: [MRI, CSF]
+  key_findings:
+    eeg:
+      straightforward:
+        - "Continuous generalized rhythmic epileptiform discharges >5 minutes (convulsive SE)"
+        - "OR: Non-convulsive SE (NCSE) — continuous or near-continuous electrographic seizures"
+        - "Ictal pattern: rhythmic spike-wave at 2-4 Hz, evolving frequency, amplitude, morphology"
+        - "Postictal suppression between bursts in post-convulsive phase"
+        - "Dramatic improvement or normalization with benzodiazepine administration (therapeutic test)"
+      moderate:
+        - "Periodic lateralized epileptiform discharges (PLEDs/LPDs) — on ictal-interictal continuum"
+        - "Generalized periodic discharges (GPDs) with fluctuating consciousness"
+        - "Subtle NCSE pattern: rhythmic delta with embedded spikes"
+      diagnostic_puzzle:
+        - "Ictal-interictal continuum — GPDs or LPDs without clear ictal pattern"
+        - "Burst-suppression pattern post-anoxia vs sedation vs NCSE"
+        - "Normal EEG between seizures in PNES/psychogenic non-epileptic status"
+    labs:
+      all_difficulties:
+        - "BMP: hyponatremia, hypoglycemia, or hyperglycemia as precipitant or consequence"
+        - "CBC: leukocytosis (post-ictal stress or infectious trigger)"
+        - "Glucose: critical — immediate bedside glucose check mandatory"
+        - "Calcium, magnesium: hypomagnesemia or hypocalcemia as precipitant"
+        - "AED levels: subtherapeutic phenytoin, valproate, levetiracetam"
+        - "Toxicology screen: cocaine, amphetamines, TCA overdose, isoniazid"
+        - "Lactate: markedly elevated (post-ictal lactic acidosis)"
+        - "CK: elevated (rhabdomyolysis from prolonged tonic-clonic activity)"
+        - "Troponin: may be elevated (neurogenic cardiac stress)"
+        - "Ammonia: elevated in valproate toxicity or hepatic cause"
+    ct:
+      straightforward:
+        - "CT head without contrast: exclude structural cause (hemorrhage, mass)"
+        - "Hemorrhagic contusion or new mass lesion precipitating SE"
+        - "No acute intracranial hemorrhage (metabolic or toxic SE)"
+      moderate:
+        - "CT shows old infarct or prior craniotomy (known epileptogenic substrate)"
+        - "No new acute finding — SE due to medication non-compliance"
+      diagnostic_puzzle:
+        - "Normal CT — does not exclude encephalitis, autoimmune SE, or subtle cortical lesions"
+        - "Post-ictal cerebral edema on CT (diffuse sulcal effacement)"
+    mri:
+      straightforward:
+        - "DWI restriction in cortical ribbon pattern (unilateral) — ictal edema"
+        - "FLAIR cortical hyperintensity corresponding to seizure focus"
+        - "Limbic encephalitis pattern: bilateral mesial temporal FLAIR signal"
+      moderate:
+        - "Subtle DWI changes resolving after seizure cessation (reversible ictal changes)"
+        - "Multifocal cortical T2/FLAIR changes — autoimmune vs ischemic"
+      diagnostic_puzzle:
+        - "Normal MRI — does not exclude NCSE or autoimmune encephalitis early"
+        - "DWI changes mimicking stroke (ictal DWI pseudostroke)"
+    csf:
+      straightforward:
+        - "Mild pleocytosis (5-30 cells) post-ictal (normal variant after SE)"
+        - "Anti-NMDAR, anti-LGI1, anti-GABA-B antibodies — autoimmune SE workup"
+        - "HSV PCR: positive in HSV encephalitis-associated SE"
+      moderate:
+        - "Normal CSF (excludes CNS infection; autoimmune antibodies pending)"
+        - "Mild protein elevation — post-ictal blood-brain barrier disruption"
+      diagnostic_puzzle:
+        - "CSF pleocytosis — infectious vs autoimmune vs post-ictal unclear"
+        - "Autoimmune antibody panel pending — empiric immunotherapy decision required"
+  differential_diagnoses:
+    - diagnosis: "Psychogenic non-epileptic status (PNES)"
+      key_distinguishing: "No EEG correlate during clinical events, eyes closed, prolonged, variable semiology, unaffected by AEDs"
+    - diagnosis: "Autoimmune encephalitis"
+      key_distinguishing: "Subacute onset, psychiatric prodrome, autoimmune antibodies, limbic MRI changes"
+    - diagnosis: "Metabolic encephalopathy"
+      key_distinguishing: "Triphasic waves on EEG, no ictal pattern, metabolic derangement (hepatic, uremic, hyponatremia)"
+    - diagnosis: "Drug toxicity (serotonin syndrome, TCA)"
+      key_distinguishing: "Drug exposure history, hyperreflexia, clonus, hyperthermia, toxicology positive"
+    - diagnosis: "Hypoxic-ischemic encephalopathy"
+      key_distinguishing: "Preceding cardiac arrest or hypoxic event, burst-suppression EEG, DWI cortical/basal ganglia changes"
+  difficulty_variants:
+    straightforward:
+      presentation: "40-year-old with known epilepsy — missed medications — found convulsing continuously for 15 minutes. Subtherapeutic valproate level. EEG shows continuous generalized seizure activity."
+      expected_agent_confidence: 0.88
+    moderate:
+      presentation: "65-year-old found confused and minimally responsive after witnessed brief shaking. Now 'awake' but disoriented. EEG shows subtle NCSE with GPDs. CT negative."
+      expected_agent_confidence: 0.62
+    diagnostic_puzzle:
+      presentation: "55-year-old with new-onset unresponsiveness, eye deviation, and subtle lip-smacking. EEG shows LPDs on ictal-interictal continuum — expert disagreement on whether to treat as NCSE."
+      expected_agent_confidence: 0.38
+  common_followups:
+    - trigger_action: "request_continuous_eeg_monitoring"
+      tool_name: "analyze_eeg"
+      description: "Continuous cEEG monitoring for 24-48h to detect NCSE and guide treatment"
+    - trigger_action: "request_autoimmune_encephalitis_panel"
+      tool_name: "interpret_labs"
+      description: "Serum and CSF autoimmune encephalitis antibody panel"
+    - trigger_action: "request_mri_brain_contrast"
+      tool_name: "analyze_brain_mri"
+      description: "MRI brain with gadolinium for encephalitis, structural, or tumoral cause"
+    - trigger_action: "request_aed_optimization"
+      tool_name: "interpret_labs"
+      description: "Therapeutic drug monitoring for levetiracetam, valproate, lacosamide levels"
+    - trigger_action: "request_lp_autoimmune"
+      tool_name: "analyze_csf"
+      description: "Lumbar puncture for CSF autoimmune antibody panel and infectious workup"
+
+peripheral_neuropathy:
+  name: "Peripheral neuropathy (diabetic/CIDP/toxic)"
+  abbreviation: "PERI-NEURO"
+  icd_code: "G62.9"
+  description: "Peripheral nervous system disorder causing distal sensorimotor symptoms; etiologies include diabetic, CIDP, toxic, inflammatory, and hereditary"
+  typical_demographics:
+    age_range: [40, 75]
+    sex_bias: null
+  encounter_type: "outpatient"
+  required_modalities: [LABS, specialized_test]
+  optional_modalities: [MRI]
+  key_findings:
+    labs:
+      straightforward:
+        - "HbA1c: elevated (>6.5%) — diabetic neuropathy etiology"
+        - "Fasting glucose: elevated"
+        - "Vitamin B12: low (<200 pg/mL) with elevated MMA/homocysteine"
+        - "CBC: macrocytic anemia (B12 deficiency)"
+        - "TSH: hypothyroidism as neuropathy cause"
+        - "SPEP (serum protein electrophoresis): monoclonal protein (M-spike) — MGUS/myeloma neuropathy"
+        - "Anti-MAG antibodies: positive in anti-MAG neuropathy (IgM MGUS)"
+        - "RPR/VDRL: positive (neurosyphilis)"
+        - "ESR/CRP: elevated in vasculitic neuropathy"
+        - "ANA, ANCA: positive in connective tissue disease-associated neuropathy"
+        - "Heavy metals (lead, arsenic, thallium): elevated in toxic neuropathy"
+      moderate:
+        - "HbA1c: borderline elevated (5.7-6.4%) — prediabetic neuropathy"
+        - "B12 low-normal (200-300 pg/mL) with equivocal MMA"
+        - "SPEP: no M-spike but total protein elevated"
+        - "Anti-sulfatide antibodies: weakly positive"
+      diagnostic_puzzle:
+        - "All standard labs negative — cryptogenic sensorimotor neuropathy"
+        - "Borderline glucose tolerance, no clear etiology"
+        - "Anti-NF155 or anti-CNTN1 antibodies (nodopathy) — may require specialized testing"
+    specialized_test:
+      straightforward:
+        - "Motor NCS: reduced CMAP amplitudes in distal nerves (axonal) or markedly slowed velocity (demyelinating)"
+        - "Sensory NCS: absent or severely reduced SNAPs bilaterally (length-dependent)"
+        - "F-waves: prolonged or absent"
+        - "EMG: chronic denervation with fibrillations and positive sharp waves in distal muscles"
+        - "Diabetic pattern: length-dependent axonal sensorimotor neuropathy"
+        - "CIDP pattern: demyelinating (velocity <75% LLN), temporal dispersion, conduction block, prolonged DML"
+      moderate:
+        - "Mild distal sensory NCS abnormalities — borderline axonal vs within normal limits"
+        - "Asymmetric nerve involvement (mononeuritis multiplex pattern — consider vasculitis)"
+        - "Mixed axonal and demyelinating features — superimposed CIDP on diabetic neuropathy"
+      diagnostic_puzzle:
+        - "Near-normal NCS — small fiber neuropathy (large fibers spared); requires skin punch biopsy for IENFD"
+        - "Focal conduction block without typical CIDP pattern — MMN vs early CIDP"
+        - "NCS consistent with both hereditary (CMT) and acquired neuropathy"
+    mri:
+      straightforward:
+        - "MRI spine: normal cord signal, excludes myelopathy as contributing factor"
+        - "MRI lumbar plexus: T2 signal in nerve roots (CIDP, diabetic lumbosacral radiculoplexus neuropathy)"
+      moderate:
+        - "MRI cervical spine: multilevel degenerative disease with mild compression — radiculopathy vs neuropathy"
+        - "MRI lumbar spine: moderate stenosis — confounding radiculopathy"
+      diagnostic_puzzle:
+        - "MRI spine: significant cervical or lumbar cord compression — myelopathy component cannot be excluded"
+        - "MRI brachial plexus: patchy enhancement (Parsonage-Turner vs vasculitic neuropathy)"
+  differential_diagnoses:
+    - diagnosis: "Radiculopathy (cervical or lumbar)"
+      key_distinguishing: "Dermatomal sensory loss, proximal pain radiation, MRI disc herniation or stenosis, NCS shows focal root level abnormality"
+    - diagnosis: "Myelopathy (cervical spondylotic)"
+      key_distinguishing: "Upper motor neuron signs, hyperreflexia below level, cord signal on MRI, gait spasticity"
+    - diagnosis: "GBS/AIDP"
+      key_distinguishing: "Acute onset over days-weeks, ascending paralysis, areflexia, albumino-cytologic dissociation"
+    - diagnosis: "Vasculitic neuropathy"
+      key_distinguishing: "Asymmetric/stepwise progression, multifocal, mononeuritis multiplex, nerve biopsy epineurial vasculitis"
+    - diagnosis: "Hereditary neuropathy (CMT)"
+      key_distinguishing: "Family history, pes cavus, hammer toes, very slow velocities, PMP22 or GJB1 mutation"
+  difficulty_variants:
+    straightforward:
+      presentation: "62-year-old with poorly controlled type 2 diabetes (HbA1c 10.2%), 3-year progressive bilateral foot numbness and burning pain. NCS shows length-dependent axonal sensorimotor neuropathy."
+      expected_agent_confidence: 0.88
+    moderate:
+      presentation: "55-year-old with 1-year progressive proximal and distal weakness and sensory loss, mildly elevated CSF protein. NCS shows demyelinating features. Query CIDP vs diabetic neuropathy."
+      expected_agent_confidence: 0.62
+    diagnostic_puzzle:
+      presentation: "48-year-old with 2-year progressive bilateral foot numbness, normal NCS (large fibers intact). Symptoms worse at night. Normal HbA1c. Small fiber neuropathy suspected — awaiting skin biopsy."
+      expected_agent_confidence: 0.38
+  common_followups:
+    - trigger_action: "request_skin_punch_biopsy"
+      tool_name: "order_specialized_test"
+      description: "Skin punch biopsy for intraepidermal nerve fiber density (IENFD) — small fiber neuropathy diagnosis"
+    - trigger_action: "request_nerve_biopsy"
+      tool_name: "order_specialized_test"
+      description: "Sural nerve biopsy for vasculitic neuropathy, amyloid, or hereditary neuropathy confirmation"
+    - trigger_action: "request_genetic_neuropathy_panel"
+      tool_name: "interpret_labs"
+      description: "PMP22 duplication/deletion, GJB1, MPZ, GDAP1 genetic panel (CMT workup)"
+    - trigger_action: "request_autonomic_testing"
+      tool_name: "order_specialized_test"
+      description: "Autonomic testing (QSART, TST, HRV) for autonomic neuropathy characterization"
+    - trigger_action: "request_csf_analysis_cidp"
+      tool_name: "analyze_csf"
+      description: "LP for CSF protein and cell count (elevated protein supports CIDP)"
+
+normal_pressure_hydrocephalus:
+  name: "Normal pressure hydrocephalus (idiopathic NPH)"
+  abbreviation: "NPH"
+  icd_code: "G91.2"
+  description: "Hakim's triad of gait apraxia, urinary incontinence, and cognitive impairment with ventriculomegaly disproportionate to cortical atrophy"
+  typical_demographics:
+    age_range: [60, 80]
+    sex_bias: "slight_male"
+  encounter_type: "inpatient"
+  required_modalities: [MRI, LABS, CSF, specialized_test]
+  optional_modalities: [advanced_imaging]
+  key_findings:
+    mri:
+      straightforward:
+        - "Ventriculomegaly disproportionate to degree of cortical atrophy (Evans index >0.3)"
+        - "Tight high-convexity sulci with ballooning of Sylvian fissures (disproportion pattern)"
+        - "Corpus callosum thinning and upward bowing"
+        - "Periventricular T2/FLAIR signal (transependymal CSF seepage)"
+        - "CSF flow void at aqueduct of Sylvius (hyperdynamic pulsatile flow)"
+        - "Callosal angle <90 degrees on coronal images (diagnostic)"
+      moderate:
+        - "Evans index borderline (0.3-0.32)"
+        - "Mild-to-moderate ventriculomegaly with some cortical atrophy"
+        - "No classic tight high-convexity sulci pattern"
+        - "Callosal angle 90-100 degrees — equivocal"
+      diagnostic_puzzle:
+        - "Ventriculomegaly with prominent cortical atrophy (true atrophy vs NPH)"
+        - "Post-traumatic or post-meningitic hydrocephalus mimicking iNPH"
+        - "Concurrent neurodegenerative disease (Alzheimer's or Parkinson's plus NPH)"
+    labs:
+      all_difficulties:
+        - "CBC: normal"
+        - "BMP: normal"
+        - "Thyroid function: normal (rules out hypothyroid cognitive impairment)"
+        - "Vitamin B12: normal"
+        - "RPR: negative"
+        - "Glucose: normal (rules out diabetic contribution to neuropathy/gait)"
+    csf:
+      straightforward:
+        - "Opening pressure: normal (5-18 cmH2O) — required criterion"
+        - "WBC: normal (<5 cells)"
+        - "Protein: normal or mildly elevated"
+        - "Glucose: normal"
+        - "High-volume tap trial (30-50 mL CSF removed): significant gait improvement within 2-24 hours"
+        - "Gait speed improvement >20% post-tap (positive predictive for shunt response)"
+      moderate:
+        - "Opening pressure normal"
+        - "Tap trial: modest improvement in gait (equivocal positive)"
+        - "Cognitive improvement less clear after tap"
+      diagnostic_puzzle:
+        - "Tap trial: no clear improvement (false negative ~40% of eventual shunt responders)"
+        - "Opening pressure borderline elevated (18-22 cmH2O)"
+        - "CSF shows mild pleocytosis — alternative etiology vs coincidental"
+    specialized_test:
+      straightforward:
+        - "Gait analysis: magnetic or apraxic gait pattern — short steps, wide base, reduced step height"
+        - "Timed Up and Go (TUG): >20 seconds, improves >10% after high-volume tap"
+        - "10-meter walk test: significant improvement post-tap"
+        - "Urodynamics: detrusor hyperactivity (neurogenic overactive bladder)"
+      moderate:
+        - "Gait analysis: mild magnetic gait component, borderline TUG improvement"
+        - "Cognitive testing: executive dysfunction predominant (MoCA 18-22)"
+      diagnostic_puzzle:
+        - "Gait impairment minimal or attributed to orthopedic causes"
+        - "No clear tap trial response; continuous lumbar drainage trial may be required"
+    advanced_imaging:
+      all_difficulties:
+        - "Cisternography (radionuclide): ventricular reflux and delayed clearance — supportive but rarely used"
+        - "CSF flow MRI (phase-contrast): hyperdynamic aqueductal flow (peak velocity >18 cm/s)"
+        - "FDG-PET: frontal hypometabolism (may overlap with FTD)"
+  differential_diagnoses:
+    - diagnosis: "Alzheimer's disease"
+      key_distinguishing: "Episodic memory predominant, hippocampal atrophy > frontal, no gait apraxia early, amyloid PET positive"
+    - diagnosis: "Parkinson's disease"
+      key_distinguishing: "Resting tremor, cogwheel rigidity, responds to levodopa, DaTscan abnormal, no ventriculomegaly"
+    - diagnosis: "Vascular dementia"
+      key_distinguishing: "Stepwise decline, lacunar infarcts on MRI, vascular risk factors, periventricular white matter disease"
+    - diagnosis: "Cervical myelopathy"
+      key_distinguishing: "Upper motor neuron signs, spasticity, Lhermitte sign, cord compression on MRI cervical spine"
+    - diagnosis: "Subcortical ischemic vascular disease"
+      key_distinguishing: "Prominent white matter hyperintensities, hypertension, stepwise cognitive decline, no Evans index criterion"
+  difficulty_variants:
+    straightforward:
+      presentation: "73-year-old man with 2-year triad of shuffling gait, urinary urgency/incontinence, and progressive forgetfulness. Evans index 0.38 on MRI, callosal angle 75°. Tap trial shows significant gait improvement."
+      expected_agent_confidence: 0.85
+    moderate:
+      presentation: "68-year-old with 1-year gait deterioration and cognitive decline. Evans index 0.31, borderline callosal angle. Concurrent moderate white matter disease. Tap trial shows modest gait improvement."
+      expected_agent_confidence: 0.58
+    diagnostic_puzzle:
+      presentation: "75-year-old with ventriculomegaly and cognitive impairment. Significant cortical atrophy present. Tap trial inconclusive. Cannot distinguish iNPH from atrophic hydrocephalus with concurrent Alzheimer's."
+      expected_agent_confidence: 0.32
+  common_followups:
+    - trigger_action: "request_continuous_lumbar_drainage"
+      tool_name: "order_specialized_test"
+      description: "Continuous external lumbar drainage trial (72h, 150-200 mL/day) for equivocal tap trial"
+    - trigger_action: "request_csf_flow_mri"
+      tool_name: "order_advanced_imaging"
+      description: "Phase-contrast MRI for aqueductal CSF flow quantification"
+    - trigger_action: "request_neuropsych_pre_post_tap"
+      tool_name: "order_specialized_test"
+      description: "Neuropsychological testing before and after high-volume tap trial"
+    - trigger_action: "request_amyloid_pet"
+      tool_name: "order_advanced_imaging"
+      description: "Amyloid PET to detect concurrent Alzheimer's pathology (reduces shunt response)"
+    - trigger_action: "request_urodynamics"
+      tool_name: "order_specialized_test"
+      description: "Urodynamic study for detrusor hyperactivity characterization"
+
+hepatic_encephalopathy:
+  name: "Hepatic encephalopathy"
+  abbreviation: "HEP-ENC"
+  icd_code: "K72.9"
+  description: "Neuropsychiatric syndrome complicating acute or chronic liver failure, driven by hyperammonemia and cerebral edema"
+  typical_demographics:
+    age_range: [40, 70]
+    sex_bias: "slight_male"
+  encounter_type: "emergency"
+  required_modalities: [LABS, EEG, CT]
+  optional_modalities: [MRI]
+  key_findings:
+    labs:
+      straightforward:
+        - "Ammonia: markedly elevated (>150 μmol/L in acute liver failure; >80-100 μmol/L in cirrhosis)"
+        - "LFTs: ALT/AST markedly elevated (>1000 U/L in acute hepatitis), or low/normal in end-stage cirrhosis"
+        - "Total bilirubin: markedly elevated"
+        - "PT/INR: markedly prolonged (INR >2.0) — hepatic synthetic dysfunction"
+        - "Albumin: low (<2.5 g/dL in chronic liver disease)"
+        - "BMP: hyponatremia (dilutional), hypokalemia, hypomagnesemia"
+        - "Glucose: hypoglycemia (acute liver failure)"
+        - "CBC: thrombocytopenia (hypersplenism in cirrhosis), leukocytosis (infection precipitant)"
+        - "Blood cultures: positive (spontaneous bacterial peritonitis or bacteremia as precipitant)"
+        - "Toxicology: benzodiazepines, opiates (precipitants in cirrhosis)"
+      moderate:
+        - "Ammonia: moderately elevated (50-100 μmol/L)"
+        - "LFTs: elevated but not markedly (AST/ALT 100-300 U/L)"
+        - "INR: mildly prolonged (1.5-2.0)"
+        - "Identifiable precipitant: GI bleed (elevated BUN), infection, medication, constipation"
+      diagnostic_puzzle:
+        - "Ammonia normal or only mildly elevated — does not exclude HE (poor correlation with grade)"
+        - "Acute-on-chronic setting: unclear what is baseline cognitive function"
+        - "Multiple concurrent metabolic derangements (hyponatremia, hypoglycemia, uremia)"
+    eeg:
+      straightforward:
+        - "Triphasic waves (TWs): generalized, fronto-predominant, 1.5-2.5 Hz — characteristic of HE"
+        - "Generalized high-amplitude slow activity (2-4 Hz delta) with superimposed faster frequencies"
+        - "Background slowing with loss of posterior dominant rhythm"
+        - "No true epileptiform discharges (distinguishes from NCSE)"
+      moderate:
+        - "Generalized slowing with theta-delta activity (4-6 Hz transition range)"
+        - "Intermittent triphasic-like waves — not fully classic morphology"
+        - "Background disorganization proportional to grade 2-3 HE"
+      diagnostic_puzzle:
+        - "Triphasic waves also seen in uremic encephalopathy, Wernicke's, septic encephalopathy — non-specific"
+        - "NCSE cannot be excluded without benzodiazepine challenge"
+        - "Normal EEG in minimal/covert HE"
+    ct:
+      straightforward:
+        - "CT head: normal (primary function — exclude structural cause)"
+        - "No acute hemorrhage, mass, or infarct"
+        - "Cerebral edema (sulcal effacement, loss of gray-white differentiation) in acute liver failure"
+      moderate:
+        - "CT normal — no structural explanation for encephalopathy"
+        - "Chronic changes only: cortical atrophy consistent with chronic liver disease"
+      diagnostic_puzzle:
+        - "Subdural hematoma (thrombocytopenic patient with head injury during encephalopathy)"
+        - "Small hyperdensity — thrombocytopenia-related microhemorrhage vs spontaneous"
+    mri:
+      straightforward:
+        - "T1 hyperintensity in bilateral globus pallidi (manganese deposition in chronic liver disease)"
+        - "Diffuse cortical and basal ganglia DWI restriction (acute liver failure — cerebral edema)"
+        - "Normal MRI in episodic HE in compensated cirrhosis"
+      moderate:
+        - "Subtle bilateral globus pallidi T1 hyperintensity"
+        - "No DWI restriction — subacute/episodic HE without cerebral edema"
+      diagnostic_puzzle:
+        - "White matter T2 changes — acquired hepatocerebral degeneration vs concurrent Wernicke's"
+        - "Bilateral T2 signal in basal ganglia — acquired hepatolenticular degeneration"
+  differential_diagnoses:
+    - diagnosis: "Wernicke encephalopathy"
+      key_distinguishing: "Thiamine deficiency (alcoholism/malnutrition), classic triad (confusion/ophthalmoplegia/ataxia), MRI periaqueductal and mammillary body T2 signal, responds to thiamine"
+    - diagnosis: "Uremic encephalopathy"
+      key_distinguishing: "Elevated creatinine/BUN, renal failure history, myoclonus, reversed by dialysis"
+    - diagnosis: "Drug intoxication (opiates, benzodiazepines)"
+      key_distinguishing: "Toxicology positive, normal LFTs/ammonia, pinpoint pupils, responds to naloxone/flumazenil"
+    - diagnosis: "Bacterial meningitis or encephalitis"
+      key_distinguishing: "Fever, meningism, CSF pleocytosis, positive cultures, no liver disease history"
+    - diagnosis: "Hyponatremia (severe)"
+      key_distinguishing: "Na+ <120 mEq/L, osmotic demyelination risk, responds to Na+ correction, no liver failure marker"
+  difficulty_variants:
+    straightforward:
+      presentation: "58-year-old with known alcoholic cirrhosis found confused and combative. Ammonia 187 μmol/L. INR 2.8. GI bleed one day prior. EEG shows classic triphasic waves. CT head normal."
+      expected_agent_confidence: 0.88
+    moderate:
+      presentation: "52-year-old with NAFLD-cirrhosis, admitted with confusion grade 2-3 HE. Ammonia 95 μmol/L. Precipitant unclear. Concurrent hyponatremia. EEG shows generalized slowing without classic triphasic waves."
+      expected_agent_confidence: 0.62
+    diagnostic_puzzle:
+      presentation: "45-year-old with Child-Pugh B cirrhosis presenting with new confusion. Ammonia only mildly elevated (68 μmol/L). CT normal. EEG shows non-specific slowing. Concurrent benzodiazepine use and mild hyponatremia — multiple contributing factors."
+      expected_agent_confidence: 0.38
+  common_followups:
+    - trigger_action: "request_lactulose_rifaximin"
+      tool_name: "interpret_labs"
+      description: "Lactulose and rifaximin for ammonia reduction; monitor bowel movements and ammonia trend"
+    - trigger_action: "request_sbp_paracentesis"
+      tool_name: "interpret_labs"
+      description: "Diagnostic paracentesis to exclude spontaneous bacterial peritonitis (PMN >250/mm3)"
+    - trigger_action: "request_continuous_eeg"
+      tool_name: "analyze_eeg"
+      description: "Continuous EEG monitoring to distinguish HE from NCSE (benzodiazepine challenge)"
+    - trigger_action: "request_thiamine_empiric"
+      tool_name: "interpret_labs"
+      description: "Empiric IV thiamine before glucose in alcoholic patients (Wernicke prophylaxis)"
+    - trigger_action: "request_liver_transplant_evaluation"
+      tool_name: "interpret_labs"
+      description: "MELD score calculation and transplant center referral for recurrent or severe HE"
+
+amyotrophic_lateral_sclerosis:
+  name: "Amyotrophic lateral sclerosis (motor neuron disease)"
+  abbreviation: "ALS"
+  icd_code: "G12.21"
+  description: "Progressive neurodegenerative disease with combined upper and lower motor neuron degeneration in multiple body regions, leading to respiratory failure"
+  typical_demographics:
+    age_range: [45, 75]
+    sex_bias: "slight_male"
+  encounter_type: "outpatient"
+  required_modalities: [specialized_test, MRI, LABS]
+  optional_modalities: [CSF]
+  key_findings:
+    specialized_test:
+      straightforward:
+        - "EMG: widespread denervation — fibrillations, positive sharp waves, fasciculation potentials in ≥3 regions (bulbar, cervical, thoracic, lumbosacral)"
+        - "Large amplitude, long-duration, polyphasic motor unit potentials (chronic reinnervation)"
+        - "Reduced recruitment — severe in affected regions"
+        - "Fasciculation potentials: complex morphology (distinguishes from benign fasciculations)"
+        - "Motor NCS: reduced CMAP amplitudes (axonal loss), normal or near-normal conduction velocities"
+        - "Sensory NCS: NORMAL — critical feature (pure motor involvement)"
+        - "Awaji criteria: fasciculations count as denervation in ≥3 body regions"
+      moderate:
+        - "EMG: denervation in only 2 body regions — requires clinical correlation for UMN signs in other regions"
+        - "Possible early median or ulnar entrapment neuropathy (confounding)"
+        - "Fibrillations sparse — early disease or limb-onset predominant"
+      diagnostic_puzzle:
+        - "EMG shows denervation predominantly in one region — possible flail limb or flail arm variant"
+        - "Fasciculations without fibrillations — benign fasciculation syndrome vs early ALS"
+        - "Abnormal motor NCS with slow velocities — MMN mimicking ALS, check anti-GM1 antibodies"
+    mri:
+      straightforward:
+        - "Brain MRI: T2/FLAIR hyperintensity along corticospinal tracts (bilateral internal capsule to brainstem)"
+        - "Motor cortex T2 signal loss (low signal in primary motor cortex — iron deposition in UMN degeneration)"
+        - "Frontal and temporal atrophy if ALS-FTD overlap (15% of ALS cases)"
+        - "MRI cervical spine: no significant cord compression (rules out myelopathy)"
+      moderate:
+        - "Brain MRI: subtle corticospinal tract T2 change in posterior limb of internal capsule"
+        - "Normal MRI — does not exclude ALS (insensitive early)"
+        - "MRI spine: mild degenerative changes without significant cord compression"
+      diagnostic_puzzle:
+        - "MRI cervical spine: multilevel degenerative disease with moderate cord compression — cervical myelopathy cannot be excluded as contributor"
+        - "No corticospinal tract signal change on brain MRI — early or lower motor neuron predominant"
+    labs:
+      all_difficulties:
+        - "CBC: normal"
+        - "BMP: normal"
+        - "CK: mildly to moderately elevated (500-2000 U/L) — myopathic overlap"
+        - "Thyroid function: normal (rules out thyrotoxic myopathy)"
+        - "Vitamin B12: normal"
+        - "Anti-GM1 antibodies: negative (positive would suggest MMN — treatable mimic)"
+        - "SPEP: no M-spike (rules out paraproteinemic motor neuropathy)"
+        - "HIV: negative"
+        - "Hexosaminidase A: normal (rules out adult-onset Tay-Sachs)"
+        - "Androgen receptor gene CAG repeat: normal (rules out Kennedy disease/SBMA)"
+    csf:
+      straightforward:
+        - "CSF protein: mildly elevated (50-80 mg/dL) — common in ALS"
+        - "WBC: normal (<5 cells)"
+        - "CSF neurofilament light chain (NfL): markedly elevated (correlates with progression rate)"
+        - "No oligoclonal bands"
+      moderate:
+        - "CSF protein: normal or borderline elevated"
+        - "NfL elevated — supports neurodegeneration but not specific to ALS"
+      diagnostic_puzzle:
+        - "CSF pleocytosis (>5 cells) — atypical for ALS, raises question of alternative diagnosis"
+        - "CSF normal — does not exclude ALS"
+  differential_diagnoses:
+    - diagnosis: "Cervical spondylotic myelopathy"
+      key_distinguishing: "Cord compression on MRI, predominantly upper motor neuron below lesion, no widespread EMG denervation, no bulbar involvement"
+    - diagnosis: "Multifocal motor neuropathy (MMN)"
+      key_distinguishing: "Purely lower motor neuron, conduction block on NCS, anti-GM1 antibodies positive, responds to IVIG"
+    - diagnosis: "Kennedy disease (SBMA)"
+      key_distinguishing: "Only lower motor neuron, bulbar and facial involvement, sensory NCS mildly abnormal, androgen receptor CAG repeat expansion, gynecomastia"
+    - diagnosis: "Inclusion body myositis (IBM)"
+      key_distinguishing: "Proximal and distal weakness, finger flexors > extensors, markedly elevated CK, EMG shows myopathic features, muscle biopsy diagnostic"
+    - diagnosis: "Multiple sclerosis (progressive)"
+      key_distinguishing: "White matter lesions on MRI, no fasciculations, no EMG denervation, CSF oligoclonal bands"
+  difficulty_variants:
+    straightforward:
+      presentation: "58-year-old man with 1-year progressive left hand weakness and wasting, then right leg weakness. Fasciculations visible in tongue and limbs. Brisk reflexes in wasted muscles. EMG shows denervation in 4 regions. Normal sensory NCS."
+      expected_agent_confidence: 0.90
+    moderate:
+      presentation: "62-year-old woman with 8-month progressive dysarthria and dysphagia, subtle bilateral leg weakness. EMG shows bulbar and cervical denervation. MRI cervical spine shows moderate stenosis — myelopathy contribution unclear."
+      expected_agent_confidence: 0.62
+    diagnostic_puzzle:
+      presentation: "52-year-old with 6-month right arm weakness and fasciculations only. EMG shows denervation in cervical and lumbosacral regions but no clear UMN signs on examination. Flail arm variant possible but other diagnoses not fully excluded."
+      expected_agent_confidence: 0.40
+  common_followups:
+    - trigger_action: "request_repeat_emg_3months"
+      tool_name: "order_specialized_test"
+      description: "Repeat EMG at 3-6 months to detect spread to additional body regions (diagnostic evolution)"
+    - trigger_action: "request_pulmonary_function_als"
+      tool_name: "interpret_labs"
+      description: "FVC, sniff nasal inspiratory pressure (SNIP), NIF for respiratory involvement and NIV timing"
+    - trigger_action: "request_genetic_als_panel"
+      tool_name: "interpret_labs"
+      description: "ALS genetic panel: SOD1, C9orf72 repeat expansion, TARDBP, FUS (especially family history or young-onset)"
+    - trigger_action: "request_als_multidisciplinary_clinic"
+      tool_name: "interpret_labs"
+      description: "ALS multidisciplinary clinic referral (neurology, pulmonology, PT/OT, speech, nutrition, palliative care)"
+    - trigger_action: "request_csf_nfl"
+      tool_name: "analyze_csf"
+      description: "CSF neurofilament light chain for prognostic stratification and monitoring"

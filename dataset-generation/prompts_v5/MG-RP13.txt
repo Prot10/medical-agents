@@ -1,0 +1,1814 @@
+You are an expert neurologist and medical educator creating a realistic simulated patient case for a neurology AI diagnostic benchmark called NeuroBench.
+
+## Task
+
+You are given a **real published clinical case report** as a seed. Your job is to use this real case as the clinical foundation and transform it into a complete NeuroBench case with structured tool outputs that force an AI agent to use diagnostic tools.
+
+Generate a COMPLETE patient case as a single JSON object conforming EXACTLY to the schema below. Output ONLY valid JSON — no markdown fences, no commentary, no explanation before or after.
+
+## JSON Schema
+
+The output must conform to this exact schema:
+
+{
+  "$defs": {
+    "ActionCategory": {
+      "enum": [
+        "required",
+        "acceptable",
+        "contraindicated"
+      ],
+      "title": "ActionCategory",
+      "type": "string"
+    },
+    "ActionStep": {
+      "properties": {
+        "step": {
+          "title": "Step",
+          "type": "integer"
+        },
+        "action": {
+          "title": "Action",
+          "type": "string"
+        },
+        "tool_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tool Name"
+        },
+        "expected_finding": {
+          "default": "",
+          "title": "Expected Finding",
+          "type": "string"
+        },
+        "category": {
+          "$ref": "#/$defs/ActionCategory"
+        },
+        "tool_parameters": {
+          "additionalProperties": true,
+          "default": {},
+          "title": "Tool Parameters",
+          "type": "object"
+        }
+      },
+      "required": [
+        "step",
+        "action",
+        "category"
+      ],
+      "title": "ActionStep",
+      "type": "object"
+    },
+    "AdvancedImagingReport": {
+      "properties": {
+        "modality": {
+          "default": "",
+          "title": "Modality",
+          "type": "string"
+        },
+        "tracer_or_protocol": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tracer Or Protocol"
+        },
+        "findings": {
+          "default": [],
+          "items": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "title": "Findings",
+          "type": "array"
+        },
+        "quantitative_data": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quantitative Data"
+        },
+        "impression": {
+          "default": "",
+          "title": "Impression",
+          "type": "string"
+        },
+        "recommended_actions": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Recommended Actions",
+          "type": "array"
+        }
+      },
+      "title": "AdvancedImagingReport",
+      "type": "object"
+    },
+    "CSFResults": {
+      "properties": {
+        "appearance": {
+          "title": "Appearance",
+          "type": "string"
+        },
+        "opening_pressure": {
+          "title": "Opening Pressure",
+          "type": "string"
+        },
+        "cell_count": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {},
+          "title": "Cell Count",
+          "type": "object"
+        },
+        "protein": {
+          "title": "Protein",
+          "type": "string"
+        },
+        "glucose": {
+          "title": "Glucose",
+          "type": "string"
+        },
+        "glucose_ratio": {
+          "default": "",
+          "title": "Glucose Ratio",
+          "type": "string"
+        },
+        "special_tests": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {},
+          "title": "Special Tests",
+          "type": "object"
+        },
+        "interpretation": {
+          "title": "Interpretation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "appearance",
+        "opening_pressure",
+        "protein",
+        "glucose",
+        "interpretation"
+      ],
+      "title": "CSFResults",
+      "type": "object"
+    },
+    "CTFinding": {
+      "properties": {
+        "type": {
+          "title": "Type",
+          "type": "string"
+        },
+        "location": {
+          "title": "Location",
+          "type": "string"
+        },
+        "size": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Size"
+        },
+        "density": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Density"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "location"
+      ],
+      "title": "CTFinding",
+      "type": "object"
+    },
+    "CTReport": {
+      "properties": {
+        "findings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/CTFinding"
+          },
+          "title": "Findings",
+          "type": "array"
+        },
+        "contrast_used": {
+          "default": false,
+          "title": "Contrast Used",
+          "type": "boolean"
+        },
+        "angiography_findings": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Angiography Findings"
+        },
+        "additional_observations": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Additional Observations",
+          "type": "array"
+        },
+        "impression": {
+          "title": "Impression",
+          "type": "string"
+        },
+        "recommended_actions": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Recommended Actions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "impression"
+      ],
+      "title": "CTReport",
+      "type": "object"
+    },
+    "CardiacMonitoringReport": {
+      "properties": {
+        "duration_hours": {
+          "default": 0,
+          "title": "Duration Hours",
+          "type": "integer"
+        },
+        "monitor_type": {
+          "default": "",
+          "title": "Monitor Type",
+          "type": "string"
+        },
+        "rhythm_summary": {
+          "default": "",
+          "title": "Rhythm Summary",
+          "type": "string"
+        },
+        "heart_rate_range": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "default": {},
+          "title": "Heart Rate Range",
+          "type": "object"
+        },
+        "events": {
+          "default": [],
+          "items": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "title": "Events",
+          "type": "array"
+        },
+        "findings": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Findings",
+          "type": "array"
+        },
+        "impression": {
+          "default": "",
+          "title": "Impression",
+          "type": "string"
+        },
+        "recommended_actions": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Recommended Actions",
+          "type": "array"
+        }
+      },
+      "title": "CardiacMonitoringReport",
+      "type": "object"
+    },
+    "CaseDifficulty": {
+      "enum": [
+        "straightforward",
+        "moderate",
+        "diagnostic_puzzle"
+      ],
+      "title": "CaseDifficulty",
+      "type": "string"
+    },
+    "ClinicalHistory": {
+      "properties": {
+        "past_medical_history": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Past Medical History",
+          "type": "array"
+        },
+        "medications": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Medication"
+          },
+          "title": "Medications",
+          "type": "array"
+        },
+        "allergies": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Allergies",
+          "type": "array"
+        },
+        "family_history": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Family History",
+          "type": "array"
+        },
+        "social_history": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {},
+          "title": "Social History",
+          "type": "object"
+        }
+      },
+      "title": "ClinicalHistory",
+      "type": "object"
+    },
+    "Demographics": {
+      "properties": {
+        "age": {
+          "maximum": 90,
+          "minimum": 18,
+          "title": "Age",
+          "type": "integer"
+        },
+        "sex": {
+          "enum": [
+            "male",
+            "female"
+          ],
+          "title": "Sex",
+          "type": "string"
+        },
+        "handedness": {
+          "default": "right",
+          "title": "Handedness",
+          "type": "string"
+        },
+        "ethnicity": {
+          "default": "",
+          "title": "Ethnicity",
+          "type": "string"
+        },
+        "bmi": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Bmi"
+        }
+      },
+      "required": [
+        "age",
+        "sex"
+      ],
+      "title": "Demographics",
+      "type": "object"
+    },
+    "DrugInteractionResult": {
+      "properties": {
+        "proposed": {
+          "title": "Proposed",
+          "type": "string"
+        },
+        "interactions": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Interactions",
+          "type": "array"
+        },
+        "contraindications": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Contraindications",
+          "type": "array"
+        },
+        "warnings": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        },
+        "formulary_status": {
+          "default": "",
+          "title": "Formulary Status",
+          "type": "string"
+        },
+        "alternatives": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Alternatives",
+          "type": "array"
+        }
+      },
+      "required": [
+        "proposed"
+      ],
+      "title": "DrugInteractionResult",
+      "type": "object"
+    },
+    "ECGReport": {
+      "properties": {
+        "rhythm": {
+          "title": "Rhythm",
+          "type": "string"
+        },
+        "rate": {
+          "title": "Rate",
+          "type": "integer"
+        },
+        "intervals": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {},
+          "title": "Intervals",
+          "type": "object"
+        },
+        "axis": {
+          "default": "",
+          "title": "Axis",
+          "type": "string"
+        },
+        "findings": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Findings",
+          "type": "array"
+        },
+        "interpretation": {
+          "title": "Interpretation",
+          "type": "string"
+        },
+        "clinical_correlation": {
+          "default": "",
+          "title": "Clinical Correlation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "rhythm",
+        "rate",
+        "interpretation"
+      ],
+      "title": "ECGReport",
+      "type": "object"
+    },
+    "EEGFinding": {
+      "properties": {
+        "type": {
+          "title": "Type",
+          "type": "string"
+        },
+        "location": {
+          "title": "Location",
+          "type": "string"
+        },
+        "frequency": {
+          "default": "",
+          "title": "Frequency",
+          "type": "string"
+        },
+        "morphology": {
+          "default": "",
+          "title": "Morphology",
+          "type": "string"
+        },
+        "state": {
+          "default": "",
+          "title": "State",
+          "type": "string"
+        },
+        "clinical_correlation": {
+          "default": "",
+          "title": "Clinical Correlation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "location"
+      ],
+      "title": "EEGFinding",
+      "type": "object"
+    },
+    "EEGReport": {
+      "properties": {
+        "classification": {
+          "enum": [
+            "normal",
+            "abnormal"
+          ],
+          "title": "Classification",
+          "type": "string"
+        },
+        "background": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {},
+          "title": "Background",
+          "type": "object"
+        },
+        "findings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/EEGFinding"
+          },
+          "title": "Findings",
+          "type": "array"
+        },
+        "artifacts": {
+          "default": [],
+          "items": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "title": "Artifacts",
+          "type": "array"
+        },
+        "activating_procedures": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {},
+          "title": "Activating Procedures",
+          "type": "object"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "impression": {
+          "title": "Impression",
+          "type": "string"
+        },
+        "limitations": {
+          "default": "",
+          "title": "Limitations",
+          "type": "string"
+        },
+        "recommended_actions": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Recommended Actions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "classification",
+        "confidence",
+        "impression"
+      ],
+      "title": "EEGReport",
+      "type": "object"
+    },
+    "EchoReport": {
+      "properties": {
+        "chambers": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {},
+          "title": "Chambers",
+          "type": "object"
+        },
+        "valves": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {},
+          "title": "Valves",
+          "type": "object"
+        },
+        "ejection_fraction": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ejection Fraction"
+        },
+        "wall_motion": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Wall Motion"
+        },
+        "findings": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Findings",
+          "type": "array"
+        },
+        "impression": {
+          "title": "Impression",
+          "type": "string"
+        },
+        "recommended_actions": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Recommended Actions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "impression"
+      ],
+      "title": "EchoReport",
+      "type": "object"
+    },
+    "EncounterType": {
+      "enum": [
+        "emergency",
+        "inpatient",
+        "outpatient"
+      ],
+      "title": "EncounterType",
+      "type": "string"
+    },
+    "FollowUpToolOutput": {
+      "description": "A conditional tool output triggered by a specific agent request.",
+      "properties": {
+        "trigger_action": {
+          "title": "Trigger Action",
+          "type": "string"
+        },
+        "tool_name": {
+          "title": "Tool Name",
+          "type": "string"
+        },
+        "output": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EEGReport"
+            },
+            {
+              "$ref": "#/$defs/MRIReport"
+            },
+            {
+              "$ref": "#/$defs/LabResults"
+            },
+            {
+              "$ref": "#/$defs/CSFResults"
+            },
+            {
+              "$ref": "#/$defs/ECGReport"
+            },
+            {
+              "$ref": "#/$defs/CTReport"
+            },
+            {
+              "$ref": "#/$defs/EchoReport"
+            },
+            {
+              "$ref": "#/$defs/CardiacMonitoringReport"
+            },
+            {
+              "$ref": "#/$defs/AdvancedImagingReport"
+            },
+            {
+              "$ref": "#/$defs/SpecializedTestReport"
+            },
+            {
+              "$ref": "#/$defs/LiteratureSearchResult"
+            },
+            {
+              "$ref": "#/$defs/DrugInteractionResult"
+            }
+          ],
+          "title": "Output"
+        }
+      },
+      "required": [
+        "trigger_action",
+        "tool_name",
+        "output"
+      ],
+      "title": "FollowUpToolOutput",
+      "type": "object"
+    },
+    "GroundTruth": {
+      "properties": {
+        "primary_diagnosis": {
+          "title": "Primary Diagnosis",
+          "type": "string"
+        },
+        "icd_code": {
+          "title": "Icd Code",
+          "type": "string"
+        },
+        "differential": {
+          "default": [],
+          "items": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "title": "Differential",
+          "type": "array"
+        },
+        "optimal_actions": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ActionStep"
+          },
+          "title": "Optimal Actions",
+          "type": "array"
+        },
+        "critical_actions": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Critical Actions",
+          "type": "array"
+        },
+        "contraindicated_actions": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Contraindicated Actions",
+          "type": "array"
+        },
+        "key_reasoning_points": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Key Reasoning Points",
+          "type": "array"
+        },
+        "red_herrings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/RedHerring"
+          },
+          "title": "Red Herrings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "primary_diagnosis",
+        "icd_code"
+      ],
+      "title": "GroundTruth",
+      "type": "object"
+    },
+    "LabResults": {
+      "properties": {
+        "panels": {
+          "additionalProperties": {
+            "items": {
+              "$ref": "#/$defs/LabValue"
+            },
+            "type": "array"
+          },
+          "default": {},
+          "title": "Panels",
+          "type": "object"
+        },
+        "interpretation": {
+          "title": "Interpretation",
+          "type": "string"
+        },
+        "abnormal_values_summary": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Abnormal Values Summary",
+          "type": "array"
+        }
+      },
+      "required": [
+        "interpretation"
+      ],
+      "title": "LabResults",
+      "type": "object"
+    },
+    "LabValue": {
+      "properties": {
+        "test": {
+          "title": "Test",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Value"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "reference_range": {
+          "title": "Reference Range",
+          "type": "string"
+        },
+        "is_abnormal": {
+          "title": "Is Abnormal",
+          "type": "boolean"
+        },
+        "clinical_significance": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Clinical Significance"
+        }
+      },
+      "required": [
+        "test",
+        "value",
+        "unit",
+        "reference_range",
+        "is_abnormal"
+      ],
+      "title": "LabValue",
+      "type": "object"
+    },
+    "LiteratureSearchResult": {
+      "properties": {
+        "query": {
+          "title": "Query",
+          "type": "string"
+        },
+        "results": {
+          "default": [],
+          "items": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "title": "Results",
+          "type": "array"
+        },
+        "summary": {
+          "title": "Summary",
+          "type": "string"
+        }
+      },
+      "required": [
+        "query",
+        "summary"
+      ],
+      "title": "LiteratureSearchResult",
+      "type": "object"
+    },
+    "MRIFinding": {
+      "properties": {
+        "type": {
+          "title": "Type",
+          "type": "string"
+        },
+        "location": {
+          "title": "Location",
+          "type": "string"
+        },
+        "size": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Size"
+        },
+        "signal_characteristics": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {},
+          "title": "Signal Characteristics",
+          "type": "object"
+        },
+        "mass_effect": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mass Effect"
+        },
+        "borders": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Borders"
+        }
+      },
+      "required": [
+        "type",
+        "location"
+      ],
+      "title": "MRIFinding",
+      "type": "object"
+    },
+    "MRIReport": {
+      "properties": {
+        "findings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/MRIFinding"
+          },
+          "title": "Findings",
+          "type": "array"
+        },
+        "volumetrics": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Volumetrics"
+        },
+        "additional_observations": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Additional Observations",
+          "type": "array"
+        },
+        "impression": {
+          "title": "Impression",
+          "type": "string"
+        },
+        "differential_by_imaging": {
+          "default": [],
+          "items": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "title": "Differential By Imaging",
+          "type": "array"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "recommended_actions": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Recommended Actions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "impression",
+        "confidence"
+      ],
+      "title": "MRIReport",
+      "type": "object"
+    },
+    "Medication": {
+      "properties": {
+        "drug": {
+          "title": "Drug",
+          "type": "string"
+        },
+        "dose": {
+          "title": "Dose",
+          "type": "string"
+        },
+        "frequency": {
+          "title": "Frequency",
+          "type": "string"
+        },
+        "indication": {
+          "title": "Indication",
+          "type": "string"
+        }
+      },
+      "required": [
+        "drug",
+        "dose",
+        "frequency",
+        "indication"
+      ],
+      "title": "Medication",
+      "type": "object"
+    },
+    "NeurologicalCondition": {
+      "enum": [
+        "focal_epilepsy_temporal",
+        "focal_epilepsy_frontal",
+        "generalized_epilepsy",
+        "alzheimers_early",
+        "alzheimers_moderate",
+        "ischemic_stroke",
+        "hemorrhagic_stroke",
+        "tia",
+        "multiple_sclerosis",
+        "parkinsons",
+        "migraine_with_aura",
+        "migraine_without_aura",
+        "bacterial_meningitis",
+        "viral_encephalitis",
+        "autoimmune_encephalitis_nmdar",
+        "autoimmune_encephalitis_lgi1",
+        "brain_tumor_glioma",
+        "brain_tumor_meningioma",
+        "brain_tumor_metastasis",
+        "ftd",
+        "nph",
+        "myasthenia_gravis",
+        "peripheral_neuropathy",
+        "syncope_cardiac",
+        "syncope_vasovagal",
+        "cjd",
+        "cadasil",
+        "neurosarcoidosis",
+        "status_epilepticus",
+        "guillain_barre",
+        "subarachnoid_hemorrhage",
+        "hepatic_encephalopathy",
+        "als",
+        "atypical_parkinsonism_msa",
+        "atypical_parkinsonism_psp",
+        "functional_neurological_disorder"
+      ],
+      "title": "NeurologicalCondition",
+      "type": "string"
+    },
+    "NeurologicalExam": {
+      "properties": {
+        "mental_status": {
+          "default": "",
+          "title": "Mental Status",
+          "type": "string"
+        },
+        "cranial_nerves": {
+          "default": "",
+          "title": "Cranial Nerves",
+          "type": "string"
+        },
+        "motor": {
+          "default": "",
+          "title": "Motor",
+          "type": "string"
+        },
+        "sensory": {
+          "default": "",
+          "title": "Sensory",
+          "type": "string"
+        },
+        "reflexes": {
+          "default": "",
+          "title": "Reflexes",
+          "type": "string"
+        },
+        "coordination": {
+          "default": "",
+          "title": "Coordination",
+          "type": "string"
+        },
+        "gait": {
+          "default": "",
+          "title": "Gait",
+          "type": "string"
+        },
+        "additional": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Additional"
+        }
+      },
+      "title": "NeurologicalExam",
+      "type": "object"
+    },
+    "PatientProfile": {
+      "properties": {
+        "patient_id": {
+          "title": "Patient Id",
+          "type": "string"
+        },
+        "demographics": {
+          "$ref": "#/$defs/Demographics"
+        },
+        "clinical_history": {
+          "$ref": "#/$defs/ClinicalHistory"
+        },
+        "neurological_exam": {
+          "$ref": "#/$defs/NeurologicalExam"
+        },
+        "vitals": {
+          "$ref": "#/$defs/Vitals"
+        },
+        "chief_complaint": {
+          "title": "Chief Complaint",
+          "type": "string"
+        },
+        "history_present_illness": {
+          "title": "History Present Illness",
+          "type": "string"
+        }
+      },
+      "required": [
+        "patient_id",
+        "demographics",
+        "clinical_history",
+        "neurological_exam",
+        "vitals",
+        "chief_complaint",
+        "history_present_illness"
+      ],
+      "title": "PatientProfile",
+      "type": "object"
+    },
+    "RedHerring": {
+      "description": "An intentional distractor embedded in a case to test agent reasoning.",
+      "properties": {
+        "data_point": {
+          "title": "Data Point",
+          "type": "string"
+        },
+        "location": {
+          "title": "Location",
+          "type": "string"
+        },
+        "intended_effect": {
+          "title": "Intended Effect",
+          "type": "string"
+        },
+        "correct_interpretation": {
+          "title": "Correct Interpretation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "data_point",
+        "location",
+        "intended_effect",
+        "correct_interpretation"
+      ],
+      "title": "RedHerring",
+      "type": "object"
+    },
+    "SpecializedTestReport": {
+      "properties": {
+        "test_type": {
+          "default": "",
+          "title": "Test Type",
+          "type": "string"
+        },
+        "findings": {
+          "default": [],
+          "items": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "title": "Findings",
+          "type": "array"
+        },
+        "quantitative_data": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quantitative Data"
+        },
+        "impression": {
+          "default": "",
+          "title": "Impression",
+          "type": "string"
+        },
+        "recommended_actions": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Recommended Actions",
+          "type": "array"
+        }
+      },
+      "title": "SpecializedTestReport",
+      "type": "object"
+    },
+    "ToolOutputSet": {
+      "description": "All pre-generated tool outputs for one case.",
+      "properties": {
+        "eeg": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EEGReport"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "mri": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MRIReport"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "ecg": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ECGReport"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "labs": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LabResults"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "csf": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CSFResults"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "ct": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CTReport"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "echo": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EchoReport"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "cardiac_monitoring": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CardiacMonitoringReport"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "advanced_imaging": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AdvancedImagingReport"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "specialized_test": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SpecializedTestReport"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "literature_search": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "$ref": "#/$defs/LiteratureSearchResult"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Literature Search"
+        },
+        "drug_interactions": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "$ref": "#/$defs/DrugInteractionResult"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Drug Interactions"
+        }
+      },
+      "title": "ToolOutputSet",
+      "type": "object"
+    },
+    "Vitals": {
+      "properties": {
+        "bp_systolic": {
+          "title": "Bp Systolic",
+          "type": "integer"
+        },
+        "bp_diastolic": {
+          "title": "Bp Diastolic",
+          "type": "integer"
+        },
+        "hr": {
+          "title": "Hr",
+          "type": "integer"
+        },
+        "temp": {
+          "title": "Temp",
+          "type": "number"
+        },
+        "rr": {
+          "title": "Rr",
+          "type": "integer"
+        },
+        "spo2": {
+          "title": "Spo2",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "bp_systolic",
+        "bp_diastolic",
+        "hr",
+        "temp",
+        "rr",
+        "spo2"
+      ],
+      "title": "Vitals",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "case_id": {
+      "title": "Case Id",
+      "type": "string"
+    },
+    "condition": {
+      "$ref": "#/$defs/NeurologicalCondition"
+    },
+    "difficulty": {
+      "$ref": "#/$defs/CaseDifficulty"
+    },
+    "encounter_type": {
+      "$ref": "#/$defs/EncounterType"
+    },
+    "patient": {
+      "$ref": "#/$defs/PatientProfile"
+    },
+    "initial_tool_outputs": {
+      "$ref": "#/$defs/ToolOutputSet"
+    },
+    "followup_outputs": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/FollowUpToolOutput"
+      },
+      "title": "Followup Outputs",
+      "type": "array"
+    },
+    "ground_truth": {
+      "$ref": "#/$defs/GroundTruth"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "default": {},
+      "title": "Metadata",
+      "type": "object"
+    }
+  },
+  "required": [
+    "case_id",
+    "condition",
+    "difficulty",
+    "encounter_type",
+    "patient",
+    "initial_tool_outputs",
+    "ground_truth"
+  ],
+  "title": "NeuroBenchCase",
+  "type": "object"
+}
+
+## Source Case (Real Published Case Report)
+
+**Source**: Clinical Case Reports (PMCID: PMC10654466)
+**Original diagnosis**: Chronic progressive external ophthalmoplegia
+
+### Clinical Presentation (from published case):
+A 51-year-old Ghanaian woman with a history of hypertension since age 32 and type II diabetes mellitus since age 34 presented for evaluation of bilateral eyelid drooping. She first noticed left upper-eyelid ptosis at age 17, which gradually worsened and was followed by right-sided ptosis. Over the following years, she developed progressive limitation of all extraocular movements but had normal pupillary reactions and no nystagmus. She denied diplopia, ocular pain, diurnal variation, exercise intolerance, dysphagia, or other muscle weakness.
+
+Myasthenia gravis was considered but an ice-pack test was negative and her exam remained consistent on multiple visits. There was no family history of similar ocular disease. 
+
+In 2020, visual acuity was 6/12+3 in the right eye and 6/9+3 in the left; intraocular pressures were elevated at 39 mmHg OD and 41 mmHg OS with normal cup-to-disc ratios. She was diagnosed with ocular hypertension and started on timolol drops. Fundoscopy was unremarkable. In 2021, progressive lens opacity led to visual acuity decline to 6/36 OD and 6/18 OS; she underwent bilateral small-incision cataract extraction, after which acuity improved to 6/18 OD and 6/12 OS and intraocular pressures fell to 21 mmHg and 20 mmHg on timolol. She declined ptosis surgery and laser trabeculoplasty.
+
+### Published Diagnostic Reasoning:
+1. Myasthenia gravis — “Myasthenia gravis was ruled out by an ice‐pack test and also clinically, as the patient presented many times to the eye clinic exactly the same way.”  
+2. Ocular myositis — “There was no ocular pain; therefore, ocular myositis was ruled out.”  
+3. Tolosa–Hunt syndrome — “Tolsa‐Hunt syndrome was also ruled out due to the lack of suggestive symptoms. Severe periorbital headaches, painful eye movements (ophthalmoplegia), and ophthalmoparesis are also present in this syndrome.”  
+4. CPEO-plus — “CPEO‐plus was ruled out because other neurological symptoms associated with the syndrome were absent.”  
+5. Kearns–Sayre syndrome — “Kearns–Sayre syndrome (KSS) can be ruled out because … pigmentary retinopathy, cerebellar ataxia, heart block, and/or elevated cerebrospinal fluid (CSF) protein >100 mg/dL (the triad) were not present.”
+
+## Case Parameters
+
+- **Case ID**: `MG-RP13`
+- **Condition**: `Myasthenia gravis`
+- **Difficulty**: `diagnostic_puzzle`
+- **Encounter type**: `inpatient`
+
+## Condition Specifications
+
+myasthenia_gravis:
+  abbreviation: MG
+  common_followups:
+  - description: Single-fiber EMG of orbicularis oculi or extensor digitorum communis
+    tool_name: order_specialized_test
+    trigger_action: request_sfemg
+  - description: 3 Hz repetitive nerve stimulation of multiple muscle groups
+    tool_name: order_specialized_test
+    trigger_action: request_repetitive_stimulation
+  - description: Anti-MuSK and anti-LRP4 antibody testing for seronegative MG
+    tool_name: interpret_labs
+    trigger_action: request_musk_antibodies
+  - description: Spirometry and NIF for bulbar/respiratory involvement (myasthenic
+      crisis risk)
+    tool_name: interpret_labs
+    trigger_action: request_pulmonary_function
+  - description: CT chest for thymoma staging and surgical planning
+    tool_name: order_ct_scan
+    trigger_action: request_thymectomy_evaluation
+  description: Autoimmune disorder of the neuromuscular junction caused by antibodies
+    against AChR or MuSK, presenting with fatigable weakness
+  differential_diagnoses:
+  - diagnosis: Lambert-Eaton myasthenic syndrome (LEMS)
+    key_distinguishing: Proximal limb weakness > ocular symptoms, incremental CMAP
+      on high-rate RNS, anti-VGCC antibodies, associated with SCLC
+  - diagnosis: Botulism
+    key_distinguishing: Descending paralysis, fixed dilated pupils, no fatigability
+      pattern, toxin assay positive
+  - diagnosis: Brainstem stroke
+    key_distinguishing: Acute onset, DWI restriction on MRI, other brainstem signs,
+      non-fatigable diplopia
+  - diagnosis: Multiple sclerosis
+    key_distinguishing: MRI white matter lesions, CSF oligoclonal bands, internuclear
+      ophthalmoplegia
+  - diagnosis: Thyroid ophthalmopathy (Graves)
+    key_distinguishing: Proptosis, lid retraction, anti-thyroid antibodies, restricted
+      EOM on MRI orbits
+  difficulty_variants:
+    diagnostic_puzzle:
+      expected_agent_confidence: 0.35
+      presentation: 45-year-old woman with fluctuating dysarthria and dysphagia over
+        6 months, initially attributed to anxiety. AChR and MuSK antibodies negative.
+        SFEMG not yet performed.
+    moderate:
+      expected_agent_confidence: 0.62
+      presentation: 52-year-old man with fatigable bilateral ptosis and dysphagia
+        over 4 months. AChR antibody borderline positive. RNS shows 9% decrement.
+    straightforward:
+      expected_agent_confidence: 0.88
+      presentation: 35-year-old woman with 3-month progressive ptosis, diplopia worsening
+        at end of day, and proximal arm fatigue. AChR antibodies markedly elevated.
+        Chest CT shows anterior mediastinal mass.
+  encounter_type: inpatient
+  icd_code: G70.0
+  key_findings:
+    ct:
+      diagnostic_puzzle:
+      - Normal CT chest (no thymic pathology)
+      - "Age-involuted thymus \u2014 no residual tissue identified"
+      moderate:
+      - Thymic hyperplasia on CT chest (enlarged but not mass-like)
+      - Indeterminate anterior mediastinal density requiring PET or biopsy
+      straightforward:
+      - 'Anterior mediastinal mass on CT chest: thymoma (well-encapsulated or invasive)'
+      - Thymoma present in ~15% of MG patients
+      - Enhancing anterior mediastinal mass consistent with Type B2 thymoma
+    labs:
+      diagnostic_puzzle:
+      - 'Seronegative MG: anti-AChR and anti-MuSK both negative (~10% of generalized
+        MG)'
+      - Anti-LRP4 antibodies may be detectable in seronegative cases
+      - Paraneoplastic antibody panel to exclude thymoma-related seronegativity
+      moderate:
+      - 'Anti-AChR antibodies: borderline positive or weakly positive'
+      - 'Anti-MuSK antibodies: positive in ~40% of AChR-negative patients'
+      - 'Thyroid peroxidase antibodies: positive (concurrent autoimmunity)'
+      straightforward:
+      - 'Anti-AChR (acetylcholine receptor) antibodies: positive (present in ~85%
+        generalized MG)'
+      - Binding, blocking, and modulating antibody titers elevated
+      - 'Thyroid function: may show concurrent autoimmune thyroid disease'
+      - 'CBC, BMP: normal'
+      - 'Anti-striated muscle antibodies: positive (associated with thymoma)'
+    mri:
+      all_difficulties:
+      - Normal brain MRI (rules out brainstem lesion causing cranial nerve palsies)
+      - No enhancement of cranial nerves
+      - No structural cause for ophthalmoplegia (rules out cavernous sinus lesion)
+    specialized_test:
+      diagnostic_puzzle:
+      - 'Ocular MG: normal repetitive stimulation on limb muscles'
+      - RNS negative, SFEMG not yet performed
+      - Lambert-Eaton-like facilitation pattern causing diagnostic confusion (rare
+        MG variant)
+      moderate:
+      - 'RNS at 3 Hz: borderline decrement 8-10%'
+      - 'SFEMG: mildly increased jitter without blocking'
+      - Fatigable ptosis and diplopia on sustained upgaze (>60 seconds)
+      straightforward:
+      - "Repetitive nerve stimulation (RNS) at 3 Hz: decremental CMAP response \u2265\
+        10% (pathognomonic)"
+      - 'Single-fiber EMG (SFEMG): increased jitter and blocking (most sensitive test,
+        >95% sensitivity)'
+      - Post-exercise facilitation then exhaustion pattern
+      - 'Tensilon (edrophonium) test: dramatic improvement of ptosis/ophthalmoplegia'
+  name: Myasthenia gravis
+  optional_modalities:
+  - MRI
+  required_modalities:
+  - LABS
+  - specialized_test
+  - CT
+  typical_demographics:
+    age_range:
+    - 20
+    - 70
+    sex_bias: female_predominant
+
+
+## Instructions for Seed-Based Case Generation
+
+### 1. USE the real case as your clinical foundation
+- The patient demographics, clinical history, presenting symptoms, and exam findings should be **inspired by** the real case
+- You may modify demographics (age, sex, ethnicity) slightly for diversity, but keep the clinical scenario realistic and consistent with the source
+- The HPI should reflect the same clinical trajectory as the source case, written as a detailed narrative (at least 150 words)
+- Preserve the clinical complexity and atypical features from the real case — these are what make it realistic
+
+### 2. SEPARATE presentation from diagnostic evidence
+This is critical: the source case text often mentions diagnostic results inline (e.g., "MRI showed periventricular lesions"). You must:
+- **REMOVE** diagnostic test results from the HPI and patient presentation
+- Instead, place them in the structured **tool outputs** (MRI report, lab results, EEG report, CSF results, ECG)
+- The patient presentation should describe symptoms and exam findings, but NOT reveal what the tests showed
+- This forces the AI agent to **call diagnostic tools** to discover the evidence
+
+### 3. ADD disguising information and red herrings (especially for moderate/puzzle difficulty)
+- **STRAIGHTFORWARD**: Findings clearly support the diagnosis. Minimal confounders.
+- **MODERATE**: Add 1-2 incidental/confounding findings:
+  - An incidental lab abnormality (e.g., mildly elevated TSH in a stroke patient)
+  - A borderline imaging finding that could suggest an alternative diagnosis
+  - A medication that could cause some of the symptoms
+  - A family history item that points to a different condition
+- **DIAGNOSTIC PUZZLE**: Add significant misdirection:
+  - Initial presentation mimics a different condition
+  - Key diagnostic test is initially equivocal or negative
+  - Red herring findings that suggest a more common diagnosis
+  - The critical diagnostic clue is buried in follow-up results, not initial tests
+
+### 4. GENERATE structured tool outputs
+Create detailed specialist reports for the required modalities. Each report should:
+- Read like a real radiologist/pathologist/technician wrote it
+- Contain the key diagnostic findings from the source case (now extracted from the narrative)
+- Include realistic normal and incidental findings alongside pathological ones
+- Have appropriate confidence levels and recommended actions
+- Be internally consistent with each other and the patient presentation
+
+### 5. GENERATE follow-up outputs (at least 5)
+Create conditional outputs that an agent could request:
+- Additional imaging (repeat MRI, CT angiography, DaTscan, VEP, etc.)
+- Additional labs (autoimmune panels, genetic testing, specialized markers)
+- Additional tests (repeat LP, EEG monitoring, autonomic testing)
+- Literature searches and drug interaction checks
+- These should include both useful and less-useful follow-ups to test the agent's clinical judgment
+
+### 6. BUILD ground truth from the source case's reasoning
+- Use the published `diagnostic_reasoning` to inform your `key_reasoning_points`
+- Map the source's differential diagnosis discussion to structured `differential` entries
+- Create a realistic `optimal_actions` sequence that a competent neurologist would follow
+- Include `critical_actions` (must-do) and `contraindicated_actions` (must-not-do)
+
+### 7. METADATA
+Include in metadata:
+- `"source": "MedCaseReasoning"`
+- `"source_pmcid": "PMC10654466"`
+- `"source_license": "CC-BY 4.0"`
+- `"generation_method": "real_case_seed"`
+- `"condition_name"`: human-readable condition name
+- `"difficulty_description"`: what makes this case this difficulty level
+- `"expected_agent_confidence"`: 0.80-0.90 for straightforward, 0.55-0.70 for moderate, 0.30-0.45 for puzzle
+
+## Clinical Realism Requirements
+
+1. **Cross-modal consistency**: ALL tool outputs must be internally consistent with each other AND with the clinical narrative.
+2. **Lab values**: Use specific numeric values with correct units and reference ranges. Mark abnormal values correctly. Include complete panels (CBC, BMP at minimum).
+3. **Medications**: Use real drug names with realistic doses and frequencies. Include indication for each medication.
+4. **Neurological exam**: Write a complete neurological examination appropriate to the condition and difficulty level.
+5. **Vital signs**: Use physiologically realistic values adjusted for the clinical scenario.
+
+## Output Format
+
+Output a single JSON object. No wrapping, no explanation. Just the JSON.
+
