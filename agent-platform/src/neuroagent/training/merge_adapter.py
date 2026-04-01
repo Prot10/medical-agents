@@ -62,6 +62,49 @@ def merge_and_save(
     tokenizer = AutoTokenizer.from_pretrained(base_model, trust_remote_code=True)
     tokenizer.save_pretrained(output_dir)
 
+    # Fix config for vLLM compatibility: the saved text-only model has
+    # model_type "qwen3_5_text" which older transformers (vLLM venv) doesn't
+    # recognize. Wrap it inside the parent "qwen3_5" config structure.
+    import json
+
+    config_path = output_path / "config.json"
+    saved_config = json.loads(config_path.read_text())
+    if saved_config.get("model_type") == "qwen3_5_text":
+        logger.info("Patching config.json: wrapping qwen3_5_text inside qwen3_5 parent")
+        try:
+            parent_config = AutoModelForCausalLM.config_class.from_pretrained(
+                base_model, trust_remote_code=True
+            ).to_dict()
+        except Exception:
+            from transformers import AutoConfig
+
+            parent_config = AutoConfig.from_pretrained(
+                base_model, trust_remote_code=True
+            ).to_dict()
+        saved_config.pop("transformers_version", None)
+        parent_config["text_config"] = saved_config
+        parent_config["model_type"] = "qwen3_5"
+        config_path.write_text(json.dumps(parent_config, indent=2))
+
+    # Fix tokenizer_config.json for vLLM compatibility: newer transformers
+    # saves "tokenizer_class": "TokenizersBackend" which older versions
+    # don't recognize. Copy the original tokenizer_config from the base model.
+    tok_config_path = output_path / "tokenizer_config.json"
+    tok_config = json.loads(tok_config_path.read_text())
+    if tok_config.get("tokenizer_class") == "TokenizersBackend":
+        logger.info("Patching tokenizer_config.json: replacing TokenizersBackend class")
+        from huggingface_hub import hf_hub_download
+
+        try:
+            orig_tok_config = Path(
+                hf_hub_download(base_model, "tokenizer_config.json")
+            ).read_text()
+            tok_config_path.write_text(orig_tok_config)
+        except Exception:
+            # Fallback: just remove the problematic class name
+            tok_config.pop("tokenizer_class", None)
+            tok_config_path.write_text(json.dumps(tok_config, indent=2))
+
     if push_to_hub and hub_name:
         logger.info("Pushing to Hub: %s", hub_name)
         model.push_to_hub(hub_name)

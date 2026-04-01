@@ -95,8 +95,20 @@ case "$MODEL" in
       --tool-call-parser hermes
     ;;
   *)
-    echo "Unknown model: $MODEL"
-    echo "Supported: qwen3.5-9b, qwen3.5-27b-awq, medgemma-4b, medgemma-27b"
-    exit 1
+    # If MODEL is a path to a local model directory, serve it with Qwen3.5 flags
+    if [ -d "$MODEL" ] || [ -d "$(pwd)/$MODEL" ]; then
+      echo "Serving local model: $MODEL"
+      $VLLM \
+        --model "$MODEL" \
+        "${COMMON_FLAGS[@]}" \
+        "${QWEN35_FLAGS[@]}" \
+        --max-model-len 131072 \
+        --trust-remote-code
+    else
+      echo "Unknown model: $MODEL"
+      echo "Supported: qwen3.5-9b, qwen3.5-27b-awq, medgemma-4b, medgemma-27b"
+      echo "Or pass a path to a local model directory."
+      exit 1
+    fi
     ;;
 esac

@@ -234,6 +234,73 @@ def format_per_step(
     return dataset
 
 
+def format_from_gold_trajectories(
+    trajectories_path: str | Path,
+    min_reward_variance: float = 0.0,
+) -> list[dict[str, Any]]:
+    """Format gold trajectories (from generate_gold_trajectories.py) for GRPO.
+
+    Groups trajectories by case_id. The prompt is the patient info (user message).
+    Each completion is the full assistant trace (think + tool_call + tool_response + assessment).
+
+    Unlike format_full_trajectory(), this works with the gold trajectory format
+    (messages list) rather than the agent trace format.
+    """
+    import json as _json
+    trajectories = []
+    with open(trajectories_path) as f:
+        for line in f:
+            trajectories.append(_json.loads(line))
+
+    by_case: dict[str, list[dict]] = defaultdict(list)
+    for traj in trajectories:
+        by_case[traj["case_id"]].append(traj)
+
+    dataset = []
+    for case_id, trajs in by_case.items():
+        if len(trajs) < 2:
+            continue
+
+        # Prompt = user message (patient info) from first trajectory
+        messages = trajs[0].get("messages", [])
+        user_msg = next((m["content"] for m in messages if m["role"] == "user"), "")
+
+        # Build completions from assistant + tool turns
+        completions = []
+        for traj in trajs:
+            msgs = traj.get("messages", [])
+            parts = []
+            for m in msgs:
+                if m["role"] == "assistant":
+                    parts.append(m["content"])
+                elif m["role"] == "tool":
+                    parts.append(f"<tool_response>\n{m['content']}\n</tool_response>")
+            completions.append("\n\n".join(parts))
+
+        # Assign rewards based on trajectory style (will be overridden by online reward)
+        rewards = []
+        for traj in trajs:
+            style = traj.get("trajectory_style", "")
+            if "minimal" in style:
+                rewards.append(0.8)
+            elif "cost" in style:
+                rewards.append(0.6)
+            else:
+                rewards.append(0.5)
+
+        dataset.append({
+            "case_id": case_id,
+            "condition": trajs[0].get("condition", ""),
+            "difficulty": trajs[0].get("difficulty", ""),
+            "prompt": user_msg,
+            "completions": completions,
+            "rewards": rewards,
+        })
+
+    logger.info("Formatted %d GRPO prompt groups from %d gold trajectories", len(dataset), len(trajectories))
+    return dataset
+
+
 def save_dataset(dataset: list[dict[str, Any]], output_dir: str | Path) -> None:
     """Save dataset as JSON (parquet conversion requires pandas/pyarrow)."""
     output_dir = Path(output_dir)
@@ -281,8 +348,8 @@ def main() -> None:
     parser.add_argument("--input", required=True, help="Input trajectories JSON")
     parser.add_argument("--output", required=True, help="Output directory")
     parser.add_argument(
-        "--mode", choices=["full", "per_step"], default="full",
-        help="full = complete trajectory, per_step = decomposed decisions",
+        "--mode", choices=["full", "per_step", "gold"], default="gold",
+        help="gold = from gold trajectories JSONL, full = from agent traces, per_step = decomposed",
     )
     parser.add_argument(
         "--min-reward-variance", type=float, default=0.01,
@@ -293,16 +360,19 @@ def main() -> None:
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
-    data = load_trajectories(args.input)
-    logger.info("Loaded %d trajectories", len(data["trajectories"]))
-
-    if args.mode == "full":
+    if args.mode == "gold":
+        dataset = format_from_gold_trajectories(args.input)
+    elif args.mode == "full":
+        data = load_trajectories(args.input)
+        logger.info("Loaded %d trajectories", len(data["trajectories"]))
         dataset = format_full_trajectory(
             data,
             system_prompt=args.system_prompt,
             min_reward_variance=args.min_reward_variance,
         )
     else:
+        data = load_trajectories(args.input)
+        logger.info("Loaded %d trajectories", len(data["trajectories"]))
         dataset = format_per_step(data, system_prompt=args.system_prompt)
 
     save_dataset(dataset, args.output)

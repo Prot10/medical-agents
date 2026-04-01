@@ -1,0 +1,46 @@
+#!/bin/bash
+# SFT Training on gold trajectories with train/val split
+# Run: bash agent-platform/scripts/run_sft_training.sh
+set -euo pipefail
+
+# Must run from project root where training_data/ lives
+cd /home/aprotani/projects/medical-agents
+
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+
+echo "========================================="
+echo " SFT Training — 769 gold trajectories"
+echo " Model: Qwen/Qwen3.5-9B (QLoRA NF4)"
+echo " LoRA: rank=64, alpha=128"
+echo " Epochs: 5, batch=1, grad_accum=8"
+echo " Max seq: 4096 tokens (eval-safe)"
+echo " Loss: completion-only (not on prompts)"
+echo " Scheduler: cosine, weight_decay=0.01"
+echo " NEFTune: alpha=5.0"
+echo " Validation: fold 0 (541 train / 228 val)"
+echo " Best model: saved by eval_loss"
+echo "========================================="
+echo ""
+echo "Start time: $(date)"
+echo ""
+
+uv run python -m neuroagent.training.train_grpo \
+    --stage sft \
+    --model Qwen/Qwen3.5-9B \
+    --data training_data/gold_trajectories/trajectories.jsonl \
+    --output checkpoints/sft_769 \
+    --lora-rank 64 \
+    --lora-alpha 128 \
+    --epochs 5 \
+    --batch-size 1 \
+    --top-fraction 1.0 \
+    --splits-dir data/neurobench_v4/splits \
+    --fold 0 \
+    --qlora
+
+echo ""
+echo "========================================="
+echo " SFT Training Complete"
+echo " Checkpoint: checkpoints/sft_769"
+echo " End time: $(date)"
+echo "========================================="

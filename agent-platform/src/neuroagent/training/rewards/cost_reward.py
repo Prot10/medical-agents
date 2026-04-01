@@ -1,4 +1,10 @@
-"""Cost-aware reward — penalizes unnecessary expensive diagnostic tests."""
+"""Cost-aware reward — penalizes unnecessary expensive diagnostic tests.
+
+Supports two modes:
+1. Flat costs: Simple per-tool-name costs (backward compatible).
+2. Parameter-aware costs: Uses CostTracker for accurate Medicare PFS rates
+   that vary by tool parameters (e.g., lab panels, imaging modifiers).
+"""
 
 from __future__ import annotations
 
@@ -45,6 +51,10 @@ class CostReward:
     Key design: missing a needed test is penalized less (0.5x) than ordering
     an unnecessary one, because over-testing is a cost problem while
     under-testing is caught by the safety reward.
+
+    When ``cost_tracker`` is provided, costs are computed using parameter-aware
+    Medicare PFS rates (e.g., MRI with contrast costs more than without).
+    Otherwise falls back to flat per-tool costs.
     """
 
     def __init__(
@@ -52,14 +62,17 @@ class CostReward:
         tool_costs: dict[str, float] | None = None,
         config_path: str | None = None,
         missing_penalty_weight: float = 0.5,
+        cost_tracker: Any | None = None,
     ):
+        self.missing_penalty_weight = missing_penalty_weight
+        self._cost_tracker = cost_tracker
+
         if tool_costs is not None:
             self.tool_costs = tool_costs
         elif config_path is not None:
             self.tool_costs = self._load_costs(config_path)
         else:
             self.tool_costs = DEFAULT_TOOL_COSTS.copy()
-        self.missing_penalty_weight = missing_penalty_weight
 
     @staticmethod
     def _load_costs(config_path: str) -> dict[str, float]:
@@ -70,12 +83,19 @@ class CostReward:
             data = yaml.safe_load(f)
         return data.get("tool_costs", DEFAULT_TOOL_COSTS.copy())
 
+    def _get_cost(self, tool_name: str, parameters: dict[str, Any] | None = None) -> float:
+        """Get cost for a tool call, using CostTracker if available."""
+        if self._cost_tracker is not None and parameters is not None:
+            entry = self._cost_tracker.compute_cost(tool_name, parameters)
+            return entry.cost_usd
+        return self.tool_costs.get(tool_name, 0)
+
     def compute(
         self,
         agent_tools: list[str],
         optimal_tools: set[str],
     ) -> float:
-        """Compute cost reward in [0, 1].
+        """Compute cost reward in [0, 1] using flat costs.
 
         Args:
             agent_tools: Tools the agent actually called (may have duplicates).
@@ -94,12 +114,93 @@ class CostReward:
         efficiency = max(0.0, 1.0 - penalty / (optimal_cost + 1))
         return efficiency
 
+    def compute_parameter_aware(
+        self,
+        agent_tool_calls: list[dict[str, Any]],
+        optimal_actions: list[dict[str, Any]],
+    ) -> float:
+        """Compute cost reward using parameter-aware costs.
+
+        Uses CostTracker for accurate Medicare PFS rates that depend on tool
+        parameters (e.g., lab panels, imaging modifiers, CSF special tests).
+
+        Args:
+            agent_tool_calls: List of {"tool_name": str, "parameters": dict}.
+            optimal_actions: Ground truth optimal_actions from NeuroBench case,
+                each with "tool_name", "tool_parameters", and "category".
+
+        Returns:
+            Cost efficiency reward in [0, 1].
+        """
+        if self._cost_tracker is None:
+            # Fall back to flat-cost computation
+            agent_names = [tc["tool_name"] for tc in agent_tool_calls]
+            optimal_names = {
+                a["tool_name"]
+                for a in optimal_actions
+                if a.get("tool_name")
+            }
+            return self.compute(agent_names, optimal_names)
+
+        # Reset tracker for clean computation
+        self._cost_tracker.reset()
+
+        # Compute actual cost from agent's tool calls
+        agent_total = 0.0
+        agent_tool_names = set()
+        for tc in agent_tool_calls:
+            entry = self._cost_tracker.compute_cost(
+                tc["tool_name"], tc.get("parameters", {})
+            )
+            agent_total += entry.cost_usd
+            agent_tool_names.add(tc["tool_name"])
+
+        # Compute optimal cost from ground truth actions
+        self._cost_tracker.reset()
+        optimal_total = 0.0
+        optimal_tool_names = set()
+        for action in optimal_actions:
+            tool_name = action.get("tool_name")
+            if not tool_name:
+                continue
+            optimal_tool_names.add(tool_name)
+            params = action.get("tool_parameters", {})
+            entry = self._cost_tracker.compute_cost(tool_name, params)
+            optimal_total += entry.cost_usd
+
+        # Compute wasted cost (tools called but not in optimal set)
+        self._cost_tracker.reset()
+        wasted = 0.0
+        for tc in agent_tool_calls:
+            if tc["tool_name"] not in optimal_tool_names:
+                entry = self._cost_tracker.compute_cost(
+                    tc["tool_name"], tc.get("parameters", {})
+                )
+                wasted += entry.cost_usd
+
+        # Compute missed cost (optimal tools not called)
+        self._cost_tracker.reset()
+        missed = 0.0
+        for action in optimal_actions:
+            tool_name = action.get("tool_name")
+            if tool_name and tool_name not in agent_tool_names:
+                params = action.get("tool_parameters", {})
+                entry = self._cost_tracker.compute_cost(tool_name, params)
+                missed += entry.cost_usd
+
+        if optimal_total == 0:
+            return 1.0 if agent_total == 0 else 0.0
+
+        penalty = wasted + missed * self.missing_penalty_weight
+        efficiency = max(0.0, 1.0 - penalty / (optimal_total + 1))
+        return efficiency
+
     def breakdown(
         self,
         agent_tools: list[str],
         optimal_tools: set[str],
     ) -> CostBreakdown:
-        """Get detailed cost breakdown."""
+        """Get detailed cost breakdown using flat costs."""
         agent_set = set(agent_tools)
         unnecessary = [t for t in agent_set if t not in optimal_tools]
         missing = [t for t in optimal_tools if t not in agent_set]
@@ -114,5 +215,5 @@ class CostReward:
         )
 
     def total_cost_usd(self, agent_tools: list[str]) -> float:
-        """Return total USD cost of tools called."""
+        """Return total USD cost of tools called (flat costs)."""
         return sum(self.tool_costs.get(t, 0) for t in set(agent_tools))
