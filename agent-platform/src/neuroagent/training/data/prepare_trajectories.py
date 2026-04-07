@@ -24,6 +24,7 @@ from neuroagent_schemas import NeuroBenchCase
 
 from ...agent.orchestrator import AgentConfig, AgentOrchestrator
 from ...agent.reasoning import AgentTrace
+from ...evaluation.runner import format_patient_info
 from ...tools.mock_server import MockServer
 from ...tools.tool_registry import ToolRegistry
 from ..rewards.composite_reward import CompositeReward, RewardBreakdown
@@ -89,33 +90,6 @@ def load_cases(dataset_path: Path, max_cases: int | None = None) -> list[NeuroBe
         data = json.loads(cf.read_text())
         cases.append(NeuroBenchCase.model_validate(data))
     return cases
-
-
-def format_patient_info(case: NeuroBenchCase) -> str:
-    """Format patient info for the agent prompt."""
-    parts = [
-        f"Patient: {case.patient.demographics.age}-year-old {case.patient.demographics.sex}",
-        f"Chief complaint: {case.patient.chief_complaint}",
-        f"History of present illness: {case.patient.history_present_illness}",
-    ]
-
-    pmh = case.patient.clinical_history.past_medical_history
-    if pmh:
-        parts.append(f"Past medical history: {', '.join(pmh)}")
-
-    meds = case.patient.clinical_history.medications
-    if meds:
-        med_strs = [f"{m.drug} {m.dose} {m.frequency}" for m in meds]
-        parts.append(f"Current medications: {', '.join(med_strs)}")
-
-    allergies = case.patient.clinical_history.allergies
-    if allergies:
-        parts.append(f"Allergies: {', '.join(allergies)}")
-
-    parts.append(f"Neurological examination: {case.patient.neurological_exam.model_dump_json()}")
-    parts.append(f"Vitals: {case.patient.vitals.model_dump_json()}")
-
-    return "\n".join(parts)
 
 
 def collect_trajectories(
@@ -216,6 +190,7 @@ def main() -> None:
     parser.add_argument("--output", required=True, help="Output path for trajectories JSON")
     parser.add_argument("--rollouts-per-case", type=int, default=8, help="Rollouts per case")
     parser.add_argument("--max-cases", type=int, default=None, help="Limit number of cases")
+    parser.add_argument("--split-file", default=None, help="File with case IDs to use (one per line, e.g. fold0_train.txt)")
     parser.add_argument("--model", default="Qwen/Qwen3.5-9B", help="Model name")
     parser.add_argument("--base-url", default="http://localhost:8000/v1", help="LLM API base URL")
     parser.add_argument("--hospital", default="us_mayo", help="Hospital for rules")
@@ -228,6 +203,10 @@ def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
     cases = load_cases(Path(args.dataset), max_cases=args.max_cases)
+    if args.split_file:
+        split_ids = set(Path(args.split_file).read_text().strip().splitlines())
+        cases = [c for c in cases if c.case_id in split_ids]
+        logger.info("Filtered to %d cases from split file %s", len(cases), args.split_file)
     logger.info("Loaded %d cases", len(cases))
 
     agent_config = AgentConfig(
