@@ -188,28 +188,42 @@ def run_dpo_training(
     max_length: int = 4096,
     bf16: bool = True,
     qlora: bool = False,
+    use_rslora: bool = True,
 ) -> None:
-    """Train with DPO on preference pairs."""
+    """Train with DPO on preference pairs.
+
+    Reference model handling:
+        For correct SFT→DPO training, pass the MERGED SFT model (not the
+        adapter checkpoint). DPOTrainer creates a fresh LoRA adapter as the
+        policy and uses the frozen base weights as the reference. This means:
+        - reference = merged SFT model (what we want)
+        - policy = SFT model + new LoRA delta
+
+        If you pass an adapter checkpoint instead, the reference becomes the
+        raw base model (pre-SFT), which is incorrect for preference learning.
+    """
     import torch
     from datasets import Dataset
-    from peft import PeftModel, get_peft_model, prepare_model_for_kbit_training
+    from peft import LoraConfig, prepare_model_for_kbit_training
     from transformers import AutoModelForCausalLM, AutoTokenizer
     from trl import DPOConfig, DPOTrainer
 
-    from .train_grpo import get_lora_config, get_quantization_config
+    from .train_grpo import get_quantization_config
 
-    # Detect PEFT adapter checkpoint
-    adapter_path = None
+    # If an adapter checkpoint is passed, warn and use base model
     model_path = Path(model_name)
     if model_path.exists() and (model_path / "adapter_config.json").exists():
-        adapter_path = str(model_path)
-        if base_model is None:
-            adapter_cfg = json.loads((model_path / "adapter_config.json").read_text())
-            base_model = adapter_cfg.get("base_model_name_or_path", "Qwen/Qwen3.5-9B")
-        logger.info("Detected PEFT adapter at %s, base model: %s", adapter_path, base_model)
-        model_name = base_model
+        adapter_cfg = json.loads((model_path / "adapter_config.json").read_text())
+        actual_base = adapter_cfg.get("base_model_name_or_path", "Qwen/Qwen3.5-9B")
+        logger.warning(
+            "Detected PEFT adapter at %s. For correct DPO reference handling, "
+            "pass the MERGED SFT model instead (e.g., models/qwen3.5-9b-sft769). "
+            "Using raw base model %s as-is — reference will be pre-SFT.",
+            model_name, actual_base,
+        )
+        model_name = actual_base
 
-    logger.info("Loading model: %s (qlora=%s)", model_name, qlora)
+    logger.info("Loading model: %s (qlora=%s, rslora=%s)", model_name, qlora, use_rslora)
     tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
@@ -228,13 +242,22 @@ def run_dpo_training(
     if qlora:
         model = prepare_model_for_kbit_training(model)
 
-    if adapter_path:
-        logger.info("Loading SFT adapter from %s", adapter_path)
-        model = PeftModel.from_pretrained(model, adapter_path, is_trainable=True)
-    else:
-        lora_config = get_lora_config(rank=lora_rank, alpha=lora_alpha)
-        model = get_peft_model(model, lora_config)
-    model.print_trainable_parameters()
+    # Build fresh LoRA config with rsLoRA for stable high-rank training.
+    # rsLoRA uses alpha/sqrt(r) scaling instead of alpha/r, which prevents
+    # performance saturation at higher ranks — benchmarked on DPO (OpenChat 3.5).
+    peft_config = LoraConfig(
+        r=lora_rank,
+        lora_alpha=lora_alpha,
+        lora_dropout=0.05,
+        bias="none",
+        task_type="CAUSAL_LM",
+        target_modules=[
+            "q_proj", "k_proj", "v_proj", "o_proj",
+            "gate_proj", "up_proj", "down_proj",
+        ],
+        use_rslora=use_rslora,
+    )
+    logger.info("LoRA config: rank=%d, alpha=%d, rslora=%s", lora_rank, lora_alpha, use_rslora)
 
     # Load DPO pairs
     pairs = json.loads(Path(pairs_path).read_text())
@@ -258,15 +281,19 @@ def run_dpo_training(
         save_total_limit=3,
         gradient_checkpointing=True,
         eval_strategy="no",
-        # No ref model — use implicit reference (same model, frozen)
         precompute_ref_log_probs=True,
     )
 
+    # Pass peft_config to DPOTrainer — this is the correct approach:
+    # - DPOTrainer creates the LoRA adapter on the model (policy)
+    # - Reference logprobs come from the frozen base weights (adapter disabled)
+    # - When base = merged SFT model, reference = SFT (correct for SFT→DPO)
     trainer = DPOTrainer(
         model=model,
         args=training_args,
         train_dataset=dataset,
         processing_class=tokenizer,
+        peft_config=peft_config,
     )
 
     logger.info("Starting DPO training for %d epochs (beta=%.2f)", epochs, beta)
@@ -299,7 +326,7 @@ def main() -> None:
 
     # --- train subcommand ---
     train_parser = subparsers.add_parser("train", help="Train DPO from preference pairs")
-    train_parser.add_argument("--model", required=True, help="Model or PEFT adapter")
+    train_parser.add_argument("--model", required=True, help="Merged SFT model path (not adapter)")
     train_parser.add_argument("--base-model", default=None)
     train_parser.add_argument("--pairs", required=True, help="DPO pairs JSON")
     train_parser.add_argument("--output", required=True, help="Output checkpoint dir")
@@ -309,9 +336,10 @@ def main() -> None:
     train_parser.add_argument("--batch-size", type=int, default=1)
     train_parser.add_argument("--lr", type=float, default=5e-7)
     train_parser.add_argument("--beta", type=float, default=0.1)
-    train_parser.add_argument("--max-length", type=int, default=4096)
+    train_parser.add_argument("--max-length", type=int, default=3584)
     train_parser.add_argument("--qlora", action="store_true")
     train_parser.add_argument("--bf16", action="store_true", default=True)
+    train_parser.add_argument("--no-rslora", action="store_true", help="Disable rsLoRA (use standard alpha/r scaling)")
 
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -373,6 +401,7 @@ def main() -> None:
             max_length=args.max_length,
             bf16=args.bf16,
             qlora=args.qlora,
+            use_rslora=not args.no_rslora,
         )
 
 
