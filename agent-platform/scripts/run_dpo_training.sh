@@ -12,6 +12,7 @@ export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SFT_MODEL="/home/aprotani/projects/medical-agents/models/qwen3.5-9b-sft769"
 SFT_ADAPTER="checkpoints/sft_769/checkpoint-272"
+SFT_MERGED="/home/aprotani/projects/medical-agents/models/qwen3.5-9b-sft769"
 DATASET="data/neurobench_v4"
 SPLIT_FILE="$DATASET/splits/fold0_train.txt"
 TRAJECTORIES="training_data/dpo_trajectories.json"
@@ -91,8 +92,12 @@ fi
 # -------------------------------------------------------
 echo ""
 echo "[Step 3/3] DPO Training..."
+# Use merged SFT model as base so that:
+# - Reference model = frozen SFT weights (correct for preference learning)
+# - Policy model = SFT + fresh rsLoRA adapter
+# Using rsLoRA (alpha/sqrt(r)) for stable high-rank DPO training
 uv run python -m neuroagent.training.train_dpo train \
-    --model "$SFT_ADAPTER" \
+    --model "$SFT_MERGED" \
     --pairs "$PAIRS" \
     --output "$OUTPUT" \
     --epochs 3 \
