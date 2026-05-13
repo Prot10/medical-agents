@@ -9,23 +9,31 @@ See README.md for full project docs, setup, and architecture.
 ## Key paths
 
 - `agent-platform/src/neuroagent/` — main Python package
+- `agent-platform/src/neuroagent/api/` — main FastAPI app (port 8888)
+- `agent-platform/src/neuroagent/review_api/` — review FastAPI app (port 8889, separate startup)
 - `packages/neuroagent-schemas/` — shared Pydantic models
 - `dataset-generation/` — NeuroBench case generation
-- `web/src/` — React frontend (Vite + TypeScript + Tailwind v4)
+- `web/src/` — main React dashboard (port 5173)
+- `web-review/src/` — dataset review UI (port 5174, imports primitives via `@web/*` alias)
 - `data/neurobench_v{1,2}/cases/` — 200 benchmark cases (JSON)
 - `data/neurobench_v3/cases/` — 200 benchmark cases with realistic tool outputs (v1+v2 combined, stripped)
 - `data/neurobench_v4/cases/` — 200 benchmark cases with 12-tool schema and cost tracking (v3 migrated)
+- `data/neurobench_v5/cases/` — 516 benchmark cases across 20 conditions (current default)
+- `data/review/annotations/{version}/{reviewer_code}/{case_id}.json` — per-reviewer annotation runtime data (gitignored)
 - `agent-platform/config/hospital_rules/{hospital}/*.yaml` — clinical pathways
+- `agent-platform/config/review/reviewer_codes.yaml` — review-app reviewer registry (hot-reloads on mtime)
 - `agent-platform/config/tool_costs.yaml` — per-tool cost registry (Medicare reference rates)
 
 ## Common commands
 
 ```bash
 uv sync --all-packages                    # install everything
-cd web && npm run build                   # build frontend
-uv run uvicorn neuroagent.api.app:app --host 0.0.0.0 --port 8888  # start server
-cd web && npm run dev                     # frontend dev (local)
-cd web && npm run dev:remote              # frontend dev (remote VM, binds 0.0.0.0)
+cd web && npm run build                   # build main frontend
+uv run uvicorn neuroagent.api.app:app --host 0.0.0.0 --port 8888         # main API
+uv run uvicorn neuroagent.review_api.app:app --host 0.0.0.0 --port 8889  # review API
+cd web && npm run dev                     # main frontend dev (local)
+cd web && npm run dev:remote              # main frontend dev (remote VM, binds 0.0.0.0)
+cd web-review && npm install && npm run dev:remote   # review frontend dev (port 5174)
 uv run pytest agent-platform/tests/ -v   # tests
 ./agent-platform/scripts/run_v3_full.sh                       # full model comparison (v3, 7 tools)
 ./agent-platform/scripts/run_v4_full.sh                       # full model comparison (v4, 12 tools + cost)
@@ -63,3 +71,15 @@ LLM client (`llm/client.py`) strips `<think>` tags from Qwen and parses OpenAI-s
 - Hospital rules CRUD via `/api/v1/hospitals/{id}/rules` endpoints
 - Traces auto-saved to `data/traces/` for replay without GPU
 - `MockServer` in evaluation mode returns pre-generated outputs from NeuroBench case files
+
+## Dataset review app
+
+Separate FastAPI + Vite app for blind triple-review of the NeuroBench dataset. Independent from the main agent — its own startup command, port, and Vite project, but reuses the `NeuroBenchCase` Pydantic schema.
+
+- Backend: `agent-platform/src/neuroagent/review_api/app.py` on port 8889. File-based persistence under `data/review/annotations/`. Gated by `X-Reviewer-Code` header; admin role unlocks aggregate endpoints under `/api/v1/admin/...`.
+- Frontend: `web-review/` (Vite + React 19 + Tailwind v4 + framer-motion). Vite alias `@web/*` → `../web/src/*` so it can import primitives from the main app without a refactor. Vite proxies `/api` → `http://127.0.0.1:8889`. Light theme is the default.
+- Reviewer registry: `agent-platform/config/review/reviewer_codes.yaml` — hand-edited; backend reloads on YAML mtime change inside the `current_reviewer` FastAPI dependency.
+- Annotation storage: `data/review/annotations/{version}/{reviewer_code}/{case_id}.json` — one file per (reviewer, version, case) triple. Filesystem-level isolation: a reviewer endpoint cannot return another reviewer's data.
+- Tabs: Overview (per-reviewer progress) / Cases (516 v5 cases) / Methodology (showcase) / Admin (4 aggregate views: inter-rater agreement, reviewer progress, field hotspots, side-by-side diff).
+- Annotation gesture: hover an `AnnotatableField` → primary-color Comment pill in margin → Radix Popover with severity (note/issue/error) + textarea + `⌘↵` save. Annotated fields get a persistent left border colored by highest severity + count badge.
+- Status flow per case per reviewer: `pending` → `in_progress` (auto on first annotation) → `needs_changes` / `approved`. Each reviewer's status is independent; admin agreement view aggregates them.

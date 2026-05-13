@@ -11,25 +11,31 @@ medical-agents/                     # uv workspace root
 ├── agent-platform/                 # Main Python package (neuroagent)
 │   ├── src/neuroagent/
 │   │   ├── agent/                  # Orchestrator (ReAct loop), reasoning, reflection
-│   │   ├── api/                    # FastAPI web server + SSE streaming
+│   │   ├── api/                    # Main FastAPI app (port 8888) — agent runs, traces, models
+│   │   ├── review_api/             # Separate FastAPI app (port 8889) — dataset review
 │   │   ├── llm/                    # LLM client (OpenAI-compatible), prompts
-│   │   ├── tools/                  # 7 diagnostic tools + MockServer + ToolRegistry
+│   │   ├── tools/                  # 12 diagnostic tools + MockServer + ToolRegistry
 │   │   ├── rules/                  # Hospital rules engine (YAML pathways)
 │   │   ├── memory/                 # ChromaDB patient memory
 │   │   └── evaluation/             # Runner, metrics, noise injector, LLM judge
 │   ├── config/
 │   │   ├── agent_config.yaml       # Default agent/LLM/rules config
 │   │   ├── system_prompts/         # orchestrator.txt, reflection.txt
-│   │   └── hospital_rules/         # 5 hospital dirs
+│   │   ├── hospital_rules/         # 5 hospital dirs
+│   │   └── review/                 # Reviewer-code registry (reviewer_codes.yaml)
 │   ├── scripts/                    # CLI entry points + vLLM serve scripts
 │   └── tests/                      # pytest suite
 ├── packages/neuroagent-schemas/    # Shared Pydantic models
 ├── dataset-generation/             # NeuroBench case generation pipeline
-├── web/                            # React frontend dashboard
+├── web/                            # Main React dashboard (port 5173)
+├── web-review/                     # Dataset review UI (port 5174, shares tokens with web/)
 └── data/
     ├── neurobench_v1/cases/        # 100 synthetic JSON cases
     ├── neurobench_v2/cases/        # 100 real-case-seeded JSON cases
     ├── neurobench_v3/cases/        # 200 combined cases (realistic tool outputs)
+    ├── neurobench_v4/cases/        # 200 cases (12-tool schema + cost tracking)
+    ├── neurobench_v5/cases/        # 516 cases across 20 conditions
+    ├── review/annotations/         # Per-reviewer annotation files (runtime, gitignored)
     └── traces/                     # Saved agent execution traces
 ```
 
@@ -163,6 +169,44 @@ uv run python agent-platform/scripts/create_v3_dataset.py  # Regenerate v3 from 
 Each case contains: patient profile, initial tool outputs, conditional followup outputs, and comprehensive ground truth.
 
 Difficulty levels: straightforward (S), moderate (M), diagnostic puzzle (P).
+
+## Dataset Review App
+
+A separate app for doctor-led review of the NeuroBench dataset. Built for a **blind triple-review** workflow: three reviewers work asynchronously and in isolation (each has a personal code; no one can see another reviewer's annotations or status decisions). An admin code unlocks aggregate views for the researcher.
+
+- Backend: `agent-platform/src/neuroagent/review_api/` — FastAPI on **port 8889**, file-based persistence, gated by `X-Reviewer-Code` header
+- Frontend: `web-review/` — separate Vite/React app on **port 5174**, shares design tokens with `web/` via the `@web/*` alias
+- Reviewer codes: hand-edited in `agent-platform/config/review/reviewer_codes.yaml` (hot-reloads on mtime change)
+- Annotations: `data/review/annotations/{version}/{reviewer_code}/{case_id}.json` (filesystem isolation per reviewer)
+
+### Run
+
+```bash
+# Terminal 1 — backend
+uv run uvicorn neuroagent.review_api.app:app --host 0.0.0.0 --port 8889
+
+# Terminal 2 — frontend (Vite proxies /api → :8889)
+cd web-review && npm install
+npm run dev:remote    # binds 0.0.0.0:5174 for remote VM access
+# or: npm run dev     # local only
+```
+
+Open `http://<vm-host>:5174` and enter a reviewer code from `reviewer_codes.yaml`.
+
+### Reviewer experience
+
+- **Code entry gate** on first visit; code stored in `localStorage` and sent on every request as `X-Reviewer-Code`
+- **Overview tab**: progress strip (approved / needs-changes / in-progress / pending), recent cases, milestones, Random-Pending CTA
+- **Cases tab**: 516-row hybrid list with status-colored left border, condition pill, severity dot cluster, multi-select condition filter, search, and a Random-Pending button
+- **Case detail**: header + chief complaint pull-quote + patient/vitals + HPI (Source Serif Pro) + neuro exam + initial workup (collapsible) + diagnostic pathway timeline + ground truth showcase (differential cards, optimal actions, critical / contraindicated, red herrings, teaching pearls) + metadata
+- **Field-level annotation gesture**: hover any field → primary-color "Comment" pill appears in the margin → popover with severity (note / issue / error) + free-text + `⌘↵` to save. Already-annotated fields get a persistent left border colored by highest severity + count badge
+- **Annotation sidebar**: 4-state status switcher (pending / in-progress / needs-changes / approved), case-wide thread, severity-filterable field annotations, Approve case + Next-Pending CTAs
+- **Methodology tab**: hero numbers, 4-stage pipeline diagram (PMC seeds → synthetic augmentation → tool outputs → ground truth) with framer-motion scroll reveal, 20-condition small-multiples grid, severity + encounter charts
+- **Admin tab** (admin role only): inter-rater agreement table with consensus badges, per-reviewer progress dashboard, field hotspots (sortable), side-by-side diff per case (field-as-row layout)
+
+### Deploy notes
+
+The frontend can be served by anything that hosts static files (Nginx, Vercel, Netlify). The backend is a small Python container — no GPU required. The annotation store and reviewer YAML can live on a persistent volume; both are file-based and easy to back up.
 
 ## Evaluation
 
