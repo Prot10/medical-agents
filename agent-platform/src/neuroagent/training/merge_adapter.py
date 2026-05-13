@@ -93,15 +93,30 @@ def merge_and_save(
     tok_config = json.loads(tok_config_path.read_text())
     if tok_config.get("tokenizer_class") == "TokenizersBackend":
         logger.info("Patching tokenizer_config.json: replacing TokenizersBackend class")
-        from huggingface_hub import hf_hub_download
+        patched = False
 
-        try:
-            orig_tok_config = Path(
-                hf_hub_download(base_model, "tokenizer_config.json")
-            ).read_text()
-            tok_config_path.write_text(orig_tok_config)
-        except Exception:
-            # Fallback: just remove the problematic class name
+        # Try local base model path first
+        local_tok = Path(base_model) / "tokenizer_config.json"
+        if local_tok.exists():
+            local_tc = json.loads(local_tok.read_text())
+            if local_tc.get("tokenizer_class") != "TokenizersBackend":
+                tok_config_path.write_text(local_tok.read_text())
+                patched = True
+
+        # Try HuggingFace Hub
+        if not patched:
+            try:
+                from huggingface_hub import hf_hub_download
+                orig_tok_config = Path(
+                    hf_hub_download(base_model, "tokenizer_config.json")
+                ).read_text()
+                tok_config_path.write_text(orig_tok_config)
+                patched = True
+            except Exception:
+                pass
+
+        # Last resort: remove the class name
+        if not patched:
             tok_config.pop("tokenizer_class", None)
             tok_config_path.write_text(json.dumps(tok_config, indent=2))
 
