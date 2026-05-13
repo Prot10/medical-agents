@@ -1,0 +1,262 @@
+// TypeScript mirrors of the Pydantic models in the review API. Keep in sync
+// with agent-platform/src/neuroagent/review_api/schemas/.
+
+export type Severity = "note" | "issue" | "error"
+
+export type ReviewStatus =
+  | "pending"
+  | "in_progress"
+  | "needs_changes"
+  | "approved"
+
+export type ReviewerRole = "reviewer" | "admin"
+
+export interface ReviewerProfile {
+  code: string
+  name: string
+  role: ReviewerRole
+}
+
+export interface DatasetSummary {
+  version: string
+  name: string
+  description: string
+  case_count: number
+  is_default: boolean
+}
+
+export interface CaseIndexEntry {
+  case_id: string
+  condition: string
+  difficulty: "straightforward" | "moderate" | "diagnostic_puzzle"
+  encounter_type: "emergency" | "inpatient" | "outpatient"
+  age: number
+  sex: string
+  chief_complaint: string
+}
+
+export interface FieldAnnotation {
+  id: string
+  field_path: string
+  field_snippet: string | null
+  comment: string
+  severity: Severity
+  created_at: string
+  updated_at: string
+  resolved: boolean
+}
+
+export interface CaseComment {
+  id: string
+  comment: string
+  severity: Severity
+  created_at: string
+  updated_at: string
+}
+
+export interface CaseReview {
+  case_id: string
+  dataset_version: string
+  reviewer_code: string
+  status: ReviewStatus
+  field_annotations: FieldAnnotation[]
+  case_comments: CaseComment[]
+  first_opened_at: string | null
+  last_updated_at: string
+  time_spent_seconds: number
+}
+
+export interface CaseReviewSummary {
+  case_id: string
+  status: ReviewStatus
+  annotation_count: number
+  comment_count: number
+  severity_counts: Record<Severity, number>
+  last_updated_at: string | null
+}
+
+export interface MyProgress {
+  reviewer_code: string
+  dataset_version: string
+  total_cases: number
+  touched_cases: number
+  by_status: Record<ReviewStatus, number>
+  by_condition: Record<string, Record<ReviewStatus, number>>
+}
+
+export interface MethodologyStats {
+  total_cases: number
+  conditions: number
+  by_difficulty: Record<string, number>
+  by_encounter: Record<string, number>
+  avg_pathway_depth: number
+}
+
+export interface MethodologyPipelineStage {
+  label: string
+  icon: string
+  description: string
+}
+
+export interface MethodologyProse {
+  title: string
+  tagline: string
+  overview: string
+  pipeline: MethodologyPipelineStage[]
+  citation_bibtex: string
+}
+
+export interface Methodology {
+  version: string
+  prose: MethodologyProse
+  stats: MethodologyStats
+  by_condition: Array<{
+    condition: string
+    count: number
+    by_difficulty: Record<string, number>
+  }>
+}
+
+// Admin views ------------------------------------------------------------
+
+export interface AdminAgreementRow {
+  case_id: string
+  condition: string
+  difficulty: string
+  statuses: Record<string, ReviewStatus>
+  consensus: "unanimous" | "agree" | "in_review" | "disagree"
+}
+
+export interface AdminAgreement {
+  reviewer_codes: string[]
+  rows: AdminAgreementRow[]
+  consensus_summary: Record<string, number>
+}
+
+export interface AdminReviewerProgress extends MyProgress {
+  code: string
+  name: string
+  role: ReviewerRole
+}
+
+export interface FieldHotspot {
+  field_path: string
+  total: number
+  by_severity: Record<Severity, number>
+  reviewer_codes: string[]
+  case_ids: string[]
+  latest_comment: string | null
+  latest_at: string | null
+}
+
+export interface CaseDiffReviewer {
+  code: string
+  name: string
+  status: ReviewStatus
+  annotation_count: number
+  comment_count: number
+  case_comments: CaseComment[]
+}
+
+export interface CaseDiffFieldRow {
+  field_path: string
+  by_reviewer: Record<string, FieldAnnotation>
+}
+
+export interface CaseDiff {
+  case_id: string
+  dataset_version: string
+  reviewers: CaseDiffReviewer[]
+  field_rows: CaseDiffFieldRow[]
+  consensus: "unanimous" | "partial" | "disagree"
+}
+
+// --- Full NeuroBenchCase (used by the case detail view) ------------------
+// Loose typing — keeping the surface area small. The detail view treats most
+// fields as JSON values and lets typed sub-components claim what they need.
+
+export interface NeuroBenchCase {
+  case_id: string
+  condition: string
+  difficulty: string
+  encounter_type: string
+  patient: PatientProfile
+  initial_tool_outputs: Record<string, unknown> | null
+  followup_outputs: Array<{
+    trigger_action: string
+    tool_name: string
+    output: unknown
+  }>
+  ground_truth: GroundTruth
+  metadata: Record<string, unknown>
+}
+
+export interface PatientProfile {
+  patient_id?: string
+  demographics: {
+    age: number
+    sex: string
+    handedness?: string
+    ethnicity?: string
+    bmi?: number
+  }
+  clinical_history: {
+    past_medical_history?: string[]
+    medications?: Array<{
+      drug: string
+      dose?: string
+      frequency?: string
+      indication?: string
+    }>
+    allergies?: string[]
+    family_history?: string[]
+    social_history?: Record<string, string>
+  }
+  neurological_exam: {
+    mental_status?: string
+    cranial_nerves?: string
+    motor?: string
+    sensory?: string
+    reflexes?: string
+    coordination?: string
+    gait?: string
+    additional?: string
+  }
+  vitals: {
+    bp_systolic?: number
+    bp_diastolic?: number
+    hr?: number
+    temp?: number
+    rr?: number
+    spo2?: number
+  }
+  chief_complaint: string
+  history_present_illness: string
+}
+
+export interface GroundTruth {
+  primary_diagnosis: string
+  icd_code?: string
+  differential?: Array<{
+    diagnosis: string
+    likelihood: string
+    key_distinguishing?: string
+  }>
+  optimal_actions?: Array<{
+    step: number
+    action: string
+    tool_name?: string
+    expected_finding?: string
+    category?: string
+    tool_parameters?: Record<string, unknown>
+  }>
+  critical_actions?: string[]
+  contraindicated_actions?: string[]
+  key_reasoning_points?: string[]
+  red_herrings?: Array<{
+    data_point: string
+    location: string
+    intended_effect: string
+    correct_interpretation: string
+  }>
+}
