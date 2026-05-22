@@ -40,6 +40,15 @@ class MockServer:
                 output=output.model_dump() if isinstance(output, BaseModel) else output,
             )
 
+        # Off-pathway fallback: a clinically coherent normal / non-contributory
+        # result for a tool that is not on this case's diagnostic pathway.
+        output = self._match_fallback_output(tool_name, parameters)
+        if output is not None:
+            return ToolResult(
+                tool_name=tool_name, success=True, from_fallback=True,
+                output=output.model_dump() if isinstance(output, BaseModel) else output,
+            )
+
         return ToolResult(
             tool_name=tool_name, success=False, output=None,
             error_message=(
@@ -142,6 +151,37 @@ class MockServer:
         for followup in self.case.followup_outputs:
             if followup.tool_name == tool_name:
                 return followup.output
+        return None
+
+    def _match_fallback_output(self, tool_name: str, parameters: dict[str, Any]) -> BaseModel | None:
+        """Resolve a tool call against the off-pathway fallback tier."""
+        fb = self.case.fallback_tool_outputs
+        if fb is None:
+            return None
+
+        mapping = {
+            "analyze_eeg": fb.eeg,
+            "analyze_brain_mri": fb.mri,
+            "analyze_ecg": fb.ecg,
+            "interpret_labs": fb.labs,
+            "analyze_csf": fb.csf,
+            "order_ct_scan": fb.ct,
+            "order_echocardiogram": fb.echo,
+            "order_cardiac_monitoring": fb.cardiac_monitoring,
+            "order_advanced_imaging": fb.advanced_imaging,
+            "order_specialized_test": fb.specialized_test,
+        }
+        if tool_name in mapping:
+            return mapping[tool_name]
+
+        if tool_name == "search_medical_literature" and fb.literature_search:
+            results = list(fb.literature_search.values())
+            return results[0] if results else None
+
+        if tool_name == "check_drug_interactions" and fb.drug_interactions:
+            results = list(fb.drug_interactions.values())
+            return results[0] if results else None
+
         return None
 
     def get_call_log(self) -> list[ToolCall]:
