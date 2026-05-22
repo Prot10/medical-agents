@@ -1,0 +1,1850 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AgentClinic — Interactive Study Guide</title>
+<meta name="description" content="An interactive, grounded explainer of the paper 'AgentClinic: a multimodal benchmark for tool-using clinical AI agents'." />
+<style>
+/* ============================================================
+   THEME TOKENS
+   ============================================================ */
+:root{
+  --bg:#f6f4ef; --surface:#ffffff; --surface-2:#faf9f5; --surface-3:#f0ede4;
+  --ink:#1b2127; --ink-soft:#46515c; --ink-faint:#76828e;
+  --border:#e4e0d4; --border-strong:#cfc9b9;
+  --primary:#0e7c86; --primary-soft:#d4ebed; --primary-ink:#0a5a62;
+  --accent:#bb3e03; --accent-soft:#f6e0d3;
+  --good:#15803d; --good-soft:#d8efdf; --bad:#b3261e; --bad-soft:#f4dcda;
+  --doctor:#2563eb; --patient:#0d9488; --measure:#b45309; --moderator:#7c3aed;
+  --warn-soft:#fbf0d6; --warn-ink:#7a5b00;
+  --shadow:0 1px 2px rgba(20,25,30,.05), 0 6px 22px rgba(20,25,30,.07);
+  --shadow-lg:0 10px 40px rgba(20,25,30,.14);
+  --font-body:Georgia,'Iowan Old Style','Palatino Linotype',Palatino,'Times New Roman',serif;
+  --font-ui:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --font-mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  --maxw:680px;
+}
+[data-theme="dark"]{
+  --bg:#13171b; --surface:#1c2228; --surface-2:#232a31; --surface-3:#2a323a;
+  --ink:#e9e7e0; --ink-soft:#b5bdc5; --ink-faint:#84909b;
+  --border:#2f373f; --border-strong:#414b54;
+  --primary:#3ec8c1; --primary-soft:#11383a; --primary-ink:#7fe0da;
+  --accent:#f3956b; --accent-soft:#3a2417;
+  --good:#54c97e; --good-soft:#15321f; --bad:#f0867d; --bad-soft:#3a1c1a;
+  --doctor:#6aa3fb; --patient:#34d6c8; --measure:#e8a64a; --moderator:#ac8cf0;
+  --warn-soft:#332a12; --warn-ink:#e5c878;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 26px rgba(0,0,0,.4);
+  --shadow-lg:0 14px 46px rgba(0,0,0,.55);
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important;}
+}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:var(--font-body); font-size:19px; line-height:1.72;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+h1,h2,h3,h4{font-family:var(--font-ui); line-height:1.22; font-weight:700;}
+a{color:var(--primary-ink);}
+:focus-visible{outline:3px solid var(--primary); outline-offset:2px; border-radius:3px;}
+img{max-width:100%;}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.progressbar{
+  position:fixed; top:0; left:0; height:4px; width:0%;
+  background:linear-gradient(90deg,var(--primary),var(--accent));
+  z-index:100; transition:width .15s ease-out;
+}
+.topbar{
+  position:fixed; top:0; left:0; right:0; height:54px; z-index:60;
+  display:flex; align-items:center; gap:12px;
+  padding:0 16px 0 18px;
+  background:color-mix(in srgb,var(--surface) 88%,transparent);
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+  font-family:var(--font-ui);
+}
+.topbar .brand{font-weight:700; font-size:15px; letter-spacing:.2px;}
+.topbar .brand .dot{color:var(--primary);}
+.topbar .spacer{flex:1;}
+.iconbtn{
+  font-family:var(--font-ui); cursor:pointer;
+  background:var(--surface-2); border:1px solid var(--border);
+  color:var(--ink); border-radius:8px; padding:7px 11px; font-size:13px;
+  display:inline-flex; align-items:center; gap:6px;
+}
+.iconbtn:hover{border-color:var(--border-strong); background:var(--surface-3);}
+.navtoggle{display:none;}
+
+.layout{display:flex; max-width:1180px; margin:0 auto;}
+.sidebar{
+  width:262px; flex:none; position:sticky; top:54px;
+  height:calc(100vh - 54px); overflow-y:auto;
+  padding:22px 14px 60px; border-right:1px solid var(--border);
+  font-family:var(--font-ui);
+}
+.sidebar h2{font-size:11px; text-transform:uppercase; letter-spacing:1.4px;
+  color:var(--ink-faint); margin:0 8px 12px; font-weight:700;}
+.nav a{
+  display:flex; gap:9px; align-items:baseline;
+  text-decoration:none; color:var(--ink-soft);
+  padding:7px 9px; border-radius:8px; font-size:13.5px; line-height:1.35;
+  border-left:2px solid transparent; margin-bottom:1px;
+}
+.nav a:hover{background:var(--surface-2); color:var(--ink);}
+.nav a.active{background:var(--primary-soft); color:var(--primary-ink);
+  border-left-color:var(--primary); font-weight:600;}
+.nav a .num{font-size:11px; color:var(--ink-faint); flex:none; width:16px;
+  font-variant-numeric:tabular-nums;}
+.nav a.active .num{color:var(--primary);}
+.nav a .chk{margin-left:auto; color:var(--good); opacity:0; font-size:12px;}
+.nav a.done .chk{opacity:1;}
+
+.main{flex:1; min-width:0; padding:54px 0 120px;}
+.wrap{max-width:var(--maxw); margin:0 auto; padding:0 26px;}
+
+/* ============================================================
+   SECTIONS / TYPOGRAPHY
+   ============================================================ */
+section{padding:54px 0 18px; scroll-margin-top:64px;}
+section + section{border-top:1px solid var(--border);}
+.kicker{
+  font-family:var(--font-ui); font-size:12px; font-weight:700;
+  letter-spacing:1.6px; text-transform:uppercase; color:var(--primary);
+  display:flex; align-items:center; gap:9px; margin-bottom:12px;
+}
+.kicker .ko{
+  width:22px;height:22px;border-radius:6px;background:var(--primary-soft);
+  color:var(--primary-ink); display:grid;place-items:center; font-size:11px;
+}
+h2.shead{font-size:31px; margin:0 0 6px; letter-spacing:-.4px;}
+h3{font-size:21px; margin:34px 0 8px;}
+h4{font-size:15px; font-family:var(--font-ui); margin:22px 0 6px; color:var(--ink);}
+p{margin:14px 0;}
+.lead{font-size:21px; line-height:1.6; color:var(--ink-soft);}
+strong{font-weight:700; color:var(--ink);}
+em{color:var(--ink); }
+.small{font-size:15px; line-height:1.6; color:var(--ink-soft);}
+ul.clean{padding-left:22px; margin:14px 0;}
+ul.clean li{margin:7px 0;}
+.fignote{font-family:var(--font-ui); font-size:12.5px; color:var(--ink-faint);
+  margin-top:8px;}
+
+/* objective bar */
+.objective{
+  font-family:var(--font-ui); font-size:14px; line-height:1.55;
+  background:var(--surface-2); border:1px solid var(--border);
+  border-left:3px solid var(--primary);
+  padding:11px 15px; border-radius:0 9px 9px 0; margin:16px 0 6px;
+  color:var(--ink-soft);
+}
+.objective b{color:var(--primary-ink); font-weight:700;}
+
+/* key terms */
+.terms{
+  font-family:var(--font-ui); font-size:13.5px;
+  background:var(--surface-2); border:1px dashed var(--border-strong);
+  border-radius:11px; padding:13px 16px; margin:18px 0;
+}
+.terms .th{font-weight:700; font-size:11px; letter-spacing:1px;
+  text-transform:uppercase; color:var(--ink-faint); margin-bottom:6px;}
+.terms li{margin:5px 0; list-style:none;}
+.terms ul{padding:0; margin:0;}
+.terms b{color:var(--ink);}
+
+/* glossary tooltip term */
+.gl{
+  border:0; background:none; padding:0; cursor:help;
+  font:inherit; color:inherit;
+  border-bottom:2px dotted var(--primary);
+}
+.gl:hover,.gl:focus-visible{background:var(--primary-soft);}
+.tip{
+  position:absolute; z-index:90; max-width:300px;
+  background:var(--ink); color:var(--bg);
+  font-family:var(--font-ui); font-size:13px; line-height:1.5;
+  padding:10px 13px; border-radius:9px; box-shadow:var(--shadow-lg);
+  pointer-events:none; opacity:0; transform:translateY(4px);
+  transition:opacity .14s, transform .14s;
+}
+.tip.show{opacity:1; transform:translateY(0);}
+.tip b{color:var(--primary); font-weight:700;}
+
+/* callouts */
+.takeaway,.callout,.gnote,.caveat{
+  border-radius:12px; padding:16px 18px; margin:24px 0;
+  font-family:var(--font-ui); font-size:14.5px; line-height:1.6;
+}
+.takeaway{background:var(--primary-soft); border:1px solid color-mix(in srgb,var(--primary) 35%,transparent);}
+.takeaway .tt{font-weight:800; font-size:11px; letter-spacing:1.3px;
+  text-transform:uppercase; color:var(--primary-ink); margin-bottom:5px;
+  display:flex;align-items:center;gap:7px;}
+.takeaway strong{color:var(--primary-ink);}
+.gnote{background:var(--warn-soft); border:1px solid color-mix(in srgb,var(--warn-ink) 30%,transparent);
+  font-size:13.5px;}
+.gnote .tt{font-weight:800; font-size:11px; letter-spacing:1.2px;
+  text-transform:uppercase; color:var(--warn-ink); margin-bottom:4px;}
+.gnote{color:var(--ink-soft);}
+.caveat{background:var(--surface-2); border:1px solid var(--border);
+  border-left:3px solid var(--ink-faint); font-size:13.5px; color:var(--ink-soft);}
+.caveat .tt{font-weight:800;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;
+  color:var(--ink-faint);margin-bottom:4px;}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{padding:46px 0 20px;}
+.hero .badge{
+  font-family:var(--font-ui); font-size:12px; font-weight:700;
+  color:var(--primary-ink); background:var(--primary-soft);
+  display:inline-block; padding:5px 12px; border-radius:999px;
+  letter-spacing:.6px; margin-bottom:18px;
+}
+.hero h1{
+  font-size:46px; line-height:1.08; letter-spacing:-1.4px; margin:0 0 6px;
+}
+.hero h1 .a{color:var(--primary);}
+.hero .sub{font-size:22px; color:var(--ink-soft); line-height:1.4; margin:8px 0 18px;
+  font-family:var(--font-ui); font-weight:500;}
+.metaline{font-family:var(--font-ui); font-size:13px; color:var(--ink-faint);
+  line-height:1.7; border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border); padding:14px 0; margin:22px 0;}
+.metaline b{color:var(--ink-soft);}
+.statgrid{display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin:26px 0;}
+.stat{
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; padding:14px 8px; text-align:center; box-shadow:var(--shadow);
+}
+.stat .n{font-family:var(--font-ui); font-weight:800; font-size:27px; color:var(--primary);}
+.stat .l{font-family:var(--font-ui); font-size:11px; color:var(--ink-faint);
+  text-transform:uppercase; letter-spacing:.6px; margin-top:2px; line-height:1.3;}
+
+/* ============================================================
+   COMPONENTS — generic cards / chips
+   ============================================================ */
+.card{background:var(--surface); border:1px solid var(--border);
+  border-radius:14px; padding:18px 20px; box-shadow:var(--shadow); margin:20px 0;}
+.figbox{background:var(--surface-2); border:1px solid var(--border);
+  border-radius:14px; padding:20px; margin:24px 0;}
+.figbox .figttl{font-family:var(--font-ui); font-size:12px; font-weight:700;
+  letter-spacing:1px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:14px;}
+
+/* ============================================================
+   AGENTS DIAGRAM
+   ============================================================ */
+.agentgrid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin:6px 0 4px;}
+.agentbtn{
+  font-family:var(--font-ui); cursor:pointer; text-align:left;
+  background:var(--surface); border:1.5px solid var(--border);
+  border-radius:12px; padding:13px 13px; color:var(--ink);
+  transition:transform .12s, border-color .12s, box-shadow .12s;
+  display:flex; flex-direction:column; gap:3px;
+}
+.agentbtn:hover{transform:translateY(-2px); box-shadow:var(--shadow);}
+.agentbtn .ico{font-size:21px; line-height:1;}
+.agentbtn .nm{font-weight:700; font-size:14px;}
+.agentbtn .rl{font-size:11.5px; color:var(--ink-faint);}
+.agentbtn[data-a="doctor"]{border-top:3px solid var(--doctor);}
+.agentbtn[data-a="patient"]{border-top:3px solid var(--patient);}
+.agentbtn[data-a="measure"]{border-top:3px solid var(--measure);}
+.agentbtn[data-a="moderator"]{border-top:3px solid var(--moderator);}
+.agentbtn.sel{border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-soft);}
+.agentbtn.full{grid-column:1/-1;}
+.agentdetail{
+  margin-top:12px; background:var(--surface-2); border:1px solid var(--border);
+  border-radius:12px; padding:16px 18px; font-family:var(--font-ui); font-size:14px;
+  line-height:1.6; min-height:120px;
+}
+.agentdetail .dh{display:flex; align-items:center; gap:9px; margin-bottom:7px;}
+.agentdetail .dh .tag{font-weight:800; font-size:16px;}
+.agentdetail .dh .pill{font-size:10.5px; font-weight:700; letter-spacing:.5px;
+  text-transform:uppercase; padding:3px 8px; border-radius:999px;}
+.agentdetail ul{margin:8px 0 0; padding-left:20px;}
+.agentdetail li{margin:5px 0;}
+.agentdetail .ex{margin-top:9px; font-family:var(--font-mono); font-size:12px;
+  background:var(--surface-3); border-radius:8px; padding:9px 11px; color:var(--ink-soft);}
+
+/* ============================================================
+   SIMULATION STEPPER
+   ============================================================ */
+.sim{background:var(--surface-2); border:1px solid var(--border);
+  border-radius:14px; padding:18px; margin:20px 0;}
+.simhead{display:flex; align-items:center; justify-content:space-between;
+  font-family:var(--font-ui); margin-bottom:12px; gap:10px; flex-wrap:wrap;}
+.dots{display:flex; gap:6px;}
+.dots span{width:9px;height:9px;border-radius:50%;background:var(--border-strong);}
+.dots span.on{background:var(--primary);}
+.dots span.cur{transform:scale(1.45);}
+.transcript{display:flex; flex-direction:column; gap:9px; min-height:280px;}
+.msg{display:flex; gap:10px; align-items:flex-start;
+  opacity:0; transform:translateY(8px); transition:opacity .35s, transform .35s;}
+.msg.vis{opacity:1; transform:none;}
+.msg .av{width:30px;height:30px;border-radius:8px;flex:none;display:grid;
+  place-items:center;font-size:15px;color:#fff;font-family:var(--font-ui);font-weight:700;}
+.msg.doctor .av{background:var(--doctor);}
+.msg.patient .av{background:var(--patient);}
+.msg.measure .av{background:var(--measure);}
+.msg.moderator .av{background:var(--moderator);}
+.msg.system .av{background:var(--ink-faint);}
+.msg .bub{background:var(--surface); border:1px solid var(--border);
+  border-radius:11px; padding:9px 13px; font-family:var(--font-ui);
+  font-size:13.7px; line-height:1.55;}
+.msg .who{font-size:10.5px; font-weight:800; letter-spacing:.5px;
+  text-transform:uppercase; color:var(--ink-faint); margin-bottom:2px;}
+.msg.cur .bub{border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-soft);}
+.msg .scan{display:flex; gap:6px; margin-top:7px;}
+.msg .scan i{width:48px;height:34px;border-radius:5px;
+  background:linear-gradient(135deg,#222,#555); display:block;
+  border:1px solid var(--border-strong); position:relative; overflow:hidden;}
+.msg .scan i::after{content:"";position:absolute;inset:0;
+  background:radial-gradient(circle at 60% 35%,rgba(255,255,255,.5),transparent 55%);}
+.msg .verdict{font-weight:800; color:var(--good);}
+.stepctrl{display:flex; gap:8px; margin-top:14px; font-family:var(--font-ui);}
+.btn{
+  font-family:var(--font-ui); cursor:pointer; font-size:13.5px; font-weight:600;
+  border-radius:9px; padding:9px 16px; border:1px solid var(--border-strong);
+  background:var(--surface); color:var(--ink);
+}
+.btn:hover:not(:disabled){background:var(--surface-3);}
+.btn:disabled{opacity:.4; cursor:not-allowed;}
+.btn.prim{background:var(--primary); color:#fff; border-color:var(--primary);}
+.btn.prim:hover:not(:disabled){filter:brightness(1.08);}
+.stepcap{font-family:var(--font-ui); font-size:13px; color:var(--ink-soft);
+  margin-top:10px; min-height:38px;}
+.stepcap b{color:var(--primary-ink);}
+
+/* ============================================================
+   DATASET CARDS
+   ============================================================ */
+.dsgrid{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:18px 0;}
+.ds{background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  padding:15px 16px; box-shadow:var(--shadow);}
+.ds .dn{font-family:var(--font-ui); font-weight:800; font-size:14.5px; color:var(--primary-ink);}
+.ds .dc{font-family:var(--font-ui); font-size:24px; font-weight:800; color:var(--ink);
+  margin:4px 0 0;}
+.ds .dc small{font-size:12px; font-weight:600; color:var(--ink-faint);}
+.ds .dd{font-family:var(--font-ui); font-size:12.6px; color:var(--ink-soft);
+  line-height:1.5; margin-top:5px;}
+.ds.wide{grid-column:1/-1;}
+
+/* ============================================================
+   BAR CHARTS
+   ============================================================ */
+.chart{font-family:var(--font-ui); margin:8px 0;}
+.bar-row{display:grid; grid-template-columns:118px 1fr 64px; align-items:center;
+  gap:9px; margin:6px 0; font-size:12.5px;}
+.bar-name{text-align:right; color:var(--ink-soft); line-height:1.2;}
+.bar-name b{color:var(--ink); font-weight:700;}
+.bar-track{background:var(--surface-3); border-radius:6px; height:22px;
+  position:relative; overflow:hidden;}
+.bar-fill{height:100%; width:0; border-radius:6px;
+  background:var(--primary); transition:width 1s cubic-bezier(.22,1,.36,1);}
+.chart.in .bar-fill{width:var(--w);}
+.bar-fill.gen{background:linear-gradient(90deg,#1f9aa3,#0e7c86);}
+.bar-fill.med{background:linear-gradient(90deg,#7c5cc4,#5e3fae);}
+.bar-fill.human{background:linear-gradient(90deg,#c2722a,#a85a18);}
+[data-theme="dark"] .bar-fill.gen{background:linear-gradient(90deg,#3ec8c1,#23978f);}
+[data-theme="dark"] .bar-fill.med{background:linear-gradient(90deg,#ac8cf0,#8b67d8);}
+[data-theme="dark"] .bar-fill.human{background:linear-gradient(90deg,#e8a64a,#c5832c);}
+.bar-val{font-variant-numeric:tabular-nums; font-weight:700; color:var(--ink);
+  font-size:12.5px;}
+.bar-val small{font-weight:500; color:var(--ink-faint); font-size:10.5px;}
+.axis100{display:grid; grid-template-columns:118px 1fr 64px; gap:9px;
+  font-size:10px; color:var(--ink-faint); margin-top:6px;}
+.axis100 .ticks{display:flex; justify-content:space-between;}
+.legend{display:flex; gap:14px; flex-wrap:wrap; font-size:11.5px;
+  color:var(--ink-soft); margin:10px 0 2px;}
+.legend i{width:11px;height:11px;border-radius:3px;display:inline-block;
+  vertical-align:-1px;margin-right:5px;}
+
+.toggle-row{display:flex; gap:6px; margin:4px 0 14px; flex-wrap:wrap;}
+.seg{font-family:var(--font-ui); cursor:pointer; font-size:12.5px; font-weight:600;
+  padding:7px 13px; border-radius:8px; border:1px solid var(--border-strong);
+  background:var(--surface); color:var(--ink-soft);}
+.seg.on{background:var(--primary); color:#fff; border-color:var(--primary);}
+
+/* place your bets */
+.bets{background:var(--surface); border:1px dashed var(--border-strong);
+  border-radius:12px; padding:15px 17px; margin:18px 0; font-family:var(--font-ui);}
+.bets .bq{font-weight:700; font-size:14px; margin-bottom:9px;}
+.bets .bopts{display:flex; gap:7px; flex-wrap:wrap;}
+.betopt{font-family:var(--font-ui); cursor:pointer; font-size:13px; font-weight:600;
+  padding:8px 14px; border-radius:8px; border:1px solid var(--border-strong);
+  background:var(--surface-2); color:var(--ink);}
+.betopt:hover{border-color:var(--primary);}
+.betopt.picked{background:var(--primary-soft); border-color:var(--primary); color:var(--primary-ink);}
+.bets .breveal{margin-top:11px; font-size:13.5px; color:var(--ink-soft);
+  display:none; line-height:1.55;}
+.bets.done .breveal{display:block;}
+.bets.done .bopts{opacity:.55; pointer-events:none;}
+
+/* slider widget */
+.sliderwrap{background:var(--surface); border:1px solid var(--border);
+  border-radius:13px; padding:18px 20px; margin:18px 0; box-shadow:var(--shadow);}
+.sliderwrap .readout{display:flex; align-items:baseline; gap:14px; margin-bottom:6px;
+  font-family:var(--font-ui); flex-wrap:wrap;}
+.sliderwrap .big{font-size:46px; font-weight:800; color:var(--primary);
+  line-height:1; font-variant-numeric:tabular-nums;}
+.sliderwrap .biglab{font-size:13px; color:var(--ink-soft);}
+.sliderwrap .nval{font-weight:800; color:var(--ink);}
+input[type=range]{width:100%; accent-color:var(--primary); height:26px; cursor:pointer;}
+.sliderscale{display:flex; justify-content:space-between; font-family:var(--font-ui);
+  font-size:11px; color:var(--ink-faint); margin-top:-2px;}
+.minibar{height:14px; background:var(--surface-3); border-radius:7px; overflow:hidden;
+  margin:12px 0 4px;}
+.minibar div{height:100%; background:var(--primary); width:0;
+  transition:width .4s cubic-bezier(.22,1,.36,1); border-radius:7px;}
+
+/* ============================================================
+   TOOL EXPLORER
+   ============================================================ */
+.toolgrid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:16px 0;}
+.tool{font-family:var(--font-ui); background:var(--surface);
+  border:1px solid var(--border); border-radius:12px; overflow:hidden;}
+.tool > summary{cursor:pointer; padding:13px 15px; list-style:none;
+  display:flex; gap:10px; align-items:flex-start;}
+.tool > summary::-webkit-details-marker{display:none;}
+.tool .ti{font-size:18px; flex:none;}
+.tool .tn{font-weight:700; font-size:13.5px;}
+.tool .ts{font-size:11.5px; color:var(--ink-faint); margin-top:1px;}
+.tool .tx{margin-left:auto; color:var(--ink-faint); font-size:14px; flex:none;}
+.tool[open] .tx{transform:rotate(45deg);}
+.tool .body{padding:0 15px 14px 41px; font-size:13px; line-height:1.6;
+  color:var(--ink-soft);}
+.tool .body .steps{margin:8px 0 0; padding-left:18px;}
+.tool .body .steps li{margin:4px 0;}
+.tool .body .ex{font-family:var(--font-mono); font-size:11.5px;
+  background:var(--surface-3); border-radius:7px; padding:8px 10px; margin-top:8px;
+  color:var(--ink-soft);}
+
+/* ============================================================
+   QUIZ
+   ============================================================ */
+.quiz{background:var(--surface); border:1px solid var(--border);
+  border-left:3px solid var(--accent); border-radius:0 12px 12px 0;
+  padding:16px 18px; margin:26px 0; font-family:var(--font-ui);}
+.quiz .qh{font-size:11px; font-weight:800; letter-spacing:1.2px;
+  text-transform:uppercase; color:var(--accent); margin-bottom:7px;}
+.quiz .qq{font-weight:700; font-size:15px; line-height:1.45; color:var(--ink);}
+.quiz .qopts{display:flex; flex-direction:column; gap:7px; margin:12px 0 0;}
+.qopt{font-family:var(--font-ui); cursor:pointer; text-align:left;
+  background:var(--surface-2); border:1px solid var(--border);
+  border-radius:9px; padding:10px 13px; font-size:13.5px; color:var(--ink);
+  display:flex; gap:9px; align-items:flex-start;}
+.qopt:hover{border-color:var(--border-strong);}
+.qopt .mk{flex:none; width:18px;height:18px;border-radius:50%;
+  border:1.5px solid var(--border-strong); display:grid;place-items:center;
+  font-size:11px; font-weight:800;}
+.qopt.correct{background:var(--good-soft); border-color:var(--good);}
+.qopt.correct .mk{background:var(--good); border-color:var(--good); color:#fff;}
+.qopt.wrong{background:var(--bad-soft); border-color:var(--bad);}
+.qopt.wrong .mk{background:var(--bad); border-color:var(--bad); color:#fff;}
+.quiz.answered .qopt{pointer-events:none;}
+.quiz.answered .qopt.isright{background:var(--good-soft); border-color:var(--good);}
+.quiz.answered .qopt.isright .mk{background:var(--good);border-color:var(--good);color:#fff;}
+.qfb{margin-top:11px; font-size:13px; line-height:1.6; color:var(--ink-soft);
+  display:none; padding:11px 13px; border-radius:9px; background:var(--surface-2);
+  border:1px solid var(--border);}
+.quiz.answered .qfb{display:block;}
+.qfb b{color:var(--ink);}
+
+/* recall prompt */
+.recall{font-family:var(--font-ui); text-align:center; margin:30px 0;
+  font-size:14px; color:var(--ink-soft);}
+.recall .rq{font-style:italic; font-size:15.5px; color:var(--ink);
+  max-width:520px; margin:6px auto 0; line-height:1.5;}
+.recall .rl{font-size:11px; font-weight:800; letter-spacing:1.4px;
+  text-transform:uppercase; color:var(--accent);}
+
+/* glossary list */
+.glist{columns:1; font-family:var(--font-ui);}
+.glist dt{font-weight:800; font-size:14px; color:var(--ink); margin-top:14px;}
+.glist dd{margin:2px 0 0; font-size:13.5px; line-height:1.55; color:var(--ink-soft);}
+
+/* footer */
+.footer{font-family:var(--font-ui); font-size:12.5px; color:var(--ink-faint);
+  text-align:center; padding:40px 26px 10px; line-height:1.7;}
+.footer a{color:var(--primary-ink);}
+
+/* dialogue inline */
+.dlg{font-family:var(--font-mono); font-size:13px; background:var(--surface-2);
+  border:1px solid var(--border); border-radius:10px; padding:12px 14px;
+  margin:14px 0; line-height:1.65;}
+.dlg .d{color:var(--doctor); font-weight:700;}
+.dlg .p{color:var(--patient); font-weight:700;}
+
+.pull{font-family:var(--font-ui); font-size:19px; line-height:1.5;
+  color:var(--primary-ink); border-left:3px solid var(--primary);
+  padding:4px 0 4px 18px; margin:24px 0; font-weight:600;}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:880px){
+  body{font-size:18px;}
+  .navtoggle{display:inline-flex;}
+  .sidebar{
+    position:fixed; top:54px; left:0; bottom:0; width:280px; z-index:55;
+    background:var(--surface); transform:translateX(-104%);
+    transition:transform .22s ease; box-shadow:var(--shadow-lg);
+  }
+  .sidebar.open{transform:translateX(0);}
+  .main{padding-top:54px;}
+  .statgrid{grid-template-columns:repeat(2,1fr);}
+  .agentgrid{grid-template-columns:1fr;}
+  .toolgrid,.dsgrid{grid-template-columns:1fr;}
+  .hero h1{font-size:34px;}
+  .bar-row{grid-template-columns:96px 1fr 56px;}
+  .axis100{grid-template-columns:96px 1fr 56px;}
+  h2.shead{font-size:25px;}
+}
+.scrim{display:none;}
+@media (max-width:880px){
+  .scrim{display:block; position:fixed; inset:54px 0 0 0; z-index:54;
+    background:rgba(0,0,0,.35); opacity:0; pointer-events:none; transition:opacity .2s;}
+  .scrim.show{opacity:1; pointer-events:auto;}
+}
+.no-js .needs-js{display:none;}
+.js .nojs-note{display:none;}
+</style>
+</head>
+<body>
+<div class="progressbar" id="progressbar"></div>
+
+<header class="topbar">
+  <button class="iconbtn navtoggle" id="navToggle" aria-label="Open section menu">☰ Sections</button>
+  <span class="brand">Agent<span class="dot">Clinic</span> · Interactive Study Guide</span>
+  <span class="spacer"></span>
+  <button class="iconbtn" id="themeToggle" aria-label="Toggle dark mode">🌙 Theme</button>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar" aria-label="Table of contents">
+    <h2>Contents</h2>
+    <div class="nav" id="nav">
+      <a href="#s-hero"><span class="num">—</span><span>Start here</span><span class="chk">✓</span></a>
+      <a href="#s-problem"><span class="num">1</span><span>The problem with exam scores</span><span class="chk">✓</span></a>
+      <a href="#s-idea"><span class="num">2</span><span>The idea: a simulated clinic</span><span class="chk">✓</span></a>
+      <a href="#s-agents"><span class="num">3</span><span>The four agents</span><span class="chk">✓</span></a>
+      <a href="#s-sim"><span class="num">4</span><span>A simulation, step by step</span><span class="chk">✓</span></a>
+      <a href="#s-data"><span class="num">5</span><span>Where the cases come from</span><span class="chk">✓</span></a>
+      <a href="#s-hard"><span class="num">6</span><span>Result: sequential is hard</span><span class="chk">✓</span></a>
+      <a href="#s-convo"><span class="num">7</span><span>The conversation matters</span><span class="chk">✓</span></a>
+      <a href="#s-tools"><span class="num">8</span><span>The agent toolbox</span><span class="chk">✓</span></a>
+      <a href="#s-bias"><span class="num">9</span><span>Result: bias</span><span class="chk">✓</span></a>
+      <a href="#s-lang"><span class="num">10</span><span>Languages &amp; specialties</span><span class="chk">✓</span></a>
+      <a href="#s-multimodal"><span class="num">11</span><span>Reading medical images</span><span class="chk">✓</span></a>
+      <a href="#s-human"><span class="num">12</span><span>The human reality check</span><span class="chk">✓</span></a>
+      <a href="#s-limits"><span class="num">13</span><span>Limits &amp; what it means</span><span class="chk">✓</span></a>
+      <a href="#s-review"><span class="num">14</span><span>Review &amp; glossary</span><span class="chk">✓</span></a>
+    </div>
+  </nav>
+  <div class="scrim" id="scrim"></div>
+
+  <main class="main">
+
+  <!-- ============================ HERO ============================ -->
+  <section id="s-hero" class="hero">
+    <div class="wrap">
+      <span class="badge">INTERACTIVE PAPER EXPLAINER</span>
+      <h1>Can an AI doctor survive a <span class="a">real conversation</span>?</h1>
+      <p class="sub">A guided, grounded walkthrough of <em>AgentClinic: a multimodal benchmark for tool-using clinical AI agents.</em></p>
+
+      <p class="lead">Large language models now ace medical licensing exams. This paper asks a sharper question: what happens when you stop handing the model a tidy exam question — and instead make it <strong>talk to a patient, order its own tests, read scans, and commit to a diagnosis</strong>, all under a turn limit? The answer is sobering, and that gap is what this study is built to measure.</p>
+
+      <div class="statgrid" aria-label="Key numbers at a glance">
+        <div class="stat"><div class="n">4</div><div class="l">Language agents</div></div>
+        <div class="stat"><div class="n">23</div><div class="l">Biases studied</div></div>
+        <div class="stat"><div class="n">9</div><div class="l">Specialties</div></div>
+        <div class="stat"><div class="n">7</div><div class="l">Languages</div></div>
+        <div class="stat"><div class="n">6</div><div class="l">Agent tools</div></div>
+      </div>
+
+      <div class="metaline">
+        <b>Paper:</b> AgentClinic: a multimodal benchmark for tool-using clinical AI agents &nbsp;·&nbsp;
+        <b>Authors:</b> Samuel Schmidgall, Rojin Ziaei, Carl Harris, Ji Woong Kim, Eduardo Pontes Reis, Jeffrey Jopling, Michael Moor &nbsp;·&nbsp;
+        <b>Affiliations:</b> Johns Hopkins University · Stanford University · Hospital Israelita Albert Einstein (São Paulo) · ETH Zürich<br>
+        <b>Venue:</b> npj Digital Medicine — DOI 10.1038/s41746-026-02674-7 &nbsp;·&nbsp;
+        <b>Status:</b> Article in Press (unedited manuscript) · received 19 Apr 2025, accepted 14 Apr 2026 &nbsp;·&nbsp;
+        <b>Licence:</b> CC BY 4.0 &nbsp;·&nbsp;
+        <b>Code:</b> github.com/SamuelSchmidgall/AgentClinic (MIT)
+      </div>
+
+      <div class="callout takeaway" style="background:var(--surface-2);border-color:var(--border)">
+        <div class="tt" style="color:var(--ink-faint)">How to use this guide</div>
+        <span class="small">Work top to bottom — each section builds on the last. Dotted-underlined words like
+        <button class="gl" data-term="llm">large language model</button> reveal a definition on hover, tap, or keyboard focus. Try every interactive panel; some ask you to <em>predict</em> before they reveal an answer — that guess is doing the teaching. Section progress is saved in your browser. Everything here is grounded line-by-line in the paper; where the manuscript contradicts itself, you'll see an amber <strong>Grounding note</strong>.</span>
+      </div>
+
+      <div class="gnote">
+        <div class="tt">⚑ Grounding note</div>
+        This is an <em>unedited</em> accepted manuscript; the authors state "there may be errors present." A few internal inconsistencies survive in it. This guide flags each one rather than quietly choosing a side.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 1 PROBLEM ============================ -->
+  <section id="s-problem">
+    <div class="wrap">
+      <div class="kicker"><span class="ko">1</span> The problem</div>
+      <h2 class="shead">A 90% exam score that means surprisingly little</h2>
+
+      <p class="lead">Here is a fact that sounds like a finish line.</p>
+      <p>In September 2021, the best language model scored <strong>38.1%</strong> on the <button class="gl" data-term="usmle">US Medical Licensing Examination</button>. By November 2023 — barely two years later — that number had climbed to <strong>90.2%</strong>. For comparison, the human <em>passing</em> score is 60% and the human <em>expert</em> score is 87%. On paper, the machine had overtaken the expert.</p>
+
+      <div class="objective"><b>By the end of this section</b> you'll understand why a high medical-exam score does not mean a model is ready for clinical work — and what is missing from the test.</div>
+
+      <p>So why isn't the problem solved? Because of <em>how</em> that exam is scored. The USMLE — and the <button class="gl" data-term="medqa">MedQA</button> dataset built from such questions — is <strong>static multiple choice</strong>. The model receives a complete <button class="gl" data-term="vignette">case vignette</button> in which <em>every relevant fact is already laid out</em>, then picks the most plausible answer from a list.</p>
+
+      <p>Real clinical work looks nothing like that. The paper calls it a <strong>multiplexed task</strong> built on <em>sequential decision-making</em>: a clinician must handle uncertainty with limited information and finite resources, decide which question to ask next, order the right test at the right time, and draw relevant information out of a patient — compassionately. None of that is exercised when the answer key is already on the page.</p>
+
+      <div class="pull">"Existing benchmarks rely heavily on static question-answering, which does not accurately depict the complex, sequential nature of clinical decision-making."</div>
+
+      <p>And this is not an abstract worry. Over <strong>40% of the global population</strong> faces limited access to healthcare, and health systems are strained — so models that could genuinely scale clinical reasoning would matter enormously. That makes it essential to know whether the exam score is real capability or an artefact of the format.</p>
+
+      <p>The paper's headline test of that question: take the <em>same</em> MedQA questions and re-cast them as interactive, conversation-driven cases. The result —</p>
+
+      <div class="callout takeaway">
+        <div class="tt">★ Key takeaway</div>
+        A static multiple-choice exam hands the model every fact and asks it to <strong>recognise</strong> an answer. Real medicine asks a clinician to <strong>gather</strong> the facts first. When the paper re-cast MedQA questions in that harder, sequential form, accuracy <strong>dropped — for the weakest models, to below a tenth of their original score</strong>. The exam was measuring the wrong thing.
+      </div>
+
+      <div class="quiz" data-quiz="q1">
+        <div class="qh">Self-check</div>
+        <div class="qq">What is the core limitation of static multiple-choice medical benchmarks, according to the paper?</div>
+        <div class="qopts">
+          <button class="qopt" data-correct="false"><span class="mk"></span><span>The questions are too easy for modern models.</span></button>
+          <button class="qopt" data-correct="true"><span class="mk"></span><span>They present all relevant information up front, so they never test gathering information through sequential decisions.</span></button>
+          <button class="qopt" data-correct="false"><span class="mk"></span><span>They are written in too many languages.</span></button>
+        </div>
+        <div class="qfb"><b>Correct: the second option.</b> The paper's objection is structural — a vignette lays out every fact and asks the model only to <em>select</em> an answer. It never exercises the sequential, uncertain, information-gathering work that defines real clinical practice.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 2 IDEA ============================ -->
+  <section id="s-idea">
+    <div class="wrap">
+      <div class="kicker"><span class="ko">2</span> The big idea</div>
+      <h2 class="shead">AgentClinic: turn the exam into a clinic</h2>
+
+      <div class="objective"><b>By the end of this section</b> you'll understand what AgentClinic <em>is</em> — a simulated clinical environment — and how it differs from a benchmark that just asks questions.</div>
+
+      <p>If the problem is the static format, the fix is to build something dynamic. <strong>AgentClinic is an open-source, multimodal benchmark that simulates a clinical environment using language agents.</strong></p>
+
+      <p>Instead of being handed a vignette, the model under test is dropped into the role of a <strong>doctor</strong>. It starts with almost nothing — just a one-line objective, such as <em>"Evaluate the patient presenting with chest pain, palpitations, and shortness of breath."</em> From there it must <strong>interview a simulated patient, order physical exams and lab tests, request medical scans, and finally commit to a diagnosis</strong> — all within a limited number of conversational turns.</p>
+
+      <p>Three design choices make this more than a chatbot demo:</p>
+      <ul class="clean">
+        <li><strong>It is multi-agent.</strong> The patient, the test results, and the grading are each played by their own language agent. (You'll meet all four in the next section.)</li>
+        <li><strong>It is multimodal.</strong> Many real diagnoses need <em>eyes</em> — a rash, an X-ray, an MRI. AgentClinic lets the doctor request and read <button class="gl" data-term="multimodal">medical images</button>.</li>
+        <li><strong>It is grounded in real cases.</strong> The scenarios are built from real medical-exam questions, real <button class="gl" data-term="mimic">de-identified hospital records</button>, and real published diagnostic puzzles — not invented stories.</li>
+      </ul>
+
+      <p>On top of that environment, the authors add two research instruments: a way to <strong>inject 23 known clinical biases</strong> into the agents, and a <strong>toolbox of 6 tools</strong> the doctor can be given. Both turn AgentClinic from a single test into a flexible laboratory — and both get their own sections later.</p>
+
+      <p>The whole thing is packaged as <strong>five sub-benchmarks</strong>, each stressing a different skill:</p>
+
+      <div class="figbox">
+        <div class="figttl">The five faces of AgentClinic</div>
+        <div class="dsgrid">
+          <div class="ds"><div class="dn">AgentClinic-MedQA</div><div class="dd">Core English benchmark — exam questions turned into live cases.</div></div>
+          <div class="ds"><div class="dn">AgentClinic-MIMIC-IV</div><div class="dd">Cases drawn from real de-identified electronic health records.</div></div>
+          <div class="ds"><div class="dn">AgentClinic-NEJM</div><div class="dd">Multimodal cases with medical images that must be read.</div></div>
+          <div class="ds"><div class="dn">AgentClinic-Spec</div><div class="dd">Specialist cases across 9 medical specialties.</div></div>
+          <div class="ds wide"><div class="dn">AgentClinic-Lang</div><div class="dd">The same clinical reasoning, tested across 7 different languages.</div></div>
+        </div>
+      </div>
+
+      <div class="callout takeaway">
+        <div class="tt">★ Key takeaway</div>
+        AgentClinic replaces "answer this question" with "<strong>run this consultation</strong>." It is a simulated clinic — multi-agent, multimodal, and built from real cases — where the model must <em>earn</em> its diagnosis by interacting, not recognise it from a list.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 3 AGENTS ============================ -->
+  <section id="s-agents">
+    <div class="wrap">
+      <div class="kicker"><span class="ko">3</span> The cast</div>
+      <h2 class="shead">Four agents, one of them on trial</h2>
+
+      <div class="objective"><b>By the end of this section</b> you'll be able to name all four language agents, say what each one does, and identify which single agent is actually being graded.</div>
+
+      <div class="terms">
+        <div class="th">Key terms first</div>
+        <ul>
+          <li><b>Language agent</b> — a large language model given a fixed role and private instructions, so it behaves as one participant in the simulation.</li>
+          <li><b>Interaction turn</b> — one round of the simulation: one message from the doctor, plus one reply from the patient, a tool, or the measurement agent.</li>
+        </ul>
+      </div>
+
+      <p>AgentClinic runs on <strong>four language agents</strong>. Each gets its own instructions and its own slice of the case file — and crucially, no agent can see information meant for another. <strong>Click each agent below</strong> to see its role.</p>
+
+      <div class="needs-js">
+        <div class="agentgrid">
+          <button class="agentbtn full sel" data-a="doctor">
+            <span class="ico">🩺</span><span class="nm">Doctor agent</span>
+            <span class="rl">The model being evaluated — click to start</span>
+          </button>
+          <button class="agentbtn" data-a="patient">
+            <span class="ico">🧑</span><span class="nm">Patient agent</span>
+            <span class="rl">Provides symptoms &amp; history</span>
+          </button>
+          <button class="agentbtn" data-a="measure">
+            <span class="ico">🔬</span><span class="nm">Measurement agent</span>
+            <span class="rl">Returns test &amp; scan results</span>
+          </button>
+          <button class="agentbtn" data-a="moderator">
+            <span class="ico">⚖️</span><span class="nm">Moderator agent</span>
+            <span class="rl">Grades the final diagnosis</span>
+          </button>
+        </div>
+        <div class="agentdetail" id="agentDetail" aria-live="polite"></div>
+      </div>
+
+      <div class="nojs-note card small">Enable JavaScript for the interactive agent panel. The four agents are: the <strong>Doctor</strong> (the model under test), the <strong>Patient</strong> (gives symptoms and history but not the diagnosis), the <strong>Measurement</strong> agent (returns realistic test and scan results on request), and the <strong>Moderator</strong> (compares the doctor's final diagnosis to the ground truth and scores it).</div>
+
+      <h3>Who is actually being tested?</h3>
+      <p>This is the point students most often miss. Only the <strong>doctor agent</strong> is the subject of the experiment — it is "the model whose performance is being evaluated." The other three exist purely to <em>create the test environment</em>. The patient supplies the symptoms, the measurement agent supplies the data, and the moderator supplies the grade.</p>
+
+      <p>That design also means the doctor never has an unfair shortcut: it begins with only a one-line objective and must <strong>extract everything else through dialogue and test orders</strong>, one interaction turn at a time, up to a turn budget (the default is <strong>N = 20</strong>).</p>
+
+      <div class="fignote">Grounded in Figure 1 and the Methods section ("Agent Details").</div>
+
+      <div class="quiz" data-quiz="q2">
+        <div class="qh">Self-check</div>
+        <div class="qq">In an AgentClinic simulation, which agent's performance is the experiment actually measuring?</div>
+        <div class="qopts">
+          <button class="qopt" data-correct="false"><span class="mk"></span><span>The patient agent</span></button>
+          <button class="qopt" data-correct="false"><span class="mk"></span><span>The moderator agent</span></button>
+          <button class="qopt" data-correct="true"><span class="mk"></span><span>The doctor agent</span></button>
+          <button class="qopt" data-correct="false"><span class="mk"></span><span>All four equally</span></button>
+        </div>
+        <div class="qfb"><b>Correct: the doctor agent.</b> It is the model on trial. The patient, measurement, and moderator agents are the apparatus — they generate the case, supply data on request, and grade the outcome, but they are not what the benchmark scores.</div>
+      </div>
+
+      <div class="callout takeaway">
+        <div class="tt">★ Key takeaway</div>
+        Four agents, one subject. The <strong>doctor</strong> is graded; the <strong>patient</strong>, <strong>measurement</strong>, and <strong>moderator</strong> agents form the environment around it. Information is deliberately partitioned — the doctor must work for every fact it gets.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 4 SIMULATION ============================ -->
+  <section id="s-sim">
+    <div class="wrap">
+      <div class="kicker"><span class="ko">4</span> See it run</div>
+      <h2 class="shead">One full case, step by step</h2>
+
+      <div class="objective"><b>By the end of this section</b> you'll have watched a complete AgentClinic episode unfold and seen exactly where the diagnosis comes from — and where it is graded.</div>
+
+      <p>Abstract descriptions only go so far. Below is the worked example the paper itself puts in Figure 1 — a real episode, played out one step at a time. <strong>Use Next and Back</strong> to advance the consultation.</p>
+
+      <div class="sim needs-js" id="sim">
+        <div class="simhead">
+          <span style="font-family:var(--font-ui);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink-faint)">Example simulation</span>
+          <div class="dots" id="simDots" aria-hidden="true"></div>
+        </div>
+        <div class="transcript" id="simTranscript"></div>
+        <div class="stepcap" id="simCap"></div>
+        <div class="stepctrl">
+          <button class="btn" id="simPrev">← Back</button>
+          <button class="btn prim" id="simNext">Next →</button>
+          <button class="btn" id="simReset">↺ Restart</button>
+        </div>
+      </div>
+
+      <div class="nojs-note card small">Enable JavaScript to step through the simulation. In summary: the doctor greets the patient → the patient reports a severe week-long headache and trouble moving the eyes → the doctor takes a history → the doctor requests an MRI of the brain and orbits → the measurement agent returns the scan → the doctor diagnoses <strong>cavernous sinus thrombosis</strong> → the moderator compares it to the ground truth and marks it <strong>correct</strong>.</div>
+
+      <h3>What to notice</h3>
+      <p>Three things in that episode are the whole point of the benchmark:</p>
+      <ul class="clean">
+        <li>The doctor was <strong>never told the diagnosis</strong>. It had to be assembled from the conversation.</li>
+        <li>The <strong>MRI did not appear automatically</strong> — the doctor had to decide it was needed and explicitly request it. A wasted or missing test costs a turn.</li>
+        <li>The episode ends with a separate <strong>moderator</strong> comparing free-text output to <button class="gl" data-term="groundtruth">ground truth</button>. The doctor doesn't grade itself.</li>
+      </ul>
+
+      <div class="callout takeaway">
+        <div class="tt">★ Key takeaway</div>
+        A simulation is a <strong>chain of decisions</strong>: greet → interview → decide what to test → order it → interpret → diagnose → get graded. Every link is a place the model can succeed or fail — and none of them exist in a multiple-choice question.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 5 DATA ============================ -->
+  <section id="s-data">
+    <div class="wrap">
+      <div class="kicker"><span class="ko">5</span> The raw material</div>
+      <h2 class="shead">Where the cases come from</h2>
+
+      <div class="objective"><b>By the end of this section</b> you'll know the real-world sources behind AgentClinic's cases and how a raw medical question becomes a four-agent simulation.</div>
+
+      <p>A benchmark is only as trustworthy as its cases. AgentClinic deliberately avoids invented scenarios and instead draws from three kinds of real medical material: <strong>medical-exam questions (USMLE / MedQA)</strong>, <strong>de-identified electronic health records (MIMIC-IV)</strong>, and <strong>published diagnostic puzzles (NEJM case challenges)</strong>, plus specialist case reports from MedMCQA.</p>
+
+      <h3>From a question to a simulation</h3>
+      <p>The conversion follows a fixed recipe. A real question is selected, then poured into a structured <button class="gl" data-term="osce">OSCE-style</button> JSON template — and that template <em>splits the information across the four agents</em>:</p>
+      <ul class="clean">
+        <li>the brief <strong>objective</strong> → the doctor agent;</li>
+        <li>the <strong>patient history &amp; symptoms</strong> → the patient agent;</li>
+        <li>the <strong>physical-exam &amp; test findings</strong> → the measurement agent;</li>
+        <li>the <strong>correct diagnosis</strong> → the moderator agent only.</li>
+      </ul>
+      <p>That partition is what forces genuine information-gathering: no single agent holds the whole picture.</p>
+
+      <h3>The five sub-benchmarks, by the numbers</h3>
+      <div class="dsgrid">
+        <div class="ds"><div class="dn">AgentClinic-MedQA</div><div class="dc">215 <small>cases</small></div><div class="dd">Built from USMLE-style exam questions — the core English benchmark.</div></div>
+        <div class="ds"><div class="dn">AgentClinic-MIMIC-IV</div><div class="dc">Real EHRs</div><div class="dd">Cases from MIMIC-IV de-identified hospital records. (Access needs PhysioNet training.)</div></div>
+        <div class="ds"><div class="dn">AgentClinic-NEJM</div><div class="dc">120 <small>of 932 cases</small></div><div class="dd">Multimodal puzzles sampled from NEJM case challenges; each has a pathology-confirmed diagnosis.</div></div>
+        <div class="ds"><div class="dn">AgentClinic-Spec</div><div class="dc">260 <small>patient agents</small></div><div class="dd">Specialist case reports (from MedMCQA) across 9 medical specialties.</div></div>
+        <div class="ds wide"><div class="dn">AgentClinic-Lang</div><div class="dc">749 <small>patient cases · 7 languages</small></div><div class="dd">MedQA cases translated by GPT-4 and then manually corrected by native speakers.</div></div>
+      </div>
+      <div class="fignote">Counts as reported in the paper's Discussion ("215 language agents… 260 patient agents from 9 medical specialties… 749 patient cases from 7 multilingual environments… 120 multimodal language agents").</div>
+
+      <div class="gnote">
+        <div class="tt">⚑ Grounding note — the 9 specialties</div>
+        The body text lists the 9 AgentClinic-Spec specialties as <em>emergency medicine, geriatrics, <strong>pharmacology</strong>, internal medicine, psychiatry, ophthalmology, otolaryngology, gynecology, and pediatrics</em>. But Figure 5's specialty chart instead shows <strong>orthopaedics</strong> in place of pharmacology. The paper does not reconcile this; treat the exact ninth specialty as uncertain.
+      </div>
+
+      <div class="callout takeaway">
+        <div class="tt">★ Key takeaway</div>
+        AgentClinic's cases are <strong>real medicine, re-packaged</strong>: exam questions, hospital records, and published puzzles poured into a template that <em>scatters the facts across four agents</em> — so the doctor can only win by collecting them.
+      </div>
+
+      <div class="recall">
+        <div class="rl">Pause &amp; recall</div>
+        <div class="rq">Without scrolling up: which one agent receives the correct diagnosis — and why does <em>only</em> that agent get it?</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 6 HARD ============================ -->
+  <section id="s-hard">
+    <div class="wrap">
+      <div class="kicker"><span class="ko">6</span> Result #1</div>
+      <h2 class="shead">The same questions, suddenly much harder</h2>
+
+      <div class="objective"><b>By the end of this section</b> you'll understand the paper's central result — that sequential, interactive diagnosis is dramatically harder than static QA — and that exam scores don't predict it.</div>
+
+      <p>On MedQA's static multiple-choice format, the strongest models score in the high 80s and low 90s. So before you see the interactive results, commit to a guess:</p>
+
+      <div class="bets needs-js" data-bets="b1">
+        <div class="bq">The best model scores ~90%+ on static MedQA. What does the best model score on <em>AgentClinic-MedQA</em> — the interactive version?</div>
+        <div class="bopts">
+          <button class="betopt" data-pick="a">About 85%</button>
+          <button class="betopt" data-pick="b">About 75%</button>
+          <button class="betopt" data-pick="c">About 62%</button>
+          <button class="betopt" data-pick="d">About 40%</button>
+        </div>
+        <div class="breveal">
+          <strong>The best model — Claude-3.5 Sonnet — scores 62.1% ± 3.3.</strong> The very best performer loses roughly thirty percentage points just by having to <em>conduct</em> the consultation instead of reading it. And it falls away fast from there.
+        </div>
+      </div>
+
+      <h3>The AgentClinic-MedQA leaderboard</h3>
+      <p>Here is every model the paper evaluated as the doctor agent, on AgentClinic-MedQA and on the real-records benchmark AgentClinic-MIMIC-IV. (Patient and measurement agents are GPT-4; the bars show accuracy with the paper's reported uncertainty.) <strong>Toggle the dataset:</strong></p>
+
+      <div class="card needs-js">
+        <div class="toggle-row" id="lbToggle">
+          <button class="seg on" data-ds="medqa">AgentClinic-MedQA</button>
+          <button class="seg" data-ds="mimic">AgentClinic-MIMIC-IV</button>
+        </div>
+        <div class="legend">
+          <span><i style="background:#0e7c86"></i>General-purpose LLM</span>
+          <span><i style="background:#5e3fae"></i>Medical fine-tuned LLM</span>
+          <span><i style="background:#a85a18"></i>Human physicians</span>
+        </div>
+        <div class="chart" id="lbChart"></div>
+        <div class="axis100"><span></span><div class="ticks"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div><span></span></div>
+      </div>
+
+      <p>Three things jump out of that chart:</p>
+      <ul class="clean">
+        <li><strong>Claude-3.5 Sonnet leads both benchmarks</strong> — 62.1% on MedQA-cases, 42.9% on real records. The paper finds Claude-sourced agents outperform other backbones "in most settings."</li>
+        <li><strong>Human physicians sit mid-pack at 54%</strong> — but with a huge ±28.5 spread, because the human panel was only <strong>3 clinicians</strong>. Read that number cautiously.</li>
+        <li><strong>The floor is brutal.</strong> Llama-2-70B-chat manages just <strong>4.5%</strong> on AgentClinic-MedQA. This is the abstract's "below a tenth of the original accuracy" in the flesh.</li>
+      </ul>
+
+      <h3>Exam scores don't predict clinic scores</h3>
+      <p>The most consequential finding is about <em>ranking</em>. The paper compares each model's static MedQA score with its AgentClinic-MedQA score (its Figure 3) and concludes that <strong>MedQA accuracy is only weakly predictive of AgentClinic-MedQA accuracy</strong>. A model can be excellent at the exam and mediocre in the simulated clinic; the ordering reshuffles.</p>
+      <p>The authors draw a pointed analogy from medical education itself: the USMLE is known to be a <em>poor predictor</em> of how a doctor later performs as a clinical resident. The static test and the real job measure different things — for machines just as for humans.</p>
+
+      <div class="pull">"MedQA accuracy is not predictive of accuracy on AgentClinic-MedQA."</div>
+
+      <div class="callout takeaway">
+        <div class="tt">★ Key takeaway</div>
+        Making the task interactive doesn't just lower every score by a fixed amount — it <strong>reshuffles the leaderboard</strong>. A strong exam score is no longer evidence of clinical competence. To know how a model handles a consultation, you have to test it <em>in</em> a consultation.
+      </div>
+
+      <div class="quiz" data-quiz="q3">
+        <div class="qh">Self-check</div>
+        <div class="qq">"MedQA accuracy is not predictive of AgentClinic-MedQA accuracy" — what does this mean in practice?</div>
+        <div class="qopts">
+          <button class="qopt" data-correct="false"><span class="mk"></span><span>Every model's score drops by exactly the same amount in AgentClinic.</span></button>
+          <button class="qopt" data-correct="true"><span class="mk"></span><span>You cannot infer how well a model will handle interactive cases from its static exam score — the ranking changes.</span></button>
+          <button class="qopt" data-correct="false"><span class="mk"></span><span>MedQA and AgentClinic-MedQA use completely different medical questions.</span></button>
+        </div>
+        <div class="qfb"><b>Correct: the second option.</b> If the drop were uniform, the exam score would still predict the clinic score. The point is that it isn't uniform — models reorder — so a high MedQA score tells you little about interactive performance. (The questions are actually the <em>same</em>; only the format changes.)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 7 CONVERSATION ============================ -->
+  <section id="s-convo">
+    <div class="wrap">
+      <div class="kicker"><span class="ko">7</span> Result #2</div>
+      <h2 class="shead">The consultation itself is a skill</h2>
+
+      <div class="objective"><b>By the end of this section</b> you'll see three ways the <em>conversation</em> — its length, its thoroughness, and who plays the patient — directly drives the diagnosis.</div>
+
+      <p>If diagnosis is sequential, then the <em>sequence</em> should matter. The paper shows it does, in three distinct ways.</p>
+
+      <h3>1 · How many turns the doctor gets</h3>
+      <p>Each simulation caps the doctor at <strong>N</strong> interaction turns. The authors varied N and re-measured accuracy. Predict first: if you <em>halved</em> the turn budget from 20 to 10, what would happen — and is more always better? Then drag the slider.</p>
+
+      <div class="sliderwrap needs-js">
+        <div class="readout">
+          <span class="big" id="nAcc">52%</span>
+          <span class="biglab">diagnostic accuracy at <span class="nval" id="nVal">N = 20</span> turns</span>
+        </div>
+        <div class="minibar"><div id="nBar" style="width:52%"></div></div>
+        <input type="range" id="nSlider" min="0" max="4" step="1" value="2" aria-label="Number of interaction turns" />
+        <div class="sliderscale"><span>10</span><span>15</span><span>20</span><span>25</span><span>30</span></div>
+        <div class="small" id="nNote" style="margin-top:8px"></div>
+      </div>
+
+      <p>The curve is not a straight line. Cutting the budget hurts hard — <strong>N=10 collapses to 25%</strong>, less than half the N=20 score — because the doctor simply runs out of turns before it has gathered enough information. But pushing <em>past</em> 20 also hurts slightly (N=25 → 48%, N=30 → 43%): the paper suggests the ever-growing conversation becomes harder for the model to process. There is a sweet spot, and it is around <strong>N = 20</strong>.</p>
+
+      <h3>2 · How much the doctor actually finds out</h3>
+      <p>The paper introduces a metric called <button class="gl" data-term="coverage">coverage</button> — the share of the relevant patient information the doctor managed to extract. Using GPT-4 as the doctor, average coverage on AgentClinic-MedQA was <strong>67%</strong>. And it splits cleanly by outcome:</p>
+      <div class="figbox">
+        <div class="figttl">Information coverage vs. diagnostic outcome (GPT-4 doctor)</div>
+        <div class="chart in">
+          <div class="bar-row"><span class="bar-name"><b>Correct</b> diagnosis</span><div class="bar-track"><div class="bar-fill gen" style="--w:72%"></div></div><span class="bar-val">72%</span></div>
+          <div class="bar-row"><span class="bar-name"><b>Incorrect</b> diagnosis</span><div class="bar-track"><div class="bar-fill" style="--w:63%;background:var(--ink-faint)"></div></div><span class="bar-val">63%</span></div>
+        </div>
+        <div class="fignote">When the doctor got the diagnosis right it had uncovered 72% of the relevant facts; when wrong, only 63%. Gathering information <em>is</em> the job.</div>
+      </div>
+
+      <h3>3 · Who plays the patient</h3>
+      <p>Here is a subtle one. The patient is also an LLM — and which model plays it changes the doctor's score. With GPT-4 as the doctor, accuracy was <strong>52%</strong> against a GPT-4 patient, <strong>48%</strong> against a GPT-3.5 patient, and <strong>46%</strong> against a Mixtral patient.</p>
+      <p>Why? Behaviour. GPT-3.5 patients tend to simply echo the doctor's question back without adding anything:</p>
+      <div class="dlg"><span class="d">Doctor:</span> Have you experienced any muscle twitching or cramps?<br><span class="p">Patient (GPT-3.5):</span> No, I haven't experienced any muscle twitching or cramps.</div>
+      <p>GPT-4 patients more often volunteer genuinely new clinical detail, surfacing clues a doctor can act on. There is even a stranger effect: a GPT-3.5 doctor scores about <strong>37%</strong> with a GPT-3.5 patient but about <strong>38%</strong> with a GPT-4 patient — talking across <em>different</em> model families is itself a measurable extra challenge.</p>
+
+      <p>The authors' practical advice follows directly: <strong>never evaluate a doctor model against a single patient model</strong> — test it against a panel of patient agents of varying ability.</p>
+
+      <div class="callout takeaway">
+        <div class="tt">★ Key takeaway</div>
+        Three levers, all part of "the conversation": <strong>turn budget</strong> (too few starves the doctor, too many overwhelms it — best near N=20), <strong>coverage</strong> (right answers come from finding more facts — 72% vs 63%), and <strong>the patient model</strong> (a better-acting patient lifts the doctor's score). Conducting the consultation well is a skill in its own right.
+      </div>
+
+      <div class="quiz" data-quiz="q4">
+        <div class="qh">Self-check</div>
+        <div class="qq">Accuracy was 52% at N=20 but only 48% at N=25 and 43% at N=30. Why does giving the doctor <em>more</em> turns slightly hurt?</div>
+        <div class="qopts">
+          <button class="qopt" data-correct="false"><span class="mk"></span><span>The patient runs out of symptoms to describe.</span></button>
+          <button class="qopt" data-correct="true"><span class="mk"></span><span>The ever-larger conversation becomes harder for the model to process — growing input size works against it.</span></button>
+          <button class="qopt" data-correct="false"><span class="mk"></span><span>The moderator gets stricter with longer transcripts.</span></button>
+        </div>
+        <div class="qfb"><b>Correct: the second option.</b> The paper attributes the dip past N=20 to "the growing input size, which can be difficult for language models." More turns mean a longer transcript to reason over — eventually a liability, not a help.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 8 TOOLS ============================ -->
+  <section id="s-tools">
+    <div class="wrap">
+      <div class="kicker"><span class="ko">8</span> The toolbox</div>
+      <h2 class="shead">Give the doctor tools — does it help?</h2>
+
+      <div class="objective"><b>By the end of this section</b> you'll know the 6 tools AgentClinic can hand the doctor, and the paper's surprising finding that tools do <em>not</em> help every model.</div>
+
+      <p>A real clinician doesn't reason from memory alone — they look things up, take notes, learn from past cases. AgentClinic gives the doctor agent an <strong>Agent Toolbox of six tools</strong>. <strong>Expand each</strong> to see how it works.</p>
+
+      <div class="toolgrid needs-js">
+        <details class="tool"><summary><span class="ti">🧩</span><span><span class="tn">Zero-Shot CoT</span><span class="ts">Reason step by step</span></span><span class="tx">+</span></summary>
+          <div class="body"><button class="gl" data-term="cot">Chain-of-thought</button> prompting: the model is told to articulate its reasoning step by step before answering — with no worked example provided.</div></details>
+        <details class="tool"><summary><span class="ti">🧩</span><span><span class="tn">One-Shot CoT</span><span class="ts">Reason, with one example</span></span><span class="tx">+</span></summary>
+          <div class="body">Same idea, but the prompt includes <strong>one</strong> worked example (k=1), chosen from a repository of previously solved cases by semantic similarity to the current problem.</div></details>
+        <details class="tool"><summary><span class="ti">🔁</span><span><span class="tn">Reflection CoT</span><span class="ts">Learn from past successes</span></span><span class="tx">+</span></summary>
+          <div class="body">An <button class="gl" data-term="experiential">experiential learning</button> loop in four steps:
+            <ol class="steps">
+              <li><b>Verification</b> — the final answer is checked against ground truth.</li>
+              <li><b>Reflection</b> — if correct, the model distils its winning reasoning into a concise "takeaway."</li>
+              <li><b>Memory storage</b> — the takeaway + original case are stored in a vector database.</li>
+              <li><b>Experiential retrieval</b> — on a new case, the most similar past takeaways are pulled back in as dynamic examples.</li>
+            </ol>
+            No weights change — it's in-context learning, distinct from static retrieval.</div></details>
+        <details class="tool"><summary><span class="ti">📓</span><span><span class="tn">Notebook</span><span class="ts">Persistent notes across cases</span></span><span class="tx">+</span></summary>
+          <div class="body">The doctor can write and edit free-form tips that <strong>persist from one patient to the next</strong>.
+            <div class="ex">"[Note #17] Remember that timing and onset of symptoms can provide valuable diagnostic insights."</div></div></details>
+        <details class="tool"><summary><span class="ti">📚</span><span><span class="tn">Adaptive RAG (Book)</span><span class="ts">Search medical textbooks</span></span><span class="tx">+</span></summary>
+          <div class="body"><button class="gl" data-term="adaptive">Adaptive retrieval</button> from 18 medical textbooks used by US medical students. "Adaptive" means the model itself decides <em>when</em> and <em>what</em> to retrieve.
+            <div class="ex">Research textbooks 'What are the symptoms of myasthenia gravis?'</div></div></details>
+        <details class="tool"><summary><span class="ti">🌐</span><span><span class="tn">Adaptive RAG (Web)</span><span class="ts">Search online sources</span></span><span class="tx">+</span></summary>
+          <div class="body">Adaptive retrieval from an internet database — PubMed research articles, StatPearls, and medical Wikipedia articles.</div></details>
+      </div>
+
+      <h3>The twist: tools are not universally good</h3>
+      <p>You might assume tools can only help. They don't. The paper's striking result is that <strong>the same tool helps one model and hurts another</strong>:</p>
+      <ul class="clean">
+        <li><strong>Claude-3.5</strong> — strongest with tools overall (averaging 51.3%), peaking at <strong>56.1%</strong> with the Notebook.</li>
+        <li><strong>GPT-4</strong> — gains modestly; best at 43.9% with Adaptive RAG (Web) and 42.2% with Reflection CoT.</li>
+        <li><strong>GPT-4o</strong> — best at 43.0% with the Notebook.</li>
+        <li><strong>GPT-3.5</strong> — <em>worse on every single tool</em>; Adaptive RAG (Book) caused a 27.1% drop.</li>
+        <li><strong>Llama-3-70B</strong> — consistent gains (≈9.4% average); the abstract reports up to a <strong>92% relative improvement</strong> with the Notebook tool.</li>
+      </ul>
+      <p>Picking up a tool and getting <em>value</em> from it are two different abilities. A model can be handed a textbook search and still do worse — retrieving the wrong thing, or being distracted by it.</p>
+
+      <div class="gnote">
+        <div class="tt">⚑ Grounding note — the Llama-3 number</div>
+        The abstract and contributions state Llama-3 shows "up to 92% relative improvements" with the Notebook; the Discussion section instead phrases the tool gains as "up to 19.7% improvement." The two figures appear in different parts of the same paper. The headline 92% is a <em>relative</em> gain over a low baseline; both are reported here as the paper states them.
+      </div>
+
+      <div class="callout takeaway">
+        <div class="tt">★ Key takeaway</div>
+        AgentClinic treats <strong>tool use as its own axis of evaluation</strong>. Tools are not free wins — they helped Claude and Llama-3 substantially, did little for GPT-4, and actively <em>hurt</em> GPT-3.5. Knowing how to use a tool well is a capability that separates models.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 9 BIAS ============================ -->
+  <section id="s-bias">
+    <div class="wrap">
+      <div class="kicker"><span class="ko">9</span> Result #3</div>
+      <h2 class="shead">What happens when you add bias</h2>
+
+      <div class="objective"><b>By the end of this section</b> you'll understand how AgentClinic injects 23 clinical biases, why one model shrugged them off while another buckled, and how bias quietly damages the <em>patient's</em> experience.</div>
+
+      <div class="terms">
+        <div class="th">Key terms first</div>
+        <ul>
+          <li><b><button class="gl" data-term="cognitive">Cognitive bias</button></b> — a systematic error of reasoning, e.g. recency or anchoring bias.</li>
+          <li><b><button class="gl" data-term="implicit">Implicit bias</button></b> — unconscious associations tied to social groups (race, gender, education, and others).</li>
+          <li><b><button class="gl" data-term="normacc">Normalized accuracy</button></b> — accuracy <em>with</em> a bias ÷ accuracy <em>without</em> it. 100% means the bias did no damage.</li>
+        </ul>
+      </div>
+
+      <p>AgentClinic can seed <strong>23 distinct biases</strong> into the system prompt of the doctor agent, the patient agent, or both. A cognitive bias might tell a doctor it recently saw a similar patient (recency bias); an implicit bias might shape how a patient trusts a doctor based on a social characteristic. The question: how much does that degrade care?</p>
+
+      <h3>One model shrugged; one model buckled</h3>
+      <p>The paper tested two doctor models under bias. <strong>Toggle between them</strong> — each bar shows normalized accuracy (closer to 100% = more robust).</p>
+
+      <div class="card needs-js">
+        <div class="toggle-row" id="biasToggle">
+          <button class="seg on" data-m="gpt4">GPT-4 &nbsp;<small style="opacity:.8">(unbiased: 52%)</small></button>
+          <button class="seg" data-m="mixtral">Mixtral-8x7B &nbsp;<small style="opacity:.8">(unbiased: 37%)</small></button>
+        </div>
+        <div class="chart" id="biasChart"></div>
+        <div class="axis100"><span></span><div class="ticks"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div><span></span></div>
+        <div class="fignote" id="biasNote"></div>
+      </div>
+
+      <p><strong>GPT-4 barely moved</strong> — across all introduced biases its accuracy fell by at most 4 percentage points (1.5% on average). The paper offers a curious explanation: GPT-4 may be <em>over-aligned</em>. In 25 of 215 gender-bias dialogues it explicitly <em>refused</em> to act on the biased instruction and stated it would judge objectively. That "bias-rejection" makes GPT-4 robust — but also a poor stand-in for studying how bias actually plays out.</p>
+
+      <p><strong>Mixtral-8x7B buckled.</strong> Its worst case — a cognitive bias on the doctor — drove normalized accuracy down to <strong>78.4%</strong> (37% → 29%). Reviewing those failures, the authors saw the model fixate on a recent diagnosis and ignore new symptoms (recency bias), and grow reluctant to order necessary tests for patients carrying a racial-bias prompt — a simulated disparity in care. That makes Mixtral the <em>more informative</em> model for studying bias.</p>
+
+      <h3>Bias hurts the patient, not just the score</h3>
+      <p>AgentClinic also captures something a pure accuracy number misses. After each consultation the patient agent gives three <strong>1–10 ratings</strong>: <em>confidence</em> in the doctor, <em>compliance</em> (will they follow the treatment?), and <em>consultation</em> (will they come back?).</p>
+      <p>When only the patient was biased, the paper found that <strong>implicit biases damaged all three ratings</strong> — education bias most consistently of all. Among cognitive biases, a patient's <em>self-diagnosis</em> bias hit hardest, dropping confidence by 4.7 points and consultation by 2. Bias doesn't just cause a wrong diagnosis; it erodes the trust that makes treatment work.</p>
+
+      <div class="caveat">
+        <div class="tt">Read this carefully</div>
+        These ratings come from <em>simulated</em> patient agents, not humans. There is no defined meaning for "a 6 vs a 7," and no inter-rater reliability analysis. The paper stresses they show <strong>relative</strong> differences (biased vs unbiased), not a true measure of human perception.
+      </div>
+
+      <div class="callout takeaway">
+        <div class="tt">★ Key takeaway</div>
+        Bias resilience is <strong>model-specific</strong>: GPT-4 resisted bias (perhaps by over-refusing it), while Mixtral-8x7B degraded sharply. And bias is not only an accuracy problem — it lowers a patient's confidence, compliance, and willingness to return. Robustness to bias must be tested directly, across many biases.
+      </div>
+
+      <div class="quiz" data-quiz="q5">
+        <div class="qh">Self-check</div>
+        <div class="qq">Why do the authors suggest Mixtral-8x7B may be a <em>better</em> model than GPT-4 for studying bias?</div>
+        <div class="qopts">
+          <button class="qopt" data-correct="false"><span class="mk"></span><span>Mixtral is more accurate overall.</span></button>
+          <button class="qopt" data-correct="true"><span class="mk"></span><span>GPT-4 often refuses to act on biased instructions, so it doesn't reveal how bias plays out; Mixtral actually exhibits the degradation.</span></button>
+          <button class="qopt" data-correct="false"><span class="mk"></span><span>Mixtral was specifically fine-tuned to be biased.</span></button>
+        </div>
+        <div class="qfb"><b>Correct: the second option.</b> GPT-4's robustness may be over-alignment — it explicitly rejects biased prompts. A model that won't <em>display</em> bias can't be used to <em>study</em> it. Mixtral's larger, visible degradation makes the mechanism observable.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 10 LANG/SPEC ============================ -->
+  <section id="s-lang">
+    <div class="wrap">
+      <div class="kicker"><span class="ko">10</span> Breadth</div>
+      <h2 class="shead">Across languages and specialties</h2>
+
+      <div class="objective"><b>By the end of this section</b> you'll know how performance varies across 7 languages and 9 specialties — and why dialogue reshuffles which specialties look "easy."</div>
+
+      <h3>Seven languages</h3>
+      <p>AgentClinic-Lang tests the same clinical reasoning in <strong>English, Chinese, French, Spanish, Hindi, Persian, and Korean</strong>. The pattern is stark: <strong>every model performed best in English</strong>, and most fell off a cliff elsewhere.</p>
+      <ul class="clean">
+        <li><strong>Claude-3.5 Sonnet</strong> was the clear exception — consistently strong across all seven, averaging <strong>48.4%</strong>, more than double the next-best model (GPT-4 at 20.9%).</li>
+        <li><strong>GPT-4</strong> ranged from 11.21% (Chinese) to 40.18% (English).</li>
+        <li><strong>GPT-4o</strong> ranged from 3.73% (Korean) to 35.5% (English).</li>
+      </ul>
+      <p>For a tool meant to widen healthcare <em>access</em>, a benchmark that only works in English would miss the point — which is exactly why this sub-benchmark exists.</p>
+
+      <h3>Nine specialties</h3>
+      <p>AgentClinic-Spec spreads cases across nine specialties. <strong>Claude-3.5 again led</strong>, averaging 66.7% — strongest in Internal Medicine (78.3%), Otolaryngology (76.7%), and Gynecology (74.3%). GPT-4 was strong in Gynecology (68.5%) and Ophthalmology (65.2%) but weak in Emergency Medicine (32.3%) and Geriatrics (40%).</p>
+      <p>The interesting twist: in the static medical-QA literature, psychiatry and otolaryngology are usually rated among the <em>least</em> challenging specialties. In AgentClinic's dialogue-driven format, that ordering does not hold — Internal Medicine and Gynecology come out higher. <strong>Diagnosing through a conversation changes which specialties are hard.</strong></p>
+
+      <div class="callout takeaway">
+        <div class="tt">★ Key takeaway</div>
+        Performance is uneven across both <strong>languages</strong> (all models favour English; only Claude-3.5 stays robust) and <strong>specialties</strong> (and the "hard" ones differ from static-QA expectations). Breadth testing exposes gaps a single English general-medicine benchmark would hide.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 11 MULTIMODAL ============================ -->
+  <section id="s-multimodal">
+    <div class="wrap">
+      <div class="kicker"><span class="ko">11</span> Result #4</div>
+      <h2 class="shead">When the diagnosis needs eyes</h2>
+
+      <div class="objective"><b>By the end of this section</b> you'll understand the multimodal benchmark — diagnosing from medical images — and why it matters whether the model is <em>handed</em> the image or must <em>ask</em> for it.</div>
+
+      <p>Many diagnoses can't be reached by conversation alone. A rash, an infection, an X-ray, a CT, an MRI — these need to be <em>seen</em>. The paper notes hospitalized patients receive an average of <strong>1.42 diagnostic images per stay</strong>. So <strong>AgentClinic-NEJM</strong> tests four vision-capable models on 120 image-based cases from NEJM case challenges, scored open-ended (the multiple-choice options exist but are hidden from the doctor).</p>
+
+      <h3>Handed the image vs. having to ask for it</h3>
+      <p>The clever design choice: images can reach the doctor two ways — <strong>provided up front</strong> at the start, or <strong>only on request</strong> from the measurement agent. The second is more realistic (a clinician must decide imaging is needed) and slightly harder. <strong>Toggle to compare:</strong></p>
+
+      <div class="card needs-js">
+        <div class="toggle-row" id="mmToggle">
+          <button class="seg on" data-mm="initial">Image provided up front</button>
+          <button class="seg" data-mm="request">Image must be requested</button>
+        </div>
+        <div class="chart" id="mmChart"></div>
+        <div class="axis100"><span></span><div class="ticks"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div><span></span></div>
+        <div class="fignote" id="mmNote"></div>
+      </div>
+
+      <p>Two observations. First, <strong>Claude-3.5 Sonnet again leads</strong> (37.2% up-front, 35.4% on request) and GPT-4o-mini trails badly (8.0% / 6.1%) — multimodal medical reasoning is genuinely hard, and the scores are low across the board. Second, <strong>every model drops a little when it must request the image itself</strong> — adding the decision step costs accuracy.</p>
+
+      <p>One encouraging detail: when GPT-4 gave a <em>wrong</em> open-ended answer, the correct diagnosis was still among the (hidden) multiple-choice options <strong>60% of the time</strong>. The model is often in the right neighbourhood — but open-ended diagnosis, with no list to pick from, is far less forgiving.</p>
+
+      <div class="callout takeaway">
+        <div class="tt">★ Key takeaway</div>
+        Real diagnosis is <strong>multimodal</strong>, and current models are weak at it — best-in-class Claude-3.5 still only reaches ~37%. Making the model <em>decide</em> to order an image, rather than handing it over, costs a few more points. Open-ended image diagnosis is much harder than picking from a list.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 12 HUMAN ============================ -->
+  <section id="s-human">
+    <div class="wrap">
+      <div class="kicker"><span class="ko">12</span> Reality check</div>
+      <h2 class="shead">Do clinicians believe the simulation?</h2>
+
+      <div class="objective"><b>By the end of this section</b> you'll know how real doctors rated the realism of AgentClinic's simulations — and where the simulation still falls short.</div>
+
+      <p>A simulated clinic is only useful if it <em>resembles</em> a clinic. So the authors ran a clinical reader study: <strong>three MD clinicians</strong> rated <strong>20 complete dialogue simulations</strong> on a 1–10 scale, across four axes.</p>
+
+      <div class="figbox">
+        <div class="figttl">Clinician realism ratings (mean, out of 10)</div>
+        <div class="chart in" id="readerChart">
+          <div class="bar-row"><span class="bar-name"><b>Patient</b> realism</span><div class="bar-track"><div class="bar-fill gen" style="--w:67%"></div></div><span class="bar-val">6.7</span></div>
+          <div class="bar-row"><span class="bar-name"><b>Measurement</b> realism</span><div class="bar-track"><div class="bar-fill gen" style="--w:63%"></div></div><span class="bar-val">6.3</span></div>
+          <div class="bar-row"><span class="bar-name"><b>Doctor</b> realism</span><div class="bar-track"><div class="bar-fill gen" style="--w:62%"></div></div><span class="bar-val">6.2</span></div>
+          <div class="bar-row"><span class="bar-name"><b>Doctor</b> empathy</span><div class="bar-track"><div class="bar-fill" style="--w:58%;background:var(--accent)"></div></div><span class="bar-val">5.8</span></div>
+        </div>
+        <div class="fignote">Scale 1–10. Empathy scored lowest.</div>
+      </div>
+
+      <p>The scores cluster in the "decent but not great" range — and the reviewers' comments explain why:</p>
+      <ul class="clean">
+        <li><strong>Doctor (6.2)</strong> — weak opening statements, basic errors, tunnel vision on one diagnosis, not diligent enough.</li>
+        <li><strong>Patient (6.7)</strong> — best-rated, but often too verbose and prone to repeating the question back.</li>
+        <li><strong>Measurement (6.3)</strong> — occasionally failed to return all needed values (e.g. omitting Factor VIII/IX levels).</li>
+        <li><strong>Empathy (5.8)</strong> — the weakest axis: the doctor "cuts right to the chase" with a neutral tone, skipping an inviting opening.</li>
+      </ul>
+
+      <div class="caveat">
+        <div class="tt">Keep it in proportion</div>
+        Only <strong>3 clinicians</strong> rated <strong>20</strong> simulations. The paper is explicit that this sample is too small to generalise to the broader population of clinicians. It is a useful signal of realism — not a verdict.
+      </div>
+
+      <div class="callout takeaway">
+        <div class="tt">★ Key takeaway</div>
+        Clinicians found the simulations <strong>moderately realistic</strong> (≈6/10), with <strong>empathy the weakest link</strong>. The environment is convincing enough to be a useful benchmark, while honestly showing where simulated agents still diverge from real clinical encounters.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 13 LIMITS ============================ -->
+  <section id="s-limits">
+    <div class="wrap">
+      <div class="kicker"><span class="ko">13</span> Honest accounting</div>
+      <h2 class="shead">What this can't do — and what it means</h2>
+
+      <div class="objective"><b>By the end of this section</b> you'll be able to state the study's main limitations and its three concrete recommendations for evaluating clinical AI.</div>
+
+      <h3>Limitations the authors name</h3>
+      <ul class="clean">
+        <li><strong>A simplified clinic.</strong> Only four roles. Real care also involves nurses, family members, administrators, and insurers — none are modelled yet.</li>
+        <li><strong>A tiny human baseline.</strong> Just 3 clinicians for scoring and rating — not generalisable.</li>
+        <li><strong>Possible data leakage.</strong> GPT-4 and Claude-3.5 may have seen MedQA during training. The authors argue that focusing on <em>novel interaction patterns</em> (query frequency, tool-use sequences) makes the findings more robust to this — but they cannot fully rule it out.</li>
+        <li><strong>The moderator is itself an LLM judge.</strong> It agrees with humans over 80% of the time (about the level humans agree with each other), but the sensitivity of results to the moderator's own model and prompt was not explored.</li>
+        <li><strong>The measurement agent can hallucinate.</strong> Because it is an LLM generating test values, it may introduce errors; a real database or SQL tool could fix this.</li>
+        <li><strong>Tool commands are abstractions.</strong> "Order an MRI" is one command here; in a real hospital it is many steps, people, and constraints. The authors call this a deliberate simplification that limits ecological validity.</li>
+      </ul>
+
+      <h3>Three recommendations for evaluating clinical AI</h3>
+      <p>The study converts its findings into concrete advice for anyone benchmarking a medical model:</p>
+      <ol class="clean">
+        <li><strong>Don't use a single patient agent.</strong> A doctor's score depends on who plays the patient — evaluate against a <em>panel</em> of varying ability.</li>
+        <li><strong>Test bias resilience deliberately.</strong> Some models hold up, others collapse — run a whole suite of cognitive and implicit biases.</li>
+        <li><strong>Treat tool use as a core axis.</strong> Effective use of retrieval and notebooks is a real, model-distinguishing capability — measure it.</li>
+      </ol>
+
+      <div class="pull">"We believe that LLMs need to be examined with novel evaluation strategies that go well beyond static question-answering benchmarks."</div>
+
+      <p>That sentence is the paper in one line. AgentClinic itself — earlier benchmarks like AMIE, SAPS and CRAFT-MD did dialogue but lacked multimodal input, real-world bias, tool use, multilingual or specialist coverage; MedAgents looked at agent collaboration but not patient interaction or tools. AgentClinic's contribution is to put all of that into one interactive, multimodal environment.</p>
+
+      <div class="callout takeaway">
+        <div class="tt">★ Key takeaway</div>
+        The paper is candid: a simplified clinic, a small human panel, an LLM-based moderator, possible data leakage. Its lasting message survives all of that — <strong>clinical AI must be tested in dynamic, interactive, multimodal conditions</strong>, because static exam scores measure the wrong thing.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 14 REVIEW ============================ -->
+  <section id="s-review">
+    <div class="wrap">
+      <div class="kicker"><span class="ko">14</span> Consolidate</div>
+      <h2 class="shead">Review &amp; glossary</h2>
+
+      <div class="objective"><b>This section</b> re-states the paper's spine in a slightly different framing — varied retrieval beats re-reading — then lets you test yourself and look up any term.</div>
+
+      <h3>The argument in seven beats</h3>
+      <ul class="clean">
+        <li><strong>1 · The trap.</strong> Models score ~90% on static medical exams, but those exams hand over every fact and only test recognition.</li>
+        <li><strong>2 · The fix.</strong> AgentClinic simulates a clinic: a doctor agent must interview, test, image, and diagnose — within a turn limit.</li>
+        <li><strong>3 · The cast.</strong> Four agents — doctor (graded), patient, measurement, moderator — with information deliberately partitioned.</li>
+        <li><strong>4 · The collapse.</strong> Re-cast as interactive cases, accuracy plunges; the best model reaches only 62.1%, and exam rank no longer predicts clinic rank.</li>
+        <li><strong>5 · The conversation.</strong> Turn budget, information coverage, and the patient model each move the score — conducting a consultation is a skill.</li>
+        <li><strong>6 · Tools &amp; bias.</strong> Tools help some models and hurt others; bias degrades some models badly and quietly erodes patient trust.</li>
+        <li><strong>7 · The verdict.</strong> Evaluate clinical AI dynamically — multimodal, multilingual, tool-using, bias-tested — not with static QA.</li>
+      </ul>
+
+      <h3>Final self-check</h3>
+      <div class="quiz" data-quiz="r1">
+        <div class="qh">Review question 1 of 3</div>
+        <div class="qq">A new model scores 91% on MedQA. Based on this paper, what can you safely conclude about its AgentClinic-MedQA performance?</div>
+        <div class="qopts">
+          <button class="qopt" data-correct="false"><span class="mk"></span><span>It will score about 91% there too.</span></button>
+          <button class="qopt" data-correct="false"><span class="mk"></span><span>It will score exactly one-tenth as much.</span></button>
+          <button class="qopt" data-correct="true"><span class="mk"></span><span>Very little — exam score is only weakly predictive of interactive performance.</span></button>
+        </div>
+        <div class="qfb"><b>Correct: the third option.</b> The paper's core finding is that MedQA accuracy does not predict AgentClinic-MedQA accuracy. The only way to know is to run the interactive benchmark.</div>
+      </div>
+      <div class="quiz" data-quiz="r2">
+        <div class="qh">Review question 2 of 3</div>
+        <div class="qq">Which statement about the agent toolbox matches the paper's findings?</div>
+        <div class="qopts">
+          <button class="qopt" data-correct="false"><span class="mk"></span><span>Every tool improved every model's accuracy.</span></button>
+          <button class="qopt" data-correct="true"><span class="mk"></span><span>Tools helped some models (Claude-3.5, Llama-3) but hurt others (GPT-3.5 dropped on every tool).</span></button>
+          <button class="qopt" data-correct="false"><span class="mk"></span><span>Tools were only available to human physicians.</span></button>
+        </div>
+        <div class="qfb"><b>Correct: the second option.</b> Tool benefit is model-specific. Claude-3.5 peaked at 56.1% with the Notebook and Llama-3 gained sharply, while GPT-3.5 declined on all six tools.</div>
+      </div>
+      <div class="quiz" data-quiz="r3">
+        <div class="qh">Review question 3 of 3</div>
+        <div class="qq">Why does the paper measure patient confidence, compliance, and consultation ratings — not just diagnostic accuracy?</div>
+        <div class="qopts">
+          <button class="qopt" data-correct="true"><span class="mk"></span><span>Because bias can erode patient trust and willingness to follow treatment even when accuracy holds — effects an accuracy number alone would miss.</span></button>
+          <button class="qopt" data-correct="false"><span class="mk"></span><span>Because diagnostic accuracy is impossible to measure in a simulation.</span></button>
+          <button class="qopt" data-correct="false"><span class="mk"></span><span>Because the ratings are more reliable than accuracy.</span></button>
+        </div>
+        <div class="qfb"><b>Correct: the first option.</b> These patient-centric metrics capture trust, compliance, and willingness to return — dimensions of care quality that pure accuracy ignores. (Remember the caveat: they come from simulated agents, so they show relative differences, not true human perception.)</div>
+      </div>
+
+      <h3>Glossary</h3>
+      <dl class="glist" id="glossaryList"></dl>
+
+      <div class="card" style="margin-top:34px">
+        <h4 style="margin-top:4px">Cite the paper</h4>
+        <p class="small" style="margin:6px 0 0">Schmidgall, S., Ziaei, R., Harris, C., Kim, J. W., Reis, E. P., Jopling, J. &amp; Moor, M. <em>AgentClinic: a multimodal benchmark for tool-using clinical AI agents.</em> npj Digital Medicine (2026). DOI: 10.1038/s41746-026-02674-7. Open Access, CC BY 4.0. Code: github.com/SamuelSchmidgall/AgentClinic.</p>
+      </div>
+
+      <div class="callout takeaway" style="margin-top:30px">
+        <div class="tt">★ You've finished</div>
+        You can now explain, from memory: why exam scores mislead, what AgentClinic simulates, who its four agents are, and what its results say about turn budgets, tools, bias, languages, and images. Revisit any section from the sidebar — and re-take the quizzes after a day to lock it in.
+      </div>
+    </div>
+  </section>
+
+  <div class="footer">
+    Interactive study guide · grounded line-by-line in the AgentClinic manuscript (npj Digital Medicine, Article in Press).<br>
+    Built for self-study — every number, name, and claim traces to the paper. Amber notes flag the manuscript's own inconsistencies.
+  </div>
+
+  </main>
+</div>
+
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script>
+"use strict";
+document.documentElement.classList.remove('no-js');
+document.documentElement.classList.add('js');
+
+/* ============================================================
+   GLOSSARY DATA
+   ============================================================ */
+var GLOSSARY = {
+  llm:{t:"Large language model (LLM)",d:"An AI system trained on large amounts of text to generate and reason with language. In this paper, LLMs are the systems being tested as clinical agents."},
+  usmle:{t:"USMLE",d:"United States Medical Licensing Examination — the static multiple-choice exam used to license US physicians. Human passing score 60%; expert score 87%."},
+  medqa:{t:"MedQA",d:"A static multiple-choice medical question-answering dataset built from medical-exam questions. AgentClinic re-casts these same questions as interactive cases."},
+  mimic:{t:"MIMIC-IV",d:"A large database of real, de-identified electronic health records, used as a source of grounded patient cases."},
+  vignette:{t:"Case vignette",d:"A written clinical scenario that lays out all relevant patient information up front, used in static multiple-choice exams."},
+  multimodal:{t:"Multimodal",d:"Able to process more than one kind of input — here, images (X-ray, CT, MRI, photos) as well as text."},
+  osce:{t:"OSCE",d:"Objective Structured Clinical Examination — a standardized clinical-exam format. AgentClinic prompts its agents using an OSCE-style structured case template."},
+  groundtruth:{t:"Ground truth",d:"The known-correct diagnosis for a case. Only the moderator agent sees it, and uses it solely to score the doctor."},
+  coverage:{t:"Coverage",d:"The fraction of the relevant patient information that the doctor agent actually managed to extract during the consultation."},
+  cot:{t:"Chain-of-thought (CoT)",d:"A prompting technique that asks the model to write out its reasoning step by step before giving a final answer."},
+  experiential:{t:"Experiential learning",d:"Letting an agent accumulate knowledge from past cases and reuse it on new ones — without changing the model's underlying weights."},
+  adaptive:{t:"Adaptive RAG",d:"Retrieval-Augmented Generation where the model itself decides when and what external text to retrieve, instead of retrieving on every step."},
+  cognitive:{t:"Cognitive bias",d:"A systematic pattern of deviation from rational judgment — for example recency bias or anchoring bias."},
+  implicit:{t:"Implicit bias",d:"Unconscious associations tied to social groups (race, gender, education, and others) that can affect clinical judgment and care."},
+  normacc:{t:"Normalized accuracy",d:"Accuracy with a bias divided by accuracy without it. 100% means the bias caused no drop in accuracy."}
+};
+
+/* ============================================================
+   THEME
+   ============================================================ */
+(function(){
+  var KEY='ac-theme';
+  var saved=null; try{saved=localStorage.getItem(KEY);}catch(e){}
+  if(saved){document.documentElement.setAttribute('data-theme',saved);}
+  var btn=document.getElementById('themeToggle');
+  function label(){
+    var d=document.documentElement.getAttribute('data-theme')==='dark';
+    btn.textContent=d?'☀️ Theme':'🌙 Theme';
+  }
+  label();
+  btn.addEventListener('click',function(){
+    var d=document.documentElement.getAttribute('data-theme')==='dark';
+    var next=d?'light':'dark';
+    document.documentElement.setAttribute('data-theme',next);
+    try{localStorage.setItem(KEY,next);}catch(e){}
+    label();
+  });
+})();
+
+/* ============================================================
+   MOBILE NAV
+   ============================================================ */
+(function(){
+  var sb=document.getElementById('sidebar'),
+      sc=document.getElementById('scrim'),
+      tg=document.getElementById('navToggle');
+  function close(){sb.classList.remove('open');sc.classList.remove('show');}
+  function open(){sb.classList.add('open');sc.classList.add('show');}
+  tg.addEventListener('click',function(){
+    sb.classList.contains('open')?close():open();
+  });
+  sc.addEventListener('click',close);
+  document.getElementById('nav').addEventListener('click',function(e){
+    if(e.target.closest('a')) close();
+  });
+})();
+
+/* ============================================================
+   PROGRESS BAR + SCROLL-SPY + SECTION COMPLETION
+   ============================================================ */
+(function(){
+  var bar=document.getElementById('progressbar');
+  var ticking=false;
+  function update(){
+    var h=document.documentElement;
+    var max=h.scrollHeight-h.clientHeight;
+    var pct=max>0?(h.scrollTop/max)*100:0;
+    bar.style.width=pct.toFixed(1)+'%';
+    ticking=false;
+  }
+  window.addEventListener('scroll',function(){
+    if(!ticking){requestAnimationFrame(update);ticking=true;}
+  },{passive:true});
+  update();
+
+  var navLinks=Array.prototype.slice.call(document.querySelectorAll('#nav a'));
+  var byId={};
+  navLinks.forEach(function(a){byId[a.getAttribute('href').slice(1)]=a;});
+
+  var DONE_KEY='ac-done';
+  var done={};
+  try{done=JSON.parse(localStorage.getItem(DONE_KEY)||'{}');}catch(e){done={};}
+  function paintDone(){
+    navLinks.forEach(function(a){
+      var id=a.getAttribute('href').slice(1);
+      if(done[id]) a.classList.add('done');
+    });
+  }
+  paintDone();
+
+  var sections=Array.prototype.slice.call(document.querySelectorAll('section'));
+  var spy=new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      var id=en.target.id, link=byId[id];
+      if(!link) return;
+      if(en.isIntersecting){
+        navLinks.forEach(function(a){a.classList.remove('active');});
+        link.classList.add('active');
+        if(!done[id]){
+          done[id]=1;
+          link.classList.add('done');
+          try{localStorage.setItem(DONE_KEY,JSON.stringify(done));}catch(e){}
+        }
+      }
+    });
+  },{rootMargin:'-45% 0px -50% 0px'});
+  sections.forEach(function(s){spy.observe(s);});
+})();
+
+/* ============================================================
+   GLOSSARY TOOLTIPS
+   ============================================================ */
+(function(){
+  var tip=document.getElementById('tip'), active=null;
+  function show(el){
+    var key=el.getAttribute('data-term'), g=GLOSSARY[key];
+    if(!g) return;
+    tip.innerHTML='<b>'+g.t+'</b><br>'+g.d;
+    tip.classList.add('show');
+    var r=el.getBoundingClientRect();
+    var tw=Math.min(300,tip.offsetWidth);
+    var left=r.left+window.scrollX+r.width/2-tw/2;
+    left=Math.max(10,Math.min(left,window.innerWidth-tw-10));
+    var top=r.top+window.scrollY-tip.offsetHeight-9;
+    if(top<window.scrollY+6) top=r.bottom+window.scrollY+9;
+    tip.style.left=left+'px';
+    tip.style.top=top+'px';
+    active=el;
+  }
+  function hide(){tip.classList.remove('show');active=null;}
+  document.querySelectorAll('.gl').forEach(function(el){
+    el.addEventListener('mouseenter',function(){show(el);});
+    el.addEventListener('mouseleave',hide);
+    el.addEventListener('focus',function(){show(el);});
+    el.addEventListener('blur',hide);
+    el.addEventListener('click',function(e){
+      e.preventDefault();
+      active===el?hide():show(el);
+    });
+  });
+  document.addEventListener('click',function(e){
+    if(active && !e.target.closest('.gl')) hide();
+  });
+  window.addEventListener('scroll',function(){if(active)hide();},{passive:true});
+})();
+
+/* ============================================================
+   AGENTS PANEL
+   ============================================================ */
+(function(){
+  var detail=document.getElementById('agentDetail');
+  if(!detail) return;
+  var DATA={
+    doctor:{nm:"Doctor agent",col:"var(--doctor)",pill:"On trial",
+      body:"<p>The <b>model being evaluated</b> — the only agent whose performance is scored.</p>"+
+      "<ul><li>Starts with almost nothing: a single-line objective (e.g. <i>\"Evaluate the patient presenting with chest pain, palpitations, and shortness of breath\"</i>).</li>"+
+      "<li>Must investigate by talking to the patient and ordering tests.</li>"+
+      "<li>Has a limited turn budget — <b>N = 20</b> by default.</li>"+
+      "<li>Must commit to a final diagnosis at the end.</li></ul>"},
+    patient:{nm:"Patient agent",col:"var(--patient)",pill:"Environment",
+      body:"<p>Plays the patient in the consultation.</p>"+
+      "<ul><li>Knows the patient's <b>symptoms and medical history</b>.</li>"+
+      "<li><b>Does NOT know the actual diagnosis</b> — it can't give the answer away.</li>"+
+      "<li>Responds to the doctor's questions, mimicking real patient experience.</li></ul>"+
+      "<p>Which model plays the patient measurably changes the doctor's score.</p>"},
+    measure:{nm:"Measurement agent",col:"var(--measure)",pill:"Environment",
+      body:"<p>Supplies <b>realistic test and scan results</b> when the doctor requests them.</p>"+
+      "<ul><li>Pre-loaded with the test results expected for this patient's condition.</li>"+
+      "<li>Returns labs, EKG readings, imaging, and more on request.</li></ul>"+
+      "<p>For an acute myocardial infarction it might return:</p>"+
+      "<div class='ex'>Electrocardiogram: ST-segment elevation in leads II, III, and aVF. Cardiac Markers: Troponin I elevated; Creatine Kinase MB elevated. Chest X-Ray: no pulmonary congestion, normal heart size.</div>"},
+    moderator:{nm:"Moderator agent",col:"var(--moderator)",pill:"Environment",
+      body:"<p>The <b>grader</b>. At the end of the episode it decides whether the doctor was right.</p>"+
+      "<ul><li>It is the only agent that holds the <b>ground-truth diagnosis</b>.</li>"+
+      "<li>Compares the doctor's free-text diagnosis to that ground truth and answers, in effect, yes or no.</li>"+
+      "<li>Needed because the doctor's diagnosis text is unstructured and must be parsed.</li></ul>"}
+  };
+  var btns=document.querySelectorAll('.agentbtn');
+  function pick(key){
+    var d=DATA[key];
+    btns.forEach(function(b){b.classList.toggle('sel',b.getAttribute('data-a')===key);});
+    detail.innerHTML='<div class="dh"><span class="tag" style="color:'+d.col+'">'+d.nm+'</span>'+
+      '<span class="pill" style="background:'+d.col+';color:#fff">'+d.pill+'</span></div>'+d.body;
+  }
+  btns.forEach(function(b){
+    b.addEventListener('click',function(){pick(b.getAttribute('data-a'));});
+  });
+  pick('doctor');
+})();
+
+/* ============================================================
+   SIMULATION STEPPER
+   ============================================================ */
+(function(){
+  var T=document.getElementById('simTranscript');
+  if(!T) return;
+  var STEPS=[
+    {who:'doctor',label:'Doctor',txt:'Hello, I am Dr. Agent. Can you tell me about the symptoms that brought you in today?',
+      cap:'<b>Step 1 — Greeting.</b> The doctor opens the consultation. It has only a one-line objective; everything else must be discovered.'},
+    {who:'patient',label:'Patient',txt:'I have been having a severe headache for the past week. I am also having trouble moving my eyes.',
+      cap:'<b>Step 2 — Presenting complaint.</b> The patient agent reports symptoms — but never the diagnosis, which it does not know.'},
+    {who:'system',label:'History taking',txt:'… several turns of symptom and history-taking dialogue …',
+      cap:'<b>Step 3 — History taking.</b> A series of back-and-forth turns. Each round counts against the doctor\'s turn budget (N = 20).'},
+    {who:'doctor',label:'Doctor',txt:'Given the severity of your headache it is important to rule out complications that could be affecting your brain. Request Scan: MRI of the brain and orbits.',
+      cap:'<b>Step 4 — Ordering a test.</b> The doctor decides imaging is needed and explicitly requests it. Nothing is provided automatically.'},
+    {who:'measure',label:'Measurement',txt:'Returning the requested imaging study →',scan:true,
+      cap:'<b>Step 5 — Test result.</b> The measurement agent returns the MRI images for the doctor to interpret.'},
+    {who:'doctor',label:'Doctor',txt:'Diagnosis Ready: Cavernous Sinus Thrombosis.',
+      cap:'<b>Step 6 — Diagnosis.</b> Having gathered enough evidence, the doctor commits to a final diagnosis.'},
+    {who:'moderator',label:'Moderator',txt:'Comparing the doctor\'s diagnosis to the ground truth … <span class="verdict">The diagnosis is CORRECT. ✓</span>',
+      cap:'<b>Step 7 — Grading.</b> The moderator — the only agent holding the ground truth — scores the outcome. Here: correct.'}
+  ];
+  var cur=0;
+  var dots=document.getElementById('simDots');
+  STEPS.forEach(function(){var s=document.createElement('span');dots.appendChild(s);});
+  var dotEls=dots.querySelectorAll('span');
+
+  function render(){
+    T.innerHTML='';
+    for(var i=0;i<=cur;i++){
+      var s=STEPS[i];
+      var m=document.createElement('div');
+      m.className='msg '+s.who+(i===cur?' cur':'');
+      var scanHtml=s.scan?'<div class="scan"><i></i><i></i><i></i></div>':'';
+      m.innerHTML='<div class="av">'+avatar(s.who)+'</div>'+
+        '<div class="bub"><div class="who">'+s.label+'</div>'+s.txt+scanHtml+'</div>';
+      T.appendChild(m);
+      void m.offsetWidth;
+      m.classList.add('vis');
+    }
+    dotEls.forEach(function(d,i){
+      d.classList.toggle('on',i<=cur);
+      d.classList.toggle('cur',i===cur);
+    });
+    document.getElementById('simCap').innerHTML=STEPS[cur].cap;
+    document.getElementById('simPrev').disabled=cur===0;
+    document.getElementById('simNext').disabled=cur===STEPS.length-1;
+    var last=T.querySelector('.msg.cur');
+    if(last) last.scrollIntoView({block:'nearest'});
+  }
+  function avatar(w){
+    return {doctor:'D',patient:'P',measure:'M',moderator:'⚖',system:'…'}[w];
+  }
+  document.getElementById('simNext').addEventListener('click',function(){
+    if(cur<STEPS.length-1){cur++;render();}
+  });
+  document.getElementById('simPrev').addEventListener('click',function(){
+    if(cur>0){cur--;render();}
+  });
+  document.getElementById('simReset').addEventListener('click',function(){
+    cur=0;render();
+  });
+  render();
+})();
+
+/* ============================================================
+   LEADERBOARD CHART
+   ============================================================ */
+(function(){
+  var chart=document.getElementById('lbChart');
+  if(!chart) return;
+  var MEDQA=[
+    {n:'Claude-3.5 Sonnet',v:62.1,e:3.3,k:'gen'},
+    {n:'OpenBioLLM-70B',v:58.3,e:4.2,k:'med'},
+    {n:'Human Physicians',v:54,e:28.5,k:'human'},
+    {n:'GPT-4',v:51.6,e:3.3,k:'gen'},
+    {n:'Mixtral-8x7B',v:37.1,e:3.1,k:'gen'},
+    {n:'GPT-3.5',v:36.6,e:null,k:'gen'},
+    {n:'GPT-4o',v:34.2,e:3.4,k:'gen'},
+    {n:'MedLlama3-8B',v:31.4,e:2.9,k:'med'},
+    {n:'Meditron-70B',v:29.1,e:2.4,k:'med'},
+    {n:'PMC-Llama-7B',v:23.6,e:2.1,k:'med'},
+    {n:'Llama-3-70B',v:19,e:2.5,k:'gen'},
+    {n:'Llama-2-70B-chat',v:4.5,e:1.3,k:'gen'}
+  ];
+  var MIMIC=[
+    {n:'Claude-3.5 Sonnet',v:42.9,e:3.3,k:'gen'},
+    {n:'OpenBioLLM-70B',v:38.1,e:3.2,k:'med'},
+    {n:'PMC-Llama-7B',v:34.3,e:3.0,k:'med'},
+    {n:'GPT-4',v:34.0,e:3.1,k:'gen'},
+    {n:'MedLlama3-8B',v:29.7,e:2.6,k:'med'},
+    {n:'Mixtral-8x7B',v:29.5,e:3.1,k:'gen'},
+    {n:'GPT-3.5',v:27.5,e:3.0,k:'gen'},
+    {n:'Meditron-70B',v:25.5,e:2.43,k:'med'},
+    {n:'GPT-4o',v:24.0,e:2.9,k:'gen'},
+    {n:'Llama-2-70B-chat',v:13.5,e:2.2,k:'gen'},
+    {n:'Llama-3-70B',v:8.5,e:1.9,k:'gen'}
+  ];
+  function draw(data){
+    chart.classList.remove('in');
+    chart.innerHTML='';
+    data.forEach(function(d){
+      var row=document.createElement('div');
+      row.className='bar-row';
+      var err=d.e!=null?'<small> ± '+d.e+'</small>':'';
+      row.innerHTML='<span class="bar-name"><b>'+d.n+'</b></span>'+
+        '<div class="bar-track"><div class="bar-fill '+d.k+'" style="--w:'+d.v+'%"></div></div>'+
+        '<span class="bar-val">'+d.v+'%'+err+'</span>';
+      chart.appendChild(row);
+    });
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){chart.classList.add('in');});
+    });
+  }
+  var datasets={medqa:MEDQA,mimic:MIMIC};
+  var seg=document.querySelectorAll('#lbToggle .seg');
+  seg.forEach(function(b){
+    b.addEventListener('click',function(){
+      seg.forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on');
+      draw(datasets[b.getAttribute('data-ds')]);
+    });
+  });
+  var io=new IntersectionObserver(function(en){
+    if(en[0].isIntersecting){draw(MEDQA);io.disconnect();}
+  },{threshold:.2});
+  io.observe(chart);
+})();
+
+/* ============================================================
+   PLACE YOUR BETS
+   ============================================================ */
+(function(){
+  document.querySelectorAll('.bets').forEach(function(box){
+    var opts=box.querySelectorAll('.betopt');
+    opts.forEach(function(o){
+      o.addEventListener('click',function(){
+        opts.forEach(function(x){x.classList.remove('picked');});
+        o.classList.add('picked');
+        box.classList.add('done');
+      });
+    });
+  });
+})();
+
+/* ============================================================
+   N-INTERACTIONS SLIDER
+   ============================================================ */
+(function(){
+  var slider=document.getElementById('nSlider');
+  if(!slider) return;
+  var N=[10,15,20,25,30];
+  var ACC=[25,38,52,48,43];
+  var NOTE=[
+    'Half the turn budget → barely half the accuracy. The doctor runs out of turns before gathering enough information.',
+    'Still well short of the sweet spot — not enough turns to fully investigate.',
+    'The default and the peak. Around 20 turns is where accuracy is highest.',
+    'Past the peak: accuracy slips. More turns mean a longer transcript to reason over.',
+    'Even more turns, even lower — the ever-growing input works against the model.'
+  ];
+  function upd(){
+    var i=+slider.value;
+    document.getElementById('nVal').textContent='N = '+N[i];
+    document.getElementById('nAcc').textContent=ACC[i]+'%';
+    document.getElementById('nBar').style.width=ACC[i]+'%';
+    document.getElementById('nNote').textContent=NOTE[i];
+  }
+  slider.addEventListener('input',upd);
+  upd();
+})();
+
+/* ============================================================
+   BIAS CHART
+   ============================================================ */
+(function(){
+  var chart=document.getElementById('biasChart');
+  if(!chart) return;
+  var note=document.getElementById('biasNote');
+  var DATA={
+    gpt4:{
+      note:'GPT-4 — unbiased accuracy 52%. Across all introduced biases, accuracy fell by at most 4 percentage points. Every bar sits near 100%: GPT-4 is highly robust to bias.',
+      rows:[
+        {n:'Cognitive · doctor',v:96.7,abs:'52% → 50.3%'},
+        {n:'Cognitive · patient',v:92.0,abs:'52% → 48%'},
+        {n:'Implicit · doctor',v:97.1,abs:'52% → 50.5%'},
+        {n:'Implicit · patient',v:98.6,abs:'52% → 51.3%'}
+      ]
+    },
+    mixtral:{
+      note:'Mixtral-8x7B — unbiased accuracy 37%. It degrades far more than GPT-4. Worst case: a cognitive bias on the doctor drops normalized accuracy to 78.4% (37% → 29%).',
+      rows:[
+        {n:'Cognitive · doctor',v:78.4,abs:'37% → 29%'},
+        {n:'Cognitive · patient',v:94.5,abs:'37% → 35%'},
+        {n:'Implicit · overall',v:88.3,abs:'37% → 32.7%'}
+      ]
+    }
+  };
+  function draw(key){
+    var d=DATA[key];
+    chart.classList.remove('in');
+    chart.innerHTML='';
+    d.rows.forEach(function(r){
+      var color=r.v>=95?'var(--good)':(r.v>=85?'var(--measure)':'var(--bad)');
+      var row=document.createElement('div');
+      row.className='bar-row';
+      row.innerHTML='<span class="bar-name"><b>'+r.n+'</b></span>'+
+        '<div class="bar-track"><div class="bar-fill" style="--w:'+r.v+'%;background:'+color+'"></div></div>'+
+        '<span class="bar-val">'+r.v+'%</span>';
+      chart.appendChild(row);
+      var sub=document.createElement('div');
+      sub.className='fignote';
+      sub.style.margin='-2px 0 6px 127px';
+      sub.textContent='normalized accuracy · absolute: '+r.abs;
+      chart.appendChild(sub);
+    });
+    note.textContent=d.note;
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){chart.classList.add('in');});
+    });
+  }
+  var seg=document.querySelectorAll('#biasToggle .seg');
+  seg.forEach(function(b){
+    b.addEventListener('click',function(){
+      seg.forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on');
+      draw(b.getAttribute('data-m'));
+    });
+  });
+  var io=new IntersectionObserver(function(en){
+    if(en[0].isIntersecting){draw('gpt4');io.disconnect();}
+  },{threshold:.2});
+  io.observe(chart);
+})();
+
+/* ============================================================
+   MULTIMODAL CHART
+   ============================================================ */
+(function(){
+  var chart=document.getElementById('mmChart');
+  if(!chart) return;
+  var note=document.getElementById('mmNote');
+  var DATA={
+    initial:{
+      note:'Image provided to the doctor up front, at initialization.',
+      rows:[
+        {n:'Claude-3.5 Sonnet',v:37.2,e:2.2},
+        {n:'GPT-4',v:27.7,e:2.0},
+        {n:'GPT-4o',v:21.4,e:1.7},
+        {n:'GPT-4o-mini',v:8.0,e:1.2}
+      ]
+    },
+    request:{
+      note:'Image withheld — the doctor must decide it is needed and request it from the measurement agent. Every model scores slightly lower than when handed the image.',
+      rows:[
+        {n:'Claude-3.5 Sonnet',v:35.4,e:2.4},
+        {n:'GPT-4',v:25.4,e:2.1},
+        {n:'GPT-4o',v:19.1,e:1.4},
+        {n:'GPT-4o-mini',v:6.1,e:1.2}
+      ]
+    }
+  };
+  function draw(key){
+    var d=DATA[key];
+    chart.classList.remove('in');
+    chart.innerHTML='';
+    d.rows.forEach(function(r){
+      var row=document.createElement('div');
+      row.className='bar-row';
+      row.innerHTML='<span class="bar-name"><b>'+r.n+'</b></span>'+
+        '<div class="bar-track"><div class="bar-fill gen" style="--w:'+r.v+'%"></div></div>'+
+        '<span class="bar-val">'+r.v+'%<small> ± '+r.e+'</small></span>';
+      chart.appendChild(row);
+    });
+    note.textContent=d.note;
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){chart.classList.add('in');});
+    });
+  }
+  var seg=document.querySelectorAll('#mmToggle .seg');
+  seg.forEach(function(b){
+    b.addEventListener('click',function(){
+      seg.forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on');
+      draw(b.getAttribute('data-mm'));
+    });
+  });
+  var io=new IntersectionObserver(function(en){
+    if(en[0].isIntersecting){draw('initial');io.disconnect();}
+  },{threshold:.2});
+  io.observe(chart);
+})();
+
+/* ============================================================
+   READER-STUDY CHART (animate on view)
+   ============================================================ */
+(function(){
+  var c=document.getElementById('readerChart');
+  if(!c) return;
+  c.classList.remove('in');
+  var io=new IntersectionObserver(function(en){
+    if(en[0].isIntersecting){c.classList.add('in');io.disconnect();}
+  },{threshold:.3});
+  io.observe(c);
+})();
+
+/* ============================================================
+   QUIZZES
+   ============================================================ */
+(function(){
+  var QKEY='ac-quiz';
+  var saved={};
+  try{saved=JSON.parse(localStorage.getItem(QKEY)||'{}');}catch(e){saved={};}
+  document.querySelectorAll('.quiz').forEach(function(q){
+    var id=q.getAttribute('data-quiz');
+    var opts=q.querySelectorAll('.qopt');
+    opts.forEach(function(o){
+      if(o.getAttribute('data-correct')==='true') o.classList.add('isright');
+      o.addEventListener('click',function(){
+        if(q.classList.contains('answered')) return;
+        var right=o.getAttribute('data-correct')==='true';
+        o.classList.add(right?'correct':'wrong');
+        q.classList.add('answered');
+        saved[id]=right?1:0;
+        try{localStorage.setItem(QKEY,JSON.stringify(saved));}catch(e){}
+      });
+    });
+  });
+})();
+
+/* ============================================================
+   GLOSSARY LIST (build from data)
+   ============================================================ */
+(function(){
+  var dl=document.getElementById('glossaryList');
+  if(!dl) return;
+  var keys=Object.keys(GLOSSARY).sort(function(a,b){
+    return GLOSSARY[a].t.localeCompare(GLOSSARY[b].t);
+  });
+  keys.forEach(function(k){
+    var g=GLOSSARY[k];
+    var dt=document.createElement('dt'); dt.textContent=g.t;
+    var dd=document.createElement('dd'); dd.textContent=g.d;
+    dl.appendChild(dt); dl.appendChild(dd);
+  });
+})();
+</script>
+</body>
+</html>
