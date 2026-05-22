@@ -1,0 +1,924 @@
+%%
+%% beamerthemeCERN.sty -- CERN Beamer theme (single-file distribution)
+%%
+%% A LaTeX Beamer theme that replicates CERN's corporate PowerPoint template.
+%%
+%% Usage:
+%%   \documentclass[aspectratio=169,t]{beamer}
+%%   \usetheme{CERN}                         % default -- single CERN logo
+%%
+%%   % Enable a second (cobranding) logo on cover / footer / end slide
+%%   % / section transitions:
+%%   \usetheme[cobrand]{CERN}
+%%   \cobrandinglogo{logos/my-brand.pdf}
+%%
+%%   \title{...}  \subtitle{...}  \author{...}  \date{...}
+%%   \event{Conference name}                 % optional; shown in footer
+%%   \begin{document}
+%%     \maketitle
+%%     \maketoc                              % optional outline slide
+%%     \section{First section}               % auto blue transition slide
+%%     \begin{frame}{Frame title}...\end{frame}
+%%     \sectionslide{Explicit transition}    % manual transition slide
+%%     \makeend                              % "home.cern" closing slide
+%%   \end{document}
+%%
+%% Engines:
+%%   XeLaTeX / LuaLaTeX  (recommended; uses fontspec + TeX Gyre Heros)
+%%   pdfLaTeX            (falls back to helvet)
+%%
+%% File layout inside this single .sty
+%%   1. Theme options                 \DeclareOptionBeamer
+%%   2. Internal state                path/event/section macros + [cafein] preset
+%%   3. Required packages             tikz / booktabs / natbib / fontspec etc.
+%%   4. Colour palette                CERN semantic colours + Beamer colour slots
+%%   5. Fonts                         fontspec or helvet + Beamer font slots
+%%   6. Inner theme                   blocks / itemize / captions / tables
+%%   7. Outer theme (helpers)         margin, section background, title box,
+%%                                    footer text, logo row, timeline
+%%   8. Outer theme (templates)       title page / frametitle / footline /
+%%                                    section page / part page / end page /
+%%                                    TOC / AtBeginSection hook
+%%   9. Date format + hyperref
+%%  10. User-facing macros
+%%
+
+\ProvidesPackage{beamerthemeCERN}[2026/04/22 v2.0 CERN Beamer theme]
+
+%%=============================================================================
+%% 1. Theme options
+%%    [cobrand]    reserves a cobranding logo slot next to the CERN mark on
+%%                 the cover, every content footer, the closing slide, and
+%%                 the section transitions. Pair with \cobrandinglogo{path}
+%%                 (and optionally \cobrandinglogowhite{path} for the white
+%%                 variant used on blue section slides).
+%%    [cafein]     pre-configured CAFEIN team variant. Equivalent to
+%%                 [cobrand] + \cobrandinglogo{logos/cafein-logo.pdf}
+%%                          + \cobrandinglogowhite{logos/cafein-logo-white.pdf}.
+%%                 Also appends a cafein.web.cern.ch link to the closing slide.
+%%    [authoryear] switch citations from numeric [1] to author-year, e.g.
+%%                 "Protani et al. (2024)" (\citet) or
+%%                 "(Protani et al., 2024)" (\citep / \cite). Default: numeric.
+%%=============================================================================
+\newif\ifbeamer@cern@cobrand
+\beamer@cern@cobrandfalse
+\DeclareOptionBeamer{cobrand}{\beamer@cern@cobrandtrue}
+
+\newif\ifbeamer@cern@cafein
+\beamer@cern@cafeinfalse
+\DeclareOptionBeamer{cafein}{%
+  \beamer@cern@cafeintrue
+  \beamer@cern@cobrandtrue   % cafein implies cobrand
+}
+
+\newif\ifbeamer@cern@authoryear
+\beamer@cern@authoryearfalse
+\DeclareOptionBeamer{authoryear}{\beamer@cern@authoryeartrue}
+
+\ProcessOptionsBeamer
+
+\mode<presentation>
+
+%%=============================================================================
+%% 2. Internal state
+%%=============================================================================
+\let\beamer@cern@cobrandpath\@empty                        % set by \cobrandinglogo
+\let\beamer@cern@cobrandpathwhite\@empty                   % set by \cobrandinglogowhite
+\let\beamer@cern@event\@empty                              % set by \event
+\let\beamer@cern@sectionlist\@empty                        % set by \cernsections
+\def\beamer@cern@logopath{logos/cern-logo.pdf}             % \cernlogopath
+\def\beamer@cern@logopathwhite{logos/cern-logo-white.pdf}  % \cernlogopathwhite
+
+% [cafein] preset: wire in the CAFEIN logos (users can still override).
+\ifbeamer@cern@cafein
+  \def\beamer@cern@cobrandpath{logos/cafein-logo.pdf}
+  \def\beamer@cern@cobrandpathwhite{logos/cafein-logo-white.pdf}
+\fi
+
+%%=============================================================================
+%% 3. Required packages
+%%=============================================================================
+\RequirePackage{iftex}
+\RequirePackage{tikz}
+\usetikzlibrary{calc,positioning,arrows.meta}
+\RequirePackage{graphicx}
+\RequirePackage{booktabs}
+\RequirePackage{colortbl}
+
+% Citations via natbib; loaded here so it sees Beamer's \bibitem.
+\ifbeamer@cern@authoryear
+  \RequirePackage[authoryear,round]{natbib}
+\else
+  \RequirePackage[numbers,square]{natbib}
+\fi
+
+%%=============================================================================
+%% 4. Colour palette
+%%    Hex values taken from the CERN brand palette; the dk1/lt1/accent
+%%    names in the comments below refer to the PowerPoint theme roles.
+%%=============================================================================
+% Primary brand
+\definecolor{CERNblue}{HTML}{0033A0}   % dk1, accent1 -- the only "CERN blue"
+% Secondary accents (PPTX accent2..6)
+\definecolor{CERNcyan}{HTML}{61C4D3}   % accent2 -- examples, highlights
+\definecolor{CERNorange}{HTML}{E15E32} % accent3 -- alerts
+\definecolor{CERNgray}{HTML}{BEBECB}   % accent4 -- rules, muted bg
+\definecolor{CERNpurple}{HTML}{6E2466} % accent5, hlink
+\definecolor{CERNnavy}{HTML}{1C446A}   % accent6 -- deep accent
+% Neutrals
+\definecolor{CERNtextdark}{HTML}{2F2F2F} % dk2 -- headings in dark variant
+\definecolor{CERNbodytext}{HTML}{171717} % tx2*0.5 -- PPTX body text
+\definecolor{CERNlightbg}{HTML}{F8F8F8}  % lt2 -- block bg
+\definecolor{CERNwhite}{HTML}{FFFFFF}    % lt1
+
+%% Beamer colour slots --------------------------------------------------------
+\setbeamercolor{normal text}{fg=CERNbodytext,bg=CERNwhite}
+\setbeamercolor{alerted text}{fg=CERNorange}
+\setbeamercolor{example text}{fg=CERNnavy}
+\setbeamercolor{structure}{fg=CERNblue}
+\setbeamercolor{background canvas}{bg=CERNwhite}
+\setbeamercolor{background}{bg=CERNwhite}
+
+\setbeamercolor{title}{fg=CERNblue}
+\setbeamercolor{subtitle}{fg=CERNblue}
+\setbeamercolor{author}{fg=CERNtextdark}
+\setbeamercolor{date}{fg=CERNtextdark}
+\setbeamercolor{institute}{fg=CERNtextdark}
+\setbeamercolor{titlegraphic}{fg=CERNblue}
+
+\setbeamercolor{frametitle}{fg=CERNblue,bg=CERNwhite}
+\setbeamercolor{framesubtitle}{fg=CERNtextdark}
+
+\setbeamercolor{section in toc}{fg=CERNblue}
+\setbeamercolor{section in toc shaded}{fg=CERNtextdark}
+\setbeamercolor{subsection in toc}{fg=CERNtextdark}
+\setbeamercolor{subsection in toc shaded}{fg=CERNtextdark}
+\setbeamercolor{section in head/foot}{fg=CERNblue,bg=CERNwhite}
+\setbeamercolor{subsection in head/foot}{fg=CERNblue,bg=CERNwhite}
+
+\setbeamercolor{footline}{fg=CERNblue,bg=CERNwhite}
+\setbeamercolor{page number in head/foot}{fg=CERNblue}
+
+\setbeamercolor{block title}{fg=CERNwhite,bg=CERNblue}
+\setbeamercolor{block body}{fg=CERNbodytext,bg=CERNlightbg}
+\setbeamercolor{block title alerted}{fg=CERNwhite,bg=CERNorange}
+\setbeamercolor{block body alerted}{fg=CERNbodytext,bg=CERNlightbg}
+\setbeamercolor{block title example}{fg=CERNwhite,bg=CERNcyan}
+\setbeamercolor{block body example}{fg=CERNbodytext,bg=CERNlightbg}
+
+\setbeamercolor{itemize item}{fg=CERNblue}
+\setbeamercolor{itemize subitem}{fg=CERNblue}
+\setbeamercolor{itemize subsubitem}{fg=CERNblue}
+\setbeamercolor{enumerate item}{fg=CERNblue}
+\setbeamercolor{enumerate subitem}{fg=CERNblue}
+\setbeamercolor{enumerate subsubitem}{fg=CERNblue}
+\setbeamercolor{description item}{fg=CERNblue}
+
+\setbeamercolor{caption}{fg=CERNbodytext}
+\setbeamercolor{caption name}{fg=CERNblue}
+
+\setbeamercolor{button}{fg=CERNwhite,bg=CERNblue}
+\setbeamercolor{button border}{fg=CERNblue}
+
+\setbeamercolor{section page}{fg=CERNwhite,bg=CERNblue}
+\setbeamercolor{part page}{fg=CERNwhite,bg=CERNblue}
+
+\setbeamercolor{math text}{fg=CERNbodytext}
+\setbeamercolor{math text inlined}{fg=CERNbodytext}
+\setbeamercolor{math text displayed}{fg=CERNbodytext}
+
+\setbeamercolor{separation line}{fg=CERNblue}
+
+%%=============================================================================
+%% 5. Fonts
+%%    PPTX specifies Arial; TeX Gyre Heros is the free Helvetica clone
+%%    bundled with TeX Live. Visually near-identical at presentation sizes.
+%%    Requires XeTeX or LuaTeX for fontspec; pdfLaTeX gets a helvet fallback.
+%%=============================================================================
+\ifXeTeX
+  \RequirePackage{fontspec}
+  \IfFontExistsTF{TeX Gyre Heros}{%
+    \setsansfont{TeX Gyre Heros}[%
+      Scale=1.0,
+      UprightFont = *-Regular,
+      BoldFont    = *-Bold,
+      ItalicFont  = *-Italic,
+      BoldItalicFont = *-BoldItalic]%
+  }{%
+    \PackageWarning{beamerthemeCERN}%
+      {TeX Gyre Heros not found -- falling back to the default sans family}%
+  }
+  % \ttfamily must be bound to a real font under fontspec, otherwise listings
+  % / \texttt / verbatim emit "nullfont" warnings or errors.
+  \IfFontExistsTF{TeX Gyre Cursor}{%
+    \setmonofont{TeX Gyre Cursor}[Scale=MatchLowercase]%
+  }{}%
+\else\ifLuaTeX
+  \RequirePackage{fontspec}
+  \IfFontExistsTF{TeX Gyre Heros}{%
+    \setsansfont{TeX Gyre Heros}[Scale=1.0]%
+  }{%
+    \PackageWarning{beamerthemeCERN}%
+      {TeX Gyre Heros not found -- falling back to the default sans family}%
+  }
+  \IfFontExistsTF{TeX Gyre Cursor}{%
+    \setmonofont{TeX Gyre Cursor}[Scale=MatchLowercase]%
+  }{}%
+\else
+  % pdflatex fallback -- Helvetica clone shipped with TeX Live
+  \RequirePackage[scaled=1.0]{helvet}
+\fi\fi
+\renewcommand{\familydefault}{\sfdefault}
+
+%% Beamer font slots ---------------------------------------------------------
+% Title page
+\setbeamerfont{title}          {family=\sffamily,series=\bfseries,size=\fontsize{28pt}{30pt}}
+\setbeamerfont{subtitle}       {family=\sffamily,series=\bfseries,size=\fontsize{14pt}{17pt}}
+\setbeamerfont{author}         {family=\sffamily,series=\bfseries,size=\fontsize{11pt}{13pt}}
+\setbeamerfont{date}           {family=\sffamily,series=\mdseries,size=\fontsize{9pt}{11pt}}
+\setbeamerfont{institute}      {family=\sffamily,series=\mdseries,size=\fontsize{10pt}{13pt}}
+\setbeamerfont{titlegraphic}   {family=\sffamily}
+% Frame
+\setbeamerfont{frametitle}     {family=\sffamily,series=\bfseries,size=\fontsize{17pt}{20pt}}
+\setbeamerfont{framesubtitle}  {family=\sffamily,series=\bfseries,size=\fontsize{11pt}{13pt}}
+% Body
+\setbeamerfont{normal text}    {family=\sffamily,series=\mdseries,size=\fontsize{10pt}{13pt}}
+% Lists
+\setbeamerfont{itemize/enumerate body}      {size=\fontsize{10pt}{13pt}}
+\setbeamerfont{itemize/enumerate subbody}   {size=\fontsize{9pt}{11pt}}
+\setbeamerfont{itemize/enumerate subsubbody}{size=\fontsize{8.5pt}{10pt}}
+\setbeamerfont{description item}{series=\bfseries}
+% Blocks
+\setbeamerfont{block title}         {family=\sffamily,series=\bfseries,size=\fontsize{11pt}{13pt}}
+\setbeamerfont{block body}          {family=\sffamily,series=\mdseries,size=\fontsize{10pt}{13pt}}
+\setbeamerfont{block title alerted} {family=\sffamily,series=\bfseries,size=\fontsize{11pt}{13pt}}
+\setbeamerfont{block title example} {family=\sffamily,series=\bfseries,size=\fontsize{11pt}{13pt}}
+% Captions
+\setbeamerfont{caption}        {family=\sffamily,series=\mdseries,size=\fontsize{9pt}{11pt}}
+\setbeamerfont{caption name}   {family=\sffamily,series=\bfseries}
+% Footline -- small, sits in the 8 mm band
+\setbeamerfont{footline}       {family=\sffamily,series=\mdseries,size=\fontsize{6pt}{7pt}}
+\setbeamerfont{page number in head/foot}{family=\sffamily,series=\bfseries,size=\fontsize{6pt}{7pt}}
+% Section / part "chapter header" transition
+\setbeamerfont{section page title}{family=\sffamily,series=\bfseries,size=\fontsize{34pt}{40pt}}
+\setbeamerfont{part page title}   {family=\sffamily,series=\bfseries,size=\fontsize{34pt}{40pt}}
+% TOC
+\setbeamerfont{section in toc}   {family=\sffamily,series=\bfseries,size=\fontsize{12pt}{15pt}}
+\setbeamerfont{subsection in toc}{family=\sffamily,series=\mdseries,size=\fontsize{10pt}{13pt}}
+
+%%=============================================================================
+%% 6. Inner theme (blocks, itemize, enumerate, captions, tables)
+%%=============================================================================
+% Blocks: rounded corners, coloured title bar, light-grey body
+\setbeamertemplate{blocks}[rounded][shadow=false]
+
+% Itemize markers (CERN blue via the "structure" colour)
+\setbeamertemplate{itemize item}{\raisebox{0.25ex}{\scalebox{0.6}{$\blacksquare$}}}
+\setbeamertemplate{itemize subitem}{\raisebox{0.15ex}{\scalebox{0.9}{$\bullet$}}}
+\setbeamertemplate{itemize subsubitem}{\raisebox{0.10ex}{--}}
+
+% Enumerate: bold coloured numbers
+\setbeamertemplate{enumerate item}{%
+  \usebeamercolor[fg]{enumerate item}\textbf{\insertenumlabel.}%
+}
+\setbeamertemplate{enumerate subitem}{%
+  \usebeamercolor[fg]{enumerate subitem}\textbf{\insertenumlabel.\insertsubenumlabel}%
+}
+\setbeamertemplate{enumerate subsubitem}{%
+  \usebeamercolor[fg]{enumerate subsubitem}%
+  \textbf{\insertenumlabel.\insertsubenumlabel.\insertsubsubenumlabel}%
+}
+
+% Captions: "Figure 1:" in CERN blue bold
+\setbeamertemplate{caption}[numbered]
+\setbeamertemplate{caption label separator}{: }
+
+% Navigation symbols off (CERN decks never show them)
+\setbeamertemplate{navigation symbols}{}
+
+% Bibliography: compact, no icon
+\setbeamertemplate{bibliography item}[text]
+
+% Table header helpers
+%   \cernth{cell}       styles a single header cell: white bold text + math
+%                       (works for both `Metric' and `$\Delta$' / `$p$').
+%                       Beamer ties math ink to the `structure' colour, so
+%                       `\textcolor{white}{$\Delta$}' alone would still render
+%                       CERN blue. `\everymath{\color{white}}' injects the
+%                       colour at every math-mode open so math glyphs are
+%                       white too.
+%   \cernheaderrow      applies the CERN-blue background to a whole row;
+%                       put it BEFORE the first cell of the header row.
+% Usage:
+%   \cernheaderrow
+%   \cernth{Metric} & \cernth{Baseline} & \cernth{$\Delta$} &
+%   \cernth{$p$-value} \\
+\newcommand{\cernth}[1]{{%
+  \color{white}\bfseries\boldmath
+  \everymath{\color{white}}%
+  #1%
+}}
+\newcommand{\cernheaderrow}{\rowcolor{CERNblue}}
+
+% \begin{cerntable}{colspec} ... \end{cerntable}
+%   Wraps tabular with the banded-row + row-stretch boilerplate that every
+%   CERN-branded table needs. Pair with \cernheaderrow + \cernth for the
+%   header row. Caller provides the column specification exactly like a
+%   regular tabular. `\rowcolors' and `\arraystretch' are scoped to the
+%   environment's implicit group, so neither leaks outward.
+\newenvironment{cerntable}[1]{%
+  \renewcommand{\arraystretch}{1.35}%
+  \rowcolors{2}{CERNlightbg}{white}%
+  \begin{tabular}{#1}%
+}{%
+  \end{tabular}%
+}
+
+%%=============================================================================
+%% 7. Outer theme -- helpers
+%%    Positioning strategy: title, footer, section and end pages are drawn
+%%    with TikZ `remember picture, overlay' relative to `current page'. This
+%%    matches the PPTX absolute-positioning model and avoids beamercolorbox
+%%    width quirks.
+%%
+%%    Geometry (mm on the 160 x 90 mm Beamer canvas):
+%%       text margins left / right             =  6   (\cern@margin below)
+%%       footer separator rule                 =  8   (from bottom)
+%%       footer band (separator..bottom)       =  8 mm; everything at y=4
+%%       footer logo / cobrand logo height     =  5
+%%       title-slide logo block                =  7..37 from top
+%%       title-slide title block               = 46..76 from top
+%%       title-slide author/date block         =  5 from bottom
+%%
+%%    Tunables (search for these constants to nudge the layout):
+%%       \cern@margin           left/right body margin
+%%       frametitle top \vspace*  (default -1mm)
+%%       frametitle trailing \vspace*  (negative pulls body up)
+%%       footer separator y
+%%       footer anchor y (shared centre for all footer elements)
+%%=============================================================================
+
+% Single source of truth for left/right body margin. A length (not a macro)
+% so arithmetic like `2\cern@margin' behaves (a \def'd macro would
+% concatenate `2' + `6mm' into `26mm').
+\newlength{\cern@margin}
+\setlength{\cern@margin}{6mm}
+\setbeamersize{text margin left=6mm,text margin right=6mm}
+
+% Full-bleed CERN-blue background for transition slides. Extended 6 mm past
+% each edge so PDF sub-pixel rounding can't leave a white hairline.
+\newcommand{\cern@sectionbluebg}{%
+  \fill[CERNblue]
+    ([xshift=-6mm, yshift=-6mm]current page.south west) rectangle
+    ([xshift= 6mm, yshift= 6mm]current page.north east);%
+}
+
+% Typeset a line-breakable section/part title in white, centred.
+% Wrapped in a standard LaTeX \parbox rather than tikz's `text width'+`align'
+% because tikz's text layout compresses inter-word glue under XeTeX/fontspec
+% on tight lines -- "An ad-hoc inner break" then renders glued together.
+\newcommand{\cern@sectiontitlebox}[2]{%
+  \parbox{\dimexpr\paperwidth-30mm\relax}{%
+    \centering #1\color{CERNwhite}#2%
+  }%
+}
+
+% Render the given code only when cobranding is enabled AND a path was set.
+\newcommand{\beamer@cern@ifcobrand}[1]{%
+  \ifbeamer@cern@cobrand
+    \ifx\beamer@cern@cobrandpath\@empty\else #1\fi
+  \fi
+}
+
+% Header logos for transition slides.
+%   Cobrand active + path: white CERN top-LEFT, cobrand top-RIGHT.
+%                          Cobrand slot prefers \beamer@cern@cobrandpathwhite
+%                          if set; otherwise falls back to the colour cobrand.
+%   Cobrand option but no path: single white CERN top-right.
+%   No cobrand: single white CERN top-right.
+% Use inside an existing tikzpicture[remember picture, overlay].
+\newcommand{\cern@sectionheaderlogos}{%
+  \ifbeamer@cern@cobrand
+    \ifx\beamer@cern@cobrandpath\@empty
+      \node[anchor=north east, inner sep=0pt]
+        at ([xshift=-10mm, yshift=-7mm]current page.north east)
+        {\includegraphics[height=10mm,width=45mm,keepaspectratio]%
+                         {\beamer@cern@logopathwhite}};
+    \else
+      \node[anchor=north west, inner sep=0pt]
+        at ([xshift=10mm, yshift=-7mm]current page.north west)
+        {\includegraphics[height=10mm,width=45mm,keepaspectratio]%
+                         {\beamer@cern@logopathwhite}};
+      \node[anchor=north east, inner sep=0pt]
+        at ([xshift=-10mm, yshift=-7mm]current page.north east)
+        {\includegraphics[height=10mm,width=45mm,keepaspectratio]{%
+          \ifx\beamer@cern@cobrandpathwhite\@empty
+            \beamer@cern@cobrandpath%
+          \else
+            \beamer@cern@cobrandpathwhite%
+          \fi
+        }};
+    \fi
+  \else
+    \node[anchor=north east, inner sep=0pt]
+      at ([xshift=-10mm, yshift=-7mm]current page.north east)
+      {\includegraphics[height=10mm,width=45mm,keepaspectratio]%
+                       {\beamer@cern@logopathwhite}};
+  \fi
+}
+
+% "Author | event-or-title" string, used in the footer.
+\newcommand{\beamer@cern@footleft}{%
+  \insertshortauthor
+  \ifx\beamer@cern@event\@empty
+    \ifx\insertshorttitle\@empty\else\space\textbar\space\insertshorttitle\fi
+  \else
+    \space\textbar\space\beamer@cern@event
+  \fi
+}
+
+% Section transition timeline: horizontal strip with one dot per section
+% (current section highlighted). Iterates \beamer@cern@sectionlist twice:
+% once to count entries, once to place nodes.
+\newcommand{\cern@drawsectiontimeline}{%
+  \xdef\beamer@cern@sectotal{0}%
+  \foreach \cern@tmp in \beamer@cern@sectionlist {%
+    \xdef\beamer@cern@sectotal{\number\numexpr\beamer@cern@sectotal+1\relax}%
+  }%
+  \coordinate (cern@tlL) at ([xshift=-50mm, yshift=-18mm]current page.center);
+  \coordinate (cern@tlR) at ([xshift= 50mm, yshift=-18mm]current page.center);
+  \draw[white!55, line width=0.5pt] (cern@tlL) -- (cern@tlR);
+  \foreach [count=\n] \sect in \beamer@cern@sectionlist {%
+    \ifnum\beamer@cern@sectotal=1
+      \coordinate (cern@tld\n) at ($(cern@tlL)!0.5!(cern@tlR)$);
+    \else
+      \pgfmathsetmacro{\cern@xp}{(\n-1)/(\beamer@cern@sectotal-1)}%
+      \coordinate (cern@tld\n) at ($(cern@tlL)!\cern@xp!(cern@tlR)$);
+    \fi
+    \ifnum\n=\beamer@cern@currentsectionnum\relax
+      \fill[white] (cern@tld\n) circle (1.6mm);
+      \node[below=2.5mm of cern@tld\n, text=white, align=center,
+            font=\sffamily\bfseries\fontsize{10pt}{12pt}\selectfont]
+        {\sect};
+    \else
+      \draw[white!80, line width=0.5pt, fill=CERNblue]
+        (cern@tld\n) circle (1mm);
+      \node[below=2.5mm of cern@tld\n, text=white!70, align=center,
+            font=\sffamily\fontsize{8pt}{10pt}\selectfont]
+        {\sect};
+    \fi
+  }%
+}
+
+%%=============================================================================
+%% 8. Outer theme -- templates
+%%=============================================================================
+
+%% Title page (PPTX Layout 3 "Title Slide with logo")
+\defbeamertemplate*{title page}{CERN}{%
+  \begin{tikzpicture}[remember picture, overlay]
+    % Logos row (30 mm tall, centered horizontally)
+    \ifbeamer@cern@cobrand
+      \ifx\beamer@cern@cobrandpath\@empty
+        \node[anchor=north, inner sep=0pt]
+          at ([yshift=-7mm]current page.north)
+          {\includegraphics[height=30mm,keepaspectratio]{\beamer@cern@logopath}};
+      \else
+        % Both images in ONE node so the pair auto-centres horizontally,
+        % regardless of individual logo widths.
+        \node[anchor=north, inner sep=0pt]
+          at ([yshift=-7mm]current page.north)
+          {\includegraphics[height=30mm,width=65mm,keepaspectratio]%
+                           {\beamer@cern@logopath}%
+           \hspace{10mm}%
+           \includegraphics[height=30mm,width=65mm,keepaspectratio]%
+                           {\beamer@cern@cobrandpath}};
+      \fi
+    \else
+      \node[anchor=north, inner sep=0pt]
+        at ([yshift=-7mm]current page.north)
+        {\includegraphics[height=30mm,keepaspectratio]{\beamer@cern@logopath}};
+    \fi
+    % Title + subtitle (both in CERN blue)
+    \node[anchor=north west,
+          text width=\dimexpr\paperwidth-2\cern@margin\relax,
+          align=flush left, inner sep=0pt]
+      at ([xshift=\cern@margin, yshift=-46mm]current page.north west)
+      {%
+        {\usebeamercolor[fg]{title}\usebeamerfont{title}\inserttitle\par}%
+        \ifx\insertsubtitle\@empty\else
+          \vspace{3.5mm}%
+          {\usebeamercolor[fg]{subtitle}\usebeamerfont{subtitle}\insertsubtitle\par}%
+        \fi
+      };
+    % Author + date (institute intentionally omitted on the cover)
+    \node[anchor=south west,
+          text width=\dimexpr\paperwidth-2\cern@margin\relax,
+          align=flush left, inner sep=0pt]
+      at ([xshift=\cern@margin, yshift=5mm]current page.south west)
+      {%
+        {\usebeamercolor[fg]{author}\usebeamerfont{author}\insertauthor\par}%
+        \vspace{0.4mm}%
+        {\usebeamercolor[fg]{date}\usebeamerfont{date}\insertdate\par}%
+      };
+  \end{tikzpicture}%
+}
+
+%% Frame title
+%% The two \vspace* below are the main knobs for vertical breathing room:
+%%   * top    (default -1mm)  negative pulls the title closer to the top
+%%   * bottom (default  0mm)  negative pulls the body UP toward the title;
+%%                            less negative (e.g. +2mm) gives more gap
+\setbeamertemplate{frametitle}{%
+  \vspace*{-1mm}%
+  \begin{minipage}[t]{\dimexpr\paperwidth-2\cern@margin\relax}%
+    \usebeamerfont{frametitle}\usebeamercolor[fg]{frametitle}%
+    \insertframetitle\strut
+    \ifx\insertframesubtitle\@empty\else
+      \par\vspace{0.3mm}%
+      {\usebeamerfont{framesubtitle}\usebeamercolor[fg]{framesubtitle}%
+       \insertframesubtitle\strut}%
+    \fi
+  \end{minipage}%
+  \vspace*{0mm}\par%
+}
+
+%% Footer
+%% `\setbeamertemplate{footline}' reserves 10 mm of invisible vertical space.
+%% The visible footer is painted on every non-plain frame via
+%% `\addtobeamertemplate{background canvas}' as a TikZ overlay -- absolute
+%% positioning keeps logos, text and page number all vertically centred on
+%% the same y = 4 mm line.
+\setbeamertemplate{footline}{\vbox to 10mm{\vfil\hbox{}}}
+
+\addtobeamertemplate{background canvas}{}{%
+  \ifbeamer@plainframe\else
+    \begin{tikzpicture}[remember picture, overlay,
+        % Force every footer text node to a uniform bounding box so that
+        % "2" (cap-height only) and "P. Name | ... 2026" (descender + cap)
+        % both centre on the same y when anchored east/west.
+        cern@ft/.style={inner sep=0pt, text=CERNblue,
+                        text height=1.4mm, text depth=0.4mm}]
+      % Separator rule, margin-to-margin
+      \draw[CERNblue, line width=0.4pt]
+        ([xshift= \cern@margin, yshift=8mm]current page.south west) --
+        ([xshift=-\cern@margin, yshift=8mm]current page.south east);
+      % CERN logo, bottom-left, centred in the 8 mm band
+      \node[anchor=west, inner sep=0pt]
+        at ([xshift=\cern@margin, yshift=4mm]current page.south west)
+        {\includegraphics[height=5mm,keepaspectratio]{\beamer@cern@logopath}};
+      % Author | event/title
+      \node[cern@ft, anchor=west, font=\usebeamerfont{footline}]
+        at ([xshift=\dimexpr\cern@margin+8mm\relax, yshift=4mm]%
+            current page.south west)
+        {\beamer@cern@footleft};
+      % Cobrand logo (only when cobrand option + path set)
+      \beamer@cern@ifcobrand{%
+        \node[anchor=center, inner sep=0pt]
+          at ([xshift=15mm, yshift=4mm]current page.south)
+          {\includegraphics[height=5mm,keepaspectratio]{\beamer@cern@cobrandpath}};
+      }%
+      % Date
+      \node[cern@ft, anchor=east, font=\usebeamerfont{footline}]
+        at ([xshift=-\dimexpr\cern@margin+8mm\relax, yshift=4mm]%
+            current page.south east)
+        {\insertshortdate};
+      % Page number (just the number, no "Slide" prefix)
+      \node[cern@ft, anchor=east,
+            font=\usebeamerfont{page number in head/foot}]
+        at ([xshift=-\cern@margin, yshift=4mm]current page.south east)
+        {\textbf{\insertframenumber}};
+    \end{tikzpicture}%
+  \fi
+}
+
+%% Headline (empty -- CERN decks have no top banner)
+\setbeamertemplate{headline}{}
+
+%% Table of contents / Outline slide
+%%   Styled as "N.  Section name": blue bold number + body-text name.
+\setbeamertemplate{section in toc}{%
+  \vspace{2mm}\leavevmode
+  \hbox{%
+    \usebeamerfont{section in toc}%
+    \color{CERNblue}\inserttocsectionnumber.%
+    \hspace{4mm}%
+    \color{CERNbodytext}\inserttocsection%
+  }%
+}
+
+% With `allowframebreaks`, Beamer appends a Roman numeral to the frame
+% title on every page ("Outline I"). `[from second]' only adds the
+% numeral from page 2 onwards.
+\setbeamertemplate{frametitle continuation}[from second]
+
+%% Section page (full CERN-blue bleed + optional timeline)
+\gdef\beamer@cern@currentsection{}
+\gdef\beamer@cern@currentsectionnum{0}
+
+\defbeamertemplate*{section page}{CERN}{%
+  \begin{tikzpicture}[remember picture, overlay]
+    \cern@sectionbluebg
+    \cern@sectionheaderlogos
+    \ifx\beamer@cern@sectionlist\@empty
+      \node[inner sep=0pt] at (current page.center)
+        {\cern@sectiontitlebox
+          {\usebeamerfont{section page title}}%
+          {\beamer@cern@currentsection}};
+    \else
+      \node[inner sep=0pt] at ([yshift=8mm]current page.center)
+        {\cern@sectiontitlebox
+          {\usebeamerfont{section page title}}%
+          {\beamer@cern@currentsection}};
+      \cern@drawsectiontimeline
+    \fi
+  \end{tikzpicture}%
+}
+
+\defbeamertemplate*{part page}{CERN}{%
+  \begin{tikzpicture}[remember picture, overlay]
+    \cern@sectionbluebg
+    \cern@sectionheaderlogos
+    \node[inner sep=0pt] at (current page.center)
+      {\cern@sectiontitlebox
+        {\usebeamerfont{part page title}}%
+        {\insertpart}};
+  \end{tikzpicture}%
+}
+
+% \insertsection expands to \hyperlink{NavigationN}{name}, which does not
+% render inside a TikZ node. Strip the hyperlink by re-letting \hyperlink
+% to \@secondoftwo during the \xdef capture. Also record the section counter
+% so the timeline knows which dot is "current".
+%
+% Section list: if the user did NOT supply \cernsections{...}, each
+% \section{...} writes its name to the .aux file. On the next compile
+% pass \cern@autoaddsection is read back BEFORE any frame renders, so
+% \beamer@cern@sectionlist is fully populated and every timeline sees
+% every section. Two passes are needed to stabilise (tectonic / latexmk
+% re-run automatically; plain xelatex users must run twice).
+\AtBeginSection[]{%
+  \begingroup
+    \let\hyperlink\@secondoftwo
+    \xdef\beamer@cern@currentsection{\insertsection}%
+    \xdef\beamer@cern@currentsectionnum{\number\value{section}}%
+  \endgroup
+  \ifcern@sections@manual\else
+    \protected@write\@auxout{}{%
+      \string\cern@autoaddsection{\beamer@cern@currentsection}}%
+  \fi
+  \begin{frame}[plain,noframenumbering]
+    \sectionpage
+  \end{frame}%
+}
+
+% Read-back callback invoked from the previous pass's .aux file.
+% Appends each section name to the list so the timeline can show them.
+\newcommand{\cern@autoaddsection}[1]{%
+  \ifx\beamer@cern@sectionlist\@empty
+    \gdef\beamer@cern@sectionlist{#1}%
+  \else
+    \xdef\beamer@cern@sectionlist{\beamer@cern@sectionlist, #1}%
+  \fi
+}
+
+%% End-slide template (invoked by \makeend below)
+\defbeamertemplate*{cern end page}{CERN}{%
+  \begin{tikzpicture}[remember picture, overlay]
+    % Logo block: one tikz node holds both \includegraphics so the pair
+    % is auto-centred horizontally on the page -- keeps the visual centre
+    % balanced no matter how wide the cobrand logo is.
+    \beamer@cern@ifcobrand{%
+      \node[anchor=center, inner sep=0pt]
+        at ([yshift=8mm]current page.center)
+        {\includegraphics[height=18mm,width=60mm,keepaspectratio]%
+                         {\beamer@cern@logopath}%
+         \hspace{10mm}%
+         \includegraphics[height=18mm,width=60mm,keepaspectratio]%
+                         {\beamer@cern@cobrandpath}};
+    }%
+    \ifbeamer@cern@cobrand
+      \ifx\beamer@cern@cobrandpath\@empty
+        \node[anchor=center, inner sep=0pt]
+          at ([yshift=8mm]current page.center)
+          {\includegraphics[height=18mm,width=60mm,keepaspectratio]%
+                           {\beamer@cern@logopath}};
+      \fi
+    \else
+      \node[anchor=center, inner sep=0pt]
+        at ([yshift=8mm]current page.center)
+        {\includegraphics[height=18mm,width=60mm,keepaspectratio]%
+                         {\beamer@cern@logopath}};
+    \fi
+    % home.cern always; cafein.web.cern.ch only under [cafein]; same font.
+    \node[anchor=north, text=CERNblue,
+          font=\usebeamerfont{subtitle}]
+      at ([yshift=-16mm]current page.center)
+      {\href{https://home.cern}{home.cern}};
+    \ifbeamer@cern@cafein
+      \node[anchor=north, text=CERNblue,
+            font=\usebeamerfont{subtitle}]
+        at ([yshift=-24mm]current page.center)
+        {\href{https://cafein.web.cern.ch}{cafein.web.cern.ch}};
+    \fi
+  \end{tikzpicture}%
+}
+
+%%=============================================================================
+%% 9. Date format + hyperref
+%%=============================================================================
+% Date: "dd Month yyyy" (e.g. "22 April 2026"). Overrides the LaTeX default
+% ("April 22, 2026"). Affects both cover and footer's \insertshortdate.
+\renewcommand{\today}{%
+  \number\day\space
+  \ifcase\month\or January\or February\or March\or April\or May\or June\or
+    July\or August\or September\or October\or November\or December\fi
+  \space\number\year
+}
+
+% Hyperref colours (beamer auto-loads hyperref)
+\hypersetup{%
+  colorlinks = true,
+  linkcolor  = CERNblue,
+  urlcolor   = CERNpurple,
+  citecolor  = CERNblue,
+  filecolor  = CERNblue,
+  pdfborder  = {0 0 0}%
+}
+
+%%=============================================================================
+%% 10. User-facing macros
+%%=============================================================================
+
+% Footer-sized variants (convenience aliases for \author[X]{...} etc.)
+\newcommand{\shortauthor}[1]{\def\insertshortauthor{#1}}
+\newcommand{\shorttitle}[1]{\def\insertshorttitle{#1}}
+\newcommand{\shortdate}[1]{\def\insertshortdate{#1}}
+\newcommand{\shortinstitute}[1]{\def\insertshortinstitute{#1}}
+
+% \event{Name} -- replaces the short title in the footer with the event name.
+\newcommand{\event}[1]{\def\beamer@cern@event{#1}}
+
+% \cernstatnum[colour]{value} -- render a KPI-style big bold number in the
+% given palette colour (default CERNblue). Handy inside a block:
+%   \begin{block}{Accuracy}
+%     \centering \cernstatnum[CERNnavy]{93.4\%}\\[0.5mm]
+%     {\footnotesize on the held-out split}
+%   \end{block}
+\newcommand{\cernstatnum}[2][CERNblue]{%
+  {\fontsize{26pt}{28pt}\selectfont\color{#1}\textbf{#2}}%
+}
+
+% \cobrandinglogo{path} -- register a second logo. Requires [cobrand];
+% otherwise a warning is issued and the macro does nothing.
+% Image constraints:
+%   PDF (vector) preferred, PNG >= 300 dpi acceptable
+%   Aspect ratio 1:1 up to 2:1 landscape; portrait discouraged
+%   Transparent or white background
+\newcommand{\cobrandinglogo}[1]{%
+  \ifbeamer@cern@cobrand
+    \def\beamer@cern@cobrandpath{#1}%
+  \else
+    \PackageWarning{beamerthemeCERN}{%
+      \string\cobrandinglogo\space was ignored because the `cobrand' option
+      was not passed to \string\usetheme.\MessageBreak
+      To enable cobranding, load the theme as \string\usetheme[cobrand]{CERN}%
+    }%
+  \fi
+}
+
+% \cobrandinglogowhite{path} -- optional white-on-transparent cobrand
+% variant used on the blue section-transition slides. If unset, the colour
+% cobrand is reused on section slides.
+\newcommand{\cobrandinglogowhite}[1]{%
+  \ifbeamer@cern@cobrand
+    \def\beamer@cern@cobrandpathwhite{#1}%
+  \else
+    \PackageWarning{beamerthemeCERN}{%
+      \string\cobrandinglogowhite\space was ignored because the `cobrand'
+      option was not passed to \string\usetheme.\MessageBreak
+      To enable cobranding, load the theme as \string\usetheme[cobrand]{CERN}%
+    }%
+  \fi
+}
+
+% \cernlogopath{path} -- override the default CERN logo (rarely needed).
+\newcommand{\cernlogopath}[1]{\def\beamer@cern@logopath{#1}}
+
+% \cernlogopathwhite{path} -- override the white CERN logo (rarely needed).
+\newcommand{\cernlogopathwhite}[1]{\def\beamer@cern@logopathwhite{#1}}
+
+% \cernsections{A, B, C} -- OPTIONAL: explicit override of the section
+% list used by the timeline. In normal use the list is auto-collected
+% from the \section{...} calls in the document (written to .aux, read
+% back on the next pass -- see the \AtBeginSection block earlier in
+% this file). Call \cernsections{...} only when you want to pin the
+% list or get correct timelines on the first compile pass.
+\newif\ifcern@sections@manual
+\cern@sections@manualfalse
+\newcommand{\cernsections}[1]{%
+  \def\beamer@cern@sectionlist{#1}%
+  \cern@sections@manualtrue
+}
+
+% \sectionslide{Title} -- explicit full-bleed blue transition slide. Shows
+% the white CERN mark top-right for brand consistency. No timeline: a manual
+% sectionslide isn't tied to the \section counter.
+\newcommand{\sectionslide}[1]{%
+  \begin{frame}[plain,noframenumbering]
+    \begin{tikzpicture}[remember picture, overlay]
+      \cern@sectionbluebg
+      \cern@sectionheaderlogos
+      % Same \parbox trick as the automatic section page -- avoids tikz's
+      % glue compression with XeTeX/fontspec on multi-word titles.
+      \node[inner sep=0pt] at (current page.center)
+        {\cern@sectiontitlebox
+          {\usebeamerfont{section page title}}{#1}};
+    \end{tikzpicture}%
+  \end{frame}%
+}
+
+% \maketoc[Frame title] -- OPTIONAL table-of-contents slide. Omit to skip.
+% Optional arg overrides the frame title (default "Outline"). Wrapped in
+% [allowframebreaks] so a very long section list paginates automatically.
+\newcommand{\maketoc}[1][Outline]{%
+  \begin{frame}[allowframebreaks]{#1}
+    \vspace{3mm}%
+    \tableofcontents[hideallsubsections]%
+  \end{frame}%
+}
+
+% \makeend -- emit the closing "home.cern" slide.
+\newcommand{\makeend}{%
+  \begin{frame}[plain,noframenumbering]
+    \usebeamertemplate{cern end page}%
+  \end{frame}%
+}
+
+% \maketitle -- force [plain] so the title slide carries no footer.
+\renewcommand{\maketitle}{%
+  \begin{frame}[plain,noframenumbering]
+    \titlepage
+  \end{frame}%
+}
+
+%%=============================================================================
+%% 11. Optional package integrations
+%%     The styles below are defined ONLY if the user loads the corresponding
+%%     package. The theme itself never pulls in listings or pgfplots (both
+%%     are heavyweight); users who want them write the usual
+%%     \usepackage{listings} / \usepackage{pgfplots} in their preamble and
+%%     then reference the `cern' style defined here.
+%%=============================================================================
+
+% listings: defines style `cern' (CERN-blue keywords, orange strings,
+% grey line numbers, light-grey background, CERN-blue left rule) and
+% activates it by default. User only picks the language in their .tex:
+%   \usepackage{listings}
+%   \lstset{language=Python}     % or C++, Bash, ...
+\AtBeginDocument{%
+  \@ifpackageloaded{listings}{%
+    \lstdefinestyle{cern}{%
+      basicstyle        = \ttfamily\scriptsize,
+      keywordstyle      = \color{CERNblue}\bfseries,
+      commentstyle      = \color{CERNtextdark}\itshape,
+      stringstyle       = \color{CERNorange},
+      backgroundcolor   = \color{CERNlightbg},
+      frame             = leftline,
+      framerule         = 1pt,
+      framesep          = 2mm,
+      rulecolor         = \color{CERNblue},
+      numbers           = left,
+      numberstyle       = \tiny\color{CERNgray},
+      xleftmargin       = 5mm,
+      breaklines        = true,
+      showstringspaces  = false,
+      aboveskip         = 1mm,
+      belowskip         = 1mm,
+    }%
+    \lstset{style=cern}%
+  }{}%
+}
+
+% pgfplots: defines axis style `cern' (CERN-blue axes + ticks + labels,
+% dashed CERNgray grid, subtle legend). Apply as an axis option:
+%   \begin{axis}[cern, width=70mm, height=42mm, xlabel={...}]
+\AtBeginDocument{%
+  \@ifpackageloaded{pgfplots}{%
+    \pgfplotsset{%
+      cern/.style={%
+        grid             = major,
+        grid style       = {CERNgray!45, dashed},
+        axis line style  = {CERNblue},
+        every tick/.style       = {CERNblue},
+        tick label style = {font=\tiny},
+        label style      = {font=\scriptsize, color=CERNblue},
+        legend style     = {font=\tiny, draw=CERNgray, fill=white,
+                            /tikz/every even column/.style={column sep=2pt}},
+        legend pos       = north east,
+      }%
+    }%
+  }{}%
+}
+
+\mode<all>

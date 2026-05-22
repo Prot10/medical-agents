@@ -11,6 +11,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.patches import FancyBboxPatch
 
 REPO = Path(__file__).resolve().parents[2]
 CASES_DIR = REPO / "data" / "neurobench_v5" / "cases"
@@ -40,11 +41,30 @@ CONDITION_LABELS = {
     "syncope_cardiac":              "Cardiac syncope",
 }
 
+# CERN cafein palette (exact hex values from beamerthemeCERN.sty)
+CERN = {
+    "blue":      "#0033A0",
+    "cyan":      "#61C4D3",
+    "orange":    "#E15E32",
+    "gray":      "#BEBECB",
+    "purple":    "#6E2466",
+    "navy":      "#1C446A",
+    "textdark":  "#2F2F2F",
+    "bodytext":  "#171717",
+    "lightbg":   "#F8F8F8",
+    "white":     "#FFFFFF",
+}
+
 DIFFICULTY_ORDER = ["straightforward", "moderate", "diagnostic_puzzle"]
 DIFFICULTY_COLOR = {
-    "straightforward":   "#4C9A2A",
-    "moderate":          "#E0A100",
-    "diagnostic_puzzle": "#B23A48",
+    "straightforward":   CERN["cyan"],
+    "moderate":          CERN["blue"],
+    "diagnostic_puzzle": CERN["orange"],
+}
+DIFFICULTY_LABEL = {
+    "straightforward":   "Straightforward",
+    "moderate":          "Moderate",
+    "diagnostic_puzzle": "Diagnostic puzzle",
 }
 
 plt.rcParams.update({
@@ -52,11 +72,36 @@ plt.rcParams.update({
     "font.size": 11,
     "axes.titlesize": 13,
     "axes.titleweight": "bold",
+    "axes.titlecolor": CERN["blue"],
+    "axes.labelcolor": CERN["textdark"],
+    "axes.edgecolor":  CERN["textdark"],
     "axes.spines.top": False,
     "axes.spines.right": False,
+    "axes.grid": True,
+    "axes.axisbelow": True,
+    "grid.color":   CERN["gray"],
+    "grid.linewidth": 0.55,
+    "grid.alpha":  0.45,
+    "xtick.color": CERN["textdark"],
+    "ytick.color": CERN["textdark"],
+    "legend.frameon": False,
+    "figure.facecolor": "white",
+    "savefig.facecolor": "white",
     "figure.dpi": 140,
     "savefig.bbox": "tight",
 })
+
+
+def _style_axis(ax, *, x_grid: bool = False, y_grid: bool = True):
+    """Apply a consistent CERN-themed grid to a single axes."""
+    ax.set_axisbelow(True)
+    ax.xaxis.grid(x_grid, color=CERN["gray"], linewidth=0.55, alpha=0.45)
+    ax.yaxis.grid(y_grid, color=CERN["gray"], linewidth=0.55, alpha=0.45)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    for s in ("left", "bottom"):
+        ax.spines[s].set_color(CERN["textdark"])
+        ax.spines[s].set_linewidth(0.8)
 
 
 def load_cases() -> list[dict]:
@@ -66,6 +111,10 @@ def load_cases() -> list[dict]:
             cases.append(json.load(f))
     return cases
 
+
+# ---------------------------------------------------------------------------
+# Plots
+# ---------------------------------------------------------------------------
 
 def fig_condition_distribution(cases: list[dict]):
     by_cond_diff = defaultdict(lambda: Counter())
@@ -77,49 +126,77 @@ def fig_condition_distribution(cases: list[dict]):
     labels = [CONDITION_LABELS.get(k, k) for k in conditions]
     counts = {d: [by_cond_diff[k].get(d, 0) for k in conditions] for d in DIFFICULTY_ORDER}
 
-    fig, ax = plt.subplots(figsize=(11, 6.2))
+    fig, ax = plt.subplots(figsize=(11.5, 6.4))
     bottoms = np.zeros(len(conditions))
     for d in DIFFICULTY_ORDER:
         vals = np.array(counts[d])
-        ax.bar(labels, vals, bottom=bottoms, color=DIFFICULTY_COLOR[d],
-               edgecolor="white", linewidth=0.6,
-               label=d.replace("_", " "))
+        ax.bar(labels, vals, bottom=bottoms,
+               color=DIFFICULTY_COLOR[d],
+               edgecolor="white", linewidth=0.9,
+               label=DIFFICULTY_LABEL[d])
         bottoms += vals
 
     for i, k in enumerate(conditions):
         total = sum(by_cond_diff[k].values())
-        ax.text(i, total + 0.6, str(total), ha="center", va="bottom",
-                fontsize=9, color="#222")
+        ax.text(i, total + 0.7, str(total),
+                ha="center", va="bottom",
+                fontsize=9.5, color=CERN["textdark"],
+                fontweight="bold")
 
-    ax.set_ylabel("Cases")
-    ax.set_title(f"NeuroBench v5 — {len(cases)} cases across {len(conditions)} conditions")
-    ax.set_ylim(0, max(sum(by_cond_diff[k].values()) for k in conditions) + 5)
+    ax.set_ylabel("Cases", fontweight="bold")
+    ax.set_title(f"{len(cases)} cases across {len(conditions)} neurological conditions",
+                 pad=12)
+    ax.set_ylim(0, max(sum(by_cond_diff[k].values()) for k in conditions) + 6)
     ax.tick_params(axis="x", rotation=45)
     for tick in ax.get_xticklabels():
         tick.set_ha("right")
-    ax.legend(title="Difficulty", loc="upper right", frameon=False)
+    _style_axis(ax, x_grid=False, y_grid=True)
+    leg = ax.legend(title="Difficulty", loc="upper right",
+                    title_fontsize=10, fontsize=10,
+                    handlelength=1.4, handleheight=1.1)
+    leg.get_title().set_color(CERN["blue"])
+    leg.get_title().set_fontweight("bold")
     fig.savefig(OUT_DIR / "condition_distribution.pdf")
     plt.close(fig)
 
 
 def fig_difficulty_pie(cases: list[dict]):
     counts = Counter(c["difficulty"] for c in cases)
-    labels = [d.replace("_", " ") for d in DIFFICULTY_ORDER]
+    labels = [DIFFICULTY_LABEL[d] for d in DIFFICULTY_ORDER]
     sizes = [counts[d] for d in DIFFICULTY_ORDER]
     colors = [DIFFICULTY_COLOR[d] for d in DIFFICULTY_ORDER]
 
-    fig, ax = plt.subplots(figsize=(6.5, 5.0))
+    fig, ax = plt.subplots(figsize=(6.8, 5.4))
     wedges, texts, autotexts = ax.pie(
-        sizes, labels=labels, colors=colors,
+        sizes,
+        labels=labels,
+        colors=colors,
         autopct=lambda pct: f"{pct:.0f}%\n({int(round(pct/100*sum(sizes)))})",
-        startangle=90, wedgeprops=dict(linewidth=1.5, edgecolor="white"),
-        textprops=dict(color="#222"),
+        startangle=90,
+        pctdistance=0.74,
+        labeldistance=1.08,
+        wedgeprops=dict(linewidth=2.5, edgecolor="white"),
+        textprops=dict(color=CERN["textdark"], fontsize=11),
     )
+    # Donut hole
+    centre = plt.Circle((0, 0), 0.55, fc="white", linewidth=0)
+    ax.add_artist(centre)
+    ax.text(0, 0.10, f"{sum(sizes)}",
+            ha="center", va="center",
+            fontsize=22, fontweight="bold", color=CERN["blue"])
+    ax.text(0, -0.18, "cases",
+            ha="center", va="center",
+            fontsize=11, color=CERN["textdark"])
     for t in autotexts:
         t.set_color("white")
         t.set_fontweight("bold")
         t.set_fontsize(10)
-    ax.set_title("Difficulty distribution")
+    ax.set_title("Difficulty distribution", pad=14)
+    ax.set(aspect="equal")
+    # Remove grid/spines for pie
+    ax.grid(False)
+    for s in ax.spines.values():
+        s.set_visible(False)
     fig.savefig(OUT_DIR / "difficulty_pie.pdf")
     plt.close(fig)
 
@@ -128,27 +205,42 @@ def fig_demographics(cases: list[dict]):
     ages = [c["patient"]["demographics"]["age"] for c in cases]
     sexes = [c["patient"]["demographics"]["sex"] for c in cases]
 
-    fig, axes = plt.subplots(1, 2, figsize=(11, 4.2))
-    ax = axes[0]
-    ax.hist(ages, bins=np.arange(0, 101, 5), color="#3D6FB5", edgecolor="white")
-    ax.set_xlabel("Age (years)")
-    ax.set_ylabel("Cases")
-    ax.set_title(f"Age distribution  (median {int(np.median(ages))} y, range {min(ages)}-{max(ages)})")
+    fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.5),
+                             gridspec_kw=dict(width_ratios=[1.6, 1.0]))
 
+    # Age
+    ax = axes[0]
+    ax.hist(ages, bins=np.arange(0, 101, 5),
+            color=CERN["blue"], edgecolor="white", linewidth=0.9)
+    ax.axvline(np.median(ages), color=CERN["orange"], linewidth=2.0,
+               linestyle="--", label=f"median {int(np.median(ages))} y")
+    ax.set_xlabel("Age (years)", fontweight="bold")
+    ax.set_ylabel("Cases", fontweight="bold")
+    ax.set_title(f"Age distribution (range {min(ages)}-{max(ages)})", pad=10)
+    ax.legend(loc="upper left", fontsize=10)
+    _style_axis(ax)
+
+    # Sex
     ax = axes[1]
     sex_counts = Counter(sexes)
     order = sorted(sex_counts, key=lambda x: -sex_counts[x])
+    sex_palette = [CERN["blue"], CERN["purple"], CERN["gray"]]
     bars = ax.bar(order, [sex_counts[s] for s in order],
-                  color=["#3D6FB5", "#B26FC8", "#999"])
+                  color=sex_palette[:len(order)],
+                  edgecolor="white", linewidth=0.9)
     for b, s in zip(bars, order):
-        ax.text(b.get_x()+b.get_width()/2, b.get_height()+2,
+        ax.text(b.get_x()+b.get_width()/2, b.get_height()+3,
                 f"{sex_counts[s]}\n({sex_counts[s]/len(cases)*100:.0f}%)",
-                ha="center", va="bottom", fontsize=10)
-    ax.set_ylabel("Cases")
-    ax.set_title("Sex distribution")
-    ax.set_ylim(0, max(sex_counts.values()) * 1.18)
+                ha="center", va="bottom",
+                fontsize=10, color=CERN["textdark"], fontweight="bold")
+    ax.set_ylabel("Cases", fontweight="bold")
+    ax.set_title("Sex distribution", pad=10)
+    ax.set_ylim(0, max(sex_counts.values()) * 1.22)
+    _style_axis(ax)
 
-    fig.suptitle("Patient demographics", fontsize=13, fontweight="bold", y=1.02)
+    fig.suptitle("Patient demographics",
+                 fontsize=14, fontweight="bold", y=1.03,
+                 color=CERN["blue"])
     fig.savefig(OUT_DIR / "demographics.pdf")
     plt.close(fig)
 
@@ -173,29 +265,45 @@ def fig_encounter_and_tools(cases: list[dict]):
             raw = u.get("tool_name") or "(unspecified)"
             followup_tools[followup_alias.get(raw, raw)] += 1
 
-    fig, axes = plt.subplots(1, 2, figsize=(11, 4.4))
+    fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.6),
+                             gridspec_kw=dict(width_ratios=[1.0, 1.3]))
 
+    # Encounter type
     ax = axes[0]
     enc_order = sorted(enc, key=lambda x: -enc[x])
+    enc_palette = [CERN["blue"], CERN["cyan"], CERN["gray"]]
     bars = ax.bar(enc_order, [enc[e] for e in enc_order],
-                  color=["#3F6E54", "#7C9A6B", "#C7B27A"][:len(enc_order)])
+                  color=enc_palette[:len(enc_order)],
+                  edgecolor="white", linewidth=0.9)
     for b, e in zip(bars, enc_order):
-        ax.text(b.get_x()+b.get_width()/2, b.get_height()+3,
+        ax.text(b.get_x()+b.get_width()/2, b.get_height()+4,
                 f"{enc[e]}\n({enc[e]/len(cases)*100:.0f}%)",
-                ha="center", va="bottom", fontsize=10)
-    ax.set_ylabel("Cases")
-    ax.set_title("Encounter type")
-    ax.set_ylim(0, max(enc.values()) * 1.18)
+                ha="center", va="bottom",
+                fontsize=10, color=CERN["textdark"], fontweight="bold")
+    ax.set_ylabel("Cases", fontweight="bold")
+    ax.set_title("Encounter type", pad=10)
+    ax.set_ylim(0, max(enc.values()) * 1.22)
     ax.tick_params(axis="x", rotation=15)
+    _style_axis(ax)
 
+    # Follow-ups histogram
     ax = axes[1]
-    ax.hist(n_followups, bins=np.arange(min(n_followups), max(n_followups)+2)-0.5,
-            color="#7B4D8C", edgecolor="white")
-    ax.set_xlabel("Follow-up outputs per case")
-    ax.set_ylabel("Cases")
-    ax.set_title(f"Pre-generated follow-ups  (median {int(np.median(n_followups))}, total {sum(n_followups):,})")
+    ax.hist(n_followups,
+            bins=np.arange(min(n_followups), max(n_followups)+2)-0.5,
+            color=CERN["purple"], edgecolor="white", linewidth=0.9)
+    ax.axvline(np.median(n_followups), color=CERN["orange"],
+               linewidth=2.0, linestyle="--",
+               label=f"median {int(np.median(n_followups))}")
+    ax.set_xlabel("Follow-up outputs per case", fontweight="bold")
+    ax.set_ylabel("Cases", fontweight="bold")
+    ax.set_title(f"Pre-generated follow-ups (total {sum(n_followups):,})",
+                 pad=10)
+    ax.legend(loc="upper right", fontsize=10)
+    _style_axis(ax)
 
-    fig.suptitle("Encounter and tool-output coverage", fontsize=13, fontweight="bold", y=1.02)
+    fig.suptitle("Encounter and tool-output coverage",
+                 fontsize=14, fontweight="bold", y=1.03,
+                 color=CERN["blue"])
     fig.savefig(OUT_DIR / "encounter_and_followups.pdf")
     plt.close(fig)
 
@@ -243,22 +351,38 @@ def fig_tool_usage(initial: Counter, followup: Counter, n_cases: int):
         initial_counts.append(c)
     followup_counts = [followup.get(k, 0) for k in rows]
 
-    fig, ax = plt.subplots(figsize=(10, 6))
+    # Sort by total usage (initial+followup) descending so most-used tools rise
+    order = np.argsort([-(a + b) for a, b in zip(initial_counts, followup_counts)])
+    rows = [rows[i] for i in order]
+    initial_counts = [initial_counts[i] for i in order]
+    followup_counts = [followup_counts[i] for i in order]
+
+    fig, ax = plt.subplots(figsize=(10.5, 6.4))
     y = np.arange(len(rows))
     h = 0.4
-    ax.barh(y - h/2, initial_counts, height=h, color="#3D6FB5",
-            label="Initial tool output (cases)")
-    ax.barh(y + h/2, followup_counts, height=h, color="#B23A48",
-            label="Follow-up outputs (uses)")
+    b1 = ax.barh(y - h/2, initial_counts, height=h,
+                 color=CERN["blue"], edgecolor="white", linewidth=0.8,
+                 label="Initial output (cases)")
+    b2 = ax.barh(y + h/2, followup_counts, height=h,
+                 color=CERN["orange"], edgecolor="white", linewidth=0.8,
+                 label="Follow-up uses")
     ax.set_yticks(y)
-    ax.set_yticklabels(rows, fontsize=10)
-    ax.invert_yaxis()
-    ax.set_xlabel("Count")
-    ax.set_title(f"Tool output coverage (n = {n_cases} cases, 12 tools)")
-    ax.legend(loc="lower right", frameon=False)
+    ax.set_yticklabels(rows, fontsize=10, family="DejaVu Sans Mono")
+    ax.set_xlabel("Count", fontweight="bold")
+    ax.set_title(f"Tool output coverage (n = {n_cases} cases, 12 tools)",
+                 pad=12)
+    ax.legend(loc="lower right", fontsize=10)
+    max_v = max(max(initial_counts), max(followup_counts))
+    ax.set_xlim(0, max_v * 1.10)
     for i, (a, b) in enumerate(zip(initial_counts, followup_counts)):
-        if a: ax.text(a + 5, i - h/2, str(a), va="center", fontsize=9)
-        if b: ax.text(b + 5, i + h/2, str(b), va="center", fontsize=9)
+        if a:
+            ax.text(a + max_v * 0.008, i - h/2, str(a),
+                    va="center", fontsize=9, color=CERN["textdark"])
+        if b:
+            ax.text(b + max_v * 0.008, i + h/2, str(b),
+                    va="center", fontsize=9, color=CERN["textdark"])
+    _style_axis(ax, x_grid=True, y_grid=False)
+    ax.invert_yaxis()
     fig.savefig(OUT_DIR / "tool_usage.pdf")
     plt.close(fig)
 
@@ -272,25 +396,38 @@ def fig_groundtruth_structure(cases: list[dict]):
     n_reason = [len((c.get("ground_truth") or {}).get("key_reasoning_points") or []) for c in cases]
 
     data = [
-        ("Optimal actions",         n_optimal),
-        ("Differential entries",    n_diff),
-        ("Critical actions",        n_crit),
-        ("Contraindicated actions", n_contra),
-        ("Red herrings",            n_red),
-        ("Reasoning points",        n_reason),
+        ("Optimal actions",         n_optimal,  CERN["blue"]),
+        ("Differential entries",    n_diff,     CERN["cyan"]),
+        ("Critical actions",        n_crit,     CERN["navy"]),
+        ("Contraindicated actions", n_contra,   CERN["orange"]),
+        ("Red herrings",            n_red,      CERN["purple"]),
+        ("Reasoning points",        n_reason,   CERN["gray"]),
     ]
     labels = [d[0] for d in data]
     values = [d[1] for d in data]
+    colors = [d[2] for d in data]
 
-    fig, ax = plt.subplots(figsize=(10, 5))
+    fig, ax = plt.subplots(figsize=(10.5, 5.2))
     parts = ax.violinplot(values, showmeans=False, showmedians=True, widths=0.85)
-    for pc in parts["bodies"]:
-        pc.set_facecolor("#3F6E54"); pc.set_edgecolor("white"); pc.set_alpha(0.75)
+    for pc, c in zip(parts["bodies"], colors):
+        pc.set_facecolor(c)
+        pc.set_edgecolor("white")
+        pc.set_alpha(0.85)
+        pc.set_linewidth(0.8)
     for key in ("cmedians", "cmins", "cmaxes", "cbars"):
-        parts[key].set_color("#333"); parts[key].set_linewidth(1.0)
-    ax.set_xticks(range(1, len(labels)+1)); ax.set_xticklabels(labels, rotation=15, ha="right")
-    ax.set_ylabel("Count per case")
-    ax.set_title("Ground-truth structure (distribution across 516 cases)")
+        parts[key].set_color(CERN["textdark"])
+        parts[key].set_linewidth(1.0)
+    # median markers as filled dots
+    for i, v in enumerate(values, start=1):
+        ax.scatter([i], [np.median(v)],
+                   color="white", edgecolor=CERN["textdark"],
+                   zorder=4, s=28, linewidth=1.0)
+    ax.set_xticks(range(1, len(labels)+1))
+    ax.set_xticklabels(labels, rotation=15, ha="right")
+    ax.set_ylabel("Count per case", fontweight="bold")
+    ax.set_title(f"Ground-truth structure (distribution across {len(cases)} cases)",
+                 pad=12)
+    _style_axis(ax)
     fig.savefig(OUT_DIR / "groundtruth_structure.pdf")
     plt.close(fig)
 
