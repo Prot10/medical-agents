@@ -13,7 +13,6 @@ export function MRIFindings({ data }: { data: Record<string, unknown> }) {
   const findings = (data.findings ?? []) as Finding[]
   const impression = data.impression as string | undefined
   const differential = data.differential_by_imaging as Array<{ diagnosis: string; likelihood: string }> | undefined
-  const confidence = data.confidence as number | string | undefined
 
   return (
     <div className="space-y-3">
@@ -69,11 +68,6 @@ export function MRIFindings({ data }: { data: Record<string, unknown> }) {
         </div>
       )}
 
-      {confidence && (
-        <div className="text-sm text-muted-foreground">
-          Confidence: {typeof confidence === "number" ? `${(confidence * 100).toFixed(0)}%` : confidence}
-        </div>
-      )}
     </div>
   )
 }

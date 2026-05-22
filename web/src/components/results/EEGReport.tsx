@@ -14,7 +14,6 @@ export function EEGReport({ data }: { data: Record<string, unknown> }) {
   const background = data.background as string | Record<string, unknown> | undefined
   const findings = (data.findings ?? []) as EEGFinding[]
   const impression = data.impression as string | undefined
-  const confidence = data.confidence as number | string | undefined
 
   return (
     <div className="space-y-3">
@@ -23,11 +22,6 @@ export function EEGReport({ data }: { data: Record<string, unknown> }) {
           <Badge variant={classification === "normal" ? "success" : "warning"} className="uppercase text-xs font-bold">
             {classification}
           </Badge>
-          {confidence && (
-            <span className="text-sm text-muted-foreground ml-auto">
-              Confidence: {typeof confidence === "number" ? `${(confidence * 100).toFixed(0)}%` : confidence}
-            </span>
-          )}
         </div>
       )}
 
