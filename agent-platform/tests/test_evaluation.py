@@ -79,13 +79,6 @@ class TestMetricsCalculator:
 
 
 class TestNoiseInjector:
-    def test_confidence_noise(self):
-        injector = NoiseInjector(seed=42)
-        output = {"confidence": 0.9, "findings": [{"type": "sharp_wave"}]}
-        noisy = injector.inject(output, "analyze_eeg", NoiseType.CONFIDENCE, severity=0.5)
-        assert noisy["confidence"] != 0.9  # Should be modified
-        assert 0.0 <= noisy["confidence"] <= 1.0
-
     def test_completeness_noise(self):
         injector = NoiseInjector(seed=42)
         output = {"findings": [{"a": 1}, {"b": 2}, {"c": 3}, {"d": 4}]}
@@ -94,6 +87,6 @@ class TestNoiseInjector:
 
     def test_zero_severity(self):
         injector = NoiseInjector()
-        output = {"confidence": 0.9, "findings": []}
-        noisy = injector.inject(output, "analyze_eeg", NoiseType.CONFIDENCE, severity=0.0)
+        output = {"findings": [{"a": 1}, {"b": 2}]}
+        noisy = injector.inject(output, "analyze_eeg", NoiseType.COMPLETENESS, severity=0.0)
         assert noisy == output  # No change

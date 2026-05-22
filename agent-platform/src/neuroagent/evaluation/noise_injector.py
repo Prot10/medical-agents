@@ -14,7 +14,6 @@ class NoiseType(str, Enum):
 
     ACCURACY = "accuracy"  # Replace correct findings with incorrect ones
     COMPLETENESS = "completeness"  # Remove some findings
-    CONFIDENCE = "confidence"  # Miscalibrate confidence scores
     CONTRADICTION = "contradiction"  # Make findings contradict other modalities
     SPECIFICITY = "specificity"  # Replace detailed findings with vague ones
 
@@ -24,7 +23,7 @@ class NoiseInjector:
 
     For full noise injection, an LLM is used to modify outputs while keeping
     them valid Pydantic models. This class provides rule-based noise injection
-    for the simpler noise types (CONFIDENCE, COMPLETENESS) and stubs for
+    for the simpler COMPLETENESS noise type and stubs for
     LLM-based injection (ACCURACY, CONTRADICTION, SPECIFICITY).
     """
 
@@ -57,9 +56,7 @@ class NoiseInjector:
         import copy
         output = copy.deepcopy(tool_output)
 
-        if noise_type == NoiseType.CONFIDENCE:
-            return self._inject_confidence_noise(output, severity)
-        elif noise_type == NoiseType.COMPLETENESS:
+        if noise_type == NoiseType.COMPLETENESS:
             return self._inject_completeness_noise(output, severity)
         elif noise_type in (NoiseType.ACCURACY, NoiseType.CONTRADICTION, NoiseType.SPECIFICITY):
             if self.llm:
@@ -67,15 +64,6 @@ class NoiseInjector:
             # Fallback: simple completeness noise
             return self._inject_completeness_noise(output, severity)
 
-        return output
-
-    def _inject_confidence_noise(self, output: dict, severity: float) -> dict:
-        """Miscalibrate confidence scores."""
-        if "confidence" in output:
-            original = output["confidence"]
-            # Add random noise proportional to severity
-            noise = self.rng.gauss(0, severity * 0.3)
-            output["confidence"] = max(0.0, min(1.0, original + noise))
         return output
 
     def _inject_completeness_noise(self, output: dict, severity: float) -> dict:
