@@ -16,10 +16,12 @@
       "Bilateral cataract surgery 3 years ago",
       "Prior clinical diagnosis of chronic progressive external ophthalmoplegia (CPEO)"
     ],
-    "patient_id": "UNKNOWN",
+    "patient_id": "MG-RP13",
     "demographics": {
       "age": 53,
-      "sex": "female"
+      "sex": "female",
+      "handedness": "right",
+      "bmi": 30.9
     },
     "clinical_history": {
       "medications": [
@@ -57,22 +59,28 @@
       "social_history": {
         "note": "Teacher; married with three adult children; non-smoker; no alcohol; originally from Ghana, resident in UK for 18 years"
       },
-      "past_medical_history": []
+      "past_medical_history": [
+        "Hypertension, since age 35",
+        "Type 2 diabetes mellitus, since age 37",
+        "Elevated intraocular pressures (ocular hypertension), managed with timolol eye drops",
+        "Bilateral cataract surgery 3 years ago",
+        "Prior clinical diagnosis of chronic progressive external ophthalmoplegia (CPEO)"
+      ]
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert, oriented. No cognitive impairment.",
+      "cranial_nerves": "Complete bilateral ptosis (left > right). Positive ice pack test (4 mm improvement bilaterally). Restricted extraocular movements in all directions, more so in vertical gaze. Diplopia on extreme lateral gaze. Fatigable palate elevation on SLURP test (new finding). No tongue fasciculations.",
+      "motor": "Limb strength 5/5 in upper limbs. Hip flexors 4/5 bilaterally (fatigable on sustained resistance). No fasciculations.",
+      "sensory": "Sensation intact throughout.",
+      "reflexes": "Deep tendon reflexes 2+ and symmetric.",
+      "coordination": "Cerebellar examination normal.",
+      "gait": "Gait normal. No ataxia."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
-      "hr": 72,
-      "temp": 37.0,
+      "bp_systolic": 142,
+      "bp_diastolic": 88,
+      "hr": 66,
+      "temp": 36.9,
       "rr": 14,
       "spo2": 98
     },
@@ -208,8 +216,27 @@
       "Positive AChR antibody is the single most valuable test: >99% specific for MG if markedly elevated; precludes need for muscle biopsy",
       "Late-onset MG can first present with pure ocular features before evolving to generalized disease years later"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Prior CPEO diagnosis over 30 years — anchoring bias",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Long-standing prior diagnosis creates anchoring bias toward continuing the CPEO label despite new clinical features",
+        "correct_interpretation": "Positive ice pack test + new fatigability + AChR antibody = MG; prior CPEO diagnosis was incorrect"
+      },
+      {
+        "data_point": "Borderline lactate/pyruvate ratio suggesting possible mitochondrial disease",
+        "location": "followup_outputs[2].output.interpretation",
+        "intended_effect": "Borderline L/P ratio with CPEO history increases suspicion for mitochondrial myopathy",
+        "correct_interpretation": "Serum lactate is normal; borderline L/P ratio is non-specific; definitive AChR antibody supersedes mitochondrial concern"
+      },
+      {
+        "data_point": "Timolol eye drops as incidental medication",
+        "location": "patient.clinical_history.medications",
+        "intended_effect": "Topical medications often overlooked; timolol seems innocuous for ocular hypertension management",
+        "correct_interpretation": "Topical timolol has systemic absorption and is contraindicated in MG — may have been exacerbating disease for years"
+      }
+    ],
+    "icd_code": "G70.01"
   },
   "red_herrings": [
     {
@@ -235,16 +262,22 @@
     "generation_method": "real_case_seed",
     "condition_name": "Myasthenia gravis misdiagnosed as chronic progressive external ophthalmoplegia",
     "difficulty_description": "Diagnostic puzzle: prior CPEO diagnosis creates anchoring bias; new fatigability and positive ice pack test are the pivotal clues; timolol eye drops as hidden contributing drug-disease interaction",
-    "expected_agent_confidence": 0.35
+    "expected_agent_confidence": 0.35,
+    "fallback_tool_kinds": {
+      "eeg": "normal",
+      "csf": "normal",
+      "echo": "normal",
+      "cardiac_monitoring": "normal",
+      "advanced_imaging": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
       "findings": [],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "Mild bilateral EOM volume reduction; no signal abnormality; no MRI features of MELAS or Kearns-Sayre; no orbital lesion. Clinical correlation recommended.",
+      "impression": "Mild bilateral extraocular muscle volume reduction; no signal abnormality; no orbital lesion; no acute intracranial abnormality. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
@@ -253,10 +286,14 @@
     "ecg": {
       "rhythm": "sinus rhythm",
       "rate": 72,
-      "intervals": {},
-      "axis": "",
+      "intervals": {
+        "PR": "162 ms",
+        "QRS": "88 ms",
+        "QTc": "412 ms"
+      },
+      "axis": "++35 degrees",
       "findings": [
-        "ELECTROCARDIOGRAM\n\nPatient: 53-year-old female\nIndication: Kearns-Sayre syndrome screen (cardiac conduction defect); new CPEO reevaluation\n\nRHYTHM: Sinus rhythm at 64 bpm\nINTERVALS: PR 162 ms, QRS 88 ms, QTc 412 ms\nAXIS: Normal at +35 degrees\n\nINTERPRETATION:\n- Normal sinus rhythm\n- No AV block, no bundle branch block\n- No cardiac conduction defect\n- QTc normal (note: timolol eye drops contribute a small systemic beta-blocker effect)\n\nNOTE: Absence of cardiac conduction defect significantly lowers likelihood of Kearns-Sayre syndrome (KSS requires: onset <20 yrs, CPEO, pigmentary retinopathy, plus EITHER heart block, cerebellar ataxia, or CSF protein >100).\n\nCONCLUSION: Normal ECG; no cardiac conduction abnormality."
+        "ELECTROCARDIOGRAM\n\nIndication: Cardiac evaluation\n\nRHYTHM: Sinus rhythm at 64 bpm\nINTERVALS: PR 162 ms, QRS 88 ms, QTc 412 ms\nAXIS: Normal at +35 degrees\n\nINTERPRETATION:\n- Normal sinus rhythm\n- No AV block, no bundle branch block\n- No cardiac conduction defect\n- QTc within normal limits\n\nIMPRESSION: Normal ECG. No cardiac conduction abnormality identified."
       ],
       "interpretation": "See report details above.",
       "clinical_correlation": ""
@@ -269,12 +306,12 @@
     "csf": null,
     "ct": {
       "findings": [],
-      "contrast_used": false,
+      "contrast_used": true,
       "angiography_findings": null,
       "additional_observations": [
-        "CT CHEST WITH CONTRAST\n\nIndication: MG re-evaluation; exclude thymoma\n\nTECHNIQUE: CT chest with IV contrast, 1mm reconstructions\n\nFINDINGS:\n  ANTERIOR MEDIASTINUM: No thymic mass. Age-appropriate fatty involution of thymus.\n  LUNGS: No parenchymal masses, no consolidation, no pleural effusion.\n  MEDIASTINUM: No adenopathy.\n  BONES: No lytic or sclerotic lesions.\n\nIMPRESSION:\n1. No thymoma or other mediastinal mass.\n2. Age-appropriate thymic involution.\n\nCONCLUSION: CT chest is normal. Absence of thymoma reduces but does not eliminate risk of thymoma-associated MG in older patients. Serology is diagnostic."
+        "CT CHEST WITH CONTRAST\n\nIndication: Anterior mediastinal evaluation\n\nTECHNIQUE: CT chest with IV contrast, 1mm reconstructions\n\nFINDINGS:\n  ANTERIOR MEDIASTINUM: No thymic mass. Age-appropriate fatty involution of thymus.\n  LUNGS: No parenchymal masses, no consolidation, no pleural effusion.\n  MEDIASTINUM: No adenopathy.\n  BONES: No lytic or sclerotic lesions.\n\nIMPRESSION:\n1. No anterior mediastinal mass.\n2. Age-appropriate thymic involution.\n3. No pulmonary or osseous abnormality."
       ],
-      "impression": "No thymoma; age-appropriate thymic involution; normal lungs and mediastinum",
+      "impression": "No anterior mediastinal mass; age-appropriate thymic involution; normal chest CT.",
       "recommended_actions": []
     },
     "echo": null,
@@ -287,23 +324,50 @@
       "trigger_action": "request_mg_antibodies",
       "tool_name": "interpret_labs",
       "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": []
+        "panels": {
+          "MG_antibody_panel": [
+            {
+              "test": "AChR binding antibody",
+              "value": "5.8 nmol/L",
+              "reference_range": "< 0.4 nmol/L",
+              "is_abnormal": true,
+              "unit": "nmol/L"
+            },
+            {
+              "test": "AChR blocking antibody",
+              "value": "1.7 nmol/L",
+              "reference_range": "< 25%",
+              "is_abnormal": true,
+              "unit": "nmol/L"
+            },
+            {
+              "test": "Anti-MuSK antibody",
+              "value": "< 0.4 nmol/L (negative)",
+              "reference_range": "< 0.4 nmol/L",
+              "is_abnormal": false,
+              "unit": "nmol/L"
+            }
+          ]
+        },
+        "interpretation": "AChR binding antibody markedly elevated at 5.8 nmol/L (reference < 0.4 nmol/L). AChR blocking antibody positive. Anti-MuSK antibody negative. Anti-acetylcholine receptor antibodies are found in a subset of patients with neuromuscular junction disorders; an elevated result supports but is not exclusive to myasthenia gravis. Clinical correlation recommended.",
+        "abnormal_values_summary": [
+          "AChR binding antibody 5.8 nmol/L (ref <0.4 nmol/L) — markedly elevated",
+          "AChR blocking antibody positive"
+        ]
       }
     },
     {
       "trigger_action": "request_sfemg",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "",
+        "test_type": "Single-fiber EMG",
         "findings": [
           {
-            "description": "SINGLE-FIBER EMG — ORBICULARIS OCULI\n\nIndication: Re-evaluate bilateral ptosis; distinguish MG from mitochondrial myopathy\n\nRESULTS:\n  MCD: 58 µs [normal <35 µs] MARKEDLY ABNORMAL\n  Blocking: 18% of potential pairs\n  Fiber density: 2.1 (mildly elevated, borderline)\n\nNOTE: Mildly elevated fiber density could represent chronic denervation-reinnervation from long-standing ptosis. However, MCD is primarily increased due to NMJ transmission failure (not axonal/myopathic), consistent with MG.\n\nMITOCHONDRIAL MYOPATHY NOTE: In mitochondrial myopathy (CPEO), SFEMG may show mildly increased jitter from myopathic changes; however, the degree of blocking and MCD abnormality here exceeds what is expected for a myopathic cause.\n\nCONCLUSION: SFEMG confirms NMJ dysfunction as primary etiology. MG confirmed."
+            "description": "SINGLE-FIBER EMG — ORBICULARIS OCULI\n\nIndication: Evaluation of bilateral ptosis\n\nRESULTS:\n  MCD: 58 µs [normal <35 µs] MARKEDLY ABNORMAL\n  Blocking: 18% of potential pairs\n  Fiber density: 2.1 (mildly elevated, borderline)\n\nIMPRESSION: Markedly increased mean consecutive difference with 18% blocking, consistent with a disorder of neuromuscular transmission. Mildly elevated fiber density is a borderline finding. Clinical correlation recommended."
           }
         ],
         "quantitative_data": null,
-        "impression": "SFEMG: MCD 58 µs with 18% blocking — NMJ dysfunction; degree of abnormality exceeds mitochondrial myopathy pattern",
+        "impression": "SFEMG (orbicularis oculi): MCD 58 µs with 18% blocking — markedly increased jitter consistent with a disorder of neuromuscular transmission. Clinical correlation recommended.",
         "recommended_actions": []
       }
     },
@@ -311,14 +375,14 @@
       "trigger_action": "request_repetitive_stimulation",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "",
+        "test_type": "Repetitive nerve stimulation",
         "findings": [
           {
-            "description": "REPETITIVE NERVE STIMULATION STUDY\n\nIndication: NMJ dysfunction evaluation in suspected MG\n\nTECHNIQUE: 3 Hz RNS, orbicularis oculi, nasalis, deltoid\n\nRESULTS:\n  Orbicularis oculi: Decrement 16% [>10% abnormal] ABNORMAL\n  Nasalis: Decrement 13% ABNORMAL\n  Deltoid (proximal): Decrement 11% ABNORMAL\n\nNOTE: Abnormal decremental response in BOTH cranial and proximal limb muscles confirms generalized NMJ dysfunction, consistent with generalized MG rather than isolated ocular MG.\n\nCONCLUSION: Generalized NMJ dysfunction confirmed by RNS in multiple muscle groups."
+            "description": "REPETITIVE NERVE STIMULATION STUDY\n\nIndication: Neuromuscular junction evaluation\n\nTECHNIQUE: 3 Hz RNS, orbicularis oculi, nasalis, deltoid\n\nRESULTS:\n  Orbicularis oculi: Decrement 16% [>10% abnormal] ABNORMAL\n  Nasalis: Decrement 13% ABNORMAL\n  Deltoid (proximal): Decrement 11% ABNORMAL\n\nIMPRESSION: Abnormal decremental response at 3 Hz in cranial and proximal limb muscles, consistent with a disorder of neuromuscular transmission. Clinical correlation recommended."
           }
         ],
         "quantitative_data": null,
-        "impression": "RNS: 16% decrement orbicularis, 13% nasalis, 11% deltoid — generalized NMJ dysfunction consistent with generalized MG",
+        "impression": "RNS: 16% decrement orbicularis, 13% nasalis, 11% deltoid — decremental responses in cranial and proximal muscles, consistent with a disorder of neuromuscular transmission. Clinical correlation recommended.",
         "recommended_actions": []
       }
     },
@@ -326,8 +390,39 @@
       "trigger_action": "request_mitochondrial_workup",
       "tool_name": "interpret_labs",
       "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
+        "panels": {
+          "Mitochondrial_workup": [
+            {
+              "test": "Serum lactate",
+              "value": "1.0 mmol/L",
+              "reference_range": "< 2.0 mmol/L",
+              "is_abnormal": false,
+              "unit": "mmol/L"
+            },
+            {
+              "test": "Pyruvate",
+              "value": "0.07 mmol/L",
+              "reference_range": "0.04-0.12 mmol/L",
+              "is_abnormal": false,
+              "unit": "mmol/L"
+            },
+            {
+              "test": "L/P ratio",
+              "value": "14.3",
+              "reference_range": "< 20",
+              "is_abnormal": false,
+              "unit": ""
+            },
+            {
+              "test": "CK (creatine kinase)",
+              "value": "78 U/L",
+              "reference_range": "< 200 U/L",
+              "is_abnormal": false,
+              "unit": "U/L"
+            }
+          ]
+        },
+        "interpretation": "Serum lactate 1.0 mmol/L (normal). Pyruvate 0.07 mmol/L (normal). L/P ratio 14.3 (within reference range). CK 78 U/L (normal). All indices within normal limits.",
         "abnormal_values_summary": []
       }
     },
@@ -335,19 +430,112 @@
       "trigger_action": "search_cpeo_vs_mg_distinction",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: CPEO vs Ocular MG — Diagnostic Pitfalls\n\nKEY FINDINGS:\n1. ICE PACK TEST: Sensitivity 80%, specificity 97% for MG ptosis when positive. Can be negative early in MG.\n2. CPEO FEATURES: Symmetric, slowly progressive, no diurnal variation, negative ice pack test, elevated CK or abnormal muscle biopsy in some, maternal inheritance pattern, associated pigmentary retinopathy in KSS\n3. MG FEATURES: Positive ice pack test, fatigability, diurnal variation (worse in afternoon), AChR antibodies, abnormal RNS/SFEMG\n4. DIAGNOSTIC ERROR: MG can be initially diagnosed as CPEO when early features are atypical; fatigability may develop years later as disease evolves\n5. TIMOLOL EYE DROPS AND MG: Beta-blockers including topical timolol can exacerbate myasthenia gravis by interfering with neuromuscular transmission. Timolol should be switched to prostaglandin analog or carbonic anhydrase inhibitor in MG patients.\n\nIMPORTANT NOTE: This patient is on timolol eye drops for ocular hypertension — timolol may be exacerbating MG symptoms and should be discontinued/replaced.\n\nCONCLUSION: Prior CPEO diagnosis was incorrect. AChR antibody positivity and new fatigability confirm MG. Switch timolol to alternative IOP-lowering agent.",
-        "summary": "CPEO vs MG: ice pack test, fatigability, and AChR antibody are distinguishing features; timolol eye drops contraindicated in MG",
-        "query": "",
-        "results": []
+        "query": "search cpeo vs mg distinction",
+        "results": [
+          {
+            "title": "Clinical literature",
+            "content": "LITERATURE SEARCH: CPEO vs Ocular MG — Diagnostic Pitfalls\n\nKEY FINDINGS:\n1. ICE PACK TEST: Sensitivity 80%, specificity 97% for MG ptosis when positive. Can be negative early in MG.\n2. CPEO FEATURES: Symmetric, slowly progressive, no diurnal variation, negative ice pack test, elevated CK or abnormal muscle biopsy in some, maternal inheritance pattern, associated pigmentary retinopathy in KSS.\n3. MG FEATURES: Positive ice pack test, fatigability, diurnal variation (worse in afternoon), AChR antibodies, abnormal RNS/SFEMG.\n4. DIAGNOSTIC OVERLAP: MG can be initially mischaracterized as CPEO when early features are atypical; fatigability may develop years later as disease evolves.\n5. TIMOLOL AND NEUROMUSCULAR TRANSMISSION: Beta-blockers, including topical ophthalmic timolol, have been reported to interfere with neuromuscular transmission in patients with disorders of the NMJ; prostaglandin analogs or carbonic anhydrase inhibitors are alternatives without known NMJ effects."
+          }
+        ],
+        "summary": "CPEO vs MG: ice pack test, fatigability, and AChR antibody are key distinguishing features; beta-blocker topical agents reported to affect NMJ transmission."
       }
     },
     {
       "trigger_action": "check_timolol_mg_interaction",
       "tool_name": "check_drug_interactions",
       "output": {
-        "report": "DRUG INTERACTION REVIEW — TIMOLOL EYE DROPS AND MYASTHENIA GRAVIS\n\nQuery: Beta-blocker timolol (ophthalmic) in patient with confirmed MG\n\nFINDINGS:\n  TIMOLOL (topical beta-blocker):\n  - Systemic absorption occurs even with topical administration (~60-70% absorbed via nasolacrimal duct)\n  - Beta-blockers can impair neuromuscular transmission — mechanism: reduced presynaptic acetylcholine release through adrenergic modulation\n  - Multiple case reports and case series of beta-blocker–exacerbated MG, including topical timolol\n  - FDA black box warning equivalent: beta-blockers should be used with extreme caution in MG\n  - Effect is dose-dependent; 0.5% timolol BID achieves significant systemic levels\n\nRECOMMENDATION:\n  Switch timolol 0.5% to preservative-free latanoprost 0.005% once daily (prostaglandin analog, no neuromuscular effects) OR\n  Dorzolamide 2% BID (carbonic anhydrase inhibitor, no NMJ interaction)\n  Ophthalmology referral for IOP reassessment after MG treatment initiated\n\nCONCLUSION: Timolol eye drops should be DISCONTINUED and replaced with an alternative IOP-lowering agent. This medication may have been contributing to MG symptom exacerbation.",
-        "summary": "Timolol contraindicated in MG — switch to latanoprost or dorzolamide; systemic absorption causes beta-blocker NMJ impairment"
+        "proposed": "check_timolol_mg_interaction",
+        "interactions": [
+          "DRUG INTERACTION REVIEW — TIMOLOL (OPHTHALMIC) AND NEUROMUSCULAR JUNCTION DISORDERS\n\nQuery: Beta-blocker timolol (ophthalmic) in patients with disorders of neuromuscular transmission\n\nFINDINGS:\n  TIMOLOL (topical beta-blocker):\n  - Systemic absorption occurs with topical ophthalmic administration (~60-70% via nasolacrimal duct)\n  - Beta-blockers have been reported to impair neuromuscular transmission in susceptible patients\n  - Multiple case reports describe worsening of neuromuscular junction disease with topical beta-blocker use\n  - Beta-blockers are generally used with caution in conditions affecting NMJ function\n  - Effect is dose-dependent; 0.5% timolol BID achieves measurable systemic levels\n\n  ALTERNATIVES WITHOUT REPORTED NMJ EFFECTS:\n  - Prostaglandin analogs (e.g., latanoprost 0.005% once daily)\n  - Carbonic anhydrase inhibitors (e.g., dorzolamide 2% BID)"
+        ],
+        "contraindications": [],
+        "warnings": [
+          "Timolol (ophthalmic): systemic absorption reported; beta-blockers associated with NMJ transmission impairment in susceptible patients; prostaglandin analogs and carbonic anhydrase inhibitors are alternatives."
+        ],
+        "formulary_status": "on formulary",
+        "alternatives": []
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": {
+      "classification": "normal",
+      "background": {
+        "pdr": "9-10 Hz posterior dominant rhythm, symmetric and reactive",
+        "sleep_features": "normal vertex waves and sleep spindles",
+        "overall": "normal organisation for age"
+      },
+      "findings": [],
+      "artifacts": [],
+      "activating_procedures": {},
+      "impression": "Normal awake and drowsy EEG. No epileptiform discharges and no focal slowing.",
+      "limitations": "",
+      "recommended_actions": []
+    },
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": null,
+    "echo": {
+      "chambers": {
+        "LV": "normal size and systolic function",
+        "RV": "normal size and function",
+        "LA": "normal size",
+        "RA": "normal size"
+      },
+      "valves": {
+        "mitral": "structurally normal",
+        "aortic": "structurally normal",
+        "tricuspid": "normal",
+        "pulmonic": "normal"
+      },
+      "ejection_fraction": 58.0,
+      "wall_motion": "no regional wall-motion abnormality",
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": []
+    },
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 49,
+        "max": 116,
+        "average": 79
+      },
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "impression": "Normal 24-hour Holter monitor.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": {
+      "modality": "FDG-PET scan",
+      "tracer_or_protocol": null,
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "No abnormality identified on advanced imaging. Findings are non-contributory; clinical correlation recommended.",
+      "recommended_actions": []
+    },
+    "specialized_test": null,
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

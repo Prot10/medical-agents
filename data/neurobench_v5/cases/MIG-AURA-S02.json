@@ -39,21 +39,21 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert; oriented. No aphasia.",
+      "cranial_nerves": "Cranial nerves II-XII intact. No ptosis. PERRLA. Full extraocular movements. Facial sensation symmetric.",
+      "motor": "Motor strength 5/5 all limbs. No pronator drift.",
+      "sensory": "Sensation to light touch and pinprick normal throughout including bilateral upper and lower limbs.",
+      "reflexes": "DTR 2+ symmetric. Plantar responses flexor bilaterally.",
+      "coordination": "Finger-nose and heel-shin normal bilaterally.",
+      "gait": "Normal gait. Romberg negative."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
-      "hr": 72,
-      "temp": 37.0,
-      "rr": 14,
-      "spo2": 98
+      "bp_systolic": 112,
+      "bp_diastolic": 70,
+      "hr": 68,
+      "temp": 36.7,
+      "rr": 13,
+      "spo2": 99
     },
     "history_present_illness": "A 32-year-old Hispanic woman was referred to the neurology clinic by her primary care physician for recurrent episodes of numbness and tingling that she has experienced monthly for approximately 3 years. Each episode begins with tingling in her left fingertips that slowly marches up the left arm to the left side of her face over 15-25 minutes. During this phase she may experience mild left facial heaviness. After the sensory symptoms resolve, she develops a severe right-sided throbbing headache (7-8/10) with nausea and sensitivity to light and sound that lasts 4-8 hours. She takes acetaminophen 1000 mg which provides only moderate relief. She has tried sumatriptan once (borrowed from a friend), which was very effective.\n\nShe has approximately 10-12 episodes per year, consistently occurring in the days before her menstrual period. She recalls her mother having similar episodes with 'numbness and headaches' that improved after menopause. She works as a school administrator and the episodes frequently interfere with work — she has had to leave early on multiple occasions. She is on no regular medications, has never smoked, drinks wine socially (2-3 glasses/week), and exercises regularly. She reports normal blood pressure at routine checks, no diabetes, no prior stroke or cardiac history, and no recent travel or infections.\n\nOn examination today (headache-free), the neurological examination is entirely normal with full strength, intact sensation, normal reflexes, and normal coordination."
   },
@@ -101,8 +101,8 @@
       {
         "step": 1,
         "action": "Brain MRI with DWI to exclude TIA and MS",
-        "tool_name": null,
-        "expected_finding": "",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Normal brain MRI; single 2mm subcortical WMH — insufficient for MS; normal DWI; no periventricular lesions",
         "category": "acceptable",
         "tool_parameters": {
           "contrast": true,
@@ -116,8 +116,8 @@
       {
         "step": 2,
         "action": "Laboratory workup — CBC, inflammatory markers, ANA, antiphospholipid antibodies, TSH",
-        "tool_name": null,
-        "expected_finding": "",
+        "tool_name": "interpret_labs",
+        "expected_finding": "All values normal — no inflammatory, autoimmune, or coagulation abnormality",
         "category": "acceptable",
         "tool_parameters": {
           "lab_type": "headache_workup"
@@ -127,7 +127,7 @@
         "step": 3,
         "action": "Prescribe sumatriptan 100 mg for acute attacks (at headache onset)",
         "tool_name": null,
-        "expected_finding": "",
+        "expected_finding": "Sumatriptan effective from patient's trial; prescribe at headache onset; do not use during sensory aura",
         "category": "acceptable",
         "tool_parameters": {}
       },
@@ -135,7 +135,7 @@
         "step": 4,
         "action": "Initiate preventive therapy — topiramate 25 mg → 50 mg BID, given MIDAS Grade IV",
         "tool_name": null,
-        "expected_finding": "",
+        "expected_finding": "Monthly frequency with MIDAS Grade IV; topiramate 25-50 mg BID first-line",
         "category": "acceptable",
         "tool_parameters": {}
       },
@@ -143,7 +143,7 @@
         "step": 5,
         "action": "Peri-menstrual mini-prophylaxis with frovatriptan 2.5 mg BID for 6 days around menses",
         "tool_name": null,
-        "expected_finding": "",
+        "expected_finding": "Frovatriptan 2.5 mg BID for 6 days peri-menstrually is evidence-based mini-prophylaxis for menstrually-related migraine",
         "category": "acceptable",
         "tool_parameters": {}
       }
@@ -167,8 +167,21 @@
       "Small PFO found but PFO closure is not indicated without prior cryptogenic stroke",
       "Menstrually-related pattern supports estrogen withdrawal as trigger — frovatriptan mini-prophylaxis is evidence-based strategy"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Small PFO on bubble echo",
+        "location": "patient.history_present_illness",
+        "intended_effect": "PFO in patient with hemisensory episodes might trigger TIA/stroke workup or closure discussion",
+        "correct_interpretation": "PFO closure not indicated for migraine without prior stroke (PREMIUM, MIST trials negative); 5-year identical episodic history is migraine"
+      },
+      {
+        "data_point": "Single subcortical white matter hyperintensity",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Any WMH in a young person with sensory symptoms might raise MS concern",
+        "correct_interpretation": "Single 2mm WMH is insufficient for MS (2017 McDonald criteria require ≥2 lesions in at least 2 of 4 locations); non-specific finding in migraineurs"
+      }
+    ],
+    "icd_code": "G43.1"
   },
   "red_herrings": [
     {
@@ -185,16 +198,35 @@
   "metadata": {
     "condition_name": "Migraine with sensory aura, menstrually-related",
     "difficulty_description": "Straightforward: classic Jacksonian sensory march over 15-25 min followed by contralateral headache; normal MRI; ICHD-3 criteria met; menstrual trigger pattern",
-    "expected_agent_confidence": 0.86
+    "expected_agent_confidence": 0.86,
+    "fallback_tool_kinds": {
+      "eeg": "normal",
+      "csf": "normal",
+      "ct": "normal",
+      "cardiac_monitoring": "normal",
+      "specialized_test": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
-      "findings": [],
+      "findings": [
+        {
+          "type": "white_matter_hyperintensity",
+          "location": "right subcortical parietal white matter",
+          "size": "1 focus, 2 mm",
+          "signal_characteristics": {
+            "FLAIR": "hyperintense",
+            "T2": "hyperintense",
+            "DWI": "no restriction"
+          },
+          "mass_effect": "none",
+          "borders": "punctate"
+        }
+      ],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "Normal brain MRI; one non-specific tiny WMH; no DWI restriction; no MS lesions; no structural cause for sensory aura. Clinical correlation recommended.",
+      "impression": "Single 2 mm punctate non-specific subcortical WMH in the right parietal white matter. No periventricular, juxtacortical, or posterior fossa lesions. Normal DWI. No structural or vascular lesion. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
@@ -228,7 +260,7 @@
       "trigger_action": "request_mra_head_neck",
       "tool_name": "order_advanced_imaging",
       "output": {
-        "modality": "",
+        "modality": "MRA head and neck",
         "tracer_or_protocol": null,
         "findings": [
           {
@@ -249,9 +281,9 @@
         "ejection_fraction": null,
         "wall_motion": null,
         "findings": [
-          "BUBBLE ECHOCARDIOGRAM\n\nFindings: Normal cardiac structure and function. EF 60%. Bubble study: Small patent foramen ovale detected — 2-3 microbubbles crossing to left atrium on Valsalva maneuver.\n\nNOTE: Small PFO found. In the context of migraine with aura, PFO closure is NOT routinely indicated unless there is a history of cryptogenic stroke. Observational studies (PREMIUM, MIST trials) did not show significant migraine improvement with PFO closure. Management: continue migraine-specific therapy; antiplatelet therapy if indicated by cardiology."
+          "BUBBLE ECHOCARDIOGRAM\n\nFindings: Normal cardiac structure and function. EF 60%. Bubble study: Small patent foramen ovale detected — 2-3 microbubbles crossing to left atrium on Valsalva manoeuvre.\n\nIMPRESSION: Small patent foramen ovale. Normal biventricular size and function. Clinical correlation recommended."
         ],
-        "impression": "Small PFO detected on bubble echo; PFO closure NOT indicated for migraine alone without prior stroke",
+        "impression": "Small patent foramen ovale detected. Normal biventricular size and function. Clinical correlation recommended.",
         "recommended_actions": []
       }
     },
@@ -285,8 +317,75 @@
       "tool_name": "search_medical_literature",
       "output": {
         "report": "MIGRAINE MONITORING AND MIDAS ASSESSMENT\n\nMIDAS SCORE ESTIMATE (Migraine Disability Assessment Score):\n  Days of school/work missed (3 months): 6 days\n  Days productivity reduced at school/work: 12 days\n  Days of household missed: 4 days\n  Days productivity reduced at household: 8 days\n  Days of leisure missed: 4 days\n  MIDAS TOTAL: ~34 (Grade IV — Severe)\n\nINDICATION FOR PREVENTIVE THERAPY:\n  - MIDAS Grade IV (severe disability)\n  - ≥4 headache days/month with moderate-severe disability\n  - Failed adequate acute therapy alone\n  - ICHD-3 criteria: Recommendation for preventive therapy\n\nCONCLUSION: Grade IV migraine disability. Preventive therapy is strongly indicated.",
-        "summary": "MIDAS Grade IV severe disability; preventive therapy strongly indicated; initiate topiramate or propranolol"
+        "summary": "MIDAS Grade IV (severe disability; score ≥21) is a recognised threshold at which preventive migraine therapy is strongly indicated; topiramate (Level A) and propranolol (Level A) are established first-line preventive agents"
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": {
+      "classification": "normal",
+      "background": {
+        "pdr": "9-10 Hz posterior dominant rhythm, symmetric and reactive",
+        "sleep_features": "normal vertex waves and sleep spindles",
+        "overall": "normal organisation for age"
+      },
+      "findings": [],
+      "artifacts": [],
+      "activating_procedures": {},
+      "impression": "Normal awake and drowsy EEG. No epileptiform discharges and no focal slowing.",
+      "limitations": "",
+      "recommended_actions": []
+    },
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "echo": null,
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 51,
+        "max": 110,
+        "average": 80
+      },
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "impression": "Normal 24-hour Holter monitor.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": null,
+    "specialized_test": {
+      "test_type": "general_neurodiagnostic_assessment",
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "Study within normal limits. No abnormality identified; non-contributory.",
+      "recommended_actions": []
+    },
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

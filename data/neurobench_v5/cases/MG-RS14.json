@@ -14,10 +14,12 @@
       "Hypertension",
       "Two prior hospitalizations for severe dysphagia in past 3 months"
     ],
-    "patient_id": "UNKNOWN",
+    "patient_id": "MG-RS14",
     "demographics": {
       "age": 75,
-      "sex": "male"
+      "sex": "male",
+      "handedness": "right",
+      "bmi": 24.4
     },
     "clinical_history": {
       "medications": [
@@ -43,24 +45,28 @@
       "social_history": {
         "note": "Retired professor; non-smoker; non-drinker; widower; lives alone with daily home aide"
       },
-      "past_medical_history": []
+      "past_medical_history": [
+        "Asymmetric rest tremor (left-predominant) diagnosed as possible Parkinson's disease age 72 — levodopa response modest",
+        "Hypertension",
+        "Two prior hospitalizations for severe dysphagia in past 3 months"
+      ]
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Masked facies. Mild executive dysfunction on bedside testing. MMSE not formally done; mild cognitive changes.",
+      "cranial_nerves": "Masked facies; decreased blink rate; astonished expression. Ophthalmoplegia with partial restriction of downward gaze (upward partially preserved). No diplopia. Severe pharyngeal weakness: dysphagia, hypophonia, nasal speech, markedly weak tongue. Pharyngeal reflex intact; masseter reflex brisk.",
+      "motor": "Frontal release signs (glabellar tap, palmomental). Asymmetric rest tremor (left legs). Limb strength 5/5 except areflexia left upper limb. Axial rigidity.",
+      "sensory": "Sensation intact.",
+      "reflexes": "Areflexia left upper limb; plantar responses flexor bilaterally. En-bloc turning.",
+      "coordination": "Coordination not formally testable due to tremor.",
+      "gait": "Gait freezing. Festinating gait."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
-      "hr": 72,
-      "temp": 37.0,
-      "rr": 14,
-      "spo2": 98
+      "bp_systolic": 136,
+      "bp_diastolic": 78,
+      "hr": 68,
+      "temp": 37.1,
+      "rr": 15,
+      "spo2": 97
     },
     "history_present_illness": "A 75-year-old man was admitted to the neurology ward for progressive dysphagia requiring nasogastric tube placement, severe dysarthria with hypophonia and nasal speech, and ophthalmoplegia without ptosis. Over the preceding two years, he had experienced similar relapsing and remitting episodes of severe dysphagia that each resolved spontaneously over days to weeks. In the three months prior to admission, he had been hospitalized twice for severe dysphagia. During each episode, prior investigations including acetylcholine receptor antibodies, autoimmune screening, barium swallow, and neck CT had been normal, and his response to three days of IV methylprednisolone was inconsistent.\n\nAt age 72, he had developed an asymmetric rest tremor predominantly in the left leg, followed by the right leg. Brain MRI at that time was normal, and treatment with levodopa-carbidopa produced only modest benefit. On current examination, he had masked facies with decreased blink rate, an astonished expression, and ophthalmoplegia with partial restriction of downward gaze while upward gaze was partially preserved. He had no diplopia. Bulbar examination revealed severe pharyngeal weakness with dysphagia, hypophonia, nasal speech, and marked tongue weakness. The pharyngeal reflex was normal; masseter reflex was brisk. Frontal release signs (glabellar tap, palmomental, and orbicularis oris reflexes) were present. Asymmetric, left-sided rest tremor in both legs was noted. Limb strength was otherwise 5/5 except for areflexia in the left upper limb (with flexor plantar responses bilaterally). Axial rigidity was present with en-bloc turning and gait freezing.\n\nExtensive investigations were performed including serum lactate (initially 2.5 mmol/L, not confirmed on repeat at 0.9 mmol/L), paraneoplastic antibodies (anti-Hu, anti-Yo, anti-Ri — all negative), chest CT (normal), spirometry (normal), and cerebrospinal fluid analysis (normal including beta-amyloid, tau, and phospho-tau). Single-fiber EMG was normal. A biceps muscle biopsy showed type I and II fiber atrophy without COX or SDH abnormalities. Brain MRI showed mild temporal atrophy and small frontal white matter lesions. FDG-PET showed decreased metabolism in the brainstem and medial temporal cortex."
   },
@@ -193,8 +199,27 @@
       "Rituximab has >75% efficacy in MuSK-MG — should be initiated early rather than after multiple failed immunosuppressant trials",
       "Normal SFEMG of facial muscles in MuSK-MG can occur if performed between episodes; RNS during crisis is more sensitive"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Parkinsonism features (tremor, gait, masked facies) suggesting PSP or MSA",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Supranuclear eye movement restriction + axial rigidity + poor levodopa response fits PSP or MSA pattern",
+        "correct_interpretation": "Eye movement restriction is from MuSK-MG (NMJ dysfunction), not supranuclear; relapsing-remitting course incompatible with PSP/MSA; anti-MuSK positive is diagnostic"
+      },
+      {
+        "data_point": "Initial elevated lactate (2.5 mmol/L) suggesting mitochondrial disease",
+        "location": "initial_tool_outputs.labs.interpretation",
+        "intended_effect": "Episodic bulbar dysfunction + mildly elevated lactate raises MELAS concern",
+        "correct_interpretation": "Repeat lactate was 0.9 mmol/L (normal); initial elevation was spurious; no other mitochondrial features; anti-MuSK confirms NMJ etiology"
+      },
+      {
+        "data_point": "Negative AChR antibody on initial testing",
+        "location": "followup_outputs[0].output.interpretation",
+        "intended_effect": "Negative AChR antibody might suggest MG is not the diagnosis",
+        "correct_interpretation": "MuSK-MG is AChR-negative by definition; requires separate anti-MuSK testing which is STRONGLY positive"
+      }
+    ],
+    "icd_code": "G70.01"
   },
   "red_herrings": [
     {
@@ -220,16 +245,20 @@
     "generation_method": "real_case_seed",
     "condition_name": "MuSK-antibody-positive myasthenia gravis with Parkinsonism comorbidity",
     "difficulty_description": "Straightforward once MuSK-MG is considered: bulbar-predominant relapsing MG in elderly man with AChR negative requires anti-MuSK panel; ophthalmoplegia without ptosis is characteristic MuSK-MG phenotype",
-    "expected_agent_confidence": 0.8
+    "expected_agent_confidence": 0.8,
+    "fallback_tool_kinds": {
+      "eeg": "normal",
+      "echo": "normal",
+      "cardiac_monitoring": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
       "findings": [],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "Mild temporal atrophy; frontal white matter changes; nigral signal reduction (parkinsonism); no brainstem lesion; no MSA hot cross bun sign. Clinical correlation recommended.",
+      "impression": "Mild temporal atrophy; scattered frontal white matter T2 signal changes. Reduced nigral signal on susceptibility-weighted imaging. No brainstem lesion. No hot cross bun sign. No acute intracranial abnormality. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
@@ -238,8 +267,12 @@
     "ecg": {
       "rhythm": "sinus rhythm",
       "rate": 72,
-      "intervals": {},
-      "axis": "",
+      "intervals": {
+        "QTc": "448 ms",
+        "PR": "162 ms",
+        "QRS": "88 ms"
+      },
+      "axis": "normal",
       "findings": [
         "ELECTROCARDIOGRAM\n\nRHYTHM: Sinus rhythm 66 bpm\nQTc: 448 ms\nINTERPRETATION: Normal sinus rhythm. Mild QTc prolongation (448 ms — borderline). No ischemic changes. No conduction block."
       ],
@@ -253,13 +286,16 @@
     },
     "csf": {
       "appearance": "Clear, colorless",
-      "opening_pressure": "normal",
-      "cell_count": {},
-      "protein": "normal",
-      "glucose": "normal",
-      "glucose_ratio": "",
+      "opening_pressure": "15 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "40 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.61",
       "special_tests": {},
-      "interpretation": "Opening pressure: normal. Protein: normal. Glucose: normal."
+      "interpretation": "Normal CSF: clear, colourless, opening pressure 15 cm H2O. WBC 2/uL (normal), RBC 0/uL. Protein 40 mg/dL (normal). Glucose 62 mg/dL (glucose ratio 0.61). No oligoclonal bands. Consistent with a non-inflammatory process."
     },
     "ct": {
       "findings": [],
@@ -281,23 +317,42 @@
       "trigger_action": "request_musk_antibodies",
       "tool_name": "interpret_labs",
       "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": []
+        "panels": {
+          "MG_antibody_panel": [
+            {
+              "test": "AChR binding antibody",
+              "value": "< 0.4 nmol/L (negative)",
+              "reference_range": "< 0.4 nmol/L",
+              "is_abnormal": false,
+              "unit": "nmol/L"
+            },
+            {
+              "test": "Anti-MuSK antibody",
+              "value": "42 nmol/L",
+              "reference_range": "< 0.4 nmol/L",
+              "is_abnormal": true,
+              "unit": "nmol/L"
+            }
+          ]
+        },
+        "interpretation": "AChR binding antibody negative. Anti-MuSK antibody markedly elevated at 42 nmol/L (reference < 0.4 nmol/L). Anti-MuSK antibodies are found in a subset of patients with neuromuscular junction disorders, particularly those with bulbar-predominant presentations; a markedly elevated result is strongly associated with autoimmune NMJ disease. Clinical correlation recommended.",
+        "abnormal_values_summary": [
+          "Anti-MuSK antibody 42 nmol/L (ref <0.4 nmol/L) — markedly elevated"
+        ]
       }
     },
     {
       "trigger_action": "request_repetitive_stimulation",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "",
+        "test_type": "Repetitive nerve stimulation",
         "findings": [
           {
-            "description": "REPETITIVE NERVE STIMULATION — BULBAR MUSCLES\n\nTECHNIQUE: 3 Hz RNS at nasalis and orbicularis oculi (facial nerve branches)\n\nRESULTS:\n  Nasalis: Decrement 22% [>10% abnormal] ABNORMAL\n  Orbicularis oculi: Decrement 18% ABNORMAL\n  Abductor digiti minimi: Decrement 6% NORMAL\n\nNOTE: In MuSK-MG, decrements are often most pronounced in facial/bulbar muscles with relatively preserved limb NMJ function — consistent with this pattern.\n\nCONCLUSION: Facial RNS confirms NMJ dysfunction with bulbar predominance, consistent with MuSK-MG."
+            "description": "REPETITIVE NERVE STIMULATION — BULBAR MUSCLES\n\nTECHNIQUE: 3 Hz RNS at nasalis and orbicularis oculi (facial nerve branches)\n\nRESULTS:\n  Nasalis: Decrement 22% [>10% abnormal] ABNORMAL\n  Orbicularis oculi: Decrement 18% ABNORMAL\n  Abductor digiti minimi: Decrement 6% NORMAL\n\nIMPRESSION: Abnormal decremental responses in facial/bulbar muscles with preserved distal limb NMJ function. Findings are consistent with a disorder of neuromuscular transmission with bulbar predominance. Clinical correlation recommended."
           }
         ],
         "quantitative_data": null,
-        "impression": "RNS: 22% decrement nasalis, 18% orbicularis, 6% ADM — bulbar-predominant NMJ dysfunction; consistent with MuSK-MG",
+        "impression": "RNS: 22% decrement nasalis, 18% orbicularis, 6% ADM — decremental pattern predominant in facial/bulbar muscles, consistent with a disorder of neuromuscular transmission. Clinical correlation recommended.",
         "recommended_actions": []
       }
     },
@@ -305,44 +360,138 @@
       "trigger_action": "search_musk_mg_treatment",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: MuSK-Antibody–Positive MG — Treatment\n\nKEY FINDINGS:\n1. RITUXIMAB: Multiple case series and small RCTs show >75% response rate in MuSK-MG; rituximab eliminates MuSK-antibody producing B cells; recommended as early second-line agent\n2. PYRIDOSTIGMINE: Less effective in MuSK-MG than AChR-MG; high doses may worsen symptoms (muscarinic side effects); use low doses only if any benefit\n3. PREDNISONE + AZATHIOPRINE: Standard MG immunosuppression; reasonable first-line but rituximab may be preferred given distinctive phenotype\n4. PLEX/IVIG: Effective for acute bulbar crisis; PLEX more rapidly effective; NGT nutrition during acute phase\n5. THYMECTOMY: NOT indicated in MuSK-MG (no thymoma association; thymectomy not beneficial)\n\nCONCLUSION: Initiate rituximab (375 mg/m2 weekly x4 or 1000 mg x2) for MuSK-MG. PLEX for acute bulbar crisis while awaiting rituximab effect.",
-        "summary": "Rituximab first choice for MuSK-MG; pyridostigmine less effective; thymectomy NOT indicated in MuSK-MG",
-        "query": "",
-        "results": []
+        "query": "search musk mg treatment",
+        "results": [
+          {
+            "title": "Clinical literature",
+            "content": "LITERATURE SEARCH: Anti-MuSK Antibody-Positive Neuromuscular Junction Disease — Treatment\n\nKEY FINDINGS:\n1. RITUXIMAB: Multiple case series and small RCTs report >75% response rates in anti-MuSK–positive NMJ disease; mechanism involves depletion of B cells producing MuSK antibodies; used as second-line agent.\n2. ACETYLCHOLINESTERASE INHIBITORS: Reported to be less effective in anti-MuSK–positive disease than in AChR-positive disease; high doses may worsen cholinergic secretions.\n3. CORTICOSTEROIDS AND AZATHIOPRINE: Established immunosuppressives used in NMJ disease management.\n4. PLEX/IVIG: Both are used for acute neuromuscular bulbar dysfunction; plasma exchange has faster onset.\n5. THYMECTOMY: Evidence for benefit in anti-MuSK–positive NMJ disease is not established; thymoma association is uncommon."
+          }
+        ],
+        "summary": "Rituximab has reported high response rates in anti-MuSK–positive NMJ disease; acetylcholinesterase inhibitors less effective; thymectomy benefit not established for anti-MuSK–positive disease."
       }
     },
     {
       "trigger_action": "check_musk_mg_parkinson_interaction",
       "tool_name": "check_drug_interactions",
       "output": {
-        "report": "DRUG INTERACTION REVIEW — MuSK-MG TREATMENT IN PATIENT WITH PARKINSONISM\n\nQuery: Rituximab + levodopa-carbidopa interaction; pyridostigmine in MuSK-MG\n\nFINDINGS:\n  RITUXIMAB + LEVODOPA: No pharmacokinetic interaction\n  RITUXIMAB IMMUNOSUPPRESSION: Requires vaccination update and infection monitoring; PCP prophylaxis (TMP-SMX or atovaquone) during B-cell depletion\n  PYRIDOSTIGMINE IN MuSK-MG: Use cautiously at low dose; may cause excessive secretions and worsen dysphagia in MuSK-MG; not contraindicated but limited benefit\n  LEVODOPA-CARBIDOPA: Continue for Parkinsonism; MuSK-MG does not interact with dopaminergic therapy\n\nCONCLUSION: Rituximab safe with levodopa. Add PCP prophylaxis. Use pyridostigmine cautiously in MuSK-MG — may not be beneficial.",
-        "summary": "Rituximab safe with levodopa; add PCP prophylaxis; use pyridostigmine cautiously in MuSK-MG"
+        "proposed": "check_musk_mg_parkinson_interaction",
+        "interactions": [
+          "DRUG INTERACTION REVIEW — RITUXIMAB AND LEVODOPA-CARBIDOPA; PYRIDOSTIGMINE IN ANTI-MuSK POSITIVE DISEASE\n\nQuery: Rituximab interaction with levodopa-carbidopa; acetylcholinesterase inhibitor use in anti-MuSK positive NMJ disease\n\nFINDINGS:\n  RITUXIMAB + LEVODOPA-CARBIDOPA: No pharmacokinetic interaction identified.\n  RITUXIMAB (immunosuppression): B-cell depletion increases infection risk; pneumocystis prophylaxis is recommended during profound B-cell depletion; vaccination history should be reviewed before initiation.\n  ACETYLCHOLINESTERASE INHIBITORS IN ANTI-MuSK POSITIVE NMJ DISEASE: Case reports and series suggest benefit may be limited; cholinergic muscarinic side effects (excess secretions) can worsen dysphagia; low-dose use with careful monitoring is advised.\n  LEVODOPA-CARBIDOPA: No known interaction with rituximab or cholinesterase inhibitors at pharmacokinetic level."
+        ],
+        "contraindications": [],
+        "warnings": [
+          "Rituximab: no interaction with levodopa-carbidopa; PCP prophylaxis recommended during B-cell depletion; acetylcholinesterase inhibitors have limited reported benefit in anti-MuSK positive NMJ disease."
+        ],
+        "formulary_status": "on formulary",
+        "alternatives": []
       }
     },
     {
       "trigger_action": "request_pulmonary_function",
       "tool_name": "interpret_labs",
       "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": []
+        "panels": {
+          "Pulmonary_function": [
+            {
+              "test": "NIF (Negative Inspiratory Force)",
+              "value": "-58 cm H2O",
+              "reference_range": "< -60 cm H2O",
+              "is_abnormal": true,
+              "unit": "cm H2O"
+            },
+            {
+              "test": "FVC % predicted",
+              "value": "76%",
+              "reference_range": "> 80%",
+              "is_abnormal": true,
+              "unit": "%"
+            }
+          ]
+        },
+        "interpretation": "Pulmonary function adequate. NIF -58 cm H2O (reference < -60 cm H2O — meets threshold for adequate respiratory reserve). FVC 76% predicted. FVC 76% below 80% predicted — monitor respiratory status; no immediate compromise at this level.",
+        "abnormal_values_summary": [
+          "NIF -58 cm H2O — borderline; respiratory function at risk; monitor closely",
+          "FVC 76% — below 80% threshold"
+        ]
       }
     },
     {
       "trigger_action": "request_fdg_pet_report",
       "tool_name": "order_advanced_imaging",
       "output": {
-        "modality": "",
+        "modality": "FDG-PET brain",
         "tracer_or_protocol": null,
         "findings": [
           {
-            "description": "FDG-PET BRAIN REPORT (REVIEW OF EXISTING STUDY)\n\nIndication: Parkinsonism evaluation; cognitive changes; atypical features\n\nFINDINGS:\n  Decreased FDG metabolism in brainstem (pontine nuclei and midbrain tegmentum)\n  Decreased FDG metabolism in medial temporal cortex bilaterally\n  Relatively preserved cortical metabolism in parietal and occipital regions\n  No asymmetric cortical hypometabolism (Parkinson's dementia would show parietal/occipital hypometabolism)\n\nINTERPRETATION: Brainstem hypometabolism is non-specific but may reflect disrupted neuromuscular signaling or Parkinson's-related changes. Medial temporal hypometabolism suggests early hippocampal involvement consistent with mild subcortical dementia.\n\nATYPICAL PARKINSONISM CONSIDERATION: The combination of symmetric rest tremor (atypical for PD), eye movement abnormality, and poor levodopa response raises consideration of atypical parkinsonism (PSP, CBD) — but MuSK-MG explains the bulbar features and the eye movement abnormality.\n\nCONCLUSION: PET findings are non-diagnostic; MuSK-MG explains the dominant clinical picture. Atypical parkinsonism remains a concurrent possibility for the tremor/gait features."
+            "description": "FDG-PET BRAIN\n\nIndication: Parkinsonism evaluation; cognitive changes\n\nFINDINGS:\n  Decreased FDG metabolism in brainstem (pontine nuclei and midbrain tegmentum)\n  Decreased FDG metabolism in medial temporal cortex bilaterally\n  Relatively preserved cortical metabolism in parietal and occipital regions\n  No asymmetric cortical hypometabolism\n\nIMPRESSION: Brainstem and bilateral medial temporal hypometabolism — a non-specific pattern. Preserved parietal and occipital metabolism. Clinical correlation recommended."
           }
         ],
         "quantitative_data": null,
-        "impression": "Brainstem and medial temporal hypometabolism; non-specific pattern; MuSK-MG explains bulbar and ocular features; atypical parkinsonism may coexist",
+        "impression": "Brainstem and medial temporal hypometabolism — non-specific metabolic pattern. Preserved parietal-occipital metabolism. Clinical correlation recommended.",
         "recommended_actions": []
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": {
+      "classification": "normal",
+      "background": {
+        "pdr": "9-10 Hz posterior dominant rhythm, symmetric and reactive",
+        "sleep_features": "normal vertex waves and sleep spindles",
+        "overall": "normal organisation for age"
+      },
+      "findings": [],
+      "artifacts": [],
+      "activating_procedures": {},
+      "impression": "Normal awake and drowsy EEG. No epileptiform discharges and no focal slowing.",
+      "limitations": "",
+      "recommended_actions": []
+    },
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": null,
+    "ct": null,
+    "echo": {
+      "chambers": {
+        "LV": "normal size and systolic function",
+        "RV": "normal size and function",
+        "LA": "normal size",
+        "RA": "normal size"
+      },
+      "valves": {
+        "mitral": "structurally normal",
+        "aortic": "structurally normal",
+        "tricuspid": "normal",
+        "pulmonic": "normal"
+      },
+      "ejection_fraction": 63.0,
+      "wall_motion": "no regional wall-motion abnormality",
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": []
+    },
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 56,
+        "max": 124,
+        "average": 68
+      },
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "impression": "Normal 24-hour Holter monitor.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": null,
+    "specialized_test": null,
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

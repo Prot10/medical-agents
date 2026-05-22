@@ -46,21 +46,21 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert; oriented. No cognitive deficit.",
+      "cranial_nerves": "Normal cranial nerves. Visual fields full by confrontation. PERRLA. No papilledema.",
+      "motor": "Motor strength 5/5 all limbs. No pronator drift.",
+      "sensory": "Sensation intact to light touch and pinprick throughout.",
+      "reflexes": "DTR 2+ symmetric. Plantar responses flexor bilaterally.",
+      "coordination": "Finger-nose and heel-shin normal bilaterally.",
+      "gait": "Normal gait. Romberg negative."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
-      "hr": 72,
-      "temp": 37.0,
+      "bp_systolic": 118,
+      "bp_diastolic": 74,
+      "hr": 70,
+      "temp": 36.7,
       "rr": 14,
-      "spo2": 98
+      "spo2": 99
     },
     "history_present_illness": "A 40-year-old mixed-race woman presented to the neurology outpatient clinic for management of established migraine with visual aura that she has experienced since age 25. She has never had a formal neurology consultation and was self-managing. She describes typical episodes consisting of an expanding crescent of shimmering zigzag lights beginning in the right visual field, gradually spreading over 20-30 minutes, followed by a severe left-sided throbbing headache (8/10) with nausea, photophobia, and phonophobia lasting 8-12 hours. She has approximately 2-3 episodes per month.\n\nShe currently uses rizatriptan 10 mg wafers (prescribed by her GP 3 years ago) which provide good relief if taken early, but she runs out before month's end and resorts to ibuprofen or aspirin for the remainder. She also takes sumatriptan nasal spray 20 mg on occasion. She would like a more comprehensive management plan. She has no cardiac disease, no stroke history, and no hypertension. She is a non-smoker on combined OCP (Yasmin — ethinylestradiol + drospirenone) prescribed for acne. She notes that her migraines were somewhat better during her two pregnancies. She has two children. Her mother and maternal aunt both have migraine."
   },
@@ -148,8 +148,15 @@
       "Subcortical WMH are expected in long-term migraineurs — reassure patient",
       "Preventive therapy indicated given 2-3 attacks/month with disability"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Multiple subcortical WMH on MRI suggesting cerebrovascular disease",
+        "location": "initial_tool_outputs.mri",
+        "intended_effect": "3 WMH in a 40-year-old woman on OCP might raise concern for cerebrovascular events or early small vessel disease",
+        "correct_interpretation": "WMH are expected in long-term migraineurs (3x higher prevalence); non-specific subcortical pattern; the key issue is OCP safety, not WMH significance; OCP must be stopped (WHO Category 4)"
+      }
+    ],
+    "icd_code": "G43.1"
   },
   "red_herrings": [
     {
@@ -161,16 +168,35 @@
   "metadata": {
     "condition_name": "Established migraine with aura — combined OCP contraindication",
     "difficulty_description": "Straightforward: established migraine diagnosis; critical pharmacological safety issue (combined OCP = WHO Category 4); preventive therapy optimization",
-    "expected_agent_confidence": 0.85
+    "expected_agent_confidence": 0.85,
+    "fallback_tool_kinds": {
+      "eeg": "normal",
+      "csf": "normal",
+      "ct": "incidental",
+      "cardiac_monitoring": "normal",
+      "specialized_test": "incidental"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
-      "findings": [],
+      "findings": [
+        {
+          "type": "white_matter_hyperintensity",
+          "location": "bilateral subcortical white matter",
+          "size": "3 foci, 2-4 mm",
+          "signal_characteristics": {
+            "FLAIR": "hyperintense",
+            "T2": "hyperintense",
+            "DWI": "no restriction"
+          },
+          "mass_effect": "none",
+          "borders": "punctate, non-confluent"
+        }
+      ],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "3 small non-specific subcortical WMH (migraine-related); no structural pathology; normal MRA. Clinical correlation recommended.",
+      "impression": "Three small punctate non-specific subcortical T2/FLAIR foci (2-4 mm); non-confluent. No juxtacortical or periventricular lesions. No DWI restriction. No structural pathology. Normal MRA. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
@@ -205,14 +231,14 @@
       "tool_name": "check_drug_interactions",
       "output": {
         "report": "DRUG REVIEW — COMBINED OCP IN MIGRAINE WITH AURA\n\nQuery: Yasmin (ethinylestradiol 30 mcg + drospirenone) in a woman with migraine with aura\n\nFINDINGS:\n  WHO MEDICAL ELIGIBILITY CRITERIA:\n  - Migraine with aura + combined OCP = WHO Category 4 (UNACCEPTABLE RISK)\n  - Risk: Approximately 4-6 fold increase in ischemic stroke risk when combined OCP used in women with migraine with aura\n  - Ethinylestradiol promotes coagulation and endothelial dysfunction; migraine with aura already associated with 2-fold stroke risk independent of OCP\n  - The combination is contraindicated regardless of dose of ethinylestradiol\n\n  ALTERNATIVES FOR CONTRACEPTION AND ACNE:\n  - Progestin-only pill (e.g., desogestrel 75 mcg): WHO Category 2 in migraine with aura (generally safe)\n  - Drospirenone-only pill (Slinda): Approved for contraception; no estrogen; may maintain acne benefit from drospirenone\n  - Copper IUD: Highly effective contraception; no hormonal effect\n  - Hormonal IUD (levonorgestrel): WHO Category 2 in migraine with aura; progestin only\n  - Acne: Topical retinoids or benzoyl peroxide for acne if contraceptive change made\n\nCRITICAL ACTION: DISCONTINUE Yasmin immediately. Switch to progestin-only option or non-hormonal contraception.\n\nCONCLUSION: Yasmin is CONTRAINDICATED. Discontinue. Discuss alternatives with gynecology.",
-        "summary": "Combined OCP contraindicated in migraine with aura (WHO Category 4); DISCONTINUE Yasmin; switch to progestin-only or non-hormonal contraception"
+        "summary": "Combined OCP is WHO Category 4 (contraindicated) in migraine with aura due to approximately 4-6 fold increased ischaemic stroke risk; progestin-only contraception (desogestrel pill, drospirenone-only pill, hormonal IUD) and non-hormonal options are WHO Category 1-2 and are appropriate alternatives"
       }
     },
     {
       "trigger_action": "search_migraine_prevention_review",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Migraine Prevention — Review for 2-3 Attacks/Month\n\nPREVENTIVE THERAPY INDICATION: ≥2 migraine days/month with significant disability; ≥3 months of suboptimal acute treatment response.\n\nFIRST-LINE OPTIONS:\n1. TOPIRAMATE 50-100 mg/day: 50% attack reduction; level A evidence; side effects (cognitive effects, paresthesias)\n2. PROPRANOLOL 40-120 mg BID: Level A; cardiovascular effects; avoid in asthma/depression\n3. AMITRIPTYLINE 10-75 mg QHS: Level B; good for comorbid anxiety/depression/sleep\n4. VALPROATE 500-1500 mg/day: Level A but teratogenic — avoid in women of childbearing age without reliable contraception\n5. CGRP ANTIBODIES: Erenumab 70/140 mg SC monthly, fremanezumab, galcanezumab — first-line alternatives; well-tolerated; high specificity\n\nCURRENT ACUTE THERAPY: Rizatriptan 10 mg is appropriate. Maximum 9 doses/month to avoid medication overuse.\n\nCONCLUSION: Initiate preventive therapy (topiramate 25→50 mg BID or erenumab). Ensure triptan supply adequate.",
+        "report": "LITERATURE SEARCH: Migraine Prevention — Review for 2-3 Attacks/Month\n\nPREVENTIVE THERAPY INDICATION: ≥2 migraine days/month with significant disability; ≥3 months of suboptimal acute treatment response.\n\nFIRST-LINE OPTIONS:\n1. TOPIRAMATE 50-100 mg/day: 50% attack reduction; level A evidence; side effects (cognitive effects, paresthesias)\n2. PROPRANOLOL 40-120 mg BID: Level A; cardiovascular effects; avoid in asthma/depression\n3. AMITRIPTYLINE 10-75 mg QHS: Level B; good for comorbid anxiety/depression/sleep\n4. VALPROATE 500-1500 mg/day: Level A but teratogenic — avoid in women of childbearing age without reliable contraception\n5. CGRP ANTIBODIES: Erenumab 70/140 mg SC monthly, fremanezumab, galcanezumab — first-line alternatives; well-tolerated; high specificity\n\nCURRENT ACUTE THERAPY: Rizatriptan 10 mg is appropriate. Maximum 9 doses/month to avoid medication overuse.\n\nCONCLUSION: Multiple Level A agents are available for episodic migraine prevention at this frequency; agent selection depends on comorbidities, tolerability, and individual clinical assessment.",
         "summary": "Preventive therapy indicated; topiramate or erenumab preferred; avoid valproate in women without reliable contraception"
       }
     },
@@ -229,7 +255,7 @@
       "trigger_action": "request_mra_head_neck",
       "tool_name": "order_advanced_imaging",
       "output": {
-        "modality": "",
+        "modality": "MRA",
         "tracer_or_protocol": null,
         "findings": [
           {
@@ -264,5 +290,85 @@
         "recommended_actions": []
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": {
+      "classification": "normal",
+      "background": {
+        "pdr": "9-10 Hz posterior dominant rhythm, symmetric and reactive",
+        "sleep_features": "normal vertex waves and sleep spindles",
+        "overall": "normal organisation for age"
+      },
+      "findings": [],
+      "artifacts": [],
+      "activating_procedures": {},
+      "impression": "Normal awake and drowsy EEG. No epileptiform discharges and no focal slowing.",
+      "limitations": "",
+      "recommended_actions": []
+    },
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [
+        {
+          "type": "calcification",
+          "location": "right frontal lobe",
+          "size": "3 mm",
+          "density": "hyperdense",
+          "description": "calcified focus consistent with an old, benign granuloma"
+        }
+      ],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. Incidental calcified granuloma, benign.",
+      "recommended_actions": []
+    },
+    "echo": null,
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 52,
+        "max": 127,
+        "average": 79
+      },
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "impression": "Normal 24-hour Holter monitor.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": null,
+    "specialized_test": {
+      "test_type": "Neurodiagnostic assessment",
+      "findings": [
+        {
+          "finding": "minor non-specific abnormality",
+          "interpretation": "of uncertain and likely no clinical significance"
+        }
+      ],
+      "quantitative_data": null,
+      "impression": "Study with only a minor non-specific finding; non-contributory to the presentation.",
+      "recommended_actions": []
+    },
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

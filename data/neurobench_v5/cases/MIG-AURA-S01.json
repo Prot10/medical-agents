@@ -40,21 +40,22 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert; oriented x3. No aphasia.",
+      "cranial_nerves": "Cranial nerves II-XII intact. Visual fields full by confrontation. Pupils equal and reactive. Extraocular movements full. No papilledema. Facial sensation symmetric.",
+      "motor": "Motor strength 5/5 all limbs. No pronator drift.",
+      "sensory": "Sensation intact to light touch and pinprick throughout.",
+      "reflexes": "DTR 2+ symmetric. Plantar responses flexor bilaterally.",
+      "coordination": "Finger-nose normal bilaterally. Heel-shin normal.",
+      "gait": "Normal gait. Tandem gait intact. Romberg negative.",
+      "additional": "No cervical tenderness. No photophobia at this visit."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
-      "hr": 72,
-      "temp": 37.0,
+      "bp_systolic": 116,
+      "bp_diastolic": 72,
+      "hr": 74,
+      "temp": 36.8,
       "rr": 14,
-      "spo2": 98
+      "spo2": 99
     },
     "history_present_illness": "A 28-year-old woman presented to the neurology outpatient clinic for evaluation and management of recurrent headaches with visual symptoms that she has experienced approximately once monthly for the past 5 years. Each episode begins with a shimmering, crescent-shaped visual disturbance in the periphery of her right visual field that gradually expands into a flickering zigzag arc (fortification spectra) over 20-30 minutes, then fades. During this visual aura she cannot read effectively and describes the phenomenon as like 'looking through a kaleidoscope.' After the visual aura resolves, she develops a severe left-sided throbbing headache (8/10 intensity) with nausea, photophobia, and phonophobia lasting 6-12 hours. Vomiting occurs in approximately half of episodes. She takes ibuprofen 400 mg which only partially helps. She has not tried triptans. She denies any limb weakness, numbness, speech difficulty, or loss of consciousness associated with the episodes. Between attacks she is entirely normal.\n\nShe has a maternal aunt with similar migraines. She reports that episodes are triggered by menstruation, sleep deprivation, and skipping meals. Oral contraceptive pills were prescribed by her GP 2 years ago for dysmenorrhea but she stopped them after 6 months because she felt they increased headache frequency. She has no history of stroke, hypertension, diabetes, or cardiac disease. She is a graphic designer, non-smoker, moderate caffeine use. The frequency of attacks has increased from one every 6 weeks to almost monthly over the past year, prompting this referral."
   },
@@ -102,8 +103,8 @@
       {
         "step": 1,
         "action": "Brain MRI to exclude secondary causes (AVM, tumor, demyelinating disease)",
-        "tool_name": null,
-        "expected_finding": "",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Normal brain MRI with only tiny non-specific subcortical WMH; no AVM, tumor, or vascular malformation; normal DWI",
         "category": "acceptable",
         "tool_parameters": {
           "contrast": true,
@@ -119,8 +120,8 @@
       {
         "step": 2,
         "action": "Routine laboratory workup (CBC, BMP, inflammatory markers, ANA, TSH, antiphospholipid)",
-        "tool_name": null,
-        "expected_finding": "",
+        "tool_name": "interpret_labs",
+        "expected_finding": "All values within normal limits — no metabolic, inflammatory, or coagulation cause",
         "category": "acceptable",
         "tool_parameters": {
           "lab_type": "headache_workup"
@@ -130,7 +131,7 @@
         "step": 3,
         "action": "Prescribe sumatriptan 100 mg orally for acute migraine attacks (take at headache onset)",
         "tool_name": null,
-        "expected_finding": "",
+        "expected_finding": "Sumatriptan 100 mg oral at headache onset is appropriate and safe in typical visual aura; no contraindications",
         "category": "acceptable",
         "tool_parameters": {}
       },
@@ -138,7 +139,7 @@
         "step": 4,
         "action": "Initiate preventive therapy — topiramate 25 mg titrating to 50 mg BID, or propranolol 40 mg BID — given monthly frequency",
         "tool_name": null,
-        "expected_finding": "",
+        "expected_finding": "Monthly frequency with disability meets threshold for preventive therapy; topiramate or propranolol as first-line",
         "category": "acceptable",
         "tool_parameters": {}
       },
@@ -146,7 +147,7 @@
         "step": 5,
         "action": "Counsel on migraine triggers (sleep, meals, menstruation), avoid combined OCP, headache diary",
         "tool_name": null,
-        "expected_finding": "",
+        "expected_finding": "Combined OCP relatively contraindicated in migraine with aura; trigger diary and avoidance counselling",
         "category": "acceptable",
         "tool_parameters": {}
       }
@@ -171,8 +172,21 @@
       "Combined OCP is relatively contraindicated in migraine with aura due to approximately 2-fold increase in stroke risk",
       "Monthly frequency with disability (MIDAS score) triggers preventive therapy discussion"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Tiny subcortical white matter T2 foci on MRI",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Small white matter hyperintensities in young women can suggest MS or cerebrovascular disease",
+        "correct_interpretation": "Non-specific T2 hyperintensities are commonly seen in migraineurs; not diagnostic for MS (no periventricular distribution) or lacunar stroke (size <3 mm)"
+      },
+      {
+        "data_point": "OCP history raising concern for cerebral venous thrombosis",
+        "location": "patient.history_present_illness",
+        "intended_effect": "OCP use + headache with visual symptoms could suggest CVT",
+        "correct_interpretation": "Patient stopped OCP 1.5 years ago; CVT would show progressive headache with papilledema or focal deficit; 5-year identical episodic history inconsistent with CVT"
+      }
+    ],
+    "icd_code": "G43.1"
   },
   "red_herrings": [
     {
@@ -189,16 +203,35 @@
   "metadata": {
     "condition_name": "Migraine with typical visual aura",
     "difficulty_description": "Straightforward: classic fortification spectra over 20-30 min, normal MRI, 5-year episodic history, family history — ICHD-3 criteria clearly met",
-    "expected_agent_confidence": 0.88
+    "expected_agent_confidence": 0.88,
+    "fallback_tool_kinds": {
+      "csf": "normal",
+      "ct": "incidental",
+      "cardiac_monitoring": "normal",
+      "specialized_test": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
-      "findings": [],
+      "findings": [
+        {
+          "type": "white_matter_hyperintensity",
+          "location": "right frontal subcortical white matter",
+          "size": "2 foci, 2-3 mm each",
+          "signal_characteristics": {
+            "FLAIR": "hyperintense",
+            "T2": "hyperintense",
+            "DWI": "no restriction",
+            "SWI": "no hemosiderin"
+          },
+          "mass_effect": "none",
+          "borders": "punctate, non-confluent"
+        }
+      ],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "Normal MRI; tiny non-specific subcortical T2 foci (migraine-related); no AVM, tumor, or vascular malformation. Clinical correlation recommended.",
+      "impression": "No acute or structural intracranial abnormality. Two punctate non-specific subcortical T2/FLAIR foci (2-3 mm) in the right frontal white matter — non-specific; no periventricular, juxtacortical, or posterior fossa lesions. No DWI restriction. No AVM, cavernoma, tumour, or demyelinating lesion. Normal MRA. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
@@ -232,11 +265,11 @@
       "trigger_action": "request_mra_head_neck",
       "tool_name": "order_advanced_imaging",
       "output": {
-        "modality": "",
+        "modality": "MRA head and neck",
         "tracer_or_protocol": null,
         "findings": [
           {
-            "description": "MRA HEAD AND NECK\n\nIndication: Migraine with visual aura — exclude AVM, cavernoma, or vascular malformation\n\nFINDINGS:\n  Circle of Willis: Patent bilateral ICAs, MCAs, ACAs, PCAs, and basilar artery. Normal caliber and flow.\n  No aneurysm (sensitivity: MRA detects >3mm). No AVM. No dural AV fistula.\n  Cervical carotid arteries: Normal bilateral ICA and ECA. No dissection flap. No stenosis.\n  Vertebral arteries: Normal bilaterally.\n  Posterior fossa vasculature: Normal PCAs, PICA, AICA, SCA.\n\nIMPRESSION: Normal MRA head and neck. No vascular malformation or dissection. Excludes AVM as cause of aura-like episodes."
+            "description": "MRA HEAD AND NECK\n\nFINDINGS:\n  Circle of Willis: Patent bilateral ICAs, MCAs, ACAs, PCAs, and basilar artery. Normal calibre and flow.\n  No aneurysm detected (MRA sensitivity approximately ≥3 mm). No AVM. No dural AV fistula.\n  Cervical carotid arteries: Normal bilateral ICA and ECA. No dissection. No stenosis.\n  Vertebral arteries: Normal bilaterally.\n  Posterior fossa vasculature: Normal.\n\nIMPRESSION: Normal MRA head and neck. No vascular malformation, aneurysm, or dissection identified."
           }
         ],
         "quantitative_data": null,
@@ -253,7 +286,7 @@
         "ejection_fraction": null,
         "wall_motion": null,
         "findings": [
-          "BUBBLE ECHOCARDIOGRAM — TRANSTHORACIC WITH AGITATED SALINE\n\nIndication: Migraine with aura — screen for patent foramen ovale\n\nFINDINGS:\n  LEFT VENTRICLE: Normal size and function, EF 62%\n  CARDIAC VALVES: Normal\n  INTERATRIAL SEPTUM: No aneurysm. Agitated saline injection with Valsalva maneuver: NO microbubbles detected in left heart within 3 cardiac cycles\n  CONCLUSION: No patent foramen ovale detected\n\nNOTE: PFO is found in ~25% of general population and ~40% of migraine with aura patients. A negative bubble echo does not exclude migraine but makes PFO-related migraine less likely. PFO closure is not routinely recommended for migraine without stroke."
+          "BUBBLE ECHOCARDIOGRAM — TRANSTHORACIC WITH AGITATED SALINE\n\nFINDINGS:\n  LEFT VENTRICLE: Normal size and systolic function. EF 62%.\n  CARDIAC VALVES: Structurally normal.\n  INTERATRIAL SEPTUM: No aneurysm. Agitated saline injection with Valsalva manoeuvre: No microbubbles detected in the left heart within 3 cardiac cycles.\n\nIMPRESSION: No patent foramen ovale detected. Normal biventricular size and function."
         ],
         "impression": "No PFO detected on bubble echocardiogram; normal cardiac structure and function",
         "recommended_actions": []
@@ -281,7 +314,7 @@
       "tool_name": "check_drug_interactions",
       "output": {
         "report": "DRUG INTERACTION REVIEW — SUMATRIPTAN FOR MIGRAINE WITH AURA\n\nQuery: Sumatriptan safety and drug interactions\n\nFINDINGS:\n  SUMATRIPTAN (5-HT1B/1D agonist):\n  - Take at headache onset (not during aura phase)\n  - Dose: 50-100 mg orally; may repeat after 2 hours if partial relief (max 200 mg/day)\n  - CONTRAINDICATIONS: Ischemic heart disease, uncontrolled HTN, history of stroke/TIA, hemiplegic migraine, concurrent MAOI or ergotamine use\n  - This patient: No contraindications identified\n\n  POTENTIAL INTERACTIONS:\n  - SSRIs/SNRIs + triptans: Theoretical serotonin syndrome risk; use cautiously but generally safe\n  - Ibuprofen: No pharmacokinetic interaction; can be combined for enhanced effect\n\n  NAPROXEN + SUMATRIPTAN COMBINATION: Fixed-dose combination (Treximet) shown superior to either alone\n\nCONCLUSION: Sumatriptan 100 mg safe for this patient. No current drug interactions. Naproxen sodium 550 mg co-administration may enhance efficacy.",
-        "summary": "Sumatriptan 100 mg safe; no contraindications; take at headache onset not during aura; combine with naproxen for enhanced effect"
+        "summary": "Sumatriptan 100 mg — no contraindications identified in this review; take at headache onset, not during the aura phase; sumatriptan-naproxen co-administration (fixed-dose combination or separately) has RCT evidence of superior efficacy to either agent alone in migraine"
       }
     },
     {
@@ -293,13 +326,74 @@
         "findings": [],
         "artifacts": [],
         "activating_procedures": {},
-        "confidence": 0.0,
-        "impression": "See findings above. Clinical correlation recommended.",
+        "impression": "This is a NORMAL EEG. No epileptiform discharges. No focal slowing. No electrographic seizures recorded. Clinical correlation recommended.",
         "limitations": "",
         "recommended_actions": [
           "Clinical correlation recommended."
         ]
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": null,
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [
+        {
+          "type": "calcification",
+          "location": "right frontal lobe",
+          "size": "3 mm",
+          "density": "hyperdense",
+          "description": "calcified focus consistent with an old, benign granuloma"
+        }
+      ],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. Incidental calcified granuloma, benign.",
+      "recommended_actions": []
+    },
+    "echo": null,
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 55,
+        "max": 129,
+        "average": 77
+      },
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "impression": "Normal 24-hour Holter monitor.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": null,
+    "specialized_test": {
+      "test_type": "general_laboratory_panel",
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "Study within normal limits. No abnormality identified; non-contributory.",
+      "recommended_actions": []
+    },
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

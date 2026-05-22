@@ -52,21 +52,21 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert; oriented. No aphasia.",
+      "cranial_nerves": "Normal cranial nerves. Visual fields full. No papilledema.",
+      "motor": "Motor strength 5/5 all limbs. No pronator drift.",
+      "sensory": "Sensation intact to light touch and pinprick throughout.",
+      "reflexes": "DTR 2+ symmetric. Plantar responses flexor bilaterally.",
+      "coordination": "Finger-nose and heel-shin normal bilaterally.",
+      "gait": "Normal gait. Romberg negative."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
+      "bp_systolic": 116,
+      "bp_diastolic": 74,
       "hr": 72,
-      "temp": 37.0,
+      "temp": 36.8,
       "rr": 14,
-      "spo2": 98
+      "spo2": 99
     },
     "history_present_illness": "A 38-year-old British woman with a 10-year history of migraine with typical visual aura presented to the neurology outpatient clinic requesting more effective preventive therapy. She describes classic episodes beginning with a bright crescent-shaped shimmering arc in the right visual field that expands over 20-25 minutes, followed by a left-sided throbbing headache (7-8/10) with nausea and photophobia lasting 6-10 hours. She has 3-4 episodes per month, increased from 1-2 per month three years ago.\n\nShe has tried sumatriptan 100 mg (effective but 4 episodes/month exhausts her prescription) and naproxen 500 mg (partial relief). Previous preventive attempts include propranolol 40 mg BID (stopped after 3 months — fatigue and bradycardia), amitriptyline 25 mg (poor effect at this dose, then stopped due to dry mouth). She is interested in newer anti-CGRP treatments after reading about them online.\n\nShe has no cardiac disease, no hypertension, and no depression. She had a 'minor TIA' query 4 years ago — on further questioning, this was a typical left-sided 20-minute visual aura without any limb or speech symptoms, which was investigated at the time (MRI was reportedly normal). She is a non-smoker, not on contraception (has an IUD), and has an older MRI brain from 4 years ago reported as normal. She would like to discuss erenumab."
   },
@@ -150,8 +150,21 @@
       "Small PFO detected but closure not indicated for migraine without prior stroke",
       "Alcohol reduction is a modifiable lifestyle factor"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Prior 'TIA query' 4 years ago — investigated with normal MRI",
+        "location": "patient.history_present_illness",
+        "intended_effect": "A prior TIA diagnosis or query might suggest cerebrovascular disease requiring anticoagulation or intensified vascular workup",
+        "correct_interpretation": "The episode was a 20-minute left visual disturbance with subsequent headache — this is typical migraine aura, not TIA; confirmed by normal MRI and typical migraine characteristics; no anticoagulation indicated"
+      },
+      {
+        "data_point": "Small PFO on bubble echocardiogram",
+        "location": "followup_outputs",
+        "intended_effect": "PFO in a patient with prior 'TIA query' could trigger cardioembolic workup and closure discussion",
+        "correct_interpretation": "No prior confirmed stroke; prior TIA was migraine aura; PFO closure not indicated for migraine without cryptogenic stroke (PREMIUM, MIST trials negative)"
+      }
+    ],
+    "icd_code": "G43.1"
   },
   "red_herrings": [
     {
@@ -168,16 +181,35 @@
   "metadata": {
     "condition_name": "Established migraine with aura — prior TIA misclassification, seeking preventive optimization",
     "difficulty_description": "Straightforward: prior TIA query is actually typical migraine aura; anti-CGRP therapy appropriate after 2 failed preventives",
-    "expected_agent_confidence": 0.85
+    "expected_agent_confidence": 0.85,
+    "fallback_tool_kinds": {
+      "eeg": "normal",
+      "csf": "normal",
+      "ct": "normal",
+      "cardiac_monitoring": "incidental",
+      "specialized_test": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
-      "findings": [],
+      "findings": [
+        {
+          "type": "normal",
+          "location": "whole brain",
+          "size": null,
+          "signal_characteristics": {
+            "DWI": "no restriction",
+            "FLAIR": "no significant signal abnormality",
+            "T1": "normal grey-white differentiation"
+          },
+          "mass_effect": "none",
+          "borders": null
+        }
+      ],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "See findings above. Clinical correlation recommended.",
+      "impression": "Normal brain MRI. No DWI restriction. No structural lesion. Normal MRA. No new lesions compared to prior study 4 years ago. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
@@ -211,7 +243,7 @@
       "trigger_action": "search_cgrp_antibody_treatment",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Anti-CGRP Monoclonal Antibodies for Migraine Prevention\n\nEVIDENCE BASE:\n1. ERENUMAB (AMG 334 — Aimovig): Anti-CGRP receptor; 70 or 140 mg SC monthly; STRIVE trial: 50% reduction in monthly migraine days vs 27% placebo (p<0.001)\n2. FREMANEZUMAB (TEV-48125 — Ajovy): Anti-CGRP ligand; 225 mg SC monthly or 675 mg quarterly; similar efficacy\n3. GALCANEZUMAB (LY2951742 — Emgality): Anti-CGRP ligand; 120 mg SC monthly; EVOLVE trials show consistent efficacy\n4. EPTINEZUMAB (IV): Quarterly IV infusion; rapid onset\n5. CARDIOVASCULAR SAFETY: CGRP has vasodilatory properties; theoretical concern for patients with hypertension or ischemic heart disease; no significant cardiovascular safety signals in large trials to date\n6. INDICATIONS: Episodic migraine ≥4 days/month OR chronic migraine (≥15 days/month)\n7. PREVIOUS TREATMENT FAILURES: This patient failed propranolol and amitriptyline — meets criteria for second-line prevention\n\nCONCLUSION: Patient qualifies for anti-CGRP therapy. Erenumab 70 mg SC monthly is appropriate. Review after 3 months for efficacy.",
+        "report": "LITERATURE SEARCH: Anti-CGRP Monoclonal Antibodies for Migraine Prevention\n\nEVIDENCE BASE:\n1. ERENUMAB (AMG 334 — Aimovig): Anti-CGRP receptor; 70 or 140 mg SC monthly; STRIVE trial: 50% reduction in monthly migraine days vs 27% placebo (p<0.001)\n2. FREMANEZUMAB (TEV-48125 — Ajovy): Anti-CGRP ligand; 225 mg SC monthly or 675 mg quarterly; similar efficacy\n3. GALCANEZUMAB (LY2951742 — Emgality): Anti-CGRP ligand; 120 mg SC monthly; EVOLVE trials show consistent efficacy\n4. EPTINEZUMAB (IV): Quarterly IV infusion; rapid onset\n5. CARDIOVASCULAR SAFETY: CGRP has vasodilatory properties; theoretical concern for patients with hypertension or ischemic heart disease; no significant cardiovascular safety signals in large trials to date\n6. INDICATIONS: Episodic migraine ≥4 days/month OR chronic migraine (≥15 days/month)\n7. ELIGIBILITY: Anti-CGRP agents are indicated for episodic migraine ≥4 days/month after ≥2 prior preventive medication trials; published guidelines specify criteria including documented treatment failures.\n\nCONCLUSION: Anti-CGRP monoclonal antibodies represent a well-evidenced preventive option in patients meeting the indicated criteria; cardiovascular safety profile is favourable in published trial populations to date.",
         "summary": "Erenumab 70 mg SC monthly appropriate after 2 failed preventive medications; 50% attack reduction in RCTs"
       }
     },
@@ -219,7 +251,7 @@
       "trigger_action": "request_mra_head_neck",
       "tool_name": "order_advanced_imaging",
       "output": {
-        "modality": "",
+        "modality": "MRA",
         "tracer_or_protocol": null,
         "findings": [
           {
@@ -227,7 +259,7 @@
           }
         ],
         "quantitative_data": null,
-        "impression": "Normal MRA; prior TIA definitively excluded",
+        "impression": "Normal intracranial and extracranial MRA. No stenosis, aneurysm, AVM, or dissection identified.",
         "recommended_actions": []
       }
     },
@@ -235,8 +267,8 @@
       "trigger_action": "check_erenumab_interactions",
       "tool_name": "check_drug_interactions",
       "output": {
-        "report": "DRUG INTERACTION REVIEW — ERENUMAB\n\nErenumab (anti-CGRP receptor monoclonal antibody):\n  - Drug interactions: Minimal; biologic drug with no significant pharmacokinetic interactions with sumatriptan or naproxen\n  - Can be co-administered with acute triptans; no serotonin syndrome risk\n  - Constipation: Most common side effect (3-4%)\n  - Injection site reactions: Minor\n  - Cardiovascular: No significant events in trials; CGRP vasodilation role theoretically relevant but no clinical signals\n  - Pregnancy: Avoid (insufficient data); patient has IUD — appropriate\n\nCONCLUSION: Erenumab 70 mg SC monthly. First injection can be given today. Next injection in 28 days. Reassess at 3 months.",
-        "summary": "Erenumab safe; minimal drug interactions; start 70 mg SC monthly; reassess at 3 months"
+        "report": "DRUG INTERACTION REVIEW — ERENUMAB\n\nErenumab (anti-CGRP receptor monoclonal antibody):\n  - Drug interactions: Minimal; biologic drug with no significant pharmacokinetic interactions with sumatriptan or naproxen\n  - Can be co-administered with acute triptans; no serotonin syndrome risk\n  - Constipation: Most common side effect (3-4%)\n  - Injection site reactions: Minor\n  - Cardiovascular: No significant events in trials; CGRP vasodilation role theoretically relevant but no clinical signals\n  - Pregnancy: Avoid (insufficient data); patient has IUD — appropriate\n\nCONCLUSION: No clinically significant pharmacokinetic interactions identified between erenumab and the reviewed co-medications. Standard monitoring for injection-site reactions and constipation applies per prescribing information.",
+        "summary": "Erenumab: minimal drug interactions with sumatriptan and naproxen; standard injection-site and constipation monitoring applies"
       }
     },
     {
@@ -265,11 +297,78 @@
         "ejection_fraction": null,
         "wall_motion": null,
         "findings": [
-          "BUBBLE ECHOCARDIOGRAM\n\nFindings: Small PFO detected (4-5 microbubbles crossing to left atrium on Valsalva). Normal cardiac structure. EF 62%.\n\nNOTE: Small PFO in migraine with aura. No prior stroke history. PFO closure NOT indicated for migraine alone (PREMIUM/MIST trials negative). No antiplatelet therapy change needed."
+          "BUBBLE ECHOCARDIOGRAM\n\nFindings: Small patent foramen ovale detected — 4-5 microbubbles crossing to the left atrium on Valsalva manoeuvre. Normal cardiac structure. EF 62%. No wall motion abnormality.\n\nIMPRESSION: Small patent foramen ovale. Normal biventricular size and systolic function. Clinical correlation recommended."
         ],
-        "impression": "Small PFO detected; closure NOT indicated without prior cryptogenic stroke; migraine management unchanged",
+        "impression": "Small patent foramen ovale. Normal biventricular size and systolic function. Clinical correlation recommended.",
         "recommended_actions": []
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": {
+      "classification": "normal",
+      "background": {
+        "pdr": "9-10 Hz posterior dominant rhythm, symmetric and reactive",
+        "sleep_features": "normal vertex waves and sleep spindles",
+        "overall": "normal organisation for age"
+      },
+      "findings": [],
+      "artifacts": [],
+      "activating_procedures": {},
+      "impression": "Normal awake and drowsy EEG. No epileptiform discharges and no focal slowing.",
+      "limitations": "",
+      "recommended_actions": []
+    },
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "echo": null,
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Predominant sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 52,
+        "max": 114,
+        "average": 68
+      },
+      "events": [],
+      "findings": [
+        "Brief runs of asymptomatic sinus tachycardia. No sustained arrhythmia, no pauses greater than 2 seconds, no AV block."
+      ],
+      "impression": "24-hour Holter monitor with only benign findings.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": null,
+    "specialized_test": {
+      "test_type": "Neurodiagnostic assessment",
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "Study within normal limits. No abnormality identified; non-contributory.",
+      "recommended_actions": []
+    },
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

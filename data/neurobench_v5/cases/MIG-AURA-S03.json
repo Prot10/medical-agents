@@ -39,21 +39,21 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert; oriented. Normal cognition.",
+      "cranial_nerves": "Normal cranial nerves. Visual fields full by confrontation. PERRLA. No papilledema.",
+      "motor": "Motor strength 5/5 throughout. No pronator drift.",
+      "sensory": "Sensation intact to light touch and pinprick throughout.",
+      "reflexes": "DTR 2+ symmetric. Plantar responses flexor bilaterally.",
+      "coordination": "Finger-nose and heel-shin normal bilaterally.",
+      "gait": "Normal gait. Romberg negative."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
+      "bp_systolic": 110,
+      "bp_diastolic": 68,
       "hr": 72,
-      "temp": 37.0,
-      "rr": 14,
-      "spo2": 98
+      "temp": 36.6,
+      "rr": 13,
+      "spo2": 99
     },
     "history_present_illness": "A 24-year-old Chinese-American woman presented to the neurology clinic for evaluation of recurrent headaches with visual phenomena that started at age 19. She reports that approximately 8-10 times per year, she experiences a small blind spot in the center of her vision that gradually expands over 20-25 minutes into a bright, shimmering, crescent-shaped arc that sweeps to the periphery and then disappears. Following the resolution of the visual phenomenon, she develops a moderate-to-severe unilateral throbbing headache (typically right-sided, 7/10 intensity) with nausea and sensitivity to light, lasting 4-8 hours. She has missed several days of university and now graduate school due to these headaches.\n\nShe notes a significant increase in attack frequency since starting her PhD program 6 months ago, attributing it to stress, irregular sleep, and frequent caffeine intake (3-4 cups coffee daily). Her mother and maternal grandmother both had migraines throughout their reproductive years. She takes over-the-counter ibuprofen which gives partial relief. She has not tried triptans. She is not on oral contraceptives. She had a normal physical examination with her university health provider 4 months ago. She denies any limb weakness, numbness, speech difficulty, loss of consciousness, or any episodes that differ from her typical pattern."
   },
@@ -95,8 +95,8 @@
       {
         "step": 1,
         "action": "Brain MRI to exclude structural cause",
-        "tool_name": null,
-        "expected_finding": "",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Normal brain MRI; no secondary structural cause for visual aura",
         "category": "acceptable",
         "tool_parameters": {
           "contrast": true
@@ -105,8 +105,8 @@
       {
         "step": 2,
         "action": "Laboratory workup including inflammatory markers and antiphospholipid antibodies",
-        "tool_name": null,
-        "expected_finding": "",
+        "tool_name": "interpret_labs",
+        "expected_finding": "All values within normal limits",
         "category": "acceptable",
         "tool_parameters": {
           "lab_type": "headache_workup"
@@ -116,7 +116,7 @@
         "step": 3,
         "action": "Prescribe sumatriptan 100 mg for acute treatment",
         "tool_name": null,
-        "expected_finding": "",
+        "expected_finding": "Clinical assessment and management as per ICHD-3 migraine with aura guidelines",
         "category": "acceptable",
         "tool_parameters": {}
       },
@@ -124,7 +124,7 @@
         "step": 4,
         "action": "Address lifestyle triggers: caffeine taper, sleep schedule",
         "tool_name": null,
-        "expected_finding": "",
+        "expected_finding": "Clinical assessment and management as per ICHD-3 migraine with aura guidelines",
         "category": "acceptable",
         "tool_parameters": {}
       },
@@ -132,7 +132,7 @@
         "step": 5,
         "action": "Initiate preventive therapy if lifestyle modification insufficient — topiramate 25 mg titrating to 50 mg BID",
         "tool_name": null,
-        "expected_finding": "",
+        "expected_finding": "Clinical assessment and management as per ICHD-3 migraine with aura guidelines",
         "category": "acceptable",
         "tool_parameters": {}
       }
@@ -156,8 +156,15 @@
       "Normal MRI excludes structural cause",
       "ICHD-3 criteria clearly met"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "High caffeine intake potentially causing secondary headaches",
+        "location": "patient.history_present_illness",
+        "intended_effect": "High caffeine can cause daily headache and analgesic overuse headache, potentially obscuring migraine diagnosis",
+        "correct_interpretation": "5-year history predates PhD; high caffeine increases frequency but doesn't change the underlying migraine diagnosis; address as modifiable trigger"
+      }
+    ],
+    "icd_code": "G43.1"
   },
   "red_herrings": [
     {
@@ -169,16 +176,35 @@
   "metadata": {
     "condition_name": "Migraine with typical visual aura",
     "difficulty_description": "Straightforward: classic expanding visual aura over 20-25 min, 5-year history, strong family history, normal MRI — ICHD-3 criteria met",
-    "expected_agent_confidence": 0.88
+    "expected_agent_confidence": 0.88,
+    "fallback_tool_kinds": {
+      "csf": "normal",
+      "ct": "incidental",
+      "echo": "normal",
+      "cardiac_monitoring": "normal",
+      "specialized_test": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
-      "findings": [],
+      "findings": [
+        {
+          "type": "normal",
+          "location": "whole brain",
+          "size": null,
+          "signal_characteristics": {
+            "DWI": "no restriction",
+            "FLAIR": "no signal abnormality",
+            "T1": "normal"
+          },
+          "mass_effect": "none",
+          "borders": null
+        }
+      ],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "Normal MRI; one tiny non-specific WMH; no AVM, tumor, or infarction. Clinical correlation recommended.",
+      "impression": "No acute or structural intracranial abnormality. No DWI restriction. No structural lesion, vascular malformation, or demyelinating lesion identified. Normal study. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
@@ -212,7 +238,7 @@
       "trigger_action": "request_mra_head_neck",
       "tool_name": "order_advanced_imaging",
       "output": {
-        "modality": "",
+        "modality": "MRA head and neck",
         "tracer_or_protocol": null,
         "findings": [
           {
@@ -229,14 +255,14 @@
       "tool_name": "search_medical_literature",
       "output": {
         "report": "LITERATURE SEARCH: Caffeine and Migraine\n\nKEY FINDINGS:\n1. CAFFEINE PARADOX: Low-dose caffeine (1 cup/day) can acutely relieve migraine; high daily intake (>400mg) is a migraine trigger and increases analgesic overuse headache risk\n2. CAFFEINE WITHDRAWAL: Abrupt reduction in high caffeine intake causes rebound headaches; gradual taper recommended (25% reduction per week)\n3. MEDICATION OVERUSE HEADACHE: Using analgesics (including ibuprofen) >10-15 days/month can trigger chronic daily headache; assess frequency\n4. RECOMMENDATION: This patient on 3-4 cups coffee daily should taper to 1 cup/day over 4 weeks; ensures consistent morning intake to avoid withdrawal\n5. STRESS + SLEEP: Irregular sleep and PhD stress are known migraine triggers; sleep hygiene counseling essential\n\nCONCLUSION: Reduce caffeine to 1 cup/day gradually; regular sleep schedule; stress management strategies.",
-        "summary": "High caffeine intake (>400mg) is a migraine trigger; recommend gradual taper to 1 cup/day; sleep hygiene"
+        "summary": "Daily caffeine intake above approximately 400 mg is associated with increased migraine frequency; gradual reduction (rather than abrupt cessation) avoids caffeine-withdrawal headache; irregular sleep and psychological stress are recognised migraine triggers"
       }
     },
     {
       "trigger_action": "search_triptan_preventive_options",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "TREATMENT OPTIONS FOR MIGRAINE WITH AURA\n\nACUTE TREATMENT:\n1. Sumatriptan 100 mg at headache onset — first choice (75% response rate); repeat after 2 hours if partial relief\n2. Naproxen sodium 550 mg combination with sumatriptan improves outcome\n\nPREVENTIVE THERAPY (≥4 migraine days/month):\n1. Topiramate 25-100 mg/day — first-line; 50% attack reduction in RCTs; side effects: cognitive, paresthesias, weight loss\n2. Propranolol 40-120 mg/day — first-line; avoid in asthma\n3. Amitriptyline 10-75 mg QHS — first-line if comorbid anxiety/depression\n4. Valproate — effective but avoid in women of childbearing age\n5. CGRP antibodies (erenumab 70mg SC monthly) — newer, well-tolerated; approved for episodic migraine\n\nCONCLUSION: Prescribe sumatriptan; initiate preventive with topiramate given 8-10 attacks/year increasing.",
+        "report": "TREATMENT OPTIONS FOR MIGRAINE WITH AURA\n\nACUTE TREATMENT:\n1. Sumatriptan 100 mg at headache onset — first choice (75% response rate); repeat after 2 hours if partial relief\n2. Naproxen sodium 550 mg combination with sumatriptan improves outcome\n\nPREVENTIVE THERAPY (≥4 migraine days/month):\n1. Topiramate 25-100 mg/day — first-line; 50% attack reduction in RCTs; side effects: cognitive, paresthesias, weight loss\n2. Propranolol 40-120 mg/day — first-line; avoid in asthma\n3. Amitriptyline 10-75 mg QHS — first-line if comorbid anxiety/depression\n4. Valproate — effective but avoid in women of childbearing age\n5. CGRP antibodies (erenumab 70mg SC monthly) — newer, well-tolerated; approved for episodic migraine\n\nCONCLUSION: Sumatriptan has an established evidence base as first-line acute therapy for migraine attacks; multiple first-line preventive agents with Level A evidence are available; selection depends on comorbidities and tolerability per individual clinical assessment.",
         "summary": "Sumatriptan first-line acute; topiramate or propranolol preventive; CGRP monoclonal antibodies alternative"
       }
     },
@@ -257,8 +283,7 @@
         "findings": [],
         "artifacts": [],
         "activating_procedures": {},
-        "confidence": 0.0,
-        "impression": "Normal EEG; no occipital epileptiform activity; visual aura is migraine not seizure. Clinical correlation recommended.",
+        "impression": "This is a NORMAL EEG. No epileptiform discharges. No occipital spike or sharp-wave activity. No electrographic seizures recorded. Clinical correlation recommended.",
         "limitations": "",
         "recommended_actions": [
           "Clinical correlation recommended."
@@ -274,5 +299,87 @@
         "abnormal_values_summary": []
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": null,
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [
+        {
+          "type": "calcification",
+          "location": "right frontal lobe",
+          "size": "3 mm",
+          "density": "hyperdense",
+          "description": "calcified focus consistent with an old, benign granuloma"
+        }
+      ],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. Incidental calcified granuloma, benign.",
+      "recommended_actions": []
+    },
+    "echo": {
+      "chambers": {
+        "LV": "normal size and systolic function",
+        "RV": "normal size and function",
+        "LA": "normal size",
+        "RA": "normal size"
+      },
+      "valves": {
+        "mitral": "structurally normal",
+        "aortic": "structurally normal",
+        "tricuspid": "normal",
+        "pulmonic": "normal"
+      },
+      "ejection_fraction": 66.0,
+      "wall_motion": "no regional wall-motion abnormality",
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": []
+    },
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 53,
+        "max": 131,
+        "average": 82
+      },
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "impression": "Normal 24-hour Holter monitor.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": null,
+    "specialized_test": {
+      "test_type": "general_neurodiagnostic_assessment",
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "Study within normal limits. No abnormality identified; non-contributory.",
+      "recommended_actions": []
+    },
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

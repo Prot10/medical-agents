@@ -14,10 +14,12 @@
       "No prior autoimmune diagnosis",
       "No prior neurological diagnosis"
     ],
-    "patient_id": "UNKNOWN",
+    "patient_id": "MG-RS15",
     "demographics": {
       "age": 53,
-      "sex": "female"
+      "sex": "female",
+      "handedness": "right",
+      "bmi": 23.6
     },
     "clinical_history": {
       "medications": [
@@ -43,24 +45,28 @@
       "social_history": {
         "note": "English language teacher; married; two adult children; non-smoker; non-drinker; physically active"
       },
-      "past_medical_history": []
+      "past_medical_history": [
+        "Chronic constipation (slow transit, longstanding)",
+        "No prior autoimmune diagnosis",
+        "No prior neurological diagnosis"
+      ]
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert; oriented x3. No cognitive impairment.",
+      "cranial_nerves": "Speech: low volume, slow rate, normal articulation and resonance. Palate elevation symmetric but mildly weak. Gag reflex intact. No tongue weakness, no fasciculations. Sustained vowel production: progressive volume decrement over 15-20 seconds. No ptosis. No diplopia. Normal extraocular movements. Cogan lid twitch negative.",
+      "motor": "Limb strength 5/5 throughout. No fasciculations.",
+      "sensory": "Sensation intact.",
+      "reflexes": "DTR 2+ symmetric.",
+      "coordination": "Coordination normal. Normal gait and tandem walk.",
+      "gait": "Normal gait and tandem walk."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
-      "hr": 72,
-      "temp": 37.0,
+      "bp_systolic": 118,
+      "bp_diastolic": 74,
+      "hr": 74,
+      "temp": 36.6,
       "rr": 14,
-      "spo2": 98
+      "spo2": 99
     },
     "history_present_illness": "A 53-year-old Sri Lankan woman presented to the neurology ward with a 15-day history of progressive reduction in voice quality. She described her voice as initially having reduced tone and texture, likening it to sounding 'pressed' and 'soft.' The voice was markedly better upon waking in the morning and feeble but intelligible through the first half of the day, degrading to near-inaudibility by evening. Her husband could not hear her speaking from across the room by dinner time. She denied choking, coughing, aspiration, throat discomfort, or pain. She had a long-standing history of constipation attributed to slow bowel transit but was otherwise healthy. She did not smoke, did not drink alcohol, and had no family history of chronic illness or neurological disease.\n\nShe had been seen by an otolaryngology service as an outpatient; laryngoscopy showed no laryngeal pathology, and empirical treatment offered there produced no improvement. She presented to neurology with the ENT referral noting 'no structural cause identified.'\n\nOn examination, vital signs were normal. She was alert and conversational at baseline (morning examination). Neurological examination was entirely normal: muscle strength 5/5 on the Medical Research Council scale across all tested groups, normal gait, tandem walk intact, gag reflex intact, all cranial nerves functional, and normal deep tendon reflexes bilaterally. Speech articulation was intact with normal tone and resonance, but markedly reduced volume and speech rate. Palate elevation was slightly weak but symmetric. Sustained speech testing over 2 minutes produced progressive reduction in volume from already soft baseline. A sustained 'ahh' for 20 seconds produced progressive volume decrement."
   },
@@ -184,8 +190,27 @@
       "Constipation history is an incidental benefit — pyridostigmine increases GI motility",
       "RNS decrement in cranial muscles (nasalis, orbicularis) confirms NMJ dysfunction"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Chronic constipation raising concern for autonomic dysfunction or Parkinson's pre-motor symptoms",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Constipation is a pre-motor feature of Parkinson's disease; combined with progressive voice changes, PD is considered",
+        "correct_interpretation": "Constipation is longstanding and unrelated; fatigable voice with diurnal variation and positive neostigmine confirm MG, not PD"
+      },
+      {
+        "data_point": "Normal neurological examination raising concern for functional disorder",
+        "location": "patient.history_present_illness",
+        "intended_effect": "No weakness, no ptosis, entirely normal neurological exam might suggest functional hypophonia",
+        "correct_interpretation": "Isolated pharyngeal MG can present with minimal exam findings at rest; fatigable nature on sustained speech testing and positive neostigmine confirm organic NMJ disorder"
+      },
+      {
+        "data_point": "ENT referral with no structural laryngeal pathology",
+        "location": "patient.chief_complaint",
+        "intended_effect": "Normal laryngoscopy might suggest functional or psychological voice disorder",
+        "correct_interpretation": "Normal laryngoscopy in MG is expected — NMJ dysfunction affects vocal cord muscle function without structural change"
+      }
+    ],
+    "icd_code": "G70.01"
   },
   "red_herrings": [
     {
@@ -211,7 +236,14 @@
     "generation_method": "real_case_seed",
     "condition_name": "Myasthenia gravis presenting as isolated progressive hypophonia",
     "difficulty_description": "Straightforward: diurnal fatigable hypophonia + normal laryngoscopy + positive neostigmine test + AChR antibody = MG; classic presentation of isolated laryngeal MG",
-    "expected_agent_confidence": 0.83
+    "expected_agent_confidence": 0.83,
+    "fallback_tool_kinds": {
+      "eeg": "normal",
+      "csf": "normal",
+      "echo": "normal",
+      "cardiac_monitoring": "normal",
+      "advanced_imaging": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
@@ -220,7 +252,6 @@
       "additional_observations": [],
       "impression": "Normal brain and spine MRI; no structural cause for hypophonia. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
@@ -229,8 +260,12 @@
     "ecg": {
       "rhythm": "sinus rhythm",
       "rate": 72,
-      "intervals": {},
-      "axis": "",
+      "intervals": {
+        "QTc": "406 ms",
+        "PR": "162 ms",
+        "QRS": "88 ms"
+      },
+      "axis": "normal",
       "findings": [
         "ELECTROCARDIOGRAM\n\nRHYTHM: Sinus rhythm 72 bpm\nQTc: 406 ms\nINTERPRETATION: Normal ECG.\n\nCONCLUSION: Normal."
       ],
@@ -263,14 +298,14 @@
       "trigger_action": "request_neostigmine_challenge",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "",
+        "test_type": "Neostigmine challenge",
         "findings": [
           {
-            "description": "NEOSTIGMINE CHALLENGE TEST\n\nIndication: Suspected MG — pharmacological test for cholinesterase inhibitor responsiveness\n\nPROCEDURE: Neostigmine 1.5 mg IM administered at 14:30 (afternoon — when patient's voice is at nadir). Atropine 0.6 mg IM co-administered to block muscarinic side effects. Baseline voice volume: near inaudible, speech rate slow.\n\nRESPONSE:\n  15 minutes post-injection: Mild voice improvement noted\n  30 minutes post-injection: Marked voice improvement — patient able to speak at near-normal volume\n  45 minutes: Patient reports 'I can hear myself for the first time in 2 weeks'\n  60 minutes: Voice improvement maintained; no significant muscarinic side effects\n  Duration: Improvement lasted approximately 2.5 hours\n\nCONCLUSION: Unequivocal positive neostigmine response. Rapid, dramatic improvement in voice volume after cholinesterase inhibitor strongly supports MG. Proceed to confirmatory AChR antibody testing."
+            "description": "NEOSTIGMINE CHALLENGE TEST\n\nIndication: Evaluation of fatigable hypophonia\n\nPROCEDURE: Neostigmine 1.5 mg IM administered at 14:30. Atropine 0.6 mg IM co-administered to block muscarinic side effects. Baseline voice volume: near inaudible, speech rate slow.\n\nRESPONSE:\n  15 minutes post-injection: Mild voice improvement noted\n  30 minutes post-injection: Marked voice improvement — patient able to speak at near-normal volume\n  45 minutes: Improvement maintained\n  60 minutes: Voice improvement sustained; no significant muscarinic side effects\n  Duration: Improvement lasted approximately 2.5 hours\n\nIMPRESSION: Positive pharmacological response — marked improvement in voice volume following cholinesterase inhibitor administration. Findings are consistent with a cholinesterase inhibitor-responsive disorder of neuromuscular transmission. Clinical correlation recommended."
           }
         ],
         "quantitative_data": null,
-        "impression": "Positive neostigmine challenge — near-complete voice restoration 30-45 minutes post-injection; confirms NMJ dysfunction",
+        "impression": "Positive neostigmine challenge — near-complete voice restoration 30–45 minutes post-injection; consistent with a cholinesterase inhibitor-responsive disorder of neuromuscular transmission. Clinical correlation recommended.",
         "recommended_actions": []
       }
     },
@@ -278,23 +313,50 @@
       "trigger_action": "request_mg_antibodies",
       "tool_name": "interpret_labs",
       "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": []
+        "panels": {
+          "MG_antibody_panel": [
+            {
+              "test": "AChR binding antibody",
+              "value": "1.11 nmol/L",
+              "reference_range": "< 0.4 nmol/L",
+              "is_abnormal": true,
+              "unit": "nmol/L"
+            },
+            {
+              "test": "AChR blocking antibody",
+              "value": "0.3 nmol/L",
+              "reference_range": "< 25%",
+              "is_abnormal": true,
+              "unit": "nmol/L"
+            },
+            {
+              "test": "Anti-MuSK antibody",
+              "value": "< 0.4 nmol/L (negative)",
+              "reference_range": "< 0.4 nmol/L",
+              "is_abnormal": false,
+              "unit": "nmol/L"
+            }
+          ]
+        },
+        "interpretation": "AChR binding antibody elevated at 1.11 nmol/L (reference < 0.4 nmol/L). AChR blocking antibody positive. Anti-MuSK antibody negative. Anti-acetylcholine receptor antibodies are found in a subset of patients with neuromuscular junction disorders; a positive result is associated with autoimmune neuromuscular junction disease. Clinical correlation recommended.",
+        "abnormal_values_summary": [
+          "AChR binding antibody 1.11 nmol/L (ref <0.4 nmol/L) — elevated",
+          "AChR blocking antibody positive"
+        ]
       }
     },
     {
       "trigger_action": "request_repetitive_stimulation",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "",
+        "test_type": "Repetitive nerve stimulation",
         "findings": [
           {
-            "description": "REPETITIVE NERVE STIMULATION\n\nTECHNIQUE: 3 Hz RNS at nasalis and orbicularis oculi; abductor digiti minimi\n\nRESULTS:\n  Nasalis: Decrement 13% [>10% abnormal] ABNORMAL\n  Orbicularis oculi: Decrement 11% ABNORMAL\n  Abductor digiti minimi: Decrement 4% NORMAL\n\nCONCLUSION: Abnormal decremental response in cranial muscles confirms NMJ dysfunction with pharyngeal/laryngeal predominance. Consistent with MG."
+            "description": "REPETITIVE NERVE STIMULATION\n\nTECHNIQUE: 3 Hz RNS at nasalis and orbicularis oculi; abductor digiti minimi\n\nRESULTS:\n  Nasalis: Decrement 13% [>10% abnormal] ABNORMAL\n  Orbicularis oculi: Decrement 11% ABNORMAL\n  Abductor digiti minimi: Decrement 4% NORMAL\n\nIMPRESSION: Abnormal decremental responses in cranial muscles with preserved distal limb NMJ function, consistent with a disorder of neuromuscular transmission with cranial predominance. Clinical correlation recommended."
           }
         ],
         "quantitative_data": null,
-        "impression": "RNS: 13% decrement nasalis, 11% orbicularis — NMJ dysfunction in cranial muscles; consistent with MG",
+        "impression": "RNS: 13% decrement nasalis, 11% orbicularis — abnormal decremental pattern in cranial muscles, consistent with a disorder of neuromuscular transmission. Clinical correlation recommended.",
         "recommended_actions": []
       }
     },
@@ -302,8 +364,25 @@
       "trigger_action": "request_pulmonary_function",
       "tool_name": "interpret_labs",
       "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
+        "panels": {
+          "Pulmonary_function": [
+            {
+              "test": "NIF (Negative Inspiratory Force)",
+              "value": "-74 cm H2O",
+              "reference_range": "< -60 cm H2O",
+              "is_abnormal": false,
+              "unit": "cm H2O"
+            },
+            {
+              "test": "FVC % predicted",
+              "value": "94%",
+              "reference_range": "> 80%",
+              "is_abnormal": false,
+              "unit": "%"
+            }
+          ]
+        },
+        "interpretation": "Pulmonary function adequate. NIF -74 cm H2O (reference < -60 cm H2O — meets threshold for adequate respiratory reserve). FVC 94% predicted. No immediate respiratory compromise.",
         "abnormal_values_summary": []
       }
     },
@@ -311,19 +390,112 @@
       "trigger_action": "search_hypophonia_mg",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Isolated Hypophonia as MG Presentation\n\nKEY FINDINGS:\n1. MG LARYNGEAL PRESENTATION: Isolated voice change (hypophonia) as the first and sole symptom of MG is rare but documented; laryngoscopy typically normal (no structural pathology)\n2. TYPICAL PATTERN: Hypophonia with preserved articulation, worse in afternoons and with sustained speech — distinguishes MG from Parkinson's hypophonia (which is monotone, not fatigable)\n3. NEOSTIGMINE TEST: High sensitivity for bulbar MG; positive response is diagnostic-grade evidence\n4. PARKINSON'S HYPOPHONIA: Monotone, non-fatigable, progressive; responds to levodopa; no NMJ dysfunction on RNS\n5. MOTOR NEURON DISEASE: Bulbar MND has fasciculations, atrophy, progressive course; no RNS decrement\n6. CONSTIPATION IN MG: Associated with pyridostigmine use (GI motility side effect) which may actually help this patient's constipation\n\nCONCLUSION: Isolated hypophonia is a recognized MG presentation requiring low threshold for AChR antibody testing and neostigmine challenge.",
-        "summary": "Isolated hypophonia with diurnal pattern is a rare but valid MG presentation; neostigmine challenge and AChR antibody are key tests",
-        "query": "",
-        "results": []
+        "query": "search hypophonia mg",
+        "results": [
+          {
+            "title": "Clinical literature",
+            "content": "LITERATURE SEARCH: Isolated Hypophonia as a Presentation of Neuromuscular Junction Disease\n\nKEY FINDINGS:\n1. LARYNGEAL NMJ DISEASE: Isolated voice change (hypophonia) as the first and sole symptom is a rare but documented presentation of neuromuscular junction disease; laryngoscopy typically shows no structural laryngeal pathology.\n2. TYPICAL PATTERN: Hypophonia with preserved articulation, worse in the afternoon and with sustained speech — a pattern distinct from hypokinetic dysarthria in Parkinson's disease (monotone, non-fatigable, progressive).\n3. NEOSTIGMINE TEST: A positive response is consistent with cholinesterase inhibitor-responsive NMJ dysfunction and supports further workup.\n4. PARKINSON'S HYPOPHONIA: Monotone, non-fatigable; typically does not show decremental RNS pattern.\n5. MOTOR NEURON DISEASE: Bulbar onset causes progressive fasciculations, atrophy; does not typically produce decremental RNS response."
+          }
+        ],
+        "summary": "Isolated hypophonia with diurnal fatigable pattern is a rare presentation of NMJ disease; neostigmine challenge and AChR antibody testing are key diagnostic steps."
       }
     },
     {
       "trigger_action": "check_pyridostigmine_constipation",
       "tool_name": "check_drug_interactions",
       "output": {
-        "report": "DRUG INTERACTION REVIEW — PYRIDOSTIGMINE AND CONSTIPATION\n\nQuery: Effect of pyridostigmine on GI motility in patient with chronic constipation\n\nFINDINGS:\n  PYRIDOSTIGMINE (AChE inhibitor) GI EFFECTS:\n  - Increases GI motility via muscarinic stimulation\n  - Common side effects: diarrhea, increased bowel movements, abdominal cramping\n  - In a patient with chronic constipation: this effect is potentially BENEFICIAL\n  - Starting dose: 30 mg q6h to minimize GI side effects; titrate to 60 mg q4-6h as tolerated\n  - Monitor for excessive GI motility (diarrhea, cramping); if excessive, reduce dose\n\nCONCLUSION: Pyridostigmine's GI pro-motility effect is incidentally beneficial for this patient's constipation. Start at lower dose to balance GI effects.",
-        "summary": "Pyridostigmine will increase GI motility — incidentally beneficial for constipation; start at 30 mg to titrate"
+        "proposed": "check_pyridostigmine_constipation",
+        "interactions": [
+          "DRUG INTERACTION REVIEW — PYRIDOSTIGMINE AND GASTROINTESTINAL MOTILITY\n\nQuery: Effect of pyridostigmine on GI motility\n\nFINDINGS:\n  PYRIDOSTIGMINE (acetylcholinesterase inhibitor) GI EFFECTS:\n  - Increases GI motility via muscarinic stimulation (pro-motility effect)\n  - Common dose-related side effects: increased bowel movements, abdominal cramping, diarrhea\n  - In patients with pre-existing constipation, this pro-motility effect may improve bowel habits\n  - GI side effects are dose-dependent; starting at lower doses and titrating reduces this effect\n  - Excessive GI motility can be managed with dose reduction or anticholinergic co-therapy (e.g., glycopyrrolate)"
+        ],
+        "contraindications": [],
+        "warnings": [
+          "Pyridostigmine increases GI motility (muscarinic pro-motility effect); dose-related GI side effects are common; may improve constipation; start at lower dose and titrate."
+        ],
+        "formulary_status": "on formulary",
+        "alternatives": []
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": {
+      "classification": "normal",
+      "background": {
+        "pdr": "9-10 Hz posterior dominant rhythm, symmetric and reactive",
+        "sleep_features": "normal vertex waves and sleep spindles",
+        "overall": "normal organisation for age"
+      },
+      "findings": [],
+      "artifacts": [],
+      "activating_procedures": {},
+      "impression": "Normal awake and drowsy EEG. No epileptiform discharges and no focal slowing.",
+      "limitations": "",
+      "recommended_actions": []
+    },
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": null,
+    "echo": {
+      "chambers": {
+        "LV": "normal size and systolic function",
+        "RV": "normal size and function",
+        "LA": "normal size",
+        "RA": "normal size"
+      },
+      "valves": {
+        "mitral": "structurally normal",
+        "aortic": "structurally normal",
+        "tricuspid": "normal",
+        "pulmonic": "normal"
+      },
+      "ejection_fraction": 60.0,
+      "wall_motion": "no regional wall-motion abnormality",
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": []
+    },
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 50,
+        "max": 115,
+        "average": 81
+      },
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "impression": "Normal 24-hour Holter monitor.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": {
+      "modality": "MRA head and neck",
+      "tracer_or_protocol": null,
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "No abnormality identified on advanced imaging. Findings are non-contributory; clinical correlation recommended.",
+      "recommended_actions": []
+    },
+    "specialized_test": null,
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

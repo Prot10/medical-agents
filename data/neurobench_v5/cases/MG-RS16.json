@@ -15,10 +15,12 @@
       "Arterial hypertension",
       "Mild cervical spondylosis on prior imaging"
     ],
-    "patient_id": "UNKNOWN",
+    "patient_id": "MG-RS16",
     "demographics": {
       "age": 73,
-      "sex": "male"
+      "sex": "male",
+      "handedness": "right",
+      "bmi": 27.7
     },
     "clinical_history": {
       "medications": [
@@ -56,24 +58,29 @@
       "social_history": {
         "note": "Retired engineer; non-smoker; non-drinker; lives with wife; minimally active due to neck drop symptoms"
       },
-      "past_medical_history": []
+      "past_medical_history": [
+        "Type 2 diabetes mellitus",
+        "Coronary artery disease (managed conservatively)",
+        "Arterial hypertension",
+        "Mild cervical spondylosis on prior imaging"
+      ]
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert; MMSE 28/30. No significant cognitive impairment. Hypomimia.",
+      "cranial_nerves": "No ptosis. No diplopia. Full extraocular movements. Hypomimia. No facial weakness.",
+      "motor": "Neck extensors: 2/5 bilaterally (profound weakness — cannot maintain head against gravity). All other muscle groups: 5/5. No fasciculations. Mild bilateral bradykinesia. Asymmetric rigidity (right > left).",
+      "sensory": "Sensation intact throughout.",
+      "reflexes": "DTR 2+ symmetric.",
+      "coordination": "Coordination intact.",
+      "gait": "Slightly shuffling gait with mild festination."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
-      "hr": 72,
+      "bp_systolic": 140,
+      "bp_diastolic": 82,
+      "hr": 70,
       "temp": 37.0,
-      "rr": 14,
-      "spo2": 98
+      "rr": 15,
+      "spo2": 97
     },
     "history_present_illness": "A 73-year-old man presented to the neurology ward with a several-month history of progressive neck flexion weakness and an inability to hold his head upright. He described a gradual worsening of head drop over approximately 4 months such that he needed to manually support his chin when seated or walking. He also noted mild dysphagia for solids and a hoarse, quieter quality to his voice over the past 2 months. He denied ptosis, diplopia, limb weakness, or sensory symptoms. His family history was notable for Parkinson's disease in his father. He did not smoke or drink alcohol and was on no medications prior to admission.\n\nHis past medical history included type 2 diabetes mellitus, coronary artery disease (managed conservatively), and arterial hypertension, as well as mild cervical spondylosis identified on prior imaging. On neurological examination, he was alert with hypomimia, mild bilateral bradykinesia, and asymmetric limb rigidity. There was no ptosis or diplopia. Extraocular movements were full. Strength testing revealed profound 2/5 power in the neck extensor group bilaterally with preserved 5/5 strength in all four limbs, shoulder girdle, and hip girdle muscles. Cognition was intact (MMSE 28/30). Gait was slightly shuffling with mild festination.\n\nBrain and cervical spine MRI studies showed no structural abnormalities — specifically no compressive pathology, no anterior spinal cord compression, and no signal change in the dorsal columns or anterior horn cells. The combination of isolated neck extensor weakness with preserved limb strength was felt to be highly atypical for Parkinson's disease, which prompted dedicated neuromuscular evaluation."
   },
@@ -201,8 +208,27 @@
       "RNS of neck extensors showing 19% decrement is the key electrophysiological finding",
       "AChR antibody 8.0 nmol/L with anti-titin positive in a 73-year-old fits late-onset MG without thymoma"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Parkinson-like features (hypomimia, bradykinesia, rigidity) suggesting antecollis from Parkinson's disease",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Parkinson's antecollis (dropped head from forward flexion) is a known PD complication; combined with family history, PD antecollis is strongly suggested",
+        "correct_interpretation": "PD antecollis is from axial rigidity of anterior neck, not true extensor weakness; 2/5 neck extensors is MG weakness — not PD"
+      },
+      {
+        "data_point": "Cervical spondylosis on MRI",
+        "location": "initial_tool_outputs.mri.impression",
+        "intended_effect": "Cervical spondylosis with neck problems could explain head drop from myelopathy",
+        "correct_interpretation": "No cord compression, no signal change on MRI; myelopathy excluded; spondylosis is an incidental finding"
+      },
+      {
+        "data_point": "Atorvastatin as potential cause of myopathy",
+        "location": "patient.clinical_history.medications",
+        "intended_effect": "Statin myopathy can cause neck weakness; patient is on atorvastatin",
+        "correct_interpretation": "Normal CK (78 U/L); statin myopathy causes myopathic EMG pattern and elevated CK; RNS shows NMJ pattern not myopathic pattern; AChR antibody is diagnostic"
+      }
+    ],
+    "icd_code": "G70.01"
   },
   "red_herrings": [
     {
@@ -228,16 +254,22 @@
     "generation_method": "real_case_seed",
     "condition_name": "Late-onset AChR+ MG presenting as isolated head drop with Parkinson-like comorbidity",
     "difficulty_description": "Straightforward: isolated 2/5 neck extensor weakness with disproportionality to PD features; RNS decrement + AChR antibody 8.0 nmol/L are diagnostic; distinguishing MG weakness from PD antecollis rigidity is the key clinical step",
-    "expected_agent_confidence": 0.84
+    "expected_agent_confidence": 0.84,
+    "fallback_tool_kinds": {
+      "eeg": "normal",
+      "csf": "incidental",
+      "echo": "normal",
+      "cardiac_monitoring": "normal",
+      "advanced_imaging": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
       "findings": [],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "No cervical myelopathy; mild nigral changes (parkinsonism); no structural cause for neck extensor weakness. Clinical correlation recommended.",
+      "impression": "No cervical cord compression or myelopathic signal change. Mild cervical spondylosis without cord contact. Mild reduced nigral signal on susceptibility-weighted imaging. No acute intracranial abnormality. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
@@ -246,8 +278,12 @@
     "ecg": {
       "rhythm": "sinus rhythm",
       "rate": 72,
-      "intervals": {},
-      "axis": "",
+      "intervals": {
+        "QTc": "440 ms",
+        "PR": "162 ms",
+        "QRS": "88 ms"
+      },
+      "axis": "normal",
       "findings": [
         "ELECTROCARDIOGRAM\n\nRHYTHM: Sinus rhythm 68 bpm\nQTc: 440 ms\nINTERPRETATION: Normal sinus rhythm. Mild LVH (hypertension, CAD). No ischemic changes. No arrhythmia.\n\nCONCLUSION: Normal ECG."
       ],
@@ -262,7 +298,7 @@
     "csf": null,
     "ct": {
       "findings": [],
-      "contrast_used": false,
+      "contrast_used": true,
       "angiography_findings": null,
       "additional_observations": [
         "CT CHEST WITH CONTRAST\n\nIndication: Newly suspected MG — thymoma screen\n\nFINDINGS: No anterior mediastinal mass. Thymic involution appropriate for age. No lung mass. No mediastinal adenopathy.\n\nIMPRESSION: Normal chest CT. No thymoma."
@@ -274,14 +310,14 @@
     "cardiac_monitoring": null,
     "advanced_imaging": null,
     "specialized_test": {
-      "test_type": "",
+      "test_type": "Repetitive nerve stimulation",
       "findings": [
         {
-          "description": "REPETITIVE NERVE STIMULATION — NECK EXTENSOR AND CRANIAL NERVE INNERVATED MUSCLES\n\nIndication: Isolated neck extensor weakness; exclude NMJ disorder\n\nTECHNIQUE: 3 Hz RNS at the neck extensor muscle (C2-C4 accessory-cervical innervation), trapezius, and nasalis\n\nRESULTS:\n  Neck extensor: Reduction in compound muscle action potential amplitude and area between 1st and 4th stimuli: 19% decrement ABNORMAL\n  Trapezius: Decrement 16% ABNORMAL\n  Nasalis: Decrement 12% ABNORMAL\n  Abductor digiti minimi (ulnar): Decrement 5% NORMAL\n\nNEEDLE EMG: No fibrillations, no fasciculations, no myopathic changes in neck extensors or limb muscles.\n\nCONCLUSION: Abnormal decremental response in neck extensor and proximal cranial muscles with normal distal limb muscles. Pattern consistent with generalized MG with preferential neck extensor involvement. No myopathic features on needle EMG."
+          "description": "REPETITIVE NERVE STIMULATION — NECK EXTENSOR AND CRANIAL NERVE INNERVATED MUSCLES\n\nIndication: Isolated neck extensor weakness; exclude NMJ disorder\n\nTECHNIQUE: 3 Hz RNS at the neck extensor muscle (C2-C4 accessory-cervical innervation), trapezius, and nasalis\n\nRESULTS:\n  Neck extensor: Reduction in compound muscle action potential amplitude and area between 1st and 4th stimuli: 19% decrement ABNORMAL\n  Trapezius: Decrement 16% ABNORMAL\n  Nasalis: Decrement 12% ABNORMAL\n  Abductor digiti minimi (ulnar): Decrement 5% NORMAL\n\nNEEDLE EMG: No fibrillations, no fasciculations, no myopathic changes in neck extensors or limb muscles.\n\nCONCLUSION: Abnormal decremental response in neck extensor and proximal cranial muscles with normal distal limb muscles. Pattern consistent with a disorder of neuromuscular transmission with proximal and cranial predominance. No myopathic features on needle EMG. Clinical correlation recommended."
         }
       ],
       "quantitative_data": null,
-      "impression": "RNS: 19% decrement neck extensors, 16% trapezius, 12% nasalis; normal needle EMG — MG pattern with neck predominance confirmed",
+      "impression": "RNS: 19% decrement neck extensors, 16% trapezius, 12% nasalis; normal needle EMG — abnormal decremental pattern with proximal and cranial predominance. Consistent with a disorder of neuromuscular transmission. Clinical correlation recommended.",
       "recommended_actions": []
     }
   },
@@ -290,23 +326,49 @@
       "trigger_action": "request_mg_antibodies",
       "tool_name": "interpret_labs",
       "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": []
+        "panels": {
+          "MG_antibody_panel": [
+            {
+              "test": "AChR binding antibody",
+              "value": "8.0 nmol/L",
+              "reference_range": "< 0.4 nmol/L",
+              "is_abnormal": true,
+              "unit": "nmol/L"
+            },
+            {
+              "test": "AChR blocking antibody",
+              "value": "2.4 nmol/L",
+              "reference_range": "< 25%",
+              "is_abnormal": true,
+              "unit": "nmol/L"
+            },
+            {
+              "test": "Anti-MuSK antibody",
+              "value": "< 0.4 nmol/L (negative)",
+              "reference_range": "< 0.4 nmol/L",
+              "is_abnormal": false,
+              "unit": "nmol/L"
+            }
+          ]
+        },
+        "interpretation": "AChR binding antibody markedly elevated at 8.0 nmol/L (reference < 0.4 nmol/L). AChR blocking antibody positive. Anti-MuSK antibody negative. Anti-acetylcholine receptor antibodies are found in a subset of patients with neuromuscular junction disorders; an elevated result is associated with autoimmune neuromuscular junction disease. Clinical correlation recommended.",
+        "abnormal_values_summary": [
+          "AChR binding antibody 8.0 nmol/L (ref <0.4 nmol/L) — markedly elevated"
+        ]
       }
     },
     {
       "trigger_action": "request_sfemg",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "",
+        "test_type": "Single-fiber EMG",
         "findings": [
           {
-            "description": "SINGLE-FIBER EMG — EXTENSOR DIGITORUM COMMUNIS\n\nMCD: 72 µs [normal <35 µs] MARKEDLY ABNORMAL\nBlocking: 26% of potential pairs\n\nCONCLUSION: SFEMG confirms NMJ dysfunction. Consistent with generalized MG."
+            "description": "SINGLE-FIBER EMG — EXTENSOR DIGITORUM COMMUNIS\n\nMCD: 72 µs [normal <35 µs] MARKEDLY ABNORMAL\nBlocking: 26% of potential pairs\n\nCONCLUSION: Markedly increased jitter with blocking is consistent with a disorder of neuromuscular transmission. Clinical correlation recommended."
           }
         ],
         "quantitative_data": null,
-        "impression": "SFEMG: MCD 72 µs with 26% blocking — markedly abnormal; confirms NMJ dysfunction",
+        "impression": "SFEMG: MCD 72 µs with 26% blocking — markedly abnormal; consistent with a disorder of neuromuscular transmission.",
         "recommended_actions": []
       }
     },
@@ -314,18 +376,39 @@
       "trigger_action": "search_head_drop_mg_neck_extensors",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Isolated Neck Extensor Weakness (Head Drop) as MG Presentation\n\nKEY FINDINGS:\n1. DROPPED HEAD SYNDROME: Causes include ALS (bulbar onset), myopathy (isolated neck extensor myopathy, IBM, mitochondrial), Parkinson's disease antecollis, and MG\n2. PARKINSON'S ANTECOLLIS vs MG NECK DROP: PD antecollis is from increased axial tone (rigidity) of anterior cervical muscles, not weakness; true weakness (2/5 neck extensors) is NOT a feature of PD\n3. MG NECK EXTENSOR PREDOMINANCE: Late-onset MG (>60) with anti-AChR or anti-MuSK can preferentially affect neck extensors; head drop is the first presentation in ~2-3% of MG cases\n4. DIAGNOSTIC APPROACH: RNS of neck extensors is more sensitive than limb RNS; AChR antibody is key; response to pyridostigmine is typically positive\n5. CERVICAL MYELOPATHY vs MG NECK DROP: Myelopathy causes cord compression — excluded by normal MRI; MG causes pure muscular weakness without cord pathology\n\nCONCLUSION: MG neck drop is confirmed by RNS, AChR antibody, and absence of myelopathy. Pyridostigmine initiation typically results in significant improvement within days.",
-        "summary": "MG neck drop is a recognized but rare presentation; PD antecollis from rigidity not weakness; RNS neck extensors and AChR antibody are key",
-        "query": "",
-        "results": []
+        "query": "search head drop mg neck extensors",
+        "results": [
+          {
+            "title": "Clinical literature",
+            "content": "LITERATURE SEARCH: Isolated Neck Extensor Weakness (Head Drop) as Neuromuscular Junction Disorder Presentation\n\nKEY FINDINGS:\n1. DROPPED HEAD SYNDROME: Causes include ALS (bulbar onset), myopathy (isolated neck extensor myopathy, IBM, mitochondrial), Parkinson's disease antecollis, and neuromuscular junction disorders\n2. PARKINSON'S ANTECOLLIS vs NEUROMUSCULAR NECK DROP: PD antecollis results from increased axial tone (rigidity) of anterior cervical muscles, not true extensor weakness; isolated neck extensor weakness is not a characteristic feature of Parkinson's disease\n3. NECK EXTENSOR PREDOMINANCE IN NMJ DISEASE: Late-onset NMJ disease (>60) with anti-AChR or anti-MuSK antibodies can preferentially affect neck extensors; head drop as the presenting feature is recognized in a minority of cases\n4. DIAGNOSTIC APPROACH: RNS of neck extensors is more sensitive than limb RNS in cases of cervical predominance; cholinesterase inhibitor trials are reported in the literature as part of the evaluation\n5. CERVICAL MYELOPATHY vs NMJ NECK DROP: Cervical myelopathy requires demonstrable cord compression on MRI; NMJ disorders cause pure muscular weakness without cord signal change"
+          }
+        ],
+        "summary": "MG neck drop is a recognized but rare presentation; PD antecollis from rigidity not weakness; RNS neck extensors and AChR antibody are key"
       }
     },
     {
       "trigger_action": "request_pulmonary_function",
       "tool_name": "interpret_labs",
       "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
+        "panels": {
+          "Pulmonary_function": [
+            {
+              "test": "NIF (Negative Inspiratory Force)",
+              "value": "-64 cm H2O",
+              "reference_range": "< -60 cm H2O",
+              "is_abnormal": false,
+              "unit": "cm H2O"
+            },
+            {
+              "test": "FVC % predicted",
+              "value": "88%",
+              "reference_range": "> 80%",
+              "is_abnormal": false,
+              "unit": "%"
+            }
+          ]
+        },
+        "interpretation": "Pulmonary function adequate. NIF -64 cm H2O (reference < -60 cm H2O — meets threshold for adequate respiratory reserve). FVC 88% predicted. No immediate respiratory compromise.",
         "abnormal_values_summary": []
       }
     },
@@ -333,19 +416,112 @@
       "trigger_action": "check_atorvastatin_mg_interaction",
       "tool_name": "check_drug_interactions",
       "output": {
-        "report": "DRUG INTERACTION REVIEW — ATORVASTATIN AND MG\n\nQuery: Statin myopathy vs MG; interaction of atorvastatin with pyridostigmine\n\nFINDINGS:\n  ATORVASTATIN + MG:\n  - Statins (HMG-CoA reductase inhibitors) can cause myopathy and rhabdomyolysis\n  - CK was normal in this patient (78 U/L) — statin myopathy unlikely\n  - However, statins have also been reported to unmask or exacerbate MG in case reports\n  - Clinical decision: Continue atorvastatin given established CAD benefit; monitor CK\n\n  ATORVASTATIN + PYRIDOSTIGMINE:\n  - No clinically significant pharmacokinetic interaction\n  - Both are safe to co-administer\n\n  ATORVASTATIN + AZATHIOPRINE:\n  - No significant interaction; monitor LFTs when azathioprine is added\n\nCONCLUSION: Continue atorvastatin (CAD indication outweighs theoretical MG risk given normal CK). Monitor CK during initial MG treatment period.",
-        "summary": "Atorvastatin safe to continue (normal CK, CAD indication); no interaction with pyridostigmine; monitor CK"
+        "proposed": "check_atorvastatin_mg_interaction",
+        "interactions": [
+          "DRUG INTERACTION REVIEW — ATORVASTATIN\n\nQuery: Statin myopathy potential in the setting of neuromuscular weakness; interaction of atorvastatin with pyridostigmine and azathioprine\n\nFINDINGS:\n  ATORVASTATIN — MYOPATHY RISK:\n  - Statins (HMG-CoA reductase inhibitors) can cause myopathy and rhabdomyolysis, typically presenting with elevated CK and proximal weakness\n  - Baseline CK should be documented when evaluating new-onset weakness in patients on statins\n  - Published case reports describe statin-associated unmasking or exacerbation of pre-existing neuromuscular junction disease, though causality is not established\n\n  ATORVASTATIN + PYRIDOSTIGMINE:\n  - No clinically significant pharmacokinetic interaction documented in the literature\n\n  ATORVASTATIN + AZATHIOPRINE:\n  - No established clinically significant interaction; hepatic transaminase and CK monitoring is standard when azathioprine is initiated"
+        ],
+        "contraindications": [],
+        "warnings": [
+          "Statin myopathy risk: document baseline CK; statins have been associated with neuromuscular junction disease unmasking in case reports; no pharmacokinetic interaction with pyridostigmine; monitor LFTs when azathioprine is co-prescribed"
+        ],
+        "formulary_status": "on formulary",
+        "alternatives": []
       }
     },
     {
       "trigger_action": "request_mgtx_thymectomy",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: MGTX Trial and Thymectomy in Late-Onset MG\n\nMGTX TRIAL (Wolfe GI et al., NEJM 2016):\n  - Enrolled: AChR+ generalized MG patients 18-65 years\n  - Results: Thymectomy + prednisone significantly better than prednisone alone (lower QMG score, lower prednisone dose, fewer treatment failures)\n  - This patient: Age 73 — exceeds MGTX trial age range of 65\n  - No thymoma: CT chest normal\n  - Expert consensus: Benefit of thymectomy in patients >65 without thymoma is less well established; guidelines recommend case-by-case multidisciplinary decision\n\nCURRENT RECOMMENDATION:\n  - Age 73: MGTX trial evidence is extrapolated — benefit less certain than in <65\n  - Surgical risk in elderly: higher perioperative risk with coronary artery disease\n  - Recommendation: Discuss with thoracic surgery; weigh risk of surgery against expected immunosuppression benefit; initiate pyridostigmine + prednisone first and reassess\n\nCONCLUSION: Thymectomy is not routinely recommended at age 73 without thymoma; initiate medical MG management first.",
-        "summary": "MGTX trial age limit 65; thymectomy less established for age 73 without thymoma; medical management first; multidisciplinary discussion",
-        "query": "",
-        "results": []
+        "query": "request mgtx thymectomy",
+        "results": [
+          {
+            "title": "Clinical literature",
+            "content": "LITERATURE SEARCH: MGTX Trial and Thymectomy in Generalized Neuromuscular Junction Disease\n\nMGTX TRIAL (Wolfe GI et al., NEJM 2016):\n  - Enrolled: AChR antibody-positive generalized MG patients aged 18–65 years\n  - Results: Thymectomy combined with prednisone was associated with significantly better outcomes than prednisone alone (lower QMG score, lower prednisone dose requirement, fewer treatment failures)\n  - The trial explicitly excluded patients older than 65 years\n  - Expert consensus: The benefit of thymectomy in patients older than 65 without thymoma is less well established; society guidelines recommend individualized multidisciplinary assessment\n\nAGE AND THYMECTOMY EVIDENCE:\n  - Surgical risk in elderly patients is higher, particularly in the presence of cardiovascular comorbidity\n  - In the absence of thymoma, the evidence base for thymectomy at age >65 is extrapolated from younger cohorts\n  - Published expert opinion favors individualized case-by-case evaluation including imaging, functional status, and comorbidities"
+          }
+        ],
+        "summary": "MGTX trial age limit 65; thymectomy less established for age 73 without thymoma; medical management first; multidisciplinary discussion"
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": {
+      "classification": "normal",
+      "background": {
+        "pdr": "9-10 Hz posterior dominant rhythm, symmetric and reactive",
+        "sleep_features": "normal vertex waves and sleep spindles",
+        "overall": "normal organisation for age"
+      },
+      "findings": [],
+      "artifacts": [],
+      "activating_procedures": {},
+      "impression": "Normal awake and drowsy EEG. No epileptiform discharges and no focal slowing.",
+      "limitations": "",
+      "recommended_actions": []
+    },
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "17 cm H2O",
+      "cell_count": {
+        "wbc": "3 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "55 mg/dL",
+      "glucose": "61 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Mildly elevated CSF protein, a non-specific finding. Cell count and glucose normal."
+    },
+    "ct": null,
+    "echo": {
+      "chambers": {
+        "LV": "normal size and systolic function",
+        "RV": "normal size and function",
+        "LA": "normal size",
+        "RA": "normal size"
+      },
+      "valves": {
+        "mitral": "structurally normal",
+        "aortic": "structurally normal",
+        "tricuspid": "normal",
+        "pulmonic": "normal"
+      },
+      "ejection_fraction": 65.0,
+      "wall_motion": "no regional wall-motion abnormality",
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": []
+    },
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 51,
+        "max": 122,
+        "average": 79
+      },
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "impression": "Normal 24-hour Holter monitor.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": {
+      "modality": "FDG-PET scan",
+      "tracer_or_protocol": null,
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "No abnormality identified on advanced imaging. Findings are non-contributory; clinical correlation recommended.",
+      "recommended_actions": []
+    },
+    "specialized_test": null,
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

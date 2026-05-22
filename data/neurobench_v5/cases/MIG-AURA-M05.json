@@ -17,7 +17,9 @@
     "patient_id": "UNKNOWN",
     "demographics": {
       "age": 48,
-      "sex": "female"
+      "sex": "female",
+      "handedness": "right",
+      "bmi": 26.0
     },
     "clinical_history": {
       "medications": [
@@ -40,21 +42,21 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert, oriented. Calm and cooperative.",
+      "cranial_nerves": "Normal cranial nerves II-XII. Visual fields full by confrontation. PERRLA. Fundoscopy: normal discs, no papilledema. Normal retinal vessels. Normal extraocular movements.",
+      "motor": "Motor 5/5. No drift.",
+      "sensory": "Sensation intact.",
+      "reflexes": "DTR 2+ symmetric. No Babinski.",
+      "coordination": "Coordination normal.",
+      "gait": "Gait normal."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
-      "hr": 72,
-      "temp": 37.0,
-      "rr": 14,
-      "spo2": 98
+      "bp_systolic": 124,
+      "bp_diastolic": 78,
+      "hr": 70,
+      "temp": 36.6,
+      "rr": 13,
+      "spo2": 99
     },
     "history_present_illness": "A 48-year-old British woman presented to the neurology outpatient clinic concerned about episodes of visual disturbance without headache that have been occurring approximately twice monthly for the past year. She has a 20-year history of migraine with visual aura and headache — typical expanding crescent of shimmering zigzag lights over 20-30 minutes followed by a right-sided throbbing headache. Over the past 12-18 months, her episodes have gradually changed: she still gets the identical visual aura, but the headache that used to follow is now absent or minimal (1-2/10) and brief. She has 2-3 'visual-only' episodes per month.\n\nShe is worried about these episodes because she read that visual disturbances in her age group without headache could be TIA or retinal artery occlusion. She is also perimenopausal — periods are now irregular (every 6-8 weeks) — and has noticed hot flushes. She wonders if the hormonal changes are connected. She has no prior TIA or stroke. She is a non-smoker, normal blood pressure, and recently had a health check which she says was 'all normal.' She is not on any hormone replacement therapy. She had her combined OCP stopped 18 years ago after her migraines were diagnosed. She currently uses paracetamol occasionally when a mild headache follows the aura. Her two adult daughters both have migraines."
   },
@@ -168,8 +170,21 @@
       "HRT in migraine with aura: combined OCP is WHO Category 4; HRT is WHO Category 3 — less restrictive; transdermal route is preferred",
       "Moderate difficulty: recognising the perimenopausal phenotype change and navigating the TIA vs acephalic migraine differentiation"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Visual aura without headache in a 48-year-old",
+        "location": "patient.history_present_illness",
+        "intended_effect": "New visual symptoms without headache in a perimenopausal woman with borderline LDL could represent posterior circulation TIA or retinal artery occlusion",
+        "correct_interpretation": "Identical visual pattern to 20-year migraine history; gradual expansion over 20-30 minutes = CSD; normal DWI/MRA/ophthalmology; acephalic migraine variant emerging with perimenopause"
+      },
+      {
+        "data_point": "Elevated FSH and low oestradiol raising concern about HRT safety",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Combined OCP is contraindicated in migraine with aura — does the same apply to HRT?",
+        "correct_interpretation": "HRT is WHO Category 3 (not Category 4) in migraine with aura — less restrictive; transdermal oestrogen is considered safer than oral HRT; shared decision-making appropriate"
+      }
+    ],
+    "icd_code": "G43.1"
   },
   "red_herrings": [
     {
@@ -186,16 +201,23 @@
   "metadata": {
     "condition_name": "Acephalic migraine (typical aura without headache) — perimenopausal phenotype change and HRT counselling",
     "difficulty_description": "Moderate: established migraine transforming to acephalic variant in perimenopause; TIA exclusion mandatory; HRT safety nuance (Category 3 not Category 4, unlike OCP)",
-    "expected_agent_confidence": 0.6
+    "expected_agent_confidence": 0.6,
+    "fallback_tool_kinds": {
+      "eeg": "normal",
+      "csf": "normal",
+      "ct": "normal",
+      "echo": "normal",
+      "cardiac_monitoring": "normal",
+      "drug_interactions": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
       "findings": [],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "See findings above. Clinical correlation recommended.",
+      "impression": "Four non-specific subcortical white matter hyperintensities in bilateral frontal and parietal regions. No restricted diffusion. Normal MRA — no posterior circulation stenosis, AVM, or aneurysm. No occipital mass or enhancing lesion. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
@@ -229,30 +251,44 @@
       "trigger_action": "search_acephalic_migraine_aura_only",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Acephalic Migraine / Migraine Aura Without Headache\n\nKEY FINDINGS:\n1. DEFINITION: 'Typical aura without headache' (ICHD-3 code 1.2.2) — characteristic aura symptoms without subsequent headache; same aura mechanisms (CSD) but headache generation suppressed\n2. EPIDEMIOLOGY: Increasingly common in perimenopausal and postmenopausal women; some women's migraines 'transform' — aura persists but headache diminishes; prevalence increases with age\n3. PERIMENOPAUSE: Declining oestrogen during perimenopause can alter migraine phenotype; many women report headache component diminishing while aura persists; some experience worsening of aura frequency peri-menopausally due to oestrogen fluctuations\n4. RISK: 'Visual aura only' in a woman aged >45 still requires secondary cause exclusion — TIA, retinal artery occlusion, occipital lobe pathology\n5. DIAGNOSTIC REQUIREMENT: Normal DWI, normal MRA, and documentation of identical aura pattern for ≥20 years provides strong diagnosis of acephalic migraine variant\n6. MANAGEMENT: No specific treatment required if aura is brief and non-disabling; consider preventive if frequency/severity concerning\n\nCONCLUSION: This patient has 20-year history of identical visual aura — now acephalic variant emerging with perimenopause. Reassurance is appropriate after normal workup.",
-        "summary": "Typical aura without headache (ICHD-3 1.2.2) is a recognised migraine variant; increasingly common in perimenopause; normal workup required before diagnosis; this patient has 20-year identical aura history"
+        "query": "search_acephalic_migraine_aura_only",
+        "results": [
+          {
+            "title": "Literature review",
+            "abstract": "LITERATURE SEARCH: Acephalic Migraine / Migraine Aura Without Headache\n\nKEY FINDINGS:\n1. DEFINITION: 'Typical aura without headache' (ICHD-3 code 1.2.2) — characteristic aura symptoms without subsequent headache; same aura mechanisms (CSD) but headache generation suppressed\n2. EPIDEMIOLOGY: Increasingly common in perimenopausal and postmenopausal women; some women's migraines 'transform' — aura persists but headache diminishes; prevalence increases with age\n3. PERIMENOPAUSE: Declining oestrogen during perimenopause can alter migraine phenotype; many women report headache component diminishing while aura persists; some experience worsening of aura frequency peri-menopausally due to oestrogen fluctuations\n4. RISK: 'Visual aura only' in a woman aged >45 still requires secondary cause exclusion — TIA, retinal artery occlusion, occipital lobe pathology\n5. DIAGNOSTIC REQUIREMENT: Normal DWI, normal MRA, and documentation of identical aura pattern for ≥20 years provides strong diagnosis of acephalic migraine variant\n6. MANAGEMENT: No specific treatment required if aura is brief and non-disabling; consider preventive if frequency/severity concerning\n\nCONCLUSION: This patient has 20-year history of identical visual aura — now acephalic variant emerging with perimenopause. Reassurance is appropriate after normal workup.",
+            "relevance": "high"
+          }
+        ],
+        "summary": "Typical aura without headache (ICHD-3 1.2.2) is a recognised migraine variant; increasingly common in perimenopausal women; exclusion of secondary causes including TIA and retinal artery occlusion is required before diagnosis."
       }
     },
     {
       "trigger_action": "search_hrt_migraine_aura_perimenopausal",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Hormone Replacement Therapy (HRT) in Perimenopausal Women with Migraine with Aura\n\nKEY FINDINGS:\n1. HRT AND MIGRAINE WITH AURA: Transdermal oestrogen (patch or gel) — WHO Category 3 (uncertain risk in migraine with aura, generally avoid or use with caution)\n2. COMBINED HRT (ORAL): Oral combined HRT contains oestrogen + progestogen; some evidence of increased stroke risk — generally avoided in migraine with aura if possible\n3. PROGESTOGEN-ONLY HRT: Not a typical HRT formulation; vasomotor symptoms require oestrogen\n4. SAFETY PROFILE: If HRT is considered for severe menopausal symptoms, transdermal route preferred (lower thromboembolic risk than oral); lowest effective dose; shared decision making\n5. CURRENT EVIDENCE: No HRT preparation is WHO Category 4 in migraine with aura (unlike combined OCP); transdermal oestrogen is relatively safer than oral combined preparations\n6. RECOMMENDATION: For this patient — menopausal symptoms (hot flushes, etc.) manageable without HRT currently; if HRT required, use transdermal oestrogen patch at lowest dose with specialist input\n\nCONCLUSION: HRT is not contraindicated (unlike combined OCP) but transdermal route preferred if symptoms severe. Discuss with GP when/if HRT considered.",
-        "summary": "HRT is not WHO Category 4 in migraine with aura; if needed, use transdermal route (lower risk); currently not required; discuss with GP if hot flushes become disabling"
+        "query": "search_hrt_migraine_aura_perimenopausal",
+        "results": [
+          {
+            "title": "Literature review",
+            "abstract": "LITERATURE SEARCH: Hormone Replacement Therapy (HRT) in Perimenopausal Women with Migraine with Aura\n\nKEY FINDINGS:\n1. HRT AND MIGRAINE WITH AURA: Transdermal oestrogen (patch or gel) — WHO Category 3 (uncertain risk in migraine with aura, generally avoid or use with caution)\n2. COMBINED HRT (ORAL): Oral combined HRT contains oestrogen + progestogen; some evidence of increased stroke risk — generally avoided in migraine with aura if possible\n3. PROGESTOGEN-ONLY HRT: Not a typical HRT formulation; vasomotor symptoms require oestrogen\n4. SAFETY PROFILE: If HRT is considered for severe menopausal symptoms, transdermal route preferred (lower thromboembolic risk than oral); lowest effective dose; shared decision making\n5. CURRENT EVIDENCE: No HRT preparation is WHO Category 4 in migraine with aura (unlike combined OCP); transdermal oestrogen is relatively safer than oral combined preparations\n6. RECOMMENDATION: For this patient — menopausal symptoms (hot flushes, etc.) manageable without HRT currently; if HRT required, use transdermal oestrogen patch at lowest dose with specialist input\n\nCONCLUSION: HRT is not contraindicated (unlike combined OCP) but transdermal route preferred if symptoms severe. Discuss with GP when/if HRT considered.",
+            "relevance": "high"
+          }
+        ],
+        "summary": "HRT is not WHO Category 4 (unlike combined OCP) in migraine with aura; if HRT is required, transdermal oestrogen is associated with lower thromboembolic risk than oral preparations; shared decision-making with the prescribing clinician is appropriate."
       }
     },
     {
       "trigger_action": "request_ophthalmology_retinal_screen",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "",
+        "test_type": "Electrophysiology",
         "findings": [
           {
-            "description": "URGENT OPHTHALMOLOGY REVIEW (performed at patient's request given visual symptoms)\n\nIndication: Bilateral visual disturbances in perimenopausal woman; visual field assessment and fundoscopy\n\nFINDINGS: Visual acuity: 6/6 bilaterally. Colour vision: normal. Intraocular pressure: 16 mmHg right, 15 mmHg left (normal).\nFundoscopy: Normal disc margins bilaterally. No papilledema. Normal retinal vasculature — no arteriovenous nipping, no cotton wool spots, no haemorrhages. Normal cup-to-disc ratio 0.3 bilaterally.\nGoldmann visual fields: Full fields bilaterally.\n\nCONCLUSION: Normal ophthalmological examination. No retinal artery occlusion. No glaucoma. No disc swelling. Visual symptoms are not ocular in origin."
+            "description": "URGENT OPHTHALMOLOGY REVIEW (performed at patient's request given visual symptoms)\n\nIndication: Bilateral visual disturbances in perimenopausal woman; visual field assessment and fundoscopy\n\nFINDINGS: Visual acuity: 6/6 bilaterally. Colour vision: normal. Intraocular pressure: 16 mmHg right, 15 mmHg left (normal).\nFundoscopy: Normal disc margins bilaterally. No papilledema. Normal retinal vasculature — no arteriovenous nipping, no cotton wool spots, no haemorrhages. Normal cup-to-disc ratio 0.3 bilaterally.\nGoldmann visual fields: Full fields bilaterally.\n\nCONCLUSION: Normal ophthalmological examination. No retinal artery occlusion, glaucoma, or disc swelling identified. Clinical correlation recommended."
           }
         ],
         "quantitative_data": null,
-        "impression": "Normal ophthalmological exam; normal retinal vasculature; normal IOP; full visual fields; symptoms are cortical in origin (migraine CSD), not ocular",
+        "impression": "Normal ophthalmological examination. Visual acuity 6/6 bilaterally. Normal intraocular pressure. Normal retinal vasculature. Full visual fields. No retinal artery occlusion, glaucoma, or disc swelling identified.",
         "recommended_actions": []
       }
     },
@@ -260,7 +296,7 @@
       "trigger_action": "request_mra_posterior_tia_screen",
       "tool_name": "order_advanced_imaging",
       "output": {
-        "modality": "",
+        "modality": "MRA head and neck",
         "tracer_or_protocol": null,
         "findings": [
           {
@@ -268,7 +304,7 @@
           }
         ],
         "quantitative_data": null,
-        "impression": "Normal MRA; no posterior circulation stenosis or vascular lesion",
+        "impression": "Normal MRA head and neck. No posterior circulation stenosis, dissection, or vascular lesion identified.",
         "recommended_actions": []
       }
     },
@@ -285,9 +321,108 @@
       "trigger_action": "search_borderline_ldl_perimenopausal_management",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Lipid Management in Perimenopausal Women\n\nKEY FINDINGS:\n1. OESTROGEN DECLINE: Oestrogen has favourable lipid effects; its decline during menopause typically raises LDL 10-15 mg/dL\n2. LIFESTYLE: Mediterranean diet, regular aerobic exercise (150 min/week), reduced saturated fat — can lower LDL 10-20%\n3. STATIN THRESHOLD: LDL 132 mg/dL with no diabetes, no hypertension, no prior CVD — calculate 10-year QRISK3 to determine statin eligibility\n4. QRISK3 ESTIMATE: Age 48, non-smoker, BP 124/78, no diabetes, LDL 132, no prior CVD — estimated 10-year cardiovascular risk <10%; lifestyle modification first-line\n\nCONCLUSION: Lifestyle modification first-line for LDL 132; calculate QRISK3; statin not immediately indicated.",
-        "summary": "LDL 132 borderline high; lifestyle modification first-line in perimenopause; calculate QRISK3; statin if ≥10% 10-year risk"
+        "query": "search_borderline_ldl_perimenopausal_management",
+        "results": [
+          {
+            "title": "Literature review",
+            "abstract": "LITERATURE SEARCH: Lipid Management in Perimenopausal Women\n\nKEY FINDINGS:\n1. OESTROGEN DECLINE: Oestrogen has favourable lipid effects; its decline during menopause typically raises LDL 10-15 mg/dL\n2. LIFESTYLE: Mediterranean diet, regular aerobic exercise (150 min/week), reduced saturated fat — can lower LDL 10-20%\n3. STATIN THRESHOLD: LDL 132 mg/dL with no diabetes, no hypertension, no prior CVD — calculate 10-year QRISK3 to determine statin eligibility\n4. QRISK3 ESTIMATE: Age 48, non-smoker, BP 124/78, no diabetes, LDL 132, no prior CVD — estimated 10-year cardiovascular risk <10%; lifestyle modification first-line\n\nCONCLUSION: Lifestyle modification first-line for LDL 132; calculate QRISK3; statin not immediately indicated.",
+            "relevance": "high"
+          }
+        ],
+        "summary": "Borderline elevated LDL in perimenopausal women is managed with lifestyle modification first; 10-year cardiovascular risk calculators (QRISK3) guide statin initiation decisions, with treatment generally considered at ≥10% 10-year risk in the absence of established CVD"
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": {
+      "classification": "normal",
+      "background": {
+        "pdr": "9-10 Hz posterior dominant rhythm, symmetric and reactive",
+        "sleep_features": "normal vertex waves and sleep spindles",
+        "overall": "normal organisation for age"
+      },
+      "findings": [],
+      "artifacts": [],
+      "activating_procedures": {},
+      "impression": "Normal awake and drowsy EEG. No epileptiform discharges and no focal slowing.",
+      "limitations": "",
+      "recommended_actions": []
+    },
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "echo": {
+      "chambers": {
+        "LV": "normal size and systolic function",
+        "RV": "normal size and function",
+        "LA": "normal size",
+        "RA": "normal size"
+      },
+      "valves": {
+        "mitral": "structurally normal",
+        "aortic": "structurally normal",
+        "tricuspid": "normal",
+        "pulmonic": "normal"
+      },
+      "ejection_fraction": 63.0,
+      "wall_motion": "no regional wall-motion abnormality",
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": []
+    },
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 52,
+        "max": 116,
+        "average": 71
+      },
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "impression": "Normal 24-hour Holter monitor.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": null,
+    "specialized_test": null,
+    "literature_search": null,
+    "drug_interactions": {
+      "general": {
+        "proposed": "(agent not specified on this case's pathway)",
+        "interactions": [],
+        "contraindications": [],
+        "warnings": [
+          "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
+        ],
+        "formulary_status": "on formulary",
+        "alternatives": []
+      }
+    }
+  }
 }

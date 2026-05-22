@@ -17,7 +17,9 @@
     "patient_id": "UNKNOWN",
     "demographics": {
       "age": 35,
-      "sex": "female"
+      "sex": "female",
+      "handedness": "right",
+      "bmi": 23.5
     },
     "clinical_history": {
       "medications": [
@@ -46,21 +48,21 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert, oriented. No cognitive impairment.",
+      "cranial_nerves": "Normal cranial nerves II-XII. Visual fields full. PERRLA. No papilledema. Normal extraocular movements.",
+      "motor": "Motor 5/5 throughout. No drift on pronator drift test.",
+      "sensory": "Sensation intact to light touch and pinprick symmetrically in all four limbs and face. No sensory level.",
+      "reflexes": "Deep tendon reflexes 2+ symmetric. No Babinski.",
+      "coordination": "Coordination normal.",
+      "gait": "Gait normal."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
+      "bp_systolic": 122,
+      "bp_diastolic": 78,
       "hr": 72,
-      "temp": 37.0,
+      "temp": 36.7,
       "rr": 14,
-      "spo2": 98
+      "spo2": 99
     },
     "history_present_illness": "A 35-year-old Irish woman was referred urgently to the neurology outpatient clinic by her GP following a first episode of unilateral neurological symptoms 5 days ago. She was sitting at her desk at work when she noticed tingling beginning in the fingertips of her right hand. Over approximately 10-12 minutes, this tingling sensation spread slowly up her right arm to her shoulder, then across her right cheek and the right side of her tongue. The sensation was described as 'pins and needles' rather than numbness, and she had full use of her arm throughout — she checked this by typing on her keyboard. The sensory disturbance lasted approximately 20-25 minutes in total before resolving completely. Within 15 minutes of the sensory symptoms resolving, she developed a severe left-sided throbbing headache rated 9/10 in intensity, with pronounced nausea, photophobia, and phonophobia. She vomited twice. The headache lasted approximately 10 hours and she took paracetamol and ibuprofen with minimal relief.\n\nShe has had no similar episodes before. She has occasional mild tension-type headaches managed with paracetamol. She has no personal history of stroke, epilepsy, or vascular disease. Her GP was concerned this might represent a TIA and sent her for urgent neurology review. On further questioning, she recalls her mother had 'migraines with flashing lights' throughout her 30s and 40s. She is on the combined oral contraceptive pill (Microgynon — ethinylestradiol 30 mcg + levonorgestrel). She is a non-smoker, does not use recreational drugs, and drinks 6-8 units alcohol/week. She works as an accountant."
   },
@@ -176,8 +178,21 @@
       "Normal DWI on MRI 5 days after episode essentially excludes TIA; DWI lesions in TIA are visible for 7-10 days",
       "Moderate difficulty stems from TIA vs sensory aura differentiation and recognising OCP contraindication"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Right arm sensory symptoms in a 35-year-old prompting urgent TIA referral",
+        "location": "patient.history_present_illness",
+        "intended_effect": "GP appropriately referred for urgent TIA evaluation given unilateral sensory symptoms",
+        "correct_interpretation": "Gradual Jacksonian march from fingertips to face over 10-12 minutes = characteristic cortical spreading depression; TIA onset is abrupt; normal DWI confirms no infarction; family history of visual migraine aura"
+      },
+      {
+        "data_point": "Mild intermittent posterior slowing on EEG suggesting epileptic focus",
+        "location": "initial_tool_outputs.eeg.impression",
+        "intended_effect": "Non-specific EEG slowing might prompt anticonvulsant consideration",
+        "correct_interpretation": "Non-specific posterior slowing is a known inter-ictal finding in migraineurs; no focal parietal epileptiform discharges; aura duration far too long for seizure propagation"
+      }
+    ],
+    "icd_code": "G43.1"
   },
   "red_herrings": [
     {
@@ -194,28 +209,36 @@
   "metadata": {
     "condition_name": "First-episode sensory migraine aura — TIA differentiation and OCP contraindication",
     "difficulty_description": "Moderate: first episode requires TIA exclusion; critical drug safety issue (combined OCP = WHO Category 4); sensory Jacksonian march timing distinguishes CSD from seizure/TIA",
-    "expected_agent_confidence": 0.62
+    "expected_agent_confidence": 0.62,
+    "fallback_tool_kinds": {
+      "csf": "normal",
+      "ct": "normal",
+      "cardiac_monitoring": "normal",
+      "specialized_test": "incidental"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
       "findings": [],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "No acute DWI restriction; 2 non-specific subcortical WMH (migraine-related); no structural lesion; normal MRA; no TIA correlate. Clinical correlation recommended.",
+      "impression": "No acute intracranial abnormality. No restricted diffusion. Two non-specific subcortical white matter hyperintensities. Normal MRA — no stenosis, occlusion, or vascular malformation. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
     },
     "eeg": {
       "classification": "normal",
-      "background": {},
+      "background": {
+        "pdr": "9-10 Hz alpha posterior dominant rhythm, symmetric and reactive to eye opening",
+        "sleep_features": "not assessed (awake recording)",
+        "overall": "Normal background organisation"
+      },
       "findings": [],
       "artifacts": [],
       "activating_procedures": {},
-      "confidence": 0.0,
-      "impression": "See findings above. Clinical correlation recommended.",
+      "impression": "This is an ABNORMAL EEG due to: 1. Mild non-specific bilateral posterior slowing (7-8 Hz theta activity in occipital regions). No focal epileptiform discharges. No electrographic seizures recorded. Clinical correlation recommended.",
       "limitations": "",
       "recommended_actions": [
         "Clinical correlation recommended."
@@ -249,16 +272,31 @@
       "trigger_action": "check_combined_ocp_migraine_aura_first_episode",
       "tool_name": "check_drug_interactions",
       "output": {
-        "report": "DRUG REVIEW — COMBINED OCP IN FIRST-EPISODE MIGRAINE WITH AURA\n\nQuery: Microgynon (EE 30 mcg + levonorgestrel) in a woman with first presentation of migraine with sensory aura\n\nFINDINGS:\n  WHO MEDICAL ELIGIBILITY CRITERIA (MEC):\n  Combined OCP + migraine with aura = WHO Category 4 (UNACCEPTABLE RISK)\n  \n  RISK: The combination of combined OCP and migraine with aura is associated with a 6-9 fold increase in ischaemic stroke risk compared to women with neither factor. Migraine with aura alone doubles stroke risk. Combined OCP alone increases risk 2-3 fold. Together the risks are multiplicative.\n  \n  THIS APPLIES EVEN TO THE FIRST EPISODE: If ICHD-3 criteria are met, the contraindication applies from the first diagnosis.\n  \n  ALTERNATIVES:\n  - Progestin-only pill (desogestrel 75 mcg): WHO Category 2 (generally safe in migraine with aura)\n  - Levonorgestrel-releasing IUD: WHO Category 2\n  - Copper IUD: WHO Category 1 (no restriction)\n  - Implant (etonogestrel): WHO Category 2\n\nACTION REQUIRED: DISCONTINUE Microgynon immediately. Switch to progestin-only or non-hormonal contraception with immediate effect.\n\nCONCLUSION: Combined OCP CONTRAINDICATED. Stop immediately.",
-        "summary": "Combined OCP contraindicated (WHO Category 4) in migraine with aura from first episode; STOP Microgynon immediately; switch to progestin-only or non-hormonal contraception"
+        "proposed": "check_combined_ocp_migraine_aura_first_episode",
+        "interactions": [
+          "DRUG REVIEW — COMBINED OCP IN MIGRAINE WITH AURA\n\nQuery: Ethinylestradiol + levonorgestrel combined oral contraceptive in a woman with migraine with sensory aura\n\nFINDINGS:\n  WHO MEDICAL ELIGIBILITY CRITERIA (MEC):\n  Combined OCP + migraine with aura = WHO Category 4 (UNACCEPTABLE RISK)\n  \n  RISK: The combination of combined OCP and migraine with aura is associated with a 6-9 fold increase in ischaemic stroke risk compared to women with neither factor. Migraine with aura alone doubles stroke risk. Combined OCP alone increases risk 2-3 fold. Together the risks are multiplicative.\n  \n  THIS APPLIES FROM FIRST DIAGNOSIS: If ICHD-3 criteria are met, the WHO Category 4 contraindication applies from the first confirmed episode.\n  \n  SAFE ALTERNATIVES IN MIGRAINE WITH AURA:\n  - Progestin-only pill (desogestrel 75 mcg): WHO Category 2 (generally safe in migraine with aura)\n  - Levonorgestrel-releasing IUD: WHO Category 2\n  - Copper IUD: WHO Category 1 (no restriction)\n  - Implant (etonogestrel): WHO Category 2\n\nCONCLUSION: Combined OCP is WHO Category 4 — contraindicated in migraine with aura."
+        ],
+        "contraindications": [],
+        "warnings": [
+          "Combined OCP is WHO Category 4 (contraindicated) in migraine with aura from the first confirmed episode; progestin-only or non-hormonal alternatives are WHO Category 1-2"
+        ],
+        "formulary_status": "on formulary",
+        "alternatives": []
       }
     },
     {
       "trigger_action": "search_sensory_aura_vs_tia_differentiation",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Sensory Migraine Aura vs TIA — Clinical Differentiation\n\nKEY DIFFERENTIATING FEATURES:\n\n1. TEMPORAL PROFILE:\n   - Migraine aura: Gradual spread (march) over 5-30 minutes; typically Jacksonian march from fingers → arm → face\n   - TIA: Abrupt onset; typically maximal at onset; no march (negative symptom abruptly rather than spreading)\n\n2. SYMPTOM QUALITY:\n   - Migraine aura: Positive symptoms (tingling/paraesthesia)\n   - TIA: Negative symptoms (numbness/weakness/vision loss)\n   Note: This distinction is imperfect; both can have positive/negative symptoms\n\n3. SUBSEQUENT HEADACHE:\n   - Migraine: Headache commonly follows aura within 60 minutes\n   - TIA: Headache in only ~25% of TIA; not characteristic\n\n4. AGE AND RISK FACTORS:\n   - TIA: More common age >60; associated with hypertension, atrial fibrillation, diabetes, smoking\n   - Migraine aura: Female sex, age 20-40, family history\n\n5. DWI-MRI:\n   - TIA: May show restricted diffusion (though often negative acutely)\n   - Migraine aura: Normal DWI\n\nTHIS CASE: Gradual 10-12 minute spread from fingertips to face (positive tingling), followed by severe ipsilateral headache, age 35, family history of visual migraine, normal DWI — consistent with sensory migraine aura, not TIA.\n\nCONCLUSION: Clinical features and normal MRI strongly favour sensory migraine aura over TIA.",
-        "summary": "Gradual sensory march (10-12 min) + positive symptoms + subsequent headache + normal DWI + age 35 + family history = sensory migraine aura, not TIA"
+        "query": "search_sensory_aura_vs_tia_differentiation",
+        "results": [
+          {
+            "title": "Literature review",
+            "abstract": "LITERATURE SEARCH: Sensory Migraine Aura vs TIA — Clinical Differentiation\n\nKEY DIFFERENTIATING FEATURES:\n\n1. TEMPORAL PROFILE:\n   - Migraine aura: Gradual spread (march) over 5-30 minutes; typically Jacksonian march from fingers → arm → face\n   - TIA: Abrupt onset; typically maximal at onset; no march (negative symptom abruptly rather than spreading)\n\n2. SYMPTOM QUALITY:\n   - Migraine aura: Positive symptoms (tingling/paraesthesia)\n   - TIA: Negative symptoms (numbness/weakness/vision loss)\n   Note: This distinction is imperfect; both can have positive/negative symptoms\n\n3. SUBSEQUENT HEADACHE:\n   - Migraine: Headache commonly follows aura within 60 minutes\n   - TIA: Headache in only ~25% of TIA; not characteristic\n\n4. AGE AND RISK FACTORS:\n   - TIA: More common age >60; associated with hypertension, atrial fibrillation, diabetes, smoking\n   - Migraine aura: Female sex, age 20-40, family history\n\n5. DWI-MRI:\n   - TIA: May show restricted diffusion (though often negative acutely)\n   - Migraine aura: Normal DWI\n\nClinical correlation with temporal profile, symptom quality, age, risk factors, and neuroimaging is required to distinguish sensory migraine aura from TIA. Clinical correlation recommended.",
+            "relevance": "high"
+          }
+        ],
+        "summary": "Gradual sensory march over 5-30 min, positive symptoms, subsequent headache, and normal DWI are features distinguishing sensory migraine aura from TIA; clinical correlation recommended."
       }
     },
     {
@@ -273,7 +311,7 @@
           }
         ],
         "quantitative_data": null,
-        "impression": "Normal MRA; no dissection, stenosis, AVM, or aneurysm",
+        "impression": "Normal MRA head and neck. No dissection, stenosis, AVM, or aneurysm identified.",
         "recommended_actions": []
       }
     },
@@ -305,9 +343,75 @@
       "trigger_action": "search_first_sensory_aura_management",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Management After First Episode of Sensory Migraine Aura\n\nKEY RECOMMENDATIONS:\n1. DIAGNOSTIC CONFIRMATION: ICHD-3 requires ≥2 attacks for definitive diagnosis; however, after thorough exclusion of secondary causes, initiating migraine-specific treatment is appropriate after first well-characterised episode\n2. ACUTE TREATMENT: Prescribe triptan (sumatriptan 100 mg) for subsequent attacks; take at headache onset (not during aura)\n3. PREVENTIVE: Single episode — monitor; preventive indicated if ≥4 attacks/month or significant disability\n4. HEADACHE DIARY: Essential; record aura duration, spreading pattern, headache laterality, duration, triggers\n5. OCP: Must be stopped immediately (WHO Category 4)\n\nCONCLUSION: Prescribe sumatriptan for future attacks. Headache diary. Follow-up in 3-6 months. Arrange OCP switch before next appointment.",
-        "summary": "Stop OCP immediately; prescribe sumatriptan for future attacks; headache diary; follow-up at 3 months; single episode — preventive not yet indicated"
+        "query": "search_first_sensory_aura_management",
+        "results": [
+          {
+            "title": "Literature review",
+            "abstract": "LITERATURE SEARCH: Management After First Episode of Sensory Migraine Aura\n\nKEY EVIDENCE:\n1. DIAGNOSTIC CRITERIA: ICHD-3 requires ≥2 attacks for definitive migraine with aura diagnosis; after exclusion of secondary causes, migraine-specific treatment may be initiated after a first well-characterised episode\n2. ACUTE TREATMENT: Triptans (e.g., sumatriptan 100 mg) are effective for the headache phase of migraine with aura; they should be taken at headache onset, not during the aura\n3. PREVENTIVE THERAPY: Single episode — monitor; preventive therapy is indicated if frequency is ≥4 attacks/month or there is significant disability\n4. HEADACHE DIARY: Recommended; record aura duration, spreading pattern, headache laterality, duration, and triggers\n5. HORMONAL CONTRACEPTION: Combined oestrogen-progestogen contraceptives are WHO Category 4 (unacceptable risk) in migraine with aura\n\nClinical correlation recommended.",
+            "relevance": "high"
+          }
+        ],
+        "summary": "Combined oestrogen-progestogen contraceptives are WHO Category 4 in migraine with aura; triptans are effective for the headache phase; preventive therapy is indicated when attack frequency or disability is significant."
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": null,
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "echo": null,
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 53,
+        "max": 129,
+        "average": 71
+      },
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "impression": "Normal 24-hour Holter monitor.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": null,
+    "specialized_test": {
+      "test_type": "Neurodiagnostic assessment",
+      "findings": [
+        {
+          "finding": "minor non-specific abnormality",
+          "interpretation": "of uncertain and likely no clinical significance"
+        }
+      ],
+      "quantitative_data": null,
+      "impression": "Study with only a minor non-specific finding; non-contributory to the presentation.",
+      "recommended_actions": []
+    },
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

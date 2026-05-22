@@ -9,7 +9,16 @@
     "generation_method": "synthetic",
     "condition_name": "Anti-NMDA receptor encephalitis",
     "difficulty_description": "Moderate difficulty: 3-week subacute course initially treated as first-break psychosis. MRI shows subtle unilateral temporal FLAIR signal. Anti-NMDAR antibodies pending — agent must initiate immunotherapy empirically while awaiting confirmation.",
-    "expected_agent_confidence": 0.55
+    "expected_agent_confidence": 0.55,
+    "fallback_tool_kinds": {
+      "ecg": "normal",
+      "ct": "normal",
+      "echo": "incidental",
+      "cardiac_monitoring": "normal",
+      "advanced_imaging": "normal",
+      "specialized_test": "normal",
+      "drug_interactions": "normal"
+    }
   },
   "patient": {
     "age": 27,
@@ -24,10 +33,13 @@
       "No prior psychiatric admission",
       "No recent infections — mild upper respiratory tract illness 5 weeks prior (self-limiting)"
     ],
-    "patient_id": "UNKNOWN",
+    "patient_id": "NB-NMDAR-ENC-M04",
     "demographics": {
       "age": 27,
-      "sex": "female"
+      "sex": "female",
+      "ethnicity": "White British",
+      "handedness": "right",
+      "bmi": 22.7
     },
     "clinical_history": {
       "medications": [
@@ -53,7 +65,12 @@
       "social_history": {
         "note": "Non-smoker. Approximately 10 units alcohol/week. No illicit drugs. Lives with 3 flatmates. Postgraduate chemistry student. No recent travel. No new sexual partners in past 6 months."
       },
-      "past_medical_history": []
+      "past_medical_history": [
+        "Generalised anxiety disorder — commenced sertraline 3 months ago",
+        "No prior seizure disorder",
+        "No prior psychiatric admission",
+        "No recent infections — mild upper respiratory tract illness 5 weeks prior (self-limiting)"
+      ]
     },
     "neurological_exam": {
       "mental_status": "Agitated and uncooperative. Disoriented to time and place. Intermittent mutism lasting several seconds. Cannot follow complex commands. Mini-mental state examination not formally assessable. Inappropriate affect.",
@@ -66,12 +83,12 @@
       "sensory": ""
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
-      "hr": 72,
-      "temp": 37.0,
-      "rr": 14,
-      "spo2": 98
+      "bp_systolic": 134,
+      "bp_diastolic": 82,
+      "hr": 108,
+      "temp": 37.6,
+      "rr": 18,
+      "spo2": 97
     },
     "chief_complaint": "Progressive confusion, insomnia, and a witnessed tonic-clonic seizure over 3 weeks",
     "history_present_illness": "A 27-year-old postgraduate student was brought to the emergency department by her flatmates who had become progressively concerned over the preceding three weeks. She had initially complained of difficulty sleeping, describing lying awake for hours despite exhaustion, and had begun making unusual statements that seemed paranoid in nature — telling her flatmates she believed her supervisor was trying to steal her research data. Her mood had become labile, with episodes of intense agitation alternating with periods of apparent emotional flatness. One flatmate noted that during conversations she would sometimes stop mid-sentence and stare blankly for 10-15 seconds before resuming, which she appeared to have no memory of afterwards. Two days before presentation she was seen by her GP who, noting the insomnia, paranoia, and emotional dysregulation in a young woman under significant academic stress, prescribed low-dose quetiapine 50 mg at night with a provisional diagnosis of acute stress reaction with psychotic features and arranged urgent psychiatry follow-up. However, on the morning of admission her flatmates witnessed a generalised tonic-clonic seizure lasting approximately 90 seconds, after which she was post-ictally confused and combative. She had no prior psychiatric history, no prior seizures, and no significant past medical history. She had no family history of psychiatric disease. She had received her HPV and meningococcal vaccines as an adolescent. She takes sertraline 50 mg daily prescribed three months ago by her GP for generalised anxiety related to her PhD. She drinks approximately 10 units of alcohol per week and has no illicit drug use. She is sexually active with a male partner and uses barrier contraception only."
@@ -98,18 +115,21 @@
   },
   "red_herrings": [
     {
-      "finding": "Active SSRI (sertraline) prescription and prior anxiety history",
-      "misleading_diagnosis": "SSRI-related acute psychiatric decompensation or serotonin syndrome",
+      "data_point": "Active SSRI (sertraline) prescription and prior anxiety history",
+      "location": "clinical_history",
+      "intended_effect": "SSRI-related acute psychiatric decompensation or serotonin syndrome",
       "correct_interpretation": "Sertraline does not cause the progressive cognitive decline, seizures, and CSF changes seen here. Anxiety is extremely common and psychiatric history is a known cause of diagnostic delay in anti-NMDAR encephalitis. The 3-week subacute course with seizures and orofacial dyskinesias is beyond an SSRI adverse effect."
     },
     {
-      "finding": "GP-prescribed quetiapine with initial symptomatic improvement in agitation",
-      "misleading_diagnosis": "First-episode psychosis (schizophrenia spectrum) responding to antipsychotic",
+      "data_point": "GP-prescribed quetiapine with initial symptomatic improvement in agitation",
+      "location": "clinical_history",
+      "intended_effect": "First-episode psychosis (schizophrenia spectrum) responding to antipsychotic",
       "correct_interpretation": "Antipsychotics may partially suppress psychiatric symptoms of anti-NMDAR encephalitis but do not treat the underlying autoimmune process. New-onset seizures in a first-episode psychosis presentation should always prompt encephalitis workup."
     },
     {
-      "finding": "Mild CRP elevation (7 mg/L) and viral prodrome 5 weeks prior",
-      "misleading_diagnosis": "Viral encephalitis (HSV)",
+      "data_point": "Mild CRP elevation (7 mg/L) and viral prodrome 5 weeks prior",
+      "location": "clinical_history",
+      "intended_effect": "Viral encephalitis (HSV)",
       "correct_interpretation": "HSV PCR in CSF is negative. MRI does not show bilateral mesial temporal T2 signal change typical of HSV. HSV encephalitis typically has higher fever, more rapid progression, and higher CSF pleocytosis. Anti-NMDAR encephalitis often follows a viral-like prodrome."
     }
   ],
@@ -280,72 +300,66 @@
       "Empirical immunotherapy is appropriate and recommended when clinical suspicion is high. Waiting for antibody results (5-7 days) in a deteriorating patient is harmful.",
       "Left ovarian teratoma removal (oophorectomy) is the most important determinant of long-term neurological outcome — rates of relapse and incomplete recovery are much higher without tumour removal."
     ],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "Active SSRI (sertraline) prescription and prior anxiety history",
+        "location": "clinical_history",
+        "intended_effect": "SSRI-related acute psychiatric decompensation or serotonin syndrome",
+        "correct_interpretation": "Sertraline does not cause the progressive cognitive decline, seizures, and CSF changes seen here. Anxiety is extremely common and psychiatric history is a known cause of diagnostic delay in anti-NMDAR encephalitis. The 3-week subacute course with seizures and orofacial dyskinesias is beyond an SSRI adverse effect."
+      },
+      {
+        "data_point": "GP-prescribed quetiapine with initial symptomatic improvement in agitation",
+        "location": "clinical_history",
+        "intended_effect": "First-episode psychosis (schizophrenia spectrum) responding to antipsychotic",
+        "correct_interpretation": "Antipsychotics may partially suppress psychiatric symptoms of anti-NMDAR encephalitis but do not treat the underlying autoimmune process. New-onset seizures in a first-episode psychosis presentation should always prompt encephalitis workup."
+      },
+      {
+        "data_point": "Mild CRP elevation (7 mg/L) and viral prodrome 5 weeks prior",
+        "location": "clinical_history",
+        "intended_effect": "Viral encephalitis (HSV)",
+        "correct_interpretation": "HSV PCR in CSF is negative. MRI does not show bilateral mesial temporal T2 signal change typical of HSV. HSV encephalitis typically has higher fever, more rapid progression, and higher CSF pleocytosis. Anti-NMDAR encephalitis often follows a viral-like prodrome."
+      }
+    ]
   },
   "initial_tool_outputs": {
     "mri": {
       "findings": [
         {
-          "type": "unknown",
-          "location": "",
-          "size": null,
-          "signal_characteristics": {},
-          "mass_effect": null,
-          "borders": null
-        },
-        {
-          "type": "unknown",
-          "location": "",
-          "size": null,
-          "signal_characteristics": {},
-          "mass_effect": null,
-          "borders": null
-        },
-        {
-          "type": "unknown",
-          "location": "",
-          "size": null,
-          "signal_characteristics": {},
-          "mass_effect": null,
-          "borders": null
-        },
-        {
-          "type": "unknown",
-          "location": "",
-          "size": null,
-          "signal_characteristics": {},
-          "mass_effect": null,
-          "borders": null
-        },
-        {
-          "type": "unknown",
-          "location": "",
-          "size": null,
-          "signal_characteristics": {},
-          "mass_effect": null,
-          "borders": null
-        },
-        {
-          "type": "unknown",
-          "location": "",
-          "size": null,
-          "signal_characteristics": {},
-          "mass_effect": null,
-          "borders": null
+          "type": "Subtle FLAIR hyperintensity",
+          "location": "Medial temporal lobe (left hippocampus and amygdala)",
+          "size": "Approximately 1.4 x 0.7 cm",
+          "signal_characteristics": {
+            "T1": "Isointense",
+            "T2": "Mildly hyperintense",
+            "FLAIR": "Subtle hyperintensity",
+            "DWI": "No restricted diffusion",
+            "post_contrast": "No pathological enhancement"
+          },
+          "mass_effect": "None",
+          "borders": "Ill-defined"
         }
       ],
       "volumetrics": null,
-      "additional_observations": [],
+      "additional_observations": [
+        "No midline shift",
+        "Ventricles normal in size",
+        "No acute hemorrhage",
+        "No extra-axial collections"
+      ],
       "impression": "Possible subtle right temporal/hippocampal FLAIR signal change, which may represent early limbic encephalitis. Cannot exclude artefact. No acute infarction, no enhancement, no mass effect. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
     },
     "eeg": {
       "classification": "abnormal",
-      "background": {},
+      "background": {
+        "posterior_dominant_rhythm": "Poorly organized theta activity, 6-7 Hz, replacing expected alpha rhythm",
+        "overall_organization": "Moderately disorganized",
+        "continuity": "Continuous",
+        "asymmetry": "No consistent hemispheric asymmetry"
+      },
       "findings": [
         {
           "type": "Background",
@@ -382,7 +396,6 @@
       ],
       "artifacts": [],
       "activating_procedures": {},
-      "confidence": 0.0,
       "impression": "Abnormal EEG. Diffuse encephalopathic slowing with right anterior temporal intermittent rhythmic delta activity. Clinical correlation recommended.",
       "limitations": "",
       "recommended_actions": [
@@ -390,19 +403,188 @@
       ]
     },
     "labs": {
-      "panels": {},
-      "interpretation": "All values within normal limits.",
-      "abnormal_values_summary": []
+      "panels": {
+        "CBC": [
+          {
+            "test": "WBC",
+            "value": 9.2,
+            "unit": "x10^9/L",
+            "reference_range": "4.0-11.0",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "Hemoglobin",
+            "value": 13.1,
+            "unit": "g/dL",
+            "reference_range": "12.0-16.0",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "Hematocrit",
+            "value": 40.5,
+            "unit": "%",
+            "reference_range": "36.0-46.0",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "Platelets",
+            "value": 241,
+            "unit": "x10^9/L",
+            "reference_range": "150-400",
+            "is_abnormal": false,
+            "clinical_significance": null
+          }
+        ],
+        "BMP": [
+          {
+            "test": "Sodium",
+            "value": 129,
+            "unit": "mEq/L",
+            "reference_range": "136-145",
+            "is_abnormal": true,
+            "clinical_significance": null
+          },
+          {
+            "test": "Potassium",
+            "value": 4.0,
+            "unit": "mEq/L",
+            "reference_range": "3.5-5.0",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "Chloride",
+            "value": 97,
+            "unit": "mEq/L",
+            "reference_range": "98-106",
+            "is_abnormal": true,
+            "clinical_significance": null
+          },
+          {
+            "test": "Bicarbonate",
+            "value": 24,
+            "unit": "mEq/L",
+            "reference_range": "22-29",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "BUN",
+            "value": 10,
+            "unit": "mg/dL",
+            "reference_range": "7-20",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "Creatinine",
+            "value": 0.8,
+            "unit": "mg/dL",
+            "reference_range": "0.6-1.2",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "Glucose",
+            "value": 96,
+            "unit": "mg/dL",
+            "reference_range": "70-100",
+            "is_abnormal": false,
+            "clinical_significance": null
+          }
+        ],
+        "Inflammatory markers": [
+          {
+            "test": "CRP",
+            "value": 0.8,
+            "unit": "mg/dL",
+            "reference_range": "0.0-0.5",
+            "is_abnormal": true,
+            "clinical_significance": null
+          },
+          {
+            "test": "ESR",
+            "value": 22,
+            "unit": "mm/hr",
+            "reference_range": "0-20",
+            "is_abnormal": true,
+            "clinical_significance": null
+          }
+        ],
+        "Thyroid function": [
+          {
+            "test": "TSH",
+            "value": 1.9,
+            "unit": "mIU/L",
+            "reference_range": "0.4-4.0",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "Free T4",
+            "value": 1.1,
+            "unit": "ng/dL",
+            "reference_range": "0.8-1.8",
+            "is_abnormal": false,
+            "clinical_significance": null
+          }
+        ],
+        "Other": [
+          {
+            "test": "CK",
+            "value": 148,
+            "unit": "U/L",
+            "reference_range": "30-135",
+            "is_abnormal": true,
+            "clinical_significance": null
+          },
+          {
+            "test": "Urine drug screen",
+            "value": "Negative",
+            "unit": "",
+            "reference_range": "Negative",
+            "is_abnormal": false,
+            "clinical_significance": null
+          }
+        ]
+      },
+      "interpretation": "Abnormal values: Sodium 129 mEq/L (L), Chloride 97 mEq/L (L), CRP 0.8 mg/dL (H), ESR 22 mm/hr (H), CK 148 U/L (H).",
+      "abnormal_values_summary": [
+        "Sodium: 129 mEq/L (L)",
+        "Chloride: 97 mEq/L (L)",
+        "CRP: 0.8 mg/dL (H)",
+        "ESR: 22 mm/hr (H)",
+        "CK: 148 U/L (H)"
+      ]
     },
     "csf": {
       "opening_pressure": "18 cmH2O (upper normal)",
       "appearance": "Clear and colourless",
-      "cell_count": {},
+      "cell_count": {
+        "WBC": "14 cells/uL (mildly elevated)",
+        "RBC": "1 cells/uL",
+        "Lymphocytes": "87%",
+        "Neutrophils": "8%",
+        "Monocytes": "5%"
+      },
       "protein": "0.52 g/L",
       "glucose": "3.6 mmol/L",
       "interpretation": "Opening pressure: 18 cmH2O. Protein: 0.52 g/L. Glucose: 3.6 mmol/L.",
       "glucose_ratio": "",
-      "special_tests": {}
+      "special_tests": {
+        "Oligoclonal bands": "Equivocal (2 faint bands)",
+        "IgG index": "0.74 (borderline elevated, normal <0.70)",
+        "HSV-1 PCR": "Negative",
+        "HSV-2 PCR": "Negative",
+        "VZV PCR": "Negative",
+        "Enterovirus PCR": "Negative",
+        "Bacterial culture": "No growth at 48 hours",
+        "Gram stain": "No organisms seen",
+        "Anti-NMDA receptor antibodies": "Pending"
+      }
     }
   },
   "followup_outputs": [
@@ -410,55 +592,84 @@
       "trigger_action": "request_nmdar_antibodies",
       "tool_name": "interpret_labs",
       "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": []
+        "panels": {
+          "NMDAR Antibody Panel": [
+            {
+              "test": "Serum anti-NMDA receptor IgG",
+              "value": "Positive (titer 1:80)",
+              "unit": "",
+              "reference_range": "Negative",
+              "is_abnormal": true,
+              "clinical_significance": null
+            },
+            {
+              "test": "CSF anti-NMDA receptor IgG",
+              "value": "Positive (titer 1:160)",
+              "unit": "",
+              "reference_range": "Negative",
+              "is_abnormal": true,
+              "clinical_significance": null
+            }
+          ]
+        },
+        "interpretation": "Abnormal values: Serum anti-NMDA receptor IgG Positive (titer 1:80) (H), CSF anti-NMDA receptor IgG Positive (titer 1:160) (H). Anti-NMDA receptor IgG antibody is found in a subset of patients with autoimmune encephalitis; a positive result should be interpreted in the clinical context. Clinical correlation recommended.",
+        "abnormal_values_summary": [
+          "Serum anti-NMDA receptor IgG: Positive (titer 1:80) (H)",
+          "CSF anti-NMDA receptor IgG: Positive (titer 1:160) (H)"
+        ]
       }
     },
     {
       "trigger_action": "request_pelvic_ultrasound",
       "tool_name": "interpret_labs",
       "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": []
+        "panels": {
+          "Pelvic Ultrasound": [
+            {
+              "test": "Left ovary",
+              "value": "3.8 x 3.1 x 2.9 cm complex adnexal mass with mixed echogenicity, posterior acoustic shadowing consistent with a calcified component, and echogenic fat-containing nodule. Features consistent with a mature cystic teratoma (dermoid cyst).",
+              "unit": "",
+              "reference_range": "Normal ovary 2.5-5.0 cm",
+              "is_abnormal": true,
+              "clinical_significance": null
+            },
+            {
+              "test": "Right ovary",
+              "value": "Normal size and echotexture, 2.8 x 2.0 x 2.2 cm. No adnexal mass.",
+              "unit": "",
+              "reference_range": "Normal ovary 2.5-5.0 cm",
+              "is_abnormal": false,
+              "clinical_significance": null
+            },
+            {
+              "test": "Uterus",
+              "value": "Normal size and echotexture.",
+              "unit": "",
+              "reference_range": "Normal",
+              "is_abnormal": false,
+              "clinical_significance": null
+            }
+          ]
+        },
+        "interpretation": "Abnormal values: Left ovarian complex mass (H). Left ovarian lesion with fat and calcification components measuring consistent with a mature cystic teratoma (dermoid). Clinical correlation recommended.",
+        "abnormal_values_summary": [
+          "Left ovary: 3.8 x 3.1 cm mature cystic teratoma (dermoid cyst) — paraneoplastic trigger (H)"
+        ]
       }
     },
     {
       "trigger_action": "request_ct_chest_abdomen_pelvis",
-      "tool_name": "analyze_brain_mri",
+      "tool_name": "order_ct_scan",
       "output": {
-        "findings": [
-          {
-            "type": "unknown",
-            "location": "",
-            "size": null,
-            "signal_characteristics": {},
-            "mass_effect": null,
-            "borders": null
-          },
-          {
-            "type": "unknown",
-            "location": "",
-            "size": null,
-            "signal_characteristics": {},
-            "mass_effect": null,
-            "borders": null
-          },
-          {
-            "type": "unknown",
-            "location": "",
-            "size": null,
-            "signal_characteristics": {},
-            "mass_effect": null,
-            "borders": null
-          }
+        "findings": [],
+        "contrast_used": false,
+        "angiography_findings": null,
+        "additional_observations": [
+          "No pulmonary nodules or masses",
+          "No mediastinal lymphadenopathy",
+          "No hepatic lesions"
         ],
-        "volumetrics": null,
-        "additional_observations": [],
-        "impression": "Left ovarian mature teratoma — no evidence of malignant transformation or metastatic disease. Paraneoplastic trigger for anti-NMDAR encephalitis confirmed. Clinical correlation recommended.",
-        "differential_by_imaging": [],
-        "confidence": 0.0,
+        "impression": "Left adnexal lesion with fat and calcification components, consistent with a mature cystic teratoma (dermoid). No evidence of malignant transformation or metastatic disease. No lymphadenopathy. Clinical correlation recommended.",
         "recommended_actions": [
           "Clinical correlation recommended."
         ]
@@ -469,7 +680,12 @@
       "tool_name": "analyze_eeg",
       "output": {
         "classification": "abnormal",
-        "background": {},
+        "background": {
+          "posterior_dominant_rhythm": "Absent; diffuse theta-delta activity",
+          "overall_organization": "Severely disorganized",
+          "continuity": "Continuous with intermittent attenuation",
+          "asymmetry": "No consistent asymmetry"
+        },
         "findings": [
           {
             "type": "Overall",
@@ -482,7 +698,6 @@
         ],
         "artifacts": [],
         "activating_procedures": {},
-        "confidence": 0.0,
         "impression": "Subclinical electrographic seizures confirmed on 24-hour monitoring. Three brief right temporal seizures. No extreme delta brush. Clinical correlation recommended.",
         "limitations": "",
         "recommended_actions": [
@@ -498,14 +713,11 @@
         "results": [
           {
             "title": "First-line and second-line immunotherapy for anti-NMDA receptor encephalitis",
-            "summary": "First-line: IV methylprednisolone 1g/day for 5 days, followed by IVIG 0.4 g/kg/day for 5 days (total 2 g/kg), and/or plasmapheresis (5 exchanges). These are typically given concurrently or sequentially. Second-line (if no improvement in 2-4 weeks): rituximab 375 mg/m² weekly × 4 doses, or cyclophosphamide. Oral prednisolone taper following IV course. Tumour removal (if identified) is critical for neurological recovery. With treatment, ~80% achieve good functional outcome at 24 months."
+            "summary": "Anti-NMDAR encephalitis is treated with immunotherapy, with published cohorts reporting first-line approaches using corticosteroids, intravenous immunoglobulin, and/or plasma exchange. Second-line agents (including rituximab and cyclophosphamide) have been used in refractory cases. Tumor removal in patients with associated teratoma is associated with improved neurological outcomes. In published series, approximately 80% of patients achieved good functional outcomes at 24 months with combined treatment."
           }
         ],
         "recommended_actions": [
-          "Start IV methylprednisolone 1g daily × 5 days",
-          "Commence IVIG 2 g/kg over 5 days",
-          "Arrange laparoscopic oophorectomy for left ovarian teratoma",
-          "Review in 2 weeks — if no improvement consider rituximab"
+          "Clinical correlation recommended."
         ],
         "summary": ""
       }
@@ -525,5 +737,99 @@
         "evidence_level": "Expert consensus — Dalmau et al. Lancet Neurol 2011"
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": null,
+    "mri": null,
+    "ecg": {
+      "rhythm": "normal sinus rhythm",
+      "rate": 70,
+      "intervals": {
+        "PR": "149 ms",
+        "QRS": "92 ms",
+        "QTc": "408 ms"
+      },
+      "axis": "normal",
+      "findings": [
+        "Normal sinus rhythm. Normal axis and intervals. No acute ST-T changes."
+      ],
+      "interpretation": "Normal ECG",
+      "clinical_correlation": ""
+    },
+    "labs": null,
+    "csf": null,
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "echo": {
+      "chambers": {
+        "LV": "normal size and systolic function",
+        "RV": "normal size and function",
+        "LA": "normal size",
+        "RA": "normal size"
+      },
+      "valves": {
+        "mitral": "structurally normal",
+        "aortic": "structurally normal",
+        "tricuspid": "normal",
+        "pulmonic": "normal"
+      },
+      "ejection_fraction": 60.0,
+      "wall_motion": "no regional wall-motion abnormality",
+      "findings": [
+        "Trace mitral regurgitation, physiological. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Structurally near-normal heart with a benign incidental finding.",
+      "recommended_actions": []
+    },
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 55,
+        "max": 116,
+        "average": 81
+      },
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "impression": "Normal 24-hour Holter monitor.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": {
+      "modality": "FDG-PET",
+      "tracer_or_protocol": null,
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "No abnormality identified on advanced imaging. Findings are non-contributory; clinical correlation recommended.",
+      "recommended_actions": []
+    },
+    "specialized_test": {
+      "test_type": "neuropsychological_testing",
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "Study within normal limits. No abnormality identified; non-contributory.",
+      "recommended_actions": []
+    },
+    "literature_search": null,
+    "drug_interactions": {
+      "general": {
+        "proposed": "(agent not specified on this case's pathway)",
+        "interactions": [],
+        "contraindications": [],
+        "warnings": [
+          "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
+        ],
+        "formulary_status": "on formulary",
+        "alternatives": []
+      }
+    }
+  }
 }

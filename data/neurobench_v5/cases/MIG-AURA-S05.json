@@ -38,21 +38,21 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert; oriented x3. No aphasia.",
+      "cranial_nerves": "Normal cranial nerves. Visual fields full. PERRLA. No papilledema.",
+      "motor": "Motor strength 5/5 throughout. No pronator drift.",
+      "sensory": "Sensation intact to light touch and pinprick throughout.",
+      "reflexes": "DTR 2+ symmetric. Plantar responses flexor bilaterally.",
+      "coordination": "Finger-nose and heel-shin intact bilaterally.",
+      "gait": "Normal gait. Romberg negative."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
-      "hr": 72,
-      "temp": 37.0,
-      "rr": 14,
-      "spo2": 98
+      "bp_systolic": 112,
+      "bp_diastolic": 70,
+      "hr": 76,
+      "temp": 36.6,
+      "rr": 13,
+      "spo2": 99
     },
     "history_present_illness": "A 22-year-old woman presented to the neurology outpatient clinic with a 3-month history of episodic visual disturbances followed by headaches. She has had four episodes total over this period. Each episode begins with flashing lights in the left visual field that slowly enlarge into a horseshoe-shaped shimmering arc over approximately 20 minutes, then fades. During this phenomenon she cannot see clearly on the left side. Following the visual disturbance, she develops a throbbing right-sided headache (6-7/10) with nausea and need to avoid bright light, lasting 4-6 hours. The fourth episode 2 days ago prompted this urgent appointment. She takes ibuprofen with partial relief and rests in a dark room.\n\nShe has never had headaches like this before these episodes began. She is otherwise healthy, takes no regular medications, and has no prior medical history. Her mother had migraines in her 20s and 30s. She recently started a new job with long screen hours and reports significant work-related stress. She is not on oral contraceptives. She drinks 1-2 cups of coffee per day. She specifically denies limb weakness, speech difficulty, loss of consciousness, fever, neck stiffness, or any headache awakening her from sleep."
   },
@@ -94,8 +94,8 @@
       {
         "step": 1,
         "action": "Brain MRI for new-onset aura (appropriate for any new presentation)",
-        "tool_name": null,
-        "expected_finding": "",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Normal brain MRI; no structural cause for new-onset visual aura",
         "category": "acceptable",
         "tool_parameters": {
           "contrast": true
@@ -104,8 +104,8 @@
       {
         "step": 2,
         "action": "Laboratory workup",
-        "tool_name": null,
-        "expected_finding": "",
+        "tool_name": "interpret_labs",
+        "expected_finding": "All values within normal limits",
         "category": "acceptable",
         "tool_parameters": {
           "lab_type": "headache_workup"
@@ -115,7 +115,7 @@
         "step": 3,
         "action": "Prescribe sumatriptan 100 mg for acute attacks",
         "tool_name": null,
-        "expected_finding": "",
+        "expected_finding": "Management per ICHD-3 migraine with aura guidelines",
         "category": "acceptable",
         "tool_parameters": {}
       },
@@ -123,7 +123,7 @@
         "step": 4,
         "action": "Identify and address triggers (screen time, stress); headache diary",
         "tool_name": null,
-        "expected_finding": "",
+        "expected_finding": "Management per ICHD-3 migraine with aura guidelines",
         "category": "acceptable",
         "tool_parameters": {}
       }
@@ -146,22 +146,41 @@
       "Screen time and work stress as modifiable triggers"
     ],
     "red_herrings": [],
-    "icd_code": ""
+    "icd_code": "G43.1"
   },
   "red_herrings": [],
   "metadata": {
     "condition_name": "New-onset migraine with typical visual aura",
     "difficulty_description": "Straightforward: new-onset visual aura meeting ICHD-3 criteria; normal MRI; family history; trigger identification",
-    "expected_agent_confidence": 0.88
+    "expected_agent_confidence": 0.88,
+    "fallback_tool_kinds": {
+      "csf": "normal",
+      "ct": "normal",
+      "echo": "normal",
+      "cardiac_monitoring": "normal",
+      "specialized_test": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
-      "findings": [],
+      "findings": [
+        {
+          "type": "normal",
+          "location": "whole brain",
+          "size": null,
+          "signal_characteristics": {
+            "DWI": "no restriction",
+            "FLAIR": "no signal abnormality",
+            "T1": "normal"
+          },
+          "mass_effect": "none",
+          "borders": null
+        }
+      ],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "Normal MRI; no structural cause identified. Clinical correlation recommended.",
+      "impression": "No acute or structural intracranial abnormality. No DWI restriction. No structural lesion, AVM, or demyelinating lesion. Normal study. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
@@ -195,7 +214,7 @@
       "trigger_action": "request_mra_head_neck",
       "tool_name": "order_advanced_imaging",
       "output": {
-        "modality": "",
+        "modality": "MRA head and neck",
         "tracer_or_protocol": null,
         "findings": [
           {
@@ -211,16 +230,16 @@
       "trigger_action": "search_new_onset_migraine_aura_workup",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: New-Onset Migraine with Aura — When is MRI Required?\n\nKEY FINDINGS:\n1. INDICATIONS FOR MRI: New-onset aura, atypical features (prolonged >60 min, motor aura, basilar features, aura without headache, first/worst headache, headache awakening from sleep, progressive pattern)\n2. TYPICAL VISUAL AURA: If MRI is normal and criteria are met, no further imaging required after initial evaluation\n3. FOURTH EPISODE IN 3 MONTHS: Appropriate to perform MRI for new-onset cases to establish baseline\n4. ICHD-3 CRITERIA FOR MIGRAINE WITH AURA: ≥2 attacks; aura consists of ≥1 symptom spreading gradually ≥5 min, lasting 5-60 min; headache follows within 60 min\n5. NOTE: Only 2 episodes are needed for ICHD-3 diagnosis; this patient has 4\n\nCONCLUSION: MRI obtained appropriately. ICHD-3 criteria met. Normal MRI confirms primary migraine diagnosis.",
-        "summary": "MRI appropriate for new-onset aura; ICHD-3 criteria met with 4 episodes; visual aura 20 min with subsequent headache is typical"
+        "report": "LITERATURE SEARCH: New-Onset Migraine with Aura — When is MRI Required?\n\nKEY FINDINGS:\n1. INDICATIONS FOR MRI: New-onset aura, atypical features (prolonged >60 min, motor aura, basilar features, aura without headache, first/worst headache, headache awakening from sleep, progressive pattern)\n2. TYPICAL VISUAL AURA: If MRI is normal and criteria are met, no further imaging required after initial evaluation\n3. FOURTH EPISODE IN 3 MONTHS: Appropriate to perform MRI for new-onset cases to establish baseline\n4. ICHD-3 CRITERIA FOR MIGRAINE WITH AURA: ≥2 attacks; aura consists of ≥1 symptom spreading gradually ≥5 min, lasting 5-60 min; headache follows within 60 min\n5. NOTE: ICHD-3 requires ≥2 attacks; each episode must include ≥1 gradually spreading aura symptom lasting 5–60 min, followed by headache within 60 min\n\nCONCLUSION: MRI is appropriate for new-onset visual aura to exclude structural cause. A normal MRI does not in itself establish a clinical diagnosis; correlation with history and examination is required per ICHD-3.",
+        "summary": "MRI appropriate for new-onset visual aura to exclude structural pathology; ICHD-3 requires ≥2 attacks with gradually spreading aura lasting 5–60 min followed by headache"
       }
     },
     {
       "trigger_action": "check_sumatriptan_young_women",
       "tool_name": "check_drug_interactions",
       "output": {
-        "report": "SUMATRIPTAN PRESCRIPTION FOR NEW MIGRAINE DIAGNOSIS\n\nQuery: Sumatriptan initiation in a 22-year-old woman\n\nFindings: Sumatriptan 50-100 mg is safe and appropriate first-line triptan. No contraindications in this patient. Take at headache onset (not during visual aura). May repeat after 2 hours (max 200 mg/day). Not on OCPs — no additional concerns.\n\nCONCLUSION: Prescribe sumatriptan 100 mg PRN. Naproxen 500 mg co-administered may improve response.",
-        "summary": "Sumatriptan 100 mg safe and appropriate; take at headache onset"
+        "report": "SUMATRIPTAN PRESCRIPTION FOR NEW MIGRAINE DIAGNOSIS\n\nQuery: Sumatriptan initiation in a 22-year-old woman\n\nFindings: Sumatriptan 50-100 mg is safe and appropriate first-line triptan. No contraindications in this patient. Take at headache onset (not during visual aura). May repeat after 2 hours (max 200 mg/day). Not on OCPs — no additional concerns.\n\nCONCLUSION: Sumatriptan 50–100 mg PO has no pharmacokinetic contraindications in this review. Standard prescribing considerations apply; sumatriptan should be taken at headache onset, not during the aura phase.",
+        "summary": "No pharmacokinetic contraindications to sumatriptan identified; standard dosing considerations apply; take at headache onset"
       }
     },
     {
@@ -249,13 +268,86 @@
         "findings": [],
         "artifacts": [],
         "activating_procedures": {},
-        "confidence": 0.0,
-        "impression": "See findings above. Clinical correlation recommended.",
+        "impression": "This is a NORMAL EEG. No epileptiform discharges. No focal slowing. No electrographic seizures recorded. Clinical correlation recommended.",
         "limitations": "",
         "recommended_actions": [
           "Clinical correlation recommended."
         ]
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": null,
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "echo": {
+      "chambers": {
+        "LV": "normal size and systolic function",
+        "RV": "normal size and function",
+        "LA": "normal size",
+        "RA": "normal size"
+      },
+      "valves": {
+        "mitral": "structurally normal",
+        "aortic": "structurally normal",
+        "tricuspid": "normal",
+        "pulmonic": "normal"
+      },
+      "ejection_fraction": 65.0,
+      "wall_motion": "no regional wall-motion abnormality",
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": []
+    },
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 51,
+        "max": 129,
+        "average": 81
+      },
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "impression": "Normal 24-hour Holter monitor.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": null,
+    "specialized_test": {
+      "test_type": "general_neurodiagnostic_assessment",
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "Study within normal limits. No abnormality identified; non-contributory.",
+      "recommended_actions": []
+    },
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

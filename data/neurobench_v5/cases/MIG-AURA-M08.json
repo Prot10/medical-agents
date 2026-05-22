@@ -47,13 +47,13 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert, oriented. Professional and cooperative. Slightly anxious about medication interaction.",
+      "cranial_nerves": "Normal cranial nerves II-XII. Visual fields full by confrontation. PERRLA. No papilledema. No facial sensory abnormality between attacks.",
+      "motor": "Motor 5/5 throughout. No pronator drift.",
+      "sensory": "Sensation intact to light touch and pinprick bilaterally in all four limbs and face — no inter-ictal abnormality.",
+      "reflexes": "Deep tendon reflexes 2+ symmetric. No Babinski.",
+      "coordination": "Coordination normal.",
+      "gait": "Gait normal."
     },
     "vitals": {
       "bp_systolic": 120,
@@ -178,8 +178,21 @@
       "Perioral tingling during aura = CSD spreading from occipital cortex to parietal somatosensory cortex (face representation)",
       "Moderate difficulty: drug interaction awareness (FDA warning vs actual evidence), recognising incomplete prior aura history"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Sertraline + sumatriptan combination — serotonin syndrome concern",
+        "location": "patient.history_present_illness",
+        "intended_effect": "FDA issued a formal advisory warning about serotonin syndrome with this combination; a pharmacist patient is acutely aware of this",
+        "correct_interpretation": "FDA warning is based on theoretical mechanism; large pharmacoepidemiological studies show no significant clinical risk at standard doses; American Headache Society does not recommend against co-use; clinical assessment shows no serotonin syndrome features"
+      },
+      {
+        "data_point": "Temporal coincidence of sertraline initiation and migraine onset",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Episodes started 2 weeks after sertraline — causal attribution seems straightforward",
+        "correct_interpretation": "Prior 2-3 year history of brief monocular flashes (likely incomplete visual aura) pre-dates sertraline; family history (father + sister) confirms genetic predisposition; sertraline likely lowered CSD threshold in a predisposed individual, unmasking rather than causing migraine"
+      }
+    ],
+    "icd_code": "G43.1"
   },
   "red_herrings": [
     {
@@ -196,28 +209,49 @@
   "metadata": {
     "condition_name": "Migraine with aura emerging with SSRI — sertraline-sumatriptan interaction knowledge gap",
     "difficulty_description": "Moderate: drug interaction nuance (serotonin syndrome concern vs actual evidence); prior incomplete aura history unrecognised; identifying genetic predisposition vs SSRI causation",
-    "expected_agent_confidence": 0.6
+    "expected_agent_confidence": 0.6,
+    "fallback_tool_kinds": {
+      "csf": "normal",
+      "ct": "normal",
+      "echo": "normal",
+      "cardiac_monitoring": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
-      "findings": [],
+      "findings": [
+        {
+          "type": "white_matter_hyperintensity",
+          "location": "subcortical white matter, scattered",
+          "size": "punctate (<3 mm)",
+          "signal_characteristics": {
+            "T2": "hyperintense",
+            "FLAIR": "hyperintense",
+            "DWI": "no restriction"
+          },
+          "mass_effect": "none",
+          "borders": "well-defined"
+        }
+      ],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "See findings above. Clinical correlation recommended.",
+      "impression": "Scattered non-specific punctate subcortical white matter hyperintensities. No DWI restriction. No mass lesion or enhancing lesion. Normal MRA — no stenosis, AVM, or aneurysm. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
     },
     "eeg": {
       "classification": "normal",
-      "background": {},
+      "background": {
+        "dominant_rhythm": "9-10 Hz posterior dominant rhythm",
+        "symmetry": "symmetric",
+        "reactivity": "reactive"
+      },
       "findings": [],
       "artifacts": [],
       "activating_procedures": {},
-      "confidence": 0.0,
-      "impression": "Non-specific posterior slowing; no temporal epileptiform discharges; no seizure correlate. Clinical correlation recommended.",
+      "impression": "This is a NORMAL EEG. No epileptiform discharges. No electrographic seizures recorded. Clinical correlation recommended.",
       "limitations": "",
       "recommended_actions": [
         "Clinical correlation recommended."
@@ -231,7 +265,7 @@
       "findings": [
         "ELECTROCARDIOGRAM\nRHYTHM: Sinus rhythm 74 bpm. QTc: 412 ms. INTERPRETATION: Normal ECG. QTc within normal range on sertraline."
       ],
-      "interpretation": "See report details above.",
+      "interpretation": "Normal sinus rhythm 74 bpm. QTc within normal range. Normal ECG.",
       "clinical_correlation": ""
     },
     "labs": {
@@ -251,30 +285,45 @@
       "trigger_action": "check_sertraline_sumatriptan_serotonin_syndrome",
       "tool_name": "check_drug_interactions",
       "output": {
-        "report": "DRUG INTERACTION REVIEW — SERTRALINE + SUMATRIPTAN\n\nQuery: Serotonin syndrome risk with sertraline 50 mg + sumatriptan 50 mg\n\nFINDINGS:\n  THEORETICAL INTERACTION: Triptans are 5-HT1B/1D agonists; SSRIs inhibit serotonin reuptake. Theoretical risk of serotonin syndrome.\n  FDA ADVISORY (2006): FDA issued a warning about serotonin syndrome risk with triptans + SSRIs/SNRIs based on case reports.\n  CURRENT EVIDENCE REASSESSMENT: Large pharmacoepidemiological studies have NOT confirmed increased serotonin syndrome risk with triptan + SSRI combination at standard doses. FDA warning based largely on theoretical mechanism; American Headache Society (AHS) and other guidelines do not recommend against co-use.\n  CLINICAL SEROTONIN SYNDROME: Requires triad of neuromuscular abnormality + cognitive changes + autonomic instability. This patient: none of these features.\n  RECOMMENDATION: Sumatriptan 50 mg and sertraline 50 mg can be co-administered safely at standard doses. Monitor clinically. No dose adjustment needed.\n  SERTRALINE-TRIGGERED MIGRAINE: SSRIs may unmask migraine in genetically predisposed individuals via serotonin-mediated CSD threshold changes — possible contributing factor here alongside genetic predisposition.\n\nCONCLUSION: Sumatriptan + sertraline are safe to co-administer at these doses. FDA warning overstated risk.",
-        "summary": "Sumatriptan + sertraline: theoretical serotonin syndrome; large studies show no clinical risk at standard doses; FDA warning does not apply at current doses; safe to continue; sertraline may have unmasked migraine predisposition"
+        "proposed": "sertraline 50 mg + sumatriptan 50 mg",
+        "interactions": [
+          "THEORETICAL INTERACTION: Triptans are 5-HT1B/1D agonists; SSRIs inhibit serotonin reuptake — theoretical risk of serotonin syndrome. FDA advisory (2006) was based on case reports. Large pharmacoepidemiological studies have NOT confirmed increased serotonin syndrome risk at standard doses. AHS and other guidelines do not recommend against co-use. Clinical serotonin syndrome requires triad of neuromuscular abnormality + cognitive changes + autonomic instability. SSRIs may modulate CSD susceptibility via serotonin receptor subtype effects."
+        ],
+        "contraindications": [],
+        "warnings": [
+          "Monitor clinically for serotonin syndrome triad if doses are escalated; safe at current doses (sertraline 50 mg + sumatriptan 50 mg)."
+        ],
+        "formulary_status": "on formulary",
+        "alternatives": []
       }
     },
     {
       "trigger_action": "search_ssri_migraine_trigger_unmask",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: SSRIs and Migraine — Unmasking or Triggering?\n\nKEY FINDINGS:\n1. SSRI AND MIGRAINE: SSRIs can both trigger AND prevent migraine depending on serotonin receptor subtype effects; 5-HT2A activation may lower CSD threshold in susceptible individuals\n2. TEMPORAL COINCIDENCE: This patient's migraines started 2 weeks after sertraline — temporal coincidence; however, family history (father, sister) and prior brief visual flashes over 2-3 years suggest genetic predisposition was present beforehand\n3. PRIOR BRIEF VISUAL FLASHES: 5-10 minute monocular flashes over 2-3 years are MORE LIKELY early incomplete visual aura (unrecognised migraine with aura) than retinal disease, especially with family history\n4. SERTRALINE MAY HAVE LOWERED THRESHOLD: For a genetically predisposed individual, sertraline initiation may have lowered CSD threshold, unmasking full migraine with aura\n5. MANAGEMENT: Do not stop sertraline — depression treatment essential; the migraine diagnosis is primary; sertraline is not a contraindication to migraine management\n\nCONCLUSION: Sertraline likely unmasked genetic migraine predisposition; do not stop antidepressant; treat migraine independently.",
-        "summary": "SSRIs may lower CSD threshold in predisposed individuals; prior brief visual flashes likely represent early incomplete visual aura; sertraline unmasked migraine — do not stop antidepressant"
+        "query": "SSRI sertraline migraine trigger unmask CSD threshold predisposition",
+        "results": [
+          {
+            "source": "Pharmacology review; headache literature",
+            "finding": "SSRIs can both trigger and prevent migraine depending on serotonin receptor subtype effects; 5-HT2A activation may lower CSD threshold in susceptible individuals. Brief monocular visual phenomena preceding a full aura syndrome are reported in the migraine literature and may represent incomplete visual aura; family history of migraine supports inherited predisposition. Depression is a recognised migraine comorbidity; both conditions require independent management.",
+            "evidence_level": "pharmacological review; case series"
+          }
+        ],
+        "summary": "SSRIs may modulate CSD threshold via serotonergic receptor effects; brief monocular visual flashes may represent incomplete visual aura in individuals with migraine predisposition; depression and migraine are recognised comorbid conditions requiring independent management."
       }
     },
     {
       "trigger_action": "request_ophthalmology_monocular_flashes",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "",
+        "test_type": "ophthalmology_assessment",
         "findings": [
           {
-            "description": "OPHTHALMOLOGY REVIEW\n\nIndication: History of 2-3 year brief monocular visual flashes; exclude retinal tear, vitreous detachment, or retinal artery occlusion\n\nFINDINGS: Visual acuity 6/6 bilaterally. Normal IOP 14/15 mmHg. Fundoscopy: Normal disc margins bilaterally. Normal retinal vasculature. No retinal tears, no breaks, no lattice degeneration. No vitreous detachment. Normal vitreous.\n\nCONCLUSION: Normal ophthalmological exam. No retinal or vitreous pathology to explain brief monocular visual phenomena. Prior brief flashes likely represent incomplete visual aura (unrecognised migraine)."
+            "description": "OPHTHALMOLOGY REVIEW\n\nIndication: History of 2-3 year brief monocular visual flashes; exclude retinal tear, vitreous detachment, or retinal artery occlusion\n\nFINDINGS: Visual acuity 6/6 bilaterally. Normal IOP 14/15 mmHg. Fundoscopy: Normal disc margins bilaterally. Normal retinal vasculature. No retinal tears, no breaks, no lattice degeneration. No vitreous detachment. Normal vitreous.\n\nCONCLUSION: Normal ophthalmological examination. No retinal or vitreous pathology identified. Clinical correlation recommended."
           }
         ],
         "quantitative_data": null,
-        "impression": "Normal ophthalmological exam; no retinal tear, detachment, or vascular disease; prior brief monocular flashes likely early incomplete visual aura",
+        "impression": "Normal ophthalmological examination. No retinal tear, detachment, or vascular disease identified. Clinical correlation recommended.",
         "recommended_actions": []
       }
     },
@@ -291,7 +340,14 @@
       "trigger_action": "search_migraine_preventive_ssri_patient",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Migraine Prevention in Patients on SSRIs for Depression\n\nKEY FINDINGS:\n1. AMITRIPTYLINE: TCA with dual antidepressant and migraine preventive properties; Level B for migraine prevention; may allow SSRI dose reduction in some patients — however, amitriptyline + SSRI combination requires caution (serotonin syndrome theoretical risk, but generally acceptable at low amitriptyline doses ≤50 mg)\n2. TOPIRAMATE: No interaction with SSRIs; mood stabilising properties may help anxiety/depression comorbidity at higher doses; Level A for migraine prevention\n3. PROPRANOLOL: Beta-blocker; no interaction with SSRIs; may cause low mood/depression at higher doses — monitor\n4. CGRP ANTIBODIES: No interaction with SSRIs; erenumab 70 mg monthly safe co-administration\n\nCONCLUSION: Topiramate or erenumab preferred for migraine prevention in a patient on sertraline; amitriptyline possible but monitor for serotonin symptoms.",
+        "query": "migraine prevention topiramate erenumab SSRI sertraline drug interactions",
+        "results": [
+          {
+            "source": "AAN guidelines; pharmacology review",
+            "finding": "Topiramate: no interaction with SSRIs; mood stabilising properties may help anxiety/depression comorbidity; Level A for migraine prevention. Erenumab (CGRP antibody): no interaction with SSRIs; 70 mg monthly safe co-administration. Propranolol: no interaction with SSRIs; may cause low mood at higher doses — monitor. Amitriptyline: dual antidepressant/migraine preventive (Level B); caution with SSRI combination (theoretical serotonin risk) but generally acceptable at low doses ≤50 mg.",
+            "evidence_level": "Level A (topiramate); Level B (amitriptyline)"
+          }
+        ],
         "summary": "Topiramate or erenumab preferred preventive in SSRI-treated patients; propranolol acceptable; amitriptyline caution at higher doses"
       }
     },
@@ -299,7 +355,7 @@
       "trigger_action": "request_mra_head",
       "tool_name": "order_advanced_imaging",
       "output": {
-        "modality": "",
+        "modality": "MRA",
         "tracer_or_protocol": null,
         "findings": [
           {
@@ -311,5 +367,73 @@
         "recommended_actions": []
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": null,
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "echo": {
+      "chambers": {
+        "LV": "normal size and systolic function",
+        "RV": "normal size and function",
+        "LA": "normal size",
+        "RA": "normal size"
+      },
+      "valves": {
+        "mitral": "structurally normal",
+        "aortic": "structurally normal",
+        "tricuspid": "normal",
+        "pulmonic": "normal"
+      },
+      "ejection_fraction": 62.0,
+      "wall_motion": "no regional wall-motion abnormality",
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": []
+    },
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 51,
+        "max": 115,
+        "average": 78
+      },
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "impression": "Normal 24-hour Holter monitor.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": null,
+    "specialized_test": null,
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

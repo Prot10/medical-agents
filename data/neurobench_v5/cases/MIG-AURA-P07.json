@@ -47,13 +47,13 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert, fully oriented. Anxious; navigating around left visual field deficit. No cognitive impairment.",
+      "cranial_nerves": "Dense left homonymous hemianopia — loss of entire left hemifield bilaterally; macular sparing present (central 5 degrees preserved). PERRLA — direct and consensual reflexes intact bilaterally. Fundoscopy: Normal discs bilaterally. Normal extraocular movements. Visual acuity 6/9 bilaterally.",
+      "motor": "Motor 5/5 throughout. No pronator drift.",
+      "sensory": "Sensation intact to light touch and pinprick bilaterally.",
+      "reflexes": "Deep tendon reflexes 2+ symmetric. No Babinski.",
+      "coordination": "Coordination normal. Finger-nose intact.",
+      "gait": "Gait normal — compensates for left visual field deficit."
     },
     "vitals": {
       "bp_systolic": 120,
@@ -176,8 +176,21 @@
       "Weakly positive antiphospholipid antibody requires repeat at 12 weeks — initial positive was transient and non-specific; APS definitively excluded on repeat",
       "The patient had a real cardioembolic stroke that coincided with a migraine episode — the migraine aura was a witness to the stroke, not the cause"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Known 12-year migraine with visual aura + DWI restriction during typical episode = migrainous infarction diagnosis assumed",
+        "location": "patient.history_present_illness",
+        "intended_effect": "An established migraineur with DWI restriction during a migraine episode is a classic ICHD-3 migrainous infarction scenario",
+        "correct_interpretation": "Infarct size 3.5cm and complete homonymous hemianopia are inconsistent with migrainous infarction; original MRA showed possible PCA occlusion; PAF detected on ILR = cardioembolic stroke coinciding with migraine"
+      },
+      {
+        "data_point": "Weakly positive aCL IgG — suggests antiphospholipid syndrome as stroke cause",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Weakly positive aCL in a young woman with stroke suggests APS as cause",
+        "correct_interpretation": "Weakly positive aCL requires repeat at 12 weeks for APS diagnosis — repeat is negative; APS excluded; primary aetiology is PAF"
+      }
+    ],
+    "icd_code": "G43.1"
   },
   "red_herrings": [
     {
@@ -194,16 +207,36 @@
   "metadata": {
     "condition_name": "Cardioembolic PCA stroke (paroxysmal AF) misdiagnosed as migrainous infarction — size criteria, ILR AF detection, DOAC switch",
     "difficulty_description": "Diagnostic puzzle: established migraineur with DWI restriction is presumed migrainous infarction; large infarct size and complete hemianopia should raise suspicion; ILR detects PAF missed on initial Holter; DOAC urgently needed",
-    "expected_agent_confidence": 0.35
+    "expected_agent_confidence": 0.35,
+    "fallback_tool_kinds": {
+      "eeg": "normal",
+      "csf": "normal",
+      "ct": "normal",
+      "advanced_imaging": "normal",
+      "specialized_test": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
-      "findings": [],
+      "findings": [
+        {
+          "type": "ischaemic_infarction",
+          "location": "right occipital cortex (PCA territory)",
+          "size": "3.5 cm x 2.5 cm",
+          "signal_characteristics": {
+            "DWI": "established restriction (6 weeks old, now T2 shine-through)",
+            "FLAIR": "hyperintense with encephalomalacic core",
+            "T1": "hypointense (chronic infarction)",
+            "T2": "hyperintense with volume loss"
+          },
+          "mass_effect": "none",
+          "borders": "well-defined cortical and subcortical involvement; right PCA territory"
+        }
+      ],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "Large right PCA territory occipital infarction (3.5cm x 2.5cm) — TOO LARGE for typical migrainous infarction; original MRA showed right PCA possible occlusion (now recanalised); cardioembolic stroke diagnosis should be reconsidered. Clinical correlation recommended.",
+      "impression": "Large right PCA territory occipital infarction 3.5 x 2.5 cm — established (6 weeks old) with encephalomalacic changes. Original MRA showed possible right PCA occlusion (now recanalised). No other DWI lesions. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
@@ -237,13 +270,25 @@
       "trigger_action": "request_prolonged_cardiac_monitoring_implantable",
       "tool_name": "order_cardiac_monitoring",
       "output": {
-        "duration_hours": 0,
-        "monitor_type": "",
-        "rhythm_summary": "Paroxysmal AF detected on ILR — not found on initial 24-hour Holter; CHA2DS2-VASc 3 (includes prior stroke); DOAC anticoagulation indicated; aspirin monotherapy insufficient",
-        "heart_rate_range": {},
-        "events": [],
+        "duration_hours": 720,
+        "monitor_type": "implantable_loop_recorder",
+        "rhythm_summary": "Paroxysmal AF detected on ILR (not identified on initial 24-hour Holter); sinus rhythm predominant",
+        "heart_rate_range": {
+          "min": 48,
+          "max": 138,
+          "average": 74
+        },
+        "events": [
+          {
+            "time": "day 17, 02:14",
+            "type": "paroxysmal_atrial_fibrillation",
+            "duration_minutes": 43,
+            "heart_rate": 138,
+            "notes": "AF during sleep; rate 138 bpm; terminated spontaneously; temporally unrelated to migraine aura episodes; confirms paroxysmal AF as cardioembolic source"
+          }
+        ],
         "findings": [],
-        "impression": "Paroxysmal AF detected on ILR — not found on initial 24-hour Holter; CHA2DS2-VASc 3 (includes prior stroke); DOAC anticoagulation indicated; aspirin monotherapy insufficient",
+        "impression": "Paroxysmal AF detected during monitoring period. Not identified on initial 24-hour Holter. Clinical correlation recommended.",
         "recommended_actions": []
       }
     },
@@ -256,9 +301,9 @@
         "ejection_fraction": null,
         "wall_motion": null,
         "findings": [
-          "TRANSOESOPHAGEAL ECHOCARDIOGRAM\n\nIndication: Large PCA stroke; paroxysmal AF on ILR; cardioembolic workup\n\nFindings: Normal LV function, EF 64%. Normal valve morphology. Normal LA size (36mm).\nLA APPENDAGE: No thrombus. Normal LAA velocities (44 cm/s).\nBUBBLE STUDY: Small PFO detected — 4-5 microbubbles on Valsalva.\n\nNOTE: Small PFO in context of confirmed PAF — PFO may have facilitated paradoxical embolism from venous thrombus OR AF directly caused LA thrombus emboli. Anticoagulation covers both mechanisms. PFO closure deferred pending full stroke aetiology workup.\n\nIMPRESSION: No LA thrombus at time of scan. Small PFO. AF is most likely cardioembolic source."
+          "TRANSOESOPHAGEAL ECHOCARDIOGRAM\n\nIndication: Large PCA territory infarction; cardioembolic workup\n\nFindings: Normal LV function, EF 64%. Normal valve morphology. Normal LA size (36mm).\nLA APPENDAGE: No thrombus. Normal LAA velocities (44 cm/s).\nBUBBLE STUDY: Small PFO detected — 4-5 microbubbles on Valsalva.\n\nIMPRESSION: No LA thrombus at time of scan. Small PFO on bubble study. Normal systolic function. Normal LA size."
         ],
-        "impression": "No LA thrombus now; small PFO; AF (from ILR) is most likely cardioembolic source; anticoagulation covers AF and PFO; PFO closure deferred",
+        "impression": "No LA thrombus at time of scan. Small PFO on bubble study. Normal LV systolic function. Normal LA size. Clinical correlation recommended.",
         "recommended_actions": []
       }
     },
@@ -266,8 +311,28 @@
       "trigger_action": "search_migrainous_infarction_vs_cardioembolic_size_criteria",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Migrainous Infarction vs Cardioembolic PCA Territory Stroke — Key Distinguishing Features\n\nKEY FINDINGS:\n1. MIGRAINOUS INFARCTION SIZE: Typically small (<10mm, cortical/juxtacortical); involves a small area within the aura territory; full field loss is UNUSUAL in true migrainous infarction\n2. CARDIOEMBOLIC PCA STROKE: Can produce large territorial infarction in PCA distribution; complete left homonymous hemianopia is a classic presentation of right PCA occlusion\n3. COMPLETE HOMONYMOUS HEMIANOPIA: Typically NOT seen in migrainous infarction (which causes small cortical defects); complete hemianopia suggests large vessel occlusion or proximal embolus\n4. MIGRAINOUS INFARCTION CRITERIA (ICHD-3): Requires that typical migraine with aura attacks occur; infarction in territory of aura; all other causes excluded\n5. IN THIS CASE: 3.5cm x 2.5cm infarction = large; complete homonymous hemianopia = large vessel territory; PAF found on ILR = cardioembolic source identified; this is NOT migrainous infarction — this is CARDIOEMBOLIC PCA STROKE occurring during (coincident with) a migraine episode\n\nCONCLUSION: Original 'migrainous infarction' diagnosis was incorrect. This is a cardioembolic PCA territory stroke occurring during migraine — not caused by migraine. DOAC anticoagulation indicated.",
-        "summary": "Large 3.5cm infarct = NOT migrainous infarction (which is <10mm); complete homonymous hemianopia inconsistent with migrainous infarction; PAF found = cardioembolic stroke; DOAC anticoagulation indicated"
+        "query": "migrainous infarction size criteria vs cardioembolic PCA territory stroke homonymous hemianopia",
+        "results": [
+          {
+            "title": "ICHD-3 Migrainous Infarction: Diagnostic Criteria and Imaging",
+            "authors": "Headache Classification Committee of the IHS.",
+            "year": "2018",
+            "summary": "Migrainous infarction (ICHD-3 1.4.1) typically causes small (<10mm) cortical or juxtacortical lesions strictly within the aura territory; full homonymous hemianopia is UNUSUAL in true migrainous infarction; all other causes must be excluded before diagnosing migrainous infarction."
+          },
+          {
+            "title": "Cardioembolic vs Migrainous PCA Territory Stroke: Distinguishing Features",
+            "authors": "Broderick JP et al.",
+            "year": "2007",
+            "summary": "Large territorial PCA infarctions (>2cm) causing complete homonymous hemianopia are inconsistent with migrainous infarction; complete hemianopia suggests proximal PCA embolism from cardioembolic source; original MRA showing possible PCA occlusion is a key differentiating finding."
+          },
+          {
+            "title": "Paroxysmal AF Detection After Cryptogenic Stroke — ILR vs Short Holter",
+            "authors": "Sanna T et al.",
+            "year": "2014",
+            "summary": "30-day ILR detects paroxysmal AF in 12-15% of cryptogenic stroke patients vs <3% with 24-hour Holter; PAF is confirmed as cardioembolic source; DOAC anticoagulation provides secondary stroke prevention superior to aspirin alone."
+          }
+        ],
+        "summary": "ICHD-3 migrainous infarction typically causes small lesions (<10mm) strictly within the aura territory; large territorial infarctions with complete homonymous hemianopia are inconsistent with migrainous infarction and suggest proximal embolic PCA occlusion. Short-duration Holter monitoring detects AF in fewer than 3% of cryptogenic stroke patients; 30-day ILR detection rate is approximately 12-15%. Confirmed AF is managed with DOAC anticoagulation for secondary stroke prevention."
       }
     },
     {
@@ -283,17 +348,106 @@
       "trigger_action": "search_doac_aspirin_switch_af_stroke",
       "tool_name": "check_drug_interactions",
       "output": {
-        "report": "DRUG REVIEW — SWITCHING FROM ASPIRIN TO DOAC FOR AF-RELATED STROKE SECONDARY PREVENTION\n\nQuery: Aspirin 75 mg currently; PAF confirmed; CHA2DS2-VASc 3 (female + prior stroke) — switch to DOAC?\n\nFINDINGS: CHA2DS2-VASc 3 = HIGH EMBOLIC RISK — DOAC strongly indicated.\nAPIXABAN 5 mg BID: First-line DOAC for AF; renal function normal (Cr 0.80 — no dose reduction needed).\nSWITCH FROM ASPIRIN: Stop aspirin; start apixaban 5 mg BID. No aspirin needed additionally (combination not superior to DOAC alone for AF stroke prevention).\n\nCONCLUSION: Switch aspirin to apixaban 5 mg BID immediately. Aspirin monotherapy is insufficient for AF secondary stroke prevention.",
-        "summary": "Switch from aspirin to apixaban 5 mg BID — CHA2DS2-VASc 3; aspirin alone insufficient for AF secondary stroke prevention; start DOAC immediately"
+        "proposed": "apixaban 5 mg BID replacing aspirin 75 mg; PAF secondary stroke prevention",
+        "interactions": [],
+        "contraindications": [],
+        "warnings": [
+          "Concurrent aspirin + DOAC increases bleeding risk without additional embolic stroke prevention benefit compared to DOAC monotherapy — dual therapy should generally be avoided",
+          "DOAC anticoagulation is indicated in atrial fibrillation with elevated CHA2DS2-VASc score (≥2 in women, ≥1 in men); female sex and prior stroke each contribute independently to CHA2DS2-VASc scoring"
+        ],
+        "formulary_status": "on formulary",
+        "alternatives": [
+          "rivaroxaban 20 mg OD",
+          "dabigatran 150 mg BID (renal function permitting)"
+        ]
       }
     },
     {
       "trigger_action": "search_visual_rehabilitation_homonymous_hemianopia",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Rehabilitation for Persistent Homonymous Hemianopia\n\nKEY FINDINGS:\n1. SPONTANEOUS RECOVERY: Some recovery in first 3 months post-stroke; macular sparing (as in this patient) usually preserved\n2. VISUAL COMPENSATION THERAPY: Eye movement training to scan into the blind field; notatake compensatory saccades — formal low vision rehabilitation\n3. PRISM GLASSES: Sector prisms can expand effective visual field — some benefit\n4. DRIVING: Cannot drive with homonymous hemianopia — DVLA Category I: complete hemianopia = automatic driving licence revocation\n5. OCCUPATIONAL THERAPY: Adaptation for work — relevant for medical secretary role\n\nCONCLUSION: Refer to neuro-ophthalmology and low vision rehabilitation; DVLA driving restriction applies; occupational therapy for work adaptation.",
-        "summary": "Neuro-ophthalmology + low vision rehab referral; DVLA driving restriction (complete homonymous hemianopia = cannot drive); occupational therapy for work adaptation"
+        "query": "rehabilitation persistent homonymous hemianopia post-stroke visual field recovery DVLA driving",
+        "results": [
+          {
+            "title": "Visual Recovery After Occipital Stroke and Homonymous Hemianopia",
+            "authors": "Pambakian ALM et al.",
+            "year": "2000",
+            "summary": "Spontaneous recovery from homonymous hemianopia occurs in ~40% within 3 months post-stroke; macular sparing is commonly preserved due to dual MCA-PCA blood supply to the macular cortex; visual compensation therapy involving eye movement training into the blind field improves functional disability."
+          },
+          {
+            "title": "Prism Therapy and Visual Rehabilitation for Hemianopia",
+            "authors": "Szlyk JP et al.",
+            "year": "2005",
+            "summary": "Sector prisms (Fresnel prisms) can expand effective visual field awareness; formal low vision rehabilitation including compensatory saccade training improves daily function; occupational therapy for work adaptation recommended for patients in visual detail-dependent roles."
+          },
+          {
+            "title": "DVLA Driving Regulations and Visual Field Defects",
+            "authors": "DVLA Driver Licensing Authority.",
+            "year": "2021",
+            "summary": "Complete homonymous hemianopia = automatic DVLA Category I driving licence revocation; patients must not drive until assessed and cleared by DVLA; formal notification required; neuro-ophthalmology assessment for DVLA medical review pathway."
+          }
+        ],
+        "summary": "Post-stroke homonymous hemianopia is managed with neuro-ophthalmology review and low vision rehabilitation including compensatory saccade training; complete homonymous hemianopia triggers automatic DVLA Category I licence revocation pending formal neuro-ophthalmology assessment; occupational therapy supports work adaptation in visually-demanding roles. Clinical correlation recommended."
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": {
+      "classification": "normal",
+      "background": {
+        "pdr": "9-10 Hz posterior dominant rhythm, symmetric and reactive",
+        "sleep_features": "normal vertex waves and sleep spindles",
+        "overall": "normal organisation for age"
+      },
+      "findings": [],
+      "artifacts": [],
+      "activating_procedures": {},
+      "impression": "Normal awake and drowsy EEG. No epileptiform discharges and no focal slowing.",
+      "limitations": "",
+      "recommended_actions": []
+    },
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "echo": null,
+    "cardiac_monitoring": null,
+    "advanced_imaging": {
+      "modality": "MRA",
+      "tracer_or_protocol": null,
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "No abnormality identified on advanced imaging. Findings are non-contributory; clinical correlation recommended.",
+      "recommended_actions": []
+    },
+    "specialized_test": {
+      "test_type": "general_laboratory_panel",
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "Study within normal limits. No abnormality identified; non-contributory.",
+      "recommended_actions": []
+    },
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

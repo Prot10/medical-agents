@@ -45,13 +45,13 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert, fully oriented. Mildly anxious about re-engaging in exercise.",
+      "cranial_nerves": "Normal cranial nerves II-XII. Visual fields full. PERRLA. No papilledema.",
+      "motor": "Motor 5/5 throughout. No pronator drift.",
+      "sensory": "Sensation intact to light touch and pinprick bilaterally.",
+      "reflexes": "Deep tendon reflexes 2+ symmetric. No Babinski.",
+      "coordination": "Finger-nose normal. Heel-shin normal. No dysmetria.",
+      "gait": "Gait normal. Tandem gait normal."
     },
     "vitals": {
       "bp_systolic": 120,
@@ -174,8 +174,21 @@
       "Beta-blockers (propranolol, metoprolol) reduce maximal exercise capacity — avoid in competitive endurance athletes",
       "Athlete's bradycardia and LVH are physiological and should not be mistaken for pathological findings"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Confusion during marathon — possible exercise-induced hyponatraemia or hypoglycaemia",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Confusion during endurance exercise appropriately triggers metabolic workup",
+        "correct_interpretation": "Visual aura expanding over 20 minutes preceding confusion = characteristic CSD + confusional aura; metabolic encephalopathy does not cause expanding zigzag aura; A&E labs normal"
+      },
+      {
+        "data_point": "Athlete's bradycardia and LVH raising concern for hypertrophic cardiomyopathy or WPW",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Brady at 52 bpm with LVH could suggest HCM or conduction abnormality in a young patient presenting with an unexplained episode",
+        "correct_interpretation": "ECG shows no WPW delta waves; wall thickness borderline 11mm (HCM threshold 15mm); Holter no arrhythmia; normal clinical exam — athlete's heart syndrome"
+      }
+    ],
+    "icd_code": "G43.1"
   },
   "red_herrings": [
     {
@@ -192,28 +205,50 @@
   "metadata": {
     "condition_name": "Exercise-triggered migraine with confusional aura in marathon runner — PRES exclusion, avoid beta-blockers",
     "difficulty_description": "Moderate: exercise-triggered migraine with confusional aura; PRES differential; beta-blocker avoidance in competitive athlete; caffeine and hydration management",
-    "expected_agent_confidence": 0.62
+    "expected_agent_confidence": 0.62,
+    "fallback_tool_kinds": {
+      "csf": "normal",
+      "ct": "normal",
+      "advanced_imaging": "normal",
+      "specialized_test": "incidental",
+      "drug_interactions": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
-      "findings": [],
+      "findings": [
+        {
+          "type": "normal",
+          "location": "entire brain including posterior fossa",
+          "size": null,
+          "signal_characteristics": {
+            "DWI": "no restriction",
+            "FLAIR": "no signal change",
+            "T1+Gd": "no enhancement"
+          },
+          "mass_effect": "none",
+          "borders": null
+        }
+      ],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "See findings above. Clinical correlation recommended.",
+      "impression": "Normal MRI brain including posterior fossa. No DWI restriction. No posterior FLAIR signal change. Normal MRA — no AVM, aneurysm, or stenosis. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
     },
     "eeg": {
       "classification": "normal",
-      "background": {},
+      "background": {
+        "dominant_rhythm": "10 Hz posterior dominant rhythm",
+        "symmetry": "symmetric",
+        "reactivity": "reactive"
+      },
       "findings": [],
       "artifacts": [],
       "activating_procedures": {},
-      "confidence": 0.0,
-      "impression": "Non-specific mild posterior slowing; no epileptiform discharges; no ictal correlate for confusion. Clinical correlation recommended.",
+      "impression": "This is a NORMAL EEG. No epileptiform discharges. No electrographic seizures recorded. Clinical correlation recommended.",
       "limitations": "",
       "recommended_actions": [
         "Clinical correlation recommended."
@@ -247,7 +282,14 @@
       "trigger_action": "search_exercise_triggered_migraine_confusional",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Exercise-Triggered Migraine Aura and Confusional Migraine\n\nKEY FINDINGS:\n1. EXERCISE-TRIGGERED MIGRAINE: Aerobic exercise can trigger migraine via multiple mechanisms: dehydration/hypoglycaemia, hyperventilation, adenosine release, CSD susceptibility during metabolic stress\n2. CONFUSIONAL MIGRAINE (ALICE IN WONDERLAND SYNDROME): ICHD-3 recognises 'migraine with confusional aura' — transient confusion/amnesia as aura; more common in adolescents and young adults; usually resolves within 30-60 min\n3. CSD DURING EXERCISE: Intense endurance exercise reduces cortical threshold for CSD, particularly with dehydration and glycogen depletion\n4. MARATHON CONTEXT: Dehydration, hyponatraemia, hypoglycaemia at 15 km in a half-marathon are all CSD triggers converging\n5. DIFFERENTIAL: Exercise-induced hypoglycaemia, hyponatraemia, or posterior cortex hypoperfusion during maximal exertion — all must be considered\n6. PROGNOSIS: Most exercise-triggered migraine resolves spontaneously; preventive during race season may be considered\n\nCONCLUSION: Exercise-triggered migraine with visual and confusional aura. Address dehydration, glycogen loading, and race-day caffeine management.",
+        "query": "exercise triggered migraine aura confusional aura marathon dehydration CSD",
+        "results": [
+          {
+            "source": "Cephalalgia; ICHD-3; sports medicine literature",
+            "finding": "Aerobic exercise triggers migraine via dehydration/hypoglycaemia, hyperventilation, adenosine release, and CSD susceptibility during metabolic stress. ICHD-3 recognises migraine with confusional aura — transient confusion/amnesia as aura; more common in young adults; resolves within 30-60 min. Dehydration, hyponatraemia, and hypoglycaemia at 15km in a half-marathon are all CSD triggers converging. Most exercise-triggered migraine resolves spontaneously; preventive during race season may be considered.",
+            "evidence_level": "ICHD-3 classification; observational"
+          }
+        ],
         "summary": "Exercise-triggered migraine with confusional aura (CSD during metabolic stress of marathon); dehydration + glycogen depletion + hyperventilation all lower CSD threshold"
       }
     },
@@ -255,8 +297,8 @@
       "trigger_action": "request_cardiac_monitoring_exertional_arrhythmia",
       "tool_name": "order_cardiac_monitoring",
       "output": {
-        "duration_hours": 0,
-        "monitor_type": "",
+        "duration_hours": 24,
+        "monitor_type": "holter_24h_with_exercise",
         "rhythm_summary": "Normal Holter with exercise; no arrhythmia; athlete's sinus bradycardia at rest; no WPW",
         "heart_rate_range": {},
         "events": [],
@@ -274,9 +316,9 @@
         "ejection_fraction": null,
         "wall_motion": null,
         "findings": [
-          "TRANSTHORACIC ECHOCARDIOGRAM\n\nFindings: Athletic LVH pattern — borderline increased wall thickness (IVSd 11mm, normal <12mm in athletes). Normal systolic function, EF 64%. Normal valves.\n\nBUBBLE STUDY: Small PFO detected — 3-4 microbubbles crossing during Valsalva. No spontaneous shunt at rest.\n\nNOTE: PFO prevalence ~25% in general population; higher frequency reported in migraineurs. PFO closure NOT indicated for exercise-triggered migraine without prior confirmed stroke (PREMIUM/MIST trials).\n\nIMPRESSION: Athletic LVH pattern. Small incidental PFO — no action needed."
+          "TRANSTHORACIC ECHOCARDIOGRAM\n\nFindings: Athletic LVH pattern — borderline increased wall thickness (IVSd 11mm, normal <12mm in athletes). Normal systolic function, EF 64%. Normal valves.\n\nBUBBLE STUDY: Small PFO detected — 3-4 microbubbles crossing during Valsalva. No spontaneous shunt at rest.\n\nIMPRESSION: Athletic LVH pattern (physiological). Small incidental PFO. Normal systolic function."
         ],
-        "impression": "Athletic LVH (physiological); small PFO — incidental; PFO closure not indicated for migraine alone",
+        "impression": "Normal systolic function. Athletic LVH pattern (physiological). Small incidental PFO on bubble study. Clinical correlation recommended.",
         "recommended_actions": []
       }
     },
@@ -284,7 +326,14 @@
       "trigger_action": "search_marathon_migraine_prevention_athlete",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Migraine Prevention in Endurance Athletes\n\nKEY FINDINGS:\n1. HYDRATION: Most critical intervention; target pre-race weight maintenance with electrolyte sports drink; prevent >2% body weight loss\n2. CARBOHYDRATE LOADING: 7-10 g/kg/day CHO for 3 days pre-race; prevents glycogen depletion-triggered CSD at high-effort threshold\n3. CAFFEINE TIMING: Withdrawal headache if regular caffeine is stopped before race; alternatively consistent daily intake reduces withdrawal risk; excessive acute caffeine (energy gels) during a race can trigger migraine in some individuals\n4. PREVENTIVE MEDICATIONS: Beta-blockers (propranolol) REDUCE exercise tolerance — avoid in competitive athletes. Topiramate 25-50 mg/day does not impair exercise; amitriptyline may cause fatigue; anti-CGRP antibodies show no exercise limitation\n5. TRIPTAN: Take at headache ONSET; not during aura; naratriptan has longer t½ and may be useful for predictable race-day migraines (taken pre-race — limited evidence)\n\nCONCLUSION: Optimise hydration/carbohydrate loading; avoid propranolol (reduces exercise tolerance); topiramate or anti-CGRP preventive options for athlete.",
+        "query": "migraine prevention endurance athlete marathon propranolol topiramate CGRP",
+        "results": [
+          {
+            "source": "Headache; sports neurology reviews",
+            "finding": "Hydration is the most critical intervention; target pre-race weight maintenance with electrolyte sports drink; prevent >2% body weight loss. Carbohydrate loading (7-10 g/kg/day for 3 days pre-race) prevents glycogen depletion-triggered CSD. Caffeine: withdrawal headache if stopped before race; consistent daily intake reduces risk. Beta-blockers (propranolol) REDUCE exercise tolerance — avoid in competitive athletes. Topiramate 25-50 mg/day does not impair exercise performance. Anti-CGRP antibodies show no exercise limitation. Naratriptan (longer half-life) may be used at headache onset.",
+            "evidence_level": "observational; expert consensus"
+          }
+        ],
         "summary": "Hydration + carbohydrate loading key for exercise-triggered migraine; avoid beta-blockers in competitive athletes (reduce exercise tolerance); topiramate or CGRP antibodies are athlete-compatible preventives"
       }
     },
@@ -301,9 +350,78 @@
       "trigger_action": "search_pres_syndrome_exertion",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: PRES vs Exertional Migraine — Differential Diagnosis\n\nKEY FINDINGS:\n1. POSTERIOR REVERSIBLE ENCEPHALOPATHY SYNDROME (PRES): Typically associated with hypertensive emergency, immunosuppressive agents (ciclosporin, tacrolimus), eclampsia; MRI shows posterior white matter T2/FLAIR signal change — NOT present in this patient\n2. EXERTION-INDUCED HYPERTENSION: Extreme exercise can transiently raise BP to 180+/100+ during maximal effort; transient hypertension could theoretically cause PRES in susceptible individuals; however, this patient has no history of hypertension and normal resting BP\n3. MRI FINDING: Normal MRI in this case — no posterior FLAIR change; excludes PRES\n4. EXERTIONAL HEADACHE: Primary exertional headache (ICHD-3 4.2) is bilateral, without aura; this patient has unilateral aura + confusion — more consistent with exercise-triggered migraine with aura\n\nCONCLUSION: PRES excluded by normal MRI. Exercise-triggered migraine with confusional aura is the diagnosis.",
-        "summary": "PRES excluded by normal MRI (no posterior FLAIR signal change); exercise-triggered migraine with confusional aura confirmed"
+        "query": "PRES posterior reversible encephalopathy syndrome exertional migraine differential",
+        "results": [
+          {
+            "source": "AJNR; Neurology review",
+            "finding": "PRES: typically associated with hypertensive emergency, immunosuppressive agents, or eclampsia; MRI shows posterior white matter T2/FLAIR signal change. In the absence of posterior FLAIR signal change on MRI, PRES is not supported. Exertion-induced hypertension could theoretically cause PRES in susceptible individuals, but normal resting BP and normal MRI argues against this. Primary exertional headache (ICHD-3 4.2) is characteristically bilateral without aura; unilateral spreading visual aura with subsequent headache is characteristic of migraine with aura.",
+            "evidence_level": "case series; expert consensus"
+          }
+        ],
+        "summary": "PRES requires posterior FLAIR signal change on MRI and is typically associated with hypertensive emergency or immunosuppressive agents; normal MRI does not support PRES. Spreading visual aura with subsequent severe headache is characteristic of migraine with aura rather than primary exertional headache. Clinical correlation recommended."
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": null,
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "echo": null,
+    "cardiac_monitoring": null,
+    "advanced_imaging": {
+      "modality": "",
+      "tracer_or_protocol": null,
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "No abnormality identified on advanced imaging. Findings are non-contributory; clinical correlation recommended.",
+      "recommended_actions": []
+    },
+    "specialized_test": {
+      "test_type": "",
+      "findings": [
+        {
+          "finding": "minor non-specific abnormality",
+          "interpretation": "of uncertain and likely no clinical significance"
+        }
+      ],
+      "quantitative_data": null,
+      "impression": "Study with only a minor non-specific finding; non-contributory to the presentation.",
+      "recommended_actions": []
+    },
+    "literature_search": null,
+    "drug_interactions": {
+      "general": {
+        "proposed": "(agent not specified on this case's pathway)",
+        "interactions": [],
+        "contraindications": [],
+        "warnings": [
+          "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
+        ],
+        "formulary_status": "on formulary",
+        "alternatives": []
+      }
+    }
+  }
 }

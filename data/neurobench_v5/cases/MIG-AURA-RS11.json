@@ -59,21 +59,21 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert and fully oriented. Normal speech. No cognitive deficit.",
+      "cranial_nerves": "Normal cranial nerves II-XII. Mild decreased pain sensation in the left frontal region on careful testing — no other cranial nerve deficit. Visual fields full. PERRLA. Extraocular movements full.",
+      "motor": "Motor strength 5/5 in all four limbs today. Normal tone. No pronator drift.",
+      "sensory": "Mild residual decreased pain sensation over the left frontal region. Otherwise intact to light touch, pinprick, and vibration throughout.",
+      "reflexes": "Deep tendon reflexes 2+ and symmetric. Plantar responses flexor bilaterally.",
+      "coordination": "Finger-nose and heel-shin tests normal bilaterally. No dysmetria.",
+      "gait": "Normal gait and tandem gait. Romberg negative."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
-      "hr": 72,
-      "temp": 37.0,
+      "bp_systolic": 139,
+      "bp_diastolic": 91,
+      "hr": 70,
+      "temp": 36.6,
       "rr": 14,
-      "spo2": 98
+      "spo2": 99
     },
     "history_present_illness": "A 39-year-old Japanese man with a long-standing history of myofascial pain syndrome and intermittent headaches was referred to the neurology outpatient clinic for urgent evaluation after two episodes of transient right-sided limb weakness. The first episode occurred 20 days prior to this visit: he noticed weakness in his right arm and right leg while at home, along with a tense, numb feeling on the right side of his face. These symptoms developed gradually over approximately 20-25 minutes and resolved over the following 30-40 minutes. Afterwards, he experienced a left occipital headache that he treated with loxoprofen with good relief.\n\nThe second episode occurred 2 days before this visit. He was at work when he again developed right upper and lower limb weakness and a tense feeling on the left side of his mouth. He was found unresponsive by a colleague and transported by ambulance to a local emergency department. En route to hospital, he regained consciousness and complained of a left occipital headache. At the emergency department, he was alert with right limb weakness and sensory disturbance over the ulnar aspect of the right upper arm. He was admitted for observation. His symptoms gradually improved over several hours and he was discharged with an outpatient referral when no acute cause was identified.\n\nHe has a history of migraine headaches and myofascial pain, managed with lomerizine hydrochloride and as-needed NSAIDs. He has no prior stroke, no hypertension, no diabetes, and no cardiac disease. He is a non-smoker. He reports no family history of hemiplegic migraine. He is now headache-free and fully neurologically intact at this consultation."
   },
@@ -187,8 +187,15 @@
       "The second episode's transient loss of consciousness can occur in severe hemiplegic migraine — not required to change diagnosis to epilepsy without EEG evidence",
       "MELAS shares clinical features (episodic neurological deficits, headache) but is distinguished by elevated lactate, mitochondrial DNA mutation, and maternal inheritance — all normal/negative here"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Transient loss of consciousness at second episode — suggesting seizure or cardiac arrhythmia",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Brief loss of consciousness is not a classic hemiplegic migraine feature — raises concern for seizure (Todd's paralysis) or cardiogenic syncope",
+        "correct_interpretation": "Loss of consciousness can occur in severe hemiplegic migraine (impaired consciousness is a recognised aura feature); normal EEG excludes seizure; normal Holter excludes arrhythmia; gradual onset remains the key differentiating feature"
+      }
+    ],
+    "icd_code": "G43.1"
   },
   "red_herrings": [
     {
@@ -204,28 +211,50 @@
     "generation_method": "real_case_seed",
     "condition_name": "Sporadic hemiplegic migraine — TIA and epilepsy exclusion; gradual onset rate is diagnostic",
     "difficulty_description": "Straightforward: two qualifying hemiplegic migraine episodes; gradual onset distinguishes from TIA; normal DWI, EEG, and lactate confirm primary diagnosis",
-    "expected_agent_confidence": 0.85
+    "expected_agent_confidence": 0.85,
+    "fallback_tool_kinds": {
+      "csf": "normal",
+      "ct": "normal",
+      "echo": "normal",
+      "specialized_test": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
-      "findings": [],
+      "findings": [
+        {
+          "type": "normal",
+          "location": "whole brain",
+          "size": null,
+          "signal_characteristics": {
+            "DWI": "no restriction",
+            "FLAIR": "no signal abnormality",
+            "T1": "normal grey-white differentiation",
+            "MRA": "normal circle of Willis, no stenosis or occlusion"
+          },
+          "mass_effect": "none",
+          "borders": null
+        }
+      ],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "See findings above. Clinical correlation recommended.",
+      "impression": "No acute or chronic infarction. No structural lesion. Normal DWI. Normal circle of Willis on MRA. No carotid dissection or stenosis. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
     },
     "eeg": {
       "classification": "normal",
-      "background": {},
+      "background": {
+        "pdr": "9-10 Hz posterior dominant rhythm, symmetric and reactive",
+        "sleep_features": "normal vertex waves",
+        "overall": "normal organisation for age"
+      },
       "findings": [],
       "artifacts": [],
       "activating_procedures": {},
-      "confidence": 0.0,
-      "impression": "See findings above. Clinical correlation recommended.",
+      "impression": "This is a NORMAL EEG. No epileptiform discharges. No focal slowing. No electrographic seizures recorded. Clinical correlation recommended.",
       "limitations": "",
       "recommended_actions": [
         "Clinical correlation recommended."
@@ -259,23 +288,23 @@
       "trigger_action": "search_sporadic_hemiplegic_migraine_diagnosis",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Sporadic Hemiplegic Migraine — ICHD-3 Criteria and TIA Differentiation\n\nICHD-3 CRITERIA FOR SPORADIC HEMIPLEGIC MIGRAINE (SHM):\n1. Migraine with motor aura: ≥2 attacks with fully reversible motor weakness as one aura symptom\n2. ≥1 other aura symptom (visual, sensory, or language) spreading gradually\n3. No first- or second-degree relative with identical attacks (distinguishes from FHM)\n4. Normal neuroimaging; no other explanation\n\nTIA VS HEMIPLEGIC MIGRAINE AURA:\n  TIA: Sudden onset maximal at onset; motor weakness/paralysis abrupt; usually lasts minutes; no subsequent headache typically\n  HM aura: Gradual progression over ≥5 min; motor weakness accompanies other aura features; followed by headache within 60 min\n\nDIFFERENTIATION KEY POINTS:\n  CSD propagation speed ~3-5mm/min — produces gradual onset over 20+ minutes\n  TIA propagation is embolic/ischaemic — maximal at onset\n  Prior migraine history and gradual spread are the key features\n\nCONCLUSION: This patient meets ICHD-3 criteria for sporadic hemiplegic migraine (SHM) — two qualifying episodes; gradual onset; followed by headache; normal DWI; normal MRI/MRA; no family history of HM (sporadic).",
-        "summary": "ICHD-3 SHM criteria met with 2 episodes; gradual motor spread = CSD propagation; normal DWI excludes TIA infarction; no family history = sporadic form"
+        "report": "LITERATURE SEARCH: Sporadic Hemiplegic Migraine — ICHD-3 Criteria and TIA Differentiation\n\nICHD-3 CRITERIA FOR SPORADIC HEMIPLEGIC MIGRAINE (SHM):\n1. Migraine with motor aura: ≥2 attacks with fully reversible motor weakness as one aura symptom\n2. ≥1 other aura symptom (visual, sensory, or language) spreading gradually\n3. No first- or second-degree relative with identical attacks (distinguishes from familial hemiplegic migraine)\n4. Normal neuroimaging and no other explanation\n\nTIA VS HEMIPLEGIC MIGRAINE AURA:\n  TIA: Sudden onset, maximal at onset; motor weakness abrupt; typically brief; not consistently followed by headache\n  HM aura: Gradual progression over ≥5 min; motor weakness accompanies other aura features; typically followed by headache within 60 min\n\nKEY DIFFERENTIATING FEATURES:\n  Cortical spreading depression propagation speed approximately 3-5 mm/min — produces gradual symptom onset over 20+ minutes\n  Embolic/ischaemic TIA is maximal at onset\n  Prior migraine history and gradual spread are key clinical features\n\nClinical correlation recommended.",
+        "summary": "ICHD-3 SHM requires ≥2 reversible motor aura attacks, gradual onset of aura over ≥5 min, and no first/second-degree relative with identical attacks; gradual motor spread distinguishes from embolic TIA"
       }
     },
     {
       "trigger_action": "request_mra_carotid_dissection_screen",
       "tool_name": "order_advanced_imaging",
       "output": {
-        "modality": "",
+        "modality": "MRA head and neck",
         "tracer_or_protocol": null,
         "findings": [
           {
-            "description": "MRA HEAD AND NECK — CAROTID AND VERTEBRAL ARTERIES\n\nFindings: Normal bilateral carotid arteries. Normal calibre and signal. No dissection (no intramural haematoma, no pseudoaneurysm). Normal bilateral vertebral arteries. Normal circle of Willis from prior MRA confirmed. No stenosis, AVM, or aneurysm.\n\nIMPRESSION: Normal MRA head and neck. Carotid dissection excluded."
+            "description": "MRA HEAD AND NECK — CAROTID AND VERTEBRAL ARTERIES\n\nFindings: Normal bilateral carotid arteries. Normal calibre and flow signal. No intramural haematoma. No pseudoaneurysm. Normal bilateral vertebral arteries. Normal circle of Willis. No stenosis, AVM, or aneurysm.\n\nIMPRESSION: Normal MRA head and neck. No dissection, stenosis, or occlusion identified."
           }
         ],
         "quantitative_data": null,
-        "impression": "Normal MRA; no carotid or vertebral dissection; carotid dissection excluded as cause of transient hemiplegia",
+        "impression": "Normal MRA head and neck. No dissection, stenosis, or occlusion identified.",
         "recommended_actions": []
       }
     },
@@ -283,12 +312,18 @@
       "trigger_action": "request_cardiac_monitoring_af_screen",
       "tool_name": "order_cardiac_monitoring",
       "output": {
-        "duration_hours": 0,
-        "monitor_type": "",
+        "duration_hours": 48,
+        "monitor_type": "holter_48h",
         "rhythm_summary": "Normal Holter; no AF; no paroxysmal arrhythmia",
-        "heart_rate_range": {},
+        "heart_rate_range": {
+          "min": 50,
+          "max": 104,
+          "average": 70
+        },
         "events": [],
-        "findings": [],
+        "findings": [
+          "No paroxysmal AF detected. Sinus rhythm throughout. No significant pauses or AV block."
+        ],
         "impression": "Normal Holter; no AF; no paroxysmal arrhythmia",
         "recommended_actions": []
       }
@@ -306,8 +341,8 @@
       "trigger_action": "search_triptan_contraindication_hemiplegic_migraine",
       "tool_name": "check_drug_interactions",
       "output": {
-        "report": "DRUG REVIEW — TRIPTANS IN SPORADIC HEMIPLEGIC MIGRAINE\n\nFINDINGS: Triptans are cautioned (not absolutely contraindicated) in hemiplegic migraine. Most headache guidelines advise against triptans during motor aura episodes due to theoretical vasoconstrictive risk.\n\nACUTE TREATMENT FOR THIS PATIENT: NSAIDs (existing meloxicam) and antiemetics. Paracetamol. Avoid triptans during motor aura episodes.\n\nPREVENTIVE THERAPY REVIEW: Current lomerizine (calcium channel blocker) — appropriate for HM prevention. Consider adding topiramate 25-100 mg/day if episodes continue. Verapamil 80-240 mg/day is another option for HM prevention.\n\nCONCLUSION: Avoid triptans during motor aura episodes. Continue lomerizine; consider adding topiramate if breakthrough episodes persist.",
-        "summary": "Triptans cautioned in hemiplegic migraine; continue lomerizine; consider topiramate if episodes continue; NSAIDs + antiemetics for acute headache"
+        "report": "DRUG REVIEW — TRIPTANS IN HEMIPLEGIC MIGRAINE\n\nFINDINGS: Triptans (5-HT1B/1D agonists) exert vasoconstrictive effects on cerebral and meningeal vasculature. In the context of hemiplegic migraine — where motor aura is associated with cortical spreading depression and haemodynamic changes — most international guidelines caution against triptan use during motor aura episodes due to theoretical vasoconstrictive risk, although the evidence base is limited.\n\nCATEGORY: Triptans are cautioned (not universally absolutely contraindicated) in hemiplegic migraine; individual guideline recommendations vary. Clinical correlation recommended.",
+        "summary": "Triptans are cautioned in hemiplegic migraine due to theoretical vasoconstrictive risk during motor aura; category-level caution applies; clinical correlation required"
       }
     },
     {
@@ -319,5 +354,64 @@
         "abnormal_values_summary": []
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": null,
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "echo": {
+      "chambers": {
+        "LV": "normal size and systolic function",
+        "RV": "normal size and function",
+        "LA": "normal size",
+        "RA": "normal size"
+      },
+      "valves": {
+        "mitral": "structurally normal",
+        "aortic": "structurally normal",
+        "tricuspid": "normal",
+        "pulmonic": "normal"
+      },
+      "ejection_fraction": 60.0,
+      "wall_motion": "no regional wall-motion abnormality",
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": []
+    },
+    "cardiac_monitoring": null,
+    "advanced_imaging": null,
+    "specialized_test": {
+      "test_type": "general_laboratory_panel",
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "Study within normal limits. No abnormality identified; non-contributory.",
+      "recommended_actions": []
+    },
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

@@ -15,10 +15,12 @@
       "No prior neurological diagnosis",
       "No known autoimmune or rheumatological co-diagnosis"
     ],
-    "patient_id": "UNKNOWN",
+    "patient_id": "MG-RP14",
     "demographics": {
       "age": 44,
-      "sex": "female"
+      "sex": "female",
+      "handedness": "right",
+      "bmi": 24.6
     },
     "clinical_history": {
       "medications": [
@@ -44,24 +46,29 @@
       "social_history": {
         "note": "Accountant; married; two children by IVF after APS diagnosis; non-smoker; minimal alcohol; physically active prior to symptom onset"
       },
-      "past_medical_history": []
+      "past_medical_history": [
+        "Antiphospholipid syndrome — three spontaneous abortions; anticardiolipin and anti-β2-GP1 antibodies positive",
+        "Transient hypothyroidism 4 years ago (viral thyroiditis), resolved without treatment",
+        "No prior neurological diagnosis",
+        "No known autoimmune or rheumatological co-diagnosis"
+      ]
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert, oriented. No cognitive impairment.",
+      "cranial_nerves": "Bilateral ptosis (left > right); worsens with sustained upgaze (positive Simpson test). Cogan lid twitch positive. Ice pack test: 3 mm improvement bilaterally. Diplopia on right lateral gaze. Mild abduction limitation right eye. Dysarthria with nasal component. Facial muscle weakness (bilateral, mild).",
+      "motor": "Neck flexor strength 4+/5 (fatigable). Limb strength 5/5 throughout. No fasciculations.",
+      "sensory": "Sensation intact throughout.",
+      "reflexes": "Deep tendon reflexes 2+ and symmetric.",
+      "coordination": "Normal coordination.",
+      "gait": "Normal gait."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
-      "hr": 72,
-      "temp": 37.0,
+      "bp_systolic": 122,
+      "bp_diastolic": 76,
+      "hr": 80,
+      "temp": 36.7,
       "rr": 14,
-      "spo2": 98
+      "spo2": 99
     },
     "history_present_illness": "A 44-year-old Caucasian woman was admitted to the neurology ward for evaluation of fluctuating diplopia, bilateral ptosis, dysarthria, dysphonia, and fatigable chewing. Symptoms were characteristically worse at the end of meals and at the end of the day, and improved significantly with rest. She had noticed progressive worsening over 8 weeks, with diplopia initially present only on right lateral gaze, subsequently becoming present throughout the day. She described difficulty chewing through a full meal without tiring, nasal voice quality when reading aloud for more than a few minutes, and increasing difficulty swallowing pills over the past 2 weeks.\n\nHer past medical history was notable for antiphospholipid syndrome (APS), diagnosed 6 years ago following three consecutive spontaneous first-trimester abortions. She also had a history of transient hypothyroidism following a viral illness 4 years ago that resolved without treatment. She was taking aspirin 81 mg daily for APS-related thromboprophylaxis. She had no prior neurological diagnosis.\n\nOn examination, she demonstrated progressive fatigability of upward gaze during a prolonged Simpson test. Ptosis was bilaterally present (left greater than right) and worsened with sustained upgaze. She had dysarthria and weakness of facial and neck muscles. Tongue strength was mildly reduced but symmetric. The Cogan lid twitch sign was positive. Ice pack test produced a 3 mm improvement bilaterally in 5 minutes. Limb strength was 5/5 throughout with normal coordination and sensation.\n\nThe antiphospholipid syndrome history raised initial concern for cerebrovascular disease as a possible explanatory framework — specifically, a small basilar artery TIA producing bilateral ocular motor signs. Laboratory results were notable for elevated anticardiolipin antibodies and anti-β2-glycoprotein-I antibodies consistent with her known APS, and prolonged PTT attributed to lupus anticoagulant."
   },
@@ -201,8 +208,27 @@
       "Polyautoimmune background (APS, subclinical Hashimoto's) increases overall autoimmune disease risk including MG",
       "RNS abnormality in multiple muscle groups (cranial and distal) confirms GENERALIZED MG, not ocular-only"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Antiphospholipid syndrome with positive lupus anticoagulant — TIA concern",
+        "location": "patient.history_present_illness",
+        "intended_effect": "APS is a known cause of stroke and TIA; bilateral ocular motor signs + APS history creates strong anchoring to vascular diagnosis",
+        "correct_interpretation": "Normal brain MRI/MRA excludes TIA; fatigable, diurnal symptoms are incompatible with vascular etiology"
+      },
+      {
+        "data_point": "Elevated aPTT (44 seconds) suggesting coagulopathy",
+        "location": "initial_tool_outputs.labs.interpretation",
+        "intended_effect": "Elevated aPTT typically triggers investigation for bleeding diathesis or factor deficiency",
+        "correct_interpretation": "Elevated aPTT is from lupus anticoagulant (in vitro artifact); mixing study shows inhibitor pattern; no true coagulopathy"
+      },
+      {
+        "data_point": "All MG antibodies negative",
+        "location": "followup_outputs[1].output.interpretation",
+        "intended_effect": "Negative AChR, MuSK, and LRP4 antibodies might lead clinician to abandon MG diagnosis",
+        "correct_interpretation": "Seronegative MG (~15% of generalized cases); SFEMG is the required next step with >97% sensitivity"
+      }
+    ],
+    "icd_code": "G70.01"
   },
   "red_herrings": [
     {
@@ -228,16 +254,21 @@
     "generation_method": "real_case_seed",
     "condition_name": "Seronegative generalized myasthenia gravis with antiphospholipid syndrome",
     "difficulty_description": "Diagnostic puzzle: APS history misdirects to TIA as explanation; seronegative MG requires SFEMG for confirmation; elevated aPTT from lupus anticoagulant is a laboratory red herring",
-    "expected_agent_confidence": 0.38
+    "expected_agent_confidence": 0.38,
+    "fallback_tool_kinds": {
+      "eeg": "normal",
+      "csf": "normal",
+      "cardiac_monitoring": "normal",
+      "advanced_imaging": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
       "findings": [],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "Normal MRI/MRA; no infarction, no vasculopathy; APS-related cerebrovascular disease excluded. Clinical correlation recommended.",
+      "impression": "No acute infarction. No DWI restriction. No white matter lesion or periventricular demyelination. MRA: no significant intracranial stenosis. Normal study. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
@@ -246,8 +277,12 @@
     "ecg": {
       "rhythm": "sinus rhythm",
       "rate": 72,
-      "intervals": {},
-      "axis": "",
+      "intervals": {
+        "PR": "158 ms",
+        "QRS": "82 ms",
+        "QTc": "408 ms"
+      },
+      "axis": "normal",
       "findings": [
         "ELECTROCARDIOGRAM\n\nPatient: 44-year-old female\nIndication: Pre-investigation baseline; valvular lesions may occur in APS\n\nRHYTHM: Sinus rhythm at 78 bpm\nINTERVALS: PR 158 ms, QRS 82 ms, QTc 408 ms\n\nINTERPRETATION: Normal sinus rhythm; no arrhythmia; normal QTc. No ischemic ST-T changes.\n\nCONCLUSION: Normal ECG."
       ],
@@ -262,12 +297,12 @@
     "csf": null,
     "ct": {
       "findings": [],
-      "contrast_used": false,
+      "contrast_used": true,
       "angiography_findings": null,
       "additional_observations": [
-        "CT CHEST WITH CONTRAST\n\nIndication: New MG diagnosis — exclude thymoma\n\nTECHNIQUE: CT chest with IV contrast, 1mm slices\n\nFINDINGS:\n  ANTERIOR MEDIASTINUM: No thymic mass. Thymic region shows age-appropriate fatty replacement.\n  LUNGS: Clear. No parenchymal disease.\n  MEDIASTINUM: No adenopathy.\n  HEART/PERICARDIUM: Normal.\n\nIMPRESSION:\n1. No thymoma or anterior mediastinal mass.\n2. Normal chest CT.\n\nNOTE: In APS, cardiac valvular lesions (Libman-Sacks endocarditis) may occur; no valvular abnormality was visible on CT. Echocardiography is recommended for more sensitive valvular evaluation."
+        "CT CHEST WITH CONTRAST\n\nIndication: Anterior mediastinal evaluation\n\nTECHNIQUE: CT chest with IV contrast, 1mm slices\n\nFINDINGS:\n  ANTERIOR MEDIASTINUM: No thymic mass. Thymic region shows age-appropriate fatty replacement.\n  LUNGS: Clear. No parenchymal disease.\n  MEDIASTINUM: No adenopathy.\n  HEART/PERICARDIUM: No pericardial effusion.\n\nIMPRESSION:\n1. No anterior mediastinal mass.\n2. Normal chest CT."
       ],
-      "impression": "No thymoma; normal chest CT; echocardiography recommended for APS valvular assessment",
+      "impression": "No anterior mediastinal mass; normal chest CT.",
       "recommended_actions": []
     },
     "echo": null,
@@ -280,14 +315,14 @@
       "trigger_action": "request_repetitive_stimulation",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "",
+        "test_type": "Repetitive nerve stimulation",
         "findings": [
           {
-            "description": "REPETITIVE NERVE STIMULATION STUDY\n\nIndication: Bilateral ocular motor findings, fatigable weakness; exclude NMJ disorder\n\nTECHNIQUE: 3 Hz RNS at orbicularis oculi, abductor digiti minimi, deltoid\n\nRESULTS:\n  Orbicularis oculi (facial nerve): Decrement 17% (1st to 4th stimulus) [>10% abnormal] ABNORMAL\n  Abductor digiti minimi (ulnar nerve): Decrement 13% ABNORMAL\n  Deltoid: Decrement 10% BORDERLINE ABNORMAL\n\nNOTE: Abnormal decremental response in both cranial and distal muscles confirms generalized NMJ dysfunction.\n\nCONCLUSION: Electrophysiological NMJ dysfunction consistent with generalized myasthenia gravis."
+            "description": "REPETITIVE NERVE STIMULATION STUDY\n\nIndication: Fatigable ocular motor and bulbar signs\n\nTECHNIQUE: 3 Hz RNS at orbicularis oculi, abductor digiti minimi, deltoid\n\nRESULTS:\n  Orbicularis oculi (facial nerve): Decrement 17% (1st to 4th stimulus) [>10% abnormal] ABNORMAL\n  Abductor digiti minimi (ulnar nerve): Decrement 13% ABNORMAL\n  Deltoid: Decrement 10% BORDERLINE ABNORMAL\n\nIMPRESSION: Decremental responses at 3 Hz in cranial, distal, and proximal muscles, consistent with a disorder of neuromuscular transmission. Clinical correlation recommended."
           }
         ],
         "quantitative_data": null,
-        "impression": "RNS: 17% decrement orbicularis, 13% abductor digiti minimi, 10% deltoid — generalized NMJ dysfunction, confirms MG",
+        "impression": "RNS: 17% decrement orbicularis, 13% abductor digiti minimi, 10% deltoid — decremental pattern in cranial and limb muscles, consistent with a disorder of neuromuscular transmission. Clinical correlation recommended.",
         "recommended_actions": []
       }
     },
@@ -295,8 +330,39 @@
       "trigger_action": "request_mg_antibodies",
       "tool_name": "interpret_labs",
       "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
+        "panels": {
+          "MG_antibody_panel": [
+            {
+              "test": "AChR binding antibody",
+              "value": "< 0.4 nmol/L (negative)",
+              "reference_range": "< 0.4 nmol/L",
+              "is_abnormal": false,
+              "unit": "nmol/L"
+            },
+            {
+              "test": "AChR blocking antibody",
+              "value": "< 25% (negative)",
+              "reference_range": "< 25%",
+              "is_abnormal": false,
+              "unit": ""
+            },
+            {
+              "test": "Anti-MuSK antibody",
+              "value": "< 0.4 nmol/L (negative)",
+              "reference_range": "< 0.4 nmol/L",
+              "is_abnormal": false,
+              "unit": "nmol/L"
+            },
+            {
+              "test": "Anti-LRP4 antibody",
+              "value": "negative",
+              "reference_range": "negative",
+              "is_abnormal": false,
+              "unit": ""
+            }
+          ]
+        },
+        "interpretation": "AChR binding antibody below detection threshold (<0.4 nmol/L). AChR blocking antibody negative. Anti-MuSK antibody negative. Anti-LRP4 antibody negative. All tested acetylcholine receptor and related antibodies are within normal limits. A negative result does not exclude a disorder of neuromuscular transmission; clinical correlation recommended.",
         "abnormal_values_summary": []
       }
     },
@@ -304,14 +370,14 @@
       "trigger_action": "request_sfemg",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "",
+        "test_type": "Single-fiber EMG",
         "findings": [
           {
-            "description": "SINGLE-FIBER EMG — ORBICULARIS OCULI\n\nIndication: Seronegative MG confirmation\n\nRESULTS:\n  MCD: 66 µs [normal <35 µs] MARKEDLY ABNORMAL\n  Blocking: 26% of potential pairs\n  Fiber density: 1.8 (normal ≤2.0)\n\nCONCLUSION: Markedly increased jitter and blocking confirms NMJ dysfunction. In seronegative MG, SFEMG provides the electrophysiological confirmation needed for diagnosis. Sensitivity >97% for generalized MG."
+            "description": "SINGLE-FIBER EMG — ORBICULARIS OCULI\n\nIndication: Evaluation of fatigable ocular motor findings\n\nRESULTS:\n  MCD: 66 µs [normal <35 µs] MARKEDLY ABNORMAL\n  Blocking: 26% of potential pairs\n  Fiber density: 1.8 (normal ≤2.0)\n\nIMPRESSION: Markedly increased mean consecutive difference with 26% blocking, consistent with a disorder of neuromuscular transmission. Clinical correlation recommended."
           }
         ],
         "quantitative_data": null,
-        "impression": "SFEMG: MCD 66 µs with 26% blocking — definitively confirms NMJ dysfunction; seronegative MG established",
+        "impression": "SFEMG (orbicularis oculi): MCD 66 µs with 26% blocking — markedly increased jitter consistent with a disorder of neuromuscular transmission. Clinical correlation recommended.",
         "recommended_actions": []
       }
     },
@@ -319,14 +385,24 @@
       "trigger_action": "request_echo_for_aps",
       "tool_name": "order_echocardiogram",
       "output": {
-        "chambers": {},
-        "valves": {},
-        "ejection_fraction": null,
-        "wall_motion": null,
+        "chambers": {
+          "LV": "normal size and systolic function (EF 62%)",
+          "RV": "normal size and function",
+          "LA": "normal size",
+          "RA": "normal size"
+        },
+        "valves": {
+          "mitral": "no thickening, no vegetations",
+          "aortic": "structurally normal",
+          "tricuspid": "trivial regurgitation (normal variant)",
+          "pulmonic": "normal"
+        },
+        "ejection_fraction": 62.0,
+        "wall_motion": "no regional wall-motion abnormality",
         "findings": [
-          "ECHOCARDIOGRAM — TRANSTHORACIC\n\nIndication: APS with positive lupus anticoagulant; screen for Libman-Sacks endocarditis\n\nFINDINGS:\n  LEFT VENTRICLE: Normal size and systolic function; EF 62%\n  VALVES: No thickening of mitral or aortic valves. No vegetations. No mitral regurgitation. Mild tricuspid regurgitation (trivial) — normal variant.\n  CHAMBERS: Normal right and left atrial size.\n  PERICARDIUM: No effusion.\n  DOPPLER: Normal pulmonary artery pressure.\n\nIMPRESSION:\n1. Normal echocardiogram. No Libman-Sacks lesions.\n2. Normal cardiac function.\n3. No cardioembolic source for cerebrovascular events.\n\nNOTE: APS cardiac complications include valve lesions and thrombotic events; neither is identified here. MG diagnosis is unrelated to cardiac structure."
+          "ECHOCARDIOGRAM — TRANSTHORACIC\n\nIndication: Valvular evaluation\n\nFINDINGS:\n  LEFT VENTRICLE: Normal size and systolic function; EF 62%\n  VALVES: No thickening of mitral or aortic valves. No vegetations. No mitral regurgitation. Trivial tricuspid regurgitation — normal variant.\n  CHAMBERS: Normal right and left atrial size.\n  PERICARDIUM: No effusion.\n  DOPPLER: Normal estimated pulmonary artery pressure.\n\nIMPRESSION:\n1. Normal transthoracic echocardiogram.\n2. No valvular lesions or vegetations identified.\n3. Normal biventricular function."
         ],
-        "impression": "Normal echocardiogram; no Libman-Sacks endocarditis; no cardioembolic source",
+        "impression": "Normal transthoracic echocardiogram. No valvular lesions or vegetations. Normal biventricular function.",
         "recommended_actions": []
       }
     },
@@ -334,19 +410,92 @@
       "trigger_action": "search_aps_mg_overlap",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Antiphospholipid Syndrome and Myasthenia Gravis Co-occurrence\n\nKEY FINDINGS:\n1. APS-MG ASSOCIATION: Co-occurrence of APS and MG is documented in the literature; both are autoimmune conditions and can co-exist in polyautoimmune individuals. APS does not cause MG; they occur concurrently.\n2. SERONEGATIVE MG IN POLYAUTOIMMUNE CONTEXT: Patients with APS/SLE may have higher rates of seronegative MG; anti-LRP4 antibodies and clustered glycine receptor antibodies may be detected on extended panels not routinely available.\n3. LUPUS ANTICOAGULANT AND COAGULATION: Lupus anticoagulant prolongs aPTT in vitro (laboratory artifact); does not cause bleeding. Do not increase anticoagulation based on elevated aPTT alone in APS.\n4. THYMECTOMY IN SERONEGATIVE MG: MGTX trial benefits may be less clear in seronegative patients; however, thymectomy is still recommended by some guidelines. CT chest showed no thymoma here.\n5. IMMUNOSUPPRESSION STRATEGY: Prednisone and azathioprine are first-line. Mycophenolate mofetil is an alternative. Important: check if APS requires anticoagulation escalation before immunosuppression.\n\nCONCLUSION: APS and seronegative MG can co-exist; diagnosis of MG confirmed by electrophysiology; immunosuppression appropriate.",
-        "summary": "APS and MG can co-exist in polyautoimmune patients; elevated aPTT from lupus anticoagulant is lab artifact; SFEMG confirms seronegative MG",
-        "query": "",
-        "results": []
+        "query": "search aps mg overlap",
+        "results": [
+          {
+            "title": "Clinical literature",
+            "content": "LITERATURE SEARCH: Antiphospholipid Syndrome and Myasthenia Gravis Co-occurrence\n\nKEY FINDINGS:\n1. APS-MG ASSOCIATION: Co-occurrence of APS and MG is documented in the literature; both are autoimmune conditions that can co-exist in polyautoimmune individuals.\n2. SERONEGATIVE MG IN POLYAUTOIMMUNE CONTEXT: Patients with APS/SLE may have higher rates of antibody-negative NMJ disease; extended antibody panels may detect additional targets not routinely tested.\n3. LUPUS ANTICOAGULANT AND LABORATORY COAGULATION TESTS: Lupus anticoagulant prolongs aPTT in vitro as a laboratory artifact; mixing studies typically show an inhibitor pattern.\n4. THYMECTOMY IN ANTIBODY-NEGATIVE MG: Evidence from the MGTX trial focused on AChR-positive patients; benefit in seronegative disease is less established.\n5. IMMUNOSUPPRESSION IN MG: Prednisone and azathioprine are established first-line agents. Mycophenolate mofetil is an alternative."
+          }
+        ],
+        "summary": "APS and MG can co-exist in polyautoimmune patients; lupus anticoagulant prolongs aPTT as an in-vitro artifact; single-fiber EMG is the most sensitive test for NMJ dysfunction when antibodies are negative."
       }
     },
     {
       "trigger_action": "check_prednisone_aps_interaction",
       "tool_name": "check_drug_interactions",
       "output": {
-        "report": "DRUG INTERACTION REVIEW — PREDNISONE AND AZATHIOPRINE IN APS + MG\n\nQuery: Immunosuppression for MG in patient with APS on aspirin\n\nFINDINGS:\n  PREDNISONE + ASPIRIN:\n  - Additive GI mucosal irritation risk — consider PPI (omeprazole 20 mg daily) prophylaxis\n  - Prednisone may transiently worsen MG at initiation (well-documented); start at 10-20 mg/day and titrate slowly\n\n  AZATHIOPRINE + APS:\n  - No direct pharmacokinetic interaction with aspirin\n  - Azathioprine may have mild antiplatelet properties — monitor platelet count\n  - Myelosuppression monitoring required (CBC monthly for 3 months, then quarterly)\n  - TPMT genotyping recommended before azathioprine initiation\n\n  WARFARIN (if needed for APS thrombosis):\n  - If warfarin required in future: azathioprine may modestly reduce warfarin effect\n  - Monitor INR more frequently when adding azathioprine\n\nCONCLUSION: Prednisone + azathioprine safe in this patient; add PPI; check TPMT before azathioprine; monitor CBC.",
-        "summary": "PPI needed with prednisone + aspirin; TPMT genotyping before azathioprine; monitor CBC; no major APS-MG drug interaction"
+        "proposed": "check_prednisone_aps_interaction",
+        "interactions": [
+          "DRUG INTERACTION REVIEW — PREDNISONE AND AZATHIOPRINE WITH ASPIRIN\n\nQuery: Corticosteroid and azathioprine co-administration with aspirin\n\nFINDINGS:\n  PREDNISONE + ASPIRIN:\n  - Additive GI mucosal irritation risk; gastroprotection (e.g., PPI) recommended when used concurrently\n  - Corticosteroids can cause transient worsening of neuromuscular disease at initiation; slow titration is advised\n\n  AZATHIOPRINE + ASPIRIN:\n  - No clinically significant pharmacokinetic interaction\n  - Azathioprine may have mild antiplatelet properties; platelet count monitoring recommended\n  - Myelosuppression monitoring required (CBC monthly for 3 months, then quarterly)\n  - TPMT genotyping recommended before initiating azathioprine to assess myelosuppression risk\n\n  AZATHIOPRINE + WARFARIN (if co-prescribed):\n  - Azathioprine may modestly reduce warfarin effect; INR monitoring frequency should increase if warfarin is added"
+        ],
+        "contraindications": [],
+        "warnings": [
+          "GI protection recommended when combining prednisone + aspirin; TPMT genotyping before azathioprine; CBC monitoring required; monitor INR if warfarin co-prescribed."
+        ],
+        "formulary_status": "on formulary",
+        "alternatives": []
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": {
+      "classification": "normal",
+      "background": {
+        "pdr": "9-10 Hz posterior dominant rhythm, symmetric and reactive",
+        "sleep_features": "normal vertex waves and sleep spindles",
+        "overall": "normal organisation for age"
+      },
+      "findings": [],
+      "artifacts": [],
+      "activating_procedures": {},
+      "impression": "Normal awake and drowsy EEG. No epileptiform discharges and no focal slowing.",
+      "limitations": "",
+      "recommended_actions": []
+    },
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": null,
+    "echo": null,
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 50,
+        "max": 126,
+        "average": 77
+      },
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "impression": "Normal 24-hour Holter monitor.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": {
+      "modality": "FDG-PET scan",
+      "tracer_or_protocol": null,
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "No abnormality identified on advanced imaging. Findings are non-contributory; clinical correlation recommended.",
+      "recommended_actions": []
+    },
+    "specialized_test": null,
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

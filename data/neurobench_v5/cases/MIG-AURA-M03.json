@@ -17,7 +17,9 @@
     "patient_id": "UNKNOWN",
     "demographics": {
       "age": 42,
-      "sex": "male"
+      "sex": "male",
+      "handedness": "right",
+      "bmi": 27.7
     },
     "clinical_history": {
       "medications": [
@@ -46,21 +48,21 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert, oriented. Mildly anxious.",
+      "cranial_nerves": "Normal cranial nerves II-XII. No speech difficulty at present. Full visual fields. PERRLA.",
+      "motor": "Motor 5/5 throughout — no drift on pronator drift test. No focal weakness between attacks.",
+      "sensory": "Sensation intact to light touch and pinprick in all four limbs. No sensory abnormality between attacks.",
+      "reflexes": "DTR 2+ symmetric. No Babinski.",
+      "coordination": "Coordination normal.",
+      "gait": "Gait normal."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
-      "hr": 72,
-      "temp": 37.0,
+      "bp_systolic": 134,
+      "bp_diastolic": 84,
+      "hr": 74,
+      "temp": 36.8,
       "rr": 14,
-      "spo2": 98
+      "spo2": 99
     },
     "history_present_illness": "A 42-year-old Pakistani-British man was referred to the neurology outpatient clinic after being evaluated in the emergency department 10 days ago for what was documented as a 'possible TIA or hemiplegic migraine.' He describes a single episode in which he was at work when he developed a gradual onset tingling in his right hand that over approximately 20-25 minutes progressed to involve his right forearm, and he noticed his grip strength was reduced — he dropped his pen. He also noticed mild difficulty articulating words during the episode, saying his speech felt 'slow and thick.' The sensory and motor symptoms lasted approximately 25-30 minutes and resolved completely. Immediately afterwards, he developed the worst headache of his life — left-sided throbbing pain 9/10 in severity with nausea, severe photophobia, and phonophobia. He vomited three times. The headache lasted 18 hours.\n\nHe had no prior episodes of this type. However, on careful questioning, he says he had 'visual episodes' once every few months over the past 4-5 years — brief shimmering lights in one corner of his vision, lasting 15-20 minutes, after which he had a mild headache that he attributed to 'eyestrain' or 'stress' and took paracetamol. He never consulted a doctor about these and had not made the connection. He has mild hypertension, is a non-smoker, and his father had a stroke at age 68. He is a secondary school science teacher. His GP started him on aspirin 75 mg after the ED visit pending specialist review."
   },
@@ -175,8 +177,21 @@
       "ICHD-3 SHM requires ≥2 motor aura attacks; this patient has 1 — label as probable SHM",
       "Triptans are cautioned (not absolutely contraindicated) in hemiplegic migraine; NSAIDs are the preferred alternative"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Motor weakness, speech difficulty, and first-ever episode in a 42-year-old — appropriate TIA workup",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Motor weakness and speech difficulty in a 42-year-old man with hypertension and elevated LDL is a reasonable TIA concern",
+        "correct_interpretation": "Normal DWI at 10 days post-episode is reassuring; gradual spread over 20-25 minutes is characteristic of CSD not embolism; prior 4-5 year history of visual episodes establishes migraine predisposition"
+      },
+      {
+        "data_point": "Elevated LDL 148 and family history of stroke at 68",
+        "location": "initial_tool_outputs.labs.interpretation",
+        "intended_effect": "Elevated cholesterol and family stroke history strengthen TIA hypothesis",
+        "correct_interpretation": "These are genuine vascular risk factors requiring statin treatment, but they do not change the neurological diagnosis; DWI is normal; the LDL should be treated regardless"
+      }
+    ],
+    "icd_code": "G43.1"
   },
   "red_herrings": [
     {
@@ -193,28 +208,36 @@
   "metadata": {
     "condition_name": "Probable sporadic hemiplegic migraine (first motor aura episode) with longstanding antecedent visual aura",
     "difficulty_description": "Moderate: TIA vs hemiplegic migraine with motor, sensory, and aphasic features; prior visual aura history not initially connected; elevated LDL as incidental finding requiring management",
-    "expected_agent_confidence": 0.58
+    "expected_agent_confidence": 0.58,
+    "fallback_tool_kinds": {
+      "csf": "normal",
+      "ct": "normal",
+      "advanced_imaging": "normal",
+      "specialized_test": "incidental"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
       "findings": [],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "No DWI restriction; 3 non-specific WMH (age/HTN/migraine-related); normal MRA intracranial and cervical; no infarction or structural cause. Clinical correlation recommended.",
+      "impression": "No acute intracranial abnormality. No restricted diffusion. Three non-specific white matter hyperintensities. Normal MRA intracranial and cervical arteries — no stenosis or dissection. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
     },
     "eeg": {
       "classification": "normal",
-      "background": {},
+      "background": {
+        "pdr": "9-10 Hz alpha posterior dominant rhythm, symmetric",
+        "sleep_features": "not assessed",
+        "overall": "Normal background with mild left posterior slowing (post-migrainous)"
+      },
       "findings": [],
       "artifacts": [],
       "activating_procedures": {},
-      "confidence": 0.0,
-      "impression": "Mild non-specific left posterior slowing (post-migrainous); no epileptiform discharges. Clinical correlation recommended.",
+      "impression": "This is an ABNORMAL EEG due to: 1. Mild non-specific left posterior slowing. No epileptiform discharges. No electrographic seizures recorded. Clinical correlation recommended.",
       "limitations": "",
       "recommended_actions": [
         "Clinical correlation recommended."
@@ -248,20 +271,34 @@
       "trigger_action": "check_aspirin_migraine_hemiplegic_aura",
       "tool_name": "check_drug_interactions",
       "output": {
-        "report": "DRUG REVIEW — ASPIRIN IN MIGRAINE WITH MOTOR/APHASIC AURA (POSSIBLE SPORADIC HEMIPLEGIC MIGRAINE)\n\nQuery: Should aspirin 75 mg continue in this patient?\n\nFINDINGS:\nTIA INDICATION: Aspirin appropriate after confirmed TIA. However, this case has NO DWI restriction on MRI — acute infarction excluded. The episode pattern (gradual spread over 20-25 min, preceded by 4-5 years of visual episodes, followed by severe headache) is consistent with migraine with motor aura or sporadic hemiplegic migraine (SHM), not TIA.\n\nMIGRAINE CONTEXT: If diagnosis is migraine with motor/aphasic aura (rather than TIA), continued aspirin may not be indicated. However, elevated LDL 148 mg/dL and family history of stroke at 68 are genuine vascular risk factors.\n\nRECOMMENDATION: Given elevated LDL and family history, aspirin may be continued pending definitive diagnosis confirmation — however, the primary treatment should be statin therapy for hyperlipidaemia (LDL 148 > threshold for treatment given 10-year Framingham risk). Confirm migraine diagnosis with second episode documentation.\n\nCONCLUSION: Maintain aspirin pending confirmation; add statin (atorvastatin 20-40 mg) for LDL 148 and vascular risk reduction.",
-        "summary": "Aspirin started empirically for TIA; diagnosis likely migraine with motor aura; elevated LDL 148 warrants statin therapy regardless; confirm migraine diagnosis with second episode"
+        "proposed": "check_aspirin_migraine_hemiplegic_aura",
+        "interactions": [
+          "DRUG REVIEW — ASPIRIN IN SETTING OF TRANSIENT MOTOR AND APHASIC SYMPTOMS\n\nQuery: Aspirin 75 mg started empirically for possible TIA.\n\nFINDINGS:\nTIA INDICATION: Aspirin is used for secondary prevention after confirmed TIA. When TIA is not confirmed by imaging or clinical criteria, the indication is uncertain.\n\nVASCULAR RISK CONTEXT: Elevated LDL 148 mg/dL is an independent indication for lipid-lowering therapy (statin) regardless of neurological diagnosis. Statin therapy is indicated when 10-year cardiovascular risk exceeds treatment thresholds per current guidelines.\n\nASPIRIN AND MIGRAINE: Aspirin has no established role in migraine prevention at antiplatelet doses. High-dose aspirin (900 mg) may be used for acute migraine attacks.\n\nClinical correlation with neurological diagnosis required before continuing antiplatelet therapy long-term."
+        ],
+        "contraindications": [],
+        "warnings": [
+          "Aspirin is indicated for secondary prevention after confirmed TIA; the indication should be reviewed once the neurological diagnosis is established; elevated LDL is an independent indication for lipid-lowering therapy per current cardiovascular risk guidelines."
+        ],
+        "formulary_status": "on formulary",
+        "alternatives": []
       }
     },
     {
       "trigger_action": "request_cardiac_monitoring_holter",
       "tool_name": "order_cardiac_monitoring",
       "output": {
-        "duration_hours": 0,
-        "monitor_type": "",
+        "duration_hours": 24,
+        "monitor_type": "holter_24h",
         "rhythm_summary": "Normal Holter; no AF; no paroxysmal arrhythmia",
-        "heart_rate_range": {},
+        "heart_rate_range": {
+          "min": 58,
+          "max": 112,
+          "average": 76
+        },
         "events": [],
-        "findings": [],
+        "findings": [
+          "Normal 24-hour Holter. Sinus rhythm throughout. No atrial fibrillation. No paroxysmal arrhythmia detected."
+        ],
         "impression": "Normal Holter; no AF; no paroxysmal arrhythmia",
         "recommended_actions": []
       }
@@ -275,9 +312,9 @@
         "ejection_fraction": null,
         "wall_motion": null,
         "findings": [
-          "TRANSTHORACIC ECHOCARDIOGRAM WITH BUBBLE STUDY\n\nFindings: Normal LV function, EF 62%. Mildly concentric LV geometry — borderline for mild LVH (IVSd 10mm, normal <11mm). Normal valves. No thrombus.\n\nBUBBLE STUDY: Small number of microbubbles (2-3) crossing to left atrium on Valsalva — tiny PFO, not haemodynamically significant.\n\nNOTE: In context of no confirmed DWI-positive stroke, this PFO is incidental. PFO closure not indicated.\n\nIMPRESSION: Normal cardiac function. Tiny PFO — incidental, no action needed."
+          "TRANSTHORACIC ECHOCARDIOGRAM WITH BUBBLE STUDY\n\nFindings: Normal LV function, EF 62%. Mildly concentric LV geometry — borderline concentric remodelling (IVSd 10mm). Normal valves. No thrombus.\n\nBUBBLE STUDY: Small number of microbubbles (2-3) crossing to left atrium on Valsalva — tiny PFO, not haemodynamically significant.\n\nIMPRESSION: Normal cardiac systolic function. Borderline concentric LV remodelling. Tiny PFO on bubble study. Clinical correlation recommended."
         ],
-        "impression": "Tiny PFO — incidental; borderline LVH geometry; no intracardiac thrombus; PFO closure not indicated",
+        "impression": "Normal cardiac systolic function. Borderline concentric LV remodelling. Tiny PFO on bubble study. No intracardiac thrombus. Clinical correlation recommended.",
         "recommended_actions": []
       }
     },
@@ -285,7 +322,14 @@
       "trigger_action": "search_sporadic_hemiplegic_migraine_diagnosis",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Sporadic Hemiplegic Migraine — Diagnosis and Management\n\nKEY FINDINGS:\n1. SPORADIC HEMIPLEGIC MIGRAINE (SHM): ICHD-3 requires: Migraine with motor aura; ≥1 aura symptom spreading gradually; no first or second degree relative with identical attacks (distinguishes from familial hemiplegic migraine)\n2. DIAGNOSIS REQUIRES ≥2 ATTACKS: This patient has had 1 definite motor/sensory/aphasic aura episode. Prior visual episodes may be type 1 migraine with aura.\n3. GENETICS: SHM: de novo or non-inherited mutations in CACNA1A, ATP1A2, SCN1A; genetic testing not routine unless severe/recurrent\n4. TIA DIFFERENTIATION: Normal DWI is KEY. In SHM, DWI is normal even with motor deficit. In TIA, DWI may show restricted diffusion (though not always acutely)\n5. MANAGEMENT: No specific SHM treatment differs significantly from migraine with aura. Avoid vasoconstrictors (triptans) if motor aura is suspected (theory-based; some guidelines caution against triptans in hemiplegic migraine)\n6. FIRST EPISODE: Diagnosis of SHM cannot be made on first episode alone — ICHD-3 requires ≥2; follow up and document second episode\n\nCONCLUSION: After second episode, SHM can be confirmed. Normal DWI is reassuring. Avoid triptans if motor aura confirmed.",
+        "query": "search_sporadic_hemiplegic_migraine_diagnosis",
+        "results": [
+          {
+            "title": "Literature review",
+            "abstract": "LITERATURE SEARCH: Sporadic Hemiplegic Migraine — Diagnosis and Management\n\nKEY FINDINGS:\n1. SPORADIC HEMIPLEGIC MIGRAINE (SHM): ICHD-3 requires: Migraine with motor aura; ≥1 aura symptom spreading gradually; no first or second degree relative with identical attacks (distinguishes from familial hemiplegic migraine)\n2. DIAGNOSIS REQUIRES ≥2 ATTACKS: This patient has had 1 definite motor/sensory/aphasic aura episode. Prior visual episodes may be type 1 migraine with aura.\n3. GENETICS: SHM: de novo or non-inherited mutations in CACNA1A, ATP1A2, SCN1A; genetic testing not routine unless severe/recurrent\n4. TIA DIFFERENTIATION: Normal DWI is KEY. In SHM, DWI is normal even with motor deficit. In TIA, DWI may show restricted diffusion (though not always acutely)\n5. MANAGEMENT: No specific SHM treatment differs significantly from migraine with aura. Avoid vasoconstrictors (triptans) if motor aura is suspected (theory-based; some guidelines caution against triptans in hemiplegic migraine)\n6. FIRST EPISODE: Diagnosis of SHM cannot be made on first episode alone — ICHD-3 requires ≥2; follow up and document second episode\n\nCONCLUSION: After second episode, SHM can be confirmed. Normal DWI is reassuring. Avoid triptans if motor aura confirmed.",
+            "relevance": "high"
+          }
+        ],
         "summary": "SHM requires ≥2 episodes for diagnosis; normal DWI is key; avoid triptans if motor aura confirmed; wait for second episode to confirm"
       }
     },
@@ -302,9 +346,67 @@
       "trigger_action": "search_triptan_use_motor_aura",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Triptans and Motor Aura — Safety in Hemiplegic Migraine\n\nKEY FINDINGS:\n1. THEORETICAL CONCERN: Triptans are vasoconstrictors; theoretical risk of worsening ischaemia during a migraine aura involving motor weakness\n2. GUIDELINES: AAN/HIS guidelines CAUTION AGAINST triptans in hemiplegic migraine; however, this caution is largely theoretical — actual cases of triptan-associated harm in HM are rare case reports\n3. ALTERNATIVE ACUTE TREATMENTS: NSAIDs (naproxen 500-750 mg), antiemetics (metoclopramide); DHE also typically avoided in hemiplegic migraine\n4. IF DIAGNOSIS UNCERTAIN: A first motor aura episode without prior confirmed hemiplegic migraine — triptans are relatively (not absolutely) contraindicated; clinical judgment required\n5. FOR THIS PATIENT: Prior visual aura episodes + first motor aura episode — labelling as hemiplegic migraine prematurely may over-restrict treatment; document second episode before restricting triptans\n\nCONCLUSION: Avoid triptans if hemiplegic migraine confirmed. For now — NSAIDs and antiemetics for acute treatment pending diagnostic clarity.",
-        "summary": "Triptans cautioned (not absolutely contraindicated) in hemiplegic migraine; use NSAIDs + antiemetics for acute treatment pending second episode confirmation"
+        "query": "search_triptan_use_motor_aura",
+        "results": [
+          {
+            "title": "Literature review",
+            "abstract": "LITERATURE SEARCH: Triptans and Motor Aura — Safety in Hemiplegic Migraine\n\nKEY FINDINGS:\n1. THEORETICAL CONCERN: Triptans are vasoconstrictors; theoretical risk of worsening ischaemia during a migraine aura involving motor weakness\n2. GUIDELINES: AAN/HIS guidelines CAUTION AGAINST triptans in hemiplegic migraine; however, this caution is largely theoretical — actual cases of triptan-associated harm in HM are rare case reports\n3. ALTERNATIVE ACUTE TREATMENTS: NSAIDs (naproxen 500-750 mg), antiemetics (metoclopramide); DHE also typically avoided in hemiplegic migraine\n4. IF DIAGNOSIS UNCERTAIN: A first motor aura episode without prior confirmed hemiplegic migraine — triptans are relatively (not absolutely) contraindicated; clinical judgment required\n5. FOR THIS PATIENT: Prior visual aura episodes + first motor aura episode — labelling as hemiplegic migraine prematurely may over-restrict treatment; document second episode before restricting triptans\n\nCONCLUSION: Avoid triptans if hemiplegic migraine confirmed. For now — NSAIDs and antiemetics for acute treatment pending diagnostic clarity.",
+            "relevance": "high"
+          }
+        ],
+        "summary": "Triptans are cautioned (not absolutely contraindicated) in hemiplegic migraine due to theoretical vasoconstrictive risk during motor aura; NSAIDs and antiemetics are the preferred alternative acute treatment; a second episode is required to confirm the diagnosis per ICHD-3 criteria"
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": null,
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "echo": null,
+    "cardiac_monitoring": null,
+    "advanced_imaging": {
+      "modality": "MRA head and neck",
+      "tracer_or_protocol": null,
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "No abnormality identified on advanced imaging. Findings are non-contributory; clinical correlation recommended.",
+      "recommended_actions": []
+    },
+    "specialized_test": {
+      "test_type": "Neurodiagnostic assessment",
+      "findings": [
+        {
+          "finding": "minor non-specific abnormality",
+          "interpretation": "of uncertain and likely no clinical significance"
+        }
+      ],
+      "quantitative_data": null,
+      "impression": "Study with only a minor non-specific finding; non-contributory to the presentation.",
+      "recommended_actions": []
+    },
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

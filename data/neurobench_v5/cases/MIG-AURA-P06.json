@@ -53,13 +53,13 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert, fully oriented, working full-time. Fluent speech, normal confrontation naming, normal repetition, normal comprehension between episodes. MOCA 28/30 — lost 1 point orientation, 1 point delayed recall (age-appropriate subcortical reduction).",
+      "cranial_nerves": "Normal cranial nerves II-XII. No nystagmus. Visual fields full. PERRLA. No papilledema.",
+      "motor": "Motor 5/5 throughout. Normal plantar responses. No pronator drift.",
+      "sensory": "Sensation intact to light touch and pinprick bilaterally.",
+      "reflexes": "Deep tendon reflexes 2+ symmetric. No Babinski.",
+      "coordination": "Coordination normal.",
+      "gait": "Gait normal."
     },
     "vitals": {
       "bp_systolic": 120,
@@ -171,8 +171,21 @@
       "The aphasic episodes in CADASIL may represent migraine with aphasic aura OR transient focal neurological episodes from subcortical lacunar disease — MRI confirms both mechanisms are operative",
       "Diagnostic puzzle difficulty: CADASIL presents with migraine-like aura; confirming the diagnosis changes management substantially; genetic testing is the key investigation"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Aphasic episodes with headache — initially treated as migraine with aphasic aura",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Clinical features are consistent with migraine with aphasic aura; without NOTCH3 testing, CADASIL may not be considered",
+        "correct_interpretation": "CADASIL is confirmed by genetics and MRI; aphasic episodes in CADASIL require different management (no triptans, no anticoagulation); genetic counselling for family essential"
+      },
+      {
+        "data_point": "MRI WMH pattern — extensive enough to be clearly CADASIL on radiology report",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Even with a radiologist suggesting CADASIL, the clinical team may defer genetic testing",
+        "correct_interpretation": "MRI pattern is highly consistent with CADASIL; NOTCH3 gene test confirmed R182C mutation; genetic confirmation is required for definitive diagnosis and triggers cascade of management and family testing"
+      }
+    ],
+    "icd_code": "G43.1"
   },
   "red_herrings": [
     {
@@ -189,28 +202,72 @@
   "metadata": {
     "condition_name": "Confirmed CADASIL with migraine with aphasic aura — triptan contraindication, genetic counselling, anticoagulation avoidance",
     "difficulty_description": "Diagnostic puzzle: CADASIL presenting as migraine with aphasic aura; diagnosis changes management (triptans contraindicated, anticoagulation avoided); genetic confirmation required; family implications",
-    "expected_agent_confidence": 0.35
+    "expected_agent_confidence": 0.35,
+    "fallback_tool_kinds": {
+      "csf": "normal",
+      "ct": "normal",
+      "echo": "normal",
+      "cardiac_monitoring": "normal",
+      "advanced_imaging": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
-      "findings": [],
+      "findings": [
+        {
+          "type": "white_matter_hyperintensity",
+          "location": "bilateral anterior temporal poles",
+          "size": "confluent bilateral lesions, largest 18 mm",
+          "signal_characteristics": {
+            "FLAIR": "confluent hyperintense",
+            "T2": "hyperintense",
+            "DWI": "no acute restriction"
+          },
+          "mass_effect": "none",
+          "borders": "ill-defined, confluent"
+        },
+        {
+          "type": "white_matter_hyperintensity",
+          "location": "bilateral external capsules and periventricular",
+          "size": "extensive, multiple foci, largest 12 mm",
+          "signal_characteristics": {
+            "FLAIR": "hyperintense",
+            "T2": "hyperintense"
+          },
+          "mass_effect": "none",
+          "borders": "ill-defined"
+        },
+        {
+          "type": "lacunar_infarction",
+          "location": "right basal ganglia (putamen)",
+          "size": "8 mm",
+          "signal_characteristics": {
+            "FLAIR": "hyperintense",
+            "T1": "hypointense",
+            "DWI": "no acute restriction"
+          },
+          "mass_effect": "none",
+          "borders": "well-defined"
+        }
+      ],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "See findings above. Clinical correlation recommended.",
+      "impression": "Extensive periventricular and subcortical WMH in bilateral anterior temporal poles and external capsules — classical CADASIL imaging pattern. Lacunar infarct right putamen (old). NOTCH3 gene sequencing required for definitive diagnosis. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
     },
     "eeg": {
       "classification": "abnormal",
-      "background": {},
+      "background": {
+        "pdr": "8-9 Hz posterior dominant rhythm, reduced amplitude bilaterally",
+        "overall": "mild diffuse slowing with left temporal accentuation — small vessel disease pattern"
+      },
       "findings": [],
       "artifacts": [],
       "activating_procedures": {},
-      "confidence": 0.0,
-      "impression": "Non-specific mild diffuse and left temporal slowing (small vessel disease pattern); no epileptiform discharges. Clinical correlation recommended.",
+      "impression": "This is an ABNORMAL EEG due to: 1. Non-specific mild diffuse slowing with left temporal accentuation. No epileptiform discharges. No electrographic seizures recorded. Clinical correlation recommended.",
       "limitations": "",
       "recommended_actions": [
         "Clinical correlation recommended."
@@ -244,7 +301,7 @@
       "trigger_action": "request_notch3_gene_test_cadasil_diagnosis",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "",
+        "test_type": "genetic_panel",
         "findings": [
           {
             "description": "NOTCH3 GENE SEQUENCING — CADASIL DIAGNOSIS\n\nTECHNIQUE: Full NOTCH3 exon 2-24 sequencing with specific assessment of EGF-like repeat domain cysteine-altering mutations\n\nRESULT: PATHOGENIC MUTATION DETECTED — c.544C>T (p.Arg182Cys) — exon 4 cysteine-altering mutation in EGF-like repeat domain 3.\n\nThe R182C mutation is the SAME mutation as confirmed in the patient's maternal cousin. This is a well-established pathogenic CADASIL variant associated with typical CADASIL phenotype.\n\nCONCLUSION: CADASIL CONFIRMED. NOTCH3 R182C (exon 4) pathogenic mutation — same as maternal cousin. Autosomal dominant inheritance confirmed in this family. Patient's children have 50% risk."
@@ -259,15 +316,20 @@
       "trigger_action": "search_cadasil_management_headache_migraine",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: CADASIL Management — Headache and Stroke Prevention\n\nKEY FINDINGS:\n1. MIGRAINE IN CADASIL: Migraine with aura is the presenting feature in ~30-40% of CADASIL patients, typically in the 3rd-4th decade; this patient's onset at 55 is later than typical\n2. APHASIC AURA IN CADASIL: Language aura is recognised in CADASIL — may be migraine aura or TIA/lacunar ischaemia in perisylvian territory\n3. TRIPTANS IN CADASIL: CONTRAINDICATED (theoretical vasoconstriction of already-diseased vessels); NSAIDs + antiemetics for acute headache management\n4. ANTIPLATELETS: Aspirin 75 mg is used for secondary stroke prevention in CADASIL (weak evidence — no RCTs); avoid clopidogrel unless prior stroke (increased bleeding risk)\n5. PREVENTIVE THERAPY FOR MIGRAINE IN CADASIL: Verapamil, amitriptyline, or topiramate can be used; valproate controversial in CADASIL (limited data); acetazolamide (some benefit in reducing aura frequency — small studies)\n6. ANTICOAGULATION: AVOID in CADASIL — increased ICH risk; do not anticoagulate even for 'TIA-like' episodes\n7. HMG-CoA REDUCTASE INHIBITORS: Statins may have neuroprotective effects in CADASIL — continue statin therapy\n\nCONCLUSION: CADASIL management: triptans contraindicated; avoid anticoagulation; aspirin 75 mg for secondary prevention; continue statin; genetic counselling for children.",
-        "summary": "CADASIL: triptans CONTRAINDICATED; anticoagulation AVOIDED (ICH risk); aspirin 75 mg for secondary prevention; continue statin; genetic counselling for adult children"
+        "query": "CADASIL management migraine headache stroke prevention triptans anticoagulation",
+        "results": [
+          {"title": "Migraine in CADASIL: Prevalence and Treatment", "authors": "Chabriat H et al.", "year": "2009", "summary": "Migraine with aura is the presenting feature in ~30-40% of CADASIL patients, typically in the 3rd-4th decade; later-onset aphasic aura is a recognised variant; triptans are CONTRAINDICATED due to vasoconstriction of already-diseased arterioles; NSAIDs + antiemetics for acute headache."},
+          {"title": "Antiplatelet Therapy in CADASIL: Secondary Stroke Prevention", "authors": "Opherk C et al.", "year": "2004", "summary": "Aspirin 75 mg used for secondary stroke prevention in CADASIL (guideline-supported despite limited RCT evidence); anticoagulation should be avoided in CADASIL due to elevated intracerebral haemorrhage risk from fragile arterioles; clopidogrel not first-line unless aspirin intolerant."},
+          {"title": "Preventive Migraine Therapy in CADASIL", "authors": "Bousser MG et al.", "year": "2012", "summary": "Verapamil, amitriptyline, or topiramate can be used for migraine prevention in CADASIL; valproate controversial (limited data); acetazolamide shows benefit in reducing aura frequency in small studies; continue statin therapy for vascular risk modification."}
+        ],
+        "summary": "In CADASIL, triptans are contraindicated due to vasoconstriction of diseased arterioles. Anticoagulation is generally avoided given elevated intracerebral haemorrhage risk from vascular fragility. Aspirin is used for secondary prevention. Topiramate or amitriptyline may be used for migraine prevention. Genetic counselling is appropriate given autosomal dominant inheritance."
       }
     },
     {
       "trigger_action": "request_neuropsychology_cognitive_baseline",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "",
+        "test_type": "neuropsychological_assessment",
         "findings": [
           {
             "description": "NEUROPSYCHOLOGICAL ASSESSMENT — BASELINE\n\nDomains assessed: Memory, processing speed, executive function, language, visuospatial\n\nRESULTS:\n  Verbal memory: 7th percentile — BELOW AVERAGE (consistent with subcortical memory loss)\n  Processing speed: 10th percentile — LOW\n  Executive function: 15th percentile — LOW NORMAL\n  Language: Normal — naming, fluency, repetition normal\n  Visuospatial: Normal\n\nCONCLUSION: Subtle subcortical cognitive impairment consistent with early CADASIL-related vascular cognitive impairment. No dementia. Annual reassessment recommended."
@@ -282,7 +344,7 @@
       "trigger_action": "request_genetic_counselling_cadasil_children",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "",
+        "test_type": "genetic_counselling",
         "findings": [
           {
             "description": "GENETIC COUNSELLING REPORT\n\nIndication: CADASIL confirmed (NOTCH3 R182C); three adult children; predictive testing discussion\n\nFINDINGS: AUTOSOMAL DOMINANT: Each of patient's three adult children has 50% probability of carrying the R182C mutation. Predictive testing available — pre-symptomatic NOTCH3 testing.\n\nCOUNSELLING POINTS:\n  - Positive predictive test: Early monitoring of BP, cholesterol; MRI baseline; lifestyle advice; career/life planning implications\n  - Negative predictive test: Reassurance; no transmission to grandchildren from that branch\n  - All adult children should be offered predictive testing; patient should discuss with family\n  - Driving: DVLA notification of CADASIL required if clinically affecting driving ability — currently drives; cognitive assessment borderline; advise review\n\nCONCLUSION: Genetic counselling offered to patient and family. Predictive testing available for adult children."
@@ -297,17 +359,112 @@
       "trigger_action": "search_triptan_contraindication_cadasil",
       "tool_name": "check_drug_interactions",
       "output": {
-        "report": "DRUG INTERACTION REVIEW — TRIPTANS IN CADASIL\n\nFINDINGS:\n  CONTRAINDICATION: Triptans (sumatriptan, rizatriptan, zolmitriptan, etc.) are contraindicated in CADASIL.\n  MECHANISM: CADASIL involves pathological changes in cerebral small vessel arterioles; triptans cause vasoconstriction; in CADASIL vessels already have smooth muscle dysfunction — theoretical increased ischaemic risk\n  EVIDENCE: Case reports of stroke exacerbation with triptan use in CADASIL; most guidelines advise against triptans\n  ALTERNATIVES: Aspirin 900 mg + metoclopramide (antiemetic) for acute headache; NSAIDs; paracetamol\n\nCONCLUSION: Triptans are CONTRAINDICATED in CADASIL. Use NSAIDs + antiemetics for acute headache management.",
-        "summary": "Triptans CONTRAINDICATED in CADASIL (vasoconstriction + diseased small vessels); use aspirin/NSAIDs + antiemetics for acute headache"
+        "proposed": "sumatriptan / triptans in CADASIL",
+        "interactions": [
+          "Triptans cause vasoconstriction via 5-HT1B receptors; in CADASIL, arteriolar smooth muscle dysfunction amplifies ischaemic risk"
+        ],
+        "contraindications": [
+          "Triptans CONTRAINDICATED in CADASIL — case reports of stroke exacerbation; guideline consensus against use"
+        ],
+        "warnings": [
+          "In CADASIL, aspirin 900 mg + antiemetic (e.g. metoclopramide) is an established triptan-free acute headache regimen",
+          "NSAIDs and paracetamol with antiemetics are acceptable for acute headache in CADASIL"
+        ],
+        "formulary_status": "contraindicated",
+        "alternatives": [
+          "aspirin 900 mg + metoclopramide",
+          "NSAIDs",
+          "paracetamol + antiemetic"
+        ]
       }
     },
     {
       "trigger_action": "search_cadasil_anticoagulation_risk",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Anticoagulation Risk in CADASIL\n\nKEY FINDINGS:\n1. CADASIL + ANTICOAGULATION: CADASIL carries elevated intracerebral haemorrhage (ICH) risk due to vascular fragility of arterioles; anticoagulation (warfarin, DOAC) significantly increases ICH risk in CADASIL\n2. GUIDELINES: European Stroke Organisation and CADASIL expert consensus: anticoagulation should be AVOIDED in CADASIL unless there is a compelling concomitant indication (confirmed AF with high CHA2DS2-VASc)\n3. IF AF COEXISTS WITH CADASIL: Carefully individualised; some experts use low-dose DOAC; most prefer antiplatelet monotherapy given ICH risk\n4. ASPIRIN: Aspirin 75 mg is the recommended antiplatelet in CADASIL for secondary prevention; not evidence-based from RCT but guideline-supported\n\nCONCLUSION: Anticoagulation contraindicated in CADASIL unless confirmed AF with very high stroke risk (individualised decision). Use aspirin 75 mg monotherapy for secondary prevention.",
-        "summary": "Anticoagulation contraindicated in CADASIL (elevated ICH risk); aspirin 75 mg for secondary prevention; only anticoagulate if confirmed AF and individualised risk-benefit analysis"
+        "query": "CADASIL anticoagulation intracerebral haemorrhage risk aspirin secondary prevention",
+        "results": [
+          {"title": "Intracerebral Haemorrhage Risk in CADASIL", "authors": "Dichgans M et al.", "year": "2002", "summary": "CADASIL carries elevated intracerebral haemorrhage (ICH) risk due to vascular fragility of GOM-laden arterioles; anticoagulation (warfarin, DOAC) significantly increases ICH risk; European Stroke Organisation consensus recommends avoiding anticoagulation in CADASIL except for compelling indication."},
+          {"title": "Antiplatelet vs Anticoagulation in CADASIL Stroke Prevention", "authors": "Singhal S et al.", "year": "2004", "summary": "Aspirin 75 mg monotherapy is recommended for secondary stroke prevention in CADASIL; if AF coexists with CADASIL, individualised decision required — some experts use low-dose DOAC with close monitoring; most prefer antiplatelet monotherapy given ICH risk."},
+          {"title": "ESO Guideline: Small Vessel Disease and Anticoagulation", "authors": "Pantoni L et al.", "year": "2010", "summary": "Anticoagulation should be avoided in hereditary small vessel disease including CADASIL unless there is confirmed AF with high CHA2DS2-VASc and clear benefit outweighing ICH risk; aspirin 75 mg for secondary prevention is guideline-supported."}
+        ],
+        "summary": "CADASIL carries elevated intracerebral haemorrhage risk from GOM-laden arteriolar fragility; anticoagulation significantly increases this risk. Aspirin monotherapy is the standard secondary prevention approach. Anticoagulation is considered only when AF is confirmed and risk-benefit analysis strongly favours it."
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": null,
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "echo": {
+      "chambers": {
+        "LV": "normal size and systolic function",
+        "RV": "normal size and function",
+        "LA": "normal size",
+        "RA": "normal size"
+      },
+      "valves": {
+        "mitral": "structurally normal",
+        "aortic": "structurally normal",
+        "tricuspid": "normal",
+        "pulmonic": "normal"
+      },
+      "ejection_fraction": 64.0,
+      "wall_motion": "no regional wall-motion abnormality",
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": []
+    },
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 49,
+        "max": 115,
+        "average": 79
+      },
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "impression": "Normal 24-hour Holter monitor.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": {
+      "modality": "MRA",
+      "tracer_or_protocol": null,
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "No abnormality identified on advanced imaging. Findings are non-contributory; clinical correlation recommended.",
+      "recommended_actions": []
+    },
+    "specialized_test": null,
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

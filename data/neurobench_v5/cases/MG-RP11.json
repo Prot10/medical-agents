@@ -14,10 +14,12 @@
       "No prior autoimmune diagnosis",
       "No malignancy history"
     ],
-    "patient_id": "UNKNOWN",
+    "patient_id": "MG-RP11",
     "demographics": {
       "age": 68,
-      "sex": "male"
+      "sex": "male",
+      "handedness": "right",
+      "bmi": 26.5
     },
     "clinical_history": {
       "medications": [
@@ -37,24 +39,28 @@
       "social_history": {
         "note": "Retired teacher; non-smoker; social alcohol use; widower; independent in all ADLs prior to this presentation"
       },
-      "past_medical_history": []
+      "past_medical_history": [
+        "No significant prior medical history",
+        "No prior autoimmune diagnosis",
+        "No malignancy history"
+      ]
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert, oriented, cooperative. No cognitive changes.",
+      "cranial_nerves": "Complete bilateral ptosis covering visual axis. Extraocular movements restricted in all directions bilaterally. No ophthalmoplegia pain. Positive ice pack test (3-4 mm improvement). Positive SLURP test (fatigable palate). Pupils equal and reactive 3 mm bilaterally.",
+      "motor": "Limb strength 5/5 throughout. No fasciculations. No drift.",
+      "sensory": "Sensation intact to light touch and pinprick in all four limbs.",
+      "reflexes": "Deep tendon reflexes 2+ and symmetric throughout.",
+      "coordination": "Normal finger-nose and heel-shin bilaterally.",
+      "gait": "Normal gait. No ataxia."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
-      "hr": 72,
-      "temp": 37.0,
-      "rr": 14,
-      "spo2": 98
+      "bp_systolic": 136,
+      "bp_diastolic": 82,
+      "hr": 78,
+      "temp": 36.8,
+      "rr": 18,
+      "spo2": 95
     },
     "history_present_illness": "A 68-year-old British man with no significant prior medical history presented to the neurology ward with a 5-month history of bilateral eyelid drooping and double vision. He first noticed right upper eyelid ptosis that gradually progressed to complete closure over approximately 10 days, followed 6 weeks later by left-sided ptosis and periorbital puffiness. Both eyes exhibited restricted extraocular movements in all directions. He also reported shortness of breath when walking a short distance — previously able to walk a mile without difficulty but now dyspneic after climbing one flight of stairs. He denied diplopia at rest (as vision was fully obstructed by ptosis), dysphagia, difficulty chewing, or limb weakness. There was no history of hypertension, diabetes, or malignancy. He had no smoking history and took no medications. His family history was unremarkable for neuromuscular or autoimmune conditions.\n\nOn examination, there was complete bilateral ptosis with restricted extraocular movements in all planes. The ice pack test applied to each eyelid for 5 minutes produced a 3–4 mm improvement in ptosis bilaterally, a positive result. Bulbar muscle testing demonstrated fatigable palate elevation consistent with the SLURP test. Limb strength was 5/5 throughout with preserved reflexes and sensation. Auscultation revealed mildly decreased breath sounds at the right base. A chest radiograph performed in the emergency department showed an oval, well-defined radio-opaque lesion in the right hemithorax adjacent to the anterior mediastinum. The radiograph was flagged by the radiographer but was initially attributed by the admitting team to possible lymphoma or germ cell tumor rather than thymoma — the connection to an underlying neuromuscular process was not immediately made."
   },
@@ -214,8 +220,27 @@
       "Normal tumor markers (LDH, AFP, beta-HCG) effectively exclude lymphoma and GCT",
       "MGTX trial supports thymectomy for AChR+ MG; thymoma is an additional mandatory surgical indication"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Anterior mediastinal mass initially evaluated as lymphoma or germ cell tumor",
+        "location": "initial_tool_outputs.ct.impression",
+        "intended_effect": "Admitting team focused on oncological differential without connecting mediastinal mass to bilateral ptosis and ophthalmoplegia",
+        "correct_interpretation": "Anterior mediastinal mass + bilateral ptosis + positive ice pack test = thymoma-associated MG; MG antibody panel is the key next step"
+      },
+      {
+        "data_point": "Age 68 with bilateral ptosis — CPEO in differential",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Chronic progressive external ophthalmoplegia is a mitochondrial disorder with bilateral ptosis and ophthalmoplegia mimicking MG",
+        "correct_interpretation": "Positive ice pack test, anti-titin positivity, and thymoma on CT distinguish MG from CPEO"
+      },
+      {
+        "data_point": "Periorbital edema (lid puffiness)",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Could suggest thyroid ophthalmopathy; Graves' disease is common in elderly males with bilateral eye changes",
+        "correct_interpretation": "Normal TSH, normal orbital MRI (no EOM enlargement, no proptosis), and ptosis (not lid retraction) exclude thyroid ophthalmopathy"
+      }
+    ],
+    "icd_code": "G70.01"
   },
   "red_herrings": [
     {
@@ -241,16 +266,22 @@
     "generation_method": "real_case_seed",
     "condition_name": "Thymoma-associated myasthenia gravis",
     "difficulty_description": "Diagnostic puzzle: anterior mediastinal mass initially evaluated as lymphoma/GCT without connecting to neuromuscular presentation; connection between ptosis + ice pack test + mediastinal mass requires diagnostic synthesis",
-    "expected_agent_confidence": 0.4
+    "expected_agent_confidence": 0.4,
+    "fallback_tool_kinds": {
+      "eeg": "incidental",
+      "csf": "incidental",
+      "echo": "normal",
+      "cardiac_monitoring": "normal",
+      "advanced_imaging": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
       "findings": [],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "Normal brain and orbits; no orbital muscle enlargement; incidental anterior mediastinal mass partially visualized — needs CT chest. Clinical correlation recommended.",
+      "impression": "Brain and orbits: No intracranial mass lesion or signal abnormality. No orbital muscle enlargement or proptosis. Anterior mediastinal soft-tissue density partially visualized at the inferior extent of the field of view. Dedicated CT chest recommended for further characterization. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
@@ -259,10 +290,14 @@
     "ecg": {
       "rhythm": "sinus rhythm",
       "rate": 72,
-      "intervals": {},
-      "axis": "",
+      "intervals": {
+        "PR": "176 ms",
+        "QRS": "88 ms",
+        "QTc": "434 ms"
+      },
+      "axis": "++30 degrees",
       "findings": [
-        "ELECTROCARDIOGRAM\n\nPatient: 68-year-old male\nIndication: Pre-operative/pre-investigation baseline\n\nRHYTHM: Sinus rhythm at 74 bpm\nINTERVALS: PR 176 ms, QRS 88 ms, QTc 434 ms\nAXIS: Normal at +30 degrees\n\nINTERPRETATION:\n- Normal sinus rhythm\n- No ST-T abnormalities\n- No arrhythmia or conduction block\n- Normal QTc\n\nNOTE: Compressive effects from anterior mediastinal mass may affect cardiac silhouette; echocardiography recommended if hemodynamic concern arises.\n\nCONCLUSION: Normal ECG."
+        "ELECTROCARDIOGRAM\n\nPatient: 68-year-old male\nIndication: Pre-operative/pre-investigation baseline\n\nRHYTHM: Sinus rhythm at 74 bpm\nINTERVALS: PR 176 ms, QRS 88 ms, QTc 434 ms\nAXIS: Normal at +30 degrees\n\nINTERPRETATION:\n- Normal sinus rhythm\n- No ST-T abnormalities\n- No arrhythmia or conduction block\n- Normal QTc\n\nNo additional cardiac findings.\n\nCONCLUSION: Normal ECG."
       ],
       "interpretation": "Normal sinus rhythm; no arrhythmia or ischemic changes",
       "clinical_correlation": ""
@@ -275,12 +310,12 @@
     "csf": null,
     "ct": {
       "findings": [],
-      "contrast_used": false,
+      "contrast_used": true,
       "angiography_findings": null,
       "additional_observations": [
-        "CT CHEST WITH CONTRAST\n\nIndication: Anterior mediastinal mass on chest radiograph and partially visualized on brain MRI; bilateral ptosis and extraocular restriction requiring etiologic investigation\n\nTECHNIQUE: Multi-detector CT chest with IV contrast, 1mm reconstructions, mediastinal and lung windows\n\nFINDINGS:\nANTERIOR MEDIASTINUM:\n  Well-defined, lobulated, oval soft-tissue density mass in the anterior mediastinum, predominantly right-sided, measuring 4.4 × 3.2 × 3.8 cm. The mass has homogeneous soft-tissue density (40 HU pre-contrast, 95 HU post-contrast with uniform enhancement). No calcification, cystic component, fat component, or necrosis. The mass partially obliterates the retrosternal space and abuts but does not invade the right atrial border or great vessels. No pericardial effusion.\n\nPLEURAL SPACES: No effusion. No pneumothorax.\n\nLUNG PARENCHYMA: No consolidation, masses, or ground-glass opacities.\n\nLYMPH NODES: No pathologically enlarged mediastinal or hilar lymph nodes.\n\nBONES: No lytic or sclerotic lesions.\n\nIMPRESSION:\n1. Well-defined anterior mediastinal soft-tissue mass (4.4 cm), uniformly enhancing without fat or calcification, abutting the right cardiac border without invasion. Appearance is most consistent with thymoma (WHO classification pending histology). Thymic carcinoma and lymphoma are in the differential but less favored given absence of adenopathy and homogeneous enhancement.\n2. No pleural, pericardial, or pulmonary metastatic disease.\n\nRECOMMENDATION: Surgical resection (thymectomy) after neuromuscular evaluation to exclude MG. Core needle biopsy may be considered if pre-operative tissue diagnosis required. CT-guided biopsy or VATS. Ensure MG stabilization before anesthesia if MG confirmed."
+        "CT CHEST WITH CONTRAST\n\nIndication: Anterior mediastinal mass on chest radiograph and partially visualized on brain MRI; bilateral ptosis and extraocular restriction requiring etiologic investigation\n\nTECHNIQUE: Multi-detector CT chest with IV contrast, 1mm reconstructions, mediastinal and lung windows\n\nFINDINGS:\nANTERIOR MEDIASTINUM:\n  Well-defined, lobulated, oval soft-tissue density mass in the anterior mediastinum, predominantly right-sided, measuring 4.4 × 3.2 × 3.8 cm. The mass has homogeneous soft-tissue density (40 HU pre-contrast, 95 HU post-contrast with uniform enhancement). No calcification, cystic component, fat component, or necrosis. The mass partially obliterates the retrosternal space and abuts but does not invade the right atrial border or great vessels. No pericardial effusion.\n\nPLEURAL SPACES: No effusion. No pneumothorax.\n\nLUNG PARENCHYMA: No consolidation, masses, or ground-glass opacities.\n\nLYMPH NODES: No pathologically enlarged mediastinal or hilar lymph nodes.\n\nBONES: No lytic or sclerotic lesions.\n\nIMPRESSION:\n1. Well-defined anterior mediastinal soft-tissue mass (4.4 cm), uniformly enhancing without fat or calcification, abutting the right cardiac border without invasion. Appearance is most consistent with thymoma (WHO classification pending histology). Thymic carcinoma and lymphoma are in the differential but less favored given absence of adenopathy and homogeneous enhancement.\n2. No pleural, pericardial, or pulmonary metastatic disease.\n\nRECOMMENDATION: Surgical or pathological evaluation recommended for tissue characterization. Clinical correlation with neuromuscular findings recommended."
       ],
-      "impression": "Anterior mediastinal mass 4.4 cm, uniformly enhancing, no invasion — most consistent with thymoma; no metastatic disease",
+      "impression": "CT chest with contrast: Well-defined lobulated anterior mediastinal soft-tissue mass (4.4 × 3.2 × 3.8 cm), uniformly enhancing, without calcification, fat, cystic change, or necrosis. The mass abuts the right cardiac border without imaging evidence of invasion. No pathologically enlarged mediastinal or hilar lymph nodes. No pleural effusion or pulmonary parenchymal disease. Imaging appearances are most consistent with a primary thymic neoplasm. Tissue diagnosis recommended for histological characterization. Clinical correlation recommended.",
       "recommended_actions": []
     },
     "echo": null,
@@ -293,23 +328,49 @@
       "trigger_action": "request_mg_antibodies",
       "tool_name": "interpret_labs",
       "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": []
+        "panels": {
+          "MG_antibody_panel": [
+            {
+              "test": "AChR binding antibody",
+              "value": "12.4 nmol/L",
+              "reference_range": "< 0.4 nmol/L",
+              "is_abnormal": true,
+              "unit": "nmol/L"
+            },
+            {
+              "test": "AChR blocking antibody",
+              "value": "3.7 nmol/L",
+              "reference_range": "< 25%",
+              "is_abnormal": true,
+              "unit": "nmol/L"
+            },
+            {
+              "test": "Anti-MuSK antibody",
+              "value": "< 0.4 nmol/L (negative)",
+              "reference_range": "< 0.4 nmol/L",
+              "is_abnormal": false,
+              "unit": "nmol/L"
+            }
+          ]
+        },
+        "interpretation": "AChR binding antibody 12.4 nmol/L (reference <0.4 nmol/L) — above reference limit. AChR blocking antibody positive. Anti-MuSK antibody within reference limits.",
+        "abnormal_values_summary": [
+          "AChR binding antibody 12.4 nmol/L (above reference <0.4 nmol/L). Anti-AChR antibody is found in patients with myasthenia gravis; clinical correlation recommended."
+        ]
       }
     },
     {
       "trigger_action": "request_sfemg",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "",
+        "test_type": "Single-fiber EMG",
         "findings": [
           {
-            "description": "SINGLE-FIBER EMG — ORBICULARIS OCULI\n\nIndication: Bilateral ptosis; confirm NMJ dysfunction\n\nRESULTS:\n  Mean consecutive difference (MCD): 62 µs [normal <35 µs] MARKEDLY ABNORMAL\n  Blocking: 22% of potential pairs showed intermittent blocking\n  Fiber density: 1.9 (normal ≤2.0)\n\nINTERPRETATION: Markedly increased jitter and blocking in orbicularis oculi confirm NMJ transmission failure consistent with myasthenia gravis. SFEMG is the most sensitive test (>97% for generalized MG).\n\nCONCLUSION: NMJ dysfunction confirmed by SFEMG. Findings support MG diagnosis prior to thymectomy."
+            "description": "SINGLE-FIBER EMG — ORBICULARIS OCULI\n\nIndication: Bilateral ptosis; neuromuscular junction assessment\n\nRESULTS:\n  Mean consecutive difference (MCD): 62 µs [normal <35 µs] MARKEDLY ABNORMAL\n  Blocking: 22% of potential pairs showed intermittent blocking\n  Fiber density: 1.9 (normal ≤2.0)\n\nINTERPRETATION: Markedly increased jitter (MCD 62 µs; reference <35 µs) with 22% blocking rate. Findings are consistent with a disorder of neuromuscular junction transmission. Clinical correlation recommended.\n\nCONCLUSION: Abnormal SFEMG. Clinical correlation recommended."
           }
         ],
         "quantitative_data": null,
-        "impression": "SFEMG: MCD 62 µs with 22% blocking — confirms NMJ dysfunction, supports MG diagnosis",
+        "impression": "Markedly abnormal SFEMG orbicularis oculi. Mean MCD 62 µs (reference <35 µs) with 22% blocking rate. Findings are consistent with a disorder of neuromuscular junction transmission. Clinical correlation recommended.",
         "recommended_actions": []
       }
     },
@@ -317,14 +378,14 @@
       "trigger_action": "request_repetitive_stimulation",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "",
+        "test_type": "Repetitive nerve stimulation",
         "findings": [
           {
-            "description": "REPETITIVE NERVE STIMULATION STUDY\n\nIndication: Confirm NMJ dysfunction; pre-operative assessment for thymectomy\n\nTECHNIQUE: 3 Hz RNS at orbicularis oculi, nasalis, trapezius\n\nRESULTS:\n  Orbicularis oculi: Decrement 20% (1st to 4th stimulus) [>10% abnormal] ABNORMAL\n  Nasalis: Decrement 17% ABNORMAL\n  Trapezius: Decrement 12% ABNORMAL\n\nCONCLUSION: Significant abnormal decremental response in multiple muscle groups. Generalized NMJ dysfunction consistent with AChR antibody–positive MG. Pre-thymectomy IVIG or pyridostigmine optimization recommended."
+            "description": "REPETITIVE NERVE STIMULATION STUDY\n\nIndication: Confirm NMJ dysfunction; pre-operative assessment for thymectomy\n\nTECHNIQUE: 3 Hz RNS at orbicularis oculi, nasalis, trapezius\n\nRESULTS:\n  Orbicularis oculi: Decrement 20% (1st to 4th stimulus) [>10% abnormal] ABNORMAL\n  Nasalis: Decrement 17% ABNORMAL\n  Trapezius: Decrement 12% ABNORMAL\n\nCONCLUSION: Significant abnormal decremental response in multiple muscle groups. Findings indicate a generalized disorder of neuromuscular junction transmission. Clinical correlation recommended."
           }
         ],
         "quantitative_data": null,
-        "impression": "RNS: 20% decrement orbicularis, 17% nasalis, 12% trapezius — generalized NMJ dysfunction confirms MG",
+        "impression": "Repetitive nerve stimulation: 20% CMAP decrement orbicularis oculi, 17% decrement nasalis, 12% decrement trapezius — all above 10% threshold. Generalized decremental pattern. Findings are consistent with a disorder of neuromuscular junction transmission. Clinical correlation recommended.",
         "recommended_actions": []
       }
     },
@@ -332,28 +393,141 @@
       "trigger_action": "request_pulmonary_function",
       "tool_name": "interpret_labs",
       "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": []
+        "panels": {
+          "Pulmonary_function": [
+            {
+              "test": "NIF (Negative Inspiratory Force)",
+              "value": "-38 cm H2O",
+              "reference_range": "< -60 cm H2O",
+              "is_abnormal": true,
+              "unit": "cm H2O"
+            },
+            {
+              "test": "FVC % predicted",
+              "value": "78%",
+              "reference_range": "> 80%",
+              "is_abnormal": true,
+              "unit": "%"
+            }
+          ]
+        },
+        "interpretation": "Pulmonary function adequate. NIF -38 cm H2O (reference < -60 cm H2O — meets threshold for adequate respiratory reserve). FVC 78% predicted. FVC 78% below 80% predicted — monitor respiratory status; no immediate compromise at this level.",
+        "abnormal_values_summary": [
+          "NIF -38 cm H2O — borderline; respiratory function at risk; monitor closely",
+          "FVC 78% — below 80% threshold"
+        ]
       }
     },
     {
       "trigger_action": "search_thymoma_mg_management",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Thymoma-Associated Myasthenia Gravis — Management\n\nKEY EVIDENCE:\n1. MGTX TRIAL (Wolfe GI et al., NEJM 2016): Thymectomy improves outcomes in AChR+ generalized MG patients 18-65 even without thymoma. For thymoma-associated MG, thymectomy is universally recommended (regardless of age) for oncologic control.\n\n2. THYMOMA HISTOLOGY (WHO Classification):\n   - Type A, AB, B1, B2, B3 thymoma (Type B associated with higher MG risk)\n   - Masaoka staging used for prognosis\n   - CT appearances: encapsulated (A/AB/B1), more lobulated (B2/B3)\n\n3. PRE-OPERATIVE OPTIMIZATION:\n   - IVIG or PLEX 2-4 weeks before thymectomy to reduce crisis risk\n   - Pyridostigmine dose adjusted; may need to hold on morning of surgery\n   - Prolonged ventilator dependency post-op is common in bulbar MG\n\n4. ANTI-TITIN ANTIBODIES:\n   - Marker for thymoma in AChR+ MG; high specificity in patients <60 years\n   - Also associated with severe MG phenotype and higher rate of myasthenic crisis\n\nCONCLUSION: Proceed with thymectomy after pre-operative IVIG optimization. Multidisciplinary approach (neurology + thoracic surgery + anesthesia) essential.",
-        "summary": "Thymectomy indicated for thymoma-associated MG; pre-operative IVIG recommended; anti-titin predicts thymoma in AChR+ MG",
-        "query": "",
-        "results": []
+        "query": "search thymoma mg management",
+        "results": [
+          {
+            "title": "Clinical literature",
+            "content": "LITERATURE SEARCH: Thymoma-Associated Myasthenia Gravis — Management\n\nKEY EVIDENCE:\n1. MGTX TRIAL (Wolfe GI et al., NEJM 2016): Thymectomy improves outcomes in AChR+ generalized MG patients 18-65 even without thymoma. For thymoma-associated MG, thymectomy is universally recommended (regardless of age) for oncologic control.\n\n2. THYMOMA HISTOLOGY (WHO Classification):\n   - Type A, AB, B1, B2, B3 thymoma (Type B associated with higher MG risk)\n   - Masaoka staging used for prognosis\n   - CT appearances: encapsulated (A/AB/B1), more lobulated (B2/B3)\n\n3. PRE-OPERATIVE OPTIMIZATION:\n   - IVIG or PLEX 2-4 weeks before thymectomy to reduce crisis risk\n   - Pyridostigmine dose adjusted; may need to hold on morning of surgery\n   - Prolonged ventilator dependency post-op is common in bulbar MG\n\n4. ANTI-TITIN ANTIBODIES:\n   - Marker for thymoma in AChR+ MG; high specificity in patients <60 years\n   - Also associated with severe MG phenotype and higher rate of myasthenic crisis\n\nCONCLUSION: Thymoma-associated MG has both neurological and oncological implications; interdisciplinary evaluation including neurology and thoracic surgery is standard of care. Pre-operative neuromuscular status assessment is recommended."
+          }
+        ],
+        "summary": "Evidence supports thymectomy for AChR-positive generalized MG with thymoma for both oncological and neurological indications. Anti-titin antibody positivity is associated with thymoma in AChR-positive MG. Pre-operative assessment of neuromuscular status is recommended. Multidisciplinary approach is standard of care."
       }
     },
     {
       "trigger_action": "check_pyridostigmine_interactions",
       "tool_name": "check_drug_interactions",
       "output": {
-        "report": "DRUG INTERACTION REVIEW — PYRIDOSTIGMINE IN MG\n\nQuery: Pyridostigmine interactions and initiation in newly diagnosed MG\n\nFINDINGS:\n  PYRIDOSTIGMINE (AChE inhibitor, 60 mg q4-6h standard):\n  - Excessive dosing → cholinergic crisis: monitor for muscarinic side effects (diarrhea, hypersalivation, bradycardia)\n  - Beta-blockers (e.g., atenolol, metoprolol): enhance bradycardia risk with pyridostigmine — use with caution\n  - Atropine is antidote for cholinergic crisis\n  - Anticholinergic medications (antihistamines, TCAs): may antagonize pyridostigmine effect\n  - No thymoma-specific drug interactions; however, immunosuppressants (prednisone, azathioprine, mycophenolate) typically added after thymectomy if symptoms persist\n\nSTARTING DOSE FOR NEW MG:\n  Pyridostigmine 30-60 mg orally every 4-6 hours; titrate to symptom relief\n  For bulbar symptoms: use liquid formulation (Mestinon Syrup)\n\nCONCLUSION: Initiate pyridostigmine 60 mg every 6 hours; monitor for cholinergic side effects. Plan long-term immunosuppression after thymectomy.",
-        "summary": "Pyridostigmine 60 mg q6h; monitor for cholinergic excess; beta-blockers enhance bradycardia risk"
+        "proposed": "check_pyridostigmine_interactions",
+        "interactions": [
+          "DRUG INTERACTION REVIEW — PYRIDOSTIGMINE IN MG\n\nQuery: Pyridostigmine interactions and initiation in newly diagnosed MG\n\nFINDINGS:\n  PYRIDOSTIGMINE (AChE inhibitor, 60 mg q4-6h standard):\n  - Excessive dosing → cholinergic crisis: monitor for muscarinic side effects (diarrhea, hypersalivation, bradycardia)\n  - Beta-blockers (e.g., atenolol, metoprolol): enhance bradycardia risk with pyridostigmine — use with caution\n  - Atropine is antidote for cholinergic crisis\n  - Anticholinergic medications (antihistamines, TCAs): may antagonize pyridostigmine effect\n  - No thymoma-specific drug interactions; however, immunosuppressants (prednisone, azathioprine, mycophenolate) typically added after thymectomy if symptoms persist\n\nSTARTING DOSE FOR NEW MG:\n  Pyridostigmine 30-60 mg orally every 4-6 hours; titrate to symptom relief\n  For bulbar symptoms: use liquid formulation (Mestinon Syrup)\n\nCONCLUSION: Pyridostigmine has a well-characterized interaction profile; excessive dosing may produce cholinergic effects. Concurrent anticholinergic or beta-blocking agents warrant monitoring. Clinical correlation and prescriber guidance recommended."
+        ],
+        "contraindications": [],
+        "warnings": [
+          "Pyridostigmine: monitor for cholinergic excess (bradycardia, hypersalivation, diarrhea); beta-adrenergic blocking agents may enhance bradycardia risk."
+        ],
+        "formulary_status": "on formulary",
+        "alternatives": []
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": {
+      "classification": "normal",
+      "background": {
+        "pdr": "9-10 Hz posterior dominant rhythm, symmetric and reactive",
+        "sleep_features": "normal vertex waves and sleep spindles",
+        "overall": "normal organisation for age"
+      },
+      "findings": [],
+      "artifacts": [],
+      "activating_procedures": {},
+      "impression": "Normal awake and drowsy EEG. Rhythmic midtemporal theta of drowsiness, a benign normal variant of no clinical significance.",
+      "limitations": "",
+      "recommended_actions": []
+    },
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "17 cm H2O",
+      "cell_count": {
+        "wbc": "3 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "55 mg/dL",
+      "glucose": "61 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Mildly elevated CSF protein, a non-specific finding. Cell count and glucose normal."
+    },
+    "ct": null,
+    "echo": {
+      "chambers": {
+        "LV": "normal size and systolic function",
+        "RV": "normal size and function",
+        "LA": "normal size",
+        "RA": "normal size"
+      },
+      "valves": {
+        "mitral": "structurally normal",
+        "aortic": "structurally normal",
+        "tricuspid": "normal",
+        "pulmonic": "normal"
+      },
+      "ejection_fraction": 66.0,
+      "wall_motion": "no regional wall-motion abnormality",
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": []
+    },
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 56,
+        "max": 128,
+        "average": 71
+      },
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "impression": "Normal 24-hour Holter monitor.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": {
+      "modality": "FDG-PET scan",
+      "tracer_or_protocol": null,
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "No abnormality identified on advanced imaging. Findings are non-contributory; clinical correlation recommended.",
+      "recommended_actions": []
+    },
+    "specialized_test": null,
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

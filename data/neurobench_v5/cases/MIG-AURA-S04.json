@@ -39,21 +39,21 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert; oriented. No cognitive deficit.",
+      "cranial_nerves": "Normal cranial nerves, visual fields, and fundoscopy. No papilledema.",
+      "motor": "Motor strength 5/5 throughout. No pronator drift.",
+      "sensory": "Sensation intact to light touch and pinprick throughout.",
+      "reflexes": "DTR 2+ symmetric. Plantar responses flexor bilaterally.",
+      "coordination": "Finger-nose and heel-shin normal bilaterally.",
+      "gait": "Normal gait. Romberg negative."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
-      "hr": 72,
-      "temp": 37.0,
+      "bp_systolic": 128,
+      "bp_diastolic": 78,
+      "hr": 70,
+      "temp": 36.7,
       "rr": 14,
-      "spo2": 98
+      "spo2": 99
     },
     "history_present_illness": "A 35-year-old Black woman presented to the neurology outpatient clinic with a 7-year history of recurrent visual aura followed by severe headaches that have increased in frequency over the past 6 months from 1-2 to 2-3 per month. Each episode begins with a small bright spot in her central vision that gradually expands into a multicolored zigzag pattern (fortification spectra) spreading outward over 20-30 minutes, leaving a temporary blind area. As the visual aura fades, she develops a severe left-sided throbbing headache (8/10) with nausea, vomiting, photophobia, and phonophobia that lasts 6-10 hours. She often needs to go to a dark room and cannot function during episodes.\n\nShe reports that sumatriptan 50 mg (prescribed by her PCP 2 years ago) is effective when taken early in the headache phase but stops working if she delays treatment. She takes it approximately twice per month. She identifies sleep disruption, wine, and intense physical exertion as personal triggers. She is a nurse and has been working double shifts frequently due to understaffing, which correlates with the increased frequency. She is not on hormonal contraception. She had hypertension treated with lifestyle modification (BP 128/78 today) and no other medical history. She denies any weakness, speech difficulty, or any episode characteristics that differ from her usual pattern."
   },
@@ -95,8 +95,8 @@
       {
         "step": 1,
         "action": "Brain MRI to exclude secondary causes",
-        "tool_name": null,
-        "expected_finding": "",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Non-specific periventricular WMH (4 foci) consistent with hypertension and migraine; no MS pattern; no DWI restriction",
         "category": "acceptable",
         "tool_parameters": {
           "contrast": true
@@ -105,8 +105,8 @@
       {
         "step": 2,
         "action": "Optimize BP control and cardiovascular risk reduction",
-        "tool_name": null,
-        "expected_finding": "",
+        "tool_name": "interpret_labs",
+        "expected_finding": "All values within normal limits; BP 128/78 represents Stage 1 hypertension — add propranolol for dual migraine prevention and BP control",
         "category": "acceptable",
         "tool_parameters": {}
       },
@@ -114,7 +114,7 @@
         "step": 3,
         "action": "Initiate propranolol as dual migraine prevention and antihypertensive",
         "tool_name": null,
-        "expected_finding": "",
+        "expected_finding": "Propranolol addresses both migraine prevention and hypertension; dual indication",
         "category": "acceptable",
         "tool_parameters": {}
       },
@@ -122,7 +122,7 @@
         "step": 4,
         "action": "Reduce sumatriptan dose to 25-50 mg when propranolol is started",
         "tool_name": null,
-        "expected_finding": "",
+        "expected_finding": "Propranolol addresses both migraine prevention and hypertension; dual indication",
         "category": "acceptable",
         "tool_parameters": {
           "drug_1": "sumatriptan",
@@ -148,8 +148,15 @@
       "Migraine with aura + HTN represents additive stroke risk",
       "Increased frequency correlates with work stress and sleep disruption (modifiable triggers)"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Hypertension history raising concern for hypertensive visual symptoms",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Mild HTN + visual symptoms could suggest hypertensive retinopathy or TIA",
+        "correct_interpretation": "Stage 1 HTN (128/78) does not cause visual symptoms; 7-year identical history predates HTN; classic migraine aura pattern"
+      }
+    ],
+    "icd_code": "G43.1"
   },
   "red_herrings": [
     {
@@ -161,16 +168,35 @@
   "metadata": {
     "condition_name": "Migraine with visual aura and hypertension comorbidity",
     "difficulty_description": "Straightforward: classic visual aura, 7-year history, normal MRI; key clinical action is recognizing propranolol as dual-indication treatment and drug interaction with sumatriptan",
-    "expected_agent_confidence": 0.86
+    "expected_agent_confidence": 0.86,
+    "fallback_tool_kinds": {
+      "csf": "normal",
+      "ct": "normal",
+      "echo": "normal",
+      "cardiac_monitoring": "normal",
+      "specialized_test": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
-      "findings": [],
+      "findings": [
+        {
+          "type": "white_matter_hyperintensity",
+          "location": "bilateral periventricular white matter",
+          "size": "4 foci, 3-5 mm",
+          "signal_characteristics": {
+            "FLAIR": "hyperintense",
+            "T2": "hyperintense",
+            "DWI": "no restriction"
+          },
+          "mass_effect": "none",
+          "borders": "punctate, non-confluent"
+        }
+      ],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "Normal MRI; 2 tiny non-specific WMH (migraine/mild HTN related); no structural cause. Clinical correlation recommended.",
+      "impression": "Four punctate non-specific periventricular T2/FLAIR foci (3-5 mm), non-confluent. No juxtacortical, posterior fossa, or spinal cord lesions. No DWI restriction. No structural or vascular lesion. Pattern does not meet McDonald 2017 criteria for dissemination in space. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
@@ -204,15 +230,15 @@
       "trigger_action": "search_preventive_therapy_htn_migraine",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Migraine Prevention in Hypertensive Patient\n\nKEY FINDINGS:\n1. BETA-BLOCKERS (propranolol, metoprolol): First-line for BOTH migraine prevention AND hypertension — ideal dual-indication\n2. PROPRANOLOL 40-120 mg BID: 50% attack reduction; reduces BP; CONTRAINDICATIONS: asthma, heart block, decompensated heart failure\n3. METOPROLOL 50-200 mg daily: Cardioselective; similar efficacy; may be better tolerated\n4. TOPIRAMATE: Effective for migraine prevention but not antihypertensive; second-line if beta-blocker not tolerated\n5. AMITRIPTYLINE: Avoid in hypertensive patients without adequate BP control; safe when BP controlled\n6. CANDESARTAN (ARB): Emerging evidence for migraine prevention with antihypertensive benefit\n\nCONCLUSION: Propranolol or metoprolol serves dual purpose (HTN + migraine prevention). Start propranolol 40 mg BID and uptitrate to 80 mg BID.",
-        "summary": "Beta-blockers (propranolol/metoprolol) treat both hypertension and migraine — ideal dual-indication; initiate propranolol 40 mg BID"
+        "report": "LITERATURE SEARCH: Migraine Prevention in Hypertensive Patient\n\nKEY FINDINGS:\n1. BETA-BLOCKERS (propranolol, metoprolol): First-line for BOTH migraine prevention AND hypertension — ideal dual-indication\n2. PROPRANOLOL 40-120 mg BID: 50% attack reduction; reduces BP; CONTRAINDICATIONS: asthma, heart block, decompensated heart failure\n3. METOPROLOL 50-200 mg daily: Cardioselective; similar efficacy; may be better tolerated\n4. TOPIRAMATE: Effective for migraine prevention but not antihypertensive; second-line if beta-blocker not tolerated\n5. AMITRIPTYLINE: Avoid in hypertensive patients without adequate BP control; safe when BP controlled\n6. CANDESARTAN (ARB): Emerging evidence for migraine prevention with antihypertensive benefit\n\nCONCLUSION: Beta-blockers (propranolol, metoprolol) have Level A evidence for both episodic migraine prevention and antihypertensive efficacy; reviewed evidence supports dual-indication use in this clinical context.",
+        "summary": "Beta-blockers (propranolol/metoprolol) treat both hypertension and migraine — Level A evidence supports dual-indication use; dose selection per clinical context"
       }
     },
     {
       "trigger_action": "request_mra_head_neck",
       "tool_name": "order_advanced_imaging",
       "output": {
-        "modality": "",
+        "modality": "MRA head and neck",
         "tracer_or_protocol": null,
         "findings": [
           {
@@ -258,13 +284,86 @@
         "findings": [],
         "artifacts": [],
         "activating_procedures": {},
-        "confidence": 0.0,
-        "impression": "Normal EEG; no epileptiform activity. Clinical correlation recommended.",
+        "impression": "This is a NORMAL EEG. No epileptiform discharges. No focal slowing. No electrographic seizures recorded. Clinical correlation recommended.",
         "limitations": "",
         "recommended_actions": [
           "Clinical correlation recommended."
         ]
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": null,
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "echo": {
+      "chambers": {
+        "LV": "normal size and systolic function",
+        "RV": "normal size and function",
+        "LA": "normal size",
+        "RA": "normal size"
+      },
+      "valves": {
+        "mitral": "structurally normal",
+        "aortic": "structurally normal",
+        "tricuspid": "normal",
+        "pulmonic": "normal"
+      },
+      "ejection_fraction": 58.0,
+      "wall_motion": "no regional wall-motion abnormality",
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": []
+    },
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 49,
+        "max": 112,
+        "average": 73
+      },
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "impression": "Normal 24-hour Holter monitor.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": null,
+    "specialized_test": {
+      "test_type": "general_neurodiagnostic_assessment",
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "Study within normal limits. No abnormality identified; non-contributory.",
+      "recommended_actions": []
+    },
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

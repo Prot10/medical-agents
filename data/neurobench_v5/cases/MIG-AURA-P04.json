@@ -46,13 +46,13 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert, fully oriented. Mildly anxious about CADASIL risk. Cognitive screen MOCA 30/30.",
+      "cranial_nerves": "Normal cranial nerves II-XII. Visual fields full. PERRLA. No papilledema.",
+      "motor": "Motor 5/5 throughout. No pronator drift.",
+      "sensory": "Sensation intact to light touch and pinprick bilaterally.",
+      "reflexes": "Deep tendon reflexes 2+ symmetric. No Babinski.",
+      "coordination": "Coordination normal. Finger-nose and heel-shin normal.",
+      "gait": "Gait normal."
     },
     "vitals": {
       "bp_systolic": 120,
@@ -167,8 +167,21 @@
       "Pregnancy planning changes preventive therapy options significantly — propranolol is the safest option; topiramate is teratogenic",
       "Diagnostic puzzle: borderline MRI + CADASIL family history creates diagnostic uncertainty that requires genetic resolution"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "External capsule and anterior temporal pole WMH in a patient with CADASIL family history",
+        "location": "patient.history_present_illness",
+        "intended_effect": "External capsule and anterior temporal pole are CADASIL signature locations; radiologist's CADASIL-pattern comment was reasonable",
+        "correct_interpretation": "Classic CADASIL requires bilateral confluent involvement — this patient has scattered lesions including only one anterior temporal pole lesion; NOTCH3 gene testing is definitive; result negative"
+      },
+      {
+        "data_point": "Maternal aunt with confirmed CADASIL — 50% transmission risk through mother's lineage",
+        "location": "patient.history_present_illness",
+        "intended_effect": "If aunt has CADASIL, the patient's mother may be a carrier; if mother is a carrier, patient has 50% risk",
+        "correct_interpretation": "Direct NOTCH3 testing of the patient is more informative than probabilistic inheritance calculation; negative NOTCH3 definitively excludes CADASIL regardless of maternal carrier status"
+      }
+    ],
+    "icd_code": "G43.1"
   },
   "red_herrings": [
     {
@@ -185,16 +198,38 @@
   "metadata": {
     "condition_name": "Migraine with aura — CADASIL differential with family history; genetic testing resolves borderline MRI findings",
     "difficulty_description": "Diagnostic puzzle: borderline CADASIL-pattern MRI + family history creates diagnostic uncertainty; NOTCH3 genetic testing is definitive; pregnancy planning changes preventive therapy selection",
-    "expected_agent_confidence": 0.4
+    "expected_agent_confidence": 0.4,
+    "fallback_tool_kinds": {
+      "eeg": "normal",
+      "csf": "normal",
+      "ct": "normal",
+      "echo": "normal",
+      "cardiac_monitoring": "incidental",
+      "advanced_imaging": "normal",
+      "drug_interactions": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
-      "findings": [],
+      "findings": [
+        {
+          "type": "white_matter_hyperintensity",
+          "location": "left external capsule and single right anterior temporal pole",
+          "size": "6 foci; largest 5 mm",
+          "signal_characteristics": {
+            "FLAIR": "hyperintense",
+            "T2": "hyperintense",
+            "DWI": "no restriction",
+            "T1": "isointense"
+          },
+          "mass_effect": "none",
+          "borders": "well-defined, punctate"
+        }
+      ],
       "volumetrics": null,
       "additional_observations": [],
       "impression": "6 WMH with some external capsule and single anterior temporal pole lesion — borderline CADASIL pattern; NOTCH3 gene testing required; not diagnostic on imaging alone; migraine-related WMH also possible. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
@@ -228,14 +263,14 @@
       "trigger_action": "request_notch3_genetic_testing",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "",
+        "test_type": "genetic_panel",
         "findings": [
           {
-            "description": "NOTCH3 GENE SEQUENCING — CADASIL SCREENING\n\nIndication: Family history of CADASIL (maternal aunt); borderline MRI WMH distribution\n\nTECHNIQUE: Full NOTCH3 gene sequencing of exons 2-24 (hotspot regions for cysteine-altering mutations)\n\nRESULT: NO PATHOGENIC MUTATION DETECTED in NOTCH3.\n\nVARIANTS: One variant of uncertain significance (VUS) in exon 11 — c.1630G>A (p.Val544Met) — no cysteine alteration; not in EGF-like repeat domain; classified as benign variant of uncertain significance; not diagnostic of CADASIL.\n\nINTERPRETATION: No CADASIL-associated NOTCH3 pathogenic mutation. The VUS is not expected to cause CADASIL. Family history may reflect phenocopy or different NOTCH3 mutation in the aunt (full family sequencing would clarify).\n\nCONCLUSION: CADASIL genetically excluded in this patient. WMH on MRI are non-specific migraine-related changes, not CADASIL."
+            "description": "NOTCH3 GENE SEQUENCING — CADASIL SCREENING\n\nIndication: Family history of CADASIL (maternal aunt); borderline MRI WMH distribution\n\nTECHNIQUE: Full NOTCH3 gene sequencing of exons 2-24 (hotspot regions for cysteine-altering mutations)\n\nRESULT: NO PATHOGENIC MUTATION DETECTED in NOTCH3.\n\nVARIANTS: One variant of uncertain significance (VUS) in exon 11 — c.1630G>A (p.Val544Met) — no cysteine alteration; not in EGF-like repeat domain; classified as benign variant of uncertain significance; not diagnostic of CADASIL.\n\nINTERPRETATION: No CADASIL-associated NOTCH3 pathogenic mutation. The VUS is not expected to cause CADASIL. Family history may reflect phenocopy or different NOTCH3 mutation in the aunt (full family sequencing would clarify).\n\nCONCLUSION: No CADASIL-associated NOTCH3 pathogenic mutation detected in this patient. The variant of uncertain significance (VUS) identified is classified as benign and not diagnostic of CADASIL. Clinical correlation recommended."
           }
         ],
         "quantitative_data": null,
-        "impression": "No NOTCH3 pathogenic mutation detected; CADASIL genetically excluded; VUS (exon 11) is benign and non-diagnostic; WMH are non-specific migraine-related",
+        "impression": "No NOTCH3 pathogenic mutation detected. CADASIL genetically excluded. VUS (exon 11) is classified as benign and not diagnostic.",
         "recommended_actions": []
       }
     },
@@ -243,15 +278,29 @@
       "trigger_action": "search_cadasil_mri_differential_migraine_wmh",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: CADASIL vs Migraine-Related WMH — MRI Differentiation\n\nKEY FINDINGS:\n1. CADASIL MRI PATTERN: Classic CADASIL has bilateral, confluent WMH involving BOTH anterior temporal poles AND external capsules; highly sensitive and specific for CADASIL when bilateral and confluent\n2. MIGRAINE WMH: Typically scattered, non-confluent subcortical punctate lesions; can involve external capsules but rarely bilateral confluent anterior temporal poles\n3. SINGLE LESION: A single anterior temporal pole lesion is insufficient for CADASIL diagnosis — bilateral symmetrical involvement is characteristic\n4. OVERLAP: In early/pre-symptomatic CADASIL, WMH may be limited and resemble migraine-related WMH — genetic testing essential\n5. AUTOSOMAL DOMINANT INHERITANCE: CADASIL has 50% risk of transmission; if patient's mother has CADASIL, each child has 50% risk; if patient's mother does NOT have CADASIL, genetic risk is much lower\n\nCONCLUSION: Borderline MRI — genetic testing (NOTCH3) is definitive; CADASIL excluded by negative gene test in this patient.",
-        "summary": "Classic CADASIL = bilateral confluent anterior temporal poles + external capsules; single lesion and negative NOTCH3 = CADASIL excluded; WMH are migraine-related"
+        "query": "CADASIL MRI anterior temporal poles external capsule WMH migraine differentiation NOTCH3",
+        "results": [
+          {
+            "source": "Neurology; CADASIL international registry; Brain",
+            "finding": "Classic CADASIL has bilateral, confluent WMH involving BOTH anterior temporal poles AND external capsules; highly sensitive and specific when bilateral and confluent. Migraine WMH: typically scattered, non-confluent subcortical punctate lesions; can involve external capsules but rarely bilateral confluent anterior temporal poles. A single anterior temporal pole lesion is insufficient for CADASIL diagnosis. In early/pre-symptomatic CADASIL, WMH may resemble migraine-related WMH — genetic testing essential. Autosomal dominant: 50% transmission risk. NOTCH3 gene testing is definitive.",
+            "evidence_level": "CADASIL registry; expert consensus"
+          }
+        ],
+        "summary": "Classic CADASIL is characterised by bilateral confluent WMH involving anterior temporal poles and external capsules; NOTCH3 gene testing is definitive; a negative NOTCH3 result excludes the most common CADASIL mutations; migraine-related WMH are typically non-confluent subcortical punctate lesions distinct from the CADASIL pattern"
       }
     },
     {
       "trigger_action": "search_migraine_preventive_pregnancy_planning",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Migraine Prevention During Pregnancy Planning\n\nKEY FINDINGS:\n1. TOPIRAMATE: Teratogenic (Category D — neural tube defects, orofacial clefts); STOP at least 1 month before conception; use effective contraception\n2. VALPROATE: Highly teratogenic; NEVER use in women of childbearing age without reliable contraception\n3. PROPRANOLOL: Relatively safe in pregnancy; may cause fetal growth restriction at high doses; acceptable at low doses (40 mg BID)\n4. AMITRIPTYLINE 10-25 mg QHS: Limited data but generally accepted; monitor neonatal adaptation\n5. ANTI-CGRP ANTIBODIES: Avoid in pregnancy — insufficient safety data; adequate washout required (erenumab half-life ~28 days; 5 half-lives = 4-5 months before conception)\n6. SUMATRIPTAN: SAFE during pregnancy — extensive registry data; low teratogenic risk\n\nCONCLUSION: For this patient planning second pregnancy: if starting prevention, propranolol is safest option. Stop topiramate or any anti-CGRP before conceiving. Sumatriptan can continue during pregnancy.",
+        "query": "migraine prevention pregnancy planning propranolol topiramate teratogenic sumatriptan safety",
+        "results": [
+          {
+            "source": "NICE guidelines; AAN teratology data; sumatriptan pregnancy registry",
+            "finding": "Topiramate: teratogenic (Category D — neural tube defects, orofacial clefts); discontinuation is required at least 1 month before attempting conception. Valproate: highly teratogenic; contraindicated in women of childbearing age without reliable contraception. Propranolol: relatively safe in pregnancy; may cause fetal growth restriction at high doses; acceptable at low doses (40 mg BID). Amitriptyline 10-25 mg QHS: limited data but generally accepted. Anti-CGRP antibodies: insufficient safety data in pregnancy — erenumab washout of 4-5 months before conception is recommended. Sumatriptan: extensive pregnancy registry data; low teratogenic risk.",
+            "evidence_level": "regulatory classification; observational registries"
+          }
+        ],
         "summary": "Propranolol safest preventive for pregnancy planning; topiramate contraindicated (teratogenic); sumatriptan safe during pregnancy; anti-CGRP requires 4-5 month washout"
       }
     },
@@ -259,7 +308,7 @@
       "trigger_action": "request_genetic_counselling_cadasil_family",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "",
+        "test_type": "genetic_counselling",
         "findings": [
           {
             "description": "GENETIC COUNSELLING REPORT\n\nIndication: CADASIL in maternal aunt; NOTCH3 negative in patient; family risk assessment\n\nFINDINGS:\n  AUTOSOMAL DOMINANT PATTERN: If patient's mother carries the NOTCH3 pathogenic mutation, each maternal aunt sibling has 50% risk; each child of a carrier has 50% risk.\n  PATIENT'S RESULT: No NOTCH3 pathogenic mutation — patient is not a CADASIL carrier; she did NOT inherit the mutation (if present in the mother's lineage).\n  RECOMMENDATION: Testing of patient's mother would clarify whether she is a carrier; if mother tests negative for aunt's mutation, the family lineage may have de novo mutation in the aunt.\n  CHILDREN'S RISK: Patient's children have NO CADASIL risk given patient is NOTCH3-negative.\n\nCONCLUSION: Patient does not have CADASIL and cannot pass it to her children. Genetic counselling for patient's mother recommended."
@@ -274,8 +323,15 @@
       "trigger_action": "search_sumatriptan_cadasil_safety",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Triptans in CADASIL — Safety Concern\n\nKEY FINDINGS:\n1. CADASIL + TRIPTANS: Triptans are CAUTIONED in CADASIL — theoretical concern that vasoconstriction of already-diseased small cerebral vessels could precipitate lacunar ischaemia\n2. SUMATRIPTAN IN CADASIL-NEGATIVE PATIENT: This patient does NOT have CADASIL — no restriction on sumatriptan use; continue as before\n3. IF CADASIL WAS CONFIRMED: Sumatriptan and all triptans would be cautioned; NSAIDs and antiemetics for acute treatment\n\nCONCLUSION: CADASIL excluded — sumatriptan is safe to continue.",
-        "summary": "Triptans cautioned in CADASIL (not relevant here — CADASIL excluded); sumatriptan is safe to continue in this NOTCH3-negative patient"
+        "query": "sumatriptan triptans CADASIL safety NOTCH3 negative migraine",
+        "results": [
+          {
+            "source": "CADASIL management guidelines; EHF guidelines",
+            "finding": "Triptans are CAUTIONED in CADASIL — theoretical concern that vasoconstriction of already-diseased small cerebral vessels could precipitate lacunar ischaemia. In patients where CADASIL has been excluded by NOTCH3 genetic testing, no triptan restriction applies on this basis; triptan use is otherwise per standard migraine guidance. If CADASIL is confirmed: all triptans are cautioned; NSAIDs and antiemetics are preferred for acute treatment.",
+            "evidence_level": "expert consensus; case reports"
+          }
+        ],
+        "summary": "Triptans are cautioned in confirmed CADASIL due to theoretical vasoconstriction risk in diseased arterioles; when CADASIL is excluded by negative NOTCH3 genetic testing, this caution does not apply and triptans are appropriate per standard migraine guidance"
       }
     },
     {
@@ -286,5 +342,104 @@
         "summary": "No routine repeat MRI needed; reassure about WMH prognosis; repeat only if new symptoms"
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": {
+      "classification": "normal",
+      "background": {
+        "pdr": "9-10 Hz posterior dominant rhythm, symmetric and reactive",
+        "sleep_features": "normal vertex waves and sleep spindles",
+        "overall": "normal organisation for age"
+      },
+      "findings": [],
+      "artifacts": [],
+      "activating_procedures": {},
+      "impression": "Normal awake and drowsy EEG. No epileptiform discharges and no focal slowing.",
+      "limitations": "",
+      "recommended_actions": []
+    },
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "echo": {
+      "chambers": {
+        "LV": "normal size and systolic function",
+        "RV": "normal size and function",
+        "LA": "normal size",
+        "RA": "normal size"
+      },
+      "valves": {
+        "mitral": "structurally normal",
+        "aortic": "structurally normal",
+        "tricuspid": "normal",
+        "pulmonic": "normal"
+      },
+      "ejection_fraction": 63.0,
+      "wall_motion": "no regional wall-motion abnormality",
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": []
+    },
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Predominant sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 51,
+        "max": 118,
+        "average": 76
+      },
+      "events": [],
+      "findings": [
+        "Brief runs of asymptomatic sinus tachycardia. No sustained arrhythmia, no pauses greater than 2 seconds, no AV block."
+      ],
+      "impression": "24-hour Holter monitor with only benign findings.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": {
+      "modality": "MRA",
+      "tracer_or_protocol": null,
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "No abnormality identified on advanced imaging. Findings are non-contributory; clinical correlation recommended.",
+      "recommended_actions": []
+    },
+    "specialized_test": null,
+    "literature_search": null,
+    "drug_interactions": {
+      "general": {
+        "proposed": "(agent not specified on this case's pathway)",
+        "interactions": [],
+        "contraindications": [],
+        "warnings": [
+          "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
+        ],
+        "formulary_status": "on formulary",
+        "alternatives": []
+      }
+    }
+  }
 }

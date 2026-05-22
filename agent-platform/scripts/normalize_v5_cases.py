@@ -4,21 +4,20 @@ This script fixes systematic validation errors in v5 cases:
 
 1. MRI findings: signal_characteristics is a string → convert to dict
 2. MRI findings: extra fields stripped (sequences, normal_structures, enhancement_pattern, etc.)
-3. MRI report: confidence is "high"/"low" string → convert to float
-4. EEG reports: non-standard structure (no classification/confidence, uses background_activity/
+3. EEG reports: non-standard structure (no classification, uses background_activity/
    abnormal_findings/events_captured/abnormalities) → convert to EEGReport schema
-5. optimal_actions: missing tool_parameters → add {}
-6. optimal_actions: category values like "very_low", "low", etc. → map to valid enum values
-7. followup_outputs MRI/EEG/CT tool outputs: same structural fixes
-8. condition: non-enum strings (e.g. "behavioral_variant_frontotemporal_dementia",
+4. optimal_actions: missing tool_parameters → add {}
+5. optimal_actions: category values like "very_low", "low", etc. → map to valid enum values
+6. followup_outputs MRI/EEG/CT tool outputs: same structural fixes
+7. condition: non-enum strings (e.g. "behavioral_variant_frontotemporal_dementia",
    "Anti-NMDA receptor encephalitis") → map to correct enum values
-9. Patient (flat v1 format): age/sex/hpi/pmh at top level → nest under demographics/clinical_history
-10. initial_tool_outputs: keyed by tool function names (analyze_brain_mri etc.) → canonical names
-    (mri, eeg, labs, csf, ct, etc.)
-11. ground_truth: non-standard format (optimal_action_sequence: list[str],
+8. Patient (flat v1 format): age/sex/hpi/pmh at top level → nest under demographics/clinical_history
+9. initial_tool_outputs: keyed by tool function names (analyze_brain_mri etc.) → canonical names
+   (mri, eeg, labs, csf, ct, etc.)
+10. ground_truth: non-standard format (optimal_action_sequence: list[str],
     differential_diagnosis, key_reasoning) → convert to ActionStep list + standard fields
-12. Medications: list of strings → list of Medication dicts
-13. EEGReport/MRIReport in followup_outputs union type: ensure correct structure
+11. Medications: list of strings → list of Medication dicts
+12. EEGReport/MRIReport in followup_outputs union type: ensure correct structure
 
 Usage:
     uv run python agent-platform/scripts/normalize_v5_cases.py [--dry-run]
@@ -64,16 +63,6 @@ CONDITION_MAP: dict[str, str] = {
 }
 
 VALID_CATEGORIES = {"required", "acceptable", "contraindicated"}
-
-CONFIDENCE_STRING_MAP = {
-    "high": 0.90,
-    "very high": 0.95,
-    "very_high": 0.95,
-    "moderate": 0.70,
-    "low": 0.50,
-    "very low": 0.30,
-    "very_low": 0.30,
-}
 
 # Maps tool function names → canonical ToolOutputSet field names
 TOOL_NAME_TO_FIELD: dict[str, str] = {
@@ -140,8 +129,6 @@ def fix_mri_report(mri: dict) -> dict:
         else []
     )
 
-    conf = _parse_confidence(mri.get("confidence", 0.85))
-
     ra = mri.get("recommended_actions", [])
     recommended_actions = [str(x) for x in ra] if isinstance(ra, list) else []
 
@@ -151,23 +138,11 @@ def fix_mri_report(mri: dict) -> dict:
         "additional_observations": additional_observations,
         "impression": str(mri.get("impression", "")),
         "differential_by_imaging": differential_by_imaging,
-        "confidence": conf,
         "recommended_actions": recommended_actions,
     }
 
 
 # ─── EEG helpers ──────────────────────────────────────────────────────────────
-
-
-def _parse_confidence(val: Any) -> float:
-    if isinstance(val, str):
-        val = CONFIDENCE_STRING_MAP.get(val.lower().strip(), 0.85)
-    if isinstance(val, (int, float)):
-        val = float(val)
-        if val > 1.0:
-            val = val / 100.0
-        return max(0.0, min(1.0, val))
-    return 0.85
 
 
 def _determine_eeg_classification(eeg: dict) -> str:
@@ -303,7 +278,6 @@ def fix_eeg_report(eeg: dict) -> dict:
         "findings": _synthesize_eeg_findings(eeg),
         "artifacts": artifacts,
         "activating_procedures": ap,
-        "confidence": _parse_confidence(eeg.get("confidence", 0.85)),
         "impression": str(eeg.get("impression", "")),
         "limitations": str(eeg.get("limitations", "")),
         "recommended_actions": recommended_actions,
@@ -1098,7 +1072,6 @@ def _convert_report_string_to_output(tool_type: str, val: dict) -> dict:
             "additional_observations": [report_text] if report_text else [],
             "impression": summary or report_text,
             "differential_by_imaging": [],
-            "confidence": 0.85,
             "recommended_actions": [],
         }
     elif tool_type == "eeg":
@@ -1108,7 +1081,6 @@ def _convert_report_string_to_output(tool_type: str, val: dict) -> dict:
             "findings": [],
             "artifacts": [],
             "activating_procedures": {},
-            "confidence": 0.85,
             "impression": summary or report_text,
             "limitations": "",
             "recommended_actions": [],
