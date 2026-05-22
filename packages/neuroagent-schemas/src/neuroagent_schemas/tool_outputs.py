@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class EEGFinding(BaseModel):
@@ -22,7 +22,6 @@ class EEGReport(BaseModel):
     findings: list[EEGFinding] = []
     artifacts: list[dict[str, str]] = []
     activating_procedures: dict[str, str] = {}
-    confidence: float = Field(ge=0.0, le=1.0)
     impression: str
     limitations: str = ""
     recommended_actions: list[str] = []
@@ -43,7 +42,6 @@ class MRIReport(BaseModel):
     additional_observations: list[str] = []
     impression: str
     differential_by_imaging: list[dict[str, str]] = []
-    confidence: float = Field(ge=0.0, le=1.0)
     recommended_actions: list[str] = []
 
 
