@@ -14,10 +14,12 @@
       "No prior neurological or autoimmune diagnosis",
       "No ocular surgery or trauma"
     ],
-    "patient_id": "UNKNOWN",
+    "patient_id": "MG-RS11",
     "demographics": {
       "age": 52,
-      "sex": "female"
+      "sex": "female",
+      "handedness": "right",
+      "bmi": 28.7
     },
     "clinical_history": {
       "medications": [
@@ -43,24 +45,28 @@
       "social_history": {
         "note": "Elementary school teacher; non-smoker; non-drinker; married; three children; active prior to symptom onset"
       },
-      "past_medical_history": []
+      "past_medical_history": [
+        "Hypertension, managed with amlodipine",
+        "No prior neurological or autoimmune diagnosis",
+        "No ocular surgery or trauma"
+      ]
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert, oriented. No cognitive impairment.",
+      "cranial_nerves": "Left upper eyelid ptosis with periorbital swelling. Cogan lid twitch positive (left). Right eye: limited horizontal movement in both directions. Left eye: impaired adduction with preserved abduction (pseudo-INO pattern). Left eye: failure to fully elevate on upgaze. No nystagmus. Visual acuity 20/20 bilaterally. Pupils equal and reactive. No proptosis. No pain on eye movement.",
+      "motor": "Motor exam 5/5 all limbs. No fasciculations.",
+      "sensory": "Sensation intact.",
+      "reflexes": "Reflexes 2+ symmetric.",
+      "coordination": "Coordination normal.",
+      "gait": "Gait normal."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
-      "hr": 72,
-      "temp": 37.0,
+      "bp_systolic": 148,
+      "bp_diastolic": 88,
+      "hr": 76,
+      "temp": 36.9,
       "rr": 14,
-      "spo2": 98
+      "spo2": 99
     },
     "history_present_illness": "A 52-year-old African American woman with hypertension presented to the neurology ward with a 2-week history of bilateral eyelid swelling, double vision, and abnormal eye movements. She reported blurred vision that fluctuated in severity, with the right eye appearing more affected. She initially noticed left upper eyelid swelling and heaviness, followed by diplopia on rightward gaze. She denied fever, photophobia, jaw or swallowing difficulty, limb weakness, numbness, or gait disturbance. She had no preceding infections, vaccinations, or recent travel. She declined the ice pack test initially as she was concerned it would cause pain.\n\nOn examination, swelling of the left upper eyelid was prominent. Extraocular movement testing revealed the right eye failed to move fully in the horizontal plane, and the left eye had impaired adduction with preserved abduction, producing a pattern consistent with pseudo-internuclear ophthalmoplegia (pseudo-INO). The left upper eyelid was ptotic. On upgaze, the left eye failed to fully elevate. A Cogan lid twitch sign was elicited in the left eye on downgaze and return to primary position. Visual acuity and fundoscopy were normal. The rest of the neurological examination was unremarkable.\n\nGiven the pseudo-INO pattern, the neurology team initially considered a brainstem structural lesion or TIA and ordered urgent imaging. CT of the orbits, MRI of the brain, MRA, and MRV were all unremarkable. Following normal imaging, the pattern of fatigable, asymmetric ocular motor signs prompted consideration of myasthenia gravis."
   },
@@ -187,8 +193,27 @@
       "Anti-GQ1b negative effectively excludes Miller-Fisher syndrome",
       "Ocular MG without limb or respiratory involvement: current pyridostigmine + prednisone strategy"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Pseudo-INO pattern suggesting brainstem TIA",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Pseudo-INO with bilateral horizontal restriction mimics true INO from brainstem lesion",
+        "correct_interpretation": "True INO requires structural MLF lesion; normal brain MRI and fatigable nature confirm MG etiology"
+      },
+      {
+        "data_point": "Periorbital swelling suggesting orbital cellulitis",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Eyelid swelling + restricted eye movement can resemble orbital cellulitis",
+        "correct_interpretation": "No fever, no chemosis, no proptosis, normal orbital MRI — orbital infection excluded"
+      },
+      {
+        "data_point": "Hypertension as vascular risk factor",
+        "location": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Hypertension raises pre-test probability for TIA/stroke as cause of focal neurological signs",
+        "correct_interpretation": "Normal MRI/MRA excludes vascular etiology; MG is the diagnosis regardless of vascular risk factors"
+      }
+    ],
+    "icd_code": "G70.01"
   },
   "red_herrings": [
     {
@@ -214,16 +239,22 @@
     "generation_method": "real_case_seed",
     "condition_name": "Ocular myasthenia gravis with pseudo-INO pattern",
     "difficulty_description": "Straightforward: imaging excludes structural cause; Cogan lid twitch and AChR antibody confirm MG; pseudo-INO in MG is a classic presentation",
-    "expected_agent_confidence": 0.85
+    "expected_agent_confidence": 0.85,
+    "fallback_tool_kinds": {
+      "eeg": "normal",
+      "csf": "normal",
+      "echo": "normal",
+      "cardiac_monitoring": "normal",
+      "advanced_imaging": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
       "findings": [],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "Normal brain MRI/MRA/MRV; no brainstem lesion; normal MLF; no orbital pathology — pseudo-INO pattern unexplained by imaging. Clinical correlation recommended.",
+      "impression": "No acute intracranial abnormality. No brainstem lesion. Normal medial longitudinal fasciculus. No orbital pathology. MRA: no significant intracranial stenosis. MRV: no venous sinus thrombosis. Normal study. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
@@ -232,8 +263,12 @@
     "ecg": {
       "rhythm": "sinus rhythm",
       "rate": 72,
-      "intervals": {},
-      "axis": "",
+      "intervals": {
+        "QTc": "422 ms",
+        "PR": "162 ms",
+        "QRS": "88 ms"
+      },
+      "axis": "normal",
       "findings": [
         "ELECTROCARDIOGRAM\n\nPatient: 52-year-old female\nIndication: Pre-investigation baseline\n\nRHYTHM: Sinus rhythm at 72 bpm\nQTc: 422 ms\nINTERPRETATION: Normal sinus rhythm. LVH by voltage criteria (consistent with hypertension). No ischemic changes. No arrhythmia.\n\nCONCLUSION: Normal ECG with mild LVH pattern."
       ],
@@ -248,7 +283,7 @@
     "csf": null,
     "ct": {
       "findings": [],
-      "contrast_used": false,
+      "contrast_used": true,
       "angiography_findings": null,
       "additional_observations": [
         "CT CHEST WITH CONTRAST\n\nIndication: Newly diagnosed MG; screen for thymoma\n\nTECHNIQUE: CT chest with IV contrast\n\nFINDINGS: No anterior mediastinal mass. Normal thymic involution for age 52. No pulmonary nodules. No mediastinal adenopathy.\n\nIMPRESSION: No thymoma. Normal chest CT."
@@ -266,9 +301,36 @@
       "trigger_action": "request_mg_antibodies",
       "tool_name": "interpret_labs",
       "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": []
+        "panels": {
+          "MG_antibody_panel": [
+            {
+              "test": "AChR binding antibody",
+              "value": "7.6 nmol/L",
+              "reference_range": "< 0.4 nmol/L",
+              "is_abnormal": true,
+              "unit": "nmol/L"
+            },
+            {
+              "test": "AChR blocking antibody",
+              "value": "2.3 nmol/L",
+              "reference_range": "< 25%",
+              "is_abnormal": true,
+              "unit": "nmol/L"
+            },
+            {
+              "test": "Anti-MuSK antibody",
+              "value": "< 0.4 nmol/L (negative)",
+              "reference_range": "< 0.4 nmol/L",
+              "is_abnormal": false,
+              "unit": "nmol/L"
+            }
+          ]
+        },
+        "interpretation": "AChR binding antibody markedly elevated at 7.6 nmol/L (reference < 0.4 nmol/L). AChR blocking antibody positive. Anti-MuSK antibody negative. Anti-acetylcholine receptor antibodies are found in a subset of patients with neuromuscular junction disorders; an elevated result is associated with autoimmune neuromuscular junction disease. Clinical correlation recommended.",
+        "abnormal_values_summary": [
+          "AChR binding antibody 7.6 nmol/L (ref <0.4 nmol/L) — markedly elevated",
+          "AChR blocking antibody positive"
+        ]
       }
     },
     {
@@ -278,11 +340,11 @@
         "test_type": "",
         "findings": [
           {
-            "description": "SINGLE-FIBER EMG — ORBICULARIS OCULI\n\nMCD: 54 µs [normal <35 µs] ABNORMAL\nBlocking: 16% of potential pairs\n\nCONCLUSION: NMJ dysfunction confirmed. Consistent with MG."
+            "description": "SINGLE-FIBER EMG — ORBICULARIS OCULI\n\nMCD: 54 µs [normal <35 µs] ABNORMAL\nBlocking: 16% of potential pairs\n\nIMPRESSION: Increased jitter with 16% blocking, consistent with a disorder of neuromuscular transmission. Clinical correlation recommended."
           }
         ],
         "quantitative_data": null,
-        "impression": "SFEMG: MCD 54 µs with 16% blocking — NMJ dysfunction confirmed",
+        "impression": "SFEMG (orbicularis oculi): MCD 54 µs with 16% blocking — increased jitter consistent with a disorder of neuromuscular transmission. Clinical correlation recommended.",
         "recommended_actions": []
       }
     },
@@ -290,8 +352,18 @@
       "trigger_action": "request_anti_gq1b_miller_fisher",
       "tool_name": "interpret_labs",
       "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
+        "panels": {
+          "Anti_ganglioside_panel": [
+            {
+              "test": "Anti-GQ1b IgG",
+              "value": "< 1:100 (negative)",
+              "reference_range": "< 1:100",
+              "is_abnormal": false,
+              "unit": "titre"
+            }
+          ]
+        },
+        "interpretation": "Anti-GQ1b antibody: negative (< 1:100). Anti-GQ1b antibody is detected in the majority of patients with Miller-Fisher syndrome; a negative result makes this diagnosis less likely. Clinical correlation recommended.",
         "abnormal_values_summary": []
       }
     },
@@ -299,8 +371,25 @@
       "trigger_action": "request_pulmonary_function",
       "tool_name": "interpret_labs",
       "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
+        "panels": {
+          "Pulmonary_function": [
+            {
+              "test": "NIF (Negative Inspiratory Force)",
+              "value": "-68 cm H2O",
+              "reference_range": "< -60 cm H2O",
+              "is_abnormal": false,
+              "unit": "cm H2O"
+            },
+            {
+              "test": "FVC % predicted",
+              "value": "92%",
+              "reference_range": "> 80%",
+              "is_abnormal": false,
+              "unit": "%"
+            }
+          ]
+        },
+        "interpretation": "Pulmonary function adequate. NIF -68 cm H2O (reference < -60 cm H2O — meets threshold for adequate respiratory reserve). FVC 92% predicted. No immediate respiratory compromise.",
         "abnormal_values_summary": []
       }
     },
@@ -308,19 +397,112 @@
       "trigger_action": "search_ocular_mg_management",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Ocular MG — Treatment and Progression\n\nKEY FINDINGS:\n1. PYRIDOSTIGMINE: First-line symptomatic treatment; 60 mg q4-6h; particularly effective for ptosis\n2. GENERALIZATION RISK: ~50% of purely ocular MG generalizes within 2 years; AChR antibody presence increases this risk\n3. IMMUNOSUPPRESSION: Prednisone recommended for ocular MG not controlled by pyridostigmine; reduces generalization risk\n4. THYMECTOMY: Controversial for isolated ocular MG; MGTX trial included only generalized MG patients\n5. FOLLOW-UP: NIF and FVC monitoring at each visit; prompt evaluation if symptoms change\n\nCONCLUSION: Initiate pyridostigmine and prednisone (with monitoring); follow-up in 3 months; educate regarding generalization risk.",
-        "summary": "Pyridostigmine first-line; 50% generalization risk within 2 years in AChR+ ocular MG; immunosuppression reduces progression",
-        "query": "",
-        "results": []
+        "query": "search ocular mg management",
+        "results": [
+          {
+            "title": "Clinical literature",
+            "content": "LITERATURE SEARCH: Ocular MG — Treatment and Progression\n\nKEY FINDINGS:\n1. PYRIDOSTIGMINE: Acetylcholinesterase inhibition is a standard symptomatic approach; particularly noted for ptosis improvement.\n2. GENERALIZATION RISK: Approximately 50% of patients with purely ocular disease at onset generalize to bulbar or limb involvement within 2 years; presence of AChR antibodies is associated with higher risk.\n3. IMMUNOSUPPRESSION: Corticosteroids are used for ocular MG not controlled by symptomatic treatment; evidence suggests reduced rate of generalization.\n4. THYMECTOMY: Role in isolated ocular MG is uncertain; the MGTX randomized trial enrolled patients with generalized disease.\n5. RESPIRATORY MONITORING: Serial NIF and FVC measurement is recommended given potential for progression."
+          }
+        ],
+        "summary": "Approximately 50% generalization risk within 2 years in AChR-positive ocular MG; pyridostigmine and immunosuppression are standard approaches; thymectomy role in isolated ocular MG is uncertain."
       }
     },
     {
       "trigger_action": "check_amlodipine_mg",
       "tool_name": "check_drug_interactions",
       "output": {
-        "report": "DRUG INTERACTION REVIEW — AMLODIPINE AND MG\n\nQuery: Calcium channel blocker (amlodipine) safety in MG\n\nFINDINGS:\n  AMLODIPINE (calcium channel blocker):\n  - Calcium channel blockers may impair neuromuscular transmission (calcium required for ACh vesicle release)\n  - Case reports of CCB-related MG exacerbation exist but are rare\n  - Clinical significance of amlodipine at standard doses is low for most MG patients\n  - If worsening occurs, discuss with cardiology regarding alternative antihypertensive (e.g., ACE inhibitor)\n\nCONCLUSION: Amlodipine is generally safe at standard doses in MG. Hydrochlorothiazide has no MG interactions. Continue current antihypertensive regimen with clinical monitoring.",
-        "summary": "Amlodipine: low MG risk at standard doses; continue with monitoring; HCTZ has no MG interaction"
+        "proposed": "check_amlodipine_mg",
+        "interactions": [
+          "DRUG INTERACTION REVIEW — AMLODIPINE IN PATIENTS WITH NEUROMUSCULAR JUNCTION DISEASE\n\nQuery: Calcium channel blocker (amlodipine) and neuromuscular transmission\n\nFINDINGS:\n  AMLODIPINE (calcium channel blocker):\n  - Calcium is required for acetylcholine vesicle release at the NMJ; calcium channel blockers may theoretically impair this step\n  - Case reports of NMJ disease worsening with calcium channel blockers exist but are uncommon\n  - Clinical significance of amlodipine at standard doses appears low for most patients\n  - ACE inhibitors or ARBs are alternative antihypertensives without known NMJ effects\n\n  HYDROCHLOROTHIAZIDE:\n  - No known pharmacodynamic interaction with NMJ function reported"
+        ],
+        "contraindications": [],
+        "warnings": [
+          "Amlodipine: low risk of NMJ effects at standard doses; monitor for any worsening of neuromuscular symptoms; HCTZ has no known NMJ interaction."
+        ],
+        "formulary_status": "on formulary",
+        "alternatives": []
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": {
+      "classification": "normal",
+      "background": {
+        "pdr": "9-10 Hz posterior dominant rhythm, symmetric and reactive",
+        "sleep_features": "normal vertex waves and sleep spindles",
+        "overall": "normal organisation for age"
+      },
+      "findings": [],
+      "artifacts": [],
+      "activating_procedures": {},
+      "impression": "Normal awake and drowsy EEG. No epileptiform discharges and no focal slowing.",
+      "limitations": "",
+      "recommended_actions": []
+    },
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": null,
+    "echo": {
+      "chambers": {
+        "LV": "normal size and systolic function",
+        "RV": "normal size and function",
+        "LA": "normal size",
+        "RA": "normal size"
+      },
+      "valves": {
+        "mitral": "structurally normal",
+        "aortic": "structurally normal",
+        "tricuspid": "normal",
+        "pulmonic": "normal"
+      },
+      "ejection_fraction": 61.0,
+      "wall_motion": "no regional wall-motion abnormality",
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": []
+    },
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 54,
+        "max": 129,
+        "average": 77
+      },
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "impression": "Normal 24-hour Holter monitor.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": {
+      "modality": "MRA head and neck",
+      "tracer_or_protocol": null,
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "No abnormality identified on advanced imaging. Findings are non-contributory; clinical correlation recommended.",
+      "recommended_actions": []
+    },
+    "specialized_test": null,
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

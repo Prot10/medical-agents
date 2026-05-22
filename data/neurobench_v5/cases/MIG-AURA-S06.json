@@ -39,21 +39,21 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert; oriented. Normal cognition.",
+      "cranial_nerves": "Normal cranial nerves. Visual fields full by confrontation. PERRLA. No papilledema.",
+      "motor": "Motor strength 5/5 all limbs. No pronator drift.",
+      "sensory": "Sensation intact to light touch and pinprick throughout.",
+      "reflexes": "DTR 2+ symmetric. Plantar responses flexor bilaterally.",
+      "coordination": "Finger-nose and heel-shin normal bilaterally.",
+      "gait": "Normal gait. Romberg negative."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
+      "bp_systolic": 114,
+      "bp_diastolic": 70,
       "hr": 72,
-      "temp": 37.0,
-      "rr": 14,
-      "spo2": 98
+      "temp": 36.7,
+      "rr": 13,
+      "spo2": 99
     },
     "history_present_illness": "A 30-year-old Indian woman presented to the neurology clinic with a 4-year history of monthly episodes consisting of 'flashing lights' followed by a severe headache. She describes the visual phenomenon as seeing a bright flickering arc in one side of her vision that expands and then disappears over about 20-25 minutes. She sometimes cannot see clearly on the affected side during this time. The visual disturbance is then followed by a severe unilateral headache (usually right-sided, 7-8/10) with nausea, photophobia, and occasional vomiting lasting 6-8 hours. She has been taking paracetamol (acetaminophen) 1000 mg with only partial relief.\n\nEpisodes occur monthly and are particularly associated with her menstrual cycle (occurring within 2-3 days of the start of her period). The frequency has increased from once to twice monthly over the past 3 months after she returned to work from maternity leave. Her sister also has migraines. She is breastfeeding her 6-month-old infant and is not on any contraception. She mentions using low-dose amitriptyline 10 mg for 3 months at a different doctor's office 2 years ago, which helped, but she stopped because she became pregnant. She specifically reports all episodes are identical; there are no 'different' episodes and no neurological symptoms between attacks."
   },
@@ -95,8 +95,8 @@
       {
         "step": 1,
         "action": "Brain MRI — appropriate for increased frequency; exclude CVT and structural cause",
-        "tool_name": null,
-        "expected_finding": "",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Normal brain MRI; no structural cause for postpartum migraine exacerbation with visual aura",
         "category": "acceptable",
         "tool_parameters": {
           "contrast": true
@@ -105,8 +105,8 @@
       {
         "step": 2,
         "action": "Iron supplementation for postpartum anemia (hemoglobin 11.8, ferritin borderline low)",
-        "tool_name": null,
-        "expected_finding": "",
+        "tool_name": "interpret_labs",
+        "expected_finding": "All values within normal limits; postpartum labs including thyroid function, CBC",
         "category": "acceptable",
         "tool_parameters": {}
       },
@@ -114,7 +114,7 @@
         "step": 3,
         "action": "Add ibuprofen to acetaminophen for acute treatment; sumatriptan is compatible with breastfeeding",
         "tool_name": null,
-        "expected_finding": "",
+        "expected_finding": "Breastfeeding-compatible management: sumatriptan safe during breastfeeding; propranolol for prevention if needed",
         "category": "acceptable",
         "tool_parameters": {}
       },
@@ -122,7 +122,7 @@
         "step": 4,
         "action": "Resume amitriptyline 10 mg QHS for prevention (prior effective response; compatible with breastfeeding)",
         "tool_name": null,
-        "expected_finding": "",
+        "expected_finding": "Breastfeeding-compatible management: sumatriptan safe during breastfeeding; propranolol for prevention if needed",
         "category": "acceptable",
         "tool_parameters": {}
       }
@@ -145,8 +145,21 @@
       "Iron deficiency anemia identified — treat to reduce headache burden",
       "Prior amitriptyline response is informative; LactMed classifies it as probably compatible at low doses"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Postpartum period raising CVT concern",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Postpartum period is a risk factor for CVT, which can present with headache",
+        "correct_interpretation": "Peak CVT risk is <4 weeks postpartum; patient is 6 months postpartum; 4-year identical history predates pregnancy; normal MRI"
+      },
+      {
+        "data_point": "Mild postpartum anemia as potential headache cause",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Mild anemia can cause headache",
+        "correct_interpretation": "Anemia may contribute to headache burden but does not cause visual aura; treat anemia as adjunct measure"
+      }
+    ],
+    "icd_code": "G43.1"
   },
   "red_herrings": [
     {
@@ -163,16 +176,35 @@
   "metadata": {
     "condition_name": "Migraine with visual aura, postpartum exacerbation",
     "difficulty_description": "Straightforward: classic visual aura pattern; key challenge is selecting breastfeeding-compatible medications and treating postpartum anemia",
-    "expected_agent_confidence": 0.85
+    "expected_agent_confidence": 0.85,
+    "fallback_tool_kinds": {
+      "csf": "normal",
+      "ct": "normal",
+      "echo": "normal",
+      "cardiac_monitoring": "incidental",
+      "specialized_test": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
-      "findings": [],
+      "findings": [
+        {
+          "type": "normal",
+          "location": "whole brain",
+          "size": null,
+          "signal_characteristics": {
+            "DWI": "no restriction",
+            "FLAIR": "no signal abnormality",
+            "T1": "normal"
+          },
+          "mass_effect": "none",
+          "borders": null
+        }
+      ],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "Normal MRI; one tiny non-specific WMH; no structural cause. Clinical correlation recommended.",
+      "impression": "No acute or structural intracranial abnormality. No DWI restriction. No structural lesion or demyelinating disease. Normal study. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
@@ -190,9 +222,50 @@
       "clinical_correlation": ""
     },
     "labs": {
-      "panels": {},
-      "interpretation": "All values within normal limits.",
-      "abnormal_values_summary": []
+      "panels": {
+        "cbc": [
+          {
+            "test": "Haemoglobin",
+            "value": 11.8,
+            "unit": "g/dL",
+            "reference_range": "12.0-16.0 g/dL",
+            "is_abnormal": true,
+            "clinical_significance": null
+          },
+          {
+            "test": "MCV",
+            "value": 76,
+            "unit": "fL",
+            "reference_range": "80-100 fL",
+            "is_abnormal": true,
+            "clinical_significance": null
+          },
+          {
+            "test": "Ferritin",
+            "value": 8,
+            "unit": "ng/mL",
+            "reference_range": "12-150 ng/mL",
+            "is_abnormal": true,
+            "clinical_significance": null
+          }
+        ],
+        "thyroid": [
+          {
+            "test": "TSH",
+            "value": 2.1,
+            "unit": "mIU/L",
+            "reference_range": "0.4-4.0 mIU/L",
+            "is_abnormal": false,
+            "clinical_significance": null
+          }
+        ]
+      },
+      "interpretation": "Mild microcytic anaemia: haemoglobin 11.8 g/dL (low), MCV 76 fL (microcytic), ferritin 8 ng/mL (low) — pattern consistent with iron deficiency anaemia. Thyroid function (TSH 2.1 mIU/L) within normal limits. Clinical correlation recommended.",
+      "abnormal_values_summary": [
+        "Haemoglobin 11.8 g/dL [L] (ref 12.0-16.0) — mild anaemia",
+        "MCV 76 fL [L] (ref 80-100) — microcytic",
+        "Ferritin 8 ng/mL [L] (ref 12-150) — iron deficiency confirmed"
+      ]
     },
     "csf": null,
     "ct": null,
@@ -214,7 +287,7 @@
       "trigger_action": "request_mra_head_neck",
       "tool_name": "order_advanced_imaging",
       "output": {
-        "modality": "",
+        "modality": "MRA head and neck",
         "tracer_or_protocol": null,
         "findings": [
           {
@@ -248,7 +321,7 @@
       "tool_name": "search_medical_literature",
       "output": {
         "report": "LITERATURE SEARCH: Postpartum Migraine — Return and Exacerbation\n\nKEY FINDINGS:\n1. POSTPARTUM MIGRAINE: Migraine commonly worsens in the postpartum period due to hormonal fluctuations (estrogen drop), sleep deprivation, and stress\n2. RETURN TO PREPREGNANCY PATTERN: Migraine frequency typically returns to baseline within 3-6 months postpartum\n3. BREASTFEEDING: Some evidence breastfeeding is protective against migraine by stabilizing estrogen levels\n4. IRON DEFICIENCY ANEMIA: Postpartum anemia may worsen headache burden; treat with iron supplementation\n5. SLEEP DEPRIVATION: Major trigger in new mothers; infant sleep training can help\n\nCONCLUSION: Postpartum migraine exacerbation explained by hormonal fluctuations, sleep deprivation, and mild anemia. Address all three modifiable factors.",
-        "summary": "Postpartum hormonal changes, sleep deprivation, and anemia all exacerbate migraine; treat anemia and prioritize sleep"
+        "summary": "Postpartum migraine exacerbation is well-recognised; contributing factors include hormonal fluctuations (oestrogen decline), sleep deprivation, and iron deficiency anaemia; correction of iron deficiency and improved sleep regularity are associated with reduced headache burden in postpartum migraineurs"
       }
     },
     {
@@ -260,13 +333,86 @@
         "findings": [],
         "artifacts": [],
         "activating_procedures": {},
-        "confidence": 0.0,
-        "impression": "See findings above. Clinical correlation recommended.",
+        "impression": "This is a NORMAL EEG. No epileptiform discharges. No focal slowing. No electrographic seizures recorded. Clinical correlation recommended.",
         "limitations": "",
         "recommended_actions": [
           "Clinical correlation recommended."
         ]
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": null,
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "echo": {
+      "chambers": {
+        "LV": "normal size and systolic function",
+        "RV": "normal size and function",
+        "LA": "normal size",
+        "RA": "normal size"
+      },
+      "valves": {
+        "mitral": "structurally normal",
+        "aortic": "structurally normal",
+        "tricuspid": "normal",
+        "pulmonic": "normal"
+      },
+      "ejection_fraction": 66.0,
+      "wall_motion": "no regional wall-motion abnormality",
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": []
+    },
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Predominant sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 56,
+        "max": 131,
+        "average": 80
+      },
+      "events": [],
+      "findings": [
+        "Occasional premature atrial complexes, benign. No sustained arrhythmia, no pauses greater than 2 seconds, no AV block."
+      ],
+      "impression": "24-hour Holter monitor with only benign findings.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": null,
+    "specialized_test": {
+      "test_type": "general_neurodiagnostic_assessment",
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "Study within normal limits. No abnormality identified; non-contributory.",
+      "recommended_actions": []
+    },
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

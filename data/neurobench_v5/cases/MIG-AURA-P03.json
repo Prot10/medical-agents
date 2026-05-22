@@ -58,13 +58,13 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert, fully oriented. Mildly anxious about diagnosis. No cognitive impairment.",
+      "cranial_nerves": "Normal cranial nerves II-XII. Visual fields full bilaterally. PERRLA. No papilledema. Visual acuity 6/6 bilaterally. No field cut on confrontation.",
+      "motor": "Motor 5/5 throughout. No pronator drift.",
+      "sensory": "Sensation intact to light touch and pinprick bilaterally.",
+      "reflexes": "Deep tendon reflexes 2+ symmetric. No Babinski.",
+      "coordination": "Coordination normal. No dysmetria.",
+      "gait": "Gait normal. No cortical visual defect between attacks."
     },
     "vitals": {
       "bp_systolic": 120,
@@ -187,8 +187,21 @@
       "Antiphospholipid antibodies must be repeated at 12 weeks for definitive APS exclusion — a single negative test is insufficient",
       "Cerazette (progestin-only) is appropriate and should be continued — combined OCP was correctly stopped 10 years ago"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Real DWI restriction on MRI — dual antiplatelet treatment started",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Confirmed cortical infarction in a 38-year-old woman triggered standard ischaemic stroke workup and DAPT",
+        "correct_interpretation": "Migrainous infarction is a real stroke, but its management differs — DAPT not indicated long-term; primary prevention = migraine prevention; aspirin monotherapy appropriate"
+      },
+      {
+        "data_point": "Antiphospholipid antibodies initially reported as negative — may not repeat",
+        "location": "patient.history_present_illness",
+        "intended_effect": "If only one negative antiphospholipid result, APS is not definitively excluded",
+        "correct_interpretation": "APS diagnosis requires two positive results 12 weeks apart; exclusion similarly requires two negative results 12 weeks apart — single test is insufficient"
+      }
+    ],
+    "icd_code": "G43.1"
   },
   "red_herrings": [
     {
@@ -205,16 +218,36 @@
   "metadata": {
     "condition_name": "Confirmed migrainous infarction (real DWI restriction) — DAPT overtreatment, primary prevention through migraine control",
     "difficulty_description": "Diagnostic puzzle: real DWI-positive infarction creates overtreatment trap (DAPT); recognising migrainous infarction requires excluding all secondary causes; primary prevention is migraine control not anticoagulation",
-    "expected_agent_confidence": 0.35
+    "expected_agent_confidence": 0.35,
+    "fallback_tool_kinds": {
+      "eeg": "normal",
+      "csf": "normal",
+      "ct": "normal",
+      "advanced_imaging": "normal",
+      "specialized_test": "normal",
+      "drug_interactions": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
-      "findings": [],
+      "findings": [
+        {
+          "type": "cortical_infarction",
+          "location": "right occipital cortex",
+          "size": "4 mm",
+          "signal_characteristics": {
+            "DWI": "restricted diffusion present (confirmed infarct)",
+            "ADC": "low signal (true restriction)",
+            "FLAIR": "mild cortical signal change"
+          },
+          "mass_effect": "none",
+          "borders": "ill-defined"
+        }
+      ],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "See findings above. Clinical correlation recommended.",
+      "impression": "4 mm area of restricted diffusion in the right occipital cortex — confirmed acute cortical infarction. Corresponding ADC low signal confirms true restriction. No other DWI lesions. Normal posterior circulation MRA — no PCA stenosis or vertebral dissection. Appearances consistent with a small cortical infarction in the right occipital territory. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
@@ -248,10 +281,14 @@
       "trigger_action": "request_cardiac_monitoring_af_screen",
       "tool_name": "order_cardiac_monitoring",
       "output": {
-        "duration_hours": 0,
-        "monitor_type": "",
+        "duration_hours": 48,
+        "monitor_type": "holter_48h",
         "rhythm_summary": "No AF on 48-hour Holter; sinus rhythm throughout",
-        "heart_rate_range": {},
+        "heart_rate_range": {
+          "min": 51,
+          "max": 112,
+          "average": 70
+        },
         "events": [],
         "findings": [],
         "impression": "No AF on 48-hour Holter; sinus rhythm throughout",
@@ -277,8 +314,15 @@
       "trigger_action": "search_migrainous_infarction_management",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Migrainous Infarction (ICHD-3 1.4.1) — Management and Prevention\n\nDEFINITION: ICHD-3 1.4.1 — stroke occurring during a migraine aura in an established migraineur; infarction in area corresponding to aura; no other stroke cause found.\n\nKEY MANAGEMENT POINTS:\n1. ANTIPLATELET: Aspirin 75-150 mg daily is generally used for secondary prevention after migrainous infarction (weak evidence — no RCTs specific to migrainous infarction; extrapolated from general ischaemic stroke/TIA secondary prevention)\n2. DUAL ANTIPLATELET (ASPIRIN + CLOPIDOGREL): POINT/CHANCE trials support short-term (21 days) DAPT for high-risk TIA; for migrainous infarction, DAPT benefit unproven; current guidelines do not support long-term DAPT\n3. COMBINED OCP: ABSOLUTELY CONTRAINDICATED — already stopped 10 years ago; continue progestin-only (appropriate)\n4. MIGRAINE PREVENTION: CRITICAL — preventing the migraine prevents the infarction. Topiramate (Level A), propranolol (Level A), or anti-CGRP antibodies. Reducing migraine frequency is the primary prevention strategy.\n5. TRIPTANS: Some guidelines caution triptans in migrainous infarction history (vasoconstrictive); this is controversial — weak evidence; individualised decision\n6. STATIN: Atorvastatin reduces stroke risk; consider if lipids elevated — normal in this patient\n\nCONCLUSION: Aspirin 75 mg monotherapy appropriate (stop clopidogrel — DAPT not indicated long-term). Initiate strong migraine preventive therapy immediately.",
-        "summary": "Migrainous infarction: aspirin monotherapy (stop clopidogrel DAPT); migraine prevention is primary prevention strategy; avoid combined OCP (already done); triptans controversial"
+        "query": "migrainous infarction ICHD-3 management antiplatelet DAPT clopidogrel prevention",
+        "results": [
+          {
+            "source": "ICHD-3; ESO stroke guidelines; Cephalalgia review",
+            "finding": "ICHD-3 1.4.1 migrainous infarction: stroke during migraine aura; infarction in area corresponding to aura; no other stroke cause. Aspirin 75-150 mg daily for secondary prevention (weak evidence; extrapolated from ischaemic stroke). DAPT (aspirin + clopidogrel): POINT/CHANCE trials support short-term DAPT for high-risk TIA; for migrainous infarction DAPT benefit unproven — current guidelines do not support long-term DAPT. Combined OCP absolutely contraindicated. Migraine prevention CRITICAL — preventing migraine prevents infarction; topiramate (Level A), propranolol (Level A), anti-CGRP antibodies. Triptans cautioned — weak evidence, individualised decision.",
+            "evidence_level": "ICHD-3 consensus; ESO guidelines; Level A (preventives)"
+          }
+        ],
+        "summary": "For migrainous infarction, aspirin 75-150 mg monotherapy is generally recommended for secondary prevention; long-term DAPT benefit is not established for migrainous infarction; combined OCP is absolutely contraindicated; migraine prevention is the primary strategy to reduce infarction risk; triptans are cautioned based on limited evidence"
       }
     },
     {
@@ -294,7 +338,14 @@
       "trigger_action": "search_triptan_contraindication_migrainous_infarction",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Triptans After Migrainous Infarction — Evidence Review\n\nKEY FINDINGS:\n1. THEORETICAL CONCERN: Triptans are vasoconstrictors; after migrainous infarction, theoretical concern about vasoconstriction in a susceptible territory\n2. EVIDENCE: No randomised trials specifically address triptan use after migrainous infarction; case reports are rare and contradictory\n3. GUIDELINE RECOMMENDATIONS: European Headache Federation and EFNS caution against triptans after migrainous infarction; however, evidence base is very weak\n4. CLINICAL REALITY: Untreated severe migraine attacks (without triptans) cause significant suffering and can potentially trigger further CSD episodes; complete triptan prohibition may worsen outcomes\n5. INDIVIDUALIZED APPROACH: The 2022 EHF guidelines suggest weighing individual risk vs benefit; if migraine attacks are severe and frequent, and the infarction was small and well-characterised, triptan use with caution may be acceptable with close monitoring\n\nCONCLUSION: Triptans are cautioned (not absolutely contraindicated) after migrainous infarction; clinical decision requires shared decision-making; prioritise strong preventive therapy to reduce acute treatment need.",
+        "query": "triptans migrainous infarction safety contraindication EHF guidelines",
+        "results": [
+          {
+            "source": "European Headache Federation (EHF) 2022 guidelines; EFNS",
+            "finding": "Triptans are vasoconstrictors; after migrainous infarction, theoretical concern about vasoconstriction in a susceptible territory. No randomised trials specifically address triptan use after migrainous infarction; case reports rare and contradictory. EHF and EFNS caution against triptans but evidence base is weak. Untreated severe migraine attacks cause significant suffering and may trigger further CSD. 2022 EHF guidelines suggest weighing individual risk vs benefit — if infarction was small and well-characterised, cautious triptan use may be acceptable with monitoring. Prioritise strong preventive therapy to reduce acute treatment need.",
+            "evidence_level": "EHF 2022 guidelines; expert consensus"
+          }
+        ],
         "summary": "Triptans cautioned (not absolutely contraindicated) after migrainous infarction; prioritise preventive therapy to reduce acute treatment need; shared decision-making"
       }
     },
@@ -302,9 +353,86 @@
       "trigger_action": "search_driving_restrictions_migrainous_infarction",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Driving After Migrainous Infarction — DVLA/Licensing Guidance\n\nKEY FINDINGS:\n1. UK DVLA GUIDANCE: After TIA or stroke with full recovery: must not drive for 1 month; can resume if no visual field defect confirmed on perimetry, no other neurological deficit, and no AF (or AF anticoagulated)\n2. MIGRAINOUS INFARCTION: Treated as stroke for DVLA purposes; 1-month driving restriction applies\n3. THIS PATIENT: Episode was 4 weeks ago; full neurological recovery; no visual field defect (full fields on exam); normal ECG and Holter; can be cleared to drive after 1 month with documented full recovery\n\nCONCLUSION: Patient can resume driving 1 month post-episode if full neurological recovery confirmed (she now qualifies — 4 weeks post-episode; full exam); visual field testing recommended to document.",
-        "summary": "UK DVLA: 1-month driving restriction after TIA/stroke; patient has had 4 weeks of recovery with full exam; visual field testing to document; can resume driving"
+        "query": "driving DVLA restrictions migrainous infarction stroke 1 month visual field",
+        "results": [
+          {
+            "source": "DVLA At a Glance Guide (UK); DVLA medical standards",
+            "finding": "After TIA or stroke with full recovery, DVLA regulations require a 1-month driving cessation period; resumption is permitted when there is no visual field defect on perimetry, no persisting neurological deficit, and no uncontrolled AF. Migrainous infarction is treated as a stroke for DVLA licensing purposes — the 1-month restriction applies. Formal visual field assessment is required before driving resumption is documented.",
+            "evidence_level": "DVLA regulatory guidance"
+          }
+        ],
+        "summary": "UK DVLA regulations require a 1-month driving cessation after TIA/stroke; resumption requires documented full neurological recovery, no visual field defect on formal perimetry, and no uncontrolled AF; migrainous infarction is classified as a stroke for DVLA purposes"
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": {
+      "classification": "normal",
+      "background": {
+        "pdr": "9-10 Hz posterior dominant rhythm, symmetric and reactive",
+        "sleep_features": "normal vertex waves and sleep spindles",
+        "overall": "normal organisation for age"
+      },
+      "findings": [],
+      "artifacts": [],
+      "activating_procedures": {},
+      "impression": "Normal awake and drowsy EEG. No epileptiform discharges and no focal slowing.",
+      "limitations": "",
+      "recommended_actions": []
+    },
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "echo": null,
+    "cardiac_monitoring": null,
+    "advanced_imaging": {
+      "modality": "",
+      "tracer_or_protocol": null,
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "No abnormality identified on advanced imaging. Findings are non-contributory; clinical correlation recommended.",
+      "recommended_actions": []
+    },
+    "specialized_test": {
+      "test_type": "",
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "Study within normal limits. No abnormality identified; non-contributory.",
+      "recommended_actions": []
+    },
+    "literature_search": null,
+    "drug_interactions": {
+      "general": {
+        "proposed": "(agent not specified on this case's pathway)",
+        "interactions": [],
+        "contraindications": [],
+        "warnings": [
+          "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
+        ],
+        "formulary_status": "on formulary",
+        "alternatives": []
+      }
+    }
+  }
 }

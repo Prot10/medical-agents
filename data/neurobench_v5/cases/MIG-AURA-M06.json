@@ -52,13 +52,13 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert, oriented. Cooperative and articulate.",
+      "cranial_nerves": "Normal cranial nerves II-XII. Visual fields full bilaterally. PERRLA. No papilledema. Normal extraocular movements.",
+      "motor": "Motor 5/5 throughout. No pronator drift.",
+      "sensory": "Sensation intact to light touch and pinprick bilaterally in all four limbs and face.",
+      "reflexes": "Deep tendon reflexes 2+ symmetric. No Babinski.",
+      "coordination": "Coordination normal. Finger-nose intact.",
+      "gait": "Gait normal."
     },
     "vitals": {
       "bp_systolic": 120,
@@ -181,8 +181,21 @@
       "Dysmenorrhoea management: levonorgestrel IUD is effective for both dysmenorrhoea and contraception and is WHO Category 2 in migraine with aura",
       "EEG is appropriate to exclude ongoing ictal activity in prolonged visual symptoms — non-specific findings only"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Low-dose combined OCP (EE 20 mcg) — patient and doctors may assume lower dose means lower risk",
+        "location": "patient.clinical_history.medications",
+        "intended_effect": "Low-dose combined OCP pills are sometimes marketed as 'safer'; EE 20 mcg is lower than standard 30-35 mcg pills",
+        "correct_interpretation": "WHO Category 4 applies to ALL combined OCP preparations regardless of oestrogen dose; EE 20 mcg still carries unacceptable stroke risk in migraine with aura"
+      },
+      {
+        "data_point": "Prolonged aura >60 min — possible migrainous infarction",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Aura lasting >60 minutes is a recognised risk factor for migrainous infarction, especially on combined OCP",
+        "correct_interpretation": "Normal DWI on MRI excludes migrainous infarction — DWI restriction is required for this diagnosis; the correct ICHD-3 classification is 'migraine with prolonged aura'"
+      }
+    ],
+    "icd_code": "G43.1"
   },
   "red_herrings": [
     {
@@ -199,28 +212,50 @@
   "metadata": {
     "condition_name": "Migraine with prolonged aura (>60 min) — migrainous infarction exclusion, low-dose OCP still contraindicated",
     "difficulty_description": "Moderate: prolonged aura raises migrainous infarction concern; key insight that low-dose combined OCP (EE 20 mcg) still WHO Category 4; triptans contraindicated during aura",
-    "expected_agent_confidence": 0.6
+    "expected_agent_confidence": 0.6,
+    "fallback_tool_kinds": {
+      "csf": "normal",
+      "ct": "normal",
+      "echo": "normal",
+      "cardiac_monitoring": "incidental",
+      "specialized_test": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
-      "findings": [],
+      "findings": [
+        {
+          "type": "white_matter_hyperintensity",
+          "location": "subcortical white matter, bilateral",
+          "size": "punctate (<3 mm)",
+          "signal_characteristics": {
+            "T2": "hyperintense",
+            "FLAIR": "hyperintense",
+            "DWI": "no restriction"
+          },
+          "mass_effect": "none",
+          "borders": "well-defined"
+        }
+      ],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "Normal MRI with no migrainous infarction; no DWI restriction; normal MRA; no structural cause for prolonged aura. Clinical correlation recommended.",
+      "impression": "No acute intracranial abnormality. No DWI restriction. Single punctate subcortical white matter hyperintensity. Normal MRA — no vascular malformation, stenosis, or aneurysm. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
     },
     "eeg": {
       "classification": "normal",
-      "background": {},
+      "background": {
+        "dominant_rhythm": "9 Hz posterior dominant rhythm",
+        "symmetry": "symmetric",
+        "reactivity": "reactive to eye opening"
+      },
       "findings": [],
       "artifacts": [],
       "activating_procedures": {},
-      "confidence": 0.0,
-      "impression": "Mild non-specific posterior slowing; no epileptiform activity; no ictal pattern. Clinical correlation recommended.",
+      "impression": "This is a NORMAL EEG. No epileptiform discharges. No electrographic seizures recorded. Clinical correlation recommended.",
       "limitations": "",
       "recommended_actions": [
         "Clinical correlation recommended."
@@ -254,31 +289,52 @@
       "trigger_action": "check_prolonged_aura_migrainous_infarction",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Prolonged Migraine Aura (>60 min) — ICHD-3 Classification\n\nKEY FINDINGS:\n1. ICHD-3 AURA DURATION CRITERIA: Standard migraine aura: 5-60 min. If aura >60 min and imaging normal: 'Migraine with prolonged aura' (previously 'complicated migraine') — recognised variant\n2. MIGRAINOUS INFARCTION: If aura >60 min WITH DWI restriction — classified as 'migrainous infarction' (ICHD-3 1.4.1). This patient: Normal DWI — migrainous infarction excluded\n3. INCREASING DURATION: Progressive lengthening of aura over 3 episodes is atypical and warrants investigation — MRI/MRA performed appropriately; normal in this case\n4. COMBINED OCP: Use of combined OCP significantly increases migrainous infarction risk in prolonged aura — urgent discontinuation required\n5. TRIPTAN DURING AURA: Triptans should not be taken during the visual aura phase; taking rizatriptan during aura does not shorten aura (CSD is not triptan-responsive) and may theoretically increase ischaemic risk during prolonged aura\n\nCONCLUSION: Migraine with prolonged aura (>60 min; DWI negative). Stop combined OCP immediately. Do not use triptans during aura phase.",
-        "summary": "Migraine with prolonged aura (>60 min, DWI negative); migrainous infarction excluded by normal DWI; combined OCP must be stopped; do not take triptans during aura"
+        "query": "prolonged migraine aura ICHD-3 migrainous infarction DWI",
+        "results": [
+          {
+            "source": "ICHD-3 / Neurology literature review",
+            "finding": "ICHD-3 aura duration criteria: 5-60 minutes for typical aura; aura >60 min with normal DWI is classified as migraine with prolonged aura rather than migrainous infarction, as the latter requires DWI restriction in the aura territory. Combined OCP use is classified WHO Category 4 in migraine with aura due to elevated ischaemic risk; risk is not reduced by lower oestrogen dose. Triptans act after the aura phase (headache onset) and do not shorten aura duration.",
+            "evidence_level": "ICHD-3 classification consensus"
+          }
+        ],
+        "summary": "Aura >60 min with normal DWI = migraine with prolonged aura per ICHD-3; migrainous infarction requires confirmed DWI restriction in aura territory; combined OCP carries WHO Category 4 risk in migraine with aura regardless of oestrogen dose; triptans are not effective during the aura phase."
       }
     },
     {
       "trigger_action": "check_combined_ocp_stop_prolonged_aura",
       "tool_name": "check_drug_interactions",
       "output": {
-        "report": "DRUG REVIEW — COMBINED OCP (GEDAREL 20) IN MIGRAINE WITH PROLONGED AURA\n\nQuery: Gedarel 20 (EE 20 mcg + desogestrel) in migraine with prolonged aura >60 min\n\nFINDINGS: Combined OCP in any form of migraine with aura = WHO Category 4. Low-dose oestrogen (EE 20 mcg vs 30 mcg) does NOT change the risk category — still Category 4.\n\nPROLONGED AURA ADDITIONAL CONCERN: Aura >60 min in a patient on combined OCP significantly increases migrainous infarction risk. The CSD-related hypoperfusion is prolonged, and OCP-related procoagulant and vasoconstrictive effects converge.\n\nDYSMENORRHOEA MANAGEMENT WITHOUT COMBINED OCP:\n- Progestin-only pill (desogestrel 75 mcg/day — Cerazette): reduces dysmenorrhoea in many women\n- Levonorgestrel IUD: highly effective for dysmenorrhoea and contraception\n- NSAIDs (mefenamic acid, naproxen) during menstrual days\n- Hormonal IUD releases progestin locally — reduces dysmenorrhoea\n\nACTION: STOP Gedarel 20 immediately. For dysmenorrhoea: levonorgestrel IUD or progestin-only pill.\n\nCONCLUSION: Combined OCP contraindicated regardless of oestrogen dose. Stop immediately.",
-        "summary": "Gedarel 20 (EE 20 mcg) still WHO Category 4 — low oestrogen dose does NOT reduce contraindication; STOP immediately; levonorgestrel IUD or desogestrel pill for dysmenorrhoea"
+        "proposed": "Gedarel 20 (ethinylestradiol 20 mcg + desogestrel) in migraine with prolonged aura >60 min",
+        "interactions": [
+          "Combined OCP in any form of migraine with aura = WHO Category 4. Low-dose oestrogen (EE 20 mcg vs 30 mcg) does NOT change the risk category — still Category 4. Prolonged aura >60 min in a patient on combined OCP significantly increases migrainous infarction risk: CSD-related hypoperfusion is prolonged, and OCP-related procoagulant and vasoconstrictive effects converge."
+        ],
+        "contraindications": [
+          "Combined OCP contraindicated in migraine with aura — WHO Category 4 regardless of oestrogen dose."
+        ],
+        "warnings": [
+          "Combined OCP is WHO Category 4 in migraine with aura regardless of oestrogen dose; progestin-only or non-hormonal alternatives are recommended. Levonorgestrel IUD is WHO Category 2 in migraine with aura and has established evidence for dysmenorrhoea management. NSAIDs (mefenamic acid, naproxen) have evidence for primary dysmenorrhoea treatment independent of hormonal therapy."
+        ],
+        "formulary_status": "contraindicated",
+        "alternatives": [
+          "Levonorgestrel IUD",
+          "Desogestrel pill (Cerazette 75 mcg)",
+          "Copper IUD"
+        ]
       }
     },
     {
       "trigger_action": "request_mra_migrainous_infarction_workup",
       "tool_name": "order_advanced_imaging",
       "output": {
-        "modality": "",
+        "modality": "MRA",
         "tracer_or_protocol": null,
         "findings": [
           {
-            "description": "MRA HEAD AND NECK\n\nFindings: Normal circle of Willis. Normal cervical carotids and vertebral arteries. No stenosis. No AVM. No dissection. No aneurysm.\n\nIMPRESSION: Normal MRA. No vascular cause for prolonged aura."
+            "description": "MRA HEAD AND NECK\n\nFindings: Normal circle of Willis. Normal cervical carotids and vertebral arteries. No stenosis. No AVM. No dissection. No aneurysm.\n\nIMPRESSION: Normal MRA head and neck. No stenosis, dissection, AVM, or aneurysm identified."
           }
         ],
         "quantitative_data": null,
-        "impression": "Normal MRA; no vascular pathology; migrainous infarction workup complete",
+        "impression": "Normal MRA head and neck. No stenosis, dissection, AVM, or aneurysm identified.",
         "recommended_actions": []
       }
     },
@@ -295,17 +351,105 @@
       "trigger_action": "search_preventive_therapy_prolonged_aura",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Preventive Therapy for Migraine with Prolonged Aura\n\nKEY FINDINGS:\n1. PREVENTIVE THERAPY INDICATION: 3 episodes with prolonged aura (>60 min) in 8 months = clear indication for prevention\n2. FIRST-LINE: Topiramate 50-100 mg/day has best evidence for aura frequency/duration reduction\n3. LAMOTRIGINE: Level B evidence specifically for migraine aura; may reduce cortical excitability (CSD susceptibility); useful when topiramate side effects limit use\n4. VALPROATE: Avoid in women of childbearing age\n5. ANTI-CGRP ANTIBODIES: Evidence emerging for migraine with aura reduction; after failure of first-line agents\n\nNOTE: 3 months minimum before assessing preventive efficacy.\n\nCONCLUSION: Initiate topiramate 25 mg/day titrating to 50-100 mg as first-line preventive; alternatively lamotrigine 25 mg titrating to 100 mg.",
-        "summary": "Topiramate or lamotrigine preferred for migraine with prolonged aura; 3 episodes in 8 months = preventive therapy clearly indicated"
+        "query": "preventive therapy migraine prolonged aura topiramate lamotrigine",
+        "results": [
+          {
+            "source": "AAN/EAN guidelines; Neurology review",
+            "finding": "Recurrent migraine with prolonged aura (>60 min) is a recognised indication for preventive therapy. Topiramate 50-100 mg/day has the strongest evidence for aura frequency/duration reduction (Level A). Lamotrigine has Level B evidence specifically for migraine aura reduction and may reduce cortical excitability (CSD susceptibility); useful when topiramate side effects limit use. Valproate is generally avoided in women of childbearing age due to teratogenicity. Anti-CGRP antibodies are an emerging option after first-line agent failure. A minimum of 3 months at therapeutic dose is required before assessing preventive efficacy.",
+            "evidence_level": "Level A (topiramate); Level B (lamotrigine)"
+          }
+        ],
+        "summary": "Topiramate (Level A) and lamotrigine (Level B) are the preferred preventive agents for migraine with prolonged aura; allow at least 3 months at therapeutic dose before assessing efficacy."
       }
     },
     {
       "trigger_action": "search_iron_deficiency_headache",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Iron Deficiency and Migraine\n\nKEY FINDINGS:\n1. Iron deficiency (without anaemia) is associated with increased headache frequency in several studies\n2. Low ferritin may affect dopamine metabolism and mitochondrial function in neurons, increasing susceptibility to CSD\n3. TREATMENT: Oral ferrous sulfate 200 mg once daily; target ferritin >50 ng/mL\n\nCONCLUSION: Treat iron depletion with oral iron supplementation — may reduce migraine frequency as adjunct measure.",
-        "summary": "Iron deficiency associated with increased headache frequency; treat with oral iron supplementation to target ferritin >50 ng/mL"
+        "query": "iron deficiency migraine headache frequency ferritin",
+        "results": [
+          {
+            "source": "Headache journals; observational studies",
+            "finding": "Iron deficiency (without anaemia) is associated with increased headache frequency in several observational studies. Low ferritin may affect dopamine metabolism and mitochondrial function in neurons, increasing susceptibility to cortical spreading depression. Oral iron supplementation to restore ferritin levels above a threshold of approximately 50 ng/mL has been studied in this context.",
+            "evidence_level": "observational"
+          }
+        ],
+        "summary": "Iron deficiency (without anaemia) is associated with increased headache frequency in observational studies; oral iron supplementation targeting ferritin restoration has been studied as an adjunct to headache management"
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": null,
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "echo": {
+      "chambers": {
+        "LV": "normal size and systolic function",
+        "RV": "normal size and function",
+        "LA": "normal size",
+        "RA": "normal size"
+      },
+      "valves": {
+        "mitral": "structurally normal",
+        "aortic": "structurally normal",
+        "tricuspid": "normal",
+        "pulmonic": "normal"
+      },
+      "ejection_fraction": 58.0,
+      "wall_motion": "no regional wall-motion abnormality",
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": []
+    },
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Predominant sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 54,
+        "max": 130,
+        "average": 80
+      },
+      "events": [],
+      "findings": [
+        "Brief runs of asymptomatic sinus tachycardia. No sustained arrhythmia, no pauses greater than 2 seconds, no AV block."
+      ],
+      "impression": "24-hour Holter monitor with only benign findings.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": null,
+    "specialized_test": {
+      "test_type": "general_laboratory_panel",
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "Study within normal limits. No abnormality identified; non-contributory.",
+      "recommended_actions": []
+    },
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

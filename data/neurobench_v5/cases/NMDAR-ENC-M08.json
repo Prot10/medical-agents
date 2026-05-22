@@ -9,7 +9,16 @@
     "generation_method": "synthetic",
     "condition_name": "Anti-NMDA receptor encephalitis",
     "difficulty_description": "Moderate difficulty: 32-year-old woman with known ovarian dermoid cyst (previously deemed too small for removal). The already-known dermoid cyst provides a moderate-level clue that a resident should connect. However, moderate MRI and EEG features require systematic workup. Agent must connect known dermoid cyst to anti-NMDAR encephalitis and recommend urgent surgical removal.",
-    "expected_agent_confidence": 0.6
+    "expected_agent_confidence": 0.6,
+    "fallback_tool_kinds": {
+      "ecg": "normal",
+      "ct": "normal",
+      "echo": "normal",
+      "cardiac_monitoring": "incidental",
+      "advanced_imaging": "normal",
+      "specialized_test": "normal",
+      "drug_interactions": "normal"
+    }
   },
   "patient": {
     "age": 32,
@@ -24,10 +33,13 @@
       "No prior seizure disorder",
       "No autoimmune disease"
     ],
-    "patient_id": "UNKNOWN",
+    "patient_id": "NB-NMDAR-ENC-M08",
     "demographics": {
       "age": 32,
-      "sex": "female"
+      "sex": "female",
+      "ethnicity": "East Asian (British Chinese)",
+      "handedness": "right",
+      "bmi": 22.1
     },
     "clinical_history": {
       "medications": [
@@ -53,7 +65,12 @@
       "social_history": {
         "note": "In a long-term relationship. Software engineer. Non-smoker, minimal alcohol (2-3 units/week). No illicit drugs. No recent travel."
       },
-      "past_medical_history": []
+      "past_medical_history": [
+        "Right ovarian dermoid cyst (mature teratoma) 2.8 cm — identified 2 years ago on surveillance ultrasound; surgery deferred",
+        "No prior psychiatric history",
+        "No prior seizure disorder",
+        "No autoimmune disease"
+      ]
     },
     "neurological_exam": {
       "mental_status": "Confused, disoriented to time and place. Repetitive echolalia. Intermittent stereotyped oral automatisms (chewing, lip-smacking). Unable to follow complex commands. Mini-mental state examination not assessable. Intermittent mutism lasting up to 30 seconds.",
@@ -66,12 +83,12 @@
       "sensory": ""
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
-      "hr": 72,
-      "temp": 37.0,
-      "rr": 14,
-      "spo2": 98
+      "bp_systolic": 136,
+      "bp_diastolic": 84,
+      "hr": 106,
+      "temp": 37.8,
+      "rr": 18,
+      "spo2": 97
     },
     "chief_complaint": "Three-week progressive confusion, personality change, and one witnessed generalised seizure",
     "history_present_illness": "A 32-year-old software engineer was brought to the emergency department by her partner following a generalised tonic-clonic seizure at their home. Her partner described a three-week history during which she had undergone a marked personality change — previously meticulous and methodical, she had become disorganised, making errors at work that she was normally incapable of, and had submitted a project deliverable to the wrong client. In the two weeks prior to admission she began sleeping erratically, wandering around the flat at 2-3 am and appearing perplexed when discovered. She had twice become agitated and accusatory toward her partner, which was entirely out of character. One week before admission her partner noticed repetitive stereotyped movements — she would repeatedly pick up and replace objects on her desk, and her mouth appeared to make repetitive chewing-like movements during periods of apparent inattentiveness. She had consulted her GP ten days prior, who had suspected burnout and work-related anxiety and prescribed a short course of diazepam 5 mg at night, which appeared to have no benefit. On the day of admission she had a 90-second generalised tonic-clonic seizure during which she lost consciousness and bit her tongue. In her past history, notably, a right ovarian dermoid cyst measuring 2.8 cm was identified incidentally on a pelvic ultrasound two years ago, arranged for pelvic pain. At the time, gynaecology had recommended surveillance ultrasound rather than surgery given its small size. She has no prior psychiatric history and no prior seizure disorder. She takes no regular medications."
@@ -98,18 +115,21 @@
   },
   "red_herrings": [
     {
-      "finding": "Right ovarian dermoid cyst previously known and under surveillance — described as 'small' at 2.8 cm",
-      "misleading_diagnosis": "Known dermoid cyst is unrelated to current neurological presentation",
+      "data_point": "Right ovarian dermoid cyst previously known and under surveillance — described as 'small' at 2.8 cm",
+      "location": "clinical_history",
+      "intended_effect": "Known dermoid cyst is unrelated to current neurological presentation",
       "correct_interpretation": "The known right ovarian dermoid cyst is the paraneoplastic trigger for anti-NMDAR encephalitis. Any teratoma in a patient with this syndrome requires urgent oophorectomy regardless of prior size classification. The agent must connect the known dermoid cyst to the current diagnosis."
     },
     {
-      "finding": "Benzodiazepine-positive urine drug screen",
-      "misleading_diagnosis": "Drug misuse causing encephalopathy or seizure",
+      "data_point": "Benzodiazepine-positive urine drug screen",
+      "location": "clinical_history",
+      "intended_effect": "Drug misuse causing encephalopathy or seizure",
       "correct_interpretation": "Diazepam 5 mg was prescribed by the GP 10 days prior — urine benzodiazepine positivity is explained and expected. No evidence of illicit drug use."
     },
     {
-      "finding": "Burnout and work stress documented by GP",
-      "misleading_diagnosis": "Work-related burnout and anxiety disorder explaining the cognitive and behavioural change",
+      "data_point": "Burnout and work stress documented by GP",
+      "location": "clinical_history",
+      "intended_effect": "Work-related burnout and anxiety disorder explaining the cognitive and behavioural change",
       "correct_interpretation": "Burnout does not cause seizures, oral automatisms, EEG encephalopathy, or CSF pleocytosis. Subacute onset over 3 weeks with these features requires organic workup. The GP diagnosis of burnout is a common cause of diagnostic delay in anti-NMDAR encephalitis."
     }
   ],
@@ -249,72 +269,66 @@
       "SIADH-related hyponatraemia (130 mmol/L) is a recognised complication of hypothalamic involvement and supports rather than complicates the anti-NMDAR diagnosis.",
       "Subclinical electrographic seizures (12 over 24 hours) detected on continuous EEG require treatment escalation — uncontrolled seizure burden contributes to long-term cognitive impairment in anti-NMDAR encephalitis."
     ],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "Right ovarian dermoid cyst previously known and under surveillance — described as 'small' at 2.8 cm",
+        "location": "clinical_history",
+        "intended_effect": "Known dermoid cyst is unrelated to current neurological presentation",
+        "correct_interpretation": "The known right ovarian dermoid cyst is the paraneoplastic trigger for anti-NMDAR encephalitis. Any teratoma in a patient with this syndrome requires urgent oophorectomy regardless of prior size classification. The agent must connect the known dermoid cyst to the current diagnosis."
+      },
+      {
+        "data_point": "Benzodiazepine-positive urine drug screen",
+        "location": "clinical_history",
+        "intended_effect": "Drug misuse causing encephalopathy or seizure",
+        "correct_interpretation": "Diazepam 5 mg was prescribed by the GP 10 days prior — urine benzodiazepine positivity is explained and expected. No evidence of illicit drug use."
+      },
+      {
+        "data_point": "Burnout and work stress documented by GP",
+        "location": "clinical_history",
+        "intended_effect": "Work-related burnout and anxiety disorder explaining the cognitive and behavioural change",
+        "correct_interpretation": "Burnout does not cause seizures, oral automatisms, EEG encephalopathy, or CSF pleocytosis. Subacute onset over 3 weeks with these features requires organic workup. The GP diagnosis of burnout is a common cause of diagnostic delay in anti-NMDAR encephalitis."
+      }
+    ]
   },
   "initial_tool_outputs": {
     "mri": {
       "findings": [
         {
-          "type": "unknown",
-          "location": "",
-          "size": null,
-          "signal_characteristics": {},
-          "mass_effect": null,
-          "borders": null
-        },
-        {
-          "type": "unknown",
-          "location": "",
-          "size": null,
-          "signal_characteristics": {},
-          "mass_effect": null,
-          "borders": null
-        },
-        {
-          "type": "unknown",
-          "location": "",
-          "size": null,
-          "signal_characteristics": {},
-          "mass_effect": null,
-          "borders": null
-        },
-        {
-          "type": "unknown",
-          "location": "",
-          "size": null,
-          "signal_characteristics": {},
-          "mass_effect": null,
-          "borders": null
-        },
-        {
-          "type": "unknown",
-          "location": "",
-          "size": null,
-          "signal_characteristics": {},
-          "mass_effect": null,
-          "borders": null
-        },
-        {
-          "type": "unknown",
-          "location": "",
-          "size": null,
-          "signal_characteristics": {},
-          "mass_effect": null,
-          "borders": null
+          "type": "Subtle FLAIR hyperintensity",
+          "location": "Medial temporal lobe (left hippocampus and amygdala)",
+          "size": "Approximately 1.4 x 0.7 cm",
+          "signal_characteristics": {
+            "T1": "Isointense",
+            "T2": "Mildly hyperintense",
+            "FLAIR": "Subtle hyperintensity",
+            "DWI": "No restricted diffusion",
+            "post_contrast": "No pathological enhancement"
+          },
+          "mass_effect": "None",
+          "borders": "Ill-defined"
         }
       ],
       "volumetrics": null,
-      "additional_observations": [],
-      "impression": "Possible right hippocampal FLAIR signal change — clinical correlation essential. Cannot exclude early limbic encephalitis. In the context of known right ovarian dermoid cyst and this clinical syndrome, anti-NMDAR encephalitis is strongly suspected. Clinical correlation recommended.",
+      "additional_observations": [
+        "No midline shift",
+        "Ventricles normal in size",
+        "No acute hemorrhage",
+        "No extra-axial collections"
+      ],
+      "impression": "Possible subtle right hippocampal FLAIR signal change — equivocal; artifact cannot be excluded. Cannot exclude early limbic encephalitis. No mass, restricted diffusion, midline shift, or pathological enhancement. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
     },
     "eeg": {
       "classification": "abnormal",
-      "background": {},
+      "background": {
+        "posterior_dominant_rhythm": "Poorly organized theta activity, 6-7 Hz, replacing expected alpha rhythm",
+        "overall_organization": "Moderately disorganized",
+        "continuity": "Continuous",
+        "asymmetry": "No consistent hemispheric asymmetry"
+      },
       "findings": [
         {
           "type": "Background",
@@ -343,7 +357,6 @@
       ],
       "artifacts": [],
       "activating_procedures": {},
-      "confidence": 0.0,
       "impression": "See findings above. Clinical correlation recommended.",
       "limitations": "",
       "recommended_actions": [
@@ -351,19 +364,188 @@
       ]
     },
     "labs": {
-      "panels": {},
-      "interpretation": "All values within normal limits.",
-      "abnormal_values_summary": []
+      "panels": {
+        "CBC": [
+          {
+            "test": "WBC",
+            "value": 9.2,
+            "unit": "x10^9/L",
+            "reference_range": "4.0-11.0",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "Hemoglobin",
+            "value": 13.1,
+            "unit": "g/dL",
+            "reference_range": "12.0-16.0",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "Hematocrit",
+            "value": 40.5,
+            "unit": "%",
+            "reference_range": "36.0-46.0",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "Platelets",
+            "value": 241,
+            "unit": "x10^9/L",
+            "reference_range": "150-400",
+            "is_abnormal": false,
+            "clinical_significance": null
+          }
+        ],
+        "BMP": [
+          {
+            "test": "Sodium",
+            "value": 129,
+            "unit": "mEq/L",
+            "reference_range": "136-145",
+            "is_abnormal": true,
+            "clinical_significance": null
+          },
+          {
+            "test": "Potassium",
+            "value": 4.0,
+            "unit": "mEq/L",
+            "reference_range": "3.5-5.0",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "Chloride",
+            "value": 97,
+            "unit": "mEq/L",
+            "reference_range": "98-106",
+            "is_abnormal": true,
+            "clinical_significance": null
+          },
+          {
+            "test": "Bicarbonate",
+            "value": 24,
+            "unit": "mEq/L",
+            "reference_range": "22-29",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "BUN",
+            "value": 10,
+            "unit": "mg/dL",
+            "reference_range": "7-20",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "Creatinine",
+            "value": 0.8,
+            "unit": "mg/dL",
+            "reference_range": "0.6-1.2",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "Glucose",
+            "value": 96,
+            "unit": "mg/dL",
+            "reference_range": "70-100",
+            "is_abnormal": false,
+            "clinical_significance": null
+          }
+        ],
+        "Inflammatory markers": [
+          {
+            "test": "CRP",
+            "value": 0.8,
+            "unit": "mg/dL",
+            "reference_range": "0.0-0.5",
+            "is_abnormal": true,
+            "clinical_significance": null
+          },
+          {
+            "test": "ESR",
+            "value": 22,
+            "unit": "mm/hr",
+            "reference_range": "0-20",
+            "is_abnormal": true,
+            "clinical_significance": null
+          }
+        ],
+        "Thyroid function": [
+          {
+            "test": "TSH",
+            "value": 1.9,
+            "unit": "mIU/L",
+            "reference_range": "0.4-4.0",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "Free T4",
+            "value": 1.1,
+            "unit": "ng/dL",
+            "reference_range": "0.8-1.8",
+            "is_abnormal": false,
+            "clinical_significance": null
+          }
+        ],
+        "Other": [
+          {
+            "test": "CK",
+            "value": 148,
+            "unit": "U/L",
+            "reference_range": "30-135",
+            "is_abnormal": true,
+            "clinical_significance": null
+          },
+          {
+            "test": "Urine drug screen",
+            "value": "Negative",
+            "unit": "",
+            "reference_range": "Negative",
+            "is_abnormal": false,
+            "clinical_significance": null
+          }
+        ]
+      },
+      "interpretation": "Abnormal values: Sodium 129 mEq/L (L), Chloride 97 mEq/L (L), CRP 0.8 mg/dL (H), ESR 22 mm/hr (H), CK 148 U/L (H).",
+      "abnormal_values_summary": [
+        "Sodium: 129 mEq/L (L)",
+        "Chloride: 97 mEq/L (L)",
+        "CRP: 0.8 mg/dL (H)",
+        "ESR: 22 mm/hr (H)",
+        "CK: 148 U/L (H)"
+      ]
     },
     "csf": {
       "opening_pressure": "19 cmH2O",
       "appearance": "Clear and colourless",
-      "cell_count": {},
+      "cell_count": {
+        "WBC": "14 cells/uL (mildly elevated)",
+        "RBC": "1 cells/uL",
+        "Lymphocytes": "87%",
+        "Neutrophils": "8%",
+        "Monocytes": "5%"
+      },
       "protein": "0.50 g/L",
       "glucose": "3.8 mmol/L",
       "interpretation": "Opening pressure: 19 cmH2O. Protein: 0.50 g/L. Glucose: 3.8 mmol/L.",
       "glucose_ratio": "",
-      "special_tests": {}
+      "special_tests": {
+        "Oligoclonal bands": "Equivocal (2 faint bands)",
+        "IgG index": "0.74 (borderline elevated, normal <0.70)",
+        "HSV-1 PCR": "Negative",
+        "HSV-2 PCR": "Negative",
+        "VZV PCR": "Negative",
+        "Enterovirus PCR": "Negative",
+        "Bacterial culture": "No growth at 48 hours",
+        "Gram stain": "No organisms seen",
+        "Anti-NMDA receptor antibodies": "Pending"
+      }
     }
   },
   "followup_outputs": [
@@ -371,18 +553,69 @@
       "trigger_action": "request_nmdar_antibodies",
       "tool_name": "interpret_labs",
       "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": []
+        "panels": {
+          "NMDAR Antibody Panel": [
+            {
+              "test": "Serum anti-NMDA receptor IgG",
+              "value": "Positive (titer 1:40)",
+              "unit": "",
+              "reference_range": "Negative",
+              "is_abnormal": true,
+              "clinical_significance": null
+            },
+            {
+              "test": "CSF anti-NMDA receptor IgG",
+              "value": "Positive (titer 1:80)",
+              "unit": "",
+              "reference_range": "Negative",
+              "is_abnormal": true,
+              "clinical_significance": null
+            }
+          ]
+        },
+        "interpretation": "Abnormal values: Serum anti-NMDA receptor IgG Positive (titer 1:40) (H), CSF anti-NMDA receptor IgG Positive (titer 1:80) (H). Anti-NMDA receptor IgG antibody is found in a subset of patients with autoimmune encephalitis; a positive result should be interpreted in the clinical context. Clinical correlation recommended.",
+        "abnormal_values_summary": [
+          "Serum anti-NMDA receptor IgG: Positive (titer 1:40) (H)",
+          "CSF anti-NMDA receptor IgG: Positive (titer 1:80) (H)"
+        ]
       }
     },
     {
       "trigger_action": "request_pelvic_ultrasound_repeat",
       "tool_name": "interpret_labs",
       "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": []
+        "panels": {
+          "Repeat Pelvic Ultrasound": [
+            {
+              "test": "Right ovary",
+              "value": "Enlarged (5.1 x 4.3 x 3.8 cm). The previously documented right ovarian dermoid cyst has grown to 4.1 cm (was 2.8 cm two years ago). Complex cystic-solid mass with echogenic fat component and posterior acoustic shadowing confirming mature cystic teratoma. Increased internal vascularity on Doppler.",
+              "unit": "",
+              "reference_range": "Normal ovary 2.5-5.0 cm",
+              "is_abnormal": true,
+              "clinical_significance": null
+            },
+            {
+              "test": "Left ovary",
+              "value": "Normal size and echotexture, 2.7 x 2.0 x 2.2 cm. No adnexal mass.",
+              "unit": "",
+              "reference_range": "Normal ovary 2.5-5.0 cm",
+              "is_abnormal": false,
+              "clinical_significance": null
+            },
+            {
+              "test": "Uterus",
+              "value": "Normal size and echotexture.",
+              "unit": "",
+              "reference_range": "Normal",
+              "is_abnormal": false,
+              "clinical_significance": null
+            }
+          ]
+        },
+        "interpretation": "Abnormal values: Right ovarian dermoid cyst (H). Right ovarian mature cystic teratoma (dermoid) has increased in size from 2.8 cm to 4.1 cm compared to prior imaging. Clinical correlation recommended.",
+        "abnormal_values_summary": [
+          "Right ovary: 4.1 cm mature cystic teratoma (grown from 2.8 cm, previously under surveillance) — paraneoplastic trigger (H)"
+        ]
       }
     },
     {
@@ -404,7 +637,12 @@
       "tool_name": "analyze_eeg",
       "output": {
         "classification": "abnormal",
-        "background": {},
+        "background": {
+          "posterior_dominant_rhythm": "Absent; diffuse theta-delta activity",
+          "overall_organization": "Severely disorganized",
+          "continuity": "Continuous with intermittent attenuation",
+          "asymmetry": "No consistent asymmetry"
+        },
         "findings": [
           {
             "type": "Overall",
@@ -417,7 +655,6 @@
         ],
         "artifacts": [],
         "activating_procedures": {},
-        "confidence": 0.0,
         "impression": "See findings above. Clinical correlation recommended.",
         "limitations": "",
         "recommended_actions": [
@@ -439,5 +676,99 @@
         "summary": ""
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": null,
+    "mri": null,
+    "ecg": {
+      "rhythm": "normal sinus rhythm",
+      "rate": 72,
+      "intervals": {
+        "PR": "171 ms",
+        "QRS": "87 ms",
+        "QTc": "410 ms"
+      },
+      "axis": "normal",
+      "findings": [
+        "Normal sinus rhythm. Normal axis and intervals. No acute ST-T changes."
+      ],
+      "interpretation": "Normal ECG",
+      "clinical_correlation": ""
+    },
+    "labs": null,
+    "csf": null,
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "echo": {
+      "chambers": {
+        "LV": "normal size and systolic function",
+        "RV": "normal size and function",
+        "LA": "normal size",
+        "RA": "normal size"
+      },
+      "valves": {
+        "mitral": "structurally normal",
+        "aortic": "structurally normal",
+        "tricuspid": "normal",
+        "pulmonic": "normal"
+      },
+      "ejection_fraction": 60.0,
+      "wall_motion": "no regional wall-motion abnormality",
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": []
+    },
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Predominant sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 48,
+        "max": 117,
+        "average": 82
+      },
+      "events": [],
+      "findings": [
+        "Brief runs of asymptomatic sinus tachycardia. No sustained arrhythmia, no pauses greater than 2 seconds, no AV block."
+      ],
+      "impression": "24-hour Holter monitor with only benign findings.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": {
+      "modality": "FDG-PET",
+      "tracer_or_protocol": null,
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "No abnormality identified on advanced imaging. Findings are non-contributory; clinical correlation recommended.",
+      "recommended_actions": []
+    },
+    "specialized_test": {
+      "test_type": "neuropsychological_testing",
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "Study within normal limits. No abnormality identified; non-contributory.",
+      "recommended_actions": []
+    },
+    "literature_search": null,
+    "drug_interactions": {
+      "general": {
+        "proposed": "(agent not specified on this case's pathway)",
+        "interactions": [],
+        "contraindications": [],
+        "warnings": [
+          "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
+        ],
+        "formulary_status": "on formulary",
+        "alternatives": []
+      }
+    }
+  }
 }

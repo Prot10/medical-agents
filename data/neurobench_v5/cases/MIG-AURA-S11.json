@@ -52,21 +52,21 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert; oriented. No aphasia.",
+      "cranial_nerves": "Normal cranial nerves II-XII. Visual fields full by confrontation. PERRLA. No papilledema.",
+      "motor": "Motor strength 5/5 throughout. No pronator drift.",
+      "sensory": "Sensation intact to light touch and pinprick throughout.",
+      "reflexes": "Deep tendon reflexes 2+ symmetric. Plantar responses flexor bilaterally.",
+      "coordination": "Finger-nose and heel-shin intact bilaterally.",
+      "gait": "Normal gait. Romberg negative."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
-      "hr": 72,
-      "temp": 37.0,
+      "bp_systolic": 128,
+      "bp_diastolic": 82,
+      "hr": 78,
+      "temp": 36.8,
       "rr": 14,
-      "spo2": 98
+      "spo2": 99
     },
     "history_present_illness": "A 45-year-old Polish-British man presented to the neurology outpatient clinic for assessment and management optimisation of long-standing migraine with aura. He has experienced episodic visual aura followed by severe headache since age 33. His typical episode begins with a small, bright, jagged zigzag line appearing near the centre of his vision on one side that slowly moves outward and expands into a crescent-shaped arc of shimmering, flickering light over 20-30 minutes before disappearing from the periphery. The affected visual field feels 'blurry' while the aura is present. Within 10-15 minutes of the aura resolving, a severe unilateral throbbing headache develops (8-9/10 intensity), predominantly right-sided but occasionally left-sided, with marked nausea, occasional vomiting, intense photophobia and phonophobia. Attacks last 8-24 hours and leave him wiped out for the rest of the day.\n\nEpisodes were previously 1-2/month but have increased to 3-4/month over the past 6 months. He attributes this to a very stressful period at work — he was recently promoted and is now managing a team of 20 people with long hours and frequent travel. He also notes he sleeps poorly and has been drinking more coffee (4-5 cups/day). He uses rizatriptan 10 mg wafers as needed which are effective if taken early, but he delays taking them hoping the headache will be mild and runs out before month end, then uses codeine-paracetamol compound for remaining attacks.\n\nHe is a non-smoker, has mild hypertension managed with amlodipine, and has no cardiac disease. His father had similar headaches. He is not on preventive migraine therapy."
   },
@@ -181,8 +181,21 @@
       "Propranolol has dual benefit for migraine prevention and hypertension in this patient",
       "Caffeine 4-5 cups/day contributes to increased attack frequency and should be tapered gradually"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Borderline hyperlipidaemia and mild hypertension suggesting cerebrovascular disease or chronic SVD as aetiology",
+        "location": "initial_tool_outputs.labs",
+        "intended_effect": "A 45-year-old man with hypertension, borderline cholesterol, and subcortical WMH on MRI might prompt cerebrovascular workup for TIA or small vessel disease",
+        "correct_interpretation": "WMH are in non-specific subcortical pattern consistent with migraine; no periventricular lesions; no lacunar infarcts; DWI normal; the primary issues are medication overuse risk and unaddressed preventive therapy need"
+      },
+      {
+        "data_point": "Increased attack frequency from 1-2 to 3-4/month over 6 months — possible transformation to chronic migraine",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Escalation to 3-4 attacks/month over 6 months might suggest chronic migraine transformation requiring different management",
+        "correct_interpretation": "Frequency escalation is explained by identified modifiable factors: work stress, excessive caffeine (4-5 cups/day), incipient codeine overuse, and absence of preventive therapy — these should be addressed before diagnosing chronic migraine"
+      }
+    ],
+    "icd_code": "G43.1"
   },
   "red_herrings": [
     {
@@ -199,16 +212,36 @@
   "metadata": {
     "condition_name": "Established migraine with aura — medication overuse risk, drug interaction, untreated preventive need",
     "difficulty_description": "Straightforward: established diagnosis; key actions are identifying medication overuse risk, initiating prevention, and recognising propranolol-rizatriptan interaction",
-    "expected_agent_confidence": 0.82
+    "expected_agent_confidence": 0.82,
+    "fallback_tool_kinds": {
+      "eeg": "normal",
+      "csf": "normal",
+      "ct": "normal",
+      "echo": "normal",
+      "cardiac_monitoring": "incidental",
+      "specialized_test": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
-      "findings": [],
+      "findings": [
+        {
+          "type": "white_matter_hyperintensity",
+          "location": "bilateral subcortical white matter",
+          "size": "4 foci, 2-4 mm",
+          "signal_characteristics": {
+            "FLAIR": "hyperintense",
+            "T2": "hyperintense",
+            "DWI": "no restriction"
+          },
+          "mass_effect": "none",
+          "borders": "punctate, non-confluent"
+        }
+      ],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "4 small non-specific subcortical WMH (migraine-related pattern); no structural or vascular pathology; normal MRA. Clinical correlation recommended.",
+      "impression": "Four small punctate non-specific subcortical T2/FLAIR foci (2-4 mm), bilateral, non-confluent. No periventricular or juxtacortical lesions. No DWI restriction. No structural or vascular pathology. Normal MRA. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
@@ -226,9 +259,68 @@
       "clinical_correlation": ""
     },
     "labs": {
-      "panels": {},
-      "interpretation": "All values within normal limits.",
-      "abnormal_values_summary": []
+      "panels": {
+        "lipids": [
+          {
+            "test": "LDL cholesterol",
+            "value": 138,
+            "unit": "mg/dL",
+            "reference_range": "<130 mg/dL",
+            "is_abnormal": true,
+            "clinical_significance": null
+          },
+          {
+            "test": "Triglycerides",
+            "value": 162,
+            "unit": "mg/dL",
+            "reference_range": "<150 mg/dL",
+            "is_abnormal": true,
+            "clinical_significance": null
+          },
+          {
+            "test": "HDL cholesterol",
+            "value": 48,
+            "unit": "mg/dL",
+            "reference_range": ">40 mg/dL",
+            "is_abnormal": false,
+            "clinical_significance": "Within normal range"
+          },
+          {
+            "test": "Total cholesterol",
+            "value": 214,
+            "unit": "mg/dL",
+            "reference_range": "<200 mg/dL",
+            "is_abnormal": true,
+            "clinical_significance": null
+          }
+        ],
+        "cbc": [
+          {
+            "test": "Haemoglobin",
+            "value": 14.8,
+            "unit": "g/dL",
+            "reference_range": "13.5-17.5 g/dL",
+            "is_abnormal": false,
+            "clinical_significance": null
+          }
+        ],
+        "metabolic": [
+          {
+            "test": "Fasting glucose",
+            "value": 92,
+            "unit": "mg/dL",
+            "reference_range": "70-99 mg/dL",
+            "is_abnormal": false,
+            "clinical_significance": null
+          }
+        ]
+      },
+      "interpretation": "Borderline hyperlipidaemia: LDL 138 mg/dL (elevated; ref <130 mg/dL), triglycerides 162 mg/dL (elevated; ref <150 mg/dL), total cholesterol 214 mg/dL (elevated; ref <200 mg/dL). HDL cholesterol, haemoglobin, and fasting glucose within normal limits. Clinical correlation recommended.",
+      "abnormal_values_summary": [
+        "LDL 138 mg/dL [H] (ref <130) — borderline elevated",
+        "Triglycerides 162 mg/dL [H] (ref <150) — borderline elevated",
+        "Total cholesterol 214 mg/dL [H] (ref <200) — borderline elevated"
+      ]
     },
     "csf": null,
     "ct": null,
@@ -243,7 +335,7 @@
       "tool_name": "search_medical_literature",
       "output": {
         "report": "LITERATURE SEARCH: Medication Overuse Headache (MOH) — Opioid/Codeine Risk\n\nKEY FINDINGS:\n1. MOH DEFINITION: Headache on ≥15 days/month in a patient using acute headache medications ≥10 days/month (opioids) or ≥15 days/month (NSAIDs/acetaminophen) for >3 months\n2. OPIOID/CODEINE: Highest risk for MOH — even 10 days/month can cause medication overuse; opioids increase central sensitisation\n3. CURRENT PATIENT: Co-codamol 6-8 days/month IN ADDITION to rizatriptan 4/month = total ~10-12 treatment days/month — BORDERLINE/AT RISK\n4. TRIPTAN OVERUSE: Triptans >10 days/month can cause triptan-overuse headache — but rizatriptan at 4/month is safe\n5. MANAGEMENT: Withdraw overused medication; bridge with NSAIDs during washout; preventive therapy reduces need for acute medications\n6. CAFFEINE: 4-5 cups/day is excessive; caffeine withdrawal itself triggers headache; daily caffeine >200 mg contributes to rebound headache\n\nCONCLUSION: Codeine overuse is a significant concern — 6-8 days/month of co-codamol is at threshold for MOH. Urgent need to withdraw codeine compounds and initiate preventive therapy.",
-        "summary": "Co-codamol use 6-8 days/month = MOH risk; withdraw codeine compounds; initiate preventive therapy; reduce caffeine to <200 mg/day"
+        "summary": "Opioid-containing analgesics used on ≥10 days per month carry the highest risk of medication overuse headache (MOH) among acute migraine treatments; withdrawal of overused opioid compounds is the primary intervention; preventive migraine therapy reduces the need for acute medication; daily caffeine above 200-400 mg/day is associated with increased migraine frequency and rebound headache risk"
       }
     },
     {
@@ -251,14 +343,14 @@
       "tool_name": "search_medical_literature",
       "output": {
         "report": "LITERATURE SEARCH: Migraine Prevention — Options in a 45-Year-Old Man with Hypertension\n\nKEY FINDINGS:\n1. PROPRANOLOL 40-120 mg BID: First-line; dual benefit for hypertension AND migraine prevention; Level A evidence; AVOID if depression/asthma\n2. AMLODIPINE (already prescribed): Calcium channel blockers have modest migraine prevention benefit; however, amlodipine has limited migraine-specific evidence vs verapamil\n3. CANDESARTAN 16 mg/day: ARB with Level B evidence for migraine prevention; additional antihypertensive benefit; good option if beta-blocker not tolerated\n4. TOPIRAMATE 50-100 mg/day: Level A; no teratogenicity concern in men; mild weight loss benefit; cognitive side effects\n5. AMITRIPTYLINE 10-75 mg QHS: Level B; useful if poor sleep or comorbid anxiety\n6. ANTI-CGRP ANTIBODIES: After failure of 2-3 first-line agents\n\nNOTE: Patient has mild hypertension on amlodipine — propranolol would be excellent dual-purpose preventive. Check for contraindications (asthma, depression, bradycardia).\n\nCONCLUSION: Add propranolol 40 mg BID (increasing to 80 mg BID) — dual benefit for migraine prevention and hypertension; may allow amlodipine dose reduction.",
-        "summary": "Propranolol preferred (dual benefit: migraine + hypertension); topiramate or candesartan alternatives; initiate after codeine withdrawal"
+        "summary": "Propranolol (Level A) has dual evidence for migraine prevention and hypertension management, making it a preferred first-line agent when both conditions coexist; topiramate (Level A) and candesartan (Level B) are established alternatives; preventive efficacy is best assessed after overused analgesics have been withdrawn, as MOH can blunt the response to preventive therapy"
       }
     },
     {
       "trigger_action": "request_mra_head_neck",
       "tool_name": "order_advanced_imaging",
       "output": {
-        "modality": "",
+        "modality": "MRA",
         "tracer_or_protocol": null,
         "findings": [
           {
@@ -274,8 +366,8 @@
       "trigger_action": "check_rizatriptan_propranolol_interaction",
       "tool_name": "check_drug_interactions",
       "output": {
-        "report": "DRUG INTERACTION REVIEW — RIZATRIPTAN + PROPRANOLOL\n\nQuery: Adding propranolol preventive to patient already using rizatriptan\n\nFINDINGS:\n  SIGNIFICANT INTERACTION: Propranolol inhibits CYP2D6 and P-glycoprotein transport of rizatriptan, increasing rizatriptan plasma concentration by ~67%\n  CLINICAL CONSEQUENCE: Increased rizatriptan exposure can increase side effects (chest tightness, dizziness, fatigue)\n  MANUFACTURER RECOMMENDATION: When co-administering propranolol and rizatriptan, REDUCE rizatriptan dose to 5 mg (not 10 mg); maximum 2 tablets/day\n  ALTERNATIVE: If rizatriptan dose reduction is undesirable, use a triptan NOT affected by propranolol (e.g., sumatriptan 50-100 mg, eletriptan 40 mg)\n\nCONCLUSION: IMPORTANT interaction — reduce rizatriptan to 5 mg wafers when starting propranolol. Or switch acute medication to sumatriptan 50 mg which has no significant propranolol interaction.",
-        "summary": "Propranolol increases rizatriptan exposure 67% via CYP2D6/P-gp inhibition; REDUCE rizatriptan to 5 mg wafer when adding propranolol; or switch to sumatriptan 50 mg"
+        "report": "DRUG INTERACTION REVIEW — RIZATRIPTAN + PROPRANOLOL\n\nQuery: Adding propranolol preventive to patient already using rizatriptan\n\nFINDINGS:\n  SIGNIFICANT INTERACTION: Propranolol inhibits CYP2D6 and P-glycoprotein transport of rizatriptan, increasing rizatriptan plasma concentration by ~67%\n  CLINICAL CONSEQUENCE: Increased rizatriptan exposure can increase side effects (chest tightness, dizziness, fatigue)\n  MANUFACTURER RECOMMENDATION: When co-administering propranolol and rizatriptan, REDUCE rizatriptan dose to 5 mg (not 10 mg); maximum 2 tablets/day\n  ALTERNATIVE: If rizatriptan dose reduction is undesirable, use a triptan NOT affected by propranolol (e.g., sumatriptan 50-100 mg, eletriptan 40 mg)\n\nCONCLUSION: CLINICALLY SIGNIFICANT interaction — propranolol substantially increases rizatriptan systemic exposure via CYP2D6/P-gp inhibition; manufacturer labelling recommends dose reduction of rizatriptan when these agents are co-prescribed. Clinical management per prescriber assessment.",
+        "summary": "Propranolol increases rizatriptan exposure ~67% via CYP2D6/P-gp inhibition; manufacturer labelling recommends rizatriptan dose reduction when co-prescribed"
       }
     },
     {
@@ -295,5 +387,92 @@
         "summary": "Caffeine >400 mg/day increases migraine frequency; gradual reduction to ≤2 cups/day recommended; avoid abrupt cessation (withdrawal headache)"
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": {
+      "classification": "normal",
+      "background": {
+        "pdr": "9-10 Hz posterior dominant rhythm, symmetric and reactive",
+        "sleep_features": "normal vertex waves and sleep spindles",
+        "overall": "normal organisation for age"
+      },
+      "findings": [],
+      "artifacts": [],
+      "activating_procedures": {},
+      "impression": "Normal awake and drowsy EEG. No epileptiform discharges and no focal slowing.",
+      "limitations": "",
+      "recommended_actions": []
+    },
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "echo": {
+      "chambers": {
+        "LV": "normal size and systolic function",
+        "RV": "normal size and function",
+        "LA": "normal size",
+        "RA": "normal size"
+      },
+      "valves": {
+        "mitral": "structurally normal",
+        "aortic": "structurally normal",
+        "tricuspid": "normal",
+        "pulmonic": "normal"
+      },
+      "ejection_fraction": 63.0,
+      "wall_motion": "no regional wall-motion abnormality",
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": []
+    },
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Predominant sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 52,
+        "max": 119,
+        "average": 72
+      },
+      "events": [],
+      "findings": [
+        "Occasional premature atrial complexes, benign. No sustained arrhythmia, no pauses greater than 2 seconds, no AV block."
+      ],
+      "impression": "24-hour Holter monitor with only benign findings.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": null,
+    "specialized_test": {
+      "test_type": "Neurodiagnostic assessment",
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "Study within normal limits. No abnormality identified; non-contributory.",
+      "recommended_actions": []
+    },
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

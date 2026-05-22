@@ -41,20 +41,21 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert and fully oriented. Normal cognition. No aphasia.",
+      "cranial_nerves": "Normal cranial nerves II-XII. Visual fields full by confrontation. PERRLA 3mm bilaterally. Extraocular movements full. No facial asymmetry. Tongue midline.",
+      "motor": "Motor strength 5/5 in all four limbs. No pronator drift. Normal tone.",
+      "sensory": "Intact to light touch, pinprick, and vibration throughout. No hemisensory deficit.",
+      "reflexes": "Deep tendon reflexes 2+ and symmetric throughout. Plantar responses flexor bilaterally.",
+      "coordination": "Finger-nose and heel-shin tests normal bilaterally. No dysmetria.",
+      "gait": "Normal gait and tandem gait. Romberg negative.",
+      "additional": "Audiometry documented bilateral mild sensorineural hearing loss (high-frequency pattern). No proximal muscle weakness on examination."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
-      "hr": 72,
-      "temp": 37.0,
-      "rr": 14,
+      "bp_systolic": 114,
+      "bp_diastolic": 68,
+      "hr": 70,
+      "temp": 36.6,
+      "rr": 13,
       "spo2": 98
     },
     "history_present_illness": "A 29-year-old Japanese woman was referred to the neurology clinic with a 2-year history of episodic left arm weakness lasting 20-40 minutes followed by a severe right-sided headache, nausea, and photophobia lasting 6-10 hours. She has had 6 episodes in 2 years. The motor symptoms spread from left hand (weakness and clumsiness) to involve the left forearm over 15-20 minutes before reaching maximum deficit. Full recovery occurs within 40-60 minutes.\n\nThe key complicating factor: her mother was diagnosed with MELAS (Mitochondrial Encephalomyopathy, Lactic Acidosis, and Stroke-like episodes) 3 years ago. The mother's MELAS was confirmed by muscle biopsy (ragged red fibres) and mitochondrial DNA analysis (m.3243A>G mutation). This has raised the concern that the daughter's episodic neurological episodes could be MELAS stroke-like episodes rather than hemiplegic migraine.\n\nThe daughter herself has mild bilateral sensorineural hearing loss (noted on audiometry at work health check). She is shorter than average (height 150cm) and her BMI is 18.8. She had mild learning difficulties at school — she struggled with mathematics. She is currently a shop assistant. She has no personal history of stroke, seizures, diabetes, or cardiac disease. She is a non-smoker, no alcohol. She has never had the m.3243A>G mutation test herself."
@@ -160,8 +161,22 @@
       "Treatment for MELAS is fundamentally different: IV arginine, CoQ10, riboflavin; avoid triptans, valproate, metformin",
       "Diagnostic puzzle: hemiplegic migraine is a plausible diagnosis; MELAS clues (hearing loss, short stature, elevated lactate, maternal inheritance) are the key to the correct diagnosis"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+
+    "red_herrings": [
+      {
+        "data_point": "Episodic left arm weakness with gradual onset and subsequent headache — hemiplegic migraine pattern",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Gradual motor arm weakness over 15-20 minutes followed by severe headache is a classic hemiplegic migraine description",
+        "correct_interpretation": "MELAS stroke-like episodes can present identically; MELAS clues (maternal inheritance of MELAS, bilateral sensorineural hearing loss, short stature, elevated lactate) distinguish MELAS from hemiplegic migraine; m.3243A>G confirmed"
+      },
+      {
+        "data_point": "Mother has MELAS — patient may have hemiplegic migraine (different condition from MELAS)",
+        "location": "patient.history_present_illness",
+        "intended_effect": "MELAS and hemiplegic migraine are different disorders; having a parent with MELAS does not mean the patient has MELAS (though maternal transmission is the mechanism)",
+        "correct_interpretation": "m.3243A>G is maternally transmitted — the patient inherited it from her mother; mutation confirmed in patient's own testing; MELAS diagnosis established"
+      }
+    ],
+    "icd_code": "G71.3"
   },
   "red_herrings": [
     {
@@ -178,28 +193,49 @@
   "metadata": {
     "condition_name": "MELAS (m.3243A>G) with stroke-like episodes misdiagnosed as hemiplegic migraine — urine testing for heteroplasmy, triptans contraindicated",
     "difficulty_description": "Diagnostic puzzle: hemiplegic migraine is clinically plausible but MELAS clues (hearing loss, short stature, elevated lactate, maternal inheritance) and m.3243A>G mutation establish MELAS; triptans must be stopped",
-    "expected_agent_confidence": 0.35
+    "expected_agent_confidence": 0.35,
+    "fallback_tool_kinds": {
+      "csf": "normal",
+      "ct": "incidental",
+      "cardiac_monitoring": "normal",
+      "advanced_imaging": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
-      "findings": [],
+      "findings": [
+        {
+          "type": "normal",
+          "location": "whole brain",
+          "size": null,
+          "signal_characteristics": {
+            "DWI": "no restriction",
+            "FLAIR": "no cortical signal change",
+            "T1": "normal",
+            "T2": "normal"
+          },
+          "mass_effect": "none",
+          "borders": null
+        }
+      ],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "Normal interictal MRI; no posterior cortical FLAIR change; MRI during episode would be needed for MELAS confirmation; mitochondrial testing essential. Clinical correlation recommended.",
+      "impression": "No acute intracranial abnormality. No DWI restriction. No posterior cortical FLAIR change. No structural lesion, mass, or hemorrhage. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
     },
     "eeg": {
       "classification": "abnormal",
-      "background": {},
+      "background": {
+        "pdr": "8-9 Hz posterior dominant rhythm, mildly reduced amplitude",
+        "overall": "mild non-specific posterior slowing; no epileptiform activity"
+      },
       "findings": [],
       "artifacts": [],
       "activating_procedures": {},
-      "confidence": 0.0,
-      "impression": "Mild non-specific posterior slowing; no epileptiform discharges; non-specific findings. Clinical correlation recommended.",
+      "impression": "This is an ABNORMAL EEG. Mild non-specific posterior slowing. No epileptiform discharges. No electrographic seizures recorded. Clinical correlation recommended.",
       "limitations": "",
       "recommended_actions": [
         "Clinical correlation recommended."
@@ -211,9 +247,9 @@
       "intervals": {},
       "axis": "",
       "findings": [
-        "ELECTROCARDIOGRAM\nRHYTHM: Sinus rhythm 68 bpm. PR 156 ms. QTc: 398 ms.\nWPW PATTERN: SHORT PR (148 ms) — borderline; no clear delta waves. WPW pattern can occur in MELAS due to mitochondrial cardiac involvement.\nINTERPRETATION: Borderline short PR — repeat ECG; consider cardiac MELAS involvement if m.3243A>G confirmed."
+        "ELECTROCARDIOGRAM\nRHYTHM: Sinus rhythm 68 bpm. PR 156 ms. QTc: 398 ms.\nSHORT PR: Borderline short PR interval (148 ms); no definite delta waves identified. No ST-T changes."
       ],
-      "interpretation": "See report details above.",
+      "interpretation": "Sinus rhythm, rate 68. Borderline short PR interval; no delta waves. No acute ST-T changes.",
       "clinical_correlation": ""
     },
     "labs": {
@@ -233,17 +269,34 @@
       "trigger_action": "request_mitochondrial_workup_m3243",
       "tool_name": "interpret_labs",
       "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": []
+        "panels": {
+          "metabolic": {
+            "lactate_serum": "2.8 mmol/L [H] (ref: 0.5-2.2)",
+            "pyruvate": "0.14 mmol/L (ref: 0.03-0.10) — borderline elevated",
+            "lactate_pyruvate_ratio": "20 (ref: <20) — borderline elevated",
+            "CK": "182 U/L (ref: 24-170) — mildly elevated"
+          },
+          "mitochondrial_dna": {
+            "m3243AG_blood": "heteroplasmy 28% in blood leukocytes — POSITIVE",
+            "m3243AG_urine": "heteroplasmy 62% in urinary epithelial cells — POSITIVE (urine preferred, higher heteroplasmy)",
+            "interpretation": "m.3243A>G mutation detected. Heteroplasmy 62% in urinary epithelial cells; 28% in blood leukocytes. Note: urine heteroplasmy is typically higher than blood heteroplasmy for this variant."
+          }
+        },
+        "interpretation": "m.3243A>G mitochondrial DNA variant detected — heteroplasmy 62% in urine, 28% in blood. Serum lactate 2.8 mmol/L (elevated; ref 0.5–2.2). Pyruvate borderline elevated with raised lactate-to-pyruvate ratio. CK mildly elevated. Clinical correlation recommended.",
+        "abnormal_values_summary": [
+          "Serum lactate 2.8 mmol/L [ELEVATED — ref 0.5-2.2]",
+          "m.3243A>G heteroplasmy 62% in urine [PATHOGENIC MUTATION CONFIRMED]",
+          "m.3243A>G heteroplasmy 28% in blood [PATHOGENIC MUTATION CONFIRMED]",
+          "CK 182 U/L [mildly elevated]"
+        ]
       }
     },
     {
       "trigger_action": "search_melas_vs_hemiplegic_migraine_differentiation",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: MELAS Stroke-like Episodes vs Hemiplegic Migraine — Clinical and Imaging Differentiation\n\nKEY FINDINGS:\n1. MELAS STROKE-LIKE EPISODES: Non-vascular territory; posterior predominant; migratory; accompanied by seizures in 60%; elevated lactate during episodes; MRI shows posterior FLAIR signal not following vascular territory; progressive over years\n2. HEMIPLEGIC MIGRAINE: Gradual motor aura (CSD speed ~3-5 mm/min); followed by headache; family history of hemiplegic migraine; CACNA1A/ATP1A2/SCN1A mutations; DWI normal (though motor deficit present)\n3. SHARED FEATURES: Both can present with episodic motor deficits and headache; family history of either condition aids diagnosis\n4. DISTINGUISHING MELAS: Maternal inheritance pattern; bilateral sensorineural hearing loss; diabetes; short stature; lactic acidosis; non-vascular MRI territory involvement during episodes; m.3243A>G mutation\n5. TRIPTANS IN MELAS: CONTRAINDICATED — vasoconstrictive effects may worsen ischaemia in stroke-like episodes\n6. MELAS TREATMENT: IV arginine during acute episodes (vasodilatory; L-arginine 0.5 g/kg); co-enzyme Q10 (CoQ10) 300-400 mg/day; riboflavin 200-400 mg/day; antioxidants\n\nCONCLUSION: MELAS diagnosis confirmed by genetics. Management differs fundamentally from hemiplegic migraine.",
-        "summary": "MELAS: maternal inheritance, hearing loss, short stature, elevated lactate, m.3243A>G; triptans CONTRAINDICATED; acute treatment = IV arginine; maintenance = CoQ10, riboflavin"
+        "report": "LITERATURE SEARCH: MELAS Stroke-like Episodes vs Hemiplegic Migraine — Clinical and Imaging Differentiation\n\nKEY FINDINGS:\n1. MELAS STROKE-LIKE EPISODES: Non-vascular territory; posterior predominant; migratory; accompanied by seizures in approximately 60%; elevated lactate during episodes; MRI shows posterior FLAIR signal not following a vascular territory; progressive over years\n2. HEMIPLEGIC MIGRAINE: Gradual motor aura (cortical spreading depression speed approximately 3-5 mm/min); followed by headache; associated with CACNA1A/ATP1A2/SCN1A mutations in familial forms; DWI typically normal during motor deficit\n3. SHARED FEATURES: Both can present with episodic motor deficits and headache; clinical and genetic features aid differentiation\n4. DISTINGUISHING FEATURES ASSOCIATED WITH MELAS: Maternal inheritance pattern; bilateral sensorineural hearing loss; diabetes; short stature; lactic acidosis; MRI abnormalities not conforming to a vascular territory during episodes; m.3243A>G mtDNA variant\n5. TRIPTANS AND VASOCONSTRICTION: Triptans are 5-HT1B/1D agonists with vasoconstrictive properties; their safety profile differs in the context of stroke-like episodes versus typical migraine\n6. MELAS-ASSOCIATED TREATMENT: IV L-arginine (nitric oxide precursor) has been used during acute stroke-like episodes; supportive supplements include CoQ10 and riboflavin\n\nClinical correlation recommended.",
+        "summary": "MELAS features include maternal inheritance, hearing loss, short stature, elevated lactate, and m.3243A>G variant; clinical and genetic correlation required to differentiate from hemiplegic migraine"
       }
     },
     {
@@ -255,9 +308,9 @@
         "ejection_fraction": null,
         "wall_motion": null,
         "findings": [
-          "ECHOCARDIOGRAM — MELAS CARDIAC SCREENING\n\nIndication: Confirmed MELAS (m.3243A>G); cardiac involvement screening\n\nFindings: Mild concentric LVH (IVSd 12mm — mildly increased). EF 60% — normal systolic function. No LVOT obstruction. Mild diastolic dysfunction (E/A ratio 0.8 — Grade I). Normal valves. No HCM pattern.\n\nIMPRESSION: Mild LVH and diastolic dysfunction — consistent with mitochondrial cardiomyopathy in MELAS. No hypertrophic obstructive cardiomyopathy. Annual cardiac monitoring recommended."
+          "ECHOCARDIOGRAM\n\nIndication: Cardiac screening\n\nFindings: Mild concentric left ventricular hypertrophy (IVSd 12 mm, mildly increased). LVEF 60% — preserved systolic function. No LVOT obstruction. Mild diastolic dysfunction (E/A ratio 0.8 — Grade I diastolic dysfunction). Normal valves. No hypertrophic obstructive pattern.\n\nIMPRESSION: Mild concentric LVH with Grade I diastolic dysfunction. Normal systolic function. No hypertrophic obstructive cardiomyopathy. Clinical correlation recommended."
         ],
-        "impression": "Mild LVH and Grade I diastolic dysfunction — mitochondrial cardiomyopathy in MELAS; annual echocardiographic monitoring recommended",
+        "impression": "Mild concentric LVH with Grade I diastolic dysfunction; preserved systolic function. Recommend clinical correlation.",
         "recommended_actions": []
       }
     },
@@ -265,22 +318,22 @@
       "trigger_action": "search_melas_acute_treatment_arginine",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: MELAS Stroke-like Episode — Acute and Preventive Treatment\n\nKEY FINDINGS:\n1. ACUTE TREATMENT: IV L-arginine 0.5 g/kg over 90 minutes during acute stroke-like episode — reduces duration and severity; L-arginine is a nitric oxide precursor improving cerebrovascular vasodilation\n2. PREVENTIVE: L-arginine 300 mg/kg/day orally between episodes; CoQ10 300-400 mg/day; riboflavin 400 mg/day\n3. ANTISEIZURE: If seizures occur — valproate AVOID (mitochondrial toxicity); levetiracetam or lamotrigine preferred\n4. AVOID: Metformin (worsens lactic acidosis); valproate (mitochondrial toxicity); triptans (vasoconstrictors)\n5. DIABETES MANAGEMENT: Insulin preferred over metformin in MELAS diabetes\n\nCONCLUSION: Acute stroke-like episode: IV L-arginine + hospital admission. Preventive: oral L-arginine + CoQ10 + riboflavin. Avoid metformin, valproate, triptans.",
-        "summary": "MELAS acute: IV L-arginine; preventive: oral L-arginine + CoQ10 + riboflavin; avoid triptans, valproate, metformin"
+        "report": "LITERATURE SEARCH: MELAS — Reported Therapeutic Approaches\n\nKEY FINDINGS:\n1. ACUTE EPISODES: IV L-arginine (0.5 g/kg over 90 minutes) has been reported to reduce duration and severity of stroke-like episodes in published case series; L-arginine is a nitric oxide precursor\n2. MAINTENANCE: Oral L-arginine supplementation, CoQ10 (300-400 mg/day), and riboflavin (400 mg/day) are commonly used adjunctive measures in MELAS management\n3. ANTISEIZURE SELECTION: Published guidelines note concerns about valproate in mitochondrial disease due to potential mitochondrial toxicity; levetiracetam or lamotrigine are alternatives\n4. DRUGS OF CONCERN IN MITOCHONDRIAL DISEASE: Metformin (associated with worsening of lactic acidosis); valproate (mitochondrial toxicity); triptans (vasoconstrictive mechanism)\n5. GLUCOSE MANAGEMENT: In patients with MELAS-associated diabetes, insulin is generally preferred over metformin\n\nClinical correlation recommended.",
+        "summary": "Reported MELAS therapeutic approaches include IV L-arginine for acute episodes and supplemental CoQ10/riboflavin; certain agents including metformin and valproate carry specific concerns in mitochondrial disease"
       }
     },
     {
       "trigger_action": "request_audiometry_formal",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "",
+        "test_type": "audiological_assessment",
         "findings": [
           {
-            "description": "FORMAL AUDIOLOGICAL ASSESSMENT\n\nFindings: Bilateral sensorineural hearing loss:\n  Right: Mild (40 dB HL at 4 kHz, 35 dB at 8 kHz) — high-frequency pattern.\n  Left: Mild (38 dB HL at 4 kHz, 32 dB at 8 kHz) — high-frequency pattern.\n\nINTERPRETATION: Bilateral mild high-frequency sensorineural hearing loss — pattern consistent with MELAS-related cochlear mitochondrial dysfunction. Hearing aids may benefit. Annual review."
+            "description": "FORMAL AUDIOLOGICAL ASSESSMENT\n\nFindings: Bilateral sensorineural hearing loss:\n  Right: Mild (40 dB HL at 4 kHz, 35 dB at 8 kHz) — high-frequency pattern.\n  Left: Mild (38 dB HL at 4 kHz, 32 dB at 8 kHz) — high-frequency pattern.\n\nINTERPRETATION: Bilateral mild high-frequency sensorineural hearing loss. Cochlear origin; retrocochlear pathology not identified. Clinical correlation recommended."
           }
         ],
         "quantitative_data": null,
-        "impression": "Bilateral mild high-frequency sensorineural hearing loss — MELAS cochlear pattern; hearing aids may benefit; annual audiological review",
+        "impression": "Bilateral mild high-frequency sensorineural hearing loss. Clinical correlation recommended.",
         "recommended_actions": []
       }
     },
@@ -288,9 +341,87 @@
       "trigger_action": "search_triptan_contraindication_melas",
       "tool_name": "check_drug_interactions",
       "output": {
-        "report": "DRUG INTERACTION REVIEW — TRIPTANS IN MELAS\n\nFINDINGS: Triptans are 5-HT1B/1D agonists — cause vasoconstriction of cranial and systemic vessels. In MELAS, stroke-like episodes are related to energy failure and mitochondrial dysfunction in cerebrovascular endothelium. Vasoconstriction during a stroke-like episode may worsen ischaemia in already-compromised vessels.\n\nCONTRAINDICATION: Triptans are CONTRAINDICATED in MELAS. If ibuprofen was being used for acute headache, it is acceptable. Consider oral L-arginine at onset of prodromal symptoms.\n\nCONCLUSION: Do not prescribe triptans. Use paracetamol ± NSAIDs for headache; oral L-arginine at episode onset.",
-        "summary": "Triptans CONTRAINDICATED in MELAS; use paracetamol/NSAIDs for headache; oral L-arginine at stroke-like episode onset"
+        "proposed": "triptans (sumatriptan) in MELAS (m.3243A>G confirmed)",
+        "interactions": [
+          "Triptans are 5-HT1B/1D agonists causing vasoconstriction — in MELAS, stroke-like episodes result from energy failure in cerebrovascular endothelium; vasoconstriction may worsen ischaemia during episodes"
+        ],
+        "contraindications": [
+          "Triptans CONTRAINDICATED in MELAS — vasoconstrictive mechanism worsens stroke-like episode severity and duration"
+        ],
+        "warnings": [
+          "Metformin is generally contraindicated in mitochondrial disorders due to risk of lactic acidosis exacerbation",
+          "Valproate carries specific mitochondrial toxicity concerns and should be avoided in mitochondrial disease"
+        ],
+        "formulary_status": "contraindicated",
+        "alternatives": [
+          "paracetamol 1000 mg for headache",
+          "ibuprofen 400-600 mg for headache",
+          "oral L-arginine at episode onset (vasodilatory)"
+        ]
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": null,
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [
+        {
+          "type": "calcification",
+          "location": "right frontal lobe",
+          "size": "3 mm",
+          "density": "hyperdense",
+          "description": "calcified focus consistent with an old, benign granuloma"
+        }
+      ],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. Incidental calcified granuloma, benign.",
+      "recommended_actions": []
+    },
+    "echo": null,
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 51,
+        "max": 125,
+        "average": 72
+      },
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "impression": "Normal 24-hour Holter monitor.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": {
+      "modality": "MRA",
+      "tracer_or_protocol": null,
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "No abnormality identified on advanced imaging. Findings are non-contributory; clinical correlation recommended.",
+      "recommended_actions": []
+    },
+    "specialized_test": null,
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

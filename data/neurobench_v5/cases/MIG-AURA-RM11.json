@@ -11,7 +11,15 @@
     "generation_method": "real_case_seed",
     "condition_name": "Sporadic hemiplegic migraine with reversible MRI changes and focal motor seizures",
     "difficulty_description": "Moderate difficulty due to MRI showing diffuse cortical swelling and T2/FLAIR hyperintensity (concerning for ischemia or encephalitis) with simultaneously normal DWI. Focal motor seizures complicate the picture (migralepsy consideration). Sporadic hemiplegic migraine diagnosis requires systematic exclusion of acute infarction, MELAS, epilepsy, and autoimmune causes.",
-    "expected_agent_confidence": 0.58
+    "expected_agent_confidence": 0.58,
+    "fallback_tool_kinds": {
+      "ecg": "normal",
+      "ct": "normal",
+      "echo": "normal",
+      "cardiac_monitoring": "normal",
+      "specialized_test": "normal",
+      "literature_search": "normal"
+    }
   },
   "patient": {
     "age": 26,
@@ -65,15 +73,15 @@
       "sensation": "Intact to light touch and pinprick bilaterally. No cortical sensory deficits.",
       "coordination": "Limited on right due to weakness. Left cerebellar tests intact.",
       "gait": "Not assessed — patient was bed-bound at presentation.",
-      "sensory": ""
+      "sensory": "Intact to light touch and pinprick bilaterally. No cortical sensory deficits."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
-      "hr": 72,
-      "temp": 37.0,
-      "rr": 14,
-      "spo2": 98
+      "bp_systolic": 128,
+      "bp_diastolic": 76,
+      "hr": 92,
+      "temp": 37.1,
+      "rr": 16,
+      "spo2": 99
     },
     "chief_complaint": "Left-sided throbbing headache with right arm weakness, speech difficulty, and a witnessed shaking episode",
     "history_present_illness": "A 26-year-old woman presented to the emergency department brought by her partner with a 3-hour history of severe left-sided throbbing headache that began approximately 30 minutes after she developed blurred vision in her right visual field. Shortly after the headache peaked, her partner noticed that she was struggling to find words and her right arm appeared weak. Within the following hour she experienced two brief episodes of right-hand rhythmic jerking lasting approximately 90 seconds each, during which she was unresponsive, followed by postictal confusion lasting approximately 20 minutes. She has had episodes of unilateral throbbing headache accompanied by transient arm weakness affecting alternating sides since the age of 14. During those earlier attacks, the weakness has always resolved completely within a few hours, and previous assessments including head CT, brain MRI, MR angiography, lumbar puncture, and basic metabolic and mitochondrial blood tests were all documented as normal at age 17 and again at age 22. She was commenced on topiramate 75 mg twice daily approximately two years ago following inadequate response to flunarizine; despite this she continues to have one to two attacks monthly. There is no family history of similar episodes, hemiplegic migraine, or any neurological condition. She does not smoke, drinks alcohol only occasionally, and uses no illicit substances. She takes topiramate and a combined oral contraceptive pill (Mercilon, desogestrel 150 mcg / ethinylestradiol 20 mcg). She has no known drug allergies."
@@ -283,72 +291,82 @@
       "CSF lactate normal and mtDNA heteroplasmy testing negative definitively excludes MELAS, which can produce identical reversible cortical changes in young women.",
       "Full reversibility at 72-hour MRI is both diagnostically reassuring and clinically important — it differentiates hemiplegic migraine from autoimmune encephalitis (which shows persistence or progression)."
     ],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "Two focal right-sided motor seizures during the attack",
+        "location": "patient.history_present_illness",
+        "intended_effect": "New-onset epilepsy / Todd's palsy explaining the hemiparesis",
+        "correct_interpretation": "Seizures are migralepsy — focal seizures triggered by hemiplegic migraine aura, not a primary epileptic disorder. EEG showed no epileptiform discharges or hemispheric dysfunction. The MRI abnormalities (cortical swelling, FLAIR signal) are reversible and DWI-negative, inconsistent with post-ictal changes from status epilepticus."
+      },
+      {
+        "data_point": "Diffuse left hemispheric cortical swelling and T2/FLAIR hyperintensity",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Autoimmune encephalitis (NMDAR or other) or HSV encephalitis",
+        "correct_interpretation": "Critically, DWI is normal, CSF shows no pleocytosis, autoimmune antibody panels negative, HSV PCR negative. Reversibility on 72-hour follow-up MRI confirms CSD-mediated cortical hyperaemia in hemiplegic migraine."
+      },
+      {
+        "data_point": "Current use of combined OCP (Mercilon EE 20 mcg)",
+        "location": "patient.history_present_illness",
+        "intended_effect": "OCP-related cerebral venous thrombosis or ischaemic event",
+        "correct_interpretation": "MRV would show no sinus thrombosis. DWI is normal excluding arterial infarction. However, OCP is WHO Category 4 in hemiplegic migraine and must be stopped, even though it is not the cause of this acute attack — this is a critical management action the agent must identify."
+      }
+    ]
   },
   "initial_tool_outputs": {
     "mri": {
       "findings": [
         {
-          "type": "unknown",
-          "location": "",
-          "size": null,
-          "signal_characteristics": {},
-          "mass_effect": null,
-          "borders": null
+          "type": "cortical_swelling",
+          "location": "left cerebral hemisphere, frontoparietal cortex",
+          "size": "diffuse hemispheric involvement",
+          "signal_characteristics": {
+            "T2": "diffuse cortical hyperintensity",
+            "FLAIR": "gyral cortical hyperintensity with sulcal effacement",
+            "DWI": "NORMAL — no diffusion restriction (critical finding)",
+            "ADC": "NORMAL — no cytotoxic oedema",
+            "T1_Gd": "no leptomeningeal or cortical enhancement"
+          },
+          "mass_effect": "mild sulcal effacement left hemisphere — consistent with vasogenic oedema",
+          "borders": "diffuse, non-territorial, no vascular territory demarcation"
         },
         {
-          "type": "unknown",
-          "location": "",
-          "size": null,
-          "signal_characteristics": {},
-          "mass_effect": null,
-          "borders": null
+          "type": "signal_abnormality",
+          "location": "left parietal and occipital cortex",
+          "size": "multifocal gyral involvement",
+          "signal_characteristics": {
+            "FLAIR": "cortical ribbon hyperintensity",
+            "T2": "hyperintense",
+            "DWI": "no restriction"
+          },
+          "mass_effect": "mild",
+          "borders": "gyral/cortical distribution"
         },
         {
-          "type": "unknown",
-          "location": "",
+          "type": "vascular_assessment",
+          "location": "circle of Willis and major cerebral arteries",
           "size": null,
-          "signal_characteristics": {},
-          "mass_effect": null,
-          "borders": null
-        },
-        {
-          "type": "unknown",
-          "location": "",
-          "size": null,
-          "signal_characteristics": {},
-          "mass_effect": null,
-          "borders": null
-        },
-        {
-          "type": "unknown",
-          "location": "",
-          "size": null,
-          "signal_characteristics": {},
-          "mass_effect": null,
-          "borders": null
-        },
-        {
-          "type": "unknown",
-          "location": "",
-          "size": null,
-          "signal_characteristics": {},
-          "mass_effect": null,
+          "signal_characteristics": {
+            "MRA": "patent bilateral ICA, MCA, ACA, PCA, basilar; no occlusion, stenosis, or dissection; no arterial filling defect"
+          },
+          "mass_effect": "none",
           "borders": null
         }
       ],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "Diffuse left hemispheric cortical swelling with mild T2/FLAIR cortical hyperintensity. Crucially, DWI is NORMAL excluding acute cortical infarction. No enhancement, no mass effect, no vascular abnormality. Migralepsy or autoimmune encephalitis should be excluded clinically. Clinical correlation recommended.",
+      "impression": "1. Diffuse left hemispheric cortical swelling with T2/FLAIR gyral cortical hyperintensity and mild sulcal effacement. 2. Critically, DWI is NORMAL — no restricted diffusion, no cytotoxic oedema. No leptomeningeal or cortical enhancement. 3. Normal MRA — no arterial occlusion, stenosis, or dissection. The pattern of vasogenic cortical oedema without cytotoxic oedema and non-territorial distribution does not conform to an arterial infarct. Imaging differential includes cortical spreading depression, autoimmune encephalitis, and other causes of cortical vasogenic oedema. Follow-up MRI is recommended to assess reversibility. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
     },
     "eeg": {
       "classification": "abnormal",
-      "background": {},
+      "background": {
+        "pdr": "6-7 Hz theta-range activity bilaterally — post-ictal slowing",
+        "overall": "mild diffuse slowing consistent with post-ictal state; no hemispheric asymmetry",
+        "hemispheric_asymmetry": "none beyond mild bilateral theta"
+      },
       "findings": [
         {
           "type": "Left hemisphere",
@@ -377,8 +395,7 @@
       ],
       "artifacts": [],
       "activating_procedures": {},
-      "confidence": 0.0,
-      "impression": "Mild diffuse post-ictal slowing. No evidence of ongoing hemispheric dysfunction, interictal epileptiform activity, or ictal activity. EEG does NOT support a primary epileptic disorder as the underlying cause of the hemispheric deficit. Clinical correlation recommended.",
+      "impression": "This is an ABNORMAL EEG. Mild diffuse background slowing in the theta range bilaterally, consistent with a post-ictal or encephalopathic state. No interictal epileptiform discharges. No ictal activity or electrographic seizures recorded. No persistent hemispheric asymmetry. Clinical correlation recommended.",
       "limitations": "",
       "recommended_actions": [
         "Clinical correlation recommended."
@@ -407,27 +424,32 @@
       "output": {
         "findings": [
           {
-            "type": "unknown",
-            "location": "",
-            "size": null,
-            "signal_characteristics": {},
-            "mass_effect": null,
-            "borders": null
+            "type": "cortical_swelling",
+            "location": "left cerebral hemisphere",
+            "size": "near-complete resolution",
+            "signal_characteristics": {
+              "FLAIR": "marked interval improvement; residual mild cortical signal change only",
+              "T2": "near-normal; minimal residual hyperintensity",
+              "DWI": "normal — no restriction"
+            },
+            "mass_effect": "resolved",
+            "borders": "normal sulcal pattern restored"
           },
           {
-            "type": "unknown",
-            "location": "",
+            "type": "vascular_assessment",
+            "location": "circle of Willis",
             "size": null,
-            "signal_characteristics": {},
-            "mass_effect": null,
+            "signal_characteristics": {
+              "MRA": "patent; no change from initial scan"
+            },
+            "mass_effect": "none",
             "borders": null
           }
         ],
         "volumetrics": null,
         "additional_observations": [],
-        "impression": "Marked interval improvement with near-complete resolution of cortical swelling and signal changes. This reversibility is a key diagnostic criterion. Clinical correlation recommended.",
+        "impression": "Marked interval improvement compared with prior study. Near-complete resolution of left hemispheric cortical swelling and FLAIR signal changes. Sulcal pattern restored. DWI normal throughout — no restricted diffusion. MRA unchanged and patent. The imaging changes were reversible over 72 hours. Clinical correlation recommended.",
         "differential_by_imaging": [],
-        "confidence": 0.0,
         "recommended_actions": [
           "Clinical correlation recommended."
         ]
@@ -452,7 +474,7 @@
             "finding": "Normal calibre bilaterally. No dissection."
           }
         ],
-        "impression": "Normal MRA head and neck. No vascular cause for the hemispheric presentation identified.",
+        "impression": "Normal MRA head and neck. No stenosis, occlusion, dissection, or aneurysm identified.",
         "recommended_actions": [
           "No vascular intervention required"
         ]
@@ -489,16 +511,104 @@
       "trigger_action": "check_ocp_safety_hemiplegic_migraine",
       "tool_name": "check_drug_interactions",
       "output": {
-        "drug_pair": [
-          "Combined oral contraceptive (ethinylestradiol 20 mcg + desogestrel)",
-          "Hemiplegic migraine with motor aura"
+        "proposed": "combined oral contraceptive (ethinylestradiol 20 mcg + desogestrel) in hemiplegic migraine with motor aura",
+        "interactions": [],
+        "contraindications": [
+          "Combined OCP is WHO MEC Category 4 (absolute contraindication) in ALL migraine with aura including hemiplegic subtypes — unacceptable ischaemic stroke risk due to oestrogen-mediated procoagulant state combined with CSD haemodynamic vulnerability",
+          "Risk applies to all doses of oestrogen including EE 20 mcg (low-dose) — dose does not mitigate Category 4 classification in hemiplegic migraine"
         ],
-        "interaction_type": "Absolute contraindication — WHO MEC Category 4",
-        "severity": "Critical",
-        "mechanism": "Oestrogen-containing contraceptives significantly increase ischaemic stroke risk in migraine with aura. In hemiplegic migraine the risk is amplified due to prolonged cortical spreading depression and haemodynamic vulnerability. All oestrogen-containing contraceptives are absolutely contraindicated in ANY migraine with aura including hemiplegic subtypes.",
-        "recommendation": "Stop Mercilon immediately. Prescribe progesterone-only contraception (e.g., Cerazette desogestrel 75 mcg daily or Nexplanon implant — both WHO MEC Category 1 in migraine with aura). Do not restart any oestrogen-containing preparation.",
-        "evidence_level": "WHO MEC 4 — unacceptable health risk"
+        "warnings": [
+          "Combined OCP should not be continued in migraine with aura; progestin-only alternatives (desogestrel 75 mcg, etonogestrel implant) are WHO MEC Category 1 in migraine with aura and are appropriate replacements",
+          "No oestrogen-containing preparation is appropriate in any subtype of migraine with aura"
+        ],
+        "formulary_status": "contraindicated",
+        "alternatives": [
+          "desogestrel 75 mcg (Cerazette) — progesterone-only pill, WHO MEC Category 1",
+          "etonogestrel implant (Nexplanon) — WHO MEC Category 1"
+        ]
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": null,
+    "mri": null,
+    "ecg": {
+      "rhythm": "normal sinus rhythm",
+      "rate": 76,
+      "intervals": {
+        "PR": "178 ms",
+        "QRS": "85 ms",
+        "QTc": "430 ms"
+      },
+      "axis": "normal",
+      "findings": [
+        "Normal sinus rhythm. Normal axis and intervals. No acute ST-T changes."
+      ],
+      "interpretation": "Normal ECG",
+      "clinical_correlation": ""
+    },
+    "labs": null,
+    "csf": null,
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "echo": {
+      "chambers": {
+        "LV": "normal size and systolic function",
+        "RV": "normal size and function",
+        "LA": "normal size",
+        "RA": "normal size"
+      },
+      "valves": {
+        "mitral": "structurally normal",
+        "aortic": "structurally normal",
+        "tricuspid": "normal",
+        "pulmonic": "normal"
+      },
+      "ejection_fraction": 58.0,
+      "wall_motion": "no regional wall-motion abnormality",
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": []
+    },
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 52,
+        "max": 120,
+        "average": 69
+      },
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "impression": "Normal 24-hour Holter monitor.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": null,
+    "specialized_test": {
+      "test_type": "general_laboratory_panel",
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "Study within normal limits. No abnormality identified; non-contributory.",
+      "recommended_actions": []
+    },
+    "literature_search": {
+      "general": {
+        "query": "general",
+        "results": [],
+        "summary": "No directly applicable, high-quality evidence was retrieved for this query. Recommend correlating with current society guidelines."
+      }
+    },
+    "drug_interactions": null
+  }
 }

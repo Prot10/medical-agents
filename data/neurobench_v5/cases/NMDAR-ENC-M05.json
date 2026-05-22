@@ -9,7 +9,16 @@
     "generation_method": "synthetic",
     "condition_name": "Anti-NMDA receptor encephalitis",
     "difficulty_description": "Moderate difficulty: 30-year-old man (less typical sex — NMDAR encephalitis is female-predominant but occurs in males). No teratoma. MRI has subtle bilateral temporal FLAIR changes that could be mistaken for HSV encephalitis. Antibodies pending — empirical HSV treatment initiated but encephalitis is autoimmune.",
-    "expected_agent_confidence": 0.52
+    "expected_agent_confidence": 0.52,
+    "fallback_tool_kinds": {
+      "ecg": "normal",
+      "ct": "normal",
+      "echo": "normal",
+      "cardiac_monitoring": "normal",
+      "advanced_imaging": "normal",
+      "specialized_test": "incidental",
+      "drug_interactions": "normal"
+    }
   },
   "patient": {
     "age": 30,
@@ -24,10 +33,13 @@
       "Mild upper respiratory tract illness 4 weeks prior to symptom onset — self-limiting",
       "No autoimmune history"
     ],
-    "patient_id": "UNKNOWN",
+    "patient_id": "NB-NMDAR-ENC-M05",
     "demographics": {
       "age": 30,
-      "sex": "male"
+      "sex": "male",
+      "ethnicity": "Black African",
+      "handedness": "right",
+      "bmi": 25.3
     },
     "clinical_history": {
       "medications": [
@@ -53,7 +65,12 @@
       "social_history": {
         "note": "Married with one child (age 3). Non-smoker. 8 units alcohol/week. No illicit drugs. No recent travel outside UK. Secondary school teacher."
       },
-      "past_medical_history": []
+      "past_medical_history": [
+        "No prior psychiatric history",
+        "No prior seizure disorder",
+        "Mild upper respiratory tract illness 4 weeks prior to symptom onset — self-limiting",
+        "No autoimmune history"
+      ]
     },
     "neurological_exam": {
       "mental_status": "Confused and disoriented. Oriented only to name. Echolalia noted — repeats examiner's last words. Unable to follow two-step commands. Intermittent automatisms — repetitive hand fumbling and lip smacking during examination.",
@@ -66,12 +83,12 @@
       "sensory": ""
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
-      "hr": 72,
-      "temp": 37.0,
-      "rr": 14,
-      "spo2": 98
+      "bp_systolic": 141,
+      "bp_diastolic": 88,
+      "hr": 112,
+      "temp": 37.9,
+      "rr": 18,
+      "spo2": 96
     },
     "chief_complaint": "Three-week history of progressive confusion, memory disturbance, and two witnessed convulsions",
     "history_present_illness": "A 30-year-old secondary school teacher was brought to the emergency department by his wife after a second witnessed generalised tonic-clonic seizure. His wife reported that over the preceding three weeks he had become increasingly forgetful and confused, losing track of conversations and on one occasion failing to recognise the route to his own school where he had taught for four years. He had also begun behaving oddly at home — making repetitive purposeless movements with his hands, and on several occasions repeating the same question within minutes without apparent awareness that he had just asked it. In the week before admission his personality had changed noticeably: he became irritable, suspicious, and at one point accused his wife of hiding things from him. His wife initially attributed these changes to work-related stress as he was preparing students for national exams. He had been seen by his GP approximately ten days before admission with complaints of poor sleep and low mood; the GP had prescribed a short course of zopiclone 7.5 mg at night and planned mental health follow-up. Two days before admission he had a brief (60-second) convulsive episode witnessed by his wife from which he recovered over about 20 minutes, and a second more prolonged (2-minute) seizure on the morning of admission prompted emergency services to be called. He had no past psychiatric history. He described a mild sore throat and low-grade fever approximately four weeks prior to onset that resolved without treatment. There is no family history of neurological or psychiatric disease. He does not smoke, drinks approximately 8 units alcohol per week, and uses no illicit substances. He takes no regular medications aside from the recently prescribed zopiclone."
@@ -98,18 +115,21 @@
   },
   "red_herrings": [
     {
-      "finding": "Male sex",
-      "misleading_diagnosis": "Anti-NMDAR encephalitis excluded based on sex — 'this is a female condition'",
+      "data_point": "Male sex",
+      "location": "clinical_history",
+      "intended_effect": "Anti-NMDAR encephalitis excluded based on sex — 'this is a female condition'",
       "correct_interpretation": "Anti-NMDAR encephalitis affects males and is not sex-exclusive. Approximately 35% of cases are male. In males, teratoma is less common but the clinical syndrome is identical."
     },
     {
-      "finding": "Bilateral temporal MRI changes with low-grade fever",
-      "misleading_diagnosis": "HSV encephalitis",
+      "data_point": "Bilateral temporal MRI changes with low-grade fever",
+      "location": "clinical_history",
+      "intended_effect": "HSV encephalitis",
       "correct_interpretation": "HSV encephalitis typically shows haemorrhagic temporal lesions with cortical ribboning on DWI, rapid progression, and higher CSF pleocytosis. The symmetric, non-haemorrhagic, DWI-negative bilateral temporal changes in this case are more consistent with autoimmune limbic encephalitis. HSV PCR negative confirms."
     },
     {
-      "finding": "GP prescribed zopiclone for insomnia with apparent initial improvement",
-      "misleading_diagnosis": "Stress-related insomnia and anxiety, not encephalitis",
+      "data_point": "GP prescribed zopiclone for insomnia with apparent initial improvement",
+      "location": "clinical_history",
+      "intended_effect": "Stress-related insomnia and anxiety, not encephalitis",
       "correct_interpretation": "Insomnia is an early prodromal feature of anti-NMDAR encephalitis — it represents hypothalamic dysfunction, not a psychiatric condition. Symptomatic improvement of insomnia with zopiclone does not address the underlying autoimmune process."
     }
   ],
@@ -217,12 +237,11 @@
       {
         "step": 7,
         "action": "CT body and testicular ultrasound to screen for paraneoplastic tumour",
-        "tool_name": "analyze_brain_mri",
+        "tool_name": "order_ct_scan",
         "expected_finding": "No tumour identified in this case — idiopathic anti-NMDAR encephalitis",
         "category": "required",
         "tool_parameters": {
-          "modality": "CT_chest_abdomen_pelvis",
-          "indication": "paraneoplastic workup male"
+          "contrast": false
         }
       },
       {
@@ -256,64 +275,66 @@
       "In males without teratoma, anti-NMDAR encephalitis is 'idiopathic' — the absence of tumour does not change the immunotherapy approach but removes the benefit of tumour removal.",
       "Subclinical electrographic seizures are common and missed without continuous EEG monitoring — levetiracetam is the anti-seizure drug of choice (non-enzyme-inducing)."
     ],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "Male sex",
+        "location": "clinical_history",
+        "intended_effect": "Anti-NMDAR encephalitis excluded based on sex — 'this is a female condition'",
+        "correct_interpretation": "Anti-NMDAR encephalitis affects males and is not sex-exclusive. Approximately 35% of cases are male. In males, teratoma is less common but the clinical syndrome is identical."
+      },
+      {
+        "data_point": "Bilateral temporal MRI changes with low-grade fever",
+        "location": "clinical_history",
+        "intended_effect": "HSV encephalitis",
+        "correct_interpretation": "HSV encephalitis typically shows haemorrhagic temporal lesions with cortical ribboning on DWI, rapid progression, and higher CSF pleocytosis. The symmetric, non-haemorrhagic, DWI-negative bilateral temporal changes in this case are more consistent with autoimmune limbic encephalitis. HSV PCR negative confirms."
+      },
+      {
+        "data_point": "GP prescribed zopiclone for insomnia with apparent initial improvement",
+        "location": "clinical_history",
+        "intended_effect": "Stress-related insomnia and anxiety, not encephalitis",
+        "correct_interpretation": "Insomnia is an early prodromal feature of anti-NMDAR encephalitis — it represents hypothalamic dysfunction, not a psychiatric condition. Symptomatic improvement of insomnia with zopiclone does not address the underlying autoimmune process."
+      }
+    ]
   },
   "initial_tool_outputs": {
     "mri": {
       "findings": [
         {
-          "type": "unknown",
-          "location": "",
-          "size": null,
-          "signal_characteristics": {},
-          "mass_effect": null,
-          "borders": null
-        },
-        {
-          "type": "unknown",
-          "location": "",
-          "size": null,
-          "signal_characteristics": {},
-          "mass_effect": null,
-          "borders": null
-        },
-        {
-          "type": "unknown",
-          "location": "",
-          "size": null,
-          "signal_characteristics": {},
-          "mass_effect": null,
-          "borders": null
-        },
-        {
-          "type": "unknown",
-          "location": "",
-          "size": null,
-          "signal_characteristics": {},
-          "mass_effect": null,
-          "borders": null
-        },
-        {
-          "type": "unknown",
-          "location": "",
-          "size": null,
-          "signal_characteristics": {},
-          "mass_effect": null,
-          "borders": null
+          "type": "Subtle FLAIR hyperintensity",
+          "location": "Medial temporal lobe (left hippocampus and amygdala)",
+          "size": "Approximately 1.4 x 0.7 cm",
+          "signal_characteristics": {
+            "T1": "Isointense",
+            "T2": "Mildly hyperintense",
+            "FLAIR": "Subtle hyperintensity",
+            "DWI": "No restricted diffusion",
+            "post_contrast": "No pathological enhancement"
+          },
+          "mass_effect": "None",
+          "borders": "Ill-defined"
         }
       ],
       "volumetrics": null,
-      "additional_observations": [],
+      "additional_observations": [
+        "No midline shift",
+        "Ventricles normal in size",
+        "No acute hemorrhage",
+        "No extra-axial collections"
+      ],
       "impression": "Bilateral (left-predominant) medial temporal FLAIR signal abnormality. Urgent CSF with HSV PCR and autoimmune antibody panel required. Pattern differs from typical HSV in that it is symmetric and non-haemorrhagic. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
     },
     "eeg": {
       "classification": "abnormal",
-      "background": {},
+      "background": {
+        "posterior_dominant_rhythm": "Poorly organized theta activity, 6-7 Hz, replacing expected alpha rhythm",
+        "overall_organization": "Moderately disorganized",
+        "continuity": "Continuous",
+        "asymmetry": "No consistent hemispheric asymmetry"
+      },
       "findings": [
         {
           "type": "Background",
@@ -342,7 +363,6 @@
       ],
       "artifacts": [],
       "activating_procedures": {},
-      "confidence": 0.0,
       "impression": "Moderate encephalopathic EEG. No extreme delta brush. No ictal activity. Clinical correlation recommended.",
       "limitations": "",
       "recommended_actions": [
@@ -350,19 +370,188 @@
       ]
     },
     "labs": {
-      "panels": {},
-      "interpretation": "All values within normal limits.",
-      "abnormal_values_summary": []
+      "panels": {
+        "CBC": [
+          {
+            "test": "WBC",
+            "value": 9.2,
+            "unit": "x10^9/L",
+            "reference_range": "4.0-11.0",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "Hemoglobin",
+            "value": 13.1,
+            "unit": "g/dL",
+            "reference_range": "12.0-16.0",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "Hematocrit",
+            "value": 40.5,
+            "unit": "%",
+            "reference_range": "36.0-46.0",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "Platelets",
+            "value": 241,
+            "unit": "x10^9/L",
+            "reference_range": "150-400",
+            "is_abnormal": false,
+            "clinical_significance": null
+          }
+        ],
+        "BMP": [
+          {
+            "test": "Sodium",
+            "value": 129,
+            "unit": "mEq/L",
+            "reference_range": "136-145",
+            "is_abnormal": true,
+            "clinical_significance": null
+          },
+          {
+            "test": "Potassium",
+            "value": 4.0,
+            "unit": "mEq/L",
+            "reference_range": "3.5-5.0",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "Chloride",
+            "value": 97,
+            "unit": "mEq/L",
+            "reference_range": "98-106",
+            "is_abnormal": true,
+            "clinical_significance": null
+          },
+          {
+            "test": "Bicarbonate",
+            "value": 24,
+            "unit": "mEq/L",
+            "reference_range": "22-29",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "BUN",
+            "value": 10,
+            "unit": "mg/dL",
+            "reference_range": "7-20",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "Creatinine",
+            "value": 0.8,
+            "unit": "mg/dL",
+            "reference_range": "0.6-1.2",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "Glucose",
+            "value": 96,
+            "unit": "mg/dL",
+            "reference_range": "70-100",
+            "is_abnormal": false,
+            "clinical_significance": null
+          }
+        ],
+        "Inflammatory markers": [
+          {
+            "test": "CRP",
+            "value": 0.8,
+            "unit": "mg/dL",
+            "reference_range": "0.0-0.5",
+            "is_abnormal": true,
+            "clinical_significance": null
+          },
+          {
+            "test": "ESR",
+            "value": 22,
+            "unit": "mm/hr",
+            "reference_range": "0-20",
+            "is_abnormal": true,
+            "clinical_significance": null
+          }
+        ],
+        "Thyroid function": [
+          {
+            "test": "TSH",
+            "value": 1.9,
+            "unit": "mIU/L",
+            "reference_range": "0.4-4.0",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "Free T4",
+            "value": 1.1,
+            "unit": "ng/dL",
+            "reference_range": "0.8-1.8",
+            "is_abnormal": false,
+            "clinical_significance": null
+          }
+        ],
+        "Other": [
+          {
+            "test": "CK",
+            "value": 148,
+            "unit": "U/L",
+            "reference_range": "30-135",
+            "is_abnormal": true,
+            "clinical_significance": null
+          },
+          {
+            "test": "Urine drug screen",
+            "value": "Negative",
+            "unit": "",
+            "reference_range": "Negative",
+            "is_abnormal": false,
+            "clinical_significance": null
+          }
+        ]
+      },
+      "interpretation": "Abnormal values: Sodium 129 mEq/L (L), Chloride 97 mEq/L (L), CRP 0.8 mg/dL (H), ESR 22 mm/hr (H), CK 148 U/L (H).",
+      "abnormal_values_summary": [
+        "Sodium: 129 mEq/L (L)",
+        "Chloride: 97 mEq/L (L)",
+        "CRP: 0.8 mg/dL (H)",
+        "ESR: 22 mm/hr (H)",
+        "CK: 148 U/L (H)"
+      ]
     },
     "csf": {
       "opening_pressure": "20 cmH2O (mildly elevated)",
       "appearance": "Clear and colourless",
-      "cell_count": {},
+      "cell_count": {
+        "WBC": "14 cells/uL (mildly elevated)",
+        "RBC": "1 cells/uL",
+        "Lymphocytes": "87%",
+        "Neutrophils": "8%",
+        "Monocytes": "5%"
+      },
       "protein": "0.61 g/L",
       "glucose": "3.4 mmol/L",
       "interpretation": "Opening pressure: 20 cmH2O. Protein: 0.61 g/L. Glucose: 3.4 mmol/L.",
       "glucose_ratio": "",
-      "special_tests": {}
+      "special_tests": {
+        "Oligoclonal bands": "Equivocal (2 faint bands)",
+        "IgG index": "0.74 (borderline elevated, normal <0.70)",
+        "HSV-1 PCR": "Negative",
+        "HSV-2 PCR": "Negative",
+        "VZV PCR": "Negative",
+        "Enterovirus PCR": "Negative",
+        "Bacterial culture": "No growth at 48 hours",
+        "Gram stain": "No organisms seen",
+        "Anti-NMDA receptor antibodies": "Pending"
+      }
     }
   },
   "followup_outputs": [
@@ -370,38 +559,46 @@
       "trigger_action": "request_nmdar_antibodies",
       "tool_name": "interpret_labs",
       "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": []
+        "panels": {
+          "NMDAR Antibody Panel": [
+            {
+              "test": "Serum anti-NMDA receptor IgG",
+              "value": "Positive (titer 1:40)",
+              "unit": "",
+              "reference_range": "Negative",
+              "is_abnormal": true,
+              "clinical_significance": null
+            },
+            {
+              "test": "CSF anti-NMDA receptor IgG",
+              "value": "Positive (titer 1:80)",
+              "unit": "",
+              "reference_range": "Negative",
+              "is_abnormal": true,
+              "clinical_significance": null
+            }
+          ]
+        },
+        "interpretation": "Abnormal values: Serum anti-NMDA receptor IgG Positive (titer 1:40) (H), CSF anti-NMDA receptor IgG Positive (titer 1:80) (H). Anti-NMDA receptor IgG antibody is found in a subset of patients with autoimmune encephalitis; a positive result should be interpreted in the clinical context. Clinical correlation recommended.",
+        "abnormal_values_summary": [
+          "Serum anti-NMDA receptor IgG: Positive (titer 1:40) (H)",
+          "CSF anti-NMDA receptor IgG: Positive (titer 1:80) (H)"
+        ]
       }
     },
     {
       "trigger_action": "request_ct_chest_abdomen_pelvis",
-      "tool_name": "analyze_brain_mri",
+      "tool_name": "order_ct_scan",
       "output": {
-        "findings": [
-          {
-            "type": "unknown",
-            "location": "",
-            "size": null,
-            "signal_characteristics": {},
-            "mass_effect": null,
-            "borders": null
-          },
-          {
-            "type": "unknown",
-            "location": "",
-            "size": null,
-            "signal_characteristics": {},
-            "mass_effect": null,
-            "borders": null
-          }
+        "findings": [],
+        "contrast_used": false,
+        "angiography_findings": null,
+        "additional_observations": [
+          "No pulmonary nodules or masses",
+          "No mediastinal lymphadenopathy",
+          "No hepatic lesions"
         ],
-        "volumetrics": null,
-        "additional_observations": [],
-        "impression": "No paraneoplastic mass identified on CT. Testicular ultrasound should be performed as anti-NMDAR encephalitis in males may be associated with testicular teratoma. Clinical correlation recommended.",
-        "differential_by_imaging": [],
-        "confidence": 0.0,
+        "impression": "No thoracic, abdominal, or pelvic mass identified. No lymphadenopathy. No distant metastatic disease. Clinical correlation recommended.",
         "recommended_actions": [
           "Clinical correlation recommended."
         ]
@@ -411,7 +608,34 @@
       "trigger_action": "request_testicular_ultrasound",
       "tool_name": "interpret_labs",
       "output": {
-        "panels": {},
+        "panels": {
+          "Testicular Ultrasound": [
+            {
+              "test": "Right testis",
+              "value": "Normal size and echotexture (4.2 x 2.8 x 2.5 cm). No intratesticular mass or microlithiasis. Normal Doppler flow.",
+              "unit": "",
+              "reference_range": "Normal",
+              "is_abnormal": false,
+              "clinical_significance": null
+            },
+            {
+              "test": "Left testis",
+              "value": "Normal size and echotexture (4.0 x 2.7 x 2.4 cm). No intratesticular mass or microlithiasis. Normal Doppler flow.",
+              "unit": "",
+              "reference_range": "Normal",
+              "is_abnormal": false,
+              "clinical_significance": null
+            },
+            {
+              "test": "Epididymides",
+              "value": "Bilateral epididymides normal in size and echogenicity. No epididymal cysts.",
+              "unit": "",
+              "reference_range": "Normal",
+              "is_abnormal": false,
+              "clinical_significance": null
+            }
+          ]
+        },
         "interpretation": "All values within normal limits.",
         "abnormal_values_summary": []
       }
@@ -435,7 +659,12 @@
       "tool_name": "analyze_eeg",
       "output": {
         "classification": "abnormal",
-        "background": {},
+        "background": {
+          "posterior_dominant_rhythm": "Absent; diffuse theta-delta activity",
+          "overall_organization": "Severely disorganized",
+          "continuity": "Continuous with intermittent attenuation",
+          "asymmetry": "No consistent asymmetry"
+        },
         "findings": [
           {
             "type": "Overall",
@@ -448,7 +677,6 @@
         ],
         "artifacts": [],
         "activating_procedures": {},
-        "confidence": 0.0,
         "impression": "Subclinical seizures on continuous EEG. Clinical correlation recommended.",
         "limitations": "",
         "recommended_actions": [
@@ -470,5 +698,104 @@
         "summary": ""
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": null,
+    "mri": null,
+    "ecg": {
+      "rhythm": "normal sinus rhythm",
+      "rate": 84,
+      "intervals": {
+        "PR": "171 ms",
+        "QRS": "90 ms",
+        "QTc": "413 ms"
+      },
+      "axis": "normal",
+      "findings": [
+        "Normal sinus rhythm. Normal axis and intervals. No acute ST-T changes."
+      ],
+      "interpretation": "Normal ECG",
+      "clinical_correlation": ""
+    },
+    "labs": null,
+    "csf": null,
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "echo": {
+      "chambers": {
+        "LV": "normal size and systolic function",
+        "RV": "normal size and function",
+        "LA": "normal size",
+        "RA": "normal size"
+      },
+      "valves": {
+        "mitral": "structurally normal",
+        "aortic": "structurally normal",
+        "tricuspid": "normal",
+        "pulmonic": "normal"
+      },
+      "ejection_fraction": 64.0,
+      "wall_motion": "no regional wall-motion abnormality",
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": []
+    },
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 49,
+        "max": 119,
+        "average": 76
+      },
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "impression": "Normal 24-hour Holter monitor.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": {
+      "modality": "FDG-PET",
+      "tracer_or_protocol": null,
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "No abnormality identified on advanced imaging. Findings are non-contributory; clinical correlation recommended.",
+      "recommended_actions": []
+    },
+    "specialized_test": {
+      "test_type": "neuropsychological_testing",
+      "findings": [
+        {
+          "finding": "minor non-specific abnormality",
+          "interpretation": "of uncertain and likely no clinical significance"
+        }
+      ],
+      "quantitative_data": null,
+      "impression": "Study with only a minor non-specific finding; non-contributory to the presentation.",
+      "recommended_actions": []
+    },
+    "literature_search": null,
+    "drug_interactions": {
+      "general": {
+        "proposed": "(agent not specified on this case's pathway)",
+        "interactions": [],
+        "contraindications": [],
+        "warnings": [
+          "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
+        ],
+        "formulary_status": "on formulary",
+        "alternatives": []
+      }
+    }
+  }
 }

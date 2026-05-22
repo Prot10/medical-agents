@@ -14,10 +14,12 @@
       "Type 2 diabetes mellitus",
       "Lichen planus (skin), diagnosed 1 year ago by dermatology"
     ],
-    "patient_id": "UNKNOWN",
+    "patient_id": "MG-RS12",
     "demographics": {
       "age": 69,
-      "sex": "male"
+      "sex": "male",
+      "handedness": "right",
+      "bmi": 23.8
     },
     "clinical_history": {
       "medications": [
@@ -49,22 +51,26 @@
       "social_history": {
         "note": "Retired civil servant; non-smoker; occasional alcohol; lives with wife; community college part-time lecturer"
       },
-      "past_medical_history": []
+      "past_medical_history": [
+        "Hypertension",
+        "Type 2 diabetes mellitus",
+        "Lichen planus (skin), diagnosed 1 year ago by dermatology"
+      ]
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert, oriented. No cognitive impairment.",
+      "cranial_nerves": "Asymmetric bilateral ptosis (left > right) without ophthalmoplegia. Fatigable ptosis on sustained upgaze. Cogan lid twitch positive. Severe reduction of gag reflex. Palate elevation: symmetric but weak. No tongue deviation or fasciculations.",
+      "motor": "Proximal limb strength 5/5 with clear fatigability on sustained resistance. No fasciculations.",
+      "sensory": "Sensation intact throughout.",
+      "reflexes": "DTR 2+ symmetric.",
+      "coordination": "Coordination normal.",
+      "gait": "Gait normal."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
+      "bp_systolic": 134,
+      "bp_diastolic": 82,
       "hr": 72,
-      "temp": 37.0,
+      "temp": 36.7,
       "rr": 14,
       "spo2": 98
     },
@@ -198,8 +204,27 @@
       "Normal needle EMG (no fasciculations) effectively excludes ALS/motor neuron disease",
       "No 50 Hz increment on RNS excludes LEMS pattern"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Lichen planus on skin exam — considered as possible paraneoplastic or connective tissue disorder",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Lichen planus with bulbar dysfunction might suggest a paraneoplastic process or SLE with neurological involvement",
+        "correct_interpretation": "Lichen planus is an incidental autoimmune co-diagnosis; does not cause bulbar dysfunction; MG is the independent cause"
+      },
+      {
+        "data_point": "Mild ESR elevation (22 mm/hr)",
+        "location": "followup_outputs[0].output.interpretation",
+        "intended_effect": "Elevated ESR with neurological symptoms could suggest vasculitis or inflammatory condition",
+        "correct_interpretation": "Non-specific mild elevation; normal CRP; no other vasculitis features; attributed to mild chronic inflammation from lichen planus"
+      },
+      {
+        "data_point": "Elevated HbA1c suggesting inadequately controlled diabetes",
+        "location": "followup_outputs[0].output.interpretation",
+        "intended_effect": "Poorly controlled diabetes with peripheral neuropathy could cause mild bulbar dysfunction",
+        "correct_interpretation": "Normal nerve conduction on EMG study; T2DM at this HbA1c level would not cause fatigable bulbar weakness; RNS and AChR antibody confirm MG"
+      }
+    ],
+    "icd_code": "G70.01"
   },
   "red_herrings": [
     {
@@ -225,7 +250,14 @@
     "generation_method": "real_case_seed",
     "condition_name": "Generalized MG with late-onset presentation and incidental lichen planus",
     "difficulty_description": "Straightforward: classic diurnal variation with bulbar and ocular fatigability; multi-muscle RNS decrement confirmed; lichen planus is an incidental distractor",
-    "expected_agent_confidence": 0.86
+    "expected_agent_confidence": 0.86,
+    "fallback_tool_kinds": {
+      "eeg": "normal",
+      "csf": "normal",
+      "echo": "normal",
+      "cardiac_monitoring": "normal",
+      "advanced_imaging": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
@@ -234,7 +266,6 @@
       "additional_observations": [],
       "impression": "No acute brainstem lesion; mild chronic white matter changes (age/hypertension); normal brainstem. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
@@ -243,8 +274,12 @@
     "ecg": {
       "rhythm": "sinus rhythm",
       "rate": 72,
-      "intervals": {},
-      "axis": "",
+      "intervals": {
+        "QTc": "436 ms",
+        "PR": "162 ms",
+        "QRS": "88 ms"
+      },
+      "axis": "normal",
       "findings": [
         "ELECTROCARDIOGRAM\n\nRHYTHM: Sinus rhythm 70 bpm\nQTc: 436 ms\nINTERPRETATION: Normal sinus rhythm. Mild LVH pattern (hypertension). No ischemic changes.\n\nCONCLUSION: Normal ECG."
       ],
@@ -271,14 +306,14 @@
     "cardiac_monitoring": null,
     "advanced_imaging": null,
     "specialized_test": {
-      "test_type": "",
+      "test_type": "Repetitive nerve stimulation",
       "findings": [
         {
-          "description": "REPETITIVE NERVE STIMULATION STUDY\n\nIndication: Fatigable ptosis, bulbar dysfunction; RNS for NMJ assessment\n\nTECHNIQUE: 3 Hz RNS performed at anconeus (radial nerve), trapezius (accessory nerve), and orbicularis oculi (facial nerve)\n\nRESULTS:\n  Anconeus: Decrement 14% from 1st to 4th stimulus [>10% abnormal] ABNORMAL\n  Trapezius: Decrement 16% ABNORMAL\n  Orbicularis oculi: Decrement 12% ABNORMAL\n\nMOTOR NERVE CONDUCTION: Normal distal latencies and amplitudes; no evidence of peripheral neuropathy.\n\nSENSORY NERVE CONDUCTION: Normal.\n\nNEEDLE EMG (distal and proximal muscles): Normal insertional activity; no fibrillations, no fasciculations; no myopathic or neuropathic motor unit morphology changes.\n\nHIGH-RATE RNS (50 Hz): No facilitating response — LEMS pattern excluded.\n\nINTERPRETATION: Abnormal decremental response at 3 Hz in three muscle groups (anconeus 14%, trapezius 16%, orbicularis 12%). Normal needle EMG and nerve conduction. No 50 Hz increment. Findings are diagnostic of myasthenia gravis.\n\nCONCLUSION: Electrophysiological confirmation of generalized MG with multi-muscle decremental response."
+          "description": "REPETITIVE NERVE STIMULATION STUDY\n\nIndication: Fatigable ptosis, bulbar dysfunction; RNS for NMJ assessment\n\nTECHNIQUE: 3 Hz RNS performed at anconeus (radial nerve), trapezius (accessory nerve), and orbicularis oculi (facial nerve)\n\nRESULTS:\n  Anconeus: Decrement 14% from 1st to 4th stimulus [>10% abnormal] ABNORMAL\n  Trapezius: Decrement 16% ABNORMAL\n  Orbicularis oculi: Decrement 12% ABNORMAL\n\nMOTOR NERVE CONDUCTION: Normal distal latencies and amplitudes; no evidence of peripheral neuropathy.\n\nSENSORY NERVE CONDUCTION: Normal.\n\nNEEDLE EMG (distal and proximal muscles): Normal insertional activity; no fibrillations, no fasciculations; no myopathic or neuropathic motor unit morphology changes.\n\nHIGH-RATE RNS (50 Hz): No pathological facilitating response.\n\nIMPRESSION: Abnormal decremental responses at 3 Hz in three muscle groups (anconeus 14%, trapezius 16%, orbicularis 12%). Normal needle EMG and nerve conduction. No 50 Hz increment. Findings are consistent with a disorder of neuromuscular transmission. Clinical correlation recommended."
         }
       ],
       "quantitative_data": null,
-      "impression": "RNS: 14-16% decrement at anconeus, trapezius, orbicularis; normal EMG; no 50Hz increment — confirms generalized MG",
+      "impression": "RNS: 14–16% decrement at anconeus, trapezius, orbicularis; normal needle EMG; no 50 Hz increment — decremental pattern consistent with a disorder of neuromuscular transmission. Clinical correlation recommended.",
       "recommended_actions": []
     }
   },
@@ -287,23 +322,50 @@
       "trigger_action": "request_mg_antibodies",
       "tool_name": "interpret_labs",
       "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": []
+        "panels": {
+          "MG_antibody_panel": [
+            {
+              "test": "AChR binding antibody",
+              "value": "11.2 nmol/L",
+              "reference_range": "< 0.4 nmol/L",
+              "is_abnormal": true,
+              "unit": "nmol/L"
+            },
+            {
+              "test": "AChR blocking antibody",
+              "value": "3.4 nmol/L",
+              "reference_range": "< 25%",
+              "is_abnormal": true,
+              "unit": "nmol/L"
+            },
+            {
+              "test": "Anti-MuSK antibody",
+              "value": "< 0.4 nmol/L (negative)",
+              "reference_range": "< 0.4 nmol/L",
+              "is_abnormal": false,
+              "unit": "nmol/L"
+            }
+          ]
+        },
+        "interpretation": "AChR binding antibody markedly elevated at 11.2 nmol/L (reference < 0.4 nmol/L). AChR blocking antibody positive. Anti-MuSK antibody negative. Anti-acetylcholine receptor antibodies are found in a subset of patients with neuromuscular junction disorders; an elevated result is associated with autoimmune neuromuscular junction disease. Clinical correlation recommended.",
+        "abnormal_values_summary": [
+          "AChR binding antibody 11.2 nmol/L (ref <0.4 nmol/L) — markedly elevated",
+          "AChR blocking antibody positive"
+        ]
       }
     },
     {
       "trigger_action": "request_sfemg",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "",
+        "test_type": "Single-fiber EMG",
         "findings": [
           {
-            "description": "SINGLE-FIBER EMG — ORBICULARIS OCULI\n\nMCD: 58 µs [normal <35 µs] MARKEDLY ABNORMAL\nBlocking: 20% of potential pairs\n\nCONCLUSION: SFEMG confirms NMJ dysfunction. Consistent with MG."
+            "description": "SINGLE-FIBER EMG — ORBICULARIS OCULI\n\nMCD: 58 µs [normal <35 µs] MARKEDLY ABNORMAL\nBlocking: 20% of potential pairs\n\nIMPRESSION: Markedly increased mean consecutive difference with 20% blocking, consistent with a disorder of neuromuscular transmission. Clinical correlation recommended."
           }
         ],
         "quantitative_data": null,
-        "impression": "SFEMG: MCD 58 µs with 20% blocking — NMJ dysfunction confirmed",
+        "impression": "SFEMG (orbicularis oculi): MCD 58 µs with 20% blocking — markedly increased jitter consistent with a disorder of neuromuscular transmission. Clinical correlation recommended.",
         "recommended_actions": []
       }
     },
@@ -311,8 +373,25 @@
       "trigger_action": "request_pulmonary_function",
       "tool_name": "interpret_labs",
       "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
+        "panels": {
+          "Pulmonary_function": [
+            {
+              "test": "NIF (Negative Inspiratory Force)",
+              "value": "-70 cm H2O",
+              "reference_range": "< -60 cm H2O",
+              "is_abnormal": false,
+              "unit": "cm H2O"
+            },
+            {
+              "test": "FVC % predicted",
+              "value": "86%",
+              "reference_range": "> 80%",
+              "is_abnormal": false,
+              "unit": "%"
+            }
+          ]
+        },
+        "interpretation": "Pulmonary function adequate. NIF -70 cm H2O (reference < -60 cm H2O — meets threshold for adequate respiratory reserve). FVC 86% predicted. No immediate respiratory compromise.",
         "abnormal_values_summary": []
       }
     },
@@ -320,18 +399,30 @@
       "trigger_action": "search_lichen_planus_mg_association",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Lichen Planus and Myasthenia Gravis Association\n\nKEY FINDINGS:\n1. POLYAUTOIMMUNE ASSOCIATIONS: Lichen planus is a T-cell–mediated immune disorder; it has been described in association with other autoimmune conditions including MG, autoimmune hepatitis, and thyroid disease\n2. CASE SERIES: Small series report co-occurrence of lichen planus and MG, suggesting shared immunological susceptibility (HLA-DR1, HLA-DQ1)\n3. CLINICAL IMPLICATION: Lichen planus does not cause MG and is not a diagnostic confounder; the two conditions share autoimmune background\n4. STEROIDS IN BOTH: Prednisone is first-line immunosuppression for MG and can also improve lichen planus — an incidental treatment benefit\n\nCONCLUSION: Lichen planus is an incidental autoimmune co-diagnosis; does not affect MG management.",
-        "summary": "Lichen planus and MG can co-exist as part of polyautoimmune predisposition; prednisone treats both; no diagnostic interaction",
-        "query": "",
-        "results": []
+        "query": "search lichen planus mg association",
+        "results": [
+          {
+            "title": "Clinical literature",
+            "content": "LITERATURE SEARCH: Lichen Planus and Myasthenia Gravis Association\n\nKEY FINDINGS:\n1. POLYAUTOIMMUNE ASSOCIATIONS: Lichen planus is a T-cell–mediated immune disorder; it has been described in association with other autoimmune conditions including neuromuscular junction disease, autoimmune hepatitis, and thyroid disease.\n2. CASE SERIES: Small series report co-occurrence of lichen planus and autoimmune neuromuscular disease, suggesting shared immunological susceptibility (HLA-DR1, HLA-DQ1).\n3. CLINICAL IMPLICATION: Lichen planus is not known to cause neuromuscular junction dysfunction; the two conditions may share an autoimmune predisposition.\n4. STEROIDS: Prednisone is used for both conditions as an immunosuppressive agent."
+          }
+        ],
+        "summary": "Lichen planus and autoimmune neuromuscular junction disease share a polyautoimmune predisposition; prednisone is used for both conditions."
       }
     },
     {
       "trigger_action": "check_metformin_mg_interaction",
       "tool_name": "check_drug_interactions",
       "output": {
-        "report": "DRUG INTERACTION REVIEW — METFORMIN + PYRIDOSTIGMINE IN MG + T2DM\n\nQuery: Drug interactions for new MG treatment in patient with T2DM on metformin\n\nFINDINGS:\n  METFORMIN + PYRIDOSTIGMINE: No clinically significant interaction\n  PREDNISONE + METFORMIN: Prednisone causes significant hyperglycemia; T2DM glucose management must be intensified; consider SGLT-2 inhibitor or insulin adjustment; monitor HbA1c\n  AMLODIPINE: Mild NMJ concern at high doses; continue at current 5 mg dose with monitoring\n\nPRACTICAL NOTE: Starting prednisone in a T2DM patient requires close blood glucose monitoring. Consider endocrinology co-management. HbA1c 7.6% is already borderline — steroid-induced hyperglycemia may require additional pharmacological management.\n\nCONCLUSION: Add PPI with prednisone; intensify diabetes monitoring; no interaction with metformin + pyridostigmine.",
-        "summary": "Prednisone will worsen T2DM glucose control — intensify monitoring; no metformin-pyridostigmine interaction"
+        "proposed": "check_metformin_mg_interaction",
+        "interactions": [
+          "DRUG INTERACTION REVIEW — METFORMIN AND PYRIDOSTIGMINE; PREDNISONE AND METFORMIN\n\nQuery: Drug interactions when adding pyridostigmine and prednisone to metformin regimen\n\nFINDINGS:\n  METFORMIN + PYRIDOSTIGMINE: No clinically significant pharmacokinetic interaction identified.\n  PREDNISONE + METFORMIN: Corticosteroids antagonize insulin action and cause dose-dependent hyperglycemia; blood glucose monitoring should be intensified when adding corticosteroids to existing antidiabetic therapy.\n  PREDNISONE (GI): Concurrent NSAID or aspirin use increases GI mucosal irritation risk; gastroprotection recommended.\n  AMLODIPINE: At standard doses, amlodipine has a low reported risk of NMJ effects; clinical monitoring is appropriate."
+        ],
+        "contraindications": [],
+        "warnings": [
+          "Prednisone will increase blood glucose — intensify monitoring in diabetic patients; no clinically significant metformin–pyridostigmine interaction."
+        ],
+        "formulary_status": "on formulary",
+        "alternatives": []
       }
     },
     {
@@ -342,11 +433,92 @@
         "contrast_used": false,
         "angiography_findings": null,
         "additional_observations": [
-          "CT CHEST FOR THYMECTOMY EVALUATION (REPEAT WITH DEDICATED VIEWS)\n\nIndication: AChR+ MG confirmed; MGTX trial evidence for thymectomy benefit in non-thymomatous generalized MG\n\nFINDINGS: No thymoma. Fatty thymic involution. No anterior mediastinal mass. No adenopathy.\n\nMGTX TRIAL APPLICABILITY:\n  - Patient age: 69 years (MGTX included 18-65; patient is outside trial age range)\n  - AChR+: Yes (qualifies on antibody criterion)\n  - Age >65: MGTX evidence is extrapolated; current guidelines support thymectomy in AChR+ generalized MG even up to age 65-70 based on expert opinion\n  - No thymoma: Thymectomy still beneficial for non-thymomatous MG per MGTX trial\n\nCONCLUSION: No thymoma found. MGTX trial evidence supports thymectomy for AChR+ generalized MG; borderline age may require multidisciplinary discussion (neurology + thoracic surgery + patient preference)."
+          "CT CHEST — DEDICATED MEDIASTINAL PROTOCOL\n\nIndication: Anterior mediastinal evaluation\n\nFINDINGS: No thymic mass. Fatty thymic involution appropriate for age. No anterior mediastinal mass. No mediastinal adenopathy. Lungs clear.\n\nIMPRESSION:\n1. No anterior mediastinal mass.\n2. Age-appropriate thymic involution."
         ],
-        "impression": "No thymoma; MGTX thymectomy benefit established for AChR+ generalized MG up to age ~65-70; discuss with patient",
+        "impression": "No anterior mediastinal mass; age-appropriate thymic involution; normal chest CT.",
         "recommended_actions": []
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": {
+      "classification": "normal",
+      "background": {
+        "pdr": "9-10 Hz posterior dominant rhythm, symmetric and reactive",
+        "sleep_features": "normal vertex waves and sleep spindles",
+        "overall": "normal organisation for age"
+      },
+      "findings": [],
+      "artifacts": [],
+      "activating_procedures": {},
+      "impression": "Normal awake and drowsy EEG. No epileptiform discharges and no focal slowing.",
+      "limitations": "",
+      "recommended_actions": []
+    },
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": null,
+    "echo": {
+      "chambers": {
+        "LV": "normal size and systolic function",
+        "RV": "normal size and function",
+        "LA": "normal size",
+        "RA": "normal size"
+      },
+      "valves": {
+        "mitral": "structurally normal",
+        "aortic": "structurally normal",
+        "tricuspid": "normal",
+        "pulmonic": "normal"
+      },
+      "ejection_fraction": 64.0,
+      "wall_motion": "no regional wall-motion abnormality",
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": []
+    },
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 53,
+        "max": 123,
+        "average": 82
+      },
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "impression": "Normal 24-hour Holter monitor.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": {
+      "modality": "FDG-PET scan",
+      "tracer_or_protocol": null,
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "No abnormality identified on advanced imaging. Findings are non-contributory; clinical correlation recommended.",
+      "recommended_actions": []
+    },
+    "specialized_test": null,
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

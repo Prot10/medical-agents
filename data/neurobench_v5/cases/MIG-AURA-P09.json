@@ -46,21 +46,22 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert and fully oriented. Fluent speech with normal naming and repetition. No cognitive deficit.",
+      "cranial_nerves": "Normal cranial nerves II-XII. No facial asymmetry. Visual fields full by confrontation. PERRLA. Extraocular movements full. Tongue midline.",
+      "motor": "Motor strength 5/5 in all four limbs. No pronator drift. Normal tone bilaterally.",
+      "sensory": "Intact to light touch, pinprick, and vibration throughout. No hemisensory deficit.",
+      "reflexes": "Deep tendon reflexes 2+ and symmetric throughout. Plantar responses flexor bilaterally. No Babinski.",
+      "coordination": "Finger-nose and heel-shin tests normal bilaterally.",
+      "gait": "Normal gait. Romberg negative.",
+      "additional": "Bradycardia at 62 bpm on propranolol. No carotid bruits."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
-      "hr": 72,
-      "temp": 37.0,
+      "bp_systolic": 136,
+      "bp_diastolic": 84,
+      "hr": 62,
+      "temp": 36.8,
       "rr": 14,
-      "spo2": 98
+      "spo2": 99
     },
     "history_present_illness": "A 36-year-old Black British man presented to the neurology clinic for a second opinion. He has had five episodes over the past 18 months of right-sided arm weakness, clumsiness and difficulty with word finding, lasting 20-35 minutes, each followed by a severe left-sided throbbing headache rated 9/10 with marked nausea and photophobia lasting 10-16 hours. The first episode was assessed at the emergency department and was diagnosed as 'likely TIA or hemiplegic migraine.' A normal CT head and a normal 24-hour Holter were performed. He was subsequently seen by a neurologist who diagnosed hemiplegic migraine and started propranolol 40 mg BID. Two further episodes occurred on propranolol.\n\nNew information from this visit: his father (aged 64) had a subarachnoid haemorrhage (SAH) 8 weeks ago from a ruptured left MCA aneurysm. The patient is therefore seeking screening for intracranial aneurysm.\n\nOn re-review of his episodes: the motor and language deficit develops gradually over approximately 20-25 minutes, which he confirms on careful questioning. He has no family history of hemiplegic migraine. His sister has typical migraine without aura. He has mild hypertension (BP today 136/84). He is a non-smoker, occasional alcohol. He has no prior imaging of the intracranial vessels — only CT head was performed acutely."
   },
@@ -167,8 +168,21 @@
       "PHASES scoring guides aneurysm management: 4mm MCA aneurysm, 36-year-old male, no prior SAH = ~3% 5-year rupture risk ≈ treatment risk; conservative monitoring is appropriate",
       "Diagnostic puzzle: the aneurysm is the hidden critical finding that a complete MRA at the first assessment would have revealed"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Hemiplegic migraine diagnosis seems secure — propranolol was started; focus on migraine prevention",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Prior neurologist diagnosed hemiplegic migraine and started treatment; no MRA was considered necessary",
+        "correct_interpretation": "First-ever MRI/MRA was never performed despite 5 episodes with focal neurological deficits; father's SAH made MRA urgently necessary; 4mm MCA aneurysm found; this changes multiple management decisions"
+      },
+      {
+        "data_point": "Father's SAH from aneurysm — focus on aneurysm screening only, not migraine diagnosis",
+        "location": "patient.history_present_illness",
+        "intended_effect": "The aneurysm finding might overwhelm the clinical consultation and divert from migraine management",
+        "correct_interpretation": "Both diagnoses are important: hemiplegic migraine is managed with topiramate (not propranolol which failed); unruptured aneurysm is managed conservatively with BP optimisation and annual MRA"
+      }
+    ],
+    "icd_code": "G43.1"
   },
   "red_herrings": [
     {
@@ -185,27 +199,59 @@
   "metadata": {
     "condition_name": "Hemiplegic migraine with incidental unruptured MCA aneurysm (familial) — MRA omitted at initial workup; triptans contraindicated",
     "difficulty_description": "Diagnostic puzzle: hemiplegic migraine diagnosis is correct but MRA was never performed; father's SAH makes familial aneurysm screening mandatory; 4mm unruptured MCA aneurysm found; changes management including triptans avoidance and BP optimisation",
-    "expected_agent_confidence": 0.38
+    "expected_agent_confidence": 0.38,
+    "fallback_tool_kinds": {
+      "csf": "normal",
+      "ct": "normal",
+      "echo": "incidental",
+      "cardiac_monitoring": "normal",
+      "advanced_imaging": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
-      "findings": [],
+      "findings": [
+        {
+          "type": "normal",
+          "location": "brain parenchyma",
+          "size": null,
+          "signal_characteristics": {
+            "DWI": "no restriction",
+            "FLAIR": "no signal abnormality",
+            "T1": "normal"
+          },
+          "mass_effect": "none",
+          "borders": null
+        },
+        {
+          "type": "vascular_abnormality",
+          "location": "left MCA bifurcation",
+          "size": "4 mm",
+          "signal_characteristics": {
+            "MRA": "4mm outpouching at left M1/M2 bifurcation — saccular aneurysm",
+            "T1_Gd": "no enhancement of surrounding tissue"
+          },
+          "mass_effect": "none",
+          "borders": "well-defined saccular morphology"
+        }
+      ],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "See findings above. Clinical correlation recommended.",
+      "impression": "1. Normal brain parenchyma. No DWI restriction. No acute infarct or signal abnormality. 2. 4 mm saccular outpouching at the left M1/M2 (MCA bifurcation) on MRA — saccular morphology consistent with an unruptured aneurysm. Normal circle of Willis otherwise. Neurovascular clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
     },
     "eeg": {
       "classification": "abnormal",
-      "background": {},
+      "background": {
+        "pdr": "9-10 Hz posterior dominant rhythm, symmetric",
+        "overall": "mild non-specific posterior slowing; no epileptiform activity"
+      },
       "findings": [],
       "artifacts": [],
       "activating_procedures": {},
-      "confidence": 0.0,
       "impression": "Non-specific mild posterior slowing; no epileptiform discharges. Clinical correlation recommended.",
       "limitations": "",
       "recommended_actions": [
@@ -240,14 +286,14 @@
       "trigger_action": "request_neurovascular_surgery_referral_urgent",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "",
+        "test_type": "neurovascular_referral",
         "findings": [
           {
-            "description": "NEUROVASCULAR TEAM REFERRAL — UNRUPTURED INTRACRANIAL ANEURYSM\n\nReferral received at Neurovascular MDT: 4mm left MCA bifurcation aneurysm; father's SAH from left MCA aneurysm; familial intracranial aneurysm screening context\n\nNEUROVASCULAR MDT ASSESSMENT:\n  RUPTURE RISK: PHASES score for 4mm MCA aneurysm in 36-year-old male, no prior SAH = PHASES score 4 = 5-year rupture risk approximately 3.0%.\n  TREATMENT RISK: Surgical clipping or endovascular coiling at experienced centre: 2-3% major morbidity/mortality for small MCA aneurysm.\n  DECISION: Risk of treatment approximately equal to natural history risk at 5 years — observation with annual MRA monitoring recommended rather than prophylactic intervention.\n  BLOOD PRESSURE CONTROL: Optimise BP to <130/80 — important modifier of aneurysm rupture risk.\n\nCONCLUSION: Conservative management with annual MRA monitoring. BP optimisation essential. No immediate intervention required for 4mm aneurysm."
+            "description": "NEUROVASCULAR CONSULTATION — UNRUPTURED INTRACRANIAL ANEURYSM\n\nReferral: 4 mm saccular aneurysm at left MCA bifurcation identified on MRA.\n\nNEUROVASCULAR MDT ASSESSMENT:\n  RUPTURE RISK: PHASES score for 4 mm MCA aneurysm in 36-year-old male, no prior SAH = PHASES score 4; estimated 5-year rupture risk approximately 3.0%.\n  TREATMENT RISK: Surgical clipping or endovascular coiling at an experienced centre carries approximately 2-3% major morbidity/mortality for small MCA aneurysms of this size.\n  ASSESSMENT: Treatment risk approximates natural history rupture risk at 5 years. Blood pressure is a modifiable risk factor for aneurysm growth and rupture. Imaging follow-up may be considered. Clinical correlation recommended."
           }
         ],
         "quantitative_data": null,
-        "impression": "4mm MCA aneurysm: conservative management with annual MRA; PHASES score = 3.0% 5-year rupture risk ≈ treatment risk; optimise BP <130/80",
+        "impression": "4 mm saccular left MCA bifurcation aneurysm. PHASES score 4; estimated 5-year rupture risk approximately 3.0%. Treatment risk approximates natural history risk. Clinical correlation recommended.",
         "recommended_actions": []
       }
     },
@@ -255,16 +301,16 @@
       "trigger_action": "search_familial_intracranial_aneurysm_screening",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Familial Intracranial Aneurysm (FIA) Screening\n\nKEY FINDINGS:\n1. DEFINITION: FIA defined as ≥2 first- or second-degree relatives with intracranial aneurysm; in this family, father had SAH + patient has aneurysm = confirmed FIA family\n2. SCREENING: UK and international guidelines recommend MRA screening for first-degree relatives of SAH patients; one affected sibling = 4x increased risk; two affected relatives = 8x increased risk\n3. SCREENING AGE: First-degree relatives age 20-70 should be offered MRA screening; repeat every 5-7 years if negative\n4. THIS PATIENT: Already confirmed aneurysm — monitoring established; patient's sister should also be offered MRA screening (first-degree relative of SAH patient)\n5. RISK FACTORS: Hypertension, smoking, excessive alcohol are modifiable risk factors for aneurysm rupture; all should be addressed\n\nCONCLUSION: Familial intracranial aneurysm confirmed; patient's sister should be offered MRA screening; annual monitoring for patient.",
-        "summary": "FIA confirmed; patient's sister should be offered MRA screening; annual monitoring established; BP control, smoking cessation, alcohol reduction are key risk modifiers"
+        "report": "LITERATURE SEARCH: Familial Intracranial Aneurysm (FIA) — Screening Evidence\n\nKEY FINDINGS:\n1. DEFINITION: FIA is typically defined as ≥2 first- or second-degree relatives with intracranial aneurysm or subarachnoid haemorrhage\n2. SCREENING: UK and international guidelines recommend MRA screening for first-degree relatives of patients who have had SAH; relative risk is approximately 4x higher in first-degree relatives of affected individuals; further increased with ≥2 affected relatives\n3. SCREENING AGE: First-degree relatives aged 20-70 are generally offered MRA screening; repeat intervals vary (commonly every 5-7 years if initially negative)\n4. MODIFIABLE RISK FACTORS: Hypertension, smoking, and excessive alcohol intake are established modifiable risk factors for aneurysm growth and rupture in population studies\n\nClinical correlation recommended.",
+        "summary": "First-degree relatives of SAH patients have approximately 4x increased intracranial aneurysm risk; screening with MRA is recommended; hypertension and smoking are key modifiable risk factors"
       }
     },
     {
       "trigger_action": "search_hemiplegic_migraine_propranolol_treatment_failure",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Hemiplegic Migraine with Propranolol Treatment Failure\n\nKEY FINDINGS:\n1. PROPRANOLOL FOR HEMIPLEGIC MIGRAINE: Some benefit but not first-line; more commonly recommended are verapamil, topiramate, or acetazolamide for HM prevention\n2. TRIPTAN USE IN HM: Triptans are CAUTIONED (not absolutely contraindicated) in hemiplegic migraine; most guidelines advise against them\n3. THIS CASE: Two further episodes on propranolol — consider switching preventive to topiramate or verapamil\n4. EFFECT OF PROPRANOLOL ON BLOOD PRESSURE: Current BP 136/84 on propranolol — consider adding amlodipine or ARB for BP target <130/80 (also reduces aneurysm risk)\n5. ANEURYSM IMPLICATION: Migrainous aura can cause cortical spreading depression near the aneurysm territory — theoretical concern (not evidence-based); primary goal is aneurysm monitoring and BP control\n\nCONCLUSION: Switch preventive from propranolol to topiramate 25-100 mg/day; add amlodipine for BP <130/80.",
-        "summary": "Propranolol failed (2 further episodes); switch to topiramate; add amlodipine for BP <130/80 (both migraine prevention and aneurysm risk reduction)"
+        "report": "LITERATURE SEARCH: Hemiplegic Migraine — Preventive Therapy Options\n\nKEY FINDINGS:\n1. PROPRANOLOL IN HEMIPLEGIC MIGRAINE: Beta-blockers have some supportive use in general migraine prevention; verapamil, topiramate, and acetazolamide have more specific evidence for hemiplegic migraine prevention\n2. TRIPTAN USE IN HM: Triptans are cautioned (not absolutely contraindicated by all guidelines) in hemiplegic migraine due to vasoconstrictive mechanism during motor aura\n3. PREVENTIVE OPTIONS AFTER PROPRANOLOL FAILURE: Topiramate (25-100 mg/day) and verapamil are commonly used second-line options in hemiplegic migraine\n4. BLOOD PRESSURE: Hypertension is a well-established modifiable risk factor for both cardiovascular events and intracranial aneurysm rupture; adequate blood pressure management is important in this population\n\nClinical correlation recommended.",
+        "summary": "Topiramate and verapamil are commonly used when propranolol is insufficient for hemiplegic migraine; triptans are cautioned; blood pressure management is important with comorbid vascular considerations"
       }
     },
     {
@@ -280,17 +326,105 @@
       "trigger_action": "search_aneurysm_triptan_interaction",
       "tool_name": "check_drug_interactions",
       "output": {
-        "report": "DRUG REVIEW — TRIPTANS WITH UNRUPTURED INTRACRANIAL ANEURYSM\n\nQuery: Triptan use in a patient with confirmed unruptured 4mm MCA aneurysm\n\nFINDINGS:\n  Triptans cause vasoconstriction of intracranial vessels via 5-HT1B receptors. Theoretical concern about vasoconstriction at an aneurysm wall during migraine headache.\n  EVIDENCE: No clinical studies specifically address triptan safety in unruptured intracranial aneurysm. The risk is largely theoretical.\n  CURRENT CONSENSUS: Most headache specialists avoid triptans when unruptured intracranial aneurysm is known — theoretical concern plus already cautioned in hemiplegic migraine.\n  RECOMMENDATION: Avoid triptans in this patient — both for hemiplegic migraine (cautioned) and for unruptured aneurysm (theoretical but precautionary).\n\nCONCLUSION: Avoid triptans — paracetamol + NSAIDs for acute headache; topiramate for prevention.",
-        "summary": "Triptans cautioned/avoided in unruptured intracranial aneurysm (theoretical vasoconstriction risk) and in hemiplegic migraine; use paracetamol + NSAIDs for acute treatment"
+        "proposed": "triptans in patient with unruptured 4mm MCA aneurysm and hemiplegic migraine",
+        "interactions": [],
+        "contraindications": [
+          "Triptans cautioned in hemiplegic migraine (vasoconstrictive mechanism during motor aura)",
+          "Triptans additionally avoided with known unruptured intracranial aneurysm — theoretical vasoconstriction at aneurysm wall during migraine"
+        ],
+        "warnings": [
+          "Avoid triptans in this patient — both hemiplegic migraine contraindication and precautionary aneurysm avoidance"
+        ],
+        "formulary_status": "avoid",
+        "alternatives": [
+          "paracetamol 1000 mg",
+          "NSAIDs (meloxicam 7.5-15 mg)",
+          "antiemetics as needed"
+        ]
       }
     },
     {
       "trigger_action": "search_bp_control_aneurysm_migraine",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Blood Pressure Control and Unruptured Intracranial Aneurysm Risk\n\nKEY FINDINGS:\n1. HYPERTENSION AS RISK FACTOR: Hypertension is the strongest modifiable risk factor for aneurysm growth and rupture (OR 2.5-3.0 for SAH in hypertensive vs normotensive)\n2. BP TARGET: <130/80 mmHg recommended for patients with known intracranial aneurysm\n3. CURRENT BP: 136/84 — needs further treatment; amlodipine 5 mg addition appropriate\n4. SMOKING: Never-smoker — very positive; continued smoking cessation counselling\n5. ALCOHOL REDUCTION: Heavy alcohol intake associated with aneurysm rupture; target <14 units/week (patient at 6-8 — acceptable)\n\nCONCLUSION: Add amlodipine 5 mg for BP target <130/80; continue non-smoking; annual MRA monitoring.",
-        "summary": "Hypertension is strongest modifiable aneurysm rupture risk factor; target BP <130/80; add amlodipine; continue non-smoking; annual MRA"
+        "report": "LITERATURE SEARCH: Blood Pressure Control and Unruptured Intracranial Aneurysm Risk\n\nKEY FINDINGS:\n1. HYPERTENSION AS RISK FACTOR: Hypertension is one of the strongest modifiable risk factors for aneurysm growth and rupture (OR approximately 2.5-3.0 for SAH in hypertensive vs normotensive individuals in population studies)\n2. BP TARGET: A target below 130/80 mmHg is generally recommended in guidelines for patients with known intracranial aneurysm\n3. SMOKING: Tobacco smoking is independently associated with aneurysm formation and rupture risk\n4. ALCOHOL: Heavy alcohol intake (more than 14 units/week) is associated with increased aneurysm rupture risk in population data\n\nClinical correlation recommended.",
+        "summary": "Hypertension and smoking are the strongest modifiable risk factors for aneurysm rupture; blood pressure targets below 130/80 are generally recommended in patients with known intracranial aneurysm"
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": null,
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "echo": {
+      "chambers": {
+        "LV": "normal size and systolic function",
+        "RV": "normal size and function",
+        "LA": "normal size",
+        "RA": "normal size"
+      },
+      "valves": {
+        "mitral": "structurally normal",
+        "aortic": "structurally normal",
+        "tricuspid": "normal",
+        "pulmonic": "normal"
+      },
+      "ejection_fraction": 58.0,
+      "wall_motion": "no regional wall-motion abnormality",
+      "findings": [
+        "Trace mitral regurgitation, physiological. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Structurally near-normal heart with a benign incidental finding.",
+      "recommended_actions": []
+    },
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 50,
+        "max": 114,
+        "average": 71
+      },
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "impression": "Normal 24-hour Holter monitor.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": {
+      "modality": "MRA",
+      "tracer_or_protocol": null,
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "No acute or structural abnormality identified. Clinical correlation recommended.",
+      "recommended_actions": []
+    },
+    "specialized_test": null,
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

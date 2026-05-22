@@ -53,13 +53,13 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert, fully oriented. Fluent speech, normal repetition, normal comprehension, normal confrontation naming — no language impairment between episodes.",
+      "cranial_nerves": "Normal cranial nerves II-XII. Visual fields full. PERRLA. No papilledema. No carotid bruit.",
+      "motor": "Motor 5/5 throughout. No pronator drift.",
+      "sensory": "Sensation intact to light touch and pinprick bilaterally.",
+      "reflexes": "Deep tendon reflexes 2+ symmetric. No Babinski.",
+      "coordination": "Coordination normal.",
+      "gait": "Gait normal."
     },
     "vitals": {
       "bp_systolic": 120,
@@ -183,8 +183,21 @@
       "Prior brief visual episodes 5-10 years ago represent early incomplete visual aura — this woman had migraine predisposition long before overt aphasic aura episodes",
       "Puzzle difficulty: aphasia at age 52 with vascular risk factors in a post-menopausal woman strongly suggests TIA to most initial assessors; complete workup is negative"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Expressive aphasia in a 52-year-old post-menopausal woman with hypertension and hypercholesterolaemia — high TIA suspicion",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Age, sex, vascular risk factors (HTN, hypercholesterolaemia, prediabetes) make TIA the first concern",
+        "correct_interpretation": "Gradual 5-8 min onset + subsequent migrainous headache + normal DWI/MRA/Holter/echo = migraine with aphasic aura; TIA workup was appropriate but negative"
+      },
+      {
+        "data_point": "Late-onset first migraine aura at age 52 — unusual timing raises secondary cause concern",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Migraine with aura is typically diagnosed in younger adults; new onset in post-menopausal women is unusual",
+        "correct_interpretation": "Post-menopausal oestrogen decline alters CSD threshold; late-onset de novo migraine aura is a recognised entity; prior brief visual flashes 5-10 years ago confirm earlier predisposition; not secondary cause"
+      }
+    ],
+    "icd_code": "G43.1"
   },
   "red_herrings": [
     {
@@ -201,28 +214,50 @@
   "metadata": {
     "condition_name": "Migraine with aphasic aura — late-onset in postmenopausal woman; TIA mimicry",
     "difficulty_description": "Diagnostic puzzle: expressive aphasia at 52 with vascular risk factors looks exactly like TIA; key distinguishing features are gradual onset and subsequent headache; prior incomplete visual aura history overlooked",
-    "expected_agent_confidence": 0.38
+    "expected_agent_confidence": 0.38,
+    "fallback_tool_kinds": {
+      "csf": "normal",
+      "ct": "incidental",
+      "advanced_imaging": "normal",
+      "specialized_test": "normal",
+      "drug_interactions": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
-      "findings": [],
+      "findings": [
+        {
+          "type": "normal",
+          "location": "entire brain including perisylvian regions",
+          "size": null,
+          "signal_characteristics": {
+            "DWI": "no restriction",
+            "FLAIR": "no periventricular or cortical signal change",
+            "T1+Gd": "no enhancement"
+          },
+          "mass_effect": "none",
+          "borders": null
+        }
+      ],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "See findings above. Clinical correlation recommended.",
+      "impression": "Normal MRI brain. No DWI restriction. Normal carotid and intracranial MRA — no stenosis or occlusion. No mass or enhancing lesion. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
     },
     "eeg": {
       "classification": "abnormal",
-      "background": {},
+      "background": {
+        "dominant_rhythm": "9 Hz posterior dominant rhythm",
+        "symmetry": "mildly asymmetric — left temporal-parietal slowing",
+        "reactivity": "reactive"
+      },
       "findings": [],
       "artifacts": [],
       "activating_procedures": {},
-      "confidence": 0.0,
-      "impression": "Mild non-specific left temporal-parietal slowing; no left temporal epileptiform discharges; no ictal aphasia pattern. Clinical correlation recommended.",
+      "impression": "This is an ABNORMAL EEG due to: 1. Mild non-specific left temporal-parietal slowing. No epileptiform discharges. No electrographic seizures recorded. Clinical correlation recommended.",
       "limitations": "",
       "recommended_actions": [
         "Clinical correlation recommended."
@@ -236,7 +271,7 @@
       "findings": [
         "ELECTROCARDIOGRAM\nRHYTHM: Sinus rhythm 72 bpm. PR 158 ms. QRS 90 ms. QTc: 418 ms. Normal axis. No AF. No LVH by voltage.\nINTERPRETATION: Normal ECG. No atrial fibrillation."
       ],
-      "interpretation": "See report details above.",
+      "interpretation": "Normal sinus rhythm 72 bpm. No atrial fibrillation. Normal intervals.",
       "clinical_correlation": ""
     },
     "labs": {
@@ -256,10 +291,14 @@
       "trigger_action": "request_cardiac_monitoring_af_screen",
       "tool_name": "order_cardiac_monitoring",
       "output": {
-        "duration_hours": 0,
-        "monitor_type": "",
+        "duration_hours": 48,
+        "monitor_type": "holter_48h",
         "rhythm_summary": "No AF on 48-hour Holter; no paroxysmal arrhythmia; sinus rhythm throughout",
-        "heart_rate_range": {},
+        "heart_rate_range": {
+          "min": 52,
+          "max": 108,
+          "average": 72
+        },
         "events": [],
         "findings": [],
         "impression": "No AF on 48-hour Holter; no paroxysmal arrhythmia; sinus rhythm throughout",
@@ -275,9 +314,9 @@
         "ejection_fraction": null,
         "wall_motion": null,
         "findings": [
-          "TRANSTHORACIC ECHOCARDIOGRAM WITH BUBBLE STUDY\n\nFindings: Normal LV function, EF 62%. Normal wall thickness. Normal valves — no mitral valve prolapse, no thickened leaflets. No intra-cardiac thrombus. Normal LA size.\n\nBUBBLE STUDY: No PFO detected. No microbubbles crossing to left atrium at rest or on Valsalva.\n\nIMPRESSION: Normal echocardiogram. No PFO. No cardioembolic source identified."
+          "TRANSTHORACIC ECHOCARDIOGRAM WITH BUBBLE STUDY\n\nFindings: Normal LV function, EF 62%. Normal wall thickness. Normal valves — no mitral valve prolapse, no thickened leaflets. No intra-cardiac thrombus. Normal LA size.\n\nBUBBLE STUDY: No PFO detected. No microbubbles crossing to left atrium at rest or on Valsalva.\n\nIMPRESSION: Normal transthoracic echocardiogram. No PFO on bubble study."
         ],
-        "impression": "Normal echocardiogram; no PFO; no cardioembolic source; normal LA",
+        "impression": "Normal transthoracic echocardiogram. No PFO on bubble study. Normal LA size. Normal systolic function.",
         "recommended_actions": []
       }
     },
@@ -285,8 +324,15 @@
       "trigger_action": "search_aphasic_migraine_aura_diagnosis",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Migraine with Aphasic Aura — Diagnosis and TIA Differentiation\n\nKEY FINDINGS:\n1. ICHD-3 MIGRAINE WITH APHASIC AURA: Language symptoms (expressive aphasia, word-finding difficulty, paraphasias) as the aura — recognised ICHD-3 variant; develops gradually over ≥5 min, lasts 5-60 min, followed by headache within 60 min\n2. ONSET PATTERN: Gradual onset over 5-8 minutes with subsequent headache is KEY differentiating feature from TIA (abrupt onset, no subsequent headache)\n3. TIA APHASIA: TIA produces sudden-onset aphasia, usually with receptive or global component; negative symptoms; no subsequent headache in most TIA cases\n4. LATE-ONSET MIGRAINE AURA: Migraine with aura can present de novo in peri/post-menopausal women; oestrogen decline may alter CSD threshold\n5. PRIOR BRIEF VISUAL EPISODES: Brief 'colours in vision' 5-10 years ago likely represent early incomplete visual aura — retrospectively confirms migraine predisposition\n6. FAMILY HISTORY: Husband with visual migraine aura — supports familial migraine tendency (household exposure and shared genetics less likely, but genetic counselling note)\n\nCONCLUSION: Three episodes meeting ICHD-3 criteria for migraine with aphasic aura. Normal DWI, normal MRA, normal cardiac workup — TIA excluded.",
-        "summary": "Gradual 5-8 min onset aphasia followed by headache = aphasic migraine aura; TIA is abrupt-onset; ICHD-3 criteria met with 3 episodes; prior visual flashes confirm longstanding predisposition"
+        "query": "migraine aphasic aura ICHD-3 TIA differentiation gradual onset late onset postmenopausal",
+        "results": [
+          {
+            "source": "ICHD-3; Cephalalgia; neurology review",
+            "finding": "ICHD-3 migraine with aphasic aura: language symptoms (expressive aphasia, word-finding difficulty, paraphasias) as the aura — develops gradually over ≥5 min, lasts 5-60 min, followed by headache within 60 min. Gradual onset over 5-8 minutes with subsequent headache is the KEY differentiating feature from TIA (abrupt onset, no subsequent headache). TIA produces sudden-onset aphasia, usually with receptive or global component. Migraine with aura can present de novo in peri/post-menopausal women — oestrogen decline alters CSD threshold. Prior brief visual episodes ('colours in vision') 5-10 years ago likely represent early incomplete visual aura.",
+            "evidence_level": "ICHD-3 classification; expert consensus"
+          }
+        ],
+        "summary": "ICHD-3 migraine with aphasic aura: language symptoms developing gradually over 5 minutes or more, lasting 5-60 minutes, followed by headache within 60 minutes. Abrupt-onset aphasia is characteristic of TIA; gradual onset with subsequent headache is characteristic of migraine aura. Prior brief visual episodes may represent incomplete visual aura in individuals with migraine predisposition."
       }
     },
     {
@@ -302,17 +348,96 @@
       "trigger_action": "search_aspirin_migraine_aura_role",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Aspirin Role in Migraine with Aura vs TIA Prevention\n\nKEY FINDINGS:\n1. TIA INDICATION: Aspirin indicated for secondary prevention after confirmed TIA (with or without DWI restriction).\n2. MIGRAINE WITH APHASIC AURA: No evidence that aspirin reduces migraine frequency or aura episodes; not recommended as migraine preventive.\n3. VASCULAR RISK: This patient has prediabetes, mild hypertension, and hypercholesterolaemia — aspirin has no proven benefit for primary cardiovascular prevention in 2024 guidelines (risk-benefit neutral to negative).\n4. RECOMMENDATION: Given the diagnosis is migraine with aphasic aura (not TIA), and no confirmed vascular event, aspirin can be discontinued. Focus on vascular risk factor modification (atorvastatin, lifestyle).\n\nCONCLUSION: Discontinue aspirin — prescribed empirically for suspected TIA; diagnosis now confirmed as migraine with aphasic aura. Continue atorvastatin. Address prediabetes and hypertension.",
-        "summary": "Aspirin not indicated for migraine with aura and not recommended for primary CV prevention; discontinue aspirin; continue atorvastatin; address prediabetes"
+        "query": "aspirin migraine with aura TIA prevention postmenopausal primary prevention 2024",
+        "results": [
+          {
+            "source": "NICE guidelines; AHA/ASA secondary prevention guidelines",
+            "finding": "Aspirin is indicated for secondary prevention after confirmed TIA or ischaemic stroke. There is no evidence that aspirin reduces migraine aura frequency or headache episodes; it is not recommended as a migraine-specific preventive. Current guidelines do not support aspirin for primary cardiovascular prevention in the absence of confirmed vascular events, given a neutral to negative risk-benefit balance. Statin therapy is appropriate for hypercholesterolaemia; lifestyle modification for borderline vascular risk factors is consistent with current guidance.",
+            "evidence_level": "Level A guideline recommendation"
+          }
+        ],
+        "summary": "Aspirin is indicated only for confirmed secondary prevention after TIA or stroke; it is not a recommended migraine preventive; current guidelines do not support aspirin for primary CV prevention in this risk profile. Statin therapy is recommended for hypercholesterolaemia."
       }
     },
     {
       "trigger_action": "search_migraine_preventive_postmenopausal",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Migraine with Aphasic Aura Prevention — Postmenopausal Woman\n\nKEY FINDINGS:\n1. INDICATION: Three disabling aphasic aura episodes in 4 months = preventive therapy clearly indicated\n2. OPTIONS: Topiramate 25-100 mg/day — Level A; no interaction with atorvastatin; monitor bicarbonate. Amitriptyline 10-50 mg QHS — Level B; care with QTc monitoring.\n3. VALPROATE: AVOID — associated with cognitive decline in older women; teratogenicity concern less relevant but cognitive effects relevant\n4. ANTI-CGRP: After first-line failure; no interactions with atorvastatin or aspirin; suitable option\n5. PREDIABETES + ATORVASTATIN: Topiramate may reduce appetite and weight, potentially beneficial in prediabetes\n\nCONCLUSION: Initiate topiramate 25 mg/day (titrating to 50-100 mg) as preferred first-line preventive in this postmenopausal woman.",
+        "query": "migraine prevention postmenopausal woman topiramate amitriptyline atorvastatin interactions",
+        "results": [
+          {
+            "source": "AAN/EAN migraine prevention guidelines; geriatric neurology review",
+            "finding": "Recurrent disabling migraine with aura at a frequency of ≥4 attacks per month is a recognised indication for preventive therapy. Topiramate 25-100 mg/day — Level A evidence for migraine prevention; no clinically significant interaction with atorvastatin; monitor serum bicarbonate. Amitriptyline 10-50 mg QHS — Level B; QTc monitoring is prudent in older patients. Valproate is generally avoided in older women due to association with cognitive decline. Anti-CGRP antibodies are an option after first-line agent failure; no interactions with statins.",
+            "evidence_level": "Level A (topiramate); Level B (amitriptyline)"
+          }
+        ],
         "summary": "Topiramate preferred preventive (Level A; weight-neutral/beneficial; no statin interaction); amitriptyline alternative; avoid valproate in older women"
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": null,
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [
+        {
+          "type": "calcification",
+          "location": "right frontal lobe",
+          "size": "3 mm",
+          "density": "hyperdense",
+          "description": "calcified focus consistent with an old, benign granuloma"
+        }
+      ],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. Incidental calcified granuloma, benign.",
+      "recommended_actions": []
+    },
+    "echo": null,
+    "cardiac_monitoring": null,
+    "advanced_imaging": {
+      "modality": "",
+      "tracer_or_protocol": null,
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "No abnormality identified on advanced imaging. Findings are non-contributory; clinical correlation recommended.",
+      "recommended_actions": []
+    },
+    "specialized_test": {
+      "test_type": "",
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "Study within normal limits. No abnormality identified; non-contributory.",
+      "recommended_actions": []
+    },
+    "literature_search": null,
+    "drug_interactions": {
+      "general": {
+        "proposed": "(agent not specified on this case's pathway)",
+        "interactions": [],
+        "contraindications": [],
+        "warnings": [
+          "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
+        ],
+        "formulary_status": "on formulary",
+        "alternatives": []
+      }
+    }
+  }
 }

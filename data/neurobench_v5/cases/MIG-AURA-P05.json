@@ -47,13 +47,13 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert, fully oriented. Fluent speech, normal confrontation naming, normal repetition — no language impairment between episodes. Slight gingival bleeding noted.",
+      "cranial_nerves": "Normal cranial nerves II-XII. Visual fields full. PERRLA. No papilledema. No carotid bruits.",
+      "motor": "Motor 5/5 throughout. No pronator drift.",
+      "sensory": "Sensation intact to light touch and pinprick bilaterally.",
+      "reflexes": "Deep tendon reflexes 2+ symmetric. No Babinski.",
+      "coordination": "Coordination normal.",
+      "gait": "Gait normal."
     },
     "vitals": {
       "bp_systolic": 120,
@@ -163,8 +163,21 @@
       "This is a patient safety case: overtreatment with anticoagulation for a misdiagnosed condition",
       "Diagnostic puzzle difficulty: the prior 'AF ECG' creates plausible TIA pathway; only careful review of original records and definitive re-investigation resolves the error"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Prior ECG reportedly showing 'intermittent AF' — TIA anticoagulation appeared justified",
+        "location": "patient.history_present_illness",
+        "intended_effect": "If AF was confirmed, TIA anticoagulation with warfarin is standard of care",
+        "correct_interpretation": "Review of original records showed a single rhythm strip during palpitations — not diagnostic AF; subsequent 48-hour Holter shows no AF; the original AF diagnosis was incorrect; warfarin was never indicated"
+      },
+      {
+        "data_point": "White matter changes on MRI — supporting TIA/vascular diagnosis",
+        "location": "patient.history_present_illness",
+        "intended_effect": "WMH are associated with cerebrovascular disease in older adults; original team interpreted them as TIA-related",
+        "correct_interpretation": "WMH are non-specific subcortical lesions consistent with longstanding migraine; no periventricular lesions, no lacunar infarcts, no large vessel territory changes; radiologist clearly stated 'non-specific, clinical correlation'"
+      }
+    ],
+    "icd_code": "G43.1"
   },
   "red_herrings": [
     {
@@ -181,27 +194,48 @@
   "metadata": {
     "condition_name": "Migraine with aphasic aura — misdiagnosed as TIA; warfarin overtreatment causing active bleeding",
     "difficulty_description": "Diagnostic puzzle: prior TIA misdiagnosis with warfarin treatment causing bleeding complications; recognising TIA misdiagnosis and appropriately stopping anticoagulation; supratherapeutic INR is urgent management priority",
-    "expected_agent_confidence": 0.38
+    "expected_agent_confidence": 0.38,
+    "fallback_tool_kinds": {
+      "csf": "normal",
+      "ct": "normal",
+      "advanced_imaging": "normal",
+      "specialized_test": "normal",
+      "drug_interactions": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
-      "findings": [],
+      "findings": [
+        {
+          "type": "white_matter_hyperintensity",
+          "location": "bilateral subcortical frontal and parietal",
+          "size": "3 foci; largest 4 mm",
+          "signal_characteristics": {
+            "FLAIR": "hyperintense",
+            "T2": "hyperintense",
+            "DWI": "no restriction"
+          },
+          "mass_effect": "none",
+          "borders": "punctate, non-confluent"
+        }
+      ],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "Non-specific WMH only (migraine pattern); no acute or prior infarction; normal MRA; no TIA-consistent lesions. Clinical correlation recommended.",
+      "impression": "Three non-specific bilateral subcortical white matter hyperintensities. No acute or prior infarction. Normal MRA — no stenosis or occlusion. No lacunar infarcts or periventricular signal change. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
     },
     "eeg": {
       "classification": "abnormal",
-      "background": {},
+      "background": {
+        "pdr": "8-9 Hz posterior dominant rhythm, symmetric",
+        "overall": "mild non-specific posterior slowing"
+      },
       "findings": [],
       "artifacts": [],
       "activating_procedures": {},
-      "confidence": 0.0,
       "impression": "Non-specific mild posterior slowing; no epileptiform activity. Clinical correlation recommended.",
       "limitations": "",
       "recommended_actions": [
@@ -236,10 +270,14 @@
       "trigger_action": "request_cardiac_monitoring_definitive_af_exclusion",
       "tool_name": "order_cardiac_monitoring",
       "output": {
-        "duration_hours": 0,
-        "monitor_type": "",
+        "duration_hours": 48,
+        "monitor_type": "holter_48h",
         "rhythm_summary": "No AF on 48-hour Holter; sinus rhythm throughout; prior AF diagnosis not confirmed",
-        "heart_rate_range": {},
+        "heart_rate_range": {
+          "min": 54,
+          "max": 106,
+          "average": 72
+        },
         "events": [],
         "findings": [],
         "impression": "No AF on 48-hour Holter; sinus rhythm throughout; prior AF diagnosis not confirmed",
@@ -265,8 +303,13 @@
       "trigger_action": "search_warfarin_cessation_migraine_aura_tia_misdiagnosis",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Anticoagulation Overtreatment in Misdiagnosed Migraine with Aphasic Aura\n\nKEY FINDINGS:\n1. TIA MISDIAGNOSIS RATE: Studies show 30-50% of TIA diagnoses are incorrect; most common mimics are migraine with aura and functional neurological disorders\n2. WARFARIN BLEEDING RISK: Long-term warfarin in patients without confirmed AF or documented TIA carries annual major bleeding risk ~2-3%/year (higher with supratherapeutic INR)\n3. STOPPING ANTICOAGULATION CRITERIA: In patients where TIA was not confirmed by imaging and where alternative diagnosis (migraine with aphasic aura) is established: anticoagulation can be safely discontinued\n4. MIGRAINE WITH APHASIC AURA: Four episodes each followed by migrainous headache; mother with visual migraine; prior visual sparkle episodes; normal Holter/echo/MRI — clear migraine diagnosis\n5. RECOMMENDATION: Stop warfarin; monitor patient without anticoagulation; aspirin only if genuine vascular risk factors are present\n\nCONCLUSION: Warfarin should be discontinued — diagnosis is migraine with aphasic aura, not TIA; no confirmed AF; no confirmed cerebral infarction; significant bleeding risk outweighs non-existent embolic prevention benefit.",
-        "summary": "Warfarin should be discontinued; diagnosis is migraine with aphasic aura not TIA; no confirmed AF or infarction; stop warfarin, avoid further bleeding risk"
+        "query": "warfarin cessation migraine aphasic aura TIA misdiagnosis anticoagulation overtreatment",
+        "results": [
+          {"title": "TIA Misdiagnosis and Anticoagulation Overtreatment", "authors": "Giles MF et al.", "year": "2010", "summary": "Studies show 30-50% of TIA diagnoses are incorrect; most common mimics are migraine with aura and functional neurological disorders; misdiagnosis leads to unnecessary anticoagulation and bleeding risk."},
+          {"title": "Warfarin Bleeding Risk Without Confirmed Indication", "authors": "Fang MC et al.", "year": "2011", "summary": "Long-term warfarin in patients without confirmed AF or documented cerebral infarction carries annual major bleeding risk ~2-3%/year, substantially higher with supratherapeutic INR."},
+          {"title": "Stopping Anticoagulation for TIA Mimics", "authors": "Ferro JM et al.", "year": "2016", "summary": "In patients where TIA diagnosis is refuted by imaging and alternative diagnosis (migraine with aura) is established, anticoagulation can be safely discontinued after definitive AF exclusion."}
+        ],
+        "summary": "Studies show 30-50% of TIA diagnoses are incorrect, with migraine with aura being a leading mimic. Long-term anticoagulation without confirmed indication carries significant annual major bleeding risk, especially when supratherapeutic. Anticoagulation can be safely discontinued when TIA diagnosis is refuted by imaging and AF is excluded on extended monitoring."
       }
     },
     {
@@ -282,17 +325,84 @@
       "trigger_action": "search_migraine_preventive_postmenopausal_warfarin_complication",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Migraine Prevention After Warfarin-Related Bleeding\n\nKEY FINDINGS:\n1. MIGRAINE PREVENTION INDICATION: Four episodes/year with disability = borderline; if attacks are disabling, preventive therapy appropriate\n2. NSAID CAUTION: After stopping warfarin, aspirin/NSAIDs for acute migraine — aspirin has some preventive benefit; NSAIDs for acute attacks\n3. POSTMENOPAUSAL CONSIDERATIONS: Amitriptyline or topiramate as first-line; anti-CGRP antibodies well-tolerated\n4. KEY PRIORITY: After stopping warfarin, ensure no hidden AF — consider extended Holter or event recorder if any palpitations\n\nCONCLUSION: Initiate migraine preventive therapy (topiramate or amitriptyline); ensure no hidden AF before stopping anticoagulation (48-hour Holter negative here).",
-        "summary": "Preventive therapy appropriate; topiramate or amitriptyline first-line; NSAID for acute attacks after stopping warfarin; extended monitoring for hidden AF if any palpitations"
+        "query": "migraine preventive therapy postmenopausal woman after warfarin bleeding complication",
+        "results": [
+          {"title": "Migraine Prevention in Postmenopausal Women", "authors": "Brandes JL.", "year": "2006", "summary": "Amitriptyline and topiramate are first-line preventive agents; anti-CGRP monoclonal antibodies well-tolerated in postmenopausal women; hormone therapy interactions minimised after natural menopause."},
+          {"title": "Preventive Therapy Indication in Recurrent Disabling Migraine", "authors": "Silberstein SD et al.", "year": "2012", "summary": "Four disabling migraine attacks per year or more = standard indication for preventive therapy; topiramate 25-100 mg/day or amitriptyline 10-25 mg QHS are recommended first-line options."},
+          {"title": "Acute Migraine Treatment and Anticoagulation", "authors": "Diener HC et al.", "year": "2019", "summary": "In patients with migraine who are not receiving anticoagulation, NSAIDs and triptans are established acute treatment options; aspirin 900 mg has both acute and mild preventive benefit; combined OCP is contraindicated in migraine with aura regardless of anticoagulant status."}
+        ],
+        "summary": "Topiramate (25-100 mg/day, Level A) and amitriptyline (10-25 mg QHS, Level B) are recommended first-line preventive options for recurrent disabling migraine in postmenopausal women; anti-CGRP monoclonal antibodies are well-tolerated in this population. NSAIDs and triptans are the established acute treatment options for migraine in patients not receiving anticoagulation."
       }
     },
     {
       "trigger_action": "search_aphasic_aura_onset_recognition",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Gradual Onset as Key Distinguishing Feature of Aphasic Migraine Aura\n\nKEY FINDINGS:\n1. GRADUAL ONSET (5-10 min): Aphasia that develops gradually over 5-10 minutes is characteristic of CSD propagation; TIA aphasia is maximal at onset\n2. SUBSEQUENT HEADACHE: Presence of severe migrainous headache following each aphasic episode in this patient is highly characteristic of migraine (TIA does not predictably cause migrainous headache)\n3. MOTHER WITH VISUAL AURA: First-degree relative with migraine with aura strongly supports familial migraine predisposition\n4. PRIOR VISUAL SPARKLES: Brief visual phenomena over several years before aphasic episodes = early incomplete visual aura establishing migraine predisposition chronologically preceding aphasic aura\n\nCONCLUSION: All features support migraine with aphasic aura; systematic misdiagnosis as TIA was an error compounded by a likely artefactual ECG rhythm strip.",
-        "summary": "Gradual 5-10 min onset + consistent subsequent headache + family history + prior visual phenomena = clear migraine with aphasic aura; TIA misdiagnosis was an error"
+        "query": "aphasic migraine aura gradual onset cortical spreading depression TIA differentiation",
+        "results": [
+          {"title": "Gradual vs Abrupt Onset in Transient Aphasia: Migraine vs TIA", "authors": "Cammermans E et al.", "year": "2015", "summary": "Aphasia developing gradually over 5-10 minutes is characteristic of CSD propagation in migraine; TIA aphasia is maximal at onset and does not characteristically progress gradually; this distinction has ~85% sensitivity for migraine when combined with subsequent headache."},
+          {"title": "Subsequent Migrainous Headache After Transient Aphasia", "authors": "Olesen J.", "year": "2018", "summary": "Severe migrainous headache following each transient aphasic episode is highly characteristic of migraine with aura; TIA does not predictably cause ipsilateral migrainous headache; this temporal pattern has high diagnostic specificity for migraine."},
+          {"title": "Family History and Prior Visual Aura in Migraine Predisposition", "authors": "Russell MB et al.", "year": "1996", "summary": "First-degree relative with migraine with aura strongly supports familial migraine; prior visual sparkle phenomena preceding aphasic episodes establish migraine predisposition temporally preceding aphasic aura; combined features confirm migraine diagnosis."}
+        ],
+        "summary": "Gradual onset of aphasia over 5-10 minutes combined with a consistent subsequent migrainous headache has approximately 85% sensitivity for migraine with aphasic aura when TIA produces abrupt maximal-onset aphasia. Family history of visual migraine aura and prior brief visual phenomena provide additional support for migraine predisposition. Single rhythm strip recordings are not equivalent to diagnostic criteria for atrial fibrillation, which require at least 30 seconds of irregular rhythm on a standard recording."
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": null,
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "echo": null,
+    "cardiac_monitoring": null,
+    "advanced_imaging": {
+      "modality": "MRA",
+      "tracer_or_protocol": null,
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "No abnormality identified on advanced imaging. Findings are non-contributory; clinical correlation recommended.",
+      "recommended_actions": []
+    },
+    "specialized_test": {
+      "test_type": "general_laboratory_panel",
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "Study within normal limits. No abnormality identified; non-contributory.",
+      "recommended_actions": []
+    },
+    "literature_search": null,
+    "drug_interactions": {
+      "general": {
+        "proposed": "(agent not specified on this case's pathway)",
+        "interactions": [],
+        "contraindications": [],
+        "warnings": [
+          "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
+        ],
+        "formulary_status": "on formulary",
+        "alternatives": []
+      }
+    }
+  }
 }

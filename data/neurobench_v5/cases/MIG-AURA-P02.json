@@ -47,13 +47,13 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert, fully oriented. Fluent speech with normal language function between episodes — normal confrontation naming, repetition, comprehension.",
+      "cranial_nerves": "Normal cranial nerves II-XII. Visual fields full. PERRLA. No papilledema. No carotid bruits.",
+      "motor": "Motor 5/5 throughout. No pronator drift.",
+      "sensory": "Sensation intact to light touch and pinprick bilaterally.",
+      "reflexes": "Deep tendon reflexes 2+ symmetric. No Babinski.",
+      "coordination": "Coordination normal.",
+      "gait": "Gait normal. Mild central adiposity noted; no gait impairment."
     },
     "vitals": {
       "bp_systolic": 120,
@@ -178,8 +178,21 @@
       "Heavy alcohol (12-15 units/week) is a major modifier — drives nocturnal vagally-mediated AF and lowers migraine threshold; alcohol reduction addresses both conditions",
       "Diagnostic puzzle difficulty: confirmed PAF creates enormous clinical pressure to diagnose all aphasic episodes as TIA; only ILR temporal analysis resolves this"
     ],
-    "red_herrings": [],
-    "icd_code": ""
+    "red_herrings": [
+      {
+        "data_point": "Confirmed paroxysmal AF on Holter — attributing all aphasic episodes to cardioembolic TIA",
+        "location": "patient.history_present_illness",
+        "intended_effect": "Paroxysmal AF is a confirmed cause of cryptogenic stroke; aphasia in a patient with AF = TIA until proven otherwise",
+        "correct_interpretation": "ILR shows AF and aphasic episodes are temporally dissociated — AF is nocturnal, aphasic episodes occur during daytime in sinus rhythm; the AF is a separate condition (alcohol-driven, vagally-mediated) co-existing with migraine with aphasic aura"
+      },
+      {
+        "data_point": "Moderate PFO on TOE — potential additional cardioembolic mechanism",
+        "location": "followup_outputs.order_echocardiogram.impression",
+        "intended_effect": "Moderate PFO in a patient with aphasic episodes and confirmed AF might suggest PFO closure recommendation",
+        "correct_interpretation": "Apixaban anticoagulation covers both AF and PFO embolism risk; ILR shows no temporal correlation with symptoms; PFO closure not indicated"
+      }
+    ],
+    "icd_code": "G43.1"
   },
   "red_herrings": [
     {
@@ -196,27 +209,49 @@
   "metadata": {
     "condition_name": "Migraine with aphasic aura co-existing with incidental paroxysmal AF — ILR temporal dissociation is the key diagnostic finding",
     "difficulty_description": "Diagnostic puzzle: confirmed PAF with aphasic episodes creates strong TIA presumption; only ILR temporal correlation analysis resolves the diagnostic question; alcohol as shared modifiable risk for both conditions",
-    "expected_agent_confidence": 0.35
+    "expected_agent_confidence": 0.35,
+    "fallback_tool_kinds": {
+      "csf": "normal",
+      "ct": "normal",
+      "advanced_imaging": "normal",
+      "specialized_test": "normal",
+      "drug_interactions": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
-      "findings": [],
+      "findings": [
+        {
+          "type": "white_matter_hyperintensity",
+          "location": "bilateral subcortical white matter, periventricular",
+          "size": "punctate to small (<5 mm)",
+          "signal_characteristics": {
+            "DWI": "no restriction",
+            "FLAIR": "hyperintense",
+            "T1+Gd": "no enhancement"
+          },
+          "mass_effect": "none",
+          "borders": "well-defined"
+        }
+      ],
       "volumetrics": null,
       "additional_observations": [],
-      "impression": "No DWI restriction; no lacunar infarcts; non-specific WMH only; normal MRA; DWI-negative does not fully exclude TIA in context of confirmed PAF. Clinical correlation recommended.",
+      "impression": "No DWI restriction. No lacunar infarcts. Non-specific bilateral subcortical white matter hyperintensities. Normal MRA — no stenosis or occlusion. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
     },
     "eeg": {
       "classification": "abnormal",
-      "background": {},
+      "background": {
+        "dominant_rhythm": "9-10 Hz posterior dominant rhythm",
+        "symmetry": "mild posterior slowing",
+        "reactivity": "reactive"
+      },
       "findings": [],
       "artifacts": [],
       "activating_procedures": {},
-      "confidence": 0.0,
       "impression": "Non-specific posterior slowing; no left temporal epileptiform discharges. Clinical correlation recommended.",
       "limitations": "",
       "recommended_actions": [
@@ -251,13 +286,24 @@
       "trigger_action": "request_prolonged_cardiac_monitoring_implantable",
       "tool_name": "order_cardiac_monitoring",
       "output": {
-        "duration_hours": 0,
-        "monitor_type": "",
-        "rhythm_summary": "CRITICAL FINDING: AF and aphasic episodes are temporally dissociated — AF occurs during sleep; aphasic episodes occur in sinus rhythm during daytime; not AF-related TIA",
-        "heart_rate_range": {},
-        "events": [],
+        "duration_hours": 720,
+        "monitor_type": "implantable_loop_recorder",
+        "rhythm_summary": "Paroxysmal AF detected — episodes nocturnal; sinus rhythm throughout daytime recording period",
+        "heart_rate_range": {
+          "min": 48,
+          "max": 142,
+          "average": 74
+        },
+        "events": [
+          {
+            "type": "paroxysmal_AF",
+            "timing": "nocturnal (01:30-01:52)",
+            "duration_minutes": 22,
+            "correlation_with_symptoms": "none — patient asleep; aphasic episodes occurred during daytime in sinus rhythm"
+          }
+        ],
         "findings": [],
-        "impression": "CRITICAL FINDING: AF and aphasic episodes are temporally dissociated — AF occurs during sleep; aphasic episodes occur in sinus rhythm during daytime; not AF-related TIA",
+        "impression": "Paroxysmal AF detected during nocturnal recording periods. Sinus rhythm during all daytime recording intervals. Clinical correlation recommended.",
         "recommended_actions": []
       }
     },
@@ -270,9 +316,9 @@
         "ejection_fraction": null,
         "wall_motion": null,
         "findings": [
-          "TRANSOESOPHAGEAL ECHOCARDIOGRAM\n\nIndication: Paroxysmal AF; TIA vs migraine; LA thrombus assessment; PFO screen\n\nFindings: Normal LV function, EF 60%. Mildly enlarged left atrium (LAD 40mm — borderline). Normal valves. No mitral valve prolapse.\n\nLA APPENDAGE: No thrombus in LAA. No spontaneous echo contrast ('smoke'). Normal LAA velocities 42 cm/s.\n\nBUBBLE STUDY via TOE: Small PFO detected — with moderate shunt on Valsalva (7-10 microbubbles).\n\nNOTE: Moderate PFO in context of confirmed AF — combined embolism risk is higher than either alone. However, temporal ILR evidence shows aphasic episodes occur in sinus rhythm — not AF-triggered emboli. PFO + AF management: anticoagulation with apixaban covers both; PFO closure not indicated additionally.\n\nIMPRESSION: No LA thrombus. Moderate PFO with borderline LA enlargement (AF substrate). Apixaban covers AF and PFO thromboembolism risk."
+          "TRANSOESOPHAGEAL ECHOCARDIOGRAM\n\nIndication: Paroxysmal AF; LA thrombus assessment; PFO screen\n\nFindings: Normal LV function, EF 60%. Mildly enlarged left atrium (LAD 40mm — borderline). Normal valves. No mitral valve prolapse.\n\nLA APPENDAGE: No thrombus in LAA. No spontaneous echo contrast ('smoke'). Normal LAA velocities 42 cm/s.\n\nBUBBLE STUDY via TOE: Moderate PFO detected — 7-10 microbubbles on Valsalva.\n\nIMPRESSION: No LA thrombus. Moderate PFO on bubble study. Borderline LA enlargement."
         ],
-        "impression": "No LA thrombus; moderate PFO (covered by apixaban anticoagulation); borderline LA enlargement; no additional PFO closure needed given anticoagulation",
+        "impression": "No LA thrombus. Moderate PFO on bubble study. Borderline LA enlargement. Normal LV systolic function. Clinical correlation recommended.",
         "recommended_actions": []
       }
     },
@@ -280,8 +326,15 @@
       "trigger_action": "search_parafasic_migraine_aura_af_temporal_correlation",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Temporal Correlation of AF and TIA Episodes — Using ILR Evidence\n\nKEY FINDINGS:\n1. ILR EVIDENCE: Multiple studies show that AF detected on prolonged cardiac monitoring may not be the cause of the index TIA/TIA-like event — particularly when temporal correlation is absent\n2. DUAL PATHOLOGY: Some patients have both paroxysmal AF and migraine with aura — these are independent conditions with different management implications\n3. NOCTURNAL AF: AF occurring exclusively during sleep/rest is a distinct phenotype (vagally-mediated AF) — often triggered by alcohol and high vagal tone during sleep\n4. ALCOHOL AND AF: Heavy alcohol use is strongly associated with AF (holiday heart syndrome); reducing alcohol can reduce AF episodes significantly\n5. MIGRAINE + AF SHARED RISK: Growing evidence for shared genetic risk between migraine with aura and AF (both involve ion channel pathways — KCNK2, CACNA1A)\n\nCONCLUSION: ILR shows no temporal correlation between AF episodes and aphasic symptoms — AF is a separate condition requiring anticoagulation but NOT the cause of aphasic episodes. Aphasic episodes are migraine with aphasic aura.",
-        "summary": "ILR temporal dissociation proves AF is not causing aphasic episodes; nocturnal vagally-mediated AF secondary to heavy alcohol; migraine + AF are co-existing independent conditions"
+        "query": "ILR implantable loop recorder AF temporal correlation TIA migraine aphasic aura dissociation",
+        "results": [
+          {
+            "source": "Heart; CRYSTAL AF trial; Neurology AF-stroke literature",
+            "finding": "AF detected on prolonged cardiac monitoring may not be the cause of the index TIA/TIA-like event — particularly when temporal correlation is absent. Some patients have both paroxysmal AF and migraine with aura — independent conditions. Nocturnal AF (vagally-mediated) is a distinct phenotype often triggered by alcohol and high vagal tone during sleep. Heavy alcohol use is strongly associated with AF (holiday heart syndrome); reducing alcohol can significantly reduce AF episodes. Growing evidence for shared genetic risk between migraine with aura and AF.",
+            "evidence_level": "CRYSTAL AF trial; ILR studies; observational"
+          }
+        ],
+        "summary": "ILR temporal correlation between detected AF episodes and neurological symptoms is the critical analytical step in distinguishing cardioembolic TIA from migraine with aura in patients with both conditions. Nocturnal vagally-mediated AF is a distinct phenotype often associated with alcohol use and parasympathetic tone during sleep. Shared genetic risk between migraine with aura and AF has been reported."
       }
     },
     {
@@ -297,7 +350,14 @@
       "trigger_action": "search_alcohol_reduction_af_migraine",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Alcohol Reduction — Impact on AF and Migraine\n\nKEY FINDINGS:\n1. AF AND ALCOHOL: REDUCE-AF trial (2020): reducing alcohol consumption from >10 units/week reduced AF recurrence by 37% compared with no reduction; alcohol is a potent AF trigger\n2. MIGRAINE AND ALCOHOL: Alcohol (particularly red wine) is a migraine trigger in ~30% of migraineurs; reduces CSD threshold via histamine, tannins, and vasodilatory effects\n3. LIVER IMPACT: GGT/ALT elevation consistent with alcohol-related hepatic stress — alcohol reduction will normalise liver enzymes\n4. TARGET: <7 units/week for cardiovascular health; ideally <14 units/week (NICE); this patient is at 12-15 units — significant reduction needed\n\nCONCLUSION: Alcohol reduction is a priority intervention affecting both AF (reduce recurrence) and migraine (reduce trigger load) and liver enzymes.",
+        "query": "alcohol reduction atrial fibrillation REDUCE-AF migraine trigger liver enzymes",
+        "results": [
+          {
+            "source": "REDUCE-AF trial (NEJM 2020); migraine trigger literature",
+            "finding": "REDUCE-AF trial (2020): reducing alcohol consumption from >10 units/week reduced AF recurrence by 37% compared with no reduction; alcohol is a potent AF trigger. Alcohol (particularly red wine) is a migraine trigger in ~30% of migraineurs; reduces CSD threshold via histamine, tannins, and vasodilatory effects. GGT/ALT elevation consistent with alcohol-related hepatic stress — alcohol reduction will normalise liver enzymes. Target <7 units/week for cardiovascular health (NICE: <14 units/week for men).",
+            "evidence_level": "RCT (REDUCE-AF); observational (migraine)"
+          }
+        ],
         "summary": "Alcohol reduction reduces AF recurrence by 37% (REDUCE-AF trial) and reduces migraine frequency; target <7 units/week; GGT/ALT will normalise"
       }
     },
@@ -305,9 +365,73 @@
       "trigger_action": "search_migraine_preventive_anticoagulated_patient",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "LITERATURE SEARCH: Migraine Preventive Therapy in an Anticoagulated Patient\n\nKEY FINDINGS:\n1. NSAID AVOIDANCE: Patients on anticoagulants (apixaban) should avoid NSAIDs for acute migraine — bleeding risk; paracetamol or triptans preferred for acute treatment\n2. DRUG INTERACTIONS: Topiramate: no significant interaction with apixaban. Amitriptyline: minimal interaction. Propranolol: no interaction.\n3. ACUTE: Switch ibuprofen to paracetamol ± triptan (CHA2DS2-VASc score 1 — apixaban covers AF; triptan safe with anticoagulation)\n4. PREVENTIVE: Topiramate 25-100 mg/day preferred (no interaction with apixaban; weight loss benefit for AF risk factor reduction)\n\nCONCLUSION: Avoid NSAIDs (ibuprofen) with apixaban; use paracetamol ± sumatriptan for acute attacks; initiate topiramate as preventive.",
-        "summary": "Avoid NSAIDs with apixaban (bleeding risk); switch to paracetamol ± triptan; topiramate preferred preventive (no apixaban interaction)"
+        "query": "migraine preventive therapy anticoagulated patient apixaban NSAID interaction topiramate",
+        "results": [
+          {
+            "source": "BNF; pharmacology interactions database; AAN migraine guidelines",
+            "finding": "Patients on anticoagulants such as apixaban should avoid NSAIDs for acute migraine due to additive bleeding risk; paracetamol and triptans are preferred acute treatment options in anticoagulated patients. Topiramate has no significant pharmacokinetic interaction with apixaban or propranolol; amitriptyline has minimal interaction. Topiramate 25-100 mg/day is a Level A preventive agent and does not interact with apixaban.",
+            "evidence_level": "pharmacological review; guideline recommendation"
+          }
+        ],
+        "summary": "NSAIDs are generally avoided with anticoagulants (apixaban) due to additive bleeding risk; paracetamol and triptans are preferred acute options in anticoagulated migraine patients; topiramate has no clinically significant interaction with apixaban and is a Level A preventive agent"
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": null,
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "echo": null,
+    "cardiac_monitoring": null,
+    "advanced_imaging": {
+      "modality": "",
+      "tracer_or_protocol": null,
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "No abnormality identified on advanced imaging. Findings are non-contributory; clinical correlation recommended.",
+      "recommended_actions": []
+    },
+    "specialized_test": {
+      "test_type": "",
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "Study within normal limits. No abnormality identified; non-contributory.",
+      "recommended_actions": []
+    },
+    "literature_search": null,
+    "drug_interactions": {
+      "general": {
+        "proposed": "(agent not specified on this case's pathway)",
+        "interactions": [],
+        "contraindications": [],
+        "warnings": [
+          "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
+        ],
+        "formulary_status": "on formulary",
+        "alternatives": []
+      }
+    }
+  }
 }

@@ -39,21 +39,21 @@
       "past_medical_history": []
     },
     "neurological_exam": {
-      "mental_status": "",
-      "cranial_nerves": "",
-      "motor": "",
-      "sensory": "",
-      "reflexes": "",
-      "coordination": "",
-      "gait": ""
+      "mental_status": "Alert; oriented. No aphasia. Normal cognition.",
+      "cranial_nerves": "Normal cranial nerves. Visual fields full by confrontation. PERRLA. No papilledema. Normal fundoscopy confirmed.",
+      "motor": "Motor strength 5/5 throughout. No pronator drift.",
+      "sensory": "Sensation intact to light touch and pinprick throughout.",
+      "reflexes": "DTR 2+ symmetric. Plantar responses flexor bilaterally.",
+      "coordination": "Finger-nose and heel-shin normal bilaterally.",
+      "gait": "Normal gait. Romberg negative."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
-      "hr": 72,
-      "temp": 37.0,
-      "rr": 14,
-      "spo2": 98
+      "bp_systolic": 108,
+      "bp_diastolic": 66,
+      "hr": 68,
+      "temp": 36.6,
+      "rr": 13,
+      "spo2": 99
     },
     "history_present_illness": "A 26-year-old Lebanese-American woman presented to the neurology outpatient clinic for evaluation of recurrent episodes of visual disturbance followed by headache that she has experienced since age 18. She describes bright shimmering lines appearing in her peripheral vision (either side, unpredictable) that slowly grow into a large arc of flickering light, moving and expanding over approximately 25 minutes before disappearing. She sometimes sees a blind spot in the area where the lights were. After the visual phenomenon resolves, she develops a moderate-severe throbbing headache (6-8/10) with nausea and light sensitivity, lasting 4-8 hours.\n\nEpisodes occur 1-2 times per month and are triggered by stress, skipping meals, and the days before her period. She has used over-the-counter NSAIDs with partial relief. She has never consulted a neurologist or tried triptans. She initially attributed the visual symptoms to eye problems and had an ophthalmologic evaluation 3 years ago which was entirely normal (refraction, tonometry, fundoscopy all normal). The ophthalmologist suggested she see neurology but she did not follow up until now.\n\nShe is a graduate student, non-smoker, no alcohol. She has no medical history, takes no medications, and is not on contraception. She denies any weakness, speech difficulty, or any headache that woke her from sleep."
   },
@@ -147,7 +147,7 @@
       "Key action: initiate appropriate triptan treatment for 8 years of undertreatment"
     ],
     "red_herrings": [],
-    "icd_code": ""
+    "icd_code": "G43.1"
   },
   "red_herrings": [
     {
@@ -159,16 +159,35 @@
   "metadata": {
     "condition_name": "Migraine with typical visual aura — untreated, triptan-naive",
     "difficulty_description": "Straightforward: long-standing migraine with aura; key action is initiating appropriate treatment for an undertreated patient",
-    "expected_agent_confidence": 0.88
+    "expected_agent_confidence": 0.88,
+    "fallback_tool_kinds": {
+      "csf": "normal",
+      "ct": "normal",
+      "echo": "incidental",
+      "cardiac_monitoring": "normal",
+      "specialized_test": "normal"
+    }
   },
   "initial_tool_outputs": {
     "mri": {
-      "findings": [],
+      "findings": [
+        {
+          "type": "white_matter_hyperintensity",
+          "location": "right subcortical frontal white matter",
+          "size": "1 focus, 2 mm",
+          "signal_characteristics": {
+            "FLAIR": "hyperintense",
+            "T2": "hyperintense",
+            "DWI": "no restriction"
+          },
+          "mass_effect": "none",
+          "borders": "punctate"
+        }
+      ],
       "volumetrics": null,
       "additional_observations": [],
       "impression": "Normal brain MRI; one non-specific tiny WMH; no structural pathology. Clinical correlation recommended.",
       "differential_by_imaging": [],
-      "confidence": 0.0,
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
@@ -202,7 +221,7 @@
       "trigger_action": "search_triptan_naive_migraine",
       "tool_name": "search_medical_literature",
       "output": {
-        "report": "TREATMENT FOR TRIPTAN-NAIVE MIGRAINE WITH AURA\n\nRESULTS:\n  ACUTE: Sumatriptan 50-100 mg PO at headache onset is first-line; 80% of patients respond. Can also use naratriptan (slower onset, fewer side effects) or eletriptan.\n  COUNSELING: Take at headache onset NOT during visual aura. Naratriptan has longer half-life, useful for long attacks.\n  PREVENTIVE: 1-2 attacks/month is borderline for preventive therapy; assess disability (MIDAS score). Topiramate, propranolol, or amitriptyline are options.\n\nCONCLUSION: Start sumatriptan 100 mg; assess response in 3 months. Preventive therapy may not be needed if sumatriptan controls attacks adequately.",
+        "report": "TREATMENT FOR TRIPTAN-NAIVE MIGRAINE WITH AURA\n\nRESULTS:\n  ACUTE: Sumatriptan 50-100 mg PO at headache onset is first-line; 80% of patients respond. Can also use naratriptan (slower onset, fewer side effects) or eletriptan.\n  COUNSELING: Take at headache onset NOT during visual aura. Naratriptan has longer half-life, useful for long attacks.\n  PREVENTIVE: 1-2 attacks/month is borderline for preventive therapy; assess disability (MIDAS score). Topiramate, propranolol, or amitriptyline are options.\n\nCONCLUSION: Sumatriptan 50–100 mg PO is first-line acute therapy for migraine with aura with a strong evidence base; sumatriptan should be taken at headache onset, not during the aura phase. Whether preventive therapy is indicated depends on attack frequency, disability, and response to acute treatment assessed clinically.",
         "summary": "Sumatriptan 100 mg first-line; take at headache onset; preventive therapy borderline given 1-2/month frequency"
       }
     },
@@ -210,7 +229,7 @@
       "trigger_action": "request_mra_head_neck",
       "tool_name": "order_advanced_imaging",
       "output": {
-        "modality": "",
+        "modality": "MRA",
         "tracer_or_protocol": null,
         "findings": [
           {
@@ -226,8 +245,8 @@
       "trigger_action": "check_sumatriptan_initiation",
       "tool_name": "check_drug_interactions",
       "output": {
-        "report": "SUMATRIPTAN PRESCRIPTION REVIEW\n\nNo contraindications. Normal BP. Not on OCPs. No cardiac disease. Prescribe sumatriptan 100 mg PO. Take at headache onset (not during aura). May repeat once after 2 hours (max 200 mg/day, max 9 days/month).\n\nCONCLUSION: Sumatriptan 100 mg safe and appropriate.",
-        "summary": "Sumatriptan 100 mg safe; no contraindications; take at headache onset"
+        "report": "SUMATRIPTAN PRESCRIPTION REVIEW\n\nNo contraindications identified. Normal BP. Not on OCPs. No cardiac disease. Sumatriptan should be taken at headache onset (not during aura phase). Standard repeat dosing applies per prescribing information.\n\nCONCLUSION: Sumatriptan has no pharmacokinetic contraindications in this review; take at headache onset.",
+        "summary": "No contraindications to sumatriptan identified; take at headache onset, not during aura phase"
       }
     },
     {
@@ -256,13 +275,86 @@
         "findings": [],
         "artifacts": [],
         "activating_procedures": {},
-        "confidence": 0.0,
-        "impression": "Normal EEG; no occipital epileptiform activity. Clinical correlation recommended.",
+        "impression": "This is a NORMAL EEG. No epileptiform discharges including no occipital epileptiform activity. No focal slowing. No electrographic seizures recorded. Clinical correlation recommended.",
         "limitations": "",
         "recommended_actions": [
           "Clinical correlation recommended."
         ]
       }
     }
-  ]
+  ],
+  "fallback_tool_outputs": {
+    "eeg": null,
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "echo": {
+      "chambers": {
+        "LV": "normal size and systolic function",
+        "RV": "normal size and function",
+        "LA": "normal size",
+        "RA": "normal size"
+      },
+      "valves": {
+        "mitral": "structurally normal",
+        "aortic": "structurally normal",
+        "tricuspid": "normal",
+        "pulmonic": "normal"
+      },
+      "ejection_fraction": 64.0,
+      "wall_motion": "no regional wall-motion abnormality",
+      "findings": [
+        "Trace mitral regurgitation, physiological. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Structurally near-normal heart with a benign incidental finding.",
+      "recommended_actions": []
+    },
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 48,
+        "max": 115,
+        "average": 72
+      },
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "impression": "Normal 24-hour Holter monitor.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": null,
+    "specialized_test": {
+      "test_type": "Neurodiagnostic assessment",
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "Study within normal limits. No abnormality identified; non-contributory.",
+      "recommended_actions": []
+    },
+    "literature_search": null,
+    "drug_interactions": null
+  }
 }

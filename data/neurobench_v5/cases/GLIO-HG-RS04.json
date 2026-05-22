@@ -125,7 +125,6 @@
         "hyperventilation": "Not performed due to clinical concern for elevated intracranial pressure",
         "photic_stimulation": "No photoparoxysmal response. Normal photic driving at 10-14 Hz posteriorly."
       },
-      "confidence": 0.0,
       "impression": "Abnormal EEG. Intermittent epileptiform discharges in the left centro-parietal region indicate cortical irritability and seizure predisposition. Background asymmetry with left hemisphere attenuation further supports a structural etiology. Clinical correlation recommended.",
       "limitations": "Hyperventilation not performed due to suspected elevated intracranial pressure.",
       "recommended_actions": [
@@ -173,8 +172,23 @@
         "Mild mucosal thickening in the left maxillary sinus, incidental"
       ],
       "impression": "Large heterogeneously enhancing left parietal mass with central necrosis, surrounding vasogenic edema, and mass effect including 6 mm midline shift and early subfalcine herniation. The mass extends medially to the atrium of the left lateral ventricle and abuts the dura laterally. The restricted diffusion in the enhancing rim suggests high cellularity. The dural contact raises concern for dural invasion. Clinical correlation recommended.",
-      "differential_by_imaging": [],
-      "confidence": 0.0,
+      "differential_by_imaging": [
+        {
+          "diagnosis": "Glioblastoma (giant cell variant)",
+          "likelihood": "High",
+          "key_imaging_features": "Heterogeneous ring enhancement, central necrosis, restricted diffusion at enhancing rim, marked perilesional FLAIR signal, irregular infiltrative margins, 6 mm midline shift — classic WHO grade IV glioma pattern"
+        },
+        {
+          "diagnosis": "Brain metastasis",
+          "likelihood": "Moderate",
+          "key_imaging_features": "Ring enhancement with necrosis could represent solitary metastasis; however, irregular infiltrative borders and dural contact favour primary glioma over metastasis which typically has well-demarcated margins at gray-white junction"
+        },
+        {
+          "diagnosis": "Brain abscess",
+          "likelihood": "Low",
+          "key_imaging_features": "Absence of central restricted diffusion (pus cavity), thick irregular ring (rather than thin smooth ring of abscess), elevated rCBV on perfusion, and absence of fever all argue against abscess"
+        }
+      ],
       "recommended_actions": [
         "Clinical correlation recommended."
       ]
@@ -439,7 +453,7 @@
           }
         ],
         "quantitative_data": null,
-        "impression": "See findings above. Clinical correlation recommended.",
+        "impression": "MR perfusion demonstrates markedly elevated rCBV ratio (4.8) in the enhancing rim of the left parietal mass, with elevated rCBF and shortened mean transit time. The central non-enhancing portion shows near-zero rCBV consistent with avascular necrotic tissue. Clinical correlation recommended.",
         "recommended_actions": [
           "Clinical correlation recommended."
         ]
@@ -469,36 +483,25 @@
       "trigger_action": "request_ct_chest_abdomen",
       "tool_name": "order_ct_scan",
       "output": {
-        "panels": {
-          "CT Chest/Abdomen/Pelvis": [
-            {
-              "test": "Chest",
-              "value": "No pulmonary masses or nodules. No mediastinal or hilar lymphadenopathy. Heart size normal.",
-              "unit": "",
-              "reference_range": "Normal",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Abdomen",
-              "value": "Liver, spleen, pancreas, adrenal glands, and kidneys are unremarkable. No focal hepatic lesions. No retroperitoneal lymphadenopathy.",
-              "unit": "",
-              "reference_range": "Normal",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Pelvis",
-              "value": "Bladder and prostate are unremarkable. No pelvic lymphadenopathy. No osseous metastatic disease.",
-              "unit": "",
-              "reference_range": "Normal",
-              "is_abnormal": false,
-              "clinical_significance": null
-            }
-          ]
-        },
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": []
+        "findings": [
+          {
+            "type": "survey",
+            "location": "Chest",
+            "description": "No pulmonary masses or nodules. No mediastinal or hilar lymphadenopathy. Heart size normal."
+          },
+          {
+            "type": "survey",
+            "location": "Abdomen",
+            "description": "Liver, spleen, pancreas, adrenal glands, and kidneys are unremarkable. No focal hepatic lesions. No retroperitoneal lymphadenopathy."
+          },
+          {
+            "type": "survey",
+            "location": "Pelvis",
+            "description": "Bladder and prostate are unremarkable. No pelvic lymphadenopathy. No osseous metastatic disease."
+          }
+        ],
+        "contrast_used": true,
+        "impression": "No evidence of extracranial primary malignancy or metastatic disease. No lymphadenopathy or visceral masses identified."
       }
     },
     {
@@ -623,7 +626,7 @@
       "trigger_action": "request_functional_mri",
       "tool_name": "order_advanced_imaging",
       "output": {
-        "modality": "perfusion_MRI",
+        "modality": "fMRI_BOLD",
         "tracer_or_protocol": null,
         "findings": [
           {
@@ -730,6 +733,73 @@
       }
     }
   ],
+  "fallback_tool_outputs": {
+    "eeg": null,
+    "mri": null,
+    "ecg": null,
+    "labs": null,
+    "csf": {
+      "appearance": "clear and colourless",
+      "opening_pressure": "16 cm H2O",
+      "cell_count": {
+        "wbc": "2 /uL",
+        "rbc": "0 /uL"
+      },
+      "protein": "38 mg/dL",
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "special_tests": {},
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
+    },
+    "ct": null,
+    "echo": {
+      "chambers": {
+        "LV": "normal size and systolic function",
+        "RV": "normal size and function",
+        "LA": "normal size",
+        "RA": "normal size"
+      },
+      "valves": {
+        "mitral": "structurally normal",
+        "aortic": "structurally normal",
+        "tricuspid": "normal",
+        "pulmonic": "normal"
+      },
+      "ejection_fraction": 65.0,
+      "wall_motion": "no regional wall-motion abnormality",
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": []
+    },
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "monitor_type": "holter_24h",
+      "rhythm_summary": "Sinus rhythm throughout the recording",
+      "heart_rate_range": {
+        "min": 56,
+        "max": 120,
+        "average": 74
+      },
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "impression": "Normal 24-hour Holter monitor.",
+      "recommended_actions": []
+    },
+    "advanced_imaging": null,
+    "specialized_test": {
+      "test_type": "neuropsychological_screening",
+      "findings": [],
+      "quantitative_data": null,
+      "impression": "Study within normal limits. No abnormality identified; non-contributory.",
+      "recommended_actions": []
+    },
+    "literature_search": null,
+    "drug_interactions": null
+  },
   "ground_truth": {
     "primary_diagnosis": "Giant cell glioblastoma (WHO grade IV)",
     "icd_code": "C71.3",
@@ -737,27 +807,27 @@
       {
         "diagnosis": "Pleomorphic xanthoastrocytoma (PXA)",
         "likelihood": "Moderate",
-        "key_distinguishing": "PXA shows BRAF V600E mutations, positive neuronal antigens (synaptophysin, NeuN), and typically lacks palisading necrosis; GCG is p53-positive and neuronal marker-negative"
+        "key_features": "PXA shows BRAF V600E mutations, positive neuronal antigens (synaptophysin, NeuN), and typically lacks palisading necrosis; GCG is p53-positive and neuronal marker-negative"
       },
       {
         "diagnosis": "Subependymal giant cell astrocytoma (SEGA)",
         "likelihood": "Low",
-        "key_distinguishing": "SEGA is associated with tuberous sclerosis complex (absent in this patient), located near the foramen of Monro, and is a WHO grade I tumor with different histological features"
+        "key_features": "SEGA is associated with tuberous sclerosis complex (absent in this patient), located near the foramen of Monro, and is a WHO grade I tumor with different histological features"
       },
       {
         "diagnosis": "Classical glioblastoma multiforme",
         "likelihood": "Moderate",
-        "key_distinguishing": "Clinical and radiological differentiation from conventional GBM is difficult; diagnosis relies on histopathological identification of numerous multinucleated giant cells, abundant reticulin, and specific immunohistochemical profile"
+        "key_features": "Clinical and radiological differentiation from conventional GBM is difficult; diagnosis relies on histopathological identification of numerous multinucleated giant cells, abundant reticulin, and specific immunohistochemical profile"
       },
       {
         "diagnosis": "Brain metastasis",
         "likelihood": "Low",
-        "key_distinguishing": "Solitary metastasis typically has more spherical shape, well-demarcated borders at gray-white junction, and requires a known primary malignancy; CT chest/abdomen/pelvis negative for extracranial primary"
+        "key_features": "Solitary metastasis typically has more spherical shape, well-demarcated borders at gray-white junction, and requires a known primary malignancy; CT chest/abdomen/pelvis negative for extracranial primary"
       },
       {
         "diagnosis": "Brain abscess",
         "likelihood": "Low",
-        "key_distinguishing": "Abscess shows restricted diffusion centrally (pus), thin smooth ring enhancement, and typically presents with fever and elevated WBC; this patient is afebrile with normal WBC"
+        "key_features": "Abscess shows restricted diffusion centrally (pus), thin smooth ring enhancement, and typically presents with fever and elevated WBC; this patient is afebrile with normal WBC"
       }
     ],
     "optimal_actions": [
@@ -817,15 +887,9 @@
       {
         "step": 6,
         "action": "Obtain CT chest/abdomen/pelvis to rule out extracranial primary malignancy",
-        "tool_name": "interpret_labs",
+        "tool_name": "order_ct_scan",
         "expected_finding": "No extracranial primary malignancy identified",
-        "category": "acceptable",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP"
-          ]
-        }
+        "category": "acceptable"
       },
       {
         "step": 7,
@@ -884,6 +948,12 @@
     "generation_method": "real_case_seed",
     "condition_name": "Brain tumor — high-grade glioma (giant cell glioblastoma)",
     "difficulty_description": "Straightforward case with classic imaging features of high-grade glioma (ring enhancement, necrosis, mass effect, midline shift) and rapid clinical progression. The prior misdiagnosis of viral encephalitis adds clinical realism but does not significantly complicate the current diagnostic workup.",
-    "expected_agent_confidence": 0.88
+    "expected_agent_confidence": 0.88,
+    "fallback_tool_kinds": {
+      "csf": "normal",
+      "echo": "normal",
+      "cardiac_monitoring": "normal",
+      "specialized_test": "normal"
+    }
   }
 }
