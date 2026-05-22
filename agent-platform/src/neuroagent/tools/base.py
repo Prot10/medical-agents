@@ -17,6 +17,7 @@ class ToolResult(BaseModel):
     output: dict[str, Any] | None = None  # serialized tool output
     error_message: str | None = None
     cost_usd: float | None = None  # populated by CostTracker
+    from_fallback: bool = False  # True if served from the off-pathway fallback tier
 
 
 class BaseTool(ABC):

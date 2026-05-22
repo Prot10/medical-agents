@@ -71,5 +71,9 @@ class NeuroBenchCase(BaseModel):
     patient: PatientProfile
     initial_tool_outputs: ToolOutputSet
     followup_outputs: list[FollowUpToolOutput] = []
+    # Off-pathway tier: clinically coherent normal / non-contributory results
+    # for tools the agent may call that are not on this case's diagnostic
+    # pathway. Keeps the simulation realistic instead of erroring out.
+    fallback_tool_outputs: ToolOutputSet | None = None
     ground_truth: GroundTruth
     metadata: dict[str, Any] = {}
