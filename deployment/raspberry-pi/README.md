@@ -36,7 +36,7 @@ Total: ~2 hours of attentive work.
 | Setting | Value |
 |---|---|
 | Pi hostname | `neurobench-review` (suggested) |
-| Pi username | `paolo` (suggested) |
+| Pi username | `andrea` (suggested) |
 | Pi password | _(set during Phase 2)_ |
 | Wi-Fi SSID | _(your network)_ |
 | Wi-Fi country code | `IT` / `US` / your country |
@@ -114,7 +114,7 @@ the Pi appears on your network at first boot.
 - [ ] Keyboard layout: matches your physical keyboard
 
 **User tab**
-- [ ] Username: `paolo` (lowercase, no spaces)
+- [ ] Username: `andrea` (lowercase, no spaces)
 - [ ] Password: strong, **write it down**
 
 **Wi-Fi tab**
@@ -183,12 +183,12 @@ the Pi appears on your network at first boot.
 - [ ] Open **Terminal** on your Mac
 - [ ] Run:
   ```bash
-  ssh paolo@neurobench-review.local
+  ssh andrea@neurobench-review.local
   ```
-  (replace `paolo` if you used a different username)
+  (replace `andrea` if you used a different username)
 - [ ] First time: type `yes` to accept the host key
 - [ ] Type the password you set in Phase 2
-- [ ] You should see the Pi's shell prompt: `paolo@neurobench-review:~$`
+- [ ] You should see the Pi's shell prompt: `andrea@neurobench-review:~$`
 
 ### 4.3 — If `.local` doesn't resolve
 
@@ -200,7 +200,7 @@ If `ssh: Could not resolve hostname`:
   dns-sd -B _ssh._tcp .
   ```
   (Ctrl-C to exit; look for the Pi hostname)
-- [ ] Or check your router's admin page for a new device named `neurobench-review` and use its IP directly: `ssh paolo@<ip>`
+- [ ] Or check your router's admin page for a new device named `neurobench-review` and use its IP directly: `ssh andrea@<ip>`
 - [ ] If still not appearing: the Wi-Fi credentials were likely mistyped during Phase 2 — re-flash the card with corrected settings
 
 ### 4.4 — Confirm you're in
@@ -227,7 +227,7 @@ sudo reboot
 
 - [ ] After `sudo reboot`, your SSH session will close. Wait ~60 seconds, then reconnect:
   ```bash
-  ssh paolo@neurobench-review.local
+  ssh andrea@neurobench-review.local
   ```
 
 ### 5.2 — Install base dependencies
@@ -251,6 +251,21 @@ uv --version
 
 - [ ] `uv --version` should print a version (e.g., `uv 0.x.y`)
 
+> **Note on `$PATH` in non-interactive SSH sessions:** `~/.bashrc` is only sourced for interactive shells. When you SSH with a command (e.g., `ssh pi 'uv ...'`), `uv` won't be on `$PATH`. Either use the full path `/home/andrea/.local/bin/uv`, or source the env file: `source ~/.local/bin/env`. The systemd unit in Phase 7.1 sets `PATH` explicitly so this isn't an issue for the service itself.
+
+### 5.4 — (Optional) Passwordless sudo
+
+If you plan to drive the rest of the deployment over SSH from your Mac (or from an automation agent), `sudo` over non-interactive SSH fails because it can't open a password prompt. The standard fix on a single-user Pi is passwordless `sudo` for your user:
+
+```bash
+echo "andrea ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/010-andrea-nopasswd > /dev/null
+sudo chmod 440 /etc/sudoers.d/010-andrea-nopasswd
+```
+
+Security justification: the only login path is SSH key auth (no password SSH after Phase 9.2). An attacker with your private key can already become root; sudo password adds no real defense in that model. Reverse with `sudo rm /etc/sudoers.d/010-andrea-nopasswd`.
+
+Skip this step if you'd rather keep `sudo` requiring a password.
+
 ✅ **Phase 5 complete when:** `uv --version` works and `sudo apt full-upgrade -y` reports no further updates.
 
 ---
@@ -263,10 +278,10 @@ the result to the Pi.
 
 ### 6.1 — Build the frontend on your Mac
 
-On the **Mac** (the one with the repo at `/Users/aprotani/Documents/medical-agents`):
+On the **Mac** (the one with the repo at `/Users/andrea/Documents/medical-agents`):
 
 ```bash
-cd /Users/aprotani/Documents/medical-agents/web-review
+cd /Users/andrea/Documents/medical-agents/web-review
 npm install
 npm run build
 ls dist/    # confirm there's an index.html and an assets/ folder
@@ -290,8 +305,8 @@ rsync -avz --progress \
   --exclude='.pytest_cache/' \
   --exclude='*.pyc' \
   --exclude='.DS_Store' \
-  /Users/aprotani/Documents/medical-agents/ \
-  paolo@neurobench-review.local:~/medical-agents/
+  /Users/andrea/Documents/medical-agents/ \
+  andrea@neurobench-review.local:~/medical-agents/
 ```
 
 - [ ] First run prompts for SSH password; subsequent runs (after Phase 9 SSH key setup) will be passwordless
@@ -318,7 +333,7 @@ uv run uvicorn neuroagent.review_api.app:app --host 127.0.0.1 --port 8889
 ```
 
 - [ ] You should see uvicorn startup logs ending with `Application startup complete`
-- [ ] In a **second SSH session** to the Pi (`ssh paolo@neurobench-review.local` in a new Terminal tab):
+- [ ] In a **second SSH session** to the Pi (`ssh andrea@neurobench-review.local` in a new Terminal tab):
   ```bash
   curl -s http://127.0.0.1:8889/api/v1/health 2>&1 | head
   # If no /health endpoint, try the OpenAPI doc:
@@ -354,10 +369,10 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-User=paolo
-WorkingDirectory=/home/paolo/medical-agents
-Environment="PATH=/home/paolo/.local/bin:/usr/local/bin:/usr/bin:/bin"
-ExecStart=/home/paolo/.local/bin/uv run uvicorn neuroagent.review_api.app:app --host 127.0.0.1 --port 8889
+User=andrea
+WorkingDirectory=/home/andrea/medical-agents
+Environment="PATH=/home/andrea/.local/bin:/usr/local/bin:/usr/bin:/bin"
+ExecStart=/home/andrea/.local/bin/uv run uvicorn neuroagent.review_api.app:app --host 127.0.0.1 --port 8889
 Restart=on-failure
 RestartSec=5
 
@@ -366,7 +381,7 @@ WantedBy=multi-user.target
 EOF
 ```
 
-> If you used a username other than `paolo`, replace all `paolo` references above.
+> If you used a username other than `andrea`, replace all `andrea` references above.
 
 ```bash
 sudo systemctl daemon-reload
@@ -394,7 +409,21 @@ sudo apt install -y caddy
 
 ### 7.3 — Configure Caddy
 
+Before reloading, fix two real-world gotchas:
+
+1. **Caddy needs to traverse `/home/andrea`**, which Pi OS Lite creates at mode `700` (owner-only). Either open it to `755` (single-user Pi — safe, matches Ubuntu default) or use an ACL for surgical access.
+2. **The Caddy package may leave `/var/log/caddy/access.log` owned by `root`**, which makes Caddy fail the next reload with `permission denied`. Pre-create or fix ownership.
+
 ```bash
+# Allow Caddy to traverse into the home dir
+sudo chmod 755 /home/andrea
+# (alternative, more surgical: sudo setfacl -m u:caddy:rx /home/andrea)
+
+# Ensure the Caddy log dir + file are writable by the caddy user
+sudo mkdir -p /var/log/caddy
+sudo chown caddy:caddy /var/log/caddy /var/log/caddy/access.log 2>/dev/null || true
+sudo chmod 750 /var/log/caddy
+
 sudo tee /etc/caddy/Caddyfile > /dev/null <<'EOF'
 :80 {
     encode gzip
@@ -404,7 +433,7 @@ sudo tee /etc/caddy/Caddyfile > /dev/null <<'EOF'
     }
 
     handle {
-        root * /home/paolo/medical-agents/web-review/dist
+        root * /home/andrea/medical-agents/web-review/dist
         try_files {path} /index.html
         file_server
     }
@@ -416,6 +445,7 @@ sudo tee /etc/caddy/Caddyfile > /dev/null <<'EOF'
 }
 EOF
 
+sudo caddy validate --config /etc/caddy/Caddyfile
 sudo systemctl reload caddy
 sudo systemctl enable caddy
 ```
@@ -441,37 +471,75 @@ Or open `http://neurobench-review.local/` in a browser on your Mac — you shoul
 
 ## Phase 8 — Expose publicly with Cloudflare Tunnel (10–15 min)
 
-> ⚠ **Decision point.** Pick ONE of the two approaches below. Named tunnel
-> is recommended for clinician review (stable URL). Quick tunnel is fine if
-> you don't have a domain — the review API does NOT use SSE, so the quick
-> tunnel SSE limitation does not apply here.
+> ⚠ **Decision point.** Pick ONE of the approaches below.
 
-### Option A — Quick tunnel (no account, no domain, fastest)
+### Plan-tier reality check (free plan)
 
-Pros: zero setup, no account needed. Cons: URL changes on every restart, no
-SLA, 200-concurrent-request limit (more than enough for clinician review).
+If your domain's DNS is at another provider (Hostinger, Namecheap, etc.) and you don't want to move nameservers to Cloudflare, the "keep DNS where it is, use Cloudflare for one subdomain" options are **not free**:
+
+| Approach | Cost | Stable URL | Keeps DNS at current provider |
+|---|---|---|---|
+| **Quick Tunnel** (`*.trycloudflare.com`) | Free | Stable while `cloudflared` runs; new on restart | ✅ |
+| **Named Tunnel** (Cloudflare-managed domain) | Free | ✅ | ❌ (DNS must be on Cloudflare) |
+| Partial CNAME setup | **Business plan ($200+/mo)** | ✅ | ✅ |
+| Subdomain NS delegation | **Enterprise only** | ✅ | ✅ |
+| Cloudflare for SaaS custom hostname | Free tier | ✅ | ✅ | Overkill, designed for SaaS platforms |
+
+Realistic free-plan choices: **Quick Tunnel** (Option A) or **move DNS to Cloudflare** (Option B). To keep an existing domain elsewhere, buy a cheap separate domain (~$10/yr) via Cloudflare Registrar just for this app and use Option B with that.
+
+The review API does NOT use SSE, so the Quick Tunnel SSE limitation does not apply here.
+
+### Option A — Quick tunnel + systemd unit (no account, no domain)
+
+Zero setup, no account needed. URL is `https://random-words.trycloudflare.com`, **stable while the `cloudflared` process runs** — so a `systemd` unit that doesn't restart-loop keeps the same URL for weeks. New URL only on reboot / `systemctl restart cloudflared-quick` / crash.
 
 On the **Pi**:
 
 ```bash
-# Install cloudflared (ARM64 .deb)
-wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm64.deb
-sudo dpkg -i cloudflared-linux-arm64.deb
+# Install cloudflared (ARM64 .deb from Cloudflare's GitHub Releases)
+wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm64.deb -O /tmp/cloudflared.deb
+sudo dpkg -i /tmp/cloudflared.deb
+rm /tmp/cloudflared.deb
 cloudflared --version
 
-# Launch a quick tunnel (foreground, prints the URL)
-cloudflared tunnel --url http://localhost:80
+# Persistent systemd unit (auto-start, auto-restart on failure)
+sudo tee /etc/systemd/system/cloudflared-quick.service > /dev/null <<'EOF'
+[Unit]
+Description=Cloudflare Quick Tunnel for neurobench-review
+After=network-online.target caddy.service
+Wants=network-online.target
+Requires=caddy.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/cloudflared tunnel --no-autoupdate --url http://localhost:80
+Restart=on-failure
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable --now cloudflared-quick
+sleep 10
+
+# Retrieve the assigned public URL
+sudo journalctl -u cloudflared-quick --no-pager | grep -oE "https://[a-z0-9-]+\.trycloudflare\.com" | tail -1
 ```
 
-The output includes a line like:
-```
-https://random-words-abc-xyz.trycloudflare.com
-```
-That's the public URL — share it with clinicians.
+Share that URL with clinicians.
 
-- [ ] Note: the URL is only valid while this `cloudflared` process is running, and it changes if you restart. For a sustained review window, use Option B.
+**To retrieve the current URL any time later:**
+```bash
+sudo journalctl -u cloudflared-quick --no-pager | grep -oE "https://[a-z0-9-]+\.trycloudflare\.com" | tail -1
+```
 
-### Option B — Named tunnel (stable URL, recommended)
+- [ ] The URL only changes when `cloudflared-quick` restarts. If clinicians need a never-changing URL, switch to Option B with a $10/yr separate domain.
+
+### Option B — Named tunnel (stable URL, requires Cloudflare-managed domain)
 
 Requires:
 - A free Cloudflare account
@@ -495,7 +563,7 @@ cloudflared tunnel create neurobench-review
 mkdir -p ~/.cloudflared
 cat > ~/.cloudflared/config.yml <<EOF
 tunnel: <PASTE-UUID-HERE>
-credentials-file: /home/paolo/.cloudflared/<PASTE-UUID-HERE>.json
+credentials-file: /home/andrea/.cloudflared/<PASTE-UUID-HERE>.json
 ingress:
   - hostname: review.yourdomain.com
     service: http://localhost:80
@@ -526,14 +594,14 @@ sudo systemctl status cloudflared
 On the **Pi**:
 
 ```bash
-mkdir -p /home/paolo/backups
+mkdir -p /home/andrea/backups
 crontab -e
 ```
 
 Add this line (daily 3 AM rsync of annotations into a dated folder):
 
 ```cron
-0 3 * * * rsync -az /home/paolo/medical-agents/data/review/annotations/ /home/paolo/backups/annotations-$(date +\%Y\%m\%d)/ 2>&1 | logger -t neurobench-backup
+0 3 * * * rsync -az /home/andrea/medical-agents/data/review/annotations/ /home/andrea/backups/annotations-$(date +\%Y\%m\%d)/ 2>&1 | logger -t neurobench-backup
 ```
 
 Save and exit (Ctrl-X, Y, Enter in `nano`).
@@ -541,7 +609,7 @@ Save and exit (Ctrl-X, Y, Enter in `nano`).
 - [ ] Verify cron is enabled: `sudo systemctl status cron`
 - [ ] Optional: also rsync the backups off-Pi to your Mac periodically — from your Mac:
   ```bash
-  rsync -az paolo@neurobench-review.local:~/backups/ ~/neurobench-backups/
+  rsync -az andrea@neurobench-review.local:~/backups/ ~/neurobench-backups/
   ```
 
 ### 9.2 — SSH key (replace password auth)
@@ -552,10 +620,10 @@ On your **Mac** (each Mac you'll SSH from):
 # Skip ssh-keygen if you already have ~/.ssh/id_ed25519
 ssh-keygen -t ed25519 -C "$(whoami)@$(hostname)"
 
-ssh-copy-id paolo@neurobench-review.local
+ssh-copy-id andrea@neurobench-review.local
 # Enter the Pi password one last time
 
-ssh paolo@neurobench-review.local
+ssh andrea@neurobench-review.local
 # Should now log in without asking for a password
 ```
 
@@ -577,7 +645,7 @@ Then:
 sudo systemctl restart ssh
 ```
 
-- [ ] Test from a new Terminal: `ssh paolo@neurobench-review.local` — must still log in (via key)
+- [ ] Test from a new Terminal: `ssh andrea@neurobench-review.local` — must still log in (via key)
 - [ ] **Do not log out of all sessions until you've confirmed key login works**, or you'll be locked out
 
 ### 9.3 — Optional: SSD-over-USB migration (future)
@@ -621,11 +689,11 @@ rsync -avz --progress \
   --exclude='data/neurobench_v1/' --exclude='data/neurobench_v2/' \
   --exclude='data/neurobench_v3/' --exclude='data/neurobench_v4/' \
   --exclude='__pycache__/' --exclude='*.pyc' --exclude='.DS_Store' \
-  /Users/aprotani/Documents/medical-agents/ \
-  paolo@neurobench-review.local:~/medical-agents/
+  /Users/andrea/Documents/medical-agents/ \
+  andrea@neurobench-review.local:~/medical-agents/
 
 # Then on the Pi:
-ssh paolo@neurobench-review.local 'cd ~/medical-agents && uv sync --all-packages && sudo systemctl restart neurobench-review'
+ssh andrea@neurobench-review.local 'cd ~/medical-agents && uv sync --all-packages && sudo systemctl restart neurobench-review'
 ```
 
 If you changed the frontend, rebuild on the Mac (`cd web-review && npm run
@@ -678,13 +746,80 @@ The backend hot-reloads on mtime change — no restart needed.
 
 | What | Where |
 |---|---|
-| Project root on Pi | `/home/paolo/medical-agents/` |
+| Project root on Pi | `/home/andrea/medical-agents/` |
 | Backend code | `agent-platform/src/neuroagent/review_api/` |
 | Frontend build | `web-review/dist/` |
 | Annotations | `data/review/annotations/{version}/{reviewer}/{case_id}.json` |
 | v5 dataset | `data/neurobench_v5/cases/` |
 | Reviewer codes | `agent-platform/config/review/reviewer_codes.yaml` |
-| systemd unit | `/etc/systemd/system/neurobench-review.service` |
+| Review API systemd unit | `/etc/systemd/system/neurobench-review.service` |
+| Cloudflared (Quick Tunnel) systemd unit | `/etc/systemd/system/cloudflared-quick.service` |
 | Caddy config | `/etc/caddy/Caddyfile` |
-| Cloudflare config | `/home/paolo/.cloudflared/config.yml` |
-| Backups | `/home/paolo/backups/annotations-YYYYMMDD/` |
+| Caddy access log | `/var/log/caddy/access.log` |
+| Cloudflare config (Option B only) | `/home/andrea/.cloudflared/config.yml` |
+| Backups | `/home/andrea/backups/annotations-YYYYMMDD/` |
+| Passwordless sudo rule | `/etc/sudoers.d/010-andrea-nopasswd` |
+
+---
+
+## Deployment record — 2026-05-24
+
+First production deployment of this runbook. Documents the **as-deployed state** of `neurobench-review.local` so anyone (future-you, another reviewer-program operator) can reason about the system without re-walking every phase.
+
+### What was deployed
+
+| Layer | Choice | Details |
+|---|---|---|
+| Hardware | Raspberry Pi 5 + active cooler | Idle temp ~46 °C with default Caddy + FastAPI + cloudflared load |
+| OS | Raspberry Pi OS Lite (64-bit), Debian Trixie | Kernel `6.18.29+rpt-rpi-2712` after Phase 5.1 upgrade |
+| Filesystem | microSD (29.7 GB) | SSD migration deferred per Phase 9.3 |
+| Backend | FastAPI via `uv run uvicorn` | `neurobench-review.service`, bound to `127.0.0.1:8889` |
+| Frontend | React (Vite build) static files | Served by Caddy from `web-review/dist/` |
+| Reverse proxy | Caddy 2.11.3 | `:80`, gzip, `/api/*` → FastAPI, SPA fallback to `index.html` |
+| Public exposure | Cloudflare Quick Tunnel (Option A) | `cloudflared-quick.service`; URL changes on restart |
+| User account | `andrea` | All paths under `/home/andrea/` |
+| sudo | Passwordless via `/etc/sudoers.d/010-andrea-nopasswd` | Justified by single-user, key-only SSH |
+| SSH | Ed25519 key auth installed in Phase 4 (not deferred to 9.2) | Password auth still enabled — disable in Phase 9.2 when ready |
+| Backups | Daily cron `0 3 * * *` → `~/backups/annotations-YYYYMMDD/` | Logged via journalctl tag `neurobench-backup` |
+
+### Why Option A (Quick Tunnel) and not Option B
+
+The operator's existing domain (`andreaprotani.com`) is registered at Hostinger and they didn't want to move DNS. On Cloudflare's free plan, the only way to use a Cloudflare Tunnel with a domain whose DNS lives elsewhere is "Partial CNAME setup", which is **Business plan ($200+/mo)**. Subdomain NS delegation is Enterprise-only. Cloudflare for SaaS custom hostnames is free-tier-eligible but designed for SaaS-platform use, much heavier setup than warranted here.
+
+Quick Tunnel is therefore the realistic free option until/unless a separate cheap domain is registered through Cloudflare Registrar.
+
+### Permissions and security tweaks that surprised the runbook
+
+The original runbook (v1) had three real-world gotchas now baked into Phases 5–7:
+
+1. **`/home/andrea` mode 700.** Pi OS Lite creates home dirs as `700`, blocking the `caddy` system user from reading `web-review/dist/`. Surface symptom: HTTP 403 on every static request. Fix: `chmod 755 /home/andrea` (single-user-Pi acceptable; matches Ubuntu default), or `setfacl` for surgical access.
+2. **`/var/log/caddy/access.log` ownership.** Either created `root:root` by the Caddy package or by an earlier reload attempt, which makes the next reload fail with `permission denied: …/access.log`. Fix: `chown caddy:caddy` on the file (and the dir).
+3. **Quick Tunnel as a systemd unit.** The v1 runbook documented Option A only as a foreground `cloudflared` command, implying the operator runs it in `tmux`. In practice, you want it as a `systemd` unit (provided in Phase 8.1) so it auto-restarts on crash and survives reboots without manual intervention. URL stays stable across crashes; only changes on full restart.
+
+### Current public URL retrieval
+
+The Quick Tunnel URL is regenerated on every `cloudflared-quick` restart. To find the current one:
+
+```bash
+ssh andrea@neurobench-review.local \
+  'sudo journalctl -u cloudflared-quick --no-pager | grep -oE "https://[a-z0-9-]+\.trycloudflare\.com" | tail -1'
+```
+
+Or from the Mac with the `pi` SSH alias:
+
+```bash
+ssh pi 'sudo journalctl -u cloudflared-quick --no-pager | grep -oE "https://[a-z0-9-]+\.trycloudflare\.com" | tail -1'
+```
+
+### Validation evidence captured during the deployment
+
+- **Backend smoke test:** `curl http://127.0.0.1:8889/docs` → HTTP 200, returns FastAPI's Swagger UI.
+- **Local network end-to-end:** `curl http://neurobench-review.local/api/v1/datasets` → HTTP 401 with body `{"detail":"Invalid or inactive reviewer code"}`, proving the proxy chain Caddy → FastAPI → reviewer-code dependency works.
+- **Public end-to-end:** Same call against the Quick Tunnel URL returns the same 401 with body, plus `cf-ray` header from Cloudflare's MRS POP and `HTTP/2 200` on the index. Confirms Cloudflare edge ↔ tunnel ↔ Caddy ↔ FastAPI is end-to-end functional.
+- **Cron validation:** Test schedule placed 2 minutes ahead fired at exactly the scheduled minute (within ~1 s); rsync copied the existing `v5/AAA/ALS-P07.json` into a dated test folder; journalctl tag `neurobench-backup` captured all rsync verbose output. Cron entry then reverted to `0 3 * * *`.
+
+### What's still pending after this deployment session
+
+- **Phase 9.2** — disable password SSH auth (`PasswordAuthentication no` in `sshd_config`). Key auth is already installed and verified.
+- **Phase 9.3** — SSD migration (deferred).
+- **Browser-side QA** — open the public URL on a different network (e.g. phone on 4G) and click through the reviewer login flow.
