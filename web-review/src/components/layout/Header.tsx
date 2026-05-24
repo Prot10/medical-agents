@@ -29,7 +29,7 @@ export function Header({ profile }: { profile: ReviewerProfile }) {
               NeuroBench Review
             </div>
             <div className="text-sm font-semibold leading-tight">
-              {datasetInfo?.name ?? "Loading…"}
+              Expert Review
             </div>
           </div>
         </div>
@@ -63,7 +63,7 @@ export function Header({ profile }: { profile: ReviewerProfile }) {
           >
             {datasets.data?.map((d) => (
               <option key={d.version} value={d.version}>
-                {d.version} · {d.case_count}
+                {d.case_count} cases
               </option>
             ))}
           </select>

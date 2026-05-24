@@ -52,7 +52,7 @@ export function CodeEntryGate() {
             </div>
             <div>
               <div className="text-xs uppercase tracking-wider text-muted-foreground">
-                NeuroBench v5
+                NeuroBench
               </div>
               <h1 className="text-lg font-semibold tracking-tight">
                 Expert Review

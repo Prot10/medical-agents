@@ -67,7 +67,7 @@ export function OverviewTab({ profile }: { profile: ReviewerProfile }) {
               Hello, {profile.name.split(" ")[0]}.
             </p>
             <h1 className="text-3xl font-semibold tracking-tight">
-              Your review of {stats?.dataset_version ?? version}
+              Your review
             </h1>
           </div>
           <span className="text-sm text-muted-foreground">
