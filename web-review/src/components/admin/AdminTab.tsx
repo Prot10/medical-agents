@@ -38,21 +38,21 @@ export function AdminTab() {
   const [view, setView] = useState<AdminView>("agreement")
 
   return (
-    <div className="px-6 py-8 max-w-7xl mx-auto w-full space-y-4">
+    <div className="px-4 sm:px-6 py-6 sm:py-8 max-w-7xl mx-auto w-full space-y-4">
       <div>
         <p className="text-xs uppercase tracking-widest text-primary font-semibold">
           Researcher view
         </p>
         <h1 className="text-2xl font-semibold tracking-tight">Admin dashboard</h1>
       </div>
-      <div className="flex items-center gap-1 border-b border-border">
+      <div className="flex items-center gap-1 border-b border-border overflow-x-auto scrollbar-hide -mx-4 sm:mx-0 px-4 sm:px-0">
         {VIEWS.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
             type="button"
             onClick={() => setView(id)}
             className={cn(
-              "px-3.5 py-2 text-sm font-medium border-b-2 -mb-px flex items-center gap-1.5 transition-colors",
+              "px-3 sm:px-3.5 py-2 text-sm font-medium border-b-2 -mb-px flex items-center gap-1.5 transition-colors whitespace-nowrap flex-shrink-0",
               view === id
                 ? "border-primary text-foreground"
                 : "border-transparent text-muted-foreground hover:text-foreground",

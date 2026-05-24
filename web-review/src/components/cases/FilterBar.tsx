@@ -50,8 +50,9 @@ export function FilterBar({
   )
 
   return (
-    <div className="flex items-center gap-2 flex-wrap">
-      <div className="relative flex-1 min-w-[200px] max-w-md">
+    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:flex-wrap">
+      {/* Search: full-width on mobile, flex-1 on desktop */}
+      <div className="relative w-full sm:flex-1 sm:min-w-[200px] sm:max-w-md">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <input
           type="text"
@@ -64,6 +65,7 @@ export function FilterBar({
           <button
             type="button"
             onClick={() => setSearch("")}
+            aria-label="Clear search"
             className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 rounded hover:bg-background text-muted-foreground"
           >
             <X className="w-3.5 h-3.5 m-auto" />
@@ -71,36 +73,39 @@ export function FilterBar({
         )}
       </div>
 
-      <ConditionFilter
-        options={conditionOptions}
-        selected={filterConditions}
-        onChange={setFilterConditions}
-      />
+      {/* Filter group + action: row on all sizes, wraps if needed */}
+      <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap sm:ml-auto">
+        <ConditionFilter
+          options={conditionOptions}
+          selected={filterConditions}
+          onChange={setFilterConditions}
+        />
 
-      <select
-        value={filterStatus}
-        onChange={(e) => setFilterStatus(e.target.value as ReviewStatus | "all")}
-        className="h-9 px-2 bg-secondary border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-      >
-        {STATUS_OPTIONS.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
-      </select>
+        <select
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value as ReviewStatus | "all")}
+          aria-label="Filter by status"
+          className="h-9 px-2 bg-secondary border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+        >
+          {STATUS_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
 
-      <div className="flex-1" />
-
-      <Button
-        variant="secondary"
-        size="sm"
-        onClick={onPickRandomPending}
-        disabled={pendingCases.length === 0}
-        title="Open a random pending case"
-      >
-        <Shuffle className="w-4 h-4" />
-        Random pending
-      </Button>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={onPickRandomPending}
+          disabled={pendingCases.length === 0}
+          title="Open a random pending case"
+        >
+          <Shuffle className="w-4 h-4" />
+          <span className="hidden sm:inline">Random pending</span>
+          <span className="sm:hidden">Random</span>
+        </Button>
+      </div>
     </div>
   )
 }
@@ -148,7 +153,8 @@ function ConditionFilter({
         <Popover.Content
           align="start"
           sideOffset={6}
-          className="z-30 w-80 bg-popover border border-border rounded-xl shadow-xl p-3"
+          collisionPadding={12}
+          className="z-30 w-[min(20rem,calc(100vw-1.5rem))] bg-popover border border-border rounded-xl shadow-xl p-3"
         >
           <div className="relative mb-2">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />

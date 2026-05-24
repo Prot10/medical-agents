@@ -109,6 +109,33 @@ body {
   background: var(--color-muted-foreground);
 }
 
+/* Hide scrollbars when we want a clean horizontal scroll (e.g. mobile tab strip) */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/*
+ * Touch-device fallback for hover-revealed UI (annotation Comment pill, etc.):
+ * on devices without a fine pointer, treat the "hover" state as always-active.
+ * Tailwind exposes `group-hover/annotatable:` which we use on AnnotatableField —
+ * this rule makes the same children behave as if hovered on touch screens.
+ */
+@media (hover: none) {
+  .group\/annotatable .group-hover\/annotatable\:opacity-100 {
+    opacity: 1 !important;
+  }
+  .group\/annotatable .group-hover\/annotatable\:scale-100 {
+    transform: scale(1) !important;
+  }
+  .group\/annotatable .group-hover\/annotatable\:translate-x-0 {
+    transform: translateX(0) !important;
+  }
+}
+
 /* Serif accent for long-form prose */
 .prose-serif {
   font-family: var(--font-serif);

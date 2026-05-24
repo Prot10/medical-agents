@@ -47,7 +47,7 @@ export function MethodologyTab() {
   const totalAnnotationFields = stats.total_cases * 50
 
   return (
-    <div className="px-6 py-10 max-w-6xl mx-auto w-full space-y-12">
+    <div className="px-4 sm:px-6 py-6 sm:py-10 max-w-6xl mx-auto w-full space-y-8 sm:space-y-12">
       <motion.section
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
