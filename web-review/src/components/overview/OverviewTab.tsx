@@ -55,7 +55,7 @@ export function OverviewTab({ profile }: { profile: ReviewerProfile }) {
     : []
 
   return (
-    <div className="px-6 py-8 max-w-6xl mx-auto w-full space-y-8">
+    <div className="px-4 sm:px-6 py-6 sm:py-8 max-w-6xl mx-auto w-full space-y-6 sm:space-y-8">
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}

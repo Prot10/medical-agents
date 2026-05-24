@@ -119,8 +119,9 @@ export function AnnotationPopover() {
             <Popover.Content
               align="start"
               sideOffset={8}
+              collisionPadding={12}
               onOpenAutoFocus={(e) => e.preventDefault()}
-              className="z-50 w-[360px] outline-none"
+              className="z-50 w-[min(360px,calc(100vw-1.5rem))] outline-none"
               asChild
             >
               <motion.div

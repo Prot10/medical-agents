@@ -45,10 +45,12 @@ export function CaseListRow({
         )}
         aria-hidden
       />
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3 min-w-0">
+
+      {/* Row 1: condition badge · case_id · stars (left), severity counts · chevron (right) */}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-wrap">
           <span
-            className="px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider"
+            className="px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider flex-shrink-0"
             style={{
               background: `${conditionColor(entry.condition)}1a`,
               color: conditionColor(entry.condition),
@@ -61,11 +63,8 @@ export function CaseListRow({
             {entry.case_id}
           </span>
           <DifficultyStars difficulty={entry.difficulty} />
-          <span className="text-sm text-foreground/90 truncate">
-            {entry.chief_complaint}
-          </span>
         </div>
-        <div className="flex items-center gap-3 flex-shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
           {review && (
             <span className="flex items-center gap-1 text-xs text-muted-foreground">
               {(["note", "issue", "error"] as const).map((sev) => {
@@ -88,6 +87,13 @@ export function CaseListRow({
           <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
         </div>
       </div>
+
+      {/* Row 2: chief complaint — wraps on small screens, single-line truncate on wide */}
+      <div className="mt-1.5 text-sm text-foreground/90 line-clamp-2 sm:line-clamp-1 sm:truncate">
+        {entry.chief_complaint}
+      </div>
+
+      {/* Row 3: demographics */}
       <div className="mt-1 text-[11px] text-muted-foreground/80 flex items-center gap-2">
         <span>{entry.age} y · {entry.sex}</span>
         <span>·</span>

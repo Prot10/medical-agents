@@ -53,7 +53,7 @@ export function CasesTab() {
   }
 
   return (
-    <div className="px-6 py-6 max-w-7xl mx-auto w-full">
+    <div className="px-4 sm:px-6 py-4 sm:py-6 max-w-7xl mx-auto w-full">
       {selectedCaseId ? (
         <CaseDetail caseId={selectedCaseId} />
       ) : (

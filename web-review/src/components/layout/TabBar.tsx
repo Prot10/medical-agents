@@ -14,13 +14,19 @@ export function TabBar({
   tabs,
   active,
   onChange,
+  layoutId = "tab-underline",
 }: {
   tabs: TabItem[]
   active: ReviewTab
   onChange: (tab: ReviewTab) => void
+  /**
+   * Unique framer-motion layoutId for the animated underline.
+   * Pass distinct values when rendering more than one TabBar (e.g. mobile + desktop) so animations don't fight.
+   */
+  layoutId?: string
 }) {
   return (
-    <div className="relative flex items-center gap-1 px-1">
+    <div className="relative flex items-center gap-0.5 sm:gap-1 px-1">
       {tabs
         .filter((t) => !t.hidden)
         .map((tab) => {
@@ -31,13 +37,13 @@ export function TabBar({
               type="button"
               onClick={() => onChange(tab.id)}
               className={cn(
-                "relative px-4 py-2.5 text-sm font-medium rounded-md transition-colors",
+                "relative px-3 sm:px-4 py-2 sm:py-2.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap",
                 isActive
                   ? "text-foreground"
                   : "text-muted-foreground hover:text-foreground",
               )}
             >
-              <span className="relative z-10 flex items-center gap-2">
+              <span className="relative z-10 flex items-center gap-1.5 sm:gap-2">
                 {tab.label}
                 {typeof tab.count === "number" && (
                   <span
@@ -54,7 +60,7 @@ export function TabBar({
               </span>
               {isActive && (
                 <motion.div
-                  layoutId="tab-underline"
+                  layoutId={layoutId}
                   className="absolute left-3 right-3 -bottom-px h-0.5 rounded-full bg-primary"
                   transition={{ type: "spring", stiffness: 380, damping: 32 }}
                 />
