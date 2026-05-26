@@ -187,10 +187,8 @@ class LLMJudge:
         if gt.differential:
             parts.append("**Differential diagnoses**:")
             for d in gt.differential:
-                parts.append(
-                    f"  - {d.get('diagnosis', '')} ({d.get('likelihood', '')}): "
-                    f"{d.get('key_distinguishing', d.get('key_features', ''))}"
-                )
+                likelihood = d.likelihood.value if hasattr(d.likelihood, "value") else str(d.likelihood)
+                parts.append(f"  - {d.diagnosis} ({likelihood}): {d.key_features}")
 
         if gt.critical_actions:
             parts.append(f"**Critical actions (MUST do)**: {'; '.join(gt.critical_actions)}")

@@ -422,10 +422,8 @@ def _build_oracle_user_prompt(case: NeuroBenchCase, events: list[dict], final_re
         f"**Differential Diagnoses:**\n"
     )
     for d in gt.differential:
-        diag = d.get("diagnosis", "") if isinstance(d, dict) else str(d)
-        likelihood = d.get("likelihood", "") if isinstance(d, dict) else ""
-        distinguishing = d.get("key_distinguishing", "") if isinstance(d, dict) else ""
-        gt_section += f"  - {diag} ({likelihood}): {distinguishing}\n"
+        likelihood = d.likelihood.value if hasattr(d.likelihood, "value") else str(d.likelihood)
+        gt_section += f"  - {d.diagnosis} ({likelihood}): {d.key_features}\n"
 
     gt_section += f"\n**Optimal Actions:**\n"
     for a in gt.optimal_actions:

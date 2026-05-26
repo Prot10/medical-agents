@@ -43,6 +43,14 @@ class CostBreakdown:
     missed_cost: float = 0.0
     unnecessary_tools: list[str] = field(default_factory=list)
     missing_tools: list[str] = field(default_factory=list)
+    # When the caller supplies the per-case useless_tools / harmful_tools sets
+    # from GroundTruth, the "unnecessary" bucket can be split further. This
+    # matters for training reward shaping: harmful calls deserve a strictly
+    # larger penalty than useless ones.
+    useless_calls: list[str] = field(default_factory=list)
+    useless_cost: float = 0.0
+    harmful_calls: list[str] = field(default_factory=list)
+    harmful_cost: float = 0.0
 
 
 class CostReward:
@@ -199,11 +207,26 @@ class CostReward:
         self,
         agent_tools: list[str],
         optimal_tools: set[str],
+        useless_tools: set[str] | None = None,
+        harmful_tools: set[str] | None = None,
     ) -> CostBreakdown:
-        """Get detailed cost breakdown using flat costs."""
+        """Get detailed cost breakdown using flat costs.
+
+        When ``useless_tools`` / ``harmful_tools`` are provided (from the v5
+        gold-trajectory regen schema), the breakdown additionally splits the
+        "unnecessary" bucket into ``useless_*`` and ``harmful_*`` fields.
+        These do not change the legacy fields — they only annotate.
+        """
         agent_set = set(agent_tools)
         unnecessary = [t for t in agent_set if t not in optimal_tools]
         missing = [t for t in optimal_tools if t not in agent_set]
+
+        useless_called: list[str] = []
+        harmful_called: list[str] = []
+        if useless_tools:
+            useless_called = [t for t in agent_set if t in useless_tools]
+        if harmful_tools:
+            harmful_called = [t for t in agent_set if t in harmful_tools]
 
         return CostBreakdown(
             total_cost=sum(self.tool_costs.get(t, 0) for t in agent_set),
@@ -212,6 +235,10 @@ class CostReward:
             missed_cost=sum(self.tool_costs.get(t, 0) for t in missing),
             unnecessary_tools=unnecessary,
             missing_tools=missing,
+            useless_calls=useless_called,
+            useless_cost=sum(self.tool_costs.get(t, 0) for t in useless_called),
+            harmful_calls=harmful_called,
+            harmful_cost=sum(self.tool_costs.get(t, 0) for t in harmful_called),
         )
 
     def total_cost_usd(self, agent_tools: list[str]) -> float:
