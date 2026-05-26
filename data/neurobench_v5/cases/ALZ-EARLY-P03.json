@@ -625,160 +625,232 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Frontal variant Alzheimer disease (behavioral/dysexecutive AD)",
+    "primary_diagnosis": "Frontal (behavioral/dysexecutive) variant of early-onset Alzheimer's disease",
     "icd_code": "G30.0",
     "differential": [
       {
         "diagnosis": "Behavioral variant frontotemporal dementia (bvFTD)",
-        "likelihood": "moderate",
-        "key_features": "Positive AD biomarkers (reduced amyloid, elevated tau) and concurrent episodic memory impairment favor AD over FTD; absence of FTD-gene mutations (MAPT, GRN, C9orf72) argues against genetic FTD"
+        "likelihood": "high",
+        "key_features": "Clinically the closest mimic — disinhibition, apathy, loss of empathy, dietary changes; distinguished by amyloid PET (positive in frontal AD, negative in bvFTD) and FDG-PET pattern (temporoparietal hypometabolism in AD vs frontotemporal in FTD)",
+        "icd_code": "G31.09"
       },
       {
-        "diagnosis": "Typical Alzheimer disease",
+        "diagnosis": "Primary psychiatric disorder (late-onset mood or personality disorder)",
         "likelihood": "moderate",
-        "key_features": "Behavioral and executive symptoms predominate over memory — unusual presentation for typical amnestic AD"
+        "key_features": "Behavioral changes at this age can be mistaken for primary psychiatry; objective neuropsychological deficits, progressive course, and biomarker positivity differentiate frontal AD from a psychiatric diagnosis",
+        "icd_code": "F32.A"
       },
       {
-        "diagnosis": "Psychiatric illness (depression, bipolar disorder)",
+        "diagnosis": "Corticobasal syndrome / progressive supranuclear palsy",
         "likelihood": "low",
-        "key_features": "Progressive course over 18 months, structural brain atrophy on MRI, and positive AD biomarkers exclude primary psychiatric etiology"
+        "key_features": "Lack of motor features (asymmetric rigidity, alien limb, oculomotor abnormalities, postural instability) argues against these atypical parkinsonian syndromes",
+        "icd_code": "G23.8"
       },
       {
-        "diagnosis": "Normal pressure hydrocephalus",
+        "diagnosis": "Vascular frontal lobe syndrome",
+        "likelihood": "low",
+        "key_features": "Excluded by absence of focal vascular lesions on MRI",
+        "icd_code": "F01.50"
+      },
+      {
+        "diagnosis": "Substance-related or medication-induced cognitive impairment",
         "likelihood": "very_low",
-        "key_features": "No gait disturbance, no urinary incontinence, no ventriculomegaly out of proportion to cortical atrophy on MRI"
+        "key_features": "Excluded by history and review of medications; no exposure to neurotoxic agents or substance use",
+        "icd_code": null
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain detailed behavioral history from patient and informant, assessing for disinhibition, apathy, loss of empathy, and compulsive behaviors",
+        "action": "Obtain detailed clinical history from patient and informant, including timeline, cognitive domains affected, functional decline, mood, sleep, and medication review",
         "tool_name": null,
-        "expected_finding": "Progressive disinhibition, apathy, poor judgment, and personality change, plus concurrent memory deficits",
-        "category": "required"
+        "expected_finding": "Gradually progressive cognitive change with informant-confirmed functional impairment in IADLs",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[NIA_AA_2011]",
+        "guideline_source": "NIA_AA_2011"
       },
       {
         "step": 2,
-        "action": "Perform comprehensive neurological examination including frontal lobe signs (grasp reflex, utilization behavior, applause sign, go/no-go, Luria sequences)",
+        "action": "Perform bedside cognitive assessment (MMSE and/or MoCA) and detailed neurological examination",
         "tool_name": null,
-        "expected_finding": "Frontal release signs, disinhibition, impaired executive tasks, with concurrent memory impairment on screening",
-        "category": "required"
+        "expected_finding": "Objective cognitive impairment on MoCA more sensitive than MMSE; non-focal neurological exam (or variant-specific findings — visuospatial in PCA, language in lvPPA, behavioral in frontal AD)",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN_dementia_2018"
       },
       {
         "step": 3,
-        "action": "Order brain MRI with volumetric protocol",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Frontal-predominant atrophy with mild hippocampal atrophy — pattern raises both bvFTD and frontal AD in the differential",
-        "category": "required",
-        "tool_parameters": {
-          "protocol": "dementia",
-          "contrast": false
-        }
-      },
-      {
-        "step": 4,
-        "action": "Order dementia screening labs: CBC, BMP, TSH, vitamin B12, folate",
+        "action": "Order reversible-cause labs (CBC, CMP, TSH, vitamin B12, folate; consider RPR/HIV per risk)",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal results excluding reversible causes",
+        "expected_finding": "Reversible mimics (hypothyroidism, B12 deficiency, neurosyphilis) excluded; identify and address co-morbid metabolic factors",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
-            "thyroid",
+            "CMP",
+            "TSH",
             "B12",
-            "folate",
-            "dementia_workup"
+            "folate"
           ]
-        }
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN_dementia_2018"
+      },
+      {
+        "step": 4,
+        "action": "Obtain brain MRI with dementia (volumetric) protocol to assess medial-temporal atrophy and exclude vascular disease, hippocampal sclerosis, NPH, and mass lesions",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Bilateral frontal-predominant cortical atrophy in addition to typical AD-pattern temporoparietal volume loss",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "dementia",
+          "contrast": false
+        },
+        "citation": "[NIA_AA_2011]",
+        "guideline_source": "NIA_AA_2011"
       },
       {
         "step": 5,
-        "action": "Order comprehensive neuropsych battery assessing both executive AND memory domains",
+        "action": "Order comprehensive neuropsychological testing to characterize the cognitive profile and establish a baseline for tracking",
         "tool_name": "order_specialized_test",
-        "expected_finding": "Severe executive dysfunction with concurrent episodic memory impairment — the combined deficit profile favors AD over pure bvFTD",
+        "expected_finding": "Executive and behavioral dysfunction (impaired set-shifting, poor judgment) often without prominent memory impairment early on",
         "category": "required",
         "tool_parameters": {
           "test_type": "neuropsych_battery"
-        }
+        },
+        "citation": "[NIA_AA_2011]",
+        "guideline_source": "NIA_AA_2011"
       },
       {
         "step": 6,
-        "action": "Obtain AD biomarkers (CSF amyloid/tau or amyloid PET) to differentiate AD from FTD",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Positive AD biomarkers confirming Alzheimer pathology",
+        "action": "Order CSF biomarkers (Aβ42, Aβ42/40 ratio, p-tau, total tau) for ATN classification",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Reduced Aβ42 (or reduced Aβ42/40 ratio) with elevated p-tau supporting A+T+ profile consistent with Alzheimer pathology",
         "category": "required",
         "tool_parameters": {
-          "imaging_type": "amyloid_PET"
-        }
+          "tests": [
+            "Abeta42",
+            "Abeta42_40_ratio",
+            "phospho_tau",
+            "total_tau"
+          ]
+        },
+        "citation": "[NIA_AA_2018]",
+        "guideline_source": "NIA_AA_2018"
       },
       {
         "step": 7,
-        "action": "Consider FTD-gene panel to exclude genetic FTD given family history",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Negative MAPT/GRN/C9orf72 — ruling out genetic FTD",
+        "action": "Order amyloid PET when CSF biomarkers are unavailable or when diagnostic uncertainty persists after clinical assessment and MRI",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Positive cortical amyloid retention (SUVr above positivity threshold) confirming amyloid pathology",
         "category": "required",
         "tool_parameters": {
-          "panels": [
-            "genetic"
-          ]
-        }
+          "modality": "amyloid_PET"
+        },
+        "citation": "[Appropriate_Use_Amyloid_PET]",
+        "guideline_source": "Appropriate_Use_Amyloid_PET"
       },
       {
         "step": 8,
-        "action": "Refer for genetic counseling given early-onset presentation and family history",
+        "action": "Order FDG-PET to assess regional metabolism and distinguish AD from frontotemporal dementia or other neurodegenerative patterns",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Bilateral temporoparietal and posterior cingulate hypometabolism that distinguishes frontal AD from bvFTD (which shows frontotemporal hypometabolism)",
+        "category": "required",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[Foster_2007]",
+        "guideline_source": "Foster_2007"
+      },
+      {
+        "step": 9,
+        "action": "Check drug interactions before initiating cholinesterase inhibitor (donepezil, rivastigmine, or galantamine)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "No clinically significant interactions; counsel on GI side effects and bradycardia risk",
+        "category": "optional",
+        "tool_parameters": {},
+        "citation": "[NIA_AA_2011]",
+        "guideline_source": "NIA_AA_2011"
+      },
+      {
+        "step": 10,
+        "action": "Consider targeted early-onset Alzheimer gene panel (APP, PSEN1, PSEN2) if family history suggests autosomal-dominant disease",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Pathogenic variant only in a minority of early-onset cases with a strong family history; result informs genetic counseling more than acute management",
+        "category": "optional",
+        "tool_parameters": {
+          "test_type": "genetic_panel:early_onset_AD"
+        },
+        "citation": "[Bateman_2012]",
+        "guideline_source": "Bateman_2012"
+      },
+      {
+        "step": 11,
+        "action": "Disclose the diagnosis to patient and family, discuss prognosis, advance directives, and driving / safety assessment",
         "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "expected_finding": "Patient and caregiver engaged in care planning; safety concerns (driving, finances, medication management) addressed",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[NIA_AA_2011]",
+        "guideline_source": "NIA_AA_2011"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG is unrelated to the dementia workup; no cardiac symptom or syncope to justify it in this case",
+        "citation": "[AAN_dementia_2018]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is unrelated to the dementia workup; no cardioembolic indication in this presentation",
+        "citation": "[AAN_dementia_2018]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring is not indicated; no arrhythmia, syncope, or palpitations described",
+        "citation": "[AAN_dementia_2018]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT adds little when MRI is available; MRI is the preferred structural modality for dementia workup",
+        "citation": "[NIA_AA_2011]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "Obtain AD biomarkers (CSF or amyloid PET) to differentiate AD from FTD",
-      "Order comprehensive neuropsych battery assessing both executive AND memory domains",
-      "Consider FTD-gene panel to exclude genetic FTD",
-      "Assess for concurrent memory impairment which favors AD over pure bvFTD",
-      "Refer for genetic counseling given early-onset presentation"
+      "Obtain collateral history from an informant who knows the patient well",
+      "Exclude reversible causes of cognitive decline with screening labs (CBC, CMP, TSH, B12, folate; HIV/RPR per risk)",
+      "Obtain structural brain MRI with dementia/volumetric protocol",
+      "Quantify cognitive impairment with a standardized cognitive battery (MoCA at minimum; formal neuropsychological testing when feasible)",
+      "Assess safety: driving, medication management, finances, and need for caregiver support",
+      "Disclose the diagnosis and discuss prognosis, advance directives, and treatment options with the patient and family",
+      "Pursue biomarker confirmation (CSF AT(N) markers or amyloid PET) when MRI is equivocal or when an atypical AD variant is suspected",
+      "Use FDG-PET to characterize the regional metabolic pattern and distinguish atypical AD from FTD or DLB"
     ],
     "contraindicated_actions": [
-      "Diagnosing bvFTD without AD biomarker testing",
-      "Treating behavioral symptoms with antipsychotics as first line without proper diagnosis",
-      "Dismissing cognitive symptoms as purely psychiatric"
+      "Do not prescribe anticholinergic medications (e.g., diphenhydramine, oxybutynin, tricyclics) which worsen cognition in patients with AD",
+      "Do not prescribe benzodiazepines as first-line management of anxiety or insomnia given fall and cognitive risk",
+      "Do not start antipsychotics without a clear behavioral indication given the FDA boxed warning for increased mortality in dementia",
+      "Do not attribute symptoms entirely to normal aging, depression, or sleep apnea without completing the dementia workup",
+      "Do not start memantine monotherapy at the mild stage (memantine is approved for moderate-to-severe AD)"
     ],
     "key_reasoning_points": [
-      "Behavioral/executive symptoms as the predominant presentation mimics bvFTD",
-      "Concurrent episodic memory impairment is unusual for bvFTD and suggests AD",
-      "Strongly positive AD biomarkers (low amyloid, high tau) confirm AD as the underlying pathology",
-      "Negative FTD gene panel argues against genetic FTD",
-      "FDG-PET showing both frontal AND posterior hypometabolism supports AD over FTD (FTD typically spares posterior regions)",
-      "Early-onset presentation (age 58) raises the pre-test probability of atypical AD variants",
-      "Father's undiagnosed behavioral dementia could represent either familial FTD or familial AD"
+      "Definite hippocampal and temporoparietal atrophy on MRI with a multi-domain amnestic cognitive profile is sufficient to make a clinical diagnosis of probable AD by NIA-AA 2011 criteria",
+      "The hallmark cognitive feature of AD is impaired delayed recall with rapid forgetting and limited benefit from cueing, reflecting a storage-type (hippocampal) memory deficit",
+      "Frontal variant AD is the closest mimic of bvFTD; amyloid PET positivity differentiates AD from FTD pathology",
+      "APOE genotyping is a risk modifier and is not used to make the diagnosis; an E3/E4 or E4/E4 result is supportive but neither sufficient nor required for diagnosis",
+      "Low-normal B12 should prompt methylmalonic acid testing before being dismissed as a non-contributor",
+      "Cholinesterase inhibitors are first-line symptomatic therapy in mild-to-moderate AD; memantine is reserved for moderate-to-severe disease"
     ],
-    "red_herrings": [
-      {
-        "data_point": "Frontal-predominant atrophy on MRI",
-        "location": "mri",
-        "intended_effect": "Strongly suggests bvFTD",
-        "correct_interpretation": "Frontal variant AD can produce identical imaging pattern; biomarkers are required to differentiate",
-        "field_path": ""
-      },
-      {
-        "data_point": "Father with behavioral changes and dementia",
-        "location": "history",
-        "intended_effect": "Suggests familial FTD",
-        "correct_interpretation": "Father was never genetically tested; could equally represent familial AD with frontal presentation",
-        "field_path": ""
-      },
-      {
-        "data_point": "Utilization behavior and disinhibition",
-        "location": "neurological_exam",
-        "intended_effect": "Classic bvFTD signs",
-        "correct_interpretation": "These frontal signs can occur in frontal variant AD as well",
-        "field_path": ""
-      }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": []
   },
   "metadata": {
     "version": "v5",
@@ -804,6 +876,14 @@
       "cardiac_monitoring": "normal",
       "literature_search": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:ALZ-EARLY",
+    "difficulty_rationale": "Behavioral-predominant AD variant that mimics bvFTD; FDG-PET + amyloid PET essential to distinguish (positive amyloid argues against FTD)",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

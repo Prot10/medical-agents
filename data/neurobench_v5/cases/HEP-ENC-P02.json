@@ -488,117 +488,183 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Hepatic encephalopathy precipitated by multiple concurrent factors: (1) valproate-induced hyperammonemia (urea cycle inhibition, level 118 µg/mL), (2) active alcohol use (ethanol 22), (3) lithium toxicity (level 1.6 from HCTZ interaction), (4) quetiapine CNS depression — in the context of alcoholic cirrhosis Child-Pugh B",
-    "icd_code": "K72.9",
+    "primary_diagnosis": "Hepatic encephalopathy with multifactorial hyperammonemia in alcoholic cirrhosis (Child-Pugh B, MELD 12) — driven by (1) valproate-induced urea-cycle inhibition (level 118 µg/mL), (2) lithium toxicity (1.6 mEq/L, HCTZ interaction), (3) quetiapine CNS depression, and (4) recent alcohol use.",
+    "icd_code": "K72.90",
     "differential": [
       {
-        "diagnosis": "Acute manic episode (bipolar disorder)",
-        "likelihood": "low",
-        "key_features": "Pressured speech and flight of ideas overlap with mania; BUT asterixis, thrombocytopenia, elevated ammonia, and supratherapeutic valproate explain the picture as HE; mania does not cause asterixis"
-      },
-      {
-        "diagnosis": "Lithium toxicity encephalopathy",
+        "diagnosis": "Bipolar manic episode (psychiatric)",
         "likelihood": "moderate",
-        "key_features": "Lithium 1.6 mEq/L (borderline toxic) — tremor, ataxia, confusion are lithium toxicity signs; HCTZ caused reduced renal clearance; contributing but not sole cause — HE with valproate-induced hyperammonemia is primary"
+        "key_features": "Lithium therapy + bipolar history; mania can mimic HE behavioral features but does not cause asterixis or respond to lactulose.",
+        "icd_code": "F31.1"
       },
       {
-        "diagnosis": "Valproate hepatotoxicity causing acute liver failure",
-        "likelihood": "low",
-        "key_features": "Valproate can cause acute hepatic failure but INR 1.6 and bilirubin 2.4 represent chronic Child-Pugh B disease not acute fulminant hepatitis; the main valproate issue here is hyperammonemia from urea cycle inhibition, not hepatotoxicity"
+        "diagnosis": "Lithium toxicity (sole cause)",
+        "likelihood": "moderate",
+        "key_features": "Level 1.6 mEq/L mildly toxic; tremor, confusion fit; HCTZ-lithium interaction is the trigger; treat with hydration and hold lithium.",
+        "icd_code": "T43.595A"
       },
       {
-        "diagnosis": "Alcohol intoxication",
+        "diagnosis": "Valproate-induced hyperammonemic encephalopathy (alone)",
+        "likelihood": "moderate",
+        "key_features": "Valproate inhibits urea-cycle carbamoyl phosphate synthase; can produce hyperammonemic encephalopathy independent of liver function; in a cirrhotic the effect amplifies.",
+        "icd_code": "G92"
+      },
+      {
+        "diagnosis": "Alcohol withdrawal",
         "likelihood": "low",
-        "key_features": "Ethanol 22 mg/dL — low-level intoxication; contributes to confusion; triggers HE via ammonia production and GABA receptor activation similar to benzodiazepines"
+        "key_features": "Ethanol 22 mg/dL on arrival; monitor CIWA.",
+        "icd_code": "F10.231"
+      },
+      {
+        "diagnosis": "Wernicke encephalopathy",
+        "likelihood": "low",
+        "key_features": "Empiric thiamine before dextrose given chronic alcohol.",
+        "icd_code": "E51.2"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Drug levels — valproate, lithium; toxicology (ethanol); ammonia",
+        "action": "Comprehensive labs: CMP including AST/ALT/bilirubin/INR/albumin, ammonia, CBC, glucose, electrolytes (Na, K, Mg), BUN/Cr, lactate, blood cultures and urine cultures; toxicology if substance use plausible. Confirms liver dysfunction and screens for precipitants.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Valproate 118 (supratherapeutic), lithium 1.6 (toxic), ethanol 22, ammonia 76",
+        "expected_finding": "Ammonia, valproate level (118 µg/mL), lithium level (1.6), ethanol 22, cirrhosis features.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 2,
-        "action": "CT head — exclude structural cause",
+        "action": "Non-contrast CT head — exclude structural alternate cause of AMS (hemorrhage, large stroke, mass) before any LP.",
         "tool_name": "order_ct_scan",
-        "expected_finding": "CT normal",
+        "expected_finding": "No acute intracranial process.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 3,
-        "action": "EEG — characterize encephalopathy (note: may look like mania on exam)",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Non-specific theta slowing — metabolic encephalopathy; no seizure activity",
+        "action": "Literature/guideline search to confirm West Haven grading, precipitant management, and lactulose/rifaximin dosing (Valproate-induced hyperammonemia; lithium toxicity; HE in psychiatric polypharmacy).",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "AASLD/EASL 2014 guidance retrieved; West Haven criteria and precipitant-driven management framework confirmed.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 4,
-        "action": "HOLD valproate IMMEDIATELY — primary HE precipitant via urea cycle inhibition",
-        "tool_name": null,
-        "expected_finding": "Ammonia falls rapidly after valproate held",
+        "action": "Drug-interaction and medication-reconciliation review covering valproate (HOLD), lithium (HOLD), quetiapine (HOLD), HCTZ-lithium interaction, lactulose, rifaximin; substitute carnitine if valproate hyperammonemia confirmed; flag any CNS depressants (benzodiazepines, opioids, sedating antiemetics, antihistamines) and confirm lactulose/rifaximin dosing in liver disease.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sedating/CNS-depressant medications identified; lactulose and rifaximin reviewed for hepatic dose adjustment.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Bajaj_2011]",
+        "guideline_source": "Bajaj 2011 HE management review"
       },
       {
         "step": 5,
-        "action": "STOP HCTZ — lithium toxicity from HCTZ reducing renal clearance; IV normal saline",
-        "tool_name": null,
-        "expected_finding": "Lithium level falls to therapeutic range",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "EEG — exclude NCSE (especially valproate-related) and characterize encephalopathy. Triphasic waves are classic but non-specific (metabolic encephalopathies broadly); main role is exclusion of non-convulsive status epilepticus where the differential supports it.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Generalized slowing; no NCSE.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Ferenci_2002]",
+        "guideline_source": "Ferenci 2002 HE nomenclature/quantification"
       },
       {
         "step": 6,
-        "action": "Lactulose + rifaximin for HE; thiamine for ethanol exposure",
-        "tool_name": null,
-        "expected_finding": "Ammonia normalizing; mental status improving",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Consult hepatology + psychiatry for bipolar regimen reformulation — coordinate definitive care, transplant candidacy assessment where applicable.",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Hepatology / critical-care guidance integrated into management.",
+        "category": "recommended",
+        "tool_parameters": {
+          "specialty": "hepatology"
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No clinical suspicion for hepatopulmonary syndrome, portopulmonary hypertension, or endocarditis; echocardiography is not part of the HE workup.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in HE workup; reversible metabolic encephalopathy is the issue, not Alzheimer pathology.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan has no role in HE workup; the question is metabolic encephalopathy, not nigrostriatal degeneration.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "genetic_panel:early_onset_AD"
+        },
+        "rationale": "Early-onset AD genetic panel has no role in HE workup; reversible metabolic encephalopathy is the diagnosis under consideration.",
+        "citation": "[AASLD_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "In altered mental status, exclude intracranial mass effect / hemorrhage on imaging before LP to avoid herniation risk.",
+        "citation": "[AASLD_2014]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "HOLD VALPROATE — valproate-induced hyperammonemic encephalopathy is the primary precipitant; valproate inhibits urea cycle enzyme CPSI, raising ammonia even WITHOUT liver disease; in cirrhosis, this effect is amplified",
-      "STOP HCTZ — causing lithium toxicity via reduced renal clearance; a classic drug interaction",
-      "Asterixis in a 'manic' patient = HE not mania — mania does not cause asterixis; metabolic encephalopathy must be excluded before attributing confusion to bipolar disorder",
-      "L-carnitine IV may help valproate-induced hyperammonemia acutely — valproate depletes carnitine which is required for mitochondrial function and ammonia metabolism"
+      "Hold valproate and lithium immediately; check repeat levels.",
+      "IV L-carnitine 100 mg/kg if valproate-induced hyperammonemia is confirmed.",
+      "Hydrate (normal saline) to support lithium clearance; consider hemodialysis if lithium >2.5 with severe symptoms or AKI.",
+      "Lactulose 30 mL TID; rifaximin 550 mg BID.",
+      "Empiric thiamine before dextrose.",
+      "Psychiatry to plan non-hepatotoxic bipolar regimen (e.g., lamotrigine)."
     ],
     "contraindicated_actions": [
-      "Increasing valproate dose to treat 'breakthrough mania' — worsens hyperammonemia",
-      "HCTZ continuation with lithium — lithium toxicity from thiazide interaction",
-      "Haloperidol for agitation — patient has documented allergy (dystonic reaction)",
-      "High-dose benzodiazepines for behavioral control in HE"
+      "Do not prescribe benzodiazepines for anxiety/agitation — they precipitate and prolong HE (use haloperidol or non-pharmacologic measures for agitation).",
+      "Do not prescribe sedating opioids — they worsen HE; consider acetaminophen at hepatic-safe dosing for pain.",
+      "Do not perform LP before neuroimaging excludes mass effect when the patient has altered mental status.",
+      "Do not restart valproate in cirrhotic without strong indication — repeat hyperammonemia risk.",
+      "Avoid HCTZ-lithium combinations — well-known interaction that precipitated this toxicity."
     ],
     "key_reasoning_points": [
-      "Valproate-induced hyperammonemic encephalopathy (VIHE) — valproate inhibits CPS1 (urea cycle step 1), raising ammonia independent of liver disease; in cirrhosis, the effect is dramatically amplified; VIHE can occur without elevated transaminases or liver failure",
-      "HCTZ-lithium interaction — thiazide diuretics reduce renal lithium clearance by promoting sodium reabsorption (lithium follows sodium); toxicity risk is well-documented but frequently missed",
-      "Mania vs HE: pressured speech and agitation can mimic mania — the presence of asterixis, supratherapeutic drug levels, and elevated ammonia should redirect to metabolic etiology",
-      "Multiple simultaneous drug precipitants (valproate + lithium + ethanol + quetiapine) additive with cirrhotic HE baseline — addressing ALL precipitants is required for full recovery"
+      "HE is a clinical diagnosis: West Haven grading + evidence of liver dysfunction + exclusion of other causes of AMS — ammonia level is supportive only and correlates poorly with grade (AASLD 2014).",
+      "Precipitant identification is more actionable than the ammonia number: infection (SBP especially), GI bleed, electrolyte disturbance (hypokalemia/hyponatremia), constipation, sedative/CNS-depressant use, dehydration, dietary protein load, renal failure.",
+      "Valproate can produce hyperammonemic encephalopathy in patients without overt liver disease (urea-cycle inhibition); in cirrhotics the effect is potentiated. L-carnitine reverses it.",
+      "Thiazides reduce lithium clearance; the lithium-HCTZ combination is a well-known cause of toxicity."
     ],
     "red_herrings": [
       {
-        "data_point": "Pressured speech, flight of ideas, limited sleep, 'manic' behavior reported by sister",
-        "location": "patient.neurological_exam.mental_status",
-        "intended_effect": "Diagnose as manic episode; call psychiatry; initiate antipsychotic; miss HE and valproate toxicity",
-        "correct_interpretation": "Asterixis (even subtle), elevated ammonia, supratherapeutic valproate, and lithium toxicity explain the presentation as metabolic encephalopathy; mania does not cause asterixis; drug levels and ammonia are the decisive tests",
-        "field_path": ""
+        "data_point": "Acute manic-appearing presentation in known bipolar",
+        "location": "patient.history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Anchor on bipolar relapse and add antipsychotic; miss multifactorial metabolic precipitants.",
+        "correct_interpretation": "Asterixis + cirrhosis + hyperammonemia + multiple offending drugs = metabolic encephalopathy presenting with behavioral overlay."
       },
       {
-        "data_point": "Bipolar disorder type I with prior hospitalization for mania",
-        "location": "patient.clinical_history.past_medical_history",
-        "intended_effect": "Strong prior psychiatric history biases clinician toward psychiatric diagnosis; minimize metabolic workup",
-        "correct_interpretation": "Prior psychiatric history creates anchoring bias — but new confusion in a known cirrhotic with abnormal drug levels must be evaluated metabolically first; the absence of classic manic prodrome (sleep reduction for weeks, goal-directed behavior) and presence of asterixis/drug toxicity points to metabolic HE over mania",
-        "field_path": ""
+        "data_point": "Ethanol 22 mg/dL",
+        "location": "initial_tool_outputs.labs.panels.Toxicology",
+        "field_path": "",
+        "intended_effect": "Attribute presentation to recent alcohol use.",
+        "correct_interpretation": "Ethanol 22 is well below intoxication threshold; the dominant drivers are valproate + lithium + cirrhosis."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -618,6 +684,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (HEP-ENC)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:HEP-ENC",
+    "difficulty_rationale": "4 required tools + EEG + psychiatry consult; ≥3 simultaneous mechanistic contributors (valproate urea-cycle inhibition + lithium toxicity from HCTZ interaction + cirrhosis); psychiatric overlay creates anchoring risk.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

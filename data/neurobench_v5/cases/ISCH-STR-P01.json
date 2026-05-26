@@ -83,7 +83,7 @@
           "signal_characteristics": {
             "DWI": "Hyperintense signal (restricted diffusion) in the left inferior cerebellar hemisphere",
             "ADC": "Corresponding hypointensity confirming true restricted diffusion",
-            "FLAIR": "Equivocal, very subtle hyperintensity — findings may be missed on FLAIR alone given early presentation",
+            "FLAIR": "Equivocal, very subtle hyperintensity \u2014 findings may be missed on FLAIR alone given early presentation",
             "T1": "No definite signal abnormality",
             "T2": "Subtle hyperintensity in left PICA territory, easily overlooked"
           },
@@ -417,11 +417,11 @@
         "ejection_fraction": 62.0,
         "wall_motion": null,
         "findings": [
-          "Interatrial Septum: Patent foramen ovale confirmed with positive bubble study — early passage of microbubbles (within 3 cardiac cycles) from right to left atrium after Valsalva maneuver",
+          "Interatrial Septum: Patent foramen ovale confirmed with positive bubble study \u2014 early passage of microbubbles (within 3 cardiac cycles) from right to left atrium after Valsalva maneuver",
           "Atrial Septal Aneurysm: Hypermobile interatrial septum with 12 mm excursion, meeting criteria for atrial septal aneurysm",
           "Pericardium: No effusion"
         ],
-        "impression": "Abnormal values: Interatrial Septum Patent foramen ovale confirmed with positive bubble study — early passage of microbubbles (within 3 cardiac cycles) from right to left atrium after Valsalva maneuver  (H), Atrial Septal Aneurysm Hypermobile interatrial septum with 12 mm excursion, meeting criteria for atrial septal aneurysm  (H).",
+        "impression": "Abnormal values: Interatrial Septum Patent foramen ovale confirmed with positive bubble study \u2014 early passage of microbubbles (within 3 cardiac cycles) from right to left atrium after Valsalva maneuver  (H), Atrial Septal Aneurysm Hypermobile interatrial septum with 12 mm excursion, meeting criteria for atrial septal aneurysm  (H).",
         "recommended_actions": []
       }
     },
@@ -723,205 +723,326 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Acute ischemic stroke, left posterior inferior cerebellar artery territory, secondary to left vertebral artery dissection",
-    "icd_code": "I63.9",
+    "primary_diagnosis": "Acute ischemic stroke, left PICA territory, secondary to left vertebral artery dissection",
+    "icd_code": "I63.012",
     "differential": [
       {
-        "diagnosis": "Vestibular neuritis",
-        "likelihood": "very_low",
-        "key_features": "Vestibular neuritis presents with unilateral vestibular hypofunction and positive head impulse test (peripheral pattern), but direction-changing nystagmus and cerebellar ataxia on exam are central signs. MRI with DWI showing cerebellar infarction definitively excludes this diagnosis."
-      },
-      {
-        "diagnosis": "Migraine with brainstem aura (basilar migraine)",
+        "diagnosis": "Benign peripheral vertigo (vestibular neuritis/BPPV)",
         "likelihood": "low",
-        "key_features": "Patient has migraine history, but current episode lacks headache at onset, has persistent focal neurological signs rather than transient aura symptoms, and MRI confirms structural infarction rather than reversible vasospasm."
-      },
-      {
-        "diagnosis": "Multiple sclerosis (cerebellar demyelinating lesion)",
-        "likelihood": "low",
-        "key_features": "Acute onset in a vascular territory distribution, absence of prior neurological episodes, and no additional white matter lesions on MRI argue against MS. The lesion conforms to PICA territory rather than perivenular distribution."
-      },
-      {
-        "diagnosis": "Paradoxical embolism through PFO",
-        "likelihood": "low",
-        "key_features": "PFO with atrial septal aneurysm and Factor V Leiden create a substrate for paradoxical embolism. However, the ipsilateral vertebral artery dissection is the more parsimonious explanation. PFO may be relevant for long-term management."
+        "key_features": "HINTS-plus and persistent ataxia/dysmetria localize lesion centrally; MRI DWI confirms cerebellar infarct",
+        "icd_code": null
       },
       {
         "diagnosis": "Cerebellar hemorrhage",
         "likelihood": "very_low",
-        "key_features": "MRI shows no hemorrhagic signal on GRE/SWI. DWI and ADC patterns are consistent with ischemia, not hemorrhage."
+        "key_features": "CT/MRI rule out hemorrhage",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Migraine with brainstem aura",
+        "likelihood": "very_low",
+        "key_features": "Persistent deficit and DWI-positive lesion exclude migraine",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Multiple sclerosis (brainstem/cerebellar relapse)",
+        "likelihood": "very_low",
+        "key_features": "Acute vascular-territory DWI lesion without other demyelinating features",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Posterior fossa tumor",
+        "likelihood": "very_low",
+        "key_features": "Acute onset and vascular-territory DWI restriction inconsistent with neoplasm",
+        "icd_code": null
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Perform focused neurological examination including HINTS exam (Head Impulse, Nystagmus, Test of Skew) to differentiate central from peripheral vertigo",
-        "tool_name": null,
-        "expected_finding": "Direction-changing nystagmus is a central sign despite positive head impulse test; this combination should raise suspicion for posterior circulation stroke",
-        "category": "required"
+        "action": "Obtain emergent non-contrast CT head as first imaging to exclude intracranial hemorrhage before any thrombolytic decision",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Non-contrast CT often normal in early posterior fossa stroke; exclude hemorrhage and cerebellar mass effect",
+        "category": "required",
+        "tool_parameters": {
+          "contrast": false,
+          "angiography": false
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 2,
-        "action": "Recognize central vestibular signs and activate stroke protocol despite initial peripheral-appearing presentation",
-        "tool_name": null,
-        "expected_finding": "NIHSS 3, direction-changing nystagmus, cerebellar signs on exam",
-        "category": "required"
+        "action": "Obtain CT angiography of head and neck to evaluate for large vessel occlusion and assess thrombectomy candidacy",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "CTA neck demonstrates left vertebral artery dissection with intimal flap or string-of-pearls/luminal narrowing; PICA distribution downstream",
+        "category": "required",
+        "tool_parameters": {
+          "contrast": true,
+          "angiography": true
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 3,
-        "action": "Obtain stat labs including CBC, BMP, coagulation studies, glucose, and troponin",
+        "action": "Order stat labs: CBC, BMP (including glucose), coagulation panel (INR/PTT), troponin",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal labs; no traditional vascular risk factors identified, prompting consideration of dissection or other unusual etiologies",
+        "expected_finding": "Glucose, coagulation, basic chemistries normal; exclude hypoglycemia mimic; check hypercoagulability later given young age",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
+            "glucose",
             "coagulation",
             "troponin"
           ]
-        }
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 4,
-        "action": "Obtain 12-lead ECG to evaluate for arrhythmia as embolic source",
+        "action": "Obtain 12-lead ECG to assess for atrial fibrillation and concurrent cardiac ischemia",
         "tool_name": "analyze_ecg",
-        "expected_finding": "Normal sinus rhythm — no cardioembolic source identified, classifying this as initially cryptogenic",
-        "category": "required"
+        "expected_finding": "Likely sinus rhythm; assess for AF and concurrent ischemia",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 5,
-        "action": "Obtain emergent brain MRI with DWI and MRA (including fat-saturated T1 of the neck) rather than relying on CT, given high suspicion for posterior fossa pathology where CT has limited sensitivity",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "DWI restriction in left PICA territory; left vertebral artery V3 dissection with intramural hematoma on fat-sat T1",
+        "action": "Review current AHA/ASA guidelines for IV thrombolysis windows, late-window selection, and mechanical thrombectomy eligibility",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Vertebral artery dissection management, antiplatelet vs anticoagulation in cervical artery dissection (CADISS)",
         "category": "required",
         "tool_parameters": {
-          "protocol": "stroke",
-          "contrast": false
-        }
+          "query": "Vertebral artery dissection management, antiplatelet vs anticoagulation in cervical artery dissection (CADISS)"
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 6,
-        "action": "Obtain CTA head and neck for further vascular characterization of the dissection",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "Left vertebral artery V3 dissection with significant luminal narrowing, no pseudoaneurysm",
+        "action": "Confirm absence of contraindications to IV thrombolysis (recent anticoagulation, surgery, bleeding, drug interactions)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "tPA contraindications screened; medication-anticoagulant interactions reviewed",
         "category": "required",
-        "tool_parameters": {
-          "angiography": true,
-          "contrast": false
-        }
+        "tool_parameters": {},
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 7,
-        "action": "Initiate antithrombotic therapy (aspirin 325 mg loading dose then 81 mg daily, or anticoagulation) for vertebral artery dissection",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Obtain brain MRI with DWI and FLAIR to confirm acute infarct, localize territory, and assess vintage",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "DWI-positive cerebellar infarct in left PICA territory; T1 fat-saturated cervical MRI shows crescentic intramural hematoma in left vertebral artery confirming dissection",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "stroke",
+          "sequences": [
+            "DWI",
+            "ADC",
+            "FLAIR",
+            "T2",
+            "T1",
+            "GRE/SWI"
+          ],
+          "contrast": false
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 8,
-        "action": "Order transthoracic echocardiogram with bubble study to evaluate PFO and assess for cardiac source of embolism",
+        "action": "Obtain transthoracic echocardiogram to evaluate for cardioembolic source of stroke",
         "tool_name": "order_echocardiogram",
-        "expected_finding": "PFO with right-to-left shunt and atrial septal aneurysm confirmed",
+        "expected_finding": "TTE to screen for cardiac source and patent foramen ovale; PFO known historically \u2014 characterize shunt and consider bubble study after acute window",
         "category": "required",
         "tool_parameters": {
-          "echo_type": "bubble_study"
-        }
+          "echo_type": "TTE"
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 9,
-        "action": "Order hypercoagulability panel given young age and stroke of uncertain etiology",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Heterozygous Factor V Leiden mutation identified",
-        "category": "recommended",
+        "action": "Initiate inpatient telemetry plus 24-hour Holter monitoring (extend to 30-day event monitor if no source identified)",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Telemetry/Holter to exclude AF; lower yield in young patient with confirmed dissection",
+        "category": "required",
         "tool_parameters": {
-          "panels": [
-            "coagulation"
-          ]
-        }
+          "monitor_type": "holter_24h"
+        },
+        "citation": "[Sanna_2014]",
+        "guideline_source": "[Sanna_2014]"
       },
       {
         "step": 10,
-        "action": "Initiate prolonged cardiac monitoring (72-hour Holter or implantable loop recorder) to evaluate for paroxysmal atrial fibrillation",
-        "tool_name": "order_cardiac_monitoring",
-        "expected_finding": "No atrial fibrillation detected over 72 hours",
-        "category": "recommended",
+        "action": "Obtain carotid duplex ultrasound to quantify cervical carotid stenosis and characterize plaque morphology",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Carotid duplex assesses anterior circulation; less informative for vertebral arteries \u2014 pursue CTA/MRA neck instead",
+        "category": "required",
         "tool_parameters": {
-          "monitor_type": "holter_48h"
-        }
+          "modality": "carotid_duplex"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
       },
       {
         "step": 11,
-        "action": "Admit to stroke unit for serial neurological examinations, monitoring for cerebellar edema and hydrocephalus",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Obtain MR angiography of head and neck with fat-saturated T1 sequences to characterize vertebral artery dissection",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Intramural hematoma and luminal narrowing confirm cervical arterial dissection",
+        "category": "required",
+        "tool_parameters": {
+          "modality": "MR_angiography"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
       },
       {
         "step": 12,
-        "action": "Plan multidisciplinary discussion regarding PFO closure given co-existing PFO with atrial septal aneurysm and Factor V Leiden in the context of vertebral artery dissection-related stroke",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended"
+        "action": "Order hypercoagulability panel and connective-tissue screen in young dissection (antiphospholipid antibodies, factor V Leiden, prothrombin, homocysteine; consider FBN1/COL3A1 referral if features of connective tissue disorder)",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Identify treatable hypercoagulable state or systemic vascular fragility",
+        "category": "recommended",
+        "tool_parameters": {
+          "panels": [
+            "antiphospholipid",
+            "factor V Leiden",
+            "prothrombin G20210A",
+            "protein C",
+            "protein S",
+            "homocysteine"
+          ]
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
+      },
+      {
+        "step": 13,
+        "action": "Consider MR angiography of head and neck if CTA was contraindicated or as confirmatory vascular study",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Alternative non-iodinated vascular assessment when CTA is limited",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "MR_angiography"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
+      },
+      {
+        "step": 14,
+        "action": "Consider transcranial Doppler for microembolic signal detection or hemodynamic assessment in selected mechanisms",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Microembolic signals support active embolic mechanism; can monitor vasospasm or right-to-left shunt",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "transcranial_doppler"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "No seizure-like features; EEG not part of posterior circulation stroke workup",
+        "citation": "[AHA_ASA_2019]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No SAH or vasculitis suspicion in clear dissection picture; LP not indicated",
+        "citation": "[AHA_ASA_2019]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "rationale": "EMG/NCS evaluates peripheral nerve disease; not applicable to central ischemic stroke",
+        "citation": "[AHA_ASA_2019]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "check_drug_interactions",
+        "reason": "Non-contrast head CT MUST exclude intracranial hemorrhage before IV thrombolysis is considered (tPA decision modeled here through drug-interaction/contraindication check).",
+        "citation": "[AHA_ASA_2019]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Glucose, INR/PTT, and platelet count must be reviewed before IV thrombolysis to exclude hypoglycemia mimic and coagulopathy contraindications.",
+        "citation": "[AHA_ASA_2019]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Recognize central vestibular signs (direction-changing nystagmus, cerebellar ataxia) and do not dismiss as benign peripheral vertigo",
-      "Obtain brain MRI with DWI for posterior fossa evaluation — CT has poor sensitivity for posterior fossa infarcts",
-      "Obtain vascular imaging (MRA with fat-sat T1 or CTA) of the neck to identify vertebral artery dissection",
-      "Initiate antithrombotic therapy for vertebral artery dissection",
-      "Monitor for cerebellar edema and obstructive hydrocephalus, which can be life-threatening",
-      "Evaluate for underlying prothrombotic state and cardiac shunt given young age"
+      "Establish time of last known well (LKW) and apply NIHSS to determine acute treatment eligibility",
+      "Obtain non-contrast CT head FIRST to exclude intracranial hemorrhage before any thrombolytic decision",
+      "Achieve door-to-needle time <60 minutes if IV thrombolysis is indicated",
+      "Maintain blood pressure <185/110 mmHg prior to IV tPA and <180/105 mmHg for 24 hours after",
+      "Verify glucose to exclude hypoglycemia as a stroke mimic",
+      "Initiate continuous telemetry and obtain prolonged cardiac monitoring to detect paroxysmal atrial fibrillation",
+      "Begin secondary prevention (antiplatelet or anticoagulation) and high-intensity statin per mechanism",
+      "Apply HINTS-plus to differentiate central from peripheral vertigo \u2014 direction-changing nystagmus, abnormal head-impulse, skew deviation point central",
+      "Initiate antiplatelet OR anticoagulation per CADISS for cervical artery dissection; either is acceptable for first 3-6 months",
+      "Monitor for cerebellar swelling and obstructive hydrocephalus in posterior fossa stroke \u2014 neurosurgical consult if mass effect develops"
     ],
     "contraindicated_actions": [
-      "Discharging the patient with a diagnosis of vestibular neuritis or benign positional vertigo without neuroimaging",
-      "Administering IV thrombolysis (alteplase) in the setting of arterial dissection without careful risk-benefit analysis — dissection is a relative contraindication",
-      "Performing cervical manipulation or chiropractic adjustment, which may worsen the dissection",
-      "Prescribing meclizine and sending the patient home without MRI evaluation",
-      "Delaying MRI in favor of CT alone for a posterior fossa presentation, as CT misses up to 40% of posterior fossa infarcts",
-      "Aggressively anticoagulating before confirming the absence of hemorrhagic transformation on imaging"
+      "Do not administer IV tPA before non-contrast CT excludes intracranial hemorrhage",
+      "Do not give IV tPA if INR >1.7, platelet count <100,000, recent major surgery, or other guideline-listed contraindications",
+      "Do not aggressively lower blood pressure below 140/90 mmHg in the acute phase outside the tPA window \u2014 risks worsening penumbral perfusion",
+      "Do not delay non-contrast CT for additional imaging or labs in a stroke alert presentation",
+      "Do not start full-dose anticoagulation in the acute phase of a large infarct without considering hemorrhagic transformation risk",
+      "Do not dismiss isolated vertigo without HINTS-plus and posterior circulation imaging (DWI MRI) in patients with vascular risk or focal exam",
+      "Do not delay vessel imaging in young patients with posterior fossa stroke \u2014 dissection must be excluded",
+      "Avoid order_specialized_test with test_type=tilt_table: Tilt-table testing is for syncope evaluation \u2014 not appropriate when central vertigo from cerebellar infarct is confirmed; delaying treatment for tilt-table workup risks deterioration"
     ],
     "key_reasoning_points": [
-      "Posterior circulation strokes frequently mimic peripheral vestibular disorders, and the HINTS exam is critical for differentiation: direction-changing nystagmus is always central, even if head impulse test appears peripheral",
-      "Young stroke patients without traditional risk factors require investigation for dissection, PFO, and thrombophilia as alternative mechanisms",
-      "The history of recent cervical hyperextension during cycling followed by posterior circulation stroke should immediately suggest vertebral artery dissection",
-      "A known PFO with atrial septal aneurysm creates diagnostic ambiguity — is this paradoxical embolism or dissection-related embolism? The ipsilateral vertebral artery dissection is the more parsimonious explanation (Occam's razor)",
-      "CT has poor sensitivity for posterior fossa infarcts; MRI with DWI is the imaging modality of choice when posterior circulation stroke is suspected",
-      "The initial NIHSS of 3 can be misleadingly low in posterior circulation strokes because the NIHSS is weighted toward anterior circulation deficits — a low NIHSS does not exclude a dangerous posterior circulation event",
-      "Cerebellar infarcts carry risk of malignant edema and obstructive hydrocephalus requiring emergent neurosurgical intervention, making inpatient monitoring essential"
+      "Acute ischemic stroke is a clinical syndrome plus neuroimaging diagnosis; CT first excludes hemorrhage and unmasks the tPA decision",
+      "Time of last known well governs IV thrombolysis eligibility (\u22644.5h standard; selected up to 9h with imaging mismatch per WAKE-UP/EXTEND)",
+      "Large vessel occlusion on CTA opens the mechanical thrombectomy pathway up to 24h per DAWN/DEFUSE-3 selection criteria",
+      "TOAST classification by mechanism (large-artery, cardioembolic, small-vessel, other, undetermined) drives secondary prevention strategy",
+      "Normal sinus rhythm on initial ECG does NOT exclude paroxysmal AF \u2014 extended cardiac monitoring is required, especially in cryptogenic stroke",
+      "Cervical arterial dissection is the most common stroke etiology in young adults with neck pain and posterior circulation symptoms",
+      "Acute treatment of dissection-related stroke uses antiplatelet or anticoagulation; CADISS showed equivalent outcomes",
+      "T1 fat-saturated MRI of the cervical vessels visualizes intramural hematoma \u2014 the dissection hallmark",
+      "Off-pathway modality for order_advanced_imaging (modality=amyloid_PET): Amyloid PET has no role in acute ischemic stroke evaluation and incurs substantial cost without altering management",
+      "Off-pathway modality for order_advanced_imaging (modality=DaTscan): Dopamine transporter SPECT is indicated for parkinsonian syndromes, not vascular stroke workup",
+      "Off-pathway modality for order_advanced_imaging (modality=FDG_PET): FDG-PET (neurodegenerative/oncologic indications) has no role in routine ischemic stroke workup"
     ],
     "red_herrings": [
       {
-        "data_point": "Sodium 129 mEq/L (hyponatremia)",
-        "location": "labs",
-        "intended_effect": "May prompt consideration of hyponatremic encephalopathy or SIADH as the cause of neurological symptoms, distracting from the vascular etiology",
-        "correct_interpretation": "Mild hyponatremia in this young patient is likely from vomiting and nausea accompanying the posterior circulation stroke; it does not explain the focal brainstem and cerebellar findings, which require a vascular workup",
-        "field_path": ""
+        "data_point": "Patent foramen ovale identified incidentally at age 28",
+        "location": "past medical history",
+        "field_path": "patient.clinical_history.past_medical_history[1]",
+        "intended_effect": "Anchor to PFO as stroke mechanism and miss the vertebral artery dissection",
+        "correct_interpretation": "Incidental PFO is common; the posterior circulation infarct + vertebral artery dissection are mechanistically primary"
       },
       {
-        "data_point": "Factor V Leiden heterozygous mutation and patent foramen ovale (PFO) with atrial septal aneurysm",
-        "location": "followup",
-        "intended_effect": "May lead the clinician to attribute the stroke to paradoxical embolism through PFO/thrombophilia, potentially diverting from the primary diagnosis of vertebral artery dissection",
-        "correct_interpretation": "While PFO and Factor V Leiden increase thrombosis risk and paradoxical embolism is plausible, the ipsilateral vertebral artery dissection on MRA is the most parsimonious causative mechanism; Occam's razor favors the dissection as the stroke source",
-        "field_path": ""
-      },
-      {
-        "data_point": "Positive head impulse test on initial vestibular assessment",
-        "location": "neurological_exam",
-        "intended_effect": "A positive head impulse test is classically a peripheral vestibular sign; if interpreted in isolation it may lead to a diagnosis of vestibular neuritis and delay vascular imaging",
-        "correct_interpretation": "In the HINTS exam, direction-changing nystagmus overrides a positive head impulse test — any direction-changing nystagmus indicates a central cause regardless of the head impulse test result; this patient had a central HINTS pattern mandating urgent stroke imaging",
-        "field_path": ""
+        "data_point": "History of episodic migraine without aura",
+        "location": "past medical history",
+        "field_path": "patient.clinical_history.past_medical_history[0]",
+        "intended_effect": "Attribute new severe vertigo to migraine equivalent",
+        "correct_interpretation": "Persistent deficits and DWI-positive cerebellar infarct exclude migraine; central vertigo from cerebellar infarct requires distinct workup"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "1.0",
     "created_by": "neurobench_generator",
     "condition_name": "Acute ischemic stroke",
-    "difficulty_description": "Diagnostic puzzle — young patient with acute vertigo, diplopia, and ataxia mimicking vestibular neuritis, without traditional vascular risk factors. Posterior circulation stroke secondary to vertebral artery dissection, complicated by co-existing PFO with atrial septal aneurysm and Factor V Leiden.",
+    "difficulty_description": "Diagnostic puzzle \u2014 young patient with acute vertigo, diplopia, and ataxia mimicking vestibular neuritis, without traditional vascular risk factors. Posterior circulation stroke secondary to vertebral artery dissection, complicated by co-existing PFO with atrial septal aneurysm and Factor V Leiden.",
     "expected_agent_confidence": "0.45",
     "clinical_pearls": [
       "The HINTS exam outperforms MRI in the first 24-48 hours for detecting central causes of acute vestibular syndrome, but direction-changing nystagmus alone should prompt urgent stroke workup",
@@ -935,6 +1056,16 @@
       "specialized_test": "normal",
       "literature_search": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:ISCH-STR",
+    "difficulty_rationale": "Posterior circulation stroke from vertebral artery dissection in young patient; HINTS-plus interpretation and dedicated vessel imaging required; PFO red herring.",
+    "case_body_concerns": [
+      "Required tool `check_drug_interactions` (step 6) has no pre-generated output in initial_tool_outputs/followup_outputs \u2014 agent will receive only the generic fallback_tool_outputs entry. Recommend adding a case-specific followup_outputs entry to match the ground-truth expected_finding."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

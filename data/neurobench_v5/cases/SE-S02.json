@@ -505,91 +505,197 @@
   },
   "ground_truth": {
     "primary_diagnosis": "Focal status epilepticus with secondary generalization in drug-resistant right temporal lobe epilepsy (hippocampal sclerosis)",
-    "icd_code": "G41.9",
+    "icd_code": "G41.1",
     "differential": [
       {
-        "diagnosis": "Autoimmune encephalitis SE",
-        "likelihood": "very_low",
-        "key_features": "Autoimmune antibodies negative serum and CSF; known TLE on MRI; therapeutic AED levels"
+        "diagnosis": "Autoimmune limbic encephalitis exacerbation",
+        "likelihood": "moderate",
+        "key_features": "TLE with recent worsening — consider autoimmune contribution; antibody panel sent",
+        "icd_code": "G04.81"
       },
       {
-        "diagnosis": "HSV encephalitis with SE",
-        "likelihood": "very_low",
-        "key_features": "HSV PCR negative; no fever pattern typical of HSV; temporal changes are chronic"
+        "diagnosis": "Subtherapeutic AED breakthrough",
+        "likelihood": "moderate",
+        "key_features": "Lamotrigine 8.2 mcg/mL; could be contributory; LEV therapeutic at 42",
+        "icd_code": "G40.219"
       },
       {
-        "diagnosis": "AED non-adherence SE",
-        "likelihood": "very_low",
-        "key_features": "Both AED levels therapeutic - breakthrough SE despite compliance in drug-resistant epilepsy"
+        "diagnosis": "New structural lesion (gliosis vs tumor)",
+        "likelihood": "low",
+        "key_features": "Known hippocampal sclerosis; MRI to assess for new lesion",
+        "icd_code": "G40.219"
+      },
+      {
+        "diagnosis": "CNS infection",
+        "likelihood": "low",
+        "key_features": "No fever / immunocompromise; CSF if clinical course worsens",
+        "icd_code": "G04.90"
+      },
+      {
+        "diagnosis": "Drug interaction with escitalopram lowering seizure threshold",
+        "likelihood": "low",
+        "key_features": "SSRIs minimal seizure-threshold effect at therapeutic doses",
+        "icd_code": "G40.219"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "EEG confirms focal SE right temporal with secondary generalization",
+        "action": "EEG — confirm focal SE with secondary generalization",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Right temporal ictal activity with secondary generalization; subclinical SE after midazolam",
+        "expected_finding": "Right temporal focal ictal activity at 4-6 Hz with secondary bilateral spread",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "Interpret labs - AED levels therapeutic, phenytoin allergy",
+        "action": "Labs: CBC, CMP, glucose, Ca/Mg, AED levels (LTG, LEV), CK, lactate, ABG, beta-hCG, tox screen",
         "tool_name": "interpret_labs",
-        "expected_finding": "Therapeutic AED levels - drug-resistant epilepsy; CK elevated; phenytoin allergy documented",
+        "expected_finding": "Lamotrigine subtherapeutic, LEV therapeutic; lactate 6.2 (post-ictal); CK 1840 (rhabdo)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Lacosamide IV - safe given phenytoin SJS allergy",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Fosphenytoin CONTRAINDICATED; lacosamide safe choice",
+        "action": "Non-contrast head CT",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Subtle chronic right temporal hypodensity, no acute hemorrhage/mass",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "MRI - right hippocampal sclerosis + peri-ictal changes",
+        "action": "MRI brain with epilepsy protocol — assess hippocampal sclerosis and exclude new lesion",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Right hippocampal sclerosis; peri-ictal DWI changes reversible",
+        "expected_finding": "Right hippocampal volume loss with T2/FLAIR hyperintensity — consistent with mesial temporal sclerosis; no new lesion",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "Epilepsy surgery evaluation counseling",
+        "action": "Lacosamide drug-interaction check (second-line AED choice)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Lacosamide compatible with current regimen; PR-interval monitoring needed",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESETT_2019]",
+        "guideline_source": ""
+      },
+      {
+        "step": 6,
+        "action": "Literature: drug-resistant focal SE — second-line and refractory pathway",
         "tool_name": "search_medical_literature",
-        "expected_finding": "Drug-resistant TLE + SE = surgery candidate evaluation",
+        "expected_finding": "ESETT supports LEV, valproate, fosphenytoin as second-line; lacosamide as alternative second-line",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESETT_2019]",
+        "guideline_source": ""
+      },
+      {
+        "step": 7,
+        "action": "Autoimmune encephalitis panel (LGI1, NMDAR) — recent worsening",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Negative on this draw; rules out autoimmune flare",
         "category": "recommended",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 8,
+        "action": "Pre-surgical epilepsy evaluation literature review",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Drug-resistant TLE with hippocampal sclerosis is a strong candidate for anterior temporal lobectomy",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "study_type": "TTE"
+        },
+        "rationale": "No clinical suspicion of cardiac source of embolus or cardiogenic seizure; routine echo is not indicated in SE workup absent cardiac findings.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No suspicion of arrhythmogenic syncope or cardiac comorbidity precipitating SE; routine telemetry beyond standard ICU monitoring adds cost without yield.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in acute SE evaluation; dementia biomarker imaging does not change acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is for ischemic stroke workup; SE without focal vascular suspicion does not warrant carotid imaging.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "DaTscan / dopamine transporter imaging has no role in SE; no parkinsonism question relevant to acute management.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Confirm beta-hCG in 28yo woman before AED escalation.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Fosphenytoin/phenytoin ABSOLUTELY CONTRAINDICATED - documented SJS allergy",
-      "IV lacosamide 400 mg loading dose as second-line AED",
-      "Continuous EEG monitoring - subclinical SE persists after clinical cessation",
-      "AED levels both therapeutic - this is drug-resistant epilepsy, not non-adherence",
-      "Right hippocampal sclerosis on MRI - refer for epilepsy surgery evaluation after recovery",
-      "Rhabdomyolysis (CK 1840) - IV hydration protocol"
+      "Administer IV lorazepam 0.1 mg/kg first-line",
+      "Load IV levetiracetam or lacosamide as second-line AED per ESETT",
+      "Reload lamotrigine to therapeutic levels (slow titration)",
+      "Refer for pre-surgical epilepsy evaluation (drug-resistant TLE with hippocampal sclerosis)"
     ],
     "contraindicated_actions": [
-      "ABSOLUTELY CONTRAINDICATED: fosphenytoin or phenytoin - SJS allergy",
-      "Do not stop cEEG after clinical seizure cessation - subclinical SE must be excluded",
-      "Do not increase lamotrigine or levetiracetam without checking levels",
-      "Do not discharge without neurology follow-up and epilepsy surgery evaluation"
+      "Do NOT load lamotrigine rapidly — risk of Stevens-Johnson syndrome with fast titration",
+      "Do NOT use enzyme-inducing AEDs that worsen depression/escitalopram interactions"
     ],
     "key_reasoning_points": [
-      "Phenytoin SJS allergy is absolute contraindication - fosphenytoin is a prodrug of phenytoin, equally contraindicated",
-      "Therapeutic AED levels confirm drug-resistant epilepsy not non-adherence",
-      "After benzodiazepine, EEG monitoring reveals subclinical NCSE - clinical examination alone insufficient",
-      "Right hippocampal sclerosis + drug-resistant TLE + SE episode = strong indication for epilepsy surgery referral",
-      "Lacosamide is appropriate second-line in phenytoin-allergic patients"
+      "Drug-resistant TLE with hippocampal sclerosis has 60-70% seizure-free outcomes after anterior temporal lobectomy",
+      "Lamotrigine must be titrated slowly to avoid SJS — emergent reload requires staged approach",
+      "ESETT trial established LEV, VPA, fosphenytoin as equivalent second-line; lacosamide is a reasonable alternative"
     ],
-    "red_herrings": [],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": [
+      {
+        "data_point": "Escitalopram on medication list",
+        "location": "patient.clinical_history.medications",
+        "field_path": "patient.clinical_history.medications",
+        "intended_effect": "Suggests SSRI lowering seizure threshold as cause",
+        "correct_interpretation": "SSRIs have minimal seizure-threshold effect at therapeutic doses; subtherapeutic lamotrigine + structural focus is the cause"
+      }
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -598,6 +704,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "6 required + 2 recommended; drug-resistant TLE in SE; teaching includes ESETT second-line equivalence, surgical candidacy, lamotrigine titration caveats; 1 grounded red herring.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

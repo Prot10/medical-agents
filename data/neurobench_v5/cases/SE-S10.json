@@ -473,94 +473,193 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Status epilepticus from combined tricyclic antidepressant (TCA) and MDMA toxidrome with QRS widening requiring sodium bicarbonate",
-    "icd_code": "G41.9",
+    "primary_diagnosis": "Status epilepticus from combined tricyclic antidepressant and MDMA toxidrome with QRS widening requiring sodium bicarbonate",
+    "icd_code": "G41.0",
     "differential": [
       {
-        "diagnosis": "MDMA toxidrome SE alone",
-        "likelihood": "low",
-        "key_features": "TCA tox screen positive; QRS widening 128 ms confirms TCA as primary driver; MDMA co-ingested"
+        "diagnosis": "Isolated TCA overdose",
+        "likelihood": "very_high",
+        "key_features": "TCA positive on tox screen; QRS widening characteristic; needs sodium bicarbonate",
+        "icd_code": "T43.015A"
       },
       {
-        "diagnosis": "New-onset primary epilepsy",
-        "likelihood": "very_low",
-        "key_features": "No family history; party setting with unknown pill ingestion; TCA + MDMA tox positive; normal MRI"
+        "diagnosis": "Isolated MDMA toxidrome",
+        "likelihood": "high",
+        "key_features": "MDMA positive; hyperthermia 39.6 and hyponatremia (Na 134); contributes to seizures and rhabdo",
+        "icd_code": "T43.625A"
       },
       {
-        "diagnosis": "Hypoxic seizure from fentanyl",
-        "likelihood": "very_low",
-        "key_features": "No opiates on tox screen; SpO2 90 from SE not respiratory depression; dilated pupils not pinpoint"
+        "diagnosis": "Serotonin syndrome",
+        "likelihood": "high",
+        "key_features": "MDMA + possible TCA serotonergic component; hyperthermia, hyperreflexia",
+        "icd_code": "T43.225A"
+      },
+      {
+        "diagnosis": "Cocaine / sympathomimetic toxidrome",
+        "likelihood": "moderate",
+        "key_features": "Tox screen indicates MDMA + TCA, not cocaine",
+        "icd_code": "T40.5X1A"
+      },
+      {
+        "diagnosis": "Anticholinergic toxidrome from TCA dominant",
+        "likelihood": "moderate",
+        "key_features": "TCA has anticholinergic component (mydriasis, urinary retention) overlapping with toxidrome",
+        "icd_code": "T44.3X1A"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "ECG urgently - QRS 128 ms confirms TCA toxicity",
-        "tool_name": "analyze_ecg",
-        "expected_finding": "QRS widening 128 ms; right axis deviation; terminal R aVR - TCA pattern",
+        "action": "EEG — confirm SE",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Continuous generalized 2-4 Hz spike-wave — generalized SE",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "Toxicology - TCA positive and MDMA positive",
+        "action": "Labs: CBC, CMP, glucose, Ca/Mg, ABG, lactate, CK, ammonia, urine and serum tox screen, urinalysis, beta-hCG (here male, n/a)",
         "tool_name": "interpret_labs",
-        "expected_finding": "TCA positive; MDMA positive; CK 6840 rhabdomyolysis; Cr 1.8 AKI",
+        "expected_finding": "TCA positive; MDMA positive; CK 6840 severe rhabdo; Cr 1.8 AKI; Na 134 mild hyponatremia",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Sodium bicarbonate 1-2 mEq/kg IV urgently for QRS widening",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Bicarbonate for TCA QRS widening; phenytoin contraindicated; levetiracetam preferred AED",
+        "action": "Non-contrast head CT — exclude structural cause",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Normal CT",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "EEG confirms SE; treat with lorazepam + levetiracetam",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Continuous generalized ictal; stimulant/anticholinergic background",
+        "action": "ECG — assess QRS widening, QTc, arrhythmia",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Wide QRS (>100 ms) and prolonged QTc — TCA cardiotoxicity; sodium bicarbonate indicated",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "Active cooling and rhabdomyolysis management",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Aggressive hydration; active cooling; bicarbonate also helps myoglobinuria",
+        "action": "Drug-interaction check: TCA + MDMA + AED + sodium bicarbonate",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sodium bicarbonate 1-2 mEq/kg bolus for QRS >100 ms; avoid Class IA/IC and III antiarrhythmics; benzodiazepines + LEV for seizures (avoid phenytoin)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 6,
+        "action": "Literature: TCA overdose with seizures and QRS widening management",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Sodium bicarbonate first; benzodiazepines for seizures; avoid phenytoin (worsens cardiac toxicity)",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 7,
+        "action": "Rhabdomyolysis and AKI management",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Aggressive IV fluids; monitor potassium and creatinine",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "study_type": "TTE"
+        },
+        "rationale": "No clinical suspicion of cardiac source of embolus or cardiogenic seizure; routine echo is not indicated in SE workup absent cardiac findings.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No suspicion of arrhythmogenic syncope or cardiac comorbidity precipitating SE; routine telemetry beyond standard ICU monitoring adds cost without yield.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in acute SE evaluation; dementia biomarker imaging does not change acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is for ischemic stroke workup; SE without focal vascular suspicion does not warrant carotid imaging.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "DaTscan / dopamine transporter imaging has no role in SE; no parkinsonism question relevant to acute management.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_ecg",
+        "after": "check_drug_interactions",
+        "reason": "ECG must be obtained before AED selection — phenytoin contraindicated with QRS widening.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "ECG urgently: QRS 128 ms = sodium bicarbonate 1-2 mEq/kg IV bolus IMMEDIATELY",
-      "TCA toxicity: maintain alkalemia pH 7.45-7.55 with sodium bicarbonate infusion",
-      "QRS monitoring after each bicarbonate dose - target QRS <100 ms",
-      "CONTRAINDICATED: phenytoin for TCA SE - worsens sodium channel blockade and cardiac toxicity",
-      "CONTRAINDICATED: physostigmine for anticholinergic symptoms in TCA - worsens seizures",
-      "Active cooling for hyperthermia 39.6°C - reduces ongoing rhabdomyolysis",
-      "CK 6840 with AKI: aggressive IV hydration; nephrology consultation"
+      "Administer IV lorazepam 0.1 mg/kg first-line",
+      "IV sodium bicarbonate 1-2 mEq/kg bolus for QRS >100 ms — TCA cardiotoxicity reversal",
+      "Load IV levetiracetam as second-line AED",
+      "Aggressive IV fluids for rhabdomyolysis (CK 6840)",
+      "Active cooling for hyperthermia 39.6"
     ],
     "contraindicated_actions": [
-      "ABSOLUTELY CONTRAINDICATED: phenytoin/fosphenytoin for TCA SE - worsens cardiac sodium channel blockade",
-      "CONTRAINDICATED: physostigmine for anticholinergic symptoms in TCA overdose",
-      "Do not miss QRS widening on ECG - it is the critical diagnostic and therapeutic trigger",
-      "Do not delay sodium bicarbonate for confirmed QRS widening"
+      "Do NOT use phenytoin in TCA overdose — worsens cardiac toxicity",
+      "Do NOT use Class IA/IC or III antiarrhythmics",
+      "Do NOT use flumazenil — seizure risk",
+      "Do NOT use phenytoin in TCA overdose with cardiac toxicity — worsens QRS prolongation and conduction.",
+      "Do NOT use Class IA/IC or III antiarrhythmics in TCA overdose — additive cardiac toxicity."
     ],
     "key_reasoning_points": [
-      "TCA overdose: QRS widening on ECG is the critical finding - treat with sodium bicarbonate not phenytoin",
-      "Terminal R wave in aVR >3 mm + QRS >100 ms is pathognomonic for TCA toxicity",
-      "Phenytoin is absolutely contraindicated in TCA SE - both block sodium channels, combination worsens cardiac toxicity",
-      "Sodium bicarbonate mechanism: alkalemia increases TCA-albumin binding + sodium load overcomes channel blockade",
-      "Combined TCA + MDMA: sympathomimetic crisis from MDMA + sodium channel blockade from TCA = complex management",
-      "Physostigmine (anticholinergic antidote) is contraindicated in TCA - increases seizure and cardiac risk"
+      "TCA overdose causes sodium-channel-blocking cardiotoxicity (QRS widening) treated with sodium bicarbonate",
+      "Phenytoin is contraindicated in TCA overdose — worsens cardiac sodium-channel block",
+      "Combined MDMA + TCA toxidrome adds serotonergic, hyperthermic, and rhabdomyolytic features",
+      "Activated charcoal may have role within 1-2 hours of ingestion"
     ],
-    "red_herrings": [],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": [
+      {
+        "data_point": "MDMA positive on tox screen",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests sympathomimetic toxidrome only, missing TCA cardiac toxicity",
+        "correct_interpretation": "MDMA toxidrome present; the TCA contributes critical cardiac toxicity (QRS widening) requiring sodium bicarbonate — both must be addressed"
+      }
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -569,6 +668,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "7 required tools; classic TCA cardiotoxicity + MDMA; teaching is sodium-bicarbonate-first, phenytoin contraindicated, ECG-before-AED-choice; 1 grounded red herring.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

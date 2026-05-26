@@ -502,116 +502,186 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Non-convulsive status epilepticus (NCSE) following breakthrough generalized tonic-clonic seizure (from subtherapeutic levetiracetam 8 µg/mL due to missed doses) + concurrent severe hepatic encephalopathy (ammonia 108) — both lowering consciousness to GCS 9",
-    "icd_code": "K72.9",
+    "primary_diagnosis": "Non-convulsive status epilepticus following breakthrough generalized tonic-clonic seizure (subtherapeutic levetiracetam 8 µg/mL) with concurrent severe hepatic encephalopathy (ammonia 108) in alcoholic cirrhosis (Child-Pugh B, MELD 12); both lower consciousness to GCS 9.",
+    "icd_code": "G41.2",
     "differential": [
       {
-        "diagnosis": "Prolonged post-ictal state without NCSE",
-        "likelihood": "very_low",
-        "key_features": "Post-ictal states typically resolve within 30-60 minutes; GCS 9 at 30+ minutes post-seizure; EEG shows continuous NCSE not post-ictal pattern — NCSE confirmed"
+        "diagnosis": "Severe hepatic encephalopathy (sole cause of GCS 9)",
+        "likelihood": "high",
+        "key_features": "Ammonia 108 + cirrhosis + asterixis = HE; but EEG is essential — cannot distinguish severe HE from NCSE clinically.",
+        "icd_code": "K72.91"
       },
       {
-        "diagnosis": "Grade IV hepatic encephalopathy (coma)",
+        "diagnosis": "Prolonged post-ictal state",
         "likelihood": "moderate",
-        "key_features": "Ammonia 108 with cirrhosis — severe HE present and contributing; but EEG shows NCSE not HE triphasic waves; GCS 9 is from NCSE primarily with HE contributing; EEG distinguishes the two"
+        "key_features": "Post-ictal usually resolves within 30-60 minutes; persistence beyond raises NCSE concern.",
+        "icd_code": "G40.909"
       },
       {
-        "diagnosis": "Alcohol withdrawal seizure + encephalopathy",
-        "likelihood": "very_low",
-        "key_features": "Serum ethanol negative; 1 year sober confirmed; no CIWA symptoms — breakthrough seizure from antiepileptic non-adherence, not alcohol withdrawal"
+        "diagnosis": "Anoxic brain injury from prolonged seizure",
+        "likelihood": "low",
+        "key_features": "MRI DWI if prolonged hypoxia; airway assessment.",
+        "icd_code": "G93.1"
       },
       {
-        "diagnosis": "Intracranial hemorrhage from coagulopathy (INR 2.0)",
-        "likelihood": "very_low",
-        "key_features": "CT head no hemorrhage — INR 2.0 is a risk but CT is negative"
+        "diagnosis": "Subdural hematoma from seizure-related fall",
+        "likelihood": "low",
+        "key_features": "CT excludes.",
+        "icd_code": "I62.00"
+      },
+      {
+        "diagnosis": "Wernicke encephalopathy (chronic alcoholic)",
+        "likelihood": "low",
+        "key_features": "Empiric thiamine.",
+        "icd_code": "E51.2"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "CT head — exclude hemorrhage (INR 2.0, post-seizure fall risk)",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "No hemorrhage — structural cause excluded",
+        "action": "Comprehensive labs: CMP including AST/ALT/bilirubin/INR/albumin, ammonia, CBC, glucose, electrolytes (Na, K, Mg), BUN/Cr, lactate, blood cultures and urine cultures; toxicology if substance use plausible. Confirms liver dysfunction and screens for precipitants.",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Ammonia 108; levetiracetam level (subtherapeutic 8 µg/mL); cirrhosis features; CK if prolonged seizure; cultures.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 2,
-        "action": "URGENT EEG — exclude NCSE; GCS 9 after seizure; EEG is THE critical diagnostic test",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "CONTINUOUS SPIKE-WAVE NCSE CONFIRMED — requires immediate IV antiepileptic treatment",
+        "action": "Non-contrast CT head — exclude structural alternate cause of AMS (hemorrhage, large stroke, mass) before any LP.",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No hemorrhage.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 3,
-        "action": "Labs — ammonia, levetiracetam level, LFTs, lactate, glucose",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Ammonia 108, levetiracetam 8 µg/mL (subtherapeutic) — dual diagnosis identified",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Literature/guideline search to confirm West Haven grading, precipitant management, and lactulose/rifaximin dosing (NCSE diagnosis; Salzburg EEG criteria; levetiracetam dosing in cirrhosis).",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "AASLD/EASL 2014 guidance retrieved; West Haven criteria and precipitant-driven management framework confirmed.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 4,
-        "action": "URGENT: IV lorazepam 4 mg for NCSE + IV levetiracetam load 60 mg/kg",
-        "tool_name": null,
-        "expected_finding": "NCSE terminates; GCS improves to 12",
+        "action": "Drug-interaction and medication-reconciliation review covering levetiracetam (LOAD and adjust dose), lactulose, rifaximin, second AED if NCSE confirmed (avoid valproate in cirrhosis); flag any CNS depressants (benzodiazepines, opioids, sedating antiemetics, antihistamines) and confirm lactulose/rifaximin dosing in liver disease.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sedating/CNS-depressant medications identified; lactulose and rifaximin reviewed for hepatic dose adjustment.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Bajaj_2011]",
+        "guideline_source": "Bajaj 2011 HE management review"
       },
       {
         "step": 5,
-        "action": "Lactulose + rifaximin for concurrent HE (ammonia 108)",
-        "tool_name": null,
-        "expected_finding": "Ammonia normalizing; HE improving",
+        "action": "Continuous EEG (cEEG) — required to exclude NCSE in any patient with persistent unresponsiveness after seizure; the single most important test in this case.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Rhythmic or periodic discharges meeting NCSE criteria, vs generalized slowing alone; benzodiazepine challenge clarifies if pattern is responsive.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "duration_hours": 24,
+          "monitor_type": "continuous"
+        },
+        "citation": "[Ferenci_2002]",
+        "guideline_source": "Ferenci 2002 (EEG in metabolic encephalopathy)"
       },
       {
         "step": 6,
-        "action": "24-hour continuous EEG monitoring to confirm NCSE does not recur",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "No NCSE recurrence; normal background at 24h",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Consult neurology + hepatology + critical care — coordinate definitive care, transplant candidacy assessment where applicable.",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Hepatology / critical-care guidance integrated into management.",
+        "category": "recommended",
+        "tool_parameters": {
+          "specialty": "hepatology"
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No clinical suspicion for hepatopulmonary syndrome, portopulmonary hypertension, or endocarditis; echocardiography is not part of the HE workup.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in HE workup; reversible metabolic encephalopathy is the issue, not Alzheimer pathology.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan has no role in HE workup; the question is metabolic encephalopathy, not nigrostriatal degeneration.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "genetic_panel:early_onset_AD"
+        },
+        "rationale": "Early-onset AD genetic panel has no role in HE workup; reversible metabolic encephalopathy is the diagnosis under consideration.",
+        "citation": "[AASLD_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "In altered mental status, exclude intracranial mass effect / hemorrhage on imaging before LP to avoid herniation risk.",
+        "citation": "[AASLD_2014]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "EEG is URGENTLY required in GCS 9 after seizure — NCSE cannot be diagnosed clinically; EEG is the only way to identify NCSE",
-      "Valproate is CONTRAINDICATED for NCSE in liver disease — use IV lorazepam then IV levetiracetam; valproate is hepatotoxic AND raises ammonia in cirrhosis",
-      "Levetiracetam level 8 µg/mL (subtherapeutic) — missed doses in cirrhotic patient with known seizure disorder causes breakthrough seizure → NCSE; adherence support is essential",
-      "HE lowers seizure threshold — hyperammonemia impairs GABAergic neurotransmission; HE and NCSE are synergistic; treat BOTH simultaneously"
+      "Continuous EEG to exclude NCSE — this is the critical test for this case.",
+      "Levetiracetam IV load (60 mg/kg up to 4.5 g) and resume daily dosing; consider lacosamide as adjunct (no hepatic dose adjustment needed; safer than valproate in cirrhosis).",
+      "Lactulose 30-45 mL TID and rifaximin 550 mg BID for HE.",
+      "Empiric thiamine 500 mg IV before dextrose.",
+      "Airway management if GCS <8."
     ],
     "contraindicated_actions": [
-      "Valproate for NCSE in cirrhosis — hepatotoxic + worsens HE",
-      "Phenytoin as first-line for NCSE — altered binding in hypoalbuminemia; levetiracetam preferred",
-      "Delaying EEG to get CT first — EEG is the critical diagnostic test; CT can follow"
+      "Do not prescribe benzodiazepines for anxiety/agitation — they precipitate and prolong HE (use haloperidol or non-pharmacologic measures for agitation).",
+      "Do not prescribe sedating opioids — they worsen HE; consider acetaminophen at hepatic-safe dosing for pain.",
+      "Do not perform LP before neuroimaging excludes mass effect when the patient has altered mental status.",
+      "Do not use valproate as second-line AED in cirrhosis — hyperammonemia + hepatic toxicity risks.",
+      "Avoid scheduled benzodiazepines as AED for HE-prone patients; use them ONLY for acute seizure termination (lorazepam 2 mg IV), then transition to levetiracetam/lacosamide."
     ],
     "key_reasoning_points": [
-      "GCS 9 after generalized tonic-clonic seizure should NOT be assumed post-ictal — EEG must exclude NCSE; post-ictal states improve within 30-60 min; sustained GCS 9 at 30+ min demands EEG",
-      "NCSE can be a complication of breakthrough seizures AND can be facilitated by HE — hyperammonemia lowers seizure threshold; HE + NCSE can coexist",
-      "Subtherapeutic antiepileptic levels are a common precipitant of breakthrough seizures — levetiracetam level 8 µg/mL (therapeutic 20-40) confirms non-adherence",
-      "EEG distinguishes HE triphasic waves from NCSE spike-wave — CRITICALLY different patterns requiring different treatments; getting EEG early changes management"
+      "HE is a clinical diagnosis: West Haven grading + evidence of liver dysfunction + exclusion of other causes of AMS — ammonia level is supportive only and correlates poorly with grade (AASLD 2014).",
+      "Precipitant identification is more actionable than the ammonia number: infection (SBP especially), GI bleed, electrolyte disturbance (hypokalemia/hyponatremia), constipation, sedative/CNS-depressant use, dehydration, dietary protein load, renal failure.",
+      "Persistent unresponsiveness after a witnessed seizure mandates continuous EEG to exclude NCSE — clinical examination cannot distinguish severe HE from NCSE.",
+      "Cirrhotic patients on AEDs need adherence and level monitoring — subtherapeutic levels are a common breakthrough trigger.",
+      "Lacosamide and levetiracetam are AEDs of choice in cirrhosis (no significant hepatic adjustment)."
     ],
     "red_herrings": [
       {
-        "data_point": "GCS 9 — 30 minutes after witnessed GTCS, tongue laceration, urinary incontinence",
-        "location": "patient.neurological_exam",
-        "intended_effect": "Diagnose as expected prolonged post-ictal state; monitor and expect spontaneous awakening; delay EEG and miss NCSE",
-        "correct_interpretation": "GCS 9 at 30+ minutes post-GTCS is NOT normal post-ictal state — must obtain EEG urgently to exclude NCSE; post-ictal typically resolves within 30-60 minutes; sustained suppression demands EEG",
-        "field_path": ""
+        "data_point": "Known seizure disorder on levetiracetam — assume post-ictal",
+        "location": "patient.clinical_history.past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history[1]",
+        "intended_effect": "Wait for post-ictal state to resolve without cEEG.",
+        "correct_interpretation": "Post-ictal states typically resolve within 30-60 minutes; persistent unresponsiveness requires cEEG to exclude NCSE."
       },
       {
-        "data_point": "Ammonia 108 µmol/L (severely elevated HE level)",
-        "location": "initial_tool_outputs.labs",
-        "intended_effect": "Attribute GCS 9 entirely to grade IV HE; treat with lactulose + rifaximin; delay EEG because 'this is HE not seizure'",
-        "correct_interpretation": "Ammonia 108 confirms significant HE contribution to encephalopathy, but does NOT exclude NCSE — the two are concurrent; EEG showing spike-wave pattern NOT triphasic waves confirms NCSE as primary; both require treatment",
-        "field_path": ""
+        "data_point": "Ammonia 108 with cirrhosis — assume HE alone",
+        "location": "initial_tool_outputs.labs.panels.LFTs",
+        "field_path": "initial_tool_outputs.labs.panels.LFTs",
+        "intended_effect": "Treat only HE without cEEG.",
+        "correct_interpretation": "Severe HE and NCSE are clinically indistinguishable; both can coexist. cEEG is mandatory."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -632,6 +702,14 @@
       "advanced_imaging": "normal",
       "specialized_test": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (HEP-ENC)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:HEP-ENC",
+    "difficulty_rationale": "5 required tools with cEEG as the load-bearing test; two simultaneous diagnoses (NCSE + HE) both lowering consciousness; AED choice constrained by cirrhosis.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

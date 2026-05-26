@@ -1,7 +1,7 @@
 {
   "case_id": "MIG-AURA-S07",
   "condition": "migraine_with_aura",
-  "difficulty": "straightforward",
+  "difficulty": "moderate",
   "encounter_type": "outpatient",
   "patient": {
     "age": 40,
@@ -82,85 +82,122 @@
     "extremities": "No edema"
   },
   "ground_truth": {
-    "primary_diagnosis": "Established migraine with typical visual aura (G43.1); critical medication safety issue — combined OCP contraindicated",
-    "primary_diagnosis_icd": "G43.1",
-    "differential": [],
+    "primary_diagnosis": "Established migraine with typical visual aura (ICHD-3 1.2.1) — critical pharmacovigilance issue: combined oestrogen-progestogen OCP is contraindicated (WHO Category 4)",
+    "icd_code": "G43.109",
+    "differential": [
+      {
+        "diagnosis": "Migraine without aura",
+        "likelihood": "low",
+        "key_features": "Aura is stereotyped and well-documented; this is migraine with aura",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Medication-overuse headache",
+        "likelihood": "low",
+        "key_features": "Background analgesic / triptan use should be quantified; not yet established as MOH",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Transient ischemic attack",
+        "likelihood": "very_low",
+        "key_features": "15-year stereotyped pattern, no fixed deficit",
+        "icd_code": "G45.9"
+      },
+      {
+        "diagnosis": "Vascular cognitive change / CADASIL",
+        "likelihood": "very_low",
+        "key_features": "No family history, no cognitive decline; would consider only if pattern changed",
+        "icd_code": null
+      }
+    ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "URGENT: Discontinue combined OCP (Yasmin) — WHO Category 4 contraindication in migraine with aura",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
+        "category": "required",
         "tool_parameters": {
-          "drug_1": "combined_oral_contraceptive",
-          "condition": "migraine_with_aura"
-        }
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "Switch to progestin-only contraception (desogestrel pill or hormonal IUD)",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
-        "tool_parameters": {}
-      },
-      {
-        "step": 3,
-        "action": "Initiate preventive therapy — topiramate or erenumab",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
-        "tool_parameters": {}
-      },
-      {
-        "step": 4,
-        "action": "Ensure adequate triptan supply (9 doses/month maximum to avoid MOH)",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
-        "tool_parameters": {}
-      },
-      {
-        "step": 5,
-        "action": "Counsel on migraine triggers, WMH findings (expected, reassuring), alcohol reduction",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
-        "tool_parameters": {}
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "URGENT: Combined OCP is WHO Category 4 in migraine with aura — must be discontinued; switch to progestin-only / non-hormonal; review acute (rizatriptan/sumatriptan) and preventive (topiramate, propranolol, CGRP mAb) options [Sacco_2022]",
+        "category": "required",
+        "tool_parameters": {
+          "context": "combined_OCP_migraine_with_aura_contraindication"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis — neither present here",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated in typical migraine with aura — no role unless cardioembolic stroke is on the differential",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is not indicated for migraine with aura; reserve for cases where focal seizure is genuinely on the differential",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "STOP combined OCP immediately — WHO Category 4 contraindication in migraine with aura; major patient safety issue",
-      "Counsel on alternative contraception (progestin-only pill or IUD)",
-      "Initiate preventive therapy for 2-3 attacks/month",
-      "Ensure adequate triptan supply"
+      "URGENTLY discontinue combined OCP (Yasmin) — WHO Category 4 contraindication",
+      "Switch to progestin-only contraception, IUD, or non-hormonal alternative",
+      "Confirm ICHD-3 1.2 criteria (15-year stereotyped history meets criteria)",
+      "Optimise acute therapy (avoid running out — adequate supply / refills)",
+      "Discuss preventive therapy (≥3 attacks/month with disability) [Holland_2012]",
+      "Consider CGRP monoclonal antibody if conventional preventives fail or are contraindicated [Sacco_2022]"
     ],
     "contraindicated_actions": [
-      "DO NOT continue combined OCP — absolutely contraindicated in migraine with aura",
-      "Do not prescribe valproate without reliable contraception in women of childbearing age",
-      "Do not allow triptan overuse >9 days/month"
+      "Do not continue combined oestrogen-progestogen contraception in migraine with aura (WHO Category 4)",
+      "Do not co-administer two different triptans within 24 hours",
+      "Do not co-administer triptans with ergotamines"
     ],
     "key_reasoning_points": [
-      "Critical safety issue: combined OCP (any estrogen-containing pill) is WHO Category 4 (unacceptable risk) in migraine with aura",
-      "Migraine with aura already doubles stroke risk; combined OCP adds further 4-6 fold increase = unacceptable cumulative risk",
-      "Progestin-only contraception (desogestrel, drospirenone-only, IUD) is safe in migraine with aura",
-      "Subcortical WMH are expected in long-term migraineurs — reassure patient",
-      "Preventive therapy indicated given 2-3 attacks/month with disability"
+      "Combined OCP in migraine with aura is associated with a 6-9x increase in ischaemic stroke risk versus neither factor; WHO MEC Category 4",
+      "Diagnosis itself is established and clinical; no further investigation is required",
+      "Preventive therapy is indicated at this frequency and disability"
     ],
     "red_herrings": [
       {
-        "data_point": "Multiple subcortical WMH on MRI suggesting cerebrovascular disease",
+        "data_point": "15 years of stable disease and 'somewhat better during pregnancies'",
+        "location": "patient.history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Stability may suggest the OCP is safe to continue",
+        "correct_interpretation": "Stable disease does not mitigate the WHO Category 4 contraindication; the stroke risk applies regardless of attack stability"
+      },
+      {
+        "data_point": "Brain MRI obtained as part of workup",
         "location": "initial_tool_outputs.mri",
-        "intended_effect": "3 WMH in a 40-year-old woman on OCP might raise concern for cerebrovascular events or early small vessel disease",
-        "correct_interpretation": "WMH are expected in long-term migraineurs (3x higher prevalence); non-specific subcortical pattern; the key issue is OCP safety, not WMH significance; OCP must be stopped (WHO Category 4)",
-        "field_path": ""
+        "field_path": "initial_tool_outputs.mri",
+        "intended_effect": "Implies imaging is part of the standard pathway",
+        "correct_interpretation": "MRI is over-investigation in stable typical migraine with aura without red flags"
       }
-    ],
-    "icd_code": "G43.1",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -179,7 +216,17 @@
       "ct": "incidental",
       "cardiac_monitoring": "normal",
       "specialized_test": "incidental"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Moderate: dominant decision is medication safety (combined OCP discontinuation), not diagnostic — but missing this is a serious harm",
+    "case_body_concerns": [
+      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide §1): ['analyze_brain_mri', 'analyze_ecg', 'interpret_labs', 'order_advanced_imaging', 'order_echocardiogram']"
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "initial_tool_outputs": {
     "mri": {

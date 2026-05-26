@@ -565,153 +565,216 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Anti-NMDA receptor encephalitis with non-convulsive status epilepticus (NCSE), associated with right ovarian teratoma",
-    "icd_code": "G41.9",
+    "primary_diagnosis": "Anti-NMDA receptor encephalitis with non-convulsive status epilepticus, associated with right ovarian teratoma",
+    "icd_code": "G41.2",
     "differential": [
       {
-        "diagnosis": "Herpes simplex encephalitis",
-        "likelihood": "low",
-        "key_features": "CSF HSV PCR negative; MRI shows bilateral limbic/temporal signal (HSV typically unilateral temporal with hemorrhagic necrosis); no hemorrhagic changes on imaging"
+        "diagnosis": "HSV / viral encephalitis",
+        "likelihood": "high",
+        "key_features": "Fever 39.1, altered mental status and seizures overlap; CSF HSV PCR will discriminate; MRI typically temporal in HSV vs medial-temporal/limbic in NMDAR",
+        "icd_code": "B00.4"
       },
       {
-        "diagnosis": "Bacterial meningitis",
-        "likelihood": "low",
-        "key_features": "CSF shows lymphocytic pleocytosis (not neutrophilic); Gram stain and culture negative; procalcitonin mildly elevated but clinical picture more consistent with subacute encephalitis"
+        "diagnosis": "Other autoimmune encephalitis (LGI1, GAD65, GABA-B-R)",
+        "likelihood": "moderate",
+        "key_features": "Other autoantibodies possible; NMDAR is the most likely given age/sex profile (young female with teratoma)",
+        "icd_code": "G04.81"
       },
       {
-        "diagnosis": "Toxic drug ingestion (MDMA, stimulants)",
+        "diagnosis": "Paraneoplastic limbic encephalitis (anti-Hu, anti-Ma2)",
         "likelihood": "low",
-        "key_features": "Comprehensive urine drug screen negative; 5-day prodrome too long for acute ingestion; anti-NMDAR antibodies positive"
+        "key_features": "Less likely at age 34 with ovarian teratoma; NMDAR strongly suggested",
+        "icd_code": "G13.1"
       },
       {
-        "diagnosis": "Autoimmune encephalitis — other antibody (LGI1, GABA-B)",
+        "diagnosis": "Primary psychiatric break with catatonia",
         "likelihood": "low",
-        "key_features": "Anti-NMDAR positive in both serum and CSF; other autoimmune antibodies negative; clinical phenotype (young woman + psychiatric prodrome + orofacial dyskinesias) is classic anti-NMDAR"
+        "key_features": "Encephalopathy and autonomic features inconsistent with primary psychiatric diagnosis; EEG NCSE pattern definitive",
+        "icd_code": "F23"
+      },
+      {
+        "diagnosis": "Drug-induced encephalopathy / serotonin syndrome",
+        "likelihood": "low",
+        "key_features": "No serotonergic exposure history; tox screen typically negative",
+        "icd_code": "T43.225A"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Emergent EEG for NCSE diagnosis and to identify extreme delta brush pattern",
+        "action": "Continuous video-EEG — characterize ictal pattern",
         "tool_name": "analyze_eeg",
-        "expected_finding": "NCSE with right temporal ictal activity; extreme delta brush (anti-NMDAR specific)",
+        "expected_finding": "Right temporal-predominant continuous rhythmic activity meeting NCSE criteria; possible 'extreme delta brush' pattern characteristic of anti-NMDAR",
         "category": "required",
-        "tool_parameters": {
-          "urgency": "stat"
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "Non-contrast CT head to exclude hemorrhage or mass",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "Normal CT — autoimmune encephalitis often normal on CT",
+        "action": "Labs: CBC, CMP, lactate, ABG, AED level, blood cultures, tox screen, beta-hCG (essential for pelvic imaging and AED selection)",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Inflammatory markers elevated; beta-hCG negative; non-specific labs",
         "category": "required",
-        "tool_parameters": {
-          "contrast": false
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "MRI brain with gadolinium — evaluate for limbic encephalitis pattern",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Bilateral mesial temporal FLAIR hyperintensity — limbic encephalitis pattern",
+        "action": "Non-contrast head CT to exclude acute structural cause",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Normal CT — does not exclude encephalitis",
         "category": "required",
-        "tool_parameters": {
-          "sequences": [
-            "T1",
-            "FLAIR",
-            "DWI",
-            "T1+Gd"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "LP for CSF: cell count, protein, glucose, HSV PCR, anti-NMDAR IgG antibody",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Lymphocytic pleocytosis; HSV PCR negative; anti-NMDAR IgG positive",
+        "action": "MRI brain with gadolinium — limbic / medial temporal pattern",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "May be normal in 50% of anti-NMDAR; or show subtle medial temporal / cortical FLAIR signal",
         "category": "required",
-        "tool_parameters": {
-          "tests": [
-            "cell_count",
-            "protein",
-            "glucose",
-            "HSV_PCR",
-            "anti-NMDAR_IgG"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "Pelvic imaging (MRI pelvis) to identify ovarian teratoma",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Right ovarian teratoma 6.8 cm — paraneoplastic trigger",
+        "action": "Lumbar puncture: cell count, protein, glucose, HSV PCR, autoimmune encephalitis CSF panel (NMDAR primary)",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Lymphocytic pleocytosis with oligoclonal bands; CSF NMDAR IgG positive (definitive)",
         "category": "required",
-        "tool_parameters": {
-          "modality": "pelvic_MRI"
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 6,
-        "action": "Literature review on anti-NMDAR encephalitis treatment",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "IV methylprednisolone + IVIG first-line; tumor removal most effective; 80% full recovery",
+        "action": "Serum autoimmune / paraneoplastic panel (NMDAR, LGI1, GABA-B-R, AMPA, GAD65)",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Serum NMDAR positive — confirms anti-NMDAR encephalitis",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 7,
-        "action": "Continuous cEEG monitoring 24-48 hours",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Extreme delta brush pattern; progressive NCSE resolution with immunotherapy",
+        "action": "Pelvic / abdominal imaging for ovarian teratoma (transvaginal US + pelvic MRI)",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Right ovarian teratoma identified — needs surgical removal as definitive immunomodulation",
         "category": "required",
         "tool_parameters": {
-          "modality": "continuous_ceeg",
-          "duration_hours": 48
-        }
+          "modality": "MR_angiography"
+        },
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 8,
+        "action": "Drug-interaction check for benzodiazepine + second-line AED + acyclovir + immunotherapy",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Levetiracetam safe with acyclovir; plan for IV methylprednisolone + IVIG",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[ESETT_2019]",
+        "guideline_source": ""
+      },
+      {
+        "step": 9,
+        "action": "Literature: anti-NMDAR encephalitis treatment guidelines + tumor removal",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "First-line: steroids + IVIG/plasmapheresis + tumor removal; second-line rituximab/cyclophosphamide if refractory",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 10,
+        "action": "Neurology + gynecology consultation",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Neuro-immunology lead; gynecology for teratoma removal",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "study_type": "TTE"
+        },
+        "rationale": "No cardiac question.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "Autonomic instability is monitored at the bedside in ICU; ambulatory Holter not indicated acutely.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "rationale": "Neuropsychological battery cannot be performed in encephalopathic patient and does not change acute management.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "CT before LP to exclude mass effect (especially with focal seizure features).",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Confirm beta-hCG before any imaging with contrast and before AED selection.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Empiric acyclovir IMMEDIATELY — before any test results; HSV encephalitis must not be missed",
-      "Anti-NMDAR IgG antibody in serum AND CSF — both needed for diagnosis",
-      "Pelvic imaging to find ovarian teratoma — tumor removal is the most effective treatment",
-      "IV methylprednisolone + IVIG after LP — immunotherapy is the primary treatment",
-      "LP before steroids — collect CSF before immunotherapy to preserve diagnostic yield",
-      "Continuous cEEG monitoring to track NCSE and identify extreme delta brush pattern"
+      "Administer IV lorazepam 0.1 mg/kg first-line; do not delay for diagnostics",
+      "Start empiric IV acyclovir until HSV PCR returns",
+      "Load levetiracetam as ESETT second-line (avoid valproate in reproductive-age women)",
+      "Initiate first-line immunotherapy (high-dose methylprednisolone + IVIG) once NMDAR encephalitis is the working diagnosis",
+      "Pelvic imaging and gynecology consult for teratoma removal — definitive treatment",
+      "Avoid haloperidol / first-gen antipsychotics in suspected anti-NMDAR"
     ],
     "contraindicated_actions": [
-      "Delaying LP and immunotherapy waiting for antibody results — empiric treatment must start based on clinical syndrome",
-      "Not performing pelvic imaging in young woman with anti-NMDAR encephalitis — 50% have teratoma, removal dramatically improves outcome",
-      "Relying solely on AED escalation without immunotherapy — NCSE in anti-NMDAR responds to immunotherapy, not just AEDs",
-      "Stopping acyclovir before HSV PCR result — fatal delay if HSV is present"
+      "Do NOT administer haloperidol / first-gen antipsychotics for agitation — risk of severe dystonia/NMS in NMDAR encephalitis",
+      "Do NOT defer LP once CT excludes mass effect — CSF NMDAR antibody is definitive",
+      "Do NOT delay teratoma removal once identified — tumor is the immunogenic source",
+      "Do NOT use haloperidol or first-generation antipsychotics for agitation in suspected anti-NMDAR encephalitis — risk of neuroleptic malignant syndrome / severe dystonia; avoid until diagnosis excluded."
     ],
     "key_reasoning_points": [
-      "Anti-NMDAR encephalitis in young women: classic pentad of psychiatric prodrome → seizures → NCSE → movement disorders (orofacial dyskinesias) → autonomic instability",
-      "Extreme delta brush (EDB) on EEG is highly specific (>90%) for anti-NMDAR encephalitis — key EEG finding for diagnosis",
-      "50% of young women with anti-NMDAR encephalitis have ovarian teratoma — pelvic imaging is mandatory",
-      "Tumor removal (salpingo-oophorectomy) is the most effective treatment — accelerates recovery more than any immunotherapy alone",
-      "Anti-NMDAR IgG must be checked in BOTH serum and CSF — CSF positive in >95%, serum positive in ~85%",
-      "First-line immunotherapy: IV methylprednisolone + IVIG (and/or plasmapheresis); second-line: rituximab, cyclophosphamide for refractory cases"
+      "Young woman with new-onset seizures + psychiatric features + autonomic instability + fever = consider anti-NMDAR encephalitis until proven otherwise",
+      "CSF NMDAR antibody is more sensitive than serum; both should be sent",
+      "Ovarian teratoma is found in ~50% of female anti-NMDAR patients; removal is the most important treatment",
+      "MRI is normal in ~50% of anti-NMDAR — a normal MRI does not exclude the diagnosis"
     ],
     "red_herrings": [
       {
-        "data_point": "Mildly elevated procalcitonin 0.8 ng/mL, WBC 13.2, temperature 39.1°C",
-        "location": "initial_tool_outputs.labs.panels.Infectious and Inflammatory",
-        "intended_effect": "Suggests bacterial meningitis or severe sepsis as the primary diagnosis, prompting broad-spectrum antibiotics and delaying autoimmune encephalitis workup, LP, and immunotherapy",
-        "correct_interpretation": "Procalcitonin <1.0 ng/mL is insufficiently elevated for bacterial sepsis/meningitis (typically >2.0); CSF shows lymphocytic not neutrophilic pleocytosis; fever is part of anti-NMDAR encephalitis syndrome; CSF Gram stain and culture negative; anti-NMDAR IgG positive in both serum and CSF",
-        "field_path": ""
-      },
-      {
-        "data_point": "Almost-empty ibuprofen bottle found in apartment by roommate",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Suggests NSAID overdose or salicylate toxicity as the cause of confusion and agitation, leading to toxicology-focused management rather than prompt autoimmune encephalitis workup",
-        "correct_interpretation": "Serum salicylates and acetaminophen are both undetectable; ibuprofen and salicylates do not cause a 5-day psychiatric prodrome with limbic encephalitis MRI changes; urine drug screen is comprehensively negative; anti-NMDAR antibody confirmed",
-        "field_path": ""
+        "data_point": "Fever 39.1°C with elevated CRP, ESR, procalcitonin",
+        "location": "patient.vitals + initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests bacterial / viral CNS infection as primary cause, prompting protracted infectious workup before autoimmune testing",
+        "correct_interpretation": "Anti-NMDAR encephalitis commonly produces fever and inflammatory markers; CSF NMDAR antibody and pelvic imaging for teratoma are required to nail the diagnosis"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -720,6 +783,14 @@
       "cardiac_monitoring": "normal",
       "specialized_test": "incidental",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "10 required tools including pelvic imaging and CSF antibody; key teaching is to not delay autoimmune workup behind protracted infection workup and to avoid haloperidol; 1 grounded red herring (fever + inflammatory markers).",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

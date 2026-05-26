@@ -695,189 +695,244 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Cardiac syncope due to hypertrophic cardiomyopathy with dynamic left ventricular outflow tract obstruction and non-sustained ventricular tachycardia",
-    "icd_code": "R55",
+    "primary_diagnosis": "Cardiac syncope due to hypertrophic cardiomyopathy with dynamic LVOT obstruction and non-sustained ventricular tachycardia",
+    "icd_code": "I42.1",
     "differential": [
       {
-        "diagnosis": "Epileptic seizure (new-onset)",
-        "likelihood": "low",
-        "key_features": "Normal EEG, normal prolactin, no post-ictal confusion, very brief convulsive movements (<15 seconds) consistent with convulsive syncope rather than true seizure. No tongue bite or incontinence. Immediate return to baseline cognition. Exertional trigger atypical for epilepsy."
+        "diagnosis": "Arrhythmogenic right ventricular cardiomyopathy",
+        "likelihood": "high",
+        "key_features": "Exertional syncope in a coach with RV-pattern PVCs raises ARVC; CMR and detailed RV imaging distinguish.",
+        "icd_code": "I42.8"
       },
       {
-        "diagnosis": "Vasovagal syncope",
-        "likelihood": "low",
-        "key_features": "No prodrome of nausea, diaphoresis, or tunnel vision. No identifiable vasovagal trigger (pain, emotional stress, prolonged standing). Exclusively exertional onset argues strongly against vasovagal mechanism. Negative tilt table test."
-      },
-      {
-        "diagnosis": "Exercise-induced ventricular tachycardia (idiopathic)",
+        "diagnosis": "Catecholaminergic polymorphic ventricular tachycardia",
         "likelihood": "moderate",
-        "key_features": "VT is present but is secondary to the underlying HCM substrate rather than idiopathic. The structural heart disease (HCM) is the unifying diagnosis."
+        "key_features": "Exercise-induced polymorphic VT with otherwise normal heart — exercise test and family history clarify.",
+        "icd_code": "I47.2"
       },
       {
-        "diagnosis": "Arrhythmogenic right ventricular cardiomyopathy (ARVC)",
+        "diagnosis": "Coronary anomalous origin / acute coronary syndrome",
+        "likelihood": "moderate",
+        "key_features": "Exertional collapse in an adult must exclude coronary ischaemia; troponin and CMR/CT-coronary anatomy contribute.",
+        "icd_code": "I25.9"
+      },
+      {
+        "diagnosis": "Long QT / Brugada channelopathy",
         "likelihood": "low",
-        "key_features": "T-wave inversions in V1-V3 and LBBB-morphology PVCs could initially suggest ARVC, but echocardiogram and cardiac MRI show normal RV without dilation, wall motion abnormality, or fatty replacement. The pathology is clearly left-sided septal hypertrophy consistent with HCM."
+        "key_features": "Exertional syncope can rarely reflect channelopathy; resting ECG and provocative testing screen.",
+        "icd_code": "I49.8"
       },
       {
-        "diagnosis": "Long QT syndrome",
-        "likelihood": "very_low",
-        "key_features": "QTc is normal (442 ms) on resting ECG. No family history suggestive of channelopathy. Morphology of the arrhythmia (monomorphic VT) is more consistent with structural heart disease than polymorphic VT/torsades de pointes seen in LQTS."
+        "diagnosis": "Convulsive epileptic seizure",
+        "likelihood": "low",
+        "key_features": "Brief jerks with no post-ictal phase, no tongue bite, normal EEG — convulsive syncope, not epilepsy.",
+        "icd_code": "G40.909"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain 12-lead ECG on presentation to evaluate for arrhythmia or conduction abnormality",
+        "action": "12-lead ECG immediately",
         "tool_name": "analyze_ecg",
-        "expected_finding": "Normal sinus rhythm with LVH by voltage criteria, PVCs, and T-wave inversions V1-V3 — no acute arrhythmia captured but features raise suspicion for structural heart disease",
-        "category": "required"
+        "expected_finding": "LVH voltage criteria, repolarisation abnormalities, LBBB-morphology PVCs",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.2"
       },
       {
         "step": 2,
-        "action": "Obtain comprehensive labs including CBC, BMP, troponin, BNP, TSH, lactate, and prolactin to evaluate metabolic and cardiac causes and assess for seizure biomarkers",
+        "action": "Labs: CBC, BMP, troponin, BNP, TSH, Mg, glucose, CK",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal metabolic panel, normal troponin, mildly elevated BNP, normal prolactin (argues against generalized seizure)",
+        "expected_finding": "Rule out ACS and electrolyte triggers; BNP elevated possible",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
-            "thyroid",
+            "magnesium",
             "troponin",
-            "prolactin"
+            "BNP",
+            "TSH"
           ]
-        }
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.3"
       },
       {
         "step": 3,
-        "action": "Obtain routine EEG to evaluate for epileptiform abnormalities given referral diagnosis of seizures",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Normal EEG with no epileptiform discharges — does not support epilepsy diagnosis",
-        "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
-      },
-      {
-        "step": 4,
-        "action": "Critically re-evaluate the history: recognize that brief convulsive movements with exertional onset, no post-ictal confusion, and rapid recovery are characteristic of convulsive syncope rather than epileptic seizure",
-        "tool_name": null,
-        "expected_finding": "Reframe the clinical picture from 'seizure' to 'cardiac syncope with convulsive features'",
-        "category": "required"
-      },
-      {
-        "step": 5,
-        "action": "Order transthoracic echocardiogram to evaluate for structural heart disease given LVH on ECG, exertional syncope, family history of sudden cardiac death, and systolic murmur increasing with Valsalva",
+        "action": "Echocardiogram with provocation (Valsalva, standing)",
         "tool_name": "order_echocardiogram",
-        "expected_finding": "Severe asymmetric septal hypertrophy (IVS 2.1 cm), dynamic LVOT obstruction with Valsalva (gradient 62 mmHg), SAM of mitral valve — diagnosis of hypertrophic obstructive cardiomyopathy",
+        "expected_finding": "Asymmetric septal hypertrophy, dynamic LVOT gradient, SAM of the mitral valve",
         "category": "required",
         "tool_parameters": {
           "echo_type": "TTE"
-        }
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §4.1"
+      },
+      {
+        "step": 4,
+        "action": "Inpatient telemetry plus Holter for NSVT/VT burden",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Frequent NSVT runs; quantify VT burden for risk stratification",
+        "category": "required",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "citation": "[Locati_2014]",
+        "guideline_source": "Locati 2014"
+      },
+      {
+        "step": 5,
+        "action": "Cardiac MRI for hypertrophy distribution, LGE quantification, ARVC criteria exclusion",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Asymmetric septal hypertrophy with mid-wall LGE quantifying fibrosis burden",
+        "category": "required",
+        "tool_parameters": {
+          "modality": "perfusion_MRI"
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §4.3"
       },
       {
         "step": 6,
-        "action": "Order 24-48 hour Holter monitor to assess for ventricular arrhythmias",
-        "tool_name": "order_cardiac_monitoring",
-        "expected_finding": "Multiple runs of NSVT (longest 11 beats at 185 bpm), frequent PVCs — major SCD risk factor in HCM",
+        "action": "Exercise stress echo for provocable LVOT gradient and arrhythmia",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Provocable LVOT obstruction with reproduction of presyncopal symptoms",
         "category": "required",
         "tool_parameters": {
-          "monitor_type": "holter_48h"
-        }
+          "test_type": "exercise_stress_test"
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.4"
       },
       {
         "step": 7,
-        "action": "Order cardiac MRI with gadolinium for tissue characterization and risk stratification",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Maximum wall thickness 23 mm, patchy mid-wall LGE representing 12% of LV mass — confirms HCM with fibrosis substrate for arrhythmia",
-        "category": "required",
-        "tool_parameters": {
-          "imaging_type": "perfusion_MRI"
-        }
+        "action": "Review medications: avoid afterload reducers, positive inotropes",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Plan beta-blocker / disopyramide; avoid ACEi/ARB/nitrates/digoxin",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §6"
       },
       {
         "step": 8,
-        "action": "Urgent cardiology and electrophysiology referral for SCD risk stratification and ICD evaluation",
-        "tool_name": null,
-        "expected_finding": "Multiple major risk factors identified: family history of SCD, exertional syncope, NSVT, extensive LGE",
-        "category": "required"
+        "action": "Search literature for HCM SCD risk score and ICD indications",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "HCM-SCD risk score guides primary-prevention ICD; syncope plus NSVT is a major risk factor",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ACC_AHA_HRS_2017]",
+        "guideline_source": "ACC/AHA/HRS 2017 §5"
       },
       {
         "step": 9,
-        "action": "Discontinue levetiracetam as the diagnosis is cardiac syncope, not epilepsy",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Cardiology / EP consult for ICD evaluation and septal reduction discussion",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "ICD candidacy and septal reduction therapy (myectomy / alcohol ablation) considered",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ACC_AHA_HRS_2017]",
+        "guideline_source": "ACC/AHA/HRS 2017 §5"
       },
       {
         "step": 10,
-        "action": "Counsel patient to immediately cease competitive and vigorous athletic activities pending cardiology evaluation, per ACC/AHA guidelines for HCM",
+        "action": "Restrict from competitive sport; counsel patient and family",
         "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "expected_finding": "Documented sports-restriction counselling and family screening recommendation",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §10"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "No significant head injury; head CT not part of routine syncope work-up.",
+        "citation": "[ACC_AHA_HRS_2017]"
       },
       {
-        "step": 11,
-        "action": "Arrange genetic counseling and first-degree family screening with ECG and echocardiography (brother with palpitations is especially concerning)",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended"
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No clinical features warranting CSF analysis.",
+        "citation": ""
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_ecg",
+        "after": "consult_medical_specialist",
+        "reason": "ECG drives admission and EP referral.",
+        "citation": "[ESC_2018]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "order_cardiac_monitoring",
+        "reason": "Troponin must be assessed before settling on a monitoring strategy.",
+        "citation": "[ROSE_2010]",
+        "severity": "hard"
+      },
+      {
+        "before": "order_echocardiogram",
+        "after": "consult_medical_specialist",
+        "reason": "Structural findings drive device and septal-reduction decisions.",
+        "citation": "[ESC_2018]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Recognize that the episodes are cardiac syncope with convulsive features, not epileptic seizures",
-      "Order echocardiogram to identify hypertrophic cardiomyopathy as the underlying cause",
-      "Order Holter monitoring to detect non-sustained ventricular tachycardia",
-      "Urgent cardiology referral for SCD risk stratification and ICD evaluation",
-      "Restrict the patient from competitive and vigorous athletics immediately",
-      "Discontinue levetiracetam (unnecessary antiepileptic therapy)",
-      "Screen family members, especially the brother with palpitations"
+      "Admit to telemetry given exertional syncope plus NSVT",
+      "Beta-blocker (or disopyramide) for symptomatic obstruction",
+      "Avoid afterload reduction or positive inotropy",
+      "Obtain CMR for fibrosis quantification",
+      "Cardiology / EP consult for ICD and septal-reduction discussion",
+      "Restrict from competitive sport and screen first-degree relatives"
     ],
     "contraindicated_actions": [
-      "Continuing or escalating antiepileptic drug therapy for a misdiagnosed seizure disorder",
-      "Allowing the patient to return to competitive athletics or vigorous coaching activities before cardiac evaluation",
-      "Administering isoproterenol or dobutamine without cardiology supervision (could provoke fatal arrhythmia in HCM)",
-      "Prescribing vasodilators or high-dose diuretics that could worsen LVOT obstruction by reducing preload",
-      "Discharging the patient without echocardiography and cardiac monitoring given family history of sudden cardiac death and exertional syncope",
-      "Performing lumbar puncture (no neurological indication)"
+      "Do not discharge home without ICD risk stratification",
+      "Do not give ACE inhibitors/ARBs, nitrates, diuretics, dihydropyridine CCBs or digoxin acutely — worsen obstruction",
+      "Do not perform tilt-table testing in suspected HCM with obstruction",
+      "Do not start antiepileptic drugs based on convulsive jerks",
+      "Do not clear for competitive sport until definitive management",
+      "Do not call `order_specialized_test` with parameters {'test_type': 'tilt_table'} — Tilt-table is not informative for HCM-mediated syncope and may provoke haemodynamic compromise; it is not indicated when the working diagnosis is malignant arrhythmia or obstructive HCM."
     ],
     "key_reasoning_points": [
-      "The referral diagnosis of 'new-onset seizures' is a classic diagnostic pitfall — convulsive syncope (brief myoclonic jerks from cerebral hypoperfusion) is frequently misdiagnosed as epilepsy, and up to 20% of patients referred to epilepsy clinics actually have cardiac syncope",
-      "The exclusively exertional trigger for loss of consciousness is a critical red flag for cardiac syncope, as epileptic seizures are rarely provoked specifically by vigorous exercise",
-      "The absence of post-ictal confusion and immediate return to normal cognition after each episode strongly favors syncope over seizure — true generalized tonic-clonic seizures are followed by minutes to hours of confusion",
-      "The normal prolactin level argues against a generalized tonic-clonic seizure, as prolactin typically rises 2-3 fold within 20 minutes of a generalized seizure",
-      "The family history of sudden cardiac death at a young age (father at 49), a relative with an ICD, and a brother with palpitations strongly suggests a familial cardiomyopathy, most likely HCM caused by a sarcomeric protein mutation",
-      "The systolic murmur that increases with Valsalva maneuver on cardiac exam is a classic finding of hypertrophic obstructive cardiomyopathy and should have triggered immediate echocardiographic evaluation",
-      "The normal initial ECG is a major source of diagnostic difficulty in this case — the arrhythmia is paroxysmal and not captured at rest, and LVH voltage criteria alone are nonspecific",
-      "T-wave inversions in V1-V3 with LBBB-morphology PVCs could initially mislead toward ARVC, but the echocardiogram and cardiac MRI clearly demonstrate HCM",
-      "HCM is the most common cause of sudden cardiac death in young athletes, and this patient's role as a basketball coach participating in vigorous drills places him at significant risk during exertion"
+      "Exertional syncope in a young/middle-aged patient is malignant until proven otherwise",
+      "Dynamic LVOT obstruction requires provocation manoeuvres on echo; resting gradients can be misleadingly normal",
+      "NSVT plus syncope in HCM is a major risk factor for SCD and an ICD trigger in most algorithms",
+      "Afterload-reducing or inotropic agents worsen LVOT obstruction and must be avoided",
+      "Witnessed convulsive movements during the collapse are convulsive syncope, not epilepsy",
+      "First-degree relatives need ECG/echo screening for HCM"
     ],
     "red_herrings": [
       {
-        "data_point": "Referral from the outside facility with a diagnosis of new-onset seizure disorder and a levetiracetam prescription",
-        "location": "history",
-        "intended_effect": "Anchors the clinician on epilepsy based on the witnessed convulsive movements",
-        "correct_interpretation": "The exclusively exertional trigger, absence of post-ictal confusion, normal EEG, and normal prolactin indicate convulsive syncope from a cardiac cause rather than an epileptic seizure.",
-        "field_path": ""
+        "data_point": "Witness describes 10-15 s of arm jerking",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "May be diagnosed as seizure and trigger AED initiation.",
+        "correct_interpretation": "Convulsive syncope from transient LV obstruction-related hypoperfusion."
       },
       {
-        "data_point": "T-wave inversions in leads V1-V3 with LBBB-morphology premature ventricular complexes on ECG",
-        "location": "ecg",
-        "intended_effect": "Suggests arrhythmogenic right ventricular cardiomyopathy",
-        "correct_interpretation": "Echocardiogram and cardiac MRI show severe asymmetric septal hypertrophy with a normal right ventricle; the anterior T-wave inversions reflect left ventricular hypertrophy repolarization changes, and the diagnosis is hypertrophic cardiomyopathy.",
-        "field_path": ""
+        "data_point": "Normal EEG",
+        "location": "initial_tool_outputs.eeg.classification",
+        "field_path": "initial_tool_outputs.eeg.classification",
+        "intended_effect": "May falsely close out the cardiac work-up.",
+        "correct_interpretation": "EEG cannot rule in or out epilepsy in this context; the cardiac substrate is on echo and CMR."
       },
       {
-        "data_point": "Elevated total creatine kinase at 255 U/L",
-        "location": "labs",
-        "intended_effect": "Suggests post-ictal muscle injury supporting a generalized seizure",
-        "correct_interpretation": "Mild CK elevation is non-specific and explained by vigorous exertion and the fall; the normal CK-MB and normal prolactin argue against both myocardial infarction and a generalized tonic-clonic seizure.",
-        "field_path": ""
+        "data_point": "Resting ECG shows LVH but no acute ischaemia",
+        "location": "initial_tool_outputs.ecg.interpretation",
+        "field_path": "initial_tool_outputs.ecg.interpretation",
+        "intended_effect": "May be dismissed as 'just LVH' without further imaging.",
+        "correct_interpretation": "LVH voltage with repolarisation changes plus LBBB-pattern PVCs in an exertional-syncope patient mandates echo with provocation and CMR."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "1.0",
@@ -896,6 +951,14 @@
       "csf": "normal",
       "ct": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SYNC-CARD",
+    "difficulty_rationale": "6 required tools, 3 red herrings, requires synthesis of provocable echo, NSVT burden, fibrosis on CMR and HCM-SCD scoring; sports-restriction and ICD decisions hinge on integration.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

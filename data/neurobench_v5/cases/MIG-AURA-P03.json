@@ -94,116 +94,166 @@
     "extremities": "No edema"
   },
   "ground_truth": {
-    "primary_diagnosis": "Migrainous infarction (ICHD-3 1.4.1) — small right occipital cortical infarct during established visual aura; all secondary causes excluded; dual antiplatelet needs review (DAPT not indicated long-term)",
-    "primary_diagnosis_icd": "G43.1",
+    "primary_diagnosis": "Migrainous infarction (ICHD-3 1.4.1) — small right occipital cortical infarct during established visual aura; all secondary causes excluded; DAPT not indicated long-term",
+    "icd_code": "I63.9",
     "differential": [
       {
-        "diagnosis": "Cardioembolic stroke (occult AF or PFO-mediated)",
-        "likelihood": "low",
-        "key_features": "No AF on 48-hour Holter; no PFO on echocardiogram; no cardioembolic source identified; infarct size 4mm (typical of migrainous infarction, not embolic); episodic migraine established 10 years; infarct occurred during typical aura"
+        "diagnosis": "Cardioembolic stroke during a coincidental migraine episode",
+        "likelihood": "high",
+        "key_features": "Critical alternative — must be excluded with prolonged cardiac monitoring, echo, and bubble study; ILR/Holter normal, echo normal",
+        "icd_code": "I63.4"
       },
       {
-        "diagnosis": "Antiphospholipid syndrome",
-        "likelihood": "very_low",
-        "key_features": "Antiphospholipid antibodies negative x2 (12-week interval) — APS definitively excluded by two-negative criterion; no prior thrombotic events"
+        "diagnosis": "Paradoxical embolism through PFO",
+        "likelihood": "moderate",
+        "key_features": "Bubble echo to evaluate — if PFO and cryptogenic stroke, closure may be considered",
+        "icd_code": "I63.4"
       },
       {
-        "diagnosis": "Posterior circulation TIA (PCA territory)",
+        "diagnosis": "Cervical / vertebral artery dissection",
         "likelihood": "low",
-        "key_features": "Normal posterior circulation MRA — no PCA stenosis; no vertebral dissection; infarct is small cortical occipital lesion in aura territory; established 10-year migraine history; no embolic source"
+        "key_features": "No neck pain or trauma; MRA shows no dissection",
+        "icd_code": "I77.71"
+      },
+      {
+        "diagnosis": "Vasculitis / antiphospholipid syndrome",
+        "likelihood": "low",
+        "key_features": "ESR/CRP normal; antiphospholipid panel pending; repeat at 12 weeks if borderline",
+        "icd_code": "D68.61"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Confirm ICHD-3 migrainous infarction diagnosis — small occipital cortical infarct during established visual aura; no other cause found",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "4mm right occipital cortical infarct at 3 days; largely resolved at 4 weeks; normal MRA posterior circulation",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
         "category": "required",
         "tool_parameters": {
-          "contrast": true,
-          "sequences": [
-            "DWI",
-            "FLAIR",
-            "T1+Gd",
-            "MRA"
-          ]
-        }
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "Stop clopidogrel — DAPT not indicated for migrainous infarction; aspirin 75 mg monotherapy appropriate",
-        "tool_name": null,
-        "expected_finding": "DAPT (aspirin + clopidogrel) has no evidence for long-term use in migrainous infarction; aspirin monotherapy appropriate",
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Step down dual antiplatelet to single antiplatelet (aspirin or clopidogrel) at 21-90 days per stroke guidance; STOP triptans permanently after migrainous infarction; preventive therapy indicated",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "context": "migraine_with_aura_pharmacotherapy"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 3,
-        "action": "Initiate strong migraine preventive therapy — topiramate 50-100 mg or propranolol; reducing migraine frequency is primary prevention",
-        "tool_name": null,
-        "expected_finding": "2-4 attacks/month = preventive therapy strongly indicated; preventing migraine prevents migrainous infarction recurrence",
+        "action": "Brain MRI/MRA review for infarct confirmation and vascular cause exclusion",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Confirmed small right occipital cortical infarct; no large-vessel disease",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "contrast": false,
+          "sequences": [
+            "DWI",
+            "FLAIR",
+            "T2",
+            "SWI",
+            "MRA"
+          ]
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 4,
-        "action": "Repeat antiphospholipid antibodies at 12 weeks — confirm APS excluded",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Two negative results 12 weeks apart required for definitive APS exclusion",
+        "action": "Prolonged cardiac monitoring and bubble echo to exclude cardioembolic source",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "No paroxysmal AF; no cardioembolic source identified",
         "category": "required",
         "tool_parameters": {
-          "lab_type": "antiphospholipid_repeat"
-        }
+          "duration_days": 30,
+          "device": "ambulatory_event_monitor"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 5,
-        "action": "Driving clearance — 4 weeks post-episode, full recovery, visual fields full; document perimetry and clear patient to drive",
-        "tool_name": null,
-        "expected_finding": "UK DVLA 1-month restriction satisfied; full recovery documented",
+        "action": "Echocardiogram with bubble study to evaluate PFO and cardiac source",
+        "tool_name": "order_echocardiogram",
+        "expected_finding": "Normal cardiac structure; no/small PFO; no thrombus",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "contrast": true,
+          "bubble_study": true
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
+      },
+      {
+        "step": 6,
+        "action": "Stroke aetiology labs — antiphospholipid, lipids, HbA1c, thrombophilia",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Antiphospholipid panel negative on repeat at 12 weeks; lipid and glucose unremarkable",
+        "category": "required",
+        "tool_parameters": {
+          "lab_type": "stroke_aetiology"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis — neither present here",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is not indicated for migraine with aura; reserve for cases where focal seizure is genuinely on the differential",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "Confirm ICHD-3 migrainous infarction diagnosis — confirmed DWI restriction in aura territory; all secondary causes excluded",
-      "Stop clopidogrel — DAPT not evidence-based for migrainous infarction; aspirin monotherapy appropriate",
-      "Migraine prevention is the PRIMARY prevention strategy for migrainous infarction recurrence — initiate topiramate or propranolol",
-      "Repeat antiphospholipid antibodies at 12 weeks — required to definitively exclude APS (two negative results needed)",
-      "Confirm progestin-only pill is appropriate contraception — combined OCP absolutely contraindicated (already appropriately stopped)"
+      "Confirm migrainous infarction by ICHD-3 1.4.1 criteria (aura >60 min + infarct on imaging in the relevant territory)",
+      "Complete stroke-aetiology workup (MRA, prolonged cardiac monitoring, echo with bubble study, antiphospholipid antibodies)",
+      "Stop triptans permanently after migrainous infarction",
+      "Step down DAPT to single antiplatelet per stroke secondary-prevention guidance",
+      "Initiate migraine preventive therapy",
+      "Counsel that combined OCP must remain stopped"
     ],
     "contraindicated_actions": [
-      "Do not continue dual antiplatelet (DAPT) long-term — no evidence for long-term DAPT in migrainous infarction",
-      "Do not prescribe combined OCP — absolute contraindication (already appropriately stopped 10 years ago)",
-      "Do not restrict driving beyond 1 month with full neurological recovery — DVLA criteria met at 4 weeks"
+      "Do not continue triptans after migrainous infarction",
+      "Do not continue dual antiplatelet therapy long-term in the absence of an ongoing indication",
+      "Do not restart combined oestrogen-progestogen contraception"
     ],
     "key_reasoning_points": [
-      "Migrainous infarction (ICHD-3 1.4.1) requires: established migraineur; infarction during typical aura; in territory of aura; all secondary causes excluded",
-      "The diagnostic puzzle: DWI restriction was present (real infarction) but the previous team added clopidogrel to aspirin — DAPT is not supported by evidence for migrainous infarction",
-      "The PRIMARY prevention strategy for migrainous infarction recurrence is preventing the migraine — not anticoagulation",
-      "Antiphospholipid antibodies must be repeated at 12 weeks for definitive APS exclusion — a single negative test is insufficient",
-      "Cerazette (progestin-only) is appropriate and should be continued — combined OCP was correctly stopped 10 years ago"
+      "Migrainous infarction is a diagnosis of exclusion — competing aetiologies (cardioembolic, dissection, vasculitis, paradoxical embolism) must be ruled out first",
+      "Long-term DAPT is not standard after small cortical infarct — step down to single antiplatelet per current stroke guidance",
+      "Triptans are contraindicated permanently after migrainous infarction"
     ],
     "red_herrings": [
       {
-        "data_point": "Real DWI restriction on MRI — dual antiplatelet treatment started",
+        "data_point": "DAPT (aspirin + clopidogrel) prescribed at index event",
         "location": "patient.history_present_illness",
-        "intended_effect": "Confirmed cortical infarction in a 38-year-old woman triggered standard ischaemic stroke workup and DAPT",
-        "correct_interpretation": "Migrainous infarction is a real stroke, but its management differs — DAPT not indicated long-term; primary prevention = migraine prevention; aspirin monotherapy appropriate",
-        "field_path": ""
-      },
-      {
-        "data_point": "Antiphospholipid antibodies initially reported as negative — may not repeat",
-        "location": "patient.history_present_illness",
-        "intended_effect": "If only one negative antiphospholipid result, APS is not definitively excluded",
-        "correct_interpretation": "APS diagnosis requires two positive results 12 weeks apart; exclusion similarly requires two negative results 12 weeks apart — single test is insufficient",
-        "field_path": ""
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "May appear to be ongoing indication",
+        "correct_interpretation": "DAPT is appropriate short-term post-stroke but should be stepped down to single antiplatelet long-term in this case"
       }
-    ],
-    "icd_code": "G43.1",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -228,7 +278,17 @@
       "advanced_imaging": "normal",
       "specialized_test": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Diagnostic puzzle: full stroke-aetiology workup, secondary prevention review, and permanent triptan discontinuation after migrainous infarction",
+    "case_body_concerns": [
+      "Required tool(s) lacking initial or followup outputs in the case body — agent calling them will fall back to off-pathway tier or empty result; tools: ['check_drug_interactions (only fallback)']"
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "initial_tool_outputs": {
     "mri": {

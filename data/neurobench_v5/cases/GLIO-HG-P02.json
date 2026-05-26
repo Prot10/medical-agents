@@ -647,169 +647,216 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Primary CNS lymphoma (EBV-associated DLBCL) in the setting of undiagnosed HIV/AIDS",
+    "primary_diagnosis": "Primary CNS lymphoma (EBV-associated DLBCL) in the setting of newly diagnosed HIV/AIDS",
     "icd_code": "C85.10",
     "differential": [
       {
-        "diagnosis": "Glioblastoma",
+        "diagnosis": "Glioblastoma, IDH-wildtype",
         "likelihood": "moderate",
-        "key_features": "Homogeneous enhancement without central necrosis is atypical for GBM (which typically ring-enhances with necrosis). Periventricular location with subependymal spread favors lymphoma. rCBV 2.4 is lower than typical GBM (>4.0). Positive CSF cytology with monoclonal B-cells confirms lymphoma. GFAP negative on biopsy excludes glial tumor."
+        "key_features": "Was the initial referring diagnosis; differentiated by homogeneous (non-ring) enhancement, diffuse DWI restriction, periventricular and corpus callosum location, and HIV/immunocompromise context"
       },
       {
-        "diagnosis": "CNS toxoplasmosis",
+        "diagnosis": "Cerebral toxoplasmosis",
         "likelihood": "moderate",
-        "key_features": "Toxoplasma IgG positive indicating prior exposure, and CD4 82 puts patient at risk. However, single homogeneous mass (not typical multiple ring-enhancing lesions of toxo). Toxoplasma PCR negative in CSF. Biopsy confirms lymphoma, not toxoplasmosis."
+        "key_features": "Important differential in HIV/AIDS; usually multiple lesions with ring enhancement and surrounding edema; serology and empirical trial response can help, thallium SPECT (low) vs lymphoma (high)"
       },
       {
-        "diagnosis": "Brain abscess",
-        "likelihood": "low",
-        "key_features": "Homogeneous enhancement is not ring-enhancing pattern of abscess. DWI restriction is diffuse and homogeneous (abscess shows CENTRAL restricted diffusion in the cavity). No fever or significant leukocytosis to suggest pyogenic abscess."
+        "diagnosis": "Cerebral toxoplasmosis",
+        "likelihood": "moderate",
+        "key_features": "HIV/AIDS context; typically multiple ring-enhancing lesions with surrounding edema; thallium SPECT cold (vs hot in lymphoma) and serology help differentiate"
       },
       {
-        "diagnosis": "Metastasis",
+        "diagnosis": "Brain abscess (bacterial / fungal in immunocompromised host)",
         "likelihood": "low",
-        "key_features": "No systemic malignancy on whole-body PET-CT. Periventricular location and subependymal spread are atypical for metastasis. Single lesion with this imaging pattern in an immunocompromised patient favors PCNSL."
+        "key_features": "Possible in advanced HIV; would expect central DWI restriction and clinical sepsis signs"
+      },
+      {
+        "diagnosis": "Tumefactive demyelination",
+        "likelihood": "low",
+        "key_features": "Open ring enhancement (incomplete on side toward cortex) and minimal mass effect are typical; this lesion shows closed/homogeneous enhancement and significant mass effect"
+      },
+      {
+        "diagnosis": "Brain metastasis",
+        "likelihood": "very_low",
+        "key_features": "No known primary; corpus callosum involvement and subependymal spread atypical"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Test for HIV immediately based on clinical features (oral thrush, lymphadenopathy, weight loss, leukopenia with lymphopenia)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "HIV positive with CD4 82 (AIDS) and viral load 156,000",
-        "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "HIV"
-          ]
-        }
-      },
-      {
-        "step": 2,
-        "action": "Order brain MRI with gadolinium for detailed lesion characterization",
+        "action": "Order MRI brain with and without gadolinium contrast (tumor protocol with DWI, FLAIR, post-contrast T1) to characterize the right frontal periventricular lesion, define mass effect, and plan surgery",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Homogeneously enhancing periventricular mass — pattern favoring lymphoma over GBM",
+        "expected_finding": "Heterogeneously enhancing mass with ring/irregular enhancement, central necrosis, restricted diffusion at the enhancing rim, perilesional FLAIR-hyperintense edema, and mass effect consistent with high-grade glioma",
         "category": "required",
         "tool_parameters": {
           "protocol": "tumor",
           "contrast": true
-        }
+        },
+        "citation": "[Stupp_2005]",
+        "guideline_source": "Stupp_2005"
+      },
+      {
+        "step": 2,
+        "action": "Order pre-operative laboratory workup: CBC, comprehensive metabolic panel, coagulation studies (PT/INR, aPTT), and type & screen in anticipation of surgical biopsy/resection",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Baseline values acceptable for surgery; identify any coagulopathy, electrolyte derangement, or steroid-relevant abnormality (e.g., hyperglycemia, hyponatremia) before craniotomy",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "coagulation",
+            "type_and_screen"
+          ]
+        },
+        "citation": "[NCCN_CNS]",
+        "guideline_source": "NCCN_CNS"
       },
       {
         "step": 3,
-        "action": "Order MR perfusion to distinguish PCNSL (moderate rCBV) from GBM (high rCBV)",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Moderate rCBV (2.4) favoring lymphoma over GBM",
-        "category": "required",
-        "tool_parameters": {
-          "imaging_type": "perfusion_MRI"
-        }
+        "action": "Search medical literature for diagnostic and management approach to suspected CNS lymphoma in HIV/AIDS, including the standard role of HIV testing, MRI pattern recognition (homogeneous enhancement, diffuse DWI restriction), and biopsy before tumor-directed therapy",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirmation that empiric steroids should be deferred until biopsy is obtained where feasible (to avoid masking lymphoma histology), and that HIV testing plus stereotactic biopsy are the diagnostic standard",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[NCCN_CNS]",
+        "guideline_source": "NCCN_CNS"
       },
       {
         "step": 4,
-        "action": "Obtain CSF cytology and flow cytometry BEFORE initiating corticosteroids (steroids lyse lymphoma cells causing 'vanishing tumor')",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Monoclonal B-cells with CD20+/BCL6+/MUM1+ confirming DLBCL",
+        "action": "Obtain urgent neurosurgical and infectious-diseases / neuro-oncology consultation; stereotactic biopsy is required for tissue diagnosis before tumor-directed therapy",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Multidisciplinary plan including tissue acquisition, molecular profiling, and adjuvant treatment per current standards",
         "category": "required",
         "tool_parameters": {
-          "special_tests": [
-            "cytology",
-            "flow_cytometry"
-          ]
-        }
+          "specialty": "neurosurgery"
+        },
+        "citation": "[NCCN_CNS]",
+        "guideline_source": "NCCN_CNS"
       },
       {
         "step": 5,
-        "action": "If CSF non-diagnostic, perform stereotactic biopsy (NOT craniotomy for resection)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "EBV-associated DLBCL confirmed on tissue",
+        "action": "Obtain neuro-oncology consultation for adjuvant therapy planning and molecular-marker-guided treatment selection",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Plan for concurrent chemoradiation (Stupp protocol with temozolomide) for IDH-wildtype GBM; alternative chemoradiation regimens for other tumor types or for atypical histologies",
         "category": "required",
         "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP"
-          ]
-        }
+          "specialty": "neuro_oncology"
+        },
+        "citation": "[Stupp_2005]",
+        "guideline_source": "Stupp_2005"
       },
       {
         "step": 6,
-        "action": "Order whole-body PET-CT to exclude systemic lymphoma",
-        "tool_name": "interpret_labs",
-        "expected_finding": "No systemic lymphoma — confirms primary CNS lymphoma",
-        "category": "required",
+        "action": "Order MR perfusion imaging (DSC perfusion) to assess tumor vascularity and target highest-grade region for biopsy",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Elevated rCBV (typically > 1.75) in enhancing component supports high-grade neoplasm and helps direct biopsy",
+        "category": "recommended",
         "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP"
-          ]
-        }
+          "modality": "perfusion_MRI"
+        },
+        "citation": "[Law_2003]",
+        "guideline_source": "Law_2003"
       },
       {
         "step": 7,
-        "action": "Refer to neuro-oncology for high-dose methotrexate-based chemotherapy",
-        "tool_name": null,
-        "expected_finding": "Treatment plan for PCNSL (NOT GBM protocol)",
-        "category": "required"
+        "action": "Order MR spectroscopy (1H-MRS) to characterize tumor metabolic profile",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Elevated Cho/NAA ratio with lipid-lactate peaks supports high-grade malignancy and helps differentiate tumor from treatment-related change at follow-up",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "MR_spectroscopy"
+        },
+        "citation": "[Bulik_2013]",
+        "guideline_source": "Bulik_2013"
       },
       {
         "step": 8,
-        "action": "Initiate antiretroviral therapy (ART) for HIV after oncologic treatment plan is established, in coordination with infectious disease",
-        "tool_name": null,
-        "expected_finding": "ART initiation with monitoring for immune reconstitution inflammatory syndrome (IRIS)",
-        "category": "required"
+        "action": "Order CT chest/abdomen/pelvis as staging to exclude an extracranial primary if a solitary metastasis is on the differential",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No extracranial primary malignancy identified, supporting primary brain tumor as the working diagnosis",
+        "category": "optional",
+        "tool_parameters": {
+          "region": "chest_abdomen_pelvis",
+          "contrast": true
+        },
+        "citation": "[NCCN_CNS]",
+        "guideline_source": "NCCN_CNS"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "echo_type": "TTE"
+        },
+        "rationale": "Echocardiogram has no role in the diagnostic workup of suspected high-grade glioma absent a specific cardiac question (e.g., suspected paraneoplastic endocarditis)",
+        "citation": "[NCCN_CNS]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "Cardiac monitoring is unrelated to the diagnostic workup of a brain mass and adds resource cost without informing management",
+        "citation": "[NCCN_CNS]"
+      }
+    ],
+    "harmful_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is contraindicated in suspected intracranial mass with significant midline shift (6 mm): the pressure gradient created by LP risks transtentorial or tonsillar herniation. Even when LP is otherwise safe, CSF studies are low-yield for primary brain tumor diagnosis.",
+        "citation": "[Hasbun_2001]"
+      }
+    ],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "MRI must precede any lumbar puncture when a mass lesion is suspected, to identify mass effect and herniation risk before LP",
+        "citation": "[Hasbun_2001]",
+        "severity": "hard"
+      },
+      {
+        "before": "analyze_brain_mri",
+        "after": "consult_medical_specialist",
+        "reason": "Adequate pre-operative MRI characterization (mass, edema, eloquent-cortex proximity) is standard of care before neurosurgical tissue acquisition",
+        "citation": "[Stupp_2005]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Test for HIV immediately — lymphadenopathy, oral thrush, leukopenia, and weight loss demand it",
-      "DO NOT proceed directly to craniotomy/resection — PCNSL should NOT be debulked surgically",
-      "Obtain CSF cytology and flow cytometry before initiating steroids (steroids cause 'vanishing lymphoma' and prevent diagnosis)",
-      "Stereotactic biopsy for tissue diagnosis if CSF is non-diagnostic",
-      "Avoid corticosteroids before biopsy if at all possible (they lyse lymphoma cells and can prevent diagnosis)",
-      "Start ART for HIV after oncologic treatment plan established",
-      "Refer to neuro-oncology for high-dose methotrexate-based chemotherapy"
+      "Obtain urgent neurosurgical consultation for tissue diagnosis (stereotactic biopsy or maximal safe resection) and operative planning",
+      "Obtain MRI brain with and without gadolinium contrast (tumor protocol) before any invasive procedure",
+      "Administer dexamethasone (loading dose 10 mg IV, then 4 mg IV every 6 hours) to reduce vasogenic edema and mass effect (6 mm midline shift)",
+      "Obtain HIV testing and infectious workup (toxoplasma serology, CD4 count, viral load) given systemic features (weight loss, lymphadenopathy, oral thrush)",
+      "Defer empiric corticosteroids until after stereotactic biopsy if clinically feasible, to avoid masking lymphoma histology",
+      "Obtain pre-operative labs (CBC, BMP, coagulation, type & screen) before craniotomy/biopsy",
+      "Plan multimodal treatment per molecular and histological profile (e.g., Stupp protocol — concurrent chemoradiation with temozolomide for IDH-wildtype GBM)"
     ],
     "contraindicated_actions": [
-      "Craniotomy for tumor resection (PCNSL is treated with chemotherapy, not surgery — surgical debulking provides no survival benefit and delays definitive treatment)",
-      "Administering dexamethasone before obtaining tissue/CSF diagnosis (vanishing tumor phenomenon — steroids lyse lymphoma cells, making diagnosis impossible)",
-      "Empirically treating for toxoplasmosis without tissue confirmation in a single-mass presentation (classic toxo presents with multiple ring-enhancing lesions)",
-      "Initiating temozolomide (GBM protocol) without confirming the diagnosis — temozolomide is ineffective against PCNSL"
+      "Do not perform lumbar puncture in the setting of mass effect (6 mm midline shift) — herniation risk",
+      "Do not initiate definitive tumor-directed therapy (radiation, temozolomide, alkylating chemotherapy) before tissue diagnosis is established",
+      "Do not start therapeutic anticoagulation without a clear thromboembolic indication, given upcoming neurosurgical intervention and bleeding risk",
+      "Do not commit to glioma-directed surgical resection (vs. stereotactic biopsy) before considering CNS lymphoma — extensive resection of CNS lymphoma is not standard"
     ],
     "key_reasoning_points": [
-      "Homogeneous enhancement with periventricular location and subependymal spread is the classic MRI pattern of PCNSL — GBM typically shows ring-enhancement with central necrosis",
-      "Lower rCBV (2.4) than expected for GBM (typically >4.0) suggests a less vascular tumor like lymphoma rather than the neoangiogenic GBM",
-      "Leukopenia + oral thrush + generalized lymphadenopathy + weight loss + fevers in a sexually active man with multiple male partners = undiagnosed HIV/AIDS must be tested",
-      "CD4 count of 82 makes PCNSL and CNS toxoplasmosis the top differential diagnoses in AIDS with a brain mass",
-      "Elevated EBV DNA in blood (12,400) and CSF (45,000) strongly correlates with EBV-driven PCNSL in AIDS",
-      "CSF cytology showing monoclonal B-cells with CD20+/BCL6+/MUM1+ and kappa restriction confirms DLBCL",
-      "PCNSL management is fundamentally different from GBM: high-dose methotrexate-based chemotherapy + whole-brain radiation (in AIDS, with concurrent ART), NOT surgical resection and temozolomide",
-      "Corticosteroids given before biopsy can cause the tumor to 'vanish' temporarily, preventing tissue diagnosis"
+      "Imaging pattern of homogeneous enhancement, diffuse DWI restriction, periventricular and corpus-callosum involvement is atypical for GBM and characteristic of primary CNS lymphoma",
+      "Systemic features (weight loss, fevers, lymphadenopathy, oral thrush) plus high-risk sexual history mandate HIV testing in this presentation",
+      "Tissue diagnosis is essential before tumor-directed therapy; in suspected CNS lymphoma, deferring corticosteroids until biopsy when feasible preserves diagnostic yield",
+      "Mass effect with midline shift contraindicates lumbar puncture; CSF studies (cytology, flow cytometry, EBV PCR) — if eventually obtained — must wait until imaging-defined safety and ideally are paired with biopsy",
+      "Surgical resection is not the standard for primary CNS lymphoma; treatment is high-dose methotrexate-based chemotherapy ± whole-brain radiation"
     ],
     "red_herrings": [
       {
-        "data_point": "Enhancing brain mass with midline shift referred as 'likely GBM'",
-        "location": "mri",
-        "intended_effect": "Immediate assumption of GBM because it is the most common primary brain tumor, leading to surgical planning",
-        "correct_interpretation": "Enhancement pattern matters: HOMOGENEOUS enhancement (PCNSL) is different from RING enhancement with necrosis (GBM). Periventricular location with subependymal spread strongly favors PCNSL.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Positive Toxoplasma IgG",
-        "location": "labs",
-        "intended_effect": "In an AIDS patient with a brain mass, suggests CNS toxoplasmosis requiring empiric treatment with pyrimethamine-sulfadiazine",
-        "correct_interpretation": "Toxoplasma IgG indicates prior exposure, which is present in 30-50% of adults. A single homogeneous mass (not multiple ring-enhancing lesions) is atypical for CNS toxoplasmosis. CSF Toxoplasma PCR is negative, and biopsy confirms lymphoma.",
-        "field_path": ""
-      },
-      {
-        "data_point": "DWI restriction in the mass",
-        "location": "mri",
-        "intended_effect": "May suggest high-grade glioma to the reader accustomed to seeing DWI restriction in GBM",
-        "correct_interpretation": "Both GBM and PCNSL show restricted diffusion, but the pattern differs: PCNSL shows DIFFUSE homogeneous restriction (dense cellularity throughout), while GBM shows rim restriction around necrotic center. The diffuse pattern here favors PCNSL.",
-        "field_path": ""
+        "data_point": "Outside-hospital preliminary diagnosis of 'brain tumor, likely GBM'",
+        "location": "patient.history_present_illness",
+        "field_path": "",
+        "intended_effect": "Anchors the receiving team on glioma and toward empirical glioma management",
+        "correct_interpretation": "MRI features (homogeneous enhancement, diffuse DWI restriction, periventricular/callosal involvement) plus systemic features (weight loss, lymphadenopathy, oral thrush) point to CNS lymphoma in an immunocompromised host; HIV testing and biopsy are mandatory before any tumor-directed therapy"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "1.0",
@@ -825,6 +872,18 @@
       "specialized_test": "normal",
       "literature_search": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:GLIO-HG",
+    "difficulty_rationale": "Off-pathway / atypical tumor histology (the case body diagnosis is not standard IDH-wildtype GBM); 4 required tools, 1 red herring(s); diagnosis requires recognizing mimic imaging patterns and adjusting management accordingly",
+    "case_body_concerns": [
+      "Case body diagnosis is primary CNS lymphoma in HIV/AIDS but the case is filed under the GLIO-HG (high-grade glioma) condition prefix. Consider moving to a CNS lymphoma or HIV-CNS pack, or re-labeling as a glioma-mimic acceptance case (the GT preserved here describes the correct, non-glioma diagnosis from the case body).",
+      "No literature_search output is provided in initial_tool_outputs or followup_outputs. search_medical_literature has been demoted from required to recommended to keep ground_truth self-consistent; a future case-body pass should add a literature_search payload covering WHO 2021 classification + Stupp protocol so this can be reinstated as required.",
+      "No literature_search output is provided in initial_tool_outputs or followup_outputs. search_medical_literature has been demoted from required to recommended to keep ground_truth self-consistent; a future case-body pass should add a literature_search payload covering WHO 2021 classification + Stupp protocol so this can be reinstated as required."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -421,90 +421,249 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Amyotrophic lateral sclerosis, flail arm variant (Vulpian-Bernardt syndrome)",
+    "primary_diagnosis": "Amyotrophic lateral sclerosis, flail-arm variant (Vulpian-Bernardt syndrome)",
     "icd_code": "G12.21",
     "differential": [
       {
-        "diagnosis": "Bilateral rotator cuff disease",
-        "likelihood": "very_low",
-        "key_features": "Rotator cuff disease does not cause muscle wasting, fasciculations, or neurogenic EMG. Bilateral Babinski signs require neurological explanation."
+        "diagnosis": "Multifocal motor neuropathy (MMN)",
+        "likelihood": "high",
+        "key_features": "Restricted upper-limb weakness mimics MMN; absence of conduction block and presence of UMN signs (when emergent) distinguish",
+        "icd_code": null
       },
       {
-        "diagnosis": "Hirayama disease (juvenile muscular atrophy)",
-        "likelihood": "very_low",
-        "key_features": "Hirayama primarily affects young males <25, C7-T1 distribution unilaterally. Age 56, bilateral involvement exclude this diagnosis."
+        "diagnosis": "Brachial amyotrophy / Hirayama disease",
+        "likelihood": "moderate",
+        "key_features": "Younger patients with cervical-cord-related upper-limb atrophy; MRI does not support",
+        "icd_code": null
       },
       {
-        "diagnosis": "Kennedy disease (SBMA)",
+        "diagnosis": "Cervical radiculopathy multilevel",
         "likelihood": "low",
-        "key_features": "Androgen receptor CAG repeat normal; no gynecomastia; Kennedy is bilateral arm/bulbar but with sensory NCS abnormalities"
+        "key_features": "Multi-myotomal EMG denervation crosses radicular distributions",
+        "icd_code": null
       },
       {
-        "diagnosis": "Brachial plexopathy bilateral",
-        "likelihood": "very_low",
-        "key_features": "Bilateral brachial plexopathy cannot explain Babinski signs; cervical paraspinal denervation on EMG not explained by plexopathy; no trauma history"
+        "diagnosis": "Inclusion body myositis",
+        "likelihood": "low",
+        "key_features": "Pattern of finger flexor and quadriceps weakness not predominant; EMG is neurogenic",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "CIDP / acquired demyelinating neuropathy",
+        "likelihood": "low",
+        "key_features": "Sensory NCS normal; no demyelinating features",
+        "icd_code": null
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "EMG bilateral arms and legs including paraspinals — essential for multi-region assessment",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Profound cervical denervation, thoracic paraspinal involvement, relative lumbosacral sparing — flail arm ALS pattern",
+        "action": "Obtain brain MRI (with cervical spine sequences) to exclude structural mimics — cervical myelopathy, demyelination, brainstem tumor",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "No structural lesion explaining the motor/bulbar findings; corticospinal-tract signal change or non-specific findings may be seen but are not by themselves diagnostic",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "DWI",
+            "T1+Gd"
+          ],
+          "include_cervical_spine": true
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       },
       {
         "step": 2,
-        "action": "MRI brain (motor cortex arm area) and cervical spine",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Motor cortex corticospinal tract changes; no cord compression",
+        "action": "Perform EMG with nerve conduction studies sampling bulbar plus ≥2 spinal regions to document lower motor neuron involvement (fibrillations, positive sharp waves, complex fasciculation potentials, large-amplitude long-duration polyphasic MUPs with reduced recruitment) and exclude conduction block",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Active denervation and chronic reinnervation in ≥2 body regions with normal sensory NCS and no conduction block — meets Awaji / El Escorial revised criteria",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[Awaji_2008]",
+        "guideline_source": "Awaji_2008"
       },
       {
         "step": 3,
-        "action": "Literature search on flail arm ALS phenotype",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Recognized ALS variant with better prognosis; same treatment as classical ALS",
-        "category": "recommended",
-        "tool_parameters": {}
+        "action": "Order a mimic-exclusion lab panel: CK, B12, TSH, HbA1c, HIV, RPR, SPEP, anti-GM1 IgM antibodies, and (in males) androgen receptor CAG repeat for Kennedy disease",
+        "tool_name": "interpret_labs",
+        "expected_finding": "CK often mildly to moderately elevated (2–5× ULN); reversible mimics (B12, TSH, HIV, RPR) negative; anti-GM1 negative; SPEP without high-titer M-spike; CAG repeat normal",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "LFTs",
+            "CK",
+            "B12",
+            "TSH",
+            "Free T4",
+            "HIV",
+            "RPR",
+            "SPEP",
+            "anti-GM1 IgM",
+            "androgen receptor CAG repeat"
+          ]
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       },
       {
         "step": 4,
-        "action": "Pulmonary function — note technical limitations with bilateral hand weakness",
-        "tool_name": "interpret_labs",
-        "expected_finding": "FVC borderline, SNIP reduced",
+        "action": "Measure respiratory function (FVC, MIP/MEP, SNIP/NIF) at baseline to inform NIV timing and prognostication",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "FVC and SNIP/MIP often reduced even in early disease; values guide timing of NIV (FVC <50% predicted or SNIP <40 cmH₂O are conventional thresholds)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
+      },
+      {
+        "step": 5,
+        "action": "Search the medical literature to confirm Awaji and Gold Coast diagnostic thresholds and AAN practice-parameter recommendations relevant to this presentation",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Awaji-Shima 2008 / Gold Coast 2020 diagnostic criteria; AAN 2009 practice parameter on ALS care",
+        "category": "recommended",
+        "tool_parameters": {
+          "query": "ALS diagnostic criteria Awaji Gold Coast AAN practice parameter"
+        },
+        "citation": "[Awaji_2008]",
+        "guideline_source": "Awaji_2008"
+      },
+      {
+        "step": 6,
+        "action": "Order an ALS-focused genetic panel (C9orf72 repeat expansion, SOD1, TARDBP, FUS, TBK1) — required when family history is positive or onset is young (<50)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "C9orf72 expansion in ~40% of familial cases; SOD1/TARDBP/FUS in additional familial subset; ~10% of apparently sporadic cases also carry a variant",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "genetic_panel:ALS"
+        },
+        "citation": "[Brown_2017]",
+        "guideline_source": "Brown_2017"
+      },
+      {
+        "step": 7,
+        "action": "Obtain CSF for neurofilament light chain (NfL) for prognostic stratification when the diagnosis remains uncertain or when prognostic information will change management",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Markedly elevated CSF NfL (typically >5,000 pg/mL) supports a motor-neuron-disease degenerative process and correlates with faster progression",
+        "category": "recommended",
+        "tool_parameters": {
+          "tests": [
+            "cell count",
+            "protein",
+            "glucose",
+            "NfL",
+            "NfH",
+            "oligoclonal bands",
+            "cytology"
+          ]
+        },
+        "citation": "[ENCALS_2018]",
+        "guideline_source": "ENCALS_2018"
+      },
+      {
+        "step": 8,
+        "action": "Check interactions before initiating riluzole 50 mg twice daily; review baseline LFTs and CBC and counsel on monitoring",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "No major interactions for typical chronic medications; advise alcohol and grapefruit-juice avoidance (CYP1A2 modulators); monthly LFTs for first 3 months",
+        "category": "recommended",
+        "tool_parameters": {
+          "proposed_drug": "riluzole"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "ALS is a motor-neuron disease without cortical electrical signature; EEG has no diagnostic role and adds cost without benefit.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG is unrelated to motor neuron disease and not part of the standard ALS workup absent specific cardiac symptoms or pre-medication QTc checks.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is unrelated to ALS diagnosis; no indication absent comorbid cardiac disease.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring has no role in ALS diagnostic workup.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "MRI is the standard structural study for ALS workup; head CT adds no diagnostic value and exposes the patient to ionizing radiation.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in ALS diagnosis (motor-neuron rather than amyloid pathology) and carries a high cost.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan evaluates nigrostriatal dopaminergic integrity; it has no role in ALS, which spares the dopaminergic system.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "FDG-PET has no established diagnostic role in ALS and adds substantial cost.",
+        "citation": "[AAN_2009]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "Bilateral Babinski signs with areflexic arms require UMN explanation — not explained by peripheral or plexus pathology alone",
-      "EMG must include thoracic paraspinals — confirms motor neuron disease beyond cervical distribution",
-      "Recognize flail arm variant as ALS phenotype — prognosis better but treatment (riluzole, MDC) is the same"
+      "Perform EMG/NCS sampling the bulbar region plus ≥2 spinal regions to document lower-motor-neuron involvement and exclude conduction block.",
+      "Obtain brain MRI to exclude structural mimics (cervical myelopathy, demyelinating disease, brainstem tumor).",
+      "Order a mimic-exclusion lab panel (CK, B12, TSH, HIV, RPR, SPEP, anti-GM1 IgM, androgen receptor CAG repeat in males).",
+      "Measure baseline respiratory function (FVC, MIP/MEP, SNIP) to inform NIV timing.",
+      "Apply Awaji-Shima 2008 / Gold Coast 2020 criteria to confirm the diagnosis.",
+      "Initiate riluzole 50 mg twice daily after baseline LFTs unless contraindicated; arrange monthly LFT monitoring for the first 3 months.",
+      "Refer to a multidisciplinary ALS clinic for SLP, dietetics, respiratory, and social-work input."
     ],
     "contraindicated_actions": [
-      "Attributing bilateral arm weakness to rotator cuff/orthopedic disease without neurological evaluation",
-      "Delaying ALS diagnosis based on absence of leg weakness — flail arm variant has relative leg sparing by definition"
+      "Do not commit the patient to cervical spine surgery on the basis of incidental spondylotic changes when EMG findings extend beyond the cervical cord.",
+      "Do not start chronic immunosuppression (steroids, IVIG, plasma exchange) for ALS — there is no benefit and treatment delays correct diagnosis.",
+      "Do not defer respiratory assessment in a symptomatic patient — even mild FVC reduction warrants close monitoring and NIV planning.",
+      "Do not dismiss bulbar or progressive symptoms as functional / psychiatric without a complete neurological workup."
     ],
     "key_reasoning_points": [
-      "Flail arm variant (Vulpian-Bernardt): bilateral arm weakness/atrophy predominating, relative leg and bulbar sparing, particularly in middle-aged men. Meets ALS El Escorial criteria despite regional phenotype.",
-      "Paradoxical finding: areflexic arms (LMN) + bilateral Babinski (UMN) — this combination strongly suggests ALS with combined UMN/LMN affecting arm region; reflexes are absent because LMN degeneration destroys the reflex arc even though UMN tract is also degenerating",
-      "Bilateral shoulder MRI red herring: bilateral rotator cuff tendinopathy is a common incidental finding that diverted diagnostic attention for 12 months"
+      "Diagnosis requires evidence of both upper-motor-neuron involvement (hyperreflexia, Babinski, Hoffman, brisk jaw jerk, spasticity) and lower-motor-neuron involvement (atrophy, fasciculations, EMG denervation) with progressive spread, while excluding mimics — Awaji 2008 / Gold Coast 2020.",
+      "EMG in bulbar plus ≥2 spinal regions documenting fibrillations, positive sharp waves, complex fasciculation potentials, and large-amplitude long-duration polyphasic MUPs with reduced recruitment satisfies the electrodiagnostic criterion.",
+      "Normal sensory NCS and absence of conduction block are pivotal: they exclude common mimics including multifocal motor neuropathy, CIDP, and Kennedy disease.",
+      "Mild-to-moderate CK elevation (2–5× ULN) is consistent with ALS and does not itself indicate a primary myopathy.",
+      "Cervical spondylotic changes on MRI are common incidental findings in the at-risk age group; bulbar findings or multi-region EMG denervation cannot be attributed to cervical disease.",
+      "Baseline FVC, MIP/MEP, and SNIP/NIF inform NIV timing — NIV initiation at FVC <50% predicted or SNIP <40 cmH₂O prolongs survival and improves quality of life.",
+      "Markedly elevated CSF neurofilament light chain (>5,000 pg/mL) supports motor neuron degeneration and correlates with progression rate (ENCALS prediction model)."
     ],
-    "red_herrings": [
-      {
-        "data_point": "Bilateral shoulder MRI showing rotator cuff tendinopathy and history of right shoulder surgery",
-        "location": "Past medical history and imaging",
-        "intended_effect": "Attribute bilateral arm weakness to bilateral orthopedic shoulder pathology",
-        "correct_interpretation": "Rotator cuff tendinopathy is a common incidental finding and does not explain bilateral arm atrophy, fasciculations, Babinski signs, or neurogenic EMG with paraspinal denervation.",
-        "field_path": ""
-      }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": []
   },
   "metadata": {
     "version": "v5",
@@ -516,6 +675,20 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:ALS",
+    "difficulty_rationale": "Restricted upper-limb phenotype requires recognition of the flail-arm variant and exclusion of MMN/CIDP; 5 required tools with literature support",
+    "case_body_concerns": [
+      {
+        "field_path": "followup_outputs",
+        "concern": "ALS genetic panel is wired to `interpret_labs` rather than `order_specialized_test` with `test_type: genetic_panel:ALS`. Per the criteria pack and TOOL_PARAMETER_VOCABULARY, genetic testing should resolve via order_specialized_test. The gold trajectory routes the action via order_specialized_test; the case body fix is a tool-name swap in followup_outputs without changing the report payload.",
+        "suggested_fix": "Change followup tool_name from interpret_labs to order_specialized_test for the ALS_Genetic_Panel followup; payload structure can stay."
+      }
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -494,118 +494,258 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Myasthenia gravis, AChR-antibody-positive, generalized (MGFA Class IIb), concurrent with relapsing-remitting multiple sclerosis; possibly natalizumab-associated",
+    "primary_diagnosis": "Myasthenia gravis, AChR antibody-positive, generalized (MGFA Class IIb), concurrent with relapsing-remitting multiple sclerosis on natalizumab; possible drug-associated autoimmunity",
     "icd_code": "G70.01",
     "differential": [
       {
-        "diagnosis": "MS relapse (new demyelinating lesion)",
-        "likelihood": "very_low",
-        "key_features": "MRI shows NO new lesions, no enhancement; poor response to IV methylprednisolone; new fatigable ptosis, jaw fatigue, arm fatigue are NOT typical MS symptoms; RNS and anti-AChR confirm MG"
+        "diagnosis": "MS relapse (brainstem demyelination)",
+        "likelihood": "high",
+        "key_features": "MS relapse could produce diplopia and weakness, but MS relapses do not produce fatigable diurnal pattern or RNS decrement; brain MRI does not show new enhancing lesion explaining symptoms.",
+        "icd_code": "G35"
       },
       {
-        "diagnosis": "Natalizumab-associated PML presenting as new neurological symptoms",
-        "likelihood": "very_low",
-        "key_features": "CSF JC PCR negative; no new brain MRI lesions; PML would show progressive cortical/subcortical changes; ptosis and fatigable weakness not typical of PML"
+        "diagnosis": "Natalizumab-associated PML",
+        "likelihood": "moderate",
+        "key_features": "Patient on natalizumab — PML must be ruled out with MRI (no characteristic lesion here) and CSF JCV PCR if doubt remains.",
+        "icd_code": "A81.2"
       },
       {
-        "diagnosis": "Thyroid eye disease",
+        "diagnosis": "Lambert-Eaton myasthenic syndrome",
+        "likelihood": "low",
+        "key_features": "No malignancy history; high-rate RNS expected to show no facilitation; baseline CMAP normal.",
+        "icd_code": "G73.1"
+      },
+      {
+        "diagnosis": "Optic neuritis (MS)",
+        "likelihood": "low",
+        "key_features": "Patient has diplopia rather than monocular visual loss; visual evoked potentials and OCT can clarify.",
+        "icd_code": "H46.9"
+      },
+      {
+        "diagnosis": "Internuclear ophthalmoplegia (MS)",
         "likelihood": "very_low",
-        "key_features": "TSH normal; no proptosis; no lid retraction; fatigable ptosis incompatible with restrictive orbital myopathy; anti-AChR markedly positive"
+        "key_features": "INO produces specific adduction failure pattern; fatigable bilateral ptosis is incompatible.",
+        "icd_code": "H51.2"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI with gadolinium to evaluate for new MS lesion vs other etiology",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "No new lesions, no enhancement — MS relapse excluded; MG workup indicated",
+        "action": "Order serologies: anti-AChR (binding, blocking, modulating), anti-MuSK, anti-LRP4, and TSH/free-T4 for thyroid autoimmunity",
+        "tool_name": "interpret_labs",
+        "expected_finding": "AChR antibody positive; TSH evaluates for comorbid thyroid disease",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "anti_AChR",
+            "anti_MuSK",
+            "anti_LRP4",
+            "TSH"
+          ]
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 2,
-        "action": "Anti-AChR and anti-MuSK antibody panel",
-        "tool_name": "interpret_labs",
-        "expected_finding": "AChR 4.2 nmol/L markedly elevated — confirms MG as second diagnosis",
+        "action": "Order repetitive nerve stimulation (RNS) at 2-3 Hz across proximal and facial muscles",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Decrement >10% in symptomatic muscles supports postsynaptic NMJ disorder",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "repetitive_nerve_stimulation"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 3,
-        "action": "RNS electrophysiology to confirm NMJ disorder",
+        "action": "Order single-fiber EMG (gold standard >95% sensitivity)",
         "tool_name": "order_specialized_test",
-        "expected_finding": "14-18% decremental RNS — confirms NMJ disorder",
-        "category": "required",
-        "tool_parameters": {}
+        "expected_finding": "Increased jitter and blocking on extensor digitorum communis or orbicularis oculi confirms NMJ transmission failure",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "emg_single_fiber"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 4,
-        "action": "CT chest for thymoma (anterior mediastinal mass found)",
+        "action": "Order CT chest with contrast for thymoma screening",
         "tool_name": "order_ct_scan",
-        "expected_finding": "2.8 x 2.2 cm anterior mediastinal mass — thymoma",
+        "expected_finding": "No thymoma; thymic involution appropriate for age",
         "category": "required",
         "tool_parameters": {
           "region": "chest",
-          "contrast": true
-        }
+          "contrast": true,
+          "indication": "thymoma_screening"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 5,
-        "action": "Check natalizumab PML risk and drug interactions with MG immunosuppression",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "JC index 3.1 = high PML risk; natalizumab + systemic immunosuppressants unacceptable combined risk; switch to ocrelizumab recommended",
+        "action": "Review MGFA classification and current treatment guidance (pyridostigmine, prednisone, steroid-sparing, IVIG/PLEX, thymectomy)",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "MGFA classification stages disease severity; thymectomy benefits AChR+ generalized MG (MGTX); IVIG/PLEX for crisis",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "query": "myasthenia gravis MGFA classification treatment thymectomy"
+        },
+        "citation": "[Sanders_2016]",
+        "guideline_source": "Sanders_2016"
       },
       {
         "step": 6,
-        "action": "Search literature for natalizumab-associated MG and MS-MG overlap management",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Natalizumab rarely associated with MG unmasking; both diagnoses require separate treatment; thymectomy indicated",
+        "action": "Check drug interactions for MG-exacerbating agents (aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, neuromuscular blockers, procainamide)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Flag aminoglycosides, fluoroquinolones, IV magnesium, telithromycin, NMBs as contraindicated or use-with-caution in MG",
+        "category": "required",
+        "tool_parameters": {
+          "proposed": "pyridostigmine_start",
+          "screen_for": [
+            "aminoglycosides",
+            "fluoroquinolones",
+            "telithromycin",
+            "magnesium_IV",
+            "neuromuscular_blockers"
+          ]
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
+      },
+      {
+        "step": 7,
+        "action": "Bedside respiratory function testing (FVC, MIP/MEP, NIF) — repeat q4h in crisis",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline FVC/NIF to assess crisis risk in patients with bulbar or limb involvement",
         "category": "recommended",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[Sanders_2016]",
+        "guideline_source": "Sanders_2016"
+      },
+      {
+        "step": 8,
+        "action": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Improvement of ptosis after 2 minutes of cooling supports MG",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "ice_pack_test"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
+      },
+      {
+        "step": 9,
+        "action": "Re-review brain MRI for new MS activity (gadolinium-enhancing or new T2 lesions)",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "No new enhancing lesions explaining ocular findings; stable MS lesion burden",
+        "category": "required",
+        "tool_parameters": {
+          "sequences": [
+            "FLAIR",
+            "T1_post_contrast",
+            "DWI"
+          ]
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
+      },
+      {
+        "step": 10,
+        "action": "Coordinate MS therapy with neuroimmunology — natalizumab may need reassessment given concurrent autoimmune emergence",
+        "tool_name": null,
+        "expected_finding": "Treatment plan balances MS relapse risk against MG immunosuppression",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Sanders_2016]",
+        "guideline_source": "Sanders_2016"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "MG is a peripheral neuromuscular junction disorder; EEG has no diagnostic role.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No CSF role in MG; LP risks complications without diagnostic yield.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "Advanced imaging (PET/MR spectroscopy/perfusion) is not indicated for MG diagnosis or staging; CT chest covers thymoma screening.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated for MG unless a comorbid cardiac question exists.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring is not indicated for MG unless arrhythmia or autonomic disease is independently suspected.",
+        "citation": "[Wolfe_2016]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "order_specialized_test",
+        "reason": "Order AChR/MuSK/LRP4 serologies first; reserve single-fiber EMG for seronegative or RNS-non-diagnostic cases (resource stewardship).",
+        "citation": "[Wolfe_2016]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Brain MRI must be performed first to confirm or exclude MS relapse — negative MRI mandates alternative diagnosis workup",
-      "Anti-AChR antibodies: markedly positive in this case — SFEMG and full serology required",
-      "PML risk assessment given JC index 3.1 — natalizumab continuation with systemic immunosuppression for MG is dangerous",
-      "Multidisciplinary MS + MG neurology management required",
-      "CT chest for thymoma — anterior mediastinal mass identified",
-      "Do NOT diagnose MS relapse without imaging confirmation — symptom attribution bias"
+      "Confirm AChR antibody positivity to establish MG distinct from MS relapse",
+      "Brain MRI to exclude new MS demyelination or natalizumab-PML",
+      "CT chest with contrast for thymoma — required in all confirmed MG",
+      "Single-fiber EMG given dual diagnosis considerations",
+      "Coordinate immunosuppression plan between MG and MS teams",
+      "JCV antibody status review (PML risk on natalizumab)"
     ],
     "contraindicated_actions": [
-      "Do NOT diagnose MS relapse when MRI shows no new lesions — new symptoms require alternative diagnosis",
-      "Do NOT start high-dose steroids again without complete MG diagnostic workup (may transiently worsen MG crisis)",
-      "Do NOT continue natalizumab with systemic immunosuppression for MG without multidisciplinary risk assessment"
+      "Do NOT prescribe aminoglycoside antibiotics (gentamicin, tobramycin, amikacin) — risk of precipitating myasthenic crisis",
+      "Do NOT prescribe fluoroquinolones (ciprofloxacin, levofloxacin, moxifloxacin) — FDA black-box warning for MG exacerbation",
+      "Do NOT prescribe telithromycin — contraindicated in MG",
+      "Do NOT administer IV magnesium for MG patients (e.g., for hypomagnesaemia, eclampsia prophylaxis) without alternative — blocks NMJ transmission",
+      "Do NOT use non-depolarizing neuromuscular blockers without anaesthesia/MG-aware dosing protocols",
+      "Do NOT initiate high-dose corticosteroids as sole outpatient therapy without hospitalization or pyridostigmine bridge — risk of paradoxical worsening at days 5-10",
+      "Do NOT attribute fluctuating fatigable weakness to a functional disorder before completing serology + RNS + single-fiber EMG workup",
+      "Do NOT escalate natalizumab dosing while MG workup pending — emerging autoimmunity may indicate drug-associated mechanism."
     ],
     "key_reasoning_points": [
-      "Fatigable ptosis and fatigable diplopia in a setting where brain MRI shows NO new lesions — MG is the diagnosis, not MS relapse",
-      "Key distinguishing feature: MS INO causes non-fatigable adduction deficit with dissociated nystagmus; MG ptosis is fatigable (worsens with sustained upgaze)",
-      "Poor response to IV methylprednisolone for 'MS relapse' is a critical red flag — acute MS relapses typically show >80% improvement with IV steroids; MG does not",
-      "AChR binding antibody 4.2 nmol/L is clearly in the unambiguous positive range (not borderline) — this makes the MG diagnosis definitive",
-      "Natalizumab has been associated with paradoxical unmasking of autoimmune conditions including MG — mechanism may involve peripheral B cell dysregulation",
-      "Two autoimmune conditions (MS + MG) may share immunological predisposition; both require treatment but separate targeted approaches"
+      "Fluctuating, fatigable weakness with diurnal pattern (worse evening) is the clinical hallmark of MG — fixed weakness suggests an alternative diagnosis.",
+      "Ocular involvement (ptosis, diplopia) is asymmetric and fatigable in MG; thyroid eye disease causes restrictive (not fatigable) ophthalmoplegia.",
+      "Single-fiber EMG (sensitivity >95%) is the most sensitive electrodiagnostic test — order when RNS is non-diagnostic or serology is negative.",
+      "All confirmed MG cases require CT chest for thymoma — present in roughly 10-15% of generalized MG; thymectomy (MGTX trial) improves long-term outcomes in non-thymoma AChR+ MG as well.",
+      "Aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, and neuromuscular blockers can precipitate myasthenic crisis and must be screened against any new prescription.",
+      "MS and MG can coexist (polyautoimmunity) and natalizumab has rare reports of triggering secondary autoimmune disease; clinical pattern (fatigable, fluctuating) distinguishes MG from MS relapse.",
+      "Brain MRI is essential here NOT because of MG, but to rule out PML and active MS — case-specific justification for brain MRI in MG workup."
     ],
     "red_herrings": [
       {
-        "data_point": "Prior internuclear ophthalmoplegia from documented right MLF lesion",
-        "location": "neurological exam",
-        "intended_effect": "Clinician attributes all oculomotor findings to MS, including new bilateral ptosis — delays MG recognition",
-        "correct_interpretation": "INO (right eye adduction deficit, dissociated nystagmus) is chronic MS finding; bilateral ptosis with fatigability is NEW and not explained by prior MLF lesion or any new MRI lesion — MG is the new diagnosis",
-        "field_path": ""
-      },
-      {
-        "data_point": "Mild transient improvement after IV methylprednisolone",
-        "location": "treatment history",
-        "intended_effect": "Some mild steroid response (MG can transiently worsen then improve with steroids) confirms MS relapse diagnosis in clinician's mind",
-        "correct_interpretation": "IV methylprednisolone can cause transient MG worsening followed by modest improvement; this is NOT the same as clear MS relapse response; MRI negative for new lesions is the definitive finding",
-        "field_path": ""
+        "data_point": "Relapsing-remitting MS on natalizumab",
+        "location": "past medical history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Attribute all new neurological symptoms to MS relapse and pursue steroid pulse without considering MG.",
+        "correct_interpretation": "MS relapses do not produce fatigable diurnal weakness or RNS decrement; AChR antibodies are required to confirm coexisting MG."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "v5",
@@ -619,6 +759,16 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MG",
+    "difficulty_rationale": "6 required tools, 1 red herrings, label-revision case with anchoring red herring",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": [
+      "emg_ncs_useless_via_param_conflation: pack lists order_specialized_test:emg_ncs as USELESS, but coherence validator treats tool_name overlap as a contradiction regardless of tool_parameters; cannot encode without removing required RNS/SFEMG entries. Suggest extending validator to compare tool_name + tool_parameters or fleet-wide pattern."
+    ]
   }
 }

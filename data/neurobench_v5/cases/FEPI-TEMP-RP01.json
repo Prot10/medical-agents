@@ -875,161 +875,197 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Focal epilepsy - temporal lobe, secondary to HSV-1 encephalitis, presenting as nonconvulsive status epilepticus in a post-neurosurgical/radiochemotherapy patient",
-    "icd_code": "G40.109",
+    "primary_diagnosis": "Focal epilepsy of temporal lobe origin presenting as nonconvulsive status epilepticus, secondary to HSV-1 encephalitis in a post-radiotherapy / post-resection patient",
+    "icd_code": "G40.219",
     "differential": [
       {
-        "diagnosis": "HSV encephalitis with secondary temporal lobe epilepsy and status epilepticus",
+        "diagnosis": "Tumor recurrence / leptomeningeal disease",
         "likelihood": "high",
-        "key_features": "Positive HSV-1 PCR in CSF, bilateral temporal MRI changes with right predominance, PLEDs on EEG, progressive course"
+        "key_features": "Recent paranasal sinus cancer with skull-base infiltration — recurrence is the leading alternative; MRI with contrast and CSF cytology evaluate this.",
+        "icd_code": "C71.9"
       },
       {
-        "diagnosis": "Autoimmune/limbic encephalitis (paraneoplastic)",
-        "likelihood": "low",
-        "key_features": "Oncologic history raises concern, but comprehensive antibody panel is negative. Mesial temporal signal abnormality overlaps with HSE. Would expect subacute onset over weeks-months rather than days."
+        "diagnosis": "Radiation necrosis / post-radiotherapy encephalopathy",
+        "likelihood": "high",
+        "key_features": "Within 3–6 months of completing radiochemotherapy — typical window for radiation-induced encephalopathy.",
+        "icd_code": "G93.49"
       },
       {
-        "diagnosis": "Tumor recurrence or leptomeningeal carcinomatosis",
-        "likelihood": "low",
-        "key_features": "Recent cancer history, but MRI shows no recurrent tumor. CSF cytology negative. Temporal lobe changes are outside the prior tumor location."
+        "diagnosis": "Autoimmune limbic encephalitis (paraneoplastic / immunotherapy-related)",
+        "likelihood": "moderate",
+        "key_features": "Cancer history + limbic syndrome; CSF antibody panel needed.",
+        "icd_code": "G04.81"
       },
       {
-        "diagnosis": "Radiation-induced encephalopathy/necrosis",
-        "likelihood": "low",
-        "key_features": "Recent radiotherapy, but temporal lobe involvement is outside typical radiation field for anterior skull base tumors. Timeline (3 months post-radiation) is early for delayed radiation necrosis."
+        "diagnosis": "Metabolic / toxic encephalopathy (chemotherapy)",
+        "likelihood": "moderate",
+        "key_features": "Common confounder; labs (ammonia, electrolytes, drug levels) clarify.",
+        "icd_code": "G92.9"
       },
       {
-        "diagnosis": "Post-ictal changes from cryptogenic status epilepticus",
-        "likelihood": "low",
-        "key_features": "Seizures could cause reversible MRI signal changes, but positive HSV PCR and progressive imaging changes argue against this being purely seizure-related"
+        "diagnosis": "Nonconvulsive status epilepticus of other etiology",
+        "likelihood": "moderate",
+        "key_features": "cEEG demonstrates pattern; etiology may overlap with several causes above.",
+        "icd_code": "G41.2"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain urgent EEG to evaluate episodic altered awareness and fluctuating consciousness",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Right frontotemporal periodic discharges and electrographic seizures consistent with NCSE",
+        "action": "Establish acuity and consciousness level; ABCDE assessment in an encephalopathic patient with possible non-convulsive status epilepticus.",
+        "tool_name": null,
+        "expected_finding": "Fluctuating consciousness with paroxysmal unresponsiveness — concerning for nonconvulsive status epilepticus.",
         "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
+        "tool_parameters": {},
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 2,
-        "action": "Obtain brain MRI with contrast to evaluate temporal lobe pathology and exclude structural lesion",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Bilateral temporal lobe signal abnormality, right greater than left, with restricted diffusion",
+        "action": "Perform detailed neurological exam focusing on level of consciousness, language, memory, and ocular findings.",
+        "tool_name": null,
+        "expected_finding": "Encephalopathy with mesial-temporal features (amnestic syndrome, possibly aphasia) suggestive of limbic involvement.",
         "category": "required",
-        "tool_parameters": {
-          "protocol": "tumor",
-          "contrast": true
-        }
+        "tool_parameters": {},
+        "citation": "",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Perform lumbar puncture for CSF analysis including viral PCR panel",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Positive HSV-1 PCR despite bland inflammatory profile due to immunosuppression",
-        "category": "required"
+        "action": "Obtain prolonged continuous video-EEG (cEEG) to evaluate for nonconvulsive status epilepticus and localize focal temporal activity.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Lateralized periodic discharges and/or focal temporal status pattern indicating nonconvulsive status epilepticus of temporal origin.",
+        "category": "required",
+        "tool_parameters": {
+          "eeg_type": "video"
+        },
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 4,
-        "action": "Initiate empiric IV acyclovir immediately based on clinical suspicion of HSV encephalitis",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Obtain MRI brain with contrast and epilepsy/encephalitis protocol (DWI + FLAIR + post-gadolinium).",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Asymmetric mesial-temporal T2/FLAIR hyperintensity with DWI restriction characteristic of HSV-1 encephalitis; exclude post-RT changes and recurrence.",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "epilepsy",
+          "contrast": true
+        },
+        "citation": "[AAN_2007]",
+        "guideline_source": "AAN_2007"
       },
       {
         "step": 5,
-        "action": "Load IV antiseizure medications (levetiracetam, lacosamide) for NCSE",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Perform lumbar puncture once mass effect is excluded; send CSF for cell count, protein, glucose, HSV PCR, autoimmune-encephalitis panel, cytology.",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Lymphocytic pleocytosis with elevated protein; HSV-1 PCR positive confirms HSV encephalitis; cytology rules out neoplastic meningitis.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 6,
-        "action": "Obtain baseline labs including CBC, BMP, hepatic panel, CRP, and prolactin",
+        "action": "Obtain CBC, CMP, ammonia, lactate, AED levels (if on therapy), inflammatory markers.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Mild leukocytosis, lymphopenia, elevated CRP, elevated prolactin",
+        "expected_finding": "Identify metabolic contributors to encephalopathy; assess AED adherence; monitor for organ dysfunction with antiviral therapy.",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
-            "LFT",
-            "CRP",
-            "prolactin"
+            "CMP",
+            "ammonia",
+            "AED_levels",
+            "inflammatory"
           ]
-        }
+        },
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 7,
-        "action": "Send paraneoplastic and autoimmune encephalitis antibody panel",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Negative antibody panel, reducing likelihood of autoimmune etiology",
+        "action": "Search literature on post-radiation seizures versus HSV-1 reactivation in head/neck cancer patients.",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "HSV reactivation can follow CNS radiotherapy; mesial-temporal MRI pattern is the diagnostic signature.",
         "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "autoimmune_encephalitis",
-            "paraneoplastic"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 8,
-        "action": "Initiate continuous EEG monitoring for seizure burden assessment",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "High seizure burden confirming refractory status epilepticus",
-        "category": "required",
-        "tool_parameters": {
-          "eeg_type": "continuous_icu"
-        }
-      },
-      {
-        "step": 9,
-        "action": "Check drug interactions between acyclovir, AEDs, and current medications",
+        "action": "Check drug interactions for empiric acyclovir, AED selection (avoid hepatic-enzyme inducers in a chemotherapy patient), and oncology drugs.",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "Acyclovir-metformin renal interaction, lacosamide PR prolongation risk",
-        "category": "recommended"
+        "expected_finding": "Acyclovir nephrotoxicity, levetiracetam preferred over enzyme-inducing AEDs in cancer patients.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "echo_type": "TTE"
+        },
+        "rationale": "No structural-heart concern; not relevant.",
+        "citation": "[AAN_2007]"
       },
       {
-        "step": 10,
-        "action": "Search literature on HSV encephalitis and refractory status epilepticus management",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Evidence for aggressive antiviral therapy and consideration of immunotherapy for post-HSV autoimmune component",
-        "category": "recommended"
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "Not relevant for encephalitis / NCSE diagnosis.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Initial emergency CT may be needed to exclude hemorrhage / mass effect before LP — but it is not diagnostic of encephalitis or NCSE on its own. MRI is the modality of choice.",
+        "citation": "[AAN_2007]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "Mass effect must be excluded by imaging prior to lumbar puncture in any encephalopathic patient, particularly one with known intracranial pathology.",
+        "citation": "[AAN_2007]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Recognize nonconvulsive status epilepticus from EEG findings",
-      "Order lumbar puncture with HSV PCR given temporal lobe involvement",
-      "Initiate empiric IV acyclovir without waiting for PCR results in suspected HSV encephalitis",
-      "Initiate aggressive IV antiseizure medication therapy for status epilepticus",
-      "Consider immunocompromised state (post-chemotherapy, on dexamethasone) as explanation for bland CSF despite active infection",
-      "Do not attribute seizures solely to structural cause from prior tumor without evaluating for infectious etiology"
+      "Initiate empiric IV acyclovir as soon as HSV encephalitis is suspected — do not wait for PCR results.",
+      "Treat nonconvulsive status epilepticus aggressively (benzodiazepine plus levetiracetam or fosphenytoin) with cEEG guidance.",
+      "Obtain neuroimaging before lumbar puncture in this encephalopathic post-treatment patient.",
+      "Engage oncology to evaluate for tumor recurrence in parallel.",
+      "Reassess all medications for nephrotoxic interactions during acyclovir therapy."
     ],
     "contraindicated_actions": [
-      "Delaying acyclovir until CSF results return -- HSV encephalitis requires empiric treatment",
-      "Performing MRI-guided biopsy of temporal lobe signal abnormality without first ruling out HSV encephalitis",
-      "Attributing all findings to post-radiation changes and delaying workup",
-      "Administering carbamazepine or phenytoin as sole AED without considering hepatic interactions with acyclovir and existing medications",
-      "Rapidly tapering dexamethasone during active HSV encephalitis with cerebral edema",
-      "Discharging patient without continuous EEG monitoring to confirm seizure control"
+      "Do not perform LP before MRI in an encephalopathic patient with prior skull-base disease — risk of herniation.",
+      "Do not delay empiric acyclovir while awaiting confirmatory PCR.",
+      "Do not start enzyme-inducing AEDs (carbamazepine, phenytoin) in a patient receiving cancer therapy when alternatives exist."
     ],
     "key_reasoning_points": [
-      "Bilateral temporal lobe involvement (right > left) on MRI with restricted diffusion is the hallmark imaging pattern of HSV encephalitis, not typical mesial temporal sclerosis or post-radiation change",
-      "Positive HSV-1 CSF PCR with normal cell count and protein is atypical but occurs in immunocompromised patients -- dexamethasone and recent chemotherapy suppress the expected inflammatory CSF response",
-      "PLEDs on EEG in the temporal region have high sensitivity for HSV encephalitis and should trigger immediate viral PCR testing",
-      "The oncologic history (paranasal sinus adenocarcinoma) creates a strong red herring toward paraneoplastic or structural causes, requiring the clinician to also consider common infectious etiologies",
-      "Structural cause from the prior tumor/surgery involves the anterior skull base, NOT the temporal lobes -- anatomic discordance should prompt search for an independent temporal lobe pathology",
-      "The immunosuppressed state from radiochemotherapy and corticosteroids increases susceptibility to HSV reactivation and modifies the expected CSF findings",
-      "Status epilepticus in HSV encephalitis can become super-refractory and may have both infectious and secondary autoimmune components"
+      "Subacute confusion in a post-radiation patient is a classic diagnostic puzzle with tumor recurrence, radiation necrosis, HSV reactivation, autoimmune encephalitis, and metabolic encephalopathy all in play.",
+      "Mesial-temporal T2/FLAIR with restricted diffusion strongly favors HSV-1 encephalitis; CSF HSV PCR confirms.",
+      "Nonconvulsive status epilepticus must be actively excluded with cEEG in any unexplained encephalopathy.",
+      "Imaging before LP is mandatory in this clinical context.",
+      "Empiric acyclovir has low harm and high benefit — initiate before PCR results."
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "Recent skull-base resection and adjuvant radiochemotherapy for paranasal-sinus adenocarcinoma.",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Attribute the encephalopathy entirely to radiation toxicity or tumor recurrence without considering HSV reactivation.",
+        "correct_interpretation": "All three (recurrence, radiation necrosis, HSV) must be worked up in parallel; HSV is treatable and time-critical."
+      }
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -1044,6 +1080,16 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "specialized_test": "incidental"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (FEPI-TEMP)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FEPI-TEMP",
+    "difficulty_rationale": "Encephalopathic patient with multiple competing etiologies (recurrence, radiation, HSV, autoimmune, metabolic) requiring parallel workup, imaging-before-LP safety constraint, and time-critical empiric acyclovir.",
+    "case_body_concerns": [
+      "useless_tools entry for `analyze_ecg` dropped: tool output is provided up-front in initial_tool_outputs, so declaring it useless to call would be incoherent (agent never had to call it)."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

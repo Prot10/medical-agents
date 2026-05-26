@@ -83,121 +83,119 @@
     "extremities": "No peripheral edema"
   },
   "ground_truth": {
-    "primary_diagnosis": "Migraine with combined visual and sensory aura (G43.1); combined OCP contraindicated; small PFO — no closure indicated",
-    "primary_diagnosis_icd": "G43.1",
+    "primary_diagnosis": "Migraine with combined visual and sensory aura (ICHD-3 1.2.1); combined OCP contraindicated (WHO Category 4); small PFO — no closure indicated",
+    "icd_code": "G43.109",
     "differential": [
       {
-        "diagnosis": "Transient ischemic attack",
+        "diagnosis": "Cardioembolic TIA / paradoxical embolism through PFO",
         "likelihood": "low",
-        "key_features": "Normal DWI on MRI; normal MRV (no CVT); no AF on Holter; no lacunar or embolic infarct pattern; gradual aura spread (15-20 min) inconsistent with TIA onset; no MRA stenosis; age 29 with no vascular risk factors beyond OCP"
+        "key_features": "Possible mechanism but pattern of stereotyped sequential aura over 20-30 min with subsequent headache is migrainous; normal DWI and Holter argue against cardioembolic disease",
+        "icd_code": "G45.9"
       },
       {
-        "diagnosis": "Cerebral venous thrombosis",
+        "diagnosis": "Focal seizure with sensory and visual phenomena",
         "likelihood": "very_low",
-        "key_features": "Combined OCP use is a CVT risk factor; however, MRV normal — no sinus filling defect; episodes are episodic and identical (CVT is progressive); no papilledema"
+        "key_features": "Sequential gradual march is too slow for seizure propagation",
+        "icd_code": "G40.109"
       },
       {
-        "diagnosis": "Focal parieto-occipital seizure",
+        "diagnosis": "Demyelinating disease (early MS)",
         "likelihood": "very_low",
-        "key_features": "Combined visual + sensory symptoms could represent occipital/parietal seizure; however, duration 15-20 minutes is far too long for seizure propagation; EEG shows no focal epileptiform activity; subsequent headache typical for migraine post-ictal but duration and pattern fit migraine"
+        "key_features": "Stereotyped brief aura is not MS pattern",
+        "icd_code": "G35"
+      },
+      {
+        "diagnosis": "AVM / cavernoma",
+        "likelihood": "very_low",
+        "key_features": "Normal vascular imaging expected",
+        "icd_code": "Q28.2"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI with DWI, MRA, and MRV — exclude acute infarction, AVM, and CVT",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "No DWI restriction; no CVT on MRV; non-specific WMH; normal MRA",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
         "category": "required",
         "tool_parameters": {
-          "contrast": true,
-          "sequences": [
-            "DWI",
-            "FLAIR",
-            "T1+Gd",
-            "MRA",
-            "MRV"
-          ]
-        }
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "URGENT: Stop combined OCP (Yasmin) immediately — WHO Category 4",
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "Yasmin contraindicated in migraine with aura; switch to progestin-only or non-hormonal",
+        "expected_finding": "Combined OCP is WHO Category 4 — discontinue; switch to progestin-only / non-hormonal contraception; sumatriptan for acute therapy",
         "category": "required",
         "tool_parameters": {
-          "drug_1": "combined_oral_contraceptive",
-          "condition": "migraine_with_aura"
-        }
+          "context": "combined_OCP_migraine_with_aura"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 3,
-        "action": "Labs including antiphospholipid screen, sickle cell screen, thrombophilia panel (young Black woman with paternal early stroke)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "All normal; no thrombophilia; no sickle cell",
-        "category": "required",
-        "tool_parameters": {
-          "lab_type": "headache_workup"
-        }
-      },
-      {
-        "step": 4,
-        "action": "Cardiac monitoring (Holter) and echocardiogram to exclude AF and cardioembolic source",
-        "tool_name": "order_cardiac_monitoring",
-        "expected_finding": "No AF; small PFO on bubble echo — no closure indicated without confirmed stroke",
+        "action": "Brain MRI with DWI to exclude infarct in a first-presentation case with sequential aura modalities",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Normal DWI; no acute infarct; non-specific WMH",
         "category": "recommended",
         "tool_parameters": {
-          "duration_hours": 24
-        }
-      },
-      {
-        "step": 5,
-        "action": "Prescribe sumatriptan for acute attacks; headache diary; follow-up 3 months",
-        "tool_name": null,
-        "expected_finding": "Two episodes meet ICHD-3 criteria; appropriate acute treatment needed",
-        "category": "required",
-        "tool_parameters": {}
+          "contrast": false,
+          "sequences": [
+            "DWI",
+            "FLAIR",
+            "T2",
+            "SWI",
+            "MRA"
+          ]
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis — neither present here",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "Stop combined OCP immediately — WHO Category 4 in migraine with aura; especially urgent given father's stroke at 45 and Black ethnicity",
-      "MRV to exclude CVT — OCP is a risk factor for CVT; MRV was appropriately included",
-      "Sickle cell screen — appropriate in Black patient with transient neurological symptoms",
-      "PFO found on bubble echo — counsel that closure NOT indicated for migraine alone without prior confirmed cryptogenic stroke"
+      "Discontinue combined OCP — WHO Category 4 contraindication",
+      "Counsel that small PFO without cryptogenic stroke is not an indication for closure [Charles_2017]",
+      "Initiate sumatriptan for future attacks"
     ],
     "contraindicated_actions": [
-      "Do not continue combined OCP — absolute contraindication",
-      "Do not refer for PFO closure based on migraine alone — PREMIUM/MIST trials negative",
-      "Do not anticoagulate for PFO without confirmed cryptogenic stroke"
+      "Do not continue combined oestrogen-progestogen contraception",
+      "Do not refer for routine PFO closure — no stroke, no closure indication",
+      "Do not co-administer triptans with ergotamines"
     ],
     "key_reasoning_points": [
-      "Combined visual + sensory aura is a recognised migraine variant (CSD spreading from occipital to parietal cortex); duration 15-20 minutes distinguishes from seizure (seconds) and TIA (abrupt)",
-      "Combined OCP must be stopped urgently; the family history of paternal stroke at 45 and Black ethnicity both amplify this urgency",
-      "MRV is appropriate addition to standard MRI in young woman on OCP with transient neurological symptoms — CVT excluded",
-      "PFO detected but not actionable — closure not indicated for migraine management without prior stroke",
-      "Sickle cell electrophoresis appropriate screening in Black patient with transient neurological symptoms — negative"
+      "Sequential visual then sensory aura over 20-30 min satisfies ICHD-3 criteria for migraine with aura",
+      "Incidental small PFO is common (~25% of adults) and not an indication for closure in the absence of cryptogenic stroke [Charles_2017]",
+      "Combined OCP must be stopped"
     ],
     "red_herrings": [
       {
-        "data_point": "Father had stroke at 45 — suggesting hereditary cerebrovascular disease",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Paternal early-onset stroke might suggest inherited thrombophilia, CADASIL, or familial hypercoagulable state",
-        "correct_interpretation": "Full thrombophilia screen negative; no CADASIL pattern on MRI; mother likely had migraine; diagnosis is migraine with aura; paternal stroke heightens urgency of OCP discontinuation but is not the cause of daughter's episodes",
-        "field_path": ""
-      },
-      {
-        "data_point": "Small PFO on bubble echocardiogram",
-        "location": "followup_outputs[2].output.impression",
-        "intended_effect": "PFO in a young woman with recurrent transient neurological symptoms is a well-known source of cryptogenic stroke",
-        "correct_interpretation": "Normal DWI — no confirmed stroke; DWI-negative TIA is possible but clinical features strongly favour migraine aura; PFO closure not indicated for migraine alone (PREMIUM, MIST trials negative)",
-        "field_path": ""
+        "data_point": "Small PFO seen on bubble echocardiogram",
+        "location": "followup_outputs (echo)",
+        "field_path": "",
+        "intended_effect": "May prompt PFO closure consideration",
+        "correct_interpretation": "Small PFO is common and not an indication for closure in the absence of cryptogenic stroke [Charles_2017]"
       }
-    ],
-    "icd_code": "G43.1",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -220,7 +218,17 @@
       "ct": "incidental",
       "advanced_imaging": "normal",
       "specialized_test": "incidental"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Moderate: combined OCP discontinuation plus incidental PFO management",
+    "case_body_concerns": [
+      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide §1): ['analyze_ecg', 'analyze_eeg', 'interpret_labs', 'order_cardiac_monitoring', 'order_echocardiogram']"
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "initial_tool_outputs": {
     "mri": {

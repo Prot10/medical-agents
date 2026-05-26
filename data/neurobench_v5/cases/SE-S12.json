@@ -515,93 +515,209 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Faciobrachial dystonic seizure (FBDS) status epilepticus from anti-LGI1 autoimmune encephalitis relapse triggered by prednisone taper",
-    "icd_code": "G41.9",
+    "primary_diagnosis": "Faciobrachial dystonic seizure status epilepticus from anti-LGI1 autoimmune encephalitis relapse triggered by prednisone taper",
+    "icd_code": "G41.1",
     "differential": [
       {
-        "diagnosis": "AED non-adherence causing focal SE",
-        "likelihood": "very_low",
-        "key_features": "Levetiracetam therapeutic 32 mcg/mL; LGI1 antibody rising 1:64 confirms autoimmune relapse"
+        "diagnosis": "Pseudo-status / dystonic posturing not seizures",
+        "likelihood": "moderate",
+        "key_features": "FBDS are brief stereotyped dystonic seizures unique to LGI1; can mimic dystonia or pseudo-seizures",
+        "icd_code": "F44.5"
       },
       {
-        "diagnosis": "New-onset epilepsy (different etiology)",
-        "likelihood": "very_low",
-        "key_features": "Known anti-LGI1 encephalitis; FBDS are pathognomonic; LGI1 antibody positive serum and CSF"
+        "diagnosis": "Other autoimmune encephalitis (NMDAR, CASPR2)",
+        "likelihood": "moderate",
+        "key_features": "Antibody profile pending; LGI1 1:64 rising on initial panel",
+        "icd_code": "G04.81"
       },
       {
-        "diagnosis": "HSV encephalitis flare",
-        "likelihood": "very_low",
-        "key_features": "HSV PCR negative; LGI1 antibody rising; known autoimmune encephalitis on immunosuppression"
+        "diagnosis": "Subtherapeutic AED + breakthrough TLE",
+        "likelihood": "low",
+        "key_features": "LEV 32 therapeutic; primary driver is LGI1 relapse not AED",
+        "icd_code": "G40.219"
+      },
+      {
+        "diagnosis": "HSV reactivation triggering autoimmune flare",
+        "likelihood": "low",
+        "key_features": "Fever absent; HSV unlikely; LGI1 relapse from steroid taper",
+        "icd_code": "B00.4"
+      },
+      {
+        "diagnosis": "Movement disorder mimicking FBDS",
+        "likelihood": "low",
+        "key_features": "FBDS pattern + EEG focal ictal pattern distinguishes from dystonia",
+        "icd_code": "G24.9"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "EEG confirms FBDS SE - brief left temporal ictal runs every 60-90s",
+        "action": "EEG with video — capture FBDS and characterize ictal pattern",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Frequent brief left temporal ictal runs correlating with FBDS - LGI1 SE",
+        "expected_finding": "Frequent brief left temporal rhythmic 8-12 Hz runs of 2-3 sec recurring every 60-90 sec — focal ictal pattern",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "LGI1 antibody titer rising 1:64 - relapse after prednisone taper",
+        "action": "Labs: CBC, CMP, glucose, Ca/Mg, AED level, ammonia, ABG, lactate, blood cultures, autoimmune encephalitis panel (LGI1 priority)",
         "tool_name": "interpret_labs",
-        "expected_finding": "LGI1 1:64 rising; levetiracetam therapeutic; CRP elevated",
+        "expected_finding": "LGI1 antibody 1:64 rising (CONFIRMS relapse); CRP 18 elevated; LEV 32 therapeutic",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "MRI confirms active limbic encephalitis relapse",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Left hippocampal gadolinium enhancement - active autoimmune",
+        "action": "Non-contrast head CT — exclude acute structural cause",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Subtle left temporal hypodensity; no hemorrhage",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "IV methylprednisolone + IVIG for autoimmune SE",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "FBDS primarily respond to immunotherapy not AEDs; IV steroids + IVIG first-line",
+        "action": "MRI brain with LGI1 encephalitis protocol — bilateral mesial temporal FLAIR",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Bilateral mesial temporal FLAIR hyperintensity — LGI1 encephalitis pattern",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "LGI1 CSF antibody confirms active CNS disease",
+        "action": "Lumbar puncture — CSF LGI1 antibody + cell count + protein",
         "tool_name": "analyze_csf",
-        "expected_finding": "LGI1 1:4 CSF positive; mild pleocytosis; no infection",
+        "expected_finding": "Mild lymphocytic pleocytosis; CSF LGI1 positive",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 6,
+        "action": "Drug-interaction check: AED + prednisone re-escalation + IVIG + mycophenolate",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Re-escalate prednisone; IVIG 0.4 g/kg/day x 5 days; rituximab consideration",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[ESETT_2019]",
+        "guideline_source": ""
+      },
+      {
+        "step": 7,
+        "action": "Literature: FBDS / LGI1 encephalitis — immunotherapy escalation including rituximab",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Re-escalate steroids first; IVIG; consider rituximab for refractory; FBDS often responds to immunotherapy alone",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 8,
+        "action": "Neurology consultation — neuro-immunology specialty",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Long-term immunotherapy planning",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "study_type": "TTE"
+        },
+        "rationale": "No clinical suspicion of cardiac source of embolus or cardiogenic seizure; routine echo is not indicated in SE workup absent cardiac findings.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No suspicion of arrhythmogenic syncope or cardiac comorbidity precipitating SE; routine telemetry beyond standard ICU monitoring adds cost without yield.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in acute SE evaluation; dementia biomarker imaging does not change acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is for ischemic stroke workup; SE without focal vascular suspicion does not warrant carotid imaging.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "DaTscan / dopamine transporter imaging has no role in SE; no parkinsonism question relevant to acute management.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "CT before LP to exclude mass effect.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Recognize FBDS SE as anti-LGI1 autoimmune encephalitis relapse - immunotherapy is primary treatment",
-      "LGI1 antibody 1:64 rising (from 1:32) + prednisone taper = confirmed autoimmune relapse",
-      "IV methylprednisolone 1 g daily x5 days URGENTLY",
-      "IVIG 2g/kg over 5 days - synergistic with steroids",
-      "Increase mycophenolate to 2000 mg twice daily",
-      "Standard AEDs (levetiracetam) are adjunctive only - immunotherapy is the treatment",
-      "Do NOT taper prednisone below 20 mg until sustained remission confirmed by antibody titer"
+      "Administer IV lorazepam 0.1 mg/kg first-line",
+      "Re-escalate prednisone (was the relapse trigger when tapered)",
+      "IVIG 0.4 g/kg/day x 5 days as first-line immunotherapy",
+      "Continue therapeutic LEV; consider adding carbamazepine (known to suppress FBDS specifically)",
+      "Neuro-immunology consultation for rituximab decision"
     ],
     "contraindicated_actions": [
-      "Do not treat FBDS SE with only AED escalation - immunotherapy is essential",
-      "Do not continue prednisone taper - autoimmune relapse triggered by taper",
-      "Do not discharge without neuroimmunology follow-up and maintenance immunotherapy plan"
+      "Do NOT continue prednisone taper — was the relapse trigger",
+      "Do NOT rely on AEDs alone — FBDS responds preferentially to immunotherapy",
+      "Do NOT delay LP after CT (CSF antibody confirms relapse)",
+      "Do not abruptly taper prednisone in known LGI1 encephalitis — was the relapse trigger."
     ],
     "key_reasoning_points": [
-      "FBDS (faciobrachial dystonic seizures) are pathognomonic for anti-LGI1 encephalitis - brief, frequent, unilateral, face + arm",
-      "FBDS primarily respond to immunotherapy not AEDs - AEDs alone are insufficient",
-      "LGI1 antibody titer rising after prednisone taper = autoimmune relapse mechanism confirmed",
-      "Active limbic encephalitis on MRI (gadolinium enhancement) - immunotherapy escalation urgently needed",
-      "CSF LGI1 antibody positive confirms active CNS autoimmune disease",
-      "Maintenance prednisone should NOT be tapered until sustained clinical and serological remission"
+      "FBDS are pathognomonic of anti-LGI1 encephalitis — brief stereotyped dystonic seizures of face and arm",
+      "FBDS often respond preferentially to immunotherapy rather than AEDs",
+      "Rising LGI1 titer confirms relapse",
+      "Carbamazepine has specific suppressive effect on FBDS"
     ],
-    "red_herrings": [],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": [
+      {
+        "data_point": "Levetiracetam 32 (therapeutic)",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests AED is adequate, missing the autoimmune relapse driver",
+        "correct_interpretation": "Therapeutic AED does not address autoimmune mechanism; immunotherapy escalation is required"
+      },
+      {
+        "data_point": "Mycophenolate mofetil on medication list",
+        "location": "patient.clinical_history.medications",
+        "field_path": "patient.clinical_history.medications",
+        "intended_effect": "Suggests adequate steroid-sparing immunosuppression",
+        "correct_interpretation": "MMF maintenance is insufficient during steroid taper if disease is active; re-escalation and IVIG required"
+      }
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -611,6 +727,14 @@
       "advanced_imaging": "normal",
       "specialized_test": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "7 required + 1 recommended; LGI1 encephalitis relapse with FBDS status; key teaching is recognizing FBDS pattern, immunotherapy-first not AED-first, CBZ specific effect on FBDS; 2 grounded red herrings.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

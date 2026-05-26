@@ -275,6 +275,22 @@
         "impression": "48-hour continuous telemetry. Predominantly normal sinus rhythm throughout. Isolated PVCs only (2 events). No sustained arrhythmia or significant conduction abnormality recorded. Clinical correlation recommended.",
         "recommended_actions": []
       }
+    },
+    {
+      "trigger_action": "check_ivig_drug_interactions",
+      "tool_name": "check_drug_interactions",
+      "output": {
+        "general": {
+          "proposed": "(agent not specified on this case's pathway)",
+          "interactions": [],
+          "contraindications": [],
+          "warnings": [
+            "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
+          ],
+          "formulary_status": "on formulary",
+          "alternatives": []
+        }
+      }
     }
   ],
   "fallback_tool_outputs": {
@@ -364,132 +380,205 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Miller Fisher syndrome (GBS variant) — anti-GQ1b positive",
+    "primary_diagnosis": "Miller Fisher syndrome (GBS variant), anti-GQ1b positive",
     "icd_code": "G61.0",
     "differential": [
       {
-        "diagnosis": "Posterior fossa stroke/brainstem infarction",
-        "likelihood": "very_low",
-        "key_features": "Brain MRI normal — no DWI restriction; age 28 without vascular risk factors; areflexia not a stroke feature"
+        "diagnosis": "Bickerstaff brainstem encephalitis",
+        "likelihood": "moderate",
+        "key_features": "Anti-GQ1b positive in both, but BBE includes altered consciousness or hyperreflexia — absent here, with preserved alertness and complete areflexia favouring MFS.",
+        "icd_code": "G04.81"
       },
       {
-        "diagnosis": "Wernicke's encephalopathy",
-        "likelihood": "very_low",
-        "key_features": "No alcohol history; no thiamine deficiency; MRI normal periaqueductal"
+        "diagnosis": "Brainstem stroke",
+        "likelihood": "moderate",
+        "key_features": "Must be excluded by MRI given ophthalmoplegia and ataxia; classically asymmetric, with crossed findings; MFS pattern is bilateral and symmetric with global areflexia.",
+        "icd_code": "I63.9"
       },
       {
-        "diagnosis": "Myasthenia gravis",
-        "likelihood": "very_low",
-        "key_features": "Areflexia not in MG; ataxia not in MG; anti-GQ1b positive; NCS shows neuropathic pattern"
+        "diagnosis": "Wernicke encephalopathy",
+        "likelihood": "low",
+        "key_features": "Triad of ophthalmoplegia / ataxia / confusion; mental status is preserved, no risk factors for thiamine deficiency.",
+        "icd_code": "E51.2"
+      },
+      {
+        "diagnosis": "Myasthenia gravis (ocular)",
+        "likelihood": "low",
+        "key_features": "Ptosis and diplopia possible but reflexes preserved and no fatigability; AChR antibodies negative expected.",
+        "icd_code": "G70.0"
       },
       {
         "diagnosis": "Botulism",
         "likelihood": "very_low",
-        "key_features": "No descending pattern; anti-GQ1b positive; no toxin exposure"
-      },
-      {
-        "diagnosis": "Classic GBS",
-        "likelihood": "low",
-        "key_features": "No limb weakness in this case — isolated cranial nerve variant"
+        "key_features": "Descending paralysis with bulbar onset; cholinergic signs absent here; sensory paresthesias are present in this patient.",
+        "icd_code": "A05.1"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI to exclude structural posterior fossa pathology",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Normal — excludes stroke, encephalitis",
+        "action": "Obtain CBC, CMP, HIV, anti-GM1/anti-GQ1b ganglioside antibodies, and stool culture / Campylobacter serology if recent diarrhea",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Mild leukocytosis / elevated inflammatory markers reflecting antecedent infection; ganglioside antibodies for variant typing; trigger identification (Campylobacter, CMV, EBV, Mycoplasma, HIV)",
         "category": "required",
-        "tool_parameters": {
-          "sequences": [
-            "DWI",
-            "T2",
-            "FLAIR",
-            "T1+Gad"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Yuki_2012]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 2,
-        "action": "Anti-GQ1b IgG antibody testing — specific test for MFS",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Strongly positive — diagnostic of MFS",
+        "action": "Order nerve conduction studies and needle EMG (EMG/NCS)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Demyelinating pattern (prolonged DML, conduction block, reduced CV, absent F-waves) consistent with AIDP, or reduced CMAP amplitudes in axonal variants (AMAN/AMSAN)",
         "category": "required",
         "tool_parameters": {
-          "panel": "anti-ganglioside antibodies including anti-GQ1b"
-        }
+          "test_type": "emg_ncs"
+        },
+        "citation": "[Hadden_1998]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 3,
-        "action": "NCS/EMG",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Sensory SNAP loss, absent H-reflex and F-waves; preserved motor CMAPs — MFS pattern",
+        "action": "Perform lumbar puncture for CSF analysis",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Albuminocytologic dissociation — elevated protein with cell count <10/μL; may be normal in the first week of illness",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 4,
-        "action": "Lumbar puncture for CSF analysis",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Mildly elevated protein, normal cells",
+        "action": "Order bedside respiratory function testing (FVC, MIP/MEP, NIF) and repeat every 4–6 hours",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline and serial FVC, MIP/MEP, NIF; deterioration to FVC <20 mL/kg, MIP worse than -30 cmH2O, or VC <40% predicted triggers ICU transfer / intubation",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[Sharshar_2003]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 5,
-        "action": "Initiate IVIG 0.4 g/kg/day x 5 days",
-        "tool_name": null,
-        "expected_finding": "Treatment for MFS",
+        "action": "Search the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[van_den_Berg_2014]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 6,
-        "action": "Serial respiratory monitoring — check for GBS overlap",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Normal FVC in isolated MFS",
+        "action": "Check drug interactions / contraindications for IVIG (renal function, IgA deficiency screen) and/or plasma exchange (coagulation, calcium, hemodynamics)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Confirmation that IVIG can be given safely (no severe renal impairment, no IgA deficiency) or that plasma exchange is appropriate (adequate vascular access, stable coagulation)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[van_den_Berg_2014]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 7,
+        "action": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Sinus tachycardia or bradycardia; conduction or repolarisation abnormalities reflecting autonomic involvement",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 8,
+        "action": "Initiate continuous cardiac telemetry for the first 1–2 weeks for moderate/severe disease — autonomic instability (bradyarrhythmias, BP lability) is common",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Documentation of sinus pauses, bradyarrhythmias, BP lability, or non-sustained tachyarrhythmias",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "GBS is a peripheral nerve / nerve-root disorder; EEG has no role in diagnosis unless atypical CNS features (encephalopathy, seizures) are present.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated in typical GBS; reserve for pre-existing cardiac disease or unexplained hemodynamic instability after autonomic causes are excluded.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT contributes no diagnostic information in GBS; the disease is peripheral and CT does not visualise nerve roots reliably.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "Functional / metabolic brain imaging adds no value in a peripheral demyelinating syndrome.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "MR_angiography"
+        },
+        "rationale": "Cerebrovascular imaging is not indicated in a peripheral neuropathy without focal cerebral signs.",
+        "citation": "[van_den_Berg_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_specialized_test",
+        "after": "check_drug_interactions",
+        "reason": "Document respiratory status (FVC/NIF) before committing to IVIG vs plasma exchange — severe respiratory compromise mandates ICU triage and may influence treatment choice and timing.",
+        "citation": "[Sharshar_2003]",
+        "severity": "soft"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Renal function, IgA screen, and CBC must be reviewed before IVIG to mitigate renal failure, anaphylaxis (IgA-deficient patients), and aseptic meningitis risk.",
+        "citation": "[van_den_Berg_2014]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Anti-GQ1b IgG testing is the definitive diagnostic test — order urgently",
-      "Brain MRI is required to exclude brainstem stroke — critical differential in acute ophthalmoplegia",
-      "Initiate IVIG after diagnosis confirmed",
-      "Monitor for overlap with classic GBS — 20% develop limb weakness",
-      "Respiratory monitoring even in MFS — rare but critical if overlap develops"
+      "Obtain MRI brain with brainstem sequences to rule out brainstem stroke / BBE given ophthalmoplegia and ataxia.",
+      "Order anti-GQ1b IgG and broader ganglioside panel as part of variant typing.",
+      "Initiate IVIG 0.4 g/kg/day for 5 days (or plasma exchange) — both effective in MFS.",
+      "Monitor respiratory function (FVC, NIF) — extension to GBS with limb weakness is possible.",
+      "Continuous cardiac telemetry for autonomic dysrhythmias."
     ],
     "contraindicated_actions": [
-      "Corticosteroids — not effective in GBS/MFS",
-      "Thrombolytics — patient does NOT have a stroke (brain MRI normal)",
-      "Delaying treatment to wait for anti-GQ1b results if clinical picture is classic — may initiate IVIG empirically"
+      "Do not start corticosteroids as monotherapy.",
+      "Do not delay treatment awaiting anti-GQ1b results — they take days to return and treatment is time-sensitive."
     ],
     "key_reasoning_points": [
-      "The diagnostic puzzle: ophthalmoplegia + ataxia + areflexia WITHOUT limb weakness in a young patient initially suggests posterior fossa stroke — but MRI is normal",
-      "Anti-GQ1b IgG >95% sensitive and specific for Miller Fisher syndrome — the key diagnostic test",
-      "GQ1b is expressed at high levels in oculomotor nerve paranodal myelin — explains why cranial nerves are selectively affected",
-      "NCS shows preserved motor CMAPs because limb motor nerves are not the primary target — sensory and cranial nerve pathology predominates",
-      "Overlap with classic GBS occurs in 20% — monitor for developing limb weakness and respiratory compromise"
+      "Classic MFS triad: ophthalmoplegia + ataxia + areflexia with preserved alertness — the absence of weakness distinguishes from typical GBS.",
+      "Anti-GQ1b IgG is the serological hallmark (>90% sensitivity in MFS) and supports clinical diagnosis.",
+      "Brainstem MRI is recommended despite the typical syndrome to exclude posterior-circulation stroke and Bickerstaff encephalitis.",
+      "Overlap syndromes (MFS extending to GBS or BBE) occur — monitor for progression to limb weakness, bulbar dysfunction, or altered consciousness."
     ],
     "red_herrings": [
       {
-        "data_point": "Bilateral ophthalmoplegia and ataxia in a young male",
-        "location": "neurological_exam",
-        "intended_effect": "Prompt agent to suspect posterior fossa stroke or brainstem lesion rather than peripheral nerve disease",
-        "correct_interpretation": "Miller Fisher syndrome — brain MRI normal; anti-GQ1b confirms peripheral nerve/ganglion pathology",
-        "field_path": ""
-      },
-      {
-        "data_point": "Normal limb strength with 5/5 power throughout",
-        "location": "neurological_exam",
-        "intended_effect": "Mislead agent to think GBS is impossible (typical association with limb weakness)",
-        "correct_interpretation": "MFS is a GBS variant that classically presents WITHOUT limb weakness — triad of ophthalmoplegia, ataxia, areflexia is sufficient for diagnosis",
-        "field_path": ""
+        "data_point": "Normal cell counts with elevated CSF protein",
+        "location": "followup_outputs.csf",
+        "field_path": "followup_outputs",
+        "intended_effect": "Reassure that no infectious encephalitis is present and anchor on a benign process.",
+        "correct_interpretation": "Albuminocytologic dissociation is the expected CSF profile in MFS as in classic GBS and supports the diagnosis."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -502,6 +591,17 @@
       "echo": "normal",
       "advanced_imaging": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:GBS",
+    "difficulty_rationale": "6 required tools, 1 red herring(s); atypical or multi-comorbidity presentation requires substantial cross-modality synthesis and active rule-out of strong mimics.",
+    "case_body_concerns": [
+      "Bedside respiratory function (FVC/MIP/MEP/NIF) is delivered via an `interpret_labs` followup panel rather than `order_specialized_test{test_type=respiratory_function}` as the criteria pack mandates. Agents calling order_specialized_test{respiratory_function} will hit the EMG/NCS output instead. Recommend adding a respiratory_function followup keyed to order_specialized_test in a follow-up case-body pass.",
+      "Mirrored fallback_tool_outputs into followup_outputs for required tools that previously only existed in the fallback bucket: ['check_drug_interactions']. Content is unchanged; the move makes the coherence validator see an explicit primary output for criteria-pack-required tools."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

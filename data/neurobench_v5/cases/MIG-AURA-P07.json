@@ -83,117 +83,166 @@
     "extremities": "No edema"
   },
   "ground_truth": {
-    "primary_diagnosis": "Cardioembolic right PCA territory ischaemic stroke occurring during a migraine episode — NOT migrainous infarction; paroxysmal AF identified on ILR; switch aspirin to DOAC",
-    "primary_diagnosis_icd": "G43.1",
+    "primary_diagnosis": "Cardioembolic right PCA-territory ischaemic stroke occurring during a migraine episode — NOT migrainous infarction; paroxysmal AF identified on implantable loop recorder; switch aspirin to DOAC",
+    "icd_code": "I63.4",
     "differential": [
       {
-        "diagnosis": "Migrainous infarction (ICHD-3 1.4.1)",
-        "likelihood": "very_low",
-        "key_features": "Migrainous infarction: typically small <10mm; within aura territory; all other causes excluded; this case has 3.5cm infarction, complete homonymous hemianopia, PAF found on ILR — migrainous infarction excluded by size and cardioembolic source identified"
+        "diagnosis": "Migrainous infarction (initial diagnosis)",
+        "likelihood": "moderate",
+        "key_features": "Originally labelled migrainous infarction but full stroke workup shows paroxysmal AF on ILR; large infarct size (3.5x2.5 cm) and persistent hemianopia argue against migrainous infarction which is typically small and cortical",
+        "icd_code": "I63.9"
       },
       {
-        "diagnosis": "Antiphospholipid syndrome with PCA territory stroke",
-        "likelihood": "very_low",
-        "key_features": "Initial weakly positive aCL IgG; however, repeat negative at 12 weeks — APS excluded; primary aetiology is PAF"
+        "diagnosis": "Paradoxical embolism through PFO",
+        "likelihood": "low",
+        "key_features": "Bubble echo evaluation; less likely once AF documented",
+        "icd_code": "I63.4"
+      },
+      {
+        "diagnosis": "Cervical artery dissection",
+        "likelihood": "low",
+        "key_features": "No neck pain or trauma; MRA shows no dissection",
+        "icd_code": "I77.71"
+      },
+      {
+        "diagnosis": "Vasculitis / antiphospholipid syndrome",
+        "likelihood": "low",
+        "key_features": "Workup unrevealing; weakly-positive antiphospholipid requires repeat at 12 weeks",
+        "icd_code": "D68.61"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Reconside original migrainous infarction diagnosis — infarct 3.5cm x 2.5cm is too large for migrainous infarction; complete homonymous hemianopia suggests large vessel territory",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Large PCA territorial infarction inconsistent with migrainous infarction; original MRA showed possible right PCA occlusion",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
         "category": "required",
         "tool_parameters": {
-          "contrast": true,
-          "sequences": [
-            "DWI",
-            "FLAIR",
-            "T1",
-            "MRA"
-          ]
-        }
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "Prolonged cardiac monitoring (ILR) — short Holter in hospital insufficient; paroxysmal AF detected on ILR",
-        "tool_name": "order_cardiac_monitoring",
-        "expected_finding": "PAF detected on ILR — not found on initial Holter",
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Switch from aspirin to DOAC for AF-related stroke prevention; STOP triptans permanently after stroke; preventive migraine therapy compatible with anticoagulation",
         "category": "required",
         "tool_parameters": {
-          "type": "implantable_loop_recorder",
-          "duration_days": 30
-        }
+          "context": "AF_stroke_aspirin_to_DOAC_switch_triptan_contraindication"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 3,
-        "action": "URGENT: Switch aspirin to apixaban 5 mg BID — CHA2DS2-VASc 3 (female + prior stroke); PAF confirmed",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "DOAC indicated; aspirin monotherapy insufficient for AF secondary stroke prevention",
+        "action": "Brain MRI re-review — infarct size, territory, mechanism",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Large (3.5x2.5 cm) right occipital cortical infarct in PCA territory — cardioembolic pattern, not the small lacune-like pattern typical of migrainous infarction",
         "category": "required",
         "tool_parameters": {
-          "drug_1": "apixaban",
-          "condition": "atrial_fibrillation_stroke_prevention"
-        }
+          "contrast": false,
+          "sequences": [
+            "DWI",
+            "FLAIR",
+            "T2",
+            "SWI",
+            "MRA"
+          ]
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 4,
-        "action": "Repeat antiphospholipid antibodies at 12 weeks — original weakly positive aCL requires confirmation",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Repeat negative — APS excluded; transient elevation",
+        "action": "Prolonged cardiac monitoring (ILR) to identify paroxysmal AF",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Paroxysmal AF identified — explains cardioembolic mechanism",
         "category": "required",
         "tool_parameters": {
-          "lab_type": "antiphospholipid_repeat"
-        }
+          "duration_days": 365,
+          "device": "implantable_loop_recorder"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 5,
-        "action": "Neuro-ophthalmology referral; DVLA notification (homonymous hemianopia = cannot drive)",
-        "tool_name": null,
-        "expected_finding": "Complete homonymous hemianopia = DVLA automatic driving revocation; low vision rehab",
+        "action": "Echocardiogram with bubble study",
+        "tool_name": "order_echocardiogram",
+        "expected_finding": "Normal cardiac structure; small / no PFO; no thrombus",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "contrast": true,
+          "bubble_study": true
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
+      },
+      {
+        "step": 6,
+        "action": "Stroke aetiology labs including repeat antiphospholipid at 12 weeks",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Repeat antiphospholipid negative; lipids and HbA1c documented",
+        "category": "required",
+        "tool_parameters": {
+          "lab_type": "stroke_aetiology"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis — neither present here",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is not indicated for migraine with aura; reserve for cases where focal seizure is genuinely on the differential",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "Revise original migrainous infarction diagnosis — infarct is too large (3.5cm) and complete hemianopia is inconsistent with small migrainous infarction",
-      "Paroxysmal AF is the confirmed cardioembolic source — ILR essential for detection when initial Holter was negative",
-      "Switch aspirin to DOAC (apixaban) immediately — CHA2DS2-VASc 3 with confirmed PAF and prior stroke; aspirin monotherapy is insufficient",
-      "DVLA notification: complete homonymous hemianopia = cannot drive — urgent",
-      "Repeat aCL antibodies at 12 weeks — weakly positive result requires confirmation (negative on repeat = APS excluded)"
+      "Re-diagnose: cardioembolic AF-related stroke, NOT migrainous infarction",
+      "Switch from aspirin to DOAC for secondary prevention",
+      "Permanently stop triptans after ischaemic stroke",
+      "Visual rehabilitation referral for homonymous hemianopia",
+      "DVLA / driving counselling per hemianopia regulations",
+      "Initiate migraine preventive therapy"
     ],
     "contraindicated_actions": [
-      "Do not maintain aspirin monotherapy — confirmed PAF with prior stroke requires DOAC",
-      "Do not use triptans in future given prior cardioembolic stroke (not migrainous infarction — but caution appropriate)",
-      "Do not permit driving — complete homonymous hemianopia = DVLA licence revocation"
+      "Do not continue triptans after ischaemic stroke",
+      "Do not continue aspirin monotherapy when AF identified — DOAC required",
+      "Do not restart combined oestrogen-progestogen contraception"
     ],
     "key_reasoning_points": [
-      "Large PCA territory infarction (3.5cm x 2.5cm) with complete homonymous hemianopia is inconsistent with typical migrainous infarction (which causes small <10mm cortical lesions)",
-      "The original MRA hint of right PCA occlusion was NOT followed up — this was a missed finding indicating proximal embolic PCA occlusion",
-      "Paroxysmal AF was only detected on ILR (30 days) not on initial 24-hour Holter — shortduration monitoring is insufficient for post-stroke AF detection",
-      "Weakly positive antiphospholipid antibody requires repeat at 12 weeks — initial positive was transient and non-specific; APS definitively excluded on repeat",
-      "The patient had a real cardioembolic stroke that coincided with a migraine episode — the migraine aura was a witness to the stroke, not the cause"
+      "An infarct occurring during a migraine episode is not automatically a migrainous infarction — full stroke workup is mandatory",
+      "Migrainous infarction is typically small and cortical; a 3.5x2.5 cm PCA-territory infarct with persistent hemianopia is more consistent with embolic mechanism",
+      "Paroxysmal AF detection often requires prolonged (≥30-day) monitoring — short Holter is insufficient to exclude"
     ],
     "red_herrings": [
       {
-        "data_point": "Known 12-year migraine with visual aura + DWI restriction during typical episode = migrainous infarction diagnosis assumed",
+        "data_point": "'Migrainous infarction' label in original hospital diagnosis",
         "location": "patient.history_present_illness",
-        "intended_effect": "An established migraineur with DWI restriction during a migraine episode is a classic ICHD-3 migrainous infarction scenario",
-        "correct_interpretation": "Infarct size 3.5cm and complete homonymous hemianopia are inconsistent with migrainous infarction; original MRA showed possible PCA occlusion; PAF detected on ILR = cardioembolic stroke coinciding with migraine",
-        "field_path": ""
-      },
-      {
-        "data_point": "Weakly positive aCL IgG — suggests antiphospholipid syndrome as stroke cause",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Weakly positive aCL in a young woman with stroke suggests APS as cause",
-        "correct_interpretation": "Weakly positive aCL requires repeat at 12 weeks for APS diagnosis — repeat is negative; APS excluded; primary aetiology is PAF",
-        "field_path": ""
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "May lock in original diagnosis",
+        "correct_interpretation": "Diagnosis requires exclusion of competing aetiologies — paroxysmal AF identified on ILR re-diagnoses the event as cardioembolic stroke"
       }
-    ],
-    "icd_code": "G43.1",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -217,7 +266,15 @@
       "ct": "normal",
       "advanced_imaging": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Diagnostic puzzle: re-diagnosing a 'migrainous infarction' as cardioembolic AF-related stroke via prolonged cardiac monitoring; treatment overhaul",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "initial_tool_outputs": {
     "mri": {

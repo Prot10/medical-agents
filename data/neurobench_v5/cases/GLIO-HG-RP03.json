@@ -833,203 +833,209 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Astrocytoma with protoplasmic features (IDH-mutant, diffuse) with leptomeningeal dissemination",
+    "primary_diagnosis": "Diffuse astrocytoma, IDH-mutant, WHO grade 2 with leptomeningeal dissemination",
     "icd_code": "C71.9",
     "differential": [
       {
-        "diagnosis": "Neurosarcoidosis",
-        "likelihood": "very_low",
-        "key_features": "Diffuse basimeningeal enhancement pattern is classic for sarcoidosis; however, absence of pulmonary involvement on chest CT, negative initial biopsy for granulomata, and progressive disease despite corticosteroid therapy argue against this diagnosis"
-      },
-      {
-        "diagnosis": "CNS lymphoma",
+        "diagnosis": "Glioblastoma, IDH-wildtype (WHO grade 4)",
         "likelihood": "moderate",
-        "key_features": "Multiple enhancing lesions with meningeal involvement can be seen in CNS lymphoma; typically more homogeneous enhancement, periventricular predominance, and resolves with steroids (the partial steroid response here was misleading)"
+        "key_features": "Pre-tissue differential; IDH-mutant grade 2 histology and lack of necrosis on biopsy distinguish from GBM and confer markedly better prognosis"
       },
       {
-        "diagnosis": "Tuberculosis (CNS)",
+        "diagnosis": "Neurosarcoidosis (leptomeningeal)",
         "likelihood": "low",
-        "key_features": "Nodular meningeal enhancement can mimic tuberculous meningitis; however, no exposure history, no endemic travel, and cystic components are atypical for TB"
+        "key_features": "Can present with leptomeningeal enhancement and cognitive decline; CSF / serum ACE and systemic workup help differentiate"
       },
       {
-        "diagnosis": "Brain metastases",
+        "diagnosis": "Leptomeningeal carcinomatosis",
         "likelihood": "low",
-        "key_features": "Multiple intracranial lesions of varying sizes could suggest metastatic disease; however, young age, no known primary, and negative body CT argue strongly against this"
+        "key_features": "Would require a known primary; CT staging negative here"
       },
       {
-        "diagnosis": "Wegener granulomatosis (granulomatosis with polyangiitis)",
+        "diagnosis": "Brain metastasis",
         "likelihood": "low",
-        "key_features": "Can mimic diffuse meningeal disease and cause cranial neuropathies; however, absence of sinus, pulmonary, or renal involvement makes this unlikely"
+        "key_features": "Staging negative; no known primary; imaging is intra-axial diffuse rather than discrete metastatic deposits"
       },
       {
-        "diagnosis": "Meningeal carcinomatosis",
-        "likelihood": "low",
-        "key_features": "Diffuse leptomeningeal enhancement with parenchymal masses; no primary cancer identified on systemic workup"
+        "diagnosis": "Tumefactive demyelination",
+        "likelihood": "very_low",
+        "key_features": "No demyelinating history; imaging and CSF do not fit"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Order brain MRI with and without contrast to characterize the multifocal intracranial lesions and meningeal enhancement pattern",
+        "action": "Order MRI brain with and without gadolinium contrast (tumor protocol with DWI, FLAIR, post-contrast T1) to characterize the diffuse with leptomeningeal dissemination lesion, define mass effect, and plan surgery",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Multifocal solid and cystic masses in right temporal lobe, prepontine cistern, and left cerebellum with diffuse nodular basimeningeal enhancement",
+        "expected_finding": "Heterogeneously enhancing mass with ring/irregular enhancement, central necrosis, restricted diffusion at the enhancing rim, perilesional FLAIR-hyperintense edema, and mass effect consistent with high-grade glioma",
         "category": "required",
         "tool_parameters": {
           "protocol": "tumor",
           "contrast": true
-        }
+        },
+        "citation": "[Stupp_2005]",
+        "guideline_source": "Stupp_2005"
       },
       {
         "step": 2,
-        "action": "Obtain comprehensive laboratory panel including CBC, BMP, inflammatory markers (ESR, CRP), ACE level, and LDH",
+        "action": "Order pre-operative laboratory workup: CBC, comprehensive metabolic panel, coagulation studies (PT/INR, aPTT), and type & screen in anticipation of surgical biopsy/resection",
         "tool_name": "interpret_labs",
-        "expected_finding": "Elevated ESR and CRP; borderline ACE level; steroid-induced leukocytosis and hyperglycemia; normal LDH",
+        "expected_finding": "Baseline values acceptable for surgery; identify any coagulopathy, electrolyte derangement, or steroid-relevant abnormality (e.g., hyperglycemia, hyponatremia) before craniotomy",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
-            "ESR",
-            "CRP",
-            "inflammatory_markers"
+            "coagulation",
+            "type_and_screen"
           ]
-        }
+        },
+        "citation": "[NCCN_CNS]",
+        "guideline_source": "NCCN_CNS"
       },
       {
         "step": 3,
-        "action": "Perform EEG given history of seizure disorder and altered mental status",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Diffuse slowing with multifocal areas of intermittent focal slowing; no epileptiform discharges",
+        "action": "Search medical literature for management of IDH-mutant diffuse astrocytoma (WHO grade 2) with leptomeningeal dissemination — surveillance vs. maximal safe resection plus radiation/chemotherapy decision points",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirmation of preferred management pathways for IDH-mutant lower-grade gliomas, including the role of molecular markers in treatment selection",
         "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
+        "tool_parameters": {},
+        "citation": "[WHO_2021]",
+        "guideline_source": "WHO_2021"
       },
       {
         "step": 4,
-        "action": "Order CT chest/abdomen/pelvis to evaluate for systemic sarcoidosis and rule out primary malignancy",
-        "tool_name": "interpret_labs",
-        "expected_finding": "No hilar lymphadenopathy, no pulmonary sarcoidosis, no primary malignancy or metastases",
+        "action": "Obtain urgent neurosurgical and neuro-oncology consultation for tissue diagnosis (stereotactic biopsy or maximal safe resection) and multidisciplinary treatment planning",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Multidisciplinary plan including tissue acquisition, molecular profiling, and adjuvant treatment per current standards",
         "category": "required",
         "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP"
-          ]
-        }
+          "specialty": "neurosurgery"
+        },
+        "citation": "[Stupp_2005]",
+        "guideline_source": "Stupp_2005"
       },
       {
         "step": 5,
-        "action": "Request MR spectroscopy of the dominant right temporal lobe mass to differentiate neoplasm from granulomatous disease",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Elevated choline, reduced NAA, lipid/lactate peaks — metabolite profile consistent with neoplasm rather than granulomatous disease",
+        "action": "Obtain neuro-oncology consultation for adjuvant therapy planning and molecular-marker-guided treatment selection",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Plan for concurrent chemoradiation (Stupp protocol with temozolomide) for IDH-wildtype GBM; alternative chemoradiation regimens for other tumor types or for atypical histologies",
         "category": "required",
         "tool_parameters": {
-          "imaging_type": "MR_spectroscopy"
-        }
+          "specialty": "neuro_oncology"
+        },
+        "citation": "[Stupp_2005]",
+        "guideline_source": "Stupp_2005"
       },
       {
         "step": 6,
-        "action": "Perform repeat stereotactic biopsy targeting the most enhancing solid component, with sufficient tissue for molecular profiling",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Astrocytoma with protoplasmic features, IDH1-mutant, ATRX loss, MGMT methylated, elevated Ki-67",
-        "category": "required",
+        "action": "Order MR perfusion imaging (DSC perfusion) to assess tumor vascularity and target highest-grade region for biopsy",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Elevated rCBV (typically > 1.75) in enhancing component supports high-grade neoplasm and helps direct biopsy",
+        "category": "recommended",
         "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP"
-          ]
-        }
+          "modality": "perfusion_MRI"
+        },
+        "citation": "[Law_2003]",
+        "guideline_source": "Law_2003"
       },
       {
         "step": 7,
-        "action": "Order complete spinal MRI with contrast to evaluate for leptomeningeal dissemination",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Diffuse nodular leptomeningeal enhancement throughout the entire spinal canal",
-        "category": "required",
+        "action": "Order MR spectroscopy (1H-MRS) to characterize tumor metabolic profile",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Elevated Cho/NAA ratio with lipid-lactate peaks supports high-grade malignancy and helps differentiate tumor from treatment-related change at follow-up",
+        "category": "recommended",
         "tool_parameters": {
-          "protocol": "standard",
-          "contrast": true
-        }
+          "modality": "MR_spectroscopy"
+        },
+        "citation": "[Bulik_2013]",
+        "guideline_source": "Bulik_2013"
       },
       {
         "step": 8,
-        "action": "Present at multidisciplinary neuro-oncology tumor board for treatment planning",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Order CT chest/abdomen/pelvis as staging to exclude an extracranial primary if a solitary metastasis is on the differential",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No extracranial primary malignancy identified, supporting primary brain tumor as the working diagnosis",
+        "category": "optional",
+        "tool_parameters": {
+          "region": "chest_abdomen_pelvis",
+          "contrast": true
+        },
+        "citation": "[NCCN_CNS]",
+        "guideline_source": "NCCN_CNS"
       },
       {
         "step": 9,
-        "action": "Check drug interactions for planned temozolomide chemotherapy with current medications",
+        "action": "Check drug interactions before starting/continuing antiepileptic medication and corticosteroids (levetiracetam preferred over enzyme-inducing AEDs; steroid effect on glycemic control)",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "No significant interaction with levetiracetam; PJP prophylaxis recommended with concurrent temozolomide and radiation",
-        "category": "recommended"
+        "expected_finding": "Identify steroid-induced hyperglycemia in diabetics and any AED-chemotherapy interaction concerns relevant to upcoming temozolomide therapy",
+        "category": "optional",
+        "tool_parameters": {},
+        "citation": "[NCCN_CNS]",
+        "guideline_source": "NCCN_CNS"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "echo_type": "TTE"
+        },
+        "rationale": "Echocardiogram has no role in the diagnostic workup of suspected high-grade glioma absent a specific cardiac question (e.g., suspected paraneoplastic endocarditis)",
+        "citation": "[NCCN_CNS]"
       },
       {
-        "step": 10,
-        "action": "Perform fMRI for pre-surgical language and motor mapping",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Left hemisphere language dominance; right temporal mass in non-dominant hemisphere; motor cortex adjacent but not invaded",
-        "category": "recommended",
+        "tool_name": "order_cardiac_monitoring",
         "tool_parameters": {
-          "protocol": "standard",
-          "contrast": false
-        }
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "Cardiac monitoring is unrelated to the diagnostic workup of a brain mass and adds resource cost without informing management",
+        "citation": "[NCCN_CNS]"
+      }
+    ],
+    "harmful_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is contraindicated in suspected intracranial mass with imaging mass effect (effacement of ventricles / sulci / cisterns): the pressure gradient created by LP risks transtentorial or tonsillar herniation. Even when LP is otherwise safe, CSF studies are low-yield for primary brain tumor diagnosis.",
+        "citation": "[Hasbun_2001]"
+      }
+    ],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "MRI must precede any lumbar puncture when a mass lesion is suspected, to identify mass effect and herniation risk before LP",
+        "citation": "[Hasbun_2001]",
+        "severity": "hard"
+      },
+      {
+        "before": "analyze_brain_mri",
+        "after": "consult_medical_specialist",
+        "reason": "Adequate pre-operative MRI characterization (mass, edema, eloquent-cortex proximity) is standard of care before neurosurgical tissue acquisition",
+        "citation": "[Stupp_2005]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Recognize that progressive disease despite corticosteroid therapy for presumed neurosarcoidosis warrants reconsideration of the diagnosis",
-      "Order repeat biopsy with adequate tissue sampling after initial non-diagnostic biopsy, targeting the most enhancing solid component",
-      "Obtain MR spectroscopy to help differentiate neoplasm from granulomatous disease before repeat biopsy",
-      "Evaluate for systemic sarcoidosis with chest CT (absence of pulmonary involvement argues against neurosarcoidosis)",
-      "Order complete spinal MRI to assess the full extent of leptomeningeal dissemination for treatment planning",
-      "Refer to neuro-oncology tumor board for multidisciplinary treatment planning given the complexity of disseminated disease"
+      "Obtain urgent neurosurgical consultation for tissue diagnosis (stereotactic biopsy or maximal safe resection) and operative planning",
+      "Obtain MRI brain with and without gadolinium contrast (tumor protocol) before any invasive procedure",
+      "Initiate dexamethasone (e.g., 4 mg IV every 6 hours) to control symptomatic peritumoral edema; titrate to lowest effective dose",
+      "Initiate antiepileptic therapy with levetiracetam (preferred non-enzyme-inducing AED) for documented seizure activity",
+      "Obtain pre-operative labs (CBC, BMP, coagulation, type & screen) before craniotomy/biopsy",
+      "Plan multimodal treatment per molecular and histological profile (e.g., Stupp protocol — concurrent chemoradiation with temozolomide for IDH-wildtype GBM)"
     ],
     "contraindicated_actions": [
-      "Continuing corticosteroid monotherapy without re-evaluation of the underlying diagnosis, as this delays appropriate oncological treatment",
-      "Accepting the initial non-diagnostic biopsy as definitive evidence against neoplasm without repeat tissue sampling",
-      "Administering whole-brain radiation without first establishing tissue diagnosis, as this could mask lymphoma and prevent accurate staging",
-      "Starting empiric anti-tuberculosis therapy without supporting evidence (no exposure, no endemic travel, atypical imaging features)",
-      "Performing aggressive surgical resection without pre-operative functional mapping, given proximity of one lesion to motor cortex"
+      "Do not perform lumbar puncture in the setting of intracranial mass effect — herniation risk",
+      "Do not initiate definitive tumor-directed therapy (radiation, temozolomide, alkylating chemotherapy) before tissue diagnosis is established",
+      "Do not start therapeutic anticoagulation without a clear thromboembolic indication, given upcoming neurosurgical intervention and bleeding risk"
     ],
     "key_reasoning_points": [
-      "Neurosarcoidosis was a reasonable initial presumptive diagnosis given the diffuse basimeningeal enhancement pattern and mildly elevated inflammatory markers, but progressive disease despite corticosteroid therapy should have prompted earlier diagnostic re-evaluation",
-      "The absence of pulmonary sarcoidosis on chest CT (present in >90% of sarcoidosis cases) is a significant negative finding that argues against the neurosarcoidosis diagnosis",
-      "A family history of sarcoidosis (father) served as a red herring that reinforced the incorrect initial diagnosis",
-      "The initial biopsy was non-diagnostic due to sampling error — protoplasmic astrocytomas are notoriously difficult to diagnose on small biopsies because of their low cellularity and bland cytology that mimics reactive gliosis",
-      "The initial symptomatic improvement on corticosteroids was misleading — steroids reduce peritumoral edema in gliomas and can cause partial tumor response, mimicking treatment response for an inflammatory condition",
-      "Protoplasmic astrocytomas are rare tumors that can present with diffuse leptomeningeal dissemination, mimicking inflammatory or infectious meningeal disease on imaging",
-      "MR spectroscopy was the critical differentiating tool: elevated choline and reduced NAA pointed to neoplasm rather than granulomatous disease, guiding the decision for repeat biopsy",
-      "Despite the histologically low-grade appearance (WHO grade 2), the clinical behavior with leptomeningeal dissemination and elevated Ki-67 index suggests more aggressive biology requiring combined-modality treatment",
-      "Molecular profiling (IDH mutation, MGMT methylation) is essential for guiding treatment decisions even in the setting of disseminated disease"
+      "Tissue diagnosis revealed an IDH-mutant lower-grade astrocytoma — distinct prognosis and treatment from IDH-wildtype GBM",
+      "Leptomeningeal dissemination from a parenchymal glioma warrants extended imaging (full-spine MRI) and consideration of adjuvant therapy beyond standard low-grade glioma management",
+      "Even for low-grade glioma, pre-operative MRI characterization and multidisciplinary planning are standard before biopsy"
     ],
-    "red_herrings": [
-      {
-        "data_point": "Father with sarcoidosis — family history of sarcoidosis",
-        "location": "patient.clinical_history.family_history",
-        "intended_effect": "Reinforces the initial misdiagnosis of neurosarcoidosis by suggesting a familial predisposition, delaying appropriate re-evaluation when disease progresses",
-        "correct_interpretation": "Sarcoidosis has a weak familial tendency but this does not confirm the diagnosis in a patient who lacks the cardinal features (no pulmonary involvement, no other organ involvement, progressive disease on steroids). Family history is a red herring that anchored the initial diagnostic team to an incorrect diagnosis.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Initial non-diagnostic biopsy with reactive changes and mild fibrosis — no granulomata, no tumor cells",
-        "location": "patient.history_present_illness",
-        "intended_effect": "The non-diagnostic biopsy was interpreted as 'supporting' the neurosarcoidosis diagnosis by excluding obvious tumor, leading to continued steroid therapy without repeat tissue sampling",
-        "correct_interpretation": "A non-diagnostic biopsy should not be interpreted as evidence against neoplasm. Protoplasmic astrocytomas have low cellularity and bland cytology that resembles reactive gliosis, making them notoriously difficult to diagnose on small or poorly targeted biopsies. Progressive disease on steroids mandates repeat biopsy targeting the most enhancing solid component with adequate tissue.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Partial symptomatic improvement on corticosteroids (steroid response)",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Steroid response is typically associated with sarcoidosis or lymphoma, reinforcing the misdiagnosis and delaying diagnostic reconsideration",
-        "correct_interpretation": "Corticosteroids reduce peritumoral vasogenic edema in gliomas and can cause partial clinical improvement by treating edema, not the underlying tumor. A partial steroid response does not distinguish sarcoidosis from glioma. Progressive imaging worsening on repeat MRI despite steroids is the critical finding that mandated re-evaluation.",
-        "field_path": ""
-      }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": []
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -1044,6 +1050,16 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:GLIO-HG",
+    "difficulty_rationale": "Off-pathway / atypical tumor histology (the case body diagnosis is not standard IDH-wildtype GBM); 5 required tools, 0 red herring(s); diagnosis requires recognizing mimic imaging patterns and adjusting management accordingly",
+    "case_body_concerns": [
+      "Tissue diagnosis is an IDH-mutant WHO grade-2 astrocytoma with leptomeningeal dissemination — a lower-grade glioma with unusual dissemination pattern, not the high-grade glioma (GBM/anaplastic astrocytoma) that the GLIO-HG pack targets. The workup is similar but treatment intent and prognosis differ. Consider re-filing under a low-grade-glioma or atypical-glioma pack."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

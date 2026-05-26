@@ -481,116 +481,181 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Hepatic encephalopathy, grade 2, NASH cirrhosis — mildly elevated ammonia (64 µmol/L); enzalutamide as potential secondary contributor; confirmed by complete response to lactulose; leptomeningeal carcinomatosis excluded by MRI",
-    "icd_code": "K72.9",
+    "primary_diagnosis": "Hepatic encephalopathy (West Haven grade II), NASH cirrhosis (Child-Pugh B, MELD 11) — ammonia mildly elevated (64 µmol/L); enzalutamide CNS effects a potential secondary contributor; leptomeningeal carcinomatosis excluded by MRI.",
+    "icd_code": "K72.90",
     "differential": [
       {
-        "diagnosis": "Enzalutamide-induced CNS toxicity",
-        "likelihood": "low",
-        "key_features": "Enzalutamide causes cognitive complaints in ~10-15% of patients; but complete response to lactulose treatment excludes enzalutamide as primary cause — enzalutamide toxicity would not reverse with lactulose"
-      },
-      {
-        "diagnosis": "Leptomeningeal carcinomatosis (prostate cancer)",
-        "likelihood": "very_low",
-        "key_features": "MRI brain with gadolinium negative for leptomeningeal enhancement — definitive exclusion; non-contrast CT alone is insufficient; clinical pattern of complete HE treatment response also excludes"
-      },
-      {
-        "diagnosis": "Parenchymal brain metastases (prostate cancer)",
-        "likelihood": "very_low",
-        "key_features": "MRI negative for parenchymal metastases; CT initially equivocal — MRI was required and definitive"
-      },
-      {
-        "diagnosis": "Progressive HE from liver disease worsening (MELD rising)",
+        "diagnosis": "Enzalutamide CNS toxicity",
         "likelihood": "moderate",
-        "key_features": "MELD 11 relatively stable; this is a first clear overt episode after prior grade 1; not end-stage progression — HE responded to treatment"
+        "key_features": "Enzalutamide crosses BBB and causes fatigue, cognitive decline, rare seizures; consider dose modification with oncology if HE management does not fully restore cognition.",
+        "icd_code": "G92"
+      },
+      {
+        "diagnosis": "Leptomeningeal carcinomatosis (prostate)",
+        "likelihood": "low",
+        "key_features": "MRI brain with gadolinium required to exclude; rare in prostate but possible; CSF if MRI suspicious.",
+        "icd_code": "C79.32"
+      },
+      {
+        "diagnosis": "Hypogonadism (ADT)-related cognitive decline",
+        "likelihood": "low",
+        "key_features": "Leuprolide-induced testosterone suppression contributes to cognitive/fatigue symptoms but not asterixis.",
+        "icd_code": "E29.1"
+      },
+      {
+        "diagnosis": "Alzheimer/neurodegenerative process",
+        "likelihood": "low",
+        "key_features": "Insidious onset in 60s could fit; lactulose response distinguishes.",
+        "icd_code": "G30.0"
+      },
+      {
+        "diagnosis": "Bone-metastasis-related hypercalcemia encephalopathy",
+        "likelihood": "very_low",
+        "key_features": "Check Ca; prostate metastases can cause hypercalcemia.",
+        "icd_code": "E83.52"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Labs — ammonia, LFTs, PSA, CBC, toxicology",
+        "action": "Comprehensive labs: CMP including AST/ALT/bilirubin/INR/albumin, ammonia, CBC, glucose, electrolytes (Na, K, Mg), BUN/Cr, lactate, blood cultures and urine cultures; toxicology if substance use plausible. Confirms liver dysfunction and screens for precipitants.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Ammonia 64, rising PSA, anemia from ADT",
+        "expected_finding": "Ammonia 64 (mild); cirrhosis features; calcium; PSA; consider androgen levels.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 2,
-        "action": "CT head — initial structural exclusion (insufficient alone for metastasis)",
+        "action": "Non-contrast CT head — exclude structural alternate cause of AMS (hemorrhage, large stroke, mass) before any LP.",
         "tool_name": "order_ct_scan",
-        "expected_finding": "CT negative for obvious mass or hemorrhage but insufficient for leptomeningeal disease",
+        "expected_finding": "Baseline non-contrast CT.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 3,
-        "action": "MRI brain with gadolinium — required to exclude leptomeningeal carcinomatosis in prostate cancer patient",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "No leptomeningeal enhancement, no parenchymal metastases",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "MRI brain with and without gadolinium — exclude alternate causes of AMS (acute ischemia, mass, Wernicke periaqueductal/mammillary changes, leptomeningeal disease) when CT is non-diagnostic or specific alternate diagnoses are suspected.",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "MRI brain with gadolinium — exclude leptomeningeal carcinomatosis given prostate cancer; expect no enhancement.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 4,
-        "action": "EEG — characterize encephalopathy",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Non-specific theta slowing — consistent with mild HE or drug effect",
+        "action": "Literature/guideline search to confirm West Haven grading, precipitant management, and lactulose/rifaximin dosing (Enzalutamide CNS effects; covert HE; AASLD/EASL HE management).",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "AASLD/EASL 2014 guidance retrieved; West Haven criteria and precipitant-driven management framework confirmed.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 5,
-        "action": "Empiric lactulose increase + rifaximin continuation — therapeutic trial is diagnostic",
-        "tool_name": null,
-        "expected_finding": "Complete mental status recovery at 72h — confirms HE as primary diagnosis",
+        "action": "Drug-interaction and medication-reconciliation review covering enzalutamide, leuprolide, lactulose, rifaximin — review for cognitive contribution; flag any CNS depressants (benzodiazepines, opioids, sedating antiemetics, antihistamines) and confirm lactulose/rifaximin dosing in liver disease.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sedating/CNS-depressant medications identified; lactulose and rifaximin reviewed for hepatic dose adjustment.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Bajaj_2011]",
+        "guideline_source": "Bajaj 2011 HE management review"
       },
       {
         "step": 6,
-        "action": "Paracentesis — exclude SBP",
-        "tool_name": "interpret_labs",
-        "expected_finding": "PMN 58 — SBP excluded",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Consult hepatology + oncology — discuss enzalutamide continuation — coordinate definitive care, transplant candidacy assessment where applicable.",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Hepatology / critical-care guidance integrated into management.",
+        "category": "recommended",
+        "tool_parameters": {
+          "specialty": "hepatology"
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      },
+      {
+        "step": 7,
+        "action": "EEG — consider if no improvement with HE management. Triphasic waves are classic but non-specific (metabolic encephalopathies broadly); main role is exclusion of non-convulsive status epilepticus where the differential supports it.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Mild generalized slowing.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Ferenci_2002]",
+        "guideline_source": "Ferenci 2002 HE nomenclature/quantification"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No clinical suspicion for hepatopulmonary syndrome, portopulmonary hypertension, or endocarditis; echocardiography is not part of the HE workup.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "genetic_panel:early_onset_AD"
+        },
+        "rationale": "Early-onset AD genetic panel has no role in HE workup; reversible metabolic encephalopathy is the diagnosis under consideration.",
+        "citation": "[AASLD_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "In altered mental status, exclude intracranial mass effect / hemorrhage on imaging before LP to avoid herniation risk.",
+        "citation": "[AASLD_2014]",
+        "severity": "hard"
+      },
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "In altered mental status, exclude intracranial mass effect on neuroimaging before LP to avoid herniation risk.",
+        "citation": "[AASLD_2014]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "MRI brain with gadolinium is required in cancer patients with progressive cognitive decline — non-contrast CT alone cannot exclude leptomeningeal carcinomatosis",
-      "Therapeutic response to lactulose is the definitive diagnostic test when multiple etiologies are possible — leptomeningeal disease and enzalutamide toxicity do not respond to lactulose; HE does",
-      "Ammonia 64 µmol/L (mildly elevated) does NOT exclude HE — clinical diagnosis based on symptoms + asterixis + treatment response",
-      "Enzalutamide can be continued if HE responds to treatment — HE is the primary diagnosis, not enzalutamide toxicity"
+      "Empiric lactulose 30 mL TID + rifaximin 550 mg BID; response is diagnostic.",
+      "MRI brain with gadolinium to exclude leptomeningeal carcinomatosis.",
+      "Coordinate with oncology re enzalutamide dose modification if persistent cognitive impairment after HE control.",
+      "Counsel on cognitive monitoring while on enzalutamide."
     ],
     "contraindicated_actions": [
-      "Relying on non-contrast CT to exclude leptomeningeal carcinomatosis — MRI with gadolinium required",
-      "Stopping enzalutamide without oncology consultation — cancer progression risk",
-      "Attributing complete encephalopathy to enzalutamide without ammonia measurement and treatment trial"
+      "Do not prescribe benzodiazepines for anxiety/agitation — they precipitate and prolong HE (use haloperidol or non-pharmacologic measures for agitation).",
+      "Do not prescribe sedating opioids — they worsen HE; consider acetaminophen at hepatic-safe dosing for pain.",
+      "Do not perform LP before neuroimaging excludes mass effect when the patient has altered mental status.",
+      "Do not perform LP before MRI excludes mass effect / meningeal disease."
     ],
     "key_reasoning_points": [
-      "Three competing diagnoses for cognitive decline in cancer patients on hepatotoxic treatment: HE vs drug CNS toxicity vs CNS metastasis — each requires specific diagnostic approach",
-      "MRI brain with gadolinium is the gold standard for leptomeningeal carcinomatosis — non-contrast CT has insufficient sensitivity",
-      "Therapeutic lactulose response is diagnostically decisive when multiple etiologies are possible — a test of treatment",
-      "Enzalutamide cognitive effects are real but do not cause asterixis or respond to lactulose — the presence of asterixis shifts probability toward metabolic/HE etiology"
+      "HE is a clinical diagnosis: West Haven grading + evidence of liver dysfunction + exclusion of other causes of AMS — ammonia level is supportive only and correlates poorly with grade (AASLD 2014).",
+      "Precipitant identification is more actionable than the ammonia number: infection (SBP especially), GI bleed, electrolyte disturbance (hypokalemia/hyponatremia), constipation, sedative/CNS-depressant use, dehydration, dietary protein load, renal failure.",
+      "Targeted oncologic agents (enzalutamide, abiraterone, BTK inhibitors) can cross the BBB and produce neuropsychiatric symptoms — always entertain when a cancer patient on these drugs presents with confusion.",
+      "Even mild ammonia elevation in a cirrhotic with insidious cognitive decline can represent covert HE; a lactulose trial is informative."
     ],
     "red_herrings": [
       {
-        "data_point": "PSA 18.4 on enzalutamide (castration-resistant prostate cancer)",
-        "location": "initial_tool_outputs.labs.panels.Oncology",
-        "intended_effect": "Attribute cognitive decline to prostate cancer CNS involvement (brain metastasis or leptomeningeal disease); proceed with oncological workup and skip HE evaluation",
-        "correct_interpretation": "Rising PSA requires staging workup (which includes MRI brain) — but MRI brain negative for CNS disease; HE is the primary diagnosis confirmed by treatment response; cancer workup should be concurrent, not exclusive",
-        "field_path": ""
+        "data_point": "Prostate cancer on castration-resistant therapy",
+        "location": "patient.clinical_history.past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history[1]",
+        "intended_effect": "Pursue brain metastasis or leptomeningeal disease workup ahead of HE evaluation.",
+        "correct_interpretation": "MRI with gadolinium is appropriate to exclude leptomeningeal disease, but the dominant treatable cause is HE; do not delay lactulose trial waiting for MRI."
       },
       {
-        "data_point": "Enzalutamide use (known CNS-penetrant, causes cognitive complaints)",
-        "location": "patient.clinical_history.medications",
-        "intended_effect": "Attribute all cognitive symptoms to enzalutamide toxicity; hold enzalutamide prematurely without HE workup; potentially compromise cancer treatment unnecessarily",
-        "correct_interpretation": "Enzalutamide cognitive effects do not respond to lactulose; complete recovery with lactulose + rifaximin excludes enzalutamide as primary cause; continue enzalutamide for cancer control",
-        "field_path": ""
+        "data_point": "Ammonia only 64 µmol/L (mildly elevated)",
+        "location": "initial_tool_outputs.labs.panels.LFTs",
+        "field_path": "initial_tool_outputs.labs.panels.LFTs",
+        "intended_effect": "Dismiss HE.",
+        "correct_interpretation": "Mild ammonia elevation is compatible with covert HE; lactulose trial diagnostic."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -609,6 +674,14 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (HEP-ENC)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:HEP-ENC",
+    "difficulty_rationale": "5 required tools (labs, CT, MRI, lit, drug); both HE and a cancer-related confounder must be addressed; MRI required to exclude leptomeningeal disease before lactulose response is the definitive diagnostic step.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

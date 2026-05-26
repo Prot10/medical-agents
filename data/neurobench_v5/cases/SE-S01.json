@@ -518,94 +518,208 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Convulsive status epilepticus from subtherapeutic valproate (medication non-adherence) in juvenile myoclonic epilepsy",
-    "icd_code": "G41.9",
+    "primary_diagnosis": "Generalized convulsive status epilepticus from subtherapeutic valproate (medication non-adherence) in juvenile myoclonic epilepsy",
+    "icd_code": "G41.0",
     "differential": [
       {
-        "diagnosis": "Alcohol withdrawal seizure",
-        "likelihood": "high",
-        "key_features": "BAL 0.18 - still elevated, not in withdrawal phase; known JME with subtherapeutic valproate is primary"
+        "diagnosis": "Alcohol withdrawal seizures / alcohol-precipitated SE",
+        "likelihood": "moderate",
+        "key_features": "BAL 0.18 g/dL indicates recent alcohol intake — can lower seizure threshold and is contributory but not alcohol withdrawal (still intoxicated)",
+        "icd_code": "F10.23"
       },
       {
-        "diagnosis": "Autoimmune encephalitis SE",
-        "likelihood": "very_low",
-        "key_features": "Normal CSF; autoimmune panel negative; known JME with clear precipitants"
+        "diagnosis": "New structural cause (occult tumor / vascular)",
+        "likelihood": "low",
+        "key_features": "CT normal; MRI to confirm; known JME with subtherapeutic AED is sufficient explanation",
+        "icd_code": "G40.909"
       },
       {
-        "diagnosis": "Hypoglycemic seizure",
+        "diagnosis": "CNS infection",
+        "likelihood": "low",
+        "key_features": "No fever / meningismus initially; CSF only if clinical course worsens",
+        "icd_code": "G04.90"
+      },
+      {
+        "diagnosis": "Drug intoxication / withdrawal causing seizures",
+        "likelihood": "low",
+        "key_features": "Aside from alcohol, no other intoxicants identified; tox screen confirms",
+        "icd_code": "T50.905A"
+      },
+      {
+        "diagnosis": "Psychogenic non-epileptic status",
         "likelihood": "very_low",
-        "key_features": "Glucose 196 elevated, not hypoglycemic; valproate subtherapeutic"
+        "key_features": "Definite electrographic SE on EEG excludes pseudo-status",
+        "icd_code": "F44.5"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "EEG confirms continuous ictal activity",
+        "action": "EEG — confirm electrographic SE and characterize pattern",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Continuous generalized seizure activity - convulsive SE confirmed",
+        "expected_finding": "Continuous generalized 2-4 Hz polyspike-wave — JME pattern in SE",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "Interpret labs - subtherapeutic valproate, rhabdomyolysis",
+        "action": "Labs: CBC, CMP, glucose, Ca/Mg, AED level (valproate), ammonia, ABG, lactate, CK, blood and urine cultures, beta-hCG, tox screen, BAL",
         "tool_name": "interpret_labs",
-        "expected_finding": "Valproate 28 mcg/mL subtherapeutic; CK 2840 rhabdomyolysis; BAL 0.18; Mg low",
+        "expected_finding": "Subtherapeutic valproate 28, BAL 0.18, lactate 8.4 (post-convulsive), CK 2840 (rhabdomyolysis), Mg 1.4",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "CT head - exclude structural cause",
+        "action": "Non-contrast head CT — exclude acute structural cause",
         "tool_name": "order_ct_scan",
-        "expected_finding": "Normal CT - no structural cause; metabolic/toxic SE from AED non-compliance",
+        "expected_finding": "Normal CT — no acute hemorrhage or mass",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "IV valproate loading + seizure termination",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "IV valproate 20 mg/kg loading; benzodiazepine escalation",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "MRI brain — exclude subacute structural cause (first time in adult with prior diagnosis)",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Normal MRI consistent with idiopathic generalized epilepsy",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "Rhabdomyolysis management",
+        "action": "Drug-interaction check: avoid phenytoin / carbamazepine in JME (can worsen myoclonus); valproate or levetiracetam",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Valproate reload IV bolus + levetiracetam adjunct preferred; avoid phenytoin in JME",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[ESETT_2019]",
+        "guideline_source": ""
+      },
+      {
+        "step": 6,
+        "action": "Literature: JME breakthrough SE — AED selection",
         "tool_name": "search_medical_literature",
-        "expected_finding": "Aggressive IV hydration; monitor creatinine; target UO 1-2 mL/kg/h",
+        "expected_finding": "Valproate IV reload + LEV; avoid phenytoin/carbamazepine/gabapentin (may exacerbate myoclonus)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
+      },
+      {
+        "step": 7,
+        "action": "Magnesium replacement and rhabdomyolysis management",
+        "tool_name": "interpret_labs",
+        "expected_finding": "IV magnesium repletion; aggressive IV fluids for CK 2840",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 8,
+        "action": "Neurology consult for AED optimization and adherence counseling",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "JME requires lifelong AED; address non-adherence factors",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "study_type": "TTE"
+        },
+        "rationale": "No clinical suspicion of cardiac source of embolus or cardiogenic seizure; routine echo is not indicated in SE workup absent cardiac findings.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No suspicion of arrhythmogenic syncope or cardiac comorbidity precipitating SE; routine telemetry beyond standard ICU monitoring adds cost without yield.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in acute SE evaluation; dementia biomarker imaging does not change acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is for ischemic stroke workup; SE without focal vascular suspicion does not warrant carotid imaging.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "DaTscan / dopamine transporter imaging has no role in SE; no parkinsonism question relevant to acute management.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Confirm pregnancy test before reloading valproate in any reproductive-age woman; here patient is male so soft constraint.",
+        "citation": "[Brophy_2012]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Immediate benzodiazepine (lorazepam 4 mg IV or diazepam 10 mg IV) - first-line",
-      "IV valproate loading 20-40 mg/kg for JME (preferred AED)",
-      "Valproate 28 mcg/mL confirms medication non-adherence as primary precipitant",
-      "Rhabdomyolysis (CK 2840, rising): aggressive IV hydration target UO 1-2 mL/kg/h",
-      "Magnesium replacement - hypomagnesemia from alcohol lowers seizure threshold",
-      "Continuous EEG monitoring after clinical cessation to exclude NCSE",
-      "LP and autoimmune panel after stabilization to exclude alternative etiology"
+      "Administer IV lorazepam 0.1 mg/kg first-line — do not delay for diagnostics",
+      "IV valproate reload 30-40 mg/kg + IV levetiracetam — both first-line in JME per ESETT and JME-specific guidance",
+      "Aggressive IV hydration for rhabdomyolysis (CK 2840)",
+      "Adherence counseling once stable"
     ],
     "contraindicated_actions": [
-      "Do not use phenytoin/fosphenytoin for JME - may worsen myoclonic seizures",
-      "Do not delay treatment while waiting for full labs",
-      "Do not miss rhabdomyolysis - rising CK requires aggressive hydration",
-      "Do not discharge without neurology follow-up and medication adherence counseling"
+      "Do NOT use phenytoin / fosphenytoin in JME — exacerbates myoclonus",
+      "Do NOT use carbamazepine / oxcarbazepine / gabapentin in JME",
+      "Do NOT discharge without addressing non-adherence",
+      "Avoid phenytoin/carbamazepine/oxcarbazepine/gabapentin in JME — can exacerbate myoclonus and worsen generalized seizures."
     ],
     "key_reasoning_points": [
-      "Classic JME SE precipitants: subtherapeutic AED + alcohol + sleep deprivation",
-      "Valproate 28 mcg/mL (therapeutic 50-100) confirms non-adherence as primary cause",
-      "JME: valproate preferred; phenytoin/fosphenytoin can worsen myoclonic seizures",
-      "Prolonged SE causes rhabdomyolysis - CK monitoring and aggressive hydration essential",
-      "Post-ictal MRI peri-ictal changes are reversible and do not indicate structural pathology",
-      "Alcohol BAL 0.18 - still intoxicated; seizure risk highest 24-48h after abstinence (withdrawal)"
+      "JME is a generalized epilepsy where sodium-channel-blocking AEDs (phenytoin, carbamazepine, oxcarbazepine) worsen myoclonus",
+      "Subtherapeutic valproate in non-adherent JME is a common SE trigger",
+      "Alcohol intake (still intoxicated) is contributory, not the primary cause",
+      "Post-convulsive lactic acidosis resolves spontaneously and does not require bicarbonate"
     ],
-    "red_herrings": [],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": [
+      {
+        "data_point": "BAL 0.18 g/dL elevated",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests alcohol withdrawal as primary cause",
+        "correct_interpretation": "Patient is still intoxicated (not withdrawing); alcohol is contributory but subtherapeutic VPA on known JME is the dominant cause"
+      },
+      {
+        "data_point": "Lactate 8.4 mmol/L",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests sepsis or shock requiring bicarbonate",
+        "correct_interpretation": "Post-convulsive lactic acidosis is expected after generalized SE and resolves spontaneously with seizure control"
+      }
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -615,6 +729,14 @@
       "advanced_imaging": "normal",
       "specialized_test": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "8 required tools; classic JME breakthrough SE; key teaching is AED selection (avoid sodium-channel blockers) and recognizing post-convulsive lactic acidosis; 2 grounded red herrings.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

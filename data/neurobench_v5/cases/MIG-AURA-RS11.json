@@ -1,7 +1,7 @@
 {
   "case_id": "MIG-AURA-RS11",
   "condition": "migraine_with_aura",
-  "difficulty": "straightforward",
+  "difficulty": "moderate",
   "encounter_type": "outpatient",
   "patient": {
     "age": 39,
@@ -95,108 +95,131 @@
     "extremities": "No edema"
   },
   "ground_truth": {
-    "primary_diagnosis": "Sporadic hemiplegic migraine (G43.1) — two qualifying episodes with gradual motor and sensory aura followed by headache; all secondary causes excluded",
-    "primary_diagnosis_icd": "G43.1",
+    "primary_diagnosis": "Sporadic hemiplegic migraine (ICHD-3 1.2.3) — two qualifying episodes with gradual motor and sensory aura followed by headache; all secondary causes excluded",
+    "icd_code": "G43.109",
     "differential": [
       {
-        "diagnosis": "Transient ischemic attack",
+        "diagnosis": "Cardioembolic / large-artery TIA",
+        "likelihood": "moderate",
+        "key_features": "Motor aura always requires TIA exclusion; normal MRI/MRA excludes acute infarction and large-vessel disease",
+        "icd_code": "G45.9"
+      },
+      {
+        "diagnosis": "Familial hemiplegic migraine (CACNA1A / ATP1A2 / SCN1A)",
         "likelihood": "low",
-        "key_features": "Normal DWI on MRI; normal MRA (no carotid disease, no dissection); no AF on Holter; gradual progression over 20-25 minutes is characteristic of CSD, not embolic TIA; age 39; no vascular risk factors except borderline TG; prior migraine history"
+        "key_features": "No family history; sporadic form more likely",
+        "icd_code": null
       },
       {
-        "diagnosis": "Epilepsy with Todd's paralysis",
-        "likelihood": "very_low",
-        "key_features": "Brief loss of consciousness at second episode could suggest seizure with post-ictal weakness; however normal EEG with no hemispheric dysfunction; gradual onset over 20+ minutes inconsistent with seizure; followed by headache not post-ictal drowsiness"
+        "diagnosis": "Cervical artery dissection",
+        "likelihood": "low",
+        "key_features": "No neck pain or trauma; MRA shows no dissection",
+        "icd_code": "I77.71"
       },
       {
-        "diagnosis": "MELAS (mitochondrial disease)",
+        "diagnosis": "Focal motor seizure",
         "likelihood": "very_low",
-        "key_features": "Episodic neurological deficits; however normal serum and CSF lactate; normal pyruvate ratio; no mitochondrial DNA mutation; no maternal family history; no hearing loss or short stature; normal mitochondrial workup"
+        "key_features": "Aura duration too long for seizure propagation",
+        "icd_code": "G40.109"
+      },
+      {
+        "diagnosis": "MELAS / mitochondrial disease",
+        "likelihood": "very_low",
+        "key_features": "No phenotypic stigmata; normal lactate",
+        "icd_code": null
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI with DWI and MRA — exclude acute infarction and carotid dissection",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Normal DWI; normal MRA; no dissection or infarction",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
         "category": "required",
         "tool_parameters": {
-          "contrast": true,
-          "sequences": [
-            "DWI",
-            "FLAIR",
-            "T1+Gd",
-            "MRA"
-          ]
-        }
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "EEG — exclude epilepsy with Todd's paralysis (brief loss of consciousness)",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Normal EEG; no epileptiform activity; no hemispheric dysfunction",
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "TRIPTANS AND ERGOTAMINES CONTRAINDICATED in hemiplegic migraine — use NSAIDs, antiemetics, or gepants/lasmiditan",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "context": "hemiplegic_migraine_triptan_contraindication"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 3,
-        "action": "Labs including serum lactate and mitochondrial workup — MELAS exclusion given episodic neurological episodes",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Normal lactate; normal pyruvate; no mitochondrial mutation; MELAS excluded",
+        "action": "Brain MRI with MRA to exclude structural / vascular cause",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Normal MRI/MRA",
         "category": "required",
         "tool_parameters": {
-          "lab_type": "headache_workup_with_lactate"
-        }
-      },
-      {
-        "step": 4,
-        "action": "Diagnose sporadic hemiplegic migraine — ICHD-3 criteria met with 2 qualifying episodes",
-        "tool_name": null,
-        "expected_finding": "Gradual motor aura + headache x2 + no family history + normal workup = sporadic hemiplegic migraine",
-        "category": "required",
-        "tool_parameters": {}
-      },
-      {
-        "step": 5,
-        "action": "Counsel on avoiding triptans during motor aura; continue lomerizine; add topiramate if breakthrough episodes",
-        "tool_name": null,
-        "expected_finding": "Triptans cautioned in HM; lomerizine appropriate; topiramate level A evidence for prevention",
-        "category": "required",
-        "tool_parameters": {}
+          "contrast": false,
+          "sequences": [
+            "DWI",
+            "FLAIR",
+            "T2",
+            "SWI",
+            "MRA"
+          ]
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis — neither present here",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Routine transthoracic / bubble echocardiogram (PFO screening) is NOT indicated in migraine with aura; PFO-migraine association is controversial and PFO closure does not reduce migraine [Charles_2017]",
+        "citation": "[Charles_2017]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "Brain MRI with DWI to exclude acute infarction — TIA/stroke is the primary differential given acute hemiplegia",
-      "EEG to exclude epilepsy with Todd's paralysis — brief loss of consciousness at second episode",
-      "Serum and CSF lactate to exclude MELAS — episodic neurological episodes with headache",
-      "Gradual onset over 20-25 minutes is the KEY feature distinguishing CSD (sporadic hemiplegic migraine) from embolic TIA (sudden maximal onset)",
-      "Avoid triptans during motor aura episodes"
+      "Brain MRI/MRA required at first hemiplegic migraine presentation",
+      "Avoid triptans and ergotamines",
+      "Use NSAIDs, antiemetics, gepants/lasmiditan for acute therapy",
+      "Consider preventive therapy if recurrent episodes (topiramate, verapamil) [Holland_2012]"
     ],
     "contraindicated_actions": [
-      "Do not prescribe triptans during motor aura episodes (cautioned in hemiplegic migraine)",
-      "Do not diagnose TIA without DWI restriction — normal DWI is reassuring; gradual onset argues against TIA",
-      "Do not close PFO without confirmed stroke — no PFO found on this workup"
+      "Do not prescribe triptans or ergotamines in hemiplegic migraine",
+      "Do not co-administer ergotamines with triptans"
     ],
     "key_reasoning_points": [
-      "Gradual progression of motor weakness over 20-25 minutes = cortical spreading depression propagation rate (3-5 mm/min) — characteristic of hemiplegic migraine aura, not embolic TIA",
-      "ICHD-3 sporadic hemiplegic migraine requires ≥2 qualifying motor aura attacks and no first/second degree relative with identical attacks — criteria met",
-      "The second episode's transient loss of consciousness can occur in severe hemiplegic migraine — not required to change diagnosis to epilepsy without EEG evidence",
-      "MELAS shares clinical features (episodic neurological deficits, headache) but is distinguished by elevated lactate, mitochondrial DNA mutation, and maternal inheritance — all normal/negative here"
+      "Two qualifying episodes meet ICHD-3 criteria when motor aura is fully reversible",
+      "TIA exclusion via MRI/MRA is mandatory at first presentation of motor aura",
+      "Triptans are contraindicated in hemiplegic migraine"
     ],
     "red_herrings": [
       {
-        "data_point": "Transient loss of consciousness at second episode — suggesting seizure or cardiac arrhythmia",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Brief loss of consciousness is not a classic hemiplegic migraine feature — raises concern for seizure (Todd's paralysis) or cardiogenic syncope",
-        "correct_interpretation": "Loss of consciousness can occur in severe hemiplegic migraine (impaired consciousness is a recognised aura feature); normal EEG excludes seizure; normal Holter excludes arrhythmia; gradual onset remains the key differentiating feature",
-        "field_path": ""
+        "data_point": "Right-sided limb weakness in a 39-year-old man",
+        "location": "patient.chief_complaint",
+        "field_path": "patient.chief_complaint",
+        "intended_effect": "May anchor on TIA",
+        "correct_interpretation": "Gradual motor + sensory aura over minutes with subsequent migrainous headache is hemiplegic migraine after TIA is excluded by normal MRI/MRA"
       }
-    ],
-    "icd_code": "G43.1",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -218,7 +241,17 @@
       "ct": "normal",
       "echo": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Moderate: hemiplegic migraine requires MRI/MRA and triptan contraindication; presentation is otherwise classic after TIA exclusion",
+    "case_body_concerns": [
+      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide §1): ['analyze_eeg', 'interpret_labs', 'order_advanced_imaging', 'order_cardiac_monitoring']"
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "initial_tool_outputs": {
     "mri": {

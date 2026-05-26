@@ -1,7 +1,7 @@
 {
   "case_id": "PD-RS03",
   "condition": "parkinsons",
-  "difficulty": "straightforward",
+  "difficulty": "moderate",
   "encounter_type": "outpatient",
   "patient": {
     "patient_id": "NB-PD-RS03",
@@ -698,149 +698,201 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Parkinson's disease",
+    "primary_diagnosis": "Parkinson's disease (idiopathic)",
     "icd_code": "G20",
     "differential": [
       {
-        "diagnosis": "Multiple system atrophy (MSA)",
-        "likelihood": "low",
-        "key_features": "Orthostatic hypotension and urinary symptoms raise this consideration, but the degree of autonomic dysfunction is mild relative to motor symptoms, no cerebellar signs, no putaminal or pontine atrophy on MRI, and positive levodopa response argues against MSA"
-      },
-      {
-        "diagnosis": "Progressive supranuclear palsy (PSP)",
-        "likelihood": "low",
-        "key_features": "Early falls and postural instability could suggest PSP, but patient has no vertical gaze palsy, no midbrain atrophy (hummingbird sign), tremor is prominent (unusual in PSP), and responds to levodopa"
-      },
-      {
         "diagnosis": "Vascular parkinsonism",
+        "likelihood": "moderate",
+        "key_features": "Upper-limb predominant asymmetric onset, no significant vascular MRI burden"
+      },
+      {
+        "diagnosis": "Essential tremor",
         "likelihood": "low",
-        "key_features": "Patient has vascular risk factors (hypertension, diabetes), but MRI shows only nonspecific white matter changes without strategic basal ganglia infarcts. Clinical features (asymmetric tremor, cogwheel rigidity) are more consistent with PD"
+        "key_features": "Rest tremor with re-emergent character and unilateral bradykinesia argue against ET"
       },
       {
         "diagnosis": "Drug-induced parkinsonism",
-        "likelihood": "very_low",
-        "key_features": "Fluoxetine can rarely cause extrapyramidal symptoms, but presentation is asymmetric with resting tremor and progressive course, inconsistent with drug-induced parkinsonism which is typically symmetric"
+        "likelihood": "low",
+        "key_features": "No dopamine receptor antagonists by history"
       },
       {
-        "diagnosis": "Normal pressure hydrocephalus",
+        "diagnosis": "Multiple system atrophy",
         "likelihood": "very_low",
-        "key_features": "Patient has gait difficulty and urinary symptoms, but MRI shows no ventriculomegaly out of proportion to sulcal atrophy. Tremor and cogwheel rigidity are not features of NPH"
+        "key_features": "No early severe dysautonomia or cerebellar features"
+      },
+      {
+        "diagnosis": "Dementia with Lewy bodies",
+        "likelihood": "very_low",
+        "key_features": "No early cognitive fluctuations, no visual hallucinations"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Order brain MRI to exclude structural causes of parkinsonism (vascular lesions, NPH, tumor, MSA/PSP features)",
+        "action": "Obtain brain MRI with SWI",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Nonspecific white matter changes without structural lesion, no cerebellar/pontine/midbrain atrophy, no ventriculomegaly",
+        "expected_finding": "No vascular, structural, or NPH features",
         "category": "required",
         "tool_parameters": {
-          "protocol": "tumor",
-          "contrast": false
-        }
+          "protocol": "standard",
+          "contrast": false,
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "SWI"
+          ]
+        },
+        "citation": "[Schwarz_2014]",
+        "guideline_source": "Schwarz_2014"
       },
       {
         "step": 2,
-        "action": "Order comprehensive laboratory panel including CBC, BMP, thyroid function, B12, RPR, and ceruloplasmin to exclude metabolic and toxic causes",
+        "action": "Order baseline labs (CBC, CMP, TSH, B12, RPR)",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal results except for known diabetes. Rules out hypothyroidism, B12 deficiency, Wilson disease, neurosyphilis",
+        "expected_finding": "Exclude reversible mimics",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
-            "thyroid",
+            "CMP",
+            "TSH",
             "B12",
             "RPR"
           ]
-        }
+        },
+        "citation": "[Postuma_2015]",
+        "guideline_source": "Postuma_2015"
       },
       {
         "step": 3,
-        "action": "Order DaTscan to confirm presynaptic dopaminergic deficit",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Reduced striatal dopamine transporter uptake, asymmetric, consistent with neurodegenerative parkinsonism",
+        "action": "Check drug interactions before starting dopaminergic therapy",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "No dopamine receptor antagonists in regimen",
         "category": "required",
         "tool_parameters": {
-          "imaging_type": "DaTscan"
-        }
+          "proposed_medication": "carbidopa-levodopa"
+        },
+        "citation": "[Postuma_2015]",
+        "guideline_source": "Postuma_2015"
       },
       {
         "step": 4,
-        "action": "Perform levodopa challenge test to assess dopaminergic responsiveness",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Greater than 30% improvement in UPDRS motor score, supporting PD diagnosis",
+        "action": "Search medical literature for MDS criteria and initial therapy",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "MDS 2015 criteria; carbidopa-levodopa first-line",
         "category": "required",
         "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP"
-          ]
-        }
+          "query": "Parkinson disease initial treatment carbidopa levodopa"
+        },
+        "citation": "[Postuma_2015]",
+        "guideline_source": "Postuma_2015"
       },
       {
         "step": 5,
-        "action": "Order ECG to evaluate for cardiac causes of near-syncope and falls",
-        "tool_name": "analyze_ecg",
-        "expected_finding": "Normal sinus rhythm, no arrhythmia",
-        "category": "recommended"
+        "action": "Order DaTscan only when clinical uncertainty exists",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Asymmetric reduced striatal DAT binding",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "citation": "[Marshall_2009]",
+        "guideline_source": "Marshall_2009"
       },
       {
         "step": 6,
-        "action": "Check drug interactions before initiating levodopa therapy given polypharmacy",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "No absolute contraindications; monitor for worsening orthostatic hypotension with metoprolol; monitor psychiatric effects with fluoxetine",
-        "category": "recommended"
+        "action": "Order neuropsych battery as baseline",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline cognitive screen for PD-MCI",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Tolosa_2021]",
+        "guideline_source": "Tolosa_2021"
       },
       {
         "step": 7,
-        "action": "Consider autonomic testing to characterize severity of orthostatic hypotension and differentiate PD from MSA",
+        "action": "Order polysomnography only if dream enactment is reported",
         "tool_name": "order_specialized_test",
-        "expected_finding": "Mild autonomic dysfunction consistent with PD rather than severe dysautonomia of MSA",
-        "category": "recommended",
+        "expected_finding": "REM without atonia would confirm RBD",
+        "category": "optional",
         "tool_parameters": {
-          "test_type": "tilt_table"
-        }
+          "test_type": "polysomnography"
+        },
+        "citation": "[Postuma_2019]",
+        "guideline_source": "Postuma_2019"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG has no role in diagnosing typical PD",
+        "citation": "[Postuma_2015]"
       },
       {
-        "step": 8,
-        "action": "Order neuropsychological testing to characterize cognitive impairment pattern",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Frontal-subcortical pattern consistent with PD-MCI, not cortical Alzheimer's pattern",
-        "category": "recommended",
-        "tool_parameters": {
-          "test_type": "neuropsychological_battery"
-        }
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "CSF is not part of routine PD workup",
+        "citation": "[Postuma_2015]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "MRI is the appropriate structural study; CT adds nothing",
+        "citation": "[Schwarz_2014]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No cardiac indication",
+        "citation": "[Postuma_2015]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "No syncope or arrhythmia concern",
+        "citation": "[Postuma_2015]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Baseline metabolic profile and medication review precede dopaminergic therapy initiation",
+        "citation": "[Postuma_2015]",
+        "severity": "soft"
+      },
+      {
+        "before": "analyze_brain_mri",
+        "after": "order_advanced_imaging",
+        "reason": "Exclude structural mimics on MRI before committing to DaTscan and a PD diagnosis",
+        "citation": "[Schwarz_2014]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Obtain brain MRI to exclude structural causes of parkinsonism",
-      "Order laboratory tests to rule out metabolic causes (thyroid, B12, Wilson disease)",
-      "Assess levodopa responsiveness to differentiate PD from atypical parkinsonism",
-      "Evaluate orthostatic hypotension and consider contribution of beta-blocker before attributing it to autonomic failure",
-      "Screen for cognitive impairment and characterize its pattern",
-      "Check for drug interactions before starting dopaminergic therapy"
+      "Apply MDS 2015 clinical diagnostic criteria for Parkinson's disease (bradykinesia plus rest tremor or rigidity, supportive features, no absolute exclusion criteria)",
+      "Document temporal sequence of motor and non-motor (REM sleep behavior disorder, hyposmia, constipation, orthostatic intolerance) features",
+      "Review the full medication list for dopamine receptor antagonists (metoclopramide, prochlorperazine, antipsychotics) and any other agents that can mimic or worsen parkinsonism",
+      "Confirm clinically established PD per MDS 2015",
+      "Initiate carbidopa-levodopa or dopamine agonist first-line",
+      "Refer for PT/OT/SLP"
     ],
     "contraindicated_actions": [
-      "Do not prescribe dopamine agonists as first-line monotherapy in a 69-year-old with cognitive impairment (risk of hallucinations and impulse control disorders)",
-      "Do not prescribe anticholinergics (trihexyphenidyl, benztropine) given patient's age and cognitive impairment",
-      "Do not start non-selective MAO inhibitors with current SSRI (fluoxetine) due to serotonin syndrome risk",
-      "Do not discontinue metoprolol abruptly without taper",
-      "Do not diagnose MSA based solely on orthostatic hypotension without considering the contribution of beta-blocker therapy"
+      "Do not prescribe metoclopramide, prochlorperazine, or promethazine for nausea in a patient with parkinsonism",
+      "Do not prescribe typical antipsychotics (haloperidol, fluphenazine) or most atypical antipsychotics (risperidone, olanzapine, aripiprazole) — restrict pharmacotherapy of psychosis to quetiapine, clozapine, or pimavanserin",
+      "Do not prescribe centrally acting anticholinergics (trihexyphenidyl, benztropine) in older adults or in any patient with cognitive impairment"
     ],
     "key_reasoning_points": [
-      "Asymmetric resting tremor, bradykinesia, and cogwheel rigidity form the cardinal motor triad of Parkinson's disease",
-      "Normal brain MRI without cerebellar, pontine, or midbrain atrophy helps exclude MSA and PSP",
-      "Orthostatic hypotension is common in PD (30-58% prevalence) and should not automatically trigger an MSA diagnosis, especially when a patient is on a beta-blocker (metoprolol) that can exacerbate it",
-      "Positive levodopa challenge (>30% UPDRS improvement) strongly supports PD over atypical parkinsonism",
-      "MoCA score of 22 with frontal-subcortical pattern suggests PD-MCI rather than Alzheimer's disease",
-      "Pisa syndrome (lateral trunk flexion) can occur in PD, not exclusively in atypical parkinsonism",
-      "DaTscan confirms presynaptic dopaminergic deficit but does not differentiate PD from MSA or PSP; clinical features and levodopa response are needed for this distinction",
-      "Wide-based gait and early falls warrant consideration of PSP, but absence of vertical gaze palsy and presence of prominent tremor argue against it"
+      "Asymmetric rest tremor, bradykinesia, rigidity, and micrographia satisfy MDS 2015 clinically established PD",
+      "No absolute exclusion features and no atypical red flags",
+      "Rapid functional decline with falls in 4 months is atypical — atypical parkinsonism (PSP, MSA) must be actively excluded; reassess clinically if levodopa response is poor"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
     "red_herrings": []
   },
   "metadata": {
@@ -857,6 +909,14 @@
       "ct": "normal",
       "echo": "normal",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (condition-expert:PD)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:PD",
+    "difficulty_rationale": "Rapid 4-month decline requires active exclusion of atypical parkinsonism",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

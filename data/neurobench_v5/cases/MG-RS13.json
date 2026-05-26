@@ -1,7 +1,7 @@
 {
   "case_id": "MG-RS13",
   "condition": "myasthenia_gravis",
-  "difficulty": "straightforward",
+  "difficulty": "moderate",
   "encounter_type": "inpatient",
   "patient": {
     "age": 47,
@@ -108,122 +108,228 @@
     "extremities": "No rash; no edema"
   },
   "ground_truth": {
-    "primary_diagnosis": "AChR antibody–positive generalized myasthenia gravis, initially misdiagnosed as Brown syndrome (G70.01)",
-    "primary_diagnosis_icd": "G70.01",
+    "primary_diagnosis": "AChR antibody-positive generalized myasthenia gravis, initially misdiagnosed as acquired Brown syndrome",
+    "icd_code": "G70.01",
     "differential": [
       {
-        "diagnosis": "Acquired Brown syndrome",
+        "diagnosis": "True acquired Brown syndrome (superior oblique tendon disorder)",
+        "likelihood": "low",
+        "key_features": "MRI here without orbital pathology; fatigable diurnal pattern not explained by mechanical tendon restriction.",
+        "icd_code": "H50.61"
+      },
+      {
+        "diagnosis": "Thyroid eye disease (restrictive ophthalmopathy)",
+        "likelihood": "low",
+        "key_features": "Hypothyroidism on levothyroxine; no proptosis; pattern is fatigable.",
+        "icd_code": "H06.2"
+      },
+      {
+        "diagnosis": "Multiple sclerosis (INO)",
+        "likelihood": "low",
+        "key_features": "MRI without demyelination; pattern incompatible.",
+        "icd_code": "G35"
+      },
+      {
+        "diagnosis": "Lambert-Eaton myasthenic syndrome",
         "likelihood": "very_low",
-        "key_features": "Three consecutive normal orbital MRI studies; bilateral presentation (atypical for Brown syndrome); ptosis and bulbar symptoms developed — not explained by SO tendon pathology"
+        "key_features": "No baseline CMAP reduction; AChR positive.",
+        "icd_code": "G73.1"
       },
       {
-        "diagnosis": "Thyroid ophthalmopathy",
-        "likelihood": "low",
-        "key_features": "Normal TSH on levothyroxine; no proptosis; no lid retraction (ptosis is present — opposite sign); normal orbital muscles on MRI"
-      },
-      {
-        "diagnosis": "SLE with ocular manifestations",
-        "likelihood": "low",
-        "key_features": "ANA 1:160 is low-titer; anti-ds-DNA negative; no SLE criteria met; no complement consumption"
+        "diagnosis": "Mitochondrial ophthalmoplegia (CPEO)",
+        "likelihood": "very_low",
+        "key_features": "Fluctuating pattern incompatible with CPEO.",
+        "icd_code": "H49.4"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Reassess ice pack test in setting of progressive bilateral ocular motor signs not explained by structural pathology",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
-        "tool_parameters": {}
+        "action": "Order serologies: anti-AChR (binding, blocking, modulating), anti-MuSK, anti-LRP4, and TSH/free-T4 for thyroid autoimmunity",
+        "tool_name": "interpret_labs",
+        "expected_finding": "AChR antibody positive; TSH evaluates for comorbid thyroid disease",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "anti_AChR",
+            "anti_MuSK",
+            "anti_LRP4",
+            "TSH"
+          ]
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 2,
-        "action": "MG antibody panel — AChR binding, blocking, modulating",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Order repetitive nerve stimulation (RNS) at 2-3 Hz across proximal and facial muscles",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Decrement >10% in symptomatic muscles supports postsynaptic NMJ disorder",
+        "category": "required",
         "tool_parameters": {
-          "lab_type": "mg_antibody_panel"
-        }
+          "test_type": "repetitive_nerve_stimulation"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 3,
-        "action": "RNS confirmation of NMJ dysfunction",
-        "tool_name": null,
-        "expected_finding": "",
+        "action": "Order single-fiber EMG (gold standard >95% sensitivity)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Increased jitter and blocking on extensor digitorum communis or orbicularis oculi confirms NMJ transmission failure",
         "category": "recommended",
         "tool_parameters": {
-          "test_type": "repetitive_nerve_stimulation",
-          "rate": "3Hz"
-        }
+          "test_type": "emg_single_fiber"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 4,
-        "action": "CT chest for thymoma screening",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Order CT chest with contrast for thymoma screening",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No thymoma; thymic involution appropriate for age",
+        "category": "required",
         "tool_parameters": {
           "region": "chest",
-          "contrast": true
-        }
+          "contrast": true,
+          "indication": "thymoma_screening"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 5,
-        "action": "Add pyridostigmine; transition from methotrexate to azathioprine; plan MGTX thymectomy",
-        "tool_name": null,
-        "expected_finding": "",
+        "action": "Review MGFA classification and current treatment guidance (pyridostigmine, prednisone, steroid-sparing, IVIG/PLEX, thymectomy)",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "MGFA classification stages disease severity; thymectomy benefits AChR+ generalized MG (MGTX); IVIG/PLEX for crisis",
+        "category": "required",
+        "tool_parameters": {
+          "query": "myasthenia gravis MGFA classification treatment thymectomy"
+        },
+        "citation": "[Sanders_2016]",
+        "guideline_source": "Sanders_2016"
+      },
+      {
+        "step": 6,
+        "action": "Check drug interactions for MG-exacerbating agents (aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, neuromuscular blockers, procainamide)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Flag aminoglycosides, fluoroquinolones, IV magnesium, telithromycin, NMBs as contraindicated or use-with-caution in MG",
+        "category": "required",
+        "tool_parameters": {
+          "proposed": "pyridostigmine_start",
+          "screen_for": [
+            "aminoglycosides",
+            "fluoroquinolones",
+            "telithromycin",
+            "magnesium_IV",
+            "neuromuscular_blockers"
+          ]
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
+      },
+      {
+        "step": 7,
+        "action": "Bedside respiratory function testing (FVC, MIP/MEP, NIF) — repeat q4h in crisis",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline FVC/NIF to assess crisis risk in patients with bulbar or limb involvement",
         "category": "recommended",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[Sanders_2016]",
+        "guideline_source": "Sanders_2016"
+      },
+      {
+        "step": 8,
+        "action": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Improvement of ptosis after 2 minutes of cooling supports MG",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "ice_pack_test"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "MG is a peripheral neuromuscular junction disorder; EEG has no diagnostic role.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No CSF role in MG; LP risks complications without diagnostic yield.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "Advanced imaging (PET/MR spectroscopy/perfusion) is not indicated for MG diagnosis or staging; CT chest covers thymoma screening.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated for MG unless a comorbid cardiac question exists.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring is not indicated for MG unless arrhythmia or autonomic disease is independently suspected.",
+        "citation": "[Wolfe_2016]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "order_specialized_test",
+        "reason": "Order AChR/MuSK/LRP4 serologies first; reserve single-fiber EMG for seronegative or RNS-non-diagnostic cases (resource stewardship).",
+        "citation": "[Wolfe_2016]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Recognize that bilateral adult-onset Brown syndrome not responding to treatment warrants MG workup",
-      "Positive ice pack test is key bedside test — >97% specific for MG ptosis",
-      "AChR antibody is diagnostic; negative orbital MRI x3 effectively excludes structural cause",
-      "Identify current medications (methotrexate, HCQ) were prescribed for incorrect diagnosis",
-      "Refer for thymectomy evaluation — patient meets MGTX criteria"
+      "Confirm AChR antibody positivity — overturns Brown syndrome label",
+      "RNS and SFEMG to confirm NMJ pathology",
+      "CT chest for thymoma (here negative)",
+      "Initiate pyridostigmine; coordinate with ophthalmology"
     ],
     "contraindicated_actions": [
-      "Do not continue immunosuppression for Brown syndrome when MG is diagnosed",
-      "Do not prescribe fluoroquinolones or aminoglycosides",
-      "Do not miss the bulbar symptoms (jaw fatigue, nasal dysarthria) — these confirm generalized MG"
+      "Do NOT prescribe aminoglycoside antibiotics (gentamicin, tobramycin, amikacin) — risk of precipitating myasthenic crisis",
+      "Do NOT prescribe fluoroquinolones (ciprofloxacin, levofloxacin, moxifloxacin) — FDA black-box warning for MG exacerbation",
+      "Do NOT prescribe telithromycin — contraindicated in MG",
+      "Do NOT administer IV magnesium for MG patients (e.g., for hypomagnesaemia, eclampsia prophylaxis) without alternative — blocks NMJ transmission",
+      "Do NOT use non-depolarizing neuromuscular blockers without anaesthesia/MG-aware dosing protocols",
+      "Do NOT initiate high-dose corticosteroids as sole outpatient therapy without hospitalization or pyridostigmine bridge — risk of paradoxical worsening at days 5-10",
+      "Do NOT attribute fluctuating fatigable weakness to a functional disorder before completing serology + RNS + single-fiber EMG workup"
     ],
     "key_reasoning_points": [
-      "The diagnostic evolution: Brown syndrome is a reasonable diagnosis initially, but lack of MRI structural correlate and bilateral progression should prompt NMJ evaluation",
-      "Positive ice pack test and new ptosis are the pivotal clinical findings that change the diagnosis",
-      "Cogan lid twitch is highly specific for MG ptosis (98% specific)",
-      "AChR antibody 4.8 nmol/L with multi-muscle RNS decrement definitively confirms generalized MG",
-      "Polyautoimmune background (Hashimoto's, PCOS) increases risk of MG — should lower diagnostic threshold",
-      "Normal orbital MRI ×3 definitively excludes SO tendon pathology (Brown syndrome) and orbital myositis"
+      "Fluctuating, fatigable weakness with diurnal pattern (worse evening) is the clinical hallmark of MG — fixed weakness suggests an alternative diagnosis.",
+      "Ocular involvement (ptosis, diplopia) is asymmetric and fatigable in MG; thyroid eye disease causes restrictive (not fatigable) ophthalmoplegia.",
+      "Single-fiber EMG (sensitivity >95%) is the most sensitive electrodiagnostic test — order when RNS is non-diagnostic or serology is negative.",
+      "All confirmed MG cases require CT chest for thymoma — present in roughly 10-15% of generalized MG; thymectomy (MGTX trial) improves long-term outcomes in non-thymoma AChR+ MG as well.",
+      "Aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, and neuromuscular blockers can precipitate myasthenic crisis and must be screened against any new prescription.",
+      "Atypical strabismus patterns that fluctuate should always raise MG suspicion — vertical diplopia in MG is recognized but under-diagnosed."
     ],
     "red_herrings": [
       {
-        "data_point": "Prior Brown syndrome diagnosis with partial steroid response",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Partial response to steroids and prior ophthalmology diagnosis creates anchoring bias toward connective tissue-related Brown syndrome",
-        "correct_interpretation": "Steroids also treat MG; partial steroid response is consistent with MG; bilateral onset in adults should trigger NMJ testing",
-        "field_path": ""
-      },
-      {
-        "data_point": "ANA 1:160 with polyautoimmune background suggesting SLE",
-        "location": "initial_tool_outputs.labs.interpretation",
-        "intended_effect": "Positive ANA + eye symptoms + joint involvement pattern could suggest SLE with ocular manifestations",
-        "correct_interpretation": "Anti-ds-DNA negative, C3/C4 normal, SLE criteria not met; ANA is non-specific in polyautoimmune patients",
-        "field_path": ""
-      },
-      {
-        "data_point": "Hypothyroidism and PCOS suggesting thyroid-related ophthalmopathy",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Thyroid disease is strongly associated with Graves' ophthalmopathy",
-        "correct_interpretation": "Normal TSH on levothyroxine; ptosis (not lid retraction); no proptosis; no EOM enlargement on MRI — Graves' ophthalmopathy excluded",
-        "field_path": ""
+        "data_point": "Prior 'acquired Brown syndrome' diagnosis",
+        "location": "past medical history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Accept the mechanical diagnosis and avoid MG workup.",
+        "correct_interpretation": "Fluctuating diurnal vertical diplopia with AChR positivity is MG; the Brown syndrome label is incorrect."
       }
-    ],
-    "icd_code": "G70.01",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -256,7 +362,17 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MG",
+    "difficulty_rationale": "5 required tools, 1 red herrings, label-revision case with anchoring red herring",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": [
+      "emg_ncs_useless_via_param_conflation: pack lists order_specialized_test:emg_ncs as USELESS, but coherence validator treats tool_name overlap as a contradiction regardless of tool_parameters; cannot encode without removing required RNS/SFEMG entries. Suggest extending validator to compare tool_name + tool_parameters or fleet-wide pattern."
+    ]
   },
   "initial_tool_outputs": {
     "mri": {

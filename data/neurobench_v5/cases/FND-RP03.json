@@ -894,217 +894,206 @@
   },
   "ground_truth": {
     "primary_diagnosis": "Functional neurological disorder - psychogenic non-epileptic seizures (PNES) with dissociative episodes, in the context of eosinophilic vasculitis (EGPA), bereavement, and health anxiety",
-    "icd_code": "F44.5",
+    "icd_code": "F44.7",
     "differential": [
       {
-        "diagnosis": "Cerebral vasculitis secondary to EGPA",
-        "likelihood": "low",
-        "key_features": "Would expect MRI abnormalities (infarcts, hemorrhage, enhancement), CSF eosinophilia or pleocytosis, vessel wall thickening on VW-MRI, and if seizures were vasculitis-related they would have EEG correlates."
-      },
-      {
         "diagnosis": "Epileptic seizures",
+        "likelihood": "moderate",
+        "key_features": "Witnessed convulsive-appearing events; ictal video-EEG showing absence of electrographic correlate during a captured habitual event is the key differentiator.",
+        "icd_code": "G40.909"
+      },
+      {
+        "diagnosis": "Structural CNS lesion (tumor, demyelination, stroke)",
         "likelihood": "low",
-        "key_features": "Would expect EEG correlate during bilateral motor events, stereotyped semiology, post-ictal confusion, elevated post-event prolactin, and response to AEDs."
+        "key_features": "Focal complaints warrant imaging; normal brain MRI without lesion, mass, or enhancement effectively excludes a structural cause for the presenting deficit.",
+        "icd_code": null
       },
       {
-        "diagnosis": "Autoimmune encephalitis (NMDAR or LGI1)",
+        "diagnosis": "Autoimmune or paraneoplastic encephalitis",
         "likelihood": "very_low",
-        "key_features": "Would expect positive autoimmune antibodies, CSF pleocytosis, and MRI changes (mesial temporal signal abnormality)."
+        "key_features": "Episodic neurological symptoms can occur in autoimmune encephalitis; normal MRI, normal EEG background, and (when obtained) negative antibody panel render this very unlikely.",
+        "icd_code": "G04.81"
       },
       {
-        "diagnosis": "Progressive encephalomyelitis with rigidity and myoclonus (PERM) or stiff-person spectrum disorder",
+        "diagnosis": "Malingering or factitious disorder",
         "likelihood": "very_low",
-        "key_features": "Would expect very high anti-GAD65 titers (>1000 IU/mL), continuous motor unit activity on EMG, and progressive course with axial rigidity."
-      },
-      {
-        "diagnosis": "Syncope or cardiac arrhythmia",
-        "likelihood": "very_low",
-        "key_features": "Would expect ECG abnormalities, hemodynamic changes during events, brief loss of consciousness."
+        "key_features": "FND is involuntary; preserved effort on symptom-validity testing and absence of clear secondary gain argue against feigning. The rule-in signs do not distinguish FND from malingering by themselves, but the clinical context does not support a feigning explanation.",
+        "icd_code": "F68.10"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain comprehensive history including detailed semiology of episodes (prodrome, motor features, awareness, post-event state), temporal relationship to vasculitis diagnosis and bereavement, response to levetiracetam and diazepam, and psychosocial context",
+        "action": "Elicit positive rule-in signs on bedside examination (Hoover sign for functional leg weakness, tremor entrainment / distractibility for functional tremor, give-way weakness, non-dermatomal sensory loss with midline splitting). Diagnosis of FND is made by these positive signs, not by exclusion alone.",
         "tool_name": null,
-        "expected_finding": "Episodes with retained awareness, variable non-stereotyped movements, no loss of consciousness, no tongue biting, no incontinence, refractory to AEDs, occurring preferentially when observed — all raising suspicion for non-epileptic events",
-        "category": "required"
+        "expected_finding": "At least one reliable positive functional sign documented",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Espay_2018]",
+        "guideline_source": "FND criteria pack — positive diagnosis"
       },
       {
         "step": 2,
-        "action": "Perform detailed neurological examination looking for positive signs of functional neurological disorder",
-        "tool_name": null,
-        "expected_finding": "Positive Hoover sign bilaterally, inconsistent give-way weakness, non-anatomical (tubular) sensory loss in left arm, discrepancy between observed gait and performance on formal testing, positive hand-drop test during unresponsive episode — these are positive diagnostic signs of FND",
-        "category": "required"
+        "action": "Order brain MRI with and without contrast to exclude a structural cause of the presenting deficit",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "No structural lesion, mass, demyelination, or stroke",
+        "category": "required",
+        "tool_parameters": {
+          "contrast": true
+        },
+        "citation": "[Espay_2018]",
+        "guideline_source": "FND criteria pack — exclude structural cause"
       },
       {
         "step": 3,
-        "action": "Order routine EEG to assess for interictal epileptiform activity",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Normal interictal EEG with benzodiazepine-related beta enhancement. No epileptiform discharges. No events captured. Provides no evidence for epilepsy but is insufficient alone — prolonged monitoring needed.",
-        "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
-      },
-      {
-        "step": 4,
-        "action": "Order brain MRI with contrast and MR angiography to evaluate for cerebral vasculitis and structural epileptogenic lesion",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "No evidence of cerebral vasculitis — no focal edema, infarcts, hemorrhage, or abnormal enhancement. Periventricular white matter changes are nonspecific (age, hypertension, diabetes). Normal MRA. These findings effectively exclude cerebral vasculitis as the cause of episodes.",
-        "category": "required",
-        "tool_parameters": {
-          "protocol": "tumor",
-          "contrast": true
-        }
-      },
-      {
-        "step": 5,
-        "action": "Order comprehensive laboratory workup including CBC with differential, BMP, hepatic panel, inflammatory markers, thyroid function, HbA1c, and baseline prolactin",
+        "action": "Order basic laboratory workup (CBC, CMP, TSH, vitamin B12) to exclude common reversible mimics",
         "tool_name": "interpret_labs",
-        "expected_finding": "Mild eosinophilia and elevated inflammatory markers reflecting systemic vasculitis (red herrings suggesting possible CNS involvement). Elevated glucose and HbA1c from steroid-exacerbated diabetes. Normal baseline prolactin for future comparison.",
+        "expected_finding": "No metabolic, thyroid, or B12 abnormality that explains symptoms",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
-            "LFT",
-            "thyroid",
-            "HbA1c",
-            "prolactin",
-            "inflammatory_markers"
+            "CMP",
+            "TSH",
+            "B12"
           ]
-        }
+        },
+        "citation": "[Stone_2018]",
+        "guideline_source": "FND criteria pack — exclude reversible causes"
+      },
+      {
+        "step": 4,
+        "action": "Search current literature on FND diagnostic signs and evidence-based treatment (CBT for PNES, specialized physiotherapy for functional motor symptoms)",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirms multidisciplinary CBT + physiotherapy is the evidence-based treatment for FND",
+        "category": "required",
+        "tool_parameters": {
+          "query": "functional neurological disorder diagnosis treatment"
+        },
+        "citation": "[Nielsen_2015]",
+        "guideline_source": "FND criteria pack — treatment evidence"
+      },
+      {
+        "step": 5,
+        "action": "Obtain video-EEG monitoring with intent to capture a habitual event (prolonged inpatient video-EEG is the gold standard for distinguishing PNES from epileptic seizures)",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Captured event with no ictal EEG correlate during clinically apparent seizure-like activity",
+        "category": "recommended",
+        "tool_parameters": {
+          "eeg_type": "video"
+        },
+        "citation": "[ILAE_PNES_2013]",
+        "guideline_source": "ILAE PNES Task Force minimum diagnostic standards"
       },
       {
         "step": 6,
-        "action": "Proceed with prolonged continuous video-EEG monitoring (3-5 days) to capture habitual events and determine whether they have an electrographic correlate",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Seven habitual events captured (four motor, three unresponsive), all without electrographic correlate, diagnostic of PNES and dissociative episodes. Normal post-event prolactin. No interictal epileptiform discharges.",
-        "category": "required",
-        "tool_parameters": {
-          "eeg_type": "video"
-        }
+        "action": "Review current medications for agents that may exacerbate symptoms (e.g., benzodiazepines, dopamine-blocking antipsychotics, AEDs initiated for PNES)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identification of medication contributors that should be tapered or discontinued",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "",
+        "guideline_source": "FND criteria pack — medication review"
       },
       {
         "step": 7,
-        "action": "Obtain CSF analysis to exclude cerebral vasculitis, autoimmune encephalitis, and infectious meningoencephalitis",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Entirely normal CSF with no pleocytosis, no eosinophilia (critical — excludes CNS eosinophilic vasculitis involvement), negative autoimmune encephalitis panel, negative viral PCR panel",
-        "category": "recommended",
-        "tool_parameters": {
-          "special_tests": [
-            "autoimmune_panel"
-          ]
-        }
+        "action": "Communicate the diagnosis transparently using positive language anchored on the rule-in signs; explicitly state the diagnosis is FND, the symptoms are real and involuntary, and there is an evidence-based treatment plan",
+        "tool_name": null,
+        "expected_finding": "Patient understanding and treatment engagement — strong predictor of recovery",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Stone_2018]",
+        "guideline_source": "FND criteria pack — diagnostic communication"
       },
       {
         "step": 8,
-        "action": "Diagnose functional neurological disorder (PNES with dissociative episodes) based on positive clinical signs and video-EEG evidence, not by exclusion",
+        "action": "Refer to specialized FND-informed physiotherapy (for functional motor symptoms) and to CBT / psychological therapy (for PNES and comorbid mood / anxiety)",
         "tool_name": null,
-        "expected_finding": "Diagnosis based on positive features: Hoover sign, give-way weakness, non-anatomical sensory loss, inconsistent gait, hand-drop test, plus video-EEG confirmation of events without electrographic correlate",
-        "category": "required"
-      },
-      {
-        "step": 9,
-        "action": "Communicate diagnosis clearly and empathically, explaining that episodes are real neurological events but not caused by epilepsy or cerebral vasculitis, and that effective treatments exist",
-        "tool_name": null,
-        "expected_finding": "Patient understands that FND is a recognized neurological condition, that his brain imaging and CSF confirm no vasculitis involvement, and that psychological treatment is the evidence-based approach",
-        "category": "required"
-      },
-      {
-        "step": 10,
-        "action": "Discontinue levetiracetam and taper diazepam. Refer for psychotherapy (CBT for PNES, grief counseling) and psychiatric evaluation for depression, anxiety, and prolonged grief disorder",
-        "tool_name": null,
-        "expected_finding": "Cessation of unnecessary AEDs and initiation of appropriate psychological and psychiatric treatment addressing bereavement, health anxiety, and caregiver stress",
-        "category": "required"
+        "expected_finding": "Engagement in evidence-based multidisciplinary care",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Nielsen_2015]",
+        "guideline_source": "Nielsen 2015 — physiotherapy consensus"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography has no role in FND; no structural cardiac question is raised by the presentation.",
+        "citation": "[Stone_2018]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac rhythm monitoring is not indicated; the events are non-syncopal and the rule-in signs point to FND.",
+        "citation": "[Stone_2018]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT adds no information beyond MRI for an FND workup and contributes diagnostic noise plus radiation exposure.",
+        "citation": "[Espay_2018]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "Advanced PET imaging has no indication in FND; standard MRI is the appropriate structural workup.",
+        "citation": "[Espay_2018]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "Perform prolonged video-EEG monitoring to capture habitual events and determine whether they have an electrographic correlate — this is the gold standard for differentiating epileptic seizures from PNES",
-      "Recognize and document positive clinical signs of FND on examination (Hoover sign, inconsistent give-way weakness, non-anatomical sensory loss, gait discrepancy, hand-drop test) — FND should be diagnosed positively, not by exclusion",
-      "Do not be anchored by the eosinophilic vasculitis diagnosis into assuming cerebral vasculitis explains the episodes — CNS involvement in EGPA is rare and would show MRI abnormalities",
-      "Appropriately exclude cerebral vasculitis and autoimmune encephalitis through imaging and CSF analysis before finalizing FND diagnosis, given the autoimmune background",
-      "Communicate the FND diagnosis with empathy, validating that symptoms are real, explaining the mechanism, and providing clear reassurance that brain imaging excludes vasculitis involvement",
-      "Discontinue unnecessary antiepileptic medication (levetiracetam) and taper diazepam",
-      "Address the underlying psychiatric comorbidity (bereavement, health anxiety, depression) that precipitated and maintains the functional symptoms"
+      "Document at least one positive rule-in sign (Hoover sign, tremor entrainment, distractibility, give-way pattern, non-dermatomal sensory loss with midline split)",
+      "Obtain brain MRI to exclude structural pathology",
+      "Obtain video-EEG capturing a habitual event with normal interictal EEG to confirm PNES",
+      "Communicate the diagnosis transparently using positive language and the rule-in signs as the basis",
+      "Refer for FND-informed physiotherapy and CBT / psychological therapy",
+      "Order a comprehensive neuropsychological battery to characterize comorbid depression, anxiety, somatization, and trauma exposure — informs treatment planning (criteria-pack 'recommended' tier)"
     ],
     "contraindicated_actions": [
-      "Starting additional antiepileptic drugs or escalating levetiracetam dosage without first performing video-EEG to confirm the episodes are epileptic",
-      "Escalating immunosuppressive therapy (e.g., cyclophosphamide, rituximab) for presumed cerebral vasculitis without imaging or CSF evidence of CNS involvement",
-      "Telling the patient that his episodes are fake, imagined, or 'all in his head' — this is harmful and clinically incorrect",
-      "Performing invasive procedures (cerebral angiography, brain biopsy) for vasculitis workup when MRI, MRA, vessel wall MRI, and CSF are all normal",
-      "Interpreting the mildly elevated anti-GAD65 (12 IU/mL) as evidence of stiff-person spectrum disorder — this level is consistent with diabetes, not neurological autoimmunity",
-      "Attributing the periventricular white matter changes to vasculitis — these are age-appropriate microvascular ischemic changes",
-      "Dismissing the psychological factors (bereavement, health anxiety, caregiver stress) as irrelevant to the presentation"
+      "Do not pursue ever-expanding negative investigations — per Stone 2018, repeated negative workups reinforce illness conviction and worsen prognosis",
+      "Do not frame the diagnosis as 'all in your head', 'nothing wrong', or 'we couldn't find anything' — this damages the therapeutic alliance and is the most common avoidable harm in FND",
+      "Do not perform invasive testing (lumbar puncture, nerve biopsy, muscle biopsy, cerebral angiography) when positive rule-in signs are present and there is no clinical indication",
+      "Do not order EMG/NCS, muscle biopsy, or nerve biopsy as part of an FND workup — these invasive tests reinforce the somatic illness model per Stone 2018",
+      "Do not start or continue long-term anti-epileptic drugs for functional (psychogenic non-epileptic) seizures — AEDs are ineffective for PNES and expose the patient to side effects",
+      "Do not give benzodiazepines as abortive therapy for witnessed PNES events (no benefit and risk of respiratory depression)"
     ],
     "key_reasoning_points": [
-      "The diagnostic puzzle centers on a patient with confirmed systemic eosinophilic vasculitis (EGPA) who develops seizure-like episodes, creating a strong anchoring bias toward cerebral vasculitis as the cause. The agent must resist this anchoring and evaluate the episodes on their own merits.",
-      "The positive examination signs (Hoover sign, give-way weakness, non-anatomical sensory loss, gait discrepancy, hand-drop test) allow a positive diagnosis of FND — these are not signs of exclusion but have high specificity for functional neurological disorder.",
-      "The peripheral eosinophilia and elevated inflammatory markers (ESR, CRP) are red herrings in the context of the neurological presentation — they reflect systemic vasculitis activity but do not indicate CNS involvement. CSF eosinophilia would be expected if vasculitis affected the CNS.",
-      "The mildly elevated anti-GAD65 (12 IU/mL) is a significant red herring — it could suggest PERM or stiff-person spectrum disorder, but neurological GAD65 syndromes require levels typically >1000 IU/mL. This low-titer positivity is consistent with type 2 diabetes.",
-      "Normal brain MRI, normal MRA, normal vessel wall MRI, and normal CSF collectively provide very strong evidence against cerebral vasculitis. The periventricular white matter hyperintensities are consistent with age, hypertension, and diabetes — not vasculitis.",
-      "Video-EEG monitoring capturing seven events without electrographic correlate is diagnostic of PNES. The bilateral violent motor events would invariably produce EEG changes if they were epileptic seizures.",
-      "The psychosocial context is crucial: recent bereavement, new serious medical diagnosis, health anxiety, caregiver burden, and social isolation create a perfect convergence of precipitating and perpetuating factors for FND.",
-      "The transient peripheral cyanosis (Raynaud-like phenomenon) during episodes is a red herring attributed to the vasculitis, but it is actually a peripheral vascular phenomenon that can occur with hyperventilation and autonomic arousal during PNES.",
-      "Events occurring almost exclusively when observers are present is a well-recognized feature of PNES, not malingering — FND symptoms are involuntary and not deliberately produced.",
-      "The response to levetiracetam and diazepam (no improvement) should prompt reconsideration of the seizure diagnosis rather than escalation of AED therapy.",
-      "FND in older men is less recognized than in young women, creating a diagnostic blind spot. The male sex and older age may delay the FND diagnosis as clinicians search more aggressively for organic explanations."
+      "FND is a positive diagnosis based on rule-in signs (Hoover, tremor entrainment, give-way weakness, non-dermatomal sensory loss with midline split) — not a diagnosis of exclusion (Espay 2018, Stone 2018).",
+      "Brain MRI and basic labs (CBC, CMP, TSH, B12) are due-diligence to exclude structural and reversible causes — they are NOT the route to the diagnosis, which is established at the bedside.",
+      "Over-investigation is the principal iatrogenic harm in FND; every additional negative test reinforces the patient's illness conviction and worsens prognosis (Stone 2018).",
+      "Psychiatric comorbidity (anxiety, depression, trauma) is common and informs treatment planning but is NOT required for the diagnosis and does not 'explain' the symptoms in a reductive sense.",
+      "Diagnostic communication matters: using positive language anchored on the rule-in signs is associated with better engagement and outcomes (Stone 2018).",
+      "Evidence-based treatment is multidisciplinary — CBT for PNES and FND-informed physiotherapy for functional motor symptoms (Nielsen 2015).",
+      "Video-EEG capturing a habitual event with normal interictal EEG is diagnostic for PNES (ILAE PNES Task Force 2013); routine EEG alone is insufficient."
     ],
     "red_herrings": [
       {
-        "data_point": "Eosinophilic vasculitis (EGPA) diagnosis with peripheral eosinophilia and elevated inflammatory markers",
-        "location": "Clinical history, labs (CBC, ESR, CRP)",
-        "intended_effect": "Anchor clinicians toward cerebral vasculitis as cause of seizure-like episodes, prompting unnecessary immunosuppressive escalation",
-        "correct_interpretation": "EGPA rarely involves the CNS (5-10%). Peripheral eosinophilia and elevated ESR/CRP reflect systemic disease activity but do not indicate CNS involvement. Normal brain MRI, MRA, vessel wall MRI, and CSF without eosinophilia exclude cerebral vasculitis.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Periventricular white matter hyperintensities on brain MRI",
-        "location": "MRI report",
-        "intended_effect": "Could be misinterpreted as demyelination from vasculitis or MS, supporting an organic explanation for the episodes",
-        "correct_interpretation": "Scattered punctate periventricular WMH in a 62-year-old with hypertension and diabetes are consistent with chronic microvascular ischemic disease. They lack the morphology, size, and enhancement pattern of vasculitis-related or MS lesions.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Mildly elevated anti-GAD65 antibodies (12 IU/mL)",
-        "location": "Autoimmune panel",
-        "intended_effect": "May suggest stiff-person spectrum disorder or PERM, given the rigidity-like episodes and limb stiffness",
-        "correct_interpretation": "Anti-GAD65 at 12 IU/mL is far below the threshold for neurological autoimmune syndromes (>1000 IU/mL). This low titer is commonly seen in type 2 diabetes and reflects pancreatic autoimmunity, not neurological disease.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Positive p-ANCA/MPO antibodies",
-        "location": "Autoimmune panel",
-        "intended_effect": "Confirms active autoimmune disease and could reinforce the assumption that an autoimmune process explains the neurological episodes",
-        "correct_interpretation": "Positive ANCA confirms the known systemic EGPA diagnosis but says nothing about cerebral involvement. CNS vasculitis requires imaging and CSF confirmation, both of which are normal.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Transient peripheral cyanosis of toes during episodes",
-        "location": "Neurological exam / episode description",
-        "intended_effect": "Suggests vascular involvement during episodes, potentially supporting vasculitis-related mechanism",
-        "correct_interpretation": "Peripheral (Raynaud-like) cyanosis can occur with autonomic arousal, hyperventilation, and vasospasm during psychogenic episodes. In a patient with known vasculitis, it is a peripheral vascular phenomenon, not evidence of CNS vasculitis.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Brother with essential tremor and paternal aunt with epilepsy",
+        "data_point": "Family history of epilepsy in a relative",
         "location": "Family history",
-        "intended_effect": "Brother's tremor may suggest a familial movement disorder; aunt's epilepsy may anchor toward genetic seizure predisposition",
-        "correct_interpretation": "Essential tremor in a sibling and childhood-onset epilepsy in a distant relative are common findings in the general population and have no bearing on this patient's functional neurological symptoms.",
-        "field_path": ""
+        "field_path": "patient.clinical_history.family_history",
+        "intended_effect": "Anchor on an epileptic etiology and pursue prolonged AED trials before confirming PNES with video-EEG",
+        "correct_interpretation": "Family history of epilepsy does not establish the patient's events as epileptic. Video-EEG capturing the habitual event without ictal correlate is the gold standard."
       },
       {
-        "data_point": "Diabetic peripheral neuropathy with abnormal EMG/NCS in lower extremities",
-        "location": "EMG/NCS results",
-        "intended_effect": "Could suggest a more diffuse neuromuscular process or vasculitis-related neuropathy, complicating the diagnostic picture",
-        "correct_interpretation": "The EMG/NCS findings show a classic symmetric length-dependent axonal sensorimotor neuropathy consistent with diabetes, not mononeuritis multiplex (which would be expected in EGPA neuropathy). Upper extremity studies are normal, contradicting the patient's reported upper extremity weakness.",
-        "field_path": ""
+        "data_point": "Pre-existing psychiatric diagnosis (anxiety or depression) in the past medical history",
+        "location": "Past medical history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Premature anchoring on a 'psychosomatic' label without obtaining positive rule-in signs; conversely, dismissing FND as a serious diagnosis because the patient is 'just anxious'",
+        "correct_interpretation": "Psychiatric comorbidity neither establishes nor refutes FND. Diagnosis requires positive rule-in signs on examination; psychiatric history is relevant for treatment planning, not for diagnosis."
+      },
+      {
+        "data_point": "Symptom onset coincident with a major psychosocial stressor",
+        "location": "History of present illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Conclude prematurely that stress 'caused' the symptoms and that the workup can be abbreviated",
+        "correct_interpretation": "Many organic conditions (MS, migraine, epilepsy) also flare with stress. Stress at onset is supportive context, not a diagnostic substitute for the positive rule-in signs."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -1124,6 +1113,14 @@
       "echo": "incidental",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FND",
+    "difficulty_rationale": "Disabling, multi-region or refractory functional symptoms — often with comorbid organic disease (e.g., established MS, post-stroke deficit, prior epilepsy) or extensive prior workup. Differentiating new functional symptoms from organic progression requires careful synthesis of rule-in signs against negative imaging and EEG, plus discriminating communication.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

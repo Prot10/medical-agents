@@ -751,146 +751,199 @@
   },
   "ground_truth": {
     "primary_diagnosis": "Functional neurological disorder with psychogenic non-epileptic seizures (PNES)",
-    "icd_code": "F44.4",
+    "icd_code": "F44.7",
     "differential": [
       {
-        "diagnosis": "Epileptic seizures (generalized tonic-clonic)",
-        "likelihood": "low",
-        "key_features": "Normal EEG during captured clinical events rules out epileptic seizures; preserved awareness during episodes, normal post-event prolactin, and lack of response to levetiracetam all argue against epilepsy"
+        "diagnosis": "Epileptic seizures",
+        "likelihood": "moderate",
+        "key_features": "Witnessed convulsive-appearing events; ictal video-EEG showing absence of electrographic correlate during a captured habitual event is the key differentiator.",
+        "icd_code": "G40.909"
       },
       {
-        "diagnosis": "Cerebral vasculitis (secondary to eosinophilic vasculitis)",
+        "diagnosis": "Structural CNS lesion (tumor, demyelination, stroke)",
         "likelihood": "low",
-        "key_features": "Normal brain MRI with no focal edema, enhancement, or vasculitic changes; normal inflammatory markers; eosinophilia resolved"
+        "key_features": "Focal complaints warrant imaging; normal brain MRI without lesion, mass, or enhancement effectively excludes a structural cause for the presenting deficit.",
+        "icd_code": null
       },
       {
-        "diagnosis": "Autoimmune or limbic encephalitis",
-        "likelihood": "low",
-        "key_features": "Negative anti-NMDAR, LGI1, and CASPR2 antibodies in both serum and CSF; normal CSF cell count and protein; no MRI signal changes in limbic structures"
+        "diagnosis": "Autoimmune or paraneoplastic encephalitis",
+        "likelihood": "very_low",
+        "key_features": "Episodic neurological symptoms can occur in autoimmune encephalitis; normal MRI, normal EEG background, and (when obtained) negative antibody panel render this very unlikely.",
+        "icd_code": "G04.81"
       },
       {
-        "diagnosis": "Meningoencephalitis (viral or infectious)",
-        "likelihood": "low",
-        "key_features": "Normal CSF with no pleocytosis; negative comprehensive PCR panel; afebrile; no meningeal signs"
-      },
-      {
-        "diagnosis": "Progressive encephalomyelitis with rigidity and myoclonus (PERM) / Stiff-person spectrum",
-        "likelihood": "low",
-        "key_features": "Normal EMG with no continuous motor unit activity; negative anti-GAD65 and anti-amphiphysin antibodies; episodes are not consistent with startle-induced myoclonus"
+        "diagnosis": "Malingering or factitious disorder",
+        "likelihood": "very_low",
+        "key_features": "FND is involuntary; preserved effort on symptom-validity testing and absence of clear secondary gain argue against feigning. The rule-in signs do not distinguish FND from malingering by themselves, but the clinical context does not support a feigning explanation.",
+        "icd_code": "F68.10"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain continuous video-EEG monitoring to capture habitual clinical events",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Normal EEG during clinical seizure-like events, confirming PNES",
+        "action": "Elicit positive rule-in signs on bedside examination (Hoover sign for functional leg weakness, tremor entrainment / distractibility for functional tremor, give-way weakness, non-dermatomal sensory loss with midline splitting). Diagnosis of FND is made by these positive signs, not by exclusion alone.",
+        "tool_name": null,
+        "expected_finding": "At least one reliable positive functional sign documented",
         "category": "required",
-        "tool_parameters": {
-          "eeg_type": "video"
-        }
+        "tool_parameters": {},
+        "citation": "[Espay_2018]",
+        "guideline_source": "FND criteria pack — positive diagnosis"
       },
       {
         "step": 2,
-        "action": "Order brain MRI with contrast to evaluate for structural lesions and vasculitis",
+        "action": "Order brain MRI with and without contrast to exclude a structural cause of the presenting deficit",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Normal brain MRI, no vasculitis or structural lesion",
+        "expected_finding": "No structural lesion, mass, demyelination, or stroke",
         "category": "required",
         "tool_parameters": {
-          "protocol": "tumor",
           "contrast": true
-        }
+        },
+        "citation": "[Espay_2018]",
+        "guideline_source": "FND criteria pack — exclude structural cause"
       },
       {
         "step": 3,
-        "action": "Obtain comprehensive laboratory panel including CBC, BMP, TSH, inflammatory markers, and post-event prolactin",
+        "action": "Order basic laboratory workup (CBC, CMP, TSH, vitamin B12) to exclude common reversible mimics",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal labs except known diabetes; normal post-event prolactin supporting non-epileptic etiology",
+        "expected_finding": "No metabolic, thyroid, or B12 abnormality that explains symptoms",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
-            "thyroid",
-            "prolactin",
-            "inflammatory_markers"
+            "CMP",
+            "TSH",
+            "B12"
           ]
-        }
+        },
+        "citation": "[Stone_2018]",
+        "guideline_source": "FND criteria pack — exclude reversible causes"
       },
       {
         "step": 4,
-        "action": "Perform EMG/NCS to evaluate for myopathy and peripheral nerve disease",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "No myopathy; mild sensory neuropathy consistent with diabetes only",
-        "category": "recommended",
+        "action": "Search current literature on FND diagnostic signs and evidence-based treatment (CBT for PNES, specialized physiotherapy for functional motor symptoms)",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirms multidisciplinary CBT + physiotherapy is the evidence-based treatment for FND",
+        "category": "required",
         "tool_parameters": {
-          "test_type": "emg_ncs"
-        }
+          "query": "functional neurological disorder diagnosis treatment"
+        },
+        "citation": "[Nielsen_2015]",
+        "guideline_source": "FND criteria pack — treatment evidence"
       },
       {
         "step": 5,
-        "action": "Obtain autoimmune encephalitis antibody panel to rule out autoimmune etiology",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Negative autoimmune panel",
+        "action": "Obtain video-EEG monitoring with intent to capture a habitual event (prolonged inpatient video-EEG is the gold standard for distinguishing PNES from epileptic seizures)",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Captured event with no ictal EEG correlate during clinically apparent seizure-like activity",
         "category": "recommended",
         "tool_parameters": {
-          "panels": [
-            "autoimmune_encephalitis"
-          ]
-        }
+          "eeg_type": "video"
+        },
+        "citation": "[ILAE_PNES_2013]",
+        "guideline_source": "ILAE PNES Task Force minimum diagnostic standards"
       },
       {
         "step": 6,
-        "action": "Communicate diagnosis of PNES/FND supportively to patient, emphasizing that the condition is real, common, and treatable",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Review current medications for agents that may exacerbate symptoms (e.g., benzodiazepines, dopamine-blocking antipsychotics, AEDs initiated for PNES)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identification of medication contributors that should be tapered or discontinued",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "",
+        "guideline_source": "FND criteria pack — medication review"
       },
       {
         "step": 7,
-        "action": "Refer to psychiatry for evaluation of comorbid anxiety and depression, and initiation of psychotherapy (CBT)",
+        "action": "Communicate the diagnosis transparently using positive language anchored on the rule-in signs; explicitly state the diagnosis is FND, the symptoms are real and involuntary, and there is an evidence-based treatment plan",
         "tool_name": null,
-        "expected_finding": "Identification of adjustment disorder with significant anxiety and depression as contributing factors",
-        "category": "required"
+        "expected_finding": "Patient understanding and treatment engagement — strong predictor of recovery",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Stone_2018]",
+        "guideline_source": "FND criteria pack — diagnostic communication"
       },
       {
         "step": 8,
-        "action": "Taper and discontinue levetiracetam as there is no indication for anti-seizure medication",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Confirmation that levetiracetam is not indicated and may contribute to psychiatric side effects",
-        "category": "required"
+        "action": "Refer to specialized FND-informed physiotherapy (for functional motor symptoms) and to CBT / psychological therapy (for PNES and comorbid mood / anxiety)",
+        "tool_name": null,
+        "expected_finding": "Engagement in evidence-based multidisciplinary care",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Nielsen_2015]",
+        "guideline_source": "Nielsen 2015 — physiotherapy consensus"
       }
     ],
-    "critical_actions": [
-      "Perform video-EEG monitoring during a habitual clinical event to establish the diagnosis of PNES",
-      "Obtain post-event prolactin to differentiate from epileptic seizures",
-      "Recognize positive functional signs on neurological exam (give-way weakness, inconsistency with distraction)",
-      "Communicate FND/PNES diagnosis in a supportive, non-dismissive manner",
-      "Discontinue unnecessary anti-seizure medication (levetiracetam)",
-      "Refer for psychiatric and psychological evaluation and treatment"
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography has no role in FND; no structural cardiac question is raised by the presentation.",
+        "citation": "[Stone_2018]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac rhythm monitoring is not indicated; the events are non-syncopal and the rule-in signs point to FND.",
+        "citation": "[Stone_2018]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT adds no information beyond MRI for an FND workup and contributes diagnostic noise plus radiation exposure.",
+        "citation": "[Espay_2018]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "Advanced PET imaging has no indication in FND; standard MRI is the appropriate structural workup.",
+        "citation": "[Espay_2018]"
+      }
     ],
-    "contraindicated_actions": [
-      "Starting or escalating anti-seizure medications when EEG shows no epileptic activity",
-      "Administering benzodiazepines as acute treatment for PNES episodes",
-      "Ordering invasive procedures (e.g., brain biopsy) for suspected vasculitis without imaging evidence",
-      "Dismissing symptoms as 'not real' or implying malingering",
-      "Initiating immunosuppressive therapy for suspected CNS vasculitis without supportive evidence"
-    ],
-    "key_reasoning_points": [
-      "The patient's seizure-like episodes lack EEG correlates during video monitoring, which is the gold standard for diagnosing PNES",
-      "Preserved awareness during convulsive episodes, absence of post-ictal confusion, and normal post-event prolactin all support a non-epileptic etiology",
-      "Give-way weakness on examination that resolves with distraction is a positive functional sign, supporting FND diagnosis",
-      "Episodes occurring predominantly in the presence of staff, stable vitals throughout, and lack of response to anti-seizure medications are additional clinical clues",
-      "The differential including cerebral vasculitis is appropriately considered given the history of eosinophilic vasculitis, but normal MRI and inflammatory markers effectively exclude CNS involvement",
-      "Autoimmune encephalitis is appropriately excluded by negative antibody panels in both serum and CSF",
-      "PERM/stiff-person spectrum is excluded by normal EMG without continuous motor unit activity and negative anti-GAD65 antibodies",
-      "Multiple psychosocial stressors (bereavement, caregiver burden, health anxiety) provide a clear context for functional symptoms",
-      "FND is a diagnosis made by positive clinical signs and electroclinical dissociation, not merely by exclusion of organic disease"
-    ],
-    "useless_tools": [],
     "harmful_tools": [],
     "sequence_constraints": [],
-    "red_herrings": []
+    "critical_actions": [
+      "Document at least one positive rule-in sign (Hoover sign, tremor entrainment, distractibility, give-way pattern, non-dermatomal sensory loss with midline split)",
+      "Obtain brain MRI to exclude structural pathology",
+      "Obtain video-EEG capturing a habitual event with normal interictal EEG to confirm PNES",
+      "Communicate the diagnosis transparently using positive language and the rule-in signs as the basis",
+      "Refer for FND-informed physiotherapy and CBT / psychological therapy",
+      "Order a comprehensive neuropsychological battery to characterize comorbid depression, anxiety, somatization, and trauma exposure — informs treatment planning (criteria-pack 'recommended' tier)"
+    ],
+    "contraindicated_actions": [
+      "Do not pursue ever-expanding negative investigations — per Stone 2018, repeated negative workups reinforce illness conviction and worsen prognosis",
+      "Do not frame the diagnosis as 'all in your head', 'nothing wrong', or 'we couldn't find anything' — this damages the therapeutic alliance and is the most common avoidable harm in FND",
+      "Do not perform invasive testing (lumbar puncture, nerve biopsy, muscle biopsy, cerebral angiography) when positive rule-in signs are present and there is no clinical indication",
+      "Do not order EMG/NCS, muscle biopsy, or nerve biopsy as part of an FND workup — these invasive tests reinforce the somatic illness model per Stone 2018",
+      "Do not start or continue long-term anti-epileptic drugs for functional (psychogenic non-epileptic) seizures — AEDs are ineffective for PNES and expose the patient to side effects",
+      "Do not give benzodiazepines as abortive therapy for witnessed PNES events (no benefit and risk of respiratory depression)"
+    ],
+    "key_reasoning_points": [
+      "FND is a positive diagnosis based on rule-in signs (Hoover, tremor entrainment, give-way weakness, non-dermatomal sensory loss with midline split) — not a diagnosis of exclusion (Espay 2018, Stone 2018).",
+      "Brain MRI and basic labs (CBC, CMP, TSH, B12) are due-diligence to exclude structural and reversible causes — they are NOT the route to the diagnosis, which is established at the bedside.",
+      "Over-investigation is the principal iatrogenic harm in FND; every additional negative test reinforces the patient's illness conviction and worsens prognosis (Stone 2018).",
+      "Psychiatric comorbidity (anxiety, depression, trauma) is common and informs treatment planning but is NOT required for the diagnosis and does not 'explain' the symptoms in a reductive sense.",
+      "Diagnostic communication matters: using positive language anchored on the rule-in signs is associated with better engagement and outcomes (Stone 2018).",
+      "Evidence-based treatment is multidisciplinary — CBT for PNES and FND-informed physiotherapy for functional motor symptoms (Nielsen 2015).",
+      "Video-EEG capturing a habitual event with normal interictal EEG is diagnostic for PNES (ILAE PNES Task Force 2013); routine EEG alone is insufficient."
+    ],
+    "red_herrings": [
+      {
+        "data_point": "Family history of epilepsy in a relative",
+        "location": "Family history",
+        "field_path": "patient.clinical_history.family_history",
+        "intended_effect": "Anchor on an epileptic etiology and pursue prolonged AED trials before confirming PNES with video-EEG",
+        "correct_interpretation": "Family history of epilepsy does not establish the patient's events as epileptic. Video-EEG capturing the habitual event without ictal correlate is the gold standard."
+      },
+      {
+        "data_point": "Symptom onset coincident with a major psychosocial stressor",
+        "location": "History of present illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Conclude prematurely that stress 'caused' the symptoms and that the workup can be abbreviated",
+        "correct_interpretation": "Many organic conditions (MS, migraine, epilepsy) also flare with stress. Stress at onset is supportive context, not a diagnostic substitute for the positive rule-in signs."
+      }
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -905,6 +958,14 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FND",
+    "difficulty_rationale": "Clear positive rule-in signs (Hoover sign and/or distractible tremor and/or non-dermatomal sensory loss with midline split) with normal MRI and supportive normal labs. Workup is hygiene-level; the diagnostic challenge is communication, not investigation.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -88,116 +88,132 @@
     "extremities": "No edema"
   },
   "ground_truth": {
-    "primary_diagnosis": "Migraine with prolonged aura (>60 min; G43.1); combined OCP contraindicated; preventive therapy required; migrainous infarction excluded by normal DWI",
-    "primary_diagnosis_icd": "G43.1",
+    "primary_diagnosis": "Migraine with prolonged aura (ICHD-3 1.2.1, aura >60 min in some attacks); combined OCP contraindicated; migrainous infarction excluded by normal DWI; preventive therapy required",
+    "icd_code": "G43.109",
     "differential": [
       {
         "diagnosis": "Migrainous infarction (ICHD-3 1.4.1)",
         "likelihood": "low",
-        "key_features": "Would require DWI restriction in posterior territory during prolonged aura; DWI normal — migrainous infarction excluded; aura was reversible"
+        "key_features": "Defined as aura symptoms lasting >60 min with confirmed infarct on imaging — normal DWI excludes this",
+        "icd_code": "I63.9"
       },
       {
-        "diagnosis": "Non-convulsive status epilepticus (visual cortex)",
-        "likelihood": "very_low",
-        "key_features": "Prolonged visual phenomenon could theoretically represent continuous occipital ictal activity; however, duration is self-limited, followed by headache; EEG no ictal pattern; gradual spreading aura over 20 min before sustained phase"
+        "diagnosis": "Persistent aura without infarction (ICHD-3 1.4.2)",
+        "likelihood": "low",
+        "key_features": "Definition requires aura ≥1 week — patient's aura resolved, so not met",
+        "icd_code": null
       },
       {
-        "diagnosis": "Posterior cortical mass with peri-ictal visual symptoms",
+        "diagnosis": "Posterior circulation TIA",
+        "likelihood": "low",
+        "key_features": "Stereotyped expanding visual aura with subsequent migrainous headache argues against TIA; normal DWI/MRA confirm",
+        "icd_code": "G45.9"
+      },
+      {
+        "diagnosis": "Occipital seizure with prolonged ictal blindness",
         "likelihood": "very_low",
-        "key_features": "Normal posterior cortex on MRI; no enhancement; no mass lesion"
+        "key_features": "No impaired awareness, no postictal state",
+        "icd_code": "G40.109"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI with DWI — exclude migrainous infarction (DWI restriction during prolonged aura >60 min)",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Normal DWI — no migrainous infarction; normal posterior cortex",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
         "category": "required",
         "tool_parameters": {
-          "contrast": true,
-          "sequences": [
-            "DWI",
-            "FLAIR",
-            "T1+Gd",
-            "MRA"
-          ]
-        }
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "URGENT: Stop combined OCP (Gedarel 20) — low-dose oestrogen does NOT reduce WHO Category 4 classification",
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "Combined OCP contraindicated regardless of oestrogen dose; levonorgestrel IUD or desogestrel pill for dysmenorrhoea",
+        "expected_finding": "Combined OCP must be stopped (WHO Category 4); initiate preventive therapy (topiramate or propranolol) [Holland_2012]; avoid triptans during the aura phase",
         "category": "required",
         "tool_parameters": {
-          "drug_1": "combined_oral_contraceptive",
-          "condition": "migraine_with_prolonged_aura"
-        }
+          "context": "prolonged_aura_OCP_preventive_indication"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 3,
-        "action": "Initiate preventive therapy — topiramate 25 mg titrating to 50-100 mg",
-        "tool_name": null,
-        "expected_finding": "3 prolonged aura episodes in 8 months = preventive therapy clearly indicated",
+        "action": "Brain MRI with DWI to exclude migrainous infarction in a prolonged-aura presentation",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Normal DWI; no infarct; no vascular malformation",
         "category": "required",
-        "tool_parameters": {}
-      },
-      {
-        "step": 4,
-        "action": "Counsel on not taking triptans during the aura phase",
-        "tool_name": null,
-        "expected_finding": "Triptans do not shorten aura (CSD not triptan-responsive); take at headache onset only",
-        "category": "required",
-        "tool_parameters": {}
-      },
-      {
-        "step": 5,
-        "action": "Iron supplementation for low ferritin 18 ng/mL",
-        "tool_name": null,
-        "expected_finding": "Low ferritin may contribute to migraine frequency; supplement to target >50 ng/mL",
-        "category": "recommended",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "contrast": false,
+          "sequences": [
+            "DWI",
+            "FLAIR",
+            "T2",
+            "SWI",
+            "MRA"
+          ]
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis — neither present here",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Routine transthoracic / bubble echocardiogram (PFO screening) is NOT indicated in migraine with aura; PFO-migraine association is controversial and PFO closure does not reduce migraine [Charles_2017]",
+        "citation": "[Charles_2017]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated in typical migraine with aura — no role unless cardioembolic stroke is on the differential",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "Stop combined OCP immediately — ANY form of combined OCP is contraindicated in migraine with aura; low-dose EE (20 mcg) does NOT reduce the risk category",
-      "Confirm migrainous infarction excluded by normal DWI — appropriate action in prolonged aura >60 min",
-      "Counsel that triptans are NOT effective during aura and may be hazardous — take at headache onset only",
-      "Initiate preventive therapy given 3 episodes with prolonged aura in 8 months"
+      "Brain MRI with DWI to exclude migrainous infarction (prolonged aura)",
+      "Discontinue combined OCP — WHO Category 4 contraindication",
+      "Initiate preventive therapy given prolonged-aura phenotype and OCP stop [Holland_2012]",
+      "Counsel: triptans only at headache onset, not during aura"
     ],
     "contraindicated_actions": [
-      "Do not continue any combined OCP, including 'low-dose' preparations",
-      "Do not take triptans during the visual aura phase",
-      "Do not diagnose migrainous infarction without DWI restriction — normal DWI excludes it"
+      "Do not continue combined oestrogen-progestogen contraception",
+      "Do not co-administer triptans with ergotamines",
+      "Do not take triptans during the aura phase"
     ],
     "key_reasoning_points": [
-      "Prolonged aura >60 minutes with normal DWI = migraine with prolonged aura (not migrainous infarction); migrainous infarction requires DWI restriction",
-      "Low-dose combined OCP (EE 20 mcg) is still WHO Category 4 in migraine with aura — dose reduction does NOT change the risk category",
-      "Triptans are ineffective during the aura phase (CSD is not vasoconstriction-dependent); taking rizatriptan during prolonged aura in a patient on OCP may increase ischaemic risk",
-      "Dysmenorrhoea management: levonorgestrel IUD is effective for both dysmenorrhoea and contraception and is WHO Category 2 in migraine with aura",
-      "EEG is appropriate to exclude ongoing ictal activity in prolonged visual symptoms — non-specific findings only"
+      "Migrainous infarction (ICHD-3 1.4.1) requires aura >60 min plus confirmed infarct on imaging — normal DWI rules it out",
+      "Prolonged aura phenotype warrants both OCP discontinuation and preventive therapy initiation",
+      "Triptans during aura are not recommended (efficacy and theoretical vascular concerns)"
     ],
     "red_herrings": [
       {
-        "data_point": "Low-dose combined OCP (EE 20 mcg) — patient and doctors may assume lower dose means lower risk",
-        "location": "patient.clinical_history.medications",
-        "intended_effect": "Low-dose combined OCP pills are sometimes marketed as 'safer'; EE 20 mcg is lower than standard 30-35 mcg pills",
-        "correct_interpretation": "WHO Category 4 applies to ALL combined OCP preparations regardless of oestrogen dose; EE 20 mcg still carries unacceptable stroke risk in migraine with aura",
-        "field_path": ""
-      },
-      {
-        "data_point": "Prolonged aura >60 min — possible migrainous infarction",
+        "data_point": "Aura lasting >60 min (the most recent 70-75 min episode)",
         "location": "patient.history_present_illness",
-        "intended_effect": "Aura lasting >60 minutes is a recognised risk factor for migrainous infarction, especially on combined OCP",
-        "correct_interpretation": "Normal DWI on MRI excludes migrainous infarction — DWI restriction is required for this diagnosis; the correct ICHD-3 classification is 'migraine with prolonged aura'",
-        "field_path": ""
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "May anchor on migrainous infarction",
+        "correct_interpretation": "Migrainous infarction requires aura >60 min PLUS imaging-confirmed infarct — normal DWI excludes the diagnosis; this is prolonged aura without infarction"
       }
-    ],
-    "icd_code": "G43.1",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -221,7 +237,17 @@
       "echo": "normal",
       "cardiac_monitoring": "incidental",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Moderate: prolonged-aura phenotype distinction from migrainous infarction; OCP discontinuation; preventive initiation",
+    "case_body_concerns": [
+      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide §1): ['analyze_ecg', 'analyze_eeg', 'interpret_labs']"
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "initial_tool_outputs": {
     "mri": {

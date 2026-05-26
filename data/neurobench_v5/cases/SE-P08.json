@@ -500,143 +500,211 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Isoniazid (INH) toxicity-induced refractory status epilepticus from pyridoxal-5-phosphate depletion (GABA synthesis impairment), requiring IV pyridoxine (vitamin B6) as specific antidote",
-    "icd_code": "G41.9",
+    "primary_diagnosis": "Isoniazid toxicity-induced refractory status epilepticus from pyridoxal-5-phosphate (vitamin B6) depletion impairing GABA synthesis, requiring IV pyridoxine as specific antidote",
+    "icd_code": "T37.1X1A",
     "differential": [
       {
-        "diagnosis": "Drug toxicity from other agent (tricyclic antidepressant, organophosphate, local anesthetic)",
-        "likelihood": "low",
-        "key_features": "INH confirmed from occupational history; INH level 284 mcg/mL massively toxic; specific mechanism (pyridoxine depletion) explains benzodiazepine resistance"
+        "diagnosis": "Other GABA-deficiency / GABA-antagonist toxicity (hydrazine, mushroom)",
+        "likelihood": "moderate",
+        "key_features": "Hydrazine derivatives produce similar B6-responsive seizure picture",
+        "icd_code": "T65.91XA"
       },
       {
-        "diagnosis": "Autoimmune encephalitis (anti-NMDAR)",
-        "likelihood": "low",
-        "key_features": "Acute onset, benzodiazepine resistance, and dramatic pyridoxine response = toxic etiology; autoimmune panel negative; no prodrome"
+        "diagnosis": "Refractory SE of other etiology (cryptogenic)",
+        "likelihood": "moderate",
+        "key_features": "Definite history of INH ingestion plus severe metabolic acidosis with anion gap argues against cryptogenic",
+        "icd_code": "G41.1"
       },
       {
-        "diagnosis": "Idiopathic refractory SE (new-onset refractory SE, NORSE)",
+        "diagnosis": "Cyanide poisoning",
         "likelihood": "low",
-        "key_features": "NORSE is a diagnosis of exclusion; toxic cause (INH) identified; pyridoxine response confirms specific etiology"
+        "key_features": "Severe lactic acidosis + altered mental status could be cyanide; INH exposure history makes B6-deficient seizures more likely",
+        "icd_code": "T57.3X1A"
+      },
+      {
+        "diagnosis": "Salicylate toxicity",
+        "likelihood": "low",
+        "key_features": "Severe metabolic acidosis with respiratory compensation; salicylate level discriminates",
+        "icd_code": "T39.0X1A"
+      },
+      {
+        "diagnosis": "Sepsis with multi-organ failure",
+        "likelihood": "low",
+        "key_features": "Hypotension, tachycardia, acidosis overlap; INH exposure history directs",
+        "icd_code": "A41.9"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Intubate and mechanically ventilate — refractory SE requiring airway protection",
-        "tool_name": null,
-        "expected_finding": "Airway secured; oximetry maintained",
+        "action": "Continuous video-EEG — confirm refractory SE",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Continuous generalized 2-3 Hz spike-wave with no response to benzodiazepine or fosphenytoin — refractory pattern",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "IV pyridoxine (vitamin B6) 5g IV IMMEDIATELY — specific antidote for INH-induced SE",
-        "tool_name": null,
-        "expected_finding": "NCSE cessation within 20-45 minutes of pyridoxine administration",
+        "action": "Labs: CBC, CMP, glucose, Ca/Mg, ABG (severe acidosis 6.98), lactate, CK, ammonia, salicylate level, INH/hydrazine level, B6 level, ethylene glycol/methanol, anion gap calculation, beta-hCG",
+        "tool_name": "interpret_labs",
+        "expected_finding": "pH 6.98 SEVERE acidosis, bicarbonate 8, lactate 16.8, pyridoxine 2 nmol/L CRITICAL low — confirms INH toxicity with B6 depletion; CK 14200 rhabdo; K 5.2",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Contact poison control (1-800-222-1222) — INH overdose management guidance",
-        "tool_name": null,
-        "expected_finding": "Poison control confirms pyridoxine dosing; supports disposition planning",
+        "action": "Non-contrast head CT — exclude structural cause",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Normal CT",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "EEG monitoring to confirm NCSE and track response to pyridoxine",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Generalized spike-wave NCSE; resolves within 45 minutes of pyridoxine",
+        "action": "Drug-interaction check: IV pyridoxine + AED + sodium bicarbonate + supportive care",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "IV pyridoxine 5 g (or gram-per-gram of INH ingested) is the SPECIFIC antidote; sodium bicarbonate for severe acidosis; supportive care",
         "category": "required",
-        "tool_parameters": {
-          "urgency": "stat"
-        }
+        "tool_parameters": {},
+        "citation": "[ESETT_2019]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "Check drug interactions: INH toxicity mechanism and why fosphenytoin fails",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Fosphenytoin ineffective in INH SE; benzodiazepines fail until GABA restored by pyridoxine",
+        "action": "Literature: INH toxicity treatment + pyridoxine dosing",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Pyridoxine 5 g IV (or gram per gram INH) is first-line antidote; benzodiazepines and AEDs work only after B6 repletion; activated charcoal if early; hemodialysis for severe cases",
         "category": "required",
-        "tool_parameters": {
-          "drugs": [
-            "isoniazid",
-            "pyridoxine",
-            "fosphenytoin",
-            "benzodiazepines"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 6,
-        "action": "Sodium bicarbonate 100 mEq IV for severe metabolic acidosis (pH 6.98)",
-        "tool_name": null,
-        "expected_finding": "pH improving toward 7.20",
+        "action": "Poison control consultation",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Toxicology + ICU co-management",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 7,
-        "action": "Aggressive IV fluid resuscitation for rhabdomyolysis (CK 14200) — target urine output >200 mL/hr with urine alkalinization",
-        "tool_name": null,
-        "expected_finding": "CK trending down after peak; creatinine stable",
+        "action": "Sodium bicarbonate for severe metabolic acidosis (pH 6.98)",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Bicarbonate IV bolus + infusion",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 8,
-        "action": "Obtain serum pyridoxine level and INH level to confirm diagnosis",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Pyridoxine critically depleted; INH massively toxic (284 mcg/mL)",
-        "category": "required",
+        "action": "Lumbar puncture — exclude infectious encephalitis if uncertainty about INH ingestion",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Likely normal; LP only if INH ingestion not confirmed and clinical picture remains unclear",
+        "category": "optional",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
         "tool_parameters": {
-          "tests": [
-            "pyridoxine_level",
-            "isoniazid_level"
-          ]
-        }
+          "study_type": "TTE"
+        },
+        "rationale": "No clinical suspicion of cardiac source of embolus or cardiogenic seizure; routine echo is not indicated in SE workup absent cardiac findings.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No suspicion of arrhythmogenic syncope or cardiac comorbidity precipitating SE; routine telemetry beyond standard ICU monitoring adds cost without yield.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in acute SE evaluation; dementia biomarker imaging does not change acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is for ischemic stroke workup; SE without focal vascular suspicion does not warrant carotid imaging.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "DaTscan / dopamine transporter imaging has no role in SE; no parkinsonism question relevant to acute management.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Confirm INH ingestion history and pyridoxine level before specific antidote dosing.",
+        "citation": "[Brophy_2012]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "IV pyridoxine 5g IMMEDIATELY — this is the specific antidote; SE will not stop without it",
-      "Contact poison control — essential for guidance and documentation",
-      "Do NOT rely on benzodiazepines alone — they fail until GABA is restored by pyridoxine",
-      "Sodium bicarbonate for pH 6.98 — severe acidosis worsens neuronal excitability",
-      "Aggressive IV fluids for massive rhabdomyolysis — CK 14200, urine myoglobin 4+"
+      "Administer IV pyridoxine 5 g IMMEDIATELY — specific antidote for INH-induced SE",
+      "IV lorazepam 0.1 mg/kg + benzodiazepines (work only after B6 repletion)",
+      "Sodium bicarbonate for severe metabolic acidosis (pH 6.98)",
+      "Activated charcoal if early presentation",
+      "Hemodialysis consideration for severe toxicity",
+      "Aggressive IV fluids for rhabdomyolysis (CK 14200)",
+      "Poison control / toxicology consultation"
     ],
     "contraindicated_actions": [
-      "Fosphenytoin or phenytoin for INH SE — sodium channel blockade has no effect on GABA-depletion mechanism; will fail",
-      "Delaying pyridoxine administration for confirmatory INH level — treat empirically based on history; INH level is confirmatory, not prerequisite",
-      "Stopping at benzodiazepine escalation without considering toxic antidote — benzodiazepine refractoriness in young healthy patient signals specific toxin"
+      "Do NOT continue escalating AEDs without pyridoxine repletion — INH SE is refractory to standard treatment until B6 is replaced",
+      "Do NOT use phenytoin (cardiac instability in toxic patient)",
+      "Do NOT delay specific antidote (pyridoxine) for diagnostic workup",
+      "Do NOT escalate AED loading without pyridoxine repletion — INH-induced SE is benzodiazepine and standard-AED resistant until B6 is replaced."
     ],
     "key_reasoning_points": [
-      "INH toxicity mechanism: INH depletes pyridoxal-5-phosphate (PLP), the cofactor for GAD (glutamic acid decarboxylase); without PLP, GABA synthesis stops; benzodiazepines require GABA at the receptor to work — benzodiazepine resistance = pathognomonic clue for GABA-depletion toxidrome",
-      "Benzodiazepine-refractory SE in young healthy patient is the KEY clinical clue — this pattern demands consideration of specific toxic antidote (INH → pyridoxine; organophosphate → atropine + pralidoxime; TCA → sodium bicarbonate)",
-      "Standard urine drug screens do NOT detect isoniazid — serum INH level requires reference lab; clinical history + pyridoxine depletion is sufficient to treat empirically",
-      "Fosphenytoin fails in INH SE — sodium channel mechanism is irrelevant to GABA-depletion pathophysiology; this is a critical clinical error in the case (fosphenytoin was given and failed, confirming INH etiology)",
-      "Pyridoxine dosing: 1g IV per 1g INH ingested (estimated); if amount unknown, 5g IV empirically; seizures stop within 20-60 minutes of adequate pyridoxine"
+      "INH depletes pyridoxal-5-phosphate (active B6), impairing GABA synthesis → benzodiazepine-resistant SE",
+      "Pyridoxine 5 g IV (or gram per gram INH ingested) is the SPECIFIC antidote",
+      "Severe metabolic acidosis with elevated anion gap and lactate is characteristic",
+      "Standard AEDs work only after B6 repletion — escalation without pyridoxine is futile"
     ],
     "red_herrings": [
       {
-        "data_point": "Benzodiazepine refractoriness — 8 mg lorazepam total with no response",
-        "location": "treatment history",
-        "intended_effect": "Conclude severe idiopathic or structural NCSE requiring escalation to anesthetics",
-        "correct_interpretation": "Benzodiazepine refractoriness in young healthy patient = toxic etiology until proven otherwise. INH depletes GABA making benzodiazepines ineffective. Pyridoxine (antidote) not escalating sedation is the answer.",
-        "field_path": ""
+        "data_point": "Negative routine urine drug screen",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests no drug exposure, missing INH",
+        "correct_interpretation": "Routine UDS does not detect INH; history of accidental ingestion + characteristic clinical picture is diagnostic"
       },
       {
-        "data_point": "Fosphenytoin 20 mg/kg PE given and failed",
-        "location": "treatment history at outside hospital",
-        "intended_effect": "Conclude third-line agents (valproate, levetiracetam, propofol) are next steps",
-        "correct_interpretation": "Fosphenytoin failure in INH SE is expected — sodium channel mechanism is irrelevant. Failure of fosphenytoin adds further evidence that this is a GABA-depletion toxidrome requiring pyridoxine.",
-        "field_path": ""
+        "data_point": "Massive lactic acidosis (lactate 16.8)",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests sepsis or cyanide as primary driver",
+        "correct_interpretation": "INH-induced refractory SE produces severe lactic acidosis from continued seizure activity and B6-related metabolic disruption; pyridoxine is the specific antidote"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "teaching_points": "INH toxicity mechanism (PLP depletion → GABA depletion → benzodiazepine resistance); pyridoxine as antidote; fosphenytoin ineffective; standard UDS misses INH; benzodiazepine refractoriness = toxic etiology clue",
@@ -649,6 +717,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "7 required + 1 optional; INH-induced refractory SE — pyridoxine is the specific antidote; teaching is recognizing B6-deficient SE and the futility of AED escalation without antidote; 2 grounded red herrings.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

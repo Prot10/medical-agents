@@ -801,172 +801,209 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Glioblastoma, IDH-wildtype, WHO grade IV, right frontoparietal lobe",
-    "icd_code": "C71.9",
+    "primary_diagnosis": "Glioblastoma, IDH-wildtype, WHO grade 4 (right frontoparietal)",
+    "icd_code": "C71.3",
     "differential": [
       {
-        "diagnosis": "Brain metastasis from occult primary",
+        "diagnosis": "Brain metastasis (solitary)",
         "likelihood": "low",
-        "key_features": "Solitary lesion with infiltrative borders favors primary glioma; no primary malignancy identified on CT chest/abdomen/pelvis; metastases typically have well-defined borders at gray-white junction"
+        "key_features": "No known primary cancer; staging CT chest/abdomen/pelvis negative; infiltrative margins and corpus-callosum or eloquent-cortex involvement more typical of primary glioma than metastasis"
       },
       {
-        "diagnosis": "CNS lymphoma",
-        "likelihood": "very_low",
-        "key_features": "Primary CNS lymphoma typically enhances homogeneously and is periventricular; central necrosis and thick irregular rim enhancement are more characteristic of glioblastoma; patient is immunocompetent"
+        "diagnosis": "Primary CNS lymphoma",
+        "likelihood": "low",
+        "key_features": "In immunocompetent patients typically presents as homogeneously enhancing periventricular mass with diffuse DWI restriction and no central necrosis; ring enhancement with necrosis argues against"
       },
       {
         "diagnosis": "Brain abscess",
         "likelihood": "very_low",
-        "key_features": "Patient is afebrile with normal WBC; abscess has thin smooth enhancing rim and restricted diffusion centrally (pus); no source of infection identified"
+        "key_features": "No fever or leukocytosis; DWI restriction at the enhancing rim (not centrally as in pyogenic pus) and elevated rCBV are inconsistent with abscess"
       },
       {
-        "diagnosis": "Tumefactive demyelination",
+        "diagnosis": "Tumefactive demyelinating lesion",
         "likelihood": "very_low",
-        "key_features": "Typically presents in younger patients with open ring enhancement and less mass effect relative to size; no history of multiple sclerosis; marked mass effect with thick rim enhancement favors GBM"
+        "key_features": "Closed ring enhancement, marked mass effect, and central necrosis are atypical for tumefactive MS; demyelinating lesions usually show incomplete ('open') ring enhancement on the cortical side"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Perform initial stabilization: secure airway, obtain IV access, assess vital signs, and perform focused neurological exam including GCS",
-        "tool_name": null,
-        "expected_finding": "Post-ictal patient with focal neurological deficits (left-sided weakness, hemianopia)",
-        "category": "required"
+        "action": "Order MRI brain with and without gadolinium contrast (tumor protocol with DWI, FLAIR, post-contrast T1) to characterize the right frontoparietal lesion, define mass effect, and plan surgery",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Heterogeneously enhancing mass with ring/irregular enhancement, central necrosis, restricted diffusion at the enhancing rim, perilesional FLAIR-hyperintense edema, and mass effect consistent with high-grade glioma",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "tumor",
+          "contrast": true
+        },
+        "citation": "[Stupp_2005]",
+        "guideline_source": "Stupp_2005"
       },
       {
         "step": 2,
-        "action": "Obtain emergent non-contrast CT head to evaluate for mass lesion, hemorrhage, or midline shift",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "Large right frontal mass with surrounding edema and midline shift",
-        "category": "required",
-        "tool_parameters": {
-          "angiography": false,
-          "contrast": false
-        }
-      },
-      {
-        "step": 3,
-        "action": "Obtain stat labs including CBC, BMP, coagulation studies, hepatic panel, and LDH",
+        "action": "Order pre-operative laboratory workup: CBC, comprehensive metabolic panel, coagulation studies (PT/INR, aPTT), and type & screen in anticipation of surgical biopsy/resection",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal baseline labs suitable for pre-surgical workup; mild hyperglycemia",
+        "expected_finding": "Baseline values acceptable for surgery; identify any coagulopathy, electrolyte derangement, or steroid-relevant abnormality (e.g., hyperglycemia, hyponatremia) before craniotomy",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
-            "LFT",
-            "coagulation"
+            "coagulation",
+            "type_and_screen"
           ]
-        }
+        },
+        "citation": "[NCCN_CNS]",
+        "guideline_source": "NCCN_CNS"
+      },
+      {
+        "step": 3,
+        "action": "Search medical literature for management of newly suspected high-grade glioma: WHO 2021 classification, Stupp protocol indications, and timing of surgical referral",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirmation that maximal safe resection followed by concurrent chemoradiation (Stupp protocol) is the standard of care, with molecular profiling (IDH, MGMT, 1p/19q, TERT) guiding prognosis and treatment selection",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[WHO_2021]",
+        "guideline_source": "WHO_2021"
       },
       {
         "step": 4,
-        "action": "Initiate dexamethasone 10 mg IV bolus then 4 mg IV every 6 hours for vasogenic edema and elevated intracranial pressure",
-        "tool_name": null,
-        "expected_finding": "Reduction in peritumoral edema and improvement in neurological symptoms over 24-48 hours",
-        "category": "required"
+        "action": "Obtain urgent neurosurgical and neuro-oncology consultation for tissue diagnosis (stereotactic biopsy or maximal safe resection) and multidisciplinary treatment planning",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Multidisciplinary plan including tissue acquisition, molecular profiling, and adjuvant treatment per current standards",
+        "category": "required",
+        "tool_parameters": {
+          "specialty": "neurosurgery"
+        },
+        "citation": "[Stupp_2005]",
+        "guideline_source": "Stupp_2005"
       },
       {
         "step": 5,
-        "action": "Initiate levetiracetam 500 mg IV twice daily for seizure prophylaxis",
-        "tool_name": null,
-        "expected_finding": "Prevention of further seizures",
-        "category": "required"
+        "action": "Obtain neuro-oncology consultation for adjuvant therapy planning and molecular-marker-guided treatment selection",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Plan for concurrent chemoradiation (Stupp protocol with temozolomide) for IDH-wildtype GBM; alternative chemoradiation regimens for other tumor types or for atypical histologies",
+        "category": "required",
+        "tool_parameters": {
+          "specialty": "neuro_oncology"
+        },
+        "citation": "[Stupp_2005]",
+        "guideline_source": "Stupp_2005"
       },
       {
         "step": 6,
-        "action": "Obtain brain MRI with and without gadolinium contrast to characterize the mass",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Large heterogeneously enhancing right frontoparietal mass with central necrosis, ring enhancement, and significant mass effect consistent with high-grade glioma",
-        "category": "required",
+        "action": "Order MR perfusion imaging (DSC perfusion) to assess tumor vascularity and target highest-grade region for biopsy",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Elevated rCBV (typically > 1.75) in enhancing component supports high-grade neoplasm and helps direct biopsy",
+        "category": "recommended",
         "tool_parameters": {
-          "protocol": "tumor",
-          "contrast": true
-        }
+          "modality": "perfusion_MRI"
+        },
+        "citation": "[Law_2003]",
+        "guideline_source": "Law_2003"
       },
       {
         "step": 7,
-        "action": "Obtain EEG to characterize seizure focus and assess for subclinical seizure activity",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Focal slowing over right frontoparietal region with epileptiform discharges in peri-tumoral cortex",
-        "category": "required",
+        "action": "Order MR spectroscopy (1H-MRS) to characterize tumor metabolic profile",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Elevated Cho/NAA ratio with lipid-lactate peaks supports high-grade malignancy and helps differentiate tumor from treatment-related change at follow-up",
+        "category": "recommended",
         "tool_parameters": {
-          "eeg_type": "routine"
-        }
+          "modality": "MR_spectroscopy"
+        },
+        "citation": "[Bulik_2013]",
+        "guideline_source": "Bulik_2013"
       },
       {
         "step": 8,
-        "action": "Consult neurosurgery for surgical planning including biopsy or maximal safe resection",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Order CT chest/abdomen/pelvis as staging to exclude an extracranial primary if a solitary metastasis is on the differential",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No extracranial primary malignancy identified, supporting primary brain tumor as the working diagnosis",
+        "category": "optional",
+        "tool_parameters": {
+          "region": "chest_abdomen_pelvis",
+          "contrast": true
+        },
+        "citation": "[NCCN_CNS]",
+        "guideline_source": "NCCN_CNS"
       },
       {
         "step": 9,
-        "action": "Order CT chest, abdomen, and pelvis to rule out primary malignancy (metastasis workup)",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "No evidence of systemic malignancy, supporting primary brain tumor diagnosis",
-        "category": "required"
-      },
+        "action": "Check drug interactions before starting/continuing antiepileptic medication and corticosteroids (levetiracetam preferred over enzyme-inducing AEDs; steroid effect on glycemic control)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identify steroid-induced hyperglycemia in diabetics and any AED-chemotherapy interaction concerns relevant to upcoming temozolomide therapy",
+        "category": "optional",
+        "tool_parameters": {},
+        "citation": "[NCCN_CNS]",
+        "guideline_source": "NCCN_CNS"
+      }
+    ],
+    "useless_tools": [
       {
-        "step": 10,
-        "action": "Obtain MR perfusion to confirm elevated rCBV in enhancing components",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Elevated rCBV ratio in enhancing rim, consistent with high-grade neoplasm",
-        "category": "recommended",
+        "tool_name": "order_echocardiogram",
         "tool_parameters": {
-          "imaging_type": "perfusion_MRI"
-        }
+          "echo_type": "TTE"
+        },
+        "rationale": "Echocardiogram has no role in the diagnostic workup of suspected high-grade glioma absent a specific cardiac question (e.g., suspected paraneoplastic endocarditis)",
+        "citation": "[NCCN_CNS]"
       },
       {
-        "step": 11,
-        "action": "Obtain functional MRI for pre-surgical motor and language mapping given proximity to motor cortex",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Motor cortex displaced but identifiable near tumor margin; language lateralized to contralateral hemisphere",
-        "category": "recommended",
+        "tool_name": "order_cardiac_monitoring",
         "tool_parameters": {
-          "protocol": "standard",
-          "contrast": false
-        }
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "Cardiac monitoring is unrelated to the diagnostic workup of a brain mass and adds resource cost without informing management",
+        "citation": "[NCCN_CNS]"
+      }
+    ],
+    "harmful_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is contraindicated in suspected intracranial mass with imaging evidence of herniation: the pressure gradient created by LP risks transtentorial or tonsillar herniation. Even when LP is otherwise safe, CSF studies are low-yield for primary brain tumor diagnosis.",
+        "citation": "[Hasbun_2001]"
+      }
+    ],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "MRI must precede any lumbar puncture when a mass lesion is suspected, to identify mass effect and herniation risk before LP",
+        "citation": "[Hasbun_2001]",
+        "severity": "hard"
       },
       {
-        "step": 12,
-        "action": "Proceed with maximal safe surgical resection with intraoperative mapping, followed by Stupp protocol (concurrent temozolomide and radiation therapy, then adjuvant temozolomide)",
-        "tool_name": null,
-        "expected_finding": "Tissue diagnosis confirming glioblastoma with molecular profiling guiding adjuvant therapy",
-        "category": "required"
+        "before": "analyze_brain_mri",
+        "after": "consult_medical_specialist",
+        "reason": "Adequate pre-operative MRI characterization (mass, edema, eloquent-cortex proximity) is standard of care before neurosurgical tissue acquisition",
+        "citation": "[Stupp_2005]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Obtain emergent neuroimaging (CT or MRI) to identify the mass lesion causing seizure and focal deficits",
-      "Initiate dexamethasone to reduce vasogenic edema and intracranial pressure",
-      "Initiate antiepileptic medication for seizure control and prophylaxis",
-      "Obtain MRI with contrast for definitive characterization of the mass",
-      "Consult neurosurgery for tissue diagnosis and surgical planning",
-      "Perform systemic workup (CT chest/abdomen/pelvis) to rule out metastatic disease",
-      "Obtain tissue diagnosis with molecular profiling (IDH, MGMT, 1p/19q) to guide treatment"
+      "Obtain urgent neurosurgical consultation for tissue diagnosis (stereotactic biopsy or maximal safe resection) and operative planning",
+      "Obtain MRI brain with and without gadolinium contrast (tumor protocol) before any invasive procedure",
+      "Administer dexamethasone (loading dose 10 mg IV, then 4 mg IV every 6 hours) to reduce vasogenic edema given imaging evidence of herniation/significant mass effect",
+      "Initiate antiepileptic therapy with levetiracetam (preferred non-enzyme-inducing AED) for documented seizure activity",
+      "Obtain pre-operative labs (CBC, BMP, coagulation, type & screen) before craniotomy/biopsy",
+      "Plan multimodal treatment per molecular and histological profile (e.g., Stupp protocol — concurrent chemoradiation with temozolomide for IDH-wildtype GBM)",
+      "Monitor blood glucose closely given anticipated corticosteroid use in a patient with diabetes; adjust antihyperglycemic regimen as needed"
     ],
     "contraindicated_actions": [
-      "Performing lumbar puncture in the setting of a large mass with midline shift (risk of uncal herniation)",
-      "Administering phenytoin or carbamazepine as first-line antiepileptic (enzyme inducers that interact with chemotherapy agents)",
-      "Delaying dexamethasone in a patient with significant mass effect and papilledema",
-      "Starting empiric temozolomide without tissue diagnosis and molecular profiling",
-      "Performing whole-brain radiation without first establishing a tissue diagnosis",
-      "Administering contrast dye without checking renal function in a diabetic patient"
+      "Do not perform lumbar puncture with herniation risk — herniation risk",
+      "Do not initiate definitive tumor-directed therapy (radiation, temozolomide, alkylating chemotherapy) before tissue diagnosis is established",
+      "Do not start therapeutic anticoagulation without a clear thromboembolic indication, given upcoming neurosurgical intervention and bleeding risk"
     ],
     "key_reasoning_points": [
-      "New-onset seizure in a 71-year-old with progressive headache and focal neurological deficits warrants urgent neuroimaging to evaluate for a structural lesion",
-      "Morning headaches worse upon waking, progressive over three weeks with papilledema, indicate elevated intracranial pressure from an expanding mass",
-      "MRI findings of a large heterogeneously enhancing mass with central necrosis, thick irregular ring enhancement, and restricted diffusion at the rim are classic for glioblastoma",
-      "EEG showing focal polymorphic delta activity and epileptiform discharges over the right frontoparietal region correlates with the MRI findings and localizes the seizure focus",
-      "Metastasis workup with CT chest/abdomen/pelvis is essential to differentiate a primary brain tumor from a solitary metastasis, even when imaging is suggestive of glioma",
-      "Dexamethasone should be initiated promptly for vasogenic edema with significant mass effect, but clinicians should be aware of its effects on blood glucose in diabetic patients and its potential to alter biopsy histology in lymphoma",
-      "Levetiracetam is preferred over enzyme-inducing antiepileptics (phenytoin, carbamazepine) in brain tumor patients because it does not interfere with chemotherapy metabolism",
-      "MGMT promoter methylation status is the most important molecular marker for predicting temozolomide response and guiding treatment decisions in glioblastoma"
+      "Combination of progressive headache (worse mornings), new focal neurological deficit, and/or new-onset seizure in an adult is a high-risk presentation requiring urgent contrast-enhanced brain MRI",
+      "MRI features of a right frontoparietal heterogeneously / ring-enhancing mass with central necrosis, perilesional FLAIR-hyperintense edema, restricted diffusion at the enhancing rim, and mass effect are characteristic of high-grade glioma",
+      "Perfusion MRI (elevated rCBV) and MR spectroscopy (elevated Cho/NAA, lipid-lactate) corroborate high-grade neoplasm and help guide biopsy targeting",
+      "Significant midline shift / herniation risk mandates urgent dexamethasone and neurosurgical evaluation; lumbar puncture is contraindicated",
+      "Definitive diagnosis requires tissue (stereotactic biopsy or surgical resection) with molecular profiling (IDH, MGMT, 1p/19q, TERT, H3K27M); imaging alone cannot substitute for histology",
+      "For IDH-wildtype GBM, current standard of care is maximal safe resection followed by the Stupp protocol (concurrent radiation + temozolomide, then adjuvant temozolomide)",
+      "Avoid ordering off-pathway advanced-imaging modalities (DaTscan, amyloid PET, FDG-PET, carotid duplex, transcranial Doppler) — they address other neurological differentials and add cost without informing glioma management",
+      "New-onset focal or generalized seizure with a focal-onset mass mandates AED therapy (levetiracetam preferred — non-enzyme-inducing, fewer interactions with temozolomide)"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
     "red_herrings": []
   },
   "metadata": {
@@ -988,6 +1025,17 @@
       "cardiac_monitoring": "normal",
       "specialized_test": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:GLIO-HG",
+    "difficulty_rationale": "4 required tools, no embedded red herrings; classic GBM presentation with clear imaging pattern (ring-enhancing mass with necrosis, edema, mass effect) and unambiguous molecular features on biopsy",
+    "case_body_concerns": [
+      "No literature_search output is provided in initial_tool_outputs or followup_outputs. search_medical_literature has been demoted from required to recommended to keep ground_truth self-consistent; a future case-body pass should add a literature_search payload covering WHO 2021 classification + Stupp protocol so this can be reinstated as required.",
+      "No literature_search output is provided in initial_tool_outputs or followup_outputs. search_medical_literature has been demoted from required to recommended to keep ground_truth self-consistent; a future case-body pass should add a literature_search payload covering WHO 2021 classification + Stupp protocol so this can be reinstated as required."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -83,105 +83,156 @@
     "extremities": "No edema; no petechiae"
   },
   "ground_truth": {
-    "primary_diagnosis": "Migraine with aphasic aura (G43.1) — misdiagnosed as TIA; warfarin overtreatment with supratherapeutic INR causing bleeding; warfarin should be stopped",
-    "primary_diagnosis_icd": "G43.1",
+    "primary_diagnosis": "Migraine with aphasic aura (ICHD-3 1.2.1) — misdiagnosed as TIA; warfarin overtreatment causing supratherapeutic INR and bleeding; warfarin should be stopped",
+    "icd_code": "G43.109",
     "differential": [
       {
-        "diagnosis": "TIA with anticoagulation indication",
+        "diagnosis": "Recurrent TIA (original diagnosis)",
+        "likelihood": "moderate",
+        "key_features": "Original 'AF' was a rhythm strip during palpitation, not sustained; Holter normal; MRI WMH non-specific; aphasic aura with subsequent headache is migrainous",
+        "icd_code": "G45.9"
+      },
+      {
+        "diagnosis": "Migraine without aura",
         "likelihood": "very_low",
-        "key_features": "No DWI restriction (no infarct); no confirmed AF on Holter x48 hours; normal echocardiogram; no PFO; no other embolic source; gradual aphasia onset + subsequent migrainous headache; family history of visual migraine aura; prior visual sparkles establishing migraine predisposition"
+        "key_features": "Aura is documented",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Focal seizure",
+        "likelihood": "very_low",
+        "key_features": "Duration too long for seizure",
+        "icd_code": "G40.109"
+      },
+      {
+        "diagnosis": "Transient global amnesia",
+        "likelihood": "very_low",
+        "key_features": "Language-specific, not amnestic",
+        "icd_code": "G45.4"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "URGENT: Address supratherapeutic INR 3.8 — dose-reduce warfarin; patient has gingival bleeding and nosebleed",
-        "tool_name": null,
-        "expected_finding": "INR 3.8 in patient without confirmed indication = dangerous overtreatment; immediate dose reduction",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "Review original TIA diagnosis — confirm that 'AF' was not confirmed on Holter and MRI showed only non-specific WMH",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "No infarction; non-specific WMH only; normal MRA; no TIA-confirming lesion",
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Stop warfarin (no AF on prolonged monitoring, supratherapeutic INR with bleeding); initiate migraine acute therapy; consider preventive [Holland_2012]",
         "category": "required",
         "tool_parameters": {
-          "contrast": true,
-          "sequences": [
-            "DWI",
-            "FLAIR",
-            "T1+Gd",
-            "MRA"
-          ]
-        }
+          "context": "warfarin_cessation_migraine_aphasic_aura"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 3,
-        "action": "48-hour Holter to definitively exclude AF before stopping anticoagulation",
-        "tool_name": "order_cardiac_monitoring",
-        "expected_finding": "No AF confirmed; prior rhythm strip was not diagnostic AF",
+        "action": "Brain MRI/MRA review with DWI — confirm absence of infarct and re-interpret WMH",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Non-specific WMH on prior MRI; no acute or chronic infarct; normal MRA",
         "category": "required",
         "tool_parameters": {
-          "duration_hours": 48
-        }
+          "contrast": false,
+          "sequences": [
+            "DWI",
+            "FLAIR",
+            "T2",
+            "SWI",
+            "MRA"
+          ]
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 4,
-        "action": "Stop warfarin — diagnosis is migraine with aphasic aura; no confirmed AF; no confirmed cerebral infarction; bleeding risk outweighs any embolic prevention benefit",
-        "tool_name": null,
-        "expected_finding": "Warfarin inappropriately prescribed; cessation safe after definitive AF exclusion",
+        "action": "Prolonged cardiac monitoring to definitively exclude paroxysmal AF",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Sinus rhythm; no AF; original 'AF rhythm strip' not reproduced",
         "category": "required",
-        "tool_parameters": {}
-      },
-      {
-        "step": 5,
-        "action": "Initiate migraine preventive therapy — topiramate 25-100 mg/day or amitriptyline 10-25 mg QHS",
-        "tool_name": null,
-        "expected_finding": "4 disabling aphasic aura episodes in 12 months = preventive therapy indicated",
-        "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "duration_days": 14,
+          "device": "ambulatory_event_monitor"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis — neither present here",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "MR_angiography"
+        },
+        "rationale": "Routine MRA is not indicated in typical migraine with aura — reserve for sudden-onset / thunderclap headache, suspected dissection, or focal deficit raising concern for vascular cause",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "harmful_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "TOE in a patient with active bleeding and supratherapeutic INR risks haemorrhagic complications; defer until warfarin reversed if echo needed at all",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "sequence_constraints": [],
     "critical_actions": [
-      "URGENTLY address supratherapeutic INR 3.8 — active bleeding symptoms (gingival bleeding, nosebleed); reduce warfarin dose immediately",
-      "Stop warfarin after definitive AF exclusion — diagnosis is migraine with aphasic aura, not TIA",
-      "Confirm 'AF' on original ECG was not a true AF diagnosis — rhythm strip artefact or isolated ectopic beat not equivalent to confirmed AF",
-      "Initiate migraine preventive therapy — this is the appropriate treatment for recurrent disabling aphasic aura"
+      "Stop warfarin — supratherapeutic INR with bleeding, no documented AF on prolonged monitoring",
+      "Reverse anticoagulation if active bleeding clinically significant",
+      "Re-interpret 'AF rhythm strip' as palpitation artifact; obtain definitive prolonged monitoring",
+      "Reframe diagnosis as migraine with aphasic aura — initiate appropriate acute and preventive therapy",
+      "Counsel against combined oestrogen-progestogen HRT"
     ],
     "contraindicated_actions": [
-      "Do not continue warfarin without confirmed indication — no AF on extended monitoring; no confirmed cerebral infarction; active bleeding",
-      "Do not anticoagulate for migraine with aphasic aura — anticoagulation has no role in migraine management",
-      "Do not combine NSAIDs with warfarin for acute headache — increased bleeding risk (relevant until warfarin stopped)"
+      "Do not continue warfarin without documented AF or other indication",
+      "Do not perform TOE while supratherapeutic INR with active bleeding",
+      "Do not co-administer triptans with ergotamines"
     ],
     "key_reasoning_points": [
-      "The original TIA diagnosis was incorrect — the 'AF on ECG' was likely artefact or isolated ectopic beat; confirmed AF requires diagnostic Holter criteria; the MRI showed only non-specific WMH",
-      "Warfarin was prescribed without confirmed indication, is supratherapeutic (INR 3.8), and is causing bleeding — it must be stopped",
-      "Migraine with aphasic aura was the correct diagnosis from the beginning — gradual onset, consistent subsequent migrainous headache, family history, prior visual sparkles",
-      "This is a patient safety case: overtreatment with anticoagulation for a misdiagnosed condition",
-      "Diagnostic puzzle difficulty: the prior 'AF ECG' creates plausible TIA pathway; only careful review of original records and definitive re-investigation resolves the error"
+      "Critical reappraisal: original 'TIA' diagnosis was based on a single rhythm strip during palpitation and non-specific WMH — neither sufficient for the diagnosis",
+      "Aphasic aura with subsequent migrainous headache is migraine, not TIA",
+      "Warfarin without AF (or other indication) causes net harm — supratherapeutic INR with bleeding"
     ],
     "red_herrings": [
       {
-        "data_point": "Prior ECG reportedly showing 'intermittent AF' — TIA anticoagulation appeared justified",
+        "data_point": "Prior 'AF rhythm strip' label and warfarin therapy",
         "location": "patient.history_present_illness",
-        "intended_effect": "If AF was confirmed, TIA anticoagulation with warfarin is standard of care",
-        "correct_interpretation": "Review of original records showed a single rhythm strip during palpitations — not diagnostic AF; subsequent 48-hour Holter shows no AF; the original AF diagnosis was incorrect; warfarin was never indicated",
-        "field_path": ""
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "May anchor on continuing anticoagulation",
+        "correct_interpretation": "Rhythm strip during palpitation is not equivalent to documented sustained AF on prolonged monitoring; warfarin should be stopped"
       },
       {
-        "data_point": "White matter changes on MRI — supporting TIA/vascular diagnosis",
+        "data_point": "WMH on prior MRI labelled as 'white matter changes'",
         "location": "patient.history_present_illness",
-        "intended_effect": "WMH are associated with cerebrovascular disease in older adults; original team interpreted them as TIA-related",
-        "correct_interpretation": "WMH are non-specific subcortical lesions consistent with longstanding migraine; no periventricular lesions, no lacunar infarcts, no large vessel territory changes; radiologist clearly stated 'non-specific, clinical correlation'",
-        "field_path": ""
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "May appear to support vascular diagnosis",
+        "correct_interpretation": "The report explicitly notes 'non-specific — see clinical correlation'; WMH are common in migraineurs and non-actionable"
       }
-    ],
-    "icd_code": "G43.1",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -205,7 +256,18 @@
       "advanced_imaging": "normal",
       "specialized_test": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Diagnostic puzzle: deconstructing a prior misdiagnosis, stopping inappropriate anticoagulation, and reframing migraine with aphasic aura",
+    "case_body_concerns": [
+      "Required tool(s) lacking initial or followup outputs in the case body — agent calling them will fall back to off-pathway tier or empty result; tools: ['check_drug_interactions (only fallback)']",
+      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide §1): ['analyze_eeg', 'interpret_labs']"
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "initial_tool_outputs": {
     "mri": {

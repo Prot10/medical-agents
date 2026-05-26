@@ -77,118 +77,117 @@
     "extremities": "No edema; no rash"
   },
   "ground_truth": {
-    "primary_diagnosis": "Migraine with typical visual aura (G43.1), ICHD-3 criteria met",
-    "primary_diagnosis_icd": "G43.1",
+    "primary_diagnosis": "Migraine with typical visual aura (ICHD-3 1.2.1)",
+    "icd_code": "G43.109",
     "differential": [
+      {
+        "diagnosis": "Migraine without aura with visual symptoms",
+        "likelihood": "low",
+        "key_features": "Stereotyped 20-30 min expanding fortification spectra and headache pattern are diagnostic of aura, not the variably-located cephalalgia of migraine without aura",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Focal occipital seizure with visual phenomena",
+        "likelihood": "very_low",
+        "key_features": "Visual seizures are brief (<2 min), stereotyped colored circles; 20-30 min spread is too slow for ictal propagation; no impaired awareness",
+        "icd_code": "G40.109"
+      },
       {
         "diagnosis": "Transient ischemic attack (posterior circulation)",
         "likelihood": "very_low",
-        "key_features": "Normal brain MRI/MRA/DWI; 5-year history with recurrent identical episodes; positive visual aura spreading over 20-30 minutes (spreading scotoma is migraine, not TIA); young age without vascular risk factors"
+        "key_features": "5-year recurrent identical pattern, young patient, no vascular risk factors; gradual aura march is incompatible with abrupt TIA onset",
+        "icd_code": "G45.9"
       },
       {
-        "diagnosis": "Focal occipital lobe seizure with visual phenomena",
+        "diagnosis": "Arteriovenous malformation / cavernoma",
         "likelihood": "very_low",
-        "key_features": "Visual seizures typically brief (<1-2 min), stereotyped, colored circular phosphenes; spreading over 20-30 min is characteristic of migraine; normal interictal EEG"
-      },
-      {
-        "diagnosis": "AVM or cavernoma",
-        "likelihood": "very_low",
-        "key_features": "Normal brain MRI (no mass, no hemosiderin); normal MRA; no hemorrhage history"
+        "key_features": "No haemorrhage history, no thunderclap, no fixed deficit — would need MRI for definitive exclusion if red flags emerge",
+        "icd_code": "Q28.2"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI to exclude secondary causes (AVM, tumor, demyelinating disease)",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Normal brain MRI with only tiny non-specific subcortical WMH; no AVM, tumor, or vascular malformation; normal DWI",
-        "category": "recommended",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
+        "category": "required",
         "tool_parameters": {
-          "contrast": true,
-          "sequences": [
-            "DWI",
-            "T2",
-            "FLAIR",
-            "SWI",
-            "MRA"
-          ]
-        }
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "Routine laboratory workup (CBC, BMP, inflammatory markers, ANA, TSH, antiphospholipid)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "All values within normal limits — no metabolic, inflammatory, or coagulation cause",
-        "category": "recommended",
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sumatriptan 50-100 mg is appropriate as acute therapy; preventive options (topiramate, propranolol) reviewed for monthly-frequency disability",
+        "category": "required",
         "tool_parameters": {
-          "lab_type": "headache_workup"
-        }
-      },
-      {
-        "step": 3,
-        "action": "Prescribe sumatriptan 100 mg orally for acute migraine attacks (take at headache onset)",
-        "tool_name": null,
-        "expected_finding": "Sumatriptan 100 mg oral at headache onset is appropriate and safe in typical visual aura; no contraindications",
-        "category": "recommended",
-        "tool_parameters": {}
-      },
-      {
-        "step": 4,
-        "action": "Initiate preventive therapy — topiramate 25 mg titrating to 50 mg BID, or propranolol 40 mg BID — given monthly frequency",
-        "tool_name": null,
-        "expected_finding": "Monthly frequency with disability meets threshold for preventive therapy; topiramate or propranolol as first-line",
-        "category": "recommended",
-        "tool_parameters": {}
-      },
-      {
-        "step": 5,
-        "action": "Counsel on migraine triggers (sleep, meals, menstruation), avoid combined OCP, headache diary",
-        "tool_name": null,
-        "expected_finding": "Combined OCP relatively contraindicated in migraine with aura; trigger diary and avoidance counselling",
-        "category": "recommended",
-        "tool_parameters": {}
+          "context": "migraine_with_aura_pharmacotherapy"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis — neither present here",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated in typical migraine with aura — no role unless cardioembolic stroke is on the differential",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "optical_coherence_tomography"
+        },
+        "rationale": "OCT is not part of the migraine workup and is reserved for demyelinating optic neuropathy or chiasmal disease — not indicated here",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "Brain MRI to exclude structural secondary causes before labeling as primary migraine",
-      "Recognize that spreading visual fortification spectra over 20-30 minutes is pathognomonic for migraine aura (not TIA)",
-      "Prescribe triptan at headache onset (not during aura phase)",
-      "Initiate preventive therapy given monthly frequency with disability",
-      "Advise against combined oral contraceptives in migraine with aura"
+      "Confirm ICHD-3 1.2 criteria are met (≥2 attacks with reversible aura ≥5 min, accompanied/followed by headache within 60 min)",
+      "Document absence of SNOOP red flags (Systemic symptoms, Neurologic deficits between attacks, sudden Onset, Onset after age 50, Pattern change)",
+      "Counsel that combined oestrogen-progestogen contraception is WHO Category 4 in migraine with aura",
+      "Initiate sumatriptan 50-100 mg at headache onset (not during aura) for acute therapy",
+      "Discuss preventive therapy (topiramate or propranolol) given approximately monthly frequency"
     ],
     "contraindicated_actions": [
-      "Do not prescribe combined OCP — relatively contraindicated in migraine with aura (WHO category 3-4, increased stroke risk)",
-      "Do not prescribe ergotamines without triptan trial (less effective and more side effects)",
-      "Do not give triptan during aura phase (give at headache onset)",
-      "Do not order LP for routine migraine evaluation without red flag features"
+      "Do not co-administer two different triptans within 24 hours",
+      "Do not co-administer triptans with ergotamines within 24 hours",
+      "Do not prescribe combined oestrogen-progestogen contraception in migraine with aura"
     ],
     "key_reasoning_points": [
-      "ICHD-3 criteria for migraine with typical visual aura: ≥2 attacks; visual aura spreading over ≥5 minutes (positive then negative symptoms); aura lasting 5-60 minutes; headache within 60 minutes of aura; no structural cause",
-      "Fortification spectra (zigzag scintillating scotoma) expanding over 20-30 minutes is essentially pathognomonic for migraine aura",
-      "Normal MRI with DWI excludes TIA; 5-year identical history further supports primary diagnosis",
-      "Combined OCP is relatively contraindicated in migraine with aura due to approximately 2-fold increase in stroke risk",
-      "Monthly frequency with disability (MIDAS score) triggers preventive therapy discussion"
+      "ICHD-3 1.2.1 is a clinical diagnosis — no neuroimaging or laboratory test confirms migraine with aura when the criteria are met",
+      "Routine brain MRI is NOT indicated in typical migraine with aura without SNOOP red flags [AAN_2000]; the MRI ordered for this case is best understood as a defensive over-investigation, not a guideline-mandated step",
+      "Two non-specific subcortical WMH on MRI are an expected (non-actionable) incidental finding in migraineurs and do not change management",
+      "Frequency at almost monthly with disability satisfies common thresholds for offering preventive therapy [Holland_2012]"
     ],
     "red_herrings": [
       {
-        "data_point": "Tiny subcortical white matter T2 foci on MRI",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Small white matter hyperintensities in young women can suggest MS or cerebrovascular disease",
-        "correct_interpretation": "Non-specific T2 hyperintensities are commonly seen in migraineurs; not diagnostic for MS (no periventricular distribution) or lacunar stroke (size <3 mm)",
-        "field_path": ""
-      },
-      {
-        "data_point": "OCP history raising concern for cerebral venous thrombosis",
-        "location": "patient.history_present_illness",
-        "intended_effect": "OCP use + headache with visual symptoms could suggest CVT",
-        "correct_interpretation": "Patient stopped OCP 1.5 years ago; CVT would show progressive headache with papilledema or focal deficit; 5-year identical episodic history inconsistent with CVT",
-        "field_path": ""
+        "data_point": "Two non-specific subcortical white matter hyperintensities on brain MRI",
+        "location": "initial_tool_outputs.mri.impression",
+        "field_path": "initial_tool_outputs.mri.impression",
+        "intended_effect": "May prompt unnecessary anxiety, repeat imaging, or workup for demyelinating disease",
+        "correct_interpretation": "Non-specific subcortical WMH are common in migraineurs and are not clinically actionable in the absence of inflammatory or vascular features"
       }
-    ],
-    "icd_code": "G43.1",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -211,7 +210,17 @@
       "ct": "incidental",
       "cardiac_monitoring": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Straightforward: 2 required tools (literature confirmation + drug interaction review), classic ICHD-3 presentation, single non-specific MRI distractor, no SNOOP red flags",
+    "case_body_concerns": [
+      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide §1): ['analyze_brain_mri', 'analyze_ecg', 'analyze_eeg', 'interpret_labs', 'order_advanced_imaging', 'order_echocardiogram']"
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "initial_tool_outputs": {
     "mri": {

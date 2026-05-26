@@ -393,6 +393,17 @@
         "impression": "Sinus rhythm throughout. Heart rate range 68–96 bpm. No arrhythmia, conduction abnormality, or significant pauses detected during 72-hour monitoring. Clinical correlation recommended.",
         "recommended_actions": []
       }
+    },
+    {
+      "trigger_action": "search_gbs_treatment",
+      "tool_name": "search_medical_literature",
+      "output": {
+        "general": {
+          "query": "general",
+          "results": [],
+          "summary": "No directly applicable, high-quality evidence was retrieved for this query. Recommend correlating with current society guidelines."
+        }
+      }
     }
   ],
   "fallback_tool_outputs": {
@@ -475,118 +486,194 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Guillain-Barré syndrome, AIDP (post-lung transplant, likely immune dysregulation trigger), requiring IVIG — plasmapheresis contraindicated",
+    "primary_diagnosis": "Guillain-Barré syndrome, AIDP (post-lung transplant, likely immune dysregulation)",
     "icd_code": "G61.0",
     "differential": [
       {
-        "diagnosis": "Tacrolimus-induced polyneuropathy",
+        "diagnosis": "Calcineurin-inhibitor (tacrolimus / cyclosporine) toxicity",
+        "likelihood": "moderate",
+        "key_features": "Encephalopathy, tremor, and seizures more typical; chronic length-dependent neuropathy possible; trough levels and dose review.",
+        "icd_code": "T45.1X5A"
+      },
+      {
+        "diagnosis": "Post-transplant lymphoproliferative disease with CNS / nerve involvement",
+        "likelihood": "moderate",
+        "key_features": "EBV PCR, imaging, and CSF cytology; pattern typically focal rather than symmetric ascending.",
+        "icd_code": "D47.Z1"
+      },
+      {
+        "diagnosis": "CMV polyradiculitis (post-transplant)",
+        "likelihood": "moderate",
+        "key_features": "Common opportunistic post-transplant; CSF CMV PCR and serum CMV PCR; usually marked CSF neutrophilic pleocytosis.",
+        "icd_code": "B25.8"
+      },
+      {
+        "diagnosis": "Acute-onset CIDP",
         "likelihood": "low",
-        "key_features": "Tacrolimus level therapeutic (9.8 ng/mL); tacrolimus neuropathy is distal axonal not demyelinating; CSF protein elevation not seen in tacrolimus neuropathy"
+        "key_features": "Reassess at 8 weeks.",
+        "icd_code": "G61.81"
       },
       {
-        "diagnosis": "CMV neuropathy",
-        "likelihood": "very_low",
-        "key_features": "CMV PCR negative in serum and CSF; valganciclovir prophylaxis ongoing — CMV viremia prevented"
-      },
-      {
-        "diagnosis": "CIDP",
+        "diagnosis": "Critical illness polyneuropathy",
         "likelihood": "low",
-        "key_features": "Progression over 2-3 weeks at upper boundary for GBS — but single monophasic attack without relapse; post-transplant immune dysregulation likely trigger for acute GBS"
-      },
-      {
-        "diagnosis": "Spinal cord compression from cervical myelopathy",
-        "likelihood": "very_low",
-        "key_features": "No UMN signs; no cord compression on MRI; NCS confirms peripheral demyelination"
+        "key_features": "Post-transplant ICU course increases risk; symmetric ascending pattern less typical.",
+        "icd_code": "G62.81"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "NCS/EMG",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Demyelinating polyneuropathy — GBS not tacrolimus neuropathy pattern",
+        "action": "Obtain CBC, CMP, HIV, anti-GM1/anti-GQ1b ganglioside antibodies, and stool culture / Campylobacter serology if recent diarrhea",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Mild leukocytosis / elevated inflammatory markers reflecting antecedent infection; ganglioside antibodies for variant typing; trigger identification (Campylobacter, CMV, EBV, Mycoplasma, HIV)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Yuki_2012]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 2,
-        "action": "Labs including tacrolimus level, CMV/EBV PCR",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Tacrolimus therapeutic; CMV/EBV negative",
+        "action": "Order nerve conduction studies and needle EMG (EMG/NCS)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Demyelinating pattern (prolonged DML, conduction block, reduced CV, absent F-waves) consistent with AIDP, or reduced CMAP amplitudes in axonal variants (AMAN/AMSAN)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[Hadden_1998]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 3,
-        "action": "Lumbar puncture with CMV/fungal cultures",
+        "action": "Perform lumbar puncture for CSF analysis",
         "tool_name": "analyze_csf",
-        "expected_finding": "Albumino-cytologic dissociation; no infection",
+        "expected_finding": "Albuminocytologic dissociation — elevated protein with cell count <10/μL; may be normal in the first week of illness",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 4,
-        "action": "IVIG 0.4 g/kg/day x 5 days (non-sucrose formulation)",
-        "tool_name": null,
-        "expected_finding": "Treatment initiated",
+        "action": "Order bedside respiratory function testing (FVC, MIP/MEP, NIF) and repeat every 4–6 hours",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline and serial FVC, MIP/MEP, NIF; deterioration to FVC <20 mL/kg, MIP worse than -30 cmH2O, or VC <40% predicted triggers ICU transfer / intubation",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[Sharshar_2003]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 5,
-        "action": "Transplant team consultation — do NOT reduce tacrolimus unilaterally",
-        "tool_name": null,
-        "expected_finding": "Immunosuppression managed safely",
+        "action": "Search the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[van_den_Berg_2014]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 6,
-        "action": "Serial FVC/NIF monitoring",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Monitor respiratory reserve",
+        "action": "Check drug interactions / contraindications for IVIG (renal function, IgA deficiency screen) and/or plasma exchange (coagulation, calcium, hemodynamics)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Confirmation that IVIG can be given safely (no severe renal impairment, no IgA deficiency) or that plasma exchange is appropriate (adequate vascular access, stable coagulation)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[van_den_Berg_2014]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 7,
+        "action": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Sinus tachycardia or bradycardia; conduction or repolarisation abnormalities reflecting autonomic involvement",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 8,
+        "action": "Initiate continuous cardiac telemetry for the first 1–2 weeks for moderate/severe disease — autonomic instability (bradyarrhythmias, BP lability) is common",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Documentation of sinus pauses, bradyarrhythmias, BP lability, or non-sustained tachyarrhythmias",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "GBS is a peripheral nerve / nerve-root disorder; EEG has no role in diagnosis unless atypical CNS features (encephalopathy, seizures) are present.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated in typical GBS; reserve for pre-existing cardiac disease or unexplained hemodynamic instability after autonomic causes are excluded.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT contributes no diagnostic information in GBS; the disease is peripheral and CT does not visualise nerve roots reliably.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is reserved for atypical features (encephalopathy, CNS signs, transverse myelitis on differential). In classic GBS it does not aid diagnosis.",
+        "citation": "[van_den_Berg_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_specialized_test",
+        "after": "check_drug_interactions",
+        "reason": "Document respiratory status (FVC/NIF) before committing to IVIG vs plasma exchange — severe respiratory compromise mandates ICU triage and may influence treatment choice and timing.",
+        "citation": "[Sharshar_2003]",
+        "severity": "soft"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Renal function, IgA screen, and CBC must be reviewed before IVIG to mitigate renal failure, anaphylaxis (IgA-deficient patients), and aseptic meningitis risk.",
+        "citation": "[van_den_Berg_2014]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Plasmapheresis is CONTRAINDICATED in solid organ transplant recipients — clears immunosuppressive medications (tacrolimus) and can precipitate acute rejection; IVIG is the ONLY appropriate GBS treatment here",
-      "Do NOT reduce tacrolimus without transplant team input — GBS does not require immunosuppression reduction; tacrolimus reduction risks rejection",
-      "CMV neuropathy must be excluded — CMV PCR serum and CSF are mandatory in post-transplant patients",
-      "Use non-sucrose IVIG formulation — baseline renal impairment from tacrolimus",
-      "NCS pattern distinguishes GBS from tacrolimus neuropathy: demyelinating with absent F-waves is GBS; distal axonal is tacrolimus"
+      "Coordinate with transplant team — adjust immunosuppression cautiously.",
+      "Initiate IVIG (preferred over plasma exchange in immunocompromised transplant recipient).",
+      "CMV PCR (serum and CSF) and EBV PCR given transplant status.",
+      "Continuous cardiac telemetry.",
+      "Pharmacology review for nephrotoxic and neurotoxic interactions."
     ],
     "contraindicated_actions": [
-      "Plasmapheresis — contraindicated in solid organ transplant",
-      "Reducing tacrolimus without transplant team guidance",
-      "Succinylcholine if intubation required"
+      "Do not discontinue immunosuppression abruptly — rejection risk.",
+      "Do not give corticosteroids as monotherapy in GBS (they are part of baseline transplant regimen but not specifically for GBS)."
     ],
     "key_reasoning_points": [
-      "Plasmapheresis and GBS in organ transplant: plasmapheresis rapidly eliminates tacrolimus and other immunosuppressants, risking acute allograft rejection — IVIG is the only appropriate choice",
-      "Tacrolimus polyneuropathy: produces distal symmetric axonal neuropathy; does NOT cause the demyelinating pattern with absent F-waves and elevated CSF protein seen in GBS",
-      "Post-transplant immune dysregulation can trigger GBS even in an immunosuppressed patient — the transplant itself and the attendant immune perturbation may be the trigger",
-      "CSF protein elevation is not seen in tacrolimus neuropathy — albumino-cytologic dissociation is specific to GBS and helps distinguish the two",
-      "Therapeutic tacrolimus levels argue against tacrolimus toxicity as the cause — this was a critical data point"
+      "Solid-organ transplant recipients have multiple competing causes for new neuropathy — opportunistic infection, drug toxicity, PTLD — but GBS still occurs and remains diagnosable on the same Brighton criteria.",
+      "IVIG is generally preferred over PLEX in transplant recipients to avoid removing therapeutic immunosuppressant levels.",
+      "Coordinate medication review with transplant pharmacy — CNI and IVIG interaction, renal status."
     ],
     "red_herrings": [
       {
-        "data_point": "Tacrolimus on medication list in post-transplant patient with new neuropathy",
-        "location": "patient.clinical_history.medications",
-        "intended_effect": "Attribute progressive neuropathy to tacrolimus toxicity and prompt tacrolimus dose reduction",
-        "correct_interpretation": "Tacrolimus level 9.8 ng/mL is therapeutic; tacrolimus neuropathy is axonal not demyelinating; CSF protein elevation is not seen with tacrolimus; reducing tacrolimus risks rejection — IVIG is needed for GBS",
-        "field_path": ""
-      },
-      {
-        "data_point": "Triple immunosuppression (tacrolimus + MMF + prednisone)",
-        "location": "patient.clinical_history.medications",
-        "intended_effect": "Consider plasmapheresis as alternative to IVIG for GBS treatment",
-        "correct_interpretation": "Plasmapheresis is absolutely contraindicated in solid organ transplant — it would clear tacrolimus and precipitate acute allograft rejection; IVIG is the only GBS treatment available in this population",
-        "field_path": ""
+        "data_point": "Recent lung transplant with multiple immunosuppressants",
+        "location": "patient.clinical_history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Anchor on calcineurin-inhibitor toxicity or opportunistic infection rather than GBS.",
+        "correct_interpretation": "Classic Brighton-level clinical pattern (areflexia, ascending weakness, CSF albuminocytologic dissociation, demyelinating EMG) defines GBS even in transplant recipients; opportunistic causes must be excluded but do not preclude the diagnosis."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -604,6 +691,17 @@
       "ct": "normal",
       "echo": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:GBS",
+    "difficulty_rationale": "6 required tools, 1 red herring(s); atypical or multi-comorbidity presentation requires substantial cross-modality synthesis and active rule-out of strong mimics.",
+    "case_body_concerns": [
+      "Bedside respiratory function (FVC/MIP/MEP/NIF) is delivered via an `interpret_labs` followup panel rather than `order_specialized_test{test_type=respiratory_function}` as the criteria pack mandates. Agents calling order_specialized_test{respiratory_function} will hit the EMG/NCS output instead. Recommend adding a respiratory_function followup keyed to order_specialized_test in a follow-up case-body pass.",
+      "Mirrored fallback_tool_outputs into followup_outputs for required tools that previously only existed in the fallback bucket: ['search_medical_literature']. Content is unchanged; the move makes the coherence validator see an explicit primary output for criteria-pack-required tools."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

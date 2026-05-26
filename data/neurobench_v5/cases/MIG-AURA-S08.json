@@ -75,80 +75,111 @@
     "extremities": "No edema"
   },
   "ground_truth": {
-    "primary_diagnosis": "Migraine with typical visual aura (G43.1); untreated, triptan-naive",
-    "primary_diagnosis_icd": "G43.1",
+    "primary_diagnosis": "Migraine with typical visual aura (ICHD-3 1.2.1), untreated and triptan-naïve",
+    "icd_code": "G43.109",
     "differential": [
       {
-        "diagnosis": "Ocular disease causing visual symptoms",
-        "likelihood": "very_low",
-        "key_features": "Normal ophthalmologic evaluation (fundoscopy, tonometry, refraction) 3 years ago; episodic expanding visual aura is cortical in origin, not ocular"
+        "diagnosis": "Migraine without aura",
+        "likelihood": "low",
+        "key_features": "Aura is stereotyped — this is migraine with aura",
+        "icd_code": null
       },
       {
-        "diagnosis": "Visual seizure (occipital lobe epilepsy)",
+        "diagnosis": "Tension-type headache",
         "likelihood": "very_low",
-        "key_features": "Visual seizures are brief (<2 min); expanding over 25 minutes is characteristic of cortical spreading depression; normal EEG; family history of migraine"
+        "key_features": "Pulsating, unilateral, with photophobia/phonophobia and nausea is migrainous",
+        "icd_code": "G44.2"
+      },
+      {
+        "diagnosis": "Cluster headache",
+        "likelihood": "very_low",
+        "key_features": "No autonomic features, no nocturnal pattern, attack duration too long for cluster",
+        "icd_code": "G44.001"
+      },
+      {
+        "diagnosis": "Hemicrania continua / paroxysmal hemicrania",
+        "likelihood": "very_low",
+        "key_features": "Episodic, not continuous; no indomethacin trial yet but features atypical",
+        "icd_code": "G44.51"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI to confirm no structural cause",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
+        "category": "required",
         "tool_parameters": {
-          "contrast": true
-        }
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "Laboratory workup including ANA and antiphospholipid antibodies",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sumatriptan / rizatriptan as first-line acute therapy; no contraindications; preventive options reviewed if frequency rises [Holland_2012]",
+        "category": "required",
         "tool_parameters": {
-          "lab_type": "headache_workup"
-        }
-      },
-      {
-        "step": 3,
-        "action": "Prescribe sumatriptan 100 mg for acute attacks",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
-        "tool_parameters": {}
-      },
-      {
-        "step": 4,
-        "action": "Counsel on trigger management and headache diary",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
-        "tool_parameters": {}
+          "context": "migraine_with_aura_pharmacotherapy"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis — neither present here",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Routine transthoracic / bubble echocardiogram (PFO screening) is NOT indicated in migraine with aura; PFO-migraine association is controversial and PFO closure does not reduce migraine [Charles_2017]",
+        "citation": "[Charles_2017]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated in typical migraine with aura — no role unless cardioembolic stroke is on the differential",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "Brain MRI for first neurology evaluation of visual aura",
-      "Prescribe triptan — patient has been undertreated for 8 years",
-      "Counsel on taking triptan at headache onset (not during aura)",
-      "Counsel on avoiding combined OCP in the future"
+      "Confirm ICHD-3 1.2 criteria are met",
+      "Initiate sumatriptan or rizatriptan as acute therapy",
+      "Counsel against combined oestrogen-progestogen contraception",
+      "Provide headache diary and trigger education"
     ],
     "contraindicated_actions": [
-      "Do not take triptan during visual aura phase",
-      "Do not prescribe combined OCP in the future (migraine with aura)",
-      "Do not overuse analgesics (>15 days/month = MOH risk)"
+      "Do not start combined oestrogen-progestogen contraception",
+      "Do not co-administer triptans with ergotamines"
     ],
     "key_reasoning_points": [
-      "Classic visual aura since age 18, family history, normal ophthalmologic evaluation — ICHD-3 criteria clearly met",
-      "Patient was undertreated for 8 years; initial referral by ophthalmologist was appropriate but not followed up",
-      "Normal brain MRI confirms primary migraine",
-      "Key action: initiate appropriate triptan treatment for 8 years of undertreatment"
+      "Most important step in a triptan-naïve patient is initiating an evidence-based acute therapy",
+      "Diagnosis is clinical; further investigation is not required when ICHD-3 criteria are met"
     ],
-    "red_herrings": [],
-    "icd_code": "G43.1",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": [
+      {
+        "data_point": "Brain MRI obtained as part of workup",
+        "location": "initial_tool_outputs.mri",
+        "field_path": "initial_tool_outputs.mri",
+        "intended_effect": "Suggests MRI is the standard pathway",
+        "correct_interpretation": "Routine MRI is not indicated in this presentation [AAN_2000]"
+      }
+    ]
   },
   "red_herrings": [
     {
@@ -167,7 +198,17 @@
       "echo": "incidental",
       "cardiac_monitoring": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Straightforward: classic untreated migraine with aura; primary decision is initiating triptan",
+    "case_body_concerns": [
+      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide §1): ['analyze_brain_mri', 'analyze_ecg', 'analyze_eeg', 'interpret_labs', 'order_advanced_imaging']"
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "initial_tool_outputs": {
     "mri": {

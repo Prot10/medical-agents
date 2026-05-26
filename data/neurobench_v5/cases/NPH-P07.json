@@ -452,123 +452,212 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Idiopathic normal pressure hydrocephalus (iNPH) — misdiagnosed as PSP",
+    "primary_diagnosis": "Idiopathic normal pressure hydrocephalus (iNPH) — prior PSP label not supported",
     "icd_code": "G91.2",
     "differential": [
       {
+        "diagnosis": "Vascular cognitive impairment / subcortical ischaemic vascular disease",
+        "likelihood": "high",
+        "key_features": "Small-vessel disease can produce gait apraxia and executive slowing, but ventriculomegaly out of proportion to white-matter burden and a positive tap test favour NPH",
+        "icd_code": "F01.50"
+      },
+      {
         "diagnosis": "Progressive supranuclear palsy (PSP)",
-        "likelihood": "low",
-        "key_features": "No complete vertical gaze palsy, no downward gaze palsy; MPAR 0.55 (above PSP threshold); normal DaTscan; no hummingbird sign; falls forward not backward. PSP diagnosis criteria not met."
+        "likelihood": "high",
+        "key_features": "PSP causes early falls and axial rigidity but is characterised by vertical supranuclear gaze palsy and midbrain atrophy on MRI; tap response would not be expected in true PSP",
+        "icd_code": "G23.1"
       },
       {
-        "diagnosis": "Parkinson's disease",
-        "likelihood": "very_low",
-        "key_features": "Normal DaTscan. No typical PD features (narrow-based festinant gait, resting tremor, asymmetric cogwheel rigidity)."
+        "diagnosis": "Leptomeningeal carcinomatosis",
+        "likelihood": "moderate",
+        "key_features": "Active malignancy mandates exclusion by CSF cytology and gadolinium-enhanced MRI; iNPH is supported when CSF cytology is negative on adequate sampling",
+        "icd_code": "C79.32"
       },
       {
-        "diagnosis": "Vascular parkinsonism with NPH",
-        "likelihood": "low",
-        "key_features": "Mild white matter changes and hypertension; however Evans 0.36 and clearly positive tap trial confirm NPH as dominant process"
+        "diagnosis": "Parkinson's disease / atypical parkinsonism",
+        "likelihood": "moderate",
+        "key_features": "Shuffling gait overlaps, but absence of resting tremor, asymmetric rigidity, or L-dopa response and presence of magnetic gait + DESH favour NPH",
+        "icd_code": "G20"
       },
       {
         "diagnosis": "Alzheimer's disease",
-        "likelihood": "very_low",
-        "key_features": "Normal CSF biomarkers, negative amyloid PET (CL 11)"
+        "likelihood": "moderate",
+        "key_features": "Cognitive decline overlaps; AD typically presents with episodic-memory predominance and hippocampal atrophy rather than frontal-subcortical pattern and magnetic gait; CSF biomarkers / amyloid PET resolve copathology",
+        "icd_code": "G30.9"
+      },
+      {
+        "diagnosis": "Cerebral atrophy with secondary ex-vacuo ventriculomegaly",
+        "likelihood": "moderate",
+        "key_features": "Ventriculomegaly proportionate to sulcal widening, callosal angle >90°, and absence of DESH or transependymal signal argue against true NPH",
+        "icd_code": "G31.9"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI re-read with formal Evans index, callosal angle, MPAR",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Evans 0.36 (missed on prior read), callosal angle 80°, DESH, MPAR 0.55 (not PSP)",
+        "action": "Literature review of iNPH diagnostic criteria and shunt-response predictors",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Relkin 2005 INPH Study Group criteria; Tisell 2011 tap-test predictors; Williams 2016 review",
         "category": "required",
-        "tool_parameters": {
-          "sequences": [
-            "T1",
-            "T2",
-            "FLAIR",
-            "DWI"
-          ],
-          "measure_MPAR": true
-        }
+        "tool_parameters": {},
+        "citation": "[Williams_2016]",
+        "guideline_source": "NPH_pack"
       },
       {
         "step": 2,
-        "action": "Formal video oculomotor exam (neuro-ophthalmology) — PSP evaluation",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Mild upward saccade slowing only — PSP criteria NOT met (no complete vertical gaze palsy)",
+        "action": "Brain MRI — measure Evans index, callosal angle, assess DESH pattern; exclude mass effect, hydrocephalus from secondary cause, and atrophy",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Ventriculomegaly with Evans index >0.3, DESH pattern (tight high-convexity sulci + widened Sylvian fissures), callosal angle <90°, periventricular transependymal signal; no mass effect or aqueductal obstruction",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Relkin_2005]",
+        "guideline_source": "NPH_pack"
       },
       {
         "step": 3,
-        "action": "High-volume tap trial — has not been offered in 2.5 years",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Normal OP 16 cmH2O; clearly positive (32% TUG)",
+        "action": "Reversible-cause labs (TSH, B12, RPR, HIV) to exclude metabolic / infectious dementia mimics",
+        "tool_name": "interpret_labs",
+        "expected_finding": "TSH, B12, RPR, HIV negative or within normal range; reversible mimics excluded",
         "category": "required",
-        "tool_parameters": {
-          "volume_removed_mL": 40,
-          "tap_trial": true
-        }
+        "tool_parameters": {},
+        "citation": "[Relkin_2005]",
+        "guideline_source": "NPH_pack"
       },
       {
         "step": 4,
-        "action": "DaTscan to exclude PD and further argue against PSP",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Normal DaTscan — no nigrostriatal degeneration",
-        "category": "recommended",
+        "action": "Baseline neuropsychological battery — subcortical/frontal pattern, and reference for pre/post-tap comparison",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Frontal-subcortical pattern: executive dysfunction and slowed processing predominate over episodic amnesia",
+        "category": "required",
         "tool_parameters": {
-          "modality": "DaTscan SPECT"
-        }
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Relkin_2005]",
+        "guideline_source": "NPH_pack"
       },
       {
         "step": 5,
-        "action": "Revise diagnosis and urgent VP shunt referral",
-        "tool_name": null,
-        "expected_finding": "PSP diagnosis not supported; iNPH confirmed; VP shunt urgently indicated after 2.5-year delay",
+        "action": "Large-volume lumbar puncture (30-50 mL tap test) with opening pressure and pre/post gait + neuropsych assessment",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Opening pressure <25 cmH2O (normal); 30-50 mL CSF removed; pre/post tap gait and neuropsych assessment shows objective improvement supporting shunt-responsive iNPH",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Tisell_2011]",
+        "guideline_source": "NPH_pack"
+      },
+      {
+        "step": 6,
+        "action": "Neurosurgery consultation for VP shunt candidacy and perioperative planning",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Neurosurgery accepts patient for VP shunt evaluation with programmable valve",
+        "category": "required",
+        "tool_parameters": {
+          "specialty": "neurosurgery"
+        },
+        "citation": "[Marmarou_2005]",
+        "guideline_source": "NPH_pack"
+      },
+      {
+        "step": 7,
+        "action": "Amyloid PET (optional) — screen for AD copathology that may temper cognitive (but not gait) shunt benefit",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Inform shunt prognosis: AD copathology common (~50% iNPH)",
+        "category": "optional",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "citation": "[Williams_2016]",
+        "guideline_source": "NPH_pack"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is non-specific for NPH and does not distinguish from neurodegenerative alternatives in this chronic gait/cognitive presentation",
+        "citation": ""
+      },
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG is unrelated to the diagnostic workup of chronic gait + cognitive + urinary triad once cardiogenic syncope is not on the differential",
+        "citation": ""
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography does not contribute to NPH evaluation in the absence of syncope or cardioembolic stroke workup",
+        "citation": ""
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is inferior to MRI for measuring Evans index and callosal angle and for excluding secondary causes; only justified if MRI is contraindicated",
+        "citation": ""
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring has no diagnostic role in NPH and is reserved for syncope or arrhythmia workup",
+        "citation": ""
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "MRI must precede large-volume LP to exclude mass effect or secondary obstructive hydrocephalus before removing 30-50 mL of CSF",
+        "citation": "[Relkin_2005]",
+        "severity": "hard"
+      },
+      {
+        "before": "order_specialized_test",
+        "after": "analyze_csf",
+        "reason": "Baseline neuropsychological and gait assessment must be obtained before the tap test so that pre/post change can be measured (tap response is the shunt-response predictor)",
+        "citation": "[Tisell_2011]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Formal MPAR measurement — subjective 'possible midbrain atrophy' on community read was incorrect",
-      "Formal video oculomotor exam — mild upward saccade slowing does NOT meet PSP criteria",
-      "Tap trial must be offered — should have been done 2.5 years ago when symptoms first appeared",
-      "Communicate diagnostic revision clearly to patient, family, and referring neurologist"
+      "Obtain brain MRI before lumbar puncture to exclude mass effect or obstructive hydrocephalus",
+      "Document objective pre-tap gait (TUG and 10-metre walk) and neuropsychological baseline so that pre/post-tap change can be quantified",
+      "Remove 30-50 mL of CSF during the tap test (a low-volume LP under-samples and biases the test toward false negative)",
+      "Re-assess gait and cognition 1-4 hours after the tap and again at 24 hours (the response window for tap-test prediction of shunt benefit)",
+      "Refer to neurosurgery for VP shunt evaluation when imaging, clinical, and tap-test criteria support iNPH"
     ],
     "contraindicated_actions": [
-      "Accepting prior PSP diagnosis without verification — midbrain volumetry was informal and incorrect",
-      "Deferring tap trial because of PSP label — tap trial should be offered in any patient with ventriculomegaly",
-      "Starting levodopa empirically for presumed PSP without tap trial — this is NPH"
+      "Do not perform large-volume lumbar puncture before MRI excludes mass effect or obstructive hydrocephalus",
+      "Do not infer iNPH from ventriculomegaly alone — DESH, callosal angle <90°, and a clinical triad are required",
+      "Do not diagnose Alzheimer's disease in a patient with gait-predominant presentation and ventriculomegaly without first excluding NPH",
+      "Do not attribute the syndrome to 'normal ageing' or 'deconditioning' once the imaging criteria for ventriculomegaly are met",
+      "Do not commit to iNPH without ruling out leptomeningeal disease by CSF cytology when active or recent malignancy is in the history"
     ],
     "key_reasoning_points": [
-      "PSP requires downward gaze palsy or complete vertical gaze palsy — mild upward saccade slowing alone is insufficient",
-      "MPAR 0.55 is above PSP threshold (0.52) — prior 'possible midbrain atrophy' was informal and incorrect",
-      "Normal DaTscan and wide-based magnetic gait (not narrow festinant) both argue against PSP",
-      "Falls were forward/sideways — PSP classically produces backward falls from truncal rigidity and retropulsion",
-      "Evans 0.36 was missed on community MRI read — formal re-read is essential in suspected movement disorders with gait change",
-      "Clearly positive tap trial (32%) definitively establishes NPH and refutes PSP as primary diagnosis"
+      "iNPH diagnosis (Relkin 2005 INPH Study Group) requires (a) Hakim's triad of gait disturbance, cognitive impairment, and urinary urgency/incontinence — gait is typically first and most prominent; (b) ventriculomegaly with Evans >0.3 and DESH on MRI without mass effect; (c) age >40 and chronic course; (d) opening pressure <25 cmH2O; (e) absence of an alternative explanation",
+      "MRI is the imaging modality of choice — measure Evans index and callosal angle (<90° supports NPH) and confirm DESH (tight high-convexity sulci + wide Sylvian fissures)",
+      "The tap test is a 30-50 mL large-volume LP with pre/post objective gait (TUG, 10-metre walk) and neuropsychological assessment; opening pressure must be normal (<25 cmH2O) to satisfy the 'normal pressure' criterion",
+      "Tap-test sensitivity is only 50-80%; a single negative tap does not exclude NPH — an extended (3-5 day) lumbar drainage trial can resolve borderline cases",
+      "Reversible-cause labs (TSH, B12, RPR, HIV) are mandatory before attributing the syndrome to NPH",
+      "Approximately 50% of iNPH patients have AD copathology — this lowers cognitive benefit from shunting but does not negate gait benefit",
+      "Shunt response is best predicted by an objectively positive tap test or extended drainage trial in a patient who meets imaging and clinical criteria"
     ],
     "red_herrings": [
       {
-        "data_point": "Working diagnosis of PSP from community neurologist based on mildly slow vertical saccades and gait disorder",
-        "location": "clinical_history",
-        "intended_effect": "PSP label prevents LP and tap trial from being offered; patient deteriorates without treatable NPH diagnosis",
-        "correct_interpretation": "Mild upward saccade slowing does NOT meet PSP criteria; MPAR 0.55 is above PSP threshold; Evans 0.36 was missed. Formal evaluation reveals iNPH, not PSP.",
-        "field_path": ""
+        "data_point": "Prior community-neurology working diagnosis of progressive supranuclear palsy",
+        "location": "clinical_history.past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "The PSP label closes the diagnostic frame and the agent stops re-evaluating treatable alternatives",
+        "correct_interpretation": "Absent vertical gaze palsy or midbrain atrophy and presence of DESH plus tap response indicate the PSP label is not supported and iNPH is the operative diagnosis"
       },
       {
-        "data_point": "'Possible midbrain atrophy' on community MRI read",
-        "location": "mri",
-        "intended_effect": "Informal description of possible midbrain atrophy reinforces PSP diagnosis and delays NPH evaluation",
-        "correct_interpretation": "Formal MPAR calculation (0.55) shows midbrain atrophy is NOT present by standard criteria. DESH, Evans 0.36, and callosal angle 80° were not reported by the community radiologist.",
-        "field_path": ""
+        "data_point": "Past breast cancer (currently in clinical remission)",
+        "location": "clinical_history.past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "The syndrome is presumptively attributed to leptomeningeal carcinomatosis and NPH is not pursued",
+        "correct_interpretation": "Negative CSF cytology on adequate sampling and absence of leptomeningeal enhancement on gadolinium MRI exclude leptomeningeal disease; iNPH remains the operative diagnosis"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "created_by": "NeuroBench v5 generator",
@@ -579,6 +668,14 @@
       "ecg": "normal",
       "echo": "normal",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:NPH",
+    "difficulty_rationale": "6 required tools (MRI, labs, neuropsych baseline, large-volume LP/tap, neurosurgery consult, literature), 2 grounded red herrings; differential includes 6 active alternatives. Anchoring on the prior neurodegenerative label is the central diagnostic challenge.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -1,7 +1,7 @@
 {
   "case_id": "HEP-ENC-S06",
   "condition": "hepatic_encephalopathy",
-  "difficulty": "straightforward",
+  "difficulty": "moderate",
   "encounter_type": "emergency",
   "patient": {
     "patient_id": "NB-HEP-ENC-S06",
@@ -676,155 +676,163 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Hepatic encephalopathy, grade 4, alcoholic cirrhosis (Child-Pugh C) — precipitated by binge alcohol relapse with medication non-adherence",
-    "optimal_actions": [
-      {
-        "step": 1,
-        "action": "Interpret labs — STAT ammonia, CBC, BMP including glucose, LFTs/INR, thiamine, ethanol, magnesium, blood cultures",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Ammonia 212; Ethanol 182; Glucose 58 (hypoglycemia); Thiamine 22 (critical deficiency); Potassium 2.8",
-        "category": "required",
-        "tool_parameters": {
-          "test_type": "comprehensive_metabolic_hepatic_ammonia_thiamine_toxicology"
-        }
-      },
-      {
-        "step": 2,
-        "action": "IV thiamine 500 mg STAT before any dextrose — critical Wernicke prophylaxis in alcoholic with thiamine 22 nmol/L",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Glucose corrected after thiamine given; no Wernicke precipitated",
-        "category": "required",
-        "tool_parameters": {
-          "test_type": "thiamine_glucose_magnesium"
-        }
-      },
-      {
-        "step": 3,
-        "action": "Order CT head without contrast — exclude subdural hematoma (thrombocytopenia 48 + coagulopathy INR 3.4 + alcohol + unwitnessed fall risk)",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "No hemorrhage — structural cause excluded",
-        "category": "required",
-        "tool_parameters": {
-          "body_part": "head",
-          "contrast": false,
-          "urgency": "emergent"
-        }
-      },
-      {
-        "step": 4,
-        "action": "Analyze EEG — confirm HE grade, exclude NCSE, assess burst suppression",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Grade 4 HE pattern — triphasic waves + burst suppression; no epileptiform activity",
-        "category": "required",
-        "tool_parameters": {
-          "indication": "grade 4 encephalopathy, NCSE exclusion"
-        }
-      },
-      {
-        "step": 5,
-        "action": "Diagnostic paracentesis — exclude SBP",
-        "tool_name": "interpret_labs",
-        "expected_finding": "PMN 142 — SBP excluded",
-        "category": "required",
-        "tool_parameters": {
-          "test_type": "ascitic_fluid_cell_count_culture"
-        }
-      },
-      {
-        "step": 6,
-        "action": "Lactulose via NG tube (patient unable to swallow) 30 mL q4-6h — titrate to 2-3 stools/day; consider rectal lactulose if NG not tolerated",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Ammonia downtrending 212 → 148 → 88 → 44",
-        "category": "required",
-        "tool_parameters": {
-          "test_type": "ammonia_trend"
-        }
-      },
-      {
-        "step": 7,
-        "action": "Correct severe hypokalemia 2.8 with IV KCl and magnesium 1.1 with IV MgSO4",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Electrolyte correction reduces ammonia",
-        "category": "required",
-        "tool_parameters": {
-          "test_type": "electrolyte_repletion_monitoring"
-        }
-      },
-      {
-        "step": 8,
-        "action": "CIWA-Ar monitoring for alcohol withdrawal — symptom-triggered benzodiazepine only if CIWA ≥10",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "CIWA-Ar 8 at 24h — mild withdrawal; PRN lorazepam only",
-        "category": "required",
-        "tool_parameters": {
-          "test_name": "ciwa_ar_scoring"
-        }
-      },
-      {
-        "step": 9,
-        "action": "Assess airway — GCS 8 with grade 4 HE may require intubation; NIV not appropriate for unprotected airway",
-        "tool_name": "interpret_labs",
-        "expected_finding": "SpO2 96%, airway currently protected by intact gag reflex — monitor closely",
-        "category": "required",
-        "tool_parameters": {
-          "test_type": "respiratory_status_assessment"
-        }
-      },
-      {
-        "step": 10,
-        "action": "Transplant evaluation referral with addiction medicine — MELD 24 + two overt HE episodes despite active alcohol use",
-        "tool_name": "interpret_labs",
-        "expected_finding": "MELD-Na 24 — high urgency but sobriety criteria not met; addiction medicine and social work required",
-        "category": "required",
-        "tool_parameters": {
-          "test_type": "meld_transplant_social_work"
-        }
-      }
-    ],
-    "critical_actions": [
-      "IV thiamine 500 mg BEFORE dextrose — thiamine 22 nmol/L is critical deficiency in alcoholic with hypoglycemia",
-      "Correct hypoglycemia — glucose 58 directly impairs consciousness and mimics/worsens HE",
-      "CT head urgently — thrombocytopenia 48 + INR 3.4 + unwitnessed fall — subdural hematoma risk",
-      "Lactulose via NG tube if patient cannot swallow — do not withhold lactulose in grade 4 HE",
-      "CIWA-Ar monitoring — distinguish HE from alcohol withdrawal (overlap can be fatal if withdrawal seizures occur)",
-      "Airway assessment — GCS 8 requires close monitoring for intubation threshold",
-      "Addiction medicine and transplant evaluation — MELD 24 + recurrent HE despite active drinking"
-    ],
-    "contraindicated_actions": [
-      "Give dextrose before thiamine: Precipitates Wernicke encephalopathy in thiamine-deficient alcoholic — thiamine first, always",
-      "Empiric benzodiazepines for presumed alcohol withdrawal: Benzodiazepines worsen hepatic encephalopathy — use CIWA-Ar guided therapy only; minimum effective dose",
-      "Avoid lactulose due to aspiration risk in low-GCS patient: Administer via NG tube or rectal route — do not withhold; lactulose is essential for ammonia reduction",
-      "Assume HE alone explains GCS 8 without CT head: Thrombocytopenia 48 and INR 3.4 with unwitnessed fall create high bleeding risk — CT head mandatory to exclude subdural"
-    ],
+    "primary_diagnosis": "Hepatic encephalopathy (West Haven grade IV — coma), alcoholic cirrhosis (Child-Pugh C, MELD 24) — precipitated by binge alcohol relapse with medication non-adherence (lactulose/rifaximin not taken); ICU-level care with airway assessment indicated.",
+    "icd_code": "K72.91",
     "differential": [
-      {
-        "diagnosis": "Acute alcohol intoxication alone",
-        "likelihood": "low",
-        "key_features": "Ethanol 182 mg/dL is consistent with moderate intoxication in a tolerant heavy drinker — insufficient to explain GCS 8; ammonia 212 µmol/L is the primary encephalopathic driver"
-      },
       {
         "diagnosis": "Wernicke encephalopathy",
         "likelihood": "moderate",
-        "key_features": "Thiamine 22 nmol/L is critically low; IV thiamine must precede glucose; no classic triad present (nystagmus/ataxia/confusion overlap with HE) — empiric treatment required"
+        "key_features": "Chronic alcoholic + binge + malnutrition; empiric thiamine before dextrose.",
+        "icd_code": "E51.2"
+      },
+      {
+        "diagnosis": "SBP",
+        "likelihood": "moderate",
+        "key_features": "Ascites + obtunded — paracentesis mandatory.",
+        "icd_code": "K65.2"
       },
       {
         "diagnosis": "Subdural hematoma",
-        "likelihood": "moderate",
-        "key_features": "Thrombocytopenia (48) + INR 3.4 + possible unwitnessed fall — CT head mandatory and shows no hemorrhage, excluding this diagnosis"
+        "likelihood": "low",
+        "key_features": "Coagulopathy + likely fall; CT excludes.",
+        "icd_code": "I62.00"
+      },
+      {
+        "diagnosis": "Non-convulsive status epilepticus",
+        "likelihood": "low",
+        "key_features": "Grade IV obtundation warrants EEG to exclude NCSE.",
+        "icd_code": "G41.2"
       }
     ],
-    "key_reasoning_points": [
-      "Alcohol level 182 mg/dL in a chronic heavy drinker does not alone explain GCS 8 — the ammonia 212 is the key contributor explaining the severity of encephalopathy; disproportionate depression of consciousness to alcohol level is a red flag",
-      "Grade 4 HE with burst suppression on EEG indicates the most severe metabolic depression — ICU monitoring required, airway at risk",
-      "Thiamine before dextrose is inviolable in alcoholic encephalopathy — level 22 nmol/L confirms high Wernicke risk",
-      "Benzodiazepine-alcohol withdrawal overlap with HE creates a clinical dilemma: CIWA-Ar guides the minimum necessary benzodiazepine dose; phenobarbital is preferable if large benzodiazepine doses are needed",
-      "Active alcohol use complicates transplant candidacy — most centers require 6 months sobriety, but early consultation with addiction medicine is essential regardless"
+    "optimal_actions": [
+      {
+        "step": 1,
+        "action": "Comprehensive labs: CMP including AST/ALT/bilirubin/INR/albumin, ammonia, CBC, glucose, electrolytes (Na, K, Mg), BUN/Cr, lactate, blood cultures and urine cultures; toxicology if substance use plausible. Confirms liver dysfunction and screens for precipitants.",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Ammonia markedly elevated; cirrhosis decompensation; ethanol level; thiamine; cultures.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      },
+      {
+        "step": 2,
+        "action": "Non-contrast CT head — exclude structural alternate cause of AMS (hemorrhage, large stroke, mass) before any LP.",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No hemorrhage.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      },
+      {
+        "step": 3,
+        "action": "Literature/guideline search to confirm West Haven grading, precipitant management, and lactulose/rifaximin dosing (Grade IV HE management; airway in HE; AASLD/EASL).",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "AASLD/EASL 2014 guidance retrieved; West Haven criteria and precipitant-driven management framework confirmed.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      },
+      {
+        "step": 4,
+        "action": "Drug-interaction and medication-reconciliation review covering lactulose, rifaximin (restart via NG/enema), avoid all sedatives; flag any CNS depressants (benzodiazepines, opioids, sedating antiemetics, antihistamines) and confirm lactulose/rifaximin dosing in liver disease.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sedating/CNS-depressant medications identified; lactulose and rifaximin reviewed for hepatic dose adjustment.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Bajaj_2011]",
+        "guideline_source": "Bajaj 2011 HE management review"
+      },
+      {
+        "step": 5,
+        "action": "Diagnostic paracentesis given ascites and grade IV HE.",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Ascitic PMN count.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      },
+      {
+        "step": 6,
+        "action": "EEG — obtunded patient — exclude NCSE; characterize HE pattern. Triphasic waves are classic but non-specific (metabolic encephalopathies broadly); main role is exclusion of non-convulsive status epilepticus where the differential supports it.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Triphasic waves vs other patterns; rule out NCSE.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Ferenci_2002]",
+        "guideline_source": "Ferenci 2002 HE nomenclature/quantification"
+      },
+      {
+        "step": 7,
+        "action": "Consult hepatology + critical care for ICU admission; consider transplant eval — coordinate definitive care, transplant candidacy assessment where applicable.",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Hepatology / critical-care guidance integrated into management.",
+        "category": "recommended",
+        "tool_parameters": {
+          "specialty": "hepatology"
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      }
     ],
-    "red_herrings": [],
-    "icd_code": "K72.9",
-    "useless_tools": [],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No clinical suspicion for hepatopulmonary syndrome, portopulmonary hypertension, or endocarditis; echocardiography is not part of the HE workup.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in HE workup; reversible metabolic encephalopathy is the issue, not Alzheimer pathology.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan has no role in HE workup; the question is metabolic encephalopathy, not nigrostriatal degeneration.",
+        "citation": "[AASLD_2014]"
+      }
+    ],
     "harmful_tools": [],
-    "sequence_constraints": []
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "In altered mental status, exclude intracranial mass effect / hemorrhage on imaging before LP to avoid herniation risk.",
+        "citation": "[AASLD_2014]",
+        "severity": "hard"
+      }
+    ],
+    "critical_actions": [
+      "Airway management — intubate if GCS <8 or inability to protect airway.",
+      "Lactulose enemas q4-6h; rifaximin via NG once airway secured.",
+      "Empiric IV thiamine 500 mg TID for 2-3 days before any dextrose.",
+      "Treat any identified infection empirically.",
+      "Transplant evaluation triggered by recurrent severe HE."
+    ],
+    "contraindicated_actions": [
+      "Do not prescribe benzodiazepines for anxiety/agitation — they precipitate and prolong HE (use haloperidol or non-pharmacologic measures for agitation).",
+      "Do not prescribe sedating opioids — they worsen HE; consider acetaminophen at hepatic-safe dosing for pain.",
+      "Do not perform LP before neuroimaging excludes mass effect when the patient has altered mental status.",
+      "Do not delay airway assessment in grade IV HE.",
+      "Avoid all benzodiazepines (alcohol withdrawal mgmt with phenobarbital or symptom-triggered low-dose if essential)."
+    ],
+    "key_reasoning_points": [
+      "HE is a clinical diagnosis: West Haven grading + evidence of liver dysfunction + exclusion of other causes of AMS — ammonia level is supportive only and correlates poorly with grade (AASLD 2014).",
+      "Precipitant identification is more actionable than the ammonia number: infection (SBP especially), GI bleed, electrolyte disturbance (hypokalemia/hyponatremia), constipation, sedative/CNS-depressant use, dehydration, dietary protein load, renal failure.",
+      "Grade IV HE = coma; airway protection is the immediate concern in addition to precipitant management.",
+      "Recurrent severe HE despite adherence should trigger transplant evaluation (AASLD)."
+    ],
+    "red_herrings": []
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -845,6 +853,14 @@
       "advanced_imaging": "normal",
       "literature_search": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (HEP-ENC)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:HEP-ENC",
+    "difficulty_rationale": "5 required tools; grade IV severity introduces airway/ICU decisions; precipitant is straightforward but co-existing problems and severity warrant moderate.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -1,7 +1,7 @@
 {
   "case_id": "MIG-AURA-S05",
   "condition": "migraine_with_aura",
-  "difficulty": "straightforward",
+  "difficulty": "moderate",
   "encounter_type": "outpatient",
   "patient": {
     "age": 22,
@@ -74,80 +74,131 @@
     "extremities": "No edema"
   },
   "ground_truth": {
-    "primary_diagnosis": "Migraine with typical visual aura (G43.1), new-onset",
-    "primary_diagnosis_icd": "G43.1",
+    "primary_diagnosis": "Migraine with typical visual aura, new-onset (ICHD-3 1.2.1)",
+    "icd_code": "G43.109",
     "differential": [
       {
-        "diagnosis": "Focal occipital epilepsy",
-        "likelihood": "very_low",
-        "key_features": "Visual seizures are brief and stereotyped; spreading over 20 min is migraine; followed by headache; normal EEG; family history of migraine"
+        "diagnosis": "Focal occipital seizure with visual phenomena",
+        "likelihood": "low",
+        "key_features": "Should be considered with new-onset visual symptoms in a young adult; 20-30 min march and absence of impaired awareness argue against seizure",
+        "icd_code": "G40.109"
       },
       {
-        "diagnosis": "TIA",
+        "diagnosis": "Idiopathic intracranial hypertension",
         "likelihood": "very_low",
-        "key_features": "Normal DWI; age 22; no vascular risk factors; typical migraine aura pattern"
+        "key_features": "Young woman of fertile age — consider; no papilledema, no diurnal/positional headache pattern, no obscurations",
+        "icd_code": "G93.2"
+      },
+      {
+        "diagnosis": "Demyelinating disease (early MS) — first attack",
+        "likelihood": "very_low",
+        "key_features": "Stereotyped repetitive visual aura over 3 months without other deficits is uncharacteristic of MS",
+        "icd_code": "G35"
+      },
+      {
+        "diagnosis": "AVM / cavernoma",
+        "likelihood": "very_low",
+        "key_features": "No haemorrhage history, no fixed deficit; would require structural imaging for definitive exclusion if a SNOOP red flag emerged",
+        "icd_code": "Q28.2"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI for new-onset aura (appropriate for any new presentation)",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Normal brain MRI; no structural cause for new-onset visual aura",
-        "category": "recommended",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
+        "category": "required",
         "tool_parameters": {
-          "contrast": true
-        }
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "Laboratory workup",
-        "tool_name": "interpret_labs",
-        "expected_finding": "All values within normal limits",
-        "category": "recommended",
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sumatriptan appropriate; counsel against combined OCP; preventive therapy not yet indicated",
+        "category": "required",
         "tool_parameters": {
-          "lab_type": "headache_workup"
-        }
+          "context": "migraine_with_aura_pharmacotherapy"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 3,
-        "action": "Prescribe sumatriptan 100 mg for acute attacks",
-        "tool_name": null,
-        "expected_finding": "Management per ICHD-3 migraine with aura guidelines",
+        "action": "Brain MRI to exclude structural cause given new-onset aura in the past 3 months (cautious work-up; not strictly required by ICHD-3 once criteria met)",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Normal brain MRI / no structural cause",
         "category": "recommended",
-        "tool_parameters": {}
-      },
-      {
-        "step": 4,
-        "action": "Identify and address triggers (screen time, stress); headache diary",
-        "tool_name": null,
-        "expected_finding": "Management per ICHD-3 migraine with aura guidelines",
-        "category": "recommended",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "contrast": false,
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "DWI",
+            "SWI"
+          ]
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis — neither present here",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Routine transthoracic / bubble echocardiogram (PFO screening) is NOT indicated in migraine with aura; PFO-migraine association is controversial and PFO closure does not reduce migraine [Charles_2017]",
+        "citation": "[Charles_2017]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated in typical migraine with aura — no role unless cardioembolic stroke is on the differential",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "MRI appropriate for new-onset aura to exclude structural cause",
-      "Confirm ICHD-3 criteria (4 episodes — criteria met after 2)",
-      "Prescribe triptan",
-      "Educate on trigger management (screen time, stress)"
+      "Confirm ICHD-3 1.2 criteria are met across the 4 episodes",
+      "Document absence of SNOOP red flags",
+      "Counsel against combined oestrogen-progestogen contraception",
+      "Provide headache diary and trigger education (screen time, sleep)"
     ],
     "contraindicated_actions": [
-      "Do not start combined OCP",
-      "Do not take triptan during visual aura phase"
+      "Do not start combined oestrogen-progestogen contraception",
+      "Do not co-administer triptans with ergotamines"
     ],
     "key_reasoning_points": [
-      "New-onset visual aura with headache warrants brain MRI for baseline exclusion",
-      "Four episodes meeting ICHD-3 criteria: spreading visual aura over ~20 minutes, lasts <60 min, followed by headache within 60 min",
-      "Family history (mother) strongly supports genetic migraine",
-      "Normal MRI and labs confirm primary diagnosis",
-      "Screen time and work stress as modifiable triggers"
+      "New-onset aura in a 22-year-old with rapidly stereotyping pattern fits migraine with aura; MRI is a reasonable cautious step but not mandatory once ICHD-3 criteria are met",
+      "Preventive therapy is not yet indicated at ~monthly frequency without significant disability",
+      "Combined OCP must be avoided going forward"
     ],
-    "red_herrings": [],
-    "icd_code": "G43.1",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": [
+      {
+        "data_point": "New-onset symptoms within the past 3 months in a young adult",
+        "location": "patient.history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Recent onset may prompt anxiety about brain tumour or vascular cause",
+        "correct_interpretation": "Recent onset is not by itself a SNOOP red flag once a stereotyped pattern is established and the exam is normal; MRI is a cautious step rather than a mandate"
+      }
+    ]
   },
   "red_herrings": [],
   "metadata": {
@@ -160,7 +211,17 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Moderate: new-onset symptoms justify cautious MRI but no other workup beyond ICHD-3 confirmation",
+    "case_body_concerns": [
+      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide §1): ['analyze_ecg', 'analyze_eeg', 'interpret_labs', 'order_advanced_imaging']"
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "initial_tool_outputs": {
     "mri": {

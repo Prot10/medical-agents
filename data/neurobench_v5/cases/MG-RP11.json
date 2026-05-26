@@ -1,7 +1,7 @@
 {
   "case_id": "MG-RP11",
   "condition": "myasthenia_gravis",
-  "difficulty": "diagnostic_puzzle",
+  "difficulty": "moderate",
   "encounter_type": "inpatient",
   "patient": {
     "age": 68,
@@ -82,167 +82,221 @@
     "extremities": "No edema; no rash; no lymphadenopathy"
   },
   "ground_truth": {
-    "primary_diagnosis": "Thymoma-associated myasthenia gravis (G70.01)",
-    "primary_diagnosis_icd": "G70.01",
+    "primary_diagnosis": "Thymoma-associated myasthenia gravis, AChR antibody-positive, generalized (MGFA Class IIb)",
+    "icd_code": "G70.01",
     "differential": [
       {
-        "diagnosis": "Anterior mediastinal lymphoma",
-        "likelihood": "low",
-        "key_features": "Normal LDH, beta-HCG, AFP; no mediastinal adenopathy; homogeneous enhancement pattern not typical of lymphoma"
+        "diagnosis": "Thymic carcinoma",
+        "likelihood": "moderate",
+        "key_features": "Imaging cannot definitively distinguish; tissue diagnosis required.",
+        "icd_code": "C37"
       },
       {
-        "diagnosis": "Germ cell tumor of mediastinum",
+        "diagnosis": "Lymphoma (mediastinal)",
         "likelihood": "low",
-        "key_features": "Normal AFP and beta-HCG; mass location (anterior mediastinum) and age (68) atypical for GCT"
+        "key_features": "Lobulated anterior mediastinal mass differential includes lymphoma; tissue diagnosis discriminates.",
+        "icd_code": "C85.9"
       },
       {
-        "diagnosis": "Thyroid ophthalmopathy (Graves' orbitopathy)",
+        "diagnosis": "Lambert-Eaton myasthenic syndrome",
         "likelihood": "low",
-        "key_features": "Normal TSH, no proptosis, no lid retraction; ptosis (not lid retraction) is key — Graves' causes lid retraction, not ptosis; normal orbit MRI"
+        "key_features": "Smoker risk for SCLC; here AChR positive and CT shows discrete thymoma, not lung lesion.",
+        "icd_code": "G73.1"
       },
       {
-        "diagnosis": "Chronic progressive external ophthalmoplegia (CPEO)",
-        "likelihood": "low",
-        "key_features": "No maternal inheritance, no pigmentary retinopathy, positive ice pack test, AChR antibody positive"
+        "diagnosis": "Germ cell tumor",
+        "likelihood": "very_low",
+        "key_features": "Anterior mediastinal mass differential in younger patients; less likely at 68 without elevated tumor markers.",
+        "icd_code": "C56"
+      },
+      {
+        "diagnosis": "Brainstem lesion",
+        "likelihood": "very_low",
+        "key_features": "No MRI findings; fluctuating fatigable pattern incompatible with focal lesion.",
+        "icd_code": "G46.3"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Perform CT chest with contrast for characterization of anterior mediastinal mass",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Order serologies: anti-AChR (binding, blocking, modulating), anti-MuSK, anti-LRP4, and TSH/free-T4 for thyroid autoimmunity",
+        "tool_name": "interpret_labs",
+        "expected_finding": "AChR antibody positive; TSH evaluates for comorbid thyroid disease",
+        "category": "required",
         "tool_parameters": {
-          "region": "chest",
-          "contrast": true,
-          "indication": "anterior mediastinal mass characterization"
-        }
+          "panels": [
+            "anti_AChR",
+            "anti_MuSK",
+            "anti_LRP4",
+            "TSH"
+          ]
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 2,
-        "action": "Order MG antibody panel including AChR, anti-MuSK, anti-titin",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Order repetitive nerve stimulation (RNS) at 2-3 Hz across proximal and facial muscles",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Decrement >10% in symptomatic muscles supports postsynaptic NMJ disorder",
+        "category": "required",
         "tool_parameters": {
-          "lab_type": "mg_antibody_panel",
-          "tests": [
-            "AChR_binding",
-            "AChR_blocking",
-            "AChR_modulating",
-            "anti-MuSK",
-            "anti-titin",
-            "anti-striational"
-          ]
-        }
+          "test_type": "repetitive_nerve_stimulation"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 3,
-        "action": "Tumor marker panel to exclude lymphoma and germ cell tumor",
-        "tool_name": null,
-        "expected_finding": "",
+        "action": "Order single-fiber EMG (gold standard >95% sensitivity)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Increased jitter and blocking on extensor digitorum communis or orbicularis oculi confirms NMJ transmission failure",
         "category": "recommended",
         "tool_parameters": {
-          "lab_type": "tumor_markers",
-          "tests": [
-            "LDH",
-            "beta-HCG",
-            "AFP"
-          ]
-        }
+          "test_type": "emg_single_fiber"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 4,
-        "action": "SFEMG or RNS to confirm NMJ dysfunction",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Order CT chest with contrast for thymoma screening",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Anterior mediastinal mass — thymoma",
+        "category": "required",
         "tool_parameters": {
-          "test_type": "SFEMG",
-          "muscle": "orbicularis_oculi"
-        }
+          "region": "chest",
+          "contrast": true,
+          "indication": "thymoma_screening"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 5,
-        "action": "Pre-operative PFTs and NIF to assess respiratory reserve",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Review MGFA classification and current treatment guidance (pyridostigmine, prednisone, steroid-sparing, IVIG/PLEX, thymectomy)",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "MGFA classification stages disease severity; thymectomy benefits AChR+ generalized MG (MGTX); IVIG/PLEX for crisis",
+        "category": "required",
         "tool_parameters": {
-          "lab_type": "pulmonary_function",
-          "values": {
-            "NIF": -38,
-            "FVC_pct_predicted": 78
-          }
-        }
+          "query": "myasthenia gravis MGFA classification treatment thymectomy"
+        },
+        "citation": "[Sanders_2016]",
+        "guideline_source": "Sanders_2016"
       },
       {
         "step": 6,
-        "action": "Initiate pyridostigmine and pre-operative IVIG optimization",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
-        "tool_parameters": {}
+        "action": "Check drug interactions for MG-exacerbating agents (aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, neuromuscular blockers, procainamide)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Flag aminoglycosides, fluoroquinolones, IV magnesium, telithromycin, NMBs as contraindicated or use-with-caution in MG",
+        "category": "required",
+        "tool_parameters": {
+          "proposed": "pyridostigmine_start",
+          "screen_for": [
+            "aminoglycosides",
+            "fluoroquinolones",
+            "telithromycin",
+            "magnesium_IV",
+            "neuromuscular_blockers"
+          ]
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 7,
-        "action": "Multidisciplinary thymectomy planning (neurology, thoracic surgery, anesthesia)",
-        "tool_name": null,
-        "expected_finding": "",
+        "action": "Bedside respiratory function testing (FVC, MIP/MEP, NIF) — repeat q4h in crisis",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline FVC/NIF to assess crisis risk in patients with bulbar or limb involvement",
         "category": "recommended",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[Sanders_2016]",
+        "guideline_source": "Sanders_2016"
+      },
+      {
+        "step": 8,
+        "action": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Improvement of ptosis after 2 minutes of cooling supports MG",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "ice_pack_test"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "MG is a peripheral neuromuscular junction disorder; EEG has no diagnostic role.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No CSF role in MG; LP risks complications without diagnostic yield.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "Advanced imaging (PET/MR spectroscopy/perfusion) is not indicated for MG diagnosis or staging; CT chest covers thymoma screening.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated for MG unless a comorbid cardiac question exists.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring is not indicated for MG unless arrhythmia or autonomic disease is independently suspected.",
+        "citation": "[Wolfe_2016]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "order_specialized_test",
+        "reason": "Order AChR/MuSK/LRP4 serologies first; reserve single-fiber EMG for seronegative or RNS-non-diagnostic cases (resource stewardship).",
+        "citation": "[Wolfe_2016]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Recognize that bilateral ptosis + positive ice pack test + anterior mediastinal mass = thymoma-associated MG until proven otherwise",
-      "Order MG antibody panel (AChR binding, anti-titin) as key diagnostic tests",
-      "CT chest with contrast for mass characterization before biopsy vs surgery planning",
-      "Assess respiratory function pre-operatively (NIF, FVC)",
-      "Pre-operative IVIG or PLEX to prevent perioperative myasthenic crisis",
-      "Coordinate with thoracic surgery for thymectomy — oncologic and neurological indication"
+      "Confirm AChR antibody positivity",
+      "Thoracic surgery referral for thymoma resection (Masaoka staging)",
+      "Pre-thymectomy MG optimization with pyridostigmine + IVIG or PLEX",
+      "Pre-operative cardiac and respiratory assessment",
+      "Histopathology with WHO thymoma classification"
     ],
     "contraindicated_actions": [
-      "Do not attribute bilateral ptosis solely to orbital or intracranial pathology without considering NMJ disorders",
-      "Do not proceed to thymectomy without optimizing MG (IVIG/PLEX pre-operatively)",
-      "Do not start fluoroquinolone antibiotics for any indication without recognizing MG risk",
-      "Do not use standard-dose neuromuscular blocking agents without TOF monitoring"
+      "Do NOT prescribe aminoglycoside antibiotics (gentamicin, tobramycin, amikacin) — risk of precipitating myasthenic crisis",
+      "Do NOT prescribe fluoroquinolones (ciprofloxacin, levofloxacin, moxifloxacin) — FDA black-box warning for MG exacerbation",
+      "Do NOT prescribe telithromycin — contraindicated in MG",
+      "Do NOT administer IV magnesium for MG patients (e.g., for hypomagnesaemia, eclampsia prophylaxis) without alternative — blocks NMJ transmission",
+      "Do NOT use non-depolarizing neuromuscular blockers without anaesthesia/MG-aware dosing protocols",
+      "Do NOT initiate high-dose corticosteroids as sole outpatient therapy without hospitalization or pyridostigmine bridge — risk of paradoxical worsening at days 5-10",
+      "Do NOT attribute fluctuating fatigable weakness to a functional disorder before completing serology + RNS + single-fiber EMG workup"
     ],
     "key_reasoning_points": [
-      "The diagnostic puzzle: the anterior mediastinal mass was initially being evaluated for lymphoma/GCT in isolation, without connecting it to the ptosis and ophthalmoplegia",
-      "The ice pack test (positive result with 3-4 mm improvement) is a specific bedside test for MG ptosis — should prompt immediate MG workup",
-      "Anti-titin + anti-striational + high AChR antibody = classic serological triad of thymoma-associated MG",
-      "Normal orbital MRI excludes thyroid ophthalmopathy, orbital myositis, and structural orbital tumors",
-      "Normal tumor markers (LDH, AFP, beta-HCG) effectively exclude lymphoma and GCT",
-      "MGTX trial supports thymectomy for AChR+ MG; thymoma is an additional mandatory surgical indication"
+      "Fluctuating, fatigable weakness with diurnal pattern (worse evening) is the clinical hallmark of MG — fixed weakness suggests an alternative diagnosis.",
+      "Ocular involvement (ptosis, diplopia) is asymmetric and fatigable in MG; thyroid eye disease causes restrictive (not fatigable) ophthalmoplegia.",
+      "Single-fiber EMG (sensitivity >95%) is the most sensitive electrodiagnostic test — order when RNS is non-diagnostic or serology is negative.",
+      "All confirmed MG cases require CT chest for thymoma — present in roughly 10-15% of generalized MG; thymectomy (MGTX trial) improves long-term outcomes in non-thymoma AChR+ MG as well.",
+      "Aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, and neuromuscular blockers can precipitate myasthenic crisis and must be screened against any new prescription.",
+      "Anti-titin or anti-RyR antibodies in an MG patient strongly predict thymoma — CT chest is mandatory and surgical referral is non-negotiable."
     ],
-    "red_herrings": [
-      {
-        "data_point": "Anterior mediastinal mass initially evaluated as lymphoma or germ cell tumor",
-        "location": "initial_tool_outputs.ct.impression",
-        "intended_effect": "Admitting team focused on oncological differential without connecting mediastinal mass to bilateral ptosis and ophthalmoplegia",
-        "correct_interpretation": "Anterior mediastinal mass + bilateral ptosis + positive ice pack test = thymoma-associated MG; MG antibody panel is the key next step",
-        "field_path": ""
-      },
-      {
-        "data_point": "Age 68 with bilateral ptosis — CPEO in differential",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Chronic progressive external ophthalmoplegia is a mitochondrial disorder with bilateral ptosis and ophthalmoplegia mimicking MG",
-        "correct_interpretation": "Positive ice pack test, anti-titin positivity, and thymoma on CT distinguish MG from CPEO",
-        "field_path": ""
-      },
-      {
-        "data_point": "Periorbital edema (lid puffiness)",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Could suggest thyroid ophthalmopathy; Graves' disease is common in elderly males with bilateral eye changes",
-        "correct_interpretation": "Normal TSH, normal orbital MRI (no EOM enlargement, no proptosis), and ptosis (not lid retraction) exclude thyroid ophthalmopathy",
-        "field_path": ""
-      }
-    ],
-    "icd_code": "G70.01",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": []
   },
   "red_herrings": [
     {
@@ -275,7 +329,17 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MG",
+    "difficulty_rationale": "5 required tools, 0 red herrings, thymoma-associated generalized MG",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": [
+      "emg_ncs_useless_via_param_conflation: pack lists order_specialized_test:emg_ncs as USELESS, but coherence validator treats tool_name overlap as a contradiction regardless of tool_parameters; cannot encode without removing required RNS/SFEMG entries. Suggest extending validator to compare tool_name + tool_parameters or fleet-wide pattern."
+    ]
   },
   "initial_tool_outputs": {
     "mri": {

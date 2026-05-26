@@ -501,140 +501,189 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Convulsive status epilepticus secondary to levetiracetam non-adherence (3 days missed doses) in known juvenile myoclonic epilepsy (JME), precipitated by concurrent sleep deprivation",
-    "icd_code": "G41.9",
+    "primary_diagnosis": "Generalized convulsive status epilepticus from levetiracetam non-adherence in juvenile myoclonic epilepsy, precipitated by concurrent sleep deprivation",
+    "icd_code": "G41.0",
     "differential": [
       {
-        "diagnosis": "New-onset structural seizures (brain tumor, AVM, stroke)",
-        "likelihood": "very_low",
-        "key_features": "Known 10-year JME history; normal CT; undetectable levetiracetam; JME EEG pattern; no new focal neurological signs"
+        "diagnosis": "Alcohol or substance-related seizure",
+        "likelihood": "low",
+        "key_features": "BAL pending; no clear intoxication; sleep deprivation is the precipitant",
+        "icd_code": "F10.23"
       },
       {
-        "diagnosis": "Drug toxicity-related SE (cocaine, stimulants)",
-        "likelihood": "very_low",
-        "key_features": "Urine drug screen negative; blood alcohol undetectable; girlfriend confirms no drug use; undetectable levetiracetam is the clear precipitant"
+        "diagnosis": "New structural cause (occult tumor / vascular)",
+        "likelihood": "low",
+        "key_features": "CT normal; MRI confirms no new lesion in known JME",
+        "icd_code": "G40.909"
       },
       {
-        "diagnosis": "Metabolic SE (hyponatremia, hypoglycemia)",
+        "diagnosis": "CNS infection",
+        "likelihood": "low",
+        "key_features": "Mild fever 38.1 likely post-ictal; no meningismus",
+        "icd_code": "G04.90"
+      },
+      {
+        "diagnosis": "Other generalized epilepsy syndrome misdiagnosed as JME",
+        "likelihood": "low",
+        "key_features": "Confirmed JME on prior video-EEG",
+        "icd_code": "G40.409"
+      },
+      {
+        "diagnosis": "Pseudo-status",
         "likelihood": "very_low",
-        "key_features": "Sodium, glucose, magnesium normal; no metabolic precipitant; medication non-adherence is the primary cause"
+        "key_features": "Definite electrographic SE on EEG; excludes pseudo-status",
+        "icd_code": "F44.5"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "IV lorazepam 2 mg for first-line SE treatment; repeat once if needed",
-        "tool_name": null,
-        "expected_finding": "Convulsive SE terminated after 2-4 mg lorazepam IV",
+        "action": "EEG — confirm electrographic SE and post-treatment recovery",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Post-ictal suppression then recovering diffuse background with interictal generalized 3-4 Hz polyspike-wave bursts — JME pattern",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "Obtain labs including levetiracetam level, BMP, CBC, toxicology",
+        "action": "Labs: CBC, CMP, glucose, Ca/Mg, AED level (LEV), ammonia, ABG, lactate, CK, troponin, blood cultures, beta-hCG (n/a, male)",
         "tool_name": "interpret_labs",
-        "expected_finding": "Undetectable levetiracetam — confirms medication non-adherence as precipitant",
+        "expected_finding": "LEV undetectable (<2 mcg/mL); lactate 8.2 (post-convulsive); CK 1840 (rhabdo); troponin 0.06 (post-convulsive)",
         "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "BMP",
-            "CBC",
-            "AED_levels",
-            "toxicology",
-            "lactate",
-            "CK"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Non-contrast CT head to exclude structural cause",
+        "action": "Non-contrast head CT — exclude acute structural cause",
         "tool_name": "order_ct_scan",
-        "expected_finding": "Normal CT — JME has no structural lesion",
+        "expected_finding": "Normal CT",
         "category": "required",
-        "tool_parameters": {
-          "contrast": false,
-          "urgency": "stat"
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "IV levetiracetam 2000 mg loading dose to restore therapeutic level — do NOT use phenytoin/fosphenytoin (contraindicated in JME)",
-        "tool_name": null,
-        "expected_finding": "Levetiracetam therapeutic (36 mcg/mL) after IV loading",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "MRI brain — confirm no new structural lesion (low yield in confirmed JME)",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Normal MRI",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "Check drug interaction: phenytoin CONTRAINDICATED in JME",
+        "action": "Drug-interaction check: LEV reload; avoid phenytoin in JME",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "Phenytoin worsens JME — use levetiracetam",
+        "expected_finding": "LEV IV reload + adjunct if persistent SE; avoid phenytoin/CBZ/oxcarbazepine/gabapentin (worsen myoclonus)",
         "category": "required",
-        "tool_parameters": {
-          "drugs": [
-            "phenytoin",
-            "levetiracetam",
-            "JME"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
       },
       {
         "step": 6,
-        "action": "EEG after SE termination to confirm JME interictal pattern and exclude NCSE",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Generalized 3-4 Hz polyspike-wave — JME pattern; no ongoing NCSE",
+        "action": "Literature: JME adherence counseling and trigger avoidance",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Sleep deprivation + missed AEDs are the canonical JME triggers; lifelong AED required",
         "category": "required",
-        "tool_parameters": {
-          "urgency": "urgent"
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 7,
-        "action": "Serial troponin to exclude acute myocardial infarction (mildly elevated on presentation)",
+        "action": "Repeat troponin — exclude cardiac event if persistently elevated",
         "tool_name": "interpret_labs",
-        "expected_finding": "Troponin stable-to-declining — neurogenic stress, not MI",
-        "category": "recommended",
-        "tool_parameters": {
-          "tests": [
-            "serial_troponin"
-          ],
-          "interval": "q3h"
-        }
-      },
-      {
-        "step": 8,
-        "action": "Discharge with 30-day levetiracetam prescription + JME trigger education + neurology follow-up 2 weeks",
-        "tool_name": null,
-        "expected_finding": "Patient recovers fully; educated about adherence and triggers",
-        "category": "required",
-        "tool_parameters": {}
+        "expected_finding": "Mild post-convulsive troponin elevation typically trends down without intervention",
+        "category": "optional",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "study_type": "TTE"
+        },
+        "rationale": "No clinical suspicion of cardiac source of embolus or cardiogenic seizure; routine echo is not indicated in SE workup absent cardiac findings.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No suspicion of arrhythmogenic syncope or cardiac comorbidity precipitating SE; routine telemetry beyond standard ICU monitoring adds cost without yield.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in acute SE evaluation; dementia biomarker imaging does not change acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is for ischemic stroke workup; SE without focal vascular suspicion does not warrant carotid imaging.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "DaTscan / dopamine transporter imaging has no role in SE; no parkinsonism question relevant to acute management.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "IV lorazepam immediately for convulsive SE",
-      "IV levetiracetam 2000 mg loading dose — restore therapeutic level",
-      "Phenytoin/fosphenytoin ABSOLUTELY CONTRAINDICATED in JME — worsens myoclonus and absence",
-      "Levetiracetam level confirms non-adherence — address medication adherence at discharge",
-      "Normal CT confirms no structural precipitant — JME is idiopathic generalized epilepsy"
+      "Administer IV lorazepam 0.1 mg/kg first-line",
+      "IV levetiracetam reload as second-line AED (avoid phenytoin in JME)",
+      "Address sleep deprivation and adherence in counseling",
+      "Aggressive IV hydration for rhabdomyolysis"
     ],
     "contraindicated_actions": [
-      "Phenytoin or fosphenytoin for JME SE — contraindicated in idiopathic generalized epilepsy, worsens myoclonus and absence seizures",
-      "Carbamazepine for long-term JME management — worsens absence and myoclonic components",
-      "Discharging without levetiracetam refill — prescription lapse was the direct cause; must provide refill before discharge"
+      "Do NOT use phenytoin / carbamazepine / oxcarbazepine / gabapentin in JME",
+      "Do NOT discharge without adherence counseling and PCP follow-up",
+      "Avoid phenytoin/carbamazepine/oxcarbazepine/gabapentin in JME — can exacerbate myoclonus."
     ],
     "key_reasoning_points": [
-      "JME + undetectable AED level = medication non-adherence is the precipitant — the most common cause of SE in patients with known epilepsy",
-      "Phenytoin/fosphenytoin CONTRAINDICATED in JME — blocks fast Na+ channels in cortical neurons but does not suppress the thalamocortical T-type calcium channel circuits mediating JME; can paradoxically worsen myoclonus",
-      "Levetiracetam IV loading is the correct approach: 2000 mg IV bolus restores therapeutic levels rapidly, safe and effective",
-      "JME triggers are critical counseling points: sleep deprivation, alcohol, medication non-adherence — all three were present in this case",
-      "Post-ictal leukocytosis is a stress response, not infection — do not initiate empiric antibiotics based on WBC elevation alone in a post-ictal patient with clear precipitant",
-      "Serial troponin trending down confirms neurogenic cardiac stress, not NSTEMI — differentiation from Type 2 MI requires trending"
+      "JME is lifelong; non-adherence is the leading cause of breakthrough SE",
+      "Sleep deprivation is the canonical JME trigger",
+      "Avoid sodium-channel-blocking AEDs in JME",
+      "Post-convulsive troponin elevation is common and benign"
     ],
-    "red_herrings": [],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": [
+      {
+        "data_point": "Troponin I 0.06 ng/mL",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests acute coronary syndrome",
+        "correct_interpretation": "Mildly elevated troponin after generalized convulsive SE is post-convulsive demand ischemia / chest-wall ischemia; trend down expected"
+      },
+      {
+        "data_point": "Lactate 8.2 mmol/L",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests sepsis or shock",
+        "correct_interpretation": "Post-convulsive lactic acidosis from muscle activity; resolves spontaneously"
+      }
+    ]
   },
   "metadata": {
     "teaching_points": "JME non-adherence causing SE; phenytoin CONTRAINDICATED in JME; levetiracetam IV loading; post-ictal leukocytosis vs infection; neurogenic troponin elevation",
@@ -647,6 +696,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "6 required + 1 optional; JME with LEV non-adherence and sleep deprivation; teaching is AED selection in JME and post-convulsive lab interpretation; 2 grounded red herrings.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

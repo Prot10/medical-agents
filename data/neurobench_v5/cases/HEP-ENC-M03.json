@@ -511,116 +511,188 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Hepatic encephalopathy, grade 2, HCV cirrhosis (post-SVR) — precipitated by constipation + TMP-SMX disrupting gut flora + undertreated hypothyroidism",
-    "icd_code": "K72.9",
+    "primary_diagnosis": "Hepatic encephalopathy (West Haven grade II), HCV cirrhosis post-SVR (Child-Pugh B, MELD 12) — precipitated by constipation and recent TMP-SMX antibiotic use (gut microbiome disruption reducing lactulose/rifaximin efficacy); undertreated hypothyroidism is a contributing cognitive factor.",
+    "icd_code": "K72.90",
     "differential": [
       {
-        "diagnosis": "Hypothyroid encephalopathy",
+        "diagnosis": "Hypothyroid encephalopathy / myxedema-related cognitive impairment",
         "likelihood": "moderate",
-        "key_features": "TSH 8.4, free T4 0.7 — undertreated hypothyroidism contributing to cognitive slowing; EEG non-specific; but ammonia 72 + cirrhosis makes HE primary; treat both"
+        "key_features": "TSH elevated — hypothyroidism contributes to cognitive slowing but does not produce asterixis or rapid lactulose response; treat both.",
+        "icd_code": "E03.5"
       },
       {
-        "diagnosis": "Opioid toxicity (methadone)",
-        "likelihood": "very_low",
-        "key_features": "Methadone level 0.28 mg/L — therapeutic range; urine positive for methadone metabolite as expected; no respiratory depression, no pinpoint pupils; opioid toxicity excluded"
-      },
-      {
-        "diagnosis": "Drug intoxication / TMP-SMX neurotoxicity",
-        "likelihood": "very_low",
-        "key_features": "TMP-SMX can rarely cause encephalopathy in renal failure but creatinine 0.9 — renal function normal; TMP-SMX precipitates HE via gut flora alteration, not direct neurotoxicity"
+        "diagnosis": "Drug-induced encephalopathy (TMP-SMX or other recent medication)",
+        "likelihood": "low",
+        "key_features": "TMP-SMX rarely causes direct CNS toxicity; main role is gut flora disruption that reduces lactulose efficacy.",
+        "icd_code": "G92"
       },
       {
         "diagnosis": "Spontaneous bacterial peritonitis",
+        "likelihood": "low",
+        "key_features": "Diagnostic paracentesis to exclude if ascites present.",
+        "icd_code": "K65.2"
+      },
+      {
+        "diagnosis": "Recurrent HCV / cirrhosis decompensation despite SVR",
+        "likelihood": "low",
+        "key_features": "SVR12 confirmed but cirrhosis morphology persists; portal hypertension still drives HE susceptibility.",
+        "icd_code": "B18.2"
+      },
+      {
+        "diagnosis": "Mild cognitive impairment / neurodegenerative process",
         "likelihood": "very_low",
-        "key_features": "PMN 45 — SBP excluded; afebrile; no leukocytosis"
+        "key_features": "Acute 3-day course with reversibility makes neurodegeneration unlikely; PHES testing later if minimal HE concern persists.",
+        "icd_code": "G31.84"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Labs — ammonia, LFTs, TSH/free T4, methadone level, CBC, BMP, toxicology",
+        "action": "Comprehensive labs: CMP including AST/ALT/bilirubin/INR/albumin, ammonia, CBC, glucose, electrolytes (Na, K, Mg), BUN/Cr, lactate, blood cultures and urine cultures; toxicology if substance use plausible. Confirms liver dysfunction and screens for precipitants.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Ammonia 72, TSH 8.4, therapeutic methadone — dual contributors identified",
+        "expected_finding": "Cirrhosis features; ammonia elevated; TSH elevated; identify precipitants — confirm no SBP, no electrolyte derangement.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 2,
-        "action": "CT head — exclude structural etiology",
+        "action": "Non-contrast CT head — exclude structural alternate cause of AMS (hemorrhage, large stroke, mass) before any LP.",
         "tool_name": "order_ct_scan",
-        "expected_finding": "CT normal",
+        "expected_finding": "No acute intracranial process; mild atrophy — structural cause excluded.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 3,
-        "action": "EEG — characterize encephalopathy",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Theta slowing — mild-moderate metabolic encephalopathy",
+        "action": "Literature/guideline search to confirm West Haven grading, precipitant management, and lactulose/rifaximin dosing (AASLD/EASL HE management; antibiotic-induced gut flora disruption and HE; hypothyroidism cognitive effects).",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "AASLD/EASL 2014 guidance retrieved; West Haven criteria and precipitant-driven management framework confirmed.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 4,
-        "action": "Diagnostic paracentesis — exclude SBP",
-        "tool_name": "interpret_labs",
-        "expected_finding": "PMN 45 — SBP excluded",
+        "action": "Drug-interaction and medication-reconciliation review covering TMP-SMX, levothyroxine, lactulose, rifaximin — review TMP-SMX completion and consider alternative antibiotic next time; reconcile thyroid replacement; flag any CNS depressants (benzodiazepines, opioids, sedating antiemetics, antihistamines) and confirm lactulose/rifaximin dosing in liver disease.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sedating/CNS-depressant medications identified; lactulose and rifaximin reviewed for hepatic dose adjustment.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Bajaj_2011]",
+        "guideline_source": "Bajaj 2011 HE management review"
       },
       {
         "step": 5,
-        "action": "Increase lactulose + add rifaximin; discontinue TMP-SMX; treat constipation",
-        "tool_name": null,
-        "expected_finding": "Ammonia normalizes; mental status improves",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Consult hepatology — coordinate definitive care, transplant candidacy assessment where applicable.",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Hepatology / critical-care guidance integrated into management.",
+        "category": "recommended",
+        "tool_parameters": {
+          "specialty": "hepatology"
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 6,
-        "action": "Increase levothyroxine dose — TSH 8.4; undertreated hypothyroidism contributing",
-        "tool_name": null,
-        "expected_finding": "Thyroid treatment initiated",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "EEG — consider only if alternate diagnosis suspected or no improvement with lactulose. Triphasic waves are classic but non-specific (metabolic encephalopathies broadly); main role is exclusion of non-convulsive status epilepticus where the differential supports it.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Generalized slowing if obtained; non-specific.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Ferenci_2002]",
+        "guideline_source": "Ferenci 2002 HE nomenclature/quantification"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No clinical suspicion for hepatopulmonary syndrome, portopulmonary hypertension, or endocarditis; echocardiography is not part of the HE workup.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in HE workup; reversible metabolic encephalopathy is the issue, not Alzheimer pathology.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan has no role in HE workup; the question is metabolic encephalopathy, not nigrostriatal degeneration.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "genetic_panel:early_onset_AD"
+        },
+        "rationale": "Early-onset AD genetic panel has no role in HE workup; reversible metabolic encephalopathy is the diagnosis under consideration.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "vep"
+        },
+        "rationale": "Visual evoked potentials have no role in HE workup; no demyelinating process is on the differential.",
+        "citation": "[AASLD_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "In altered mental status, exclude intracranial mass effect / hemorrhage on imaging before LP to avoid herniation risk.",
+        "citation": "[AASLD_2014]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Identify ALL precipitants — constipation, TMP-SMX, and hypothyroidism are all contributing; address each",
-      "Discontinue TMP-SMX — in cirrhosis, antibiotics that alter gut flora (especially TMP-SMX, fluoroquinolones) can precipitate HE; replace with nitrofurantoin if UTI confirmed",
-      "TSH elevation requires treatment — hypothyroid encephalopathy can both mimic and worsen HE; levothyroxine dose increase appropriate",
-      "SVR does not eliminate HE risk in established cirrhosis — patient requires continued HE prophylaxis"
+      "Lactulose 30 mL TID-QID titrated to 2-4 soft stools/day — address the constipation precipitant directly.",
+      "Rifaximin 550 mg BID — restart if interrupted.",
+      "Adjust levothyroxine dose for elevated TSH after acute illness resolves and recheck in 6 weeks.",
+      "Counsel about avoiding TMP-SMX and other broad-spectrum antibiotics that disrupt gut flora when possible."
     ],
     "contraindicated_actions": [
-      "TMP-SMX in cirrhosis — precipitates HE via gut flora disruption; use nitrofurantoin for UTI",
-      "Benzodiazepines for agitation",
-      "Opioid dose escalation without clear indication"
+      "Do not prescribe benzodiazepines for anxiety/agitation — they precipitate and prolong HE (use haloperidol or non-pharmacologic measures for agitation).",
+      "Do not prescribe sedating opioids — they worsen HE; consider acetaminophen at hepatic-safe dosing for pain.",
+      "Do not perform LP before neuroimaging excludes mass effect when the patient has altered mental status.",
+      "Do not stop rifaximin out of concern for antibiotic interaction with TMP-SMX — rifaximin is non-absorbable and essential for HE control."
     ],
     "key_reasoning_points": [
-      "TMP-SMX is frequently prescribed without recognizing HE precipitation risk in cirrhosis — the antibiotic disrupts the gut microbiome that lactulose and rifaximin target",
-      "Undertreated hypothyroidism can both contribute to and mimic HE — TSH should be checked in any confusion workup, especially in women over 50",
-      "Methadone in opioid use disorder maintenance is NOT the cause of encephalopathy when levels are therapeutic — methadone should NOT be discontinued without addiction medicine involvement",
-      "SVR does not reverse established cirrhosis — HCV-cured cirrhotic patients remain at risk for HE and require ongoing hepatology care"
+      "HE is a clinical diagnosis: West Haven grading + evidence of liver dysfunction + exclusion of other causes of AMS — ammonia level is supportive only and correlates poorly with grade (AASLD 2014).",
+      "Precipitant identification is more actionable than the ammonia number: infection (SBP especially), GI bleed, electrolyte disturbance (hypokalemia/hyponatremia), constipation, sedative/CNS-depressant use, dehydration, dietary protein load, renal failure.",
+      "SVR12 cures HCV but does not reverse established cirrhosis morphology or portal hypertension — patients remain at HE risk and require ongoing surveillance.",
+      "Broad-spectrum antibiotics disrupt the gut microbiome on which lactulose/rifaximin efficacy depends; this is an under-recognized HE precipitant."
     ],
     "red_herrings": [
       {
-        "data_point": "Urine drug screen positive opioids (methadone metabolite)",
-        "location": "initial_tool_outputs.labs.panels.Toxicology",
-        "intended_effect": "Attribute confusion to methadone toxicity/overdose; consider naloxone trial or methadone dose reduction",
-        "correct_interpretation": "Methadone level 0.28 mg/L is therapeutic; positive UDS is expected in maintenance therapy; opioid toxicity excluded; methadone should NOT be stopped without addiction medicine consultation",
-        "field_path": ""
+        "data_point": "HCV cured with SVR12 confirmed",
+        "location": "patient.clinical_history.past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history[1]",
+        "intended_effect": "Dismiss HE as 'liver disease is cured'.",
+        "correct_interpretation": "SVR cures HCV viremia but cirrhosis and portal hypertension persist; HE risk continues for years post-SVR."
       },
       {
-        "data_point": "TSH 8.4, free T4 0.7 (hypothyroid)",
-        "location": "initial_tool_outputs.labs.panels.Thyroid",
-        "intended_effect": "Attribute all confusion to hypothyroid encephalopathy as sole cause; treat only hypothyroidism and miss HE",
-        "correct_interpretation": "Hypothyroidism is a contributing factor but not the primary diagnosis — ammonia 72 + cirrhosis + EEG slowing + constipation all point to HE as primary; both conditions must be treated",
-        "field_path": ""
+        "data_point": "Elevated TSH (undertreated hypothyroidism)",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs.panels",
+        "intended_effect": "Attribute confusion entirely to hypothyroidism.",
+        "correct_interpretation": "Hypothyroidism contributes to cognitive slowing but does not produce asterixis or respond to lactulose; treat HE concurrently."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -640,6 +712,14 @@
       "cardiac_monitoring": "incidental",
       "advanced_imaging": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (HEP-ENC)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:HEP-ENC",
+    "difficulty_rationale": "4 required tools and 2 recommended; 2 grounded distractors (post-SVR 'cure' framing, elevated TSH); identifying TMP-SMX as a precipitant requires medication-history synthesis with mechanism.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -747,187 +747,280 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Acute ischemic stroke, left MCA superior division territory, likely cardioembolic etiology from paroxysmal atrial fibrillation",
-    "icd_code": "I63.9",
+    "primary_diagnosis": "Acute ischemic stroke, left MCA superior division territory \u2014 cardioembolic etiology from paroxysmal atrial fibrillation",
+    "icd_code": "I63.412",
     "differential": [
       {
-        "diagnosis": "Large artery atherosclerotic stroke (artery-to-artery embolism from left ICA plaque)",
+        "diagnosis": "Large-artery atherosclerotic stroke",
         "likelihood": "moderate",
-        "key_features": "Moderate left ICA stenosis with vulnerable plaque is present, but the detection of paroxysmal AF on Holter monitoring favors cardioembolic mechanism; both mechanisms may be contributory"
+        "key_features": "Vascular risk factors warrant vessel imaging; cortical territory is consistent with embolic mechanism",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Small-vessel (lacunar) infarct",
+        "likelihood": "low",
+        "key_features": "Cortical MCA-territory lesion does not fit a lacunar pattern",
+        "icd_code": null
       },
       {
         "diagnosis": "Hemorrhagic stroke",
-        "likelihood": "low",
-        "key_features": "MRI shows DWI restriction without hemorrhage; CT/MRI definitively excludes hemorrhagic etiology"
+        "likelihood": "very_low",
+        "key_features": "CT and MRI exclude hemorrhage",
+        "icd_code": null
       },
       {
-        "diagnosis": "Todd's paralysis (post-ictal)",
+        "diagnosis": "Hypoglycemia or metabolic mimic",
         "likelihood": "very_low",
-        "key_features": "No seizure activity reported; deficits have persisted for hours; MRI confirms acute infarction on DWI"
+        "key_features": "Glucose elevated; persistent focal deficit",
+        "icd_code": null
       },
       {
-        "diagnosis": "Hemiplegic migraine",
+        "diagnosis": "Brain tumor",
         "likelihood": "very_low",
-        "key_features": "Patient age 67 with no migraine history; acute DWI-positive lesion on MRI rules out migraine mimic"
-      },
-      {
-        "diagnosis": "Hypoglycemia",
-        "likelihood": "very_low",
-        "key_features": "Field glucose 204 mg/dL and ED glucose 218 mg/dL; hypoglycemia excluded as cause of focal deficits"
+        "key_features": "Vascular-territory acute DWI restriction without mass",
+        "icd_code": null
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Activate stroke code and perform rapid clinical assessment including NIHSS, establish last known well time, and obtain fingerstick glucose",
-        "tool_name": null,
-        "expected_finding": "NIHSS 6, last known well approximately 9 hours prior (23:00 previous evening), glucose 204 mg/dL",
-        "category": "required"
+        "action": "Obtain emergent non-contrast CT head as first imaging to exclude intracranial hemorrhage before any thrombolytic decision",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No hemorrhage; possible subtle hypodensity in left MCA superior division",
+        "category": "required",
+        "tool_parameters": {
+          "contrast": false,
+          "angiography": false
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 2,
-        "action": "Obtain emergent non-contrast CT head to exclude hemorrhage",
+        "action": "Obtain CT angiography of head and neck to evaluate for large vessel occlusion and assess thrombectomy candidacy",
         "tool_name": "order_ct_scan",
-        "expected_finding": "No hemorrhage; possible subtle hypodensity in left frontal-parietal region",
+        "expected_finding": "Assess for LVO; characterize cervical and intracranial vessels",
         "category": "required",
         "tool_parameters": {
-          "angiography": false,
-          "contrast": false
-        }
+          "contrast": true,
+          "angiography": true
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 3,
-        "action": "Obtain stat labs including CBC, BMP, coagulation studies, troponin, lipid panel, and HbA1c",
+        "action": "Order stat labs: CBC, BMP (including glucose), coagulation panel (INR/PTT), troponin",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal coagulation, hyperglycemia, elevated creatinine (CKD), poorly controlled diabetes, dyslipidemia",
+        "expected_finding": "Hyperglycemia, elevated creatinine, normal coagulation",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
+            "glucose",
             "coagulation",
-            "lipid",
-            "troponin",
-            "HbA1c"
+            "troponin"
           ]
-        }
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 4,
-        "action": "Obtain 12-lead ECG to evaluate cardiac rhythm",
+        "action": "Obtain 12-lead ECG to assess for atrial fibrillation and concurrent cardiac ischemia",
         "tool_name": "analyze_ecg",
-        "expected_finding": "Sinus rhythm with left atrial enlargement and LVH; no AF on this tracing but LAE raises suspicion",
-        "category": "required"
+        "expected_finding": "Assess for AF on initial tracing; left atrial enlargement may foreshadow paroxysmal AF",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 5,
-        "action": "Obtain brain MRI with DWI to evaluate for acute infarction and assess DWI-FLAIR mismatch for potential thrombolysis eligibility",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Acute DWI restriction in left MCA superior division territory; FLAIR positive indicating onset >4.5 hours; no DWI-FLAIR mismatch",
+        "action": "Review current AHA/ASA guidelines for IV thrombolysis windows, late-window selection, and mechanical thrombectomy eligibility",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "AHA/ASA 2019 acute ischemic stroke management, IV tPA criteria, mechanical thrombectomy windows",
         "category": "required",
         "tool_parameters": {
-          "protocol": "stroke",
-          "contrast": false
-        }
+          "query": "AHA/ASA 2019 acute ischemic stroke management, IV tPA criteria, mechanical thrombectomy windows"
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 6,
-        "action": "Determine that IV thrombolysis is NOT indicated: last known well >4.5 hours, no DWI-FLAIR mismatch on MRI, FLAIR already positive",
-        "tool_name": null,
-        "expected_finding": "Patient does not meet criteria for IV alteplase per WAKE-UP trial or standard guidelines",
-        "category": "required"
+        "action": "Confirm absence of contraindications to IV thrombolysis (recent anticoagulation, surgery, bleeding, drug interactions)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "tPA contraindications screened; medication-anticoagulant interactions reviewed",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 7,
-        "action": "Obtain CTA head and neck to evaluate for large vessel occlusion and vascular anatomy",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "No large vessel occlusion; moderate left ICA stenosis (55-60%); mild left MCA M2 irregularity",
+        "action": "Obtain brain MRI with DWI and FLAIR to confirm acute infarct, localize territory, and assess vintage",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "DWI-positive infarct in left MCA superior division; evaluate DWI-FLAIR mismatch",
         "category": "required",
         "tool_parameters": {
-          "angiography": true,
+          "protocol": "stroke",
+          "sequences": [
+            "DWI",
+            "ADC",
+            "FLAIR",
+            "T2",
+            "T1",
+            "GRE/SWI"
+          ],
           "contrast": false
-        }
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 8,
-        "action": "Initiate dual antiplatelet therapy (aspirin + clopidogrel) for early secondary prevention pending stroke mechanism workup",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended"
-      },
-      {
-        "step": 9,
-        "action": "Order prolonged cardiac monitoring (Holter or telemetry) to evaluate for paroxysmal atrial fibrillation given left atrial enlargement on ECG and echo",
-        "tool_name": "order_cardiac_monitoring",
-        "expected_finding": "Paroxysmal atrial fibrillation detected with 14.6% AF burden",
-        "category": "required",
-        "tool_parameters": {
-          "monitor_type": "holter_24h"
-        }
-      },
-      {
-        "step": 10,
-        "action": "Order transthoracic echocardiogram to evaluate cardiac structure and function and assess for cardioembolic source",
+        "action": "Obtain transthoracic echocardiogram to evaluate for cardioembolic source of stroke",
         "tool_name": "order_echocardiogram",
-        "expected_finding": "LVH, dilated left atrium, diastolic dysfunction, no thrombus or PFO",
+        "expected_finding": "Cardioembolic risk: LA size, EF, valves, shunt; consider TEE if cryptogenic",
         "category": "required",
         "tool_parameters": {
           "echo_type": "TTE"
-        }
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
+      },
+      {
+        "step": 9,
+        "action": "Initiate inpatient telemetry plus 24-hour Holter monitoring (extend to 30-day event monitor if no source identified)",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Detect paroxysmal atrial fibrillation",
+        "category": "required",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "citation": "[Sanna_2014]",
+        "guideline_source": "[Sanna_2014]"
+      },
+      {
+        "step": 10,
+        "action": "Obtain carotid duplex ultrasound to quantify cervical carotid stenosis and characterize plaque morphology",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Cervical carotid stenosis assessment",
+        "category": "required",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
       },
       {
         "step": 11,
-        "action": "Once paroxysmal AF is confirmed, transition from antiplatelet to anticoagulation therapy with a DOAC (e.g., apixaban 5 mg BID, with dose adjustment consideration for renal function)",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Consider MR angiography of head and neck if CTA was contraindicated or as confirmatory vascular study",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Alternative non-iodinated vascular assessment when CTA is limited",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "MR_angiography"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
       },
       {
         "step": 12,
-        "action": "Optimize vascular risk factor management: restart amlodipine, intensify statin to high-dose (rosuvastatin 40 mg or atorvastatin 80 mg), optimize diabetes management, counsel on smoking cessation and CPAP adherence",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Consider transcranial Doppler for microembolic signal detection or hemodynamic assessment in selected mechanisms",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Microembolic signals support active embolic mechanism; can monitor vasospasm or right-to-left shunt",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "transcranial_doppler"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "No seizure features; EEG is not part of routine stroke workup",
+        "citation": "[AHA_ASA_2019]"
       },
       {
-        "step": 13,
-        "action": "Admit to stroke unit for monitoring, serial neurological assessments, and rehabilitation evaluation",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No SAH or CNS infection suspicion; LP not indicated",
+        "citation": "[AHA_ASA_2019]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "rationale": "EMG/NCS evaluates peripheral nerve disease; not applicable to central ischemic stroke",
+        "citation": "[AHA_ASA_2019]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "check_drug_interactions",
+        "reason": "Non-contrast head CT MUST exclude intracranial hemorrhage before IV thrombolysis is considered (tPA decision modeled here through drug-interaction/contraindication check).",
+        "citation": "[AHA_ASA_2019]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Glucose, INR/PTT, and platelet count must be reviewed before IV thrombolysis to exclude hypoglycemia mimic and coagulopathy contraindications.",
+        "citation": "[AHA_ASA_2019]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Establish last known well time to determine thrombolysis eligibility; recognize that wake-up stroke with FLAIR-positive MRI excludes standard IV thrombolysis",
-      "Obtain emergent CT head to exclude hemorrhage",
-      "Obtain brain MRI with DWI to confirm acute infarction and assess DWI-FLAIR mismatch",
-      "Obtain ECG and recognize left atrial enlargement as a clue to possible paroxysmal AF",
-      "Order prolonged cardiac monitoring to detect paroxysmal atrial fibrillation",
-      "Initiate anticoagulation rather than antiplatelet therapy once paroxysmal AF is confirmed",
-      "Do NOT administer IV alteplase given the FLAIR-positive wake-up stroke beyond the standard treatment window"
+      "Establish time of last known well (LKW) and apply NIHSS to determine acute treatment eligibility",
+      "Obtain non-contrast CT head FIRST to exclude intracranial hemorrhage before any thrombolytic decision",
+      "Achieve door-to-needle time <60 minutes if IV thrombolysis is indicated",
+      "Maintain blood pressure <185/110 mmHg prior to IV tPA and <180/105 mmHg for 24 hours after",
+      "Verify glucose to exclude hypoglycemia as a stroke mimic",
+      "Initiate continuous telemetry and obtain prolonged cardiac monitoring to detect paroxysmal atrial fibrillation",
+      "Begin secondary prevention (antiplatelet or anticoagulation) and high-intensity statin per mechanism",
+      "Apply wake-up stroke late-window thrombolysis criteria (WAKE-UP/EXTEND)",
+      "Pursue extended cardiac monitoring to confirm paroxysmal AF",
+      "Initiate oral anticoagulation once AF is documented and hemorrhagic transformation risk is acceptable"
     ],
     "contraindicated_actions": [
-      "Administering IV alteplase when last known well time exceeds 4.5 hours and DWI-FLAIR mismatch is absent (FLAIR already positive)",
-      "Pursuing mechanical thrombectomy in the absence of a large vessel occlusion or target mismatch profile",
-      "Aggressively lowering blood pressure below 140/90 in the first 24-48 hours (risk of worsening ischemia in the absence of thrombolysis)",
-      "Relying solely on a single ECG tracing to exclude atrial fibrillation as the stroke mechanism",
-      "Continuing antiplatelet-only therapy after paroxysmal AF is documented; anticoagulation is mandatory for secondary prevention",
-      "Administering contrast-enhanced imaging without awareness of CKD stage 3a and need for renal-protective measures"
+      "Do not administer IV tPA before non-contrast CT excludes intracranial hemorrhage",
+      "Do not give IV tPA if INR >1.7, platelet count <100,000, recent major surgery, or other guideline-listed contraindications",
+      "Do not aggressively lower blood pressure below 140/90 mmHg in the acute phase outside the tPA window \u2014 risks worsening penumbral perfusion",
+      "Do not delay non-contrast CT for additional imaging or labs in a stroke alert presentation",
+      "Do not start full-dose anticoagulation in the acute phase of a large infarct without considering hemorrhagic transformation risk",
+      "Do not treat as purely large-artery atherosclerotic without confirmatory cardiac monitoring",
+      "Avoid order_ct_scan with contrast=True, angiography=True: Iodinated contrast carries nephrotoxicity risk in CKD stage 3a; mitigate or substitute MR angiography when feasible"
     ],
     "key_reasoning_points": [
-      "Wake-up stroke with unknown onset time requires DWI-FLAIR mismatch assessment on MRI to determine thrombolysis eligibility; FLAIR positivity in this case indicates onset >4.5 hours ago, precluding standard IV tPA",
-      "Normal sinus rhythm on initial ECG does not exclude paroxysmal atrial fibrillation; left atrial enlargement on ECG and echocardiogram should prompt prolonged cardiac monitoring",
-      "The detection of paroxysmal AF fundamentally changes secondary prevention strategy from antiplatelet to anticoagulation therapy",
-      "Moderate left ICA stenosis with vulnerable plaque represents a competing stroke mechanism; both artery-to-artery embolism and cardioembolism may contribute, but AF detection takes therapeutic priority",
-      "Chronic small vessel ischemic disease on MRI (Fazekas 2-3) can obscure acute findings on FLAIR; DWI sequences are essential for identifying the acute lesion",
-      "The right-sided neglect with a left hemisphere lesion is the key lateralizing finding; subtle neglect in a dominant hemisphere stroke is an atypical feature that can be missed without careful examination",
-      "CKD stage 3a (eGFR 48) impacts contrast administration decisions and anticoagulant dosing; apixaban does not require dose reduction until eGFR <25 or if two of three criteria are met (age >=80, weight <=60 kg, creatinine >=1.5)",
-      "Multiple poorly controlled risk factors (hypertension off medication, diabetes with HbA1c 9.0%, active smoking, dyslipidemia, untreated OSA) all contributed to stroke risk and must be addressed comprehensively"
+      "Acute ischemic stroke is a clinical syndrome plus neuroimaging diagnosis; CT first excludes hemorrhage and unmasks the tPA decision",
+      "Time of last known well governs IV thrombolysis eligibility (\u22644.5h standard; selected up to 9h with imaging mismatch per WAKE-UP/EXTEND)",
+      "Large vessel occlusion on CTA opens the mechanical thrombectomy pathway up to 24h per DAWN/DEFUSE-3 selection criteria",
+      "TOAST classification by mechanism (large-artery, cardioembolic, small-vessel, other, undetermined) drives secondary prevention strategy",
+      "Normal sinus rhythm on initial ECG does NOT exclude paroxysmal AF \u2014 extended cardiac monitoring is required, especially in cryptogenic stroke",
+      "Cortical MCA-superior-division infarcts are typically embolic; cardiac source workup is essential",
+      "Left atrial enlargement increases pretest probability of paroxysmal AF and warrants prolonged monitoring",
+      "Off-pathway modality for order_advanced_imaging (modality=amyloid_PET): Amyloid PET has no role in acute ischemic stroke evaluation and incurs substantial cost without altering management",
+      "Off-pathway modality for order_advanced_imaging (modality=DaTscan): Dopamine transporter SPECT is indicated for parkinsonian syndromes, not vascular stroke workup",
+      "Off-pathway modality for order_advanced_imaging (modality=FDG_PET): FDG-PET (neurodegenerative/oncologic indications) has no role in routine ischemic stroke workup"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "Chronic small-vessel ischemic disease on MRI",
+        "location": "MRI",
+        "field_path": "initial_tool_outputs.mri",
+        "intended_effect": "Distract toward small-vessel mechanism",
+        "correct_interpretation": "Acute cortical MCA infarct fits embolic mechanism better; chronic SVD is background"
+      }
+    ]
   },
   "metadata": {
     "version": "1.0",
@@ -947,6 +1040,16 @@
       "specialized_test": "normal",
       "literature_search": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:ISCH-STR",
+    "difficulty_rationale": "Wake-up MCA stroke, cardioembolic from paroxysmal AF; tissue-clock decision and mechanism assignment require multimodal synthesis.",
+    "case_body_concerns": [
+      "Required tool `check_drug_interactions` (step 6) has no pre-generated output in initial_tool_outputs/followup_outputs \u2014 agent will receive only the generic fallback_tool_outputs entry. Recommend adding a case-specific followup_outputs entry to match the ground-truth expected_finding."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

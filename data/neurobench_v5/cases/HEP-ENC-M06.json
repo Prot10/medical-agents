@@ -511,116 +511,175 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Hepatic encephalopathy, grade 2-3, post-TIPS cirrhosis — precipitated by lactulose overdose (8-10 stools/day → severe hypokalemia K 2.6 → paradoxical hyperammonemia + AKI from dehydration)",
-    "icd_code": "K72.9",
+    "primary_diagnosis": "Hepatic encephalopathy (West Haven grade II-III), post-TIPS alcoholic cirrhosis (Child-Pugh B) — precipitated by lactulose overdose (8-10 stools/day) causing severe hypokalemia (K 2.6), hypovolemia, and pre-renal AKI; TIPS shunt itself is a structural background contributor.",
+    "icd_code": "K72.90",
     "differential": [
       {
-        "diagnosis": "TIPS shunt stenosis/occlusion causing HE",
-        "likelihood": "low",
-        "key_features": "Doppler shows patent shunt with normal flow velocities — shunt stenosis excluded; HE is from metabolic precipitant not shunt failure"
-      },
-      {
-        "diagnosis": "Post-TIPS hepatic encephalopathy (expected)",
+        "diagnosis": "TIPS shunt malfunction with rebound portal hypertension",
         "likelihood": "moderate",
-        "key_features": "Post-TIPS HE occurs in 20-30% of cases — correct background, but the acute precipitant is lactulose overdose; this is an exacerbation of post-TIPS HE"
+        "key_features": "Post-TIPS cirrhotics rely on patent shunt; sudden HE worsening may signal occlusion — assess via Doppler ultrasound.",
+        "icd_code": "T82.898A"
       },
       {
-        "diagnosis": "Escitalopram toxicity in liver failure",
-        "likelihood": "low",
-        "key_features": "Escitalopram 10 mg exceeds recommended dose for Child-Pugh B (max 5 mg) — contributes to CNS depression; reduce dose but not sole cause"
-      },
-      {
-        "diagnosis": "Decompensated alcoholic cirrhosis with spontaneous HE",
+        "diagnosis": "Post-TIPS expected HE (chronic background)",
         "likelihood": "moderate",
-        "key_features": "No alcohol on toxicology; TIPS functioning — not acute decompensation from alcohol or shunt failure; lactulose overdose is the precipitant"
+        "key_features": "~25-40% of TIPS patients develop HE within months; this episode is acute-on-chronic.",
+        "icd_code": "K72.90"
+      },
+      {
+        "diagnosis": "Drug-induced encephalopathy (escitalopram in liver disease)",
+        "likelihood": "low",
+        "key_features": "Escitalopram metabolism is altered in cirrhosis; supratherapeutic accumulation possible but unlikely sole cause.",
+        "icd_code": "G92"
+      },
+      {
+        "diagnosis": "Spontaneous bacterial peritonitis",
+        "likelihood": "low",
+        "key_features": "Paracentesis if any residual ascites; less likely after TIPS but not impossible.",
+        "icd_code": "K65.2"
+      },
+      {
+        "diagnosis": "Hepatorenal syndrome (type 2)",
+        "likelihood": "low",
+        "key_features": "Creatinine 1.6 is mostly pre-renal from hypovolemia; reassess after volume resuscitation.",
+        "icd_code": "K76.7"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Labs — ammonia, electrolytes (potassium), renal function, LFTs",
+        "action": "Comprehensive labs: CMP including AST/ALT/bilirubin/INR/albumin, ammonia, CBC, glucose, electrolytes (Na, K, Mg), BUN/Cr, lactate, blood cultures and urine cultures; toxicology if substance use plausible. Confirms liver dysfunction and screens for precipitants.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Potassium 2.6 (severe hypokalemia from diarrhea), creatinine 1.6 (AKI), ammonia 94 — lactulose overdose identified",
+        "expected_finding": "K 2.6 (severe hypokalemia), Cr 1.6 (AKI), ammonia 94 — pinpoints over-diuresis from lactulose; cirrhosis features.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 2,
-        "action": "CT head — exclude structural cause",
+        "action": "Non-contrast CT head — exclude structural alternate cause of AMS (hemorrhage, large stroke, mass) before any LP.",
         "tool_name": "order_ct_scan",
-        "expected_finding": "CT normal",
+        "expected_finding": "No acute intracranial process.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 3,
-        "action": "EEG — characterize encephalopathy",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Generalized slowing — grade 2-3 metabolic HE",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Literature/guideline search to confirm West Haven grading, precipitant management, and lactulose/rifaximin dosing (Post-TIPS HE management; lactulose titration; hypokalemia and HE).",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "AASLD/EASL 2014 guidance retrieved; West Haven criteria and precipitant-driven management framework confirmed.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 4,
-        "action": "TIPS Doppler ultrasound — assess shunt patency",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Shunt patent — stenosis excluded",
+        "action": "Drug-interaction and medication-reconciliation review covering lactulose dosing, rifaximin, escitalopram in liver disease, diuretics — reduce lactulose dose to target 2-3 stools/day; flag any CNS depressants (benzodiazepines, opioids, sedating antiemetics, antihistamines) and confirm lactulose/rifaximin dosing in liver disease.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sedating/CNS-depressant medications identified; lactulose and rifaximin reviewed for hepatic dose adjustment.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Bajaj_2011]",
+        "guideline_source": "Bajaj 2011 HE management review"
       },
       {
         "step": 5,
-        "action": "REDUCE lactulose to 15 mL BID (target 2-3 stools/day); IV KCl repletion",
-        "tool_name": null,
-        "expected_finding": "Potassium corrected; diarrhea resolves; ammonia normalizes",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "TIPS Doppler ultrasound — assess shunt patency given new-onset HE worsening.",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Interventional radiology assessment of TIPS patency.",
+        "category": "recommended",
+        "tool_parameters": {
+          "specialty": "interventional_radiology"
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 6,
-        "action": "Reduce escitalopram to 5 mg — exceeds dose for Child-Pugh B",
-        "tool_name": null,
-        "expected_finding": "Safer antidepressant dosing in liver disease",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Consult hepatology — coordinate definitive care, transplant candidacy assessment where applicable.",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Hepatology / critical-care guidance integrated into management.",
+        "category": "recommended",
+        "tool_parameters": {
+          "specialty": "hepatology"
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No clinical suspicion for hepatopulmonary syndrome, portopulmonary hypertension, or endocarditis; echocardiography is not part of the HE workup.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "genetic_panel:early_onset_AD"
+        },
+        "rationale": "Early-onset AD genetic panel has no role in HE workup; reversible metabolic encephalopathy is the diagnosis under consideration.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "vep"
+        },
+        "rationale": "Visual evoked potentials have no role in HE workup; no demyelinating process is on the differential.",
+        "citation": "[AASLD_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "In altered mental status, exclude intracranial mass effect / hemorrhage on imaging before LP to avoid herniation risk.",
+        "citation": "[AASLD_2014]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Lactulose DOSE REDUCTION — paradoxical HE from lactulose overdose is a recognized phenomenon; excessive diarrhea causes hypokalemia which increases renal ammoniagenesis; target 2-3 stools/day NOT maximum diarrhea",
-      "TIPS shunt patency must be assessed — TIPS stenosis/occlusion causes recurrent ascites and HE; Doppler ultrasound required in any post-TIPS patient with HE",
-      "Hypokalemia repletion — hypokalemia is an independent HE precipitant via renal ammoniagenesis",
-      "Escitalopram dose reduction in Child-Pugh B — hepatically metabolized SSRIs accumulate; doses should be halved"
+      "Reduce lactulose dose to target 2-3 soft stools per day — over-titration is iatrogenic.",
+      "Aggressive IV potassium repletion (K 2.6 with cardiac monitoring during repletion).",
+      "Volume resuscitation with albumin to reverse pre-renal AKI.",
+      "Confirm TIPS patency on Doppler ultrasound.",
+      "Continue rifaximin 550 mg BID."
     ],
     "contraindicated_actions": [
-      "Increasing lactulose dose in response to HE — paradoxically worsens HE if overdose is the precipitant",
-      "Escitalopram >5 mg in Child-Pugh B",
-      "Benzodiazepines as sedatives"
+      "Do not prescribe benzodiazepines for anxiety/agitation — they precipitate and prolong HE (use haloperidol or non-pharmacologic measures for agitation).",
+      "Do not prescribe sedating opioids — they worsen HE; consider acetaminophen at hepatic-safe dosing for pain.",
+      "Do not perform LP before neuroimaging excludes mass effect when the patient has altered mental status.",
+      "Do not interpret lactulose as 'more is better' — the dose target is 2-3 soft stools/day; over-titration is a common iatrogenic HE precipitant."
     ],
     "key_reasoning_points": [
-      "Lactulose overdose is an underrecognized HE precipitant — excessive diarrhea causes hypokalemia → renal ammoniagenesis → hyperammonemia → paradoxical HE worsening; always count stools/day",
-      "TIPS shunt assessment is mandatory in any post-TIPS patient with HE — shunt stenosis occurs in 25-30% within 1 year and requires revision",
-      "Post-TIPS HE occurs in 20-30% of patients and requires adjusted lactulose + rifaximin prophylaxis — dose monitoring is critical",
-      "SSRIs are hepatically metabolized — doses must be reduced in Child-Pugh B/C liver disease; escitalopram max 5 mg in hepatic impairment"
+      "HE is a clinical diagnosis: West Haven grading + evidence of liver dysfunction + exclusion of other causes of AMS — ammonia level is supportive only and correlates poorly with grade (AASLD 2014).",
+      "Precipitant identification is more actionable than the ammonia number: infection (SBP especially), GI bleed, electrolyte disturbance (hypokalemia/hyponatremia), constipation, sedative/CNS-depressant use, dehydration, dietary protein load, renal failure.",
+      "Lactulose overdose causes hypovolemia, hypokalemia, and pre-renal AKI — all of which paradoxically worsen HE; titrate to stool frequency, not to ammonia level.",
+      "Post-TIPS HE worsening should prompt assessment of shunt patency before assuming a behavioral precipitant."
     ],
     "red_herrings": [
       {
-        "data_point": "Rifaximin 550 mg BID (appropriate dose) + lactulose appearing on medication list",
+        "data_point": "Escitalopram on medication list",
         "location": "patient.clinical_history.medications",
-        "intended_effect": "Assume HE medications are being given correctly; pursue other precipitants; miss lactulose overdose",
-        "correct_interpretation": "Medications listed as prescribed ≠ medications taken correctly; must ask about actual stool frequency (8-10/day → overdose); lactulose should produce 2-3 soft stools daily, not diarrhea",
-        "field_path": ""
+        "field_path": "patient.clinical_history.medications",
+        "intended_effect": "Attribute HE to escitalopram toxicity / SSRI accumulation.",
+        "correct_interpretation": "Escitalopram can have altered metabolism in cirrhosis but is not the primary driver; lactulose overdose with hypokalemia is the dominant precipitant."
       },
       {
-        "data_point": "TIPS procedure 4 months ago",
+        "data_point": "TIPS placed 4 months ago",
         "location": "patient.clinical_history.past_medical_history",
-        "intended_effect": "Attribute all HE to expected post-TIPS encephalopathy; skip TIPS assessment; treat empirically without identifying reversible precipitant",
-        "correct_interpretation": "Post-TIPS HE is common but TIPS shunt patency still requires assessment AND reversible precipitants (lactulose overdose, hypokalemia) must be identified — this episode is from lactulose overdose not shunt failure",
-        "field_path": ""
+        "field_path": "patient.clinical_history.past_medical_history[1]",
+        "intended_effect": "Assume TIPS is the cause and request shunt revision; ignore lactulose dosing.",
+        "correct_interpretation": "TIPS is a contributing structural background, but a sudden worsening should prompt patency check AND review of medication titration — lactulose overdose is the proximate cause here."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -640,6 +699,14 @@
       "cardiac_monitoring": "incidental",
       "specialized_test": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (HEP-ENC)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:HEP-ENC",
+    "difficulty_rationale": "4 required tools + IR consult; iatrogenic precipitant (lactulose overdose) requires recognizing 8-10 stools/day as problematic, not just 'good ammonia control'.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

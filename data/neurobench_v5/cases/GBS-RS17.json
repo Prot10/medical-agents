@@ -342,6 +342,17 @@
         "impression": "Sinus tachycardia throughout monitoring. Heart rate range 62–124 bpm. QTc improved to 442 ms by day 3. No significant arrhythmia detected. Clinical correlation recommended.",
         "recommended_actions": []
       }
+    },
+    {
+      "trigger_action": "search_gbs_treatment",
+      "tool_name": "search_medical_literature",
+      "output": {
+        "general": {
+          "query": "general",
+          "results": [],
+          "summary": "No directly applicable, high-quality evidence was retrieved for this query. Recommend correlating with current society guidelines."
+        }
+      }
     }
   ],
   "fallback_tool_outputs": {
@@ -419,119 +430,199 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Guillain-Barré syndrome, severe AIDP (post-Mycoplasma pneumoniae), with concurrent Mycoplasma pneumonia — requiring mechanical ventilation",
+    "primary_diagnosis": "Guillain-Barré syndrome, severe AIDP (post-Mycoplasma pneumoniae)",
     "icd_code": "G61.0",
     "differential": [
       {
-        "diagnosis": "Bacterial meningitis",
-        "likelihood": "very_low",
-        "key_features": "CSF: no organisms, bacterial meningitis panel negative, normal WBC — albumino-cytologic dissociation not bacterial meningitis"
+        "diagnosis": "Mycoplasma-associated CNS encephalitis / ADEM",
+        "likelihood": "moderate",
+        "key_features": "Mycoplasma triggers both encephalitis and GBS; CNS involvement requires brain MRI; absent here.",
+        "icd_code": "G04.81"
       },
       {
-        "diagnosis": "Herpes simplex encephalitis",
-        "likelihood": "very_low",
-        "key_features": "HSV PCR CSF negative; no temporal lobe signal on MRI; CT head twice normal"
+        "diagnosis": "Acute-onset CIDP",
+        "likelihood": "low",
+        "key_features": "Reassess at 8 weeks.",
+        "icd_code": "G61.81"
       },
       {
-        "diagnosis": "Acute disseminated encephalomyelitis (ADEM)",
-        "likelihood": "very_low",
-        "key_features": "No white matter lesions on MRI; peripheral NCS demyelinating pattern (not central); areflexia (not ADEM)"
+        "diagnosis": "Lyme polyradiculitis",
+        "likelihood": "low",
+        "key_features": "Endemic exposure; serology and CSF.",
+        "icd_code": "A69.22"
       },
       {
-        "diagnosis": "Stroke with basilar artery territory involvement",
+        "diagnosis": "Spinal cord compression",
         "likelihood": "very_low",
-        "key_features": "Two head CTs both normal; MRI normal; NCS peripheral demyelination"
+        "key_features": "MRI excludes; no sensory level.",
+        "icd_code": "G95.20"
+      },
+      {
+        "diagnosis": "Botulism",
+        "likelihood": "very_low",
+        "key_features": "Descending pattern; absence of food / wound history.",
+        "icd_code": "A05.1"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "INTUBATE — SpO2 91%, rapid deterioration with tachypnea",
-        "tool_name": null,
-        "expected_finding": "Airway secured",
+        "action": "Obtain CBC, CMP, HIV, anti-GM1/anti-GQ1b ganglioside antibodies, and stool culture / Campylobacter serology if recent diarrhea",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Mild leukocytosis / elevated inflammatory markers reflecting antecedent infection; ganglioside antibodies for variant typing; trigger identification (Campylobacter, CMV, EBV, Mycoplasma, HIV)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Yuki_2012]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 2,
-        "action": "Lumbar puncture — key diagnostic test that reveals albumino-cytologic dissociation",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Protein 118 mg/dL, WBC 2 — bacterial/viral meningitis excluded; GBS identified",
+        "action": "Order nerve conduction studies and needle EMG (EMG/NCS)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Demyelinating pattern (prolonged DML, conduction block, reduced CV, absent F-waves) consistent with AIDP, or reduced CMAP amplitudes in axonal variants (AMAN/AMSAN)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[Hadden_1998]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 3,
-        "action": "NCS/EMG (when stable)",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Severe sensorimotor GBS pattern",
+        "action": "Perform lumbar puncture for CSF analysis",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Albuminocytologic dissociation — elevated protein with cell count <10/μL; may be normal in the first week of illness",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 4,
-        "action": "Serology including Mycoplasma IgM",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Mycoplasma IgM positive — trigger confirmed",
+        "action": "Order bedside respiratory function testing (FVC, MIP/MEP, NIF) and repeat every 4–6 hours",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline and serial FVC, MIP/MEP, NIF; deterioration to FVC <20 mL/kg, MIP worse than -30 cmH2O, or VC <40% predicted triggers ICU transfer / intubation",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[Sharshar_2003]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 5,
-        "action": "IVIG 0.4 g/kg/day x 5 days",
-        "tool_name": null,
-        "expected_finding": "GBS treatment initiated",
+        "action": "Search the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[van_den_Berg_2014]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 6,
-        "action": "Switch azithromycin to doxycycline — QTc prolonged 464 ms, macrolides contraindicated",
-        "tool_name": null,
-        "expected_finding": "Antibiotic switch to avoid QT toxicity",
+        "action": "Check drug interactions / contraindications for IVIG (renal function, IgA deficiency screen) and/or plasma exchange (coagulation, calcium, hemodynamics)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Confirmation that IVIG can be given safely (no severe renal impairment, no IgA deficiency) or that plasma exchange is appropriate (adequate vascular access, stable coagulation)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[van_den_Berg_2014]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 7,
+        "action": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Sinus tachycardia or bradycardia; conduction or repolarisation abnormalities reflecting autonomic involvement",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 8,
+        "action": "Initiate continuous cardiac telemetry for the first 1–2 weeks for moderate/severe disease — autonomic instability (bradyarrhythmias, BP lability) is common",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Documentation of sinus pauses, bradyarrhythmias, BP lability, or non-sustained tachyarrhythmias",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "GBS is a peripheral nerve / nerve-root disorder; EEG has no role in diagnosis unless atypical CNS features (encephalopathy, seizures) are present.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated in typical GBS; reserve for pre-existing cardiac disease or unexplained hemodynamic instability after autonomic causes are excluded.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT contributes no diagnostic information in GBS; the disease is peripheral and CT does not visualise nerve roots reliably.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "Functional / metabolic brain imaging adds no value in a peripheral demyelinating syndrome.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "MR_angiography"
+        },
+        "rationale": "Cerebrovascular imaging is not indicated in a peripheral neuropathy without focal cerebral signs.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is reserved for atypical features (encephalopathy, CNS signs, transverse myelitis on differential). In classic GBS it does not aid diagnosis.",
+        "citation": "[van_den_Berg_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_specialized_test",
+        "after": "check_drug_interactions",
+        "reason": "Document respiratory status (FVC/NIF) before committing to IVIG vs plasma exchange — severe respiratory compromise mandates ICU triage and may influence treatment choice and timing.",
+        "citation": "[Sharshar_2003]",
+        "severity": "soft"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Renal function, IgA screen, and CBC must be reviewed before IVIG to mitigate renal failure, anaphylaxis (IgA-deficient patients), and aseptic meningitis risk.",
+        "citation": "[van_den_Berg_2014]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "LP is the pivotal diagnostic test — albumino-cytologic dissociation distinguishes GBS from meningitis and is the finding that redirects therapy from empiric antibiotics to IVIG",
-      "Mycoplasma pneumoniae is a recognized GBS trigger — the pneumonia and GBS share the same trigger; treat both",
-      "Macrolide antibiotics (azithromycin, clarithromycin) are contraindicated with QTc >460 ms in GBS autonomic context — switch to doxycycline for Mycoplasma",
-      "Levofloxacin (used initially for pneumonia) is also QT-prolonging — also contraindicated; use beta-lactam + doxycycline",
-      "GBS with meningoencephalitis presentation: the confusion in GBS is from SIADH, fever from concurrent pneumonia, and encephalopathy — the LP result is the discriminating test"
+      "Initiate IVIG / plasma exchange.",
+      "Mycoplasma serology and PCR (sputum / throat swab) for antecedent confirmation.",
+      "Continuous cardiac telemetry.",
+      "Standard antibiotic course for Mycoplasma if active infection persists."
     ],
     "contraindicated_actions": [
-      "Macrolide antibiotics (azithromycin) with QTc >460 ms",
-      "Fluoroquinolones (levofloxacin) — QT risk",
-      "Corticosteroids",
-      "Succinylcholine if re-intubation needed"
+      "Do not start corticosteroids as monotherapy."
     ],
     "key_reasoning_points": [
-      "Mycoplasma pneumoniae is the third most common GBS trigger (after Campylobacter and EBV) — Mycoplasma atypical pneumonia + GBS can present concurrently",
-      "CSF albumino-cytologic dissociation is the key finding that shifts the diagnosis from meningoencephalitis to GBS — normal WBC with elevated protein is NOT meningitis",
-      "SIADH in GBS (hyponatremia sodium 132) can cause confusion that mimics encephalitis — the meningoencephalitis presentation of GBS is a recognized clinical trap",
-      "Macrolide antibiotics are contraindicated in GBS with QTc prolongation — Mycoplasma treatment should use doxycycline or tetracycline",
-      "The 'stroke notification' for unilateral facial droop + arm weakness was appropriate — two negative CT heads correctly excluded stroke before LP was prioritized"
+      "Mycoplasma pneumoniae is a recognised GBS trigger (third-most-common after Campylobacter and CMV).",
+      "Antecedent confirmation does not change acute management but informs prognosis and counselling."
     ],
-    "red_herrings": [
-      {
-        "data_point": "Fever 38.6°C, leukocytosis 14,800, procalcitonin 2.8 ng/mL, neck rigidity",
-        "location": "patient.vitals and initial_tool_outputs.labs",
-        "intended_effect": "Diagnose as bacterial meningitis and treat with broad-spectrum antibiotics rather than recognizing GBS",
-        "correct_interpretation": "CSF with WBC 2 and protein 118 is albumino-cytologic dissociation — bacterial meningitis has WBC >100-1000; the LP is the decisive test that distinguishes GBS from meningitis",
-        "field_path": ""
-      },
-      {
-        "data_point": "Left facial droop + greater left arm weakness triggering stroke notification",
-        "location": "patient.neurological_exam.cranial_nerves",
-        "intended_effect": "Diagnose as stroke and focus workup on CT/MRI brain rather than LP and NCS",
-        "correct_interpretation": "Two negative head CTs exclude large-volume stroke; the global areflexia and ascending course confirm peripheral GBS — LP is the next priority",
-        "field_path": ""
-      }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": []
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -550,6 +641,17 @@
       "echo": "incidental",
       "advanced_imaging": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:GBS",
+    "difficulty_rationale": "6 required tools, 0 red herring(s); textbook GBS / variant presentation reachable with the standard required workup chain.",
+    "case_body_concerns": [
+      "Bedside respiratory function (FVC/MIP/MEP/NIF) is delivered via an `interpret_labs` followup panel rather than `order_specialized_test{test_type=respiratory_function}` as the criteria pack mandates. Agents calling order_specialized_test{respiratory_function} will hit the EMG/NCS output instead. Recommend adding a respiratory_function followup keyed to order_specialized_test in a follow-up case-body pass.",
+      "Mirrored fallback_tool_outputs into followup_outputs for required tools that previously only existed in the fallback bucket: ['search_medical_literature']. Content is unchanged; the move makes the coherence validator see an explicit primary output for criteria-pack-required tools."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

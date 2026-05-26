@@ -613,131 +613,162 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Diabetic peripheral neuropathy (length-dependent axonal sensorimotor neuropathy)",
+    "primary_diagnosis": "Diabetic peripheral polyneuropathy (length-dependent axonal sensorimotor)",
     "icd_code": "E11.40",
     "differential": [
       {
-        "diagnosis": "Vitamin B12 deficiency neuropathy",
-        "likelihood": "low",
-        "key_features": "Low B12 (178 pg/mL), elevated MMA, macrocytosis, metformin use - likely co-contributing"
+        "diagnosis": "B12 deficiency neuropathy",
+        "likelihood": "moderate",
+        "key_features": "Common comorbidity; check B12 + MMA + homocysteine.",
+        "icd_code": "E53.8"
       },
       {
-        "diagnosis": "Chronic inflammatory demyelinating polyneuropathy (CIDP)",
+        "diagnosis": "Uremic / CKD-related neuropathy",
         "likelihood": "low",
-        "key_features": "NCS shows axonal not demyelinating pattern, no temporal dispersion or conduction block, symmetric"
+        "key_features": "CKD stage 2 here; mild contribution at most.",
+        "icd_code": "G63"
+      },
+      {
+        "diagnosis": "CIDP",
+        "likelihood": "very_low",
+        "key_features": "Demyelinating features absent on NCS; pattern is axonal.",
+        "icd_code": "G61.81"
       },
       {
         "diagnosis": "Vasculitic neuropathy",
         "likelihood": "very_low",
-        "key_features": "No asymmetry, no mononeuritis multiplex pattern, ESR only mildly elevated, no systemic features"
+        "key_features": "Symmetric pattern argues against; would need asymmetric multifocal pattern.",
+        "icd_code": "G63"
       },
       {
         "diagnosis": "Hereditary neuropathy (CMT)",
         "likelihood": "very_low",
-        "key_features": "No family history, onset in 60s atypical, no pes cavus, axonal pattern consistent with acquired"
+        "key_features": "Adult onset, no family history or pes cavus.",
+        "icd_code": "G60.0"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Review labs - note HbA1c 10.8%, low B12, elevated MMA",
+        "action": "Order broad neuropathy labs (CBC, CMP, HbA1c, B12 + MMA, TSH, SPEP/IFE, urinalysis)",
         "tool_name": "interpret_labs",
-        "expected_finding": "HbA1c 10.8%, B12 178 pg/mL, MMA elevated - confirms diabetic neuropathy etiology with B12 co-deficiency",
+        "expected_finding": "Identify reversible/treatable etiologies (diabetes, B12 deficiency, monoclonal gammopathy, thyroid disease)",
         "category": "required",
         "tool_parameters": {
           "panels": [
-            "diabetes",
-            "neuropathy_workup",
-            "CBC"
+            "CBC",
+            "CMP",
+            "HbA1c",
+            "B12",
+            "MMA",
+            "TSH",
+            "SPEP",
+            "IFE",
+            "UA"
           ]
-        }
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
       },
       {
         "step": 2,
-        "action": "Order nerve conduction study and EMG",
+        "action": "Order EMG/NCS to characterize axonal vs demyelinating pattern and distribution",
         "tool_name": "order_specialized_test",
-        "expected_finding": "Length-dependent axonal sensorimotor neuropathy pattern confirming diabetic peripheral neuropathy",
+        "expected_finding": "Length-dependent axonal vs demyelinating vs multifocal pattern; severity and distribution",
         "category": "required",
         "tool_parameters": {
-          "test_type": "nerve_conduction_study_emg"
-        }
+          "test_type": "emg_ncs"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
       },
       {
         "step": 3,
-        "action": "Start intramuscular vitamin B12 supplementation",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "B12 1000 mcg IM safe, no significant interactions, renal dose adjustment not needed",
+        "action": "Search literature for DSP evaluation guidelines and etiology-specific recommendations",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirm AAN 2009 DSP workup, etiology-specific evaluations",
         "category": "required",
         "tool_parameters": {
-          "proposed_drug": "cyanocobalamin_1000mcg_IM"
-        }
+          "query": "distal symmetric polyneuropathy evaluation AAN 2009"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
       },
       {
         "step": 4,
-        "action": "Initiate neuropathic pain treatment with duloxetine or gabapentin",
+        "action": "Review medications for neurotoxic agents and check interactions for symptomatic therapy",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "Gabapentin requires renal dose adjustment for CKD; duloxetine preferred per ADA for painful diabetic neuropathy",
+        "expected_finding": "Identify potentially neurotoxic drugs (chemotherapy, metronidazole, megadose B6, nitrofurantoin); guide neuropathic-pain pharmacotherapy",
         "category": "required",
         "tool_parameters": {
-          "proposed_drug": "gabapentin_or_duloxetine"
-        }
+          "medications": []
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is a cortical test and is non-contributory in peripheral nerve disease.",
+        "citation": "[AAN_2009]"
       },
       {
-        "step": 5,
-        "action": "Urgent diabetology referral for glycemic optimization and diabetes management",
-        "tool_name": null,
-        "expected_finding": "Intensified diabetes regimen to reduce HbA1c below 7%",
-        "category": "required",
-        "tool_parameters": {}
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head/brain CT has no role in peripheral neuropathy evaluation.",
+        "citation": "[AAN_2009]"
       },
       {
-        "step": 6,
-        "action": "Podiatric referral for foot care and wound prevention",
-        "tool_name": null,
-        "expected_finding": "Protective footwear, callus management, monofilament testing, ulcer prevention",
-        "category": "required",
-        "tool_parameters": {}
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is not indicated in typical distal symmetric polyneuropathy without CNS signs.",
+        "citation": "[AAN_2009]"
       },
       {
-        "step": 7,
-        "action": "Search literature for treatment guidelines",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "ADA standards: intensive glycemic control, duloxetine/pregabalin for pain, annual foot exam",
-        "category": "recommended",
-        "tool_parameters": {
-          "query": "diabetic peripheral neuropathy treatment guidelines"
-        }
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {},
+        "rationale": "Advanced cerebral imaging (PET/MRA/MRV/perfusion) has no routine role in peripheral neuropathy.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated unless cardiac amyloid is suspected.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated unless there is syncope or symptomatic dysautonomia with arrhythmia concern.",
+        "citation": "[AAN_2009]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "order_specialized_test",
+        "reason": "Tier the workup — basic labs first, then targeted electrodiagnostic and tissue studies.",
+        "citation": "[AAN_2009]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Measure HbA1c and full neuropathy lab workup including B12 and MMA",
-      "Perform nerve conduction study and EMG to characterize neuropathy pattern",
-      "Start vitamin B12 supplementation (metformin-induced deficiency contributing)",
-      "Urgent glycemic optimization referral - HbA1c 10.8% is driving neuropathy progression",
-      "Initiate neuropathic pain management (duloxetine preferred; gabapentin with renal dose adjustment)",
-      "Refer to podiatry for foot care and ulcer prevention"
+      "Aggressive glycemic optimization",
+      "B12 screening and supplementation",
+      "Symptomatic neuropathic pain therapy (duloxetine, pregabalin, gabapentin)",
+      "Foot care education and annual podiatry assessment given length-dependent sensory loss"
     ],
     "contraindicated_actions": [
-      "Do not prescribe tricyclic antidepressants (amitriptyline) without cardiac evaluation in elderly diabetic patient",
-      "Do not use opioids as first-line treatment for diabetic neuropathy pain",
-      "Do not start full-dose gabapentin without renal dose adjustment (CKD stage 2)",
-      "Do not attribute all symptoms to lumbar spine without ruling out peripheral neuropathy",
-      "Do not delay glycemic optimization - progressive neuropathy correlates directly with HbA1c"
+      "Do not prescribe symptomatic pain therapy without addressing glycemic control"
     ],
     "key_reasoning_points": [
-      "Poorly controlled type 2 diabetes (HbA1c 10.8%) is the primary etiology in this length-dependent sensorimotor axonal neuropathy",
-      "NCS showing reduced SNAP amplitudes with preserved conduction velocities confirms axonal (not demyelinating) neuropathy",
-      "Low vitamin B12 (178 pg/mL) with elevated MMA is a metformin-related complication that co-contributes to neuropathy",
-      "Macrocytic anemia (MCV 101) is a clue to B12 deficiency in a metformin-treated patient",
-      "Absent ankle reflexes and stocking-distribution sensory loss are classic physical exam findings of length-dependent peripheral neuropathy",
-      "Absence of demyelinating features (no temporal dispersion, no conduction block, velocities proportional to axon loss) excludes CIDP",
-      "CKD requires dose adjustment for both gabapentin and pregabalin",
-      "Podiatric care is essential to prevent diabetic foot ulcers given absent protective sensation"
+      "14-year history of poorly controlled T2DM + length-dependent axonal pattern = classic DPNP",
+      "Reversible co-factors (B12, thyroid) must be screened even in 'obvious' diabetic cases"
     ],
-    "red_herrings": [],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": []
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -748,6 +779,14 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:PERI-NEURO",
+    "difficulty_rationale": "4 required tools, 0 red herrings; classification reflects clinical complexity per PERI-NEURO pack section 6 (M/S/P/R variants).",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

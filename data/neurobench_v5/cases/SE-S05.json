@@ -569,93 +569,208 @@
   },
   "ground_truth": {
     "primary_diagnosis": "Alcohol withdrawal status epilepticus with Wernicke encephalopathy (thiamine deficiency)",
-    "icd_code": "G41.9",
+    "icd_code": "G41.0",
     "differential": [
       {
-        "diagnosis": "Primary epilepsy",
-        "likelihood": "very_low",
-        "key_features": "No prior epilepsy; BAL 0 confirming 36h abstinence; seizures in typical withdrawal window (24-72h)"
+        "diagnosis": "Hypoglycemic seizures",
+        "likelihood": "high",
+        "key_features": "Glucose 62 — hypoglycemia common in chronic alcoholism and a direct seizure cause; correct first",
+        "icd_code": "E16.2"
       },
       {
-        "diagnosis": "Hypoglycemic seizure",
-        "likelihood": "low",
-        "key_features": "Glucose 62 is a contributing factor alongside withdrawal; withdrawal is primary mechanism"
+        "diagnosis": "Hepatic encephalopathy with seizures",
+        "likelihood": "moderate",
+        "key_features": "Chronic alcoholism may have hepatic component; ammonia + LFTs needed",
+        "icd_code": "K72.90"
       },
       {
-        "diagnosis": "CNS infection",
-        "likelihood": "very_low",
-        "key_features": "Normal CSF; no fever pattern of meningitis; alcohol withdrawal explains SE"
+        "diagnosis": "Wernicke-Korsakoff without seizures",
+        "likelihood": "moderate",
+        "key_features": "Triad of ophthalmoplegia, ataxia, confusion — Wernicke alone uncommonly causes SE but coexists",
+        "icd_code": "E51.2"
+      },
+      {
+        "diagnosis": "Acute alcohol withdrawal seizures (Stage 1 — without SE)",
+        "likelihood": "moderate",
+        "key_features": "Withdrawal seizures occur 6-48h post-cessation; usually self-limited but can evolve to SE",
+        "icd_code": "F10.231"
+      },
+      {
+        "diagnosis": "Symptomatic seizures from electrolyte disturbance",
+        "likelihood": "moderate",
+        "key_features": "Mg 0.8 critically low + thiamine 22 critically low — both contribute to seizure threshold",
+        "icd_code": "E83.42"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Thiamine 500 mg IV BEFORE glucose - Wernicke prevention/treatment",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Thiamine 22 critically low; Wernicke encephalopathy risk",
+        "action": "EEG — confirm electrographic SE",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Continuous generalized 2-3 Hz spike-wave — generalized SE",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "IV glucose 50% 25 mL for hypoglycemia 62 mg/dL",
+        "action": "Labs: CBC, CMP, glucose, Ca/Mg, AED level, ammonia, ABG, lactate, LFTs, blood cultures, tox screen, BAL, thiamine level, CIWA score",
         "tool_name": "interpret_labs",
-        "expected_finding": "Glucose 62 - hypoglycemia treatment after thiamine given",
+        "expected_finding": "Glucose 62 (CRITICAL low), Mg 0.8 (CRITICAL), thiamine 22 (CRITICAL low), BAL 0.0 (withdrawal)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "High-dose benzodiazepine for alcohol withdrawal SE",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Continuous ictal activity; alcohol withdrawal CNS hyperexcitability pattern",
+        "action": "Non-contrast head CT — exclude trauma / SDH (alcoholics fall)",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Diffuse cerebral atrophy; no acute hemorrhage",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "IV magnesium replacement - severe hypomagnesemia",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Magnesium 0.8 critical - IV replacement urgently; lowers seizure threshold",
+        "action": "MRI brain with Wernicke protocol — mammillary bodies, periaqueductal, thalami",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Mammillary body and periaqueductal FLAIR/T2 hyperintensity confirms Wernicke",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "MRI confirms Wernicke - IV thiamine 500 mg TID x5 days",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Bilateral medial thalamic and mammillary body changes - Wernicke confirmed",
+        "action": "Drug-interaction check: thiamine dosing, benzodiazepine choice, AED selection in alcoholic",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "High-dose IV thiamine 500 mg TID x 3 days; lorazepam preferred (not metabolized by liver); avoid phenytoin (worsens cerebellar signs)",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[ESETT_2019]",
+        "guideline_source": ""
+      },
+      {
+        "step": 6,
+        "action": "Literature: Wernicke + alcohol withdrawal SE — thiamine BEFORE glucose",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Always give thiamine 500 mg IV BEFORE glucose in alcoholic patients to avoid precipitating Wernicke",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 7,
+        "action": "Magnesium repletion (essential for thiamine metabolism)",
+        "tool_name": "interpret_labs",
+        "expected_finding": "IV Mg sulfate 2 g; cofactor for thiamine-dependent enzymes",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 8,
+        "action": "Addiction medicine consultation for post-acute management",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Plan for withdrawal protocol and rehab referral",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "study_type": "TTE"
+        },
+        "rationale": "No clinical suspicion of cardiac source of embolus or cardiogenic seizure; routine echo is not indicated in SE workup absent cardiac findings.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No suspicion of arrhythmogenic syncope or cardiac comorbidity precipitating SE; routine telemetry beyond standard ICU monitoring adds cost without yield.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in acute SE evaluation; dementia biomarker imaging does not change acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is for ischemic stroke workup; SE without focal vascular suspicion does not warrant carotid imaging.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "DaTscan / dopamine transporter imaging has no role in SE; no parkinsonism question relevant to acute management.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Thiamine 500 mg IV must be given BEFORE any glucose in alcoholic patient with suspected Wernicke.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "THIAMINE 500 mg IV BEFORE glucose - giving glucose without thiamine precipitates acute Wernicke",
-      "IV glucose for hypoglycemia 62 mg/dL (after thiamine)",
-      "High-dose benzodiazepine (lorazepam 8 mg or diazepam 20 mg IV) for alcohol withdrawal SE",
-      "Phenobarbital if benzodiazepines insufficient - NOT phenytoin (ineffective for withdrawal seizures)",
-      "Magnesium 0.8 critically low - IV MgSO4 aggressively",
-      "MRI confirms Wernicke - IV thiamine 500 mg TID x5 days (Prescott protocol)",
-      "CIWA-Ar protocol for ongoing withdrawal management"
+      "Administer IV lorazepam 0.1 mg/kg first-line for SE",
+      "Administer IV thiamine 500 mg TID for 3 days BEFORE any glucose — Wernicke prevention/treatment",
+      "Correct hypoglycemia ONLY after thiamine",
+      "Correct severe hypomagnesemia (Mg 0.8) — essential cofactor for thiamine",
+      "Initiate CIWA-guided benzodiazepine withdrawal protocol"
     ],
     "contraindicated_actions": [
-      "Do NOT give glucose without thiamine first - precipitates acute Wernicke encephalopathy",
-      "Do NOT use phenytoin as primary treatment for alcohol withdrawal SE - ineffective",
-      "Do not miss Wernicke encephalopathy - critically low thiamine with neurological symptoms",
-      "Do not under-dose benzodiazepines in alcohol withdrawal SE - requires higher doses"
+      "Do NOT give IV glucose before thiamine in chronic alcoholic — precipitates Wernicke",
+      "Do NOT use phenytoin in cerebellar/Wernicke patients — worsens ataxia",
+      "Do NOT under-dose thiamine — 100 mg is prophylactic; treatment requires 500 mg TID",
+      "Do NOT administer IV glucose without first giving IV thiamine 500 mg in suspected Wernicke — risk of precipitating or worsening Wernicke encephalopathy."
     ],
     "key_reasoning_points": [
-      "Thiamine BEFORE glucose is critical: glucose drives thiamine utilization and precipitates acute Wernicke in deficient patients",
-      "Alcohol withdrawal SE mechanism: GABA-A downregulation + NMDA upregulation from chronic alcohol use; treat with GABA-A agonists (benzodiazepines, phenobarbital)",
-      "Phenytoin is ineffective for alcohol withdrawal seizures - does not address GABA/NMDA mechanism",
-      "Wernicke confirmed on MRI: bilateral medial thalami and mammillary bodies - classic triad and IV thiamine urgently",
-      "Severe hypomagnesemia (0.8 mg/dL) dramatically lowers seizure threshold - aggressive IV replacement",
-      "BAL 0.0 at 36h: typical alcohol withdrawal seizure window is 24-72h after last drink"
+      "Chronic alcoholism causes thiamine deficiency; IV glucose alone can precipitate Wernicke by exhausting remaining thiamine",
+      "Thiamine 500 mg IV TID for at least 3 days is the treatment dose; 100 mg/day is prophylactic",
+      "Hypoglycemia + hypomagnesemia + thiamine deficiency form a triad that drives SE in alcoholics",
+      "Glucose administration is one of the SE workup steps requiring caveat in alcoholics"
     ],
-    "red_herrings": [],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": [
+      {
+        "data_point": "Hypoglycemia (glucose 62)",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests reflex IV dextrose administration as priority",
+        "correct_interpretation": "In alcoholic patients, thiamine must be given BEFORE glucose to avoid precipitating Wernicke encephalopathy"
+      },
+      {
+        "data_point": "BAL 0.0 g/dL with last drink 36 hours ago",
+        "location": "patient.history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Suggests fully resolved alcohol intoxication, no need for withdrawal protocol",
+        "correct_interpretation": "BAL 0.0 with last drink 36h ago is the peak withdrawal window — continue CIWA-guided benzodiazepine protocol"
+      }
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -665,6 +780,14 @@
       "advanced_imaging": "normal",
       "specialized_test": "incidental",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "8 required tools; the canonical alcohol-withdrawal + Wernicke SE; teaching is thiamine-before-glucose sequence (hard constraint), high-dose thiamine, and avoidance of phenytoin; 2 grounded red herrings.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

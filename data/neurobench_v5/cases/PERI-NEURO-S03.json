@@ -537,103 +537,183 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Alcoholic-nutritional peripheral polyneuropathy with severe thiamine deficiency (Wernicke risk)",
-    "icd_code": "G62.9",
+    "primary_diagnosis": "Alcoholic-nutritional peripheral polyneuropathy with thiamine deficiency",
+    "icd_code": "G62.1",
     "differential": [
       {
         "diagnosis": "Diabetic peripheral neuropathy",
-        "likelihood": "very_low",
-        "key_features": "HbA1c 5.4% — no diabetes. Alcoholic neuropathy confirmed."
+        "likelihood": "low",
+        "key_features": "No diabetes here; alcoholic pattern is distinct in nutritional context.",
+        "icd_code": "E11.40"
       },
       {
         "diagnosis": "B12 deficiency neuropathy",
-        "likelihood": "low",
-        "key_features": "B12 228 (low-normal); however thiamine 28 nmol/L is the dominant deficiency. Both may contribute."
+        "likelihood": "moderate",
+        "key_features": "Chronic heavy drinking often coexists with B12 + folate deficiency.",
+        "icd_code": "E53.8"
+      },
+      {
+        "diagnosis": "Wernicke encephalopathy",
+        "likelihood": "moderate",
+        "key_features": "CNS counterpart of thiamine deficiency; assess for confusion, ophthalmoplegia, ataxia; treat empirically with IV thiamine.",
+        "icd_code": "E51.2"
       },
       {
         "diagnosis": "CMT hereditary neuropathy",
         "likelihood": "very_low",
-        "key_features": "No family history, no pes cavus, clear alcoholic etiology, very severe and acute-on-chronic presentation"
+        "key_features": "No childhood features or family history.",
+        "icd_code": "G60.0"
       },
       {
-        "diagnosis": "Wernicke encephalopathy (CNS component)",
-        "likelihood": "low",
-        "key_features": "Thiamine 28 nmol/L severely low — Wernicke risk is high even without classic triad. IV thiamine must be given urgently."
+        "diagnosis": "CIDP",
+        "likelihood": "very_low",
+        "key_features": "Axonal pattern argues against.",
+        "icd_code": "G61.81"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "IV thiamine IMMEDIATELY — do not wait for NCS",
-        "tool_name": null,
-        "expected_finding": "Thiamine 28 nmol/L — Wernicke risk; IV thiamine 500 mg TID x 5 days before NCS scheduling",
+        "action": "Order broad neuropathy labs (CBC, CMP, HbA1c, B12 + MMA, TSH, SPEP/IFE, urinalysis)",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Identify reversible/treatable etiologies (diabetes, B12 deficiency, monoclonal gammopathy, thyroid disease)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "HbA1c",
+            "B12",
+            "MMA",
+            "TSH",
+            "SPEP",
+            "IFE",
+            "UA"
+          ]
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
       },
       {
         "step": 2,
-        "action": "Labs: CBC, BMP, LFTs, thiamine, B12, folate, HbA1c, TSH, RPR",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Severe thiamine deficiency, macrocytic anemia, alcoholic liver disease, low folate",
+        "action": "Order EMG/NCS to characterize axonal vs demyelinating pattern and distribution",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Length-dependent axonal vs demyelinating vs multifocal pattern; severity and distribution",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
       },
       {
         "step": 3,
-        "action": "NCS/EMG bilateral upper and lower extremities",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Severe length-dependent axonal sensorimotor polyneuropathy",
+        "action": "Search literature for DSP evaluation guidelines and etiology-specific recommendations",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirm AAN 2009 DSP workup, etiology-specific evaluations",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "query": "distal symmetric polyneuropathy evaluation AAN 2009"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
       },
       {
         "step": 4,
-        "action": "Alcohol cessation and addiction medicine referral",
-        "tool_name": null,
-        "expected_finding": "Acamprosate preferred (liver disease) over naltrexone",
+        "action": "Review medications for neurotoxic agents and check interactions for symptomatic therapy",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identify potentially neurotoxic drugs (chemotherapy, metronidazole, megadose B6, nitrofurantoin); guide neuropathic-pain pharmacotherapy",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "medications": []
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
       },
       {
         "step": 5,
-        "action": "Hepatology referral for alcoholic liver disease staging",
-        "tool_name": null,
-        "expected_finding": "Alcoholic hepatitis with splenomegaly — hepatology care required",
+        "action": "Thiamine, folate, niacin, copper, and broader nutritional workup; consider erythrocyte transketolase",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Low thiamine (vitamin B1), folate, niacin, copper in chronic heavy drinker; treat empirically",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "thiamine_B1",
+            "folate",
+            "niacin_B3",
+            "copper",
+            "zinc",
+            "vitamin_D"
+          ]
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is a cortical test and is non-contributory in peripheral nerve disease.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head/brain CT has no role in peripheral neuropathy evaluation.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is not indicated in typical distal symmetric polyneuropathy without CNS signs.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {},
+        "rationale": "Advanced cerebral imaging (PET/MRA/MRV/perfusion) has no routine role in peripheral neuropathy.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated unless cardiac amyloid is suspected.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated unless there is syncope or symptomatic dysautonomia with arrhythmia concern.",
+        "citation": "[AAN_2009]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "order_specialized_test",
+        "reason": "Tier the workup — basic labs first, then targeted electrodiagnostic and tissue studies.",
+        "citation": "[AAN_2009]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "IV THIAMINE IMMEDIATELY — thiamine 28 nmol/L is severely low and Wernicke encephalopathy risk is critical",
-      "NEVER give glucose (IV dextrose) before thiamine in a thiamine-deficient patient — precipitates acute Wernicke",
-      "Alcohol cessation is the primary disease-modifying intervention for neuropathy",
-      "Avoid naltrexone given active hepatic inflammation (AST 3x ULN) — use acamprosate",
-      "Avoid NSAIDs and high-dose acetaminophen given portal hypertension and liver disease"
+      "Administer IV thiamine 500 mg TID for 2-3 days before any glucose-containing fluids (Wernicke prophylaxis)",
+      "Alcohol cessation and nutrition optimization (multivitamin, folate, B12, thiamine)",
+      "Symptomatic neuropathic pain therapy",
+      "Screen for Wernicke encephalopathy / Korsakoff's syndrome"
     ],
     "contraindicated_actions": [
-      "IV dextrose administration without thiamine in a severely thiamine-deficient patient",
-      "Prescribing naltrexone with active alcoholic hepatitis (AST 3x ULN)",
-      "NSAIDs in a patient with portal hypertension and thrombocytopenia",
-      "Delaying thiamine replacement pending NCS results — Wernicke risk is immediate"
+      "Do not give IV glucose before thiamine in a chronic heavy drinker — precipitates Wernicke encephalopathy",
+      "Do not stop at the alcohol explanation without checking for co-deficiencies (B12, folate, copper)"
     ],
     "key_reasoning_points": [
-      "Severe thiamine deficiency (28 nmol/L) is the most urgent finding — Wernicke encephalopathy must be prevented with immediate IV thiamine",
-      "Alcoholic-nutritional neuropathy is the primary diagnosis: alcohol 8-10 beers/day x 15 years, severe thiamine deficiency, macrocytic anemia",
-      "Alcoholic liver disease markers (AST:ALT >2, GGT 342, splenomegaly) indicate advanced hepatic disease — affects medication choices",
-      "Neuropathy prognosis: partial recovery with thiamine repletion and alcohol cessation over 3-6 months"
+      "Chronic heavy alcohol use causes axonal sensorimotor neuropathy via direct neurotoxicity + thiamine + B-complex deficiency",
+      "Empiric IV thiamine in alcoholic patients prevents Wernicke encephalopathy",
+      "Cessation + nutrition is the disease-modifying intervention"
     ],
-    "red_herrings": [
-      {
-        "data_point": "Macrocytic anemia (MCV 108) suggesting B12 or folate deficiency as primary diagnosis",
-        "location": "labs",
-        "intended_effect": "B12 deficiency neuropathy considered primary; thiamine deficiency overlooked",
-        "correct_interpretation": "Thiamine (28 nmol/L) is critically low and is the most urgent deficiency. Folate (1.8 ng/mL) is low and contributes to macrocytosis. B12 is low-normal. Primary neuropathy mechanism is alcoholic-thiamine deficiency.",
-        "field_path": ""
-      }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": []
   },
   "metadata": {
     "created_by": "NeuroBench v5 generator",
@@ -648,6 +728,14 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:PERI-NEURO",
+    "difficulty_rationale": "5 required tools, 0 red herrings; classification reflects clinical complexity per PERI-NEURO pack section 6 (M/S/P/R variants).",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

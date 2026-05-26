@@ -331,6 +331,17 @@
           "Enoxaparin for VTE prophylaxis — dose adjust for age and renal function"
         ]
       }
+    },
+    {
+      "trigger_action": "search_gbs_treatment",
+      "tool_name": "search_medical_literature",
+      "output": {
+        "general": {
+          "query": "general",
+          "results": [],
+          "summary": "No directly applicable, high-quality evidence was retrieved for this query. Recommend correlating with current society guidelines."
+        }
+      }
     }
   ],
   "fallback_tool_outputs": {
@@ -401,97 +412,191 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Guillain-Barré syndrome, AIDP (post-spinal surgery trigger, possible mild GI antecedent), anti-GM1 and anti-GalNAc-GD1a positive",
+    "primary_diagnosis": "Guillain-Barré syndrome, AIDP (post-spinal-surgery trigger, possible mechanical contribution)",
     "icd_code": "G61.0",
     "differential": [
       {
-        "diagnosis": "Epidural hematoma from surgical site",
-        "likelihood": "very_low",
-        "key_features": "No epidural hematoma on urgent MRI; hardware in satisfactory position; afebrile"
+        "diagnosis": "Post-surgical mechanical nerve injury",
+        "likelihood": "moderate",
+        "key_features": "Anatomically restricted distribution and asymmetric pattern; symmetric ascending weakness with areflexia argues against pure mechanical injury.",
+        "icd_code": "G97.0"
       },
       {
-        "diagnosis": "Epidural abscess",
-        "likelihood": "very_low",
-        "key_features": "No fever, no wound infection signs, no leukocytosis, MRI negative"
+        "diagnosis": "Epidural haematoma / spinal cord compression",
+        "likelihood": "moderate",
+        "key_features": "Spinal MRI required; sensory level and sphincter dysfunction absent here; MRI excludes.",
+        "icd_code": "G95.20"
       },
       {
-        "diagnosis": "Hardware failure/displacement causing radiculopathy",
+        "diagnosis": "Acute-onset CIDP",
+        "likelihood": "low",
+        "key_features": "Reassess at 8 weeks.",
+        "icd_code": "G61.81"
+      },
+      {
+        "diagnosis": "Critical illness polyneuropathy",
+        "likelihood": "low",
+        "key_features": "Post-op ICU course increases risk; pattern of CSF dissociation and demyelinating EMG argues for GBS.",
+        "icd_code": "G62.81"
+      },
+      {
+        "diagnosis": "Cauda equina syndrome",
         "likelihood": "very_low",
-        "key_features": "MRI: hardware in satisfactory position; bilateral symmetric weakness not monofocal radiculopathy"
+        "key_features": "Sphincter and saddle anaesthesia absent; not consistent.",
+        "icd_code": "G83.4"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "URGENT MRI spine with gadolinium (metal artifact reduction) — exclude surgical complication",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "No hematoma/abscess; nerve root enhancement",
+        "action": "Obtain CBC, CMP, HIV, anti-GM1/anti-GQ1b ganglioside antibodies, and stool culture / Campylobacter serology if recent diarrhea",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Mild leukocytosis / elevated inflammatory markers reflecting antecedent infection; ganglioside antibodies for variant typing; trigger identification (Campylobacter, CMV, EBV, Mycoplasma, HIV)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Yuki_2012]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 2,
-        "action": "NCS/EMG",
+        "action": "Order nerve conduction studies and needle EMG (EMG/NCS)",
         "tool_name": "order_specialized_test",
-        "expected_finding": "AIDP — temporal dispersion, abnormal median/normal sural",
+        "expected_finding": "Demyelinating pattern (prolonged DML, conduction block, reduced CV, absent F-waves) consistent with AIDP, or reduced CMAP amplitudes in axonal variants (AMAN/AMSAN)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[Hadden_1998]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 3,
-        "action": "Labs including anti-GM1, anti-GalNAc-GD1a antibodies",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Both positive — GBS confirmed serologically",
+        "action": "Perform lumbar puncture for CSF analysis",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Albuminocytologic dissociation — elevated protein with cell count <10/μL; may be normal in the first week of illness",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 4,
-        "action": "Lumbar puncture (after MRI confirms no hematoma)",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Albumino-cytologic dissociation",
+        "action": "Order bedside respiratory function testing (FVC, MIP/MEP, NIF) and repeat every 4–6 hours",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline and serial FVC, MIP/MEP, NIF; deterioration to FVC <20 mL/kg, MIP worse than -30 cmH2O, or VC <40% predicted triggers ICU transfer / intubation",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[Sharshar_2003]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 5,
-        "action": "IVIG 0.4 g/kg/day x 5 days",
-        "tool_name": null,
-        "expected_finding": "Treatment initiated",
+        "action": "Search the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[van_den_Berg_2014]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 6,
-        "action": "DVT prophylaxis — sequential compression devices + enoxaparin",
-        "tool_name": null,
-        "expected_finding": "VTE prophylaxis initiated",
+        "action": "Check drug interactions / contraindications for IVIG (renal function, IgA deficiency screen) and/or plasma exchange (coagulation, calcium, hemodynamics)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Confirmation that IVIG can be given safely (no severe renal impairment, no IgA deficiency) or that plasma exchange is appropriate (adequate vascular access, stable coagulation)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[van_den_Berg_2014]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 7,
+        "action": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Sinus tachycardia or bradycardia; conduction or repolarisation abnormalities reflecting autonomic involvement",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 8,
+        "action": "Initiate continuous cardiac telemetry for the first 1–2 weeks for moderate/severe disease — autonomic instability (bradyarrhythmias, BP lability) is common",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Documentation of sinus pauses, bradyarrhythmias, BP lability, or non-sustained tachyarrhythmias",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "GBS is a peripheral nerve / nerve-root disorder; EEG has no role in diagnosis unless atypical CNS features (encephalopathy, seizures) are present.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated in typical GBS; reserve for pre-existing cardiac disease or unexplained hemodynamic instability after autonomic causes are excluded.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT contributes no diagnostic information in GBS; the disease is peripheral and CT does not visualise nerve roots reliably.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is reserved for atypical features (encephalopathy, CNS signs, transverse myelitis on differential). In classic GBS it does not aid diagnosis.",
+        "citation": "[van_den_Berg_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_specialized_test",
+        "after": "check_drug_interactions",
+        "reason": "Document respiratory status (FVC/NIF) before committing to IVIG vs plasma exchange — severe respiratory compromise mandates ICU triage and may influence treatment choice and timing.",
+        "citation": "[Sharshar_2003]",
+        "severity": "soft"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Renal function, IgA screen, and CBC must be reviewed before IVIG to mitigate renal failure, anaphylaxis (IgA-deficient patients), and aseptic meningitis risk.",
+        "citation": "[van_den_Berg_2014]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Urgent MRI spine is the first priority — epidural hematoma post-laminectomy is a surgical emergency requiring decompression; must be excluded before attributing weakness to GBS",
-      "Abnormal median with normal sural SNAP is the pathognomonic NCS pattern for AIDP (not AMSAN)",
-      "Temporal dispersion on NCS confirms AIDP over nodopathy — even with anti-GalNAc-GD1a positivity",
-      "DVT prophylaxis is critical — post-surgical immobile patient receiving IVIG (increased viscosity) is at high VTE risk",
-      "Surgery and mild GI illness are both recognized GBS triggers"
+      "MRI spine to exclude epidural haematoma, residual compression, or operative complication.",
+      "Initiate IVIG / plasma exchange.",
+      "Continuous cardiac telemetry.",
+      "Coordinate with surgical team for post-op review."
     ],
     "contraindicated_actions": [
-      "Corticosteroids",
-      "Succinylcholine if intubation required — use rocuronium"
+      "Do not start corticosteroids as monotherapy."
     ],
     "key_reasoning_points": [
-      "Post-spinal surgery GBS: laminectomy/fusion is a recognized GBS trigger (surgical immune activation); single soft stool episode was the antecedent GI event",
-      "MRI spine with metal artifact reduction sequences is critical before LP in post-surgical patients — epidural hematoma must be excluded first",
-      "Abnormal median with normal sural sensory response is pathognomonic for AIDP — this specific NCS pattern distinguishes AIDP from AMSAN where both are abnormal",
-      "Temporal dispersion on nerve conduction study is a marker of acute demyelination and supports AIDP over axonal subtypes",
-      "Anti-GalNAc-GD1a antibodies are associated with nodopathy — but NCS temporal dispersion without conduction block favors AIDP over nodopathy in this case"
+      "Surgery is a recognised immune-trigger for GBS; mechanical injury alone is restricted in distribution and timing.",
+      "Imaging rules out structural / surgical complication; GBS is diagnosed by Brighton-level clinical and laboratory criteria."
     ],
-    "red_herrings": [],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": [
+      {
+        "data_point": "Recent spinal surgery",
+        "location": "patient.clinical_history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Anchor on mechanical / surgical injury rather than autoimmune polyradiculoneuropathy.",
+        "correct_interpretation": "Symmetric ascending paralysis with CSF dissociation and demyelinating EMG indicates GBS triggered by the surgical inflammatory milieu, not direct surgical injury."
+      }
+    ]
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -509,6 +614,17 @@
       "ct": "normal",
       "echo": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:GBS",
+    "difficulty_rationale": "6 required tools, 1 red herring(s); textbook GBS / variant presentation reachable with the standard required workup chain.",
+    "case_body_concerns": [
+      "Bedside respiratory function (FVC/MIP/MEP/NIF) is delivered via an `interpret_labs` followup panel rather than `order_specialized_test{test_type=respiratory_function}` as the criteria pack mandates. Agents calling order_specialized_test{respiratory_function} will hit the EMG/NCS output instead. Recommend adding a respiratory_function followup keyed to order_specialized_test in a follow-up case-body pass.",
+      "Mirrored fallback_tool_outputs into followup_outputs for required tools that previously only existed in the fallback bucket: ['search_medical_literature']. Content is unchanged; the move makes the coherence validator see an explicit primary output for criteria-pack-required tools."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

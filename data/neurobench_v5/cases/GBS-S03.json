@@ -316,6 +316,22 @@
         ],
         "summary": "Published evidence indicates that severe GBS requiring mechanical ventilation is associated with 60–70% probability of independent walking at 1 year; 15–20% of patients sustain permanent disability; reported mortality is approximately 5%. High anti-GM1 titers and CMAP amplitude reduction (secondary axonal injury) are independently associated with slower and incomplete recovery. Extended inpatient and outpatient rehabilitation is typically required."
       }
+    },
+    {
+      "trigger_action": "check_ivig_drug_interactions",
+      "tool_name": "check_drug_interactions",
+      "output": {
+        "general": {
+          "proposed": "(agent not specified on this case's pathway)",
+          "interactions": [],
+          "contraindications": [],
+          "warnings": [
+            "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
+          ],
+          "formulary_status": "on formulary",
+          "alternatives": []
+        }
+      }
     }
   ],
   "fallback_tool_outputs": {
@@ -410,93 +426,201 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Guillain-Barré syndrome, severe AIDP with secondary axonal injury and respiratory failure (post-Campylobacter), requiring mechanical ventilation and temporary cardiac pacing",
+    "primary_diagnosis": "Guillain-Barré syndrome, severe AIDP with secondary axonal injury",
     "icd_code": "G61.0",
     "differential": [
       {
-        "diagnosis": "AMAN (axonal GBS)",
-        "likelihood": "low",
-        "key_features": "High anti-GM1 IgG with axonal CMAP reduction — may have AMAN component"
+        "diagnosis": "Acute-onset CIDP",
+        "likelihood": "moderate",
+        "key_features": "Cannot distinguish at <8 weeks; longitudinal reassessment.",
+        "icd_code": "G61.81"
       },
       {
-        "diagnosis": "Transverse myelitis",
+        "diagnosis": "AMAN / AMSAN variant",
+        "likelihood": "moderate",
+        "key_features": "Axonal features on EMG and ganglioside antibody positivity warrant repeat EMG and serology.",
+        "icd_code": "G61.0"
+      },
+      {
+        "diagnosis": "Critical illness polyneuropathy",
+        "likelihood": "low",
+        "key_features": "ICU course raises risk but GBS pattern with CSF dissociation precedes ICU stay.",
+        "icd_code": "G62.81"
+      },
+      {
+        "diagnosis": "Botulism",
         "likelihood": "very_low",
-        "key_features": "Areflexia, no sensory level, no UMN signs"
+        "key_features": "Descending paralysis; absent here.",
+        "icd_code": "A05.1"
+      },
+      {
+        "diagnosis": "Spinal cord compression",
+        "likelihood": "very_low",
+        "key_features": "MRI excludes structural cause.",
+        "icd_code": "G95.20"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "IMMEDIATE INTUBATION — SpO2 92%, CO2 52, FVC 41%",
-        "tool_name": null,
-        "expected_finding": "Airway secured — respiratory failure",
+        "action": "Obtain CBC, CMP, HIV, anti-GM1/anti-GQ1b ganglioside antibodies, and stool culture / Campylobacter serology if recent diarrhea",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Mild leukocytosis / elevated inflammatory markers reflecting antecedent infection; ganglioside antibodies for variant typing; trigger identification (Campylobacter, CMV, EBV, Mycoplasma, HIV)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Yuki_2012]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 2,
-        "action": "ICU admission",
-        "tool_name": null,
-        "expected_finding": "ICU level care for autonomic and respiratory",
+        "action": "Order nerve conduction studies and needle EMG (EMG/NCS)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Demyelinating pattern (prolonged DML, conduction block, reduced CV, absent F-waves) consistent with AIDP, or reduced CMAP amplitudes in axonal variants (AMAN/AMSAN)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[Hadden_1998]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 3,
-        "action": "NCS/EMG (after stabilization)",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Very severe AIDP with axonal injury",
+        "action": "Perform lumbar puncture for CSF analysis",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Albuminocytologic dissociation — elevated protein with cell count <10/μL; may be normal in the first week of illness",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 4,
-        "action": "Labs including ABG, Campylobacter serology",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Campylobacter positive; CO2 retention",
+        "action": "Order bedside respiratory function testing (FVC, MIP/MEP, NIF) and repeat every 4–6 hours",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline and serial FVC, MIP/MEP, NIF; deterioration to FVC <20 mL/kg, MIP worse than -30 cmH2O, or VC <40% predicted triggers ICU transfer / intubation",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[Sharshar_2003]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 5,
-        "action": "Initiate IVIG 0.4 g/kg/day x 5 days",
-        "tool_name": null,
-        "expected_finding": "Treatment initiated",
+        "action": "Search the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[van_den_Berg_2014]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 6,
-        "action": "Lumbar puncture for CSF (after stabilization)",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Classic albumino-cytologic dissociation",
+        "action": "Check drug interactions / contraindications for IVIG (renal function, IgA deficiency screen) and/or plasma exchange (coagulation, calcium, hemodynamics)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Confirmation that IVIG can be given safely (no severe renal impairment, no IgA deficiency) or that plasma exchange is appropriate (adequate vascular access, stable coagulation)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[van_den_Berg_2014]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 7,
+        "action": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Sinus tachycardia or bradycardia; conduction or repolarisation abnormalities reflecting autonomic involvement",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 8,
+        "action": "Initiate continuous cardiac telemetry for the first 1–2 weeks for moderate/severe disease — autonomic instability (bradyarrhythmias, BP lability) is common",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Documentation of sinus pauses, bradyarrhythmias, BP lability, or non-sustained tachyarrhythmias",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "GBS is a peripheral nerve / nerve-root disorder; EEG has no role in diagnosis unless atypical CNS features (encephalopathy, seizures) are present.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated in typical GBS; reserve for pre-existing cardiac disease or unexplained hemodynamic instability after autonomic causes are excluded.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT contributes no diagnostic information in GBS; the disease is peripheral and CT does not visualise nerve roots reliably.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "Functional / metabolic brain imaging adds no value in a peripheral demyelinating syndrome.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "MR_angiography"
+        },
+        "rationale": "Cerebrovascular imaging is not indicated in a peripheral neuropathy without focal cerebral signs.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is reserved for atypical features (encephalopathy, CNS signs, transverse myelitis on differential). In classic GBS it does not aid diagnosis.",
+        "citation": "[van_den_Berg_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_specialized_test",
+        "after": "check_drug_interactions",
+        "reason": "Document respiratory status (FVC/NIF) before committing to IVIG vs plasma exchange — severe respiratory compromise mandates ICU triage and may influence treatment choice and timing.",
+        "citation": "[Sharshar_2003]",
+        "severity": "soft"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Renal function, IgA screen, and CBC must be reviewed before IVIG to mitigate renal failure, anaphylaxis (IgA-deficient patients), and aseptic meningitis risk.",
+        "citation": "[van_den_Berg_2014]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "INTUBATE IMMEDIATELY — not a discussion, patient in respiratory failure (SpO2 92%, CO2 52)",
-      "DO NOT USE SUCCINYLCHOLINE — use rocuronium for RSI",
-      "ICU admission for temporary pacing capability — life-threatening bradycardia expected in severe GBS",
-      "IVIG initiated after intubation",
-      "DVT prophylaxis mandatory"
+      "Intubate and mechanically ventilate; ICU admission.",
+      "Initiate IVIG / plasma exchange.",
+      "Continuous cardiac telemetry for autonomic instability.",
+      "DVT prophylaxis.",
+      "Early physical / occupational therapy."
     ],
     "contraindicated_actions": [
-      "Succinylcholine for RSI — hyperkalemia risk, potentially fatal",
-      "Corticosteroids",
-      "Delayed intubation — respiratory arrest imminent"
+      "Do not give corticosteroids as monotherapy."
     ],
     "key_reasoning_points": [
-      "Most severe GBS case in series — respiratory failure present on arrival; CO2 52 and SpO2 92% demand immediate intubation before any other workup",
-      "Succinylcholine must not be used — in GBS, upregulated nicotinic receptors release massive potassium causing cardiac arrest; rocuronium is the RSI agent of choice",
-      "Temporary cardiac pacing required in severe GBS with autonomic arrest — must have transvenous pacing capability available",
-      "Very high anti-GM1/GD1a titers predict severe disease with axonal injury and prolonged recovery",
-      "GBS is NOT caused by corticosteroids or exacerbated by avoiding them — do not give steroids"
+      "Severe AIDP with respiratory failure mandates ICU and ventilation.",
+      "Autonomic monitoring is mandatory throughout the acute phase.",
+      "Repeat EMG at 1–2 weeks for prognostication and AIDP-vs-axonal-variant clarification."
     ],
-    "red_herrings": [],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": []
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -509,6 +633,17 @@
       "echo": "normal",
       "advanced_imaging": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:GBS",
+    "difficulty_rationale": "6 required tools, 0 red herring(s); textbook GBS / variant presentation reachable with the standard required workup chain.",
+    "case_body_concerns": [
+      "Bedside respiratory function (FVC/MIP/MEP/NIF) is delivered via an `interpret_labs` followup panel rather than `order_specialized_test{test_type=respiratory_function}` as the criteria pack mandates. Agents calling order_specialized_test{respiratory_function} will hit the EMG/NCS output instead. Recommend adding a respiratory_function followup keyed to order_specialized_test in a follow-up case-body pass.",
+      "Mirrored fallback_tool_outputs into followup_outputs for required tools that previously only existed in the fallback bucket: ['check_drug_interactions']. Content is unchanged; the move makes the coherence validator see an explicit primary output for criteria-pack-required tools."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

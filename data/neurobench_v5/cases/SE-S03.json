@@ -530,93 +530,189 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Symptomatic status epilepticus precipitated by severe hyponatremia (Na 129) from UTI and dehydration in post-stroke epilepsy",
-    "icd_code": "G41.9",
+    "primary_diagnosis": "Symptomatic generalized convulsive status epilepticus precipitated by severe hyponatremia (Na 129) from UTI and dehydration in post-stroke epilepsy",
+    "icd_code": "G41.0",
     "differential": [
       {
-        "diagnosis": "New ischemic stroke with SE",
-        "likelihood": "very_low",
-        "key_features": "No new DWI restriction on MRI; CT shows only chronic changes; hyponatremia is the precipitant"
+        "diagnosis": "Acute recurrent stroke",
+        "likelihood": "moderate",
+        "key_features": "Known chronic right MCA territory; CT shows no new acute change",
+        "icd_code": "I63.9"
       },
       {
-        "diagnosis": "UTI sepsis with toxic encephalopathy",
-        "likelihood": "very_low",
-        "key_features": "UTI is contributing factor; primary issue is hyponatremia causing SE; EEG confirms ictal not metabolic pattern"
+        "diagnosis": "UTI/sepsis-precipitated seizures without primary hyponatremia driver",
+        "likelihood": "moderate",
+        "key_features": "WBC 18.4, fever — UTI/sepsis confirmed; both metabolic disturbance and infection contribute",
+        "icd_code": "A41.9"
       },
       {
-        "diagnosis": "AED non-adherence SE",
-        "likelihood": "very_low",
-        "key_features": "Levetiracetam level 18 - therapeutic; hyponatremia is the primary precipitant"
+        "diagnosis": "Subtherapeutic AED breakthrough",
+        "likelihood": "low",
+        "key_features": "Levetiracetam level pending; chronic post-stroke epilepsy with structural focus",
+        "icd_code": "G40.909"
+      },
+      {
+        "diagnosis": "Subdural hematoma in elderly",
+        "likelihood": "low",
+        "key_features": "No new finding on CT; chronic encephalomalacia",
+        "icd_code": "S06.5X9A"
+      },
+      {
+        "diagnosis": "CNS infection / encephalitis",
+        "likelihood": "low",
+        "key_features": "Fever explained by UTI; LP only if clinical course worsens",
+        "icd_code": "G04.90"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "EEG confirms continuous SE",
+        "action": "EEG — confirm electrographic SE",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Continuous generalized ictal activity with right hemisphere chronic background",
+        "expected_finding": "Continuous generalized 2-3 Hz spike-wave with left-hemisphere predominance — concordant with chronic right MCA focus (contralateral activation pattern)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "Identify precipitant - Na 129 hyponatremia",
+        "action": "Labs: CBC, CMP, glucose, Ca/Mg, AED level, ammonia, ABG, lactate, urinalysis, blood and urine cultures, CK",
         "tool_name": "interpret_labs",
-        "expected_finding": "Sodium 129 critical; UTI on UA; levetiracetam therapeutic",
+        "expected_finding": "Na 129 (CRITICAL), WBC 18.4, lactate 7.8, CK 1640 — UTI + hyponatremia + rhabdo",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Hypertonic saline for symptomatic hyponatremia",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "3% NaCl bolus; target 4-6 mEq/L in first hour; max 10-12/24h",
+        "action": "Non-contrast head CT",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Known right MCA encephalomalacia; no new acute pathology",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "CT/MRI to exclude new stroke",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "Only chronic right MCA changes; no new lesion",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "MRI brain — assess for any subacute lesion (low yield given chronic stroke focus)",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Chronic encephalomalacic change only",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "Hold metformin - dehydration and contrast risk",
+        "action": "Drug-interaction check before hyponatremia correction and antibiotic choice",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "Hold metformin; TMP-SMX creatinine artifact explained",
+        "expected_finding": "Levetiracetam compatible with empiric ceftriaxone; avoid CBZ which worsens SIADH",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 6,
+        "action": "Literature: sodium correction targets in seizure-induced/symptomatic hyponatremia",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Correct sodium ≤8 mEq/L per 24h; 3% saline boluses for severe symptomatic hyponatremia followed by fluid restriction",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 7,
+        "action": "Empiric UTI antibiotics",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Empiric gram-negative coverage pending culture",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "study_type": "TTE"
+        },
+        "rationale": "No clinical suspicion of cardiac source of embolus or cardiogenic seizure; routine echo is not indicated in SE workup absent cardiac findings.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No suspicion of arrhythmogenic syncope or cardiac comorbidity precipitating SE; routine telemetry beyond standard ICU monitoring adds cost without yield.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in acute SE evaluation; dementia biomarker imaging does not change acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is for ischemic stroke workup; SE without focal vascular suspicion does not warrant carotid imaging.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "DaTscan / dopamine transporter imaging has no role in SE; no parkinsonism question relevant to acute management.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Confirm Na, K, renal function before AED dosing and antibiotic selection.",
+        "citation": "[Brophy_2012]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Identify sodium 129 as SE precipitant - hypertonic saline urgently",
-      "3% NaCl 100 mL IV bolus - target Na increase 4-6 mEq/L in first hour",
-      "IV levetiracetam additional 1500 mg loading dose",
-      "Treat UTI - switch antibiotic (TMP-SMX interaction with creatinine/metformin; penicillin allergy)",
-      "Hold metformin during acute dehydration and SE",
-      "Maximum sodium correction 10-12 mEq/L per 24h - osmotic demyelination risk"
+      "Administer IV lorazepam 0.1 mg/kg first-line",
+      "Correct sodium gradually (≤8 mEq/L per 24h); 3% saline bolus 100 mL for severely symptomatic hyponatremia",
+      "Load IV levetiracetam (chronic AED)",
+      "Empiric antibiotics for UTI",
+      "IV fluids for dehydration and rhabdomyolysis"
     ],
     "contraindicated_actions": [
-      "Do not correct sodium faster than 10-12 mEq/L per 24h - osmotic demyelination",
-      "Do not continue metformin with dehydration and elevated creatinine",
-      "Do not attribute left arm weakness to new stroke without DWI imaging - Todd's paresis likely",
-      "Do not miss hyponatremia as the primary precipitant of SE"
+      "Do NOT correct sodium faster than 8 mEq/L per 24h — risk of osmotic demyelination",
+      "Do NOT use carbamazepine which worsens SIADH"
     ],
     "key_reasoning_points": [
-      "Sodium 129 is the primary SE precipitant - hypertonic saline treatment is urgently needed to abort SE",
-      "Symptomatic severe hyponatremia: 3% NaCl bolus; target 4-6 mEq/L rise in first hour to stop seizures",
-      "TMP-SMX inhibits tubular creatinine secretion - creatinine 1.6 is partly artifactual",
-      "Left arm weakness post-ictally is Todd's paresis overlying known stroke weakness - not new stroke",
-      "Maximum Na correction 10-12 mEq/L per 24h strictly - osmotic demyelination syndrome risk in elderly",
-      "UTI-associated SIADH causing hyponatremia is a classic precipitant of SE in elderly post-stroke patients"
+      "Chronic post-stroke epilepsy has lowered seizure threshold; modest metabolic disturbance triggers SE",
+      "Severe hyponatremia (Na <130) requires hypertonic saline if symptomatic but rate-limited",
+      "UTI is the precipitant of dehydration → hyponatremia → SE"
     ],
-    "red_herrings": [],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": [
+      {
+        "data_point": "Fever 38.8°C and WBC 18.4",
+        "location": "patient.vitals + initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests sepsis as primary driver requiring sepsis bundle",
+        "correct_interpretation": "Fever and leukocytosis are from UTI which precipitated dehydration and hyponatremia; treat UTI and correct sodium"
+      }
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -625,6 +721,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "7 required tools; symptomatic SE from hyponatremia + UTI in post-stroke epilepsy; key teaching: sodium correction limit, AED choice avoiding SIADH-inducing drugs; 1 grounded red herring.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

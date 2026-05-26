@@ -519,116 +519,203 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Hepatic encephalopathy, grade 2 (overt, evolving from covert/minimal HE) — precipitated by clonazepam accumulation in liver disease + quetiapine CNS depression; ammonia only mildly elevated (68 µmol/L); prior 'MCI' diagnosis was covert HE",
-    "icd_code": "K72.9",
+    "primary_diagnosis": "Hepatic encephalopathy (West Haven grade I-II, overt, evolving from covert/minimal HE), cryptogenic Child-Pugh B cirrhosis — precipitated by clonazepam accumulation in liver disease (level 84 ng/mL, supratherapeutic) plus quetiapine CNS depression; prior 'MCI' was likely covert HE (PHES -7).",
+    "icd_code": "K72.90",
     "differential": [
       {
-        "diagnosis": "Alzheimer's disease / dementia progression",
-        "likelihood": "low",
-        "key_features": "Prior MCI diagnosis; father had Alzheimer's; CT atrophy — BUT dementia does not cause asterixis or respond to lactulose; PHES confirms HE not neurodegenerative process; reversibility with treatment is key"
-      },
-      {
-        "diagnosis": "Benzodiazepine toxicity/accumulation (sole cause)",
-        "likelihood": "moderate",
-        "key_features": "Clonazepam 84 ng/mL supratherapeutic; contributes significantly; BUT ammonia 68 + cirrhosis history + thrombocytopenia 108 indicate HE is the primary underlying process — benzodiazepine accumulation is an additive precipitant not sole cause"
+        "diagnosis": "Benzodiazepine (clonazepam) accumulation / toxicity as sole cause",
+        "likelihood": "high",
+        "key_features": "Supratherapeutic clonazepam (84 ng/mL) in Child-Pugh B; benzodiazepines accumulate due to reduced hepatic metabolism; contributes substantially but does not explain asterixis or PHES findings — additive to underlying HE.",
+        "icd_code": "T42.4X5A"
       },
       {
         "diagnosis": "Drug-induced encephalopathy (quetiapine)",
         "likelihood": "low",
-        "key_features": "Quetiapine CNS depression contributes; antiemetics and antipsychotics worsen HE; but quetiapine 25 mg is a low dose and the primary driver is HE + clonazepam accumulation"
+        "key_features": "Quetiapine 25 mg is low dose; contributes mildly via CNS depression.",
+        "icd_code": "G92"
+      },
+      {
+        "diagnosis": "Alzheimer / early-onset dementia (family history)",
+        "likelihood": "low",
+        "key_features": "47-year-old with cirrhosis — covert HE is far more likely than early-onset AD; PHES confirms HE; reversibility with lactulose is diagnostic.",
+        "icd_code": "G30.0"
+      },
+      {
+        "diagnosis": "Substance use disorder (occult alcohol)",
+        "likelihood": "low",
+        "key_features": "'Cryptogenic' cirrhosis with denied alcohol — re-evaluate (CDT, PEth, family history); manage HE either way.",
+        "icd_code": "F10.20"
       },
       {
         "diagnosis": "Normal pressure hydrocephalus",
         "likelihood": "very_low",
-        "key_features": "CT shows cortical atrophy not ventriculomegaly; no magnetic gait; no incontinence triad of NPH"
+        "key_features": "No magnetic gait / incontinence triad; CT shows atrophy not ventriculomegaly.",
+        "icd_code": "G91.2"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Labs — ammonia, LFTs, CBC, drug levels (clonazepam), toxicology",
+        "action": "Comprehensive labs: CMP including AST/ALT/bilirubin/INR/albumin, ammonia, CBC, glucose, electrolytes (Na, K, Mg), BUN/Cr, lactate, blood cultures and urine cultures; toxicology if substance use plausible. Confirms liver dysfunction and screens for precipitants.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Ammonia 68 (mildly elevated), clonazepam supratherapeutic 84 ng/mL",
+        "expected_finding": "Ammonia 68 (mildly elevated); clonazepam supratherapeutic; cirrhosis features; thrombocytopenia.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 2,
-        "action": "CT head — exclude structural cause, assess atrophy",
+        "action": "Non-contrast CT head — exclude structural alternate cause of AMS (hemorrhage, large stroke, mass) before any LP.",
         "tool_name": "order_ct_scan",
-        "expected_finding": "Atrophy, no acute structural lesion",
+        "expected_finding": "Cortical atrophy disproportionate for age; no acute lesion.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 3,
-        "action": "EEG — characterize non-specific slowing + benzodiazepine beta",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Theta slowing + benzodiazepine beta activity — non-specific but supports HE + drug effect",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Literature/guideline search to confirm West Haven grading, precipitant management, and lactulose/rifaximin dosing (Covert/minimal HE; PHES diagnostic threshold; benzodiazepines in cirrhosis).",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "AASLD/EASL 2014 guidance retrieved; West Haven criteria and precipitant-driven management framework confirmed.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 4,
-        "action": "Empiric lactulose 30 mL TID + rifaximin 550 mg BID trial — response is diagnostic",
-        "tool_name": null,
-        "expected_finding": "Mental status improves — HE confirmed by treatment response",
+        "action": "Drug-interaction and medication-reconciliation review covering clonazepam (TAPER), quetiapine (HOLD), substitute non-benzodiazepine anxiolytic and non-sedating sleep aid (e.g., melatonin); flag any CNS depressants (benzodiazepines, opioids, sedating antiemetics, antihistamines) and confirm lactulose/rifaximin dosing in liver disease.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sedating/CNS-depressant medications identified; lactulose and rifaximin reviewed for hepatic dose adjustment.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Bajaj_2011]",
+        "guideline_source": "Bajaj 2011 HE management review"
       },
       {
         "step": 5,
-        "action": "Taper/hold clonazepam + hold quetiapine — remove HE precipitants",
-        "tool_name": null,
-        "expected_finding": "Clonazepam level normalizes; cognition improves further",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "PHES psychometric battery — confirm covert HE diagnosis and distinguish from neurodegenerative process.",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "PHES -7 confirms minimal HE; prior 'MCI' label reframed.",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Ferenci_2002]",
+        "guideline_source": "Ferenci 2002 HE nomenclature/quantification (PHES)"
       },
       {
         "step": 6,
-        "action": "PHES neuropsychological testing — distinguish HE from MCI/dementia",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "PHES -7 — covert/minimal HE confirmed; prior MCI diagnosis was HE",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "EEG — characterize slowing + assess for benzodiazepine beta activity; serial recordings track resolution. Triphasic waves are classic but non-specific (metabolic encephalopathies broadly); main role is exclusion of non-convulsive status epilepticus where the differential supports it.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Theta slowing + diffuse beta from benzodiazepine; both improve with management.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Ferenci_2002]",
+        "guideline_source": "Ferenci 2002 HE nomenclature/quantification"
+      },
+      {
+        "step": 7,
+        "action": "Consult hepatology; psychiatry for taper plan — coordinate definitive care, transplant candidacy assessment where applicable.",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Hepatology / critical-care guidance integrated into management.",
+        "category": "recommended",
+        "tool_parameters": {
+          "specialty": "hepatology"
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No clinical suspicion for hepatopulmonary syndrome, portopulmonary hypertension, or endocarditis; echocardiography is not part of the HE workup.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in HE workup; reversible metabolic encephalopathy is the issue, not Alzheimer pathology.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan has no role in HE workup; the question is metabolic encephalopathy, not nigrostriatal degeneration.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "FDG PET has no role in HE workup; metabolic encephalopathy is reversible with precipitant control and does not require nuclear functional imaging.",
+        "citation": "[AASLD_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "In altered mental status, exclude intracranial mass effect / hemorrhage on imaging before LP to avoid herniation risk.",
+        "citation": "[AASLD_2014]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "HE is a CLINICAL diagnosis — ammonia level (68 µmol/L) correlates poorly with grade; do not use ammonia threshold alone to exclude HE",
-      "Therapeutic response to lactulose is diagnostic when clinical picture is uncertain — an empiric trial is appropriate and justified",
-      "Benzodiazepines accumulate in liver disease — any benzodiazepine or sedating medication should be discontinued or minimized in cirrhotic patients with confusion",
-      "Prior 'MCI' in a cirrhotic patient should be re-evaluated for covert HE using validated tools (PHES, Stroop test) before attributing to neurodegenerative disease"
+      "Taper clonazepam over 2-4 weeks (do not abrupt-stop — seizure risk).",
+      "Hold quetiapine; substitute melatonin or low-dose mirtazapine for sleep if needed.",
+      "Empiric lactulose 30 mL TID + rifaximin 550 mg BID; observe for clinical improvement as diagnostic of HE.",
+      "PHES psychometric testing to confirm covert HE; reframe 'MCI' diagnosis.",
+      "Re-evaluate 'cryptogenic' cirrhosis etiology (PEth, CDT, hepatitis serologies, AMA/ANA, ferritin, ceruloplasmin, NASH features)."
     ],
     "contraindicated_actions": [
-      "Abrupt clonazepam discontinuation — withdrawal seizure risk; taper required",
-      "Benzodiazepines as anxiolytics in HE — worsen the primary problem",
-      "Dismissing HE because ammonia is only mildly elevated"
+      "Do not prescribe benzodiazepines for anxiety/agitation — they precipitate and prolong HE (use haloperidol or non-pharmacologic measures for agitation).",
+      "Do not prescribe sedating opioids — they worsen HE; consider acetaminophen at hepatic-safe dosing for pain.",
+      "Do not perform LP before neuroimaging excludes mass effect when the patient has altered mental status.",
+      "Do not abruptly discontinue clonazepam — withdrawal seizure risk; taper.",
+      "Do not anchor on ammonia 68 being 'only mildly elevated' to dismiss HE.",
+      "Do not start cholinesterase inhibitors for presumed AD without confirming HE has been treated and excluded."
     ],
     "key_reasoning_points": [
-      "Ammonia level correlates poorly with HE grade — clinical diagnosis is based on neuropsychiatric symptoms, asterixis, and treatment response, not ammonia threshold",
-      "Benzodiazepines accumulate in cirrhosis (reduced hepatic metabolism) and can precipitate overt HE from covert/minimal HE baseline — medication reconciliation must specifically identify all CNS-depressant medications",
-      "Prior MCI in a cirrhotic patient may actually be covert HE — PHES testing distinguishes the two; the diagnosis matters for management (lactulose/rifaximin for HE vs cholinesterase inhibitors for Alzheimer's)",
-      "Empiric lactulose trial with treatment response monitoring is a valid and recommended diagnostic approach when HE diagnosis is uncertain"
+      "HE is a clinical diagnosis: West Haven grading + evidence of liver dysfunction + exclusion of other causes of AMS — ammonia level is supportive only and correlates poorly with grade (AASLD 2014).",
+      "Precipitant identification is more actionable than the ammonia number: infection (SBP especially), GI bleed, electrolyte disturbance (hypokalemia/hyponatremia), constipation, sedative/CNS-depressant use, dehydration, dietary protein load, renal failure.",
+      "Prior 'MCI' in a cirrhotic patient should always be re-evaluated for covert HE using PHES — the treatment is completely different (lactulose vs cholinesterase inhibitors).",
+      "Benzodiazepines accumulate in cirrhosis (Child-Pugh B-C: half-life 2-3× normal); even nominally 'low' chronic doses produce supratherapeutic steady-state levels.",
+      "Therapeutic response to lactulose is a recognized diagnostic test when HE diagnosis is uncertain."
     ],
     "red_herrings": [
       {
-        "data_point": "Prior mild cognitive impairment diagnosis + father with Alzheimer's",
-        "location": "patient.clinical_history",
-        "intended_effect": "Attribute confusion to worsening dementia; refer to neurology for dementia workup; miss HE",
-        "correct_interpretation": "MCI in a 47-year-old cirrhotic is atypical for neurodegenerative disease — covert HE is a far more likely explanation; PHES testing confirms HE; treatment response with lactulose is diagnostic",
-        "field_path": ""
+        "data_point": "Prior MCI diagnosis at age 46 + father with Alzheimer's",
+        "location": "patient.clinical_history.past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history[1]",
+        "intended_effect": "Pursue dementia workup and miss reversible HE.",
+        "correct_interpretation": "MCI at age 46-47 in a cirrhotic is atypical for neurodegeneration; covert HE is far more likely; PHES testing and lactulose response are diagnostic."
       },
       {
-        "data_point": "Ammonia only 68 µmol/L (mildly elevated)",
-        "location": "initial_tool_outputs.labs",
-        "intended_effect": "Dismiss HE diagnosis because ammonia is not markedly elevated; pursue alternate diagnoses",
-        "correct_interpretation": "Ammonia 68 is above the 51 µmol/L upper limit of normal; ammonia correlates POORLY with HE grade; overt grade 2 HE can occur with modestly elevated ammonia, particularly when potentiated by sedating medications; clinical diagnosis with treatment response takes precedence",
-        "field_path": ""
+        "data_point": "Ammonia 68 µmol/L (only mildly elevated)",
+        "location": "initial_tool_outputs.labs.panels.LFTs",
+        "field_path": "initial_tool_outputs.labs.panels.LFTs",
+        "intended_effect": "Dismiss HE because ammonia is not markedly elevated.",
+        "correct_interpretation": "Ammonia correlates poorly with HE grade; covert/minimal HE often presents with only modestly elevated ammonia, especially when potentiated by sedating medications."
+      },
+      {
+        "data_point": "Urine benzodiazepines positive",
+        "location": "initial_tool_outputs.labs.panels.Toxicology",
+        "field_path": "initial_tool_outputs.labs.panels.Toxicology",
+        "intended_effect": "Assume the cause is straightforward 'benzo accumulation' and miss underlying covert HE.",
+        "correct_interpretation": "Expected positive from prescribed clonazepam; serum level being supratherapeutic confirms accumulation as a contributor — but ammonia + asterixis + PHES indicate HE is also present and primary."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -648,6 +735,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (HEP-ENC)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:HEP-ENC",
+    "difficulty_rationale": "5 required tools + PHES + serial EEG; ≥3 grounded red herrings; rare condition presentation (covert HE masquerading as MCI); therapeutic-trial reasoning required.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

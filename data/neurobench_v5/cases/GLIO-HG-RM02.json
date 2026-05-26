@@ -1,7 +1,7 @@
 {
   "case_id": "GLIO-HG-RM02",
   "condition": "brain_tumor_glioma",
-  "difficulty": "moderate",
+  "difficulty": "diagnostic_puzzle",
   "encounter_type": "inpatient",
   "patient": {
     "patient_id": "NB-GLIO-HG-RM02",
@@ -854,197 +854,207 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Glioblastoma, IDH-wildtype, WHO grade IV, of the cervical spinal cord",
+    "primary_diagnosis": "Glioblastoma, IDH-wildtype, WHO grade 4 (cervical spinal cord)",
     "icd_code": "C72.0",
     "differential": [
       {
-        "diagnosis": "Pilocytic astrocytoma",
+        "diagnosis": "Malignant peripheral nerve sheath tumor (MPNST) — NF1 context",
         "likelihood": "moderate",
-        "key_features": "Most common intramedullary tumor in NF1 patients, but imaging here lacks the classic cystic mass with enhancing mural nodule pattern and shows atypical features including heterogeneous enhancement and areas suggesting necrosis"
+        "key_features": "NF1 raises baseline risk; differentiated from intramedullary glioma by anatomic location (peripheral nerve sheath vs intramedullary cord)"
       },
       {
-        "diagnosis": "Ependymoma",
-        "likelihood": "low",
-        "key_features": "Second most common intramedullary tumor in adults and reported in NF1; typically central in location with cap sign (hemosiderin) on MRI and more well-defined borders"
-      },
-      {
-        "diagnosis": "Neuromyelitis optica spectrum disorder (NMOSD)",
-        "likelihood": "low",
-        "key_features": "Area postrema involvement and longitudinally extensive transverse myelitis pattern are features of NMOSD, but negative AQP4 antibodies, heterogeneous enhancement with necrosis, and mass effect argue strongly against this diagnosis"
-      },
-      {
-        "diagnosis": "Malignant peripheral nerve sheath tumor (MPNST)",
-        "likelihood": "low",
-        "key_features": "NF1 patients have elevated risk of MPNST; however, these typically arise from peripheral nerves or nerve roots rather than presenting as intramedullary lesions"
-      },
-      {
-        "diagnosis": "Anaplastic astrocytoma WHO grade III",
+        "diagnosis": "Ependymoma (intramedullary)",
         "likelihood": "moderate",
-        "key_features": "Can present similarly to GBM but typically lacks the palisading necrosis and microvascular proliferation that define GBM; tissue biopsy is required for definitive distinction"
+        "key_features": "Often centrally located in cord with capping cysts; differs in growth pattern and histology"
+      },
+      {
+        "diagnosis": "NF1-associated low-grade glioma",
+        "likelihood": "moderate",
+        "key_features": "Childhood-onset NF1 gliomas are usually low-grade; this lesion's rapid course and high-grade imaging features argue for transformation"
+      },
+      {
+        "diagnosis": "Transverse myelitis (idiopathic or post-infectious)",
+        "likelihood": "low",
+        "key_features": "Acute / subacute cord syndrome; would typically have shorter cord lesion without exophytic mass; CSF inflammation more prominent"
+      },
+      {
+        "diagnosis": "Spinal cord metastasis",
+        "likelihood": "low",
+        "key_features": "Requires a known systemic primary; staging negative in this case"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain brain and cervical spine MRI with contrast to characterize the lesion",
+        "action": "Order MRI brain with and without gadolinium contrast (tumor protocol with DWI, FLAIR, post-contrast T1) to characterize the cervical spinal cord lesion, define mass effect, and plan surgery",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Extensive infiltrative intramedullary cervical cord lesion with heterogeneous enhancement, exophytic component, and extension to area postrema",
+        "expected_finding": "Heterogeneously enhancing mass with ring/irregular enhancement, central necrosis, restricted diffusion at the enhancing rim, perilesional FLAIR-hyperintense edema, and mass effect consistent with high-grade glioma",
         "category": "required",
         "tool_parameters": {
           "protocol": "tumor",
           "contrast": true
-        }
+        },
+        "citation": "[Stupp_2005]",
+        "guideline_source": "Stupp_2005"
       },
       {
         "step": 2,
-        "action": "Order baseline laboratory studies including CBC, BMP, liver function, coagulation panel",
+        "action": "Order pre-operative laboratory workup: CBC, comprehensive metabolic panel, coagulation studies (PT/INR, aPTT), and type & screen in anticipation of surgical biopsy/resection",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal baseline labs suitable for surgical and chemotherapy planning",
+        "expected_finding": "Baseline values acceptable for surgery; identify any coagulopathy, electrolyte derangement, or steroid-relevant abnormality (e.g., hyperglycemia, hyponatremia) before craniotomy",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
-            "LFT",
-            "coagulation"
+            "coagulation",
+            "type_and_screen"
           ]
-        }
+        },
+        "citation": "[NCCN_CNS]",
+        "guideline_source": "NCCN_CNS"
       },
       {
         "step": 3,
-        "action": "Perform EEG to evaluate for subclinical seizure activity and baseline cerebral function",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Nonspecific generalized slowing without focal cortical epileptiform discharges",
+        "action": "Search medical literature for management of newly suspected high-grade glioma: WHO 2021 classification, Stupp protocol indications, and timing of surgical referral",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirmation that maximal safe resection followed by concurrent chemoradiation (Stupp protocol) is the standard of care, with molecular profiling (IDH, MGMT, 1p/19q, TERT) guiding prognosis and treatment selection",
         "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
+        "tool_parameters": {},
+        "citation": "[WHO_2021]",
+        "guideline_source": "WHO_2021"
       },
       {
         "step": 4,
-        "action": "Request CSF analysis including oligoclonal bands, AQP4 antibodies, MOG antibodies, and cytology to differentiate neoplasm from demyelinating disease",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Elevated protein, negative OCBs, negative AQP4/MOG antibodies, atypical cells suspicious for malignancy on cytology",
+        "action": "Obtain urgent neurosurgical (spinal cord tumor specialist) and neuro-oncology consultation for tissue diagnosis and treatment planning of the intramedullary cervical cord lesion",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Multidisciplinary plan including tissue acquisition, molecular profiling, and adjuvant treatment per current standards",
         "category": "required",
         "tool_parameters": {
-          "special_tests": [
-            "oligoclonal_bands",
-            "cytology",
-            "MOG_antibodies"
-          ]
-        }
+          "specialty": "neurosurgery"
+        },
+        "citation": "[Stupp_2005]",
+        "guideline_source": "Stupp_2005"
       },
       {
         "step": 5,
-        "action": "Request MR spectroscopy of the lesion to characterize metabolite profile",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Elevated choline, reduced NAA, lipid-lactate peak consistent with high-grade neoplasm",
+        "action": "Obtain neuro-oncology consultation for adjuvant therapy planning and molecular-marker-guided treatment selection",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Plan for concurrent chemoradiation (Stupp protocol with temozolomide) for IDH-wildtype GBM; alternative chemoradiation regimens for other tumor types or for atypical histologies",
         "category": "required",
         "tool_parameters": {
-          "imaging_type": "MR_spectroscopy"
-        }
+          "specialty": "neuro_oncology"
+        },
+        "citation": "[Stupp_2005]",
+        "guideline_source": "Stupp_2005"
       },
       {
         "step": 6,
-        "action": "Request MRI perfusion to assess tumor vascularity",
+        "action": "Order MR perfusion imaging (DSC perfusion) to assess tumor vascularity and target highest-grade region for biopsy",
         "tool_name": "order_advanced_imaging",
-        "expected_finding": "Elevated rCBV consistent with high-grade neoplasm",
+        "expected_finding": "Elevated rCBV (typically > 1.75) in enhancing component supports high-grade neoplasm and helps direct biopsy",
         "category": "recommended",
         "tool_parameters": {
-          "imaging_type": "perfusion_MRI"
-        }
+          "modality": "perfusion_MRI"
+        },
+        "citation": "[Law_2003]",
+        "guideline_source": "Law_2003"
       },
       {
         "step": 7,
-        "action": "Request complete spinal axis MRI to evaluate for drop metastases",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "No evidence of leptomeningeal dissemination",
-        "category": "required",
+        "action": "Order MR spectroscopy (1H-MRS) to characterize tumor metabolic profile",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Elevated Cho/NAA ratio with lipid-lactate peaks supports high-grade malignancy and helps differentiate tumor from treatment-related change at follow-up",
+        "category": "recommended",
         "tool_parameters": {
-          "protocol": "standard",
-          "contrast": false
-        }
+          "modality": "MR_spectroscopy"
+        },
+        "citation": "[Bulik_2013]",
+        "guideline_source": "Bulik_2013"
       },
       {
         "step": 8,
-        "action": "Arrange tissue biopsy for histological and molecular characterization (IDH, MGMT, 1p/19q)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Glioblastoma, IDH-wildtype, MGMT unmethylated",
-        "category": "required",
+        "action": "Order CT chest/abdomen/pelvis as staging to exclude an extracranial primary if a solitary metastasis is on the differential",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No extracranial primary malignancy identified, supporting primary brain tumor as the working diagnosis",
+        "category": "optional",
         "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP"
-          ]
-        }
+          "region": "chest_abdomen_pelvis",
+          "contrast": true
+        },
+        "citation": "[NCCN_CNS]",
+        "guideline_source": "NCCN_CNS"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "echo_type": "TTE"
+        },
+        "rationale": "Echocardiogram has no role in the diagnostic workup of suspected high-grade glioma absent a specific cardiac question (e.g., suspected paraneoplastic endocarditis)",
+        "citation": "[NCCN_CNS]"
       },
       {
-        "step": 9,
-        "action": "Check drug interactions for temozolomide with current medications",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Interaction with oral contraceptives noted; myelosuppression monitoring required",
-        "category": "recommended"
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "Cardiac monitoring is unrelated to the diagnostic workup of a brain mass and adds resource cost without informing management",
+        "citation": "[NCCN_CNS]"
+      }
+    ],
+    "harmful_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is contraindicated in suspected intracranial mass with imaging mass effect (effacement of ventricles / sulci / cisterns): the pressure gradient created by LP risks transtentorial or tonsillar herniation. Even when LP is otherwise safe, CSF studies are low-yield for primary brain tumor diagnosis.",
+        "citation": "[Hasbun_2001]"
+      }
+    ],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "MRI must precede any lumbar puncture when a mass lesion is suspected, to identify mass effect and herniation risk before LP",
+        "citation": "[Hasbun_2001]",
+        "severity": "hard"
       },
       {
-        "step": 10,
-        "action": "Search medical literature for NF1-associated spinal cord glioblastoma management",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Rare entity with poor prognosis; standard treatment is maximal safe resection plus radiation with or without temozolomide",
-        "category": "recommended"
+        "before": "analyze_brain_mri",
+        "after": "consult_medical_specialist",
+        "reason": "Adequate pre-operative MRI characterization (mass, edema, eloquent-cortex proximity) is standard of care before neurosurgical tissue acquisition",
+        "citation": "[Stupp_2005]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Obtain MRI of the cervical spine and brain with contrast to characterize the lesion and rule out intracranial pathology",
-      "Test for AQP4 antibodies and oligoclonal bands to exclude NMOSD and MS before proceeding with biopsy",
-      "Obtain tissue diagnosis via biopsy with molecular profiling (IDH, MGMT, 1p/19q) before initiating definitive treatment",
-      "Perform complete spinal axis MRI to assess for leptomeningeal dissemination",
-      "Refer to neuro-oncology multidisciplinary team for treatment planning",
-      "Initiate dexamethasone for spinal cord edema and mass effect to prevent further neurological deterioration"
+      "Obtain urgent neurosurgical consultation for tissue diagnosis (stereotactic biopsy or maximal safe resection) and operative planning",
+      "Obtain MRI of the cervical spine (with and without gadolinium) and MRI brain to characterize lesion extent and rule out additional CNS disease before biopsy",
+      "Initiate dexamethasone (e.g., 4 mg IV every 6 hours) to control symptomatic peritumoral edema; titrate to lowest effective dose",
+      "Obtain pre-operative labs (CBC, BMP, coagulation, type & screen) before craniotomy/biopsy",
+      "Plan multimodal treatment per molecular and histological profile (e.g., Stupp protocol — concurrent chemoradiation with temozolomide for IDH-wildtype GBM)"
     ],
     "contraindicated_actions": [
-      "Initiating high-dose corticosteroids without first obtaining diagnostic imaging and antibody testing, as steroids could confound the diagnostic workup for demyelinating disease",
-      "Assuming the diagnosis is pilocytic astrocytoma based solely on the NF1 history without obtaining tissue confirmation",
-      "Performing lumbar puncture without first confirming there is no obstructive hydrocephalus or significant mass effect at the craniocervical junction",
-      "Delaying biopsy in favor of empiric immunosuppressive therapy for presumed NMOSD without supporting serological evidence",
-      "Starting temozolomide without tissue diagnosis and molecular profiling",
-      "Withholding anticoagulation prophylaxis in an immobilized patient without documented contraindication"
+      "Do not perform lumbar puncture in the setting of intracranial mass effect — herniation risk",
+      "Do not initiate definitive tumor-directed therapy (radiation, temozolomide, alkylating chemotherapy) before tissue diagnosis is established",
+      "Do not start therapeutic anticoagulation without a clear thromboembolic indication, given upcoming neurosurgical intervention and bleeding risk"
     ],
     "key_reasoning_points": [
-      "In NF1 patients, pilocytic astrocytoma is the most common intramedullary spinal cord tumor, but the imaging features here — heterogeneous enhancement, areas of necrosis, and infiltrative margins — are atypical for pilocytic astrocytoma and should raise suspicion for a higher-grade neoplasm",
-      "The lesion's extension to the area postrema initially mimics NMOSD, which classically involves this region, but the negative AQP4 antibodies, enhancement pattern with necrosis, and mass effect argue strongly against demyelinating disease",
-      "Ependymoma is also reported in NF1 and should be in the differential, but ependymomas are typically more central, well-demarcated, and show a hemosiderin cap sign",
-      "The 2015 NMOSD diagnostic criteria require either AQP4-IgG positivity with a core characteristic, or two core characteristics with spatial dissemination in the AQP4-seronegative setting — neither criterion is met here, effectively excluding NMOSD",
-      "CSF cytology showing atypical cells suspicious for malignancy is a critical finding that shifts the differential decisively toward neoplasm",
-      "The mildly elevated TSH is a red herring — it represents subclinical hypothyroidism that does not explain the acute myelopathic presentation and should not distract from the spinal cord lesion workup",
-      "The exophytic component of the lesion, while unusual for a typical GBM, has been described in spinal cord gliomas and should not lead the clinician to incorrectly favor a nerve sheath tumor diagnosis",
-      "Molecular profiling is essential — the IDH-wildtype and MGMT-unmethylated status have direct implications for treatment planning and prognosis"
+      "Acute / subacute cervical-cord syndrome with intramedullary exophytic mass on MRI requires consideration of high-grade intramedullary glioma, ependymoma, and NF1-related tumors",
+      "NF1 increases lifetime risk of high-grade glioma; rapid clinical progression and high-grade imaging features argue against an indolent NF1-associated low-grade lesion",
+      "Pre-operative MRI of the entire neuraxis (brain + spinal cord) is needed before biopsy to define dissemination and operative approach",
+      "Tissue diagnosis by spinal-cord-experienced neurosurgery is essential; molecular profiling (IDH, MGMT, H3K27M) drives treatment selection"
     ],
     "red_herrings": [
       {
-        "data_point": "NF1 diagnosis — pilocytic astrocytoma is the most common intramedullary spinal cord tumor in NF1 patients",
+        "data_point": "Long-standing neurofibromatosis type 1 with prior stable optic-pathway glioma",
         "location": "patient.clinical_history.past_medical_history",
-        "intended_effect": "Anchoring on NF1-associated pilocytic astrocytoma as the most likely diagnosis, leading to less aggressive workup and delayed tissue diagnosis",
-        "correct_interpretation": "NF1 predisposes to pilocytic astrocytoma, but the imaging features here — heterogeneous enhancement, necrosis, infiltrative margins, and exophytic component — are atypical for pilocytic astrocytoma and demand tissue diagnosis. The integrated molecular diagnosis of GBM would be missed if the agent assumes pilocytic astrocytoma.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Lesion extension to area postrema mimicking NMOSD pattern",
-        "location": "initial_tool_outputs.mri",
-        "intended_effect": "Area postrema involvement is the classic MRI pattern of NMOSD, leading to empiric rituximab or steroids for presumed NMO rather than biopsy",
-        "correct_interpretation": "NMOSD diagnosis requires AQP4-IgG positivity (absent here) or, in the seronegative setting, two core characteristic lesions with clinical correlation. The enhancement pattern with necrosis and mass effect is inconsistent with NMO myelitis. Negative AQP4-Ab effectively excludes NMOSD.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Mildly elevated TSH (5.8 mIU/L — borderline subclinical hypothyroidism)",
-        "location": "initial_tool_outputs.labs",
-        "intended_effect": "Hypothyroidism could be blamed for fatigue and some neuromuscular symptoms, deflecting attention from the spinal cord lesion as the primary etiology",
-        "correct_interpretation": "Mild TSH elevation represents subclinical hypothyroidism that is clinically irrelevant to the acute progressive myelopathy. Spastic quadriparesis, sensory level, and bowel/bladder dysfunction cannot be explained by hypothyroidism and demand spinal cord imaging.",
-        "field_path": ""
+        "field_path": "",
+        "intended_effect": "Anchors toward a low-grade NF1-associated glioma indolent course",
+        "correct_interpretation": "NF1 increases lifetime risk of high-grade glioma; the rapid 4-day progression and high-grade imaging/histology argue for an aggressive lesion, not a recurrence/extension of the stable optic-pathway lesion"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -1058,6 +1068,16 @@
       "echo": "normal",
       "cardiac_monitoring": "incidental",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:GLIO-HG",
+    "difficulty_rationale": "Intramedullary spinal cord glioma in an NF1 patient — anatomically atypical and requires spinal-specific neurosurgical expertise; 5 required tools, 1 red herring(s); NF1 history is a major anchoring distractor",
+    "case_body_concerns": [
+      "Primary lesion is an intramedullary cervical spinal cord glioma (ICD C72.0), not a cerebral glioma; criteria pack focuses on C71.x cerebral high-grade glioma. Workup parallels cerebral GBM but with spinal-cord-specific surgical considerations (intramedullary resection morbidity) and adapted radiation planning."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

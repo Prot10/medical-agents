@@ -1,7 +1,7 @@
 {
   "case_id": "MIG-AURA-S11",
   "condition": "migraine_with_aura",
-  "difficulty": "straightforward",
+  "difficulty": "moderate",
   "encounter_type": "outpatient",
   "patient": {
     "age": 45,
@@ -88,116 +88,117 @@
     "extremities": "No edema"
   },
   "ground_truth": {
-    "primary_diagnosis": "Established migraine with typical visual aura (G43.1); medication overuse risk (co-codamol); preventive therapy not initiated despite 12-year history and MIDAS disability",
-    "primary_diagnosis_icd": "G43.1",
+    "primary_diagnosis": "Established migraine with typical visual aura (ICHD-3 1.2.1) with medication-overuse risk from co-codamol",
+    "icd_code": "G43.109",
     "differential": [
       {
-        "diagnosis": "Medication overuse headache (MOH) superimposed on migraine",
+        "diagnosis": "Medication-overuse headache",
+        "likelihood": "high",
+        "key_features": "Co-codamol use ≥10 days/month for ≥3 months meets ICHD-3 criteria for MOH; must be addressed [Holland_2012]",
+        "icd_code": "G44.41"
+      },
+      {
+        "diagnosis": "Chronic migraine",
         "likelihood": "moderate",
-        "key_features": "Co-codamol 6-8 days/month = borderline overuse; increased attack frequency over 6 months; opioid-containing compounds highest MOH risk; however, stress and caffeine also contributing"
+        "key_features": "Headache days approaching ≥15/month over 3 months — quantify",
+        "icd_code": null
       },
       {
-        "diagnosis": "Transient ischemic attack",
-        "likelihood": "very_low",
-        "key_features": "Normal DWI; 12-year identical pattern; visual phenomenon spreads gradually over 20-30 min; no DWI restriction; mild hypertension but no other vascular risk factors; aura spreading pattern characteristic of migraine"
+        "diagnosis": "Migraine without aura",
+        "likelihood": "low",
+        "key_features": "Aura is stereotyped",
+        "icd_code": null
       },
       {
-        "diagnosis": "Cerebral small vessel disease",
+        "diagnosis": "Tension-type headache",
         "likelihood": "very_low",
-        "key_features": "Mild hypertension; borderline cholesterol; WMH are non-specific subcortical pattern; no lacunar infarcts; no periventricular WMH; clinical pattern is episodic migraine not chronic"
+        "key_features": "Pattern is clearly migrainous",
+        "icd_code": "G44.2"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI to confirm no secondary cause given increased frequency",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Non-specific WMH; no structural pathology; normal MRA",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
         "category": "required",
         "tool_parameters": {
-          "contrast": true,
-          "sequences": [
-            "DWI",
-            "FLAIR",
-            "T1+Gd",
-            "MRA"
-          ]
-        }
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "Identify and address codeine/co-codamol overuse — withdrawal of opioid-containing compounds",
-        "tool_name": null,
-        "expected_finding": "Co-codamol 6-8 days/month at MOH threshold; cessation essential before initiating prevention",
-        "category": "required",
-        "tool_parameters": {}
-      },
-      {
-        "step": 3,
-        "action": "Initiate propranolol 40 mg BID as preventive (dual benefit for hypertension) — reduce rizatriptan to 5 mg wafer due to interaction",
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "Propranolol-rizatriptan interaction; reduce rizatriptan dose to 5 mg",
+        "expected_finding": "Withdraw co-codamol (taper); initiate preventive therapy (topiramate or propranolol); rizatriptan as acute therapy ≤2 days/week [Holland_2012]",
         "category": "required",
         "tool_parameters": {
-          "drug_1": "propranolol",
-          "drug_2": "rizatriptan"
-        }
-      },
-      {
-        "step": 4,
-        "action": "Counsel on caffeine reduction (4-5 cups/day → ≤2 cups/day) and stress management",
-        "tool_name": null,
-        "expected_finding": "Caffeine and stress are contributing modifiable triggers",
-        "category": "required",
-        "tool_parameters": {}
-      },
-      {
-        "step": 5,
-        "action": "Lifestyle counselling for borderline hyperlipidaemia (LDL 138, TG 162)",
-        "tool_name": null,
-        "expected_finding": "Dietary modification; repeat lipids in 6 months",
-        "category": "recommended",
-        "tool_parameters": {}
+          "context": "migraine_with_aura_pharmacotherapy"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis — neither present here",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Routine transthoracic / bubble echocardiogram (PFO screening) is NOT indicated in migraine with aura; PFO-migraine association is controversial and PFO closure does not reduce migraine [Charles_2017]",
+        "citation": "[Charles_2017]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated in typical migraine with aura — no role unless cardioembolic stroke is on the differential",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is not indicated for migraine with aura; reserve for cases where focal seizure is genuinely on the differential",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "Identify codeine/co-codamol overuse — 6-8 days/month approaches MOH threshold; must withdraw before preventive therapy will be effective",
-      "Initiate preventive therapy — 12 years of migraine, 3-4 attacks/month, never been offered prevention",
-      "Identify propranolol-rizatriptan interaction — reduce rizatriptan to 5 mg wafer when adding propranolol",
-      "Reduce caffeine intake gradually (4-5 cups/day is excessive; withdrawal headache risk if abrupt)"
+      "Confirm ICHD-3 1.2 criteria are met",
+      "Address medication-overuse headache — withdraw codeine-containing compound analgesic",
+      "Initiate preventive therapy (topiramate or propranolol) [Holland_2012]",
+      "Limit acute triptan use to ≤2 days/week to avoid MOH recurrence"
     ],
     "contraindicated_actions": [
-      "Do not continue co-codamol without withdrawal plan — opioid MOH will undermine any preventive therapy",
-      "Do not use rizatriptan 10 mg with propranolol — reduce to 5 mg due to CYP2D6/P-gp interaction",
-      "Do not abruptly stop caffeine — risk of severe withdrawal headache; gradual taper required"
+      "Do not continue compound codeine analgesics for migraine — they cause MOH and are not recommended for migraine [Holland_2012]",
+      "Do not co-administer ergotamines with triptans"
     ],
     "key_reasoning_points": [
-      "Critical drug interaction: propranolol increases rizatriptan exposure ~67% via CYP2D6 inhibition; dose reduction to 5 mg wafer required",
-      "Co-codamol 6-8 days/month = borderline MOH with opioid-containing compound; opioids are highest-risk acute medications for MOH",
-      "Preventive therapy has never been initiated despite 12 years of migraine — major management gap",
-      "Propranolol has dual benefit for migraine prevention and hypertension in this patient",
-      "Caffeine 4-5 cups/day contributes to increased attack frequency and should be tapered gradually"
+      "Compound opioid analgesics are inappropriate for migraine and a leading driver of medication-overuse headache",
+      "Long-standing untreated migraine with aura with current MOH risk warrants both withdrawal and preventive therapy [Holland_2012]"
     ],
     "red_herrings": [
       {
-        "data_point": "Borderline hyperlipidaemia and mild hypertension suggesting cerebrovascular disease or chronic SVD as aetiology",
-        "location": "initial_tool_outputs.labs",
-        "intended_effect": "A 45-year-old man with hypertension, borderline cholesterol, and subcortical WMH on MRI might prompt cerebrovascular workup for TIA or small vessel disease",
-        "correct_interpretation": "WMH are in non-specific subcortical pattern consistent with migraine; no periventricular lesions; no lacunar infarcts; DWI normal; the primary issues are medication overuse risk and unaddressed preventive therapy need",
-        "field_path": ""
-      },
-      {
-        "data_point": "Increased attack frequency from 1-2 to 3-4/month over 6 months — possible transformation to chronic migraine",
+        "data_point": "Co-codamol use for headache",
         "location": "patient.history_present_illness",
-        "intended_effect": "Escalation to 3-4 attacks/month over 6 months might suggest chronic migraine transformation requiring different management",
-        "correct_interpretation": "Frequency escalation is explained by identified modifiable factors: work stress, excessive caffeine (4-5 cups/day), incipient codeine overuse, and absence of preventive therapy — these should be addressed before diagnosing chronic migraine",
-        "field_path": ""
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "May appear to be a routine analgesic regimen",
+        "correct_interpretation": "Codeine compound analgesics are inappropriate for migraine and drive MOH; should be tapered off"
       }
-    ],
-    "icd_code": "G43.1",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -222,7 +223,17 @@
       "echo": "normal",
       "cardiac_monitoring": "incidental",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Moderate: MOH withdrawal plus preventive initiation in long-standing untreated migraine",
+    "case_body_concerns": [
+      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide §1): ['analyze_brain_mri', 'analyze_ecg', 'interpret_labs', 'order_advanced_imaging']"
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "initial_tool_outputs": {
     "mri": {

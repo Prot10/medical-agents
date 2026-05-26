@@ -482,107 +482,269 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Behavioral variant frontotemporal dementia — sporadic — with concurrent small vessel cerebrovascular disease (secondary contributor); Alzheimer's disease definitively excluded by negative amyloid PET despite APOE e4 and maternal AD",
+    "primary_diagnosis": "Behavioral variant frontotemporal dementia (bvFTD), probable, sporadic — with concurrent small-vessel cerebrovascular disease; AD definitively excluded by negative amyloid PET",
     "icd_code": "G31.09",
     "differential": [
       {
-        "diagnosis": "Alzheimer's disease (familial, APOE e4-mediated)",
-        "likelihood": "very_low",
-        "key_features": "Amyloid PET NEGATIVE despite APOE e4 heterozygosity and maternal AD; FDG-PET preserved posterior cingulate (AD invariably shows posterior cingulate hypometabolism); borderline MRI hippocampal change does not indicate AD without amyloid confirmation; behavioral syndrome (disinhibition, perseveration) is FTD, not AD"
+        "diagnosis": "Alzheimer disease (familial / APOE e4-mediated)",
+        "likelihood": "high",
+        "key_features": "Maternal AD and concern for inherited risk; resolved by negative amyloid PET."
       },
       {
-        "diagnosis": "Vascular dementia (subcortical small vessel)",
-        "likelihood": "very_low",
-        "key_features": "FDG-PET frontal hypometabolism (28-32%) far exceeds what Fazekas 2 alone produces; no strategic vascular infarcts; preserved posterior cortex; primary frontotemporal pattern is FTLD, with minor secondary vascular contribution"
+        "diagnosis": "Vascular cognitive impairment (subcortical small-vessel)",
+        "likelihood": "high",
+        "key_features": "Vascular risk factors and small-vessel burden contribute; however, the dominant pattern is frontotemporal lobar."
       },
       {
         "diagnosis": "Mixed FTD-AD pathology",
-        "likelihood": "very_low",
-        "key_features": "Amyloid PET completely negative — no mixed AD-FTD pathology; negative amyloid PET specifically excludes any AD contribution regardless of risk factors"
+        "likelihood": "moderate",
+        "key_features": "Amyloid PET negativity makes mixed pathology less likely."
+      },
+      {
+        "diagnosis": "Familial FTD (C9orf72 / GRN / MAPT)",
+        "likelihood": "moderate",
+        "key_features": "Brother's status / additional family detail warrants genetic panel."
       },
       {
         "diagnosis": "Normal pressure hydrocephalus",
-        "likelihood": "very_low",
-        "key_features": "No gait apraxia or urinary incontinence; ventricular enlargement proportionate to atrophy (not disproportionate); no periventricular lucency"
+        "likelihood": "low",
+        "key_features": "No classic triad; atrophic pattern dominates."
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "MRI brain — frontal atrophy pattern; Fazekas grade; hippocampal assessment",
+        "action": "Obtain brain MRI with volumetric coronal T1 to assess frontal/anterior temporal atrophy and exclude alternative structural cause",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Moderate frontal atrophy; Fazekas 2 white matter; borderline hippocampal — ambiguous between FTD and AD",
+        "expected_finding": "Bilateral frontal and/or anterior temporal atrophy in a lobar pattern with relative posterior sparing",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "DWI",
+            "volumetric"
+          ]
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky 2011 bvFTD criteria"
       },
       {
         "step": 2,
-        "action": "Labs including HbA1c, APOE genotype, standard dementia workup",
+        "action": "Order metabolic dementia panel (TSH, B12, CMP, RPR/HIV per risk) to exclude reversible mimics",
         "tool_name": "interpret_labs",
-        "expected_finding": "HbA1c 8.2% (suboptimal); APOE e3/e4 (elevated AD risk but not diagnostic)",
+        "expected_finding": "No reversible metabolic or infectious cause of cognitive decline identified",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "TSH",
+            "B12",
+            "RPR",
+            "HIV"
+          ]
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
       },
       {
         "step": 3,
-        "action": "FDG-PET brain — distinguish FTD (frontal) from AD (posterior) from vascular (subcortical)",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Severe frontal hypometabolism; preserved posterior cingulate — rules out AD; frontal severity exceeds vascular contribution",
+        "action": "Order comprehensive neuropsychological battery characterising executive function, social cognition, language and memory",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Frontal-executive and social-cognition deficits with relative sparing of episodic memory and visuospatial function",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky 2011 bvFTD criteria"
       },
       {
         "step": 4,
-        "action": "Amyloid PET — definitive AD exclusion given maternal AD and APOE e4",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "NEGATIVE — AD definitively excluded despite genetic risk",
+        "action": "Search medical literature for bvftd with vascular comorbidity and ad biomarker exclusion",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirms Rascovsky 2011 criteria, FDG-PET evidence (Foster 2007), and management approach (Bang 2015)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "query": "bvFTD with vascular comorbidity and AD biomarker exclusion"
+        },
+        "citation": "[Bang_2015]",
+        "guideline_source": "Bang 2015 Lancet review"
       },
       {
         "step": 5,
-        "action": "FTD genetic panel — C9orf72, GRN, MAPT",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Negative — sporadic bvFTD",
+        "action": "Consult behavioral/cognitive neurology for syndromic diagnosis, biomarker interpretation, and longitudinal care plan",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Behavioral neurology confirms bvFTD syndrome, coordinates biomarkers and disclosure",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "specialty": "behavioral_neurology"
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
+      },
+      {
+        "step": 6,
+        "action": "Order FDG-PET brain to characterise frontotemporal hypometabolism and distinguish bvFTD from AD",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Bifrontal and/or anterior temporal hypometabolism with relative posterior sparing",
+        "category": "required",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[Foster_2007]",
+        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
+      },
+      {
+        "step": 7,
+        "action": "Order amyloid PET to definitively exclude familial AD (APOE e4-mediated risk)",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Negative amyloid PET — secures non-AD etiology",
+        "category": "required",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "citation": "[Foster_2007]",
+        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
+      },
+      {
+        "step": 8,
+        "action": "Order FTD genetic panel (C9orf72, GRN, MAPT) given maternal AD and family pattern — clarify familial cause",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Identifies or excludes pathogenic C9orf72 / GRN / MAPT variant relevant to prognosis and cascade testing",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "genetic_panel:FTD"
+        },
+        "citation": "[Pottier_2016]",
+        "guideline_source": "Pottier 2016 FTLD genetics review"
+      },
+      {
+        "step": 9,
+        "action": "Aggressively manage vascular risk factors (BP, diabetes, lipids)",
+        "tool_name": null,
+        "expected_finding": "Vascular risk modification reduces ongoing small-vessel injury",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
+      },
+      {
+        "step": 10,
+        "action": "Address judicial / occupational and decision-making capacity formally",
+        "tool_name": null,
+        "expected_finding": "Capacity assessment documented; safeguards in place",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is non-specific in FTD; not part of the standard dementia workup unless seizures or rapidly progressive course suggest CJD or autoimmune encephalitis.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG has no role in the cognitive workup of suspected FTD; reserved for syncope, palpitations, or pre-procedure clearance.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is unrelated to a neurodegenerative cognitive syndrome and adds cost without diagnostic value.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is unrelated to FTD and not indicated absent syncope or palpitations.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT lacks the resolution and lobar specificity needed to characterise frontotemporal atrophy; MRI is the standard structural study.",
+        "citation": "[AAN_dementia_2018]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "MR_spectroscopy"
+        },
+        "rationale": "MR spectroscopy has no established role in the routine FTD diagnostic pathway.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "perfusion_MRI"
+        },
+        "rationale": "Perfusion MRI is not indicated in the standard FTD workup once a structural MRI and FDG-PET (or amyloid PET) have characterised the lobar pattern.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is a vascular study with no diagnostic role in primary neurodegenerative dementia.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan evaluates presynaptic dopaminergic terminals; it is not indicated unless overt parkinsonism raises concern for PD, DLB, or atypical parkinsonism (PSP/CBS overlap).",
+        "citation": "[Bang_2015]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "Exclude structural cause of focal cognitive symptoms and screen for elevated ICP before lumbar puncture.",
+        "citation": "[AAN_dementia_2018]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Amyloid PET is MANDATORY when maternal AD history and APOE e4 create genuine diagnostic uncertainty — negative amyloid PET DEFINITIVELY excludes AD regardless of family history or APOE status",
-      "APOE e4 genotype raises AD risk but does NOT diagnose AD — never diagnose AD based on APOE genotype alone",
-      "The preserved posterior cingulate on FDG-PET is the single most discriminating imaging feature: AD ALWAYS involves posterior cingulate; its preservation effectively excludes AD"
+      "Definitively exclude AD with amyloid PET given strong maternal AD history and APOE e4 concern.",
+      "Optimise vascular risk factors regardless of primary diagnosis.",
+      "Address judicial / occupational capacity formally.",
+      "Apply Rascovsky 2011 bvFTD criteria explicitly (≥3 of 6 core features within 3 years) and document functional decline.",
+      "Assess and document decision-making, financial, and driving capacity given the high risk of impulsivity and impaired judgment in FTD.",
+      "Provide caregiver education, safety planning, and referral to FTD-focused support resources.",
+      "Offer genetic counselling and discuss cascade testing options if a pathogenic variant is identified or suspected."
     ],
     "contraindicated_actions": [
-      "Cholinesterase inhibitors — contraindicated in bvFTD even when AD was initially considered",
-      "Diagnosing AD based on APOE e4 and family history without amyloid PET or CSF biomarkers",
-      "Prescribing donepezil or memantine based on family history of AD without amyloid confirmation"
+      "Do not start acetylcholinesterase inhibitors (donepezil, rivastigmine, galantamine): no benefit in FTD and may worsen behavioral symptoms.",
+      "Do not start memantine: no evidence of benefit in bvFTD and may worsen behavioral symptoms.",
+      "Avoid antipsychotics as first-line behavioral therapy given increased cerebrovascular and mortality risk in dementia; reserve for refractory dangerous agitation with specialist oversight.",
+      "Avoid benzodiazepines for behavioral control: risk of paradoxical disinhibition and falls."
     ],
     "key_reasoning_points": [
-      "APOE e4 is the most common genetic risk factor for sporadic Alzheimer's disease but is NOT diagnostic — it increases lifetime risk but many APOE e4 carriers never develop AD; negative amyloid PET is the definitive exclusion test",
-      "The preserved posterior cingulate cortex on FDG-PET is pathognomonic evidence AGAINST Alzheimer's disease — AD invariably involves the posterior cingulate/precuneus as an early and consistent metabolic signature; its preservation effectively rules out AD as the primary pathology",
-      "Fazekas 2 white matter changes create a red herring for vascular dementia — the degree of frontal FDG-PET cortical hypometabolism (28-32%) far exceeds what can be attributed to Fazekas 2 alone; the primary FTD pathology with secondary vascular contribution is the correct interpretation",
-      "In high-profile professionals (judge, attorney, executive), the occupational performance record provides important clinical information: judicial performance review findings are equivalent to a detailed occupational history documenting the functional impact of frontal disinhibition and impaired judgment"
+      "Negative amyloid PET securely excludes AD as the primary aetiology despite strong family history and APOE e4.",
+      "Small-vessel changes contribute but do not explain the lobar frontotemporal pattern.",
+      "Address fiduciary capacity urgently for a sitting / recently retired judge."
     ],
     "red_herrings": [
       {
-        "data_point": "Maternal Alzheimer's disease + APOE e3/e4",
-        "location": "Family history and genetics",
-        "intended_effect": "Diagnose familial Alzheimer's disease as primary diagnosis; prescribe cholinesterase inhibitors",
-        "correct_interpretation": "APOE e4 and maternal AD raise risk but do not diagnose AD; amyloid PET is NEGATIVE — definitively excluding AD; FDG-PET preserved posterior cingulate confirms no AD metabolic pattern; bvFTD confirmed",
-        "field_path": ""
-      },
-      {
-        "data_point": "Fazekas grade 2 white matter changes + hypertension + diabetes (HbA1c 8.2%)",
-        "location": "MRI and labs",
-        "intended_effect": "Diagnose vascular dementia as primary cause",
-        "correct_interpretation": "Fazekas 2 with no strategic infarcts cannot produce the degree (28-32%) of frontal cortical hypometabolism on FDG-PET; primary FTD pathology is confirmed by the metabolic pattern exceeding vascular contribution",
-        "field_path": ""
+        "data_point": "Maternal Alzheimer's disease",
+        "location": "family_history",
+        "field_path": "patient.clinical_history.family_history",
+        "intended_effect": "Anchors on familial AD as the explanation.",
+        "correct_interpretation": "Family history of AD does not determine etiology; biomarkers (amyloid PET) are the discriminator."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "v5",
@@ -595,6 +757,18 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (condition-expert:FTD)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FTD",
+    "difficulty_rationale": "≥5 required tools, multi-axis confounders (psychiatric comorbidity, normal/subtle MRI, parkinsonism overlap, or APOE-driven AD anchoring), and 2+ grounded red herrings — requires sophisticated biomarker / genetic reasoning to overcome anchoring on a comorbidity.",
+    "case_body_concerns": [
+      "validator flags `order_advanced_imaging` in both optimal_actions (FDG_PET / amyloid_PET) and useless_tools (MR_spectroscopy / DaTscan / perfusion_MRI / carotid_duplex) — these are distinct modalities of the same catchall tool. Known systemic validator limitation: the coherence script ignores `tool_parameters.modality`. No fix at case level.",
+      "required tool `order_specialized_test` has no matching `initial_tool_outputs` or `followup_outputs` entry — case body should add a corresponding output so the agent gets a meaningful result when calling this required step.",
+      "fallback output for `order_advanced_imaging` is missing in `fallback_tool_outputs` — calling the useless tool will return empty; case body needs an off-pathway fallback entry."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -488,135 +488,219 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Psychogenic non-epileptic status (prolonged PNES episode) in a patient with known comorbid JME on therapeutic lamotrigine; triggered by acute psychosocial stress",
+    "primary_diagnosis": "Psychogenic non-epileptic status (prolonged PNES episode) in patient with known comorbid JME on therapeutic lamotrigine; triggered by acute psychosocial stress",
     "icd_code": "F44.5",
     "differential": [
       {
-        "diagnosis": "Breakthrough epileptic SE (JME breakthrough from lamotrigine non-adherence or underdose)",
-        "likelihood": "low",
-        "key_features": "Lamotrigine 14.2 mcg/mL is therapeutic; normal EEG during events; normal prolactin/lactate/CK; active eye closure is not epileptic feature; known PNES comorbidity"
+        "diagnosis": "Breakthrough JME convulsive SE",
+        "likelihood": "high",
+        "key_features": "Known JME background; subtherapeutic AED ruled out (LTG therapeutic); rules out epileptic SE only with EEG",
+        "icd_code": "G41.0"
       },
       {
-        "diagnosis": "Anti-NMDAR autoimmune encephalitis",
-        "likelihood": "low",
-        "key_features": "Autoimmune panel negative; acute onset without prodrome; normal EEG; no psychiatric prodrome preceding event by weeks"
+        "diagnosis": "Acute non-organic / dissociative episode",
+        "likelihood": "high",
+        "key_features": "Known PNES on prior video-EEG; acute psychosocial stressor triggers; preserved consciousness during apparent convulsion",
+        "icd_code": "F44.5"
       },
       {
-        "diagnosis": "Toxic drug ingestion (benzodiazepine or sedative withdrawal mimicking SE)",
+        "diagnosis": "Drug interaction lowering seizure threshold (sertraline + lamotrigine)",
         "likelihood": "low",
-        "key_features": "Toxicology negative; no benzodiazepine use; normal metabolic panel; known PNES history"
+        "key_features": "Sertraline minimal effect; LTG level therapeutic",
+        "icd_code": "G40.909"
+      },
+      {
+        "diagnosis": "Autoimmune encephalitis",
+        "likelihood": "low",
+        "key_features": "No focal deficits; antibody panel pending",
+        "icd_code": "G04.81"
+      },
+      {
+        "diagnosis": "Migraine with confusion / hemiplegic migraine",
+        "likelihood": "very_low",
+        "key_features": "No headache or aura pattern",
+        "icd_code": "G43.109"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "EEG with video monitoring — do NOT delay for video recording as clinical features suggest PNES",
+        "action": "Continuous video-EEG — definitively distinguish PNES from epileptic SE",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Normal EEG during clinical events — confirms PNES",
+        "expected_finding": "Normal background, no electrographic correlate during the apparent convulsion — confirms PNES",
         "category": "required",
-        "tool_parameters": {
-          "modality": "video_eeg",
-          "urgency": "urgent"
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "Draw lamotrigine level immediately to exclude subtherapeutic AED as contributing factor",
+        "action": "Labs: CBC, CMP, glucose, Ca/Mg, AED level (LTG), prolactin (serial), ammonia, lactate, ABG, CK, beta-hCG, tox screen",
         "tool_name": "interpret_labs",
-        "expected_finding": "Lamotrigine therapeutic (14.2 mcg/mL) — AED non-compliance not contributing",
+        "expected_finding": "LTG therapeutic, no abnormalities; serial prolactin is NOT elevated 15-20 min post-event (epileptic seizure typically raises prolactin); lactate normal (PNES does not produce post-ictal lactic acidosis)",
         "category": "required",
-        "tool_parameters": {
-          "tests": [
-            "lamotrigine_level"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Draw prolactin level within 20-60 minutes of clinical event; obtain lactate and CK as post-ictal markers",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Prolactin normal (no surge); lactate <2 mmol/L; CK normal — all support PNES",
+        "action": "Non-contrast head CT — exclude structural cause",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Normal CT",
         "category": "required",
-        "tool_parameters": {
-          "tests": [
-            "prolactin",
-            "lactate",
-            "CK"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "Observe patient with active monitoring — do NOT give empiric IV benzodiazepines for suspected PNES (reinforces behavior, causes respiratory depression without benefit)",
-        "tool_name": null,
-        "expected_finding": "Prolonged PNES events often self-resolve without benzodiazepine",
+        "action": "Drug-interaction check: lamotrigine + sertraline + AED options if epileptic component",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sertraline minimal effect; LTG therapeutic; avoid escalating AED if PNES confirmed",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[ESETT_2019]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "Compassionate communication of PNES diagnosis to patient when alert",
-        "tool_name": null,
-        "expected_finding": "Patient receives diagnosis without invalidation",
+        "action": "Literature: PNES recognition and treatment",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Cognitive behavioral therapy is the evidence-based treatment for PNES; AED escalation is counterproductive",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 6,
-        "action": "Psychology/psychiatry inpatient consultation for CBT initiation",
-        "tool_name": null,
-        "expected_finding": "CBT treatment plan initiated",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Autoimmune encephalitis panel for completeness given altered mental status differential",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Negative — supports functional diagnosis",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 7,
-        "action": "Do NOT escalate lamotrigine — level therapeutic, escalation would not benefit PNES",
-        "tool_name": null,
-        "expected_finding": "Lamotrigine maintained at therapeutic dose",
+        "action": "Psychology / behavioral health consultation for PNES management",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "CBT-PNES is first-line; gentle reframing of diagnosis",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 8,
+        "action": "MRI brain — to address comorbid JME ruling out new lesion (low yield)",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Normal MRI",
+        "category": "optional",
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "study_type": "TTE"
+        },
+        "rationale": "No clinical suspicion of cardiac source of embolus or cardiogenic seizure; routine echo is not indicated in SE workup absent cardiac findings.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No suspicion of arrhythmogenic syncope or cardiac comorbidity precipitating SE; routine telemetry beyond standard ICU monitoring adds cost without yield.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in acute SE evaluation; dementia biomarker imaging does not change acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is for ischemic stroke workup; SE without focal vascular suspicion does not warrant carotid imaging.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "DaTscan / dopamine transporter imaging has no role in SE; no parkinsonism question relevant to acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {
+          "tests": [
+            "routine"
+          ]
+        },
+        "rationale": "No infectious or autoimmune signs; LP not indicated.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_eeg",
+        "after": "check_drug_interactions",
+        "reason": "EEG must precede further AED escalation when PNES is on the differential.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Video-EEG monitoring — gold standard for PNES vs epileptic SE diagnosis",
-      "Prolactin level within 20-60 minutes — normal prolactin supports PNES diagnosis",
-      "Do NOT give empiric IV benzodiazepines without EEG confirmation of ictal activity in known PNES patient",
-      "Lamotrigine level — to exclude non-adherence as contributor to true epileptic events"
+      "Continuous video-EEG with semiology capture is THE diagnostic test",
+      "Single dose of IV lorazepam is reasonable initial; do NOT escalate to intubation/anesthetic before EEG confirms epileptic SE",
+      "Once PNES confirmed, gentle communication of diagnosis and CBT referral",
+      "Continue therapeutic AED for comorbid JME"
     ],
     "contraindicated_actions": [
-      "IV benzodiazepines empirically for prolonged PNES events — reinforces behavior and risks respiratory depression without therapeutic benefit",
-      "Escalating lamotrigine for PNES events — lamotrigine treats epileptic seizures, not PNES",
-      "Valproate — documented allergy alert (teratogenicity concern for planning pregnancy) and also not appropriate for JME in pregnancy",
-      "Diagnosing NCSE based on clinical appearance alone in known PNES patient — video-EEG required"
+      "Do NOT intubate or initiate anesthetic infusions for PNES — iatrogenic harm",
+      "Do NOT escalate AEDs aggressively before EEG confirms epileptic pattern",
+      "Do NOT dismiss the patient — PNES is a real disorder requiring treatment",
+      "Escalating AED loading and intubation for confirmed PNES exposes the patient to iatrogenic harm without benefit — once EEG confirms PNES, de-escalate."
     ],
     "key_reasoning_points": [
-      "PNES and epilepsy coexist in 20-40% of PNES patients — the challenge is distinguishing which event is PNES vs epileptic",
-      "Three post-ictal markers support PNES: normal prolactin (no surge), normal lactate, normal CK — all three together are highly specific",
-      "Active eye closure during events (eyes forcefully closing when opened) is a high-specificity PNES feature not seen in epileptic seizures",
-      "Video-EEG is the gold standard: normal EEG during clinical event = PNES (provided adequate recording quality and artifact management)",
-      "Empiric benzodiazepines for prolonged PNES 'status' is a common harmful error — does not treat PNES, causes respiratory depression, reinforces patient illness behavior, and delays appropriate psychiatric treatment",
-      "Acute psychosocial stress is a common PNES trigger — mother's cancer diagnosis is the precipitant here; therapy must address this"
+      "Video-EEG is the gold standard for distinguishing PNES from epileptic SE",
+      "Serial prolactin (15-20 min post-event) often elevated after epileptic GTC but not PNES",
+      "Normal lactate post-event argues strongly against epileptic SE",
+      "PNES treatment is CBT — AED escalation is harmful and counterproductive",
+      "Patients can have BOTH epilepsy and PNES (this patient has known JME + PNES)"
     ],
     "red_herrings": [
       {
-        "data_point": "Known epilepsy diagnosis with generalized tonic-clonic seizures",
-        "location": "past medical history",
-        "intended_effect": "Suggest current prolonged event is epileptic status epilepticus requiring AED escalation",
-        "correct_interpretation": "Patient has BOTH epilepsy (well-controlled on lamotrigine) AND PNES. Current event is PNES, confirmed by normal EEG during events, normal prolactin, and active eye-closure sign.",
-        "field_path": ""
+        "data_point": "Known history of JME on lamotrigine",
+        "location": "patient.clinical_history.past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Anchoring on epilepsy diagnosis, assuming all events are epileptic",
+        "correct_interpretation": "Patient has documented co-existing PNES; EEG distinguishes the current event"
       },
       {
-        "data_point": "Bilateral rhythmic extremity shaking for 30+ minutes",
-        "location": "clinical presentation",
-        "intended_effect": "Mimic convulsive SE and trigger AED escalation + benzodiazepine treatment",
-        "correct_interpretation": "Bilateral rhythmic shaking in PNES can mimic convulsive SE. Key distinguishing features: eyes closed, active eye closure, normal EEG, normal post-event prolactin/lactate/CK, no true post-ictal suppression.",
-        "field_path": ""
+        "data_point": "Sertraline on medication list",
+        "location": "patient.clinical_history.medications",
+        "field_path": "patient.clinical_history.medications",
+        "intended_effect": "Suggests SSRI lowering seizure threshold",
+        "correct_interpretation": "SSRIs at therapeutic doses have minimal seizure-threshold effect; not the cause"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -627,6 +711,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "7 required + 2 optional/recommended; PNES vs epileptic SE diagnostic puzzle in patient with both diagnoses; key teaching is video-EEG primacy, harm of over-treatment; 2 grounded red herrings.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

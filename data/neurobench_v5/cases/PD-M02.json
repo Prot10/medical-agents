@@ -734,173 +734,249 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Parkinson disease",
+    "primary_diagnosis": "Parkinson's disease (idiopathic), unmasked or exacerbated by concurrent metoclopramide exposure",
     "icd_code": "G20",
-    "red_herrings": [
-      {
-        "data_point": "Brother has essential tremor managed with propranolol; patient exhibits mild bilateral postural tremor",
-        "location": "family_history and neurological_exam.additional",
-        "intended_effect": "May anchor agent toward essential tremor or drug-induced parkinsonism, underweighting the asymmetric cogwheel rigidity and bradykinesia",
-        "correct_interpretation": "Brother's ET is incidental. Patient's postural tremor is a non-specific finding. The cogwheel rigidity, bradykinesia, hyposmia, prodromal RBD, and abnormal DaTscan confirm neurodegenerative PD unmasked by metoclopramide",
-        "field_path": ""
-      }
-    ],
     "differential": [
       {
         "diagnosis": "Drug-induced parkinsonism (metoclopramide)",
-        "likelihood": "moderate",
-        "key_features": "2-year metoclopramide use, bilateral presentation; BUT asymmetric exam, prodromal RBD/hyposmia/constipation argue against pure DIP"
+        "likelihood": "high",
+        "key_features": "Active metoclopramide use exceeding the 12-week FDA limit; symmetric features and gradual onset could fit DIP",
+        "icd_code": "G21.11"
       },
       {
-        "diagnosis": "Essential tremor",
+        "diagnosis": "Vascular parkinsonism",
+        "likelihood": "moderate",
+        "key_features": "Periventricular white-matter changes and gait predominance support this consideration; need MRI burden assessment",
+        "icd_code": "G21.4"
+      },
+      {
+        "diagnosis": "Multiple system atrophy (MSA-P)",
         "likelihood": "low",
-        "key_features": "Bilateral postural tremor, brother with ET; however, bradykinesia, rigidity, and shuffling gait are not features of ET"
+        "key_features": "Mild autonomic and gait features without cerebellar findings or characteristic MRI signature argue against MSA",
+        "icd_code": "G90.3"
       },
       {
         "diagnosis": "Normal pressure hydrocephalus",
         "likelihood": "low",
-        "key_features": "Gait instability, mild ventricular enlargement on MRI; however, no urinary incontinence, no magnetic gait, Evans index borderline, and sulcal widening proportionate"
+        "key_features": "Need to inspect Evans index, callosal angle, and DESH pattern; gait apraxia and urinary symptoms would shift toward NPH",
+        "icd_code": "G91.2"
       },
       {
-        "diagnosis": "Vascular parkinsonism",
+        "diagnosis": "Progressive supranuclear palsy",
         "likelihood": "low",
-        "key_features": "Hypertension, diabetes, periventricular white matter changes; however, no lower-body predominant parkinsonism, no stepwise progression, no basal ganglia infarcts"
+        "key_features": "Absent vertical gaze palsy and absent early backward falls argue against PSP",
+        "icd_code": "G23.1"
+      },
+      {
+        "diagnosis": "Essential tremor",
+        "likelihood": "very_low",
+        "key_features": "Bradykinesia and rigidity exclude pure ET",
+        "icd_code": "G25.0"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain complete history including medication review, focusing on dopamine-blocking agents and onset timeline relative to metoclopramide initiation",
-        "tool_name": null,
-        "expected_finding": "Metoclopramide started approximately 2 years ago; motor symptoms began approximately 1 year ago, but prodromal features (constipation, hyposmia, RBD) predate metoclopramide use",
-        "category": "required"
-      },
-      {
-        "step": 2,
-        "action": "Perform detailed neurological examination with focus on asymmetry of motor findings, presence of resting versus postural tremor, and non-motor features",
-        "tool_name": null,
-        "expected_finding": "Bilateral bradykinesia and rigidity, slightly more on right; no resting tremor but mild postural tremor; hypomimia; positive Myerson sign",
-        "category": "required"
-      },
-      {
-        "step": 3,
-        "action": "Order brain MRI to exclude structural causes of parkinsonism",
+        "action": "Obtain brain MRI to exclude vascular parkinsonism, NPH, and structural mimics; inspect SWI substantia nigra",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Mild white matter changes and borderline ventricular enlargement but no structural lesion, no features of MSA or PSP",
+        "expected_finding": "Mild age-appropriate changes; no vascular, NPH, or pontine/cerebellar features incompatible with PD",
         "category": "required",
         "tool_parameters": {
           "protocol": "standard",
-          "contrast": false
-        }
+          "contrast": false,
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "SWI"
+          ]
+        },
+        "citation": "[Schwarz_2014]",
+        "guideline_source": "Schwarz_2014"
       },
       {
-        "step": 4,
-        "action": "Order basic labs including CBC, BMP, TSH, vitamin B12, RPR to exclude metabolic/infectious causes",
+        "step": 2,
+        "action": "Order baseline labs (CBC, CMP, TSH, B12, RPR)",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal except mildly elevated glucose and HbA1c reflecting known diabetes",
+        "expected_finding": "No reversible metabolic, endocrine, or infectious cause",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
-            "thyroid",
+            "CMP",
+            "TSH",
             "B12",
             "RPR"
           ]
-        }
+        },
+        "citation": "[Postuma_2015]",
+        "guideline_source": "Postuma_2015"
+      },
+      {
+        "step": 3,
+        "action": "Check drug interactions and flag metoclopramide as a dopamine D2 receptor antagonist that can cause or worsen parkinsonism",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Metoclopramide flagged as DA-antagonist with FDA black-box warning beyond 12 weeks; pharmacological antagonism with levodopa noted; alternatives include ondansetron, erythromycin, prucalopride, or domperidone",
+        "category": "required",
+        "tool_parameters": {
+          "proposed_medication": "carbidopa-levodopa",
+          "current_medications": [
+            "metoclopramide"
+          ]
+        },
+        "citation": "[Postuma_2015]",
+        "guideline_source": "Postuma_2015"
+      },
+      {
+        "step": 4,
+        "action": "Search medical literature on distinguishing PD from drug-induced parkinsonism",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "DaTscan is the key differentiator; RBD favors neurodegenerative synucleinopathy over DIP",
+        "category": "required",
+        "tool_parameters": {
+          "query": "drug-induced parkinsonism metoclopramide DaTscan Parkinson disease"
+        },
+        "citation": "[Marshall_2009]",
+        "guideline_source": "Marshall_2009"
       },
       {
         "step": 5,
-        "action": "Request DaTscan to differentiate neurodegenerative parkinsonism from drug-induced parkinsonism",
+        "action": "Order DaTscan to differentiate idiopathic PD from pure drug-induced parkinsonism",
         "tool_name": "order_advanced_imaging",
-        "expected_finding": "Abnormal — reduced bilateral putaminal dopamine transporter uptake, confirming presynaptic dopaminergic deficit",
+        "expected_finding": "Abnormal asymmetric striatal DAT binding confirms underlying neurodegenerative parkinsonism (DIP without underlying PD typically yields a normal scan)",
         "category": "required",
         "tool_parameters": {
-          "imaging_type": "DaTscan"
-        }
+          "modality": "DaTscan"
+        },
+        "citation": "[Marshall_2009]",
+        "guideline_source": "Marshall_2009"
       },
       {
         "step": 6,
-        "action": "Recommend discontinuation of metoclopramide and discuss alternative prokinetic agents with gastroenterologist",
-        "tool_name": null,
-        "expected_finding": "Metoclopramide is exacerbating underlying PD; should be replaced with domperidone (if available) or non-dopamine-blocking alternative",
-        "category": "required"
-      },
-      {
-        "step": 7,
-        "action": "Consider levodopa challenge test to assess dopaminergic responsiveness",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Positive response (>30% improvement in UPDRS-III), supporting PD diagnosis",
-        "category": "recommended",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP"
-          ]
-        }
-      },
-      {
-        "step": 8,
-        "action": "Order polysomnography to confirm suspected REM sleep behavior disorder",
+        "action": "Order polysomnography if dream-enactment behaviors are reported (premotor synucleinopathy marker)",
         "tool_name": "order_specialized_test",
-        "expected_finding": "RBD confirmed — supports synucleinopathy diagnosis",
+        "expected_finding": "REM sleep without atonia confirms RBD and strongly supports neurodegenerative etiology",
         "category": "recommended",
         "tool_parameters": {
           "test_type": "polysomnography"
-        }
+        },
+        "citation": "[Postuma_2019]",
+        "guideline_source": "Postuma_2019"
       },
       {
-        "step": 9,
-        "action": "Initiate dopaminergic therapy (low-dose carbidopa/levodopa or dopamine agonist) after metoclopramide discontinuation and washout",
-        "tool_name": null,
-        "expected_finding": "Clinical improvement in bradykinesia, rigidity, and gait with levodopa therapy",
-        "category": "recommended"
-      },
-      {
-        "step": 10,
-        "action": "Screen for depression and refer for neuropsychological testing given borderline MoCA",
+        "step": 7,
+        "action": "Order neuropsychological battery as baseline cognitive screen",
         "tool_name": "order_specialized_test",
-        "expected_finding": "Mild depression (GDS-15 = 7) and PD-MCI pattern on neuropsychological testing",
+        "expected_finding": "Frontal-subcortical executive pattern consistent with PD-MCI",
         "category": "recommended",
         "tool_parameters": {
           "test_type": "neuropsych_battery"
-        }
+        },
+        "citation": "[Tolosa_2021]",
+        "guideline_source": "Tolosa_2021"
       },
       {
-        "step": 11,
-        "action": "Refer to physical therapy for gait and balance training, and to occupational therapy for fine motor strategies",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended"
+        "step": 8,
+        "action": "Order autonomic testing if atypical autonomic features warrant exclusion of MSA",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Mild autonomic findings consistent with PD-related autonomic involvement, not the severe early failure of MSA",
+        "category": "optional",
+        "tool_parameters": {
+          "test_type": "autonomic_testing"
+        },
+        "citation": "[Tolosa_2021]",
+        "guideline_source": "Tolosa_2021"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG has no role in PD/DIP differentiation",
+        "citation": "[Postuma_2015]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "CSF not indicated",
+        "citation": "[Postuma_2015]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "MRI is the appropriate modality",
+        "citation": "[Schwarz_2014]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No cardiac indication",
+        "citation": "[Postuma_2015]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "No arrhythmia concern",
+        "citation": "[Postuma_2015]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "check_drug_interactions",
+        "after": "interpret_labs",
+        "reason": "Identify the offending DA antagonist (metoclopramide) before relying on levodopa response to clarify diagnosis",
+        "citation": "[Postuma_2015]",
+        "severity": "soft"
+      },
+      {
+        "before": "analyze_brain_mri",
+        "after": "order_advanced_imaging",
+        "reason": "Exclude vascular/NPH/structural mimics on MRI before committing to DaTscan-based PD confirmation",
+        "citation": "[Schwarz_2014]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Identify metoclopramide as a dopamine-blocking agent that can cause or worsen parkinsonism",
-      "Recognize prodromal non-motor features (hyposmia, RBD, constipation) predating metoclopramide as evidence of underlying neurodegeneration",
-      "Order DaTscan to distinguish neurodegenerative parkinsonism from drug-induced parkinsonism",
-      "Recommend discontinuation of metoclopramide",
-      "Assess for orthostatic hypotension and autonomic dysfunction to help rule out MSA"
+      "Apply MDS 2015 clinical diagnostic criteria for Parkinson's disease (bradykinesia plus rest tremor or rigidity, supportive features, no absolute exclusion criteria)",
+      "Document temporal sequence of motor and non-motor (REM sleep behavior disorder, hyposmia, constipation, orthostatic intolerance) features",
+      "Review the full medication list for dopamine receptor antagonists (metoclopramide, prochlorperazine, antipsychotics) and any other agents that can mimic or worsen parkinsonism",
+      "Identify metoclopramide as a dopamine D2 receptor antagonist and discontinue it; substitute ondansetron, prucalopride, erythromycin, or (where available) domperidone",
+      "Recognize that premotor features (RBD, constipation, hyposmia) preceding metoclopramide use point to underlying idiopathic PD rather than pure DIP",
+      "Use DaTscan to differentiate underlying neurodegenerative PD (abnormal scan) from pure DIP (normal scan)",
+      "Do not start levodopa while the patient remains on metoclopramide because of pharmacological antagonism"
     ],
     "contraindicated_actions": [
-      "Continuing metoclopramide without addressing its role in the parkinsonian presentation",
-      "Prescribing typical antipsychotics (haloperidol, chlorpromazine) for any behavioral symptoms",
-      "Starting anticholinergic medications (benztropine, trihexyphenidyl) as first-line treatment in a 70-year-old with cognitive concerns",
-      "Prescribing metoclopramide or prochlorperazine for nausea management",
-      "Diagnosing drug-induced parkinsonism without investigating for underlying neurodegenerative disease given the prodromal features"
+      "Do not prescribe metoclopramide, prochlorperazine, or promethazine for nausea in a patient with parkinsonism",
+      "Do not prescribe typical antipsychotics (haloperidol, fluphenazine) or most atypical antipsychotics (risperidone, olanzapine, aripiprazole) — restrict pharmacotherapy of psychosis to quetiapine, clozapine, or pimavanserin",
+      "Do not prescribe centrally acting anticholinergics (trihexyphenidyl, benztropine) in older adults or in any patient with cognitive impairment",
+      "Do not continue metoclopramide in a patient with parkinsonism",
+      "Do not start levodopa while metoclopramide remains in the regimen"
     ],
     "key_reasoning_points": [
-      "The moderate difficulty lies in the confounding presence of metoclopramide: a clinician must determine whether the parkinsonism is drug-induced, neurodegenerative, or both (metoclopramide unmasking subclinical PD)",
-      "Prodromal non-motor features (hyposmia 1 year, RBD 18 months, constipation 2+ years, depression) strongly suggest an underlying synucleinopathy rather than pure drug-induced parkinsonism",
-      "The bilateral but asymmetric motor findings (right > left) support PD rather than DIP, which is typically symmetric",
-      "Absence of resting tremor does not exclude PD — approximately 25% of PD patients do not have tremor at onset (akinetic-rigid subtype)",
-      "DaTscan is the key discriminating test: abnormal in neurodegenerative parkinsonism, normal in drug-induced parkinsonism",
-      "The brother with essential tremor is a potential red herring — the postural tremor could initially suggest ET, but the presence of bradykinesia, rigidity, and non-motor features clearly points to a parkinsonian syndrome",
-      "Borderline ventricular enlargement on MRI could raise concern for NPH, but the proportionate sulcal widening and absence of classic NPH triad (gait apraxia, urinary incontinence, dementia) argue against it",
-      "The mild cognitive profile (PD-MCI with frontal-subcortical pattern) is consistent with early PD and is distinct from the cortical pattern seen in Alzheimer disease"
+      "Symmetric onset in a patient on metoclopramide creates diagnostic overlap between idiopathic PD and pure drug-induced parkinsonism",
+      "Premotor non-motor features that predate metoclopramide initiation point to underlying synucleinopathy",
+      "DaTscan is the critical differentiator: abnormal scan supports underlying neurodegenerative PD",
+      "RBD on polysomnography is a strong synucleinopathy biomarker and not caused by metoclopramide",
+      "Mother / family history of essential tremor (if present) is a red herring — ET and PD are distinct diseases",
+      "Metoclopramide has an FDA black-box warning against use beyond 12 weeks because of tardive dyskinesia risk"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": [
+      {
+        "data_point": "Active metoclopramide use for gastroparesis predating most motor symptoms",
+        "location": "medications and history_present_illness",
+        "field_path": "patient.clinical_history.medications",
+        "intended_effect": "Anchor toward pure drug-induced parkinsonism and away from a neurodegenerative diagnosis",
+        "correct_interpretation": "Premotor features (RBD, constipation, hyposmia) preceding metoclopramide and an abnormal DaTscan establish underlying PD; metoclopramide unmasks rather than causes the syndrome"
+      },
+      {
+        "data_point": "Family member with essential tremor",
+        "location": "family_history",
+        "field_path": "patient.clinical_history.family_history",
+        "intended_effect": "Suggest familial tremor pattern",
+        "correct_interpretation": "ET and PD are distinct conditions; PD diagnosis is established by motor and supportive criteria irrespective of family ET"
+      }
+    ]
   },
   "metadata": {
     "version": "1.0",
@@ -920,6 +996,14 @@
       "ct": "normal",
       "echo": "normal",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (condition-expert:PD)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:PD",
+    "difficulty_rationale": "Same metoclopramide confound and DA-antagonist disambiguation",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

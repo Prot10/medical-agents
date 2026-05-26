@@ -472,57 +472,222 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Anti-synthetase syndrome (anti-Jo-1 polymyositis with ILD) — misattributed to peripheral neuropathy",
-    "critical_actions": [
-      "Do NOT accept 'neuropathy' diagnosis when CK is 4800 U/L and weakness is proximal predominant — this is myopathy",
-      "Repeat NCS/EMG with physician interpretation — myopathic MUPs were misread as neuropathic by non-physician technician",
-      "Order anti-Jo-1 and full myositis antibody panel — this is the primary diagnostic test",
-      "Order HRCT chest urgently — ILD can be rapidly progressive in anti-synthetase syndrome and causes significant morbidity/mortality",
-      "Evaluate for MG overlap (ptosis, dysphagia) — AChR antibody and RNS"
-    ],
-    "contraindicated_actions": [
-      "Do not diagnose as peripheral neuropathy based on misread EMG — normal NCS excludes significant neuropathy",
-      "Do not attribute to statin myopathy without checking anti-HMGCR — statin was 4 months only; primary diagnosis is anti-synthetase syndrome",
-      "Do not miss ILD evaluation — 80-90% of anti-synthetase syndrome patients have ILD which is the leading cause of death",
-      "Do not use ice pack test result to diagnose MG without AChR/MuSK antibodies — ice pack test is non-specific and can be positive in any cause of ptosis"
-    ],
-    "optimal_actions": [],
+    "primary_diagnosis": "Anti-synthetase syndrome (anti-Jo-1 inflammatory myopathy ± interstitial lung disease) — misattributed to peripheral neuropathy",
+    "icd_code": "M33.02",
     "differential": [
       {
-        "diagnosis": "Peripheral neuropathy (CIDP or other)",
-        "likelihood": "very_low",
-        "key_features": "Normal NCS; myopathic not neuropathic EMG; weakness is proximal predominant (deltoids, hip flexors) not distal; no sensory loss; CK markedly elevated (neuropathy does not elevate CK significantly)"
+        "diagnosis": "Statin-associated immune-mediated necrotizing myopathy (IMNM, anti-HMGCR)",
+        "likelihood": "high",
+        "key_features": "Recent atorvastatin; persists despite statin discontinuation; anti-HMGCR positive.",
+        "icd_code": "M33.20"
       },
       {
-        "diagnosis": "Statin-associated immune-mediated necrotizing myopathy (IMNM)",
-        "likelihood": "low",
-        "key_features": "Anti-HMGCR negative; anti-SRP negative; statin was only 4 months (short duration); biopsy shows inflammatory cells invading fibers (PM pattern) not pure necrosis (IMNM pattern)"
+        "diagnosis": "Dermatomyositis",
+        "likelihood": "moderate",
+        "key_features": "Heliotrope rash, Gottron papules, skin features absent here; anti-Mi-2 / anti-TIF1γ.",
+        "icd_code": "M33.10"
+      },
+      {
+        "diagnosis": "Polymyositis",
+        "likelihood": "moderate",
+        "key_features": "Symmetric proximal weakness, elevated CK, endomysial CD8 infiltrate.",
+        "icd_code": "M33.20"
       },
       {
         "diagnosis": "Myasthenia gravis",
         "likelihood": "low",
-        "key_features": "Ptosis from levator myositis not NMJ dysfunction; AChR/MuSK antibodies negative; no decremental response on RNS; ice pack test can be false positive in non-MG ptosis"
+        "key_features": "Proximal weakness can mimic; need AChR antibodies and RNS/SFEMG; bulbar/ocular features here are absent.",
+        "icd_code": "G70.00"
       },
       {
-        "diagnosis": "Dermatomyositis",
-        "likelihood": "low",
-        "key_features": "No classic skin rash (Gottron's papules, heliotrope, V-sign, shawl sign — all absent); no perifascicular atrophy on biopsy; anti-Mi-2 and anti-TIF1-gamma negative; anti-Jo-1 positive (more typical of PM/antisynthetase)"
+        "diagnosis": "CIDP or peripheral neuropathy",
+        "likelihood": "very_low",
+        "key_features": "EMG showed myopathic, not neurogenic, MUPs; sensory exam intact — this is NOT peripheral neuropathy.",
+        "icd_code": "G61.81"
       }
     ],
-    "key_reasoning_points": [
-      "DIAGNOSTIC PUZZLE: Three compounding misdirections — (1) non-physician EMG misread myopathic MUPs as neuropathic, (2) atorvastatin history led to statin myopathy attribution, (3) ptosis/dysphagia raised false MG concern",
-      "CRITICAL CLUE IGNORED: CK 4,800 U/L (18x ULN) — peripheral neuropathy does NOT elevate CK; only myopathy or motor neuron disease elevates CK significantly",
-      "PROXIMAL WEAKNESS DISTRIBUTION: Deltoids 3+/5, hip flexors 3+/5 with intact sensation = myopathy; typical neuropathy has distal > proximal and sensory + motor",
-      "EMG PITFALL: Myopathic MUPs (small, short, polyphasic) can be mistaken for neuropathic by inexperienced readers; expert physician interpretation is essential",
-      "ANTI-JO-1 CLINICAL SYNDROME: Not just myositis — includes ILD (90%), Raynaud's, inflammatory arthritis, mechanic's hands; must evaluate all components",
-      "ICE PACK TEST: Positive in any ptosis (cold improves acetylcholinesterase activity) — non-specific for MG; AChR antibody and RNS are the definitive tests",
-      "STATIN TRAP: 4 months of atorvastatin + elevated CK = statin myopathy assumption; anti-HMGCR must be checked; in this case, statin was coincidental (pre-existing anti-Jo-1 syndrome)"
+    "optimal_actions": [
+      {
+        "step": 1,
+        "action": "Order broad neuropathy labs (CBC, CMP, HbA1c, B12 + MMA, TSH, SPEP/IFE, urinalysis)",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Identify reversible/treatable etiologies (diabetes, B12 deficiency, monoclonal gammopathy, thyroid disease)",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "HbA1c",
+            "B12",
+            "MMA",
+            "TSH",
+            "SPEP",
+            "IFE",
+            "UA"
+          ]
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 2,
+        "action": "Order EMG/NCS to characterize axonal vs demyelinating pattern and distribution",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Length-dependent axonal vs demyelinating vs multifocal pattern; severity and distribution",
+        "category": "required",
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 3,
+        "action": "Search literature for DSP evaluation guidelines and etiology-specific recommendations",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirm AAN 2009 DSP workup, etiology-specific evaluations",
+        "category": "required",
+        "tool_parameters": {
+          "query": "distal symmetric polyneuropathy evaluation AAN 2009"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 4,
+        "action": "Review medications for neurotoxic agents and check interactions for symptomatic therapy",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identify potentially neurotoxic drugs (chemotherapy, metronidazole, megadose B6, nitrofurantoin); guide neuropathic-pain pharmacotherapy",
+        "category": "required",
+        "tool_parameters": {
+          "medications": []
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 5,
+        "action": "CK, myositis-specific antibody panel (anti-Jo-1, anti-PL-7, anti-PL-12, anti-EJ, anti-OJ, anti-Mi-2, anti-SRP, anti-HMGCR, anti-MDA5, anti-TIF1γ), aldolase, LDH",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Elevated CK + anti-Jo-1 (or other anti-synthetase) supports anti-synthetase syndrome",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CK",
+            "aldolase",
+            "LDH",
+            "anti_Jo1",
+            "myositis_panel"
+          ]
+        },
+        "citation": "[Said_2007]",
+        "guideline_source": "Said 2007 vasculitic neuropathy"
+      },
+      {
+        "step": 6,
+        "action": "Muscle biopsy (deltoid or vastus lateralis) for inflammatory myopathy",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Endomysial inflammation, perifascicular atrophy supports inflammatory myopathy / anti-synthetase",
+        "category": "required",
+        "tool_parameters": {
+          "test_type": "muscle_biopsy"
+        },
+        "citation": "[Said_2007]",
+        "guideline_source": "Said 2007 vasculitic neuropathy"
+      },
+      {
+        "step": 7,
+        "action": "Pulmonary workup for interstitial lung disease (chest HRCT, PFTs) given anti-synthetase association",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Identify NSIP/OP imaging pattern and restrictive PFTs supporting anti-synthetase syndrome",
+        "category": "recommended",
+        "tool_parameters": {
+          "query": "anti-synthetase syndrome interstitial lung disease HRCT"
+        },
+        "citation": "[Said_2007]",
+        "guideline_source": "Said 2007 vasculitic neuropathy"
+      }
     ],
-    "red_herrings": [],
-    "icd_code": "M33.02",
-    "useless_tools": [],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is a cortical test and is non-contributory in peripheral nerve disease.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head/brain CT has no role in peripheral neuropathy evaluation.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is not indicated in typical distal symmetric polyneuropathy without CNS signs.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {},
+        "rationale": "Advanced cerebral imaging (PET/MRA/MRV/perfusion) has no routine role in peripheral neuropathy.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated unless cardiac amyloid is suspected.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated unless there is syncope or symptomatic dysautonomia with arrhythmia concern.",
+        "citation": "[AAN_2009]"
+      }
+    ],
     "harmful_tools": [],
-    "sequence_constraints": []
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "order_specialized_test",
+        "reason": "Tier the workup — basic labs first, then targeted electrodiagnostic and tissue studies.",
+        "citation": "[AAN_2009]",
+        "severity": "soft"
+      }
+    ],
+    "critical_actions": [
+      "Recognize this is NOT a peripheral neuropathy — EMG shows myopathic motor unit potentials and sensory exam is intact",
+      "Send CK, aldolase, myositis-specific antibody panel (anti-Jo-1, anti-HMGCR, etc.)",
+      "Muscle biopsy for definitive diagnosis",
+      "Screen for interstitial lung disease (chest HRCT, PFTs)",
+      "Initiate corticosteroids ± methotrexate / rituximab once diagnosis confirmed"
+    ],
+    "contraindicated_actions": [
+      "Do not treat as peripheral neuropathy — diagnosis is muscle disease",
+      "Do not restart statin if anti-HMGCR positive (IMNM)"
+    ],
+    "key_reasoning_points": [
+      "Short-duration low-amplitude polyphasic MUPs with early recruitment = MYOPATHIC pattern, not neurogenic",
+      "Normal NCS + intact sensory exam excludes peripheral neuropathy",
+      "Anti-synthetase syndrome (especially anti-Jo-1) features myositis + ILD + Raynaud's + mechanic's hands + arthritis"
+    ],
+    "red_herrings": [
+      {
+        "data_point": "Case is labeled 'peripheral neuropathy' and presented as such",
+        "location": "history",
+        "field_path": "case_id",
+        "intended_effect": "Anchor on neuropathy workup",
+        "correct_interpretation": "EMG shows myopathic units; the working diagnosis is myositis, not neuropathy."
+      },
+      {
+        "data_point": "Recent atorvastatin then self-discontinuation",
+        "location": "medications",
+        "field_path": "patient.clinical_history.medications",
+        "intended_effect": "Anchor on statin myalgia / simple myopathy",
+        "correct_interpretation": "Statin discontinuation should resolve simple statin myopathy; persistence suggests autoimmune (anti-HMGCR IMNM) or anti-synthetase syndrome."
+      }
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -535,6 +700,18 @@
       "cardiac_monitoring": "normal",
       "literature_search": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:PERI-NEURO",
+    "difficulty_rationale": "6 required tools, 2 red herrings; classification reflects clinical complexity per PERI-NEURO pack section 6 (M/S/P/R variants).",
+    "case_body_concerns": [
+      "Case file categorized as 'peripheral neuropathy' but the true diagnosis is inflammatory myopathy — kept as part of mimic ('P' progressive/atypical) variant; consider reclassifying the condition tag for downstream modeling."
+    ],
+    "citation_gap": [],
+    "vocab_gap": [
+      "Chest HRCT and PFTs are not in the advanced_imaging vocabulary; addressed via search_medical_literature placeholder in optimal_actions[6]."
+    ]
   }
 }

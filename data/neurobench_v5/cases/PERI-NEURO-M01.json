@@ -649,58 +649,224 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Chronic Inflammatory Demyelinating Polyneuropathy (CIDP) with background prediabetic neuropathy",
-    "critical_actions": [
-      "Check serum IgA before IVIG — IgA deficiency with anti-IgA antibodies is a contraindication",
-      "Perform LP for CSF protein to confirm CIDP diagnosis before long-term immunotherapy",
-      "Check anti-NF155/CNTN1 antibodies — nodopathy variants may not respond to IVIG",
-      "Initiate IVIG 2 g/kg induction — first-line evidence-based treatment for CIDP",
-      "Do not attribute all findings to prediabetes — demyelinating pattern requires separate explanation"
-    ],
-    "contraindicated_actions": [
-      "Do not start IVIG without checking serum IgA (risk of anaphylaxis in IgA deficiency)",
-      "Do not dismiss as pure diabetic neuropathy — demyelinating velocities and CSF protein require CIDP workup",
-      "Do not use rituximab as first-line — anti-MAG neuropathy (primary rituximab indication) has been excluded",
-      "Do not prescribe only symptomatic gabapentin/duloxetine without addressing underlying treatable CIDP"
-    ],
-    "optimal_actions": [],
+    "primary_diagnosis": "Chronic inflammatory demyelinating polyradiculoneuropathy (CIDP), with background prediabetes",
+    "icd_code": "G61.81",
     "differential": [
       {
-        "diagnosis": "Diabetic polyneuropathy (primary diagnosis)",
-        "likelihood": "low",
-        "key_features": "HbA1c only 6.1% prediabetic; diabetic neuropathy would show length-dependent axonal pattern (amplitude loss > velocity slowing); demyelinating velocities and CSF dissociation not explained by prediabetes"
+        "diagnosis": "Anti-MAG IgM MGUS neuropathy",
+        "likelihood": "moderate",
+        "key_features": "Demyelinating pattern overlaps; would need IgM paraprotein and anti-MAG antibody — SPEP here is negative without M-spike and IgM in normal range.",
+        "icd_code": "G61.81"
       },
       {
-        "diagnosis": "Anti-MAG neuropathy (IgM MGUS)",
-        "likelihood": "low",
-        "key_features": "No M-spike on SPEP; anti-MAG antibody not tested here but anti-sulfatide only weakly positive; no IgM paraprotein; terminal slowing pattern not present"
+        "diagnosis": "Anti-NF155/CNTN1 nodopathy (CIDP variant)",
+        "likelihood": "moderate",
+        "key_features": "Important to exclude before IVIG — IgG4 nodopathies are typically IVIG-refractory and respond to rituximab.",
+        "icd_code": "G61.81"
       },
       {
-        "diagnosis": "Hereditary neuropathy (CMT type 1)",
+        "diagnosis": "Diabetic / prediabetic polyneuropathy",
         "likelihood": "low",
-        "key_features": "Family history of paternal aunt with nerve problem is a red herring; CMT1 shows very slow uniform velocities <38 m/s throughout; onset age 55 is late; PMP22 on nerve biopsy was normal; CMT does not fluctuate"
+        "key_features": "HbA1c 6.1% (prediabetes) is too mild to explain proximal weakness, demyelinating velocities, or CSF protein elevation.",
+        "icd_code": "E11.40"
+      },
+      {
+        "diagnosis": "Hereditary demyelinating neuropathy (CMT1A)",
+        "likelihood": "low",
+        "key_features": "Late adult onset, fluctuating course, and absence of pes cavus / hammer toes argue against; CMT1 would show uniformly slow velocities without conduction block but family history is vague.",
+        "icd_code": "G60.0"
       },
       {
         "diagnosis": "Vasculitic neuropathy",
         "likelihood": "low",
-        "key_features": "ESR mildly elevated 32 mm/hr but ANCA/ANA negative; vasculitic neuropathy typically asymmetric multifocal (mononeuritis multiplex); nerve biopsy showed no vasculitis"
+        "key_features": "Mildly elevated ESR but negative ANCA/ANA and a symmetric (not multifocal) pattern; nerve biopsy showed no vasculitis.",
+        "icd_code": "G63"
       }
     ],
-    "key_reasoning_points": [
-      "MODERATE DIFFICULTY: Prediabetes (HbA1c 6.1%) creates diagnostic anchoring trap — easy to attribute to diabetes and miss treatable CIDP",
-      "Key discriminator: NCS velocities are too slow for pure axonal diabetic neuropathy (which reduces amplitudes more than velocities)",
-      "Proximal muscle EMG involvement (vastus lateralis) is a red flag for pure distal diabetic neuropathy",
-      "CSF albumino-cytologic dissociation (protein 94 mg/dL, 2 WBC) clinches CIDP diagnosis",
-      "Fluctuating symptom course is classic for CIDP (relapsing-remitting pattern)",
-      "Weakly positive anti-sulfatide IgM (1:100) is a distractor — clinically significant anti-sulfatide neuropathy requires high titers with IgM paraprotein",
-      "IVIG is first-line for CIDP; checking IgA first is mandatory safety step",
-      "Anti-NF155+ nodopathy variant is typically refractory to IVIG — important to exclude"
+    "optimal_actions": [
+      {
+        "step": 1,
+        "action": "Order broad neuropathy labs (CBC, CMP, HbA1c, B12 + MMA, TSH, SPEP/IFE, urinalysis)",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Identify reversible/treatable etiologies (diabetes, B12 deficiency, monoclonal gammopathy, thyroid disease)",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "HbA1c",
+            "B12",
+            "MMA",
+            "TSH",
+            "SPEP",
+            "IFE",
+            "UA"
+          ]
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 2,
+        "action": "Order EMG/NCS to characterize axonal vs demyelinating pattern and distribution",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Length-dependent axonal vs demyelinating vs multifocal pattern; severity and distribution",
+        "category": "required",
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 3,
+        "action": "Search literature for DSP evaluation guidelines and etiology-specific recommendations",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirm AAN 2009 DSP workup, etiology-specific evaluations",
+        "category": "required",
+        "tool_parameters": {
+          "query": "distal symmetric polyneuropathy evaluation AAN 2009"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 4,
+        "action": "Review medications for neurotoxic agents and check interactions for symptomatic therapy",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identify potentially neurotoxic drugs (chemotherapy, metronidazole, megadose B6, nitrofurantoin); guide neuropathic-pain pharmacotherapy",
+        "category": "required",
+        "tool_parameters": {
+          "medications": []
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 5,
+        "action": "Lumbar puncture for CSF when CIDP suspected",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Albuminocytologic dissociation (elevated protein, normal cell count) supports CIDP",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Joint_Task_Force_2010_CIDP]",
+        "guideline_source": "EFNS/PNS 2010 CIDP guideline"
+      },
+      {
+        "step": 6,
+        "action": "Pre-IVIG safety labs (serum IgA, IgG subclasses, anti-NF155/CNTN1 nodal antibodies)",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Normal IgA (rules out anaphylaxis risk); nodal antibodies negative (anti-NF155+ CIDP responds poorly to IVIG)",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "IgA",
+            "IgG_subclasses",
+            "anti_NF155",
+            "anti_CNTN1"
+          ]
+        },
+        "citation": "[Joint_Task_Force_2010_CIDP]",
+        "guideline_source": "EFNS/PNS 2010 CIDP guideline"
+      }
     ],
-    "red_herrings": [],
-    "icd_code": "G61.81",
-    "useless_tools": [],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is a cortical test and is non-contributory in peripheral nerve disease.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head/brain CT has no role in peripheral neuropathy evaluation.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is not indicated in typical distal symmetric polyneuropathy without CNS signs.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {},
+        "rationale": "Advanced cerebral imaging (PET/MRA/MRV/perfusion) has no routine role in peripheral neuropathy.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated unless cardiac amyloid is suspected.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated unless there is syncope or symptomatic dysautonomia with arrhythmia concern.",
+        "citation": "[AAN_2009]"
+      }
+    ],
     "harmful_tools": [],
-    "sequence_constraints": []
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "order_specialized_test",
+        "reason": "Tier the workup — basic labs first, then targeted electrodiagnostic and tissue studies.",
+        "citation": "[AAN_2009]",
+        "severity": "soft"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "analyze_csf",
+        "reason": "Confirm normal IgA and coagulation before IVIG and LP respectively.",
+        "citation": "[Joint_Task_Force_2010_CIDP]",
+        "severity": "soft"
+      }
+    ],
+    "critical_actions": [
+      "Recognize that demyelinating NCS pattern and proximal weakness are not explained by prediabetes",
+      "Obtain CSF to demonstrate albuminocytologic dissociation supporting CIDP",
+      "Check serum IgA before any IVIG (anaphylaxis risk with selective IgA deficiency)",
+      "Check anti-NF155 / anti-CNTN1 nodal antibodies — IgG4 nodopathies are typically IVIG-refractory",
+      "Plan IVIG 2 g/kg induction once safety screen is clear (first-line for CIDP)"
+    ],
+    "contraindicated_actions": [
+      "Do not attribute the picture to prediabetic neuropathy and stop the workup",
+      "Do not start IVIG without checking serum IgA",
+      "Do not prescribe gabapentin/duloxetine as the only intervention — symptomatic therapy alone misses a treatable demyelinating disease"
+    ],
+    "key_reasoning_points": [
+      "Demyelinating velocities + prolonged F-waves + proximal EMG changes do not fit a length-dependent diabetic axonal pattern",
+      "CSF protein 94 mg/dL with 2 WBC = albuminocytologic dissociation, classic for CIDP",
+      "Fluctuating ('relapsing-remitting') course is a defining feature of CIDP",
+      "Weakly positive anti-sulfatide IgM (1:100) is a distractor — clinically significant anti-sulfatide neuropathy needs high titers and an IgM paraprotein",
+      "IVIG is first-line; pre-treatment safety includes IgA and screening for IgG4 nodopathies"
+    ],
+    "red_herrings": [
+      {
+        "data_point": "Prediabetes (HbA1c 6.1%)",
+        "location": "history",
+        "field_path": "patient.clinical_history.past_medical_history[0]",
+        "intended_effect": "Anchor on diabetes as cause and stop the workup",
+        "correct_interpretation": "Prediabetes does not produce demyelinating velocities, CSF protein elevation, or proximal weakness; CIDP must be pursued."
+      },
+      {
+        "data_point": "Paternal aunt with unspecified 'nerve problem'",
+        "location": "family_history",
+        "field_path": "patient.clinical_history.family_history[0]",
+        "intended_effect": "Bias toward hereditary CMT diagnosis",
+        "correct_interpretation": "Vague family history without pes cavus / hammer toes / childhood onset is non-specific; CMT1 does not fluctuate."
+      },
+      {
+        "data_point": "Weakly positive anti-sulfatide IgM (1:100)",
+        "location": "labs",
+        "field_path": "initial_tool_outputs.labs.panels.Anti-Sulfatide Antibodies[0]",
+        "intended_effect": "Suggest anti-sulfatide IgM neuropathy as primary diagnosis",
+        "correct_interpretation": "Clinically meaningful anti-sulfatide neuropathy requires high titers and an IgM paraprotein, neither present here."
+      }
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -712,6 +878,14 @@
       "advanced_imaging": "normal",
       "literature_search": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:PERI-NEURO",
+    "difficulty_rationale": "6 required tools, 3 red herrings; classification reflects clinical complexity per PERI-NEURO pack section 6 (M/S/P/R variants).",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

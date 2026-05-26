@@ -83,118 +83,130 @@
     "extremities": "No edema"
   },
   "ground_truth": {
-    "primary_diagnosis": "Migraine with visual and somatosensory aura (G43.1); likely genetically predisposed migraine unmasked by sertraline; sertraline-sumatriptan co-administration safe",
-    "primary_diagnosis_icd": "G43.1",
+    "primary_diagnosis": "Migraine with visual and somatosensory aura (ICHD-3 1.2.1); likely genetically predisposed migraine unmasked by sertraline; sertraline-sumatriptan co-administration acceptable with counselling",
+    "icd_code": "G43.109",
     "differential": [
       {
-        "diagnosis": "Serotonin syndrome from sertraline + sumatriptan combination",
+        "diagnosis": "SSRI-induced serotonin syndrome (with triptan)",
         "likelihood": "very_low",
-        "key_features": "No neuromuscular hyperactivity, no cognitive changes between episodes, no autonomic instability; FDA warning based on theoretical mechanism; large epidemiological studies show no clinical risk at standard doses"
+        "key_features": "Clinical syndrome of hyperthermia, hyperreflexia, clonus, autonomic instability — none present; risk of triptan + SSRI is real but clinically low [Holland_2012]",
+        "icd_code": null
       },
       {
-        "diagnosis": "SSRI-induced migraine (sertraline triggering)",
-        "likelihood": "moderate",
-        "key_features": "Temporal coincidence with sertraline start; however, prior 2-3 years of brief monocular flashes suggests pre-existing migraine predisposition; family history (father + sister); sertraline likely unmasked rather than caused migraine"
+        "diagnosis": "Transient ischemic attack",
+        "likelihood": "very_low",
+        "key_features": "Gradual sequential aura over minutes argues against TIA",
+        "icd_code": "G45.9"
       },
       {
-        "diagnosis": "Temporal lobe seizure with gustatory/sensory aura",
+        "diagnosis": "Focal seizure (sensory + visual phenomena)",
         "likelihood": "very_low",
-        "key_features": "Perioral tingling could represent temporal lobe ictal activity; however, aura lasts 20-25 minutes (too long for seizure); EEG no temporal epileptiform activity; followed by severe headache (migraine)"
+        "key_features": "Aura duration too long for seizure propagation",
+        "icd_code": "G40.109"
+      },
+      {
+        "diagnosis": "Idiopathic intracranial hypertension",
+        "likelihood": "very_low",
+        "key_features": "No papilledema, no diurnal pattern",
+        "icd_code": "G93.2"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI with DWI — exclude structural cause and any sertraline-related neurological effects",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Normal except non-specific WMH; no DWI restriction; normal MRA",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
         "category": "required",
         "tool_parameters": {
-          "contrast": true,
-          "sequences": [
-            "DWI",
-            "FLAIR",
-            "T1+Gd",
-            "MRA"
-          ]
-        }
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "Assess sertraline-sumatriptan interaction — reassure regarding serotonin syndrome at standard doses",
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "No serotonin syndrome risk at standard doses; FDA warning overstated; safe to continue both",
+        "expected_finding": "Sertraline + sumatriptan: theoretical serotonin syndrome risk acceptable in practice (FDA warning, clinically rare); counsel patient; consider venlafaxine or amitriptyline as alternative for preventive if needed",
         "category": "required",
         "tool_parameters": {
-          "drug_1": "sertraline",
-          "drug_2": "sumatriptan"
-        }
+          "context": "sertraline_sumatriptan_serotonin_syndrome"
+        },
+        "citation": "[Holland_2012]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 3,
-        "action": "Connect prior brief monocular visual flashes to early incomplete visual aura — not retinal disease",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Normal ophthalmology — prior flashes represent early incomplete visual aura",
+        "action": "Brain MRI to exclude structural cause given new-onset aura within 4 episodes",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Normal MRI; no structural lesion",
         "category": "recommended",
         "tool_parameters": {
-          "test_type": "ophthalmology_assessment"
-        }
-      },
-      {
-        "step": 4,
-        "action": "Do not stop sertraline — depression treatment essential; sertraline likely unmasked genetic migraine predisposition",
-        "tool_name": null,
-        "expected_finding": "Sertraline critical for depression; migraine manageable alongside antidepressant",
-        "category": "required",
-        "tool_parameters": {}
-      },
-      {
-        "step": 5,
-        "action": "Consider preventive therapy if attacks continue — topiramate or erenumab compatible with sertraline",
-        "tool_name": null,
-        "expected_finding": "4 episodes in 3 months borderline for preventive; address if frequency increases",
-        "category": "recommended",
-        "tool_parameters": {}
+          "contrast": false,
+          "sequences": [
+            "DWI",
+            "FLAIR",
+            "T2",
+            "SWI",
+            "MRA"
+          ]
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis — neither present here",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Routine transthoracic / bubble echocardiogram (PFO screening) is NOT indicated in migraine with aura; PFO-migraine association is controversial and PFO closure does not reduce migraine [Charles_2017]",
+        "citation": "[Charles_2017]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated in typical migraine with aura — no role unless cardioembolic stroke is on the differential",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "Reassure patient: sumatriptan + sertraline is safe at standard doses; FDA warning is overstated based on large study evidence",
-      "Do not stop sertraline — depression management is essential; migraine is manageable alongside",
-      "Identify prior brief monocular flashes as likely early incomplete visual aura — family history confirms migraine predisposition pre-dated sertraline",
-      "Perioral tingling during aura = somatosensory face representation in parietal cortex — consistent with CSD spreading from occipital to parietal cortex"
+      "Confirm ICHD-3 1.2 criteria across the 4 episodes",
+      "Counsel that sertraline + triptan co-administration carries a theoretical serotonin-syndrome risk but is clinically used [Holland_2012]",
+      "Brain MRI as a cautious step in new-onset aura",
+      "Document symptom diary and consider preventive options"
     ],
     "contraindicated_actions": [
-      "Do not stop sertraline — clinical depression treatment takes priority",
-      "Do not restrict sumatriptan based on FDA serotonin syndrome warning — clinical evidence does not support significant risk at standard doses",
-      "Do not reinstate combined OCP if contraception is needed in future"
+      "Do not co-administer triptans with ergotamines",
+      "Do not start combined oestrogen-progestogen contraception"
     ],
     "key_reasoning_points": [
-      "FDA warning on serotonin syndrome with triptan + SSRI combination is based on theoretical mechanism and case reports; large pharmacoepidemiological studies show no clinically significant risk at standard doses",
-      "Prior 2-3 years of brief monocular visual flashes most likely represent incomplete visual aura in a genetically predisposed woman (father + sister with migraine) — ophthalmology normal",
-      "Sertraline may have lowered CSD threshold in a genetically predisposed individual, unmasking full-blown migraine with aura",
-      "Perioral tingling during aura = CSD spreading from occipital cortex to parietal somatosensory cortex (face representation)",
-      "Moderate difficulty: drug interaction awareness (FDA warning vs actual evidence), recognising incomplete prior aura history"
+      "SSRI initiation can unmask underlying migraine in a genetically predisposed patient",
+      "Triptan + SSRI clinical serotonin-syndrome events are rare; FDA warning persists but most headache specialists co-prescribe with counselling [Holland_2012]"
     ],
     "red_herrings": [
       {
-        "data_point": "Sertraline + sumatriptan combination — serotonin syndrome concern",
+        "data_point": "SSRI initiation preceding aura onset",
         "location": "patient.history_present_illness",
-        "intended_effect": "FDA issued a formal advisory warning about serotonin syndrome with this combination; a pharmacist patient is acutely aware of this",
-        "correct_interpretation": "FDA warning is based on theoretical mechanism; large pharmacoepidemiological studies show no significant clinical risk at standard doses; American Headache Society does not recommend against co-use; clinical assessment shows no serotonin syndrome features",
-        "field_path": ""
-      },
-      {
-        "data_point": "Temporal coincidence of sertraline initiation and migraine onset",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Episodes started 2 weeks after sertraline — causal attribution seems straightforward",
-        "correct_interpretation": "Prior 2-3 year history of brief monocular flashes (likely incomplete visual aura) pre-dates sertraline; family history (father + sister) confirms genetic predisposition; sertraline likely lowered CSD threshold in a predisposed individual, unmasking rather than causing migraine",
-        "field_path": ""
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "May anchor on SSRI as cause or contraindicate triptan",
+        "correct_interpretation": "SSRI may unmask migraine; triptans can be co-prescribed with counselling [Holland_2012]"
       }
-    ],
-    "icd_code": "G43.1",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -217,7 +229,17 @@
       "ct": "normal",
       "echo": "normal",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Moderate: SSRI-triptan interaction counselling and new-onset MRI workup",
+    "case_body_concerns": [
+      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide §1): ['analyze_ecg', 'analyze_eeg', 'interpret_labs']"
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "initial_tool_outputs": {
     "mri": {

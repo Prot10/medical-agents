@@ -709,175 +709,210 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Parkinson's disease",
+    "primary_diagnosis": "Parkinson's disease (idiopathic)",
     "icd_code": "G20",
-    "red_herrings": [
-      {
-        "data_point": "Prior diagnosis of 'essential tremor' by primary care physician 3 years ago, with family history of ET in the father",
-        "location": "past_medical_history, family_history, and history_present_illness",
-        "intended_effect": "Creates diagnostic anchoring toward the pre-existing ET label, potentially causing the agent to interpret the new resting tremor and bradykinesia as ET progression rather than recognizing a new superimposed neurodegenerative condition",
-        "correct_interpretation": "The new right-sided resting tremor (4-5 Hz, diminishes with action), progressive bradykinesia, cogwheel rigidity, and micrographia are not features of ET. The prior ET diagnosis describes bilateral postural tremor — the emergence of a distinct resting tremor with hypokinesia signals PD development, possibly in a patient who did have mild ET beforehand",
-        "field_path": ""
-      },
-      {
-        "data_point": "Propranolol 40 mg twice daily prescribed for ET, which initially provided partial relief",
-        "location": "medications and history_present_illness",
-        "intended_effect": "The partial response to propranolol may reinforce the ET diagnosis, as beta-blockers are effective for ET; agent may attribute ongoing tremor to inadequate beta-blockade rather than a fundamentally different tremor mechanism",
-        "correct_interpretation": "Beta-blockers can modestly suppress any tremor including PD-related rest and postural tremor, producing partial improvement that misleadingly supports the ET label. The characteristic resting tremor, progressive decrement on repetitive movements, and presence of premotor PD features (RBD, hyposmia, constipation) are not explained by ET and should prompt DaTscan evaluation",
-        "field_path": ""
-      }
-    ],
     "differential": [
       {
-        "diagnosis": "Essential tremor",
-        "likelihood": "moderate",
-        "key_features": "Prior diagnosis of bilateral postural tremor with family history; propranolol partially effective initially; but progressive asymmetric resting tremor, bradykinesia, and rigidity are not features of ET"
+        "diagnosis": "Essential tremor (prior diagnosis)",
+        "likelihood": "high",
+        "key_features": "Past ET label may have been incorrect or coexist; ET-PD overlap is recognized — current rest tremor with bradykinesia and rigidity now fits PD"
       },
       {
-        "diagnosis": "Essential tremor with concurrent Parkinson's disease (ET-PD overlap)",
+        "diagnosis": "Drug-induced parkinsonism",
         "likelihood": "low",
-        "key_features": "Initial presentation consistent with ET evolving to include parkinsonian features; may represent both conditions coexisting"
+        "key_features": "No documented DA antagonist exposure"
       },
       {
-        "diagnosis": "Multiple system atrophy (MSA)",
+        "diagnosis": "Vascular parkinsonism",
         "likelihood": "low",
-        "key_features": "Constipation and hyperhidrosis from source case could raise concern for autonomic involvement, but no significant orthostatic hypotension, no cerebellar signs, positive levodopa response, and normal autonomic testing argue against MSA"
+        "key_features": "Asymmetric upper-limb onset with rest tremor argues against pure vascular phenotype"
       },
       {
-        "diagnosis": "Progressive supranuclear palsy (PSP)",
-        "likelihood": "low",
-        "key_features": "No vertical gaze palsy, no early falls, asymmetric limb involvement rather than axial-predominant, and positive levodopa response argue against PSP"
+        "diagnosis": "Multiple system atrophy",
+        "likelihood": "very_low",
+        "key_features": "No early severe dysautonomia or cerebellar features"
       },
       {
-        "diagnosis": "Cervical spondylotic myelopathy contributing to motor symptoms",
-        "likelihood": "low",
-        "key_features": "Known C5-C6 spondylosis with mild right hand wasting could confuse the picture, but MRI shows no cord signal abnormality, sensory exam normal, and reflexes are normal without upper motor neuron signs"
+        "diagnosis": "Functional tremor",
+        "likelihood": "very_low",
+        "key_features": "No distractibility or entrainment described"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain detailed history focusing on tremor characteristics (rest vs. action), timeline of symptom progression, and non-motor features (anosmia, constipation, RBD, depression)",
-        "tool_name": null,
-        "expected_finding": "Progressive right-sided resting tremor with bradykinesia distinct from prior bilateral postural tremor; premotor features including hyposmia, constipation, and dream enactment behavior",
-        "category": "required"
-      },
-      {
-        "step": 2,
-        "action": "Perform comprehensive neurological examination with focus on asymmetry of motor signs, tremor at rest vs. with posture/action, and signs distinguishing PD from ET",
-        "tool_name": null,
-        "expected_finding": "Asymmetric cogwheel rigidity (right > left), right-sided resting tremor elicited with distraction, progressive micrographia, hypomimia, reduced right arm swing, bradykinesia on finger tapping",
-        "category": "required"
-      },
-      {
-        "step": 3,
-        "action": "Order brain MRI to exclude structural causes of parkinsonism and evaluate for atypical parkinsonian features",
+        "action": "Obtain brain MRI to exclude structural/vascular mimics",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Normal brain MRI without features of MSA, PSP, or NPH; incidental cervical spondylosis without myelopathy",
+        "expected_finding": "No vascular or structural cause",
         "category": "required",
         "tool_parameters": {
           "protocol": "standard",
-          "contrast": false
-        }
+          "contrast": false,
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "SWI"
+          ]
+        },
+        "citation": "[Schwarz_2014]",
+        "guideline_source": "Schwarz_2014"
       },
       {
-        "step": 4,
-        "action": "Order routine laboratory studies including CBC, BMP, thyroid function, vitamin B12, ceruloplasmin, and RPR",
+        "step": 2,
+        "action": "Order baseline labs (CBC, CMP, TSH, B12, RPR)",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal except mildly elevated TSH (subclinical hypothyroidism — confounding factor) and low vitamin D; no metabolic cause of parkinsonism",
+        "expected_finding": "No metabolic or thyroid mimic",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
-            "thyroid",
+            "CMP",
+            "TSH",
             "B12",
             "RPR"
           ]
-        }
+        },
+        "citation": "[Postuma_2015]",
+        "guideline_source": "Postuma_2015"
+      },
+      {
+        "step": 3,
+        "action": "Check drug interactions before starting dopaminergic therapy",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "No DA antagonists; safe levodopa initiation profile",
+        "category": "required",
+        "tool_parameters": {
+          "proposed_medication": "carbidopa-levodopa"
+        },
+        "citation": "[Postuma_2015]",
+        "guideline_source": "Postuma_2015"
+      },
+      {
+        "step": 4,
+        "action": "Search medical literature on distinguishing ET from PD",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Rest tremor, bradykinesia and rigidity differentiate PD; DaTscan abnormal in PD and normal in ET",
+        "category": "required",
+        "tool_parameters": {
+          "query": "differentiating essential tremor from Parkinson disease DaTscan"
+        },
+        "citation": "[Marshall_2009]",
+        "guideline_source": "Marshall_2009"
       },
       {
         "step": 5,
-        "action": "Order DaTscan to differentiate Parkinson's disease from essential tremor given diagnostic uncertainty",
+        "action": "Order DaTscan to resolve ET vs PD given diagnostic uncertainty",
         "tool_name": "order_advanced_imaging",
-        "expected_finding": "Abnormal DaTscan showing asymmetric reduced putaminal DAT uptake, confirming neurodegenerative parkinsonism and distinguishing from essential tremor",
+        "expected_finding": "Abnormal asymmetric striatal DAT binding confirms PD; normal scan would support pure ET",
         "category": "required",
         "tool_parameters": {
-          "imaging_type": "DaTscan"
-        }
+          "modality": "DaTscan"
+        },
+        "citation": "[Marshall_2009]",
+        "guideline_source": "Marshall_2009"
       },
       {
         "step": 6,
-        "action": "Recognize the significance of non-motor prodromal features (RBD, hyposmia, constipation, depression) as supporting evidence for synucleinopathy",
-        "tool_name": null,
-        "expected_finding": "Cluster of non-motor features predating motor symptoms is characteristic of prodromal PD",
-        "category": "required"
+        "action": "Order neuropsychological battery as baseline",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline cognitive screen for future PD-MCI surveillance",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Tolosa_2021]",
+        "guideline_source": "Tolosa_2021"
       },
       {
         "step": 7,
-        "action": "Order polysomnography to confirm clinically suspected REM sleep behavior disorder",
+        "action": "Order polysomnography only if dream-enactment behaviors reported",
         "tool_name": "order_specialized_test",
-        "expected_finding": "Confirmed RBD with REM without atonia and dream enactment behavior, strongly supporting synucleinopathy diagnosis",
-        "category": "recommended",
+        "expected_finding": "REM without atonia would support synucleinopathy",
+        "category": "optional",
         "tool_parameters": {
           "test_type": "polysomnography"
-        }
+        },
+        "citation": "[Postuma_2019]",
+        "guideline_source": "Postuma_2019"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG has no role in diagnosing typical PD",
+        "citation": "[Postuma_2015]"
       },
       {
-        "step": 8,
-        "action": "Consider levodopa challenge test to confirm dopaminergic responsiveness",
-        "tool_name": "interpret_labs",
-        "expected_finding": "41% improvement in UPDRS-III confirming positive levodopa response, supporting idiopathic PD",
-        "category": "recommended",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP"
-          ]
-        }
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "CSF is not part of routine PD workup",
+        "citation": "[Postuma_2015]"
       },
       {
-        "step": 9,
-        "action": "Initiate dopaminergic therapy (carbidopa/levodopa) and consider adjusting or discontinuing propranolol",
-        "tool_name": null,
-        "expected_finding": "Clinical improvement in motor symptoms with dopaminergic therapy",
-        "category": "required"
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "MRI is the appropriate structural study; CT adds nothing",
+        "citation": "[Schwarz_2014]"
       },
       {
-        "step": 10,
-        "action": "Address subclinical hypothyroidism with endocrine referral or monitoring, and refer for multidisciplinary rehabilitation (PT, OT, speech therapy)",
-        "tool_name": null,
-        "expected_finding": "Comprehensive management addressing both the primary movement disorder and comorbidities",
-        "category": "recommended"
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No cardiac indication",
+        "citation": "[Postuma_2015]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "No syncope or arrhythmia concern",
+        "citation": "[Postuma_2015]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Baseline metabolic profile and medication review precede dopaminergic therapy initiation",
+        "citation": "[Postuma_2015]",
+        "severity": "soft"
+      },
+      {
+        "before": "analyze_brain_mri",
+        "after": "order_advanced_imaging",
+        "reason": "Exclude structural mimics on MRI before committing to DaTscan and a PD diagnosis",
+        "citation": "[Schwarz_2014]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Recognize that the new resting tremor, bradykinesia, and rigidity are not consistent with essential tremor alone and warrant further evaluation for Parkinson's disease",
-      "Order DaTscan to definitively differentiate neurodegenerative parkinsonism from essential tremor",
-      "Identify the cluster of non-motor prodromal features (RBD, hyposmia, constipation) as strong supportive evidence for a synucleinopathy",
-      "Recognize that the prior essential tremor diagnosis does not exclude concurrent Parkinson's disease",
-      "Evaluate cervical spondylosis as a potential confounding factor but correctly attribute motor findings to PD rather than myelopathy"
+      "Apply MDS 2015 clinical diagnostic criteria for Parkinson's disease (bradykinesia plus rest tremor or rigidity, supportive features, no absolute exclusion criteria)",
+      "Document temporal sequence of motor and non-motor (REM sleep behavior disorder, hyposmia, constipation, orthostatic intolerance) features",
+      "Review the full medication list for dopamine receptor antagonists (metoclopramide, prochlorperazine, antipsychotics) and any other agents that can mimic or worsen parkinsonism",
+      "Re-examine the prior ET diagnosis given new rest tremor and bradykinesia",
+      "Use DaTscan to resolve clinical uncertainty between residual ET and emerging PD",
+      "Initiate carbidopa-levodopa once PD is confirmed and counsel on motor and non-motor course"
     ],
     "contraindicated_actions": [
-      "Attributing all motor symptoms to essential tremor and simply increasing propranolol without further workup",
-      "Attributing right hand weakness and clumsiness solely to cervical spondylosis without recognizing parkinsonian features",
-      "Starting antipsychotic medications (typical or atypical except quetiapine/clozapine) for behavioral symptoms",
-      "Prescribing anticholinergic medications (e.g., trihexyphenidyl) without cognitive assessment in a patient with borderline MoCA",
-      "Dismissing the dream enactment episodes as normal aging or secondary to depression/sertraline without evaluation for RBD"
+      "Do not prescribe metoclopramide, prochlorperazine, or promethazine for nausea in a patient with parkinsonism",
+      "Do not prescribe typical antipsychotics (haloperidol, fluphenazine) or most atypical antipsychotics (risperidone, olanzapine, aripiprazole) — restrict pharmacotherapy of psychosis to quetiapine, clozapine, or pimavanserin",
+      "Do not prescribe centrally acting anticholinergics (trihexyphenidyl, benztropine) in older adults or in any patient with cognitive impairment"
     ],
     "key_reasoning_points": [
-      "The key diagnostic challenge is distinguishing evolving Parkinson's disease from the pre-existing essential tremor diagnosis — the emergence of a new resting tremor, progressive bradykinesia, and rigidity exceeds what ET can explain",
-      "The prior essential tremor diagnosis and positive family history of ET act as red herrings that could delay PD diagnosis if the clinician anchors on the existing diagnosis",
-      "Cervical spondylosis with mild right first dorsal interosseous wasting provides another confounding finding that could mislead toward a structural or lower motor neuron explanation for right hand dysfunction",
-      "Subclinical hypothyroidism (TSH 5.2) is an incidental red herring — it can cause generalized slowness and fatigue but does not explain the specific motor syndrome of resting tremor, rigidity, and bradykinesia",
-      "The cluster of non-motor features (RBD, hyposmia, constipation, depression) predating the full motor syndrome is characteristic of prodromal PD and should raise clinical suspicion even in the presence of confounders",
-      "DaTscan is the critical investigation that definitively distinguishes PD (abnormal) from ET (normal), resolving the diagnostic uncertainty",
-      "Propranolol therapy for ET may be partially masking the extent of the resting tremor, as beta-blockers can modestly suppress parkinsonian tremor",
-      "The source case's hand weakness and wasting (from Hirayama disease) is repurposed as an incidental cervical spondylosis finding that serves as a misleading clue in this transformed PD case"
+      "Prior ET label does not exclude emergence of PD years later; ET-PD overlap is recognized",
+      "Asymmetric rest tremor, bradykinesia, and micrographia tip the diagnosis toward PD",
+      "DaTscan is the most useful confirmatory study when prior diagnosis is uncertain"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": [
+      {
+        "data_point": "Prior essential tremor diagnosis",
+        "location": "history_present_illness and past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Anchor toward sticking with ET label",
+        "correct_interpretation": "Rest tremor, bradykinesia, and asymmetric rigidity now satisfy MDS PD criteria; DaTscan provides definitive differentiation"
+      }
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -894,6 +929,14 @@
       "ct": "normal",
       "echo": "incidental",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (condition-expert:PD)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:PD",
+    "difficulty_rationale": "Prior ET label vs emerging PD; DaTscan is the key differentiator",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

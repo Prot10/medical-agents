@@ -2,7 +2,7 @@
   "case_id": "MIG-AURA-RM11",
   "condition": "migraine_with_aura",
   "icd_code": "G43.1",
-  "difficulty": "moderate",
+  "difficulty": "diagnostic_puzzle",
   "encounter_type": "outpatient",
   "metadata": {
     "source": "MedCaseReasoning",
@@ -19,7 +19,17 @@
       "cardiac_monitoring": "normal",
       "specialized_test": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Diagnostic puzzle: hemiplegic migraine with migralepsy and reversible MRI changes — extensive mimic exclusion (MELAS, encephalitis, primary epilepsy, stroke)",
+    "case_body_concerns": [
+      "Required tool(s) lacking initial or followup outputs in the case body — agent calling them will fall back to off-pathway tier or empty result; tools: ['search_medical_literature (only fallback)']"
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "patient": {
     "age": 26,
@@ -124,199 +134,182 @@
     }
   ],
   "ground_truth": {
-    "primary_diagnosis": "Sporadic hemiplegic migraine (ICHD-3 1.2.3) with migralepsy and reversible MRI changes",
-    "icd_code": "G43.105",
+    "primary_diagnosis": "Sporadic hemiplegic migraine (ICHD-3 1.2.3) with migralepsy (single seizure during aura, ICHD-3 1.4.4) and reversible MRI changes — comprehensive workup excluded structural and metabolic mimics",
+    "icd_code": "G43.109",
     "differential": [
       {
-        "diagnosis": "Acute ischaemic stroke (MCA territory)",
-        "likelihood": "very_low",
-        "key_features": "Excluded by normal DWI/ADC. MRA normal. No vascular occlusion. 12-year history of identical reversible episodes."
+        "diagnosis": "Familial hemiplegic migraine (CACNA1A / ATP1A2 / SCN1A)",
+        "likelihood": "moderate",
+        "key_features": "Genetic panel pending; sporadic and familial forms are clinically indistinguishable in isolated cases",
+        "icd_code": null
       },
       {
-        "diagnosis": "Autoimmune/viral encephalitis (NMDAR, HSV)",
+        "diagnosis": "Focal motor seizure with secondary aphasia and post-ictal Todd's paralysis",
+        "likelihood": "moderate",
+        "key_features": "Witnessed shaking episode raises seizure question; migralepsy (seizure occurring during migraine aura) is the most parsimonious explanation when EEG shows no ongoing epileptiform activity",
+        "icd_code": "G40.109"
+      },
+      {
+        "diagnosis": "Autoimmune encephalitis (NMDAR / LGI1)",
         "likelihood": "low",
-        "key_features": "Excluded by normal CSF (no pleocytosis), negative autoimmune panel, negative HSV PCR, and full reversibility on follow-up MRI."
+        "key_features": "CSF and antibody panels exclude",
+        "icd_code": "G04.81"
       },
       {
-        "diagnosis": "Primary epilepsy with Todd's paralysis",
+        "diagnosis": "MELAS / mitochondrial disease",
         "likelihood": "low",
-        "key_features": "EEG showed no epileptiform discharges or hemispheric dysfunction. Seizures explained as migralepsy (triggered by hemiplegic aura). 12-year history of episodes without primary seizure diagnosis."
+        "key_features": "No family history, normal lactate, normal m.3243A>G; reversible MRI changes can mimic MELAS lesions",
+        "icd_code": null
       },
       {
-        "diagnosis": "MELAS (m.3243A>G mitochondrial encephalomyopathy)",
-        "likelihood": "very_low",
-        "key_features": "Excluded by normal serum and CSF lactate, normal pyruvate, and negative mtDNA heteroplasmy testing. No maternal inheritance history."
-      },
-      {
-        "diagnosis": "Cerebral venous thrombosis",
-        "likelihood": "very_low",
-        "key_features": "Normal MRA/MRV, negative antiphospholipid antibodies, DWI negative. Though OCP use is a risk factor, no imaging evidence of thrombosis."
+        "diagnosis": "Ischaemic stroke / cervical artery dissection",
+        "likelihood": "low",
+        "key_features": "MRA normal, reversible MRI changes argue against permanent infarct",
+        "icd_code": "I63.9"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Perform urgent MRI brain with DWI, FLAIR, T1+Gd, and MRA to exclude acute infarction and vascular cause",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Diffuse left cortical swelling and FLAIR hyperintensity but normal DWI — excludes acute infarction. Normal MRA.",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
         "category": "required",
         "tool_parameters": {
-          "sequences": [
-            "DWI",
-            "FLAIR",
-            "T1+Gd",
-            "MRA"
-          ],
-          "urgency": "urgent",
-          "indication": "hemispheric deficit with seizures"
-        }
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "Perform EEG to evaluate for primary epileptic disorder versus migralepsy",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Mild post-ictal slowing, no epileptiform discharges, no hemispheric dysfunction — argues against primary epilepsy as the underlying cause",
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "TRIPTANS AND ERGOTAMINES CONTRAINDICATED in hemiplegic migraine; OCP safety review; AED choice if seizure recurs",
         "category": "required",
         "tool_parameters": {
-          "urgency": "same-day",
-          "duration_minutes": 45,
-          "indication": "seizures with hemiparesis — exclude status epilepticus and epileptic cause"
-        }
+          "context": "hemiplegic_migraine_with_migralepsy_OCP"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 3,
-        "action": "Send comprehensive bloods including CBC, metabolic panel, inflammatory markers, serum lactate, thyroid function, and autoimmune/antiphospholipid screen",
-        "tool_name": "interpret_labs",
-        "expected_finding": "All normal — excludes metabolic, mitochondrial, and autoimmune causes. Normal lactate argues against MELAS.",
+        "action": "Repeat brain MRI at 48h and follow-up to document reversibility",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Reversible cortical / subcortical signal changes over 48h to weeks — consistent with hemiplegic migraine; no new infarct",
         "category": "required",
         "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP",
-            "LFTs",
-            "TSH",
-            "serum_lactate",
-            "ANA",
-            "anti-dsDNA",
-            "anticardiolipin",
-            "antiphospholipid",
-            "beta-2-GPI",
-            "lupus_anticoagulant"
+          "contrast": false,
+          "sequences": [
+            "DWI",
+            "FLAIR",
+            "T2",
+            "SWI",
+            "MRA"
           ]
-        }
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 4,
-        "action": "Perform lumbar puncture to analyse CSF including lactate, glucose, protein, cell count, oligoclonal bands, HSV PCR, and VZV PCR",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Normal CSF — no pleocytosis, normal lactate, negative HSV/VZV PCR. Excludes viral encephalitis and MELAS.",
+        "action": "EEG to evaluate for ongoing epileptiform activity",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "No interictal epileptiform activity; possible focal slowing during/after the migralepsy episode",
         "category": "required",
         "tool_parameters": {
-          "tests": [
-            "cell_count",
-            "protein",
-            "glucose",
-            "lactate",
-            "oligoclonal_bands",
-            "HSV_PCR",
-            "VZV_PCR"
-          ],
-          "indication": "hemispheric swelling, seizures, exclude encephalitis"
-        }
+          "duration_hours": 24,
+          "video_eeg": true
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 5,
-        "action": "Arrange repeat MRI brain at 72 hours to confirm reversibility of cortical changes",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Near-complete resolution of cortical swelling and FLAIR signal — confirming reversible CSD-mediated changes consistent with hemiplegic migraine",
+        "action": "Mitochondrial / autoimmune workup and genetic panel for hemiplegic migraine",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Normal lactate; negative autoimmune encephalitis panel; CACNA1A / ATP1A2 / SCN1A pending",
         "category": "required",
         "tool_parameters": {
-          "timing": "72_hours",
-          "sequences": [
-            "T2",
-            "FLAIR",
-            "DWI"
-          ],
-          "indication": "confirm reversibility of hemispheric changes"
-        }
+          "lab_type": "hemiplegic_migraine_workup"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 6,
-        "action": "Stop combined oral contraceptive pill (Mercilon) immediately — WHO MEC Category 4 absolute contraindication in hemiplegic migraine",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Combined OCP is WHO Category 4 in hemiplegic migraine — unacceptable stroke risk. Must stop immediately and switch to progesterone-only pill or implant.",
-        "category": "required",
-        "tool_parameters": {
-          "drug_1": "combined_OCP_ethinylestradiol",
-          "drug_2": "hemiplegic_migraine_aura",
-          "check_type": "contraindication"
-        }
-      },
-      {
-        "step": 7,
-        "action": "Consider optimising migraine prevention — current topiramate dose may be inadequate given 1-2 attacks/month. Discuss adding sodium valproate or switching to verapamil (valproate requires pregnancy prevention discussion).",
-        "tool_name": null,
-        "expected_finding": "Preventive therapy rationalisation — flunarizine failed, topiramate sub-optimal. Consider verapamil 240 mg SR or valproate 400-600 mg (with contraception plan).",
+        "action": "Lumbar puncture given encephalopathy-like features and to exclude infectious / autoimmune cause",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Normal CSF — no pleocytosis, normal protein/glucose; supports exclusion of encephalitis",
         "category": "recommended",
-        "tool_parameters": {}
-      },
-      {
-        "step": 8,
-        "action": "Prescribe progesterone-only contraception to replace OCP — desogestrel 75 mcg (Cerazette) daily or Nexplanon implant",
-        "tool_name": null,
-        "expected_finding": "Safe contraception for patient with hemiplegic migraine — progesterone-only preparations are WHO MEC Category 1",
-        "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "Routine ECG is not indicated for migraine workup; only a baseline ECG to screen triptan contraindications in patients with cardiovascular risk factors has any role",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Routine transthoracic / bubble echocardiogram (PFO screening) is NOT indicated in migraine with aura; PFO-migraine association is controversial and PFO closure does not reduce migraine [Charles_2017]",
+        "citation": "[Charles_2017]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated in typical migraine with aura — no role unless cardioembolic stroke is on the differential",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "Normal DWI must be recognised as excluding acute infarction despite alarming FLAIR/cortical swelling findings",
-      "Stop combined oral contraceptive pill (WHO MEC Category 4) and prescribe progesterone-only alternative",
-      "Confirm reversibility of MRI changes at 72-hour follow-up",
-      "Migralepsy must be recognised — seizures triggered by hemiplegic aura, not primary epilepsy"
+      "Confirm hemiplegic migraine — fully reversible motor aura plus visual / sensory / speech aura",
+      "Document seizure with EEG and consider AED if recurrence (migralepsy is a recognised ICHD-3 entity)",
+      "Confirm MRI changes reversible on follow-up imaging",
+      "Avoid triptans and ergotamines in hemiplegic migraine",
+      "Genetic panel (CACNA1A / ATP1A2 / SCN1A)",
+      "Re-evaluate OCP if patient is on combined OCP"
     ],
     "contraindicated_actions": [
-      "Continue combined OCP in any migraine with aura including hemiplegic subtype (WHO Category 4)",
-      "Prescribe triptans for hemiplegic migraine during acute attack (contraindicated by ICHD and BNF)",
-      "Prescribe ergotamine for acute hemiplegic migraine attack (contraindicated)",
-      "Commence anticoagulation (warfarin, DOAC) without MRV evidence of cerebral venous thrombosis",
-      "Commence anti-seizure medication for migralepsy in the absence of true primary epilepsy diagnosis"
+      "Do not prescribe triptans or ergotamines in hemiplegic migraine",
+      "Do not start combined oestrogen-progestogen contraception",
+      "Do not commit to long-term AED on the basis of a single migralepsy seizure"
     ],
     "key_reasoning_points": [
-      "Normal DWI despite dramatic FLAIR changes and cortical swelling is the pathognomonic pattern of hemiplegic migraine — CSD causes cortical hyperaemia and oedema without ischaemia.",
-      "Focal motor seizures in the setting of hemiplegic migraine constitute migralepsy (ICHD-3 1.4.3) — seizures triggered by the migraine aura. EEG not showing interictal epileptiform discharges supports this distinction from primary epilepsy.",
-      "Absence of family history in any of the three known HM genes supports sporadic hemiplegic migraine — this is the correct diagnosis even with normal genetic panel.",
-      "Combined OCP is WHO MEC Category 4 (absolute contraindication) in ALL migraine with aura including hemiplegic subtypes, even at the lowest oestrogen dose (EE 20 mcg). The attending must recognise and act on this at first contact.",
-      "12-year history of identical reversible episodes with prior normal investigations provides strong prior probability for the same mechanism. The agent should weight this history heavily.",
-      "CSF lactate normal and mtDNA heteroplasmy testing negative definitively excludes MELAS, which can produce identical reversible cortical changes in young women.",
-      "Full reversibility at 72-hour MRI is both diagnostically reassuring and clinically important — it differentiates hemiplegic migraine from autoimmune encephalitis (which shows persistence or progression)."
+      "Migralepsy (ICHD-3 1.4.4) is a seizure triggered by migraine aura — requires aura to be temporally followed by a seizure",
+      "Reversible MRI signal changes are recognised in hemiplegic migraine and should not be misinterpreted as permanent infarct",
+      "Hemiplegic migraine workup must exclude MELAS, autoimmune encephalitis, and structural causes"
     ],
     "red_herrings": [
       {
-        "data_point": "Two focal right-sided motor seizures during the attack",
+        "data_point": "Witnessed shaking episode",
         "location": "patient.history_present_illness",
-        "intended_effect": "New-onset epilepsy / Todd's palsy explaining the hemiparesis",
-        "correct_interpretation": "Seizures are migralepsy — focal seizures triggered by hemiplegic migraine aura, not a primary epileptic disorder. EEG showed no epileptiform discharges or hemispheric dysfunction. The MRI abnormalities (cortical swelling, FLAIR signal) are reversible and DWI-negative, inconsistent with post-ictal changes from status epilepticus.",
-        "field_path": ""
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "May anchor on primary epilepsy diagnosis",
+        "correct_interpretation": "Single seizure during aura is migralepsy, not chronic epilepsy; EEG normalises interictally"
       },
       {
-        "data_point": "Diffuse left hemispheric cortical swelling and T2/FLAIR hyperintensity",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Autoimmune encephalitis (NMDAR or other) or HSV encephalitis",
-        "correct_interpretation": "Critically, DWI is normal, CSF shows no pleocytosis, autoimmune antibody panels negative, HSV PCR negative. Reversibility on 72-hour follow-up MRI confirms CSD-mediated cortical hyperaemia in hemiplegic migraine.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Current use of combined OCP (Mercilon EE 20 mcg)",
-        "location": "patient.history_present_illness",
-        "intended_effect": "OCP-related cerebral venous thrombosis or ischaemic event",
-        "correct_interpretation": "MRV would show no sinus thrombosis. DWI is normal excluding arterial infarction. However, OCP is WHO Category 4 in hemiplegic migraine and must be stopped, even though it is not the cause of this acute attack — this is a critical management action the agent must identify.",
-        "field_path": ""
+        "data_point": "Acute MRI signal changes",
+        "location": "initial_tool_outputs.mri",
+        "field_path": "initial_tool_outputs.mri",
+        "intended_effect": "May suggest infarct, encephalitis, or MELAS",
+        "correct_interpretation": "Reversible signal changes on follow-up imaging are characteristic of hemiplegic migraine"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "initial_tool_outputs": {
     "mri": {

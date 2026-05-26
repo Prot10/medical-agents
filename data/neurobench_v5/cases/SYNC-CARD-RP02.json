@@ -608,143 +608,223 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Cardiac syncope due to right ventricular outflow tract myxoma",
-    "icd_code": "R55",
+    "primary_diagnosis": "Cardiac syncope due to right ventricular outflow tract myxoma causing intermittent dynamic RVOT obstruction",
+    "icd_code": "D15.1",
     "differential": [
       {
-        "diagnosis": "Cardiac myxoma (RVOT)",
+        "diagnosis": "Hypertrophic cardiomyopathy with dynamic LVOT obstruction",
         "likelihood": "high",
-        "key_features": "Exertional syncope, systolic ejection murmur at LUSB, RVH on ECG, elevated BNP, mobile pedunculated mass on echocardiography, characteristic MRI signal"
+        "key_features": "Exertional syncope in a young athlete classically suggests HCM; echo and CMR distinguish.",
+        "icd_code": "I42.1"
       },
       {
-        "diagnosis": "Epileptic seizure",
-        "likelihood": "very_low",
-        "key_features": "Brief convulsive movements (convulsive syncope) were misinterpreted as seizure. Normal EEG, no post-ictal confusion >1 min, normal prolactin, exertional trigger all argue against"
-      },
-      {
-        "diagnosis": "Arrhythmogenic right ventricular cardiomyopathy (ARVC)",
-        "likelihood": "very_low",
-        "key_features": "RV dilation and PVCs of RVOT origin could suggest ARVC. However, no fatty infiltration on cardiac MRI, no LGE, and presence of a discrete mass with obstruction explain findings"
-      },
-      {
-        "diagnosis": "Cardiac thrombus",
-        "likelihood": "very_low",
-        "key_features": "Intracavitary mass differential includes thrombus, but enhancement pattern on MRI, pedunculated morphology, and young age without thrombotic risk factors argue against"
-      },
-      {
-        "diagnosis": "Vasovagal syncope",
-        "likelihood": "very_low",
-        "key_features": "Exertional trigger without typical vasovagal prodrome. Negative tilt table test. RVH on ECG and elevated BNP inconsistent with benign vasovagal mechanism"
+        "diagnosis": "Arrhythmogenic right ventricular cardiomyopathy",
+        "likelihood": "high",
+        "key_features": "RV strain pattern and exertional syncope overlap with ARVC; CMR task-force criteria distinguish from mass lesion.",
+        "icd_code": "I42.8"
       },
       {
         "diagnosis": "Pulmonary embolism",
-        "likelihood": "very_low",
-        "key_features": "Right heart strain on ECG could suggest PE, but normal D-dimer, chronic nature of symptoms, and intracardiac mass on imaging exclude this"
+        "likelihood": "moderate",
+        "key_features": "RV strain pattern can reflect acute PE; D-dimer, CT-PA distinguish.",
+        "icd_code": "I26.99"
+      },
+      {
+        "diagnosis": "Pulmonary arterial hypertension",
+        "likelihood": "moderate",
+        "key_features": "Right heart catheterisation and echo right-sided pressures distinguish.",
+        "icd_code": "I27.0"
+      },
+      {
+        "diagnosis": "Inherited channelopathy",
+        "likelihood": "low",
+        "key_features": "Exercise stress and resting ECG screen.",
+        "icd_code": "I49.8"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Perform 12-lead ECG to evaluate for arrhythmia or conduction abnormality",
+        "action": "12-lead ECG immediately",
         "tool_name": "analyze_ecg",
-        "expected_finding": "RVH pattern, right axis deviation, ST depression V1-V4 — unexpected findings prompting cardiac workup",
-        "category": "required"
+        "expected_finding": "Sinus tachycardia, RV strain pattern with V1-V3 ST-depression and T-inversions",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.2"
       },
       {
         "step": 2,
-        "action": "Obtain routine EEG to evaluate for epileptiform activity given referral for 'seizures'",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Normal EEG with no epileptiform discharges, making seizure unlikely",
-        "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
-      },
-      {
-        "step": 3,
-        "action": "Order comprehensive metabolic labs including cardiac biomarkers",
+        "action": "Labs: CBC, BMP, Mg, troponin, BNP, TSH, glucose, D-dimer",
         "tool_name": "interpret_labs",
-        "expected_finding": "Elevated BNP suggesting right heart strain; normal prolactin arguing against seizure",
+        "expected_finding": "Rule out PE and ACS; document baseline",
         "category": "required",
         "tool_parameters": {
           "panels": [
-            "CMP"
+            "CBC",
+            "BMP",
+            "magnesium",
+            "troponin",
+            "BNP",
+            "TSH",
+            "D_dimer"
           ]
-        }
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.3"
       },
       {
-        "step": 4,
-        "action": "Request transthoracic echocardiogram given ECG abnormalities and exertional syncope",
+        "step": 3,
+        "action": "Echocardiogram including RV outflow assessment and mass screen",
         "tool_name": "order_echocardiogram",
-        "expected_finding": "Large RVOT mass causing severe obstruction — the critical diagnostic finding",
+        "expected_finding": "RVOT mass with dynamic obstruction during exertion",
         "category": "required",
         "tool_parameters": {
           "echo_type": "TTE"
-        }
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §4.1"
+      },
+      {
+        "step": 4,
+        "action": "Telemetry and Holter",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Arrhythmia burden quantified",
+        "category": "required",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "citation": "[Locati_2014]",
+        "guideline_source": "Locati 2014"
       },
       {
         "step": 5,
-        "action": "Request cardiac MRI for tissue characterization of the intracardiac mass",
+        "action": "Cardiac MRI to characterise mass and exclude ARVC",
         "tool_name": "order_advanced_imaging",
-        "expected_finding": "Well-circumscribed pedunculated mass with T2 hyperintensity and heterogeneous enhancement, consistent with cardiac myxoma",
-        "category": "recommended",
+        "expected_finding": "Mass with myxomatous characteristics in the RVOT, distinguishable from fibro-fatty ARVC infiltration",
+        "category": "required",
         "tool_parameters": {
-          "imaging_type": "FDG_PET"
-        }
+          "modality": "perfusion_MRI"
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §4.3"
       },
       {
         "step": 6,
-        "action": "Search medical literature for RVOT masses and cardiac syncope in young adults",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Literature supporting RVOT myxoma as rare cause of exertional syncope, often misdiagnosed as epilepsy",
-        "category": "recommended"
+        "action": "Exercise stress test under monitored conditions",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Symptom reproduction with dynamic obstruction",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "exercise_stress_test"
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.4"
       },
       {
         "step": 7,
-        "action": "Recommend urgent cardiothoracic surgery consultation for surgical excision",
-        "tool_name": null,
-        "expected_finding": "Definitive treatment is surgical resection of the myxoma",
-        "category": "required"
+        "action": "Medication review",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Avoid proarrhythmic and afterload-reducing agents pending surgical resection",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §6"
       },
       {
         "step": 8,
-        "action": "Restrict patient from all physical exertion pending surgery",
-        "tool_name": null,
-        "expected_finding": "Exercise restriction to prevent further hemodynamic compromise",
-        "category": "required"
+        "action": "Search literature for management of cardiac myxoma — surgical resection",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Cardiac myxoma is a surgical indication; embolic risk and recurrence considerations",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ACC_AHA_HRS_2017]",
+        "guideline_source": "ACC/AHA/HRS 2017 §6"
+      },
+      {
+        "step": 9,
+        "action": "Cardiothoracic surgery and EP consult",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Surgical resection plan; EP review of ICD threshold post-resection",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ACC_AHA_HRS_2017]",
+        "guideline_source": "ACC/AHA/HRS 2017 §6"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "No focal deficit; brain MRI is low-yield in cardiac syncope. May be considered if cerebral embolism from a myxoma is suspected.",
+        "citation": "[ACC_AHA_HRS_2017]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "No head injury; head CT not indicated.",
+        "citation": "[ACC_AHA_HRS_2017]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No CNS infection or encephalopathy.",
+        "citation": ""
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_ecg",
+        "after": "consult_medical_specialist",
+        "reason": "ECG and echo drive surgical referral.",
+        "citation": "[ESC_2018]",
+        "severity": "hard"
+      },
+      {
+        "before": "order_echocardiogram",
+        "after": "consult_medical_specialist",
+        "reason": "Echo identifies the mass and informs surgical urgency.",
+        "citation": "[ESC_2018]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Obtain ECG and recognize RVH/strain pattern as a clue to cardiac etiology rather than neurological",
-      "Obtain EEG to rule out epilepsy before assuming seizure diagnosis",
-      "Order echocardiogram when ECG shows unexplained RVH in a young patient with exertional syncope",
-      "Recognize that convulsive movements during syncope (convulsive syncope) do not equal epileptic seizures",
-      "Recommend urgent surgical consultation for RVOT mass resection",
-      "Restrict physical activity given risk of hemodynamic collapse from RVOT obstruction during exertion"
+      "Admit to telemetry — exertional syncope plus RV mass is high-risk",
+      "Restrict from sport until resection",
+      "Anticoagulation consideration to mitigate embolic risk",
+      "Cardiothoracic surgery consult for resection",
+      "EP consultation for arrhythmia management"
     ],
     "contraindicated_actions": [
-      "Starting antiepileptic drugs without confirmed epilepsy diagnosis",
-      "Discharging patient without cardiac workup based on normal EEG alone",
-      "Performing lumbar puncture — not indicated and delays cardiac evaluation",
-      "Allowing continued physical activity prior to definitive treatment of obstructive cardiac mass",
-      "Administering thrombolytics (not a stroke or PE)",
-      "Performing exercise stress test before echocardiogram identifies the obstructive mass (risk of hemodynamic collapse)"
+      "Do not perform tilt-table",
+      "Do not give afterload-reducing agents acutely",
+      "Do not delay surgical referral",
+      "Do not clear for competitive sport pre-resection",
+      "Do not call `order_specialized_test` with parameters {'test_type': 'tilt_table'} — Tilt-table is contraindicated in known dynamic RVOT obstruction with exertional collapse — risks haemodynamic compromise and is not informative."
     ],
     "key_reasoning_points": [
-      "Exertional syncope with brief convulsive movements was initially misdiagnosed as new-onset seizures — this is convulsive syncope, a common mimicker of epilepsy caused by transient cerebral hypoperfusion",
-      "Normal EEG and normal postictal prolactin argue strongly against epileptic seizures",
-      "ECG showing RVH pattern with right axis deviation in a young, previously healthy patient is a critical red flag for structural right heart disease",
-      "Elevated BNP (285 pg/mL) with otherwise normal metabolic labs points to cardiac etiology rather than neurological",
-      "The systolic ejection murmur at the left upper sternal border localizes to the RVOT/pulmonic valve region and should prompt echocardiography",
-      "Primary cardiac masses are rare; intracavitary differential includes myxoma (most common benign), thrombus, lipoma, and malignant neoplasms",
-      "Cardiac MRI provides tissue characterization: T2 hyperintensity and heterogeneous enhancement favor myxoma over thrombus or fibroma",
-      "RVOT myxomas cause fixed outflow obstruction that worsens with exercise, explaining exertional syncope when cardiac output demand exceeds the obstructed capacity",
-      "The diagnostic puzzle lies in the initial referral for 'seizures' — the agent must pivot from a neurological to a cardiological workup based on clues in the ECG, physical exam, and lab results"
+      "Exertional syncope in a young athlete is malignant until proven otherwise — cardiac mass is among the differential",
+      "Echocardiography with attention to the RVOT plus CMR identifies myxomatous masses",
+      "Surgical resection is the definitive therapy; anticoagulation may be required for embolic risk",
+      "Tilt-table is contraindicated when dynamic obstruction is suspected"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "'Rushing chest' sensation attributed to exam stress",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "May anchor to anxiety/dehydration.",
+        "correct_interpretation": "Documented RV strain on ECG and the exertional pattern point to structural obstruction."
+      },
+      {
+        "data_point": "RV strain pattern on ECG",
+        "location": "initial_tool_outputs.ecg.interpretation",
+        "field_path": "initial_tool_outputs.ecg.interpretation",
+        "intended_effect": "May be misread as acute PE.",
+        "correct_interpretation": "D-dimer and CT-PA exclude PE; echo and CMR identify the myxoma."
+      }
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -758,6 +838,14 @@
       "mri": "normal",
       "csf": "normal",
       "ct": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SYNC-CARD",
+    "difficulty_rationale": "6 required tools; cross-modality integration of echo, CMR and exercise stress; multiple plausible alternatives (HCM, ARVC, PE, PAH) require active exclusion; surgical referral is the definitive step.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

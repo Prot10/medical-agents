@@ -1,7 +1,7 @@
 {
   "case_id": "GLIO-HG-RP01",
   "condition": "brain_tumor_glioma",
-  "difficulty": "diagnostic_puzzle",
+  "difficulty": "moderate",
   "encounter_type": "inpatient",
   "patient": {
     "patient_id": "NB-GLIO-HG-RP01",
@@ -833,191 +833,206 @@
     "icd_code": "C71.9",
     "differential": [
       {
-        "diagnosis": "Thyroid follicular carcinoma brain metastasis",
+        "diagnosis": "Brain metastasis (from prior thyroid follicular carcinoma)",
         "likelihood": "low",
-        "key_features": "History of thyroid follicular carcinoma and mildly elevated thyroglobulin make metastasis an important consideration. However, thyroid cancer brain metastases are rare and typically present as well-circumscribed, spherical, hypervascular lesions — not as infiltrative masses. MR perfusion shows elevated rCBV in perilesional tissue (infiltrative glioma pattern), MR spectroscopy shows metabolic abnormalities extending beyond enhancement (glioma pattern), CT body imaging shows no thyroid cancer recurrence, thyroid ultrasound shows residual thyroid tissue explaining the thyroglobulin elevation, and biopsy is TTF-1/PAX8 negative definitively excluding thyroid origin."
+        "key_features": "8-year disease-free history with undetectable thyroglobulin and negative surveillance imaging makes metastatic recurrence unlikely; imaging features and IDH-wildtype histology confirm primary glioma"
       },
       {
-        "diagnosis": "Anaplastic astrocytoma (WHO grade 3)",
-        "likelihood": "moderate",
-        "key_features": "The predominantly non-enhancing infiltrative pattern initially suggests a lower-grade glioma. However, elevated rCBV in non-enhancing regions, high proliferation index (Ki-67 40%), and histological features of microvascular proliferation and palisading necrosis confirm WHO grade 4 (glioblastoma)."
-      },
-      {
-        "diagnosis": "CNS lymphoma",
+        "diagnosis": "Brain metastasis (solitary)",
         "likelihood": "low",
-        "key_features": "CNS lymphoma typically shows homogeneous enhancement (not patchy irregular enhancement), periventricular predilection, and dramatic response to corticosteroids. Patient is immunocompetent. The infiltrative pattern with patchy enhancement is atypical for lymphoma."
+        "key_features": "No known primary cancer; staging CT chest/abdomen/pelvis negative; infiltrative margins and corpus-callosum or eloquent-cortex involvement more typical of primary glioma than metastasis"
       },
       {
-        "diagnosis": "Other brain metastasis (lung, breast, melanoma)",
+        "diagnosis": "Primary CNS lymphoma",
         "likelihood": "low",
-        "key_features": "No primary extracranial malignancy identified on CT chest/abdomen/pelvis. Infiltrative growth pattern inconsistent with typical metastatic morphology. Family history of breast cancer could raise concern but the imaging pattern excludes metastasis."
+        "key_features": "In immunocompetent patients typically presents as homogeneously enhancing periventricular mass with diffuse DWI restriction and no central necrosis; ring enhancement with necrosis argues against"
       },
       {
-        "diagnosis": "Low-grade diffuse glioma (WHO grade 2)",
+        "diagnosis": "Brain abscess",
         "likelihood": "very_low",
-        "key_features": "Although the initial MRI appearance with predominantly non-enhancing infiltrative pattern could suggest low-grade glioma, the markedly elevated rCBV, high cellularity, mitotic activity, microvascular proliferation, and palisading necrosis on biopsy definitively exclude a low-grade tumor."
+        "key_features": "No fever or leukocytosis; DWI restriction at the enhancing rim (not centrally as in pyogenic pus) and elevated rCBV are inconsistent with abscess"
+      },
+      {
+        "diagnosis": "Tumefactive demyelinating lesion",
+        "likelihood": "very_low",
+        "key_features": "Closed ring enhancement, marked mass effect, and central necrosis are atypical for tumefactive MS; demyelinating lesions usually show incomplete ('open') ring enhancement on the cortical side"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain comprehensive laboratory panel including CBC, BMP, hepatic panel, coagulation studies, thyroid function (TSH, free T4), thyroglobulin with anti-Tg antibodies, and LDH",
+        "action": "Order MRI brain with and without gadolinium contrast (tumor protocol with DWI, FLAIR, post-contrast T1) to characterize the right hemisphere lesion, define mass effect, and plan surgery",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Heterogeneously enhancing mass with ring/irregular enhancement, central necrosis, restricted diffusion at the enhancing rim, perilesional FLAIR-hyperintense edema, and mass effect consistent with high-grade glioma",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "tumor",
+          "contrast": true
+        },
+        "citation": "[Stupp_2005]",
+        "guideline_source": "Stupp_2005"
+      },
+      {
+        "step": 2,
+        "action": "Order pre-operative laboratory workup: CBC, comprehensive metabolic panel, coagulation studies (PT/INR, aPTT), and type & screen in anticipation of surgical biopsy/resection",
         "tool_name": "interpret_labs",
-        "expected_finding": "Largely normal labs with critically elevated thyroglobulin level creating diagnostic confusion about possible thyroid cancer metastasis",
+        "expected_finding": "Baseline values acceptable for surgery; identify any coagulopathy, electrolyte derangement, or steroid-relevant abnormality (e.g., hyperglycemia, hyponatremia) before craniotomy",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
-            "LFT",
             "coagulation",
-            "thyroid"
+            "type_and_screen"
           ]
-        }
-      },
-      {
-        "step": 2,
-        "action": "Order brain MRI with and without gadolinium contrast",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Infiltrative right temporal mass with atypical patchy enhancement pattern creating diagnostic uncertainty between primary glioma, metastasis, and lymphoma",
-        "category": "required",
-        "tool_parameters": {
-          "protocol": "standard",
-          "contrast": true
-        }
+        },
+        "citation": "[NCCN_CNS]",
+        "guideline_source": "NCCN_CNS"
       },
       {
         "step": 3,
-        "action": "Obtain EEG to evaluate for subclinical seizure activity and characterize the reported motor event",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Generalized and focal slowing with equivocal sharp transients; insufficient for definitive localization",
+        "action": "Search medical literature for management of newly suspected high-grade glioma: WHO 2021 classification, Stupp protocol indications, and timing of surgical referral",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirmation that maximal safe resection followed by concurrent chemoradiation (Stupp protocol) is the standard of care, with molecular profiling (IDH, MGMT, 1p/19q, TERT) guiding prognosis and treatment selection",
         "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
+        "tool_parameters": {},
+        "citation": "[WHO_2021]",
+        "guideline_source": "WHO_2021"
       },
       {
         "step": 4,
-        "action": "Initiate anti-seizure medication (levetiracetam 500 mg twice daily) given the witnessed focal motor seizure and structural brain lesion",
-        "tool_name": null,
-        "expected_finding": "Prevention of seizure recurrence",
-        "category": "required"
+        "action": "Obtain urgent neurosurgical and neuro-oncology consultation for tissue diagnosis (stereotactic biopsy or maximal safe resection) and multidisciplinary treatment planning",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Multidisciplinary plan including tissue acquisition, molecular profiling, and adjuvant treatment per current standards",
+        "category": "required",
+        "tool_parameters": {
+          "specialty": "neurosurgery"
+        },
+        "citation": "[Stupp_2005]",
+        "guideline_source": "Stupp_2005"
       },
       {
         "step": 5,
-        "action": "Order MR perfusion imaging to assess cerebral blood volume and distinguish primary glioma from metastasis",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Elevated rCBV in both enhancing and non-enhancing regions with elevated perilesional perfusion, confirming infiltrative high-grade glioma rather than metastasis",
+        "action": "Obtain neuro-oncology consultation for adjuvant therapy planning and molecular-marker-guided treatment selection",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Plan for concurrent chemoradiation (Stupp protocol with temozolomide) for IDH-wildtype GBM; alternative chemoradiation regimens for other tumor types or for atypical histologies",
         "category": "required",
         "tool_parameters": {
-          "imaging_type": "perfusion_MRI"
-        }
+          "specialty": "neuro_oncology"
+        },
+        "citation": "[Stupp_2005]",
+        "guideline_source": "Stupp_2005"
       },
       {
         "step": 6,
-        "action": "Order MR spectroscopy for metabolic characterization of the lesion",
+        "action": "Order MR perfusion imaging (DSC perfusion) to assess tumor vascularity and target highest-grade region for biopsy",
         "tool_name": "order_advanced_imaging",
-        "expected_finding": "Elevated choline, reduced NAA, lipid/lactate peaks in enhancing regions with metabolic abnormalities extending into non-enhancing tissue — pathognomonic for infiltrative glioma, excluding metastasis",
-        "category": "required",
+        "expected_finding": "Elevated rCBV (typically > 1.75) in enhancing component supports high-grade neoplasm and helps direct biopsy",
+        "category": "recommended",
         "tool_parameters": {
-          "imaging_type": "MR_spectroscopy"
-        }
+          "modality": "perfusion_MRI"
+        },
+        "citation": "[Law_2003]",
+        "guideline_source": "Law_2003"
       },
       {
         "step": 7,
-        "action": "Order CT chest, abdomen, and pelvis to evaluate for thyroid cancer recurrence and other primary malignancies",
-        "tool_name": "interpret_labs",
-        "expected_finding": "No evidence of thyroid cancer recurrence or other extracranial malignancy",
-        "category": "required",
+        "action": "Order MR spectroscopy (1H-MRS) to characterize tumor metabolic profile",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Elevated Cho/NAA ratio with lipid-lactate peaks supports high-grade malignancy and helps differentiate tumor from treatment-related change at follow-up",
+        "category": "recommended",
         "tool_parameters": {
-          "panels": [
-            "thyroid"
-          ]
-        }
+          "modality": "MR_spectroscopy"
+        },
+        "citation": "[Bulik_2013]",
+        "guideline_source": "Bulik_2013"
       },
       {
         "step": 8,
-        "action": "Initiate dexamethasone 4-8 mg IV for vasogenic edema and mass effect",
-        "tool_name": null,
-        "expected_finding": "Improvement in perilesional edema, headache, and neurological symptoms",
-        "category": "required"
-      },
-      {
-        "step": 9,
-        "action": "Proceed with stereotactic biopsy with molecular profiling (IDH, MGMT, 1p/19q, TERT, EGFR) and immunohistochemistry (TTF-1, PAX8, GFAP) to definitively distinguish primary brain tumor from thyroid metastasis",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Glioblastoma, IDH-wildtype, WHO grade 4 with methylated MGMT promoter; TTF-1 and PAX8 negative excluding thyroid origin",
-        "category": "required",
+        "action": "Order CT chest/abdomen/pelvis as staging to exclude an extracranial primary if a solitary metastasis is on the differential",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No extracranial primary malignancy identified, supporting primary brain tumor as the working diagnosis",
+        "category": "optional",
         "tool_parameters": {
-          "panels": [
-            "thyroid"
-          ]
-        }
-      },
+          "region": "chest_abdomen_pelvis",
+          "contrast": true
+        },
+        "citation": "[NCCN_CNS]",
+        "guideline_source": "NCCN_CNS"
+      }
+    ],
+    "useless_tools": [
       {
-        "step": 10,
-        "action": "Obtain functional MRI for pre-surgical language and motor mapping given right temporal location",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Left-dominant language with mild bilateral representation; partial overlap of right hemispheric language co-activation with tumor margin",
-        "category": "required",
+        "tool_name": "order_echocardiogram",
         "tool_parameters": {
-          "protocol": "standard",
-          "contrast": false
-        }
+          "echo_type": "TTE"
+        },
+        "rationale": "Echocardiogram has no role in the diagnostic workup of suspected high-grade glioma absent a specific cardiac question (e.g., suspected paraneoplastic endocarditis)",
+        "citation": "[NCCN_CNS]"
       },
       {
-        "step": 11,
-        "action": "Plan maximal safe surgical resection with awake craniotomy and language mapping, followed by Stupp protocol (concurrent temozolomide and radiation therapy)",
-        "tool_name": null,
-        "expected_finding": "Comprehensive surgical and adjuvant treatment plan established via multidisciplinary tumor board",
-        "category": "required"
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "Cardiac monitoring is unrelated to the diagnostic workup of a brain mass and adds resource cost without informing management",
+        "citation": "[NCCN_CNS]"
+      }
+    ],
+    "harmful_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is contraindicated in suspected intracranial mass with imaging mass effect (effacement of ventricles / sulci / cisterns): the pressure gradient created by LP risks transtentorial or tonsillar herniation. Even when LP is otherwise safe, CSF studies are low-yield for primary brain tumor diagnosis.",
+        "citation": "[Hasbun_2001]"
+      }
+    ],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "MRI must precede any lumbar puncture when a mass lesion is suspected, to identify mass effect and herniation risk before LP",
+        "citation": "[Hasbun_2001]",
+        "severity": "hard"
+      },
+      {
+        "before": "analyze_brain_mri",
+        "after": "consult_medical_specialist",
+        "reason": "Adequate pre-operative MRI characterization (mass, edema, eloquent-cortex proximity) is standard of care before neurosurgical tissue acquisition",
+        "citation": "[Stupp_2005]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Do not assume the intracranial mass is a thyroid cancer metastasis based solely on the cancer history and elevated thyroglobulin — advanced imaging and tissue biopsy are essential to differentiate primary brain tumor from metastasis",
-      "Order MR perfusion and MR spectroscopy to evaluate whether the lesion shows an infiltrative (glioma) or non-infiltrative (metastasis) pattern in perilesional tissue",
-      "Request immunohistochemistry for TTF-1 and PAX8 on biopsy tissue to definitively exclude metastatic thyroid carcinoma",
-      "Initiate anti-seizure medication after the witnessed focal motor seizure in the setting of a structural brain lesion",
-      "Request molecular profiling (IDH, MGMT, 1p/19q, TERT, EGFR) on biopsy to guide treatment planning — particularly MGMT methylation status for temozolomide response prediction",
-      "Perform metastatic workup (CT chest/abdomen/pelvis) to evaluate for thyroid cancer recurrence or other primary malignancies"
+      "Obtain urgent neurosurgical consultation for tissue diagnosis (stereotactic biopsy or maximal safe resection) and operative planning",
+      "Obtain MRI brain with and without gadolinium contrast (tumor protocol) before any invasive procedure",
+      "Initiate dexamethasone (e.g., 4 mg IV every 6 hours) to control symptomatic peritumoral edema; titrate to lowest effective dose",
+      "Obtain pre-operative labs (CBC, BMP, coagulation, type & screen) before craniotomy/biopsy",
+      "Plan multimodal treatment per molecular and histological profile (e.g., Stupp protocol — concurrent chemoradiation with temozolomide for IDH-wildtype GBM)"
     ],
     "contraindicated_actions": [
-      "Treating the brain lesion as a presumed thyroid cancer metastasis with systemic thyroid cancer therapy (e.g., radioactive iodine, lenvatinib, sorafenib) without tissue confirmation — this would delay appropriate GBM treatment with potentially fatal consequences",
-      "Administering radioactive iodine therapy empirically for presumed thyroid metastasis without tissue diagnosis",
-      "Performing lumbar puncture in the setting of mass effect and midline shift due to risk of uncal herniation",
-      "Withholding corticosteroids in the presence of significant vasogenic edema and mass effect",
-      "Using enzyme-inducing anti-epileptic drugs (carbamazepine, phenytoin, phenobarbital) that would reduce temozolomide efficacy via CYP450 induction",
-      "Discharging the patient for outpatient follow-up given the large mass with mass effect and focal neurological deficits"
+      "Do not perform lumbar puncture in the setting of intracranial mass effect — herniation risk",
+      "Do not initiate definitive tumor-directed therapy (radiation, temozolomide, alkylating chemotherapy) before tissue diagnosis is established",
+      "Do not start therapeutic anticoagulation without a clear thromboembolic indication, given upcoming neurosurgical intervention and bleeding risk"
     ],
     "key_reasoning_points": [
-      "The prior thyroid follicular carcinoma history is the central confounding factor in this diagnostic puzzle — it creates a plausible explanation for the brain lesion as a metastasis, potentially leading to premature diagnostic closure",
-      "The mildly elevated thyroglobulin (3.2 ng/mL) is a deliberate red herring: after hemithyroidectomy (not total thyroidectomy), residual normal thyroid tissue can produce measurable thyroglobulin levels, and the value is within the range explained by residual tissue rather than necessarily indicating cancer recurrence",
-      "The atypical MRI appearance (infiltrative mass with patchy rather than ring enhancement, no classic central necrosis) creates additional diagnostic uncertainty — it does not look like a typical GBM, which may steer clinicians toward alternative diagnoses including metastasis",
-      "MR perfusion is a critical discriminating study: elevated rCBV in perilesional non-enhancing tissue is characteristic of infiltrative glioma and effectively excludes metastasis, which shows elevated perfusion only within the enhancing lesion",
-      "MR spectroscopy provides the second key discriminating study: metabolic abnormalities (elevated choline, reduced NAA) extending into non-enhancing tissue confirm infiltrative tumor spread, which is pathognomonic for primary diffuse glioma and incompatible with metastatic disease",
-      "The recent extensive medical workup (cardiology, gastroenterology) for nonspecific symptoms (dyspnea, chest discomfort, dysphagia) in retrospect may represent early constitutional symptoms or could be entirely unrelated — these red herrings add to the complexity of the case",
-      "The family history of breast and prostate cancer adds another layer of concern for metastatic disease from an undiagnosed primary, but CT body imaging is negative",
-      "TTF-1 and PAX8 immunohistochemistry on biopsy tissue is the definitive test to exclude thyroid carcinoma metastasis — an expert clinician should specifically request these stains given the clinical history"
+      "Combination of progressive headache (worse mornings), new focal neurological deficit, and/or new-onset seizure in an adult is a high-risk presentation requiring urgent contrast-enhanced brain MRI",
+      "MRI features of a right hemisphere heterogeneously / ring-enhancing mass with central necrosis, perilesional FLAIR-hyperintense edema, restricted diffusion at the enhancing rim, and mass effect are characteristic of high-grade glioma",
+      "Perfusion MRI (elevated rCBV) and MR spectroscopy (elevated Cho/NAA, lipid-lactate) corroborate high-grade neoplasm and help guide biopsy targeting",
+      "Mass effect, even when modest, makes lumbar puncture risky and low-yield for primary brain tumor diagnosis — MRI must precede any consideration of LP",
+      "Definitive diagnosis requires tissue (stereotactic biopsy or surgical resection) with molecular profiling (IDH, MGMT, 1p/19q, TERT, H3K27M); imaging alone cannot substitute for histology",
+      "For IDH-wildtype GBM, current standard of care is maximal safe resection followed by the Stupp protocol (concurrent radiation + temozolomide, then adjuvant temozolomide)",
+      "Avoid ordering off-pathway advanced-imaging modalities (DaTscan, amyloid PET, FDG-PET, carotid duplex, transcranial Doppler) — they address other neurological differentials and add cost without informing glioma management"
     ],
     "red_herrings": [
       {
-        "data_point": "Prior history of thyroid follicular carcinoma treated with hemithyroidectomy 8 years ago",
+        "data_point": "Remote thyroid follicular carcinoma (pT2N0M0) treated 8 years ago with hemithyroidectomy and RAI ablation",
         "location": "patient.clinical_history.past_medical_history",
-        "intended_effect": "The most powerful red herring: immediately suggests that the brain lesion is a thyroid carcinoma metastasis, leading to oncological workup for recurrent thyroid cancer rather than glioblastoma workup",
-        "correct_interpretation": "Thyroid follicular carcinoma can metastasize to brain, but metastases are typically well-circumscribed, spherical, and hypervascular — not infiltrative. MR perfusion shows elevated rCBV in perilesional non-enhancing tissue (glioma pattern). MR spectroscopy shows metabolic abnormalities extending beyond the enhancement (infiltrative glioma pattern). Biopsy with TTF-1/PAX8 staining is definitively negative, excluding thyroid origin.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Mildly elevated thyroglobulin (3.2 ng/mL) — above target post-hemithyroidectomy (<1 ng/mL)",
-        "location": "initial_tool_outputs.labs",
-        "intended_effect": "Elevated thyroglobulin after thyroid cancer surgery suggests cancer recurrence, further supporting the diagnosis of thyroid brain metastasis",
-        "correct_interpretation": "After hemithyroidectomy (not total thyroidectomy), the remaining normal thyroid lobe produces measurable thyroglobulin. A level of 3.2 ng/mL is within the expected range for residual normal thyroid tissue. Thyroid ultrasound shows benign residual left thyroid tissue — no recurrent cancer nodule. This is a deliberate numeric red herring.",
-        "field_path": ""
+        "field_path": "",
+        "intended_effect": "Anchors clinician toward metastatic disease from prior malignancy, potentially altering staging workup and biopsy considerations",
+        "correct_interpretation": "Undetectable thyroglobulin and negative surveillance argue strongly against recurrence; the frontal mass has imaging characteristics of high-grade glioma and biopsy confirms primary glial neoplasm"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -1037,6 +1052,14 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:GLIO-HG",
+    "difficulty_rationale": "5 required tools, 1 red herring; requires synthesis of MRI + advanced imaging + tissue diagnosis; the red herring is a plausible alternative explanation that needs to be actively ruled out",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

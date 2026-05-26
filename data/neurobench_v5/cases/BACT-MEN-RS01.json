@@ -1,7 +1,7 @@
 {
   "case_id": "BACT-MEN-RS01",
   "condition": "bacterial_meningitis",
-  "difficulty": "straightforward",
+  "difficulty": "diagnostic_puzzle",
   "encounter_type": "emergency",
   "patient": {
     "patient_id": "NB-BACT-MEN-RS01",
@@ -826,176 +826,213 @@
   },
   "ground_truth": {
     "primary_diagnosis": "Acute bacterial meningitis due to Streptococcus agalactiae (Group B Streptococcus)",
-    "icd_code": "G00.9",
+    "icd_code": "G00.2",
     "differential": [
       {
-        "diagnosis": "Cervical spine pathology (degenerative disc disease, fracture)",
-        "likelihood": "low",
-        "key_features": "CT and MRI of the cervical spine show only degenerative changes without fracture or significant compression. Degenerative changes are common in this age group and do not explain the marked leukocytosis or the progressive clinical course. Torticollis from cervical spine pathology would not be associated with WBC 34,500."
+        "diagnosis": "Viral (aseptic) meningitis",
+        "likelihood": "moderate",
+        "key_features": "Lymphocyte-predominant CSF, normal-to-mildly elevated glucose, lower protein, lower CRP/procalcitonin — clinically distinguished by less toxic appearance",
+        "icd_code": "A87.9"
       },
       {
-        "diagnosis": "Viral meningitis",
-        "likelihood": "low",
-        "key_features": "Viral meningitis presents with lymphocytic pleocytosis, normal or mildly elevated protein, and normal glucose. This patient has neutrophilic pleocytosis, markedly elevated protein, very low glucose, and positive GBS antigen."
+        "diagnosis": "Viral encephalitis (HSV-1)",
+        "likelihood": "moderate",
+        "key_features": "Temporal lobe MRI changes, seizures or focal deficits, lymphocytic CSF; HSV PCR required to exclude",
+        "icd_code": "B00.4"
       },
       {
-        "diagnosis": "Retropharyngeal or cervical soft-tissue abscess",
+        "diagnosis": "Tuberculous meningitis",
+        "likelihood": "moderate",
+        "key_features": "Subacute onset, lymphocytic CSF, basilar enhancement, very low glucose — different tempo and pattern from this case",
+        "icd_code": "A17.0"
+      },
+      {
+        "diagnosis": "Cryptococcal meningitis",
         "likelihood": "low",
-        "key_features": "No pharyngeal erythema, tonsillar inflammation, dysphagia, or odynophagia on examination. CT neck showed intact prevertebral soft tissues without abscess collection."
+        "key_features": "Typically in severely immunocompromised host; cryptococcal antigen and India ink exclude",
+        "icd_code": "B45.1"
       },
       {
         "diagnosis": "Subarachnoid hemorrhage",
         "likelihood": "very_low",
-        "key_features": "SAH presents with sudden thunderclap headache and xanthochromia. This patient has a subacute progressive course with neck stiffness rather than acute headache. CT head was normal. CSF shows neutrophilic pleocytosis rather than xanthochromia."
-      },
-      {
-        "diagnosis": "Tuberculous meningitis",
-        "likelihood": "very_low",
-        "key_features": "TB meningitis typically has a more gradual course over weeks, lymphocytic pleocytosis, basilar enhancement, and risk factors for TB exposure. This patient has neutrophilic pleocytosis and positive GBS antigen."
+        "key_features": "Sudden thunderclap headache, xanthochromic CSF, hemorrhage on CT — none of these features present",
+        "icd_code": "I60.9"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Recognize that persistent neck stiffness with torticollis in the setting of markedly elevated WBC (34,500) and tachycardia in an afebrile patient should raise suspicion for occult meningitis, even without classic fever or headache",
-        "tool_name": null,
-        "expected_finding": "Torticollis as an atypical presentation of meningeal irritation; WBC 34,500 with 92% neutrophils is incompatible with simple musculoskeletal neck pain",
-        "category": "required"
+        "action": "Obtain non-contrast CT head to exclude mass effect, midline shift, basal cistern obliteration, or hydrocephalus that would contraindicate lumbar puncture in this patient with altered mental status and/or immunocompromise.",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Absence of mass lesion, midline shift, or signs of impending herniation — confirms LP is safe.",
+        "category": "required",
+        "tool_parameters": {
+          "contrast": false
+        },
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §V"
       },
       {
         "step": 2,
-        "action": "Obtain laboratory studies including CBC with differential, BMP, inflammatory markers (CRP, procalcitonin, lactate), and blood cultures",
+        "action": "Draw two sets of peripheral blood cultures BEFORE the first antibiotic dose and send CBC with differential, CMP, procalcitonin, CRP, and lactate.",
         "tool_name": "interpret_labs",
-        "expected_finding": "WBC 34,500 with 92% neutrophils, CRP 185, procalcitonin 5.4, elevated lactate indicating severe bacterial infection",
+        "expected_finding": "Peripheral leukocytosis with left shift, elevated procalcitonin/CRP, eventual blood-culture growth of the pathogen.",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
-            "CRP",
+            "blood_cultures",
             "inflammatory_markers"
           ]
-        }
+        },
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §VI"
       },
       {
         "step": 3,
-        "action": "Obtain CT head to rule out contraindications to lumbar puncture",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "Normal CT head without mass lesion or herniation; safe to proceed with LP",
-        "category": "required",
-        "tool_parameters": {
-          "angiography": false,
-          "contrast": false
-        }
-      },
-      {
-        "step": 4,
-        "action": "Administer empiric IV antibiotics immediately (vancomycin plus ceftriaxone; add ampicillin for Listeria coverage given age >50 and diabetes)",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
-      },
-      {
-        "step": 5,
-        "action": "Perform lumbar puncture with opening pressure measurement and send CSF for cell count, protein, glucose, Gram stain, culture, bacterial antigens, and lactate",
+        "action": "Perform lumbar puncture with opening-pressure measurement and send CSF for cell count with differential, glucose (with paired serum), protein, Gram stain, bacterial culture, meningitis multiplex PCR panel, and CSF lactate.",
         "tool_name": "analyze_csf",
-        "expected_finding": "Turbid CSF, elevated opening pressure, WBC 1310 (94% neutrophils), protein 248, glucose 18, GBS antigen positive",
+        "expected_finding": "Elevated opening pressure, PMN-predominant pleocytosis, low CSF:serum glucose ratio (<0.4), elevated protein, elevated CSF lactate; PCR or culture identifies the organism.",
         "category": "required",
         "tool_parameters": {
           "special_tests": [
             "meningitis_panel"
           ]
-        }
+        },
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §V"
+      },
+      {
+        "step": 4,
+        "action": "Verify compatibility of empiric vancomycin + ceftriaxone (+ ampicillin if Listeria coverage indicated) and adjunctive dexamethasone with the patient's current medications, and confirm timing of dexamethasone BEFORE or WITH the first antibiotic dose.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "No prohibitive interactions; confirmation of standard guideline-directed empiric regimen with dose adjustments as required.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[De_Gans_2002]",
+        "guideline_source": "De Gans 2002"
+      },
+      {
+        "step": 5,
+        "action": "Search the literature for current guideline-directed empiric antibiotic selection by age and host factors and for the evidence base supporting adjunctive dexamethasone in pneumococcal meningitis.",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Retrieval of IDSA 2004, ESCMID 2016, and De Gans 2002 to support empiric regimen and steroid timing.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §VII"
       },
       {
         "step": 6,
-        "action": "Order brain MRI with and without contrast to evaluate extent of meningeal involvement and rule out complications",
+        "action": "Obtain contrast-enhanced brain MRI to assess for parenchymal complications (cerebritis, abscess, subdural empyema, ventriculitis, venous sinus thrombosis, infarction).",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Diffuse leptomeningeal enhancement, sulcal FLAIR hyperintensity consistent with meningitis",
-        "category": "required",
-        "tool_parameters": {
-          "protocol": "standard",
-          "contrast": true
-        }
-      },
-      {
-        "step": 7,
-        "action": "Narrow antibiotic therapy to high-dose penicillin G or ampicillin once GBS is confirmed and susceptibilities are available",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
-      },
-      {
-        "step": 8,
-        "action": "Discontinue cyclobenzaprine, hydrocodone, and methocarbamol to avoid masking neurological symptoms and accurately assess mental status",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
-      },
-      {
-        "step": 9,
-        "action": "Monitor and manage hyponatremia from potential SIADH with serial sodium levels and fluid management",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended"
-      },
-      {
-        "step": 10,
-        "action": "Evaluate the right lower-extremity venous stasis ulcer as a potential portal of entry for GBS bacteremia",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended"
-      },
-      {
-        "step": 11,
-        "action": "Search medical literature on GBS meningitis in nonpregnant adults for treatment duration and adjunctive therapy guidance",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "GBS meningitis requires 14-21 days of treatment; consider synergistic gentamicin for first 5-7 days",
-        "category": "recommended"
-      },
-      {
-        "step": 12,
-        "action": "Assess hearing with audiometry prior to discharge",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Audiometry to screen for sensorineural hearing loss as a complication of bacterial meningitis",
+        "expected_finding": "Leptomeningeal enhancement; identification or exclusion of complications that modify management.",
         "category": "recommended",
         "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP"
-          ]
-        }
+          "contrast": true
+        },
+        "citation": "[Brouwer_2012]",
+        "guideline_source": "Brouwer 2012"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No evidence of endocarditis as a primary source in this case; echocardiography is not part of routine meningitis workup.",
+        "citation": "[IDSA_2004]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "No arrhythmia indication; continuous cardiac monitoring contributes nothing to meningitis diagnosis or treatment.",
+        "citation": "[IDSA_2004]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "PET imaging has no role in acute meningitis diagnosis; CT and MRI cover the indications.",
+        "citation": "[IDSA_2004]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET is a dementia biomarker tool with no role in acute infectious meningitis.",
+        "citation": "[IDSA_2004]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "Per IDSA 2004, non-contrast CT head must precede lumbar puncture whenever any imaging-first criterion is present (altered mental status, focal neurological deficit, papilledema, recent seizure, immunocompromise, or age >60). LP performed in undetected mass effect can precipitate fatal herniation.",
+        "citation": "[IDSA_2004]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "analyze_csf",
+        "reason": "Blood cultures must be drawn (under interpret_labs) before the first dose of empiric antibiotics so that culture yield is not lost; in practice this means peripheral cultures are collected at the same draw as the CSF analysis is initiated, and the lab tube sequencing prevents antibiotic exposure before specimen acquisition.",
+        "citation": "[IDSA_2004]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Recognize that torticollis with severe leukocytosis (WBC 34,500) indicates a serious infection, not simple musculoskeletal pathology",
-      "Obtain blood cultures before antibiotic administration",
-      "Administer empiric IV antibiotics (vancomycin plus ceftriaxone, with ampicillin for Listeria coverage given age >50) immediately upon suspicion of meningitis",
-      "Perform lumbar puncture with CSF analysis including cell count, protein, glucose, Gram stain, culture, and bacterial antigens",
-      "Obtain CT head before LP to rule out contraindications",
-      "Admit to ICU or monitored setting for close neurological and hemodynamic monitoring"
+      "Administer the first dose of empiric IV antibiotics (vancomycin 15-20 mg/kg + ceftriaxone 2 g) within 60 minutes of clinical suspicion; do NOT delay antibiotics for LP or imaging beyond what is strictly needed for safety.",
+      "Give adjunctive dexamethasone 10 mg IV before or with the first antibiotic dose; continue q6h for 4 days in confirmed pneumococcal meningitis.",
+      "Draw two sets of peripheral blood cultures before the first antibiotic dose.",
+      "Obtain CT head before LP because imaging-first criteria are present (altered mental status, immunocompromise, focal signs, papilledema, or age >60).",
+      "Send full CSF panel (cell count, differential, glucose, protein, Gram stain, culture, meningitis multiplex PCR, lactate) at the LP.",
+      "Reassess and de-escalate antibiotics based on Gram stain, culture, and susceptibility results.",
+      "Place patient on droplet precautions until meningococcal disease is excluded."
     ],
     "contraindicated_actions": [
-      "Discharging the patient a third time with oral analgesics and muscle relaxants without investigating the cause of marked leukocytosis",
-      "Delaying antibiotic administration to wait for CT, LP, or culture results",
-      "Attributing the tachycardia solely to cyclobenzaprine without considering sepsis",
-      "Using fluoroquinolone monotherapy for suspected bacterial meningitis",
-      "Performing LP without first obtaining CT in a patient with altered sensorium or focal deficits",
-      "Withholding lumbar puncture because the patient is afebrile and lacks classic meningeal signs"
+      "Do NOT delay empiric antimicrobial therapy while awaiting imaging or LP results when bacterial meningitis is clinically suspected.",
+      "Do NOT perform lumbar puncture before CT head when any imaging-first criterion (altered mental status, focal deficit, papilledema, seizure, immunocompromise, age >60) is present.",
+      "Do NOT discontinue dexamethasone solely because the Gram stain is negative — completion of the 4-day course is appropriate in suspected pneumococcal meningitis until alternative organism is identified.",
+      "Do NOT rely on a negative Gram stain or a 'normal CT' to rule out bacterial meningitis when the clinical syndrome is present.",
+      "Do NOT treat with oral antibiotics alone; CNS penetration is inadequate for meningitis.",
+      "Do NOT assume a benign musculoskeletal etiology for fluctuating neck stiffness in older or immunocompromised patients without first excluding meningitis with LP."
     ],
     "key_reasoning_points": [
-      "Meningeal irritation can present with torticollis or opisthotonus rather than classic nuchal rigidity, and this atypical presentation can lead to repeated misdiagnosis as musculoskeletal neck pain",
-      "The absence of fever does not rule out bacterial meningitis; up to 5-20% of adult bacterial meningitis cases may be afebrile at presentation, particularly in elderly or immunocompromised patients",
-      "The dramatically elevated WBC (34,500 with 92% neutrophils) is a critical clue that the neck stiffness has an infectious rather than musculoskeletal etiology, and should have prompted further workup at earlier ED visits",
-      "CSF findings of neutrophilic pleocytosis (WBC 1310), markedly elevated protein (248 mg/dL), very low glucose (CSF:serum ratio 0.10), and positive GBS antigen are diagnostic for bacterial meningitis despite negative Gram stain",
-      "Group B Streptococcus meningitis in nonpregnant adults is associated with diabetes mellitus and may have a portal of entry through skin breaks such as the chronic lower-extremity ulcer",
-      "A negative Gram stain does not exclude bacterial meningitis; Gram stain sensitivity ranges from 60-90% depending on organism and bacterial load, making bacterial antigen testing and PCR essential complementary studies",
-      "This case illustrates a diagnostic pitfall: three ED visits over 15 days with progressive symptoms before the correct diagnosis was made, emphasizing the importance of reconsidering the differential when initial treatment fails"
+      "Acute bacterial meningitis presents with fever, headache, meningismus, and altered mental status; the full triad is present in only ~40%, so partial syndromes warrant aggressive workup.",
+      "Antibiotic timing matters: every hour of delay after the first hour increases mortality. Antibiotics MUST precede imaging or LP if either would delay treatment >60 minutes.",
+      "CT before LP is mandated when any imaging-first criterion is present (altered mental status, focal signs, papilledema, recent seizure, immunocompromise, or age >60).",
+      "Adjunctive dexamethasone (10 mg IV q6h × 4 days) given BEFORE or WITH the first antibiotic dose reduces mortality and unfavourable outcomes in pneumococcal meningitis (De Gans 2002, NEJM).",
+      "A negative CSF Gram stain (sensitivity ~60-90%, lower if antibiotic pretreated) does not exclude bacterial meningitis; multiplex PCR or antigen testing retains sensitivity.",
+      "CSF:serum glucose ratio <0.4 is more reliable than absolute CSF glucose for distinguishing bacterial from viral meningitis.",
+      "Empiric coverage must include vancomycin + ceftriaxone in adults; add ampicillin for Listeria coverage if age >50 or immunocompromised.",
+      "Group B Streptococcus is unusual in non-pregnant adults; risk factors include diabetes, age >60, malignancy, and cirrhosis. Coverage with ampicillin (or penicillin) plus ceftriaxone is appropriate."
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "Negative CSF Gram stain",
+        "location": "initial_tool_outputs.csf.special_tests.Gram_stain",
+        "field_path": "initial_tool_outputs.csf",
+        "intended_effect": "Lower the index of suspicion for bacterial meningitis.",
+        "correct_interpretation": "Gram-stain sensitivity is only 60-90% even untreated; multiplex PCR and antigen testing must be used to confirm the organism."
+      },
+      {
+        "data_point": "Hyponatremia on admission labs",
+        "location": "initial_tool_outputs.labs.panels.BMP",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Redirect workup toward primary endocrine or volume-status causes of hyponatremia.",
+        "correct_interpretation": "SIADH is a common complication OF bacterial meningitis itself; treat with fluid restriction while addressing the underlying CNS infection — do not let it distract from the meningitis diagnosis."
+      },
+      {
+        "data_point": "15-day history of neck stiffness initially attributed to musculoskeletal pain",
+        "location": "patient.history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Anchor on musculoskeletal aetiology and miss subacute bacterial meningitis.",
+        "correct_interpretation": "Atypical or indolent meningitis (e.g., GBS, Listeria) can present with prolonged neck stiffness; new fever or altered mental status mandates LP."
+      }
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -1011,6 +1048,15 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "literature_search": "normal"
-    }
+    },
+    "version": "1.0",
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:BACT-MEN",
+    "difficulty_rationale": "5 required tools; 3 red herrings",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

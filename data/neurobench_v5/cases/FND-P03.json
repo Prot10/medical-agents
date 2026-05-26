@@ -606,157 +606,198 @@
     "icd_code": "F44.4",
     "differential": [
       {
-        "diagnosis": "MS relapse",
-        "likelihood": "low",
-        "key_features": "No new MRI lesions or enhancement on brain or spine imaging; bilateral symmetric pattern atypical for MS relapse (which is typically unilateral and follows anatomical pathways); positive functional signs (Hoover, give-way weakness, distractibility); fluctuating symptoms with emotional triggers."
+        "diagnosis": "Multiple sclerosis (demyelinating disease)",
+        "likelihood": "moderate",
+        "key_features": "Sensorimotor symptoms in a young adult raise demyelinating disease; brain (and when indicated spine) MRI without T2/FLAIR lesions or enhancement argues against an active demyelinating process.",
+        "icd_code": "G35"
       },
       {
-        "diagnosis": "Secondary progressive MS",
+        "diagnosis": "Structural CNS lesion (tumor, demyelination, stroke)",
         "likelihood": "low",
-        "key_features": "SPMS progression is gradual over months to years, not a 2-week fluctuating course; MRI stable without progressive atrophy; patient's stable MRI over 3 years argues against active progression."
+        "key_features": "Focal complaints warrant imaging; normal brain MRI without lesion, mass, or enhancement effectively excludes a structural cause for the presenting deficit.",
+        "icd_code": null
       },
       {
-        "diagnosis": "Spinal cord compression",
+        "diagnosis": "Peripheral neuropathy or radiculopathy",
+        "likelihood": "low",
+        "key_features": "Non-dermatomal sensory loss, normal reflexes, and (when obtained) normal EMG/NCS argue against peripheral nerve or root pathology.",
+        "icd_code": "G62.9"
+      },
+      {
+        "diagnosis": "Autoimmune or paraneoplastic encephalitis",
         "likelihood": "very_low",
-        "key_features": "Spine MRI shows no new lesion, no cord compression, stable T6 lesion; bilateral symmetric pattern with positive functional signs is non-anatomical."
+        "key_features": "Episodic neurological symptoms can occur in autoimmune encephalitis; normal MRI, normal EEG background, and (when obtained) negative antibody panel render this very unlikely.",
+        "icd_code": "G04.81"
       },
       {
-        "diagnosis": "Depression-related psychomotor slowing",
-        "likelihood": "low",
-        "key_features": "Give-way weakness and positive Hoover sign are specific for FND, not depression; dramatic fluctuation and normalization with distraction is not a feature of depressive psychomotor retardation."
+        "diagnosis": "Malingering or factitious disorder",
+        "likelihood": "very_low",
+        "key_features": "FND is involuntary; preserved effort on symptom-validity testing and absence of clear secondary gain argue against feigning. The rule-in signs do not distinguish FND from malingering by themselves, but the clinical context does not support a feigning explanation.",
+        "icd_code": "F68.10"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain brain and spine MRI with gadolinium to rule out new MS inflammatory activity",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Stable MS lesions with no new or enhancing lesions, effectively excluding MS relapse",
+        "action": "Elicit positive rule-in signs on bedside examination (Hoover sign for functional leg weakness, tremor entrainment / distractibility for functional tremor, give-way weakness, non-dermatomal sensory loss with midline splitting). Diagnosis of FND is made by these positive signs, not by exclusion alone.",
+        "tool_name": null,
+        "expected_finding": "At least one reliable positive functional sign documented",
         "category": "required",
-        "tool_parameters": {
-          "protocol": "ms",
-          "contrast": true
-        }
+        "tool_parameters": {},
+        "citation": "[Espay_2018]",
+        "guideline_source": "FND criteria pack — positive diagnosis"
       },
       {
         "step": 2,
-        "action": "Compare current MRI with prior studies to confirm stability",
+        "action": "Order brain MRI with and without contrast to exclude a structural cause of the presenting deficit",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Zero new lesions confirmed on formal comparison",
+        "expected_finding": "No structural lesion, mass, demyelination, or stroke",
         "category": "required",
         "tool_parameters": {
-          "protocol": "standard",
-          "contrast": false
-        }
+          "contrast": true
+        },
+        "citation": "[Espay_2018]",
+        "guideline_source": "FND criteria pack — exclude structural cause"
       },
       {
         "step": 3,
-        "action": "Perform detailed neurological examination with specific attention to functional signs, DISTINGUISHING new functional signs from old stable MS deficits",
-        "tool_name": null,
-        "expected_finding": "New functional signs (Hoover sign, give-way weakness, tubular fields, midline splitting, gait inconsistency) on top of stable old MS findings (optic pallor, brisk reflexes, vibration reduction)",
-        "category": "required"
-      },
-      {
-        "step": 4,
-        "action": "Order labs including inflammatory markers to exclude active systemic process",
+        "action": "Order basic laboratory workup (CBC, CMP, TSH, vitamin B12) to exclude common reversible mimics",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal labs, no evidence of active inflammation",
+        "expected_finding": "No metabolic, thyroid, or B12 abnormality that explains symptoms",
         "category": "required",
         "tool_parameters": {
           "panels": [
-            "inflammatory_markers"
+            "CBC",
+            "CMP",
+            "TSH",
+            "B12"
           ]
-        }
+        },
+        "citation": "[Stone_2018]",
+        "guideline_source": "FND criteria pack — exclude reversible causes"
+      },
+      {
+        "step": 4,
+        "action": "Search current literature on FND diagnostic signs and evidence-based treatment (CBT for PNES, specialized physiotherapy for functional motor symptoms)",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirms multidisciplinary CBT + physiotherapy is the evidence-based treatment for FND",
+        "category": "recommended",
+        "tool_parameters": {
+          "query": "functional neurological disorder diagnosis treatment"
+        },
+        "citation": "[Nielsen_2015]",
+        "guideline_source": "FND criteria pack — treatment evidence"
       },
       {
         "step": 5,
-        "action": "Consider SSEPs to assess whether sensory pathways have changed from baseline",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Cortical responses present (intact sensory pathway); old prolonged conduction stable",
+        "action": "Review current medications for agents that may exacerbate symptoms (e.g., benzodiazepines, dopamine-blocking antipsychotics, AEDs initiated for PNES)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identification of medication contributors that should be tapered or discontinued",
         "category": "recommended",
-        "tool_parameters": {
-          "test_type": "neuropsych_battery"
-        }
+        "tool_parameters": {},
+        "citation": "",
+        "guideline_source": "FND criteria pack — medication review"
       },
       {
         "step": 6,
-        "action": "Deliver the dual diagnosis transparently: 'Your MS is stable and this is not a relapse, but you have developed a different type of neurological problem called FND that can co-occur with MS'",
+        "action": "Communicate the diagnosis transparently using positive language anchored on the rule-in signs; explicitly state the diagnosis is FND, the symptoms are real and involuntary, and there is an evidence-based treatment plan",
         "tool_name": null,
-        "expected_finding": "Patient understanding of dual pathology",
-        "category": "required"
+        "expected_finding": "Patient understanding and treatment engagement — strong predictor of recovery",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Stone_2018]",
+        "guideline_source": "FND criteria pack — diagnostic communication"
       },
       {
         "step": 7,
-        "action": "Do NOT escalate MS immunotherapy — natalizumab should be continued as scheduled",
+        "action": "Refer to specialized FND-informed physiotherapy (for functional motor symptoms) and to CBT / psychological therapy (for PNES and comorbid mood / anxiety)",
         "tool_name": null,
-        "expected_finding": "No DMT change",
-        "category": "required"
-      },
-      {
-        "step": 8,
-        "action": "Refer for psychological treatment addressing depression, health anxiety, and psychosocial stressors",
-        "tool_name": null,
-        "expected_finding": "Psychiatric referral placed",
-        "category": "required"
-      },
-      {
-        "step": 9,
-        "action": "Refer for specialized FND physiotherapy",
-        "tool_name": null,
-        "expected_finding": "FND-specific physiotherapy referral placed",
-        "category": "required"
+        "expected_finding": "Engagement in evidence-based multidisciplinary care",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Nielsen_2015]",
+        "guideline_source": "Nielsen 2015 — physiotherapy consensus"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG has no diagnostic role in FND; cardiac etiology is not on the differential for the presenting neurological deficit.",
+        "citation": "[Stone_2018]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography has no role in FND; no structural cardiac question is raised by the presentation.",
+        "citation": "[Stone_2018]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac rhythm monitoring is not indicated; the events are non-syncopal and the rule-in signs point to FND.",
+        "citation": "[Stone_2018]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT adds no information beyond MRI for an FND workup and contributes diagnostic noise plus radiation exposure.",
+        "citation": "[Espay_2018]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in typical FND; invasive testing reinforces somatic illness model and adds iatrogenic risk without changing management.",
+        "citation": "[Stone_2018]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "Advanced PET imaging has no indication in FND; standard MRI is the appropriate structural workup.",
+        "citation": "[Espay_2018]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "Obtain brain and spine MRI to rule out new MS activity",
-      "Identify positive functional signs (Hoover sign, give-way weakness, distractibility, tubular fields) through careful examination",
-      "Clearly distinguish new functional symptoms from old stable MS deficits",
-      "Deliver the dual diagnosis transparently — FND can co-occur with MS",
-      "Do NOT escalate MS immunotherapy for functional symptoms",
-      "Treat underlying psychological factors (depression, health anxiety, psychosocial stressors)"
+      "Document at least one positive rule-in sign (Hoover sign, tremor entrainment, distractibility, give-way pattern, non-dermatomal sensory loss with midline split)",
+      "Obtain brain MRI to exclude structural pathology",
+      "Communicate the diagnosis transparently using positive language and the rule-in signs as the basis",
+      "Refer for FND-informed physiotherapy and CBT / psychological therapy",
+      "Order a comprehensive neuropsychological battery to characterize comorbid depression, anxiety, somatization, and trauma exposure — informs treatment planning (criteria-pack 'recommended' tier)"
     ],
     "contraindicated_actions": [
-      "Treating with IV methylprednisolone for a 'pseudo-relapse' without MRI evidence of new inflammatory activity",
-      "Escalating MS therapy (switching from natalizumab to a more aggressive DMT) based on functional symptoms",
-      "Attributing all new symptoms to MS without examination for functional signs",
-      "Dismissing symptoms as 'just psychological' — FND is a legitimate neurological disorder that requires specific treatment"
+      "Do not pursue ever-expanding negative investigations — per Stone 2018, repeated negative workups reinforce illness conviction and worsen prognosis",
+      "Do not frame the diagnosis as 'all in your head', 'nothing wrong', or 'we couldn't find anything' — this damages the therapeutic alliance and is the most common avoidable harm in FND",
+      "Do not perform invasive testing (lumbar puncture, nerve biopsy, muscle biopsy, cerebral angiography) when positive rule-in signs are present and there is no clinical indication",
+      "Do not order EMG/NCS, muscle biopsy, or nerve biopsy as part of an FND workup — these invasive tests reinforce the somatic illness model per Stone 2018"
     ],
     "key_reasoning_points": [
-      "FND co-occurs with MS at higher rates than the general population (up to 30% in some MS cohorts) — this is a well-recognized dual pathology",
-      "Positive functional signs (Hoover sign, give-way weakness, distractibility, tubular fields, midline splitting) are present ON TOP OF genuine stable MS findings",
-      "Stable MRI with no new or enhancing lesions excludes active MS relapse — this is the single most important investigation",
-      "The new symptoms are BILATERAL and symmetric — MS relapses are typically unilateral and follow anatomical pathways",
-      "Fluctuation with emotional stress and improvement with distraction are hallmarks of FND, not MS",
-      "Old stable MS findings (optic pallor, brisk reflexes, reduced vibration) should be carefully distinguished from new functional findings — these old signs do not indicate new disease activity",
-      "Psychosocial precipitants (fear of SPMS progression, marital stress, disability application) are risk factors for FND in MS patients",
-      "SSEPs showing intact cortical responses bilaterally argue against a new structural lesion causing the current sensory complaints"
+      "FND is a positive diagnosis based on rule-in signs (Hoover, tremor entrainment, give-way weakness, non-dermatomal sensory loss with midline split) — not a diagnosis of exclusion (Espay 2018, Stone 2018).",
+      "Brain MRI and basic labs (CBC, CMP, TSH, B12) are due-diligence to exclude structural and reversible causes — they are NOT the route to the diagnosis, which is established at the bedside.",
+      "Over-investigation is the principal iatrogenic harm in FND; every additional negative test reinforces the patient's illness conviction and worsens prognosis (Stone 2018).",
+      "Psychiatric comorbidity (anxiety, depression, trauma) is common and informs treatment planning but is NOT required for the diagnosis and does not 'explain' the symptoms in a reductive sense.",
+      "Diagnostic communication matters: using positive language anchored on the rule-in signs is associated with better engagement and outcomes (Stone 2018).",
+      "Evidence-based treatment is multidisciplinary — CBT for PNES and FND-informed physiotherapy for functional motor symptoms (Nielsen 2015)."
     ],
     "red_herrings": [
       {
-        "data_point": "Known MS diagnosis with 12-year history",
-        "location": "history",
-        "intended_effect": "Every new neurological symptom in an MS patient is reflexively attributed to MS relapse or progression",
-        "correct_interpretation": "MS patients can develop FND; positive functional signs on examination + stable MRI = FND, not relapse. The diagnosis of MS creates a strong cognitive anchor that must be overcome.",
-        "field_path": ""
+        "data_point": "Pre-existing psychiatric diagnosis (anxiety or depression) in the past medical history",
+        "location": "Past medical history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Premature anchoring on a 'psychosomatic' label without obtaining positive rule-in signs; conversely, dismissing FND as a serious diagnosis because the patient is 'just anxious'",
+        "correct_interpretation": "Psychiatric comorbidity neither establishes nor refutes FND. Diagnosis requires positive rule-in signs on examination; psychiatric history is relevant for treatment planning, not for diagnosis."
       },
       {
-        "data_point": "Brisk reflexes in lower extremities",
-        "location": "neurological_exam",
-        "intended_effect": "Suggests ongoing upper motor neuron disease activity that could explain the weakness",
-        "correct_interpretation": "These are OLD findings from the prior thoracic myelitis 8 years ago, documented as stable on prior examinations. They are not new UMN signs and do not indicate current disease activity.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Fear of secondary progressive MS transition",
-        "location": "history",
-        "intended_effect": "Supports the assumption that MS is indeed progressing and these symptoms represent the transition to SPMS",
-        "correct_interpretation": "This fear is a psychological precipitant for FND, not evidence of actual MS progression. The stable MRI and lack of gradual disability progression argue against SPMS transition.",
-        "field_path": ""
+        "data_point": "Symptom onset coincident with a major psychosocial stressor",
+        "location": "History of present illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Conclude prematurely that stress 'caused' the symptoms and that the workup can be abbreviated",
+        "correct_interpretation": "Many organic conditions (MS, migraine, epilepsy) also flare with stress. Stress at onset is supportive context, not a diagnostic substitute for the positive rule-in signs."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "1.0",
@@ -775,6 +816,14 @@
       "advanced_imaging": "normal",
       "literature_search": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FND",
+    "difficulty_rationale": "Disabling, multi-region or refractory functional symptoms — often with comorbid organic disease (e.g., established MS, post-stroke deficit, prior epilepsy) or extensive prior workup. Differentiating new functional symptoms from organic progression requires careful synthesis of rule-in signs against negative imaging and EEG, plus discriminating communication.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

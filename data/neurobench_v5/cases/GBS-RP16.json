@@ -418,6 +418,17 @@
         "impression": "Sinus tachycardia with heart rate range 76–108 bpm. No significant arrhythmia detected during 72-hour monitoring. No conduction abnormality or significant pauses. Clinical correlation recommended.",
         "recommended_actions": []
       }
+    },
+    {
+      "trigger_action": "search_gbs_treatment",
+      "tool_name": "search_medical_literature",
+      "output": {
+        "general": {
+          "query": "general",
+          "results": [],
+          "summary": "No directly applicable, high-quality evidence was retrieved for this query. Recommend correlating with current society guidelines."
+        }
+      }
     }
   ],
   "fallback_tool_outputs": {
@@ -488,119 +499,194 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Guillain-Barré syndrome, AMAN variant (acute motor axonal neuropathy) — during ALL induction chemotherapy, likely immune dysregulation trigger; anti-GM1/GD1a positive",
+    "primary_diagnosis": "Guillain-Barré syndrome, AMAN variant (acute motor axonal neuropathy) during ALL induction; anti-GM1 / GD1a positive",
     "icd_code": "G61.0",
     "differential": [
       {
-        "diagnosis": "Vincristine-induced polyneuropathy",
+        "diagnosis": "Vincristine-induced neuropathy (acute exacerbation)",
+        "likelihood": "high",
+        "key_features": "Length-dependent, sensorimotor, typically subacute; areflexia possible but acute symmetric quadriplegia with CSF dissociation is not typical.",
+        "icd_code": "G62.0"
+      },
+      {
+        "diagnosis": "Leptomeningeal leukaemia / CNS infiltration",
+        "likelihood": "moderate",
+        "key_features": "CSF cytology, flow cytometry, MRI brain / spine; typically focal cranial neuropathies and not symmetric LMN.",
+        "icd_code": "C91.00"
+      },
+      {
+        "diagnosis": "Acute-onset CIDP",
+        "likelihood": "moderate",
+        "key_features": "Cannot distinguish at <8 weeks; longitudinal reassessment.",
+        "icd_code": "G61.81"
+      },
+      {
+        "diagnosis": "Critical illness polyneuropathy",
         "likelihood": "low",
-        "key_features": "Vincristine neuropathy is sensory-predominant 'dying-back' pattern; sensory NCS is NORMAL here; CSF protein elevated (not vincristine neuropathy); anti-GM1/GD1a positive; 48-hour acute onset not typical of gradual vincristine toxicity"
+        "key_features": "ICU and sepsis dependent; not consistent with rapid 48-hour onset.",
+        "icd_code": "G62.81"
       },
       {
-        "diagnosis": "CNS leukemic infiltration causing weakness",
+        "diagnosis": "Spinal cord compression from extramedullary chloroma",
         "likelihood": "very_low",
-        "key_features": "CSF cytology: zero blasts; MRI no cord/root infiltration; peripheral NCS pattern"
-      },
-      {
-        "diagnosis": "L-asparaginase-induced neuropathy",
-        "likelihood": "very_low",
-        "key_features": "L-asparaginase causes thrombosis not neuropathy; NCS demyelinating/axonal GBS pattern"
-      },
-      {
-        "diagnosis": "CIDP (chronic inflammatory demyelinating polyneuropathy)",
-        "likelihood": "very_low",
-        "key_features": "48-hour acute onset within GBS window (<4 weeks); AMAN NCS pattern; acute not chronic"
+        "key_features": "MRI spine excludes; sensory preserved here.",
+        "icd_code": "G95.20"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "NCS/EMG — urgent",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "AMAN pattern — pure motor axonal, sensory NCS normal",
+        "action": "Obtain CBC, CMP, HIV, anti-GM1/anti-GQ1b ganglioside antibodies, and stool culture / Campylobacter serology if recent diarrhea",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Mild leukocytosis / elevated inflammatory markers reflecting antecedent infection; ganglioside antibodies for variant typing; trigger identification (Campylobacter, CMV, EBV, Mycoplasma, HIV)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Yuki_2012]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 2,
-        "action": "Platelet transfusion then lumbar puncture with cytology",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Protein 128, WBC 5, no blasts — AMAN GBS, not CNS leukemia",
+        "action": "Order nerve conduction studies and needle EMG (EMG/NCS)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Demyelinating pattern (prolonged DML, conduction block, reduced CV, absent F-waves) consistent with AIDP, or reduced CMAP amplitudes in axonal variants (AMAN/AMSAN)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[Hadden_1998]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 3,
-        "action": "Anti-ganglioside panel (anti-GM1, anti-GD1a)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "High titer anti-GM1 and anti-GD1a — AMAN confirmed",
+        "action": "Perform lumbar puncture for CSF analysis",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Albuminocytologic dissociation — elevated protein with cell count <10/μL; may be normal in the first week of illness",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 4,
-        "action": "IVIG 0.4 g/kg/day x 5 days",
-        "tool_name": null,
-        "expected_finding": "Treatment initiated",
+        "action": "Order bedside respiratory function testing (FVC, MIP/MEP, NIF) and repeat every 4–6 hours",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline and serial FVC, MIP/MEP, NIF; deterioration to FVC <20 mL/kg, MIP worse than -30 cmH2O, or VC <40% predicted triggers ICU transfer / intubation",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[Sharshar_2003]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 5,
-        "action": "HOLD vincristine — discuss with oncology",
-        "tool_name": null,
-        "expected_finding": "Causative chemotherapy agent held",
+        "action": "Search the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[van_den_Berg_2014]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 6,
-        "action": "Serial FVC/NIF — AMAN high intubation risk",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Monitor declining FVC",
+        "action": "Check drug interactions / contraindications for IVIG (renal function, IgA deficiency screen) and/or plasma exchange (coagulation, calcium, hemodynamics)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Confirmation that IVIG can be given safely (no severe renal impairment, no IgA deficiency) or that plasma exchange is appropriate (adequate vascular access, stable coagulation)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[van_den_Berg_2014]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 7,
+        "action": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Sinus tachycardia or bradycardia; conduction or repolarisation abnormalities reflecting autonomic involvement",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 8,
+        "action": "Initiate continuous cardiac telemetry for the first 1–2 weeks for moderate/severe disease — autonomic instability (bradyarrhythmias, BP lability) is common",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Documentation of sinus pauses, bradyarrhythmias, BP lability, or non-sustained tachyarrhythmias",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "GBS is a peripheral nerve / nerve-root disorder; EEG has no role in diagnosis unless atypical CNS features (encephalopathy, seizures) are present.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated in typical GBS; reserve for pre-existing cardiac disease or unexplained hemodynamic instability after autonomic causes are excluded.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT contributes no diagnostic information in GBS; the disease is peripheral and CT does not visualise nerve roots reliably.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is reserved for atypical features (encephalopathy, CNS signs, transverse myelitis on differential). In classic GBS it does not aid diagnosis.",
+        "citation": "[van_den_Berg_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_specialized_test",
+        "after": "check_drug_interactions",
+        "reason": "Document respiratory status (FVC/NIF) before committing to IVIG vs plasma exchange — severe respiratory compromise mandates ICU triage and may influence treatment choice and timing.",
+        "citation": "[Sharshar_2003]",
+        "severity": "soft"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Renal function, IgA screen, and CBC must be reviewed before IVIG to mitigate renal failure, anaphylaxis (IgA-deficient patients), and aseptic meningitis risk.",
+        "citation": "[van_den_Berg_2014]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Distinguish AMAN-GBS from vincristine neuropathy using NCS: vincristine affects sensory fibers first (sensory predominant); AMAN has NORMAL sensory NCS — this is the critical discriminating finding",
-      "CSF protein 128 mg/dL with no blasts confirms GBS not CNS leukemia — both protein elevation and no blasts are required",
-      "Platelet transfusion required to >100,000 before lumbar puncture — thrombocytopenia 98,000 is below safe LP threshold",
-      "Hold vincristine and discuss with oncology — vincristine may have primed the immune environment for AMAN; do not give next scheduled dose",
-      "Anti-GM1/GD1a serological confirmation — AMAN is a serologically defined GBS subtype"
+      "Hold further vincristine pending neurology / oncology review.",
+      "Initiate IVIG 0.4 g/kg/day for 5 days (PLEX considered if leukaemia / coagulopathy permits).",
+      "MRI brain / spine and CSF cytology / flow cytometry to exclude CNS leukaemia.",
+      "Continuous cardiac telemetry given autonomic risk.",
+      "Coordinate with haem-onc and transfusion medicine for thrombocytopenia / coagulopathy considerations."
     ],
     "contraindicated_actions": [
-      "Continuing vincristine without oncology discussion",
-      "Succinylcholine if intubation required — use rocuronium",
-      "Corticosteroids (do not replace IVIG with steroids)",
-      "LP without platelet transfusion"
+      "Do not give further vincristine while GBS is active.",
+      "Do not give corticosteroids as monotherapy in GBS (steroids may be part of chemotherapy backbone, but are not a GBS treatment)."
     ],
     "key_reasoning_points": [
-      "AMAN vs vincristine neuropathy: vincristine is a 'dying-back' neuropathy affecting distal sensory fibers first — sensory symptoms and sensory NCS abnormalities predominate; AMAN is pure motor with NORMAL sensory NCS",
-      "CSF albumino-cytologic dissociation (protein 128, WBC 5) is not seen in vincristine neuropathy — protein elevation definitively implicates inflammatory nerve root involvement of GBS",
-      "Anti-GM1 and anti-GD1a IgG antibodies at high titer are the serological markers of AMAN — these are antibodies to axonal gangliosides, not myelin",
-      "Vincristine may have contributed to susceptibility by partially injuring peripheral nerves, creating an antigenic milieu for GBS immunopathogenesis",
-      "Thrombocytopenia in ALL requires platelet transfusion before LP — this is a mandatory safety step that cannot be skipped"
+      "Pure-motor presentation with anti-GM1 / GD1a positivity defines AMAN.",
+      "Vincristine neuropathy alone cannot explain rapid quadriplegia with CSF dissociation; the chemotherapy may be a permissive immunological trigger rather than the direct mechanism.",
+      "Aggressive workup for leptomeningeal leukaemia is essential before attributing all findings to GBS."
     ],
     "red_herrings": [
       {
-        "data_point": "Vincristine 4th dose given 3 days before symptom onset",
-        "location": "patient.clinical_history.medications",
-        "intended_effect": "Attribute rapidly progressive weakness to vincristine neuropathy and discontinue vincristine without IVIG",
-        "correct_interpretation": "Vincristine neuropathy is sensory-predominant and gradual; the pure motor syndrome with intact sensory NCS and markedly elevated CSF protein is AMAN-GBS triggered in an immune-perturbed host; IVIG is required in addition to vincristine hold",
-        "field_path": ""
-      },
-      {
-        "data_point": "Chemotherapy-related leukocytosis (WBC 14,300)",
-        "location": "initial_tool_outputs.labs.CBC",
-        "intended_effect": "Raise concern for CNS leukemic infiltration causing motor neuropathy",
-        "correct_interpretation": "CSF cytology shows zero blasts — CNS ALL excluded; leukocytosis is expected in ALL induction and does not indicate CNS disease; NCS confirms peripheral AMAN pattern",
-        "field_path": ""
+        "data_point": "Recent vincristine dose 3 days before presentation",
+        "location": "patient.clinical_history",
+        "field_path": "patient.clinical_history.medications",
+        "intended_effect": "Attribute the entire syndrome to vincristine toxicity and miss the AMAN diagnosis.",
+        "correct_interpretation": "Vincristine produces a length-dependent sensorimotor neuropathy with chronic progression; acute symmetric quadriplegia with CSF dissociation and anti-GM1/GD1a positivity defines AMAN."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -618,6 +704,17 @@
       "ct": "normal",
       "echo": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:GBS",
+    "difficulty_rationale": "6 required tools, 1 red herring(s); atypical or multi-comorbidity presentation requires substantial cross-modality synthesis and active rule-out of strong mimics.",
+    "case_body_concerns": [
+      "Bedside respiratory function (FVC/MIP/MEP/NIF) is delivered via an `interpret_labs` followup panel rather than `order_specialized_test{test_type=respiratory_function}` as the criteria pack mandates. Agents calling order_specialized_test{respiratory_function} will hit the EMG/NCS output instead. Recommend adding a respiratory_function followup keyed to order_specialized_test in a follow-up case-body pass.",
+      "Mirrored fallback_tool_outputs into followup_outputs for required tools that previously only existed in the fallback bucket: ['search_medical_literature']. Content is unchanged; the move makes the coherence validator see an explicit primary output for criteria-pack-required tools."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

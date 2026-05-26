@@ -549,162 +549,205 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Post-anoxic non-convulsive status epilepticus (NCSE) following out-of-hospital cardiac arrest with hypoxic-ischemic encephalopathy (HIE)",
-    "icd_code": "G41.9",
+    "primary_diagnosis": "Post-anoxic non-convulsive status epilepticus with hypoxic-ischemic encephalopathy following out-of-hospital cardiac arrest",
+    "icd_code": "G41.2",
     "differential": [
       {
-        "diagnosis": "Autoimmune encephalitis (newly identified)",
-        "likelihood": "low",
-        "key_features": "Autoimmune panel negative; cardiac arrest with 12-minute resuscitation time is clear precipitant; DWI restriction pattern is anoxic (bilateral watershed/basal ganglia), not limbic"
+        "diagnosis": "Myoclonic status epilepticus (post-anoxic) vs NCSE",
+        "likelihood": "high",
+        "key_features": "GPDs with sharp triphasic components at 1.5-2 Hz can represent either ictal-interictal continuum or post-anoxic NCSE; benzodiazepine trial helps adjudicate",
+        "icd_code": "G41.1"
       },
       {
-        "diagnosis": "Drug toxicity (amiodarone, statin rhabdomyolysis)",
-        "likelihood": "low",
-        "key_features": "Amiodarone level therapeutic; no evidence of drug toxicity; CK not markedly elevated; clinical picture clearly post-anoxic"
+        "diagnosis": "Toxic-metabolic encephalopathy (uremia, hepatic, sedative residual)",
+        "likelihood": "moderate",
+        "key_features": "Multiple sedatives + organ dysfunction after arrest; triphasic-like waves overlap; clinical/EEG response to benzo helps distinguish",
+        "icd_code": "G93.41"
       },
       {
-        "diagnosis": "New structural lesion (hemorrhage, stroke)",
+        "diagnosis": "Persistent cardiogenic arrhythmia causing recurrent hypoperfusion",
+        "likelihood": "moderate",
+        "key_features": "Recent VF arrest with ICD; ICD interrogation and serial troponin/BNP help",
+        "icd_code": "I49.01"
+      },
+      {
+        "diagnosis": "Subclinical seizures from cerebral edema",
+        "likelihood": "moderate",
+        "key_features": "CT shows diffuse cerebral edema; cerebral edema lowers seizure threshold; NCSE more likely than focal epileptic origin",
+        "icd_code": "G93.6"
+      },
+      {
+        "diagnosis": "Persistent sedative effect (amiodarone, propofol residual)",
         "likelihood": "low",
-        "key_features": "CT no hemorrhage; MRI shows diffuse anoxic pattern not focal stroke; no focally lateralized EEG seizures — generalized NCSE"
+        "key_features": "Amiodarone CNS effects mild; propofol can mask EEG but withdrawal reveals true pattern",
+        "icd_code": "T46.2X5A"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Emergent EEG to diagnose NCSE and characterize pattern (ictal vs post-anoxic GPDs)",
+        "action": "Continuous video-EEG — characterize GPDs and assess for NCSE",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Generalized NCSE with GPDs on post-anoxic encephalopathic background",
+        "expected_finding": "Generalized periodic discharges at 1.5-2 Hz with triphasic components; assess for evolution and benzodiazepine response per Salzburg criteria",
         "category": "required",
-        "tool_parameters": {
-          "urgency": "stat"
-        }
+        "tool_parameters": {},
+        "citation": "[Salzburg_NCSE_2015]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "IV lorazepam 2 mg for NCSE; assess EEG response — improvement supports ictal etiology",
-        "tool_name": null,
-        "expected_finding": "Partial suppression of ictal runs",
+        "action": "Labs: CBC, CMP, glucose, Ca/Mg, AED levels, ammonia, ABG, lactate, blood cultures, NSE, troponin, BNP",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Elevated NSE 42 (HIE marker), troponin and BNP elevated post-arrest",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Load levetiracetam 1500 mg IV (preferred over lacosamide — no PR prolongation risk with amiodarone)",
-        "tool_name": null,
-        "expected_finding": "AED therapeutic for NCSE control",
+        "action": "Non-contrast head CT — assess for cerebral edema and exclude hemorrhage",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Diffuse loss of gray-white differentiation and sulcal effacement — diffuse cerebral edema from HIE",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "Check drug interactions: amiodarone + AED choice — lacosamide has additive PR prolongation risk",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Lacosamide + amiodarone = additive PR risk; prefer levetiracetam",
+        "action": "MRI brain (DWI for cortical / deep gray injury) — prognostic",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Cortical and basal ganglia DWI restriction in HIE pattern",
         "category": "required",
-        "tool_parameters": {
-          "drugs": [
-            "amiodarone",
-            "lacosamide",
-            "levetiracetam"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "MRI brain with DWI/ADC for prognostication — assess extent of hypoxic-ischemic injury",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Extensive bilateral cortical and deep grey DWI restriction — poor prognosis marker",
-        "category": "required",
+        "action": "SSEP — bilateral absence of N20 has high specificity for poor neurological outcome",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Adjunct neuroprognostication tool per post-anoxic guidelines",
+        "category": "recommended",
         "tool_parameters": {
-          "sequences": [
-            "DWI",
-            "ADC",
-            "FLAIR"
-          ]
-        }
+          "test_type": "ssep"
+        },
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 6,
-        "action": "Obtain NSE at 48 and 72 hours post-arrest for prognostication",
-        "tool_name": "interpret_labs",
-        "expected_finding": "NSE >33 mcg/L supports poor outcome",
+        "action": "Drug-interaction check: amiodarone + AED + sedative; ECG QTc surveillance",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Amiodarone prolongs QT; phenytoin/fosphenytoin pose additional cardiac risk; prefer levetiracetam",
         "category": "required",
-        "tool_parameters": {
-          "tests": [
-            "NSE"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[ESETT_2019]",
+        "guideline_source": ""
       },
       {
         "step": 7,
-        "action": "Order bilateral SSEP testing — N20 response bilaterally",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Bilateral absent N20 — 100% specificity for poor outcome",
+        "action": "Literature: post-anoxic SE treatment and neuroprognostication",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Treat NCSE aggressively but recognize prognostic limitations of refractory post-anoxic SE",
         "category": "required",
-        "tool_parameters": {
-          "test": "SSEP_bilateral_median"
-        }
+        "tool_parameters": {},
+        "citation": "[Shorvon_2011]",
+        "guideline_source": ""
       },
       {
         "step": 8,
-        "action": "Initiate multimodal neuroprognostication; call family meeting with neurology, cardiology, and palliative care",
-        "tool_name": null,
-        "expected_finding": "Goals of care discussion and plan aligned with prognosis",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "12-lead ECG and review ICD device interrogation",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Confirm sinus rhythm, QTc; review ICD log for breakthrough arrhythmia",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 9,
-        "action": "Continuous cEEG monitoring 48-72 hours",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Post-anoxic NCSE pattern evolution — prognostic information",
-        "category": "required",
+        "action": "Neurology + critical-care + cardiology multidisciplinary consultation",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Integrated post-arrest care",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_advanced_imaging",
         "tool_parameters": {
-          "modality": "continuous_ceeg",
-          "duration_hours": 72
-        }
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in HIE.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan has no role.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex not indicated — global ischemic injury, not embolic.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_ecg",
+        "after": "check_drug_interactions",
+        "reason": "ECG/QTc must be reviewed before adding any QT-prolonging AED in patient on amiodarone.",
+        "citation": "[ESETT_2019]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Electrolytes (K, Mg) confirmed before AED loading to minimise arrhythmia risk.",
+        "citation": "[Brophy_2012]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Emergent EEG — NCSE diagnosis and post-anoxic pattern characterization",
-      "Levetiracetam preferred over lacosamide — amiodarone + lacosamide = additive PR prolongation",
-      "MRI DWI at minimum 72h post-arrest for accurate prognostication",
-      "Bilateral SSEPs — bilateral absent N20 is 100% specific for poor outcome",
-      "Multimodal neuroprognostication before withdrawing care — single marker insufficient",
-      "Family meeting for goals of care as soon as neuroprognostication complete"
+      "Continuous EEG throughout post-arrest care to detect NCSE",
+      "Load IV levetiracetam (avoid phenytoin in QT-prolonged patient on amiodarone)",
+      "Maintain targeted temperature management goals per local protocol",
+      "Multidisciplinary neuroprognostication: NSE, SSEP, MRI, EEG over 72-96h",
+      "ICD interrogation for breakthrough arrhythmia"
     ],
     "contraindicated_actions": [
-      "Lacosamide in patient on amiodarone — additive PR prolongation and AV block risk",
-      "Premature prognostication within first 24-48 hours before full multimodal assessment",
-      "Aggressive AED escalation to burst-suppression induction in post-anoxic NCSE with multimodal poor prognosis — may mask natural EEG evolution without benefit"
+      "Do NOT use phenytoin / fosphenytoin in patient on amiodarone without continuous cardiac monitoring",
+      "Do NOT make neuroprognostication decisions before 72-96 hours and multimodal data",
+      "Do NOT escalate to deep anesthetic infusions for purely post-anoxic GPDs without confirming ictal pattern",
+      "Avoid phenytoin/fosphenytoin in a patient on amiodarone with HIE without continuous cardiac monitoring — additive QT prolongation and risk of hypotension/asystole."
     ],
     "key_reasoning_points": [
-      "Post-anoxic NCSE following cardiac arrest requires simultaneous seizure treatment AND neuroprognostication",
-      "Amiodarone + lacosamide = additive PR prolongation — levetiracetam is the safe AED choice",
-      "Bilateral absent SSEPs (N20) at >24h post-arrest with TTM = 100% specificity for poor outcome (no false positives)",
-      "NSE >33 mcg/L at 48-72h post-arrest with TTM = >90% specificity for poor outcome",
-      "Multimodal neuroprognostication required — no single marker is sufficient; must combine EEG + MRI + SSEP + NSE",
-      "Early discharge from cardiac ICU (day 4) was premature — 'staring spells' at home were likely NCSE events that were not recognized"
+      "Post-anoxic GPDs sit on the ictal-interictal continuum; Salzburg criteria + benzodiazepine trial help adjudicate NCSE",
+      "Neuroprognostication after cardiac arrest requires multimodal data (EEG, NSE, SSEP, MRI) at 72-96 hours",
+      "Amiodarone + phenytoin together increase QT-prolongation risk; choose levetiracetam preferentially",
+      "Refractory post-anoxic SE has a poor prognosis but treatment is still indicated while assessment is ongoing"
     ],
     "red_herrings": [
       {
-        "data_point": "Troponin I 0.24 ng/mL elevated (markedly above normal <0.04) and BNP 486 pg/mL elevated",
-        "location": "labs — Cardiac panel",
-        "intended_effect": "Suggests new acute MI or decompensated heart failure as the cause of current neurological deterioration, prompting urgent cardiology consultation and focus on cardiac diagnosis rather than NCSE",
-        "correct_interpretation": "Elevated troponin and BNP are residual findings from the cardiac arrest 5 days ago, not evidence of a new cardiac event; HR 72, BP 132/82, no new cardiac symptoms; the neurological deterioration is from post-anoxic NCSE, not recurrent cardiac event",
-        "field_path": ""
-      },
-      {
-        "data_point": "Amiodarone therapeutic level 1.2 mcg/mL and recent ICD implant (3 days ago)",
-        "location": "labs — Drug Levels; clinical history",
-        "intended_effect": "Suggests amiodarone toxicity (neurological side effects including tremor, ataxia, peripheral neuropathy) or ICD complication as cause of altered consciousness rather than NCSE",
-        "correct_interpretation": "Amiodarone level is within therapeutic range (1.0-2.5 mcg/mL); amiodarone neurological toxicity at therapeutic levels is rare and not associated with seizures; ICD was recently implanted for arrhythmia prevention and would not cause NCSE; EEG definitively shows seizure pattern",
-        "field_path": ""
+        "data_point": "Troponin I (hs) 0.24 ng/mL and BNP 486 pg/mL",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests acute coronary syndrome as primary mechanism",
+        "correct_interpretation": "Troponin elevation is expected after cardiac arrest from compressions and demand ischemia; BNP elevation expected with post-arrest myocardial stunning; the brain pathology is the dominant problem"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -713,6 +756,14 @@
       "echo": "incidental",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "8 required tools + 1 recommended; case is on ictal-interictal continuum after OHCA; teaching points are multimodal neuroprognostication, avoiding QT-prolonging AEDs on amiodarone, Salzburg criteria; 1 grounded red herring.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

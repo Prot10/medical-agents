@@ -1,7 +1,7 @@
 {
   "case_id": "MG-RS12",
   "condition": "myasthenia_gravis",
-  "difficulty": "straightforward",
+  "difficulty": "moderate",
   "encounter_type": "inpatient",
   "patient": {
     "age": 69,
@@ -94,139 +94,221 @@
     "extremities": "Violaceous papules and hyperpigmented macules on bilateral lower extremity flexures — lichen planus morphology"
   },
   "ground_truth": {
-    "primary_diagnosis": "AChR antibody–positive generalized myasthenia gravis (G70.01) — late-onset with lichen planus autoimmune background",
-    "primary_diagnosis_icd": "G70.01",
+    "primary_diagnosis": "AChR antibody-positive generalized myasthenia gravis, late-onset, with concurrent lichen planus (autoimmune background)",
+    "icd_code": "G70.01",
     "differential": [
       {
-        "diagnosis": "Bulbar ALS (motor neuron disease)",
+        "diagnosis": "Vascular brainstem disease / lacunar disease",
         "likelihood": "low",
-        "key_features": "Normal needle EMG (no fasciculations or denervation); fatigable pattern with diurnal variation (not ALS); AChR antibody positive"
+        "key_features": "Age and hypertension raise concern; MRI without acute lesion; fluctuating fatigable pattern incompatible.",
+        "icd_code": "G46.3"
+      },
+      {
+        "diagnosis": "Diabetic cranial neuropathy",
+        "likelihood": "low",
+        "key_features": "T2DM; cranial mononeuropathy is acute, monocular, painful.",
+        "icd_code": "E11.40"
       },
       {
         "diagnosis": "Lambert-Eaton myasthenic syndrome",
-        "likelihood": "low",
-        "key_features": "No 50 Hz increment; ptosis and bulbar symptoms predominant (not proximal limb-predominant); no SCLC on CT"
+        "likelihood": "very_low",
+        "key_features": "No baseline CMAP reduction; no facilitation; AChR positive.",
+        "icd_code": "G73.1"
       },
       {
-        "diagnosis": "Brainstem stroke (posterior circulation)",
-        "likelihood": "low",
-        "key_features": "Normal brain MRI/DWI; diurnal variation and fatigability incompatible with fixed vascular deficit"
+        "diagnosis": "Drug-induced myasthenia",
+        "likelihood": "very_low",
+        "key_features": "Patient not on penicillamine or implicated agents.",
+        "icd_code": "G70.1"
       },
       {
-        "diagnosis": "Oculopharyngeal muscular dystrophy",
-        "likelihood": "low",
-        "key_features": "OPMD has ptosis and dysphagia but gradual onset over decades; no fatigable component; normal RNS; genetic testing (PABPN1)"
+        "diagnosis": "ALS bulbar onset",
+        "likelihood": "very_low",
+        "key_features": "No tongue fasciculations or atrophy; SFEMG/RNS will discriminate.",
+        "icd_code": "G12.21"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI to exclude brainstem lesion given ptosis and bulbar dysfunction",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Order serologies: anti-AChR (binding, blocking, modulating), anti-MuSK, anti-LRP4, and TSH/free-T4 for thyroid autoimmunity",
+        "tool_name": "interpret_labs",
+        "expected_finding": "AChR antibody positive; TSH evaluates for comorbid thyroid disease",
+        "category": "required",
         "tool_parameters": {
-          "contrast": true,
-          "sequences": [
-            "DWI",
-            "T2",
-            "FLAIR"
+          "panels": [
+            "anti_AChR",
+            "anti_MuSK",
+            "anti_LRP4",
+            "TSH"
           ]
-        }
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 2,
-        "action": "RNS with low-rate (3 Hz) in multiple muscle groups to confirm NMJ dysfunction",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Order repetitive nerve stimulation (RNS) at 2-3 Hz across proximal and facial muscles",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Decrement >10% in symptomatic muscles supports postsynaptic NMJ disorder",
+        "category": "required",
         "tool_parameters": {
-          "test_type": "repetitive_nerve_stimulation",
-          "rate": "3Hz",
-          "muscles": [
-            "anconeus",
-            "trapezius",
-            "orbicularis_oculi"
-          ]
-        }
+          "test_type": "repetitive_nerve_stimulation"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 3,
-        "action": "AChR antibody panel for serological confirmation",
-        "tool_name": null,
-        "expected_finding": "",
+        "action": "Order single-fiber EMG (gold standard >95% sensitivity)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Increased jitter and blocking on extensor digitorum communis or orbicularis oculi confirms NMJ transmission failure",
         "category": "recommended",
         "tool_parameters": {
-          "lab_type": "mg_antibody_panel"
-        }
+          "test_type": "emg_single_fiber"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 4,
-        "action": "CT chest for thymoma screening",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Order CT chest with contrast for thymoma screening",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No thymoma; thymic involution appropriate for age",
+        "category": "required",
         "tool_parameters": {
           "region": "chest",
-          "contrast": true
-        }
+          "contrast": true,
+          "indication": "thymoma_screening"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 5,
-        "action": "Initiate pyridostigmine; add prednisone with PPI; intensify diabetes monitoring",
-        "tool_name": null,
-        "expected_finding": "",
+        "action": "Review MGFA classification and current treatment guidance (pyridostigmine, prednisone, steroid-sparing, IVIG/PLEX, thymectomy)",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "MGFA classification stages disease severity; thymectomy benefits AChR+ generalized MG (MGTX); IVIG/PLEX for crisis",
+        "category": "required",
+        "tool_parameters": {
+          "query": "myasthenia gravis MGFA classification treatment thymectomy"
+        },
+        "citation": "[Sanders_2016]",
+        "guideline_source": "Sanders_2016"
+      },
+      {
+        "step": 6,
+        "action": "Check drug interactions for MG-exacerbating agents (aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, neuromuscular blockers, procainamide)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Flag aminoglycosides, fluoroquinolones, IV magnesium, telithromycin, NMBs as contraindicated or use-with-caution in MG",
+        "category": "required",
+        "tool_parameters": {
+          "proposed": "pyridostigmine_start",
+          "screen_for": [
+            "aminoglycosides",
+            "fluoroquinolones",
+            "telithromycin",
+            "magnesium_IV",
+            "neuromuscular_blockers"
+          ]
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
+      },
+      {
+        "step": 7,
+        "action": "Bedside respiratory function testing (FVC, MIP/MEP, NIF) — repeat q4h in crisis",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline FVC/NIF to assess crisis risk in patients with bulbar or limb involvement",
         "category": "recommended",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[Sanders_2016]",
+        "guideline_source": "Sanders_2016"
+      },
+      {
+        "step": 8,
+        "action": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Improvement of ptosis after 2 minutes of cooling supports MG",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "ice_pack_test"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "MG is a peripheral neuromuscular junction disorder; EEG has no diagnostic role.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No CSF role in MG; LP risks complications without diagnostic yield.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "Advanced imaging (PET/MR spectroscopy/perfusion) is not indicated for MG diagnosis or staging; CT chest covers thymoma screening.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated for MG unless a comorbid cardiac question exists.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring is not indicated for MG unless arrhythmia or autonomic disease is independently suspected.",
+        "citation": "[Wolfe_2016]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "order_specialized_test",
+        "reason": "Order AChR/MuSK/LRP4 serologies first; reserve single-fiber EMG for seronegative or RNS-non-diagnostic cases (resource stewardship).",
+        "citation": "[Wolfe_2016]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Recognize diurnal variation (worse in PM) as hallmark MG feature",
-      "RNS showing decremental response in 3 muscle groups is diagnostic",
-      "Order AChR antibody — result is strongly positive and confirms diagnosis",
-      "CT chest for thymoma screening in all new MG",
-      "Monitor NIF and FVC given bulbar involvement",
-      "Account for prednisone impact on T2DM glucose control"
+      "Confirm AChR antibody positivity",
+      "RNS — clearly abnormal 14-16% decrement here supports diagnosis",
+      "CT chest for thymoma (here negative)",
+      "Initiate pyridostigmine and coordinate diabetes management for steroid plan",
+      "Dermatology continued care for lichen planus"
     ],
     "contraindicated_actions": [
-      "Do not prescribe fluoroquinolones or aminoglycosides in this patient",
-      "Do not dismiss bulbar symptoms as lichen planus-related (not causally related)",
-      "Do not fail to adjust diabetes management when starting prednisone"
+      "Do NOT prescribe aminoglycoside antibiotics (gentamicin, tobramycin, amikacin) — risk of precipitating myasthenic crisis",
+      "Do NOT prescribe fluoroquinolones (ciprofloxacin, levofloxacin, moxifloxacin) — FDA black-box warning for MG exacerbation",
+      "Do NOT prescribe telithromycin — contraindicated in MG",
+      "Do NOT administer IV magnesium for MG patients (e.g., for hypomagnesaemia, eclampsia prophylaxis) without alternative — blocks NMJ transmission",
+      "Do NOT use non-depolarizing neuromuscular blockers without anaesthesia/MG-aware dosing protocols",
+      "Do NOT initiate high-dose corticosteroids as sole outpatient therapy without hospitalization or pyridostigmine bridge — risk of paradoxical worsening at days 5-10",
+      "Do NOT attribute fluctuating fatigable weakness to a functional disorder before completing serology + RNS + single-fiber EMG workup"
     ],
     "key_reasoning_points": [
-      "Diurnal variation with worse symptoms in the afternoon is the hallmark clinical feature distinguishing MG from ALS, stroke, and myopathy",
-      "Multi-muscle decremental response on RNS (3 sites) is electrophysiological confirmation — high specificity",
-      "Lichen planus co-diagnosis is a red herring — it is incidentally present but shares autoimmune background",
-      "Normal needle EMG (no fasciculations) effectively excludes ALS/motor neuron disease",
-      "No 50 Hz increment on RNS excludes LEMS pattern"
+      "Fluctuating, fatigable weakness with diurnal pattern (worse evening) is the clinical hallmark of MG — fixed weakness suggests an alternative diagnosis.",
+      "Ocular involvement (ptosis, diplopia) is asymmetric and fatigable in MG; thyroid eye disease causes restrictive (not fatigable) ophthalmoplegia.",
+      "Single-fiber EMG (sensitivity >95%) is the most sensitive electrodiagnostic test — order when RNS is non-diagnostic or serology is negative.",
+      "All confirmed MG cases require CT chest for thymoma — present in roughly 10-15% of generalized MG; thymectomy (MGTX trial) improves long-term outcomes in non-thymoma AChR+ MG as well.",
+      "Aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, and neuromuscular blockers can precipitate myasthenic crisis and must be screened against any new prescription.",
+      "Lichen planus is an autoimmune skin condition; polyautoimmunity supports MG diagnosis."
     ],
-    "red_herrings": [
-      {
-        "data_point": "Lichen planus on skin exam — considered as possible paraneoplastic or connective tissue disorder",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Lichen planus with bulbar dysfunction might suggest a paraneoplastic process or SLE with neurological involvement",
-        "correct_interpretation": "Lichen planus is an incidental autoimmune co-diagnosis; does not cause bulbar dysfunction; MG is the independent cause",
-        "field_path": ""
-      },
-      {
-        "data_point": "Mild ESR elevation (22 mm/hr)",
-        "location": "followup_outputs[0].output.interpretation",
-        "intended_effect": "Elevated ESR with neurological symptoms could suggest vasculitis or inflammatory condition",
-        "correct_interpretation": "Non-specific mild elevation; normal CRP; no other vasculitis features; attributed to mild chronic inflammation from lichen planus",
-        "field_path": ""
-      },
-      {
-        "data_point": "Elevated HbA1c suggesting inadequately controlled diabetes",
-        "location": "followup_outputs[0].output.interpretation",
-        "intended_effect": "Poorly controlled diabetes with peripheral neuropathy could cause mild bulbar dysfunction",
-        "correct_interpretation": "Normal nerve conduction on EMG study; T2DM at this HbA1c level would not cause fatigable bulbar weakness; RNS and AChR antibody confirm MG",
-        "field_path": ""
-      }
-    ],
-    "icd_code": "G70.01",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": []
   },
   "red_herrings": [
     {
@@ -259,7 +341,17 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MG",
+    "difficulty_rationale": "5 required tools, 0 red herrings, typical AChR+ generalized MG",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": [
+      "emg_ncs_useless_via_param_conflation: pack lists order_specialized_test:emg_ncs as USELESS, but coherence validator treats tool_name overlap as a contradiction regardless of tool_parameters; cannot encode without removing required RNS/SFEMG entries. Suggest extending validator to compare tool_name + tool_parameters or fleet-wide pattern."
+    ]
   },
   "initial_tool_outputs": {
     "mri": {

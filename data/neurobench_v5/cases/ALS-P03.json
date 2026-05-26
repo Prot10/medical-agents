@@ -415,101 +415,264 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Amyotrophic lateral sclerosis (ALS), misdiagnosed as multifocal motor neuropathy for 14 months",
+    "primary_diagnosis": "Amyotrophic lateral sclerosis (ALS), previously misdiagnosed as multifocal motor neuropathy",
     "icd_code": "G12.21",
     "differential": [
       {
-        "diagnosis": "Multifocal motor neuropathy (MMN)",
-        "likelihood": "very_low",
-        "key_features": "MMN is purely LMN — UMN signs (Babinski, Hoffman, brisk reflexes) are absolutely incompatible with MMN. Low anti-GM1 titer was non-specific. No confirmed conduction block on careful re-examination. IVIG non-response sustained."
+        "diagnosis": "ALS with coincidental low-titer anti-GM1",
+        "likelihood": "very_high",
+        "key_features": "Working primary candidate — to be distinguished by current EMG and UMN signs",
+        "icd_code": null
       },
       {
-        "diagnosis": "Progressive motor neuropathy",
+        "diagnosis": "Multifocal motor neuropathy (MMN)",
+        "likelihood": "high",
+        "key_features": "Prior diagnosis; loss of conduction block, emergence of UMN signs, and widespread denervation refute MMN now",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Lower motor neuron-predominant ALS variant",
+        "likelihood": "moderate",
+        "key_features": "Possible if UMN signs were absent; current exam shows hyperreflexia",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Inflammatory myopathy",
+        "likelihood": "low",
+        "key_features": "EMG pattern is neurogenic, not myopathic",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Hereditary motor neuropathy",
         "likelihood": "very_low",
-        "key_features": "UMN signs exclude pure motor neuropathy"
+        "key_features": "Adult-onset, no family history, UMN signs argue against",
+        "icd_code": null
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Reassess anti-GM1 antibody — repeat high-titer specific test",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Now negative — prior borderline titer was non-specific",
+        "action": "Obtain brain MRI (with cervical spine sequences) to exclude structural mimics — cervical myelopathy, demyelination, brainstem tumor",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "No structural lesion explaining the motor/bulbar findings; corticospinal-tract signal change or non-specific findings may be seen but are not by themselves diagnostic",
         "category": "required",
         "tool_parameters": {
-          "panels": [
-            "anti-GM1 IgM high-titer"
-          ]
-        }
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "DWI",
+            "T1+Gd"
+          ],
+          "include_cervical_spine": true
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       },
       {
         "step": 2,
-        "action": "Repeat EMG with attention to conduction block assessment",
+        "action": "Perform EMG with nerve conduction studies sampling bulbar plus ≥2 spinal regions to document lower motor neuron involvement (fibrillations, positive sharp waves, complex fasciculation potentials, large-amplitude long-duration polyphasic MUPs with reduced recruitment) and exclude conduction block",
         "tool_name": "order_specialized_test",
-        "expected_finding": "No conduction block confirmed; widespread denervation; paraspinal involvement",
+        "expected_finding": "Active denervation and chronic reinnervation in ≥2 body regions with normal sensory NCS and no conduction block — meets Awaji / El Escorial revised criteria",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[Awaji_2008]",
+        "guideline_source": "Awaji_2008"
       },
       {
         "step": 3,
-        "action": "MRI brain for corticospinal tract assessment",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Bilateral corticospinal tract changes — incompatible with MMN",
+        "action": "Order a mimic-exclusion lab panel: CK, B12, TSH, HbA1c, HIV, RPR, SPEP, anti-GM1 IgM antibodies, and (in males) androgen receptor CAG repeat for Kennedy disease",
+        "tool_name": "interpret_labs",
+        "expected_finding": "CK often mildly to moderately elevated (2–5× ULN); reversible mimics (B12, TSH, HIV, RPR) negative; anti-GM1 negative; SPEP without high-titer M-spike; CAG repeat normal",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "LFTs",
+            "CK",
+            "B12",
+            "TSH",
+            "Free T4",
+            "HIV",
+            "RPR",
+            "SPEP",
+            "anti-GM1 IgM",
+            "androgen receptor CAG repeat"
+          ]
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       },
       {
         "step": 4,
-        "action": "Literature review of MMN vs ALS diagnostic criteria",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "UMN signs absolutely exclude MMN; low anti-GM1 non-specific",
+        "action": "Measure respiratory function (FVC, MIP/MEP, SNIP/NIF) at baseline to inform NIV timing and prognostication",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "FVC and SNIP/MIP often reduced even in early disease; values guide timing of NIV (FVC <50% predicted or SNIP <40 cmH₂O are conventional thresholds)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       },
       {
         "step": 5,
-        "action": "Discontinue IVIG and initiate riluzole after ALS diagnosis confirmed",
+        "action": "Search the medical literature to confirm Awaji and Gold Coast diagnostic thresholds and AAN practice-parameter recommendations relevant to this presentation",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Awaji-Shima 2008 / Gold Coast 2020 diagnostic criteria; AAN 2009 practice parameter on ALS care",
+        "category": "recommended",
+        "tool_parameters": {
+          "query": "ALS diagnostic criteria Awaji Gold Coast AAN practice parameter"
+        },
+        "citation": "[Awaji_2008]",
+        "guideline_source": "Awaji_2008"
+      },
+      {
+        "step": 6,
+        "action": "Order an ALS-focused genetic panel (C9orf72 repeat expansion, SOD1, TARDBP, FUS, TBK1) — required when family history is positive or onset is young (<50)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "C9orf72 expansion in ~40% of familial cases; SOD1/TARDBP/FUS in additional familial subset; ~10% of apparently sporadic cases also carry a variant",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "genetic_panel:ALS"
+        },
+        "citation": "[Brown_2017]",
+        "guideline_source": "Brown_2017"
+      },
+      {
+        "step": 7,
+        "action": "Obtain CSF for neurofilament light chain (NfL) for prognostic stratification when the diagnosis remains uncertain or when prognostic information will change management",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Markedly elevated CSF NfL (typically >5,000 pg/mL) supports a motor-neuron-disease degenerative process and correlates with faster progression",
+        "category": "recommended",
+        "tool_parameters": {
+          "tests": [
+            "cell count",
+            "protein",
+            "glucose",
+            "NfL",
+            "NfH",
+            "oligoclonal bands",
+            "cytology"
+          ]
+        },
+        "citation": "[ENCALS_2018]",
+        "guideline_source": "ENCALS_2018"
+      },
+      {
+        "step": 8,
+        "action": "Check interactions before initiating riluzole 50 mg twice daily; review baseline LFTs and CBC and counsel on monitoring",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "Riluzole safe; IVIG provides no ALS benefit",
-        "category": "required",
-        "tool_parameters": {}
+        "expected_finding": "No major interactions for typical chronic medications; advise alcohol and grapefruit-juice avoidance (CYP1A2 modulators); monthly LFTs for first 3 months",
+        "category": "recommended",
+        "tool_parameters": {
+          "proposed_drug": "riluzole"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "ALS is a motor-neuron disease without cortical electrical signature; EEG has no diagnostic role and adds cost without benefit.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG is unrelated to motor neuron disease and not part of the standard ALS workup absent specific cardiac symptoms or pre-medication QTc checks.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is unrelated to ALS diagnosis; no indication absent comorbid cardiac disease.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring has no role in ALS diagnostic workup.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "MRI is the standard structural study for ALS workup; head CT adds no diagnostic value and exposes the patient to ionizing radiation.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in ALS diagnosis (motor-neuron rather than amyloid pathology) and carries a high cost.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan evaluates nigrostriatal dopaminergic integrity; it has no role in ALS, which spares the dopaminergic system.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "FDG-PET has no established diagnostic role in ALS and adds substantial cost.",
+        "citation": "[AAN_2009]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "ANY UMN sign (Babinski, Hoffman, brisk reflexes) in a patient with 'MMN' MUST trigger ALS reassessment — MMN is purely LMN by definition",
-      "Anti-GM1 antibody interpretation: only high-titer (>1:400) is specific for MMN; low titer is non-specific",
-      "Discontinue IVIG once ALS diagnosis confirmed — expensive, burdensome, no benefit in ALS",
-      "Initiate riluzole urgently — 14-month diagnostic delay has allowed progression"
+      "Perform EMG/NCS sampling the bulbar region plus ≥2 spinal regions to document lower-motor-neuron involvement and exclude conduction block.",
+      "Obtain brain MRI to exclude structural mimics (cervical myelopathy, demyelinating disease, brainstem tumor).",
+      "Order a mimic-exclusion lab panel (CK, B12, TSH, HIV, RPR, SPEP, anti-GM1 IgM, androgen receptor CAG repeat in males).",
+      "Measure baseline respiratory function (FVC, MIP/MEP, SNIP) to inform NIV timing.",
+      "Apply Awaji-Shima 2008 / Gold Coast 2020 criteria to confirm the diagnosis.",
+      "Initiate riluzole 50 mg twice daily after baseline LFTs unless contraindicated; arrange monthly LFT monitoring for the first 3 months.",
+      "Refer to a multidisciplinary ALS clinic for SLP, dietetics, respiratory, and social-work input."
     ],
     "contraindicated_actions": [
-      "Continuing IVIG therapy after ALS diagnosis confirmed — no benefit in motor neuron disease, significant cost and procedural burden",
-      "Relying on low-titer anti-GM1 positivity as sole basis for MMN diagnosis without confirming conduction block on careful NCS"
+      "Do not commit the patient to cervical spine surgery on the basis of incidental spondylotic changes when EMG findings extend beyond the cervical cord.",
+      "Do not start chronic immunosuppression (steroids, IVIG, plasma exchange) for ALS — there is no benefit and treatment delays correct diagnosis.",
+      "Do not defer respiratory assessment in a symptomatic patient — even mild FVC reduction warrants close monitoring and NIV planning.",
+      "Do not dismiss bulbar or progressive symptoms as functional / psychiatric without a complete neurological workup."
     ],
     "key_reasoning_points": [
-      "MMN diagnostic criteria require: (1) predominantly LMN weakness, (2) NO UMN signs (Babinski, Hoffman are disqualifying), (3) confirmed conduction block on NCS, (4) anti-GM1 IgM at significant titer (>1:400). This patient fulfills NONE of these criteria on reassessment.",
-      "IVIG partial response in ALS is not diagnostic of MMN — placebo effect, natural fluctuation, or regression to mean can produce apparent initial response",
-      "Diagnostic anchoring bias: the prior MMN diagnosis created anchoring that delayed ALS diagnosis by 14 months",
-      "MRI showing bilateral corticospinal tract changes is incompatible with MMN, which has no CNS pathology"
+      "Diagnosis requires evidence of both upper-motor-neuron involvement (hyperreflexia, Babinski, Hoffman, brisk jaw jerk, spasticity) and lower-motor-neuron involvement (atrophy, fasciculations, EMG denervation) with progressive spread, while excluding mimics — Awaji 2008 / Gold Coast 2020.",
+      "EMG in bulbar plus ≥2 spinal regions documenting fibrillations, positive sharp waves, complex fasciculation potentials, and large-amplitude long-duration polyphasic MUPs with reduced recruitment satisfies the electrodiagnostic criterion.",
+      "Normal sensory NCS and absence of conduction block are pivotal: they exclude common mimics including multifocal motor neuropathy, CIDP, and Kennedy disease.",
+      "Mild-to-moderate CK elevation (2–5× ULN) is consistent with ALS and does not itself indicate a primary myopathy.",
+      "Cervical spondylotic changes on MRI are common incidental findings in the at-risk age group; bulbar findings or multi-region EMG denervation cannot be attributed to cervical disease.",
+      "Baseline FVC, MIP/MEP, and SNIP/NIF inform NIV timing — NIV initiation at FVC <50% predicted or SNIP <40 cmH₂O prolongs survival and improves quality of life.",
+      "Markedly elevated CSF neurofilament light chain (>5,000 pg/mL) supports motor neuron degeneration and correlates with progression rate (ENCALS prediction model)."
     ],
     "red_herrings": [
       {
-        "data_point": "Prior anti-GM1 IgM positive at 1:100 titer and diagnosis of MMN by neurologist 14 months ago",
-        "location": "Prior diagnosis and medications",
-        "intended_effect": "Maintain MMN diagnosis and continue IVIG therapy",
-        "correct_interpretation": "Low anti-GM1 titer (1:100) is non-specific. MMN diagnosis requires high titer AND confirmed conduction block AND NO UMN signs. Development of UMN signs absolutely excludes MMN. Original diagnosis was erroneous.",
-        "field_path": ""
+        "data_point": "Existing MMN diagnosis with anti-GM1 positive, on IVIG",
+        "location": "HPI",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Anchors the agent on confirming and continuing MMN therapy",
+        "correct_interpretation": "Low-titer anti-GM1 is non-specific; emergence of UMN signs, bulbar involvement, and widespread denervation without conduction block reclassifies the case as ALS"
       },
       {
-        "data_point": "Initial 'partial response' to IVIG therapy",
-        "location": "Treatment history",
-        "intended_effect": "Confirm MMN diagnosis and continue IVIG",
-        "correct_interpretation": "Sustained non-response (worsening despite IVIG x 14 months) demonstrates ALS progression, not MMN. Initial apparent response was likely natural fluctuation. True MMN consistently responds to IVIG.",
-        "field_path": ""
+        "data_point": "Low-titer anti-GM1 antibody (1:100)",
+        "location": "Labs",
+        "field_path": "initial_tool_outputs.labs.panels.Neuromuscular_Panel",
+        "intended_effect": "Suggests MMN if interpreted in isolation",
+        "correct_interpretation": "Low-titer anti-GM1 is seen in ALS, healthy controls, and other neuropathies; specificity for MMN requires high titer with conduction block"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "v5",
@@ -521,6 +684,20 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:ALS",
+    "difficulty_rationale": "Established (wrong) MMN diagnosis with months of IVIG anchors against ALS; revealing the misdiagnosis requires careful EMG/UMN synthesis and literature support",
+    "case_body_concerns": [
+      {
+        "field_path": "followup_outputs",
+        "concern": "ALS genetic panel is wired to `interpret_labs` rather than `order_specialized_test` with `test_type: genetic_panel:ALS`. Per the criteria pack and TOOL_PARAMETER_VOCABULARY, genetic testing should resolve via order_specialized_test. The gold trajectory routes the action via order_specialized_test; the case body fix is a tool-name swap in followup_outputs without changing the report payload.",
+        "suggested_fix": "Change followup tool_name from interpret_labs to order_specialized_test for the ALS_Genetic_Panel followup; payload structure can stay."
+      }
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

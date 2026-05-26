@@ -779,155 +779,239 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Focal epilepsy - temporal lobe (left temporal lobe epilepsy with focal to bilateral tonic-clonic seizures)",
-    "icd_code": "G40.109",
+    "primary_diagnosis": "Focal epilepsy of left temporal lobe origin with focal-to-bilateral tonic-clonic seizures (mesial TLE), with concurrent unrelated pulmonary embolism complicating the diagnostic workup",
+    "icd_code": "G40.219",
     "differential": [
       {
-        "diagnosis": "Syncope secondary to pulmonary embolism",
+        "diagnosis": "Convulsive syncope secondary to pulmonary embolism",
+        "likelihood": "high",
+        "key_features": "Hemoptysis, exertional dyspnea, and leg pain raise PE strongly; a witnessed convulsion can be convulsive syncope. ECG, D-dimer, CTPA / echocardiogram clarify.",
+        "icd_code": "I26.99"
+      },
+      {
+        "diagnosis": "Cardiogenic syncope with secondary anoxic convulsion",
+        "likelihood": "moderate",
+        "key_features": "Pilots with arrhythmia or structural heart disease can have syncope-mimicking-seizure; needs ECG and echocardiogram.",
+        "icd_code": "R55"
+      },
+      {
+        "diagnosis": "Primary generalized epilepsy (juvenile myoclonic epilepsy)",
         "likelihood": "low",
-        "key_features": "PE-related syncope typically occurs during exertion or with sudden hemodynamic compromise, lacks post-ictal confusion, and EEG would not show temporal epileptiform discharges; however, PE was confirmed concurrently"
+        "key_features": "Early-morning seizures could fit JME; however the focal MRI/EEG localization to left temporal lobe favors symptomatic focal epilepsy.",
+        "icd_code": "G40.319"
       },
       {
-        "diagnosis": "Provoked seizures from cerebral hypoxia secondary to pulmonary embolism",
+        "diagnosis": "Toxic / metabolic seizure provocation (alcohol, sleep deprivation, drug)",
         "likelihood": "low",
-        "key_features": "Would expect seizures temporally linked to PE symptoms, but patient's first seizure preceded significant cardiopulmonary symptoms and EEG shows a clear focal temporal epileptogenic focus"
+        "key_features": "Pilot occupation involves time-zone changes and sleep deprivation; toxicology screen and history clarify.",
+        "icd_code": "G40.509"
       },
       {
-        "diagnosis": "Cardiac arrhythmia with syncope (related to mitral valve prolapse)",
+        "diagnosis": "Psychogenic non-epileptic spells",
         "likelihood": "very_low",
-        "key_features": "MVP rarely causes life-threatening arrhythmia; ECG and clinical course do not support primary cardiac etiology"
-      },
-      {
-        "diagnosis": "Psychogenic non-epileptic seizures (PNES)",
-        "likelihood": "very_low",
-        "key_features": "Ruled out by video-EEG demonstrating clear electrographic seizure correlate with all clinical events"
+        "key_features": "Tonic-clonic semiology with post-ictal confusion is not typical PNES.",
+        "icd_code": "F44.5"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Perform routine EEG to evaluate for epileptiform activity",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Normal routine EEG with benign variants (wicket spikes); does not exclude epilepsy",
+        "action": "Obtain detailed seizure history including semiology, aura, automatisms, duration, frequency, witness accounts, and post-ictal features.",
+        "tool_name": null,
+        "expected_finding": "Stereotyped focal impaired-awareness events with temporal-lobe aura and post-ictal confusion.",
         "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
+        "tool_parameters": {},
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 2,
-        "action": "Order brain MRI to evaluate for structural epileptogenic lesion",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Normal standard MRI; incidental lung nodule noted on scout",
+        "action": "Perform complete neurological examination.",
+        "tool_name": null,
+        "expected_finding": "Interictal exam typically normal; subtle memory deficit may be present.",
         "category": "required",
-        "tool_parameters": {
-          "protocol": "tumor",
-          "contrast": false
-        }
+        "tool_parameters": {},
+        "citation": "",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Obtain laboratory studies including CBC, BMP, coagulation panel, prolactin, and AED levels",
+        "action": "Order EEG (routine first; pursue ambulatory or video-EEG if non-diagnostic) to identify interictal epileptiform discharges and capture habitual events.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Interictal sharps/spikes and/or focal slowing in the anterior temporal region; ictal correlate confirms diagnosis.",
+        "category": "required",
+        "tool_parameters": {
+          "eeg_type": "routine"
+        },
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
+      },
+      {
+        "step": 4,
+        "action": "Order MRI brain with dedicated epilepsy protocol (thin-cut coronal T1/FLAIR/T2/DWI through the hippocampi).",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Hippocampal sclerosis, low-grade tumor (DNET, ganglioglioma), cavernoma, or focal cortical dysplasia; rule out alternative structural causes.",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "epilepsy",
+          "contrast": true
+        },
+        "citation": "[AAN_2007]",
+        "guideline_source": "AAN_2007"
+      },
+      {
+        "step": 5,
+        "action": "Obtain CBC, comprehensive metabolic panel, prolactin (if drawn within 10–20 min of event), and AED levels if on therapy.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Markedly elevated D-dimer, elevated post-ictal prolactin, subtherapeutic levetiracetam level",
+        "expected_finding": "Exclude metabolic provocation (hypoglycemia, hyponatremia, uremia); baseline organ function for AED selection; AED level for adherence and dosing.",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
-            "coagulation",
-            "prolactin",
-            "AED_levels"
+            "CMP",
+            "prolactin"
           ]
-        }
-      },
-      {
-        "step": 4,
-        "action": "Order ECG to evaluate for cardiac arrhythmia or right heart strain",
-        "tool_name": "analyze_ecg",
-        "expected_finding": "Normal sinus rhythm with borderline tachycardia; no right heart strain pattern",
-        "category": "required"
-      },
-      {
-        "step": 5,
-        "action": "Request prolonged video-EEG monitoring to capture habitual events and confirm epilepsy",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Left temporal epileptiform discharges and captured seizures with left temporal onset confirming focal epilepsy",
-        "category": "required",
-        "tool_parameters": {
-          "eeg_type": "video"
-        }
+        },
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 6,
-        "action": "Request 3T MRI with epilepsy protocol for subtle lesion detection",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Subtle left temporal pole abnormality suspicious for focal cortical dysplasia; borderline hippocampal volumetric asymmetry",
+        "action": "Search current literature for AED selection in focal epilepsy and ILAE 2017 seizure classification.",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Evidence-based AED options for focal epilepsy (levetiracetam, lamotrigine, oxcarbazepine, lacosamide); ILAE classification framework.",
         "category": "required",
-        "tool_parameters": {
-          "protocol": "epilepsy",
-          "contrast": false
-        }
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 7,
-        "action": "Optimize levetiracetam dose given subtherapeutic levels",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Check drug interactions before initiating or modifying AED therapy (enzyme inducers, OCP, other CNS-active drugs).",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identify pharmacokinetic interactions (CYP induction by carbamazepine/phenytoin) and CNS adverse-effect overlap.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 8,
-        "action": "Urgently evaluate for pulmonary embolism given elevated D-dimer, dyspnea, hemoptysis, and calf pain (separate from epilepsy workup)",
-        "tool_name": null,
-        "expected_finding": "CTPA expected to show bilateral pulmonary emboli",
-        "category": "required"
+        "action": "Pursue prolonged video-EEG monitoring to capture habitual events, confirm lateralization, and evaluate surgical candidacy.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Capture of habitual focal seizure with electrographic correlate; concordance with imaging supports surgical workup.",
+        "category": "recommended",
+        "tool_parameters": {
+          "eeg_type": "video"
+        },
+        "citation": "[Engel_2003]",
+        "guideline_source": "Engel_2003"
       },
       {
         "step": 9,
-        "action": "Search medical literature to understand relationship between temporal lobe epilepsy, DVT, and pulmonary embolism",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Epilepsy and VTE are typically independent; PE can rarely provoke seizures but focal temporal EEG findings indicate primary epilepsy",
-        "category": "recommended"
+        "action": "Order comprehensive neuropsychological battery to lateralize memory function and inform surgical risk.",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Material-specific memory deficit consistent with side of seizure focus (verbal memory deficit in dominant TLE; visuospatial in non-dominant).",
+        "category": "optional",
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Engel_2003]",
+        "guideline_source": "Engel_2003"
       },
       {
         "step": 10,
-        "action": "Check drug interactions for levetiracetam with anticipated anticoagulation",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "No significant interactions; levetiracetam favorable in patients requiring anticoagulation",
-        "category": "recommended"
+        "action": "Obtain 12-lead ECG to evaluate for arrhythmic substrate (Brugada, long-QT, AV block) and right-heart strain (suggesting PE).",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Identify arrhythmia or RV strain pattern (S1Q3T3, RBBB, T-wave inversion V1–V4) consistent with PE.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[AAN_2007]",
+        "guideline_source": "AAN_2007"
+      },
+      {
+        "step": 11,
+        "action": "Obtain transthoracic echocardiogram to evaluate for RV dysfunction (PE), structural heart disease, and embolic source.",
+        "tool_name": "order_echocardiogram",
+        "expected_finding": "Right-ventricular dilation or dysfunction supports PE; structurally normal heart lowers cardiac syncope likelihood.",
+        "category": "recommended",
+        "tool_parameters": {
+          "echo_type": "TTE"
+        },
+        "citation": "[AAN_2007]",
+        "guideline_source": "AAN_2007"
+      },
+      {
+        "step": 12,
+        "action": "Obtain ambulatory cardiac monitoring to rule out paroxysmal arrhythmia as a cause of breakthrough events.",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Absence of significant arrhythmia supports a primary neurological etiology.",
+        "category": "optional",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "citation": "[AAN_2007]",
+        "guideline_source": "AAN_2007"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No clinical features of CNS infection or encephalitis.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT is inferior to MRI for the epileptogenic substrate; a chest CT (different study) may be needed for the PE workup but is not a diagnostic for the seizure.",
+        "citation": "[AAN_2007]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "check_drug_interactions",
+        "reason": "Structural cause influences AED choice (e.g., low-grade tumor → consider AEDs with CYP-neutral profile; hippocampal sclerosis → multiple equally appropriate options). MRI should inform drug selection.",
+        "citation": "[ILAE_drug_2017]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Recognize that normal routine EEG does not exclude epilepsy and pursue prolonged video-EEG monitoring",
-      "Identify the markedly elevated D-dimer and initiate urgent workup for pulmonary embolism (this is a life-threatening concurrent diagnosis)",
-      "Distinguish between primary focal epilepsy (temporal lobe) and provoked seizures from PE/hypoxia by noting the temporal sequence and EEG findings",
-      "Recognize the subtherapeutic levetiracetam level and recommend dose optimization",
-      "Identify the epigastric aura and deja vu episodes as focal aware seizures consistent with temporal lobe origin",
-      "Recognize that the lung nodule requires dedicated chest imaging to exclude malignancy (Trousseau syndrome consideration)"
+      "Recognize that early-morning convulsions in a previously well adult can be focal-to-bilateral tonic-clonic seizures of temporal-lobe origin even with a confounding cardiopulmonary picture.",
+      "Work up pulmonary embolism in parallel given hemoptysis, exertional dyspnea, leg pain (Wells-criteria-driven CTPA, D-dimer, lower-extremity Doppler) but do not let the PE workup delay seizure evaluation.",
+      "Obtain video-EEG and 3T MRI epilepsy protocol to confirm temporal-lobe origin.",
+      "Counsel on absolute driving and flying restriction pending diagnosis (occupational implications for pilot).",
+      "Coordinate with FAA-certified aviation medical examiner regarding return-to-flight criteria."
     ],
     "contraindicated_actions": [
-      "Dismissing epilepsy based on a single normal routine EEG",
-      "Attributing all seizures to pulmonary embolism without confirming focal epileptogenic EEG findings",
-      "Prescribing enzyme-inducing antiepileptic drugs (carbamazepine, phenytoin) that would interfere with anticoagulation therapy",
-      "Ignoring the elevated D-dimer and systemic symptoms (dyspnea, hemoptysis, calf pain) while focusing exclusively on the seizure workup",
-      "Performing lumbar puncture without first addressing the possible pulmonary embolism and anticoagulation needs",
-      "Discontinuing levetiracetam based on the normal routine EEG alone"
+      "Do not clear the patient to return to piloting until the seizure-free interval and FAA criteria are met.",
+      "Do not start an enzyme-inducing AED that will affect anticoagulation if PE is confirmed.",
+      "Do not perform LP without a clear indication."
     ],
     "key_reasoning_points": [
-      "The patient presents with two concurrent but likely independent diagnoses: left temporal lobe epilepsy AND thromboembolic disease (DVT/PE), requiring dual diagnostic reasoning tracks",
-      "The initial normal EEG with wicket spikes (benign variant) is a diagnostic trap — wicket spikes in the temporal region may be misidentified as epileptiform, while the normal EEG may falsely reassure against epilepsy",
-      "The epigastric rising sensation and deja vu episodes represent unrecognized focal aware seizures (temporal lobe aura), establishing the focal onset of the generalized convulsions",
-      "Temporal sequence is key: the first seizure occurred BEFORE significant PE symptoms, suggesting primary epilepsy rather than PE-provoked seizures, though PE may have lowered seizure threshold subsequently",
-      "The incidental lung nodule creates a Trousseau syndrome red herring — while oncologic evaluation is warranted, it must not delay acute PE treatment or epilepsy diagnosis",
-      "Subtherapeutic levetiracetam level explains ongoing seizure breakthrough and is an immediately actionable finding",
-      "The early-morning timing of generalized seizures is a recognized pattern in temporal lobe epilepsy (seizures arising from NREM sleep)",
-      "Multi-modal concordance (video-EEG lateralization + 3T MRI subtle lesion + PET hypometabolism + neuropsychological verbal memory deficit) confirms left temporal lobe epilepsy"
+      "Pulmonary embolism with hemoptysis is a competing emergency that must be addressed in parallel.",
+      "Temporal lobe epilepsy can debut in adulthood after years of subclinical activity.",
+      "Cardiac/cardiopulmonary workup is justified per case (PE/syncope differential) and is not 'useless' here.",
+      "Occupational and licensure considerations are critical for pilots and must inform AED selection (sedating side effects vs alertness)."
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "Early-morning timing of seizures.",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Anchor on juvenile myoclonic epilepsy / primary generalized epilepsy and prescribe valproate.",
+        "correct_interpretation": "Focal MRI/EEG features support symptomatic focal temporal epilepsy; AED choice differs accordingly."
+      },
+      {
+        "data_point": "Hemoptysis, exertional dyspnea, and left leg pain raising pulmonary embolism.",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Attribute the witnessed convulsion entirely to PE-driven syncope and miss the underlying temporal lobe epilepsy.",
+        "correct_interpretation": "Both processes are present; PE must be addressed but does not explain the focal temporal EEG/MRI findings."
+      }
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -942,6 +1026,14 @@
       "ct": "normal",
       "echo": "normal",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (FEPI-TEMP)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FEPI-TEMP",
+    "difficulty_rationale": "Concurrent pulmonary embolism and focal temporal epilepsy require parallel workup; pilot occupation adds licensure complexity; ECG/echo/cardiac monitoring justified per case rather than useless.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

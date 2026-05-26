@@ -701,155 +701,199 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Focal epilepsy - temporal lobe (right mesial temporal lobe epilepsy with hippocampal sclerosis)",
-    "icd_code": "G40.109",
+    "primary_diagnosis": "Focal epilepsy of right temporal lobe origin with mesial temporal sclerosis (mesial TLE, focal impaired-awareness seizures with olfactory aura)",
+    "icd_code": "G40.219",
     "differential": [
       {
-        "diagnosis": "Psychogenic non-epileptic seizures (PNES)",
+        "diagnosis": "Psychogenic non-epileptic spells",
+        "likelihood": "moderate",
+        "key_features": "Possible if no electrographic correlate captured; ruled out by video-EEG showing ictal pattern coincident with stereotyped semiology.",
+        "icd_code": "F44.5"
+      },
+      {
+        "diagnosis": "Migraine with olfactory aura",
         "likelihood": "low",
-        "key_features": "History of anxiety disorder could suggest psychogenic etiology. However, stereotyped semiology with olfactory aura, contralateral automatisms, and post-ictal confusion with amnesia is highly suggestive of epileptic seizures. EEG confirmation of ictal correlate excludes PNES for the captured event."
+        "key_features": "Olfactory hallucinations can occur in migraine but here the aura is followed by behavioral arrest and amnesia — not migraine.",
+        "icd_code": "G43.109"
       },
       {
-        "diagnosis": "Migraine with aura",
+        "diagnosis": "Frontal lobe focal epilepsy",
         "likelihood": "low",
-        "key_features": "Patient has a known history of migraines, which could initially confuse the picture. However, her migraines are without aura and phenomenologically distinct from these episodes. Migraine aura spreads slowly over minutes, while her olfactory episodes are abrupt and followed by altered awareness and automatisms, not headache."
+        "key_features": "Hypermotor or nocturnal frontal events absent; oroalimentary automatisms and amnesia favor temporal localization.",
+        "icd_code": "G40.219"
       },
       {
-        "diagnosis": "Transient ischemic attack",
-        "likelihood": "very_low",
-        "key_features": "Age 41 without vascular risk factors. TIAs produce negative symptoms and do not typically cause olfactory hallucinations, automatisms, or post-ictal confusion. Episodes are recurrent and stereotyped, not consistent with TIA."
+        "diagnosis": "Transient global amnesia",
+        "likelihood": "low",
+        "key_features": "TGA episodes are minutes-to-hours of anterograde amnesia without automatisms; semiology here is too brief and stereotyped.",
+        "icd_code": "G45.4"
       },
       {
-        "diagnosis": "Syncope (vasovagal)",
-        "likelihood": "very_low",
-        "key_features": "No prodrome of lightheadedness, pallor, or diaphoresis. Prolonged post-ictal confusion and automatisms during the event are incompatible with simple syncope. No postural trigger."
+        "diagnosis": "Convulsive syncope",
+        "likelihood": "low",
+        "key_features": "No prodromal lightheadedness, no postural trigger, prolonged post-ictal confusion — inconsistent with syncope.",
+        "icd_code": "R55"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain detailed history of episode semiology from patient and witnesses, including aura description, automatisms, duration, and post-ictal features",
+        "action": "Obtain detailed seizure history including semiology, aura, automatisms, duration, frequency, witness accounts, and post-ictal features.",
         "tool_name": null,
-        "expected_finding": "Olfactory aura (unpleasant metallic smell), depersonalization, behavioral arrest with contralateral hand automatisms and oral automatisms, post-ictal confusion with amnesia",
-        "category": "required"
+        "expected_finding": "Stereotyped focal impaired-awareness events with temporal-lobe aura and post-ictal confusion.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 2,
-        "action": "Perform complete neurological examination including bedside olfactory testing and mental status assessment",
+        "action": "Perform complete neurological examination.",
         "tool_name": null,
-        "expected_finding": "Largely normal exam with subtle olfactory identification deficit and possible brief behavioral pauses during interview suggesting subclinical seizure activity",
-        "category": "required"
+        "expected_finding": "Interictal exam typically normal; subtle memory deficit may be present.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Order routine EEG",
+        "action": "Order EEG (routine first; pursue ambulatory or video-EEG if non-diagnostic) to identify interictal epileptiform discharges and capture habitual events.",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Equivocal right temporal sharp transients and intermittent right temporal slowing; findings are ambiguous and require further monitoring",
+        "expected_finding": "Interictal sharps/spikes and/or focal slowing in the anterior temporal region; ictal correlate confirms diagnosis.",
         "category": "required",
         "tool_parameters": {
           "eeg_type": "routine"
-        }
+        },
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 4,
-        "action": "Order brain MRI",
+        "action": "Order MRI brain with dedicated epilepsy protocol (thin-cut coronal T1/FLAIR/T2/DWI through the hippocampi).",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Equivocal subtle right hippocampal asymmetry on 1.5T; recommend 3T epilepsy protocol",
+        "expected_finding": "Hippocampal sclerosis, low-grade tumor (DNET, ganglioglioma), cavernoma, or focal cortical dysplasia; rule out alternative structural causes.",
         "category": "required",
         "tool_parameters": {
-          "protocol": "standard",
-          "contrast": false
-        }
+          "protocol": "epilepsy",
+          "contrast": true
+        },
+        "citation": "[AAN_2007]",
+        "guideline_source": "AAN_2007"
       },
       {
         "step": 5,
-        "action": "Order basic labs including BMP, CBC, prolactin, TSH, and urine drug screen",
+        "action": "Obtain CBC, comprehensive metabolic panel, prolactin (if drawn within 10–20 min of event), and AED levels if on therapy.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal metabolic panel; mildly elevated prolactin confounded by late sampling and sertraline; negative drug screen",
+        "expected_finding": "Exclude metabolic provocation (hypoglycemia, hyponatremia, uremia); baseline organ function for AED selection; AED level for adherence and dosing.",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
-            "thyroid",
-            "drug_screen",
+            "CMP",
             "prolactin"
           ]
-        }
+        },
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 6,
-        "action": "Request prolonged video-EEG monitoring to capture habitual events and resolve equivocal routine EEG findings",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Capture of habitual seizure with right temporal onset confirming epilepsy diagnosis and lateralization",
+        "action": "Search current literature for AED selection in focal epilepsy and ILAE 2017 seizure classification.",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Evidence-based AED options for focal epilepsy (levetiracetam, lamotrigine, oxcarbazepine, lacosamide); ILAE classification framework.",
         "category": "required",
-        "tool_parameters": {
-          "eeg_type": "video"
-        }
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 7,
-        "action": "Request 3T MRI with dedicated epilepsy protocol given equivocal 1.5T findings",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Confirmed right mesial temporal sclerosis with hippocampal volume loss and T2/FLAIR hyperintensity",
+        "action": "Check drug interactions before initiating or modifying AED therapy (enzyme inducers, OCP, other CNS-active drugs).",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identify pharmacokinetic interactions (CYP induction by carbamazepine/phenytoin) and CNS adverse-effect overlap.",
         "category": "required",
-        "tool_parameters": {
-          "protocol": "epilepsy",
-          "contrast": false
-        }
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 8,
-        "action": "Initiate antiepileptic drug therapy appropriate for focal epilepsy, checking for drug interactions with current medications",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Lamotrigine or levetiracetam are appropriate first-line options; consideration of psychiatric side effects of levetiracetam given anxiety history",
-        "category": "required"
+        "action": "Pursue prolonged video-EEG monitoring to capture habitual events, confirm lateralization, and evaluate surgical candidacy.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Capture of habitual focal seizure with electrographic correlate; concordance with imaging supports surgical workup.",
+        "category": "recommended",
+        "tool_parameters": {
+          "eeg_type": "video"
+        },
+        "citation": "[Engel_2003]",
+        "guideline_source": "Engel_2003"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No clinical features of CNS infection, encephalitis, or immunocompromise; CSF analysis is not indicated for routine focal epilepsy workup and exposes the patient to procedural risk and cost.",
+        "citation": "[AAN_2007]"
       },
       {
-        "step": 9,
-        "action": "Counsel patient on driving restrictions, seizure safety, and the importance of medication adherence",
-        "tool_name": null,
-        "expected_finding": "Patient informed of state driving restrictions, avoidance of heights and unsupervised swimming, and seizure first aid for household members",
-        "category": "required"
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "Episode semiology is clearly seizure-like; convulsive syncope is not on the differential, so ECG is low-yield.",
+        "citation": "[AAN_2007]"
       },
       {
-        "step": 10,
-        "action": "Refer for neuropsychological testing and epilepsy surgery evaluation at a comprehensive epilepsy center",
-        "tool_name": null,
-        "expected_finding": "Referral placed given structural lesion and potential surgical candidacy",
-        "category": "recommended"
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "echo_type": "TTE"
+        },
+        "rationale": "No syncope-versus-seizure question and no structural-heart concern; echocardiogram contributes nothing to epilepsy workup.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "Ambulatory cardiac monitoring is reserved for syncope-versus-seizure differentiation; not indicated when semiology is clearly epileptic.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT is inferior to MRI for detecting epileptogenic substrates (hippocampal sclerosis, FCD, low-grade tumor) and adds ionizing radiation without diagnostic yield.",
+        "citation": "[AAN_2007]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "check_drug_interactions",
+        "reason": "Structural cause influences AED choice (e.g., low-grade tumor → consider AEDs with CYP-neutral profile; hippocampal sclerosis → multiple equally appropriate options). MRI should inform drug selection.",
+        "citation": "[ILAE_drug_2017]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Obtain EEG to identify epileptiform activity; pursue prolonged video-EEG when routine EEG is equivocal",
-      "Obtain brain MRI; escalate to 3T epilepsy protocol when 1.5T findings are inconclusive",
-      "Obtain basic metabolic panel and CBC to exclude metabolic causes of seizures",
-      "Initiate appropriate antiepileptic drug therapy for focal epilepsy",
-      "Counsel patient on driving restrictions and seizure safety precautions",
-      "Recognize that the olfactory aura with depersonalization and subsequent automatisms represent temporal lobe seizure semiology, not anxiety or panic attacks"
+      "Recognize olfactory hallucinations followed by behavioral arrest and oroalimentary automatisms as a mesial-temporal seizure semiology.",
+      "Pursue prolonged video-EEG monitoring when routine EEG is non-diagnostic to capture a habitual event.",
+      "Obtain dedicated 3T MRI epilepsy protocol to evaluate the hippocampi.",
+      "Initiate a first-line focal-epilepsy AED (e.g., lamotrigine, levetiracetam, lacosamide).",
+      "Counsel on driving restrictions and seizure safety, particularly with classroom occupation."
     ],
     "contraindicated_actions": [
-      "Dismissing the episodes as panic attacks or anxiety without obtaining EEG and MRI",
-      "Performing lumbar puncture without clinical indication (no signs of infection or inflammation)",
-      "Prescribing bupropion which lowers seizure threshold",
-      "Discharging patient without AED initiation or neurology follow-up after confirmed seizure",
-      "Advising the patient that she may continue driving without restriction",
-      "Rapidly titrating lamotrigine (risk of Stevens-Johnson syndrome)",
-      "Attributing the left frontal white matter lesion to the seizure etiology and pursuing unnecessary workup for demyelinating disease"
+      "Do not pursue ENT workup for the olfactory hallucinations in isolation — they are seizure aura.",
+      "Do not perform lumbar puncture without features of encephalitis.",
+      "Do not order a non-contrast head CT in lieu of MRI for epilepsy localization."
     ],
     "key_reasoning_points": [
-      "Olfactory hallucinations (uncinate fits) localize seizure onset to the mesial temporal lobe, specifically the amygdala and uncinate region, though they do not strongly lateralize",
-      "Contralateral (left) hand automatisms during the witnessed seizure are a lateralizing sign pointing to right temporal lobe seizure onset",
-      "The subtle behavioral pauses observed during the neurological exam may represent brief focal impaired awareness seizures, underscoring the need for video-EEG monitoring",
-      "Equivocal sharp transients on routine EEG that overlap with wicket spikes (a benign variant) require prolonged monitoring for definitive classification -- this is a key moderate-difficulty diagnostic challenge",
-      "A 1.5T MRI may miss subtle hippocampal sclerosis that becomes apparent on 3T with epilepsy-specific sequences -- recognizing the need to escalate imaging is essential",
-      "Prolactin elevation must be interpreted cautiously when sampling is delayed and the patient is on an SSRI, both of which confound interpretation",
-      "The pre-existing anxiety diagnosis and migraine history create diagnostic noise that could lead an unwary clinician to attribute temporal lobe seizure symptoms to psychiatric or migraine etiologies",
-      "The incidental left frontal white matter lesion is a red herring that should not be pursued as the seizure focus, given right-sided lateralization of all other findings"
+      "Olfactory aura points to mesial-temporal origin (uncinate seizures).",
+      "Stereotyped behavioral arrest with oral automatisms and amnesia is the signature semiology of mesial TLE.",
+      "Routine EEG sensitivity is limited; prolonged video-EEG is the gold standard for capturing events and confirming lateralization.",
+      "3T MRI epilepsy protocol is needed to identify hippocampal sclerosis with confidence."
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
     "red_herrings": []
   },
   "metadata": {
@@ -865,6 +909,14 @@
       "ct": "normal",
       "echo": "normal",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (FEPI-TEMP)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FEPI-TEMP",
+    "difficulty_rationale": "Five required tools, video-EEG follow-up needed for capture; olfactory aura is a classic but easily misattributed feature.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

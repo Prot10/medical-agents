@@ -500,92 +500,204 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Status epilepticus from subtherapeutic levetiracetam and worsening peritumoral edema in progressive right frontal GBM",
-    "icd_code": "G41.9",
+    "primary_diagnosis": "Focal status epilepticus with secondary generalization from subtherapeutic levetiracetam and worsening peritumoral edema in progressive right frontal glioblastoma",
+    "icd_code": "G41.1",
     "differential": [
       {
-        "diagnosis": "Tumor progression SE",
+        "diagnosis": "Tumor progression with new hemorrhage",
+        "likelihood": "high",
+        "key_features": "Known GBM on bevacizumab; progressive disease can hemorrhage; CT shows mass with peritumoral edema",
+        "icd_code": "C71.1"
+      },
+      {
+        "diagnosis": "Subtherapeutic AED breakthrough alone",
+        "likelihood": "high",
+        "key_features": "LEV 8 mcg/mL subtherapeutic; contributing primary cause",
+        "icd_code": "G40.219"
+      },
+      {
+        "diagnosis": "Drug-related (citalopram lowering seizure threshold)",
         "likelihood": "low",
-        "key_features": "MRI shows tumor progression with increased rCBV; peritumoral edema worse with steroid taper - both mechanisms active"
+        "key_features": "Citalopram has minimal seizure-threshold effect at therapeutic doses",
+        "icd_code": "T43.225A"
       },
       {
-        "diagnosis": "Radiation necrosis (not progression)",
-        "likelihood": "very_low",
-        "key_features": "MRI perfusion shows high rCBV (progression not necrosis); DWI restriction in necrosis"
+        "diagnosis": "Hypercoagulable / paraneoplastic stroke",
+        "likelihood": "low",
+        "key_features": "GBM patients have hypercoagulable state; no acute infarct on CT",
+        "icd_code": "I63.9"
       },
       {
-        "diagnosis": "CNS infection (immunocompromised on bevacizumab)",
-        "likelihood": "very_low",
-        "key_features": "CSF normal; no infection pattern; subtherapeutic AED explains SE"
+        "diagnosis": "CNS infection (immunosuppressed on chemo)",
+        "likelihood": "low",
+        "key_features": "Mild fever 37.8 but no meningismus; CSF only if clinical course worsens",
+        "icd_code": "G04.90"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "EEG confirms right frontal focal SE",
+        "action": "EEG — confirm focal SE with secondary generalization",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Right frontal ictal activity with secondary generalization; peritumoral slowing background",
+        "expected_finding": "Right frontal focal ictal activity at 6-8 Hz evolving to generalized 3 Hz spike-wave — concordant with tumor location",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "Labs - subtherapeutic levetiracetam, dexamethasone hyperglycemia",
+        "action": "Labs: CBC, CMP, glucose, Ca/Mg, AED level (LEV), CK, lactate, ABG, beta-hCG",
         "tool_name": "interpret_labs",
-        "expected_finding": "Levetiracetam 8 subtherapeutic - missed dose; glucose 248 dexamethasone effect",
+        "expected_finding": "LEV 8 subtherapeutic; glucose 248 (dexamethasone effect); Hgb 11.4 (bevacizumab anemia)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "IV levetiracetam loading + IV dexamethasone escalation",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "LEV 3000 mg IV; dexamethasone back to 8 mg/day; citalopram mild seizure threshold effect noted",
+        "action": "Non-contrast head CT — assess tumor + new hemorrhage + edema progression",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Right frontal mass with ring enhancement and peritumoral edema, mild leftward midline shift",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "CT/MRI for tumor progression vs radiation necrosis",
+        "action": "MRI brain with gadolinium — tumor progression vs radiation necrosis",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Tumor progression confirmed (high rCBV, DWI); peritumoral edema worse from steroid taper",
+        "expected_finding": "Tumor progression with worsening edema; no new acute infarct or hemorrhage",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "Palliative care consultation for GBM progression",
+        "action": "Drug-interaction check: citalopram + LEV + dexamethasone + bevacizumab + AED choice",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Continue LEV (no interactions); avoid phenytoin (CYP induction reduces TMZ); SSRIs OK at therapeutic doses",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESETT_2019]",
+        "guideline_source": ""
+      },
+      {
+        "step": 6,
+        "action": "Literature: SE in known glioma with peritumoral edema management",
         "tool_name": "search_medical_literature",
-        "expected_finding": "Goals of care discussion; palliative care early integration in GBM progression",
+        "expected_finding": "Increase dexamethasone for tumor edema; load LEV; second-line lacosamide or VPA per ESETT",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 7,
+        "action": "Palliative care consultation — discuss goals in progressive GBM",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Align AED and tumor-edema management with goals of care",
         "category": "recommended",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "study_type": "TTE"
+        },
+        "rationale": "No clinical suspicion of cardiac source of embolus or cardiogenic seizure; routine echo is not indicated in SE workup absent cardiac findings.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No suspicion of arrhythmogenic syncope or cardiac comorbidity precipitating SE; routine telemetry beyond standard ICU monitoring adds cost without yield.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in acute SE evaluation; dementia biomarker imaging does not change acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is for ischemic stroke workup; SE without focal vascular suspicion does not warrant carotid imaging.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "DaTscan / dopamine transporter imaging has no role in SE; no parkinsonism question relevant to acute management.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "MRI must precede any LP in patient with mass and midline shift.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Confirm AED level before reload; check beta-hCG (here female with reproductive potential).",
+        "citation": "[Brophy_2012]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "IV levetiracetam 3000 mg loading dose - subtherapeutic level from missed dose is primary precipitant",
-      "IV dexamethasone escalation to 8-10 mg - steroid taper worsened peritumoral edema precipitating SE",
-      "MRI with perfusion - tumor progression vs radiation necrosis changes management significantly",
-      "Citalopram: acceptable to continue at 20 mg but monitor QTc; mirtazapine alternative",
-      "Insulin protocol for dexamethasone-induced hyperglycemia 248 mg/dL",
-      "Palliative care consultation for tumor progression discussion"
+      "Administer IV lorazepam 0.1 mg/kg first-line",
+      "Re-escalate dexamethasone for peritumoral edema",
+      "Reload IV levetiracetam to therapeutic level + add second-line AED if persistent",
+      "Multidisciplinary discussion of goals (palliative care, neuro-oncology)"
     ],
     "contraindicated_actions": [
-      "Do not continue steroid taper during active SE from peritumoral edema",
-      "Do not miss tumor progression as SE precipitant - MRI is essential",
-      "Do not add phenytoin which interacts with bevacizumab and dexamethasone",
-      "Do not delay goals of care discussion in progressive GBM"
+      "Do NOT perform LP — mass effect with midline shift",
+      "Do NOT use enzyme-inducing AEDs (phenytoin, CBZ) — reduce TMZ exposure",
+      "Do NOT escalate to anesthetic infusion without goals-of-care discussion in progressive GBM",
+      "LP contraindicated with right frontal mass + leftward midline shift — herniation risk."
     ],
     "key_reasoning_points": [
-      "Dual SE precipitant: subtherapeutic levetiracetam (missed dose) + dexamethasone taper worsening peritumoral edema",
-      "Dexamethasone escalation treats SE cause (peritumoral edema) in GBM patients",
-      "MRI perfusion distinguishes tumor progression (high rCBV) from radiation necrosis (low rCBV) - management differs",
-      "Citalopram has mild seizure threshold-lowering effect - monitor in epileptic patient but benefit outweighs risk for GBM depression",
-      "GBM progression with SE: palliative care early integration improves patient and family outcomes"
+      "Subtherapeutic AED + peritumoral edema is a dual driver requiring both AED escalation and steroid escalation",
+      "LP is contraindicated in mass effect with midline shift",
+      "Goals-of-care must inform escalation strategy in progressive GBM"
     ],
-    "red_herrings": [],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": [
+      {
+        "data_point": "Glucose 248 mg/dL",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests new diabetic ketoacidosis or hyperglycemic seizure",
+        "correct_interpretation": "Hyperglycemia is expected on chronic dexamethasone in GBM; no ketones or hyperosmolarity to suggest DKA/HHS"
+      },
+      {
+        "data_point": "Citalopram on medication list",
+        "location": "patient.clinical_history.medications",
+        "field_path": "patient.clinical_history.medications",
+        "intended_effect": "Suggests SSRI-induced seizure",
+        "correct_interpretation": "Citalopram at therapeutic doses has minimal seizure-threshold effect; tumor + subtherapeutic LEV is the cause"
+      }
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -594,6 +706,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "incidental",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "6 required + 1 recommended; progressive GBM SE; LP harmful given mass effect; AED selection compatible with chemo; 2 grounded red herrings.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -1,7 +1,7 @@
 {
   "case_id": "GLIO-HG-RP02",
   "condition": "brain_tumor_glioma",
-  "difficulty": "diagnostic_puzzle",
+  "difficulty": "moderate",
   "encounter_type": "inpatient",
   "patient": {
     "patient_id": "NB-GLIO-HG-RP02",
@@ -812,198 +812,205 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Glioblastoma, IDH-wildtype, WHO Grade 4",
+    "primary_diagnosis": "Glioblastoma, IDH-wildtype, WHO grade 4 (right frontal)",
     "icd_code": "C71.1",
     "differential": [
       {
-        "diagnosis": "Tumefactive demyelinating lesion (tumefactive MS)",
-        "likelihood": "very_low",
-        "key_features": "Incomplete ring enhancement pattern and contralateral white matter lesion with family history of MS initially raised this possibility. Excluded by significantly elevated rCBV (>4.0 at enhancing rim), elevated choline extending beyond enhancing margin on spectroscopy, negative CSF oligoclonal bands, and normal myelin basic protein."
-      },
-      {
-        "diagnosis": "Brain abscess (pyogenic or tuberculous)",
-        "likelihood": "very_low",
-        "key_features": "Ring-enhancing lesion with history of recent sinusitis and prior pulmonary TB raised infectious differential. Excluded by absence of restricted diffusion centrally, elevated perfusion parameters at the rim (abscess would show low perfusion), normal WBC, negative CSF cultures, negative AFB smear and TB PCR, and no meningeal enhancement."
-      },
-      {
-        "diagnosis": "CNS lymphoma",
+        "diagnosis": "Brain metastasis (solitary)",
         "likelihood": "low",
-        "key_features": "Ring-enhancing lesion can occasionally represent lymphoma, particularly in immunocompromised patients. Excluded by elevated perfusion at rim (lymphoma typically hypercellular with lower rCBV), ring rather than homogeneous enhancement pattern, and patient is immunocompetent."
+        "key_features": "No known primary cancer; staging CT chest/abdomen/pelvis negative; infiltrative margins and corpus-callosum or eloquent-cortex involvement more typical of primary glioma than metastasis"
       },
       {
-        "diagnosis": "Solitary brain metastasis",
+        "diagnosis": "Primary CNS lymphoma",
         "likelihood": "low",
-        "key_features": "Solitary ring-enhancing lesion in middle-aged woman with family history of breast cancer. Excluded by infiltrative spectral pattern extending beyond enhancing margin (metastases have sharp tumor-brain interface), negative CT chest/abdomen/pelvis, and no known primary malignancy."
+        "key_features": "In immunocompetent patients typically presents as homogeneously enhancing periventricular mass with diffuse DWI restriction and no central necrosis; ring enhancement with necrosis argues against"
       },
       {
-        "diagnosis": "Low-grade glioma (WHO Grade 2)",
+        "diagnosis": "Brain abscess",
         "likelihood": "very_low",
-        "key_features": "Excluded by presence of ring enhancement, central necrosis, markedly elevated perfusion parameters, and high choline levels — all indicating high-grade rather than low-grade pathology."
+        "key_features": "No fever or leukocytosis; DWI restriction at the enhancing rim (not centrally as in pyogenic pus) and elevated rCBV are inconsistent with abscess"
+      },
+      {
+        "diagnosis": "Tumefactive demyelinating lesion",
+        "likelihood": "very_low",
+        "key_features": "Closed ring enhancement, marked mass effect, and central necrosis are atypical for tumefactive MS; demyelinating lesions usually show incomplete ('open') ring enhancement on the cortical side"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain brain MRI with contrast to characterize the intracranial lesion",
+        "action": "Order MRI brain with and without gadolinium contrast (tumor protocol with DWI, FLAIR, post-contrast T1) to characterize the right frontal lobe lesion, define mass effect, and plan surgery",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Ring-enhancing right frontal lesion with surrounding vasogenic edema",
+        "expected_finding": "Heterogeneously enhancing mass with ring/irregular enhancement, central necrosis, restricted diffusion at the enhancing rim, perilesional FLAIR-hyperintense edema, and mass effect consistent with high-grade glioma",
         "category": "required",
         "tool_parameters": {
           "protocol": "tumor",
           "contrast": true
-        }
+        },
+        "citation": "[Stupp_2005]",
+        "guideline_source": "Stupp_2005"
       },
       {
         "step": 2,
-        "action": "Review laboratory results including CBC, BMP, inflammatory markers, and coagulation studies",
+        "action": "Order pre-operative laboratory workup: CBC, comprehensive metabolic panel, coagulation studies (PT/INR, aPTT), and type & screen in anticipation of surgical biopsy/resection",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal CBC and coagulation; mildly elevated ESR and CRP (nonspecific)",
+        "expected_finding": "Baseline values acceptable for surgery; identify any coagulopathy, electrolyte derangement, or steroid-relevant abnormality (e.g., hyperglycemia, hyponatremia) before craniotomy",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
             "coagulation",
-            "inflammatory_markers"
+            "type_and_screen"
           ]
-        }
+        },
+        "citation": "[NCCN_CNS]",
+        "guideline_source": "NCCN_CNS"
       },
       {
         "step": 3,
-        "action": "Obtain EEG to evaluate for subclinical seizures given staring episode",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Focal right frontocentral slowing suggesting structural lesion",
+        "action": "Search medical literature for management of newly suspected high-grade glioma: WHO 2021 classification, Stupp protocol indications, and timing of surgical referral",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirmation that maximal safe resection followed by concurrent chemoradiation (Stupp protocol) is the standard of care, with molecular profiling (IDH, MGMT, 1p/19q, TERT) guiding prognosis and treatment selection",
         "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
+        "tool_parameters": {},
+        "citation": "[WHO_2021]",
+        "guideline_source": "WHO_2021"
       },
       {
         "step": 4,
-        "action": "Request MR perfusion imaging to characterize vascularity of the enhancing lesion",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Markedly elevated rCBV at enhancing rim, favoring high-grade glioma over abscess or demyelination",
+        "action": "Obtain urgent neurosurgical and neuro-oncology consultation for tissue diagnosis (stereotactic biopsy or maximal safe resection) and multidisciplinary treatment planning",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Multidisciplinary plan including tissue acquisition, molecular profiling, and adjuvant treatment per current standards",
         "category": "required",
         "tool_parameters": {
-          "imaging_type": "perfusion_MRI"
-        }
+          "specialty": "neurosurgery"
+        },
+        "citation": "[Stupp_2005]",
+        "guideline_source": "Stupp_2005"
       },
       {
         "step": 5,
-        "action": "Request MR spectroscopy to evaluate metabolite ratios at lesion and peritumoral region",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Elevated choline, reduced NAA, lipid/lactate peaks; tumoral pattern extending beyond enhancement",
+        "action": "Obtain neuro-oncology consultation for adjuvant therapy planning and molecular-marker-guided treatment selection",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Plan for concurrent chemoradiation (Stupp protocol with temozolomide) for IDH-wildtype GBM; alternative chemoradiation regimens for other tumor types or for atypical histologies",
         "category": "required",
         "tool_parameters": {
-          "imaging_type": "MR_spectroscopy"
-        }
+          "specialty": "neuro_oncology"
+        },
+        "citation": "[Stupp_2005]",
+        "guideline_source": "Stupp_2005"
       },
       {
         "step": 6,
-        "action": "Order CT chest/abdomen/pelvis to rule out primary extracranial malignancy (metastatic workup)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "No evidence of primary extracranial malignancy",
+        "action": "Order MR perfusion imaging (DSC perfusion) to assess tumor vascularity and target highest-grade region for biopsy",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Elevated rCBV (typically > 1.75) in enhancing component supports high-grade neoplasm and helps direct biopsy",
         "category": "recommended",
         "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP"
-          ]
-        }
+          "modality": "perfusion_MRI"
+        },
+        "citation": "[Law_2003]",
+        "guideline_source": "Law_2003"
       },
       {
         "step": 7,
-        "action": "Recommend stereotactic biopsy for tissue diagnosis and molecular profiling",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Glioblastoma, IDH-wildtype, MGMT methylated, WHO Grade 4",
-        "category": "required",
+        "action": "Order MR spectroscopy (1H-MRS) to characterize tumor metabolic profile",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Elevated Cho/NAA ratio with lipid-lactate peaks supports high-grade malignancy and helps differentiate tumor from treatment-related change at follow-up",
+        "category": "recommended",
         "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP"
-          ]
-        }
+          "modality": "MR_spectroscopy"
+        },
+        "citation": "[Bulik_2013]",
+        "guideline_source": "Bulik_2013"
       },
       {
         "step": 8,
-        "action": "Request functional MRI for pre-surgical motor and language mapping",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Motor cortex displaced but preserved, 8 mm from tumor margin",
-        "category": "recommended",
+        "action": "Order CT chest/abdomen/pelvis as staging to exclude an extracranial primary if a solitary metastasis is on the differential",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No extracranial primary malignancy identified, supporting primary brain tumor as the working diagnosis",
+        "category": "optional",
         "tool_parameters": {
-          "protocol": "standard",
-          "contrast": false
-        }
+          "region": "chest_abdomen_pelvis",
+          "contrast": true
+        },
+        "citation": "[NCCN_CNS]",
+        "guideline_source": "NCCN_CNS"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "echo_type": "TTE"
+        },
+        "rationale": "Echocardiogram has no role in the diagnostic workup of suspected high-grade glioma absent a specific cardiac question (e.g., suspected paraneoplastic endocarditis)",
+        "citation": "[NCCN_CNS]"
       },
       {
-        "step": 9,
-        "action": "Check drug interactions for temozolomide with current medications",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "No major interactions; PJP prophylaxis needed with consideration of penicillin allergy",
-        "category": "recommended"
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "Cardiac monitoring is unrelated to the diagnostic workup of a brain mass and adds resource cost without informing management",
+        "citation": "[NCCN_CNS]"
+      }
+    ],
+    "harmful_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is contraindicated in suspected intracranial mass with imaging mass effect (effacement of ventricles / sulci / cisterns): the pressure gradient created by LP risks transtentorial or tonsillar herniation. Even when LP is otherwise safe, CSF studies are low-yield for primary brain tumor diagnosis.",
+        "citation": "[Hasbun_2001]"
+      }
+    ],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "MRI must precede any lumbar puncture when a mass lesion is suspected, to identify mass effect and herniation risk before LP",
+        "citation": "[Hasbun_2001]",
+        "severity": "hard"
       },
       {
-        "step": 10,
-        "action": "Initiate antiepileptic medication given likely subclinical seizure (staring episode) and structural lesion",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "before": "analyze_brain_mri",
+        "after": "consult_medical_specialist",
+        "reason": "Adequate pre-operative MRI characterization (mass, edema, eloquent-cortex proximity) is standard of care before neurosurgical tissue acquisition",
+        "citation": "[Stupp_2005]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Obtain brain MRI with gadolinium contrast to characterize the ring-enhancing lesion",
-      "Request advanced MRI (perfusion and/or spectroscopy) to differentiate high-grade glioma from abscess, lymphoma, and tumefactive demyelination",
-      "Recognize that the absence of restricted diffusion centrally argues against pyogenic abscess",
-      "Recognize that elevated perfusion at the enhancing rim argues against abscess, lymphoma, and tumefactive demyelination",
-      "Recognize that tumoral spectral pattern extending beyond enhancing margin confirms infiltrative glioma rather than metastasis",
-      "Recommend stereotactic biopsy for definitive tissue diagnosis and molecular profiling",
-      "Initiate antiepileptic prophylaxis given structural lesion and suspected subclinical seizures",
-      "Refer to multidisciplinary neuro-oncology tumor board"
+      "Obtain urgent neurosurgical consultation for tissue diagnosis (stereotactic biopsy or maximal safe resection) and operative planning",
+      "Obtain MRI brain with and without gadolinium contrast (tumor protocol) before any invasive procedure",
+      "Initiate dexamethasone (e.g., 4 mg IV every 6 hours) to control symptomatic peritumoral edema; titrate to lowest effective dose",
+      "Obtain pre-operative labs (CBC, BMP, coagulation, type & screen) before craniotomy/biopsy",
+      "Plan multimodal treatment per molecular and histological profile (e.g., Stupp protocol — concurrent chemoradiation with temozolomide for IDH-wildtype GBM)"
     ],
     "contraindicated_actions": [
-      "Initiating high-dose corticosteroids before obtaining tissue diagnosis (can obscure lymphoma diagnosis and affect biopsy interpretation)",
-      "Empiric antibiotic treatment for presumed brain abscess without further diagnostic workup",
-      "Lumbar puncture before neuroimaging in a patient with a mass lesion and midline shift (risk of herniation)",
-      "Attributing symptoms to migraine or anxiety without investigating the changed headache pattern",
-      "Starting immunosuppressive therapy for presumed tumefactive MS without tissue confirmation",
-      "Delaying biopsy in favor of prolonged empiric observation"
+      "Do not perform lumbar puncture in the setting of intracranial mass effect — herniation risk",
+      "Do not initiate definitive tumor-directed therapy (radiation, temozolomide, alkylating chemotherapy) before tissue diagnosis is established",
+      "Do not start therapeutic anticoagulation without a clear thromboembolic indication, given upcoming neurosurgical intervention and bleeding risk"
     ],
     "key_reasoning_points": [
-      "The change in headache character from episodic migraine to persistent morning headache with nausea and sleep disruption suggests increased intracranial pressure, not migraine exacerbation",
-      "Absence of restricted diffusion in the central cavity of a ring-enhancing lesion effectively rules out pyogenic abscess and tuberculoma, which show restricted diffusion from pus or caseous material",
-      "Elevated rCBV at the enhancing rim (rCBV ratio >4.0) is characteristic of neovascular tumor tissue (GBM) and strongly argues against abscess (low perfusion), lymphoma (intermediate perfusion), and tumefactive demyelination (low rCBV, typically <2.0)",
-      "The tumoral spectral pattern (elevated choline, reduced NAA) extending beyond the enhancing margin into the peritumoral FLAIR abnormality is pathognomonic for infiltrative glioma and excludes metastasis, which has a sharp tumor-brain interface",
-      "The small contralateral white matter lesion and family history of MS are significant red herrings — negative CSF oligoclonal bands and markedly elevated perfusion parameters definitively exclude tumefactive demyelination",
-      "History of prior pulmonary tuberculosis is a red herring — treated TB decades ago does not significantly increase risk for CNS tuberculoma, and negative AFB/TB PCR in CSF further excludes this",
-      "Recent sinusitis with mildly elevated inflammatory markers (ESR, CRP) adds deliberate diagnostic confusion but is insufficient to explain the intracranial findings in the absence of fever, leukocytosis, or restricted diffusion",
-      "The incomplete ring enhancement pattern initially mimics tumefactive demyelination, but the overall perfusion and spectroscopy pattern is diagnostic of GBM — demonstrating why advanced imaging is essential"
+      "Combination of progressive headache (worse mornings), new focal neurological deficit, and/or new-onset seizure in an adult is a high-risk presentation requiring urgent contrast-enhanced brain MRI",
+      "MRI features of a right frontal lobe heterogeneously / ring-enhancing mass with central necrosis, perilesional FLAIR-hyperintense edema, restricted diffusion at the enhancing rim, and mass effect are characteristic of high-grade glioma",
+      "Perfusion MRI (elevated rCBV) and MR spectroscopy (elevated Cho/NAA, lipid-lactate) corroborate high-grade neoplasm and help guide biopsy targeting",
+      "Mass effect, even when modest, makes lumbar puncture risky and low-yield for primary brain tumor diagnosis — MRI must precede any consideration of LP",
+      "Definitive diagnosis requires tissue (stereotactic biopsy or surgical resection) with molecular profiling (IDH, MGMT, 1p/19q, TERT, H3K27M); imaging alone cannot substitute for histology",
+      "For IDH-wildtype GBM, current standard of care is maximal safe resection followed by the Stupp protocol (concurrent radiation + temozolomide, then adjuvant temozolomide)",
+      "Avoid ordering off-pathway advanced-imaging modalities (DaTscan, amyloid PET, FDG-PET, carotid duplex, transcranial Doppler) — they address other neurological differentials and add cost without informing glioma management"
     ],
     "red_herrings": [
       {
-        "data_point": "History of prior pulmonary tuberculosis treated 15 years ago",
+        "data_point": "Long-standing history of migraine without aura",
         "location": "patient.clinical_history.past_medical_history",
-        "intended_effect": "Raises concern for CNS tuberculoma as the cause of the ring-enhancing lesion, leading to empiric antituberculous therapy rather than biopsy",
-        "correct_interpretation": "Treated TB 15 years ago does not significantly elevate risk for current CNS tuberculoma. Tuberculomas classically show central restricted diffusion (caseous necrosis) which is absent here. CSF AFB smear, TB PCR, and adenosine deaminase are all negative. Elevated perfusion at the enhancing rim is incompatible with the avascular granulomatous capsule of a tuberculoma.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Recent sinusitis with mildly elevated inflammatory markers (ESR, CRP)",
-        "location": "patient.history_present_illness / initial_tool_outputs.labs",
-        "intended_effect": "Suggests spread from adjacent sinusitis to cause a pyogenic brain abscess, reinforcing the infectious differential",
-        "correct_interpretation": "Sinusitis-related brain abscess would show central restricted diffusion (pus), smooth thin ring enhancement, and usually presents with fever and leukocytosis. This lesion shows no central restricted diffusion, irregular thick ring enhancement, elevated rCBV (abscess has avascular capsule), and normal WBC with low procalcitonin. The mildly elevated ESR/CRP is nonspecific.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Contralateral white matter lesion on MRI and family history of MS",
-        "location": "initial_tool_outputs.mri / patient.clinical_history.family_history",
-        "intended_effect": "Raises concern for tumefactive MS, potentially leading to steroid therapy that would confound tissue diagnosis",
-        "correct_interpretation": "The contralateral white matter lesion is small and nonspecific. CSF oligoclonal bands are negative and myelin basic protein is normal, effectively excluding MS. Markedly elevated rCBV (>4.0) at the enhancing rim is incompatible with tumefactive demyelination (rCBV typically <2.0).",
-        "field_path": ""
+        "field_path": "",
+        "intended_effect": "Misattributes new progressive headache to a flare of pre-existing migraine",
+        "correct_interpretation": "New, qualitatively different, progressive headache that is unresponsive to usual migraine treatment — especially with behavioral change and focal signs — requires brain MRI regardless of migraine history"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -1018,6 +1025,14 @@
       "echo": "incidental",
       "cardiac_monitoring": "normal",
       "specialized_test": "incidental"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:GLIO-HG",
+    "difficulty_rationale": "5 required tools, 1 red herring; requires synthesis of MRI + advanced imaging + tissue diagnosis; the red herring is a plausible alternative explanation that needs to be actively ruled out",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

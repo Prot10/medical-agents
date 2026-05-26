@@ -1,7 +1,7 @@
 {
   "case_id": "MG-RP13",
   "condition": "myasthenia_gravis",
-  "difficulty": "diagnostic_puzzle",
+  "difficulty": "moderate",
   "encounter_type": "inpatient",
   "patient": {
     "age": 53,
@@ -104,141 +104,242 @@
     "extremities": "No edema; bilateral posterior subcapsular lens opacity noted by patient (post-cataract surgery)"
   },
   "ground_truth": {
-    "primary_diagnosis": "AChR antibody–positive generalized myasthenia gravis, evolving from decades-long ocular presentation misdiagnosed as CPEO (G70.01)",
-    "primary_diagnosis_icd": "G70.01",
+    "primary_diagnosis": "AChR antibody-positive generalized myasthenia gravis, presenting as long-standing 'ocular' disease previously misdiagnosed as chronic progressive external ophthalmoplegia",
+    "icd_code": "G70.01",
     "differential": [
       {
-        "diagnosis": "Chronic progressive external ophthalmoplegia (CPEO)",
-        "likelihood": "low",
-        "key_features": "Prior diagnosis; however, positive ice pack test, new fatigability, diurnal variation, and positive AChR antibodies definitively exclude CPEO"
+        "diagnosis": "True CPEO / mitochondrial ophthalmoplegia",
+        "likelihood": "moderate",
+        "key_features": "Decades-long ophthalmoplegia is suggestive; mitochondrial genetic panel and muscle biopsy if diagnostic doubt persists; AChR positive here favors MG.",
+        "icd_code": "H49.4"
       },
       {
         "diagnosis": "Kearns-Sayre syndrome",
-        "likelihood": "very_low",
-        "key_features": "No pigmentary retinopathy, no cardiac conduction defect, no cerebellar ataxia — cannot diagnose KSS; criteria not met"
+        "likelihood": "low",
+        "key_features": "KSS includes pigmentary retinopathy and cardiac conduction disease; ECG and ophthalmology examination clarify.",
+        "icd_code": "H49.81"
       },
       {
-        "diagnosis": "Myotonic dystrophy (ocular features)",
-        "likelihood": "very_low",
-        "key_features": "Myotonic dystrophy can cause ptosis but also causes myotonia, grip release difficulty, cataracts, frontal balding; no these features; normal CK"
+        "diagnosis": "Oculopharyngeal muscular dystrophy",
+        "likelihood": "low",
+        "key_features": "OPMD is hereditary, family history relevant; PABPN1 genetic testing.",
+        "icd_code": "G71.0"
       },
       {
-        "diagnosis": "Thyroid ophthalmopathy",
+        "diagnosis": "Lambert-Eaton myasthenic syndrome",
         "likelihood": "very_low",
-        "key_features": "Normal TSH; ptosis (not lid retraction); no proptosis; normal orbital MRI extraocular muscles"
+        "key_features": "Decades-long ocular presentation incompatible with LEMS.",
+        "icd_code": "G73.1"
+      },
+      {
+        "diagnosis": "Thyroid eye disease",
+        "likelihood": "very_low",
+        "key_features": "No proptosis, lid retraction; no Graves history.",
+        "icd_code": "H06.2"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Reassess ice pack test — positive result changes prior CPEO diagnosis",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
-        "tool_parameters": {}
+        "action": "Order serologies: anti-AChR (binding, blocking, modulating), anti-MuSK, anti-LRP4, and TSH/free-T4 for thyroid autoimmunity",
+        "tool_name": "interpret_labs",
+        "expected_finding": "AChR antibody positive; TSH evaluates for comorbid thyroid disease",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "anti_AChR",
+            "anti_MuSK",
+            "anti_LRP4",
+            "TSH"
+          ]
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 2,
-        "action": "MG antibody panel (AChR binding, blocking, modulating, anti-MuSK)",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Order repetitive nerve stimulation (RNS) at 2-3 Hz across proximal and facial muscles",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Decrement >10% in symptomatic muscles supports postsynaptic NMJ disorder",
+        "category": "required",
         "tool_parameters": {
-          "lab_type": "mg_antibody_panel"
-        }
+          "test_type": "repetitive_nerve_stimulation"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 3,
-        "action": "CT chest to exclude thymoma",
-        "tool_name": null,
-        "expected_finding": "",
+        "action": "Order single-fiber EMG (gold standard >95% sensitivity)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Increased jitter and blocking on extensor digitorum communis or orbicularis oculi confirms NMJ transmission failure",
         "category": "recommended",
         "tool_parameters": {
-          "region": "chest",
-          "contrast": true,
-          "indication": "thymoma evaluation"
-        }
+          "test_type": "emg_single_fiber"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 4,
-        "action": "SFEMG and RNS to confirm NMJ dysfunction",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Order CT chest with contrast for thymoma screening",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No thymoma; thymic involution appropriate for age",
+        "category": "required",
         "tool_parameters": {
-          "test_type": "SFEMG",
-          "muscle": "orbicularis_oculi"
-        }
+          "region": "chest",
+          "contrast": true,
+          "indication": "thymoma_screening"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 5,
-        "action": "Recognize timolol eye drops as MG exacerbant and discontinue — switch to latanoprost or dorzolamide",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Review MGFA classification and current treatment guidance (pyridostigmine, prednisone, steroid-sparing, IVIG/PLEX, thymectomy)",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "MGFA classification stages disease severity; thymectomy benefits AChR+ generalized MG (MGTX); IVIG/PLEX for crisis",
+        "category": "required",
         "tool_parameters": {
-          "drug_1": "timolol",
-          "condition": "myasthenia gravis"
-        }
+          "query": "myasthenia gravis MGFA classification treatment thymectomy"
+        },
+        "citation": "[Sanders_2016]",
+        "guideline_source": "Sanders_2016"
       },
       {
         "step": 6,
-        "action": "Initiate pyridostigmine; add prednisone and azathioprine for generalized MG management",
-        "tool_name": null,
-        "expected_finding": "",
+        "action": "Check drug interactions for MG-exacerbating agents (aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, neuromuscular blockers, procainamide)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Flag aminoglycosides, fluoroquinolones, IV magnesium, telithromycin, NMBs as contraindicated or use-with-caution in MG",
+        "category": "required",
+        "tool_parameters": {
+          "proposed": "pyridostigmine_start",
+          "screen_for": [
+            "aminoglycosides",
+            "fluoroquinolones",
+            "telithromycin",
+            "magnesium_IV",
+            "neuromuscular_blockers"
+          ]
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
+      },
+      {
+        "step": 7,
+        "action": "Bedside respiratory function testing (FVC, MIP/MEP, NIF) — repeat q4h in crisis",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline FVC/NIF to assess crisis risk in patients with bulbar or limb involvement",
         "category": "recommended",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[Sanders_2016]",
+        "guideline_source": "Sanders_2016"
+      },
+      {
+        "step": 8,
+        "action": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Improvement of ptosis after 2 minutes of cooling supports MG",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "ice_pack_test"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
+      },
+      {
+        "step": 9,
+        "action": "Consider mitochondrial genetic panel and/or muscle biopsy if AChR positivity does not fully resolve diagnostic doubt",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Mitochondrial mutations would support CPEO; muscle biopsy ragged-red fibers / COX-negative fibers",
+        "category": "optional",
+        "tool_parameters": {
+          "test_type": "genetic_panel:mitochondrial"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "MG is a peripheral neuromuscular junction disorder; EEG has no diagnostic role.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No CSF role in MG; LP risks complications without diagnostic yield.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "Advanced imaging (PET/MR spectroscopy/perfusion) is not indicated for MG diagnosis or staging; CT chest covers thymoma screening.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated for MG unless a comorbid cardiac question exists.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring is not indicated for MG unless arrhythmia or autonomic disease is independently suspected.",
+        "citation": "[Wolfe_2016]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "order_specialized_test",
+        "reason": "Order AChR/MuSK/LRP4 serologies first; reserve single-fiber EMG for seronegative or RNS-non-diagnostic cases (resource stewardship).",
+        "citation": "[Wolfe_2016]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Recognize that positive ice pack test invalidates prior CPEO diagnosis — it is >97% specific for MG",
-      "Order AChR antibody panel as definitive serological diagnosis",
-      "Identify and discontinue timolol eye drops — beta-blockers exacerbate MG",
-      "Screen for thymoma with CT chest despite age >50 (thymus involuted but still relevant)",
-      "Assess for fatigable limb weakness — confirms generalized rather than ocular-only disease",
-      "Mitochondrial workup deferred given positive serology — AChR antibody is diagnostic"
+      "Confirm AChR antibody positivity — overturns CPEO label",
+      "RNS and SFEMG to confirm NMJ pathology",
+      "CT chest for thymoma screening",
+      "Therapeutic trial of pyridostigmine with objective documentation of improvement",
+      "Ophthalmology and patient education on revised diagnosis"
     ],
     "contraindicated_actions": [
-      "Do not continue timolol eye drops — contraindicated in MG",
-      "Do not prescribe beta-blockers in any form without considering MG risk",
-      "Do not pursue muscle biopsy for mitochondrial disease before ordering AChR antibody (unnecessary if AChR positive)",
-      "Do not diagnose CPEO in a patient with positive ice pack test and AChR antibodies"
+      "Do NOT prescribe aminoglycoside antibiotics (gentamicin, tobramycin, amikacin) — risk of precipitating myasthenic crisis",
+      "Do NOT prescribe fluoroquinolones (ciprofloxacin, levofloxacin, moxifloxacin) — FDA black-box warning for MG exacerbation",
+      "Do NOT prescribe telithromycin — contraindicated in MG",
+      "Do NOT administer IV magnesium for MG patients (e.g., for hypomagnesaemia, eclampsia prophylaxis) without alternative — blocks NMJ transmission",
+      "Do NOT use non-depolarizing neuromuscular blockers without anaesthesia/MG-aware dosing protocols",
+      "Do NOT initiate high-dose corticosteroids as sole outpatient therapy without hospitalization or pyridostigmine bridge — risk of paradoxical worsening at days 5-10",
+      "Do NOT attribute fluctuating fatigable weakness to a functional disorder before completing serology + RNS + single-fiber EMG workup"
     ],
     "key_reasoning_points": [
-      "The diagnostic puzzle: decades-long 'CPEO' diagnosis was incorrect; the key change is a NOW-positive ice pack test and new fatigability, which should trigger AChR antibody testing",
-      "CPEO and MG can share features (bilateral ptosis, ophthalmoplegia) but are distinguished by fatigability, diurnal variation, ice pack test, and AChR antibody",
-      "Timolol eye drops are a critical hidden drug-disease interaction that may have been worsening MG for years — beta-blockers impair NMJ transmission",
-      "KSS criteria not met: no pigmentary retinopathy, no cardiac conduction defect, no cerebellar ataxia",
-      "Positive AChR antibody is the single most valuable test: >99% specific for MG if markedly elevated; precludes need for muscle biopsy",
-      "Late-onset MG can first present with pure ocular features before evolving to generalized disease years later"
+      "Fluctuating, fatigable weakness with diurnal pattern (worse evening) is the clinical hallmark of MG — fixed weakness suggests an alternative diagnosis.",
+      "Ocular involvement (ptosis, diplopia) is asymmetric and fatigable in MG; thyroid eye disease causes restrictive (not fatigable) ophthalmoplegia.",
+      "Single-fiber EMG (sensitivity >95%) is the most sensitive electrodiagnostic test — order when RNS is non-diagnostic or serology is negative.",
+      "All confirmed MG cases require CT chest for thymoma — present in roughly 10-15% of generalized MG; thymectomy (MGTX trial) improves long-term outcomes in non-thymoma AChR+ MG as well.",
+      "Aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, and neuromuscular blockers can precipitate myasthenic crisis and must be screened against any new prescription.",
+      "Long-standing 'CPEO' labels are not infrequently revised to ocular MG when fatigability emerges or serology becomes positive.",
+      "Mitochondrial workup is OPTIONAL only — pursue if AChR negative or treatment response poor."
     ],
     "red_herrings": [
       {
-        "data_point": "Prior CPEO diagnosis over 30 years — anchoring bias",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Long-standing prior diagnosis creates anchoring bias toward continuing the CPEO label despite new clinical features",
-        "correct_interpretation": "Positive ice pack test + new fatigability + AChR antibody = MG; prior CPEO diagnosis was incorrect",
-        "field_path": ""
-      },
-      {
-        "data_point": "Borderline lactate/pyruvate ratio suggesting possible mitochondrial disease",
-        "location": "followup_outputs[2].output.interpretation",
-        "intended_effect": "Borderline L/P ratio with CPEO history increases suspicion for mitochondrial myopathy",
-        "correct_interpretation": "Serum lactate is normal; borderline L/P ratio is non-specific; definitive AChR antibody supersedes mitochondrial concern",
-        "field_path": ""
-      },
-      {
-        "data_point": "Timolol eye drops as incidental medication",
-        "location": "patient.clinical_history.medications",
-        "intended_effect": "Topical medications often overlooked; timolol seems innocuous for ocular hypertension management",
-        "correct_interpretation": "Topical timolol has systemic absorption and is contraindicated in MG — may have been exacerbating disease for years",
-        "field_path": ""
+        "data_point": "Prior diagnosis of CPEO (chronic progressive external ophthalmoplegia)",
+        "location": "past medical history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Accept the CPEO label and pursue mitochondrial workup; miss MG.",
+        "correct_interpretation": "Emerging fatigability and positive AChR antibodies overturn the CPEO label — diagnostic re-anchoring is essential."
       }
-    ],
-    "icd_code": "G70.01",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -271,7 +372,17 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MG",
+    "difficulty_rationale": "5 required tools, 1 red herrings, label-revision case with anchoring red herring",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": [
+      "emg_ncs_useless_via_param_conflation: pack lists order_specialized_test:emg_ncs as USELESS, but coherence validator treats tool_name overlap as a contradiction regardless of tool_parameters; cannot encode without removing required RNS/SFEMG entries. Suggest extending validator to compare tool_name + tool_parameters or fleet-wide pattern."
+    ]
   },
   "initial_tool_outputs": {
     "mri": {

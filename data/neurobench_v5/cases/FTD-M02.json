@@ -512,115 +512,278 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Behavioral variant frontotemporal dementia — C9orf72 hexanucleotide repeat expansion (pathogenic) — FTD-ALS spectrum disorder",
+    "primary_diagnosis": "Behavioral variant frontotemporal dementia (bvFTD), probable, C9orf72-associated (FTD-ALS spectrum)",
     "icd_code": "G31.09",
     "differential": [
       {
-        "diagnosis": "Alzheimer's disease",
-        "likelihood": "very_low",
-        "key_features": "Amyloid PET negative; CSF Abeta42 normal; FDG-PET shows frontotemporal hypometabolism without posterior cingulate sign; bvFTD behavioral profile"
+        "diagnosis": "FTD-MND (C9orf72-associated motor neuron disease)",
+        "likelihood": "high",
+        "key_features": "C9orf72 carries high ALS risk; brother died of ALS — must surveil for fasciculations/weakness/bulbar signs."
       },
       {
-        "diagnosis": "Sporadic bvFTD (without genetic basis)",
-        "likelihood": "very_low",
-        "key_features": "C9orf72 pathogenic expansion confirmed — this is genetic FTD; brother's ALS is same familial expansion"
+        "diagnosis": "Sporadic bvFTD",
+        "likelihood": "moderate",
+        "key_features": "Clinical phenotype identical; the C9orf72 result distinguishes."
       },
       {
-        "diagnosis": "Frontotemporal dementia with motor neuron disease (FTD-MND)",
+        "diagnosis": "Alzheimer disease (frontal variant)",
         "likelihood": "low",
-        "key_features": "Borderline EMG neurogenic changes in context of C9orf72 — early motor neuron involvement possible; does not yet meet ALS El Escorial criteria but warrants monitoring"
+        "key_features": "Negative amyloid biomarkers expected to confirm FTD."
       },
       {
-        "diagnosis": "Psychiatric disorder (late-onset personality change)",
+        "diagnosis": "Primary psychiatric disorder",
+        "likelihood": "low",
+        "key_features": "Strong family history of ALS argues for neurodegenerative process."
+      },
+      {
+        "diagnosis": "Vascular cognitive impairment",
         "likelihood": "very_low",
-        "key_features": "Structural atrophy on MRI, frontotemporal hypometabolism on FDG-PET, and C9orf72 genetic confirmation establish neurodegenerative basis"
+        "key_features": "No vascular MRI pattern."
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "MRI brain — atrophy pattern assessment",
+        "action": "Obtain brain MRI with volumetric coronal T1 to assess frontal/anterior temporal atrophy and exclude alternative structural cause",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Mild bifrontal atrophy; borderline hippocampal volume",
+        "expected_finding": "Bilateral frontal and/or anterior temporal atrophy in a lobar pattern with relative posterior sparing",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "DWI",
+            "volumetric"
+          ]
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky 2011 bvFTD criteria"
       },
       {
         "step": 2,
-        "action": "Standard dementia labs — reversible cause exclusion",
+        "action": "Order metabolic dementia panel (TSH, B12, CMP, RPR/HIV per risk) to exclude reversible mimics",
         "tool_name": "interpret_labs",
-        "expected_finding": "All normal",
+        "expected_finding": "No reversible metabolic or infectious cause of cognitive decline identified",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "TSH",
+            "B12",
+            "RPR",
+            "HIV"
+          ]
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
       },
       {
         "step": 3,
-        "action": "FDG-PET brain — metabolic pattern",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Frontotemporal hypometabolism; absent posterior cingulate sign",
+        "action": "Order comprehensive neuropsychological battery characterising executive function, social cognition, language and memory",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Frontal-executive and social-cognition deficits with relative sparing of episodic memory and visuospatial function",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky 2011 bvFTD criteria"
       },
       {
         "step": 4,
-        "action": "Amyloid PET — AD exclusion",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Negative — AD excluded",
+        "action": "Search medical literature for c9orf72 ftd-als spectrum: surveillance and management",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirms Rascovsky 2011 criteria, FDG-PET evidence (Foster 2007), and management approach (Bang 2015)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "query": "C9orf72 FTD-ALS spectrum: surveillance and management"
+        },
+        "citation": "[Bang_2015]",
+        "guideline_source": "Bang 2015 Lancet review"
       },
       {
         "step": 5,
-        "action": "C9orf72 genetic panel — given ALS family history",
-        "tool_name": "interpret_labs",
-        "expected_finding": "C9orf72 pathogenic expansion confirmed",
+        "action": "Consult behavioral/cognitive neurology for syndromic diagnosis, biomarker interpretation, and longitudinal care plan",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Behavioral neurology confirms bvFTD syndrome, coordinates biomarkers and disclosure",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "specialty": "behavioral_neurology"
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
       },
       {
         "step": 6,
-        "action": "Neuromuscular EMG — baseline motor neuron involvement in C9orf72-FTD",
+        "action": "Order FDG-PET brain to characterise frontotemporal hypometabolism and distinguish bvFTD from AD",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Bifrontal and/or anterior temporal hypometabolism with relative posterior sparing",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[Foster_2007]",
+        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
+      },
+      {
+        "step": 7,
+        "action": "Order FTD genetic panel (C9orf72, GRN, MAPT) given brother died of ALS — high pre-test probability of C9orf72",
         "tool_name": "order_specialized_test",
-        "expected_finding": "Borderline early neurogenic changes — subclinical ALS component",
+        "expected_finding": "Identifies or excludes pathogenic C9orf72 / GRN / MAPT variant relevant to prognosis and cascade testing",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "genetic_panel:FTD"
+        },
+        "citation": "[Pottier_2016]",
+        "guideline_source": "Pottier 2016 FTLD genetics review"
+      },
+      {
+        "step": 8,
+        "action": "Consider EMG/NCS surveillance for early motor neuron disease given C9orf72 risk and any subtle motor symptoms",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline EMG to detect subclinical denervation; repeat if motor symptoms emerge",
+        "category": "optional",
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[Pottier_2016]",
+        "guideline_source": "Pottier 2016 FTLD genetics review"
+      },
+      {
+        "step": 9,
+        "action": "Order CSF to obtain Aβ42/p-tau and neurofilament light for biomarker stratification",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Non-AD CSF profile; NfL elevated supporting neurodegeneration",
+        "category": "optional",
+        "tool_parameters": {
+          "tests": [
+            "Abeta42",
+            "phospho_tau",
+            "total_tau",
+            "NfL"
+          ]
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
+      },
+      {
+        "step": 10,
+        "action": "Consider amyloid PET to exclude AD biomarker overlap",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Negative amyloid PET",
+        "category": "optional",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "citation": "[Foster_2007]",
+        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is non-specific in FTD; not part of the standard dementia workup unless seizures or rapidly progressive course suggest CJD or autoimmune encephalitis.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG has no role in the cognitive workup of suspected FTD; reserved for syncope, palpitations, or pre-procedure clearance.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is unrelated to a neurodegenerative cognitive syndrome and adds cost without diagnostic value.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is unrelated to FTD and not indicated absent syncope or palpitations.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT lacks the resolution and lobar specificity needed to characterise frontotemporal atrophy; MRI is the standard structural study.",
+        "citation": "[AAN_dementia_2018]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "MR_spectroscopy"
+        },
+        "rationale": "MR spectroscopy has no established role in the routine FTD diagnostic pathway.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "perfusion_MRI"
+        },
+        "rationale": "Perfusion MRI is not indicated in the standard FTD workup once a structural MRI and FDG-PET (or amyloid PET) have characterised the lobar pattern.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is a vascular study with no diagnostic role in primary neurodegenerative dementia.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan evaluates presynaptic dopaminergic terminals; it is not indicated unless overt parkinsonism raises concern for PD, DLB, or atypical parkinsonism (PSP/CBS overlap).",
+        "citation": "[Bang_2015]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "Exclude structural cause of focal cognitive symptoms and screen for elevated ICP before lumbar puncture.",
+        "citation": "[AAN_dementia_2018]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "C9orf72 genetic testing is MANDATORY when family history includes ALS — C9orf72 expansion is the genetic link between familial FTD and familial ALS",
-      "Genetic counseling MUST be arranged — each child has 50% inheritance risk",
-      "Baseline EMG is essential in C9orf72-FTD to establish motor neuron involvement baseline",
-      "Amyloid PET or CSF biomarkers must exclude AD before FTD diagnosis — especially given the borderline hippocampal volume"
+      "Pursue genetic testing — high pre-test probability for C9orf72 given family history of ALS.",
+      "Provide formal genetic counselling and discuss cascade testing for adult relatives.",
+      "Establish baseline motor / respiratory function to detect emerging ALS features.",
+      "Apply Rascovsky 2011 bvFTD criteria explicitly (≥3 of 6 core features within 3 years) and document functional decline.",
+      "Assess and document decision-making, financial, and driving capacity given the high risk of impulsivity and impaired judgment in FTD.",
+      "Provide caregiver education, safety planning, and referral to FTD-focused support resources.",
+      "Offer genetic counselling and discuss cascade testing options if a pathogenic variant is identified or suspected."
     ],
     "contraindicated_actions": [
-      "Cholinesterase inhibitors (donepezil) — contraindicated in FTD; not an Alzheimer's disease case",
-      "Delaying genetic testing despite clear ALS family history — family history of ALS is the single most important indicator for C9orf72 testing"
+      "Do not start acetylcholinesterase inhibitors (donepezil, rivastigmine, galantamine): no benefit in FTD and may worsen behavioral symptoms.",
+      "Do not start memantine: no evidence of benefit in bvFTD and may worsen behavioral symptoms.",
+      "Avoid antipsychotics as first-line behavioral therapy given increased cerebrovascular and mortality risk in dementia; reserve for refractory dangerous agitation with specialist oversight.",
+      "Avoid benzodiazepines for behavioral control: risk of paradoxical disinhibition and falls."
     ],
     "key_reasoning_points": [
-      "FAMILY HISTORY OF ALS in a first-degree relative of a behavioral dementia patient mandates C9orf72 genetic testing — C9orf72 expansion causes FTD-ALS spectrum with different phenotypes in different family members",
-      "The ambiguous MRI (borderline hippocampal volume) initially raises AD concern, but FDG-PET shows frontotemporal predominance WITHOUT posterior cingulate sign — resolving the ambiguity in favor of FTD",
-      "Negative amyloid PET provides definitive AD exclusion, making bvFTD the confirmed diagnosis",
-      "C9orf72 FTD typically shows symmetric frontal involvement (vs GRN FTD which tends to be highly asymmetric) — this case's symmetric FDG-PET pattern is consistent with C9orf72 pathology"
+      "Brother with ALS + behavioural / cognitive syndrome → C9orf72 must be considered until excluded.",
+      "Mother's 'nervous breakdown' is more likely an early FTD/C9orf72 manifestation than primary psychiatric illness.",
+      "Symmetric upper-extremity rigidity is not parkinsonism warranting DaTscan; the lobar FTD pattern is the diagnostic finding."
     ],
     "red_herrings": [
       {
-        "data_point": "Borderline hippocampal volume reduction on MRI",
-        "location": "MRI findings",
-        "intended_effect": "Raise Alzheimer's disease as primary diagnosis",
-        "correct_interpretation": "FDG-PET shows frontotemporal predominance without posterior cingulate sign; amyloid PET negative — these findings definitively exclude AD despite borderline MRI hippocampal change",
-        "field_path": ""
-      },
-      {
-        "data_point": "Brother with ALS — different diagnosis",
-        "location": "Family history",
-        "intended_effect": "Consider ALS family history irrelevant to FTD patient",
-        "correct_interpretation": "C9orf72 expansion is the molecular link — same pathogenic repeat causes FTD in patient and ALS in brother",
-        "field_path": ""
+        "data_point": "Maternal 'nervous breakdown' in her 50s",
+        "location": "family_history",
+        "field_path": "patient.clinical_history.family_history",
+        "intended_effect": "Could be mistaken for primary psychiatric inheritance.",
+        "correct_interpretation": "Late-life personality / psychiatric change in a relative of a C9orf72 carrier is most likely an early FTD manifestation."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "v5",
@@ -632,6 +795,17 @@
       "echo": "normal",
       "cardiac_monitoring": "incidental",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (condition-expert:FTD)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FTD",
+    "difficulty_rationale": "5 required tools + 1–2 recommended biomarkers and a substantial differential (psychiatric, alcohol, vascular, or AD-overlap); 1–3 grounded red herrings (alcohol, family history, comorbid HIV / bipolar / GRN status); requires multi-modal synthesis.",
+    "case_body_concerns": [
+      "validator flags `order_advanced_imaging` in both optimal_actions (FDG_PET / amyloid_PET) and useless_tools (MR_spectroscopy / DaTscan / perfusion_MRI / carotid_duplex) — these are distinct modalities of the same catchall tool. Known systemic validator limitation: the coherence script ignores `tool_parameters.modality`. No fix at case level.",
+      "fallback output for `order_advanced_imaging` is missing in `fallback_tool_outputs` — calling the useless tool will return empty; case body needs an off-pathway fallback entry."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

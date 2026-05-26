@@ -811,158 +811,240 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Early-stage Alzheimer's disease",
-    "icd_code": "G30.0",
+    "primary_diagnosis": "Mild cognitive impairment due to Alzheimer's disease (amnestic, multi-domain), early-onset",
+    "icd_code": "G31.84",
     "differential": [
       {
+        "diagnosis": "Dementia with Lewy bodies",
+        "likelihood": "moderate",
+        "key_features": "DLB must be actively excluded by absence of visual hallucinations, parkinsonism, cognitive fluctuations, and REM sleep behavior disorder; biomarkers and (when needed) DaTscan can distinguish if features emerge",
+        "icd_code": "G31.83"
+      },
+      {
+        "diagnosis": "Frontotemporal dementia (behavioral or language variant)",
+        "likelihood": "moderate",
+        "key_features": "FTD typically presents with prominent personality change, disinhibition, or progressive aphasia rather than amnesia; positive amyloid biomarkers further argue against FTLD pathology",
+        "icd_code": "G31.09"
+      },
+      {
         "diagnosis": "Vascular cognitive impairment",
-        "likelihood": "moderate",
-        "key_features": "Fazekas grade 2 WMH and cardiovascular risk factors suggest vascular contribution, but cognitive profile shows prominent episodic memory impairment rather than the executive dysfunction pattern typical of VCI. Positive amyloid and tau biomarkers confirm AD pathology."
-      },
-      {
-        "diagnosis": "Mixed dementia (Alzheimer's + vascular)",
-        "likelihood": "moderate",
-        "key_features": "White matter disease may contribute to overall cognitive burden. Cannot exclude mixed pathology; however, primary cognitive profile is most consistent with AD."
-      },
-      {
-        "diagnosis": "Subclinical hypothyroidism-related cognitive decline",
         "likelihood": "low",
-        "key_features": "TSH mildly elevated at 5.8 with normal free T4. Subclinical hypothyroidism alone unlikely to account for the degree and pattern of cognitive deficits seen on neuropsychological testing."
+        "key_features": "No significant cerebrovascular burden on MRI and the gradual amnestic course is not stepwise — pure VCI is unlikely",
+        "icd_code": "F01.50"
       },
       {
         "diagnosis": "Depression (pseudodementia)",
         "likelihood": "low",
-        "key_features": "GDS score borderline. Apathy present but onset followed cognitive decline rather than preceding it. Neuropsychological pattern shows true encoding and storage deficits inconsistent with effort-dependent performance seen in depression."
+        "key_features": "Insidious course over months to years with disproportionate delayed-recall impairment and limited benefit from cueing is not typical of pseudodementia",
+        "icd_code": "F32.A"
       },
       {
-        "diagnosis": "Medication-related cognitive impairment (zolpidem)",
+        "diagnosis": "Reversible metabolic, endocrine, or sleep-related cognitive impairment",
         "likelihood": "low",
-        "key_features": "Zolpidem use could contribute to confusion and memory complaints. However, progressive course over 14 months and structural/biomarker evidence argues against medication as primary etiology. Discontinuation should be considered regardless."
-      },
-      {
-        "diagnosis": "Lewy body dementia",
-        "likelihood": "low",
-        "key_features": "Patient has visual misperceptions but not formed visual hallucinations. No parkinsonism on exam. No REM sleep behavior disorder reported. No significant fluctuations in alertness. FDG-PET does not show occipital hypometabolism."
+        "key_features": "Screening labs exclude hypothyroidism, B12 deficiency, neurosyphilis, and HIV; the progressive amnestic profile would not normalize with treatment of any of these alone",
+        "icd_code": null
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain brain MRI to evaluate for structural causes and atrophy pattern",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Mild bilateral hippocampal atrophy (Scheltens 1-2) with temporoparietal cortical volume loss and moderate white matter disease",
+        "action": "Obtain detailed clinical history from patient and informant, including timeline, cognitive domains affected, functional decline, mood, sleep, and medication review",
+        "tool_name": null,
+        "expected_finding": "Gradually progressive cognitive change with informant-confirmed functional impairment in IADLs",
         "category": "required",
-        "tool_parameters": {
-          "protocol": "standard",
-          "contrast": false
-        }
+        "tool_parameters": {},
+        "citation": "[NIA_AA_2011]",
+        "guideline_source": "NIA_AA_2011"
       },
       {
         "step": 2,
-        "action": "Order comprehensive laboratory workup including CBC, BMP, thyroid function, B12, folate, RPR, HIV",
+        "action": "Perform bedside cognitive assessment (MMSE and/or MoCA) and detailed neurological examination",
+        "tool_name": null,
+        "expected_finding": "Objective cognitive impairment on MoCA more sensitive than MMSE; non-focal neurological exam (or variant-specific findings — visuospatial in PCA, language in lvPPA, behavioral in frontal AD)",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN_dementia_2018"
+      },
+      {
+        "step": 3,
+        "action": "Order reversible-cause labs (CBC, CMP, TSH, vitamin B12, folate; consider RPR/HIV per risk)",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal metabolic workup except mildly elevated TSH and suboptimal diabetic control; rules out reversible causes of dementia",
+        "expected_finding": "Reversible mimics (hypothyroidism, B12 deficiency, neurosyphilis) excluded; identify and address co-morbid metabolic factors",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
-            "thyroid",
+            "CMP",
+            "TSH",
             "B12",
-            "folate",
-            "RPR",
-            "HIV"
+            "folate"
           ]
-        }
-      },
-      {
-        "step": 3,
-        "action": "Request formal neuropsychological testing to characterize cognitive profile",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Amnestic MCI to early dementia profile with prominent episodic memory impairment, impaired executive function, and reduced semantic fluency consistent with AD pattern",
-        "category": "required",
-        "tool_parameters": {
-          "test_type": "neuropsych_battery"
-        }
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN_dementia_2018"
       },
       {
         "step": 4,
-        "action": "Obtain EEG to evaluate for subclinical seizures or other electrographic abnormalities",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Borderline slow PDR and mild diffuse theta slowing consistent with early neurodegenerative process",
-        "category": "recommended",
+        "action": "Obtain brain MRI with dementia (volumetric) protocol to assess medial-temporal atrophy and exclude vascular disease, hippocampal sclerosis, NPH, and mass lesions",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Subtle medial-temporal atrophy (Scheltens MTA grade 1-2) with or without temporoparietal volume loss",
+        "category": "required",
         "tool_parameters": {
-          "eeg_type": "routine"
-        }
+          "protocol": "dementia",
+          "contrast": false
+        },
+        "citation": "[NIA_AA_2011]",
+        "guideline_source": "NIA_AA_2011"
       },
       {
         "step": 5,
-        "action": "Request amyloid PET or CSF biomarkers to confirm amyloid pathology",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Positive amyloid PET or decreased CSF Abeta42 with elevated phospho-tau confirming AD pathology",
+        "action": "Order comprehensive neuropsychological testing to characterize the cognitive profile and establish a baseline for tracking",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Amnestic profile with disproportionate impairment of delayed recall and limited benefit from cueing, plus involvement of at least one other cognitive domain",
         "category": "required",
         "tool_parameters": {
-          "imaging_type": "amyloid_PET"
-        }
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[NIA_AA_2011]",
+        "guideline_source": "NIA_AA_2011"
       },
       {
         "step": 6,
-        "action": "Search literature on AD diagnostic criteria and differentiation from vascular cognitive impairment",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "NIA-AA AT(N) framework supporting biomarker-based AD diagnosis",
-        "category": "recommended"
+        "action": "Order CSF biomarkers (Aβ42, Aβ42/40 ratio, p-tau, total tau) for ATN classification",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Reduced Aβ42 (or reduced Aβ42/40 ratio) with elevated p-tau supporting A+T+ profile consistent with Alzheimer pathology",
+        "category": "required",
+        "tool_parameters": {
+          "tests": [
+            "Abeta42",
+            "Abeta42_40_ratio",
+            "phospho_tau",
+            "total_tau"
+          ]
+        },
+        "citation": "[NIA_AA_2018]",
+        "guideline_source": "NIA_AA_2018"
       },
       {
         "step": 7,
-        "action": "Check drug interactions before initiating cholinesterase inhibitor therapy",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Interaction with zolpidem; caution with bradycardia risk; recommend discontinuing zolpidem",
-        "category": "recommended"
+        "action": "Order amyloid PET when CSF biomarkers are unavailable or when diagnostic uncertainty persists after clinical assessment and MRI",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Positive cortical amyloid retention (SUVr above positivity threshold) confirming amyloid pathology",
+        "category": "required",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "citation": "[Appropriate_Use_Amyloid_PET]",
+        "guideline_source": "Appropriate_Use_Amyloid_PET"
       },
       {
         "step": 8,
-        "action": "Request APOE genotyping for risk stratification",
-        "tool_name": "interpret_labs",
-        "expected_finding": "APOE e3/e4 heterozygous carrier supporting increased AD risk",
-        "category": "recommended",
+        "action": "Order FDG-PET to assess regional metabolism and distinguish AD from frontotemporal dementia or other neurodegenerative patterns",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Bilateral temporoparietal and posterior cingulate hypometabolism characteristic of Alzheimer pattern",
+        "category": "optional",
         "tool_parameters": {
-          "panels": [
-            "genetic"
-          ]
-        }
+          "modality": "FDG_PET"
+        },
+        "citation": "[Foster_2007]",
+        "guideline_source": "Foster_2007"
+      },
+      {
+        "step": 9,
+        "action": "Check drug interactions before initiating cholinesterase inhibitor (donepezil, rivastigmine, or galantamine)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "No clinically significant interactions; counsel on GI side effects and bradycardia risk",
+        "category": "optional",
+        "tool_parameters": {},
+        "citation": "[NIA_AA_2011]",
+        "guideline_source": "NIA_AA_2011"
+      },
+      {
+        "step": 10,
+        "action": "Consider targeted early-onset Alzheimer gene panel (APP, PSEN1, PSEN2) if family history suggests autosomal-dominant disease",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Pathogenic variant only in a minority of early-onset cases with a strong family history; result informs genetic counseling more than acute management",
+        "category": "optional",
+        "tool_parameters": {
+          "test_type": "genetic_panel:early_onset_AD"
+        },
+        "citation": "[Bateman_2012]",
+        "guideline_source": "Bateman_2012"
+      },
+      {
+        "step": 11,
+        "action": "Disclose the diagnosis to patient and family, discuss prognosis, advance directives, and driving / safety assessment",
+        "tool_name": null,
+        "expected_finding": "Patient and caregiver engaged in care planning; safety concerns (driving, finances, medication management) addressed",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[NIA_AA_2011]",
+        "guideline_source": "NIA_AA_2011"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is unrelated to the dementia workup; no cardioembolic indication in this presentation",
+        "citation": "[AAN_dementia_2018]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring is not indicated; no arrhythmia, syncope, or palpitations described",
+        "citation": "[AAN_dementia_2018]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT adds little when MRI is available; MRI is the preferred structural modality for dementia workup",
+        "citation": "[NIA_AA_2011]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "Obtain structural imaging before lumbar puncture to exclude mass effect / herniation risk, particularly in older patients",
+        "citation": "[NIA_AA_2011]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Order brain MRI to assess for hippocampal atrophy and exclude structural lesions",
-      "Obtain comprehensive labs to rule out reversible causes of cognitive decline (thyroid, B12, RPR, HIV)",
-      "Perform or request formal neuropsychological testing to characterize the cognitive deficit pattern",
-      "Obtain amyloid biomarker (amyloid PET or CSF Abeta42) to confirm Alzheimer's pathology given borderline MRI findings",
-      "Assess for and recommend discontinuation of zolpidem which may be exacerbating cognitive symptoms",
-      "Evaluate subclinical hypothyroidism and consider treatment if contributing to symptoms"
+      "Obtain collateral history from an informant who knows the patient well",
+      "Exclude reversible causes of cognitive decline with screening labs (CBC, CMP, TSH, B12, folate; HIV/RPR per risk)",
+      "Obtain structural brain MRI with dementia/volumetric protocol",
+      "Quantify cognitive impairment with a standardized cognitive battery (MoCA at minimum; formal neuropsychological testing when feasible)",
+      "Assess safety: driving, medication management, finances, and need for caregiver support",
+      "Disclose the diagnosis and discuss prognosis, advance directives, and treatment options with the patient and family",
+      "Pursue biomarker confirmation (CSF AT(N) markers or amyloid PET) when MRI is equivocal or when an atypical AD variant is suspected"
     ],
     "contraindicated_actions": [
-      "Diagnosing Alzheimer's disease based solely on clinical presentation without biomarker confirmation, especially given competing vascular pathology",
-      "Attributing cognitive decline primarily to subclinical hypothyroidism without further workup",
-      "Initiating anticholinergic medications which would worsen cognitive symptoms",
-      "Performing lumbar puncture without first obtaining brain MRI to rule out mass lesions",
-      "Starting memantine as initial monotherapy (indicated for moderate-to-severe AD, not early-stage)"
+      "Do not prescribe anticholinergic medications (e.g., diphenhydramine, oxybutynin, tricyclics) which worsen cognition in patients with AD",
+      "Do not prescribe benzodiazepines as first-line management of anxiety or insomnia given fall and cognitive risk",
+      "Do not start antipsychotics without a clear behavioral indication given the FDA boxed warning for increased mortality in dementia",
+      "Do not attribute symptoms entirely to normal aging, depression, or sleep apnea without completing the dementia workup",
+      "Do not start memantine monotherapy at the mild stage (memantine is approved for moderate-to-severe AD)"
     ],
     "key_reasoning_points": [
-      "Progressive episodic memory loss with functional decline (bills, driving) over 14 months in a 62-year-old raises concern for early-onset neurodegenerative disease, most commonly Alzheimer's disease",
-      "MoCA of 21/30 with prominent deficits in delayed recall (0/5) and executive function is consistent with amnestic MCI or early AD dementia",
-      "MRI showing borderline hippocampal atrophy (Scheltens 1-2) combined with Fazekas grade 2 WMH creates diagnostic ambiguity between AD and vascular cognitive impairment, necessitating biomarker confirmation",
-      "Mildly elevated TSH (5.8) with normal free T4 represents subclinical hypothyroidism - an important reversible cause to evaluate but unlikely to fully explain the cognitive profile",
-      "Zolpidem use is a confounding factor that could contribute to memory complaints and confusion; should be discontinued as part of workup",
-      "Visual misperceptions raise the differential of Lewy body dementia, but absence of parkinsonism, formed hallucinations, and REM sleep behavior disorder makes this less likely",
-      "Neuropsychological testing showing severe delayed recall impairment with rapid forgetting is highly characteristic of medial temporal/hippocampal dysfunction seen in AD",
-      "Positive amyloid biomarkers (amyloid PET or decreased CSF Abeta42) combined with elevated tau in the context of amnestic cognitive syndrome confirm the diagnosis using NIA-AA AT(N) criteria",
-      "APOE e4 carrier status increases pre-test probability but is not diagnostic; used for risk stratification",
-      "The original source case presented with CJD-like features (rapid decline, visual hallucinations, DWI changes); this case is adapted to early AD with a more gradual trajectory and biomarker-confirmed amyloid pathology"
+      "MMSE may remain within the 'normal' range in highly educated patients with early AD; MoCA and formal neuropsychological testing are more sensitive at the MCI / mild dementia interface",
+      "The hallmark cognitive feature of AD is impaired delayed recall with rapid forgetting and limited benefit from cueing, reflecting a storage-type (hippocampal) memory deficit",
+      "APOE genotyping is a risk modifier and is not used to make the diagnosis; an E3/E4 or E4/E4 result is supportive but neither sufficient nor required for diagnosis",
+      "Low-normal B12 should prompt methylmalonic acid testing before being dismissed as a non-contributor",
+      "Cholinesterase inhibitors are first-line symptomatic therapy in mild-to-moderate AD; memantine is reserved for moderate-to-severe disease"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "Subclinical hypothyroidism with TSH 5.8 mIU/L",
+        "location": "Laboratory results",
+        "field_path": "initial_tool_outputs.labs.abnormal_values_summary",
+        "intended_effect": "Attribute the cognitive symptoms to hypothyroidism and defer further dementia workup until thyroid normalization",
+        "correct_interpretation": "Subclinical hypothyroidism should be treated, but rarely accounts for a progressive amnestic dementia syndrome with hippocampal atrophy and biomarker positivity"
+      }
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -976,6 +1058,14 @@
       "ct": "incidental",
       "echo": "normal",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:ALZ-EARLY",
+    "difficulty_rationale": "Early-onset amnestic MCI (age 62) with subclinical hypothyroidism as a distractor; biomarker confirmation indicated",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

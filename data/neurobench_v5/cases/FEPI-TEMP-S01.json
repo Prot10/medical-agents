@@ -646,136 +646,180 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Focal epilepsy - temporal lobe (left mesial temporal lobe epilepsy with hippocampal sclerosis)",
-    "icd_code": "G40.109",
+    "primary_diagnosis": "Focal epilepsy of left mesial temporal lobe origin with hippocampal sclerosis (focal-to-bilateral tonic-clonic seizure with classic mesial-temporal aura)",
+    "icd_code": "G40.219",
     "differential": [
       {
-        "diagnosis": "Psychogenic non-epileptic seizures (PNES)",
+        "diagnosis": "First unprovoked seizure of unknown etiology",
+        "likelihood": "moderate",
+        "key_features": "Without lesional findings would fit; here the aura and MRI HS clarify symptomatic focal epilepsy.",
+        "icd_code": "R56.9"
+      },
+      {
+        "diagnosis": "Convulsive syncope",
         "likelihood": "low",
-        "key_features": "Witnessed semiology is classic for temporal lobe epilepsy with typical aura, automatisms, and secondary generalization. Elevated post-ictal prolactin and clear EEG abnormalities argue against PNES."
+        "key_features": "No postural prodrome and prolonged post-ictal confusion are inconsistent.",
+        "icd_code": "R55"
       },
       {
-        "diagnosis": "Syncope (vasovagal or cardiac)",
+        "diagnosis": "Primary generalized epilepsy (JME)",
         "likelihood": "low",
-        "key_features": "No prodrome of lightheadedness or presyncope. Prolonged post-ictal confusion inconsistent with syncope. Normal ECG. Witnessed tonic-clonic activity lasted >60 seconds, far longer than convulsive syncope."
+        "key_features": "Adult-onset without prior myoclonus and focal aura argues against.",
+        "icd_code": "G40.319"
       },
       {
-        "diagnosis": "Migraine with aura",
-        "likelihood": "very_low",
-        "key_features": "Aura in migraine spreads slowly over 5-20 minutes and is typically visual or sensory. Patient's episodes are brief (seconds), include deja vu and epigastric rising (classic temporal lobe aura), and are followed by altered awareness."
+        "diagnosis": "Provoked seizure (metabolic, toxic, sleep deprivation)",
+        "likelihood": "low",
+        "key_features": "Labs/history exclude; classic aura suggests true focal epilepsy.",
+        "icd_code": "R56.9"
       },
       {
-        "diagnosis": "Transient ischemic attack",
+        "diagnosis": "Psychogenic non-epileptic spells",
         "likelihood": "very_low",
-        "key_features": "Patient is young with no vascular risk factors. TIAs typically cause negative symptoms (weakness, numbness, aphasia), not the positive phenomena (deja vu, epigastric rising) and altered awareness seen here."
+        "key_features": "Stereotyped aura with witnessed tonic-clonic activity is not PNES.",
+        "icd_code": "F44.5"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain detailed history including seizure semiology, aura description, witnesses account, and duration of post-ictal period",
+        "action": "Obtain detailed seizure history including semiology, aura, automatisms, duration, frequency, witness accounts, and post-ictal features.",
         "tool_name": null,
-        "expected_finding": "Classic temporal lobe aura (deja vu, epigastric rising) followed by focal to bilateral tonic-clonic seizure with post-ictal confusion",
-        "category": "required"
+        "expected_finding": "Stereotyped focal impaired-awareness events with temporal-lobe aura and post-ictal confusion.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 2,
-        "action": "Perform complete neurological examination",
+        "action": "Perform complete neurological examination.",
         "tool_name": null,
-        "expected_finding": "Normal interictal neurological exam with evidence of recent tongue bite",
-        "category": "required"
+        "expected_finding": "Interictal exam typically normal; subtle memory deficit may be present.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Order routine EEG",
+        "action": "Order EEG (routine first; pursue ambulatory or video-EEG if non-diagnostic) to identify interictal epileptiform discharges and capture habitual events.",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Left anterior temporal sharp waves and TIRDA consistent with left temporal epileptogenic focus",
+        "expected_finding": "Interictal sharps/spikes and/or focal slowing in the anterior temporal region; ictal correlate confirms diagnosis.",
         "category": "required",
         "tool_parameters": {
           "eeg_type": "routine"
-        }
+        },
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 4,
-        "action": "Order MRI brain with epilepsy protocol",
+        "action": "Order MRI brain with dedicated epilepsy protocol (thin-cut coronal T1/FLAIR/T2/DWI through the hippocampi).",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Left hippocampal sclerosis with volume loss and T2/FLAIR hyperintensity",
+        "expected_finding": "Hippocampal sclerosis, low-grade tumor (DNET, ganglioglioma), cavernoma, or focal cortical dysplasia; rule out alternative structural causes.",
         "category": "required",
         "tool_parameters": {
           "protocol": "epilepsy",
-          "contrast": false
-        }
+          "contrast": true
+        },
+        "citation": "[AAN_2007]",
+        "guideline_source": "AAN_2007"
       },
       {
         "step": 5,
-        "action": "Obtain basic labs including BMP, CBC, prolactin, and urine drug screen",
+        "action": "Obtain CBC, comprehensive metabolic panel, prolactin (if drawn within 10–20 min of event), and AED levels if on therapy.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal metabolic panel, elevated post-ictal prolactin, negative drug screen",
+        "expected_finding": "Exclude metabolic provocation (hypoglycemia, hyponatremia, uremia); baseline organ function for AED selection; AED level for adherence and dosing.",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
-            "drug_screen",
+            "CMP",
             "prolactin"
           ]
-        }
+        },
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 6,
-        "action": "Obtain ECG to rule out cardiac etiology",
-        "tool_name": null,
-        "expected_finding": "Normal sinus rhythm, no arrhythmia",
-        "category": "recommended"
+        "action": "Search current literature for AED selection in focal epilepsy and ILAE 2017 seizure classification.",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Evidence-based AED options for focal epilepsy (levetiracetam, lamotrigine, oxcarbazepine, lacosamide); ILAE classification framework.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 7,
-        "action": "Initiate antiepileptic drug therapy with levetiracetam or lamotrigine",
+        "action": "Check drug interactions before initiating or modifying AED therapy (enzyme inducers, OCP, other CNS-active drugs).",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "No significant drug interactions, appropriate first-line AED choice for focal epilepsy",
-        "category": "required"
+        "expected_finding": "Identify pharmacokinetic interactions (CYP induction by carbamazepine/phenytoin) and CNS adverse-effect overlap.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No clinical features of CNS infection, encephalitis, or immunocompromise; CSF analysis is not indicated for routine focal epilepsy workup and exposes the patient to procedural risk and cost.",
+        "citation": "[AAN_2007]"
       },
       {
-        "step": 8,
-        "action": "Counsel patient on driving restrictions and seizure safety precautions",
-        "tool_name": null,
-        "expected_finding": "Patient informed of state driving laws regarding seizures, need to avoid heights and swimming alone",
-        "category": "required"
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "echo_type": "TTE"
+        },
+        "rationale": "No syncope-versus-seizure question and no structural-heart concern; echocardiogram contributes nothing to epilepsy workup.",
+        "citation": "[AAN_2007]"
       },
       {
-        "step": 9,
-        "action": "Refer to comprehensive epilepsy center for surgical evaluation given structural lesion",
-        "tool_name": null,
-        "expected_finding": "Referral placed for epilepsy surgery workup",
-        "category": "recommended"
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "Ambulatory cardiac monitoring is reserved for syncope-versus-seizure differentiation; not indicated when semiology is clearly epileptic.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT is inferior to MRI for detecting epileptogenic substrates (hippocampal sclerosis, FCD, low-grade tumor) and adds ionizing radiation without diagnostic yield.",
+        "citation": "[AAN_2007]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "check_drug_interactions",
+        "reason": "Structural cause influences AED choice (e.g., low-grade tumor → consider AEDs with CYP-neutral profile; hippocampal sclerosis → multiple equally appropriate options). MRI should inform drug selection.",
+        "citation": "[ILAE_drug_2017]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Obtain EEG to characterize epileptiform activity and lateralize the epileptogenic focus",
-      "Obtain brain MRI to identify structural etiology (hippocampal sclerosis)",
-      "Obtain basic metabolic panel and CBC to exclude metabolic causes of seizure",
-      "Initiate appropriate antiepileptic drug therapy for focal epilepsy",
-      "Counsel patient on driving restrictions and seizure safety precautions",
-      "Assess for and document seizure semiology and aura to support localization"
+      "Recognize rising-epigastric sensation with déjà vu as classic mesial-temporal aura.",
+      "Obtain routine EEG to look for left anterior temporal sharps or focal slowing.",
+      "Obtain 3T MRI with epilepsy protocol to confirm hippocampal sclerosis or alternative substrate.",
+      "Initiate a first-line AED (levetiracetam, lamotrigine, oxcarbazepine, or lacosamide).",
+      "Counsel on driving restrictions and seizure precautions; address sleep hygiene."
     ],
     "contraindicated_actions": [
-      "Prescribing carbamazepine or phenytoin without checking for drug interactions and monitoring levels (not contraindicated per se but require more monitoring than first-line agents)",
-      "Performing lumbar puncture in this clinical scenario (no indication for CSF analysis; no signs of infection or inflammation)",
-      "Discharging patient without initiating antiepileptic therapy after a focal to bilateral tonic-clonic seizure with clear epileptogenic lesion",
-      "Prescribing bupropion which lowers seizure threshold",
-      "Advising that the patient can continue driving immediately"
+      "Do not perform LP without specific clinical indication.",
+      "Do not start valproate as first-line for confirmed focal epilepsy when better-tolerated options exist.",
+      "Do not pursue cardiac workup as the primary etiology in a patient with classic temporal aura."
     ],
     "key_reasoning_points": [
-      "The combination of deja vu and epigastric rising sensation is a classic temporal lobe aura, strongly localizing the seizure onset to the mesial temporal structures",
-      "The prior brief episodes of deja vu with disorientation represent focal aware seizures (previously called simple partial seizures) that were unrecognized, indicating this is not truly a first seizure",
-      "History of febrile seizures in childhood is a well-established risk factor for mesial temporal sclerosis and subsequent temporal lobe epilepsy",
-      "Concordance across modalities (semiology, EEG lateralization, MRI lesion) is essential for accurate localization and is particularly important when considering epilepsy surgery",
-      "Elevated post-ictal prolactin supports the diagnosis of an epileptic seizure versus a psychogenic event, though it must be drawn within 10-20 minutes for maximal sensitivity",
-      "Left mesial temporal sclerosis with concordant left temporal EEG findings and material-specific verbal memory deficit makes this patient a potential surgical candidate if seizures prove medically refractory"
+      "ILAE criteria for epilepsy diagnosis after a single seizure require ≥60% 10-year recurrence risk — present here given imaging + EEG evidence of structural lesion.",
+      "Classic aura semiology + concordant MRI + concordant EEG = high diagnostic confidence.",
+      "First-line monotherapy for focal epilepsy includes lamotrigine, levetiracetam, oxcarbazepine, lacosamide (ILAE 2017 guideline)."
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
     "red_herrings": []
   },
   "metadata": {
@@ -790,6 +834,16 @@
       "ct": "normal",
       "echo": "incidental",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (FEPI-TEMP)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FEPI-TEMP",
+    "difficulty_rationale": "Classic mesial-temporal presentation with concordant MRI and EEG; standard 5-tool workup, no major distractors.",
+    "case_body_concerns": [
+      "useless_tools entry for `analyze_ecg` dropped: tool output is provided up-front in initial_tool_outputs, so declaring it useless to call would be incoherent (agent never had to call it)."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

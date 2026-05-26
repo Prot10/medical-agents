@@ -691,178 +691,250 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Early-stage Alzheimer's disease",
-    "icd_code": "G30.1",
+    "primary_diagnosis": "Mild cognitive impairment due to Alzheimer's disease (amnestic, multi-domain) with mixed vascular contribution",
+    "icd_code": "G31.84",
     "differential": [
       {
-        "diagnosis": "Vascular cognitive impairment / vascular dementia",
-        "likelihood": "moderate",
-        "key_features": "Fazekas grade 2 white matter disease, chronic lacunar infarct, microbleeds, and vascular risk factors (diabetes, hypertension, former smoker) support a vascular contribution. However, the gradual amnestic-predominant decline is more typical of AD than stepwise vascular dementia. Most likely mixed pathology."
+        "diagnosis": "Vascular cognitive impairment / vascular contribution to dementia",
+        "likelihood": "high",
+        "key_features": "Concurrent small-vessel ischemic disease (Fazekas, lacunar infarct, microbleeds) and vascular risk factors suggest a vascular contribution; however, the gradual amnestic profile and biomarker positivity argue for mixed pathology rather than pure vascular dementia",
+        "icd_code": "F01.50"
+      },
+      {
+        "diagnosis": "Dementia with Lewy bodies",
+        "likelihood": "low",
+        "key_features": "No visual hallucinations, no parkinsonism, no REM sleep behavior disorder, no cognitive fluctuations described",
+        "icd_code": "G31.83"
+      },
+      {
+        "diagnosis": "Frontotemporal dementia (behavioral variant)",
+        "likelihood": "low",
+        "key_features": "No early personality change, disinhibition, or executive-predominant profile; memory is the dominant deficit, atypical for bvFTD",
+        "icd_code": "G31.09"
       },
       {
         "diagnosis": "Depression (pseudodementia)",
         "likelihood": "low",
-        "key_features": "GDS 6/15 shows mild depressive symptoms and patient has social withdrawal. However, gradual onset over 12 months, disproportionate memory impairment on testing, and impaired delayed recall with rapid forgetting are not typical of pseudodementia."
+        "key_features": "Insidious course over months to years with disproportionate delayed-recall impairment and limited benefit from cueing is not typical of pseudodementia",
+        "icd_code": "F32.A"
       },
       {
-        "diagnosis": "Normal aging / subjective cognitive decline",
+        "diagnosis": "Reversible cognitive impairment from thyroid disease, B12 deficiency, or untreated sleep apnea",
         "likelihood": "low",
-        "key_features": "MoCA 22/30, impaired delayed recall at 8th percentile, and functional changes (missed bills, duplicate payments) indicate impairment beyond normal aging despite MMSE of 26/30."
-      },
-      {
-        "diagnosis": "Obstructive sleep apnea-related cognitive impairment",
-        "likelihood": "low",
-        "key_features": "Known OSA with inconsistent CPAP use could contribute to cognitive complaints, but progressive amnestic profile and imaging findings suggest a neurodegenerative component beyond what OSA alone would produce."
-      },
-      {
-        "diagnosis": "Lewy body dementia",
-        "likelihood": "very_low",
-        "key_features": "No visual hallucinations, no parkinsonism, no REM sleep behavior disorder, no cognitive fluctuations. No evidence on exam."
+        "key_features": "Screening labs and (when relevant) PSG are needed to exclude; the progressive amnestic profile would not normalize with treatment of these conditions alone",
+        "icd_code": null
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain detailed history from patient and informant, including timeline of cognitive changes, nature of complaints, functional status, and behavioral symptoms",
+        "action": "Obtain detailed clinical history from patient and informant, including timeline, cognitive domains affected, functional decline, mood, sleep, and medication review",
         "tool_name": null,
-        "expected_finding": "Gradual progressive memory complaints over 12 months with subtle functional decline confirmed by spouse; word-finding difficulty; no hallucinations or parkinsonism",
-        "category": "required"
+        "expected_finding": "Gradually progressive cognitive change with informant-confirmed functional impairment in IADLs",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[NIA_AA_2011]",
+        "guideline_source": "NIA_AA_2011"
       },
       {
         "step": 2,
-        "action": "Perform comprehensive neurological examination including detailed mental status assessment with MMSE and/or MoCA",
+        "action": "Perform bedside cognitive assessment (MMSE and/or MoCA) and detailed neurological examination",
         "tool_name": null,
-        "expected_finding": "MMSE 26/30 with recall deficit; clock drawing with subtle error; neurological exam otherwise unremarkable except mildly reduced vibration at toes",
-        "category": "required"
+        "expected_finding": "Objective cognitive impairment on MoCA more sensitive than MMSE; non-focal neurological exam (or variant-specific findings — visuospatial in PCA, language in lvPPA, behavioral in frontal AD)",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN_dementia_2018"
       },
       {
         "step": 3,
-        "action": "Order dementia screening labs: CBC, BMP, TSH, vitamin B12, folate, RPR, HIV, and HbA1c given diabetes history",
+        "action": "Order reversible-cause labs (CBC, CMP, TSH, vitamin B12, folate; consider RPR/HIV per risk)",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal labs except mildly elevated glucose and HbA1c 7.1%; low-normal B12 warrants methylmalonic acid level",
+        "expected_finding": "Reversible mimics (hypothyroidism, B12 deficiency, neurosyphilis) excluded; identify and address co-morbid metabolic factors",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
-            "thyroid",
+            "CMP",
+            "TSH",
             "B12",
-            "folate",
-            "HbA1c",
-            "RPR",
-            "HIV",
-            "dementia_workup"
+            "folate"
           ]
-        }
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN_dementia_2018"
       },
       {
         "step": 4,
-        "action": "Order brain MRI with volumetric protocol",
+        "action": "Obtain brain MRI with dementia (volumetric) protocol to assess medial-temporal atrophy and exclude vascular disease, hippocampal sclerosis, NPH, and mass lesions",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Mild hippocampal atrophy (Scheltens grade 1-2) with Fazekas grade 2 white matter disease and chronic lacunar infarct; findings equivocal for early AD vs vascular",
+        "expected_finding": "Subtle medial-temporal atrophy (Scheltens MTA grade 1-2) with or without temporoparietal volume loss",
         "category": "required",
         "tool_parameters": {
           "protocol": "dementia",
           "contrast": false
-        }
+        },
+        "citation": "[NIA_AA_2011]",
+        "guideline_source": "NIA_AA_2011"
       },
       {
         "step": 5,
-        "action": "Request comprehensive neuropsychological testing to characterize the cognitive profile and distinguish AD from vascular or depressive etiologies",
+        "action": "Order comprehensive neuropsychological testing to characterize the cognitive profile and establish a baseline for tracking",
         "tool_name": "order_specialized_test",
-        "expected_finding": "Amnestic profile with impaired delayed recall, emerging anomia, and borderline executive dysfunction; pattern most consistent with early AD with possible vascular contribution",
+        "expected_finding": "Amnestic profile with disproportionate impairment of delayed recall and limited benefit from cueing, plus involvement of at least one other cognitive domain",
         "category": "required",
         "tool_parameters": {
           "test_type": "neuropsych_battery"
-        }
+        },
+        "citation": "[NIA_AA_2011]",
+        "guideline_source": "NIA_AA_2011"
       },
       {
         "step": 6,
-        "action": "Order amyloid PET or CSF biomarkers to clarify whether Alzheimer pathology underlies the cognitive decline, given equivocal structural imaging",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Amyloid PET positive or CSF showing borderline-low Abeta42, confirming Alzheimer pathology",
+        "action": "Order CSF biomarkers (Aβ42, Aβ42/40 ratio, p-tau, total tau) for ATN classification",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Reduced Aβ42 (or reduced Aβ42/40 ratio) with elevated p-tau supporting A+T+ profile consistent with Alzheimer pathology",
         "category": "required",
         "tool_parameters": {
-          "imaging_type": "amyloid_PET"
-        }
+          "tests": [
+            "Abeta42",
+            "Abeta42_40_ratio",
+            "phospho_tau",
+            "total_tau"
+          ]
+        },
+        "citation": "[NIA_AA_2018]",
+        "guideline_source": "NIA_AA_2018"
       },
       {
         "step": 7,
-        "action": "Optimize vascular risk factor management: tighten glycemic control, ensure blood pressure at target, continue statin, encourage CPAP compliance",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Order amyloid PET when CSF biomarkers are unavailable or when diagnostic uncertainty persists after clinical assessment and MRI",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Positive cortical amyloid retention (SUVr above positivity threshold) confirming amyloid pathology",
+        "category": "required",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "citation": "[Appropriate_Use_Amyloid_PET]",
+        "guideline_source": "Appropriate_Use_Amyloid_PET"
       },
       {
         "step": 8,
-        "action": "Consider initiating cholinesterase inhibitor therapy (donepezil 5 mg daily) after confirming Alzheimer pathology",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "No significant drug interactions with current medications",
-        "category": "recommended"
+        "action": "Order FDG-PET to assess regional metabolism and distinguish AD from frontotemporal dementia or other neurodegenerative patterns",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Bilateral temporoparietal and posterior cingulate hypometabolism characteristic of Alzheimer pattern",
+        "category": "optional",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[Foster_2007]",
+        "guideline_source": "Foster_2007"
       },
       {
         "step": 9,
-        "action": "Provide diagnosis disclosure and counseling to patient and family, discuss mixed pathology, prognosis, safety planning, advance directives, and community resources",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Check drug interactions before initiating cholinesterase inhibitor (donepezil, rivastigmine, or galantamine)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "No clinically significant interactions; counsel on GI side effects and bradycardia risk",
+        "category": "optional",
+        "tool_parameters": {},
+        "citation": "[NIA_AA_2011]",
+        "guideline_source": "NIA_AA_2011"
       },
       {
         "step": 10,
-        "action": "Schedule follow-up in 3-6 months to reassess cognition and treatment response; consider referral for driving evaluation",
+        "action": "Disclose the diagnosis to patient and family, discuss prognosis, advance directives, and driving / safety assessment",
         "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "expected_finding": "Patient and caregiver engaged in care planning; safety concerns (driving, finances, medication management) addressed",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[NIA_AA_2011]",
+        "guideline_source": "NIA_AA_2011"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG is unrelated to the dementia workup; no cardiac symptom or syncope to justify it in this case",
+        "citation": "[AAN_dementia_2018]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is unrelated to the dementia workup; no cardioembolic indication in this presentation",
+        "citation": "[AAN_dementia_2018]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring is not indicated; no arrhythmia, syncope, or palpitations described",
+        "citation": "[AAN_dementia_2018]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT adds little when MRI is available; MRI is the preferred structural modality for dementia workup",
+        "citation": "[NIA_AA_2011]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "Obtain structural imaging before lumbar puncture to exclude mass effect / herniation risk, particularly in older patients",
+        "citation": "[NIA_AA_2011]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Exclude reversible causes of dementia (labs: TSH, B12, RPR, HIV)",
-      "Obtain structural neuroimaging (MRI brain)",
-      "Perform standardized cognitive assessment (MMSE, MoCA, or neuropsychological battery)",
-      "Obtain collateral history from informant (spouse)",
-      "Recognize and address the vascular contribution to cognitive impairment (optimize diabetes, hypertension, CPAP adherence)",
-      "Pursue biomarker confirmation (amyloid PET or CSF) given equivocal structural imaging",
-      "Assess functional status and safety including driving, medication management, and finances",
-      "Discuss diagnosis, prognosis, and safety planning with patient and family"
+      "Obtain collateral history from an informant who knows the patient well",
+      "Exclude reversible causes of cognitive decline with screening labs (CBC, CMP, TSH, B12, folate; HIV/RPR per risk)",
+      "Obtain structural brain MRI with dementia/volumetric protocol",
+      "Quantify cognitive impairment with a standardized cognitive battery (MoCA at minimum; formal neuropsychological testing when feasible)",
+      "Assess safety: driving, medication management, finances, and need for caregiver support",
+      "Disclose the diagnosis and discuss prognosis, advance directives, and treatment options with the patient and family",
+      "Optimize vascular risk factor management (glycemic control, blood pressure, lipid management, smoking cessation, CPAP adherence)",
+      "Pursue biomarker confirmation (CSF AT(N) markers or amyloid PET) when MRI is equivocal or when an atypical AD variant is suspected"
     ],
     "contraindicated_actions": [
-      "Prescribing anticholinergic medications (e.g., diphenhydramine, oxybutynin) which worsen cognitive function",
-      "Prescribing benzodiazepines for anxiety without careful consideration of cognitive and fall risk",
-      "Attributing symptoms entirely to normal aging, depression, or sleep apnea without thorough workup",
-      "Starting memantine monotherapy in mild disease (not indicated until moderate stage)",
-      "Ordering brain biopsy (not indicated given clinical profile)",
-      "Prescribing antipsychotics without clear behavioral indication (risk of increased mortality in dementia)",
-      "Discontinuing vascular risk factor medications (statins, antihypertensives) which are important for managing mixed pathology"
+      "Do not prescribe anticholinergic medications (e.g., diphenhydramine, oxybutynin, tricyclics) which worsen cognition in patients with AD",
+      "Do not prescribe benzodiazepines as first-line management of anxiety or insomnia given fall and cognitive risk",
+      "Do not start antipsychotics without a clear behavioral indication given the FDA boxed warning for increased mortality in dementia",
+      "Do not attribute symptoms entirely to normal aging, depression, or sleep apnea without completing the dementia workup",
+      "Do not start memantine monotherapy at the mild stage (memantine is approved for moderate-to-severe AD)"
     ],
     "key_reasoning_points": [
-      "MMSE of 26/30 may appear reassuring but is below expected for a patient with a master's degree; MoCA at 22/30 is more sensitive and reveals clear impairment",
-      "The pattern of impaired delayed recall with rapid forgetting (8th percentile on RAVLT delayed recall) is characteristic of hippocampal-type amnesia seen in AD",
-      "The moderate difficulty arises from co-existing vascular disease (Fazekas 2, lacunar infarct, microbleeds) that creates diagnostic uncertainty between pure AD, vascular cognitive impairment, and mixed pathology",
-      "Borderline CSF biomarkers (Abeta42 at 465, tau values high-normal) reflect early-stage disease and require careful interpretation rather than definitive classification",
-      "Low-normal B12 requires follow-up with methylmalonic acid to fully exclude functional deficiency before attributing all symptoms to neurodegeneration",
-      "Mild depressive symptoms (GDS 6/15) are likely reactive but must be considered as a potential contributing factor",
-      "Inconsistent CPAP use for sleep apnea could contribute to cognitive complaints and should be addressed as part of comprehensive management",
-      "Despite multiple confounders, the progressive amnestic-predominant cognitive profile most strongly points to underlying Alzheimer pathology, which biomarker testing can confirm"
+      "MMSE may remain within the 'normal' range in highly educated patients with early AD; MoCA and formal neuropsychological testing are more sensitive at the MCI / mild dementia interface",
+      "The hallmark cognitive feature of AD is impaired delayed recall with rapid forgetting and limited benefit from cueing, reflecting a storage-type (hippocampal) memory deficit",
+      "Mixed vascular and AD pathology is common in older adults; the presence of small-vessel disease does not exclude AD and should not stop the biomarker workup",
+      "APOE genotyping is a risk modifier and is not used to make the diagnosis; an E3/E4 or E4/E4 result is supportive but neither sufficient nor required for diagnosis",
+      "Low-normal B12 should prompt methylmalonic acid testing before being dismissed as a non-contributor",
+      "Cholinesterase inhibitors are first-line symptomatic therapy in mild-to-moderate AD; memantine is reserved for moderate-to-severe disease"
     ],
     "red_herrings": [
       {
-        "data_point": "Fazekas grade 2 white matter disease and chronic lacunar infarct in left caudate head",
+        "data_point": "Chronic lacunar infarct in the left caudate head plus Fazekas grade 2 small-vessel disease",
         "location": "MRI findings",
-        "intended_effect": "Lead clinician to diagnose pure vascular cognitive impairment and bypass Alzheimer biomarker workup",
-        "correct_interpretation": "Vascular disease contributes but the progressive amnestic profile with rapid forgetting and positive amyloid PET indicates Alzheimer pathology as the primary driver; mixed pathology is the most likely diagnosis",
-        "field_path": ""
+        "field_path": "initial_tool_outputs.mri.findings[3]",
+        "intended_effect": "Anchor on pure vascular cognitive impairment and skip Alzheimer biomarker workup",
+        "correct_interpretation": "Vascular disease contributes to the picture, but a gradually progressive amnestic profile with rapid forgetting and positive amyloid biomarkers points to AD as the primary driver of a mixed-pathology presentation"
       },
       {
         "data_point": "Inconsistent CPAP use for obstructive sleep apnea",
         "location": "Social history",
-        "intended_effect": "Attribute all cognitive symptoms to sleep apnea and defer further neurodegenerative workup",
-        "correct_interpretation": "OSA can contribute to cognitive symptoms but cannot alone explain the progressive amnestic-predominant decline with objective neuropsychological deficits and positive amyloid biomarkers",
-        "field_path": ""
+        "field_path": "patient.clinical_history.past_medical_history[4]",
+        "intended_effect": "Attribute cognitive symptoms entirely to under-treated OSA and defer further neurodegenerative workup",
+        "correct_interpretation": "OSA may contribute, but a progressive amnestic-predominant decline with hippocampal atrophy and positive amyloid biomarkers cannot be explained by OSA alone"
+      },
+      {
+        "data_point": "MMSE 26/30 within \"normal\" range",
+        "location": "Mental status exam",
+        "field_path": "patient.neurological_exam.mental_status",
+        "intended_effect": "Reassure the agent that cognition is intact and stop the workup",
+        "correct_interpretation": "MMSE is insensitive for early AD especially in highly educated patients; MoCA 22/30 with disproportionate delayed-recall impairment is the more reliable finding"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "v5",
@@ -885,6 +957,14 @@
       "echo": "incidental",
       "cardiac_monitoring": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:ALZ-EARLY",
+    "difficulty_rationale": "5 required tools (MRI + labs + neuropsych + biomarker confirmation), mixed vascular pathology and OSA as red herrings, MMSE 26/30 falsely reassuring in highly educated patient",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

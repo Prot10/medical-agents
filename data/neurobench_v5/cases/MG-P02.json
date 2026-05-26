@@ -525,129 +525,217 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Lambert-Eaton Myasthenic Syndrome (LEMS), paraneoplastic, secondary to new small cell lung cancer (SCLC, limited stage)",
+    "primary_diagnosis": "Lambert-Eaton myasthenic syndrome (LEMS), paraneoplastic, secondary to new small cell lung cancer (SCLC); anti-VGCC P/Q-type positive, anti-SOX1 positive",
     "icd_code": "G73.1",
     "differential": [
       {
-        "diagnosis": "Myasthenia gravis",
-        "likelihood": "very_low",
-        "key_features": "Anti-AChR negative; ocular symptoms absent; proximal leg weakness > bulbar; baseline CMAP reduced; >100% increment at 50Hz — all features specific to LEMS not MG; high-rate RNS distinguishes these conditions definitively"
+        "diagnosis": "Myasthenia gravis (post-synaptic NMJ)",
+        "likelihood": "moderate",
+        "key_features": "MG can produce fatigable weakness but typically shows decrement (not increment) on RNS and normal baseline CMAP; here baseline CMAP low with >100% facilitation at 50 Hz and AChR negative.",
+        "icd_code": "G70.0"
       },
       {
-        "diagnosis": "Chemotherapy-related peripheral neuropathy (cisplatin)",
+        "diagnosis": "Inflammatory myopathy (PM/DM/IBM)",
         "likelihood": "low",
-        "key_features": "Mild axonal neuropathy present and explains mild sensory symptoms; however, CANNOT explain baseline CMAP reduction and 142% increment at 50Hz; NMJ disorder is primary diagnosis"
+        "key_features": "Inflammatory myopathy raises CK and shows myopathic EMG; here CK normal and RNS facilitation is diagnostic of pre-synaptic NMJ disorder.",
+        "icd_code": "M33.2"
       },
       {
-        "diagnosis": "Recurrent NSCLC with peripheral nerve compression",
-        "likelihood": "very_low",
-        "key_features": "PET-CT shows no recurrence at prior NSCLC site; no spinal cord or plexus compression; new SCLC is the relevant cancer"
-      },
-      {
-        "diagnosis": "Autoimmune (non-paraneoplastic) LEMS",
+        "diagnosis": "Diabetic / age-related polyneuropathy",
         "likelihood": "low",
-        "key_features": "Anti-SOX1 positive, hilar SCLC confirmed — this is paraneoplastic LEMS; autoimmune LEMS would be diagnosis of exclusion if malignancy workup negative"
+        "key_features": "Could explain mild reduced SNAPs but does not produce >100% facilitation on RNS or proximal weakness improving with brief exercise.",
+        "icd_code": "G63"
+      },
+      {
+        "diagnosis": "Botulism",
+        "likelihood": "very_low",
+        "key_features": "Botulism is acute, descending, with autonomic features and bulbar involvement; this is sub-acute over months without an exposure.",
+        "icd_code": "A05.1"
+      },
+      {
+        "diagnosis": "Statin-induced or anticoagulant-induced myopathy",
+        "likelihood": "very_low",
+        "key_features": "Patient is anticoagulated but not on a statin; CK normal.",
+        "icd_code": "G72.0"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Perform RNS including high-rate (50Hz) stimulation when initial EMG shows low baseline CMAP amplitudes",
-        "tool_name": "order_specialized_test",
-        "expected_finding": ">100% increment at 50Hz — LEMS pattern; baseline CMAP low",
+        "action": "Order anti-VGCC P/Q-type and N-type antibodies, anti-SOX1, plus standard AChR and MuSK to exclude MG",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Anti-VGCC P/Q positive (LEMS); anti-SOX1 positive (paraneoplastic SCLC marker); AChR/MuSK negative",
         "category": "required",
         "tool_parameters": {
-          "test": "high_rate_RNS"
-        }
+          "panels": [
+            "anti_VGCC_PQ",
+            "anti_VGCC_N",
+            "anti_SOX1",
+            "anti_AChR",
+            "anti_MuSK"
+          ]
+        },
+        "citation": "[Gilhus_2016]",
+        "guideline_source": "Gilhus_2016"
       },
       {
         "step": 2,
-        "action": "Order anti-VGCC P/Q-type antibody and paraneoplastic panel (anti-SOX1)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Anti-VGCC 0.62 nmol/L (markedly elevated); anti-SOX1 positive — malignancy concern",
+        "action": "Order RNS with high-rate (20-50 Hz) post-exercise facilitation protocol",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Low baseline CMAP with >100% increment after brief MVC or 50 Hz RNS confirms pre-synaptic LEMS",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "repetitive_nerve_stimulation"
+        },
+        "citation": "[Gilhus_2016]",
+        "guideline_source": "Gilhus_2016"
       },
       {
         "step": 3,
-        "action": "Order PET-CT (not just standard CT) to detect occult malignancy including SCLC",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Hypermetabolic hilar node 1.4 cm SUV 8.4 — not seen on standard CT",
+        "action": "CT chest with contrast for occult SCLC (most common LEMS-associated malignancy)",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "May be negative initially — SCLC can be small; PET-CT recommended if standard CT non-diagnostic",
         "category": "required",
         "tool_parameters": {
-          "modality": "PET-CT",
-          "tracer": "FDG"
-        }
+          "region": "chest",
+          "contrast": true,
+          "indication": "occult_SCLC_screening"
+        },
+        "citation": "[Gilhus_2016]",
+        "guideline_source": "Gilhus_2016"
       },
       {
         "step": 4,
-        "action": "Biopsy of hypermetabolic hilar node via EBUS bronchoscopy",
-        "tool_name": null,
-        "expected_finding": "SCLC confirmed on pathology — limited stage",
+        "action": "Order FDG-PET if standard CT is negative or equivocal — sensitivity exceeds chest CT for small SCLC",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Hypermetabolic hilar/lung lesion supports occult SCLC; guides biopsy",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[Gilhus_2016]",
+        "guideline_source": "Gilhus_2016"
       },
       {
         "step": 5,
-        "action": "Initiate amifampridine for LEMS symptom control while cancer treatment arranged",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Amifampridine safe with current regimen; ECG monitoring for QTc",
-        "category": "required",
+        "action": "Autonomic testing (QSART, tilt-table) — autonomic features (dry mouth, constipation, erectile dysfunction) support LEMS",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Sympathetic/parasympathetic dysfunction consistent with pre-synaptic cholinergic failure",
+        "category": "recommended",
         "tool_parameters": {
-          "proposed": "amifampridine"
-        }
+          "test_type": "autonomic_testing"
+        },
+        "citation": "[Gilhus_2016]",
+        "guideline_source": "Gilhus_2016"
       },
       {
         "step": 6,
-        "action": "Oncology consultation for concurrent cisplatin/etoposide + thoracic radiation for limited stage SCLC",
-        "tool_name": null,
-        "expected_finding": "Cancer treatment initiated — LEMS may improve significantly with tumor treatment",
+        "action": "Search literature for LEMS treatment (amifampridine/3,4-DAP, pyridostigmine adjunct, immunotherapy, oncologic treatment of SCLC)",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "3,4-DAP is first-line symptomatic treatment; treating underlying SCLC often improves LEMS",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "query": "LEMS amifampridine 3,4-DAP paraneoplastic SCLC treatment"
+        },
+        "citation": "[Gilhus_2016]",
+        "guideline_source": "Gilhus_2016"
+      },
+      {
+        "step": 7,
+        "action": "Check drug interactions for proposed amifampridine in patient on apixaban; review MG-exacerbating drug list (still relevant in NMJ disease)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Amifampridine: lowers seizure threshold; check apixaban interactions; avoid aminoglycosides/fluoroquinolones",
+        "category": "required",
+        "tool_parameters": {
+          "proposed": "amifampridine_start"
+        },
+        "citation": "[Gilhus_2016]",
+        "guideline_source": "Gilhus_2016"
+      },
+      {
+        "step": 8,
+        "action": "Baseline ECG given amifampridine QT prolongation risk and atrial fibrillation history",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Document baseline QTc before starting amifampridine; monitor on therapy",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Gilhus_2016]",
+        "guideline_source": "Gilhus_2016"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is non-contributory for neuromuscular junction disorders.",
+        "citation": "[Gilhus_2016]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "CSF has no diagnostic role in LEMS or MG.",
+        "citation": "[Gilhus_2016]"
+      },
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is non-contributory for LEMS unless an alternative CNS cause is being entertained.",
+        "citation": "[Gilhus_2016]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "search_medical_literature",
+        "reason": "Confirm anti-VGCC/SOX1 serology before initiating LEMS-specific symptomatic therapy or oncologic referral.",
+        "citation": "[Gilhus_2016]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "High-rate RNS (50Hz) is CRITICAL when baseline CMAP is low — distinguishes LEMS from MG",
-      "Anti-VGCC antibody testing (NOT just anti-AChR) in any patient with suspected LEMS pattern",
-      "PET-CT superiority over standard CT for detecting occult SCLC in LEMS",
-      "Urgent malignancy workup in ALL LEMS patients — paraneoplastic in 60-70% of cases",
-      "Amifampridine is FDA-approved for LEMS — initiate early for symptom relief",
-      "Anti-SOX1 positive is a strong predictor of SCLC-LEMS and mandates aggressive malignancy search"
+      "Confirm anti-VGCC (P/Q-type) positivity",
+      "RNS with high-rate facilitation protocol — low baseline CMAP with >100% increment is diagnostic",
+      "CT chest + PET-CT to search for occult SCLC (LEMS often precedes radiographic tumor by months)",
+      "Oncology referral for staging and treatment of underlying malignancy",
+      "Initiate symptomatic therapy with amifampridine (3,4-DAP) after ECG and drug-interaction review",
+      "Plan repeat surveillance imaging at 3-6 month intervals for up to 2 years if initial PET-CT negative"
     ],
     "contraindicated_actions": [
-      "Do NOT diagnose MG without high-rate RNS — baseline CMAP reduction is a key differentiating feature of LEMS vs MG",
-      "Do NOT use standard CT alone to exclude malignancy in LEMS — PET-CT required",
-      "Do NOT dismiss new neuromuscular symptoms in a cancer patient as 'deconditioning' without proper electrophysiological testing",
-      "Do NOT use aminoglycosides — worsen NMJ in LEMS as well as MG"
+      "Do NOT diagnose this as myasthenia gravis based on fatigable weakness alone — RNS facilitation pattern and anti-VGCC positivity place this in the LEMS category.",
+      "Do NOT prescribe aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, or NMBs — these worsen any pre-synaptic NMJ disorder.",
+      "Do NOT delay oncologic workup once anti-VGCC + anti-SOX1 positive — paraneoplastic LEMS frequently precedes detectable SCLC."
     ],
     "key_reasoning_points": [
-      "The diagnostic clue is LOW baseline CMAP amplitudes (0.8 mV in deltoid, 1.2 mV in median) — this NEVER occurs in MG and should immediately prompt high-rate RNS",
-      "Greater than 100% CMAP increment at 50Hz is pathognomonic for LEMS (reflects pre-synaptic calcium accumulation enabling transient NMJ transmission)",
-      "Autonomic features (dry mouth, erectile dysfunction, mild orthostatic hypotension) are characteristic of LEMS (VGCC antibodies affect autonomic ganglia)",
-      "Proximal leg weakness without significant ocular involvement is the typical LEMS distribution vs MG (ocular > limb in MG)",
-      "Anti-SOX1 positive in LEMS strongly predicts SCLC — PET-CT is mandatory even with apparently negative standard CT",
-      "Prior NSCLC history is a red herring — new histologically distinct SCLC can develop independently",
-      "SCLC treatment (chemotherapy + radiation) is the primary therapeutic intervention for paraneoplastic LEMS — LEMS often dramatically improves with tumor control"
+      "LEMS is the principal MG mimic the case is designed to test — pre-synaptic NMJ failure with low baseline CMAP and high-rate facilitation is the discriminator.",
+      "Anti-VGCC P/Q-type antibody is positive in 85-90% of LEMS; anti-SOX1 raises paraneoplastic concern for SCLC.",
+      "Smoker with prior NSCLC: standard CT may miss small SCLC; PET-CT is essential.",
+      "Patient improves with brief exercise (post-activation facilitation) — the opposite pattern to MG; this clinical sign is highly specific.",
+      "Treat the underlying SCLC and use amifampridine for symptomatic control; IVIG and immunosuppression are second-line."
     ],
     "red_herrings": [
       {
-        "data_point": "Prior non-small cell lung cancer treated and in remission",
-        "location": "past medical history",
-        "intended_effect": "Prior NSCLC remission may cause clinician to consider NSCLC recurrence as paraneoplastic cause, rather than pursuing PET-CT for new SCLC",
-        "correct_interpretation": "Anti-SOX1 is strongly associated with SCLC specifically; standard CT shows no NSCLC recurrence; PET-CT detects new SCLC hilar node not visible on CT — different histological primary",
-        "field_path": ""
+        "data_point": "Negative anti-AChR antibody",
+        "location": "labs / neuromuscular antibodies",
+        "field_path": "initial_tool_outputs.labs.panels",
+        "intended_effect": "Conclude that 'NMJ disease excluded' and miss LEMS.",
+        "correct_interpretation": "AChR-negative does NOT exclude pre-synaptic NMJ disorders; anti-VGCC is the discriminating test for LEMS."
       },
       {
-        "data_point": "Chemotherapy history (prior adjuvant cisplatin)",
-        "location": "treatment history",
-        "intended_effect": "Clinician attributes weakness and hyporeflexia to cisplatin peripheral neuropathy, delaying LEMS evaluation",
-        "correct_interpretation": "Cisplatin neuropathy causes mild sensory neuropathy; CANNOT explain low baseline CMAP with facilitation, proximal weakness worse than distal, dry mouth, or erectile dysfunction — these are LEMS features",
-        "field_path": ""
+        "data_point": "CT chest negative for NSCLC recurrence at prior surgical site; no new mass",
+        "location": "CT chest",
+        "field_path": "initial_tool_outputs.ct.impression",
+        "intended_effect": "Rule out malignancy and miss occult new SCLC.",
+        "correct_interpretation": "Standard CT has limited sensitivity for small lung primaries; LEMS often precedes radiographic SCLC by months — PET-CT is required and surveillance continues for up to 2 years."
+      },
+      {
+        "data_point": "Pre-existing atrial fibrillation on apixaban",
+        "location": "past medical history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Misattribute weakness to anticoagulant fatigue or cardiac decompensation.",
+        "correct_interpretation": "AFib does not produce fatigable proximal weakness or RNS facilitation; the underlying pathology is paraneoplastic LEMS."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "v5",
@@ -660,6 +748,16 @@
       "csf": "normal",
       "echo": "normal",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MG",
+    "difficulty_rationale": "6 required tools, 3 red herrings, reverse-mimic LEMS workup",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": [
+      "emg_ncs_useless_via_param_conflation: pack lists order_specialized_test:emg_ncs as USELESS, but coherence validator treats tool_name overlap as a contradiction regardless of tool_parameters; cannot encode without removing required RNS/SFEMG entries. Suggest extending validator to compare tool_name + tool_parameters or fleet-wide pattern."
+    ]
   }
 }

@@ -844,149 +844,225 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Focal epilepsy — temporal lobe, secondary to left temporal lobe brain metastasis (melanoma)",
-    "icd_code": "G40.109",
+    "primary_diagnosis": "Focal epilepsy of left temporal lobe origin secondary to left temporal melanoma metastasis (with concurrent suspected immune-related neurotoxicity from checkpoint inhibitors)",
+    "icd_code": "G40.219",
     "differential": [
       {
-        "diagnosis": "Focal epilepsy secondary to left temporal metastasis",
+        "diagnosis": "Immune-checkpoint-inhibitor neurotoxicity (encephalitis / myelitis)",
         "likelihood": "high",
-        "key_features": "Stereotyped episodes with temporal semiology (epigastric aura, deja vu, behavioral arrest, oroalimentary automatisms), growing left temporal lesion with hippocampal involvement, subtherapeutic AED levels, elevated post-ictal prolactin"
+        "key_features": "Onset within weeks of immunotherapy; broad inflammatory CNS pattern possible.",
+        "icd_code": "G04.81"
       },
       {
-        "diagnosis": "Immune checkpoint inhibitor-associated encephalitis",
-        "likelihood": "low",
-        "key_features": "Temporal relationship with immunotherapy is suggestive, but stereotyped semiology, structural lesion, negative autoimmune panels, and absence of progressive encephalopathy argue against"
-      },
-      {
-        "diagnosis": "Immune checkpoint inhibitor-associated motor neuropathy (concurrent, not explaining episodes)",
+        "diagnosis": "Leptomeningeal melanomatosis",
         "likelihood": "moderate",
-        "key_features": "Mild motor axonal neuropathy on EMG/NCS, temporal relationship with immunotherapy, lower extremity weakness; however, this does not explain the paroxysmal episodes"
+        "key_features": "Multifocal cranial-nerve / radicular signs and CSF cytology positive.",
+        "icd_code": "C79.32"
       },
       {
         "diagnosis": "Paraneoplastic limbic encephalitis",
         "likelihood": "low",
-        "key_features": "Negative paraneoplastic antibody panel, no progressive cognitive decline, stereotyped rather than progressive symptoms"
+        "key_features": "Subacute amnestic syndrome with antibody panel positivity.",
+        "icd_code": "G13.1"
       },
       {
-        "diagnosis": "Cardiac syncope",
+        "diagnosis": "Treatment-related metabolic / endocrine encephalopathy (hypophysitis)",
+        "likelihood": "low",
+        "key_features": "ICI-induced hypophysitis can cause encephalopathy; cortisol, TSH/T4 distinguish.",
+        "icd_code": "E23.0"
+      },
+      {
+        "diagnosis": "Cerebrovascular event (drug-related vasculopathy)",
         "likelihood": "very_low",
-        "key_features": "Normal ECG, episodes have positive motor phenomena (automatisms) and post-ictal confusion inconsistent with syncope"
+        "key_features": "MRI DWI excludes acute infarct.",
+        "icd_code": "I63.9"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain routine EEG to evaluate for epileptiform activity",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Non-specific left temporal slowing with benign variants; no definitive epileptiform discharges on initial routine study",
+        "action": "Obtain detailed seizure history including semiology, aura, automatisms, duration, frequency, witness accounts, and post-ictal features.",
+        "tool_name": null,
+        "expected_finding": "Stereotyped focal impaired-awareness events with temporal-lobe aura and post-ictal confusion.",
         "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
+        "tool_parameters": {},
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 2,
-        "action": "Review brain MRI to assess temporal lesion and mass effect",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Growth of left temporal metastasis with perilesional edema involving hippocampal formation",
+        "action": "Perform complete neurological examination.",
+        "tool_name": null,
+        "expected_finding": "Interictal exam typically normal; subtle memory deficit may be present.",
         "category": "required",
-        "tool_parameters": {
-          "protocol": "tumor",
-          "contrast": false
-        }
+        "tool_parameters": {},
+        "citation": "",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Obtain comprehensive laboratory studies including AED levels, metabolic panel, and thyroid function",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Subtherapeutic levetiracetam level, elevated TSH, elevated post-ictal prolactin, steroid-related metabolic derangements",
+        "action": "Order EEG (routine first; pursue ambulatory or video-EEG if non-diagnostic) to identify interictal epileptiform discharges and capture habitual events.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Interictal sharps/spikes and/or focal slowing in the anterior temporal region; ictal correlate confirms diagnosis.",
         "category": "required",
         "tool_parameters": {
-          "panels": [
-            "thyroid",
-            "AED_levels"
-          ]
-        }
+          "eeg_type": "routine"
+        },
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 4,
-        "action": "Obtain ECG to rule out cardiac etiology for episodes of unresponsiveness",
-        "tool_name": "analyze_ecg",
-        "expected_finding": "Normal sinus rhythm with non-specific T-wave changes; no arrhythmia",
-        "category": "recommended"
+        "action": "Order MRI brain with dedicated epilepsy protocol (thin-cut coronal T1/FLAIR/T2/DWI through the hippocampi).",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Hippocampal sclerosis, low-grade tumor (DNET, ganglioglioma), cavernoma, or focal cortical dysplasia; rule out alternative structural causes.",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "epilepsy",
+          "contrast": true
+        },
+        "citation": "[AAN_2007]",
+        "guideline_source": "AAN_2007"
       },
       {
         "step": 5,
-        "action": "Request prolonged video-EEG monitoring to capture habitual events",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Left temporal seizures captured with clinical correlation confirming focal epilepsy",
+        "action": "Obtain CBC, comprehensive metabolic panel, prolactin (if drawn within 10–20 min of event), and AED levels if on therapy.",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Exclude metabolic provocation (hypoglycemia, hyponatremia, uremia); baseline organ function for AED selection; AED level for adherence and dosing.",
         "category": "required",
         "tool_parameters": {
-          "eeg_type": "video"
-        }
+          "panels": [
+            "CBC",
+            "CMP",
+            "prolactin"
+          ]
+        },
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 6,
-        "action": "Request 3T MRI with epilepsy protocol to evaluate hippocampal involvement",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Confirmation of tumor extension into hippocampal body and amygdala",
-        "category": "recommended",
-        "tool_parameters": {
-          "protocol": "epilepsy",
-          "contrast": false
-        }
+        "action": "Search current literature for AED selection in focal epilepsy and ILAE 2017 seizure classification.",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Evidence-based AED options for focal epilepsy (levetiracetam, lamotrigine, oxcarbazepine, lacosamide); ILAE classification framework.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 7,
-        "action": "Consider CSF analysis to evaluate for autoimmune or paraneoplastic etiology",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Mild pleocytosis with elevated protein; negative autoimmune and paraneoplastic panels",
-        "category": "recommended"
+        "action": "Check drug interactions before initiating or modifying AED therapy (enzyme inducers, OCP, other CNS-active drugs).",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identify pharmacokinetic interactions (CYP induction by carbamazepine/phenytoin) and CNS adverse-effect overlap.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 8,
-        "action": "Check drug interactions for AED optimization in the setting of immunotherapy",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Levetiracetam safe with immunotherapy; avoid enzyme-inducing AEDs",
-        "category": "recommended"
+        "action": "Pursue prolonged video-EEG monitoring to capture habitual events, confirm lateralization, and evaluate surgical candidacy.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Capture of habitual focal seizure with electrographic correlate; concordance with imaging supports surgical workup.",
+        "category": "recommended",
+        "tool_parameters": {
+          "eeg_type": "video"
+        },
+        "citation": "[Engel_2003]",
+        "guideline_source": "Engel_2003"
       },
       {
         "step": 9,
-        "action": "Search literature on seizure management in brain metastasis patients on checkpoint inhibitors",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Evidence supporting AED optimization and definitive lesion treatment for seizure control",
-        "category": "recommended"
+        "action": "Obtain CSF analysis with cell count, protein, glucose, cytology, flow cytometry, autoimmune-encephalitis panel and oligoclonal bands once imaging excludes mass effect.",
+        "tool_name": "analyze_csf",
+        "expected_finding": "CSF cytology positive for melanoma cells or evidence of immune-mediated inflammation; rules out neoplastic vs autoimmune cause.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[AAN_2007]",
+        "guideline_source": "AAN_2007"
+      },
+      {
+        "step": 10,
+        "action": "Order FDG-PET to evaluate metabolic activity of the temporal lesion and identify additional metastatic foci.",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Hypermetabolic temporal lesion supports active metastasis or inflammation; identifies further lesions for staging.",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[Willmann_2007]",
+        "guideline_source": "Willmann_2007"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "echo_type": "TTE"
+        },
+        "rationale": "No syncope-versus-seizure question and no structural-heart concern; echocardiogram contributes nothing to epilepsy workup.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "Ambulatory cardiac monitoring is reserved for syncope-versus-seizure differentiation; not indicated when semiology is clearly epileptic.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT is inferior to MRI for detecting epileptogenic substrates (hippocampal sclerosis, FCD, low-grade tumor) and adds ionizing radiation without diagnostic yield.",
+        "citation": "[AAN_2007]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "Exclude mass effect before LP in a patient with intracranial metastases.",
+        "citation": "[AAN_2007]",
+        "severity": "hard"
+      },
+      {
+        "before": "analyze_brain_mri",
+        "after": "check_drug_interactions",
+        "reason": "Structural cause influences AED choice (e.g., low-grade tumor → consider AEDs with CYP-neutral profile; hippocampal sclerosis → multiple equally appropriate options). MRI should inform drug selection.",
+        "citation": "[ILAE_drug_2017]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Obtain prolonged video-EEG monitoring to capture and characterize the paroxysmal episodes",
-      "Review brain MRI to assess the left temporal metastasis and its relationship to mesial temporal structures",
-      "Check levetiracetam serum level and optimize antiepileptic drug therapy",
-      "Distinguish focal seizures from immune-mediated encephalitis, as management differs significantly",
-      "Ensure adequate seizure precautions given breakthrough events",
-      "Coordinate with oncology regarding definitive management of the growing temporal metastasis"
+      "Obtain contrasted MRI to characterize the temporal lesion, look for additional metastases, and evaluate for ICI-related inflammatory changes.",
+      "Send CSF for cytology, autoimmune-encephalitis panel, and infectious workup once mass effect is excluded.",
+      "Coordinate with oncology and neuro-oncology regarding continued immunotherapy, possible high-dose steroids for ICI neurotoxicity, and management of CNS metastasis (stereotactic radiosurgery, surgical resection).",
+      "Initiate non-enzyme-inducing AED (levetiracetam, lacosamide) appropriate in a cancer patient.",
+      "Counsel on driving restrictions and document seizure log."
     ],
     "contraindicated_actions": [
-      "Attributing paroxysmal episodes to anxiety or chemotherapy side effects without diagnostic workup",
-      "Discontinuing levetiracetam without adequate seizure evaluation",
-      "Starting enzyme-inducing antiepileptic drugs (phenytoin, carbamazepine) that may interfere with oncologic therapies",
-      "Initiating high-dose corticosteroids for presumed immune encephalitis without confirming the diagnosis, as steroids may mask symptoms and affect immunotherapy efficacy",
-      "Withholding EEG monitoring due to assumption that the known metastasis fully explains all symptoms"
+      "Do not perform LP before MRI confirms no mass effect.",
+      "Do not start phenytoin or carbamazepine in a patient on immunotherapy without considering drug-drug interactions and steroid co-administration.",
+      "Do not attribute symptoms solely to immunotherapy toxicity without ruling out structural metastasis."
     ],
     "key_reasoning_points": [
-      "The stereotyped semiology (epigastric aura, deja vu, behavioral arrest, oroalimentary automatisms, right hand automatisms, head version to right) is classic for left temporal lobe seizures, not panic attacks or chemotherapy side effects",
-      "A growing left temporal metastasis with perilesional edema extending into the hippocampal formation provides a clear structural epileptogenic substrate",
-      "Subtherapeutic levetiracetam levels (8.2 mcg/mL, therapeutic range 12-46) due to non-adherence explain breakthrough seizures despite prophylaxis",
-      "Elevated post-ictal prolactin (42 ng/mL, drawn 30 minutes after event) supports an epileptic mechanism over non-epileptic events",
-      "The initial routine EEG was non-diagnostic (as expected — single routine EEG sensitivity is only 29-55%), requiring prolonged video-EEG monitoring to capture seizures",
-      "The concurrent mild motor axonal neuropathy (likely checkpoint inhibitor-related) is a separate process and should not distract from the primary diagnosis of focal epilepsy",
-      "Negative autoimmune encephalitis and paraneoplastic panels argue against immune-mediated encephalitis, confirming the seizures are structural rather than autoimmune in etiology",
-      "The diagnostic puzzle arises from multiple competing hypotheses: progressive metastatic disease, immune-mediated neurotoxicity (encephalitis vs neuropathy), paraneoplastic syndrome, and structural epilepsy — requiring systematic evaluation to distinguish"
+      "Both ICI neurotoxicity and CNS metastasis are common in this clinical context; both can produce focal seizures.",
+      "MRI with contrast plus FDG-PET clarify whether a lesion is metabolically active.",
+      "CSF cytology and autoimmune-encephalitis panel distinguish neoplastic from inflammatory CNS disease.",
+      "AED choice must avoid enzyme induction interfering with cancer therapy."
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "Recent ipilimumab + nivolumab immunotherapy with onset of symptoms ~10 days after a cycle.",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Attribute all neurological findings to immunotherapy toxicity and start high-dose steroids without imaging.",
+        "correct_interpretation": "Concurrent CNS metastasis must be excluded by contrasted MRI before assuming purely immune-mediated etiology."
+      }
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -1000,6 +1076,16 @@
       "ct": "incidental",
       "echo": "normal",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (FEPI-TEMP)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FEPI-TEMP",
+    "difficulty_rationale": "Cancer patient on checkpoint inhibitors with focal temporal seizures requires parallel workup for metastasis and immune-related neurotoxicity, including CSF (justified by encephalitis concern), advanced imaging, and careful AED selection.",
+    "case_body_concerns": [
+      "useless_tools entry for `analyze_ecg` dropped: tool output is provided up-front in initial_tool_outputs, so declaring it useless to call would be incoherent (agent never had to call it)."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

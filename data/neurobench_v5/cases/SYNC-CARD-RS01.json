@@ -637,146 +637,226 @@
   },
   "ground_truth": {
     "primary_diagnosis": "Cardiac syncope due to complete (third-degree) atrioventricular block",
-    "icd_code": "R55",
+    "icd_code": "I44.2",
     "differential": [
       {
-        "diagnosis": "Vasovagal syncope",
+        "diagnosis": "Vasovagal (neurally-mediated) syncope with procedural trigger",
+        "likelihood": "high",
+        "key_features": "Procedural setting and anxiety raise vasovagal possibility, but documented complete AV block on ECG identifies the cardiac substrate.",
+        "icd_code": "R55.01"
+      },
+      {
+        "diagnosis": "Local-anaesthetic systemic toxicity (LAST)",
+        "likelihood": "moderate",
+        "key_features": "Lidocaine injection raises LAST as a consideration; dose, timing and lipid-emulsion rescue protocol address.",
+        "icd_code": "T41.3"
+      },
+      {
+        "diagnosis": "Sustained ventricular tachycardia / fibrillation",
+        "likelihood": "moderate",
+        "key_features": "Periprocedural arrest must exclude VF; ECG with junctional escape and AV dissociation argues for complete heart block.",
+        "icd_code": "I47.2"
+      },
+      {
+        "diagnosis": "Pulmonary embolism",
         "likelihood": "low",
-        "key_features": "Procedural setting with pain and anxiety could suggest vasovagal etiology, but the complete heart block on ECG, prior near-syncopal episodes unrelated to pain or emotional triggers, and chronotropic incompetence establish a cardiac etiology as primary"
+        "key_features": "Acute syncope in a young woman warrants consideration; D-dimer and CT-PA address.",
+        "icd_code": "I26.99"
       },
       {
-        "diagnosis": "Local anesthetic systemic toxicity (LAST)",
+        "diagnosis": "Convulsive epileptic seizure",
         "likelihood": "very_low",
-        "key_features": "The total lidocaine dose (10-20 mg) was far below toxic thresholds; proper intramuscular placement was confirmed with ultrasound; no preceding CNS symptoms of LAST (tinnitus, perioral numbness, seizure)"
-      },
-      {
-        "diagnosis": "Epileptic seizure",
-        "likelihood": "low",
-        "key_features": "Normal EEG without epileptiform discharges, very brief loss of consciousness with rapid return to baseline, no tonic-clonic activity, no post-ictal confusion beyond 20-30 seconds, and ECG showing complete heart block"
-      },
-      {
-        "diagnosis": "Anaphylaxis to lidocaine",
-        "likelihood": "very_low",
-        "key_features": "No urticaria, angioedema, bronchospasm, or other allergic features; true IgE-mediated lidocaine allergy is exceedingly rare; rapid resolution inconsistent with anaphylaxis"
-      },
-      {
-        "diagnosis": "Psychogenic non-epileptic event",
-        "likelihood": "very_low",
-        "key_features": "Although patient has anxiety and depression, the documented loss of pulse and unshockable rhythm on AED with CPR requirement cannot be psychogenic; complete heart block on ECG provides a clear organic explanation"
+        "key_features": "Brief loss of consciousness with rapid recovery and documented cardiac arrest is not epilepsy.",
+        "icd_code": "G40.909"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain 12-lead ECG immediately upon arrival to emergency department",
+        "action": "12-lead ECG immediately on return of consciousness",
         "tool_name": "analyze_ecg",
-        "expected_finding": "Complete (third-degree) AV block with junctional escape rhythm at 38 bpm",
-        "category": "required"
+        "expected_finding": "Third-degree AV block with junctional escape at ~38 bpm",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.2"
       },
       {
         "step": 2,
-        "action": "Order comprehensive laboratory evaluation including CBC, BMP, cardiac biomarkers (troponin, BNP), TSH, and magnesium",
+        "action": "Labs: CBC, BMP, Mg, troponin, BNP, TSH, lactate, blood gas",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal labs, ruling out metabolic and ischemic causes of conduction block",
+        "expected_finding": "Document peri-arrest metabolic profile; troponin tracks myocardial stress",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
-            "thyroid",
-            "troponin"
+            "magnesium",
+            "troponin",
+            "BNP",
+            "TSH"
           ]
-        }
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.3"
       },
       {
         "step": 3,
-        "action": "Obtain EEG to evaluate for epileptic etiology given witnessed loss of consciousness with possible convulsive movements",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Normal EEG without epileptiform discharges, supporting cardiac rather than epileptic etiology",
-        "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
-      },
-      {
-        "step": 4,
-        "action": "Request urgent cardiology consultation for permanent pacemaker implantation",
-        "tool_name": null,
-        "expected_finding": "Cardiology concurs with indication for permanent dual-chamber pacemaker",
-        "category": "required"
-      },
-      {
-        "step": 5,
-        "action": "Initiate continuous telemetry monitoring and transcutaneous pacing capability at bedside",
-        "tool_name": null,
-        "expected_finding": "Continuous monitoring for hemodynamic stability while awaiting pacemaker",
-        "category": "required"
-      },
-      {
-        "step": 6,
-        "action": "Order transthoracic echocardiogram to evaluate for structural heart disease",
+        "action": "Echocardiogram",
         "tool_name": "order_echocardiogram",
-        "expected_finding": "Normal biventricular function, mild MVP, no structural cause of AV block",
+        "expected_finding": "LV function, mitral valve prolapse and structural assessment",
         "category": "required",
         "tool_parameters": {
           "echo_type": "TTE"
-        }
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §4.1"
+      },
+      {
+        "step": 4,
+        "action": "Continuous telemetry; pacing plan",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Persistent complete AV block",
+        "category": "required",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "citation": "[Locati_2014]",
+        "guideline_source": "Locati 2014"
+      },
+      {
+        "step": 5,
+        "action": "Medication and procedural review",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Review for AV-nodal blockers; assess lidocaine dosing for LAST exclusion",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §6"
+      },
+      {
+        "step": 6,
+        "action": "Confirm pacing indication for third-degree AV block",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Class I pacing indication",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ACC_AHA_HRS_2017]",
+        "guideline_source": "ACC/AHA/HRS 2017 §4"
       },
       {
         "step": 7,
-        "action": "Search medical literature on cardiac syncope and complete heart block management in young adults",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "ACC/AHA guidelines confirm Class I indication for permanent pacing in symptomatic complete heart block",
-        "category": "recommended"
+        "action": "Cardiology / EP consult for permanent pacing",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Pacemaker plan",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ACC_AHA_HRS_2017]",
+        "guideline_source": "ACC/AHA/HRS 2017 §4"
       },
       {
         "step": 8,
-        "action": "Check drug interactions for current medications in context of QTc prolongation",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Escitalopram may contribute to QTc prolongation; monitor after pacemaker implantation",
-        "category": "recommended"
+        "action": "Cardiac MRI for substrate characterisation if etiology unclear (young patient, no obvious structural disease)",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Identify infiltrative / inflammatory contributors",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "perfusion_MRI"
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §4.3"
       },
       {
         "step": 9,
-        "action": "Order Lyme serology, inflammatory markers, and ACE level to exclude reversible causes of AV block",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Negative Lyme serology, normal inflammatory markers, excluding reversible infectious or inflammatory causes",
-        "category": "recommended",
+        "action": "Tilt-table only if neurally-mediated component remains unclear after pacing decision",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Identify coexisting vasovagal contribution; not used to confirm cardiac syncope",
+        "category": "optional",
         "tool_parameters": {
-          "panels": [
-            "inflammatory_markers"
-          ]
-        }
+          "test_type": "tilt_table"
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.4"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "No focal neurological deficit; brain MRI is low-yield in cardiac syncope.",
+        "citation": "[ACC_AHA_HRS_2017]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "No head injury; head CT not indicated.",
+        "citation": "[ACC_AHA_HRS_2017]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No CNS infection or encephalopathy.",
+        "citation": ""
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_ecg",
+        "after": "consult_medical_specialist",
+        "reason": "ECG drives pacing pathway.",
+        "citation": "[ESC_2018]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "order_cardiac_monitoring",
+        "reason": "Troponin and labs must precede monitoring/pacing strategy.",
+        "citation": "[ROSE_2010]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Identify complete heart block on ECG as the cause of syncope and cardiac arrest",
-      "Initiate continuous cardiac monitoring with transcutaneous pacing capability immediately available",
-      "Obtain urgent cardiology consultation for permanent pacemaker implantation",
-      "Rule out reversible causes of complete heart block (electrolytes, ischemia, Lyme disease, hypothyroidism)",
-      "Recognize that the procedural setting (trigger point injection) was a coincidental context and not the primary cause of the cardiac arrest"
+      "Admit to telemetry",
+      "Permanent pacing for symptomatic third-degree AV block",
+      "Review periprocedural lidocaine dosing for LAST exclusion",
+      "Counsel on driving restriction"
     ],
     "contraindicated_actions": [
-      "Diagnosing the event as vasovagal syncope without recognizing the underlying complete heart block",
-      "Initiating antiepileptic medications based on the brief convulsive movements (convulsive syncope, not seizure)",
-      "Discharging the patient without continuous cardiac monitoring and cardiology evaluation",
-      "Attributing the cardiac arrest solely to local anesthetic toxicity and missing the underlying conduction disease",
-      "Administering atropine as definitive treatment for complete heart block (may be temporarily useful but does not address the need for permanent pacing)",
-      "Starting rate-lowering medications (beta-blockers, calcium channel blockers) which would worsen bradycardia"
+      "Do not attribute arrest solely to vasovagal mechanism without addressing the documented AV block",
+      "Do not give further AV-nodal blockers",
+      "Do not delay pacing while awaiting tilt-table",
+      "Do not allow driving until clearance"
     ],
     "key_reasoning_points": [
-      "The complete heart block on ECG is the unifying diagnosis explaining both the acute cardiac arrest during the procedure and the prior near-syncopal episodes over the past three months",
-      "Vasovagal syncope was a reasonable initial consideration given the procedural context (pain, anxiety, needle phobia) but the ECG findings and history of prior unprovoked near-syncopal episodes point to a cardiac conduction etiology",
-      "Local anesthetic systemic toxicity (LAST) is exceedingly unlikely given the very low dose of lidocaine (10-20 mg total), proper intramuscular placement confirmed by ultrasound, and absence of preceding CNS toxicity symptoms",
-      "The brief convulsive movements observed represent convulsive syncope (myoclonic jerking due to cerebral hypoperfusion) rather than an epileptic seizure, as supported by the normal EEG and rapid return to baseline consciousness",
-      "Normal cardiac biomarkers (troponin, BNP) exclude acute myocardial infarction and decompensated heart failure as contributors",
-      "The family history of sudden cardiac death in the father at age 45 and paternal grandmother requiring a pacemaker raises concern for a familial conduction system disease and should prompt genetic counseling consideration",
-      "The QTc prolongation observed is secondary to the marked bradycardia and is expected to improve with adequate pacing; however, the concurrent use of escitalopram warrants monitoring"
+      "A documented complete AV block with junctional escape during procedural stress is a cardiac syncope, not vasovagal",
+      "LAST should be considered but the lidocaine dose (1 mL of 1%) is far below toxicity",
+      "Pacing is the definitive therapy",
+      "Tilt-table here is only useful if a coexisting vasovagal contribution needs characterisation post-pacing"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "Anxiety and procedural setting",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Anchors clinician to vasovagal interpretation.",
+        "correct_interpretation": "ECG shows complete AV block — the substrate is cardiac and requires pacing."
+      },
+      {
+        "data_point": "History of mitral valve prolapse",
+        "location": "patient.clinical_history.past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "May be invoked as the explanation for arrest.",
+        "correct_interpretation": "MVP alone does not cause complete AV block; the documented rhythm identifies the substrate."
+      },
+      {
+        "data_point": "Lidocaine injection just before arrest",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Suggests LAST as the mechanism.",
+        "correct_interpretation": "Dose (1 mL of 1%) is far below LAST threshold; rhythm is complete AV block, not LAST-pattern VT."
+      }
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -790,6 +870,14 @@
       "mri": "normal",
       "csf": "normal",
       "ct": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SYNC-CARD",
+    "difficulty_rationale": "ECG-diagnostic complete AV block; main complexity is overriding the appealing 'procedural vasovagal' anchor and excluding LAST.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

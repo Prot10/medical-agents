@@ -75,115 +75,112 @@
     "extremities": "No edema; no rash"
   },
   "ground_truth": {
-    "primary_diagnosis": "Migraine with sensory (somatosensory) aura (G43.1), ICHD-3 criteria met; menstrually-related migraine pattern",
-    "primary_diagnosis_icd": "G43.1",
+    "primary_diagnosis": "Migraine with sensory (somatosensory) aura, menstrually-related (ICHD-3 1.2.1)",
+    "icd_code": "G43.109",
     "differential": [
       {
-        "diagnosis": "Transient ischemic attack (parietal/thalamic)",
+        "diagnosis": "Focal sensory (Jacksonian) seizure",
         "likelihood": "very_low",
-        "key_features": "TIA is sudden onset, negative symptoms, brief (<60 min), no headache; spreading sensory march over 15-25 min is migraine aura; normal DWI; normal MRA"
+        "key_features": "Seizure propagation is seconds, not minutes; no loss of awareness; no inter-ictal epileptiform discharges",
+        "icd_code": "G40.109"
       },
       {
-        "diagnosis": "Multiple sclerosis (sensory relapse)",
+        "diagnosis": "Transient ischemic attack",
         "likelihood": "very_low",
-        "key_features": "MS episodes are not followed by headache; no T2/FLAIR periventricular lesions; no McDonald criteria met; single tiny WMH is insufficient"
+        "key_features": "Stereotyped 3-year recurrent pattern, young woman, no vascular risk factors — incompatible with TIA",
+        "icd_code": "G45.9"
       },
       {
-        "diagnosis": "Focal sensory seizure (parietal lobe)",
+        "diagnosis": "Multiple sclerosis with sensory symptoms",
         "likelihood": "very_low",
-        "key_features": "Sensory seizures are typically brief (<1 min) and stereotyped; aura spreading over 15-25 minutes is characteristically migraine; no interictal EEG abnormality"
+        "key_features": "Episodic stereotyped sensory marches are not the temporal pattern of MS attacks; no other neurological deficits",
+        "icd_code": "G35"
+      },
+      {
+        "diagnosis": "Cervical radiculopathy / peripheral entrapment",
+        "likelihood": "very_low",
+        "key_features": "Hand-to-face march crosses dermatomes — central (cortical) origin, not peripheral",
+        "icd_code": "M54.12"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI with DWI to exclude TIA and MS",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Normal brain MRI; single 2mm subcortical WMH — insufficient for MS; normal DWI; no periventricular lesions",
-        "category": "recommended",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
+        "category": "required",
         "tool_parameters": {
-          "contrast": true,
-          "sequences": [
-            "DWI",
-            "T2",
-            "FLAIR"
-          ]
-        }
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "Laboratory workup — CBC, inflammatory markers, ANA, antiphospholipid antibodies, TSH",
-        "tool_name": "interpret_labs",
-        "expected_finding": "All values normal — no inflammatory, autoimmune, or coagulation abnormality",
-        "category": "recommended",
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sumatriptan appropriate; consider menstrual prevention (frovatriptan / NSAID short course) [Holland_2012]",
+        "category": "required",
         "tool_parameters": {
-          "lab_type": "headache_workup"
-        }
-      },
-      {
-        "step": 3,
-        "action": "Prescribe sumatriptan 100 mg for acute attacks (at headache onset)",
-        "tool_name": null,
-        "expected_finding": "Sumatriptan effective from patient's trial; prescribe at headache onset; do not use during sensory aura",
-        "category": "recommended",
-        "tool_parameters": {}
-      },
-      {
-        "step": 4,
-        "action": "Initiate preventive therapy — topiramate 25 mg → 50 mg BID, given MIDAS Grade IV",
-        "tool_name": null,
-        "expected_finding": "Monthly frequency with MIDAS Grade IV; topiramate 25-50 mg BID first-line",
-        "category": "recommended",
-        "tool_parameters": {}
-      },
-      {
-        "step": 5,
-        "action": "Peri-menstrual mini-prophylaxis with frovatriptan 2.5 mg BID for 6 days around menses",
-        "tool_name": null,
-        "expected_finding": "Frovatriptan 2.5 mg BID for 6 days peri-menstrually is evidence-based mini-prophylaxis for menstrually-related migraine",
-        "category": "recommended",
-        "tool_parameters": {}
+          "context": "migraine_with_aura_pharmacotherapy"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis — neither present here",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated in typical migraine with aura — no role unless cardioembolic stroke is on the differential",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is not indicated for migraine with aura; reserve for cases where focal seizure is genuinely on the differential",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "Brain MRI to exclude structural secondary causes including MS and TIA",
-      "Recognize Jacksonian march of sensory symptoms over 15-25 minutes as migraine aura, not TIA",
-      "Prescribe triptan — confirmed effective from patient's trial",
-      "Initiate preventive therapy given monthly frequency and MIDAS Grade IV",
-      "Avoid combined oral contraceptives"
+      "Confirm ICHD-3 1.2 criteria for migraine with sensory aura",
+      "Document menstrual trigger pattern in headache diary",
+      "Counsel against combined OCP (WHO Category 4)",
+      "Discuss perimenstrual mini-prophylaxis (e.g., frovatriptan or naproxen 4-5 days around menses) [Holland_2012]"
     ],
     "contraindicated_actions": [
-      "Do not start combined OCP — contraindicated in migraine with aura",
-      "Do not give triptan during sensory aura phase — wait for headache onset",
-      "Do not anticoagulate for TIA without confirmed TIA on imaging"
+      "Do not start combined oestrogen-progestogen contraception",
+      "Do not co-administer triptans with ergotamines"
     ],
     "key_reasoning_points": [
-      "Sensory aura spreading slowly (15-25 minutes) from fingertips to face (Jacksonian march pattern) is characteristic of migraine cortical spreading depression, not TIA",
-      "TIA sensory symptoms are sudden-onset, maximal immediately, and typically resolve within minutes",
-      "Normal DWI definitively excludes acute ischemic event",
-      "Small PFO found but PFO closure is not indicated without prior cryptogenic stroke",
-      "Menstrually-related pattern supports estrogen withdrawal as trigger — frovatriptan mini-prophylaxis is evidence-based strategy"
+      "Hand-to-face sensory march over minutes is the hallmark of cortical spreading depression; the rate excludes seizure (seconds) and TIA (instantaneous)",
+      "Menstrually-related migraine is a recognised pattern and the criteria pack allows perimenstrual mini-prophylaxis",
+      "No imaging or laboratory test is required when ICHD-3 criteria are met and there are no SNOOP red flags"
     ],
     "red_herrings": [
       {
-        "data_point": "Small PFO on bubble echo",
-        "location": "patient.history_present_illness",
-        "intended_effect": "PFO in patient with hemisensory episodes might trigger TIA/stroke workup or closure discussion",
-        "correct_interpretation": "PFO closure not indicated for migraine without prior stroke (PREMIUM, MIST trials negative); 5-year identical episodic history is migraine",
-        "field_path": ""
-      },
-      {
-        "data_point": "Single subcortical white matter hyperintensity",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Any WMH in a young person with sensory symptoms might raise MS concern",
-        "correct_interpretation": "Single 2mm WMH is insufficient for MS (2017 McDonald criteria require ≥2 lesions in at least 2 of 4 locations); non-specific finding in migraineurs",
-        "field_path": ""
+        "data_point": "Brain MRI obtained as part of workup",
+        "location": "initial_tool_outputs.mri",
+        "field_path": "initial_tool_outputs.mri",
+        "intended_effect": "The fact that imaging was performed may suggest it was required",
+        "correct_interpretation": "MRI in this case is over-investigation; routine MRI is not indicated in typical migraine with aura [AAN_2000]"
       }
-    ],
-    "icd_code": "G43.1",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -207,7 +204,17 @@
       "ct": "normal",
       "cardiac_monitoring": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Straightforward: classic stereotyped sensory aura with menstrual pattern, no red flags, 2 required tools",
+    "case_body_concerns": [
+      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide §1): ['analyze_brain_mri', 'analyze_ecg', 'interpret_labs', 'order_advanced_imaging', 'order_echocardiogram']"
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "initial_tool_outputs": {
     "mri": {

@@ -1,7 +1,7 @@
 {
   "case_id": "MIG-AURA-S04",
   "condition": "migraine_with_aura",
-  "difficulty": "straightforward",
+  "difficulty": "moderate",
   "encounter_type": "outpatient",
   "patient": {
     "age": 35,
@@ -75,90 +75,113 @@
     "extremities": "No edema"
   },
   "ground_truth": {
-    "primary_diagnosis": "Migraine with typical visual aura (G43.1), increasing frequency; comorbid Stage 1 hypertension",
-    "primary_diagnosis_icd": "G43.1",
+    "primary_diagnosis": "Migraine with typical visual aura (ICHD-3 1.2.1) with comorbid stage 1 hypertension",
+    "icd_code": "G43.109",
     "differential": [
       {
-        "diagnosis": "Hypertensive retinopathy with visual symptoms",
-        "likelihood": "very_low",
-        "key_features": "Stage 1 HTN (128/78) is not severe enough to cause hypertensive visual symptoms; normal fundoscopy; 7-year history predates HTN diagnosis; spreading visual aura is migraine"
+        "diagnosis": "Migraine without aura with rising frequency",
+        "likelihood": "low",
+        "key_features": "Aura is stereotyped and well-documented; differential is between aura and aura-less episodes",
+        "icd_code": null
       },
       {
-        "diagnosis": "TIA (posterior circulation)",
+        "diagnosis": "Hypertensive headache",
         "likelihood": "very_low",
-        "key_features": "Normal DWI; 7-year identical history; slow spreading over 20-30 min (migraine); followed by headache (not TIA pattern)"
+        "key_features": "BP 128/78 today; stage 1 HTN is not by itself a sufficient explanation for stereotyped aura plus headache",
+        "icd_code": "I10"
+      },
+      {
+        "diagnosis": "Posterior reversible encephalopathy syndrome (PRES)",
+        "likelihood": "very_low",
+        "key_features": "PRES presents with marked acute hypertension, encephalopathy, and bilateral parieto-occipital oedema — none present",
+        "icd_code": "G93.49"
+      },
+      {
+        "diagnosis": "Focal occipital seizure",
+        "likelihood": "very_low",
+        "key_features": "Aura duration and stereotyped pattern over 7 years are inconsistent with seizure",
+        "icd_code": "G40.109"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI to exclude secondary causes",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Non-specific periventricular WMH (4 foci) consistent with hypertension and migraine; no MS pattern; no DWI restriction",
-        "category": "recommended",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
+        "category": "required",
         "tool_parameters": {
-          "contrast": true
-        }
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "Optimize BP control and cardiovascular risk reduction",
-        "tool_name": "interpret_labs",
-        "expected_finding": "All values within normal limits; BP 128/78 represents Stage 1 hypertension — add propranolol for dual migraine prevention and BP control",
-        "category": "recommended",
-        "tool_parameters": {}
-      },
-      {
-        "step": 3,
-        "action": "Initiate propranolol as dual migraine prevention and antihypertensive",
-        "tool_name": null,
-        "expected_finding": "Propranolol addresses both migraine prevention and hypertension; dual indication",
-        "category": "recommended",
-        "tool_parameters": {}
-      },
-      {
-        "step": 4,
-        "action": "Reduce sumatriptan dose to 25-50 mg when propranolol is started",
-        "tool_name": null,
-        "expected_finding": "Propranolol addresses both migraine prevention and hypertension; dual indication",
-        "category": "recommended",
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sumatriptan appropriate; HTN is not a contraindication at this BP; propranolol attractive as it treats both HTN and migraine; check for triptan-SSRI interactions if any",
+        "category": "required",
         "tool_parameters": {
-          "drug_1": "sumatriptan",
-          "drug_2": "propranolol"
-        }
+          "context": "migraine_with_aura_pharmacotherapy"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis — neither present here",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Routine transthoracic / bubble echocardiogram (PFO screening) is NOT indicated in migraine with aura; PFO-migraine association is controversial and PFO closure does not reduce migraine [Charles_2017]",
+        "citation": "[Charles_2017]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated in typical migraine with aura — no role unless cardioembolic stroke is on the differential",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "Recognize that propranolol addresses both hypertension and migraine prevention",
-      "Counsel on reducing sumatriptan dose when starting propranolol (drug interaction)",
-      "Target BP <130/80 — migraine with aura + HTN increases stroke risk",
-      "Counsel on avoiding triggers (wine, sleep disruption)",
-      "Brain MRI to exclude structural cause given increased frequency"
+      "Confirm ICHD-3 1.2 criteria are met",
+      "Address modifiable triggers (sleep deprivation from shift work)",
+      "Initiate preventive therapy — propranolol attractive as it treats both stage 1 HTN and migraine [Holland_2012]",
+      "Optimise blood pressure (lifestyle ± pharmacotherapy)"
     ],
     "contraindicated_actions": [
-      "Do not start combined OCP (HTN + migraine with aura doubles stroke risk)",
-      "Do not use triptans if BP becomes uncontrolled (>160/100)"
+      "Do not start combined oestrogen-progestogen contraception",
+      "Do not co-administer triptans with ergotamines",
+      "Do not assume new-onset HTN is the cause of migraine attacks without re-examining the diagnostic criteria"
     ],
     "key_reasoning_points": [
-      "Classic expanding visual fortification over 20-30 min, 7-year history, family history = classic migraine with aura",
-      "Propranolol is ideal: antihypertensive AND first-line migraine preventive",
-      "Propranolol inhibits CYP2D6 and increases sumatriptan levels — reduce triptan dose",
-      "Migraine with aura + HTN represents additive stroke risk",
-      "Increased frequency correlates with work stress and sleep disruption (modifiable triggers)"
+      "Comorbid HTN does not change the migraine diagnosis but informs preventive selection (favour beta-blocker)",
+      "Sumatriptan is not contraindicated at stage 1 HTN, but caution and BP monitoring are warranted",
+      "Shift-work sleep deprivation is a major modifiable trigger and is plausibly driving the recent frequency increase"
     ],
     "red_herrings": [
       {
-        "data_point": "Hypertension history raising concern for hypertensive visual symptoms",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Mild HTN + visual symptoms could suggest hypertensive retinopathy or TIA",
-        "correct_interpretation": "Stage 1 HTN (128/78) does not cause visual symptoms; 7-year identical history predates HTN; classic migraine aura pattern",
-        "field_path": ""
+        "data_point": "Stage 1 hypertension (128/78 today)",
+        "location": "patient.vitals",
+        "field_path": "patient.vitals",
+        "intended_effect": "May anchor on hypertensive headache or PRES",
+        "correct_interpretation": "Stage 1 HTN is comorbid; it does not by itself cause stereotyped migraine with aura and informs preventive choice rather than the diagnosis"
       }
-    ],
-    "icd_code": "G43.1",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -177,7 +200,17 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Moderate: comorbid HTN complicates drug selection but is not a SNOOP red flag; 2 required tools; preventive therapy decision",
+    "case_body_concerns": [
+      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide §1): ['analyze_brain_mri', 'analyze_eeg', 'interpret_labs', 'order_advanced_imaging']"
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "initial_tool_outputs": {
     "mri": {

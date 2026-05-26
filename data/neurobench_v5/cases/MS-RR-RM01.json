@@ -1,7 +1,7 @@
 {
   "case_id": "MS-RR-RM01",
   "condition": "multiple_sclerosis",
-  "difficulty": "moderate",
+  "difficulty": "diagnostic_puzzle",
   "encounter_type": "inpatient",
   "patient": {
     "patient_id": "NB-MS-RR-RM01",
@@ -775,209 +775,242 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Tumefactive multiple sclerosis, with large demyelinating lesions mimicking a brain neoplasm, confirmed by brain biopsy",
+    "primary_diagnosis": "Multiple sclerosis, relapsing-remitting type (tumefactive variant)",
     "icd_code": "G35",
     "differential": [
       {
-        "diagnosis": "Primary brain neoplasm (high-grade glioma)",
+        "diagnosis": "CNS lymphoma (primary CNS lymphoma)",
+        "likelihood": "high",
+        "key_features": "Homogeneous enhancement (often without open ring), periventricular location, restricted diffusion, marked steroid sensitivity; consider in immunocompromised hosts — distinguish by biopsy if imaging is equivocal",
+        "icd_code": "C85.9"
+      },
+      {
+        "diagnosis": "High-grade glioma (glioblastoma)",
+        "likelihood": "high",
+        "key_features": "Closed-ring enhancement (rather than open ring with cortical-side break), elevated choline:NAA on spectroscopy, lack of CSF oligoclonal bands; tissue diagnosis often required",
+        "icd_code": "C71.9"
+      },
+      {
+        "diagnosis": "Neuromyelitis optica spectrum disorder (NMOSD)",
         "likelihood": "moderate",
-        "key_features": "Large expansile lesion with mass effect and enhancement initially raises concern for glioma; however, open ring enhancement pattern, DWI shine-through without restriction, MR spectroscopy showing mildly elevated choline with elevated myo-inositol and no lipid peak, and biopsy confirming demyelination without neoplastic cells all exclude this"
+        "key_features": "AQP4-IgG positivity, longitudinally extensive transverse myelitis, area postrema syndrome — must be excluded before DMT selection",
+        "icd_code": "G36.0"
+      },
+      {
+        "diagnosis": "MOG antibody-associated disease (MOGAD)",
+        "likelihood": "moderate",
+        "key_features": "MOG-IgG positivity, ADEM-like large lesions especially in younger patients, frequent lesion resolution on follow-up MRI",
+        "icd_code": "G36.9"
+      },
+      {
+        "diagnosis": "Brain abscess",
+        "likelihood": "low",
+        "key_features": "Restricted diffusion centrally (not peripheral), thick smooth ring, fever and elevated inflammatory markers, predisposing source (dental, sinus, endocarditis)",
+        "icd_code": "G06.0"
       },
       {
         "diagnosis": "Acute disseminated encephalomyelitis (ADEM)",
         "likelihood": "low",
-        "key_features": "Multifocal white matter and deep gray matter lesions following a recent URI are consistent with ADEM; however, oligoclonal bands and elevated IgG index favor MS over ADEM (OCBs are typically absent in ADEM), and the presence of T1 hypointensity suggests chronicity inconsistent with a monophasic process"
-      },
-      {
-        "diagnosis": "Behcet's disease with CNS involvement (neuro-Behcet's)",
-        "likelihood": "low",
-        "key_features": "Family history of Behcet's disease prompted evaluation, but patient lacks uveitis, oral/genital ulcers, or pathergy; rheumatology assessment deemed Behcet's a diagnosis of exclusion and favored alternative etiologies"
-      },
-      {
-        "diagnosis": "CNS vasculitis",
-        "likelihood": "low",
-        "key_features": "Evaluated with MR angiography which showed no evidence of vascular irregularities, beading, or occlusion; open ring enhancement and CSF profile are more consistent with demyelination"
-      },
-      {
-        "diagnosis": "Brain abscess or viral encephalitis",
-        "likelihood": "very_low",
-        "key_features": "No restricted diffusion on DWI (expected in abscess), comprehensive CSF infectious workup entirely negative including bacterial panel, HSV, JC virus, West Nile virus, and VDRL"
-      },
-      {
-        "diagnosis": "CNS lymphoma",
-        "likelihood": "very_low",
-        "key_features": "Flow cytometry shows polyclonal lymphocyte population, CSF cytology negative for malignant cells, Ki-67 low on biopsy, and open ring enhancement is atypical for lymphoma which typically shows solid homogeneous enhancement"
+        "key_features": "Monophasic, post-infectious/post-vaccination, encephalopathy hallmark; large confluent lesions; MOG-IgG sometimes positive in young adults",
+        "icd_code": "G04.81"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain detailed history from patient and family members including timeline of progressive symptoms, personality changes, weight loss, and recent infections",
-        "tool_name": null,
-        "expected_finding": "Identifies 6-week progressive left-sided weakness, personality changes with impulsivity, significant weight loss (30-45 lbs over 6 months), and recent URI 3 weeks prior",
-        "category": "required"
+        "action": "Obtain contrast-enhanced brain MRI with MS protocol (FLAIR, T2, DWI, pre- and post-gadolinium T1) to assess dissemination in space and time",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Multifocal T2/FLAIR hyperintensities in MS-typical regions; assess for enhancing lesions, T1 black holes, and Dawson-finger morphology",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "MS_protocol",
+          "contrast": true,
+          "sequences": [
+            "FLAIR",
+            "T2",
+            "DWI",
+            "T1_pre",
+            "T1_post"
+          ]
+        },
+        "citation": "[McDonald_2017]",
+        "guideline_source": "McDonald 2017"
       },
       {
         "step": 2,
-        "action": "Perform comprehensive neurological examination including mental status, cranial nerves, motor, sensory, coordination, and gait assessments",
-        "tool_name": null,
-        "expected_finding": "Left hemiparesis with hyperreflexia, mild left facial weakness, left-sided dysmetria, unsteady gait with leftward veering, equivocal left plantar response",
-        "category": "required"
+        "action": "Extend MRI to cervical and thoracic spinal cord with contrast — ~80% of MS patients have cord lesions, and cord involvement counts toward dissemination in space",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Short-segment (<2 vertebral bodies) peripheral cord lesions favor MS over NMOSD (which characteristically shows longitudinally extensive transverse myelitis ≥3 segments)",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "MS_protocol",
+          "contrast": true,
+          "region": "cervical_thoracic_spine"
+        },
+        "citation": "[MAGNIMS_2016]",
+        "guideline_source": "MAGNIMS 2016"
       },
       {
         "step": 3,
-        "action": "Order brain MRI with and without gadolinium contrast to characterize the lesion",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Large expansile right hemispheric lesion with open ring enhancement, multifocal brainstem and cerebellar involvement, splenial and thalamic lesions — raising differential of neoplasm vs tumefactive demyelination",
+        "action": "Perform lumbar puncture for CSF analysis including oligoclonal bands (paired serum), IgG index, cell count, protein, and glucose",
+        "tool_name": "analyze_csf",
+        "expected_finding": "CSF-restricted oligoclonal bands (≥2) and/or elevated IgG index support inflammatory CNS demyelination; per McDonald 2017 OCBs can substitute for dissemination in time in CIS with DIS",
         "category": "required",
         "tool_parameters": {
-          "protocol": "tumor",
-          "contrast": true
-        }
+          "tests": [
+            "oligoclonal_bands",
+            "IgG_index",
+            "cell_count",
+            "protein",
+            "glucose"
+          ],
+          "paired_serum": true
+        },
+        "citation": "[McDonald_2017]",
+        "guideline_source": "McDonald 2017"
       },
       {
         "step": 4,
-        "action": "Order EEG to evaluate seizure risk and characterize cerebral dysfunction",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Right hemispheric focal delta slowing with right frontotemporal sharp waves, consistent with structural pathology and epileptogenic focus",
-        "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
-      },
-      {
-        "step": 5,
-        "action": "Order comprehensive laboratory studies including CBC, BMP, inflammatory markers, and infectious and autoimmune workup",
+        "action": "Order broad mimic-exclusion serology: CBC, CMP, TSH, vitamin B12, vitamin D, ANA, AQP4-IgG (cell-based assay), MOG-IgG (cell-based assay), HIV, and RPR",
         "tool_name": "interpret_labs",
-        "expected_finding": "Leukocytosis with left shift, elevated inflammatory markers (CRP and ESR), negative infectious and autoimmune studies",
+        "expected_finding": "AQP4-IgG and MOG-IgG negative; B12, TSH, HIV, RPR normal — excludes NMOSD, MOGAD, B12 deficiency, thyroid disease, neurosyphilis, and HIV-associated demyelination",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
-            "inflammatory_markers"
+            "CMP",
+            "TSH",
+            "B12",
+            "vitamin_D",
+            "ANA",
+            "AQP4_IgG",
+            "MOG_IgG",
+            "HIV",
+            "RPR"
           ]
-        }
+        },
+        "citation": "[Wingerchuk_2015]",
+        "guideline_source": "Wingerchuk 2015 (NMOSD criteria)"
+      },
+      {
+        "step": 5,
+        "action": "Search the medical literature for the McDonald 2017 diagnostic criteria and current first-line / high-efficacy DMT options for RRMS",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Retrieves McDonald 2017 criteria and contemporary DMT guidance (platform vs. high-efficacy choice, NEDA-3 outcome framework)",
+        "category": "required",
+        "tool_parameters": {
+          "query": "McDonald 2017 criteria multiple sclerosis disease-modifying therapy first-line high-efficacy"
+        },
+        "citation": "[Reich_2018]",
+        "guideline_source": "Reich 2018 NEJM review"
       },
       {
         "step": 6,
-        "action": "Perform lumbar puncture for CSF analysis including cell count, protein, glucose, oligoclonal bands, IgG index, cytology, flow cytometry, and comprehensive infectious studies",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Mild lymphocytic pleocytosis, elevated protein, positive oligoclonal bands (4 bands), elevated IgG index, elevated myelin basic protein, negative infectious workup, negative cytology and flow cytometry",
+        "action": "Run a drug-interaction and contraindication check for the proposed disease-modifying therapy, including JC virus serostatus considerations, live-vaccine timing, and (for fingolimod) baseline ECG / first-dose bradyarrhythmia monitoring",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Confirms DMT compatibility with current medications; flags PML risk for natalizumab in JCV-positive patients and first-dose bradyarrhythmia risk for fingolimod",
         "category": "required",
         "tool_parameters": {
-          "special_tests": [
-            "oligoclonal_bands",
-            "IgG_index",
-            "cytology",
-            "flow_cytometry"
+          "proposed_class": "MS_DMT",
+          "screen_for": [
+            "JCV_serostatus",
+            "live_vaccines",
+            "hepatic_function",
+            "lymphocyte_count"
           ]
-        }
+        },
+        "citation": "[Reich_2018]",
+        "guideline_source": "Reich 2018 NEJM review"
       },
       {
         "step": 7,
-        "action": "Order aquaporin-4 and MOG antibody testing to exclude NMOSD and MOGAD",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Both negative, excluding NMOSD and MOGAD",
-        "category": "required",
+        "action": "Obtain retinal optical coherence tomography (OCT) to assess for RNFL/GCL thinning supporting prior subclinical optic pathway involvement",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Reduced peripapillary RNFL and ganglion cell layer thickness, particularly asymmetric, supports prior optic neuritis even without acute symptoms — contributes to dissemination in space",
+        "category": "recommended",
         "tool_parameters": {
-          "panels": [
-            "NMO_MOG"
-          ]
-        }
+          "test_type": "optical_coherence_tomography"
+        },
+        "citation": "[Petzold_2017]",
+        "guideline_source": "Petzold 2017"
       },
       {
         "step": 8,
-        "action": "Consider MR spectroscopy of the dominant lesion to help differentiate demyelination from neoplasm",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Metabolite pattern favoring demyelination: mildly reduced NAA, mildly elevated choline, elevated myo-inositol, no lipid peak",
+        "action": "Obtain visual evoked potentials to detect subclinical optic pathway demyelination",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Prolonged P100 latency (with preserved amplitude relative to delay) is the classic VEP signature of demyelinating optic pathway disease — useful for DIS when MRI is borderline",
         "category": "recommended",
         "tool_parameters": {
-          "imaging_type": "MR_spectroscopy"
-        }
+          "test_type": "vep"
+        },
+        "citation": "[McDonald_2017]",
+        "guideline_source": "McDonald 2017"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "CT is markedly inferior to MRI for visualising demyelinating plaques; ordering CT delays diagnosis and adds radiation without clinical benefit.",
+        "citation": "[MAGNIMS_2016]"
       },
       {
-        "step": 9,
-        "action": "Consult neurosurgery for stereotactic brain biopsy given the tumefactive appearance and diagnostic uncertainty",
-        "tool_name": null,
-        "expected_finding": "Biopsy confirms active demyelination with relative axonal preservation, foamy macrophages, Creutzfeldt cells, no neoplastic cells — definitive diagnosis of tumefactive MS",
-        "category": "required"
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No cardiac indication in a typical MS workup; echocardiography does not inform the demyelinating differential.",
+        "citation": "[Reich_2018]"
       },
       {
-        "step": 10,
-        "action": "Initiate high-dose IV methylprednisolone 1 g daily for 5 days for acute treatment of tumefactive demyelination",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Appropriate first-line acute treatment; monitor glucose and electrolytes",
-        "category": "required"
-      },
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring is only indicated for first-dose fingolimod initiation (bradyarrhythmia risk) — not as part of MS diagnostic workup.",
+        "citation": "[Reich_2018]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
       {
-        "step": 11,
-        "action": "Initiate antiepileptic therapy for seizure prophylaxis given the structural lesion and prior seizure",
-        "tool_name": null,
-        "expected_finding": "Levetiracetam is preferred given fewer drug interactions with future disease-modifying therapies",
-        "category": "required"
-      },
-      {
-        "step": 12,
-        "action": "Plan initiation of high-efficacy disease-modifying therapy after acute stabilization, given the aggressive tumefactive presentation",
-        "tool_name": null,
-        "expected_finding": "High-efficacy DMT such as natalizumab or ocrelizumab appropriate given the aggressive initial presentation",
-        "category": "required"
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "Standard pre-LP imaging: confirm absence of mass effect / herniation risk on brain MRI before lumbar puncture",
+        "citation": "[McDonald_2017]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Recognize that the open ring enhancement pattern on MRI favors demyelination over neoplasm — the opening faces the cortex, which is a key imaging discriminator",
-      "Perform lumbar puncture with CSF analysis including oligoclonal bands and IgG index, which support intrathecal immunoglobulin synthesis consistent with MS",
-      "Order comprehensive CSF studies to exclude infection (especially in the setting of leukocytosis and elevated inflammatory markers) before attributing findings to demyelination",
-      "Exclude NMOSD and MOGAD with aquaporin-4 and MOG antibody testing before committing to an MS diagnosis",
-      "Consult neurosurgery for brain biopsy when imaging findings are suspicious for neoplasm and cannot be definitively distinguished from tumefactive demyelination by non-invasive means",
-      "Initiate high-dose IV corticosteroids for acute treatment once demyelinating pathology is confirmed",
-      "Initiate seizure prophylaxis given the presenting seizure and epileptogenic EEG findings"
+      "Establish dissemination in space (DIS) using brain and spinal-cord MRI in MS-typical regions (periventricular, juxtacortical/cortical, infratentorial, spinal cord)",
+      "Establish dissemination in time (DIT) by demonstrating simultaneous enhancing and non-enhancing lesions, a new lesion on follow-up MRI, or CSF-restricted oligoclonal bands (per McDonald 2017)",
+      "Exclude NMOSD and MOGAD with AQP4-IgG and MOG-IgG cell-based assays before committing to an MS diagnosis and DMT",
+      "Order CSF analysis with paired serum to assess oligoclonal bands and IgG index",
+      "For tumefactive presentations with mass effect, consult neurosurgery and consider brain biopsy if imaging plus CSF/serology do not establish diagnosis with confidence",
+      "Treat the acute relapse with high-dose IV methylprednisolone (1 g daily for 3–5 days), with plasma exchange reserved for steroid-refractory severe relapses",
+      "Initiate a disease-modifying therapy (DMT) after relapse stabilization; choice between platform vs. high-efficacy agent based on disease activity, MRI burden, and patient preference",
+      "Check JC virus antibody serostatus before considering natalizumab; verify up-to-date vaccinations (especially live-attenuated) before initiating B-cell depleting or S1P-modulator DMTs",
+      "Counsel on Uhthoff phenomenon, heat avoidance, smoking cessation, and vitamin D supplementation as modifiable lifestyle factors"
     ],
     "contraindicated_actions": [
-      "Proceeding directly to craniotomy and surgical resection under the assumption of brain tumor without considering tumefactive demyelination — resection of a demyelinating lesion would cause unnecessary neurological damage",
-      "Initiating chemotherapy or radiation therapy based on imaging alone without tissue diagnosis — would be harmful if the lesion is demyelinating",
-      "Starting natalizumab without first checking JC virus antibody status — risk of progressive multifocal leukoencephalopathy",
-      "Failing to perform lumbar puncture for CSF analysis in a patient with a large enhancing brain lesion and seizure — CSF is essential for differentiating tumor, infection, and demyelination",
-      "Attributing the elevated inflammatory markers (CRP, ESR) to MS without excluding infection — MS typically does not cause significantly elevated acute-phase reactants",
-      "Diagnosing Behcet's disease based solely on family history without confirming classic diagnostic criteria (oral ulcers, uveitis, genital ulcers, pathergy)"
-    ],
-    "red_herrings": [
-      {
-        "data_point": "Father diagnosed with Behcet's disease",
-        "location": "clinical_history.family_history",
-        "intended_effect": "Prompt consideration of neuro-Behcet's disease as the cause of the large CNS lesion, given that Behcet's can cause large CNS vasculitic or inflammatory lesions in the brain",
-        "correct_interpretation": "Behcet's disease is autosomal without a strong familial pattern; moreover, the patient lacks all cardinal Behcet's features (oral ulcers, genital ulcers, uveitis, pathergy) — rheumatology confirmed no Behcet's criteria met. Family history alone is not diagnostic.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Elevated CRP 7.63 mg/dL and ESR 48 mm/hr",
-        "location": "initial_tool_outputs.labs",
-        "intended_effect": "Suggest an infectious or systemic inflammatory process rather than demyelinating disease, as MS typically does not cause significantly elevated acute-phase reactants",
-        "correct_interpretation": "The elevated inflammatory markers are attributable to the recent upper respiratory infection one week prior and to the postictal stress response from the witnessed seizure. Once infectious workup (including CSF cultures, viral panels, and blood cultures) returned negative, these elevations were contextualized appropriately.",
-        "field_path": ""
-      },
-      {
-        "data_point": "30–45 lb unintentional weight loss over 6 months",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Raise suspicion for an underlying malignancy causing both the brain lesion and constitutional symptoms, shifting the differential toward primary CNS lymphoma or metastatic disease",
-        "correct_interpretation": "Brain biopsy confirmed tumefactive demyelination (no malignant cells, foamy macrophages with myelin debris). Constitutional features can occasionally accompany aggressive tumefactive demyelination and do not confirm malignancy without tissue diagnosis.",
-        "field_path": ""
-      }
+      "Do not diagnose MS based on non-specific white-matter lesions alone without meeting McDonald 2017 criteria and excluding mimics",
+      "Do not start natalizumab in a JC virus-antibody-positive patient (especially with high index) without explicit benefit-risk discussion of PML",
+      "Do not initiate fingolimod without a baseline ECG and first-dose bradyarrhythmia monitoring; avoid in patients with second-degree AV block, prior MI, or severe sleep apnea",
+      "Do not start teriflunomide in a woman of child-bearing potential without effective contraception (teratogenic, long elimination half-life)",
+      "Do not use chronic oral corticosteroids as a maintenance treatment for MS — they are ineffective long-term and carry significant harm",
+      "Do not administer live-attenuated vaccines after initiation of B-cell depleting therapy (ocrelizumab, ofatumumab) or S1P modulators (fingolimod, ozanimod)",
+      "Do not omit spinal-cord MRI in a patient with myelopathic signs even if the brain MRI alone meets DIS criteria — cord lesions change relapse counting and management",
+      "Do not pursue aggressive cytoreductive surgery for a presumed tumefactive demyelinating lesion before exhausting non-invasive workup — open ring enhancement, CSF OCBs, and AQP4/MOG serology should be obtained first"
     ],
     "key_reasoning_points": [
-      "Tumefactive MS lesions (>2 cm with mass effect, edema, or ring enhancement) can closely mimic brain tumors and require a systematic approach to differentiation — the open ring enhancement pattern with the opening facing the cortex is highly specific for demyelination over neoplasm",
-      "The family history of Behcet's disease is a deliberate red herring — while neuro-Behcet's can cause large CNS lesions, the absence of mucocutaneous features and rheumatologic assessment exclude this diagnosis",
-      "Elevated inflammatory markers (CRP 7.63, ESR 48) are atypical for MS and create diagnostic confusion — they are likely related to the recent URI and postictal stress response, not the underlying demyelinating process",
-      "CSF oligoclonal bands (4 bands) and elevated IgG index (0.82) are strong positive findings that support intrathecal immunoglobulin synthesis, favoring MS over ADEM (which typically lacks OCBs)",
-      "The multifocal distribution of lesions crossing multiple vascular territories (supratentorial, brainstem, cerebellum, corpus callosum) is atypical for a single neoplastic process and should raise suspicion for a diffuse inflammatory or demyelinating condition",
-      "DWI shine-through without true restricted diffusion (normal ADC map) is an important imaging feature that argues against both brain abscess and high-grade glioma",
-      "Approximately 70% of patients presenting with tumefactive demyelination go on to develop clinically definite relapsing-remitting MS, making long-term disease-modifying therapy essential",
-      "Brain biopsy is often necessary in tumefactive MS when non-invasive workup cannot definitively exclude neoplasm — the pathological hallmark is demyelination with relative axonal preservation and Creutzfeldt cells"
+      "MS is a clinical-radiographic diagnosis: McDonald 2017 requires dissemination in space (DIS) and dissemination in time (DIT) plus exclusion of better explanations — no single test confirms it",
+      "MS-typical MRI regions are periventricular, juxtacortical/cortical, infratentorial, and spinal cord — recognising a lesion in three of these regions establishes DIS for an attack-meeting clinical event",
+      "CSF-restricted oligoclonal bands (≥2 bands not present in paired serum) can substitute for DIT under McDonald 2017 when DIS is met — this changes the calculus for clinically isolated syndromes",
+      "Short-segment (<2 vertebral bodies), peripheral, dorsolateral or dorsal-column spinal cord lesions strongly favour MS over NMOSD (which characteristically produces longitudinally extensive transverse myelitis ≥3 segments)",
+      "Tumefactive demyelinating lesions are a recognised MS variant — distinguishing imaging features from neoplasm include open ring enhancement, prominent intralesional venules, less mass effect than expected for size, and CSF OCBs; brain biopsy should be a last resort",
+      "Open-ring enhancement with the opening oriented toward the cortex is a high-specificity sign of demyelination, distinguishing tumefactive MS from neoplasm and abscess",
+      "AQP4-IgG and MOG-IgG must be ordered as cell-based assays, not ELISA — the older ELISA-based AQP4 assays have unacceptable false-negative rates",
+      "T1 hypointense 'black holes' indicate axonal loss from prior inflammatory episodes and contribute evidence of dissemination in time even without simultaneous enhancing lesions",
+      "Choice of DMT — platform agent (interferon-β, glatiramer, teriflunomide, dimethyl fumarate) vs. high-efficacy agent (natalizumab, ocrelizumab, ofatumumab, cladribine, S1P modulators) — should weigh disease activity, MRI burden, patient comorbidities, JCV serostatus, and reproductive plans",
+      "If the initial brain MRI does not include the spinal cord, extending imaging to cervical and thoracic cord is essential — both for diagnostic DIS and for relapse counting"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": []
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -998,6 +1031,14 @@
       "ct": "normal",
       "echo": "normal",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (condition-expert:MS-RR)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MS-RR",
+    "difficulty_rationale": "Tumefactive demyelinating lesion overlaps imaging features with neoplasm/abscess; differential must include CNS lymphoma and high-grade glioma; agent must integrate open-ring enhancement, CSF OCB status, and AQP4/MOG serology to avoid biopsy",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -751,163 +751,202 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Focal epilepsy of right temporal lobe origin with mesial temporal sclerosis, likely secondary to neonatal meningitis (dual pathology)",
-    "icd_code": "G40.109",
+    "primary_diagnosis": "Focal epilepsy of right temporal lobe origin with mesial temporal sclerosis, secondary to remote neonatal pneumococcal meningitis (dual pathology with prior perinatal CNS injury)",
+    "icd_code": "G40.219",
     "differential": [
       {
-        "diagnosis": "Focal epilepsy — right temporal lobe (mesial temporal sclerosis)",
-        "likelihood": "high",
-        "key_features": "Stereotyped episodes of behavioral arrest with oroalimentary automatisms, right temporal EEG focus, right hippocampal sclerosis on MRI, concordant PET hypometabolism"
+        "diagnosis": "Symptomatic focal epilepsy from perinatal injury without HS",
+        "likelihood": "moderate",
+        "key_features": "Perinatal CNS infection alone can cause focal epilepsy without sclerosis; MRI distinguishes.",
+        "icd_code": "G40.219"
       },
       {
-        "diagnosis": "VP shunt malfunction with raised intracranial pressure",
+        "diagnosis": "Shunt malfunction with raised intracranial pressure",
         "likelihood": "low",
-        "key_features": "Headaches could suggest shunt dysfunction, but shunt reservoir fills appropriately, no papilledema, no acute hydrocephalus on imaging"
+        "key_features": "Would expect headache, vomiting, papilledema, gait change; shunt imaging excludes.",
+        "icd_code": "T85.030A"
       },
       {
-        "diagnosis": "Psychogenic non-epileptic seizures (PNES)",
+        "diagnosis": "Post-traumatic epilepsy from prior cervical surgery / falls",
         "likelihood": "low",
-        "key_features": "Semiology is typical of temporal lobe seizures (not atypical), post-ictal prolactin elevation supports epileptic seizure, EEG captures electrographic seizure"
+        "key_features": "History of cervical spine surgery; no documented head injury; less likely than mesial-temporal origin.",
+        "icd_code": "G40.509"
       },
       {
-        "diagnosis": "Seizures secondary to subclinical hypothyroidism",
-        "likelihood": "very_low",
-        "key_features": "Mildly elevated TSH with normal free T4 is unlikely to cause seizures; subclinical hypothyroidism rarely lowers seizure threshold significantly"
+        "diagnosis": "Psychogenic non-epileptic spells",
+        "likelihood": "low",
+        "key_features": "Stereotyped lip-smacking and secondarily generalized convulsion favor epileptic etiology.",
+        "icd_code": "F44.5"
       },
       {
-        "diagnosis": "Recurrent cervical myelopathy or white cord syndrome",
+        "diagnosis": "Convulsive syncope",
         "likelihood": "very_low",
-        "key_features": "Prior white cord syndrome resolved; current symptoms (episodes of altered awareness with automatisms) are not consistent with spinal cord pathology"
+        "key_features": "Witnessed automatisms and prolonged post-ictal phase are not syncope.",
+        "icd_code": "R55"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain EEG to evaluate for epileptiform activity",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Right anterior temporal sharp transients and intermittent temporal slowing",
+        "action": "Obtain detailed seizure history including semiology, aura, automatisms, duration, frequency, witness accounts, and post-ictal features.",
+        "tool_name": null,
+        "expected_finding": "Stereotyped focal impaired-awareness events with temporal-lobe aura and post-ictal confusion.",
         "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
+        "tool_parameters": {},
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 2,
-        "action": "Order brain MRI to evaluate for structural lesion or hippocampal sclerosis",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Subtle right hippocampal volume asymmetry with equivocal signal changes; left frontoparietal encephalomalacia",
+        "action": "Perform complete neurological examination.",
+        "tool_name": null,
+        "expected_finding": "Interictal exam typically normal; subtle memory deficit may be present.",
         "category": "required",
-        "tool_parameters": {
-          "protocol": "epilepsy",
-          "contrast": false
-        }
+        "tool_parameters": {},
+        "citation": "",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Obtain laboratory studies including CBC, BMP, thyroid panel, prolactin, and toxicology screen",
+        "action": "Order EEG (routine first; pursue ambulatory or video-EEG if non-diagnostic) to identify interictal epileptiform discharges and capture habitual events.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Interictal sharps/spikes and/or focal slowing in the anterior temporal region; ictal correlate confirms diagnosis.",
+        "category": "required",
+        "tool_parameters": {
+          "eeg_type": "routine"
+        },
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
+      },
+      {
+        "step": 4,
+        "action": "Order MRI brain with dedicated epilepsy protocol (thin-cut coronal T1/FLAIR/T2/DWI through the hippocampi).",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Hippocampal sclerosis, low-grade tumor (DNET, ganglioglioma), cavernoma, or focal cortical dysplasia; rule out alternative structural causes.",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "epilepsy",
+          "contrast": true
+        },
+        "citation": "[AAN_2007]",
+        "guideline_source": "AAN_2007"
+      },
+      {
+        "step": 5,
+        "action": "Obtain CBC, comprehensive metabolic panel, prolactin (if drawn within 10–20 min of event), and AED levels if on therapy.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Post-ictal elevations in prolactin, CK, and lactate; mildly elevated TSH; negative toxicology",
+        "expected_finding": "Exclude metabolic provocation (hypoglycemia, hyponatremia, uremia); baseline organ function for AED selection; AED level for adherence and dosing.",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
-            "thyroid",
-            "drug_screen",
+            "CMP",
             "prolactin"
           ]
-        }
-      },
-      {
-        "step": 4,
-        "action": "Obtain ECG to rule out cardiac arrhythmia as cause of episodes",
-        "tool_name": "analyze_ecg",
-        "expected_finding": "Normal sinus rhythm, no arrhythmia",
-        "category": "recommended"
-      },
-      {
-        "step": 5,
-        "action": "Request prolonged video-EEG monitoring to capture habitual events and confirm epileptic focus",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Definitive right temporal epileptiform discharges and subclinical electrographic seizure",
-        "category": "required",
-        "tool_parameters": {
-          "eeg_type": "video"
-        }
+        },
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 6,
-        "action": "Request epilepsy protocol MRI with thin coronal cuts through temporal lobes",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Confirmed right mesial temporal sclerosis with 30% hippocampal volumetric asymmetry",
+        "action": "Search current literature for AED selection in focal epilepsy and ILAE 2017 seizure classification.",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Evidence-based AED options for focal epilepsy (levetiracetam, lamotrigine, oxcarbazepine, lacosamide); ILAE classification framework.",
         "category": "required",
-        "tool_parameters": {
-          "protocol": "epilepsy",
-          "contrast": false
-        }
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 7,
-        "action": "Check drug interactions before initiating antiepileptic therapy",
+        "action": "Check drug interactions before initiating or modifying AED therapy (enzyme inducers, OCP, other CNS-active drugs).",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "Levetiracetam-baclofen additive CNS depression; lamotrigine has fewer interactions but slower titration",
-        "category": "recommended"
+        "expected_finding": "Identify pharmacokinetic interactions (CYP induction by carbamazepine/phenytoin) and CNS adverse-effect overlap.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 8,
-        "action": "Initiate appropriate antiepileptic drug (levetiracetam or lamotrigine)",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
-      },
-      {
-        "step": 9,
-        "action": "Search medical literature for temporal lobe epilepsy management and surgical outcomes",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Evidence supporting early surgical evaluation for drug-resistant TLE with MTS",
-        "category": "recommended"
-      },
-      {
-        "step": 10,
-        "action": "Consider FDG-PET for presurgical evaluation concordance",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Right temporal hypometabolism concordant with MRI and EEG",
+        "action": "Pursue prolonged video-EEG monitoring to capture habitual events, confirm lateralization, and evaluate surgical candidacy.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Capture of habitual focal seizure with electrographic correlate; concordance with imaging supports surgical workup.",
         "category": "recommended",
         "tool_parameters": {
-          "imaging_type": "FDG_PET"
-        }
+          "eeg_type": "video"
+        },
+        "citation": "[Engel_2003]",
+        "guideline_source": "Engel_2003"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No clinical features of CNS infection, encephalitis, or immunocompromise; CSF analysis is not indicated for routine focal epilepsy workup and exposes the patient to procedural risk and cost.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "echo_type": "TTE"
+        },
+        "rationale": "No syncope-versus-seizure question and no structural-heart concern; echocardiogram contributes nothing to epilepsy workup.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "Ambulatory cardiac monitoring is reserved for syncope-versus-seizure differentiation; not indicated when semiology is clearly epileptic.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT is inferior to MRI for detecting epileptogenic substrates (hippocampal sclerosis, FCD, low-grade tumor) and adds ionizing radiation without diagnostic yield.",
+        "citation": "[AAN_2007]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "check_drug_interactions",
+        "reason": "Structural cause influences AED choice (e.g., low-grade tumor → consider AEDs with CYP-neutral profile; hippocampal sclerosis → multiple equally appropriate options). MRI should inform drug selection.",
+        "citation": "[ILAE_drug_2017]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Obtain EEG to evaluate for epileptiform activity — essential for diagnosis and lateralization",
-      "Obtain brain MRI to assess for structural etiology including hippocampal sclerosis",
-      "Order basic laboratory studies to exclude metabolic causes of seizures",
-      "Request prolonged video-EEG monitoring given equivocal findings on routine EEG",
-      "Initiate antiepileptic drug therapy after confirming epilepsy diagnosis",
-      "Recognize the clinical significance of olfactory aura (uncinate fits) as localizing to temporal lobe"
+      "Recognize lip-smacking automatisms with subsequent secondary generalization as focal-to-bilateral tonic-clonic seizures of temporal-lobe origin.",
+      "Pursue video-EEG monitoring to confirm lateralization given complex remote history.",
+      "Obtain 3T MRI with epilepsy protocol to characterize hippocampal sclerosis and assess for residual sequelae of prior meningitis or shunt-related changes.",
+      "Initiate a first-line AED for focal epilepsy (levetiracetam, lacosamide, or lamotrigine), accounting for any baseline cognitive impairment.",
+      "Confirm VP shunt is functioning (imaging review) — exclude as proximate cause."
     ],
     "contraindicated_actions": [
-      "Do NOT attribute episodes to behavioral/psychiatric condition without adequate EEG evaluation",
-      "Do NOT prescribe carbamazepine without checking for HLA-B*15:02 if patient were of Southeast Asian descent (not applicable here but important principle)",
-      "Do NOT discharge without initiating antiepileptic therapy after confirmed seizure with structural lesion",
-      "Do NOT perform lumbar puncture as a first-line diagnostic test in this clinical context (no signs of infection or inflammation)",
-      "Do NOT initiate phenytoin as first-line given availability of better-tolerated modern AEDs and patient's cognitive baseline",
-      "Do NOT overlook the VP shunt — must confirm it is functioning before attributing all symptoms to epilepsy"
+      "Do not assume the recent secondarily generalized seizure indicates idiopathic generalized epilepsy and prescribe valproate without evaluating for focal onset.",
+      "Do not perform LP without first excluding raised ICP or shunt malfunction.",
+      "Do not start carbamazepine without confirming there is no hyponatremia from prior meningitis sequelae."
     ],
     "key_reasoning_points": [
-      "The semiology of behavioral arrest with oroalimentary automatisms and manual automatisms is classic for temporal lobe seizures, and the secondary generalization pattern (focal to bilateral tonic-clonic) confirms an epileptic rather than non-epileptic etiology",
-      "Olfactory aura (unpleasant smell perception) is a highly localizing symptom pointing to the temporal lobe, specifically the uncinate region — this is a subtle but critical clue in the history",
-      "The patient's complex neurological background (neonatal meningitis, VP shunt, left hemispheric injury) creates diagnostic complexity but also provides the likely etiology for mesial temporal sclerosis through the mechanism of dual pathology",
-      "Routine EEG findings are equivocal (sharp transients of uncertain significance) — recognizing the need for prolonged monitoring rather than dismissing these findings is a key clinical decision point",
-      "The breach rhythm from the VP shunt site must be recognized as an artifact and not misinterpreted as epileptiform activity",
-      "The mildly elevated TSH is a red herring — subclinical hypothyroidism with normal free T4 is not a sufficient explanation for new-onset seizures with structural correlate",
-      "Dual pathology (left hemispheric injury from neonatal meningitis + right mesial temporal sclerosis) is a well-recognized phenomenon where early brain injury leads to contralateral hippocampal sclerosis, and recognition of this pattern is important for treatment planning",
-      "The post-ictal prolactin elevation supports an epileptic seizure over a psychogenic event, though it was drawn outside the optimal window"
+      "Childhood CNS insult (perinatal meningitis) is a recognized cause of subsequent dual pathology with mesial temporal sclerosis.",
+      "Focal-to-bilateral tonic-clonic seizures still localize to a focal onset zone — typically temporal in patients with HS.",
+      "Shunt malfunction must be considered but is unlikely with stereotyped focal semiology and no signs of raised ICP.",
+      "Multiple risk factors warrant epileptologist referral and consideration of surgical evaluation if refractory."
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "Chronic left spastic hemiparesis and prior cervical spine surgery.",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Pursue spinal-cord or motor-system workup instead of identifying the new focal seizures.",
+        "correct_interpretation": "Pre-existing hemiparesis is remote and unchanged; the new clinical issue is focal temporal seizures."
+      }
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -922,6 +961,16 @@
       "ct": "normal",
       "echo": "normal",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (FEPI-TEMP)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FEPI-TEMP",
+    "difficulty_rationale": "Five required tools with video-EEG follow-up; complex remote history adds distractors (hemiparesis, shunt) but does not change the temporal-lobe localization.",
+    "case_body_concerns": [
+      "useless_tools entry for `analyze_ecg` dropped: tool output is provided up-front in initial_tool_outputs, so declaring it useless to call would be incoherent (agent never had to call it)."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

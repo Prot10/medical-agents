@@ -506,95 +506,243 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Myasthenia gravis, AChR antibody-positive, generalized (MGFA Class IIb), new onset concurrent with recovering Guillain-Barré syndrome",
+    "primary_diagnosis": "Myasthenia gravis, AChR antibody-positive, generalized (MGFA Class IIb), new onset after recent Guillain-Barré syndrome (sequential/concurrent autoimmunity)",
     "icd_code": "G70.01",
     "differential": [
       {
-        "diagnosis": "Miller-Fisher syndrome (GBS variant)",
-        "likelihood": "very_low",
-        "key_features": "Anti-GQ1b negative; Fisher syndrome presents with ophthalmoplegia + ataxia + areflexia simultaneously; fatigable ptosis not typical; AChR antibodies confirm MG"
+        "diagnosis": "Recurrent or recrudescent GBS",
+        "likelihood": "moderate",
+        "key_features": "GBS recurrence/relapse is possible but typically presents with ascending weakness and areflexia, not fatigable ocular/bulbar weakness; AChR positive here.",
+        "icd_code": "G61.0"
       },
       {
-        "diagnosis": "GBS progression with cranial nerve involvement",
-        "likelihood": "very_low",
-        "key_features": "GBS cranial involvement is non-fatigable; diurnal variation not seen in GBS; new NMJ findings on RNS not present in initial GBS workup; AChR positive"
+        "diagnosis": "Acute-onset CIDP",
+        "likelihood": "low",
+        "key_features": "CIDP would show demyelination on NCS; here NCS does not match.",
+        "icd_code": "G61.81"
       },
       {
-        "diagnosis": "Botulism",
+        "diagnosis": "Miller-Fisher syndrome (anti-GQ1b)",
+        "likelihood": "low",
+        "key_features": "MFS gives ophthalmoplegia + ataxia + areflexia; anti-GQ1b negative; reflexes preserved; pattern fluctuating not monophasic.",
+        "icd_code": "G61.0"
+      },
+      {
+        "diagnosis": "Brainstem lesion",
         "likelihood": "very_low",
-        "key_features": "No exposure history; descending paralysis pattern; fixed dilated pupils (absent here); toxin assay would confirm but clinical picture inconsistent"
+        "key_features": "No focal MRI findings; fluctuating pattern not vascular.",
+        "icd_code": "G46.3"
+      },
+      {
+        "diagnosis": "Functional weakness post-illness",
+        "likelihood": "very_low",
+        "key_features": "Objective RNS decrement and AChR positivity rule out functional etiology.",
+        "icd_code": "F44.4"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Repeat RNS with facial muscle assessment (nasalis)",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "13% nasalis decrement (new finding) — confirms NMJ dysfunction not present during GBS hospitalization",
+        "action": "Order serologies: anti-AChR (binding, blocking, modulating), anti-MuSK, anti-LRP4, and TSH/free-T4 for thyroid autoimmunity",
+        "tool_name": "interpret_labs",
+        "expected_finding": "AChR antibody positive; TSH evaluates for comorbid thyroid disease",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "anti_AChR",
+            "anti_MuSK",
+            "anti_LRP4",
+            "TSH"
+          ]
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 2,
-        "action": "Anti-AChR antibody panel AND anti-GQ1b (Miller Fisher exclusion)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "AChR 2.1 nmol/L positive; anti-GQ1b negative — MG confirmed, not Miller Fisher",
+        "action": "Order repetitive nerve stimulation (RNS) at 2-3 Hz across proximal and facial muscles",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Decrement >10% in symptomatic muscles supports postsynaptic NMJ disorder",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "repetitive_nerve_stimulation"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 3,
-        "action": "CT chest for thymoma/thymic hyperplasia",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "Thymic hyperplasia — no thymoma; MGTX trial thymectomy recommendation",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Order single-fiber EMG (gold standard >95% sensitivity)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Increased jitter and blocking on extensor digitorum communis or orbicularis oculi confirms NMJ transmission failure",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "emg_single_fiber"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 4,
-        "action": "SFEMG for confirmation",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "MCD 62 us, 65% blocking — MG confirmed",
+        "action": "Order CT chest with contrast for thymoma screening",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No thymoma; thymic involution appropriate for age",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "region": "chest",
+          "contrast": true,
+          "indication": "thymoma_screening"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 5,
-        "action": "Search literature for GBS-MG coexistence",
+        "action": "Review MGFA classification and current treatment guidance (pyridostigmine, prednisone, steroid-sparing, IVIG/PLEX, thymectomy)",
         "tool_name": "search_medical_literature",
-        "expected_finding": "Rare but documented; distinct pathophysiologies; treat both separately",
+        "expected_finding": "MGFA classification stages disease severity; thymectomy benefits AChR+ generalized MG (MGTX); IVIG/PLEX for crisis",
+        "category": "required",
+        "tool_parameters": {
+          "query": "myasthenia gravis MGFA classification treatment thymectomy"
+        },
+        "citation": "[Sanders_2016]",
+        "guideline_source": "Sanders_2016"
+      },
+      {
+        "step": 6,
+        "action": "Check drug interactions for MG-exacerbating agents (aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, neuromuscular blockers, procainamide)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Flag aminoglycosides, fluoroquinolones, IV magnesium, telithromycin, NMBs as contraindicated or use-with-caution in MG",
+        "category": "required",
+        "tool_parameters": {
+          "proposed": "pyridostigmine_start",
+          "screen_for": [
+            "aminoglycosides",
+            "fluoroquinolones",
+            "telithromycin",
+            "magnesium_IV",
+            "neuromuscular_blockers"
+          ]
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
+      },
+      {
+        "step": 7,
+        "action": "Bedside respiratory function testing (FVC, MIP/MEP, NIF) — repeat q4h in crisis",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline FVC/NIF to assess crisis risk in patients with bulbar or limb involvement",
         "category": "recommended",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[Sanders_2016]",
+        "guideline_source": "Sanders_2016"
+      },
+      {
+        "step": 8,
+        "action": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Improvement of ptosis after 2 minutes of cooling supports MG",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "ice_pack_test"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "MG is a peripheral neuromuscular junction disorder; EEG has no diagnostic role.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No CSF role in MG; LP risks complications without diagnostic yield.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "Advanced imaging (PET/MR spectroscopy/perfusion) is not indicated for MG diagnosis or staging; CT chest covers thymoma screening.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is non-contributory in typical MG; reserve for cases where an alternative CNS cause (brainstem lesion, demyelination) is genuinely in the differential.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated for MG unless a comorbid cardiac question exists.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring is not indicated for MG unless arrhythmia or autonomic disease is independently suspected.",
+        "citation": "[Wolfe_2016]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "order_specialized_test",
+        "reason": "Order AChR/MuSK/LRP4 serologies first; reserve single-fiber EMG for seronegative or RNS-non-diagnostic cases (resource stewardship).",
+        "citation": "[Wolfe_2016]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Anti-GQ1b must be checked to exclude Miller-Fisher syndrome as cause of cranial nerve involvement in GBS context",
-      "Anti-AChR confirms second diagnosis — two concurrent autoimmune conditions",
-      "Respiratory monitoring critical — combined GBS weakness and MG",
-      "Thymectomy deferred until GBS recovery is complete"
+      "Confirm AChR positivity to distinguish MG from GBS relapse",
+      "Single-fiber EMG given recent GBS and possible electrodiagnostic overlap",
+      "CT chest — diffuse thymic enlargement noted; thoracic imaging/MRI for further characterization",
+      "Bedside FVC/NIF — patient recently had respiratory involvement during GBS",
+      "Coordinate immunosuppression carefully — IVIG appropriate for both diagnoses"
     ],
     "contraindicated_actions": [
-      "Do NOT attribute new fatigable cranial nerve findings to GBS — fatigable pattern specific to NMJ disorder",
-      "Do NOT treat as GBS relapse without workup — new MG diagnosis must be made"
+      "Do NOT prescribe aminoglycoside antibiotics (gentamicin, tobramycin, amikacin) — risk of precipitating myasthenic crisis",
+      "Do NOT prescribe fluoroquinolones (ciprofloxacin, levofloxacin, moxifloxacin) — FDA black-box warning for MG exacerbation",
+      "Do NOT prescribe telithromycin — contraindicated in MG",
+      "Do NOT administer IV magnesium for MG patients (e.g., for hypomagnesaemia, eclampsia prophylaxis) without alternative — blocks NMJ transmission",
+      "Do NOT use non-depolarizing neuromuscular blockers without anaesthesia/MG-aware dosing protocols",
+      "Do NOT initiate high-dose corticosteroids as sole outpatient therapy without hospitalization or pyridostigmine bridge — risk of paradoxical worsening at days 5-10",
+      "Do NOT attribute fluctuating fatigable weakness to a functional disorder before completing serology + RNS + single-fiber EMG workup"
     ],
     "key_reasoning_points": [
-      "Fatigable ptosis with diurnal variation after GBS is NOT a GBS feature — GBS causes non-fatigable ascending paralysis",
-      "Anti-GQ1b is the critical test to exclude Miller-Fisher syndrome (GBS variant with cranial nerve involvement) before diagnosing concurrent MG",
-      "Two concurrent autoimmune neurological diseases can develop simultaneously after immune trigger (viral illness or IVIG)",
-      "Thymic hyperplasia is the expected CT finding in young MG patients (not thymoma); thymectomy still recommended"
+      "Fluctuating, fatigable weakness with diurnal pattern (worse evening) is the clinical hallmark of MG — fixed weakness suggests an alternative diagnosis.",
+      "Ocular involvement (ptosis, diplopia) is asymmetric and fatigable in MG; thyroid eye disease causes restrictive (not fatigable) ophthalmoplegia.",
+      "Single-fiber EMG (sensitivity >95%) is the most sensitive electrodiagnostic test — order when RNS is non-diagnostic or serology is negative.",
+      "All confirmed MG cases require CT chest for thymoma — present in roughly 10-15% of generalized MG; thymectomy (MGTX trial) improves long-term outcomes in non-thymoma AChR+ MG as well.",
+      "Aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, and neuromuscular blockers can precipitate myasthenic crisis and must be screened against any new prescription.",
+      "GBS and MG are both antibody-mediated; sequential/overlapping autoimmunity is uncommon but documented and should not lead to anchoring on the first diagnosis.",
+      "Diffuse thymic enlargement (not a discrete mass) is common in AChR+ MG and typically reflects thymic hyperplasia — thymectomy may still be considered."
     ],
     "red_herrings": [
       {
-        "data_point": "Recent GBS hospitalization and recovery",
+        "data_point": "Recent 'mild GBS' hospitalization 4 weeks ago",
         "location": "past medical history",
-        "intended_effect": "New cranial nerve symptoms attributed to GBS relapse or Miller-Fisher variant rather than recognizing a second diagnosis of MG",
-        "correct_interpretation": "Fatigable ptosis with diurnal variation is NOT consistent with any GBS variant; new NMJ findings on RNS + positive AChR antibodies confirm independent MG diagnosis",
-        "field_path": ""
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Attribute new ocular symptoms to GBS recurrence and treat empirically without re-investigating.",
+        "correct_interpretation": "Fatigable ptosis and diplopia are not features of GBS; AChR antibodies and RNS decrement establish concurrent MG."
+      },
+      {
+        "data_point": "Anti-GQ1b within reference limits",
+        "location": "labs",
+        "field_path": "initial_tool_outputs.labs.panels",
+        "intended_effect": "Conclude 'Miller-Fisher excluded' satisfies the differential.",
+        "correct_interpretation": "Anti-GQ1b absence is reassuring against MFS but does not address MG; AChR testing is the diagnostic step."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "v5",
@@ -614,6 +762,16 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MG",
+    "difficulty_rationale": "5 required tools, 2 red herrings, typical AChR+ generalized MG",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": [
+      "emg_ncs_useless_via_param_conflation: pack lists order_specialized_test:emg_ncs as USELESS, but coherence validator treats tool_name overlap as a contradiction regardless of tool_parameters; cannot encode without removing required RNS/SFEMG entries. Suggest extending validator to compare tool_name + tool_parameters or fleet-wide pattern."
+    ]
   }
 }

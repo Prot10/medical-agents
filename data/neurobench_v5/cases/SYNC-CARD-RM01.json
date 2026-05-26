@@ -1,7 +1,7 @@
 {
   "case_id": "SYNC-CARD-RM01",
   "condition": "syncope_cardiac",
-  "difficulty": "moderate",
+  "difficulty": "diagnostic_puzzle",
   "encounter_type": "emergency",
   "patient": {
     "patient_id": "NB-SYNC-CARD-RM01",
@@ -746,162 +746,221 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Cardiac syncope secondary to central sleep apnea with sleep-dependent asystole, caused by anti-Hu paraneoplastic brainstem encephalitis",
-    "icd_code": "R55",
+    "primary_diagnosis": "Syncope due to nocturnal central sleep apnoea with sleep-dependent asystole, driven by anti-Hu paraneoplastic brainstem encephalitis",
+    "icd_code": "G13.1",
     "differential": [
       {
-        "diagnosis": "Obstructive sleep apnea with secondary bradyarrhythmia",
+        "diagnosis": "Primary obstructive sleep apnoea with bradyarrhythmia",
+        "likelihood": "high",
+        "key_features": "Obstructive apnoea can cause severe nocturnal bradycardia and pauses; PSG and arousal patterns distinguish from central apnoea.",
+        "icd_code": "G47.33"
+      },
+      {
+        "diagnosis": "Intrinsic sinus node dysfunction / nocturnal bradyarrhythmia",
         "likelihood": "moderate",
-        "key_features": "Obstructive events show continued respiratory effort against closed airway; this patient has predominantly central apneas without respiratory effort"
+        "key_features": "Atrioventricular and SA-node disease can cause sleep-dependent pauses; Holter and EP study contribute.",
+        "icd_code": "I49.5"
       },
       {
-        "diagnosis": "Primary sick sinus syndrome",
+        "diagnosis": "Brainstem stroke / posterior circulation event",
+        "likelihood": "moderate",
+        "key_features": "Acute brainstem ischaemia can cause autonomic instability; MRI/MRA distinguishes from inflammatory aetiology.",
+        "icd_code": "I63.9"
+      },
+      {
+        "diagnosis": "Vasovagal / sleep-related neurally-mediated syncope",
         "likelihood": "low",
-        "key_features": "Primary SSS produces bradycardia during waking hours as well, not exclusively during sleep; resting ECG shows no conduction abnormalities"
+        "key_features": "Possible but does not explain the encephalitic features.",
+        "icd_code": "R55"
       },
       {
-        "diagnosis": "Epileptic seizure",
-        "likelihood": "very_low",
-        "key_features": "No epileptiform activity on EEG; no post-ictal confusion; no tongue biting or incontinence; events exclusively during sleep with associated apnea and cyanosis"
-      },
-      {
-        "diagnosis": "Brugada syndrome",
-        "likelihood": "very_low",
-        "key_features": "No Brugada pattern on ECG; typically causes ventricular arrhythmia (shockable rhythm), not asystole with preceding apnea"
-      },
-      {
-        "diagnosis": "Myasthenia gravis with respiratory failure",
-        "likelihood": "very_low",
-        "key_features": "Would show fatigable weakness on exam and decremental response on EMG; this patient has full muscle strength"
+        "diagnosis": "Cardiac structural disease",
+        "likelihood": "low",
+        "key_features": "Echo and CMR rule out HCM, ARVC, etc.",
+        "icd_code": "I25.5"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain 12-lead ECG to evaluate for arrhythmia or conduction abnormality",
+        "action": "12-lead ECG immediately",
         "tool_name": "analyze_ecg",
-        "expected_finding": "Normal sinus rhythm, no conduction disease, occasional PVCs",
-        "category": "required"
+        "expected_finding": "Sinus rhythm with non-specific findings; capture of nocturnal pauses requires monitoring",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.2"
       },
       {
         "step": 2,
-        "action": "Obtain routine EEG to rule out epileptic etiology for loss of consciousness",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Normal EEG with no epileptiform discharges",
-        "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
-      },
-      {
-        "step": 3,
-        "action": "Obtain laboratory studies including CBC, BMP, cardiac markers, and arterial blood gas",
+        "action": "Labs: CBC, BMP, Mg, troponin, BNP, TSH, glucose, paraneoplastic and autoimmune panel",
         "tool_name": "interpret_labs",
-        "expected_finding": "Hypercapnia (PaCO2 52) with chronic metabolic compensation, mildly elevated troponin post-CPR",
+        "expected_finding": "Anti-Hu antibody positive supports paraneoplastic brainstem encephalitis; basic panel otherwise unremarkable",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP"
+            "BMP",
+            "magnesium",
+            "troponin",
+            "BNP",
+            "TSH",
+            "paraneoplastic_antibodies"
           ]
-        }
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.3"
+      },
+      {
+        "step": 3,
+        "action": "Brain MRI with contrast for brainstem inflammation / structural lesion",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Brainstem T2/FLAIR hyperintensity with possible enhancement consistent with rhombencephalitis",
+        "category": "required",
+        "tool_parameters": {
+          "sequence": "T2_FLAIR_contrast"
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §4.4"
       },
       {
         "step": 4,
-        "action": "Request continuous cardiac monitoring or Holter monitor to capture sleep-related arrhythmia",
-        "tool_name": "order_cardiac_monitoring",
-        "expected_finding": "Sleep-dependent sinus pauses and asystole preceded by central apneic episodes",
+        "action": "Echocardiogram to exclude structural heart disease",
+        "tool_name": "order_echocardiogram",
+        "expected_finding": "Structurally normal heart; rules out HCM/ARVC contribution",
         "category": "required",
         "tool_parameters": {
-          "monitor_type": "holter_24h"
-        }
+          "echo_type": "TTE"
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §4.1"
       },
       {
         "step": 5,
-        "action": "Request brain MRI to evaluate for structural brainstem pathology",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "No structural brainstem abnormality",
+        "action": "Telemetry + extended monitoring (overnight); plan polysomnography",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Sleep-associated sinus pauses and asystole",
         "category": "required",
         "tool_parameters": {
-          "protocol": "standard",
-          "contrast": false
-        }
+          "monitor_type": "holter_24h"
+        },
+        "citation": "[Locati_2014]",
+        "guideline_source": "Locati 2014"
       },
       {
         "step": 6,
-        "action": "Request chest CT to evaluate for thoracic pathology given clinical suspicion for paraneoplastic syndrome",
-        "tool_name": "interpret_labs",
-        "expected_finding": "3.4 cm mediastinal mass with pathologic lymphadenopathy",
-        "category": "required",
+        "action": "Overnight polysomnography",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Central sleep apnoea pattern with desaturations and arousals correlating with cardiac pauses",
+        "category": "recommended",
         "tool_parameters": {
-          "panels": [
-            "paraneoplastic"
-          ]
-        }
+          "test_type": "polysomnography"
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.4"
       },
       {
         "step": 7,
-        "action": "Search medical literature on central sleep apnea with cardiac arrest and brainstem causes",
+        "action": "Search literature for paraneoplastic encephalitis-related dysautonomia and pacing role",
         "tool_name": "search_medical_literature",
-        "expected_finding": "Association between anti-Hu paraneoplastic brainstem encephalitis and Ondine's curse",
-        "category": "recommended"
+        "expected_finding": "Paraneoplastic central apnoea responds to immunotherapy and tumour treatment; pacing may be needed as a bridge",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.4"
       },
       {
         "step": 8,
-        "action": "Request paraneoplastic antibody panel",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Strongly positive anti-Hu (ANNA-1) antibodies",
+        "action": "Medication review for sedatives / opioids / antihypertensives affecting respiratory drive",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identify respiratory depressants",
         "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "paraneoplastic"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §6"
       },
       {
         "step": 9,
-        "action": "Check drug interactions before prescribing cardiac medications",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Antiarrhythmics are not indicated; address underlying cause",
-        "category": "recommended"
+        "action": "Body imaging for occult malignancy (PET/CT) and neurology / oncology consult",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Tumour search to identify paraneoplastic substrate (often small-cell lung cancer)",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §10"
+      },
+      {
+        "step": 10,
+        "action": "Head CT if MRI not immediately available",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Rules out acute haemorrhage as a one-off",
+        "category": "optional",
+        "tool_parameters": {},
+        "citation": "[ACC_AHA_HRS_2017]",
+        "guideline_source": "ACC/AHA/HRS 2017 §3"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "If anti-Hu workup is being initiated, CSF is potentially informative — but routine CSF analysis without that suspicion is not part of the cardiac syncope work-up. (Flagged not as universally useless but as optional when paraneoplastic is suspected.)",
+        "citation": ""
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_ecg",
+        "after": "consult_medical_specialist",
+        "reason": "ECG and structural assessment must precede commitment to pacing-only strategy when an extracardiac cause is on the differential.",
+        "citation": "[ESC_2018]",
+        "severity": "hard"
+      },
+      {
+        "before": "analyze_brain_mri",
+        "after": "consult_medical_specialist",
+        "reason": "Brain MRI must precede neurology consult to direct paraneoplastic / inflammatory work-up.",
+        "citation": "[ESC_2018]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Obtain ECG and continuous cardiac monitoring to characterize the arrhythmia",
-      "Recognize that normal resting ECG does not exclude paroxysmal arrhythmia during sleep",
-      "Identify hypercapnia on ABG as evidence of chronic hypoventilation",
-      "Obtain chest imaging to evaluate for thoracic malignancy once paraneoplastic syndrome is suspected",
-      "Request paraneoplastic antibody panel given the combination of central sleep apnea, dysphagia, and mediastinal mass",
-      "Ensure nocturnal ventilatory support to prevent recurrent cardiac arrest during sleep"
+      "Brain MRI to evaluate brainstem inflammation",
+      "Polysomnography to characterise sleep breathing pattern",
+      "Anti-Hu and paraneoplastic antibody testing",
+      "Tumour search (PET/CT)",
+      "Pacing consideration as a bridge while immunotherapy is initiated",
+      "Neurology and oncology consultation"
     ],
     "contraindicated_actions": [
-      "Prescribing antiepileptic drugs without evidence of epilepsy on EEG",
-      "Implanting permanent pacemaker as sole treatment without addressing the underlying central sleep apnea etiology",
-      "Administering antiarrhythmic drugs (e.g., amiodarone) for secondary bradyarrhythmia caused by central apnea",
-      "Discharging the patient without continuous nocturnal monitoring or ventilatory support",
-      "Attributing the presentation to obstructive sleep apnea without formal polysomnography differentiating central from obstructive events"
+      "Do not attribute the events solely to OSA without addressing the encephalitic features",
+      "Do not give respiratory-depressant drugs",
+      "Do not delay tumour work-up"
     ],
     "key_reasoning_points": [
-      "The cardiac arrest occurred exclusively during sleep with a non-shockable rhythm (asystole/PEA), and the patient has preserved full consciousness and normal cardiac function when awake, suggesting the arrhythmia is secondary rather than primary",
-      "A normal resting ECG with normal conduction intervals argues against primary cardiac conduction disease as the cause of the sleep-related cardiac arrest",
-      "Hypercapnia (PaCO2 52 mmHg) with metabolic compensation on ABG indicates chronic hypoventilation, pointing toward a respiratory drive abnormality rather than primary cardiac pathology",
-      "Preserved voluntary breathing while awake with loss of automatic respiratory drive during sleep localizes the pathology to the medullary respiratory centers in the lower brainstem (Ondine's curse)",
-      "The absence of brainstem abnormalities on MRI rules out structural causes such as infarction, demyelination, and tumor, directing consideration toward autoimmune or paraneoplastic brainstem encephalitis",
-      "The combination of progressive dysphagia, central sleep apnea, and a mediastinal mass in an elderly male with smoking history strongly suggests anti-Hu paraneoplastic neurologic syndrome, most commonly associated with small cell lung carcinoma",
-      "Anti-Hu antibodies uniquely among paraneoplastic antibodies are associated with central sleep apnea due to targeting of the ventrolateral medulla and nucleus tractus solitarius"
+      "Sleep-dependent cardiac pauses driven by central rather than obstructive apnoea suggest brainstem pathology",
+      "Anti-Hu encephalitis can cause autonomic instability and central apnoea, often as a paraneoplastic phenomenon of small-cell lung cancer",
+      "Brain MRI is mandatory here, not optional — this is a SYNC-CARD mimic where brainstem imaging is on the diagnostic path",
+      "Polysomnography distinguishes central from obstructive apnoea",
+      "Pacing alone will not address the underlying neurological mechanism"
     ],
     "red_herrings": [
       {
-        "data_point": "Subclinical hypothyroidism: TSH 5.8 mIU/L (mildly elevated above upper limit of 4.0)",
-        "location": "labs",
-        "intended_effect": "Suggests hypothyroidism as an explanation for fatigue, bradycardia, and sleep-related symptoms, potentially anchoring the clinician on an endocrine cause",
-        "correct_interpretation": "Subclinical hypothyroidism is an incidental finding in this patient. TSH at this level does not cause cardiac arrest or central sleep apnea. The primary etiology is paraneoplastic anti-Hu brainstem encephalitis affecting the medullary respiratory centers, which is confirmed by positive anti-Hu antibodies and mediastinal mass. Treating hypothyroidism alone would not prevent recurrent nocturnal cardiac arrest.",
-        "field_path": ""
+        "data_point": "History of loud snoring and possible OSA",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Anchors clinician to obstructive sleep apnoea as the sole cause.",
+        "correct_interpretation": "Central rather than obstructive apnoea on PSG, plus brainstem MRI signal, identify a paraneoplastic encephalitis as the underlying mechanism."
+      },
+      {
+        "data_point": "Largely normal resting ECG",
+        "location": "initial_tool_outputs.ecg.interpretation",
+        "field_path": "initial_tool_outputs.ecg.interpretation",
+        "intended_effect": "Suggests no cardiac substrate.",
+        "correct_interpretation": "Daytime ECG can be normal in nocturnal-only sinus arrest; Holter and PSG capture the pauses."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -916,6 +975,14 @@
       "ct": "incidental",
       "advanced_imaging": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SYNC-CARD",
+    "difficulty_rationale": "Mimic case: 6+ required tools (ECG, labs, MRI, echo, monitoring, PSG, drug review, consult); brain MRI is required not optional; the dominant red herring is the OSA anchor; cross-modality synthesis of cardiac, sleep and neurological data.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

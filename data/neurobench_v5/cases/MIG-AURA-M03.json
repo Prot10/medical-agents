@@ -84,116 +84,129 @@
     "extremities": "No peripheral edema"
   },
   "ground_truth": {
-    "primary_diagnosis": "Probable sporadic hemiplegic migraine (first definite motor aura episode) with antecedent visual aura episodes (G43.1); elevated LDL — statin warranted",
-    "primary_diagnosis_icd": "G43.1",
+    "primary_diagnosis": "Probable sporadic hemiplegic migraine (ICHD-3 1.2.3) — first definite motor aura episode with antecedent visual aura episodes",
+    "icd_code": "G43.109",
     "differential": [
       {
-        "diagnosis": "Transient ischemic attack",
-        "likelihood": "low",
-        "key_features": "Normal DWI on MRI (10 days post-episode — DWI lesions persist 7-10 days); gradual sensory/motor spread over 20-25 minutes argues against embolic TIA; no AF on Holter; no carotid stenosis; no cardioembolic source; preceding 4-5 year history of visual episodes consistent with migraine"
-      },
-      {
-        "diagnosis": "Familial hemiplegic migraine",
-        "likelihood": "very_low",
-        "key_features": "No family history of motor aura migraine; father's stroke was at 68 and not hemiplegic migraine; sporadic form possible; genetic testing not yet indicated"
+        "diagnosis": "Cardioembolic / large-artery TIA",
+        "likelihood": "moderate",
+        "key_features": "Motor aura always requires TIA exclusion; gradual onset and subsequent migrainous headache argue against TIA; normal MRI/MRA needed",
+        "icd_code": "G45.9"
       },
       {
         "diagnosis": "Focal motor seizure",
+        "likelihood": "low",
+        "key_features": "Seizure propagation is seconds; 15-20 min march is too slow",
+        "icd_code": "G40.109"
+      },
+      {
+        "diagnosis": "Familial hemiplegic migraine (CACNA1A / ATP1A2 / SCN1A)",
+        "likelihood": "low",
+        "key_features": "No family history of hemiplegic migraine — sporadic form more likely; genetic testing optional",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "CADASIL",
         "likelihood": "very_low",
-        "key_features": "Motor weakness over 20-25 minutes is far too gradual for focal motor seizure (seconds to minutes maximum); no tonic-clonic activity; EEG no focal epileptiform activity; post-event severe headache fits migraine"
+        "key_features": "No family history of stroke/dementia; consider only with positive family history",
+        "icd_code": "I67.850"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI with DWI, MRA (intracranial + cervical) — exclude acute infarction and dissection",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "No DWI restriction; normal MRA; non-specific WMH; not TIA on imaging",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
         "category": "required",
         "tool_parameters": {
-          "contrast": true,
-          "sequences": [
-            "DWI",
-            "FLAIR",
-            "T1+Gd",
-            "MRA"
-          ]
-        }
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "Cardiac monitoring (Holter) and echocardiogram to exclude AF and cardioembolic source",
-        "tool_name": "order_cardiac_monitoring",
-        "expected_finding": "Normal Holter; tiny PFO on echo — no action needed without confirmed stroke",
-        "category": "recommended",
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "TRIPTANS AND ERGOTAMINES ARE CONTRAINDICATED IN HEMIPLEGIC MIGRAINE — use NSAIDs, antiemetics, or lasmiditan/gepants instead; review statin indication given elevated LDL",
+        "category": "required",
         "tool_parameters": {
-          "duration_hours": 24
-        }
+          "context": "hemiplegic_migraine_triptan_contraindication"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 3,
-        "action": "Treat elevated LDL 148 with statin (atorvastatin 20-40 mg) for vascular risk reduction",
-        "tool_name": null,
-        "expected_finding": "LDL 148 mg/dL with family history of stroke and hypertension = statin-eligible",
+        "action": "Brain MRI with MRA to exclude structural / vascular cause of motor aura",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Normal MRI/MRA; no infarct, dissection, or AVM",
         "category": "required",
-        "tool_parameters": {}
-      },
-      {
-        "step": 4,
-        "action": "Advise against triptans pending confirmation of motor aura diagnosis; use NSAIDs + antiemetics for acute treatment",
-        "tool_name": null,
-        "expected_finding": "Triptans cautioned in hemiplegic migraine; alternative acute treatment appropriate",
-        "category": "required",
-        "tool_parameters": {}
-      },
-      {
-        "step": 5,
-        "action": "Arrange headache diary and follow-up for second episode to confirm SHM diagnosis",
-        "tool_name": null,
-        "expected_finding": "ICHD-3 requires ≥2 motor aura episodes for SHM diagnosis",
-        "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "contrast": false,
+          "sequences": [
+            "DWI",
+            "FLAIR",
+            "T2",
+            "SWI",
+            "MRA"
+          ]
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis — neither present here",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "MR_angiography"
+        },
+        "rationale": "Routine MRA is not indicated in typical migraine with aura — reserve for sudden-onset / thunderclap headache, suspected dissection, or focal deficit raising concern for vascular cause",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "Normal DWI on MRI is the key finding that distinguishes hemiplegic migraine from TIA — reassurance appropriate",
-      "Prior 4-5 year history of visual episodes was overlooked; linking these to the current motor aura episode is essential for migraine diagnosis",
-      "Statin therapy indicated for elevated LDL 148 — vascular risk reduction appropriate",
-      "Avoid triptans pending confirmation of motor aura diagnosis; NSAIDs + antiemetics for acute treatment",
-      "ICHD-3 requires ≥2 motor aura episodes — diagnose as 'probable SHM' until second episode"
+      "Brain MRI/MRA required for first motor aura to exclude vascular cause",
+      "Avoid triptans and ergotamines in hemiplegic migraine",
+      "Use NSAIDs, antiemetics, or gepants/lasmiditan for acute therapy",
+      "Address elevated LDL with lifestyle and consider statin per primary prevention thresholds",
+      "Consider preventive therapy if recurrent episodes (topiramate, verapamil)"
     ],
     "contraindicated_actions": [
-      "Do not diagnose TIA without DWI restriction — normal DWI at 10 days is reassuring against acute TIA",
-      "Do not prescribe triptans for acute treatment if motor aura confirmed",
-      "Do not close PFO based on migraine diagnosis alone — no confirmed stroke"
+      "Do not prescribe triptans in hemiplegic migraine",
+      "Do not prescribe ergotamines in hemiplegic migraine",
+      "Do not co-administer ergotamines with triptans"
     ],
     "key_reasoning_points": [
-      "Prior 4-5 years of brief visual episodes = unrecognised migraine with visual aura — the motor aura episode is a new aura type, not first presentation of migraine",
-      "Gradual motor/sensory spread over 20-25 minutes is characteristic of CSD, not embolic TIA; rate of spread equals CSD propagation speed (3-5 mm/min)",
-      "Elevated LDL 148 mg/dL is an incidental finding requiring treatment in its own right",
-      "ICHD-3 SHM requires ≥2 motor aura attacks; this patient has 1 — label as probable SHM",
-      "Triptans are cautioned (not absolutely contraindicated) in hemiplegic migraine; NSAIDs are the preferred alternative"
+      "Hemiplegic migraine is defined by fully reversible motor aura and requires TIA exclusion at first presentation",
+      "Triptans and ergotamines are contraindicated in hemiplegic migraine due to vasoconstriction risk",
+      "Sporadic form (no family history) is more common than familial; genetic testing is optional"
     ],
     "red_herrings": [
       {
-        "data_point": "Motor weakness, speech difficulty, and first-ever episode in a 42-year-old — appropriate TIA workup",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Motor weakness and speech difficulty in a 42-year-old man with hypertension and elevated LDL is a reasonable TIA concern",
-        "correct_interpretation": "Normal DWI at 10 days post-episode is reassuring; gradual spread over 20-25 minutes is characteristic of CSD not embolism; prior 4-5 year history of visual episodes establishes migraine predisposition",
-        "field_path": ""
-      },
-      {
-        "data_point": "Elevated LDL 148 and family history of stroke at 68",
-        "location": "initial_tool_outputs.labs.interpretation",
-        "intended_effect": "Elevated cholesterol and family stroke history strengthen TIA hypothesis",
-        "correct_interpretation": "These are genuine vascular risk factors requiring statin treatment, but they do not change the neurological diagnosis; DWI is normal; the LDL should be treated regardless",
-        "field_path": ""
+        "data_point": "Elevated LDL",
+        "location": "patient.clinical_history (or labs)",
+        "field_path": "",
+        "intended_effect": "May anchor on atherosclerotic TIA",
+        "correct_interpretation": "Elevated LDL warrants primary prevention attention but does not change the migraine diagnosis once TIA is excluded by normal MRI/MRA"
       }
-    ],
-    "icd_code": "G43.1",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -216,7 +229,17 @@
       "ct": "normal",
       "advanced_imaging": "normal",
       "specialized_test": "incidental"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Moderate: hemiplegic migraine requires MRI/MRA and triptan contraindication management",
+    "case_body_concerns": [
+      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide §1): ['analyze_eeg', 'interpret_labs', 'order_cardiac_monitoring', 'order_echocardiogram']"
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "initial_tool_outputs": {
     "mri": {

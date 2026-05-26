@@ -581,154 +581,225 @@
   },
   "ground_truth": {
     "primary_diagnosis": "CNS toxoplasmosis reactivation presenting as new-onset focal seizure with NCSE and traumatic head injury from seizure-related fall in HIV patient",
-    "icd_code": "G41.9",
+    "icd_code": "G41.2",
     "differential": [
       {
         "diagnosis": "Primary CNS lymphoma",
+        "likelihood": "high",
+        "key_features": "HIV patient with ring-enhancing lesion; toxoplasma vs PCNSL distinction requires thallium SPECT or response to empiric toxo therapy",
+        "icd_code": "C85.99"
+      },
+      {
+        "diagnosis": "Tuberculoma / mycobacterial CNS infection",
         "likelihood": "moderate",
-        "key_features": "Ring-enhancing lesion in HIV patient; however MRS shows lipid/lactate without elevated choline; Toxoplasma IgG positive and CSF PCR positive; EBV CSF negative — toxoplasmosis confirmed"
+        "key_features": "HIV patient with possible ring-enhancing lesion; CSF AFB and TB workup indicated",
+        "icd_code": "A17.81"
       },
       {
-        "diagnosis": "Brain abscess (bacterial)",
-        "likelihood": "low",
-        "key_features": "DWI shows peripheral restriction not central (abscess = central restriction); Toxoplasma PCR positive; no fever; no source of bacteremia"
+        "diagnosis": "PML (progressive multifocal leukoencephalopathy)",
+        "likelihood": "moderate",
+        "key_features": "HIV patient with new neurological event; MRI pattern usually non-enhancing white-matter; less likely with ring-enhancement",
+        "icd_code": "A81.2"
       },
       {
-        "diagnosis": "Post-traumatic seizure with subdural hematoma",
+        "diagnosis": "Traumatic intracerebral contusion as primary seizure cause",
+        "likelihood": "moderate",
+        "key_features": "Left temporal contusion noted on CT from fall — could itself produce seizures; coexists with toxoplasmosis lesion",
+        "icd_code": "S06.330A"
+      },
+      {
+        "diagnosis": "Cryptococcal meningitis",
         "likelihood": "low",
-        "key_features": "No subdural on CT; contrecoup contusion explains left NCSE but ring-enhancing basal ganglia lesion is non-traumatic; toxoplasmosis is the primary pathology"
+        "key_features": "HIV patient at risk; usually presents with meningismus and hydrocephalus rather than focal mass",
+        "icd_code": "B45.1"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Emergent CT head with contrast to exclude hemorrhage and identify ring-enhancing lesion",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "Left temporal contrecoup contusion + incidental left basal ganglia ring-enhancing lesion",
+        "action": "Continuous video-EEG — confirm NCSE and laterality",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Left temporal-parietal evolving rhythmic 1.8-2.5 Hz sharp-wave complexes — NCSE concordant with imaging lesion",
         "category": "required",
-        "tool_parameters": {
-          "contrast": true,
-          "urgency": "stat"
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "Emergent EEG for NCSE diagnosis",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Left temporal NCSE",
+        "action": "Labs: CBC, CMP, glucose, Ca/Mg, AED level, lactate, ABG, CD4, HIV viral load, toxoplasma IgG/IgM, blood cultures, tox screen",
+        "tool_name": "interpret_labs",
+        "expected_finding": "CD4 382 (lower limit of protective range), expected toxoplasma IgG positive",
         "category": "required",
-        "tool_parameters": {
-          "urgency": "stat"
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "IV lorazepam + levetiracetam loading for NCSE — preferred over phenytoin/carbamazepine in HIV (no CYP induction affecting cART)",
-        "tool_name": null,
-        "expected_finding": "NCSE suppression",
+        "action": "Non-contrast head CT — characterize ring-enhancing lesion + contusion + hemorrhage",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Left temporal traumatic contusion + left basal ganglia ring-enhancing lesion — toxoplasmosis vs PCNSL",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "MRI brain with gadolinium for ring-enhancing lesion characterization and MR spectroscopy",
+        "action": "MRI brain with gadolinium — characterize ring-enhancing lesion and assess for additional lesions",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Eccentric target sign + MRS lipid/lactate — toxoplasmosis; EBV in CSF negative",
+        "expected_finding": "Multiple ring-enhancing lesions favoring toxoplasmosis over PCNSL",
         "category": "required",
-        "tool_parameters": {
-          "sequences": [
-            "T1+Gd",
-            "T2",
-            "DWI",
-            "MRS"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "Serum Toxoplasma IgG serology and LP with CSF Toxoplasma PCR",
+        "action": "Toxoplasma serology + repeat HIV labs",
         "tool_name": "interpret_labs",
-        "expected_finding": "Toxoplasma IgG positive; CSF Toxoplasma PCR positive",
+        "expected_finding": "Toxoplasma IgG positive supports reactivation toxoplasmosis",
         "category": "required",
-        "tool_parameters": {
-          "tests": [
-            "toxoplasma_IgG",
-            "CSF_toxo_PCR"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 6,
-        "action": "Check drug interactions: cART + AED — avoid enzyme-inducing AEDs with cART",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Levetiracetam safe; phenytoin/carbamazepine contraindicated with cART",
+        "action": "Lumbar puncture (after MRI confirms no contraindicating mass effect) for opportunistic infection workup",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Mild lymphocytic pleocytosis; toxo PCR may be negative (low sensitivity); cryptococcal antigen + India ink negative",
         "category": "required",
-        "tool_parameters": {
-          "drugs": [
-            "bictegravir",
-            "levetiracetam",
-            "phenytoin"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 7,
-        "action": "Initiate pyrimethamine 200 mg loading then 75 mg/day + clindamycin 600 mg IV q6h + leucovorin 20 mg/day (sulfonamide allergy precludes sulfadiazine)",
-        "tool_name": null,
-        "expected_finding": "Ring-enhancing lesion shrinks over 2 weeks with treatment",
+        "action": "Drug-interaction check: cART + AED + pyrimethamine/sulfadiazine for toxoplasmosis",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Levetiracetam preferred (minimal interactions with cART); avoid enzyme-inducing AEDs (phenytoin/CBZ) that reduce ART levels",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[ESETT_2019]",
+        "guideline_source": ""
       },
       {
         "step": 8,
-        "action": "Continue and optimize cART — Biktarvy should not be interrupted; ID consultation",
-        "tool_name": null,
-        "expected_finding": "Maintain viral suppression and immune reconstitution support",
+        "action": "Literature: empiric toxoplasmosis therapy and response criteria + PCNSL differentiation",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Empiric pyrimethamine + sulfadiazine + leucovorin; reimage at 2 weeks; if no response, biopsy for PCNSL",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 9,
+        "action": "Infectious-disease consultation",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Co-management of HIV opportunistic infection",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "study_type": "TTE"
+        },
+        "rationale": "No clinical suspicion of cardiac source of embolus or cardiogenic seizure; routine echo is not indicated in SE workup absent cardiac findings.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No suspicion of arrhythmogenic syncope or cardiac comorbidity precipitating SE; routine telemetry beyond standard ICU monitoring adds cost without yield.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in acute SE evaluation; dementia biomarker imaging does not change acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is for ischemic stroke workup; SE without focal vascular suspicion does not warrant carotid imaging.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "DaTscan / dopamine transporter imaging has no role in SE; no parkinsonism question relevant to acute management.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "MRI must precede LP in HIV patient with ring-enhancing lesion to exclude mass effect.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "CD4 and viral load + creatinine confirmed before adjusting ART or starting toxoplasmosis therapy.",
+        "citation": "[Brophy_2012]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "CT head immediately to exclude epidural/subdural hematoma and identify ring-enhancing lesion",
-      "Levetiracetam for AED — do NOT use phenytoin or carbamazepine (CYP induction reduces cART levels)",
-      "Serum Toxoplasma IgG and CSF Toxoplasma PCR for diagnosis",
-      "Pyrimethamine + clindamycin + leucovorin (sulfonamide allergy — cannot use sulfadiazine)",
-      "Leucovorin mandatory with pyrimethamine — prevents megaloblastic anemia",
-      "Continue cART — do NOT stop antiretroviral therapy"
+      "Administer IV lorazepam 0.1 mg/kg first-line",
+      "Empiric toxoplasmosis treatment (pyrimethamine + sulfadiazine + leucovorin)",
+      "Load levetiracetam as second-line AED (compatible with cART)",
+      "Trauma assessment (cervical spine, surgical evaluation of contusion)",
+      "Continue cART without interruption"
     ],
     "contraindicated_actions": [
-      "Phenytoin or carbamazepine for seizure prophylaxis in HIV patient on cART — CYP3A4 induction reduces bictegravir and other antiretroviral levels dramatically",
-      "Sulfadiazine — sulfonamide allergy; use clindamycin as alternative",
-      "Stopping cART — continuation essential for immune reconstitution and toxoplasmosis control",
-      "Delaying toxoplasmosis treatment to await biopsy — empiric treatment for 2 weeks is standard; biopsy only if no response"
+      "Do NOT perform LP without MRI assessment of mass effect",
+      "Do NOT use enzyme-inducing AEDs (phenytoin, carbamazepine) that reduce cART efficacy",
+      "Do NOT delay empiric toxoplasmosis treatment for 2-week response window",
+      "LP should be deferred until MRI confirms ring-enhancing lesions do not cause significant mass effect — herniation risk in basal ganglia lesion."
     ],
     "key_reasoning_points": [
-      "New seizure in HIV patient = CNS structural lesion until proven otherwise — ring-enhancing lesion is toxoplasmosis at CD4 382",
-      "Enzyme-inducing AEDs (phenytoin, carbamazepine, valproate to a lesser extent) reduce antiretroviral levels — levetiracetam is the safe AED in HIV",
-      "Sulfonamide allergy precludes sulfadiazine — clindamycin is the established alternative for CNS toxoplasmosis",
-      "Leucovorin is mandatory with pyrimethamine to prevent bone marrow toxicity — not optional",
-      "The contrecoup contusion explains the left NCSE on EEG — the right-sided head impact caused left temporal cortical seizure focus, not the basal ganglia toxoplasmosis lesion directly",
-      "Ring-enhancing lesion identified incidentally — it likely caused the first seizure that led to the fall; this is the primary diagnosis"
+      "Ring-enhancing lesions in HIV patients are toxoplasmosis vs PCNSL until proven otherwise; multiple lesions favor toxoplasmosis",
+      "Empiric toxoplasmosis treatment is the standard first step; response at 2 weeks confirms diagnosis; failure prompts biopsy for PCNSL",
+      "Levetiracetam is the preferred AED in HIV patients on cART to avoid drug-drug interactions",
+      "Seizure-related falls cause traumatic contusions — assess for concurrent injuries"
     ],
     "red_herrings": [
       {
-        "data_point": "CD4 382 cells/mm3 (above classic opportunistic infection threshold of 100-200 cells/mm3)",
-        "location": "labs — HIV Panel",
-        "intended_effect": "Suggests toxoplasmosis is unlikely at CD4 382 (above the classic threshold of <200), prompting attribution of ring-enhancing lesion to other etiology (PCNSL, abscess) and delaying empiric toxoplasmosis treatment",
-        "correct_interpretation": "Toxoplasmosis can occur at CD4 counts up to 500 cells/mm3 in patients with high pre-existing antibody titers; Toxoplasma IgG titer 1:512 confirms prior exposure; CSF PCR positive (850 copies/mL) is definitive; empiric treatment is indicated regardless of CD4 threshold when clinical picture is consistent",
-        "field_path": ""
+        "data_point": "Left temporal traumatic contusion from fall",
+        "location": "initial_tool_outputs.ct",
+        "field_path": "initial_tool_outputs.ct.findings[2]",
+        "intended_effect": "Suggests traumatic brain injury as the primary cause of seizure and confusion",
+        "correct_interpretation": "Contusion is a consequence of the seizure-related fall, not the cause; the basal-ganglia ring-enhancing lesion is the primary pathology"
       },
       {
-        "data_point": "Right-sided head impact with visible right temporal scalp laceration and hematoma — prominent traumatic mechanism",
-        "location": "initial_tool_outputs — ct and neurological_exam",
-        "intended_effect": "Focuses attention on traumatic etiology (post-traumatic seizure from right temporal contusion) and misses the left basal ganglia ring-enhancing lesion as the primary pathology; may prompt CT without contrast (missing ring enhancement) or attribution of all findings to trauma",
-        "correct_interpretation": "The right temporal impact caused contrecoup left temporal contusion; however, the left basal ganglia ring-enhancing lesion is non-traumatic and is best explained by HIV-associated toxoplasmosis reactivation; this lesion likely caused the initial seizure that precipitated the fall — the HIV diagnosis must redirect the diagnostic workup",
-        "field_path": ""
+        "data_point": "CD4 382 cells/mm3",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests CD4 above the protective threshold of 200 — toxoplasmosis less likely",
+        "correct_interpretation": "Optimal toxoplasmosis protection requires CD4 >500 with viral suppression; CD4 in 200-500 range still leaves patient at risk if poor adherence or recent infection"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -737,6 +808,14 @@
       "cardiac_monitoring": "incidental",
       "advanced_imaging": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "9 required tools; HIV patient with NCSE and ring-enhancing lesion — must triage toxoplasmosis vs PCNSL; LP timing flagged; ART-compatible AED choice critical; 2 grounded red herrings (contusion, CD4).",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

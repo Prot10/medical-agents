@@ -491,108 +491,240 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Non-convulsive status epilepticus (NCSE) from paraneoplastic anti-Hu limbic encephalitis associated with suspected small cell lung cancer",
-    "icd_code": "G41.9",
+    "primary_diagnosis": "Non-convulsive status epilepticus secondary to paraneoplastic anti-Hu limbic encephalitis (suspected small cell lung cancer)",
+    "icd_code": "G41.2",
     "differential": [
       {
-        "diagnosis": "Ischemic stroke mimicking NCSE",
-        "likelihood": "very_low",
-        "key_features": "MRI shows ictal pseudostroke (cortical ribbon DWI not vascular territory); NCSE resolved with AED; stroke would not resolve with lorazepam"
+        "diagnosis": "Acute ischemic stroke with seizure mimicking NCSE",
+        "likelihood": "moderate",
+        "key_features": "CT shows subtle left temporal hypodensity, exam shows gaze deviation and facial droop; however MRI shows cortical ribbon DWI pattern not conforming to vascular territory — ictal pseudostroke not infarct",
+        "icd_code": "I63.9"
       },
       {
-        "diagnosis": "Autoimmune encephalitis (non-paraneoplastic)",
-        "likelihood": "very_low",
-        "key_features": "Hu antibody positive - paraneoplastic; CT shows lung mass; paraneoplastic not autoimmune etiology"
+        "diagnosis": "HSV / viral limbic encephalitis",
+        "likelihood": "moderate",
+        "key_features": "Temporal lobe involvement and altered mental status overlap with HSV; CSF HSV PCR negative and anti-Hu strongly positive favor paraneoplastic etiology",
+        "icd_code": "B00.4"
       },
       {
-        "diagnosis": "Metabolic encephalopathy with EEG slowing",
+        "diagnosis": "Non-paraneoplastic autoimmune encephalitis (NMDAR / LGI1)",
+        "likelihood": "low",
+        "key_features": "NMDAR and LGI1 antibodies negative on the autoimmune panel; anti-Hu positivity points to paraneoplastic limbic encephalitis",
+        "icd_code": "G04.81"
+      },
+      {
+        "diagnosis": "Metabolic / toxic encephalopathy with EEG slowing",
+        "likelihood": "low",
+        "key_features": "EEG shows continuously evolving rhythmic theta-delta meeting Salzburg criteria for NCSE — not generalized triphasic waves of metabolic encephalopathy",
+        "icd_code": "G93.41"
+      },
+      {
+        "diagnosis": "Psychogenic non-epileptic status (pseudo-status)",
         "likelihood": "very_low",
-        "key_features": "EEG shows rhythmic evolving ictal not just triphasic waves; clinical confusion resolved with AED trial confirming ictal"
+        "key_features": "Definite electrographic NCSE pattern on EEG excludes pseudo-status",
+        "icd_code": "F44.5"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "EEG identifies NCSE - subtle left temporal continuous activity",
+        "action": "Immediate continuous video-EEG to evaluate persistent altered mental status — looking for NCSE",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Subtle continuous left temporal NCSE pattern - explains 45 minutes confusion",
+        "expected_finding": "Continuous left temporal rhythmic 2-3 Hz theta-delta with embedded sharps meeting Salzburg NCSE criteria",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": "Brophy_2012"
       },
       {
         "step": 2,
-        "action": "MRI - ictal pseudostroke not ischemic stroke",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Cortical ribbon DWI restriction = ictal pseudostroke; no tPA indicated",
+        "action": "Comprehensive labs: CBC, CMP, glucose, Ca/Mg, AED levels, ammonia, ABG, lactate, blood cultures, tox screen",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Mild WBC elevation (post-ictal); glucose 142 — not the SE etiology",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": "Brophy_2012"
       },
       {
         "step": 3,
-        "action": "Autoimmune panel - Hu antibody positive",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Hu antibody 1:1000 - paraneoplastic; urgent cancer workup",
+        "action": "Non-contrast head CT to exclude acute hemorrhage / mass before LP and to triage stroke pathway",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Subtle left temporal hypodensity — not a vascular-territory infarct; no hemorrhage or mass effect",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": "Brophy_2012"
       },
       {
         "step": 4,
-        "action": "CT body - hilar lung mass SCLC",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Hilar mass suspicious for SCLC - paraneoplastic source",
+        "action": "MRI brain with DWI/FLAIR/contrast — characterise subacute structural cause",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Cortical ribbon DWI restriction not conforming to a vascular territory — ictal pseudostroke pattern, supports NCSE etiology over acute infarct",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": "Glauser_2016"
       },
       {
         "step": 5,
-        "action": "IV AED for NCSE + immunotherapy for paraneoplastic encephalitis",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Treat NCSE with AEDs; paraneoplastic: steroids + IVIG + treat cancer urgently",
+        "action": "Lumbar puncture with HSV/enterovirus PCR, cell count, protein/glucose, autoimmune+paraneoplastic CSF antibodies, cytology",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Lymphocytic pleocytosis with mildly elevated protein and CSF anti-Hu positive — paraneoplastic limbic encephalitis",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": "Brophy_2012"
+      },
+      {
+        "step": 6,
+        "action": "Autoimmune / paraneoplastic serum panel (NMDAR, LGI1, Hu/ANNA-1, Ri, CV2, Ma2, Yo, GAD65)",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Anti-Hu positive 1:1000 — paraneoplastic; mandates urgent cancer search",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": "Brophy_2012"
+      },
+      {
+        "step": 7,
+        "action": "Body imaging for occult malignancy in new-onset paraneoplastic syndrome — CT chest/abdomen/pelvis with contrast",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Right hilar 2.8 cm mass with mediastinal lymphadenopathy and spiculated RUL nodule — suspicious for SCLC",
+        "category": "required",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[Brophy_2012]",
+        "guideline_source": "Brophy_2012"
+      },
+      {
+        "step": 8,
+        "action": "Drug interaction check for benzodiazepine + second-line AED (levetiracetam preferred per ESETT)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Lorazepam → levetiracetam regimen safe; avoid valproate given paraneoplastic context",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[ESETT_2019]",
+        "guideline_source": "ESETT_2019"
+      },
+      {
+        "step": 9,
+        "action": "Literature review: paraneoplastic NCSE treatment (immunotherapy + tumor-directed therapy)",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Anti-Hu paraneoplastic NCSE: AEDs + steroids/IVIG + treat SCLC; intracellular-antigen syndromes respond poorly to immunotherapy alone",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": "Brophy_2012"
+      },
+      {
+        "step": 10,
+        "action": "Neurology and critical-care consultation for ICU continuous EEG and management plan",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Co-management with epileptology and oncology for paraneoplastic SE",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": "Brophy_2012"
+      },
+      {
+        "step": 11,
+        "action": "Baseline 12-lead ECG before initiating IV AEDs in an older patient",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Normal sinus rhythm, normal QTc — safe to load second-line AED",
+        "category": "optional",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": "Brophy_2012"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "study_type": "TTE"
+        },
+        "rationale": "No cardiac source-of-embolus question — MRI ictal-pseudostroke pattern excludes cardioembolic stroke as the mechanism.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No arrhythmia or syncope to evaluate; standard ICU telemetry suffices.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "rationale": "Neuropsych battery cannot be performed in an encephalopathic patient and does not change acute SE management.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "Head CT must precede LP to exclude space-occupying lesion or hemorrhage that contraindicates LP.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Confirm electrolytes (Ca, Mg, Na) and renal function before loading AEDs to dose appropriately.",
+        "citation": "[Brophy_2012]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "EEG essential to diagnose NCSE - clinical examination alone insufficient",
-      "MRI differentiates ictal pseudostroke from ischemic stroke - DO NOT give tPA for ictal DWI changes",
-      "Hu antibody positive: urgent cancer workup urgently - SCLC most common",
-      "CT body reveals hilar lung mass - oncology consultation for biopsy/treatment",
-      "IV levetiracetam + lorazepam for NCSE",
-      "IV methylprednisolone + IVIG for paraneoplastic encephalitis"
+      "Administer IV lorazepam 0.1 mg/kg as first-line treatment immediately — do NOT delay benzodiazepine for diagnostics",
+      "Load second-line AED (levetiracetam 60 mg/kg IV, per ESETT) if seizure persists after benzodiazepine",
+      "Continuous video-EEG to confirm NCSE control after treatment",
+      "Initiate empiric IV acyclovir until HSV PCR returns",
+      "Initiate immunotherapy (high-dose methylprednisolone +/- IVIG) once paraneoplastic etiology established",
+      "Urgent oncology consultation for tissue diagnosis of suspected SCLC"
     ],
     "contraindicated_actions": [
-      "Do not give tPA - ictal pseudostroke not ischemic stroke (cortical ribbon DWI pattern)",
-      "Do not miss paraneoplastic etiology - new-onset NCSE in 65yo smoker requires cancer workup",
-      "Do not rely on clinical examination alone to diagnose or exclude NCSE",
-      "Do not delay cancer workup - paraneoplastic encephalitis requires treating the cancer"
+      "Do NOT administer IV thrombolysis (tPA) — cortical ribbon DWI is ictal pseudostroke, not vascular-territory infarct",
+      "Do NOT defer LP for autoimmune workup after CT excludes mass effect",
+      "Do NOT rely on resolution of motor activity to declare SE terminated — continuous EEG is required"
     ],
     "key_reasoning_points": [
-      "NCSE presents as persistent confusion without convulsions - EEG is essential for diagnosis",
-      "Ictal pseudostroke: DWI restriction from NCSE shows cortical ribbon pattern (not vascular territory); resolves with seizure control",
-      "New-onset focal NCSE in 65yo: always investigate structural/paraneoplastic cause",
-      "Hu antibody positive + lung mass = paraneoplastic limbic encephalitis from SCLC",
-      "AED therapeutic trial: clinical confusion resolution with lorazepam confirms NCSE diagnosis",
-      "Do NOT give tPA for ictal DWI changes - this would be harmful"
+      "Persistent altered mental status after a brief convulsive event in an older patient with no epilepsy is NCSE until EEG proves otherwise",
+      "Cortical-ribbon DWI restriction that does not respect arterial territory is the signature of ictal pseudostroke, not acute infarct",
+      "Anti-Hu (ANNA-1) positivity is >80% associated with SCLC and demands urgent CT chest / FDG-PET for tumor identification",
+      "Intracellular-antigen paraneoplastic syndromes (anti-Hu) are best treated by treating the underlying tumor; immunotherapy alone often disappoints",
+      "Salzburg NCSE criteria (rhythmic ≥2.5 Hz with evolution, or LPDs + clinical/EEG response to benzodiazepines) operationalize ambiguous patterns"
     ],
     "red_herrings": [
       {
-        "data_point": "Subtle left temporal hypodensity on CT head",
-        "location": "initial_tool_outputs.ct.findings[0]",
-        "intended_effect": "Suggests early left MCA territory ischemic stroke, prompting tPA consideration in a patient with acute confusion and left temporal changes",
-        "correct_interpretation": "Post-ictal or ictal edema from NCSE, not ischemic stroke; MRI shows cortical ribbon DWI pattern (not vascular territory) confirming ictal pseudostroke; clinical confusion responds to IV lorazepam not thrombolytics",
-        "field_path": ""
+        "data_point": "Subtle left temporal hypodensity on non-contrast CT",
+        "location": "initial_tool_outputs.ct",
+        "field_path": "initial_tool_outputs.ct.findings[0]",
+        "intended_effect": "Suggests early MCA-territory infarct prompting tPA pathway",
+        "correct_interpretation": "MRI shows cortical-ribbon DWI pattern that does not respect a vascular territory — ictal pseudostroke, not acute ischemic stroke"
       },
       {
-        "data_point": "Gaze preference left and right facial droop on neurological exam",
+        "data_point": "Right facial droop and intermittent left gaze preference on neurological exam",
         "location": "patient.neurological_exam.cranial_nerves",
-        "intended_effect": "Mimics a right hemisphere focal cortical deficit consistent with left MCA stroke, reinforcing misdiagnosis of acute ischemic stroke",
-        "correct_interpretation": "Ictal lateral gaze deviation toward the seizure focus (left temporal); fluctuating nature and resolution after lorazepam confirm ictal not ischemic etiology; vascular stroke would produce fixed not fluctuating deficits",
-        "field_path": ""
+        "field_path": "patient.neurological_exam.cranial_nerves",
+        "intended_effect": "Mimics focal cortical deficit from MCA stroke",
+        "correct_interpretation": "Ictal eye deviation toward the seizure focus and fluctuating cranial-nerve findings — vascular deficits are fixed, not fluctuating"
+      },
+      {
+        "data_point": "Mild WBC elevation to 12.2 ×10^9/L",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs.panels.CBC[0]",
+        "intended_effect": "Suggests primary infectious etiology (meningitis / encephalitis)",
+        "correct_interpretation": "Post-ictal leukocytosis is common after SE and does not establish CNS infection; CSF and HSV PCR are required"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -601,6 +733,14 @@
       "cardiac_monitoring": "incidental",
       "specialized_test": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "10 required tools across EEG/labs/CT/MRI/CSF/body imaging/literature/drug-check; 3 grounded red herrings (ictal pseudostroke, ictal cranial-nerve findings, post-ictal WBC); cross-modality synthesis of EEG + MRI + autoimmune panel + body imaging needed to nail paraneoplastic etiology.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

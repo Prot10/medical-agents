@@ -807,188 +807,276 @@
     "icd_code": "G04.81",
     "differential": [
       {
-        "diagnosis": "Primary psychiatric disorder (first-break psychosis with catatonic features)",
-        "likelihood": "low",
-        "key_features": "The patient's pre-existing anxiety diagnosis and initial psychiatric presentation with paranoia, insomnia, and behavioral changes led to initial psychiatric management. However, the subsequent development of seizures, CSF pleocytosis, and EEG abnormalities distinguishes this from primary psychiatric illness. Pure psychiatric disorders do not cause CSF pleocytosis or electrographic seizures."
+        "diagnosis": "Herpes simplex virus (HSV-1) encephalitis",
+        "likelihood": "high",
+        "key_features": "Acute febrile encephalopathy with temporal-lobe focus; mandatory empiric acyclovir until CSF HSV-1/2 PCR returns negative.",
+        "icd_code": "B00.4"
       },
       {
-        "diagnosis": "Viral encephalitis (HSV)",
-        "likelihood": "low",
-        "key_features": "Temporal lobe involvement on MRI overlaps with HSV encephalitis, but HSV typically presents more acutely with high fever, has hemorrhagic changes and restricted diffusion on MRI, and shows positive HSV PCR in CSF. All viral PCRs are negative in this case, and the subacute 3-week course is more typical of autoimmune encephalitis."
+        "diagnosis": "Other autoimmune (paraneoplastic) encephalitis (anti-LGI1, CASPR2, GABA-B, or AMPAR)",
+        "likelihood": "moderate",
+        "key_features": "Limbic encephalitis phenotype with similar imaging; distinguished by surface-antigen antibody panel and demographic skew (LGI1/CASPR2 older men, GABA-B with SCLC, AMPAR with thymoma).",
+        "icd_code": "G04.81"
       },
       {
-        "diagnosis": "Hashimoto encephalopathy (SREAT)",
-        "likelihood": "low",
-        "key_features": "Can present with encephalopathy, seizures, and CSF pleocytosis. Distinguished by markedly elevated anti-TPO antibodies and thyroid dysfunction. This patient has normal thyroid function and normal anti-TPO antibodies. Family history of autoimmune disease raises the consideration but does not confirm this diagnosis."
+        "diagnosis": "Primary psychiatric disorder (first-episode psychosis / catatonia)",
+        "likelihood": "moderate",
+        "key_features": "Subacute course, seizures, dyskinesias, autonomic instability, abnormal EEG, or CSF pleocytosis argue strongly against a primary psychiatric etiology.",
+        "icd_code": "F23"
       },
       {
-        "diagnosis": "Serotonin syndrome",
+        "diagnosis": "Drug-induced psychosis or NMS/serotonin syndrome",
         "likelihood": "low",
-        "key_features": "Recent sertraline dose increase could theoretically contribute, but serotonin syndrome typically presents with clonus, hyperreflexia, hyperthermia, and diarrhea rather than subacute encephalopathy with seizures and dyskinesias. CSF should be normal in serotonin syndrome."
-      },
-      {
-        "diagnosis": "CNS lupus (neuropsychiatric SLE)",
-        "likelihood": "low",
-        "key_features": "Family history of SLE and low-titer ANA raise this possibility. However, the patient lacks other SLE criteria (no rash, arthritis, serositis, cytopenias), and the ANA titer is too low to be diagnostic. Anti-NMDAR antibody positivity provides a more specific diagnosis."
+        "key_features": "Requires recent ingestion of NMDA antagonist (ketamine/PCP), neuroleptic exposure (NMS: lead-pipe rigidity, CK >1000), or serotonergic drug; toxicology and medication review usually clarifying.",
+        "icd_code": "F19.159"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Stabilize patient: ensure IV access, continuous cardiac and pulse oximetry monitoring, seizure precautions. Administer lorazepam 2 mg IV if active seizure.",
-        "tool_name": null,
-        "expected_finding": "Patient stabilization",
-        "category": "required"
+        "action": "Obtain brain MRI with and without gadolinium to evaluate for limbic/cortical involvement and exclude mass effect, HSV encephalitis, or vascular pathology before lumbar puncture.",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Often normal early; may show bilateral medial-temporal/frontobasal T2/FLAIR hyperintensity without restricted diffusion or hemorrhage; rules out HSV pattern and mass lesions.",
+        "category": "required",
+        "tool_parameters": {
+          "contrast": true,
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "DWI",
+            "post-contrast T1"
+          ]
+        },
+        "citation": "[Titulaer_2013]",
+        "guideline_source": "Titulaer_2013"
       },
       {
         "step": 2,
-        "action": "Obtain comprehensive labs: CBC, BMP, CRP, ESR, CK, hepatic panel, thyroid function, urine drug screen",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Mild hyponatremia, mildly elevated inflammatory markers and CK, normal thyroid function, urine drug screen positive only for prescribed benzodiazepines",
-        "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP",
-            "LFT",
-            "thyroid",
-            "ESR",
-            "CRP",
-            "drug_screen"
-          ]
-        }
-      },
-      {
-        "step": 3,
-        "action": "Order brain MRI with and without gadolinium contrast",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Subtle left medial temporal FLAIR hyperintensity, equivocal but warranting clinical correlation",
-        "category": "required",
-        "tool_parameters": {
-          "protocol": "standard",
-          "contrast": true
-        }
-      },
-      {
-        "step": 4,
-        "action": "Perform lumbar puncture with CSF sent for cell count, protein, glucose, Gram stain, bacterial culture, viral PCRs (HSV, VZV, enterovirus), oligoclonal bands, IgG index, cytology, and anti-NMDA receptor antibodies",
+        "action": "Perform lumbar puncture with CSF analysis for cell count, protein, glucose, oligoclonal bands, HSV-1/2 PCR, and a paired CSF/serum autoimmune encephalitis panel including anti-NMDAR (GluN1) IgG.",
         "tool_name": "analyze_csf",
-        "expected_finding": "Mild lymphocytic pleocytosis, borderline protein, equivocal oligoclonal bands, negative viral PCRs, NMDAR antibodies pending",
+        "expected_finding": "Lymphocytic pleocytosis, mildly elevated protein, CSF-restricted oligoclonal bands, and anti-NMDAR IgG positive in CSF (gold standard; 100% sensitive, more specific than serum).",
         "category": "required",
         "tool_parameters": {
           "special_tests": [
-            "oligoclonal_bands",
-            "IgG_index",
-            "meningitis_panel",
-            "cytology",
+            "NMDAR_antibodies",
             "autoimmune_panel",
-            "NMDAR_antibodies"
+            "oligoclonal_bands"
+          ],
+          "basic": [
+            "cells",
+            "protein",
+            "glucose",
+            "gram_stain",
+            "culture",
+            "HSV_PCR"
           ]
-        }
+        },
+        "citation": "[Graus_2016]",
+        "guideline_source": "Graus_2016"
       },
       {
-        "step": 5,
-        "action": "Start empiric IV acyclovir 10 mg/kg q8h pending HSV PCR results",
-        "tool_name": null,
-        "expected_finding": "Empiric coverage until HSV is excluded",
-        "category": "required"
-      },
-      {
-        "step": 6,
-        "action": "Obtain routine EEG; if abnormal, initiate continuous EEG monitoring for 24-48 hours",
+        "step": 3,
+        "action": "Obtain continuous EEG monitoring to evaluate for extreme delta brush, non-convulsive status epilepticus, and overall encephalopathic background.",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Diffuse slowing, left temporal sharp waves, possible electrographic seizures without extreme delta brush",
-        "category": "required"
+        "expected_finding": "Abnormal in >90% of cases; extreme delta brush pattern in 30–50% (specific for anti-NMDAR encephalitis); generalized slowing; may capture electrographic seizures.",
+        "category": "required",
+        "tool_parameters": {
+          "duration": "continuous",
+          "indication": "encephalopathy_with_seizures_and_dyskinesias"
+        },
+        "citation": "[Schmitt_2012]",
+        "guideline_source": "Schmitt_2012"
       },
       {
-        "step": 7,
-        "action": "Optimize anti-seizure medication: increase levetiracetam to 1000 mg IV q12h given breakthrough seizure activity",
-        "tool_name": null,
-        "expected_finding": "Improved seizure control",
-        "category": "required"
-      },
-      {
-        "step": 8,
-        "action": "Given high clinical suspicion for autoimmune encephalitis despite pending antibodies, initiate empiric first-line immunotherapy with IV methylprednisolone 1 g daily for 5 days",
-        "tool_name": null,
-        "expected_finding": "Early treatment initiation may improve outcomes; do not wait for antibody confirmation when clinical suspicion is high",
-        "category": "required"
-      },
-      {
-        "step": 9,
-        "action": "Add IVIG 0.4 g/kg/day for 5 days as part of first-line immunotherapy once NMDAR antibodies confirmed or if clinical deterioration continues",
-        "tool_name": null,
-        "expected_finding": "Combined immunotherapy with steroids and IVIG or plasma exchange",
-        "category": "required"
-      },
-      {
-        "step": 10,
-        "action": "Order pelvic ultrasound to screen for ovarian teratoma",
+        "step": 4,
+        "action": "Order comprehensive laboratory workup: CBC, CMP, TSH, blood cultures, HIV, syphilis (RPR/TPPA), comprehensive autoimmune encephalitis panel (anti-Hu, anti-Ma2, anti-LGI1, anti-CASPR2, anti-AMPAR, anti-GABABR, anti-DPPX, anti-IgLON5), and paraneoplastic markers.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Left ovarian teratoma identified",
+        "expected_finding": "Often non-specific (mild leukocytosis, hyponatremia from SIADH); rules out infectious encephalitis, thyroid disease (Hashimoto), and other autoantibody-mediated encephalitides.",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP"
+            "CMP",
+            "TSH",
+            "blood_cultures",
+            "HIV",
+            "syphilis",
+            "autoimmune_encephalitis_panel",
+            "paraneoplastic_panel"
           ]
-        }
+        },
+        "citation": "[Graus_2016]",
+        "guideline_source": "Graus_2016"
       },
       {
-        "step": 11,
-        "action": "Consult gynecologic oncology for teratoma resection once confirmed on imaging",
-        "tool_name": null,
-        "expected_finding": "Surgical planning for left ovarian teratoma resection to remove immunologic trigger",
-        "category": "required"
+        "step": 5,
+        "action": "Order contrast-enhanced CT of the chest, abdomen, and pelvis (or transvaginal ultrasound) to screen for ovarian teratoma — the trigger tumor in up to 50% of young women with anti-NMDAR encephalitis.",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Right or left adnexal mass with mixed fat/calcification components consistent with mature cystic teratoma; if present, gynecologic-oncology resection is part of definitive therapy.",
+        "category": "required",
+        "tool_parameters": {
+          "region": "chest_abdomen_pelvis",
+          "contrast": true,
+          "indication": "paraneoplastic_screen_teratoma"
+        },
+        "citation": "[Dalmau_2011]",
+        "guideline_source": "Dalmau_2011"
       },
       {
-        "step": 12,
-        "action": "Implement fluid restriction for SIADH-associated hyponatremia with serial sodium monitoring every 6-8 hours",
-        "tool_name": null,
-        "expected_finding": "Gradual sodium correction; avoid overcorrection",
-        "category": "required"
+        "step": 6,
+        "action": "Search the medical literature for the Graus 2016 autoimmune-encephalitis diagnostic criteria, first-line immunotherapy (corticosteroids + IVIG or plasma exchange), and second-line therapy (rituximab, cyclophosphamide).",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirms diagnostic criteria, treatment sequence, and emerging evidence (e.g., post-HSV NMDAR-E, checkpoint-inhibitor-associated AE) relevant to this case.",
+        "category": "recommended",
+        "tool_parameters": {
+          "query": "anti-NMDA receptor encephalitis diagnosis treatment Graus 2016"
+        },
+        "citation": "[Graus_2016]",
+        "guideline_source": "Graus_2016"
       },
       {
-        "step": 13,
-        "action": "If insufficient clinical improvement after 2 weeks of first-line immunotherapy: escalate to second-line therapy with rituximab 375 mg/m2 weekly for 4 doses",
-        "tool_name": null,
-        "expected_finding": "Improved neurological function with B-cell depletion",
-        "category": "recommended"
+        "step": 7,
+        "action": "Check drug interactions and safety profile for first- and second-line immunotherapy (high-dose corticosteroids, IVIG, rituximab) and for antipsychotic choices used to manage acute agitation.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "No prohibitive interactions for steroid+IVIG; rituximab requires hepatitis B/C and TB screening; flags haloperidol and other dopamine-2 blockers as relatively contraindicated due to risk of worsening extrapyramidal symptoms.",
+        "category": "recommended",
+        "tool_parameters": {
+          "drugs": [
+            "methylprednisolone",
+            "IVIG",
+            "rituximab",
+            "haloperidol",
+            "olanzapine"
+          ]
+        },
+        "citation": "[Lancaster_2016]",
+        "guideline_source": "Lancaster_2016"
+      },
+      {
+        "step": 8,
+        "action": "Consult neurology (primary), psychiatry (behavioral management), and gynecology/gynecologic oncology if pelvic imaging identifies a teratoma; engage critical care if dysautonomia or central hypoventilation develops.",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Multidisciplinary care plan: neurology directs immunotherapy escalation, psychiatry advises on non-D2-blocker symptom control, gynecology/urology coordinates tumor resection where indicated.",
+        "category": "recommended",
+        "tool_parameters": {
+          "specialists": [
+            "neurology",
+            "psychiatry",
+            "gynecology"
+          ]
+        },
+        "citation": "[Titulaer_2013]",
+        "guideline_source": "Titulaer_2013"
+      },
+      {
+        "step": 9,
+        "action": "Consider FDG-PET of the brain to look for frontotemporal hypermetabolism (early disease) or hypometabolism (later), and whole-body FDG-PET when conventional cross-sectional imaging is unrevealing in suspected paraneoplastic cases.",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Anteroposterior gradient with frontotemporal hypermetabolism early and occipital sparing; can support diagnosis when MRI is normal.",
+        "category": "optional",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[Dalmau_2018]",
+        "guideline_source": "Dalmau_2018"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Transthoracic echo is not indicated for anti-NMDAR encephalitis; it adds cost without informing diagnosis or management unless a discrete cardiac concern (e.g., new murmur, embolic stroke) coexists.",
+        "citation": "[Graus_2016]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "rationale": "EMG/NCS plays no role in the diagnostic workup of anti-NMDAR encephalitis; it neither confirms the antibody-mediated CNS process nor distinguishes among the differential diagnoses.",
+        "citation": "[Graus_2016]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET targets Alzheimer pathology and contributes no information to the diagnosis or treatment of autoimmune encephalitis in a young patient with subacute neuropsychiatric symptoms.",
+        "citation": "[Dalmau_2018]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan evaluates nigrostriatal dopaminergic function and has no role in autoimmune encephalitis; the orofacial dyskinesias of anti-NMDAR encephalitis are antibody-mediated, not presynaptic dopaminergic.",
+        "citation": "[Dalmau_2018]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "Brain imaging must precede lumbar puncture in patients with focal neurologic signs, altered consciousness, or seizures to exclude mass effect and minimize herniation risk.",
+        "citation": "[Graus_2016]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Comprehensive labs (paraneoplastic + autoimmune encephalitis panel, baseline metabolic and infectious screen) inform safe initiation of empiric immunotherapy; confirm interactions and pre-rituximab serologies before escalating.",
+        "citation": "[Titulaer_2013]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Perform lumbar puncture and send CSF for anti-NMDA receptor antibodies",
-      "Start empiric acyclovir until HSV PCR returns negative",
-      "Recognize that the clinical presentation (psychiatric symptoms progressing to seizures and dyskinesias) is suspicious for autoimmune encephalitis despite initial psychiatric framing",
-      "Initiate immunotherapy empirically based on clinical suspicion rather than delaying for antibody results",
-      "Screen for ovarian teratoma with pelvic imaging",
-      "Initiate or optimize anti-seizure medication",
-      "Obtain continuous EEG monitoring to assess subclinical seizure burden",
-      "Admit to a monitored setting (ICU or step-down) given seizures and autonomic instability"
+      "Send paired CSF and serum for anti-NMDAR (GluN1) IgG; CSF is the gold-standard sample and must not be omitted in favor of serum-only testing.",
+      "Start empiric IV acyclovir 10 mg/kg every 8 hours until CSF HSV-1/2 PCR returns negative; HSV encephalitis is the can't-miss differential.",
+      "Initiate first-line immunotherapy promptly once clinical probability is high — IV methylprednisolone 1 g daily for 5 days combined with IVIG 0.4 g/kg/day for 5 days or therapeutic plasma exchange; do not wait for antibody results.",
+      "Screen for ovarian teratoma with pelvic imaging (transvaginal ultrasound and/or contrast-enhanced CT of chest/abdomen/pelvis); proceed to gynecologic-oncology resection if a teratoma is identified.",
+      "Control seizures aggressively with levetiracetam or valproate; obtain continuous EEG monitoring to detect non-convulsive status epilepticus.",
+      "Plan escalation to second-line therapy (rituximab 375 mg/m² weekly ×4 and/or cyclophosphamide) if there is no meaningful response to first-line immunotherapy by day 10–14."
     ],
     "contraindicated_actions": [
-      "Accepting the psychiatric framing at face value and discharging with psychiatric follow-up only",
-      "Administering high-dose antipsychotics (especially first-generation), which can worsen dyskinesias and risk neuroleptic malignant syndrome",
-      "Delaying immunotherapy for days while awaiting antibody results from reference laboratory, when clinical suspicion is high",
-      "Attributing seizures solely to sertraline dose change and failing to pursue encephalitis workup",
-      "Rapid sodium correction exceeding 8-10 mEq/L per 24 hours, risking osmotic demyelination syndrome",
-      "Performing brain biopsy when antibody testing can establish the diagnosis non-invasively"
+      "Do not give haloperidol or other high-potency D2 antagonists; they worsen the movement disorder and can mimic neuroleptic malignant syndrome in anti-NMDAR encephalitis.",
+      "Do not delay immunotherapy while waiting for the anti-NMDAR antibody result when clinical probability is high — antibody turnaround can take 1–2 weeks and delay worsens outcome.",
+      "Do not anchor on a primary psychiatric diagnosis without first excluding autoimmune encephalitis in a young patient with subacute neuropsychiatric symptoms plus any of seizures, dyskinesias, dysautonomia, or CSF pleocytosis.",
+      "Do not perform lumbar puncture without prior imaging in a patient with altered consciousness, focal signs, or new seizures — exclude mass effect first.",
+      "Do not interpret a negative serum anti-NMDAR antibody as ruling out the disease; the CSF assay is the gold standard and may be positive when serum is negative."
     ],
     "key_reasoning_points": [
-      "The progression from psychiatric symptoms to seizures and movement disorder over 3 weeks in a young woman should trigger consideration of autoimmune encephalitis, even when the initial framing is psychiatric",
-      "Pre-existing anxiety disorder and recent sertraline dose increase create a plausible but misleading psychiatric narrative that may delay the correct diagnosis",
-      "Subtle or absent MRI findings do not exclude anti-NMDA receptor encephalitis; up to 50% of cases have normal MRI",
-      "Mild CSF pleocytosis (WBC 5-20) is common early in the disease course; a near-normal CSF does not rule out the diagnosis",
-      "The absence of extreme delta brush on EEG does not exclude NMDAR encephalitis; this pattern is seen in only about 30% of cases",
-      "Hyponatremia from SIADH is a common complication of CNS inflammation and should prompt further investigation",
-      "Family history of autoimmune disease (SLE, rheumatoid arthritis) increases pre-test probability for autoimmune conditions including autoimmune encephalitis",
-      "Ovarian teratoma screening is essential even with small or indeterminate masses, as tumor resection significantly improves outcomes and reduces relapse",
-      "Empiric immunotherapy should be started based on clinical suspicion when antibody results will take days to return, as delays worsen prognosis"
+      "The recognizable phenotype is a subacute (<3 months) progression in a young adult — viral prodrome → psychiatric/behavioral changes → seizures, orofacial dyskinesias, and autonomic instability or decreased consciousness — fulfilling Graus 2016 criteria for probable/definite anti-NMDAR encephalitis.",
+      "CSF anti-NMDAR (GluN1) IgG is the gold-standard test (100% sensitive); serum alone is less reliable, and a negative serum result does not exclude the diagnosis. Paired CSF/serum sampling with confirmation on tissue-based assay is the standard.",
+      "Extreme delta brush on EEG is highly specific (30–50% sensitivity) for anti-NMDAR encephalitis; combined with the clinical syndrome it strongly supports the diagnosis even before antibody results return.",
+      "Treatment is time-sensitive: clinical probability should drive empiric immunotherapy (high-dose IV methylprednisolone + IVIG or plasma exchange) rather than waiting for antibody confirmation; earlier treatment correlates with better functional outcome (Titulaer 2013).",
+      "Tumor screen is part of the workup, not optional: ~50% of young women have an ovarian teratoma, and tumor removal is itself a core therapeutic step. CT chest/abdomen/pelvis or transvaginal ultrasound is mandatory in women of reproductive age.",
+      "Partial/mild phenotypes (predominantly psychiatric features without overt seizures or dyskinesias) are the highest-risk anchoring traps; obtaining CSF and EEG early avoids prolonged psychiatric admission."
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "Acute psychiatric presentation (paranoia, hallucinations, bizarre behavior) in a previously well young adult.",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Anchors the agent on a primary psychiatric diagnosis (first-episode psychosis, brief psychotic disorder) and delays neurologic workup.",
+        "correct_interpretation": "Concurrent or subsequent seizures, dyskinesias, dysautonomia, abnormal EEG, or CSF pleocytosis are red flags that mandate exclusion of anti-NMDAR encephalitis before accepting a psychiatric diagnosis."
+      },
+      {
+        "data_point": "Mild hyponatremia (sodium 122 mEq/L).",
+        "location": "labs.BMP",
+        "field_path": "initial_tool_outputs.labs.panels.BMP.0",
+        "intended_effect": "Tempts the agent toward a primary metabolic-encephalopathy framing (SIADH from another cause, dehydration, polydipsia) instead of recognizing SIADH as a known complication of NMDAR-E.",
+        "correct_interpretation": "Mild hyponatremia is a recognized SIADH-mediated complication of anti-NMDAR encephalitis; it should be corrected slowly and does not reframe the diagnosis."
+      },
+      {
+        "data_point": "Mildly elevated CK (136 U/L).",
+        "location": "labs.Other",
+        "field_path": "initial_tool_outputs.labs.panels.Other.0",
+        "intended_effect": "Raises concern for neuroleptic malignant syndrome or rhabdomyolysis when combined with dyskinesias and hyperthermia.",
+        "correct_interpretation": "NMS requires antipsychotic exposure and a CK typically >1000 with lead-pipe rigidity; mild CK elevation in this clinical context is non-specific muscle activity from dyskinesias and does not change management."
+      }
+    ]
   },
   "metadata": {
     "version": "1.0",
@@ -1006,6 +1094,14 @@
       "specialized_test": "normal",
       "literature_search": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:NMDAR-ENC",
+    "difficulty_rationale": "5 required tools, 3 red herrings, subtype=M; requires CSF antibody confirmation + MRI/EEG/labs synthesis",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

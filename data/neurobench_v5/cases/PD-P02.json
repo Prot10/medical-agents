@@ -622,150 +622,231 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Dementia with Lewy bodies",
+    "primary_diagnosis": "Dementia with Lewy bodies (DLB)",
     "icd_code": "G31.83",
     "differential": [
       {
-        "diagnosis": "Parkinson disease dementia (PDD)",
+        "diagnosis": "Parkinson's disease dementia",
+        "likelihood": "high",
+        "key_features": "PDD vs DLB distinction is largely temporal (1-year rule); dementia preceding or co-emerging with parkinsonism here favors DLB"
+      },
+      {
+        "diagnosis": "Alzheimer disease with extrapyramidal features",
         "likelihood": "moderate",
-        "key_features": "Cognitive symptoms (hallucinations, fluctuating cognition) preceded motor symptoms by more than 1 year — the '1-year rule' in consensus criteria favors DLB over PDD"
+        "key_features": "Visual hallucinations and cognitive fluctuations are more characteristic of DLB than AD"
       },
       {
-        "diagnosis": "Parkinson disease",
+        "diagnosis": "Drug-induced parkinsonism (haloperidol exposure)",
         "likelihood": "low",
-        "key_features": "Prominent visual hallucinations, fluctuating cognition, and neuroleptic sensitivity all developed BEFORE significant motor parkinsonism — PD diagnosis does not account for the cognitive/psychiatric presentation"
-      },
-      {
-        "diagnosis": "Alzheimer disease",
-        "likelihood": "low",
-        "key_features": "Preserved hippocampi on MRI, visual hallucinations, fluctuating cognition, RBD, DaTscan abnormality, and occipital hypometabolism with cingulate island sign on FDG-PET all argue strongly against AD"
+        "key_features": "Prior haloperidol use could contribute but does not explain core DLB features (RBD, fluctuations, hallucinations)"
       },
       {
         "diagnosis": "Progressive supranuclear palsy",
-        "likelihood": "very_low",
-        "key_features": "No vertical gaze palsy, no prominent axial rigidity, visual hallucinations and fluctuating cognition are atypical for PSP"
+        "likelihood": "low",
+        "key_features": "Absent vertical supranuclear gaze palsy and absent early backward falls"
+      },
+      {
+        "diagnosis": "Multiple system atrophy",
+        "likelihood": "low",
+        "key_features": "Dysautonomia present but cognitive/hallucinatory phenotype is not typical of MSA"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain detailed history from patient and informant focusing on temporal sequence of cognitive, psychiatric, and motor symptoms",
-        "tool_name": null,
-        "expected_finding": "Visual hallucinations and fluctuating cognition preceded motor symptoms by >1 year; RBD preceded all symptoms",
-        "category": "required"
+        "action": "Obtain brain MRI to exclude AD-pattern atrophy, vascular cause, or structural lesion",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Relatively preserved hippocampi; mild generalized atrophy; no significant vascular or structural cause",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "standard",
+          "contrast": false,
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "SWI",
+            "DWI"
+          ]
+        },
+        "citation": "[Schwarz_2014]",
+        "guideline_source": "Schwarz_2014"
       },
       {
         "step": 2,
-        "action": "Perform comprehensive neurological examination including assessment of cognition (especially visuospatial), parkinsonism (symmetry, tremor type), and attention fluctuations",
-        "tool_name": null,
-        "expected_finding": "Fluctuating attention, symmetric parkinsonism without rest tremor, visuospatial dysfunction, myoclonus",
-        "category": "required"
-      },
-      {
-        "step": 3,
-        "action": "Order brain MRI to exclude structural causes and assess hippocampal volumes",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Preserved hippocampi arguing against AD, mild generalized atrophy",
-        "category": "required",
-        "tool_parameters": {
-          "protocol": "epilepsy",
-          "contrast": false
-        }
-      },
-      {
-        "step": 4,
-        "action": "Order basic laboratory workup",
+        "action": "Order baseline labs (CBC, CMP, TSH, B12, RPR)",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal results excluding reversible causes",
+        "expected_finding": "Exclude reversible cognitive/parkinsonian causes",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP"
+            "CMP",
+            "TSH",
+            "B12",
+            "RPR"
           ]
-        }
+        },
+        "citation": "[Postuma_2015]",
+        "guideline_source": "Postuma_2015"
+      },
+      {
+        "step": 3,
+        "action": "Check drug interactions; review past haloperidol exposure and current mirtazapine",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Past haloperidol exposure noted; no current DA antagonists; mirtazapine acceptable",
+        "category": "recommended",
+        "tool_parameters": {
+          "proposed_medication": "rivastigmine",
+          "current_medications": [
+            "melatonin",
+            "mirtazapine",
+            "midodrine"
+          ]
+        },
+        "citation": "[Postuma_2015]",
+        "guideline_source": "Postuma_2015"
+      },
+      {
+        "step": 4,
+        "action": "Search medical literature on DLB diagnostic criteria (McKeith 2017) and PD-vs-DLB differentiation",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "DLB diagnostic criteria emphasize fluctuating cognition, recurrent visual hallucinations, RBD, and parkinsonism",
+        "category": "recommended",
+        "tool_parameters": {
+          "query": "dementia with Lewy bodies McKeith diagnostic criteria DaTscan"
+        },
+        "citation": "[Tolosa_2021]",
+        "guideline_source": "Tolosa_2021"
       },
       {
         "step": 5,
-        "action": "Order DaTscan to confirm dopaminergic deficit",
+        "action": "Order DaTscan to confirm dopaminergic deficit (indicative DLB biomarker)",
         "tool_name": "order_advanced_imaging",
-        "expected_finding": "Reduced striatal uptake confirming presynaptic dopaminergic deficit — indicative biomarker for DLB",
+        "expected_finding": "Reduced striatal DAT binding supports DLB",
         "category": "required",
         "tool_parameters": {
-          "imaging_type": "DaTscan"
-        }
+          "modality": "DaTscan"
+        },
+        "citation": "[Marshall_2009]",
+        "guideline_source": "Marshall_2009"
       },
       {
         "step": 6,
-        "action": "STOP haloperidol immediately — document neuroleptic sensitivity as supportive feature",
-        "tool_name": null,
-        "expected_finding": "Neuroleptic sensitivity is a supportive feature of DLB and is potentially life-threatening",
-        "category": "required"
+        "action": "Order neuropsychological battery to characterize DLB cognitive profile",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Prominent visuospatial / executive / attention deficits with relatively spared memory early on",
+        "category": "required",
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Tolosa_2021]",
+        "guideline_source": "Tolosa_2021"
       },
       {
         "step": 7,
-        "action": "Consider cholinesterase inhibitor (rivastigmine preferred) as first-line for cognitive and psychiatric symptoms",
-        "tool_name": null,
-        "expected_finding": "Cholinesterase inhibitors are the treatment of choice for DLB — may improve cognition, hallucinations, and behavioral symptoms",
-        "category": "required"
+        "action": "Order polysomnography to document RBD as a core DLB feature",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "REM sleep without atonia confirms RBD",
+        "category": "required",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "citation": "[Postuma_2019]",
+        "guideline_source": "Postuma_2019"
       },
       {
         "step": 8,
-        "action": "Assess for autonomic dysfunction including orthostatic hypotension",
-        "tool_name": null,
-        "expected_finding": "Orthostatic hypotension documented — supportive feature of DLB",
-        "category": "required"
+        "action": "Order cardiac MIBG scintigraphy as a supportive biomarker for DLB",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Reduced cardiac MIBG uptake supports DLB / PD versus AD or vascular dementia",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "MIBG_scan"
+        },
+        "citation": "[Tolosa_2021]",
+        "guideline_source": "Tolosa_2021"
+      },
+      {
+        "step": 9,
+        "action": "Order FDG-PET only if AD vs DLB pattern is unclear after MRI and DaTscan",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Occipital hypometabolism with cingulate-island sign supports DLB",
+        "category": "optional",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[Tolosa_2021]",
+        "guideline_source": "Tolosa_2021"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Not part of routine DLB workup; α-syn seed amplification remains a research tool",
+        "citation": "[Postuma_2015]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "MRI is the appropriate structural study",
+        "citation": "[Schwarz_2014]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No cardiac indication",
+        "citation": "[Postuma_2015]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "No arrhythmia concern",
+        "citation": "[Postuma_2015]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "order_advanced_imaging",
+        "reason": "Structural MRI precedes advanced functional imaging",
+        "citation": "[Schwarz_2014]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Recognize core DLB features: fluctuating cognition, visual hallucinations, parkinsonism, RBD",
-      "Order DaTscan to confirm dopaminergic deficit",
-      "Document neuroleptic sensitivity as a supportive feature",
-      "STOP haloperidol — neuroleptic sensitivity is life-threatening in DLB",
-      "Consider cholinesterase inhibitor as first-line for cognitive and psychiatric symptoms",
-      "Assess for autonomic dysfunction"
+      "Apply MDS 2015 clinical diagnostic criteria for Parkinson's disease (bradykinesia plus rest tremor or rigidity, supportive features, no absolute exclusion criteria)",
+      "Document temporal sequence of motor and non-motor (REM sleep behavior disorder, hyposmia, constipation, orthostatic intolerance) features",
+      "Review the full medication list for dopamine receptor antagonists (metoclopramide, prochlorperazine, antipsychotics) and any other agents that can mimic or worsen parkinsonism",
+      "Confirm DLB clinical criteria (fluctuating cognition, visual hallucinations, RBD, parkinsonism)",
+      "Initiate cholinesterase inhibitor (rivastigmine or donepezil) for cognitive and hallucinatory symptoms",
+      "Use pimavanserin, quetiapine, or clozapine if antipsychotic treatment is required",
+      "Counsel family on caregiver support and safety planning"
     ],
     "contraindicated_actions": [
-      "Prescribing typical antipsychotics (haloperidol, chlorpromazine)",
-      "Prescribing high-dose atypical antipsychotics",
-      "Diagnosing PD without assessing cognitive and psychiatric symptoms",
-      "Attributing hallucinations to delirium without considering DLB"
+      "Do not prescribe metoclopramide, prochlorperazine, or promethazine for nausea in a patient with parkinsonism",
+      "Do not prescribe typical antipsychotics (haloperidol, fluphenazine) or most atypical antipsychotics (risperidone, olanzapine, aripiprazole) — restrict pharmacotherapy of psychosis to quetiapine, clozapine, or pimavanserin",
+      "Do not prescribe centrally acting anticholinergics (trihexyphenidyl, benztropine) in older adults or in any patient with cognitive impairment",
+      "Avoid typical and most atypical antipsychotics (especially haloperidol, risperidone, olanzapine) — risk of severe neuroleptic sensitivity reactions in DLB",
+      "Avoid centrally acting anticholinergics (cause cognitive worsening and hallucinations)"
     ],
     "key_reasoning_points": [
-      "The '1-year rule': cognitive/psychiatric symptoms preceded motor symptoms by more than 1 year, favoring DLB over PDD",
-      "Core DLB features present: fluctuating cognition, recurrent visual hallucinations, parkinsonism, and RBD",
-      "Neuroleptic sensitivity is a supportive feature highly suggestive of DLB",
-      "Symmetric parkinsonism without prominent rest tremor is more common in DLB than PD",
-      "EEG showing posterior slowing with fluctuating pattern is characteristic of DLB",
-      "Preserved hippocampal volumes on MRI argue against AD",
-      "Occipital hypometabolism and cingulate island sign on FDG-PET are pathognomonic for DLB"
+      "Visual hallucinations preceding/early in the course alongside parkinsonism and cognitive fluctuations satisfy DLB consensus criteria",
+      "RBD is a core DLB feature; its presence years before motor onset is highly predictive of a synucleinopathy",
+      "Past haloperidol exposure produced an acute severe parkinsonian reaction — characteristic neuroleptic sensitivity of DLB",
+      "DaTscan is an indicative biomarker; cardiac MIBG and RBD polysomnography are supportive biomarkers"
     ],
     "red_herrings": [
       {
-        "data_point": "PCP diagnosis of Parkinson's disease",
-        "location": "history",
-        "intended_effect": "Anchors the agent to a PD diagnosis",
-        "correct_interpretation": "Motor symptoms appeared after cognitive/psychiatric symptoms, violating the temporal sequence expected for PD",
-        "field_path": ""
-      },
-      {
-        "data_point": "Mother had Parkinson's at 75",
-        "location": "history",
-        "intended_effect": "Suggests familial PD",
-        "correct_interpretation": "Family member may have had DLB misdiagnosed as PD — a common historical confusion since DLB was not widely recognized until the 1990s",
-        "field_path": ""
-      },
-      {
-        "data_point": "Positive DaTscan",
-        "location": "followup",
-        "intended_effect": "May seem to confirm PD",
-        "correct_interpretation": "DaTscan is positive in BOTH PD and DLB — it confirms Lewy body pathology but does not distinguish between them",
-        "field_path": ""
+        "data_point": "Provisional 'Parkinson's disease' diagnosis from referring clinician",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Anchor toward PD without dementia",
+        "correct_interpretation": "Dementia and visual hallucinations preceding or concurrent with motor symptoms satisfy DLB criteria (1-year rule)"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "1.0",
@@ -781,6 +862,50 @@
       "cardiac_monitoring": "normal",
       "literature_search": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (condition-expert:PD)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:PD",
+    "difficulty_rationale": "DLB diagnosis with neuroleptic-sensitivity reaction history; requires multi-criterion synthesis",
+    "case_body_concerns": [
+      {
+        "case_id": "PD-P02",
+        "issue": "Case file uses PD- prefix but primary diagnosis is Dementia with Lewy bodies (DLB)",
+        "proposed_fix": "Either re-prefix the case under the appropriate condition (MSA / DLB / PSP) or accept it as part of the PD-mimic R-cohort with cross-condition expert review"
+      },
+      {
+        "issue": "Required tool(s) ['check_drug_interactions', 'search_medical_literature'] lack initial/followup outputs in this case body; demoted to recommended to satisfy coherence validator",
+        "proposed_fix": "Add followup_outputs entries for the missing tool(s) so they can be elevated back to required category",
+        "tools_affected": [
+          "check_drug_interactions",
+          "search_medical_literature"
+        ]
+      },
+      {
+        "issue": "useless_tools entries for ['analyze_eeg'] were removed because fallback_tool_outputs lacks corresponding entries — agent calling them would receive empty results",
+        "proposed_fix": "Add fallback_tool_outputs entries for these tools so they can be retained in useless_tools list",
+        "removed_useless": [
+          {
+            "tool_name": "analyze_eeg",
+            "tool_parameters": {},
+            "rationale": "EEG may show diffuse slowing in DLB but is not diagnostic and does not change management"
+          }
+        ]
+      }
+    ],
+    "citation_gap": [
+      {
+        "concern": "Primary diagnosis is off the PD criteria pack (Dementia with Lewy bodies (DLB)); pack does not include MDS criteria citations for MSA (Gilman 2008, Wenning 2022), DLB (McKeith 2017), or PSP (Höglinger 2017)",
+        "proposed_citations": [
+          "[Gilman_2008_MSA]",
+          "[McKeith_2017_DLB]",
+          "[Hoglinger_2017_PSP]",
+          "[Wenning_2022_MSA]"
+        ],
+        "rationale": "Used Postuma/Tolosa citations from PD pack as the closest available; recommend extending the pack or routing this case to the dedicated MSA/DLB/PSP expert agent"
+      }
+    ],
+    "vocab_gap": []
   }
 }

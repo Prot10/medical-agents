@@ -686,138 +686,181 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Focal epilepsy - temporal lobe (right temporal lobe epilepsy secondary to dysembryoplastic neuroepithelial tumor)",
-    "icd_code": "G40.109",
+    "primary_diagnosis": "Focal epilepsy of right temporal lobe origin secondary to dysembryoplastic neuroepithelial tumor (DNET) (focal-to-bilateral tonic-clonic seizure)",
+    "icd_code": "G40.219",
     "differential": [
       {
-        "diagnosis": "Psychogenic non-epileptic seizures (PNES)",
+        "diagnosis": "Ganglioglioma (epileptogenic temporal tumor)",
+        "likelihood": "high",
+        "key_features": "Imaging and histology distinguish from DNET; both are low-grade, epileptogenic, often resected.",
+        "icd_code": "D43.0"
+      },
+      {
+        "diagnosis": "Mesial temporal sclerosis without tumor",
         "likelihood": "low",
-        "key_features": "Witnessed semiology with olfactory aura, consistent automatisms, and secondary generalization is classic for temporal lobe epilepsy. Elevated post-ictal prolactin and clear epileptiform EEG abnormalities argue strongly against PNES."
+        "key_features": "MRI signal characteristics differ from a discrete lesion.",
+        "icd_code": "G40.219"
       },
       {
-        "diagnosis": "Syncope (vasovagal or cardiac)",
+        "diagnosis": "Focal cortical dysplasia (type IIIb associated with tumor)",
         "likelihood": "low",
-        "key_features": "No prodrome of lightheadedness. Prolonged post-ictal confusion is inconsistent with syncope. Normal ECG. Aura of olfactory hallucination has no cardiac correlate. Sustained tonic-clonic activity lasting over 60 seconds is not consistent with convulsive syncope."
+        "key_features": "Often coexists with DNET; MRI characterization clarifies.",
+        "icd_code": "Q04.3"
       },
       {
-        "diagnosis": "Migraine with aura",
-        "likelihood": "very_low",
-        "key_features": "Migraine aura typically evolves over 5-20 minutes with visual or sensory phenomena and is followed by headache. The patient's episodes are abrupt (seconds), feature olfactory hallucinations and altered awareness with automatisms, and lack headache. Olfactory auras of this type are not a recognized migraine phenomenon."
+        "diagnosis": "Cavernous malformation",
+        "likelihood": "low",
+        "key_features": "Characteristic 'popcorn' MRI appearance with hemosiderin rim; distinguished by MRI.",
+        "icd_code": "Q28.3"
       },
       {
-        "diagnosis": "Transient ischemic attack",
+        "diagnosis": "Convulsive syncope",
         "likelihood": "very_low",
-        "key_features": "Patient is a 27-year-old female with no vascular risk factors. TIAs produce negative symptoms (weakness, numbness) rather than positive symptoms (olfactory hallucinations, automatisms). The recurrent stereotyped nature of the episodes and young age strongly argue against TIA."
+        "key_features": "Aura with stereotyped automatisms is not syncope.",
+        "icd_code": "R55"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain detailed seizure history including aura description, witness account, semiology, and timeline of prior similar episodes",
+        "action": "Obtain detailed seizure history including semiology, aura, automatisms, duration, frequency, witness accounts, and post-ictal features.",
         "tool_name": null,
-        "expected_finding": "Olfactory aura (burning rubber), nausea, sense of dread, followed by behavioral arrest, oral automatisms, left hand automatisms, and secondary generalization. Prior unrecognized focal seizures over 14 months.",
-        "category": "required"
+        "expected_finding": "Stereotyped focal impaired-awareness events with temporal-lobe aura and post-ictal confusion.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 2,
-        "action": "Perform complete neurological examination",
+        "action": "Perform complete neurological examination.",
         "tool_name": null,
-        "expected_finding": "Normal interictal neurological exam; tongue bite consistent with recent seizure",
-        "category": "required"
+        "expected_finding": "Interictal exam typically normal; subtle memory deficit may be present.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Order routine EEG",
+        "action": "Order EEG (routine first; pursue ambulatory or video-EEG if non-diagnostic) to identify interictal epileptiform discharges and capture habitual events.",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Right anterior temporal spike-and-wave complexes and TIRDA consistent with right temporal epileptogenic focus",
+        "expected_finding": "Interictal sharps/spikes and/or focal slowing in the anterior temporal region; ictal correlate confirms diagnosis.",
         "category": "required",
         "tool_parameters": {
           "eeg_type": "routine"
-        }
+        },
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 4,
-        "action": "Order MRI brain with epilepsy protocol",
+        "action": "Order MRI brain with dedicated epilepsy protocol (thin-cut coronal T1/FLAIR/T2/DWI through the hippocampi).",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Right mesial temporal DNET measuring approximately 18 mm, non-enhancing, with classic bubbly appearance",
+        "expected_finding": "Hippocampal sclerosis, low-grade tumor (DNET, ganglioglioma), cavernoma, or focal cortical dysplasia; rule out alternative structural causes.",
         "category": "required",
         "tool_parameters": {
           "protocol": "epilepsy",
-          "contrast": false
-        }
+          "contrast": true
+        },
+        "citation": "[AAN_2007]",
+        "guideline_source": "AAN_2007"
       },
       {
         "step": 5,
-        "action": "Obtain basic labs including BMP, CBC, prolactin, urine drug screen, and pregnancy test",
+        "action": "Obtain CBC, comprehensive metabolic panel, prolactin (if drawn within 10–20 min of event), and AED levels if on therapy.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal metabolic panel, elevated post-ictal prolactin, negative drug screen, negative pregnancy test",
+        "expected_finding": "Exclude metabolic provocation (hypoglycemia, hyponatremia, uremia); baseline organ function for AED selection; AED level for adherence and dosing.",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
-            "drug_screen",
+            "CMP",
             "prolactin"
           ]
-        }
+        },
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 6,
-        "action": "Obtain ECG to evaluate for cardiac etiology",
-        "tool_name": null,
-        "expected_finding": "Normal sinus rhythm, no arrhythmia",
-        "category": "recommended"
+        "action": "Search current literature for AED selection in focal epilepsy and ILAE 2017 seizure classification.",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Evidence-based AED options for focal epilepsy (levetiracetam, lamotrigine, oxcarbazepine, lacosamide); ILAE classification framework.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 7,
-        "action": "Initiate antiepileptic drug therapy appropriate for focal epilepsy, accounting for oral contraceptive interaction",
+        "action": "Check drug interactions before initiating or modifying AED therapy (enzyme inducers, OCP, other CNS-active drugs).",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "Select a non-enzyme-inducing AED (levetiracetam or lamotrigine preferred) to avoid reducing contraceptive efficacy",
-        "category": "required"
+        "expected_finding": "Identify pharmacokinetic interactions (CYP induction by carbamazepine/phenytoin) and CNS adverse-effect overlap.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No clinical features of CNS infection, encephalitis, or immunocompromise; CSF analysis is not indicated for routine focal epilepsy workup and exposes the patient to procedural risk and cost.",
+        "citation": "[AAN_2007]"
       },
       {
-        "step": 8,
-        "action": "Counsel patient on driving restrictions and seizure safety precautions",
-        "tool_name": null,
-        "expected_finding": "Patient informed of mandatory seizure-free interval before resuming driving per state law; advised on safety measures including avoiding unsupervised swimming and heights",
-        "category": "required"
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "echo_type": "TTE"
+        },
+        "rationale": "No syncope-versus-seizure question and no structural-heart concern; echocardiogram contributes nothing to epilepsy workup.",
+        "citation": "[AAN_2007]"
       },
       {
-        "step": 9,
-        "action": "Refer to comprehensive epilepsy center and neurosurgery for evaluation of surgical candidacy given structural lesion",
-        "tool_name": null,
-        "expected_finding": "Referral placed for pre-surgical workup including video-EEG, neuropsychological testing, and language lateralization studies",
-        "category": "required"
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "Ambulatory cardiac monitoring is reserved for syncope-versus-seizure differentiation; not indicated when semiology is clearly epileptic.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT is inferior to MRI for detecting epileptogenic substrates (hippocampal sclerosis, FCD, low-grade tumor) and adds ionizing radiation without diagnostic yield.",
+        "citation": "[AAN_2007]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "check_drug_interactions",
+        "reason": "Structural cause influences AED choice (e.g., low-grade tumor → consider AEDs with CYP-neutral profile; hippocampal sclerosis → multiple equally appropriate options). MRI should inform drug selection.",
+        "citation": "[ILAE_drug_2017]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Obtain EEG to identify and lateralize epileptiform activity",
-      "Obtain brain MRI to identify the structural epileptogenic lesion (DNET)",
-      "Obtain basic metabolic panel and CBC to exclude metabolic seizure causes",
-      "Order pregnancy test before initiating AED therapy in a woman of childbearing age",
-      "Initiate appropriate AED therapy, selecting a non-enzyme-inducing agent given concurrent oral contraceptive use",
-      "Counsel patient on driving restrictions per state law",
-      "Refer to comprehensive epilepsy center for surgical evaluation given the structural lesion and young age"
+      "Recognize olfactory aura with nausea as mesial-temporal seizure semiology.",
+      "Obtain MRI brain with contrast and epilepsy protocol to characterize the tumor (DNET, ganglioglioma).",
+      "Refer to neurosurgery and neuro-oncology for surgical resection planning — DNETs are typically benign and resection is often curative for the seizures.",
+      "Initiate an AED active in focal epilepsy; lamotrigine, levetiracetam, or lacosamide are appropriate first-line.",
+      "Counsel on driving restrictions, surgical risk/benefit, and seizure precautions."
     ],
     "contraindicated_actions": [
-      "Prescribing enzyme-inducing AEDs (carbamazepine, phenytoin, phenobarbital) without addressing the reduction in oral contraceptive efficacy",
-      "Performing lumbar puncture in this clinical scenario (no signs of infection or inflammation; structural lesion identified on MRI)",
-      "Discharging patient without initiating antiepileptic therapy after a focal to bilateral tonic-clonic seizure with an identified structural lesion",
-      "Prescribing valproic acid as first-line in a woman of childbearing age due to teratogenicity risk",
-      "Advising the patient that she can continue driving immediately",
-      "Prescribing bupropion or other medications that lower seizure threshold"
+      "Do not delay surgical referral once a temporal-lobe tumor is identified.",
+      "Do not start enzyme-inducing AEDs without considering interactions with future chemotherapy (rare for DNET) or oral contraceptives.",
+      "Do not perform LP in the presence of a structural lesion with mass effect."
     ],
     "key_reasoning_points": [
-      "Olfactory hallucinations (unpleasant smell of burning rubber) are a classic aura of mesial temporal lobe seizures, arising from the uncus and amygdala region, and should immediately raise suspicion for a temporal lobe epileptic focus",
-      "The prior recurrent stereotyped episodes of olfactory aura with nausea and brief altered awareness represent unrecognized focal impaired awareness seizures, indicating this is established epilepsy and not a first-time seizure",
-      "A structural lesion such as DNET in a young patient with new-onset focal epilepsy warrants early surgical evaluation, as gross total resection of DNET achieves seizure freedom in 80-90% of cases",
-      "Left-handedness raises the possibility of atypical (right-hemisphere or bilateral) language dominance, making language lateralization testing essential before any right temporal surgery",
-      "AED selection in women of childbearing age must account for drug-drug interactions with hormonal contraceptives and teratogenic potential; enzyme-inducing AEDs reduce contraceptive efficacy, and valproic acid carries unacceptable teratogenic risk",
-      "Cross-modal concordance between seizure semiology (olfactory aura, left-sided automatisms suggesting right-hemisphere onset), EEG (right temporal spikes and TIRDA), and MRI (right temporal DNET) is essential for confident localization and surgical planning"
+      "Adult-onset focal temporal seizures with a discrete temporal lesion most commonly arise from low-grade glioneuronal tumors (DNET, ganglioglioma) or cavernoma.",
+      "DNET is histologically benign; complete resection is usually curative for seizures.",
+      "MRI with contrast plus epilepsy protocol is the central diagnostic imaging study.",
+      "AED bridge therapy is needed until surgical control is achieved."
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
     "red_herrings": []
   },
   "metadata": {
@@ -832,6 +875,16 @@
       "ct": "normal",
       "echo": "normal",
       "cardiac_monitoring": "incidental"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (FEPI-TEMP)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FEPI-TEMP",
+    "difficulty_rationale": "Single tumor as proximate cause with clear localization; standard workup pathway plus surgical referral.",
+    "case_body_concerns": [
+      "useless_tools entry for `analyze_ecg` dropped: tool output is provided up-front in initial_tool_outputs, so declaring it useless to call would be incoherent (agent never had to call it)."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

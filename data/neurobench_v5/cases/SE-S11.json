@@ -556,93 +556,210 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Uremic status epilepticus from missed hemodialysis sessions (BUN 142, hyperkalemia K 6.8, hypocalcemia, hyponatremia) in ESRD",
-    "icd_code": "G41.9",
+    "primary_diagnosis": "Uremic status epilepticus from missed hemodialysis with severe metabolic derangement (BUN 142, K 6.8, Ca 6.8, Na 128) in ESRD",
+    "icd_code": "G41.0",
     "differential": [
       {
-        "diagnosis": "Hypertensive emergency with SE",
-        "likelihood": "low",
-        "key_features": "BP severely elevated but uremic metabolic disturbances (BUN 142, K 6.8, Ca 6.8) better explain SE"
+        "diagnosis": "Hyperkalemia / hypocalcemia-driven seizures alone",
+        "likelihood": "high",
+        "key_features": "K 6.8, Ca 6.8 are themselves seizure-provocative; uremia is the unifying cause",
+        "icd_code": "E87.5"
       },
       {
-        "diagnosis": "Hypocalcemia seizures alone",
-        "likelihood": "low",
-        "key_features": "Ca 6.8 lowers seizure threshold but uremia is dominant mechanism; emergency dialysis corrects all"
+        "diagnosis": "Hypertensive encephalopathy / PRES",
+        "likelihood": "moderate",
+        "key_features": "BP 198/118 severe; PRES can occur in uremia + hypertensive crisis",
+        "icd_code": "I67.4"
       },
       {
-        "diagnosis": "CNS infection with SE",
-        "likelihood": "very_low",
-        "key_features": "Normal CSF; multiple metabolic disturbances from missed dialysis clearly explain SE"
+        "diagnosis": "Subdural hematoma (uremic platelet dysfunction)",
+        "likelihood": "moderate",
+        "key_features": "Uremia causes platelet dysfunction; CT to exclude SDH",
+        "icd_code": "S06.5X9A"
+      },
+      {
+        "diagnosis": "Drug accumulation seizure (cefepime, levetiracetam toxicity in ESRD)",
+        "likelihood": "moderate",
+        "key_features": "Drug accumulation in ESRD can lower seizure threshold; renal AED dosing essential",
+        "icd_code": "T50.905A"
+      },
+      {
+        "diagnosis": "Septic encephalopathy",
+        "likelihood": "low",
+        "key_features": "No infection identified initially",
+        "icd_code": "G93.41"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "EEG confirms SE + uremic encephalopathy (triphasic waves)",
+        "action": "EEG — confirm electrographic SE",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Generalized SE with triphasic wave background - uremic pattern",
+        "expected_finding": "Continuous generalized 2-3 Hz spike-wave with intermittent triphasic waves of uremic encephalopathy",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "Critical labs - K+ 6.8, BUN 142, Ca 6.8, Na 128, HCO3 12",
+        "action": "Labs: CBC, CMP, BUN/Cr, glucose, Ca/Mg/Phos, AED level, ABG, lactate, K, ammonia, troponin, BNP",
         "tool_name": "interpret_labs",
-        "expected_finding": "Multiple critical metabolic disturbances from missed dialysis",
+        "expected_finding": "BUN 142 (CRITICAL), K 6.8 (CRITICAL hyperkalemia), Ca 6.8 (CRITICAL hypocalcemia), Na 128, BNP 2840",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Hyperkalemia K+ 6.8 - cardiac stabilization before AED",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Calcium gluconate IV immediately; insulin-dextrose; then emergency dialysis",
+        "action": "Non-contrast head CT — exclude SDH (uremic platelet dysfunction)",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Mild diffuse sulcal effacement and periventricular hypodensities consistent with uremia; no SDH",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "Levetiracetam for SE with ESRD dose adjustment",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "LEV max 500-1000 mg BID in ESRD; supplemental dose after dialysis",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "ECG — assess hyperkalemia ECG changes",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Peaked T waves, widened QRS — hyperkalemia ECG pattern",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "Emergency hemodialysis after SE controlled",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Definitive treatment for uremic SE; corrects all metabolic disturbances",
+        "action": "Drug-interaction check: urgent hyperkalemia treatment + AED renal dosing",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Calcium gluconate, insulin + dextrose, bicarbonate, sodium polystyrene, urgent hemodialysis; LEV dose-adjust for renal function",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 6,
+        "action": "Literature: AED dosing in ESRD and uremic SE management",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Levetiracetam dose-adjust 500-1000 mg q24h with HD supplementation; emergent HD is the definitive treatment",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 7,
+        "action": "MRI brain — exclude PRES if hypertension persists",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Posterior parietooccipital FLAIR changes if PRES",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "study_type": "TTE"
+        },
+        "rationale": "No clinical suspicion of cardiac source of embolus or cardiogenic seizure; routine echo is not indicated in SE workup absent cardiac findings.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No suspicion of arrhythmogenic syncope or cardiac comorbidity precipitating SE; routine telemetry beyond standard ICU monitoring adds cost without yield.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in acute SE evaluation; dementia biomarker imaging does not change acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is for ischemic stroke workup; SE without focal vascular suspicion does not warrant carotid imaging.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "DaTscan / dopamine transporter imaging has no role in SE; no parkinsonism question relevant to acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {
+          "tests": [
+            "routine"
+          ]
+        },
+        "rationale": "Uremia explains presentation; LP not indicated initially.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_ecg",
+        "after": "check_drug_interactions",
+        "reason": "ECG hyperkalemia changes must be reviewed before calcium gluconate and other K-lowering therapy.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Confirm K, Ca, BUN before urgent dialysis ordering and AED dosing.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "K+ 6.8 CARDIAC EMERGENCY: calcium gluconate 1g IV immediately for membrane stabilization",
-      "Then emergency hemodialysis - only definitive treatment for uremic SE in ESRD",
-      "IV lorazepam first-line for SE",
-      "Levetiracetam ESRD dose: max 500-1000 mg BID (NOT standard 1500 mg BID) + supplemental after dialysis",
-      "Hypocalcemia Ca 6.8: IV calcium gluconate also treats hypocalcemia (same dose as cardiac stabilization)",
-      "Hypertonic saline NOT indicated for Na 128 in ESRD - dialysis is the treatment"
+      "Administer IV lorazepam 0.1 mg/kg first-line",
+      "Urgent hyperkalemia treatment: calcium gluconate IV, insulin + dextrose, bicarbonate, sodium polystyrene",
+      "Emergent hemodialysis — definitive treatment for uremic SE",
+      "Replace calcium for severe hypocalcemia (Ca 6.8)",
+      "Load IV levetiracetam with renal dose adjustment",
+      "Control BP (BP 198/118)"
     ],
     "contraindicated_actions": [
-      "Do not give hypertonic saline for hyponatremia in ESRD - dialysis is the treatment",
-      "Do not use standard levetiracetam dose - ESRD requires significant dose reduction",
-      "Do not delay treatment of K+ 6.8 - immediate cardiac stabilization required before dialysis",
-      "Do not miss the connection between missed dialysis and all metabolic SE precipitants"
+      "Do NOT delay emergent hemodialysis",
+      "Do NOT use renal-cleared AEDs at standard doses",
+      "Do NOT use sodium phosphate / IV magnesium without dialysis ready",
+      "Avoid IV phosphate or magnesium supplements without dialysis; will worsen retention in ESRD."
     ],
     "key_reasoning_points": [
-      "Missed dialysis causes cascade: BUN elevation (uremic SE) + hyperkalemia + hypocalcemia + hyponatremia + acidosis - all lower seizure threshold",
-      "K+ 6.8 requires immediate cardiac stabilization (calcium gluconate) before any other intervention",
-      "Emergency dialysis is the definitive treatment for uremic SE - AEDs are a bridge measure",
-      "Levetiracetam is renally cleared - ESRD requires dose reduction to max 500-1000 mg BID; supplemental post-dialysis dose",
-      "Triphasic waves on EEG are classic for metabolic/uremic encephalopathy - help distinguish uremic from primary epileptic SE",
-      "BUN 142 directly causes uremic encephalopathy and lowers seizure threshold - uremia is THE mechanism"
+      "Missed dialysis with BUN 142 and severe electrolyte derangement (K, Ca, Na) is a layered SE precipitant — uremia, hyperkalemia, hypocalcemia, hyponatremia each contribute",
+      "Emergent hemodialysis is the definitive treatment",
+      "AED dosing requires renal adjustment in ESRD",
+      "Uremic platelet dysfunction increases SDH risk — CT essential"
     ],
-    "red_herrings": [],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": [
+      {
+        "data_point": "BNP 2840 pg/mL",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests acute heart failure as primary driver",
+        "correct_interpretation": "BNP is chronically elevated in ESRD due to volume overload; the SE driver is uremia + hyperkalemia + hypocalcemia"
+      }
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -652,6 +769,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "incidental",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "6 required + 1 recommended; layered metabolic SE; emergent HD as definitive treatment; AED renal dosing essential; 1 grounded red herring.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

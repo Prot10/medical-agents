@@ -526,93 +526,219 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Status epilepticus from subtherapeutic valproate plus valproate-induced hyperammonemia in SLE patient on prednisone",
-    "icd_code": "G41.9",
+    "primary_diagnosis": "Generalized convulsive status epilepticus from subtherapeutic valproate plus valproate-induced hyperammonemia, in SLE on prednisone",
+    "icd_code": "G41.0",
     "differential": [
       {
-        "diagnosis": "Neuropsychiatric SLE with SE",
+        "diagnosis": "Hyperammonemic encephalopathy from VPA precipitating SE",
         "likelihood": "high",
-        "key_features": "Subtherapeutic valproate and hyperammonemia better explain SE; NMDAR negative; no lupus encephalitis pattern"
+        "key_features": "Ammonia 84 + subtherapeutic VPA — VPA-induced hyperammonemia is a known mechanism; consider carnitine",
+        "icd_code": "E72.20"
       },
       {
-        "diagnosis": "CNS vasculitis (lupus cerebritis)",
-        "likelihood": "high",
-        "key_features": "MRI shows SLE white matter disease but no acute vasculitis pattern; NMDAR negative; AED levels explain SE"
+        "diagnosis": "CNS lupus / lupus cerebritis",
+        "likelihood": "moderate",
+        "key_features": "Active SLE with rising dsDNA 142; CNS lupus must be considered; MRI and CSF will adjudicate",
+        "icd_code": "M32.19"
       },
       {
-        "diagnosis": "HSV encephalitis",
-        "likelihood": "very_low",
-        "key_features": "HSV PCR negative; subtherapeutic AED plus hyperammonemia better explain SE"
+        "diagnosis": "SLE-related autoimmune encephalitis (NMDAR, ribosomal P)",
+        "likelihood": "moderate",
+        "key_features": "SLE associated with autoimmune encephalitis; CSF panel sent",
+        "icd_code": "G04.81"
+      },
+      {
+        "diagnosis": "Subtherapeutic AED breakthrough alone",
+        "likelihood": "moderate",
+        "key_features": "VPA 36 subtherapeutic; correlates with breakthrough seizures",
+        "icd_code": "G40.909"
+      },
+      {
+        "diagnosis": "Infectious encephalitis in immunosuppressed patient",
+        "likelihood": "low",
+        "key_features": "On prednisone; LP if clinical course worsens",
+        "icd_code": "G04.90"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "EEG confirms generalized SE",
+        "action": "EEG — confirm electrographic SE",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Continuous generalized ictal activity; consistent with known generalized epilepsy",
+        "expected_finding": "Continuous generalized 2-4 Hz polyspike-wave — generalized SE",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "Identify dual precipitants - subtherapeutic valproate + hyperammonemia",
+        "action": "Labs: CBC, CMP, glucose, Ca/Mg, AED level (VPA), ammonia, ABG, lactate, dsDNA, complements, ESR, beta-hCG, CK, urine for SLE flare",
         "tool_name": "interpret_labs",
-        "expected_finding": "Valproate 36 subtherapeutic; ammonia 84 elevated - dual mechanism",
+        "expected_finding": "VPA 36 subtherapeutic; ammonia 84 elevated; dsDNA 142; mild cytopenias",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "IV valproate loading + L-carnitine for hyperammonemia",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "IV valproate 20 mg/kg; L-carnitine for hyperammonemia; carbamazepine allergy noted",
+        "action": "Non-contrast head CT — exclude acute structural cause",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No acute pathology; subtle bilateral periventricular hypodensities",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "CT head - exclude structural SLE CNS involvement",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "No acute lesion; chronic SLE white matter changes",
+        "action": "MRI brain — characterize white matter changes and exclude CNS lupus",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Small-vessel white-matter changes; no acute infarct or CNS lupus pattern",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "SLE management - prednisone lowering seizure threshold",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Prednisone lowers seizure threshold; continue hydroxychloroquine; rheumatology involved",
+        "action": "Drug-interaction check: VPA + prednisone + hydroxychloroquine + AED switch options",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "L-carnitine 100 mg/kg IV for VPA-induced hyperammonemia; lactulose if needed; consider switch to LEV to avoid further hyperammonemia",
         "category": "recommended",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 6,
+        "action": "Lumbar puncture — exclude CNS lupus / autoimmune encephalitis",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Mild lymphocytic pleocytosis; elevated protein possible in CNS lupus; autoimmune CSF panel sent",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 7,
+        "action": "Literature: VPA hyperammonemic encephalopathy and SLE flare with seizures",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "L-carnitine reverses VPA hyperammonemia; for CNS lupus give pulse steroids + cyclophosphamide if confirmed",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 8,
+        "action": "Rheumatology consultation for SLE flare",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Coordinate immunosuppression in setting of CNS event",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 9,
+        "action": "Autoimmune encephalitis panel",
+        "tool_name": "interpret_labs",
+        "expected_finding": "NMDAR/LGI1 negative; supports VPA hyperammonemia + SLE flare etiology",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "study_type": "TTE"
+        },
+        "rationale": "No clinical suspicion of cardiac source of embolus or cardiogenic seizure; routine echo is not indicated in SE workup absent cardiac findings.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No suspicion of arrhythmogenic syncope or cardiac comorbidity precipitating SE; routine telemetry beyond standard ICU monitoring adds cost without yield.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in acute SE evaluation; dementia biomarker imaging does not change acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is for ischemic stroke workup; SE without focal vascular suspicion does not warrant carotid imaging.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "DaTscan / dopamine transporter imaging has no role in SE; no parkinsonism question relevant to acute management.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "CT before LP to exclude mass effect.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Beta-hCG and ammonia confirmed before AED management.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "IV lorazepam first-line immediately",
-      "IV valproate 20-40 mg/kg loading - drug of choice for generalized epilepsy",
-      "Carbamazepine allergy: avoid oxcarbazepine (cross-reactivity risk)",
-      "Hyperammonemia 84 mcmol/L from valproate - L-carnitine 50-100 mg/kg/day",
-      "Do NOT stop valproate for hyperammonemia - treat with L-carnitine; stopping risks worse seizures",
-      "Monitor prednisone-induced hyperglycemia; insulin coverage in ICU"
+      "Administer IV lorazepam 0.1 mg/kg first-line",
+      "IV L-carnitine 100 mg/kg for VPA-induced hyperammonemia",
+      "Transition to IV levetiracetam (avoid further VPA escalation in hyperammonemia)",
+      "Check beta-hCG before any AED change in this reproductive-age woman",
+      "Rheumatology consult for SLE management"
     ],
     "contraindicated_actions": [
-      "Do not use carbamazepine or oxcarbazepine - cross-reactivity with carbamazepine SJS allergy",
-      "Do not stop valproate for hyperammonemia - treat with L-carnitine instead",
-      "Do not miss valproate-induced hyperammonemia as SE precipitant",
-      "Do not ignore SLE flare as contributing factor"
+      "Do NOT escalate VPA in setting of hyperammonemia",
+      "Do NOT initiate cyclophosphamide before confirming CNS lupus diagnosis",
+      "Do NOT delay seizure control awaiting full autoimmune workup",
+      "VPA reload is risky given existing hyperammonemia — give L-carnitine and consider transition to levetiracetam rather than escalating VPA."
     ],
     "key_reasoning_points": [
-      "Dual SE mechanism: subtherapeutic valproate (missed dose) PLUS valproate-induced hyperammonemia (lowers seizure threshold)",
-      "Valproate hyperammonemia treated with L-carnitine - do NOT stop valproate which would worsen epilepsy",
-      "Carbamazepine SJS allergy implies cross-reactivity risk with oxcarbazepine - avoid both",
-      "Prednisone for SLE flare can paradoxically lower seizure threshold",
-      "SLE thrombocytopenia (platelets 124) - monitor bleeding risk; LP safe at this level but note",
-      "Active SLE flare (dsDNA 142, low C3/C4) - rheumatology involvement for flare management"
+      "VPA causes hyperammonemia in 20-50% of users; can present as encephalopathy or SE",
+      "L-carnitine reverses VPA hyperammonemia",
+      "SLE patients have multiple seizure mechanisms: CNS lupus, PRES, antiphospholipid stroke, autoimmune encephalitis",
+      "Avoid VPA in reproductive-age women given teratogenicity"
     ],
-    "red_herrings": [],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": [
+      {
+        "data_point": "dsDNA 142 (rising) and active SLE markers",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests CNS lupus as primary driver requiring immediate pulse steroids and cyclophosphamide",
+        "correct_interpretation": "SLE flare is real but VPA-induced hyperammonemia + subtherapeutic VPA explain the SE; address VPA first, then plan for SLE workup"
+      }
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -622,6 +748,14 @@
       "advanced_imaging": "normal",
       "specialized_test": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "8 required + 1 recommended; key mechanism is VPA hyperammonemia recognition and L-carnitine; SLE flare is a parallel issue; 1 grounded red herring.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -343,6 +343,33 @@
         "impression": "96-hour continuous telemetry. 1. Predominantly sinus tachycardia/bradycardia alternation (range 46–122 bpm). 2. Intermittent hypertensive episodes (peak BP 170/102 mmHg). No sustained arrhythmia recorded. Clinical correlation recommended.",
         "recommended_actions": []
       }
+    },
+    {
+      "trigger_action": "search_gbs_treatment",
+      "tool_name": "search_medical_literature",
+      "output": {
+        "general": {
+          "query": "general",
+          "results": [],
+          "summary": "No directly applicable, high-quality evidence was retrieved for this query. Recommend correlating with current society guidelines."
+        }
+      }
+    },
+    {
+      "trigger_action": "check_ivig_drug_interactions",
+      "tool_name": "check_drug_interactions",
+      "output": {
+        "general": {
+          "proposed": "(agent not specified on this case's pathway)",
+          "interactions": [],
+          "contraindications": [],
+          "warnings": [
+            "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
+          ],
+          "formulary_status": "on formulary",
+          "alternatives": []
+        }
+      }
     }
   ],
   "fallback_tool_outputs": {
@@ -431,95 +458,212 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Guillain-Barré syndrome, AIDP superimposed on pre-existing diabetic peripheral neuropathy (post-Mycoplasma)",
+    "primary_diagnosis": "Guillain-Barré syndrome, AIDP superimposed on pre-existing diabetic peripheral neuropathy",
     "icd_code": "G61.0",
     "differential": [
       {
-        "diagnosis": "Worsening diabetic neuropathy",
-        "likelihood": "very_low",
-        "key_features": "Acute onset over 10 days; bilateral facial weakness; global areflexia new; HbA1c only 7.2% — insufficient explanation"
+        "diagnosis": "Acute worsening of diabetic polyneuropathy / diabetic amyotrophy",
+        "likelihood": "high",
+        "key_features": "Pre-existing diabetic neuropathy raises baseline EMG abnormalities, but acute symmetric progression, areflexia, and elevated CSF protein favour superimposed GBS.",
+        "icd_code": "E11.42"
       },
       {
-        "diagnosis": "Transverse myelitis",
-        "likelihood": "very_low",
-        "key_features": "No sensory level, no UMN signs, areflexia"
+        "diagnosis": "Acute-onset CIDP",
+        "likelihood": "moderate",
+        "key_features": "Cannot exclude at <8 weeks; relapsing course or progression beyond 8 weeks reclassifies.",
+        "icd_code": "G61.81"
       },
       {
-        "diagnosis": "CIDP",
+        "diagnosis": "Lyme / infectious polyradiculitis",
         "likelihood": "low",
-        "key_features": "Acute 10-day onset — too rapid for CIDP"
+        "key_features": "Possible mimic but serology negative for active Lyme; antecedent illness supports GBS.",
+        "icd_code": "A69.22"
+      },
+      {
+        "diagnosis": "Diabetic ketoacidosis with neuropathic worsening",
+        "likelihood": "low",
+        "key_features": "Metabolic decompensation could exacerbate baseline neuropathy but does not explain acute areflexia and demyelinating EMG.",
+        "icd_code": "E11.10"
+      },
+      {
+        "diagnosis": "Vasculitic neuropathy",
+        "likelihood": "very_low",
+        "key_features": "Symmetric not multifocal; no systemic features.",
+        "icd_code": "M31.7"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "NCS/EMG",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Acute demyelinating AIDP superimposed on background diabetic neuropathy",
+        "action": "Obtain CBC, CMP, HIV, anti-GM1/anti-GQ1b ganglioside antibodies, and stool culture / Campylobacter serology if recent diarrhea",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Mild leukocytosis / elevated inflammatory markers reflecting antecedent infection; ganglioside antibodies for variant typing; trigger identification (Campylobacter, CMV, EBV, Mycoplasma, HIV)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Yuki_2012]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 2,
-        "action": "Labs including HbA1c, Mycoplasma serology",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Mycoplasma IgM positive; HbA1c mildly elevated — T2DM not the acute cause",
+        "action": "Order nerve conduction studies and needle EMG (EMG/NCS)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Demyelinating pattern (prolonged DML, conduction block, reduced CV, absent F-waves) consistent with AIDP, or reduced CMAP amplitudes in axonal variants (AMAN/AMSAN)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[Hadden_1998]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 3,
-        "action": "Serial FVC/NIF monitoring",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Above threshold but declining — close monitoring needed",
+        "action": "Perform lumbar puncture for CSF analysis",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Albuminocytologic dissociation — elevated protein with cell count <10/μL; may be normal in the first week of illness",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 4,
-        "action": "Lumbar puncture",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Mildly elevated protein with normal cells — albumino-cytologic dissociation",
+        "action": "Order bedside respiratory function testing (FVC, MIP/MEP, NIF) and repeat every 4–6 hours",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline and serial FVC, MIP/MEP, NIF; deterioration to FVC <20 mL/kg, MIP worse than -30 cmH2O, or VC <40% predicted triggers ICU transfer / intubation",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[Sharshar_2003]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 5,
-        "action": "Initiate IVIG",
-        "tool_name": null,
-        "expected_finding": "Treatment initiated",
+        "action": "Search the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[van_den_Berg_2014]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 6,
+        "action": "Check drug interactions / contraindications for IVIG (renal function, IgA deficiency screen) and/or plasma exchange (coagulation, calcium, hemodynamics)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Confirmation that IVIG can be given safely (no severe renal impairment, no IgA deficiency) or that plasma exchange is appropriate (adequate vascular access, stable coagulation)",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[van_den_Berg_2014]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 7,
+        "action": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Sinus tachycardia or bradycardia; conduction or repolarisation abnormalities reflecting autonomic involvement",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 8,
+        "action": "Initiate continuous cardiac telemetry for the first 1–2 weeks for moderate/severe disease — autonomic instability (bradyarrhythmias, BP lability) is common",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Documentation of sinus pauses, bradyarrhythmias, BP lability, or non-sustained tachyarrhythmias",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "GBS is a peripheral nerve / nerve-root disorder; EEG has no role in diagnosis unless atypical CNS features (encephalopathy, seizures) are present.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated in typical GBS; reserve for pre-existing cardiac disease or unexplained hemodynamic instability after autonomic causes are excluded.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT contributes no diagnostic information in GBS; the disease is peripheral and CT does not visualise nerve roots reliably.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "Functional / metabolic brain imaging adds no value in a peripheral demyelinating syndrome.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "MR_angiography"
+        },
+        "rationale": "Cerebrovascular imaging is not indicated in a peripheral neuropathy without focal cerebral signs.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is reserved for atypical features (encephalopathy, CNS signs, transverse myelitis on differential). In classic GBS it does not aid diagnosis.",
+        "citation": "[van_den_Berg_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_specialized_test",
+        "after": "check_drug_interactions",
+        "reason": "Document respiratory status (FVC/NIF) before committing to IVIG vs plasma exchange — severe respiratory compromise mandates ICU triage and may influence treatment choice and timing.",
+        "citation": "[Sharshar_2003]",
+        "severity": "soft"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Renal function, IgA screen, and CBC must be reviewed before IVIG to mitigate renal failure, anaphylaxis (IgA-deficient patients), and aseptic meningitis risk.",
+        "citation": "[van_den_Berg_2014]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Do not attribute rapid progression to diabetic neuropathy — tempo and pattern (facial diplegia, global areflexia) clearly indicate acute GBS",
-      "Initiate IVIG without delay — pre-existing neuropathy does not affect treatment decision",
-      "ICU admission for respiratory monitoring — monitor serially",
-      "Continuous telemetry for autonomic instability"
+      "Admit for serial respiratory and autonomic monitoring.",
+      "Initiate IVIG 0.4 g/kg/day for 5 days — check renal function and hydration carefully given comorbid diabetes.",
+      "Continuous cardiac telemetry given autonomic risk.",
+      "Tight glycaemic control during acute illness; document baseline diabetic neuropathy severity.",
+      "DVT prophylaxis."
     ],
     "contraindicated_actions": [
-      "Corticosteroids",
-      "Delaying IVIG waiting for resolution of 'diabetic flare'"
+      "Do not administer corticosteroids as monotherapy in GBS.",
+      "Do not give IVIG without baseline renal function and hydration assessment — diabetic nephropathy increases acute kidney injury risk.",
+      "Do not attribute the entire syndrome to diabetic neuropathy without ruling out GBS."
     ],
     "key_reasoning_points": [
-      "The KEY moderate-difficulty challenge: distinguishing acute GBS from worsening diabetic neuropathy — facial diplegia, global areflexia, and rapid 10-day progression are NOT diabetic neuropathy features",
-      "Mycoplasma pneumoniae is a well-recognized GBS trigger, especially following upper respiratory illness",
-      "Background diabetic neuropathy complicates NCS interpretation but does not change management — AIDP features are still identifiable",
-      "Anti-GD1b antibodies associated with Mycoplasma-triggered GBS"
+      "Baseline diabetic neuropathy elevates the bar for diagnosing GBS — the diagnostic anchor is acute symmetric progression with areflexia and elevated CSF protein, not the chronic baseline.",
+      "EMG demyelinating features that exceed expected diabetic chronic neuropathy support superimposed AIDP.",
+      "Renal function dictates IVIG safety; plasma exchange remains an alternative if renal disease is advanced.",
+      "Glycaemic stress accompanies acute inflammatory illness; aggressive infection or DKA workup should accompany the GBS workup."
     ],
     "red_herrings": [
       {
-        "data_point": "HbA1c 7.2% and known mild diabetic peripheral neuropathy",
-        "location": "patient.clinical_history.past_medical_history and initial_tool_outputs.labs.HbA1c",
-        "intended_effect": "Attribute all neurological symptoms to worsening diabetic neuropathy rather than recognizing superimposed acute GBS",
-        "correct_interpretation": "HbA1c 7.2% represents mild glycaemic impairment insufficient to cause acute 10-day ascending paralysis, bilateral facial weakness, or global areflexia; the acute tempo and cranial nerve involvement confirm GBS superimposed on background diabetic neuropathy",
-        "field_path": ""
+        "data_point": "Background diabetic peripheral neuropathy and mildly elevated HbA1c",
+        "location": "patient.clinical_history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Lead the clinician to attribute all neurological signs to diabetic neuropathy and miss the superimposed GBS.",
+        "correct_interpretation": "Diabetic neuropathy is chronic and length-dependent; acute symmetric areflexia with rapid progression and elevated CSF protein indicates a new GBS process."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -533,6 +677,17 @@
       "advanced_imaging": "normal",
       "literature_search": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:GBS",
+    "difficulty_rationale": "6 required tools, 1 red herring(s); classic or near-classic GBS workup with one or more plausible mimics that need active exclusion.",
+    "case_body_concerns": [
+      "Bedside respiratory function (FVC/MIP/MEP/NIF) is delivered via an `interpret_labs` followup panel rather than `order_specialized_test{test_type=respiratory_function}` as the criteria pack mandates. Agents calling order_specialized_test{respiratory_function} will hit the EMG/NCS output instead. Recommend adding a respiratory_function followup keyed to order_specialized_test in a follow-up case-body pass.",
+      "Mirrored fallback_tool_outputs into followup_outputs for required tools that previously only existed in the fallback bucket: ['search_medical_literature', 'check_drug_interactions']. Content is unchanged; the move makes the coherence validator see an explicit primary output for criteria-pack-required tools."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

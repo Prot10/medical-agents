@@ -1,7 +1,7 @@
 {
   "case_id": "FEPI-TEMP-RS04",
   "condition": "focal_epilepsy_temporal",
-  "difficulty": "straightforward",
+  "difficulty": "diagnostic_puzzle",
   "encounter_type": "inpatient",
   "patient": {
     "patient_id": "NB-FEPI-TEMP-RS04",
@@ -747,138 +747,206 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Focal epilepsy - temporal lobe (right mesial temporal lobe epilepsy with hippocampal sclerosis, drug-resistant)",
-    "icd_code": "G40.109",
+    "primary_diagnosis": "Drug-resistant focal epilepsy of right temporal lobe origin with mesial temporal sclerosis (mesial TLE, surgical-evaluation pathway)",
+    "icd_code": "G40.219",
     "differential": [
       {
-        "diagnosis": "Psychogenic non-epileptic seizures (PNES)",
+        "diagnosis": "Coexisting PNES on top of refractory epilepsy",
+        "likelihood": "moderate",
+        "key_features": "Common in chronic epilepsy clinics; video-EEG distinguishes.",
+        "icd_code": "F44.5"
+      },
+      {
+        "diagnosis": "Frontal lobe focal epilepsy mimicking TLE",
         "likelihood": "low",
-        "key_features": "Stereotyped semiology with classic temporal lobe aura (epigastric rising, deja vu), consistent automatisms, and post-ictal confusion. Elevated post-ictal prolactin and clear EEG abnormalities argue strongly against PNES."
+        "key_features": "Hypermotor automatisms and nocturnal preponderance would suggest frontal; current semiology is classically mesial-temporal.",
+        "icd_code": "G40.219"
       },
       {
-        "diagnosis": "Syncope (vasovagal or cardiac)",
+        "diagnosis": "Generalized epilepsy with secondary focal features",
         "likelihood": "low",
-        "key_features": "No prodrome of lightheadedness. Prolonged post-ictal confusion inconsistent with syncope. Normal ECG. Tonic-clonic activity lasting 60-90 seconds far exceeds convulsive syncope duration."
+        "key_features": "Generalized spike-wave on EEG would differ; current localization is focal.",
+        "icd_code": "G40.319"
       },
       {
-        "diagnosis": "Migraine with aura",
-        "likelihood": "very_low",
-        "key_features": "Migraine aura spreads slowly over minutes and is typically visual or sensory. Patient's episodes are brief, include deja vu and epigastric rising (classic temporal lobe aura), and are followed by impaired awareness and automatisms."
+        "diagnosis": "Autoimmune limbic encephalitis (chronic phase)",
+        "likelihood": "low",
+        "key_features": "Slowly progressive refractoriness with personality change; antibody panel needed.",
+        "icd_code": "G04.81"
       },
       {
-        "diagnosis": "Transient ischemic attack",
+        "diagnosis": "Adverse drug effects mimicking seizures (e.g., topiramate-induced cognitive slowing)",
         "likelihood": "very_low",
-        "key_features": "Patient is young with no vascular risk factors. TIAs cause negative symptoms (weakness, numbness), not the positive phenomena and altered awareness seen in this case."
+        "key_features": "Sedation or cognitive blunting differs from ictal events; EEG distinguishes.",
+        "icd_code": "T42.71XA"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain detailed seizure history including aura description, semiology, frequency, and witnesses' account",
+        "action": "Obtain detailed seizure history including semiology, aura, automatisms, duration, frequency, witness accounts, and post-ictal features.",
         "tool_name": null,
-        "expected_finding": "Classic temporal lobe aura (deja vu, epigastric rising) followed by focal impaired awareness seizures with automatisms and secondary generalization",
-        "category": "required"
+        "expected_finding": "Stereotyped focal impaired-awareness events with temporal-lobe aura and post-ictal confusion.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 2,
-        "action": "Perform complete neurological examination",
+        "action": "Perform complete neurological examination.",
         "tool_name": null,
-        "expected_finding": "Largely normal interictal examination with lateral tongue bite from recent seizure and mild post-ictal memory impairment",
-        "category": "required"
+        "expected_finding": "Interictal exam typically normal; subtle memory deficit may be present.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Order routine EEG",
+        "action": "Order EEG (long-term video-EEG monitoring) to identify interictal epileptiform discharges and capture habitual events.",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Right anterior temporal sharp waves and spikes with TIRDA consistent with right temporal epileptogenic focus",
+        "expected_finding": "Interictal sharps/spikes and/or focal slowing in the anterior temporal region; ictal correlate confirms diagnosis.",
         "category": "required",
         "tool_parameters": {
-          "eeg_type": "routine"
-        }
+          "eeg_type": "video"
+        },
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 4,
-        "action": "Order MRI brain with epilepsy protocol",
+        "action": "Order MRI brain with dedicated epilepsy protocol (thin-cut coronal T1/FLAIR/T2/DWI through the hippocampi).",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Right hippocampal sclerosis with volume loss and T2/FLAIR hyperintensity",
+        "expected_finding": "Hippocampal sclerosis, low-grade tumor (DNET, ganglioglioma), cavernoma, or focal cortical dysplasia; rule out alternative structural causes.",
         "category": "required",
         "tool_parameters": {
           "protocol": "epilepsy",
-          "contrast": false
-        }
+          "contrast": true
+        },
+        "citation": "[AAN_2007]",
+        "guideline_source": "AAN_2007"
       },
       {
         "step": 5,
-        "action": "Obtain basic labs including BMP, CBC, AED levels, prolactin, and liver function tests",
+        "action": "Obtain CBC, comprehensive metabolic panel, prolactin (if drawn within 10–20 min of event), and AED levels if on therapy.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal metabolic panel, therapeutic AED levels despite ongoing seizures, elevated post-ictal prolactin, normal hepatic function",
+        "expected_finding": "Exclude metabolic provocation (hypoglycemia, hyponatremia, uremia); baseline organ function for AED selection; AED level for adherence and dosing.",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
-            "LFT",
+            "CMP",
             "prolactin",
             "AED_levels"
           ]
-        }
+        },
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 6,
-        "action": "Obtain ECG to rule out cardiac etiology",
-        "tool_name": null,
-        "expected_finding": "Normal sinus rhythm, no arrhythmia",
-        "category": "recommended"
+        "action": "Search current literature for AED selection in focal epilepsy and ILAE 2017 seizure classification.",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Evidence-based AED options for focal epilepsy (levetiracetam, lamotrigine, oxcarbazepine, lacosamide); ILAE classification framework.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 7,
-        "action": "Review current antiepileptic drug regimen for interactions and appropriateness",
+        "action": "Check drug interactions before initiating or modifying AED therapy (enzyme inducers, OCP, other CNS-active drugs).",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "Significant drug-drug interactions in current triple therapy, valproate teratogenicity risk in woman of childbearing age",
-        "category": "required"
+        "expected_finding": "Identify pharmacokinetic interactions (CYP induction by carbamazepine/phenytoin) and CNS adverse-effect overlap.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 8,
-        "action": "Refer to comprehensive epilepsy center for surgical evaluation given drug-resistant epilepsy with concordant structural lesion",
-        "tool_name": null,
-        "expected_finding": "Referral for pre-surgical workup including prolonged video-EEG monitoring, neuropsychological testing, and FDG-PET",
-        "category": "required"
+        "action": "Order interictal FDG-PET when MRI is non-localizing or as part of surgical evaluation.",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Focal hypometabolism ipsilateral to the seizure focus, providing concordant localization for surgical planning.",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[Willmann_2007]",
+        "guideline_source": "Willmann_2007"
       },
       {
         "step": 9,
-        "action": "Counsel patient regarding teratogenic risks of valproate and the importance of contraception while on current regimen",
-        "tool_name": null,
-        "expected_finding": "Patient counseled on valproate teratogenicity and pregnancy prevention",
-        "category": "required"
+        "action": "Order comprehensive neuropsychological battery to lateralize memory function and inform surgical risk.",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Material-specific memory deficit consistent with side of seizure focus (verbal memory deficit in dominant TLE; visuospatial in non-dominant).",
+        "category": "optional",
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Engel_2003]",
+        "guideline_source": "Engel_2003"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No clinical features of CNS infection, encephalitis, or immunocompromise; CSF analysis is not indicated for routine focal epilepsy workup and exposes the patient to procedural risk and cost.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "echo_type": "TTE"
+        },
+        "rationale": "No syncope-versus-seizure question and no structural-heart concern; echocardiogram contributes nothing to epilepsy workup.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "Ambulatory cardiac monitoring is reserved for syncope-versus-seizure differentiation; not indicated when semiology is clearly epileptic.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT is inferior to MRI for detecting epileptogenic substrates (hippocampal sclerosis, FCD, low-grade tumor) and adds ionizing radiation without diagnostic yield.",
+        "citation": "[AAN_2007]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "check_drug_interactions",
+        "reason": "Structural cause influences AED choice (e.g., low-grade tumor → consider AEDs with CYP-neutral profile; hippocampal sclerosis → multiple equally appropriate options). MRI should inform drug selection.",
+        "citation": "[ILAE_drug_2017]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Obtain EEG to characterize and lateralize the epileptogenic focus",
-      "Obtain brain MRI to identify the structural substrate (hippocampal sclerosis)",
-      "Confirm AED levels are therapeutic to establish drug resistance rather than non-adherence",
-      "Recognize this as drug-resistant epilepsy meeting ILAE criteria (failure of 3 appropriately dosed AEDs)",
-      "Refer for epilepsy surgery evaluation given concordant clinical, EEG, and MRI findings",
-      "Counsel woman of childbearing age about teratogenic risk of valproate"
+      "Apply ILAE drug-resistance criteria (failure of ≥2 appropriately chosen and tolerated AEDs) and refer to a comprehensive epilepsy center.",
+      "Perform long-term video-EEG to confirm focal temporal onset and assess lateralization.",
+      "Obtain 3T MRI with epilepsy protocol and FDG-PET for surgical workup.",
+      "Order neuropsychological battery to lateralize memory function and inform surgical risk for memory decline.",
+      "Discuss surgical resection (anterior temporal lobectomy, selective amygdalohippocampectomy) versus neuromodulation (RNS, VNS) options with the patient."
     ],
     "contraindicated_actions": [
-      "Increasing valproate dose further in a woman of childbearing age without discussing teratogenic risks and alternatives",
-      "Performing lumbar puncture (no clinical indication; no signs of infection or inflammation)",
-      "Discharging without a plan for epilepsy surgery referral given drug-resistant epilepsy with a structural lesion",
-      "Adding another AED without considering surgical evaluation, as further polytherapy is unlikely to achieve seizure freedom",
-      "Prescribing medications that lower seizure threshold (e.g., bupropion, tramadol)"
+      "Do not continue indefinite AED escalation when refractoriness criteria are met — refer to epilepsy surgery center.",
+      "Do not perform LP in absence of infectious indication.",
+      "Do not omit neuropsychological evaluation prior to dominant-hemisphere temporal lobectomy — risk of severe verbal memory decline."
     ],
     "key_reasoning_points": [
-      "The combination of epigastric rising sensation and deja vu is a classic mesial temporal lobe aura, localizing the seizure onset to the mesial temporal structures",
-      "History of infantile epilepsy with early seizure freedom and later recurrence is a classic trajectory for mesial temporal sclerosis, potentially related to an initial precipitating injury in early childhood",
-      "All three AED levels are within therapeutic ranges yet seizures persist at a frequency of 3 per week, establishing this as drug-resistant epilepsy per ILAE criteria",
-      "Concordance across modalities (semiology localizing to right temporal lobe, right temporal EEG abnormalities, right hippocampal sclerosis on MRI) is essential for surgical candidacy",
-      "Valproate at 1400 mg/day in a 29-year-old woman poses significant teratogenic risk, and the published source case demonstrated fetal malformations attributed to valproate exposure",
-      "Complex pharmacokinetic interactions between valproate (enzyme inhibitor), carbamazepine (enzyme inducer), and phenobarbital (enzyme inducer) make polytherapy optimization extremely difficult and support consideration of surgical cure rather than further medication manipulation",
-      "Elevated post-ictal prolactin supports the diagnosis of epileptic seizures and helps distinguish from psychogenic non-epileptic events"
+      "Drug-resistant mesial TLE with HS is the prototypical indication for epilepsy surgery, with ~60–70% seizure freedom at 2 years.",
+      "Comprehensive presurgical evaluation includes video-EEG, 3T MRI, FDG-PET, neuropsychology, and material-specific Wada or fMRI for memory lateralization.",
+      "Triple AED therapy at therapeutic doses with continued seizures meets refractoriness criteria.",
+      "Patient counselling on surgical benefits/risks is essential."
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
     "red_herrings": []
   },
   "metadata": {
@@ -894,6 +962,16 @@
       "ct": "incidental",
       "echo": "normal",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (FEPI-TEMP)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FEPI-TEMP",
+    "difficulty_rationale": "Drug-resistant epilepsy requiring full surgical workup (video-EEG, FDG-PET, neuropsych); long-standing presentation with established structural lesion plus comprehensive epilepsy-center pathway.",
+    "case_body_concerns": [
+      "useless_tools entry for `analyze_ecg` dropped: tool output is provided up-front in initial_tool_outputs, so declaring it useless to call would be incoherent (agent never had to call it)."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

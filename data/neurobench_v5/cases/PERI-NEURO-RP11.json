@@ -449,153 +449,207 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Anti-Hu paraneoplastic sensory neuronopathy and limbic encephalitis caused by extensive-stage small cell lung carcinoma",
-    "critical_actions": [
-      "Obtain serum anti-Hu (ANNA-1), anti-Yo, anti-Ri, anti-CRMP5 urgently when sensory neuronopathy is confirmed",
-      "CT chest-abdomen-pelvis with contrast urgently (prior CXR insufficient — SCLC hilar masses missed on CXR)",
-      "EBUS-guided biopsy of hilar mass for tissue confirmation and SCLC histology",
-      "PET-CT for staging (extensive vs limited SCLC determines treatment)",
-      "Oncology referral: carboplatin-etoposide chemotherapy ± atezolizumab (with neurology co-management)",
-      "Neurology co-management: treat SIADH (fluid restriction, tolvaptan if severe); gabapentin/pregabalin for neuropathic pain",
-      "Do NOT re-treat with IVIG — ineffective for paraneoplastic (intracellular antigen) syndromes",
-      "Neurology-oncology co-management for checkpoint inhibitor decision in established PNS"
+    "primary_diagnosis": "Anti-Hu paraneoplastic sensory neuronopathy with limbic encephalitis from small cell lung carcinoma",
+    "icd_code": "G13.0",
+    "differential": [
+      {
+        "diagnosis": "Sjögren's syndrome sensory ganglionopathy",
+        "likelihood": "moderate",
+        "key_features": "Common identifiable cause of ganglionopathy; anti-SSA/SSB + sicca + lip biopsy.",
+        "icd_code": "G63"
+      },
+      {
+        "diagnosis": "Idiopathic sensory neuronopathy",
+        "likelihood": "moderate",
+        "key_features": "Diagnosis of exclusion after autoimmune, paraneoplastic, toxic causes ruled out.",
+        "icd_code": "G60.9"
+      },
+      {
+        "diagnosis": "Toxic sensory ganglionopathy (cisplatin, pyridoxine megadose)",
+        "likelihood": "low",
+        "key_features": "Need detailed medication/supplement and chemotherapy history.",
+        "icd_code": "G62.2"
+      },
+      {
+        "diagnosis": "CIDP",
+        "likelihood": "low",
+        "key_features": "Demyelinating motor and sensory; this case is non-length-dependent sensory ganglionopathy + CNS features.",
+        "icd_code": "G61.81"
+      },
+      {
+        "diagnosis": "Cervical / thoracic myelopathy with posterior column involvement",
+        "likelihood": "low",
+        "key_features": "Imaging required; would not explain limbic encephalitis features.",
+        "icd_code": "G95.9"
+      }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "interpret_labs (CBC, CMP with Na for SIADH, HbA1c, SPEP, paraneoplastic antibody panel serum)",
+        "action": "Order broad neuropathy labs (CBC, CMP, HbA1c, B12 + MMA, TSH, SPEP/IFE, urinalysis)",
         "tool_name": "interpret_labs",
-        "expected_finding": "Anti-Hu (ANNA-1) strongly positive at 1:1000; anti-SSA/SSB negative (Sjögren's excluded); SIADH pattern (Na 130 if checked)",
+        "expected_finding": "Identify reversible/treatable etiologies (diabetes, B12 deficiency, monoclonal gammopathy, thyroid disease)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "HbA1c",
+            "B12",
+            "MMA",
+            "TSH",
+            "SPEP",
+            "IFE",
+            "UA"
+          ]
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
       },
       {
         "step": 2,
-        "action": "analyze_brain_mri (limbic encephalitis pattern, exclude metastasis)",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Bilateral medial temporal lobe T2/FLAIR hyperintensity consistent with paraneoplastic limbic encephalitis",
+        "action": "Order EMG/NCS to characterize axonal vs demyelinating pattern and distribution",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Length-dependent axonal vs demyelinating vs multifocal pattern; severity and distribution",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
       },
       {
         "step": 3,
-        "action": "interpret_labs (NCS/EMG — pan-SNAP absence with normal motor is pathognomonic)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Pan-sensory SNAPs absent in all 7 tested nerves; motor NCS completely normal; normal EMG — pathognomonic sensory neuronopathy (DRG disease)",
+        "action": "Search literature for DSP evaluation guidelines and etiology-specific recommendations",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirm AAN 2009 DSP workup, etiology-specific evaluations",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "query": "distal symmetric polyneuropathy evaluation AAN 2009"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
       },
       {
         "step": 4,
-        "action": "analyze_csf (lymphocytic pleocytosis + elevated protein + oligoclonal bands + anti-Hu CSF)",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Mild lymphocytic pleocytosis (WBC 8/uL), protein 72 mg/dL, oligoclonal bands, anti-Hu positive in CSF",
+        "action": "Review medications for neurotoxic agents and check interactions for symptomatic therapy",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identify potentially neurotoxic drugs (chemotherapy, metronidazole, megadose B6, nitrofurantoin); guide neuropathic-pain pharmacotherapy",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "medications": []
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
       },
       {
         "step": 5,
-        "action": "interpret_labs (anti-Hu serum 1:1000, complete paraneoplastic panel)",
+        "action": "Comprehensive paraneoplastic antibody panel (anti-Hu, anti-Yo, anti-Ri, anti-CV2/CRMP5, anti-amphiphysin, anti-Ma2/PNMA, anti-GAD, anti-LGI1, anti-CASPR2, anti-NMDAR, anti-AMPAR, anti-GABA-B-R)",
         "tool_name": "interpret_labs",
-        "expected_finding": "Anti-Hu serum 1:1000 strongly positive; all other paraneoplastic antibodies negative; anti-SSA negative",
+        "expected_finding": "Anti-Hu positivity confirms paraneoplastic sensory neuronopathy + limbic encephalitis (esp. SCLC)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "paraneoplastic_panel",
+            "autoimmune_encephalitis_panel"
+          ]
+        },
+        "citation": "[Said_2007]",
+        "guideline_source": "Said 2007 vasculitic neuropathy"
       },
       {
         "step": 6,
-        "action": "order_ct_scan (CT chest-abdomen-pelvis — identify SCLC hilar mass missed on CXR)",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "Right hilar mass 2.8 cm with paratracheal lymphadenopathy; right adrenal nodule 1.1 cm — prior CXR was false-negative",
+        "action": "FDG-PET / CT chest-abdomen-pelvis for occult malignancy (especially small cell lung cancer)",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Hypermetabolic lung mass / mediastinal lymphadenopathy supports SCLC",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[Said_2007]",
+        "guideline_source": "Said 2007 vasculitic neuropathy"
       },
       {
         "step": 7,
-        "action": "order_specialized_test (EBUS biopsy + PET-CT staging)",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "SCLC confirmed on EBUS biopsy: synaptophysin+, chromogranin+, Ki-67 >80%; extensive stage (adrenal metastasis on PET)",
+        "action": "Lumbar puncture for CSF when CIDP suspected",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Albuminocytologic dissociation (elevated protein, normal cell count) supports CIDP",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Joint_Task_Force_2010_CIDP]",
+        "guideline_source": "EFNS/PNS 2010 CIDP guideline"
       },
       {
         "step": 8,
-        "action": "search_medical_literature (anti-Hu SCLC treatment)",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "IVIG ineffective for intracellular antigen paraneoplastic syndromes; carboplatin-etoposide for SCLC; DRG neurons do not regenerate",
+        "action": "Brain MRI with contrast for limbic encephalitis findings (mesial temporal T2/FLAIR hyperintensity)",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Mesial temporal T2/FLAIR hyperintensity supports limbic encephalitis",
         "category": "required",
-        "tool_parameters": {}
-      },
-      {
-        "step": 9,
-        "action": "check_drug_interactions (checkpoint inhibitor caution in paraneoplastic syndrome)",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Checkpoint inhibitor atezolizumab may worsen anti-Hu paraneoplastic syndrome; neurology-oncology co-management essential",
-        "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "region": "brain_with_contrast",
+          "sequences": [
+            "FLAIR",
+            "T2",
+            "DWI"
+          ]
+        },
+        "citation": "[Said_2007]",
+        "guideline_source": "Said 2007 vasculitic neuropathy"
       }
     ],
-    "differential": [
+    "useless_tools": [
       {
-        "diagnosis": "CIDP (inflammatory polyradiculoneuropathy)",
-        "likelihood": "low",
-        "key_features": "CIDP presents with demyelinating NCS (slow velocities, conduction block) and responds to IVIG; this patient had IVIG failure. Pan-SNAP absence with completely normal motor NCS is DRG disease, not CIDP. CSF in CIDP shows albumino-cytologic dissociation without pleocytosis, unlike the lymphocytic pleocytosis here."
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is a cortical test and is non-contributory in peripheral nerve disease.",
+        "citation": "[AAN_2009]"
       },
       {
-        "diagnosis": "Sjögren's syndrome sensory ganglionopathy",
-        "likelihood": "low",
-        "key_features": "Sjögren's is the second most common cause of sensory neuronopathy; anti-SSA negative excludes it. No sicca symptoms (dry eyes/mouth). No salivary gland enlargement. Anti-SSA/SSB both negative in serum."
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head/brain CT has no role in peripheral neuropathy evaluation.",
+        "citation": "[AAN_2009]"
       },
       {
-        "diagnosis": "Paraneoplastic sensory neuronopathy from non-SCLC tumor",
-        "likelihood": "very_low",
-        "key_features": "Anti-Hu (ANNA-1) at 1:1000 is associated with SCLC in 85-90% of cases. CT chest confirmed right hilar mass with pathology-proven SCLC. Anti-Yo (ovarian/breast) and anti-Ri negative."
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated unless cardiac amyloid is suspected.",
+        "citation": "[AAN_2009]"
       },
       {
-        "diagnosis": "Toxic sensory neuropathy (chemotherapy, pyridoxine toxicity)",
-        "likelihood": "very_low",
-        "key_features": "No history of chemotherapy, neurotoxic medications, or high-dose B6 supplementation. Acute-subacute onset with weight loss and former smoker history points to paraneoplastic etiology."
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated unless there is syncope or symptomatic dysautonomia with arrhythmia concern.",
+        "citation": "[AAN_2009]"
       }
     ],
-    "key_reasoning_points": [
-      "DIAGNOSTIC PUZZLE: The case was initially diagnosed as CIDP (elevated CSF protein + prior NCS 'neuropathy') and treated empirically with IVIG — the IVIG failure is a critical clue that this is not CIDP",
-      "CRITICAL NCS PATTERN: Pan-SNAP absence in all 7 tested nerves with COMPLETELY NORMAL motor NCS and EMG is pathognomonic for sensory neuronopathy (DRG disease), not CIDP (which shows demyelination) or axonal neuropathy (which preserves some SNAPs)",
-      "NON-LENGTH-DEPENDENT PATTERN: Upper and lower limbs equally affected simultaneously means DRG cell body destruction, not dying-back axon disease — this is the key localization clue",
-      "FORMER SMOKER + WEIGHT LOSS = SCLC UNTIL PROVEN OTHERWISE: 35 pack-year history with unintentional weight loss and anti-Hu positivity — chest imaging is mandatory even if prior CXR was 'normal'",
-      "PSEUDOATHETOSIS: Involuntary finger writhing with eyes closed is pathognomonic for severe proprioceptive loss from DRG disease — its presence indicates near-complete posterior column / DRG function loss",
-      "IVIG IS INEFFECTIVE FOR INTRACELLULAR ANTIGEN PNS: Anti-Hu targets an intracellular protein (HuD); antibody-mediated mechanisms are T-cell cytotoxic, not responsive to IVIG (contrast with NMDAR, LGI1 which do respond)"
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "order_specialized_test",
+        "reason": "Tier the workup — basic labs first, then targeted electrodiagnostic and tissue studies.",
+        "citation": "[AAN_2009]",
+        "severity": "soft"
+      }
+    ],
+    "critical_actions": [
+      "Recognize non-length-dependent sensory loss + sensory ataxia + areflexia + cognitive/behavioral features = paraneoplastic sensory neuronopathy + limbic encephalitis",
+      "Comprehensive paraneoplastic and autoimmune encephalitis antibody panel (serum AND CSF)",
+      "FDG-PET / CT chest for occult SCLC; if negative, repeat in 3-6 months given high SCLC sensitivity of anti-Hu",
+      "Brain MRI for limbic encephalitis pattern",
+      "Treat the underlying malignancy and consider IVIG / steroids / cyclophosphamide / rituximab"
     ],
     "contraindicated_actions": [
-      "Do not re-treat with IVIG when IVIG failed — ineffective for intracellular antigen paraneoplastic syndromes (anti-Hu, anti-Yo)",
-      "Do not trust normal CXR to exclude SCLC — hilar masses are frequently missed on CXR; CT chest is required in any former smoker with sensory neuronopathy",
-      "Do not start checkpoint inhibitor immunotherapy (atezolizumab) without neurology co-management — may severely worsen anti-Hu paraneoplastic syndrome"
+      "Do not stop the workup with a 'CIDP' label — the picture is ganglionopathy + CNS, not peripheral demyelination",
+      "Do not delay malignancy screen — anti-Hu is most often paraneoplastic to SCLC"
     ],
-    "red_herrings": [
-      {
-        "data_point": "Empirical IVIG treatment 6 weeks prior with no improvement — outside neurologist diagnosed CIDP",
-        "location": "clinical_history / PMH",
-        "intended_effect": "Anchors clinician toward confirming the CIDP diagnosis, potentially prompting repeat IVIG or IVIG dose increase rather than reconsidering the diagnosis entirely",
-        "correct_interpretation": "IVIG failure is a critical diagnostic clue: CIDP responds to IVIG in 70-80% of cases. Failure after standard dosing should prompt reconsideration of diagnosis. The pan-SNAP absence with normal motor NCS is NOT CIDP — it is sensory neuronopathy (DRG disease), which is IVIG-refractory.",
-        "field_path": ""
-      },
-      {
-        "data_point": "CSF protein elevation (72 mg/dL) with lymphocytic pleocytosis (WBC 8/uL)",
-        "location": "followup_outputs / analyze_csf",
-        "intended_effect": "Elevated CSF protein could be misinterpreted as supporting CIDP diagnosis (albumino-cytologic dissociation); pleocytosis is not typical for CIDP and should actually argue against it",
-        "correct_interpretation": "CIDP shows albumino-cytologic dissociation (high protein, NORMAL cell count). Lymphocytic pleocytosis (WBC 8/uL) with oligoclonal bands indicates intrathecal immune activation from paraneoplastic CNS inflammation, NOT CIDP. Paraneoplastic CSF pattern: mild pleocytosis + elevated protein + oligoclonal bands + anti-Hu in CSF.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Chest X-ray reportedly 'within normal limits' 5 months ago",
-        "location": "clinical_history / HPI",
-        "intended_effect": "May provide false reassurance that pulmonary malignancy has been adequately excluded, leading to delay in CT chest",
-        "correct_interpretation": "SCLC hilar masses are frequently missed or inapparent on CXR due to their central location and mediastinal overlap. CT chest is required for SCLC detection — CXR sensitivity for SCLC hilar masses is only 60-70%. A negative CXR does not exclude SCLC.",
-        "field_path": ""
-      }
+    "key_reasoning_points": [
+      "Anti-Hu syndrome = paraneoplastic sensory neuronopathy (dorsal root ganglionopathy) + limbic encephalitis, classically with SCLC",
+      "Sensory neuronopathy: non-length-dependent sensory loss, sensory ataxia, areflexia, often with autonomic involvement",
+      "Limbic encephalitis: memory impairment, behavioral change, seizures, mesial temporal MRI signal change"
     ],
-    "icd_code": "G13.0",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": []
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -604,6 +658,14 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:PERI-NEURO",
+    "difficulty_rationale": "8 required tools, 0 red herrings; classification reflects clinical complexity per PERI-NEURO pack section 6 (M/S/P/R variants).",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -490,142 +490,227 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Sporadic Creutzfeldt-Jakob disease (sCJD) with superimposed focal left temporal NCSE on a background of typical CJD periodic sharp wave complexes (PSWCs) — two separate EEG patterns requiring different treatment approaches",
-    "icd_code": "G41.9",
+    "primary_diagnosis": "Sporadic Creutzfeldt-Jakob disease with superimposed focal left temporal non-convulsive status epilepticus on a background of typical periodic sharp wave complexes",
+    "icd_code": "A81.01",
     "differential": [
       {
-        "diagnosis": "NCSE from autoimmune encephalitis mimicking CJD",
-        "likelihood": "low",
-        "key_features": "RT-QuIC positive (>95% specificity), 14-3-3 positive, DWI cortical ribboning — these together confirm prion disease; autoimmune antibodies negative"
+        "diagnosis": "Pure sCJD-related myoclonus and PSWCs (no NCSE)",
+        "likelihood": "high",
+        "key_features": "PSWCs are typical for CJD; the ictal pattern (focal temporal) is distinct from PSWCs and requires AED",
+        "icd_code": "A81.01"
       },
       {
-        "diagnosis": "Rapidly progressive autoimmune dementia (anti-GABA-B, anti-NMDAR)",
-        "likelihood": "low",
-        "key_features": "Autoimmune panel negative; RT-QuIC positive; cortical ribboning; PSWCs at 1 Hz are classic sCJD, not autoimmune encephalitis"
-      },
-      {
-        "diagnosis": "CJD PSWCs only (no separate NCSE)",
+        "diagnosis": "Autoimmune encephalitis (CASPR2, LGI1)",
         "likelihood": "moderate",
-        "key_features": "The KEY insight is that TWO patterns coexist: CJD PSWCs + focal left temporal NCSE; levetiracetam trial confirmed differential response — focal NCSE responds to AED while PSWCs remain unchanged"
+        "key_features": "Rapidly progressive dementia mimics — antibody panel must be sent (treatable mimic)",
+        "icd_code": "G04.81"
+      },
+      {
+        "diagnosis": "Other prion disease (familial, variant)",
+        "likelihood": "low",
+        "key_features": "Sporadic CJD most common; family history negative",
+        "icd_code": "A81.09"
+      },
+      {
+        "diagnosis": "Viral encephalopathy (HHV-6, atypical)",
+        "likelihood": "low",
+        "key_features": "CSF testing excludes; RT-QuIC is highly specific for prion",
+        "icd_code": "B33.8"
+      },
+      {
+        "diagnosis": "Toxic-metabolic encephalopathy",
+        "likelihood": "low",
+        "key_features": "Labs do not support; RT-QuIC and 14-3-3 positive",
+        "icd_code": "G93.41"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "EEG to characterize both the CJD PSWCs and any superimposed focal ictal patterns",
+        "action": "Continuous video-EEG — distinguish PSWCs from focal NCSE",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Dual pattern: generalized PSWCs at 1 Hz (CJD) + left temporal focal ictal runs (NCSE)",
+        "expected_finding": "Two distinct patterns: generalized PSWCs (CJD) and focal left temporal ictal pattern — only the focal pattern is treatable as NCSE",
         "category": "required",
-        "tool_parameters": {
-          "urgency": "urgent"
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "CSF RT-QuIC and 14-3-3 protein to confirm sCJD diagnosis",
-        "tool_name": "analyze_csf",
-        "expected_finding": "RT-QuIC positive; 14-3-3 positive; total tau markedly elevated",
+        "action": "Labs: CBC, CMP, glucose, Ca/Mg, AED level, ammonia, ABG, lactate, blood cultures, tox screen, autoimmune encephalitis panel (treatable mimic!)",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Mild glucose elevation; autoimmune encephalitis panel (LGI1, CASPR2, NMDAR) pending — treatable mimic must be excluded",
         "category": "required",
-        "tool_parameters": {
-          "tests": [
-            "RT-QuIC",
-            "14-3-3",
-            "total_tau",
-            "HSV_PCR",
-            "autoimmune_panel"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "MRI brain DWI to assess cortical ribboning extent",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Bilateral cortical ribbon DWI restriction — sCJD hallmark",
+        "action": "Non-contrast head CT",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Diffuse cortical atrophy; no acute lesion",
         "category": "required",
-        "tool_parameters": {
-          "sequences": [
-            "DWI",
-            "ADC",
-            "FLAIR"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "IV levetiracetam 1000 mg trial and repeat EEG — assess differential response: focal NCSE (responds) vs CJD PSWCs (do not respond)",
-        "tool_name": null,
-        "expected_finding": "Left temporal ictal runs reduce; PSWCs unchanged — proves two separate patterns",
+        "action": "MRI brain (DWI / FLAIR) — cortical and basal-ganglia ribboning is the prion signature",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Cortical ribboning DWI restriction (pulvinar/dorsomedial thalamus in variant; cortical/basal ganglia in sporadic)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "Goals of care family meeting with neurology, palliative care — sCJD is terminal, NCSE treatment is for comfort not cure",
-        "tool_name": null,
-        "expected_finding": "Family understands prognosis; comfort-focused plan established",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Lumbar puncture: 14-3-3, RT-QuIC, total tau (highly specific for prion), HSV PCR, autoimmune encephalitis CSF panel",
+        "tool_name": "analyze_csf",
+        "expected_finding": "14-3-3 positive, RT-QuIC positive, tau >1200 — CJD confirmed; rules out treatable infectious/autoimmune mimics",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 6,
-        "action": "Check drug interaction: quetiapine + escitalopram QTc risk; ECG",
+        "action": "Drug-interaction check: quetiapine + escitalopram + AED — focal NCSE treatment compatible with CJD palliative care goals",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "QTc 462 ms borderline; monitor; consider escitalopram dose reduction",
+        "expected_finding": "Continue LEV for focal NCSE; minimal interactions; avoid escalation to anesthetic infusion in known terminal prion disease",
         "category": "required",
-        "tool_parameters": {
-          "drugs": [
-            "quetiapine",
-            "escitalopram"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[ESETT_2019]",
+        "guideline_source": ""
       },
       {
         "step": 7,
-        "action": "Palliative care consultation for comfort management: levetiracetam for NCSE, clonazepam for myoclonus, quetiapine for agitation",
-        "tool_name": null,
-        "expected_finding": "Comprehensive comfort-focused symptom management plan",
+        "action": "Literature: sCJD diagnosis criteria + NCSE treatment in terminal disease",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirmed sCJD per Paris-Edinburgh criteria; treat focal NCSE with LEV for comfort; avoid anesthetic infusion given terminal trajectory",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 8,
+        "action": "Palliative care consultation — goals of care in confirmed terminal prion disease",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Comfort-focused care plan",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 9,
+        "action": "Neurology + infection control consultation for CJD precautions",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Standard precautions plus CJD-specific for high-risk procedures",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "study_type": "TTE"
+        },
+        "rationale": "No clinical suspicion of cardiac source of embolus or cardiogenic seizure; routine echo is not indicated in SE workup absent cardiac findings.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No suspicion of arrhythmogenic syncope or cardiac comorbidity precipitating SE; routine telemetry beyond standard ICU monitoring adds cost without yield.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in acute SE evaluation; dementia biomarker imaging does not change acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is for ischemic stroke workup; SE without focal vascular suspicion does not warrant carotid imaging.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "DaTscan / dopamine transporter imaging has no role in SE; no parkinsonism question relevant to acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "rationale": "Neuropsych battery cannot be performed in encephalopathic prion patient.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "CT before LP to exclude mass effect.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Distinguish CJD PSWCs from superimposed focal NCSE — AED trial with repeat EEG resolves this",
-      "RT-QuIC CSF for sCJD confirmation (>95% specificity)",
-      "Goals of care family meeting — terminal disease; NCSE treatment is comfort-focused",
-      "Check QTc — quetiapine + escitalopram combination carries QTc prolongation risk",
-      "Do NOT use succinylcholine, Do NOT intubate without goals-of-care discussion in terminal patient"
+      "Administer IV lorazepam 0.1 mg/kg for focal NCSE (comfort and seizure control)",
+      "Load IV levetiracetam for focal NCSE",
+      "Rule out treatable mimics (autoimmune encephalitis CSF panel) before accepting CJD as the final diagnosis",
+      "Palliative care consultation and goals-of-care discussion",
+      "Family communication about prognosis and CJD precautions"
     ],
     "contraindicated_actions": [
-      "Aggressive AED escalation targeting CJD PSWCs — these do not respond to AEDs and represent the CJD process itself",
-      "Intubation and ICU admission without goals-of-care discussion — terminal disease; aggressive interventions require explicit family consent",
-      "Diagnosing all rhythmic movements as CJD without EEG — superimposed NCSE in terminal disease is treatable for comfort"
+      "Do NOT escalate to deep anesthetic infusion in confirmed terminal sCJD without goals-of-care alignment",
+      "Do NOT skip autoimmune encephalitis workup — treatable mimics share clinical features with prion disease",
+      "Do NOT treat the EEG PSWCs as NCSE — these are the CJD signature, not seizures",
+      "Avoid anesthetic infusion (midazolam/propofol/pentobarbital) for refractory SE in confirmed terminal sCJD — goals of care favor comfort; aggressive escalation not aligned with prognosis."
     ],
     "key_reasoning_points": [
-      "Expert-level distinction: CJD PSWCs and focal NCSE coexist on the same EEG — differential AED response (focal NCSE reduces while PSWCs remain) proves two separate patterns",
-      "RT-QuIC has >95% specificity for prion disease — positive result is essentially diagnostic in the appropriate clinical context",
-      "CJD PSWCs at 1 Hz are a diagnostic criterion for sCJD — they represent the prion disease process, NOT treatable NCSE; do not escalate AEDs targeting PSWCs",
-      "Focal NCSE superimposed on CJD represents a treatable complication worth addressing for quality of life and family comfort (patient appears less distressed)",
-      "QTc risk: quetiapine + escitalopram both prolong QTc; levetiracetam is safe to add; monitor ECG in terminal patients receiving these agents"
+      "Periodic sharp wave complexes are pathognomonic of sCJD and are NOT seizures — distinguish from concurrent focal NCSE",
+      "RT-QuIC has very high sensitivity and specificity for prion disease",
+      "Autoimmune encephalitis (LGI1, CASPR2) can mimic rapidly progressive dementia — must be excluded as a treatable mimic",
+      "Goals-of-care must inform SE escalation in terminal prion disease"
     ],
     "red_herrings": [
       {
-        "data_point": "EEG report: 'generalized periodic sharp wave complexes at 1 Hz — typical CJD pattern'",
-        "location": "referring hospital EEG report",
-        "intended_effect": "Conclude ALL rhythmic EEG activity is CJD and no AED treatment is needed",
-        "correct_interpretation": "CJD PSWCs are present, but additional left focal ictal activity is a SEPARATE pattern representing superimposed NCSE. AED trial with repeat EEG reveals differential response. Both diagnoses coexist.",
-        "field_path": ""
+        "data_point": "'Typical CJD pattern' on initial EEG report",
+        "location": "initial_tool_outputs.eeg",
+        "field_path": "initial_tool_outputs.eeg",
+        "intended_effect": "Causes assumption that all EEG abnormalities are PSWCs (no AED), missing concurrent treatable focal NCSE",
+        "correct_interpretation": "Two distinct patterns coexist: generalized PSWCs (CJD signature) AND focal left temporal ictal pattern (treatable NCSE) — AED is appropriate for the focal pattern"
       },
       {
-        "data_point": "Terminal prion disease diagnosis",
-        "location": "clinical context",
-        "intended_effect": "Decide no treatment is appropriate for any EEG abnormality",
-        "correct_interpretation": "Terminal disease does not mean no treatment. Superimposed NCSE causes additional suffering and reduced awareness — levetiracetam can improve quality of remaining life consistent with comfort-focused goals.",
-        "field_path": ""
+        "data_point": "Quetiapine on medication list",
+        "location": "patient.clinical_history.medications",
+        "field_path": "patient.clinical_history.medications",
+        "intended_effect": "Suggests neuroleptic-induced movement disorder",
+        "correct_interpretation": "Quetiapine for anxiety is not the cause; sCJD is confirmed with RT-QuIC and characteristic MRI/EEG"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -635,6 +720,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "8 required + 1 recommended; sCJD with overlapping focal NCSE; teaching is PSWC vs ictal distinction, treatable-mimic exclusion, goals-of-care; 2 grounded red herrings.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

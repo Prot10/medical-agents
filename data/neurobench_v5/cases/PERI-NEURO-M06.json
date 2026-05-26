@@ -493,57 +493,210 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Leflunomide-induced small fiber neuropathy",
-    "critical_actions": [
-      "Recognize small fiber neuropathy phenotype — normal NCS does NOT exclude neuropathy",
-      "Order skin punch biopsy for IENFD — standard NCS cannot diagnose SFN",
-      "Identify leflunomide as causative agent — temporal correlation is the key diagnostic clue",
-      "Discontinue leflunomide — recovery requires drug removal",
-      "Cholestyramine washout to accelerate leflunomide elimination (otherwise half-life is 15+ days due to enterohepatic recirculation)",
-      "Coordinate rheumatology for RA management after leflunomide cessation"
-    ],
-    "contraindicated_actions": [
-      "Do not dismiss as 'normal' because NCS is normal — small fiber neuropathy is invisible to standard NCS",
-      "Do not attribute to stress — prior neurologist's diagnosis was incorrect; structural skin biopsy test is objective",
-      "Do not discontinue methotrexate — leflunomide is the causative drug, not MTX",
-      "Do not start high-dose opioids as first-line — duloxetine and pregabalin are first-line for SFN pain"
-    ],
-    "optimal_actions": [],
+    "primary_diagnosis": "Leflunomide-induced small-fiber neuropathy",
+    "icd_code": "G62.0",
     "differential": [
       {
-        "diagnosis": "Idiopathic small fiber neuropathy",
-        "likelihood": "low",
-        "key_features": "Temporal correlation with leflunomide initiation makes idiopathic diagnosis inappropriate; drug rechallenge/dechallenge relationship supports causal role"
+        "diagnosis": "Idiopathic small-fiber neuropathy",
+        "likelihood": "moderate",
+        "key_features": "Diagnosis of exclusion after toxic, metabolic, autoimmune, and hereditary causes excluded.",
+        "icd_code": "G60.3"
       },
       {
-        "diagnosis": "Diabetic small fiber neuropathy",
-        "likelihood": "very_low",
-        "key_features": "HbA1c 5.2% — definitively no diabetes; glucose/fasting glucose normal"
+        "diagnosis": "RA-associated small-fiber neuropathy",
+        "likelihood": "moderate",
+        "key_features": "RA itself can cause SFN; differentiate by temporal relationship to leflunomide start.",
+        "icd_code": "G63"
       },
       {
-        "diagnosis": "RA-associated neuropathy",
-        "likelihood": "low",
-        "key_features": "RA in clinical and serological remission (ESR 14, CRP 0.8, DAS28 1.8); RA neuropathy in remission would be improving not worsening; temporal correlation with leflunomide not RA activity"
+        "diagnosis": "Sjögren's-associated small-fiber neuropathy",
+        "likelihood": "moderate",
+        "key_features": "Common cause of SFN; need anti-SSA/SSB + sicca review.",
+        "icd_code": "G63"
       },
       {
-        "diagnosis": "Sjögren's syndrome small fiber neuropathy",
+        "diagnosis": "Diabetic small-fiber neuropathy",
         "likelihood": "low",
-        "key_features": "Anti-SSA/SSB negative; ANA 1:160 likely RA-related (context); no sicca symptoms; dry eye excluded by negative sicca workup"
+        "key_features": "Need HbA1c / fasting glucose / 2-hour OGTT — even prediabetes can cause SFN.",
+        "icd_code": "E11.40"
+      },
+      {
+        "diagnosis": "Hereditary small-fiber neuropathy (SCN9A/SCN10A/SCN11A)",
+        "likelihood": "low",
+        "key_features": "Younger onset usual; consider if family history positive.",
+        "icd_code": "G60.3"
       }
     ],
-    "key_reasoning_points": [
-      "MODERATE DIFFICULTY: Normal NCS labeled as 'negative workup' by prior neurologist — this is the classic pitfall in small fiber neuropathy",
-      "KEY PRINCIPLE: Standard NCS tests ONLY large myelinated A-beta fibers; C fibers and A-delta fibers (responsible for pain and temperature) are NOT assessed by NCS",
-      "SFN clinical phenotype: burning pain + allodynia + temperature loss + PRESERVED vibration/proprioception/reflexes — this combination points exclusively to small fibers",
-      "Leflunomide neuropathy: underrecognized drug toxicity; appears at therapeutic plasma levels; requires active cholestyramine washout due to enterohepatic recirculation",
-      "Overseas history, vaccinations, antimalarials, and dapsone exposure are all red herrings once heavy metals screen is negative",
-      "RA-related anti-CCP positivity and ANA 1:160 are expected findings and must not be over-interpreted as causal"
+    "optimal_actions": [
+      {
+        "step": 1,
+        "action": "Order broad neuropathy labs (CBC, CMP, HbA1c, B12 + MMA, TSH, SPEP/IFE, urinalysis)",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Identify reversible/treatable etiologies (diabetes, B12 deficiency, monoclonal gammopathy, thyroid disease)",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "HbA1c",
+            "B12",
+            "MMA",
+            "TSH",
+            "SPEP",
+            "IFE",
+            "UA"
+          ]
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 2,
+        "action": "Order EMG/NCS to characterize axonal vs demyelinating pattern and distribution",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Length-dependent axonal vs demyelinating vs multifocal pattern; severity and distribution",
+        "category": "required",
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 3,
+        "action": "Search literature for DSP evaluation guidelines and etiology-specific recommendations",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirm AAN 2009 DSP workup, etiology-specific evaluations",
+        "category": "required",
+        "tool_parameters": {
+          "query": "distal symmetric polyneuropathy evaluation AAN 2009"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 4,
+        "action": "Review medications for neurotoxic agents and check interactions for symptomatic therapy",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identify potentially neurotoxic drugs (chemotherapy, metronidazole, megadose B6, nitrofurantoin); guide neuropathic-pain pharmacotherapy",
+        "category": "required",
+        "tool_parameters": {
+          "medications": []
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 5,
+        "action": "Skin biopsy for intraepidermal nerve fiber density (IENFD)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "IENFD below 97.5% lower limit for age/sex confirms small-fiber neuropathy",
+        "category": "required",
+        "tool_parameters": {
+          "test_type": "skin_biopsy_iencf"
+        },
+        "citation": "[Lauria_2010]",
+        "guideline_source": "EFNS/PNS 2010 small-fiber guideline"
+      },
+      {
+        "step": 6,
+        "action": "Autonomic function testing (QSART, deep-breathing HRV, Valsalva)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Sudomotor and/or cardiovagal dysfunction supports small-fiber / autonomic involvement",
+        "category": "required",
+        "tool_parameters": {
+          "test_type": "autonomic_testing"
+        },
+        "citation": "[Lauria_2010]",
+        "guideline_source": "EFNS/PNS 2010 small-fiber guideline"
+      },
+      {
+        "step": 7,
+        "action": "Detailed medication and toxin review; identify and discontinue offending agent (leflunomide); consider cholestyramine washout",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Leflunomide is associated with peripheral and small-fiber neuropathy; cholestyramine washout 8 g TID x 11 days eliminates active metabolite (teriflunomide)",
+        "category": "required",
+        "tool_parameters": {
+          "medications": [
+            "leflunomide"
+          ]
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      }
     ],
-    "red_herrings": [],
-    "icd_code": "G62.0",
-    "useless_tools": [],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is a cortical test and is non-contributory in peripheral nerve disease.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head/brain CT has no role in peripheral neuropathy evaluation.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is not indicated in typical distal symmetric polyneuropathy without CNS signs.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {},
+        "rationale": "Advanced cerebral imaging (PET/MRA/MRV/perfusion) has no routine role in peripheral neuropathy.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated unless cardiac amyloid is suspected.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated unless there is syncope or symptomatic dysautonomia with arrhythmia concern.",
+        "citation": "[AAN_2009]"
+      }
+    ],
     "harmful_tools": [],
-    "sequence_constraints": []
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "order_specialized_test",
+        "reason": "Tier the workup — basic labs first, then targeted electrodiagnostic and tissue studies.",
+        "citation": "[AAN_2009]",
+        "severity": "soft"
+      }
+    ],
+    "critical_actions": [
+      "Recognize the small-fiber phenotype (burning pain, normal EMG/NCS, preserved reflexes/proprioception)",
+      "Skin biopsy for IENFD is the diagnostic gold standard [Lauria_2010]",
+      "Autonomic testing (QSART, HRV) to define small-fiber involvement and dysautonomia",
+      "Identify and discontinue offending drug (leflunomide); consider cholestyramine washout to accelerate elimination"
+    ],
+    "contraindicated_actions": [
+      "Do not stop the workup at normal EMG/NCS — small-fiber neuropathy is invisible to standard NCS",
+      "Do not continue leflunomide once SFN is documented and other causes are excluded"
+    ],
+    "key_reasoning_points": [
+      "Normal large-fiber exam + burning distal pain = consider small-fiber neuropathy",
+      "Normal EMG/NCS does NOT exclude small-fiber neuropathy — need skin biopsy IENFD or QSART",
+      "Drug history is essential; leflunomide is a recognized cause of toxic neuropathy"
+    ],
+    "red_herrings": [
+      {
+        "data_point": "RA in remission",
+        "location": "history",
+        "field_path": "patient.clinical_history.past_medical_history[0]",
+        "intended_effect": "Anchor on RA-related neuropathy",
+        "correct_interpretation": "RA in remission with neuropathy onset after leflunomide initiation favors drug toxicity over disease activity."
+      }
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -556,6 +709,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:PERI-NEURO",
+    "difficulty_rationale": "7 required tools, 1 red herrings; classification reflects clinical complexity per PERI-NEURO pack section 6 (M/S/P/R variants).",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

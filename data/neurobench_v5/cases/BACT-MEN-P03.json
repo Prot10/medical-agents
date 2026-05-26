@@ -697,166 +697,195 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Cryptococcal meningoencephalitis in the setting of undiagnosed HIV/AIDS",
+    "primary_diagnosis": "Cryptococcal meningoencephalitis in the setting of previously undiagnosed advanced HIV/AIDS",
     "icd_code": "B45.1",
     "differential": [
       {
-        "diagnosis": "TB meningitis",
+        "diagnosis": "Tuberculous meningitis",
+        "likelihood": "high",
+        "key_features": "Subacute lymphocytic meningitis with low glucose is the leading mimic; AFB stain, TB PCR, and ADA must be sent",
+        "icd_code": "A17.0"
+      },
+      {
+        "diagnosis": "Acute bacterial meningitis",
         "likelihood": "moderate",
-        "key_features": "Positive cryptococcal antigen and India ink confirm crypto. CSF glucose ratio is higher than typical TBM (0.34 vs usually <0.3 in TBM). Minimal inflammatory response (WBC 35) favors crypto over TB, which typically produces more CSF inflammation (WBC >100)."
+        "key_features": "PMN-predominant pleocytosis with rapid clinical course typical; this case is lymphocytic with subacute progression",
+        "icd_code": "G00.9"
       },
       {
-        "diagnosis": "HIV-associated CNS lymphoma",
+        "diagnosis": "Viral meningitis or encephalitis (HSV)",
+        "likelihood": "moderate",
+        "key_features": "HSV PCR on CSF required; HSV typically affects temporal lobes on MRI",
+        "icd_code": "B00.4"
+      },
+      {
+        "diagnosis": "CNS lymphoma",
         "likelihood": "low",
-        "key_features": "No mass lesion on MRI. CSF cytology pending but clinical picture is clearly infectious with positive cryptococcal antigen. CNS lymphoma typically presents with enhancing mass lesions."
+        "key_features": "AIDS-related primary CNS lymphoma can cause leptomeningeal disease; CSF flow cytometry and EBV PCR assist",
+        "icd_code": "C85.9"
       },
       {
-        "diagnosis": "Toxoplasmosis",
+        "diagnosis": "Toxoplasma encephalitis",
         "likelihood": "low",
-        "key_features": "No ring-enhancing mass lesions on MRI. Toxoplasmosis presents with focal neurological deficits and characteristic ring-enhancing lesions, not diffuse meningitis."
-      },
-      {
-        "diagnosis": "Bacterial meningitis",
-        "likelihood": "very_low",
-        "key_features": "4-week indolent course with minimal fever, lymphocytic CSF with only 35 WBC, and afebrile presentation exclude typical bacterial meningitis. Bacterial meningitis is hyperacute with neutrophilic predominance."
+        "key_features": "Typical in advanced AIDS with ring-enhancing lesions; serology and pattern of imaging help",
+        "icd_code": "B58.2"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Perform lumbar puncture with opening pressure measurement — ICP management is the key to survival in cryptococcal meningitis",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Markedly elevated opening pressure (38 cmH2O), clear CSF with mild lymphocytic pleocytosis, positive India ink and cryptococcal antigen",
-        "category": "required"
+        "action": "Obtain non-contrast CT head to exclude mass effect, midline shift, basal cistern obliteration, or hydrocephalus that would contraindicate lumbar puncture in this patient with altered mental status and/or immunocompromise.",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Absence of mass lesion, midline shift, or signs of impending herniation — confirms LP is safe.",
+        "category": "required",
+        "tool_parameters": {
+          "contrast": false
+        },
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §V"
       },
       {
         "step": 2,
-        "action": "Test CSF for cryptococcal antigen AND India ink preparation",
-        "tool_name": "analyze_csf",
-        "expected_finding": "India ink positive, CSF CrAg positive at 1:2048",
-        "category": "required"
-      },
-      {
-        "step": 3,
-        "action": "Test for HIV immediately — cryptococcal meningitis is an AIDS-defining illness",
+        "action": "Draw two sets of peripheral blood cultures BEFORE the first antibiotic dose and send CBC with differential, CMP, procalcitonin, CRP, and lactate.",
         "tool_name": "interpret_labs",
-        "expected_finding": "HIV-1 positive, CD4 45 cells/uL, viral load 285,000",
-        "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "HIV"
-          ]
-        }
-      },
-      {
-        "step": 4,
-        "action": "Start induction antifungal therapy: amphotericin B deoxycholate (0.7-1.0 mg/kg/day) plus flucytosine (100 mg/kg/day divided q6h) for 2 weeks",
-        "tool_name": null,
-        "expected_finding": "Induction therapy to rapidly reduce fungal burden",
-        "category": "required"
-      },
-      {
-        "step": 5,
-        "action": "Perform serial therapeutic LPs to manage elevated ICP — goal closing pressure <20 cmH2O",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Pressure reduction from 42 to 20 cmH2O with immediate symptom relief",
-        "category": "required"
-      },
-      {
-        "step": 6,
-        "action": "Do NOT start ART immediately — wait 4-6 weeks after starting antifungal therapy to avoid immune reconstitution inflammatory syndrome (IRIS)",
-        "tool_name": null,
-        "expected_finding": "ART initiation deferred to reduce risk of fatal IRIS",
-        "category": "required"
-      },
-      {
-        "step": 7,
-        "action": "Obtain ophthalmology consultation to assess papilledema and monitor for visual compromise",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Bilateral papilledema requiring aggressive ICP management",
+        "expected_finding": "Peripheral leukocytosis with left shift, elevated procalcitonin/CRP, eventual blood-culture growth of the pathogen.",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP"
+            "BMP",
+            "blood_cultures",
+            "inflammatory_markers"
           ]
-        }
+        },
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §VI"
       },
       {
-        "step": 8,
-        "action": "Obtain chest CT to evaluate for disseminated cryptococcosis",
+        "step": 3,
+        "action": "Verify compatibility and interactions of induction antifungal therapy (liposomal amphotericin B + flucytosine) with the patient's antiretroviral regimen and existing medications.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "No prohibitive interactions; confirmation of standard guideline-directed empiric regimen with dose adjustments as required.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §VII"
+      },
+      {
+        "step": 4,
+        "action": "Search the literature for current guideline-directed empiric antibiotic selection by age and host factors and for the evidence base supporting adjunctive dexamethasone in pneumococcal meningitis.",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Retrieval of IDSA 2004, ESCMID 2016, and De Gans 2002 to support empiric regimen and steroid timing.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §VII"
+      },
+      {
+        "step": 5,
+        "action": "Obtain contrast-enhanced brain MRI to assess for parenchymal complications (cerebritis, abscess, subdural empyema, ventriculitis, venous sinus thrombosis, infarction).",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Pulmonary nodules confirming disseminated disease",
+        "expected_finding": "Leptomeningeal enhancement; identification or exclusion of complications that modify management.",
         "category": "recommended",
         "tool_parameters": {
-          "protocol": "standard",
-          "contrast": false
-        }
+          "contrast": true
+        },
+        "citation": "[Brouwer_2012]",
+        "guideline_source": "Brouwer 2012"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No evidence of endocarditis as a primary source in this case; echocardiography is not part of routine meningitis workup.",
+        "citation": "[IDSA_2004]"
       },
       {
-        "step": 9,
-        "action": "Transition to consolidation fluconazole 400 mg daily for 8 weeks after 2-week induction, then maintenance fluconazole 200 mg daily",
-        "tool_name": null,
-        "expected_finding": "Step-down antifungal therapy per WHO/IDSA guidelines",
-        "category": "recommended"
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "No arrhythmia indication; continuous cardiac monitoring contributes nothing to meningitis diagnosis or treatment.",
+        "citation": "[IDSA_2004]"
       },
       {
-        "step": 10,
-        "action": "Monitor renal function and electrolytes closely during amphotericin B therapy",
-        "tool_name": null,
-        "expected_finding": "Amphotericin B nephrotoxicity monitoring",
-        "category": "recommended"
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "PET imaging has no role in acute meningitis diagnosis; CT and MRI cover the indications.",
+        "citation": "[IDSA_2004]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET is a dementia biomarker tool with no role in acute infectious meningitis.",
+        "citation": "[IDSA_2004]"
+      }
+    ],
+    "harmful_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {
+          "special_tests": [
+            "meningitis_panel"
+          ]
+        },
+        "rationale": "Imaging in this case demonstrates space-occupying lesions and/or significant hydrocephalus with elevated intracranial pressure; performing lumbar puncture in this setting risks cerebral herniation. CSF sampling should only follow neurosurgical consultation and ICP-lowering measures.",
+        "citation": "[IDSA_2004]"
+      }
+    ],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "Per IDSA 2004, non-contrast CT head must precede lumbar puncture whenever any imaging-first criterion is present (altered mental status, focal neurological deficit, papilledema, recent seizure, immunocompromise, or age >60). LP performed in undetected mass effect can precipitate fatal herniation.",
+        "citation": "[IDSA_2004]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "analyze_csf",
+        "reason": "Blood cultures must be drawn (under interpret_labs) before the first dose of empiric antibiotics so that culture yield is not lost; in practice this means peripheral cultures are collected at the same draw as the CSF analysis is initiated, and the lab tube sequencing prevents antibiotic exposure before specimen acquisition.",
+        "citation": "[IDSA_2004]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Perform LP with opening pressure measurement — elevated ICP management is the key to survival",
-      "Test CSF for cryptococcal antigen AND India ink",
-      "Test for HIV immediately — cryptococcal meningitis is an AIDS-defining illness",
-      "Start induction antifungal therapy (amphotericin B + flucytosine for 2 weeks)",
-      "Serial therapeutic LPs to manage elevated ICP (goal: OP <20 cmH2O)",
-      "Do NOT start ART immediately — wait 4-6 weeks to avoid immune reconstitution inflammatory syndrome (IRIS)"
+      "Initiate induction antifungal therapy with liposomal amphotericin B (3-4 mg/kg/day IV) plus flucytosine (100 mg/kg/day PO divided q6h) for at least 2 weeks.",
+      "Manage elevated intracranial pressure aggressively with serial therapeutic lumbar punctures targeting opening pressure <20 cmH2O; consider lumbar drain if refractory.",
+      "Confirm HIV status, obtain CD4 count and viral load, and coordinate ART initiation (typically delayed 4-6 weeks after antifungal start to mitigate IRIS).",
+      "Send CSF cryptococcal antigen (CrAg) titre and fungal culture; obtain serum CrAg.",
+      "Screen for and treat concurrent opportunistic infections."
     ],
     "contraindicated_actions": [
-      "Starting ART immediately (risk of fatal IRIS)",
-      "Prescribing corticosteroids (no benefit in cryptococcal meningitis, unlike TB meningitis)",
-      "Relying on neck stiffness to diagnose meningitis (often absent in crypto)",
-      "Treating empirically with antibacterials without CSF analysis in a subacute presentation"
+      "Do NOT proceed to lumbar puncture: imaging shows mass effect / significant hydrocephalus and LP risks cerebral herniation until ICP is managed and neurosurgery has cleared the procedure.",
+      "Do NOT delay empiric antimicrobial therapy while awaiting imaging or LP results when bacterial meningitis is clinically suspected.",
+      "Do NOT perform lumbar puncture before CT head when any imaging-first criterion (altered mental status, focal deficit, papilledema, seizure, immunocompromise, age >60) is present.",
+      "Do NOT discontinue dexamethasone solely because the Gram stain is negative — completion of the 4-day course is appropriate in suspected pneumococcal meningitis until alternative organism is identified.",
+      "Do NOT rely on a negative Gram stain or a 'normal CT' to rule out bacterial meningitis when the clinical syndrome is present.",
+      "Do NOT treat with oral antibiotics alone; CNS penetration is inadequate for meningitis.",
+      "Do NOT initiate antiretroviral therapy concurrently with antifungal induction; delay ART 4-6 weeks to reduce IRIS risk.",
+      "Do NOT use fluconazole monotherapy for induction in CNS cryptococcosis."
     ],
     "key_reasoning_points": [
-      "Subacute/chronic headache (4 weeks) with minimal fever in an immunocompromised patient = think opportunistic infection",
-      "Oral thrush + wasting + leukopenia in a sexually active man who hasn't seen a doctor in 8 years = high suspicion for undiagnosed HIV",
-      "Markedly elevated opening pressure (38 cmH2O) is THE hallmark of cryptococcal meningitis and the main cause of morbidity/mortality",
-      "Deceptively clear CSF with minimal pleocytosis (WBC 35) is classic for crypto in AIDS — the immune system cannot mount a robust inflammatory response",
-      "Absent meningismus in ~50% of cryptococcal meningitis cases — absence of neck stiffness does NOT exclude meningitis",
-      "Gelatinous pseudocysts in basal ganglia on MRI are characteristic of cryptococcal infection",
-      "ART must be DELAYED 4-6 weeks after starting antifungals to prevent IRIS, which can be fatal in CNS crypto"
+      "Cryptococcal meningoencephalitis presents with high opening pressure and a relatively bland CSF cell count; opening pressure must be measured at every LP.",
+      "Multiple basal-ganglia 'pseudocysts' following CSF signal on MRI is a classic imaging pattern of cryptococcal meningoencephalitis.",
+      "India ink, serum and CSF cryptococcal antigen, and fungal culture are the diagnostic tests; culture is the gold standard.",
+      "Induction therapy with liposomal amphotericin B + flucytosine is non-negotiable in CNS disease.",
+      "Therapeutic LP is the first-line intervention for elevated ICP; refractory cases require lumbar drain or VP shunt.",
+      "ART timing matters: starting ART too early risks IRIS — delay 4-6 weeks after antifungal start."
     ],
     "red_herrings": [
       {
-        "data_point": "No neck stiffness",
-        "location": "neurological_exam",
-        "intended_effect": "May lead clinician to exclude meningitis",
-        "correct_interpretation": "Meningismus is often absent in cryptococcal meningitis — a well-known clinical pitfall",
-        "field_path": ""
-      },
-      {
-        "data_point": "Low-grade/absent fever (37.4°C)",
-        "location": "vitals",
-        "intended_effect": "May suggest non-infectious etiology",
-        "correct_interpretation": "Cryptococcal meningitis in AIDS often presents without significant fever due to impaired immune response",
-        "field_path": ""
-      },
-      {
-        "data_point": "Clear CSF appearance",
-        "location": "csf",
-        "intended_effect": "Clear CSF may falsely reassure that meningitis is absent",
-        "correct_interpretation": "CSF can be clear in cryptococcal meningitis due to minimal inflammatory cell response in severely immunocompromised patients",
-        "field_path": ""
+        "data_point": "Negative CSF Gram stain",
+        "location": "initial_tool_outputs.csf.special_tests.Gram_stain",
+        "field_path": "initial_tool_outputs.csf",
+        "intended_effect": "Lower the index of suspicion for bacterial meningitis.",
+        "correct_interpretation": "Gram-stain sensitivity is only 60-90% even untreated; multiplex PCR and antigen testing must be used to confirm the organism."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "1.0",
@@ -881,6 +910,18 @@
       "specialized_test": "normal",
       "literature_search": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:BACT-MEN",
+    "difficulty_rationale": "4 required tools; 1 red herrings; imaging shows mass effect / hydrocephalus that contraindicates LP without neurosurgical clearance; non-pyogenic mimic (TBM or cryptococcal) requiring expanded workup",
+    "case_body_concerns": [
+      "Required tool 'check_drug_interactions' has no initial_tool_outputs or followup_outputs entry; fallback output exists but the agent would receive only the off-pathway tier. Recommend adding a concrete output during a follow-up case-body pass.",
+      "Required tool 'order_ct_scan' has no initial_tool_outputs or followup_outputs entry; fallback output exists but the agent would receive only the off-pathway tier. Recommend adding a concrete output during a follow-up case-body pass.",
+      "Required tool 'search_medical_literature' has no initial_tool_outputs or followup_outputs entry; fallback output exists but the agent would receive only the off-pathway tier. Recommend adding a concrete output during a follow-up case-body pass."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

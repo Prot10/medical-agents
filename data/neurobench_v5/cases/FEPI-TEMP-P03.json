@@ -589,153 +589,201 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Psychogenic non-epileptic seizures (PNES) coexisting with controlled right temporal lobe epilepsy",
+    "primary_diagnosis": "Psychogenic non-epileptic seizures (PNES) coexisting with previously controlled right mesial temporal lobe epilepsy",
     "icd_code": "F44.5",
     "differential": [
       {
-        "diagnosis": "Breakthrough epileptic seizures",
+        "diagnosis": "Breakthrough epileptic seizures (medication failure)",
+        "likelihood": "moderate",
+        "key_features": "Possible but the new semiology is markedly different from prior documented events; video-EEG without electrographic correlate excludes this.",
+        "icd_code": "G40.219"
+      },
+      {
+        "diagnosis": "New seizure focus (dual epilepsy)",
         "likelihood": "low",
-        "key_features": "Therapeutic lamotrigine level (8.2-9.1 mcg/mL), normal ictal EEG during all 7 captured events, semiology completely different from prior documented epileptic seizures (eyes closed vs open, thrashing vs behavioral arrest, 5-20 min vs 1-2 min, no post-ictal confusion), normal post-ictal prolactin."
+        "key_features": "Would require new ictal pattern from a different region; video-EEG and stable MRI rule this in or out.",
+        "icd_code": "G40.219"
       },
       {
-        "diagnosis": "New seizure focus (dual epileptic foci)",
-        "likelihood": "very_low",
-        "key_features": "MRI stable with no new lesions. Interictal EEG unchanged from prior recordings. Video-EEG captured 7 events with NO electrographic ictal correlate — the gold standard for distinguishing PNES from epileptic seizures."
-      },
-      {
-        "diagnosis": "Medication non-compliance",
+        "diagnosis": "Medication non-adherence or pharmacokinetic failure",
         "likelihood": "low",
-        "key_features": "Lamotrigine levels consistently therapeutic (8.2 on admission, 9.1 during monitoring), confirming regular medication intake."
+        "key_features": "Lamotrigine level would document subtherapeutic adherence; the contradictory semiology argues against pure breakthrough seizures.",
+        "icd_code": "Z91.14"
       },
       {
-        "diagnosis": "Drug interaction reducing lamotrigine",
+        "diagnosis": "Benzodiazepine intoxication / withdrawal events",
+        "likelihood": "low",
+        "key_features": "Escalating alprazolam use can produce paroxysmal events on withdrawal; less stereotyped than seizures.",
+        "icd_code": "F13.20"
+      },
+      {
+        "diagnosis": "Convulsive syncope (cardiac)",
         "likelihood": "very_low",
-        "key_features": "No new medications that affect lamotrigine metabolism have been added. Lamotrigine levels are therapeutic and stable."
+        "key_features": "No postural or exertional trigger; preserved awareness during the events excludes loss-of-consciousness-driven syncope.",
+        "icd_code": "R55"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Admit for prolonged video-EEG monitoring to capture and characterize the current events with simultaneous EEG recording",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Events captured WITHOUT electrographic correlate, confirming PNES",
+        "action": "Obtain detailed comparative semiology between prior documented epileptic seizures and the new events (duration, eye state, motor pattern, awareness, post-ictal features).",
+        "tool_name": null,
+        "expected_finding": "Marked semiology shift: longer events, eyes closed, side-to-side head, preserved awareness, no post-ictal confusion — characteristic of PNES.",
         "category": "required",
-        "tool_parameters": {
-          "eeg_type": "video"
-        }
+        "tool_parameters": {},
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 2,
-        "action": "Compare current event semiology with the patient's prior documented epileptic seizure semiology",
+        "action": "Perform neurological exam.",
         "tool_name": null,
-        "expected_finding": "Completely different semiology: eyes closed vs open, thrashing vs behavioral arrest, long vs short, no post-ictal confusion vs 20-30 min confusion",
-        "category": "required"
+        "expected_finding": "Interictal exam normal; no new focal deficits.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Check lamotrigine level to confirm therapeutic dosing and exclude non-compliance",
+        "action": "Admit for prolonged video-EEG monitoring to capture habitual events; the gold standard for diagnosing PNES.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Habitual event captured without electrographic correlate confirms PNES; interictal epileptiform discharges from prior known TLE may persist.",
+        "category": "required",
+        "tool_parameters": {
+          "eeg_type": "video"
+        },
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
+      },
+      {
+        "step": 4,
+        "action": "Review baseline MRI for stability of known hippocampal sclerosis (new high-resolution imaging not required unless new focal deficit).",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Stable right hippocampal sclerosis without new lesions.",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "epilepsy",
+          "contrast": false
+        },
+        "citation": "[AAN_2007]",
+        "guideline_source": "AAN_2007"
+      },
+      {
+        "step": 5,
+        "action": "Check lamotrigine level, electrolytes, basic labs, and toxicology (alprazolam misuse).",
         "tool_name": "interpret_labs",
-        "expected_finding": "Therapeutic lamotrigine level confirming compliance",
+        "expected_finding": "Confirm lamotrigine therapeutic; document any sedative misuse from increased alprazolam intake.",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP"
+            "CMP",
+            "AED_levels",
+            "toxicology"
           ]
-        }
-      },
-      {
-        "step": 4,
-        "action": "Obtain MRI to rule out new structural pathology",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Stable hippocampal sclerosis, no new lesions",
-        "category": "required",
-        "tool_parameters": {
-          "protocol": "standard",
-          "contrast": false
-        }
-      },
-      {
-        "step": 5,
-        "action": "Deliver the dual diagnosis clearly: 'Your epilepsy is well controlled on your medication, but you have developed a new type of episode that is different from your seizures. These new episodes are called non-epileptic seizures.'",
-        "tool_name": null,
-        "expected_finding": "Patient understanding of the dual diagnosis",
-        "category": "required"
+        },
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 6,
-        "action": "Do NOT increase lamotrigine or add additional AEDs for PNES events",
-        "tool_name": null,
-        "expected_finding": "Lamotrigine maintained at current dose",
-        "category": "required"
+        "action": "Search literature on PNES coexisting with epilepsy (PNES + ES) and best-practice management.",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Coexistence rate ~10–30% in chronic epilepsy clinics; multidisciplinary care with cognitive-behavioral therapy and AED stability is recommended.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 7,
-        "action": "Refer for trauma-focused psychotherapy (CBT for PNES)",
-        "tool_name": null,
-        "expected_finding": "Psychotherapy referral placed",
-        "category": "required"
+        "action": "Check drug interactions before any AED modification and assess benzodiazepine taper plan.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identify lamotrigine interactions; plan safe taper for escalating alprazolam use.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No fever, no meningismus, no immunocompromise; CSF analysis is not indicated.",
+        "citation": "[AAN_2007]"
       },
       {
-        "step": 8,
-        "action": "Address escalating alprazolam use and develop a safe taper plan to prevent benzodiazepine dependence",
-        "tool_name": null,
-        "expected_finding": "Alprazolam taper plan established",
-        "category": "required"
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "echo_type": "TTE"
+        },
+        "rationale": "No structural-heart concern; not relevant to PNES or epilepsy diagnosis.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "Cardiac monitoring not indicated when video-EEG is the gold-standard test.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Inferior to MRI; not needed here.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "FDG-PET is reserved for surgical evaluation of refractory epilepsy with non-localizing MRI; not indicated when the issue is PNES.",
+        "citation": "[Willmann_2007]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_eeg",
+        "after": "check_drug_interactions",
+        "reason": "Establish whether events are epileptic before modifying the patient's effective long-term AED regimen.",
+        "citation": "[ILAE_drug_2017]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Perform video-EEG monitoring to capture events and correlate with EEG",
-      "Distinguish PNES semiology from the patient's known epileptic seizure semiology",
-      "Check AED levels to confirm therapeutic dosing",
-      "Deliver the dual diagnosis: 'Your epilepsy is well controlled, but you have developed a new type of episode that is different'",
-      "DO NOT increase AEDs for PNES",
-      "Refer for trauma-focused psychotherapy (CBT for PNES)",
-      "Address alprazolam use and potential benzodiazepine dependence"
+      "Admit for prolonged video-EEG monitoring to capture habitual events — gold-standard diagnostic test.",
+      "Identify the precipitating psychosocial trigger (daughter's recent epilepsy diagnosis, maternal guilt) and arrange psychiatric/CBT referral.",
+      "Maintain stable lamotrigine for the underlying confirmed epilepsy; do not escalate AED therapy for the PNES events.",
+      "Safely taper escalating alprazolam use with addiction-medicine input.",
+      "Counsel on driving restrictions given any breakthrough epileptic activity."
     ],
     "contraindicated_actions": [
-      "Increasing lamotrigine dose for events that are PNES, not epileptic",
-      "Adding additional AEDs",
-      "Administering IV benzodiazepines for prolonged PNES events (risks respiratory depression without benefit)",
-      "Discontinuing lamotrigine (the underlying epilepsy still needs treatment)",
-      "Telling the patient her events are 'fake' or 'not real'"
+      "Do not escalate AED dose or add a second AED for events without electrographic correlate.",
+      "Do not start a benzodiazepine drip during a PNES event.",
+      "Do not intubate prophylactically for events meeting PNES semiology criteria.",
+      "Do not dismiss the patient — PNES is a treatable disorder requiring multidisciplinary care."
     ],
     "key_reasoning_points": [
-      "PNES coexists with epilepsy in 10-20% of cases — having epilepsy does NOT exclude PNES",
-      "Key semiology differences: eyes closed (PNES) vs eyes open (epileptic), bilateral thrashing vs behavioral arrest/automatisms, long duration (5-20 min) vs short (1-2 min), preserved awareness vs impaired awareness, no post-ictal confusion vs 20-30 min confusion",
-      "Normal ictal EEG during clinical events is the gold standard for PNES diagnosis",
-      "Normal post-ictal prolactin supports PNES (epileptic GTC seizures typically elevate prolactin 2-3x)",
-      "Therapeutic AED levels exclude non-compliance as the cause of 'increased seizures'",
-      "Stable interictal EEG and MRI confirm the underlying epilepsy is unchanged and controlled",
-      "Psychological precipitant (daughter's epilepsy diagnosis) is identifiable and treatable",
-      "Prior childhood sexual abuse is a well-established risk factor for PNES"
+      "PNES and epilepsy coexist in 10–30% of patients followed in chronic epilepsy clinics; both must be addressed.",
+      "Marked semiology change from prior stereotyped epileptic events is a high-yield clue (longer duration, closed eyes, side-to-side movement, preserved awareness, no post-ictal confusion).",
+      "Video-EEG capturing the event without ictal correlate is the definitive diagnostic gold standard.",
+      "A psychosocial precipitant frequently precedes PNES onset; identifying it is therapeutic.",
+      "AED escalation in PNES adds toxicity without benefit and may obscure the true diagnosis."
     ],
     "red_herrings": [
       {
-        "data_point": "Known epilepsy with hippocampal sclerosis",
-        "location": "history",
-        "intended_effect": "Every new event in an epilepsy patient is reflexively attributed to epilepsy, leading to AED escalation",
-        "correct_interpretation": "Having epilepsy does not make all events epileptic. PNES coexists with epilepsy in 10-20% of patients. Video-EEG is essential to distinguish.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Right temporal sharp waves on routine EEG",
-        "location": "eeg",
-        "intended_effect": "Confirms active epilepsy and seems to explain the current events",
-        "correct_interpretation": "Interictal sharp waves confirm the UNDERLYING epilepsy but do not prove the CURRENT events are epileptic. The sharp waves are stable and unchanged from prior EEGs. Ictal EEG during events is needed to determine whether the events are epileptic.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Family history of epilepsy in daughter",
-        "location": "history",
-        "intended_effect": "Suggests genetic predisposition and possible worsening of maternal epilepsy",
-        "correct_interpretation": "The daughter's diagnosis is the psychological TRIGGER for PNES development — it caused overwhelming maternal guilt and anxiety. It is not evidence of worsening maternal epilepsy.",
-        "field_path": ""
+        "data_point": "Pre-existing diagnosis of right mesial temporal lobe epilepsy with hippocampal sclerosis on lamotrigine.",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Assume breakthrough seizures and escalate AED therapy.",
+        "correct_interpretation": "Distinctly different semiology and a clear psychosocial precipitant should trigger video-EEG to test for PNES."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "1.0",
@@ -754,6 +802,18 @@
       "specialized_test": "normal",
       "literature_search": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (FEPI-TEMP)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FEPI-TEMP",
+    "difficulty_rationale": "Coexistence of two disorders (PNES + controlled epilepsy) requires careful semiology contrasting, video-EEG capture, and avoidance of AED escalation. High risk of anchoring to known epilepsy diagnosis.",
+    "case_body_concerns": [
+      "useless_tools entry for `analyze_ecg` dropped: tool output is provided up-front in initial_tool_outputs, so declaring it useless to call would be incoherent (agent never had to call it).",
+      "optimal_actions step 6 (`search_medical_literature`) downgraded from required → recommended: case body lacks an initial/followup output, so calling this tool would return no result. Pack designates this as required for the condition; the case body should be augmented in a follow-up pass.",
+      "optimal_actions step 7 (`check_drug_interactions`) downgraded from required → recommended: case body lacks an initial/followup output, so calling this tool would return no result. Pack designates this as required for the condition; the case body should be augmented in a follow-up pass."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -1,7 +1,7 @@
 {
   "case_id": "HEP-ENC-M04",
   "condition": "hepatic_encephalopathy",
-  "difficulty": "moderate",
+  "difficulty": "diagnostic_puzzle",
   "encounter_type": "emergency",
   "patient": {
     "patient_id": "NB-HEP-ENC-M04",
@@ -532,117 +532,200 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Hepatic encephalopathy, grade 2-3, severe alcoholic hepatitis on steroids — concurrent moderate alcohol withdrawal syndrome (CIWA 12); hypoglycemia as critical precipitant",
-    "icd_code": "K72.9",
+    "primary_diagnosis": "Hepatic encephalopathy (West Haven grade II-III), severe alcoholic hepatitis on corticosteroids — concurrent moderate alcohol withdrawal (CIWA 12) and hypoglycemia (glucose 62-64) as critical co-precipitants; high Wernicke risk given chronic alcohol and malnutrition.",
+    "icd_code": "K72.90",
     "differential": [
       {
-        "diagnosis": "Alcohol withdrawal encephalopathy / delirium tremens",
-        "likelihood": "moderate",
-        "key_features": "CIWA 12, hyperreflexia, tremor, diaphoresis, tachycardia — 48h after last drink; concurrent with HE; EEG excess beta consistent with withdrawal"
+        "diagnosis": "Alcohol withdrawal syndrome with delirium tremens",
+        "likelihood": "high",
+        "key_features": "Confusion 48 h post-last drink + tremor + autonomic features fit withdrawal; CIWA 12 = moderate; coexists with HE and requires careful adjunctive treatment (avoid scheduled benzos).",
+        "icd_code": "F10.231"
       },
       {
         "diagnosis": "Wernicke encephalopathy",
-        "likelihood": "low",
-        "key_features": "Thiamine 28 nmol/L (deficient) in alcoholic with malnutrition — treat empirically with IV thiamine despite no ophthalmoplegia or MRI changes; cannot exclude early Wernicke"
+        "likelihood": "high",
+        "key_features": "Chronic alcohol + malnutrition + chronic pancreatitis = high thiamine-deficiency risk; thiamine 28 nmol/L low; treat empirically with high-dose IV thiamine regardless of MRI.",
+        "icd_code": "E51.2"
       },
       {
-        "diagnosis": "Prednisolone-induced hyperglycemia causing hyperosmolar encephalopathy",
-        "likelihood": "very_low",
-        "key_features": "Glucose is LOW (62-64), not high — prednisolone causes hyperglycemia but this patient has liver failure impaired gluconeogenesis causing hypoglycemia instead"
+        "diagnosis": "Hypoglycemic encephalopathy",
+        "likelihood": "moderate",
+        "key_features": "Glucose 62-64 contributes to confusion and is itself critical to correct (after thiamine).",
+        "icd_code": "E16.2"
       },
       {
-        "diagnosis": "Septic encephalopathy",
+        "diagnosis": "Septic encephalopathy (alcoholic hepatitis with infection)",
+        "likelihood": "moderate",
+        "key_features": "Alcoholic hepatitis on steroids is immunosuppressed; screen with blood/urine cultures and paracentesis if ascites.",
+        "icd_code": "G93.41"
+      },
+      {
+        "diagnosis": "Steroid psychosis / steroid-induced encephalopathy",
         "likelihood": "low",
-        "key_features": "Leukocytosis 18.6 — but prednisolone causes leukocytosis (demargination); no clear infection source identified; blood cultures pending"
+        "key_features": "Prednisolone can cause neuropsychiatric symptoms but does not produce asterixis; consider only if other precipitants are excluded.",
+        "icd_code": "G92"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "URGENT: IV thiamine 500 mg BEFORE dextrose — glucose 62-64 is hypoglycemic; thiamine-deficient alcoholic; Wernicke risk",
-        "tool_name": null,
-        "expected_finding": "Thiamine 28 — deficient; glucose corrected after thiamine",
+        "action": "Comprehensive labs: CMP including AST/ALT/bilirubin/INR/albumin, ammonia, CBC, glucose, electrolytes (Na, K, Mg), BUN/Cr, lactate, blood cultures and urine cultures; toxicology if substance use plausible. Confirms liver dysfunction and screens for precipitants.",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Ammonia 82; bilirubin 14.8; INR 2.4; thiamine 28 nmol/L (low); K 3.0, Mg 1.4 (low); glucose 62-64 (low); Maddrey 38 (severe alcoholic hepatitis).",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 2,
-        "action": "IV dextrose (D50W) + continuous D10W infusion after thiamine",
-        "tool_name": null,
-        "expected_finding": "Glucose normalized",
+        "action": "Non-contrast CT head — exclude structural alternate cause of AMS (hemorrhage, large stroke, mass) before any LP.",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No acute intracranial process — excludes hemorrhage and mass effect.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 3,
-        "action": "CT head — exclude hemorrhage despite coagulopathy (INR 2.4)",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "No hemorrhage",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Literature/guideline search to confirm West Haven grading, precipitant management, and lactulose/rifaximin dosing (AASLD/EASL HE management; alcoholic hepatitis management (Lille score); concurrent alcohol withdrawal in HE).",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "AASLD/EASL 2014 guidance retrieved; West Haven criteria and precipitant-driven management framework confirmed.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 4,
-        "action": "EEG — characterize encephalopathy, note mixed HE + withdrawal pattern",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Mixed theta-delta + beta overlay — HE + alcohol withdrawal",
+        "action": "Drug-interaction and medication-reconciliation review covering prednisolone, lactulose, rifaximin, any benzodiazepines in use — minimize benzodiazepine exposure; phenobarbital or careful adjuncts preferred for withdrawal; flag any CNS depressants (benzodiazepines, opioids, sedating antiemetics, antihistamines) and confirm lactulose/rifaximin dosing in liver disease.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sedating/CNS-depressant medications identified; lactulose and rifaximin reviewed for hepatic dose adjustment.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Bajaj_2011]",
+        "guideline_source": "Bajaj 2011 HE management review"
       },
       {
         "step": 5,
-        "action": "Electrolyte repletion: IV magnesium, KCl, phosphorus",
-        "tool_name": null,
-        "expected_finding": "Seizure risk reduced",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "MRI brain with and without gadolinium — exclude alternate causes of AMS (acute ischemia, mass, Wernicke periaqueductal/mammillary changes, leptomeningeal disease) when CT is non-diagnostic or specific alternate diagnoses are suspected.",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Periaqueductal gray and mammillary body T2/FLAIR signal would confirm Wernicke; absent signal does NOT exclude — thiamine given empirically anyway. Required given high Wernicke pre-test probability.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 6,
-        "action": "CIWA protocol with low-dose lorazepam for alcohol withdrawal; concurrent lactulose + rifaximin for HE",
-        "tool_name": null,
-        "expected_finding": "Both HE and alcohol withdrawal treated",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "EEG — characterize encephalopathy and exclude NCSE; assess withdrawal-related features. Triphasic waves are classic but non-specific (metabolic encephalopathies broadly); main role is exclusion of non-convulsive status epilepticus where the differential supports it.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Generalized slowing; no NCSE.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Ferenci_2002]",
+        "guideline_source": "Ferenci 2002 HE nomenclature/quantification"
+      },
+      {
+        "step": 7,
+        "action": "Consult hepatology and critical care; consider transplant evaluation if Lille day-7 indicates non-response — coordinate definitive care, transplant candidacy assessment where applicable.",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Hepatology / critical-care guidance integrated into management.",
+        "category": "recommended",
+        "tool_parameters": {
+          "specialty": "hepatology"
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No clinical suspicion for hepatopulmonary syndrome, portopulmonary hypertension, or endocarditis; echocardiography is not part of the HE workup.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in HE workup; reversible metabolic encephalopathy is the issue, not Alzheimer pathology.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan has no role in HE workup; the question is metabolic encephalopathy, not nigrostriatal degeneration.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "genetic_panel:early_onset_AD"
+        },
+        "rationale": "Early-onset AD genetic panel has no role in HE workup; reversible metabolic encephalopathy is the diagnosis under consideration.",
+        "citation": "[AASLD_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "In altered mental status, exclude intracranial mass effect / hemorrhage on imaging before LP to avoid herniation risk.",
+        "citation": "[AASLD_2014]",
+        "severity": "hard"
+      },
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "In altered mental status, exclude intracranial mass effect on neuroimaging before LP to avoid herniation risk.",
+        "citation": "[AASLD_2014]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Hypoglycemia (glucose 62-64) is immediately life-threatening — correcting glucose before identifying it would cause neurological injury; IV thiamine FIRST then dextrose",
-      "Alcohol withdrawal seizures risk: hypomagnesemia lowers seizure threshold further — magnesium repletion is critical before withholding benzodiazepines",
-      "Concurrent HE + alcohol withdrawal requires simultaneous treatment — each is independently life-threatening; the Lille score determines steroid response",
-      "Protein restriction is CONTRAINDICATED in HE management — modern standard is adequate protein intake (1.2-1.5 g/kg/day) to support liver regeneration"
+      "High-dose IV thiamine 500 mg TID for 3 days BEFORE any dextrose (Wernicke prophylaxis/treatment) — empirical regardless of MRI.",
+      "Correct hypoglycemia AFTER thiamine; maintain euglycemia.",
+      "IV magnesium and potassium repletion (Mg 1.4, K 3.0).",
+      "Lactulose titrated to 2-4 soft stools/day; rifaximin 550 mg BID.",
+      "Treat alcohol withdrawal with symptom-triggered protocol preferring phenobarbital or adjunctive clonidine/gabapentin; use benzodiazepines only at lowest effective doses when essential (e.g., severe agitation, seizures).",
+      "Re-assess steroid response on day 7 (Lille score); discontinue prednisolone if non-responder."
     ],
     "contraindicated_actions": [
-      "Dextrose before thiamine in thiamine-deficient alcoholic",
-      "Protein restriction in HE — outdated practice; increases mortality",
-      "Diazepam or chlordiazepoxide for alcohol withdrawal in cirrhosis",
-      "Stopping prednisolone without calculating Lille score at day 7"
+      "Do not prescribe benzodiazepines for anxiety/agitation — they precipitate and prolong HE (use haloperidol or non-pharmacologic measures for agitation).",
+      "Do not prescribe sedating opioids — they worsen HE; consider acetaminophen at hepatic-safe dosing for pain.",
+      "Do not perform LP before neuroimaging excludes mass effect when the patient has altered mental status.",
+      "Do not give dextrose before thiamine in any alcoholic patient — precipitates Wernicke.",
+      "Do not use scheduled (fixed-dose) benzodiazepines as withdrawal prophylaxis in this patient; HE precipitation risk outweighs benefit at moderate CIWA."
     ],
     "key_reasoning_points": [
-      "Hypoglycemia in alcoholic hepatitis is a critical emergency — liver failure impairs gluconeogenesis; always check glucose in alcoholic encephalopathy",
-      "Alcohol withdrawal and HE are not mutually exclusive — they can and do coexist; the EEG mixed pattern (slow background + excess beta) reflects this duality",
-      "Protein restriction in HE is an outdated concept — ammonia production from gut bacteria can be reduced by lactulose without dietary protein restriction",
-      "Lille score at day 7 predicts steroid response in alcoholic hepatitis — score <0.45 = responder (continue steroids); >0.45 = non-responder (stop steroids)"
+      "HE is a clinical diagnosis: West Haven grading + evidence of liver dysfunction + exclusion of other causes of AMS — ammonia level is supportive only and correlates poorly with grade (AASLD 2014).",
+      "Precipitant identification is more actionable than the ammonia number: infection (SBP especially), GI bleed, electrolyte disturbance (hypokalemia/hyponatremia), constipation, sedative/CNS-depressant use, dehydration, dietary protein load, renal failure.",
+      "When HE and alcohol withdrawal coexist, the treatment dilemma is real: scheduled benzodiazepines worsen HE while undertreated withdrawal risks seizures. Symptom-triggered, lowest-dose, short-acting agents (lorazepam) are preferred over scheduled long-acting drugs (chlordiazepoxide); phenobarbital is a useful alternative.",
+      "Thiamine must be given before any glucose; the 'banana bag' tradition is supported here."
     ],
     "red_herrings": [
       {
-        "data_point": "WBC 18.6 (leukocytosis)",
-        "location": "initial_tool_outputs.labs.panels.CBC",
-        "intended_effect": "Diagnose as systemic infection/sepsis as cause of encephalopathy; initiate broad-spectrum antibiotics; delay HE treatment",
-        "correct_interpretation": "Leukocytosis >15 is an expected side effect of prednisolone (demargination of neutrophils) — not necessarily infection; blood cultures should be sent but prednisolone-related leukocytosis does not require empiric antibiotics without other signs of infection",
-        "field_path": ""
+        "data_point": "On prednisolone for alcoholic hepatitis",
+        "location": "patient.clinical_history.medications",
+        "field_path": "patient.clinical_history.medications",
+        "intended_effect": "Attribute confusion to 'steroid psychosis' and abruptly discontinue steroids.",
+        "correct_interpretation": "Steroid neuropsychiatric effects are possible but do not cause asterixis and are not the primary driver here; assess Lille day-7 before stopping prednisolone."
       },
       {
-        "data_point": "CIWA score 12 (moderate alcohol withdrawal)",
-        "location": "patient.neurological_exam.additional",
-        "intended_effect": "Attribute all confusion to alcohol withdrawal only; treat with benzodiazepines and miss HE component; potentially over-sedate",
-        "correct_interpretation": "CIWA 12 is significant and requires treatment, but ammonia 82 + low albumin + triphasic-like waves indicate concurrent HE; both require treatment; benzodiazepines should be minimized due to HE risk",
-        "field_path": ""
+        "data_point": "Borderline-low glucose 62-64",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs.panels.BMP",
+        "intended_effect": "Reflexively give D50W to correct glucose first.",
+        "correct_interpretation": "Give IV thiamine first, then correct glucose — this sequence is critical to avoid precipitating Wernicke."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -663,6 +746,14 @@
       "advanced_imaging": "normal",
       "specialized_test": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (HEP-ENC)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:HEP-ENC",
+    "difficulty_rationale": "5 required tools (labs, CT, MRI, lit, drug); ≥3 active overlapping problems (HE + withdrawal + Wernicke risk + hypoglycemia + steroid response monitoring); management dilemma around benzodiazepines.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

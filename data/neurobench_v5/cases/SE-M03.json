@@ -568,154 +568,225 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Non-convulsive status epilepticus (NCSE) secondary to posterior reversible encephalopathy syndrome (PRES) in the context of hypertensive emergency and active SLE with subtherapeutic levetiracetam",
-    "icd_code": "G41.9",
+    "primary_diagnosis": "Non-convulsive status epilepticus secondary to posterior reversible encephalopathy syndrome (PRES) from hypertensive emergency in active SLE",
+    "icd_code": "G41.2",
     "differential": [
       {
-        "diagnosis": "CNS lupus (neuropsychiatric SLE)",
-        "likelihood": "moderate",
-        "key_features": "SLE with elevated dsDNA and low complement indicates SLE activity; however, PRES imaging pattern (posterior, no DWI restriction) and hypertension better explain the imaging than CNS vasculitis"
-      },
-      {
-        "diagnosis": "Herpes simplex encephalitis",
-        "likelihood": "low",
-        "key_features": "CSF HSV PCR negative; MRI shows posterior not temporal-frontoparietal predilection of HSV; no fever or prodrome consistent with viral encephalitis"
-      },
-      {
-        "diagnosis": "Autoimmune encephalitis (anti-NMDAR or other)",
-        "likelihood": "low",
-        "key_features": "Autoimmune antibody panel negative in serum and CSF; subacute onset but PRES imaging pattern clearly visible; no psychiatric prodrome characteristic of anti-NMDAR"
+        "diagnosis": "CNS lupus / lupus cerebritis",
+        "likelihood": "high",
+        "key_features": "Active SLE with high dsDNA, low complements; CNS lupus possible but PRES better explains posterior MRI pattern and severe hypertension",
+        "icd_code": "M32.19"
       },
       {
         "diagnosis": "Hypertensive encephalopathy without PRES",
+        "likelihood": "high",
+        "key_features": "Severe hypertension 172/108 can cause encephalopathy; PRES is the specific imaging-defined subtype seen here",
+        "icd_code": "I67.4"
+      },
+      {
+        "diagnosis": "Subtherapeutic levetiracetam — primary epileptic SE",
+        "likelihood": "moderate",
+        "key_features": "Levetiracetam 8 mcg/mL is subtherapeutic and contributory but does not explain the PRES-pattern imaging",
+        "icd_code": "G40.909"
+      },
+      {
+        "diagnosis": "Autoimmune / antiphospholipid-related stroke or encephalitis",
+        "likelihood": "moderate",
+        "key_features": "SLE patients have higher autoimmune-encephalitis and stroke risk; MRI pattern is PRES not infarct",
+        "icd_code": "G04.81"
+      },
+      {
+        "diagnosis": "Drug-induced (high-dose steroid) seizure",
         "likelihood": "low",
-        "key_features": "BP 172/108 elevated but PRES-specific MRI pattern present, distinguishing from diffuse hypertensive encephalopathy without structural imaging correlate"
+        "key_features": "Chronic prednisone unlikely to cause SE acutely; PRES is the mechanism",
+        "icd_code": "T38.0X5A"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Emergent EEG to confirm NCSE",
+        "action": "Continuous video-EEG to characterize ictal pattern",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Left temporal NCSE with LPDs meeting Salzburg criteria",
+        "expected_finding": "Left temporal-occipital evolving rhythmic delta meeting Salzburg NCSE criteria — concordant with PRES distribution",
         "category": "required",
-        "tool_parameters": {
-          "urgency": "stat",
-          "modality": "standard_eeg"
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "Non-contrast CT head to exclude hemorrhage",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "No hemorrhage; subtle posterior hypodensity suggesting PRES",
+        "action": "Labs: CBC, CMP, glucose, Ca/Mg, lactate, ABG, AED level (levetiracetam), pregnancy test, urinalysis (active urine sediment in SLE), complement / dsDNA / ESR / CRP",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Subtherapeutic levetiracetam 8; active SLE serology (dsDNA 42, low C3/C4, ESR 68); RBC casts suggest lupus nephritis flare",
         "category": "required",
-        "tool_parameters": {
-          "contrast": false
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Order labs including BMP, CBC, AED levels, rheumatology panel, urinalysis",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Subtherapeutic levetiracetam; elevated dsDNA; low complement; proteinuria",
+        "action": "Non-contrast CT to exclude hemorrhage",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Bilateral posterior cortical-subcortical hypodensity — suggests PRES; no hemorrhage",
         "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP",
-            "AED_levels",
-            "dsDNA",
-            "complement",
-            "UA"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "Urgent MRI brain with gadolinium including DWI/ADC and FLAIR to confirm PRES",
+        "action": "MRI brain with FLAIR — PRES typically posterior parieto-occipital",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Bilateral posterior FLAIR hyperintensity, no DWI restriction (vasogenic edema) = PRES",
+        "expected_finding": "Bilateral parieto-occipital cortical/subcortical FLAIR hyperintensity without DWI restriction — PRES pattern",
         "category": "required",
-        "tool_parameters": {
-          "sequences": [
-            "T1",
-            "FLAIR",
-            "DWI",
-            "ADC",
-            "T1+Gd"
-          ],
-          "urgency": "urgent"
-        }
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "Check drug interactions before escalating levetiracetam with SLE medications",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Minor pro-convulsant effect of hydroxychloroquine and prednisone; no contraindication to levetiracetam escalation",
+        "action": "Lumbar puncture (cells, protein, glucose, HSV PCR, autoimmune CSF panel) — exclude CNS infection / lupus cerebritis",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Mild lymphocytic pleocytosis, negative HSV PCR, negative NMDAR — consistent with PRES + SLE, no encephalitis",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 6,
-        "action": "Initiate continuous cEEG monitoring for 24-48 hours",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Improvement in NCSE with BP control and AED escalation",
+        "action": "Autoimmune encephalitis panel (NMDAR, LGI1, GAD65) — SLE patients have higher autoimmune-encephalitis incidence",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Negative autoimmune encephalitis antibodies — PRES + active lupus remain primary",
         "category": "required",
-        "tool_parameters": {
-          "modality": "continuous_ceeg",
-          "duration_hours": 48
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 7,
-        "action": "Review literature on PRES-associated NCSE in SLE",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "BP control is primary therapy; full recovery with adequate management; SLE-PRES requires rheumatology involvement",
+        "action": "Drug-interaction check before adding antihypertensives + second-line AED + immunosuppressants",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Avoid valproate in young woman of reproductive age; levetiracetam safe; nicardipine drip safe with current regimen",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[ESETT_2019]",
+        "guideline_source": ""
+      },
+      {
+        "step": 8,
+        "action": "Literature: PRES management — control BP, seizure control, recognize reversibility",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Lower MAP 20-25% in first hour; continue AED; PRES typically reversible if BP controlled",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 9,
+        "action": "Rheumatology consultation for active SLE flare with nephritis",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Plan for pulse steroids / immunosuppression once SE controlled",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "study_type": "TTE"
+        },
+        "rationale": "No clinical suspicion of cardiac source of embolus or cardiogenic seizure; routine echo is not indicated in SE workup absent cardiac findings.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No suspicion of arrhythmogenic syncope or cardiac comorbidity precipitating SE; routine telemetry beyond standard ICU monitoring adds cost without yield.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in acute SE evaluation; dementia biomarker imaging does not change acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is for ischemic stroke workup; SE without focal vascular suspicion does not warrant carotid imaging.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "DaTscan / dopamine transporter imaging has no role in SE; no parkinsonism question relevant to acute management.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "CT must precede LP to exclude hemorrhage / mass effect.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Beta-hCG and renal function must be checked before AED selection in a 42yo woman with lupus nephritis.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Emergent EEG to diagnose NCSE — confusion after brief seizure requires EEG for diagnosis",
-      "Urgent BP control with IV antihypertensive — PRES treatment is primarily BP reduction",
-      "MRI brain with FLAIR and DWI to confirm PRES — CT insufficient for PRES diagnosis",
-      "Escalate levetiracetam from subtherapeutic 500 mg BID to 1000 mg BID with IV loading",
-      "Do NOT over-lower BP — gradual reduction 10-15% in first hour; aggressive lowering risks cerebral hypoperfusion"
+      "Administer IV lorazepam 0.1 mg/kg first-line; do not delay for diagnostics",
+      "Lower blood pressure 20-25% over first hour with nicardipine/labetalol IV — do not over-correct",
+      "Load IV levetiracetam (subtherapeutic on admission) per ESETT second-line",
+      "Check beta-hCG before AED loading in any woman of reproductive age",
+      "Rheumatology consult for active SLE flare with possible nephritis"
     ],
     "contraindicated_actions": [
-      "Over-aggressively lowering blood pressure to rapid normalization — risk cerebral hypoperfusion in PRES",
-      "Delaying MRI and relying solely on CT — CT is insensitive for PRES; MRI with FLAIR is diagnostic",
-      "Stopping hydroxychloroquine abruptly — would worsen SLE flare which is a contributing precipitant",
-      "High-dose immunosuppression for 'CNS lupus' without first ruling out PRES — PRES requires BP control first, not aggressive immunosuppression"
+      "Do NOT load valproate in this 42yo woman of reproductive age — teratogen risk",
+      "Do NOT use phenytoin/fosphenytoin if cardiac instability develops without monitoring",
+      "Do NOT lower BP precipitously — risks ischemic injury in PRES"
     ],
     "key_reasoning_points": [
-      "PRES in SLE is precipitated by hypertensive emergency (BP 172/108) + steroid use — classic scenario requires urgent MRI",
-      "NCSE complicating PRES responds to BP control + AED; BP control is the primary treatment",
-      "DWI negative (no restriction) in PRES = vasogenic edema = reversible; DWI positive = cytotoxic edema = poor prognosis",
-      "Subtherapeutic levetiracetam (8 mcg/mL on 500 mg BID) is a contributing but not primary cause",
-      "Elevated dsDNA + low complement = SLE systemic activity, but PRES (not CNS lupus vasculitis) is the imaging diagnosis based on posterior distribution + no DWI restriction",
-      "PRES-associated NCSE in SLE requires integrating PRES imaging, BP management, rheumatology, and AED optimization simultaneously"
+      "PRES classically presents with seizures, encephalopathy, visual symptoms, and severe hypertension; bilateral posterior parieto-occipital FLAIR hyperintensity is pathognomonic",
+      "Active SLE expands the differential to lupus cerebritis and antiphospholipid-related events, but PRES is the unifying diagnosis here",
+      "Subtherapeutic AED + PRES + SLE flare is a triple-hit precipitant — all three must be addressed",
+      "Avoid valproate in women of reproductive age; use levetiracetam preferentially"
     ],
     "red_herrings": [
       {
-        "data_point": "Elevated dsDNA 42 IU/mL, low C3 62 and C4 8, ESR 68 — SLE serological activity",
-        "location": "initial_tool_outputs.labs.panels.Rheumatology Panel",
-        "intended_effect": "Suggests active CNS lupus (neuropsychiatric SLE with cerebral vasculitis) as the primary diagnosis, prompting high-dose immunosuppression with cyclophosphamide instead of BP management",
-        "correct_interpretation": "SLE serological activity confirms systemic SLE flare but MRI FLAIR shows classic posterior PRES pattern without DWI restriction; CNS vasculitis would show multifocal DWI lesions in vascular territories, not symmetric bilateral posterior vasogenic edema; BP control is the primary treatment",
-        "field_path": ""
+        "data_point": "Subtherapeutic levetiracetam 8 mcg/mL",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests pure non-adherence epilepsy as cause",
+        "correct_interpretation": "Subtherapeutic AED is contributory but does not explain the PRES MRI pattern or severe hypertension"
       },
       {
-        "data_point": "Subtherapeutic levetiracetam level 8 mcg/mL",
-        "location": "initial_tool_outputs.labs.panels.AED Levels",
-        "intended_effect": "Suggests AED non-compliance or inadequate dosing as the primary cause of NCSE, directing focus solely to AED escalation rather than identifying the structural PRES etiology and urgently controlling BP",
-        "correct_interpretation": "Subtherapeutic AED is a contributing factor but not the primary cause; PRES from hypertensive emergency (BP 172/108) is the structural etiology; BP control must occur simultaneously with AED escalation for effective NCSE treatment",
-        "field_path": ""
+        "data_point": "Active urine sediment with RBC casts and proteinuria",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests focus on lupus nephritis flare diverting from acute SE management",
+        "correct_interpretation": "Lupus nephritis flare is real and must be addressed but does not change first-line SE treatment; PRES is the immediate brain finding to act on"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -724,6 +795,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "9 required tools across EEG/labs/CT/MRI/CSF/autoimmune/drug-check/literature/consult; triple precipitant (PRES + SLE flare + subtherapeutic AED); 2 grounded red herrings.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

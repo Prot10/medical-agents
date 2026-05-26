@@ -449,100 +449,257 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Amyotrophic lateral sclerosis (ALS) concurrent with well-controlled HIV infection",
+    "primary_diagnosis": "Amyotrophic lateral sclerosis (ALS) concurrent with virologically suppressed HIV",
     "icd_code": "G12.21",
     "differential": [
       {
-        "diagnosis": "HIV vacuolar myelopathy",
-        "likelihood": "very_low",
-        "key_features": "Vacuolar myelopathy causes posterior column degeneration with sensory and UMN findings; does NOT cause fasciculations, LMN denervation on EMG, or arm atrophy; MRI shows no vacuolar changes"
+        "diagnosis": "HIV-associated motor neuronopathy",
+        "likelihood": "moderate",
+        "key_features": "Reported HIV-associated ALS-like syndromes typically with uncontrolled viremia; this patient is suppressed",
+        "icd_code": null
       },
       {
-        "diagnosis": "CMV radiculomyelopathy",
-        "likelihood": "very_low",
-        "key_features": "Requires CD4 <100 for CMV reactivation; CD4 here is 520; CMV PCR negative"
+        "diagnosis": "Vacuolar myelopathy (HIV)",
+        "likelihood": "low",
+        "key_features": "Predominantly UMN with sensory involvement; sensory NCS here is normal",
+        "icd_code": null
       },
       {
-        "diagnosis": "HIV-associated distal sensory neuropathy",
-        "likelihood": "very_low",
-        "key_features": "HIV neuropathy is sensory-predominant and symmetric distally; normal sensory NCS here excludes HIV neuropathy as explanation"
+        "diagnosis": "ART-related toxic neuropathy",
+        "likelihood": "low",
+        "key_features": "Tenofovir and integrase inhibitors not classically associated; pattern is motor only",
+        "icd_code": null
       },
       {
-        "diagnosis": "ART-associated mitochondrial neuropathy",
+        "diagnosis": "Cervical myelopathy",
+        "likelihood": "low",
+        "key_features": "Brain/spine MRI excludes structural cord disease",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Inclusion body myositis",
         "likelihood": "very_low",
-        "key_features": "Normal lactate; normal sensory NCS; current regimen (bictegravir/TAF) has very low mitochondrial toxicity"
+        "key_features": "Neurogenic EMG pattern with fasciculations excludes IBM",
+        "icd_code": null
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "HIV viral load and CD4 count — assess immune status and risk for opportunistic complications",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Undetectable VL, CD4 520 — well-controlled HIV; low risk for opportunistic CNS complications",
+        "action": "Obtain brain MRI (with cervical spine sequences) to exclude structural mimics — cervical myelopathy, demyelination, brainstem tumor",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "No structural lesion explaining the motor/bulbar findings; corticospinal-tract signal change or non-specific findings may be seen but are not by themselves diagnostic",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "DWI",
+            "T1+Gd"
+          ],
+          "include_cervical_spine": true
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       },
       {
         "step": 2,
-        "action": "MRI brain and spine with gadolinium — assess for HIV myelopathy, PML, lymphoma",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Corticospinal tract ALS changes; no vacuolar myelopathy; no PML; no lymphoma",
+        "action": "Perform EMG with nerve conduction studies sampling bulbar plus ≥2 spinal regions to document lower motor neuron involvement (fibrillations, positive sharp waves, complex fasciculation potentials, large-amplitude long-duration polyphasic MUPs with reduced recruitment) and exclude conduction block",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Active denervation and chronic reinnervation in ≥2 body regions with normal sensory NCS and no conduction block — meets Awaji / El Escorial revised criteria",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[Awaji_2008]",
+        "guideline_source": "Awaji_2008"
       },
       {
         "step": 3,
-        "action": "CSF including HIV RNA, CMV PCR, NfL",
-        "tool_name": "analyze_csf",
-        "expected_finding": "HIV RNA undetectable; CMV negative; NfL markedly elevated",
+        "action": "Order a mimic-exclusion lab panel: CK, B12, TSH, HbA1c, HIV, RPR, SPEP, anti-GM1 IgM antibodies, and (in males) androgen receptor CAG repeat for Kennedy disease",
+        "tool_name": "interpret_labs",
+        "expected_finding": "CK often mildly to moderately elevated (2–5× ULN); reversible mimics (B12, TSH, HIV, RPR) negative; anti-GM1 negative; SPEP without high-titer M-spike; CAG repeat normal",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "LFTs",
+            "CK",
+            "B12",
+            "TSH",
+            "Free T4",
+            "HIV",
+            "RPR",
+            "SPEP",
+            "anti-GM1 IgM",
+            "androgen receptor CAG repeat"
+          ]
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       },
       {
         "step": 4,
-        "action": "EMG/NCS with attention to sensory NCS pattern",
+        "action": "Measure respiratory function (FVC, MIP/MEP, SNIP/NIF) at baseline to inform NIV timing and prognostication",
         "tool_name": "order_specialized_test",
-        "expected_finding": "Normal sensory NCS (excluding HIV neuropathy); multi-region motor denervation (ALS)",
+        "expected_finding": "FVC and SNIP/MIP often reduced even in early disease; values guide timing of NIV (FVC <50% predicted or SNIP <40 cmH₂O are conventional thresholds)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       },
       {
         "step": 5,
-        "action": "Check riluzole interaction with ART regimen",
+        "action": "Search the medical literature to confirm Awaji and Gold Coast diagnostic thresholds and AAN practice-parameter recommendations relevant to this presentation",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Awaji-Shima 2008 / Gold Coast 2020 diagnostic criteria; AAN 2009 practice parameter on ALS care",
+        "category": "recommended",
+        "tool_parameters": {
+          "query": "ALS diagnostic criteria Awaji Gold Coast AAN practice parameter"
+        },
+        "citation": "[Awaji_2008]",
+        "guideline_source": "Awaji_2008"
+      },
+      {
+        "step": 6,
+        "action": "Order an ALS-focused genetic panel (C9orf72 repeat expansion, SOD1, TARDBP, FUS, TBK1) — required when family history is positive or onset is young (<50)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "C9orf72 expansion in ~40% of familial cases; SOD1/TARDBP/FUS in additional familial subset; ~10% of apparently sporadic cases also carry a variant",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "genetic_panel:ALS"
+        },
+        "citation": "[Brown_2017]",
+        "guideline_source": "Brown_2017"
+      },
+      {
+        "step": 7,
+        "action": "Obtain CSF for neurofilament light chain (NfL) for prognostic stratification when the diagnosis remains uncertain or when prognostic information will change management",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Markedly elevated CSF NfL (typically >5,000 pg/mL) supports a motor-neuron-disease degenerative process and correlates with faster progression",
+        "category": "recommended",
+        "tool_parameters": {
+          "tests": [
+            "cell count",
+            "protein",
+            "glucose",
+            "NfL",
+            "NfH",
+            "oligoclonal bands",
+            "cytology"
+          ]
+        },
+        "citation": "[ENCALS_2018]",
+        "guideline_source": "ENCALS_2018"
+      },
+      {
+        "step": 8,
+        "action": "Check interactions before initiating riluzole 50 mg twice daily; review baseline LFTs and CBC and counsel on monitoring",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "Minimal interaction with bictegravir/TAF/emtricitabine",
-        "category": "required",
-        "tool_parameters": {}
+        "expected_finding": "No major interactions for typical chronic medications; advise alcohol and grapefruit-juice avoidance (CYP1A2 modulators); monthly LFTs for first 3 months",
+        "category": "recommended",
+        "tool_parameters": {
+          "proposed_drug": "riluzole"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "ALS is a motor-neuron disease without cortical electrical signature; EEG has no diagnostic role and adds cost without benefit.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG is unrelated to motor neuron disease and not part of the standard ALS workup absent specific cardiac symptoms or pre-medication QTc checks.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is unrelated to ALS diagnosis; no indication absent comorbid cardiac disease.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring has no role in ALS diagnostic workup.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "MRI is the standard structural study for ALS workup; head CT adds no diagnostic value and exposes the patient to ionizing radiation.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in ALS diagnosis (motor-neuron rather than amyloid pathology) and carries a high cost.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan evaluates nigrostriatal dopaminergic integrity; it has no role in ALS, which spares the dopaminergic system.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "FDG-PET has no established diagnostic role in ALS and adds substantial cost.",
+        "citation": "[AAN_2009]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "Assess HIV status (VL, CD4) first — well-controlled HIV effectively excludes HIV-driven opportunistic neurological complications",
-      "CSF including HIV RNA, CMV PCR to exclude HIV-related CNS complications",
-      "Normal sensory NCS is key — HIV neuropathy is sensory; ALS is purely motor",
-      "Continue ART — HIV control is essential; ALS does not alter HIV management need"
+      "Perform EMG/NCS sampling the bulbar region plus ≥2 spinal regions to document lower-motor-neuron involvement and exclude conduction block.",
+      "Obtain brain MRI to exclude structural mimics (cervical myelopathy, demyelinating disease, brainstem tumor).",
+      "Order a mimic-exclusion lab panel (CK, B12, TSH, HIV, RPR, SPEP, anti-GM1 IgM, androgen receptor CAG repeat in males).",
+      "Measure baseline respiratory function (FVC, MIP/MEP, SNIP) to inform NIV timing.",
+      "Apply Awaji-Shima 2008 / Gold Coast 2020 criteria to confirm the diagnosis.",
+      "Initiate riluzole 50 mg twice daily after baseline LFTs unless contraindicated; arrange monthly LFT monitoring for the first 3 months.",
+      "Refer to a multidisciplinary ALS clinic for SLP, dietetics, respiratory, and social-work input."
     ],
     "contraindicated_actions": [
-      "Attributing all neurological symptoms to HIV without EMG confirmation — HIV mimics are excluded systematically by well-controlled viral load, normal sensory NCS, and EMG pattern",
-      "Changing ART regimen based on neurological presentation — current regimen (Biktarvy) is appropriate and undetectable VL should be maintained"
+      "Do not commit the patient to cervical spine surgery on the basis of incidental spondylotic changes when EMG findings extend beyond the cervical cord.",
+      "Do not start chronic immunosuppression (steroids, IVIG, plasma exchange) for ALS — there is no benefit and treatment delays correct diagnosis.",
+      "Do not defer respiratory assessment in a symptomatic patient — even mild FVC reduction warrants close monitoring and NIV planning.",
+      "Do not dismiss bulbar or progressive symptoms as functional / psychiatric without a complete neurological workup."
     ],
     "key_reasoning_points": [
-      "HIV with undetectable viral load and CD4 >500 essentially excludes all HIV-driven opportunistic CNS complications that require immune deficiency",
-      "HIV neuropathy is sensory-predominant; ALS is purely motor — normal sensory NCS is the key distinguishing finding",
-      "Fasciculations and combined UMN/LMN syndrome are not features of any HIV complication; they are hallmarks of ALS",
-      "ALS concurrent with HIV is an independent co-occurrence; HIV treatment continues independently"
+      "Diagnosis requires evidence of both upper-motor-neuron involvement (hyperreflexia, Babinski, Hoffman, brisk jaw jerk, spasticity) and lower-motor-neuron involvement (atrophy, fasciculations, EMG denervation) with progressive spread, while excluding mimics — Awaji 2008 / Gold Coast 2020.",
+      "EMG in bulbar plus ≥2 spinal regions documenting fibrillations, positive sharp waves, complex fasciculation potentials, and large-amplitude long-duration polyphasic MUPs with reduced recruitment satisfies the electrodiagnostic criterion.",
+      "Normal sensory NCS and absence of conduction block are pivotal: they exclude common mimics including multifocal motor neuropathy, CIDP, and Kennedy disease.",
+      "Mild-to-moderate CK elevation (2–5× ULN) is consistent with ALS and does not itself indicate a primary myopathy.",
+      "Cervical spondylotic changes on MRI are common incidental findings in the at-risk age group; bulbar findings or multi-region EMG denervation cannot be attributed to cervical disease.",
+      "Baseline FVC, MIP/MEP, and SNIP/NIF inform NIV timing — NIV initiation at FVC <50% predicted or SNIP <40 cmH₂O prolongs survival and improves quality of life.",
+      "Markedly elevated CSF neurofilament light chain (>5,000 pg/mL) supports motor neuron degeneration and correlates with progression rate (ENCALS prediction model)."
     ],
     "red_herrings": [
       {
-        "data_point": "HIV-positive status and history of opportunistic neurological complications in other patients",
+        "data_point": "Long-standing HIV diagnosis (on suppressive ART)",
         "location": "Past medical history",
-        "intended_effect": "Attribute progressive weakness to HIV-related neurological complication (vacuolar myelopathy, HIV neuropathy, CMV)",
-        "correct_interpretation": "Well-controlled HIV (undetectable VL, CD4 520) makes HIV-related opportunistic CNS complications highly unlikely. Pattern of weakness with fasciculations and combined UMN/LMN signs is ALS, not any HIV complication.",
-        "field_path": ""
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Suggests HIV-associated motor neuropathy or ART-related neuromuscular complications",
+        "correct_interpretation": "Virologically suppressed HIV with normal CD4 makes HIV-associated motor neuron syndrome unlikely; EMG/UMN findings are classic ALS"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "v5",
@@ -554,6 +711,20 @@
       "echo": "incidental",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:ALS",
+    "difficulty_rationale": "HIV introduces ALS-mimic differential (HIV-associated motor neuronopathy) requiring literature support; well-controlled HIV reduces but does not eliminate diagnostic ambiguity",
+    "case_body_concerns": [
+      {
+        "field_path": "followup_outputs",
+        "concern": "ALS genetic panel is wired to `interpret_labs` rather than `order_specialized_test` with `test_type: genetic_panel:ALS`. Per the criteria pack and TOOL_PARAMETER_VOCABULARY, genetic testing should resolve via order_specialized_test. The gold trajectory routes the action via order_specialized_test; the case body fix is a tool-name swap in followup_outputs without changing the report payload.",
+        "suggested_fix": "Change followup tool_name from interpret_labs to order_specialized_test for the ALS_Genetic_Panel followup; payload structure can stay."
+      }
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -491,91 +491,197 @@
   },
   "ground_truth": {
     "primary_diagnosis": "Status epilepticus from carbamazepine toxicity due to CYP3A4 inhibition by clarithromycin in left temporal focal epilepsy",
-    "icd_code": "G41.9",
+    "icd_code": "G41.1",
     "differential": [
       {
-        "diagnosis": "Subtherapeutic carbamazepine from non-adherence",
-        "likelihood": "very_low",
-        "key_features": "Carbamazepine 16.8 is supratherapeutic not subtherapeutic; clarithromycin inhibits metabolism"
+        "diagnosis": "Pneumonia/sepsis-precipitated seizures",
+        "likelihood": "moderate",
+        "key_features": "Mild fever 38.2 with pneumonia (on clarithromycin); contributing but not primary cause",
+        "icd_code": "J18.9"
       },
       {
-        "diagnosis": "New structural lesion causing breakthrough SE",
-        "likelihood": "very_low",
-        "key_features": "MRI shows only chronic hippocampal sclerosis; carbamazepine level explains SE"
+        "diagnosis": "Subtherapeutic AED — non-adherence",
+        "likelihood": "low",
+        "key_features": "CBZ 16.8 is supratherapeutic, not subtherapeutic — drug interaction explains",
+        "icd_code": "G40.219"
       },
       {
-        "diagnosis": "CNS infection from immunocompromise",
-        "likelihood": "very_low",
-        "key_features": "Normal CSF; carbamazepine toxicity better explains SE; no immunocompromise"
+        "diagnosis": "New structural lesion",
+        "likelihood": "low",
+        "key_features": "Known left temporal focus; CT/MRI to confirm no new lesion",
+        "icd_code": "G40.219"
+      },
+      {
+        "diagnosis": "Drug-induced (serotonin / sertraline) seizure",
+        "likelihood": "low",
+        "key_features": "Sertraline at therapeutic dose unlikely; clarithromycin + CBZ is the mechanism",
+        "icd_code": "T43.225A"
+      },
+      {
+        "diagnosis": "Other AED toxicity / paradoxical effect",
+        "likelihood": "low",
+        "key_features": "Mood symptoms / hypothyroidism not implicated",
+        "icd_code": "G40.219"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "EEG confirms left temporal focal SE",
+        "action": "EEG — confirm focal SE",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Left temporal ictal activity with secondary generalization; Todd's paresis confirms left focus",
+        "expected_finding": "Left temporal focal ictal activity at 5-7 Hz with secondary bilateral spread",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "Carbamazepine 16.8 - supratherapeutic from clarithromycin interaction",
+        "action": "Labs: CBC, CMP, glucose, Ca/Mg, AED levels (CBZ + free CBZ), lactate, ABG, troponin (CBZ can cause cardiac toxicity), tox screen",
         "tool_name": "interpret_labs",
-        "expected_finding": "Carbamazepine toxic level from CYP3A4 inhibition; valproate allergy noted",
+        "expected_finding": "CBZ 16.8 TOXIC; lactate 6.4 post-ictal; CK 1860 rhabdo",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Stop clarithromycin - switch to safe antibiotic",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Clarithromycin CYP3A4 inhibits carbamazepine metabolism; switch to levofloxacin",
+        "action": "Non-contrast head CT",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Subtle chronic left mesial temporal changes; no acute pathology",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "IV lacosamide for SE - NOT valproate (allergy), NOT fosphenytoin (cross-react CBZ)",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Lacosamide safe; valproate allergic; sertraline QTc monitoring with lacosamide",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "MRI brain — assess for any progression of structural focus",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Chronic left mesial temporal sclerosis pattern only",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "MRI confirms chronic left hippocampal sclerosis - no new lesion",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Left hippocampal sclerosis stable; no new acute lesion",
+        "action": "Drug-interaction check: CBZ + clarithromycin (CYP3A4) + sertraline + levothyroxine + AED switch",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Clarithromycin inhibits CYP3A4 → CBZ toxicity; switch antibiotic (azithromycin or doxycycline) and lower CBZ; consider transition to LEV",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESETT_2019]",
+        "guideline_source": ""
+      },
+      {
+        "step": 6,
+        "action": "Baseline ECG — CBZ can cause AV block / arrhythmia at toxic levels",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Check for PR prolongation, AV block, arrhythmia",
         "category": "recommended",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 7,
+        "action": "Literature: CBZ toxicity management and pneumonia antibiotic alternatives",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Activated charcoal if recent ingestion; supportive care; switch macrolide; consider transition AED",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "study_type": "TTE"
+        },
+        "rationale": "No clinical suspicion of cardiac source of embolus or cardiogenic seizure; routine echo is not indicated in SE workup absent cardiac findings.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No suspicion of arrhythmogenic syncope or cardiac comorbidity precipitating SE; routine telemetry beyond standard ICU monitoring adds cost without yield.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in acute SE evaluation; dementia biomarker imaging does not change acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is for ischemic stroke workup; SE without focal vascular suspicion does not warrant carotid imaging.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "DaTscan / dopamine transporter imaging has no role in SE; no parkinsonism question relevant to acute management.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_ecg",
+        "after": "check_drug_interactions",
+        "reason": "ECG must be reviewed for CBZ-induced AV block before further AED loading.",
+        "citation": "[Brophy_2012]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "STOP clarithromycin immediately - major drug interaction doubling carbamazepine levels",
-      "Switch to safe antibiotic: levofloxacin or azithromycin for pneumonia",
-      "Carbamazepine 16.8 mcg/mL is TOXIC not subtherapeutic - reduce dose or hold temporarily",
-      "IV lacosamide for SE treatment - NOT valproate (allergy) NOT fosphenytoin/phenytoin (carbamazepine cross-reactivity concern)",
-      "Carbamazepine level monitoring every 12h until normalized",
-      "Sertraline likely subtherapeutic from carbamazepine CYP3A4 induction"
+      "Administer IV lorazepam 0.1 mg/kg first-line",
+      "Hold carbamazepine and switch antibiotic (clarithromycin → azithromycin/doxycycline)",
+      "Load IV levetiracetam as bridging AED",
+      "Continuous cardiac monitoring during CBZ clearance (risk of arrhythmia)"
     ],
     "contraindicated_actions": [
-      "Do not give valproate - documented allergy (thrombocytopenia and pancreatitis)",
-      "Do not continue clarithromycin - it is causing the toxicity",
-      "Do not increase carbamazepine - it is already toxic",
-      "Do not use phenobarbital without checking carbamazepine cross-induction effects"
+      "Do NOT continue clarithromycin with carbamazepine — the interaction is the cause",
+      "Do NOT load phenytoin in patient with CBZ-induced cardiac effects without monitoring",
+      "Do NOT use other CYP3A4 inhibitors (e.g., erythromycin, fluconazole) with carbamazepine",
+      "Do NOT continue clarithromycin with carbamazepine — the interaction is the cause; switch to azithromycin or doxycycline."
     ],
     "key_reasoning_points": [
-      "Clarithromycin CYP3A4 inhibition: carbamazepine cannot be metabolized, levels double - this is a major drug interaction that can cause SE",
-      "Carbamazepine toxicity (>12 mcg/mL) can paradoxically cause seizures via sodium channel effects",
-      "Valproate allergy (thrombocytopenia + pancreatitis) is absolute contraindication - use lacosamide or levetiracetam",
-      "Right Todd's paresis post-ictally confirms left temporal focal origin - consistent with known left hippocampal sclerosis",
-      "Sertraline is likely subtherapeutic because carbamazepine induces CYP3A4 and CYP2D6 - may explain poor depression control"
+      "Clarithromycin is a strong CYP3A4 inhibitor; combination with carbamazepine (CYP3A4 substrate) raises CBZ levels into toxic range",
+      "CBZ toxicity can cause cardiac AV block / arrhythmia",
+      "Switching macrolide to azithromycin (minimal CYP interaction) or doxycycline resolves the interaction",
+      "ESETT supports LEV / VPA / fosphenytoin equivalence as second-line"
     ],
-    "red_herrings": [],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": [
+      {
+        "data_point": "Pneumonia with fever 38.2",
+        "location": "patient.history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Suggests sepsis-precipitated SE as primary mechanism",
+        "correct_interpretation": "Pneumonia is the comorbidity, but the seizure mechanism is the CYP3A4 drug interaction raising CBZ to toxic levels"
+      },
+      {
+        "data_point": "Sertraline on medication list",
+        "location": "patient.clinical_history.medications",
+        "field_path": "patient.clinical_history.medications",
+        "intended_effect": "Suggests SSRI-precipitated seizure",
+        "correct_interpretation": "SSRIs at therapeutic doses have minimal seizure threshold effect; CBZ toxicity is the cause"
+      }
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -584,6 +690,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "7 required tools; classic CBZ + clarithromycin interaction; teaching includes CYP3A4 mechanism, cardiac toxicity, antibiotic switch; 2 grounded red herrings.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

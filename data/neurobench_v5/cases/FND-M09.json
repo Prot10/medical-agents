@@ -398,95 +398,185 @@
     "icd_code": "F44.4",
     "differential": [
       {
-        "diagnosis": "MS relapse (acute demyelinating attack)",
-        "likelihood": "very_low",
-        "key_features": "No new T2 lesions and no enhancing lesions on MRI — MS relapses require new or enlarging lesions for pathological confirmation; positive Hoover sign and distractibility inconsistent with organic MS relapse"
+        "diagnosis": "Multiple sclerosis (demyelinating disease)",
+        "likelihood": "moderate",
+        "key_features": "Sensorimotor symptoms in a young adult raise demyelinating disease; brain (and when indicated spine) MRI without T2/FLAIR lesions or enhancement argues against an active demyelinating process.",
+        "icd_code": "G35"
       },
       {
-        "diagnosis": "Progressive multifocal leukoencephalopathy (PML) from natalizumab",
-        "likelihood": "very_low",
-        "key_features": "JC PCR in CSF NEGATIVE (<10 copies/mL). MRI shows no PML pattern (no large irregular non-enhancing white matter lesions in frontal/parietal/temporal regions). PML definitively excluded."
-      },
-      {
-        "diagnosis": "Pseudorelapse (Uhthoff's phenomenon — heat or infection)",
+        "diagnosis": "Structural CNS lesion (tumor, demyelination, stroke)",
         "likelihood": "low",
-        "key_features": "No fever, no recent infection, no heat exposure. Functional signs positive. Pseudorelapses are real MS symptom fluctuations without new lesions — but mechanism is physiological in Uhthoff's vs functional in FND"
+        "key_features": "Focal complaints warrant imaging; normal brain MRI without lesion, mass, or enhancement effectively excludes a structural cause for the presenting deficit.",
+        "icd_code": null
       },
       {
-        "diagnosis": "Fatigue-related MS functional impairment",
+        "diagnosis": "Peripheral neuropathy or radiculopathy",
         "likelihood": "low",
-        "key_features": "MS fatigue can worsen existing symptoms but Hoover sign positive and rapid recovery with physiotherapy suggest functional overlay rather than pure fatigue"
+        "key_features": "Non-dermatomal sensory loss, normal reflexes, and (when obtained) normal EMG/NCS argue against peripheral nerve or root pathology.",
+        "icd_code": "G62.9"
+      },
+      {
+        "diagnosis": "Autoimmune or paraneoplastic encephalitis",
+        "likelihood": "very_low",
+        "key_features": "Episodic neurological symptoms can occur in autoimmune encephalitis; normal MRI, normal EEG background, and (when obtained) negative antibody panel render this very unlikely.",
+        "icd_code": "G04.81"
+      },
+      {
+        "diagnosis": "Malingering or factitious disorder",
+        "likelihood": "very_low",
+        "key_features": "FND is involuntary; preserved effort on symptom-validity testing and absence of clear secondary gain argue against feigning. The rule-in signs do not distinguish FND from malingering by themselves, but the clinical context does not support a feigning explanation.",
+        "icd_code": "F68.10"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI with gadolinium — urgent MS relapse and PML exclusion",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Stable — no new T2/enhancing lesions; no PML pattern",
+        "action": "Elicit positive rule-in signs on bedside examination (Hoover sign for functional leg weakness, tremor entrainment / distractibility for functional tremor, give-way weakness, non-dermatomal sensory loss with midline splitting). Diagnosis of FND is made by these positive signs, not by exclusion alone.",
+        "tool_name": null,
+        "expected_finding": "At least one reliable positive functional sign documented",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Espay_2018]",
+        "guideline_source": "FND criteria pack — positive diagnosis"
       },
       {
         "step": 2,
-        "action": "JC virus PCR in CSF — mandatory in high JC index patient with new neurological symptoms",
-        "tool_name": "analyze_csf",
-        "expected_finding": "JC PCR negative — PML definitively excluded",
+        "action": "Order brain MRI with and without contrast to exclude a structural cause of the presenting deficit",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "No structural lesion, mass, demyelination, or stroke",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "contrast": true
+        },
+        "citation": "[Espay_2018]",
+        "guideline_source": "FND criteria pack — exclude structural cause"
       },
       {
         "step": 3,
-        "action": "Labs including JC antibody index and natalizumab level",
+        "action": "Order basic laboratory workup (CBC, CMP, TSH, vitamin B12) to exclude common reversible mimics",
         "tool_name": "interpret_labs",
-        "expected_finding": "JC index 2.8 (high risk — CSF PCR mandatory); natalizumab therapeutic",
+        "expected_finding": "No metabolic, thyroid, or B12 abnormality that explains symptoms",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "TSH",
+            "B12"
+          ]
+        },
+        "citation": "[Stone_2018]",
+        "guideline_source": "FND criteria pack — exclude reversible causes"
       },
       {
         "step": 4,
-        "action": "Positive FND sign assessment (Hoover, distractibility)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Positive Hoover, distractibility — functional overlay confirmed",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Search current literature on FND diagnostic signs and evidence-based treatment (CBT for PNES, specialized physiotherapy for functional motor symptoms)",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirms multidisciplinary CBT + physiotherapy is the evidence-based treatment for FND",
+        "category": "recommended",
+        "tool_parameters": {
+          "query": "functional neurological disorder diagnosis treatment"
+        },
+        "citation": "[Nielsen_2015]",
+        "guideline_source": "FND criteria pack — treatment evidence"
       },
       {
         "step": 5,
-        "action": "Psychiatric evaluation — caregiver burden and stress precipitant",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Moderate depression, high caregiver burden, mother's dementia as precipitant",
+        "action": "Review current medications for agents that may exacerbate symptoms (e.g., benzodiazepines, dopamine-blocking antipsychotics, AEDs initiated for PNES)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identification of medication contributors that should be tapered or discontinued",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "",
+        "guideline_source": "FND criteria pack — medication review"
+      },
+      {
+        "step": 6,
+        "action": "Communicate the diagnosis transparently using positive language anchored on the rule-in signs; explicitly state the diagnosis is FND, the symptoms are real and involuntary, and there is an evidence-based treatment plan",
+        "tool_name": null,
+        "expected_finding": "Patient understanding and treatment engagement — strong predictor of recovery",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Stone_2018]",
+        "guideline_source": "FND criteria pack — diagnostic communication"
+      },
+      {
+        "step": 7,
+        "action": "Refer to specialized FND-informed physiotherapy (for functional motor symptoms) and to CBT / psychological therapy (for PNES and comorbid mood / anxiety)",
+        "tool_name": null,
+        "expected_finding": "Engagement in evidence-based multidisciplinary care",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Nielsen_2015]",
+        "guideline_source": "Nielsen 2015 — physiotherapy consensus"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG has no diagnostic role in FND; cardiac etiology is not on the differential for the presenting neurological deficit.",
+        "citation": "[Stone_2018]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography has no role in FND; no structural cardiac question is raised by the presentation.",
+        "citation": "[Stone_2018]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac rhythm monitoring is not indicated; the events are non-syncopal and the rule-in signs point to FND.",
+        "citation": "[Stone_2018]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT adds no information beyond MRI for an FND workup and contributes diagnostic noise plus radiation exposure.",
+        "citation": "[Espay_2018]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "Advanced PET imaging has no indication in FND; standard MRI is the appropriate structural workup.",
+        "citation": "[Espay_2018]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "CSF JC PCR is MANDATORY in JC-positive patient on natalizumab with new neurological symptoms — even if MRI is normal, early PML can be MRI-negative",
-      "Do not withhold natalizumab pending workup unless PML is confirmed",
-      "FND treatment should address caregiver burden as root cause"
+      "Document at least one positive rule-in sign (Hoover sign, tremor entrainment, distractibility, give-way pattern, non-dermatomal sensory loss with midline split)",
+      "Obtain brain MRI to exclude structural pathology",
+      "Communicate the diagnosis transparently using positive language and the rule-in signs as the basis",
+      "Refer for FND-informed physiotherapy and CBT / psychological therapy",
+      "Order a comprehensive neuropsychological battery to characterize comorbid depression, anxiety, somatization, and trauma exposure — informs treatment planning (criteria-pack 'recommended' tier)"
     ],
     "contraindicated_actions": [
-      "High-dose IV steroids without confirmed new MS lesion — FND does not respond to steroids",
-      "Stopping natalizumab immediately without PML confirmation — stopping natalizumab abruptly can cause severe rebound MS activity"
+      "Do not pursue ever-expanding negative investigations — per Stone 2018, repeated negative workups reinforce illness conviction and worsen prognosis",
+      "Do not frame the diagnosis as 'all in your head', 'nothing wrong', or 'we couldn't find anything' — this damages the therapeutic alliance and is the most common avoidable harm in FND",
+      "Do not perform invasive testing (lumbar puncture, nerve biopsy, muscle biopsy, cerebral angiography) when positive rule-in signs are present and there is no clinical indication",
+      "Do not order EMG/NCS, muscle biopsy, or nerve biopsy as part of an FND workup — these invasive tests reinforce the somatic illness model per Stone 2018"
     ],
     "key_reasoning_points": [
-      "JC antibody index 2.8 (>1.5 = high risk) in a natalizumab patient with new neurological symptoms MANDATES CSF JC PCR — early PML can occur with normal MRI and requires CSF confirmation or exclusion",
-      "Negative CSF JC PCR definitively excludes PML regardless of serology risk stratification",
-      "FND superimposed on established neurological disease (MS, epilepsy, prior stroke) is well-recognized — positive functional signs in the context of stable disease support FND",
-      "Patient's own insight ('this doesn't feel like my MS') is a clinically valuable observation from a patient with 4 years of MS experience"
+      "FND is a positive diagnosis based on rule-in signs (Hoover, tremor entrainment, give-way weakness, non-dermatomal sensory loss with midline split) — not a diagnosis of exclusion (Espay 2018, Stone 2018).",
+      "Brain MRI and basic labs (CBC, CMP, TSH, B12) are due-diligence to exclude structural and reversible causes — they are NOT the route to the diagnosis, which is established at the bedside.",
+      "Over-investigation is the principal iatrogenic harm in FND; every additional negative test reinforces the patient's illness conviction and worsens prognosis (Stone 2018).",
+      "Psychiatric comorbidity (anxiety, depression, trauma) is common and informs treatment planning but is NOT required for the diagnosis and does not 'explain' the symptoms in a reductive sense.",
+      "Diagnostic communication matters: using positive language anchored on the rule-in signs is associated with better engagement and outcomes (Stone 2018).",
+      "Evidence-based treatment is multidisciplinary — CBT for PNES and FND-informed physiotherapy for functional motor symptoms (Nielsen 2015)."
     ],
     "red_herrings": [
       {
-        "data_point": "Established RRMS on natalizumab with elevated JC index 2.8",
-        "location": "Past medical history and labs",
-        "intended_effect": "Assume new neurological symptoms are MS relapse or PML without systematic workup; either start steroids empirically or panic about PML without CSF PCR confirmation",
-        "correct_interpretation": "Systematic workup: (1) MRI stable — no new MS or PML lesion; (2) CSF JC PCR negative — PML definitively excluded; (3) positive Hoover sign and distractibility — FND confirmed",
-        "field_path": ""
+        "data_point": "Pre-existing psychiatric diagnosis (anxiety or depression) in the past medical history",
+        "location": "Past medical history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Premature anchoring on a 'psychosomatic' label without obtaining positive rule-in signs; conversely, dismissing FND as a serious diagnosis because the patient is 'just anxious'",
+        "correct_interpretation": "Psychiatric comorbidity neither establishes nor refutes FND. Diagnosis requires positive rule-in signs on examination; psychiatric history is relevant for treatment planning, not for diagnosis."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "v5",
@@ -499,6 +589,14 @@
       "advanced_imaging": "normal",
       "specialized_test": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FND",
+    "difficulty_rationale": "Mixed motor and/or seizure phenotype with at least one prominent comorbidity or compelling red herring (family history of MS, antipsychotic exposure, comorbid SLE). Standard FND workup (MRI + basic labs + video-EEG when seizure phenotype) plus disciplined diagnostic communication.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

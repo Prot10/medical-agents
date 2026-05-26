@@ -558,58 +558,207 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Sjögren's syndrome sensory neuronopathy (dorsal root ganglionopathy)",
-    "critical_actions": [
-      "Recognize sensory neuronopathy pattern — non-length-dependent pan-sensory loss with normal motor NCS is DRG localization, not peripheral nerve",
-      "Order anti-SSA/SSB — even patients with prior negative results can seroconvert over time",
-      "Lip biopsy to confirm Sjögren's before treating with IVIG or hydroxychloroquine",
-      "Check paraneoplastic panel (anti-Hu) to exclude malignant etiology — urgent if positive",
-      "Do not attribute to B12 deficiency or diabetes without confirming that B12 normalization improves symptoms",
-      "MRI spine to exclude posterior column disease (B12 SCDC differential)"
-    ],
-    "contraindicated_actions": [
-      "Do not diagnose as pure diabetic neuropathy — non-length-dependent pattern with absent motor NCS and pseudoathetosis is not diabetic",
-      "Do not stop metformin reflexively — B12 low-normal is addressable with supplementation while continuing metformin",
-      "Do not attribute to vestibular disease — vestibular testing was already negative; this is proprioceptive ataxia from DRG involvement",
-      "Do not delay IVIG while awaiting all test results in patient with rapidly progressing sensory ataxia and falls"
-    ],
-    "optimal_actions": [],
+    "primary_diagnosis": "Sjögren's syndrome-associated sensory neuronopathy (dorsal root ganglionopathy)",
+    "icd_code": "G63",
     "differential": [
       {
-        "diagnosis": "Diabetic polyneuropathy",
-        "likelihood": "low",
-        "key_features": "Diabetic neuropathy is length-dependent — distal > proximal; PAIN is dominant; motor NCS mildly affected; proprioception and vibration loss in isolation with absent SNAPs pan-extremity is NOT diabetic pattern"
-      },
-      {
-        "diagnosis": "B12 deficiency subacute combined degeneration",
-        "likelihood": "low",
-        "key_features": "B12 284 pg/mL low-normal, MMA equivocal; MRI spine shows NO posterior column signal change; B12 normalization did not improve symptoms — B12 was NOT the primary cause"
-      },
-      {
-        "diagnosis": "Paraneoplastic sensory neuronopathy (anti-Hu, small cell lung cancer)",
-        "likelihood": "low",
-        "key_features": "Anti-Hu negative, anti-Yo/CV2 negative; anti-SSA positive with Sjögren's confirmed by lip biopsy; non-smoker; age-appropriate cancer screening current"
+        "diagnosis": "Paraneoplastic sensory neuronopathy (anti-Hu)",
+        "likelihood": "high",
+        "key_features": "Anti-Hu DRG involvement is the classic mimic; requires paraneoplastic panel and CT chest (esp. SCLC screen).",
+        "icd_code": "G13.0"
       },
       {
         "diagnosis": "Idiopathic sensory neuronopathy",
+        "likelihood": "moderate",
+        "key_features": "Diagnosis of exclusion once Sjögren's and paraneoplastic causes are ruled out.",
+        "icd_code": "G60.9"
+      },
+      {
+        "diagnosis": "B12 deficiency / subacute combined degeneration",
+        "likelihood": "moderate",
+        "key_features": "Can mimic with proprioceptive ataxia; need B12, MMA, homocysteine; spinal MRI shows posterior column signal change.",
+        "icd_code": "E53.8"
+      },
+      {
+        "diagnosis": "Diabetic polyneuropathy",
         "likelihood": "low",
-        "key_features": "Anti-SSA positive and lip biopsy confirmatory — not idiopathic"
+        "key_features": "Symmetric length-dependent axonal pattern; does not present as a sensory ganglionopathy with non-length-dependent loss.",
+        "icd_code": "E11.40"
+      },
+      {
+        "diagnosis": "Vitamin B6 toxicity neuropathy",
+        "likelihood": "low",
+        "key_features": "Pyridoxine megadose causes sensory ganglionopathy; review supplement history.",
+        "icd_code": "G62.2"
       }
     ],
-    "key_reasoning_points": [
-      "MODERATE DIFFICULTY: Chronic dry eye + diabetes creates anchoring toward routine metabolic neuropathy; sensory ataxia pattern is the key diagnostic clue",
-      "PSEUDOATHETOSIS is pathognomonic for severe proprioceptive loss (DRG) — not seen in typical diabetic or B12 neuropathy",
-      "Sjögren's seroconversion: anti-SSA can become positive over years; prior negative does not exclude current Sjögren's — must re-test",
-      "KEY NCS PATTERN: Absent SNAPs pan-extremity (both upper and lower, not length-dependent) with NORMAL motor NCS and NORMAL EMG = sensory neuronopathy above DRG",
-      "B12 supplementation trial is both diagnostic (no improvement = not B12) and therapeutic (addresses metformin-related insufficiency)",
-      "IVIG for Sjögren's ganglionopathy is stabilization therapy — DRG neurons lost to ganglionitis do not regenerate; early treatment prevents further loss",
-      "Paraneoplastic sensory neuronopathy (anti-Hu) is critical to exclude — has different treatment implications and underlying malignancy"
+    "optimal_actions": [
+      {
+        "step": 1,
+        "action": "Order broad neuropathy labs (CBC, CMP, HbA1c, B12 + MMA, TSH, SPEP/IFE, urinalysis)",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Identify reversible/treatable etiologies (diabetes, B12 deficiency, monoclonal gammopathy, thyroid disease)",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "HbA1c",
+            "B12",
+            "MMA",
+            "TSH",
+            "SPEP",
+            "IFE",
+            "UA"
+          ]
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 2,
+        "action": "Order EMG/NCS to characterize axonal vs demyelinating pattern and distribution",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Length-dependent axonal vs demyelinating vs multifocal pattern; severity and distribution",
+        "category": "required",
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 3,
+        "action": "Search literature for DSP evaluation guidelines and etiology-specific recommendations",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirm AAN 2009 DSP workup, etiology-specific evaluations",
+        "category": "required",
+        "tool_parameters": {
+          "query": "distal symmetric polyneuropathy evaluation AAN 2009"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 4,
+        "action": "Review medications for neurotoxic agents and check interactions for symptomatic therapy",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identify potentially neurotoxic drugs (chemotherapy, metronidazole, megadose B6, nitrofurantoin); guide neuropathic-pain pharmacotherapy",
+        "category": "required",
+        "tool_parameters": {
+          "medications": []
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 5,
+        "action": "Sjögren's and paraneoplastic serologies (anti-SSA, anti-SSB, anti-Hu, anti-CV2, anti-amphiphysin, anti-PNMA, anti-Ri)",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Anti-SSA/SSB supports Sjögren's; paraneoplastic antibodies support DRG-onconeural cause",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "anti_SSA",
+            "anti_SSB",
+            "paraneoplastic_panel"
+          ]
+        },
+        "citation": "[Said_2007]",
+        "guideline_source": "Said 2007 vasculitic neuropathy"
+      },
+      {
+        "step": 6,
+        "action": "Skin biopsy for IENFD (if small-fiber overlap suspected) and consider lip biopsy for Sjögren's confirmation",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Reduced IENFD supports small-fiber component; lip biopsy (flagged as off-vocab) confirms Sjögren's histologically",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "skin_biopsy_iencf"
+        },
+        "citation": "[Lauria_2010]",
+        "guideline_source": "EFNS/PNS 2010 small-fiber guideline"
+      }
     ],
-    "red_herrings": [],
-    "icd_code": "G63",
-    "useless_tools": [],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is a cortical test and is non-contributory in peripheral nerve disease.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head/brain CT has no role in peripheral neuropathy evaluation.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is not indicated in typical distal symmetric polyneuropathy without CNS signs.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {},
+        "rationale": "Advanced cerebral imaging (PET/MRA/MRV/perfusion) has no routine role in peripheral neuropathy.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated unless cardiac amyloid is suspected.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated unless there is syncope or symptomatic dysautonomia with arrhythmia concern.",
+        "citation": "[AAN_2009]"
+      }
+    ],
     "harmful_tools": [],
-    "sequence_constraints": []
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "order_specialized_test",
+        "reason": "Tier the workup — basic labs first, then targeted electrodiagnostic and tissue studies.",
+        "citation": "[AAN_2009]",
+        "severity": "soft"
+      }
+    ],
+    "critical_actions": [
+      "Recognize non-length-dependent sensory loss + sensory ataxia + areflexia = sensory neuronopathy / dorsal-root ganglionopathy",
+      "Obtain paraneoplastic antibody panel and screen for occult malignancy (CT chest, CA-125, mammogram)",
+      "Send Sjögren's serology and consider minor salivary gland biopsy if seronegative",
+      "Initiate immunotherapy (IVIG / steroids) if Sjögren's-associated and disabling"
+    ],
+    "contraindicated_actions": [
+      "Do not attribute to diabetic neuropathy without addressing the sensory-ataxic, non-length-dependent pattern",
+      "Do not delay malignancy screen — anti-Hu paraneoplastic causes are a critical alternative"
+    ],
+    "key_reasoning_points": [
+      "Sensory loss in a NON-length-dependent pattern with sensory ataxia and areflexia points to DRG (ganglionopathy), not peripheral nerve",
+      "Sjögren's is the most common identifiable cause of sensory ganglionopathy; sicca features here support workup",
+      "Anti-Hu paraneoplastic ganglionopathy is the must-not-miss alternative"
+    ],
+    "red_herrings": [
+      {
+        "data_point": "12-year history of T2DM (HbA1c 6.8%)",
+        "location": "history",
+        "field_path": "patient.clinical_history.past_medical_history[0]",
+        "intended_effect": "Anchor on diabetic neuropathy",
+        "correct_interpretation": "Well-controlled diabetes does not produce a sensory ganglionopathy pattern."
+      },
+      {
+        "data_point": "Prior anti-SSA/SSB negative 3 years ago",
+        "location": "history",
+        "field_path": "patient.clinical_history.past_medical_history[1]",
+        "intended_effect": "Dismiss Sjögren's because of remote negative serology",
+        "correct_interpretation": "Anti-SSA/SSB seroconversion occurs; up to 30% of Sjögren's cases are seronegative — lip biopsy is the gold standard if clinically suspected."
+      }
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -622,6 +771,16 @@
       "advanced_imaging": "incidental",
       "literature_search": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:PERI-NEURO",
+    "difficulty_rationale": "5 required tools, 2 red herrings; classification reflects clinical complexity per PERI-NEURO pack section 6 (M/S/P/R variants).",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": [
+      "Minor salivary gland (lip) biopsy is not in the order_specialized_test vocabulary; used skin_biopsy_iencf as nearest proxy and described lip biopsy in action text."
+    ]
   }
 }

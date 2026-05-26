@@ -536,147 +536,221 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Hepatic encephalopathy (Child-Pugh C cirrhosis) with SBP-precipitated acute decompensation, EEG showing triphasic waves mimicking NCSE; resolved with ammonia correction; no primary NCSE",
-    "icd_code": "K72.91",
+    "primary_diagnosis": "Hepatic encephalopathy from Child-Pugh C cirrhosis with spontaneous bacterial peritonitis precipitating acute decompensation; EEG triphasic waves mimicking non-convulsive status epilepticus but resolving with ammonia correction",
+    "icd_code": "K72.90",
     "differential": [
       {
-        "diagnosis": "NCSE from independent epileptiform cause",
+        "diagnosis": "True NCSE in cirrhotic patient",
+        "likelihood": "high",
+        "key_features": "Triphasic waves can be either metabolic OR ictal; benzodiazepine + ammonia trial discriminates",
+        "icd_code": "G41.2"
+      },
+      {
+        "diagnosis": "Wernicke encephalopathy",
         "likelihood": "moderate",
-        "key_features": "EEG sharpened 3-4 Hz runs initially suggest possible NCSE; however resolution with ammonia correction confirms metabolic origin; left temporal epileptiform activity noted but not causing current presentation"
+        "key_features": "Alcoholic cirrhosis; thiamine status uncertain; treat empirically",
+        "icd_code": "E51.2"
       },
       {
-        "diagnosis": "Autoimmune encephalitis",
-        "likelihood": "low",
-        "key_features": "Autoimmune panel negative; CSF normal; clear metabolic precipitant (SBP + elevated ammonia); triphasic waves not limbic encephalitis pattern"
+        "diagnosis": "Subdural hematoma in coagulopathic patient",
+        "likelihood": "moderate",
+        "key_features": "Cirrhosis + INR 3.2 + thrombocytopenia → bleeding risk; CT excludes",
+        "icd_code": "S06.5X9A"
       },
       {
-        "diagnosis": "Alcohol withdrawal seizures",
+        "diagnosis": "CNS infection (cirrhotic immune compromise)",
+        "likelihood": "moderate",
+        "key_features": "SBP confirmed by ascitic fluid; central CNS infection less likely; LP cautious due to coagulopathy",
+        "icd_code": "G04.90"
+      },
+      {
+        "diagnosis": "Drug-induced encephalopathy (propranolol, spironolactone, lactulose dosing)",
         "likelihood": "low",
-        "key_features": "Last drink 3 years ago; not acute withdrawal; alcoholic cirrhosis does not cause withdrawal if abstinent for years"
+        "key_features": "Standard cirrhosis medications; not the primary driver",
+        "icd_code": "T50.905A"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "EEG to characterize triphasic waves and assess for NCSE superimposition",
+        "action": "Continuous video-EEG — distinguish triphasic waves of metabolic encephalopathy from true NCSE",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Triphasic waves at 1.5-2 Hz with anterior phase lag — HE pattern; plus possible ictal sharpening",
+        "expected_finding": "Generalized triphasic waves at 1.5-2 Hz with anterior predominance and AP phase lag — metabolic pattern; overlapping focal left temporal 3-4 Hz activity warrants benzo trial",
         "category": "required",
-        "tool_parameters": {
-          "urgency": "urgent"
-        }
+        "tool_parameters": {},
+        "citation": "[Salzburg_NCSE_2015]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "Serum ammonia immediately — critical for HE vs NCSE differentiation",
+        "action": "Labs: CBC, CMP, glucose, Ca/Mg, AED level, ammonia (key — extremely elevated 186), ABG, lactate, LFTs, PT/INR, albumin, blood cultures, ascitic fluid (cell count, culture, gram stain)",
         "tool_name": "interpret_labs",
-        "expected_finding": "Ammonia 186 µmol/L — markedly elevated, consistent with HE driving EEG changes",
+        "expected_finding": "Ammonia 186 (CRITICAL high), bilirubin 8.6, PT/INR 3.2, albumin 2.2, ascitic WBC 680 = SBP",
         "category": "required",
-        "tool_parameters": {
-          "tests": [
-            "ammonia",
-            "LFTs",
-            "BMP",
-            "CBC",
-            "coagulation"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "IV dextrose 50% immediately for hypoglycemia (glucose 62 mg/dL) — liver failure impairs gluconeogenesis",
-        "tool_name": null,
-        "expected_finding": "Glucose correction to 100-150 mg/dL",
+        "action": "Non-contrast head CT — exclude SDH (cirrhotic coagulopathy)",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No acute pathology",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "Diagnostic paracentesis for SBP workup — elevated WBC 12.4, clinician suspected SBP precipitant",
-        "tool_name": null,
-        "expected_finding": "SBP confirmed: PMN >250 cells/mm3",
+        "action": "Drug-interaction check: lactulose + rifaximin + AED dosing in cirrhosis + albumin replacement",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Increase lactulose; continue rifaximin; albumin for SBP and HRS prevention; LEV preferred (hepatic dose adjustment minimal)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[ESETT_2019]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "Ceftriaxone 2g IV daily for SBP (E. coli) — treat the HE precipitant",
-        "tool_name": null,
-        "expected_finding": "Ammonia improving as infection resolves; EEG triphasic waves improve",
+        "action": "Literature: hepatic encephalopathy + SBP treatment + ammonia targets",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Treat SBP with cefotaxime + albumin; lactulose to target 2-3 stools/day; ammonia improvement should resolve triphasic waves",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 6,
-        "action": "Check drug interactions: valproate and benzodiazepines are CONTRAINDICATED in cirrhosis",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Valproate = hepatotoxic + hyperammonemic; benzodiazepines = worsens HE; levetiracetam = safe",
+        "action": "Serial ammonia + EEG response — confirms metabolic vs ictal origin",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Triphasic waves resolve with ammonia normalization — confirms metabolic encephalopathy, NOT NCSE",
         "category": "required",
-        "tool_parameters": {
-          "drugs": [
-            "valproate",
-            "benzodiazepines",
-            "levetiracetam"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 7,
-        "action": "IV levetiracetam 500 mg (reduced dose for liver/renal function) — cautious AED trial; do NOT use benzodiazepines",
-        "tool_name": null,
-        "expected_finding": "EEG improvement correlates with ammonia correction (not isolated AED response)",
-        "category": "recommended",
-        "tool_parameters": {}
+        "action": "Empiric SBP treatment (3rd-gen cephalosporin) + IV albumin",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Cefotaxime + albumin 1.5 g/kg day 1, 1 g/kg day 3",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 8,
-        "action": "Repeat EEG at 24 hours after metabolic correction — if triphasic waves improve with ammonia normalization, diagnosis is HE not NCSE",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Triphasic waves improving at 24h with ammonia correction; sharpened 3-4 Hz runs resolved",
+        "action": "MRI brain — exclude additional structural cause if encephalopathy persists despite ammonia correction",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "T1 globus pallidus signal of chronic hepatic encephalopathy; no acute lesion",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
+      },
+      {
+        "step": 9,
+        "action": "Hepatology + GI consultation for cirrhosis management",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Transplant candidacy assessment; SBP prophylaxis post-treatment",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "study_type": "TTE"
+        },
+        "rationale": "No clinical suspicion of cardiac source of embolus or cardiogenic seizure; routine echo is not indicated in SE workup absent cardiac findings.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No suspicion of arrhythmogenic syncope or cardiac comorbidity precipitating SE; routine telemetry beyond standard ICU monitoring adds cost without yield.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in acute SE evaluation; dementia biomarker imaging does not change acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is for ischemic stroke workup; SE without focal vascular suspicion does not warrant carotid imaging.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "DaTscan / dopamine transporter imaging has no role in SE; no parkinsonism question relevant to acute management.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Confirm INR and platelets before any invasive procedure or anticoagulation decisions.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "IV dextrose immediately — hypoglycemia in liver failure is life-threatening",
-      "Ammonia level immediately — markedly elevated ammonia confirms HE",
-      "Diagnostic paracentesis and treat SBP — precipitant for HE decompensation",
-      "Valproate is absolutely CONTRAINDICATED — hepatotoxic and causes hyperammonemia in liver failure",
-      "Benzodiazepines are dangerous in cirrhosis — prolonged HE, respiratory failure; use levetiracetam",
-      "Hold propranolol during acute HE — impairs gluconeogenesis and hepatic blood flow"
+      "Treat SBP empirically with cefotaxime + IV albumin",
+      "Aggressive lactulose to titrate ammonia down (target 2-3 stools/day)",
+      "Continue rifaximin",
+      "Single diagnostic IV lorazepam dose to distinguish triphasic waves from NCSE; avoid maintenance benzodiazepine",
+      "Hepatology consult; transplant candidacy"
     ],
     "contraindicated_actions": [
-      "Valproate for NCSE in cirrhosis — causes hyperammonemia and hepatotoxicity; would worsen both HE and liver failure",
-      "Benzodiazepines empirically for triphasic waves — worsen HE, cause prolonged sedation in liver failure",
-      "Treating EEG triphasic waves as NCSE without first correcting ammonia and metabolic derangements",
-      "Continuing propranolol during acute HE — worsens hypoglycemia and hepatic recovery"
+      "Do NOT escalate aggressive AED therapy if triphasic waves resolve with ammonia correction (it's HE, not NCSE)",
+      "Do NOT perform LP with INR 3.2",
+      "Do NOT use chronic benzodiazepines in HE",
+      "Do NOT use sedatives that worsen HE",
+      "LP relatively contraindicated in cirrhotic with INR 3.2 and thrombocytopenia — spinal hematoma risk.",
+      "Avoid benzodiazepines as maintenance therapy in suspected HE — worsen encephalopathy; single dose for diagnostic SE trial acceptable."
     ],
     "key_reasoning_points": [
-      "Triphasic waves of hepatic encephalopathy vs NCSE GPDs: the KEY diagnostic approach is metabolic correction first — if EEG improves with ammonia correction, it was HE not NCSE",
-      "Valproate is absolutely contraindicated in liver failure — inhibits urea cycle enzymes causing further hyperammonemia (ammonia can rise dramatically), and is hepatotoxic",
-      "Benzodiazepines in cirrhosis (Child-Pugh B/C): prolonged half-life (reduced hepatic metabolism), accumulate, precipitate/deepen hepatic coma — levetiracetam is the safe AED",
-      "SBP is the most common precipitant of acute HE decompensation in cirrhotic patients — always perform diagnostic paracentesis when HE decompensates",
-      "Hypoglycemia in liver failure is common (impaired gluconeogenesis) and is itself a cause of EEG changes and seizures — give dextrose FIRST before any other assessment"
+      "Triphasic waves are a hallmark of metabolic encephalopathy (HE, uremia, drug intoxication) but can overlap with NCSE",
+      "Salzburg criteria + benzodiazepine + ammonia normalization trial discriminates",
+      "SBP is a common precipitant of HE — empiric treatment changes encephalopathy course",
+      "LEV is the AED of choice in cirrhosis (minimal hepatic metabolism)"
     ],
     "red_herrings": [
       {
-        "data_point": "EEG report: 'sharpening of triphasic waves at 3-4 Hz — possible NCSE'",
-        "location": "initial EEG interpretation",
-        "intended_effect": "Initiate benzodiazepines for suspected NCSE without metabolic workup",
-        "correct_interpretation": "Sharpening of triphasic waves in HE is a metabolic fluctuation, not true NCSE. Metabolic correction (ammonia normalization) resolves both the clinical and EEG changes. Benzodiazepines in cirrhosis are dangerous.",
-        "field_path": ""
+        "data_point": "Triphasic waves at 1.5-2 Hz on EEG",
+        "location": "initial_tool_outputs.eeg",
+        "field_path": "initial_tool_outputs.eeg",
+        "intended_effect": "Suggests NCSE requiring aggressive AED escalation",
+        "correct_interpretation": "Triphasic waves with AP phase lag and anterior predominance are classic for HE — improve with ammonia normalization, distinct from NCSE"
       },
       {
-        "data_point": "Rhythmic limb movements noted by nursing",
-        "location": "clinical observation",
-        "intended_effect": "Conclude NCSE based on rhythmic movements",
-        "correct_interpretation": "Rhythmic movements in HE can be myoclonic jerks or asterixis variants — not necessarily NCSE. EEG correlation is required. Metabolic correction first before AED treatment.",
-        "field_path": ""
+        "data_point": "Coexisting focal left temporal 3-4 Hz activity",
+        "location": "initial_tool_outputs.eeg",
+        "field_path": "initial_tool_outputs.eeg",
+        "intended_effect": "Suggests overlapping focal NCSE",
+        "correct_interpretation": "Possible IIC focal pattern; benzodiazepine diagnostic trial under EEG resolves the question; if resolves with ammonia alone, it was HE"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "teaching_points": "Triphasic waves vs NCSE in cirrhosis; valproate contraindicated in liver failure; benzodiazepines worsen HE; levetiracetam safe in cirrhosis; SBP as HE precipitant; hypoglycemia in liver failure",
@@ -689,6 +763,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "8 required + 1 recommended; HE with triphasic waves mimicking NCSE; SBP precipitant; teaching is triphasic-wave interpretation and Salzburg discrimination; LP harmful; 2 grounded red herrings.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

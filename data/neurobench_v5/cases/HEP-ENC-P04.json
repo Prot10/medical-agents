@@ -478,116 +478,190 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Hepatic encephalopathy (acute) superimposed on Wilson's disease neurological presentation (KF rings, wing-beating tremor, cerebellar ataxia, basal ganglia degeneration) — 'cryptogenic cirrhosis' diagnosis was unrecognized Wilson's disease",
-    "icd_code": "K72.9",
+    "primary_diagnosis": "Acute hepatic encephalopathy superimposed on previously unrecognized Wilson disease — neurologic features (KF rings, wing-beating tremor, cerebellar ataxia, basal ganglia changes) plus acute hyperammonemia in 'cryptogenic' Child-Pugh B cirrhosis; copper metabolism is the missing diagnosis.",
+    "icd_code": "K72.90",
     "differential": [
       {
-        "diagnosis": "Essential tremor with incidental cirrhosis",
-        "likelihood": "very_low",
-        "key_features": "Prior diagnosis of 'essential tremor' was wrong — wing-beating tremor + KF rings + low ceruloplasmin + elevated urine copper = Wilson's disease; essential tremor does not cause KF rings or cerebellar ataxia"
+        "diagnosis": "Wilson disease (hepatolenticular degeneration) underlying",
+        "likelihood": "very_high",
+        "key_features": "KF rings + wing-beating tremor + dystonia + basal ganglia T2 changes + young patient with 'cryptogenic' cirrhosis = Wilson disease until proven otherwise; ceruloplasmin, 24-h urine copper, slit-lamp exam, ATP7B genetic testing.",
+        "icd_code": "E83.01"
       },
       {
-        "diagnosis": "Alcoholic cirrhosis with acquired hepatocerebral degeneration",
-        "likelihood": "very_low",
-        "key_features": "Patient never drank alcohol; acquired hepatocerebral degeneration does not cause KF rings; ceruloplasmin low, urine copper elevated — specific to Wilson's"
+        "diagnosis": "Other metabolic encephalopathy (uremia, thyroid)",
+        "likelihood": "low",
+        "key_features": "Exclude on labs.",
+        "icd_code": "G92"
       },
       {
-        "diagnosis": "Neurological Wilson's disease without HE",
-        "likelihood": "moderate",
-        "key_features": "Wilson's neurological presentation IS present — but ammonia 78 confirms concurrent HE which requires HE-specific treatment alongside chelation"
+        "diagnosis": "Essential tremor (prior 5-year attribution)",
+        "likelihood": "very_low",
+        "key_features": "Wing-beating tremor + dystonia + ataxia is NOT essential tremor; the original attribution was incorrect.",
+        "icd_code": "G25.0"
       },
       {
-        "diagnosis": "Autoimmune hepatitis with neurological paraneoplastic syndrome",
+        "diagnosis": "Drug-induced tremor",
         "likelihood": "very_low",
-        "key_features": "Ceruloplasmin 8 and urine copper 284 are diagnostic for Wilson's; ANA/ASMA negative (tested separately); basal ganglia MRI changes are copper deposition not paraneoplastic"
+        "key_features": "Antidepressant tremor would not produce dystonia or KF rings.",
+        "icd_code": "G25.1"
+      },
+      {
+        "diagnosis": "Autoimmune hepatitis with cerebral involvement",
+        "likelihood": "very_low",
+        "key_features": "Less likely than Wilson given exam.",
+        "icd_code": "K75.4"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Slit-lamp examination for KF rings — CRITICAL finding that triggers Wilson's workup",
-        "tool_name": null,
-        "expected_finding": "KF rings confirmed — Wilson's disease strongly suspected",
+        "action": "Comprehensive labs: CMP including AST/ALT/bilirubin/INR/albumin, ammonia, CBC, glucose, electrolytes (Na, K, Mg), BUN/Cr, lactate, blood cultures and urine cultures; toxicology if substance use plausible. Confirms liver dysfunction and screens for precipitants.",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Ammonia; cirrhosis features; CERULOPLASMIN (low in Wilson); 24-hour urine copper (elevated); LFTs (alkaline phosphatase:bilirubin ratio low and AST:ALT >2.2 are Wilson clues).",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 2,
-        "action": "Labs — ammonia, LFTs (note LOW ALP), ceruloplasmin, urine copper 24h",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Low ceruloplasmin 8, urine copper 284, LOW ALP 38, ammonia 78",
+        "action": "Non-contrast CT head — exclude structural alternate cause of AMS (hemorrhage, large stroke, mass) before any LP.",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Baseline; consider MRI for basal ganglia signal.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 3,
-        "action": "CT head — assess basal ganglia (bilateral putaminal changes = Wilson's)",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "Bilateral basal ganglia hypodensity — Wilson's hepatolenticular degeneration",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "MRI brain with and without gadolinium — exclude alternate causes of AMS (acute ischemia, mass, Wernicke periaqueductal/mammillary changes, leptomeningeal disease) when CT is non-diagnostic or specific alternate diagnoses are suspected.",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "MRI brain — bilateral T2/FLAIR hyperintensity in basal ganglia (putamen) and 'face of the giant panda' sign in midbrain are Wilson disease hallmarks.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 4,
-        "action": "MRI brain — confirm Wilson's disease neurological pattern ('face of giant panda')",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Bilateral putaminal T2 signal, midbrain pattern — classic Wilson's disease",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Literature/guideline search to confirm West Haven grading, precipitant management, and lactulose/rifaximin dosing (Wilson disease diagnostic criteria; Leipzig score; chelation therapy).",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "AASLD/EASL 2014 guidance retrieved; West Haven criteria and precipitant-driven management framework confirmed.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 5,
-        "action": "EEG — characterize encephalopathy",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Generalized theta-delta slowing + triphasic-like waves — HE component confirmed",
+        "action": "Drug-interaction and medication-reconciliation review covering lactulose, rifaximin; chelation (penicillamine vs trientine); zinc maintenance; avoid copper-containing supplements; flag any CNS depressants (benzodiazepines, opioids, sedating antiemetics, antihistamines) and confirm lactulose/rifaximin dosing in liver disease.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sedating/CNS-depressant medications identified; lactulose and rifaximin reviewed for hepatic dose adjustment.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Bajaj_2011]",
+        "guideline_source": "Bajaj 2011 HE management review"
       },
       {
         "step": 6,
-        "action": "Trientine chelation + lactulose/rifaximin for HE simultaneously",
-        "tool_name": null,
-        "expected_finding": "HE resolves; Wilson's neurological symptoms improve over months",
+        "action": "Slit-lamp ophthalmologic exam to confirm Kayser-Fleischer rings.",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "KF rings confirmed by experienced ophthalmologist.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "specialty": "ophthalmology"
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline (Wilson workup adjunctive)"
+      },
+      {
+        "step": 7,
+        "action": "ATP7B genetic panel — confirm Wilson disease at the molecular level.",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "ATP7B pathogenic variant(s) confirms diagnosis; recommend cascade testing for siblings.",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "genetic_panel:CADASIL"
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 (Wilson adjunctive)"
+      },
+      {
+        "step": 8,
+        "action": "Consult hepatology + neurology + medical genetics — coordinate definitive care, transplant candidacy assessment where applicable.",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Hepatology / critical-care guidance integrated into management.",
+        "category": "recommended",
+        "tool_parameters": {
+          "specialty": "hepatology"
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No clinical suspicion for hepatopulmonary syndrome, portopulmonary hypertension, or endocarditis; echocardiography is not part of the HE workup.",
+        "citation": "[AASLD_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "In altered mental status, exclude intracranial mass effect / hemorrhage on imaging before LP to avoid herniation risk.",
+        "citation": "[AASLD_2014]",
+        "severity": "hard"
+      },
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "In altered mental status, exclude intracranial mass effect on neuroimaging before LP to avoid herniation risk.",
+        "citation": "[AASLD_2014]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "KF rings on slit-lamp are pathognomonic for Wilson's disease in liver disease patients — EVERY patient with unexplained cirrhosis should have slit-lamp exam",
-      "Low ALP in liver disease is a classic Wilson's disease clue — alkaline phosphatase is characteristically low or normal in Wilson's despite significant hepatic dysfunction",
-      "Trientine preferred over penicillamine for neurological Wilson's — penicillamine can paradoxically worsen neurological symptoms by acutely mobilizing copper",
-      "Wilson's disease is CURABLE with liver transplant — treat HE and chelate copper; refer for transplant evaluation if MELD rises"
+      "Lactulose + rifaximin for acute HE management.",
+      "Confirm Wilson disease with ceruloplasmin + 24-h urine copper + slit-lamp KF rings + ATP7B (Leipzig score ≥4).",
+      "Initiate chelation therapy (trientine preferred; penicillamine alternative) once stable.",
+      "Add zinc 50 mg TID for maintenance after chelation phase.",
+      "Educate about low-copper diet (avoid shellfish, liver, mushrooms, nuts, chocolate).",
+      "Cascade screening of first-degree relatives."
     ],
     "contraindicated_actions": [
-      "Penicillamine as first-line for neurological Wilson's disease — use trientine",
-      "Dismissing tremor as essential tremor without slit-lamp exam in young cirrhotic patient",
-      "Continuing without copper metabolism testing in cryptogenic cirrhosis"
+      "Do not prescribe benzodiazepines for anxiety/agitation — they precipitate and prolong HE (use haloperidol or non-pharmacologic measures for agitation).",
+      "Do not prescribe sedating opioids — they worsen HE; consider acetaminophen at hepatic-safe dosing for pain.",
+      "Do not perform LP before neuroimaging excludes mass effect when the patient has altered mental status.",
+      "Do not delay Wilson workup — the diagnosis changes lifelong management and family screening.",
+      "Avoid copper-containing IV multivitamins until copper status defined."
     ],
     "key_reasoning_points": [
-      "Wilson's disease is a treatable cause of cirrhosis — 'cryptogenic cirrhosis' in a patient <60 requires copper metabolism testing (ceruloplasmin, 24h urine copper, slit-lamp)",
-      "Three classic Wilson's disease clues: (1) KF rings, (2) low ceruloplasmin, (3) low ALP in liver disease — any two of three strongly suggest Wilson's",
-      "HE is concurrent with Wilson's neurological presentation but distinct — HE is treated with lactulose/rifaximin; Wilson's neurological symptoms require copper chelation",
-      "Family screening is mandatory after Wilson's diagnosis — siblings and children have 1 in 4 risk (autosomal recessive)"
+      "HE is a clinical diagnosis: West Haven grading + evidence of liver dysfunction + exclusion of other causes of AMS — ammonia level is supportive only and correlates poorly with grade (AASLD 2014).",
+      "Precipitant identification is more actionable than the ammonia number: infection (SBP especially), GI bleed, electrolyte disturbance (hypokalemia/hyponatremia), constipation, sedative/CNS-depressant use, dehydration, dietary protein load, renal failure.",
+      "Any 'cryptogenic' cirrhosis in a patient <40 (or with neurologic features) demands Wilson disease workup — missing it costs lives and lifetimes of family.",
+      "Wing-beating tremor and KF rings are highly specific for Wilson disease; the prior 'essential tremor' label was a misattribution."
     ],
     "red_herrings": [
       {
-        "data_point": "Wing-beating tremor and 5-year 'essential tremor' diagnosis",
+        "data_point": "Prior diagnosis of essential tremor (5 years)",
         "location": "patient.clinical_history.past_medical_history",
-        "intended_effect": "Accept prior essential tremor diagnosis; attribute all tremor to ET; focus only on HE management; miss Wilson's disease",
-        "correct_interpretation": "Wing-beating (postural, held position) tremor in a cirrhotic patient is NOT essential tremor — it is Wilson's disease until proven otherwise; essential tremor does not occur with cerebellar ataxia, KF rings, or basal ganglia CT changes",
-        "field_path": ""
+        "field_path": "patient.clinical_history.past_medical_history[1]",
+        "intended_effect": "Accept prior diagnosis and treat with propranolol.",
+        "correct_interpretation": "Wing-beating tremor + dystonia + cirrhosis in a young patient is Wilson disease, not essential tremor."
       },
       {
-        "data_point": "Low ALP 38 U/L in liver disease",
-        "location": "initial_tool_outputs.labs.panels.LFTs",
-        "intended_effect": "Assume lab error or attribute to medication effect; miss this critical diagnostic clue for Wilson's disease",
-        "correct_interpretation": "LOW alkaline phosphatase in liver disease is a RED FLAG — ALP is normally elevated in liver disease; paradoxically low ALP is a classic feature of Wilson's disease and acute fulminant hepatitis; should immediately trigger copper metabolism testing",
-        "field_path": ""
+        "data_point": "'Cryptogenic' cirrhosis label",
+        "location": "patient.clinical_history.past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history[0]",
+        "intended_effect": "Accept cryptogenic label and focus only on HE management.",
+        "correct_interpretation": "Cryptogenic in a young cirrhotic with neurologic features = Wilson disease workup mandatory."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -606,6 +680,16 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (HEP-ENC)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:HEP-ENC",
+    "difficulty_rationale": "≥5 required tools including MRI and genetic testing; rare condition (Wilson disease) requiring multidisciplinary diagnosis; high stakes for family.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": [
+      "ATP7B genetic panel for Wilson disease is not in the closed `order_specialized_test` vocabulary. Recommend adding `genetic_panel:wilson` (gene: ATP7B) to TOOL_PARAMETER_VOCABULARY.md. Placeholder used: 'genetic_panel:CADASIL' (incorrect mapping — flag-don't-fix)."
+    ]
   }
 }
