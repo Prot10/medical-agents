@@ -62,7 +62,7 @@ class CostTracker:
         elif tool_name == "order_advanced_imaging":
             total, breakdown = self._cost_by_type(tool_cfg, parameters, "imaging_type", "FDG_PET")
         elif tool_name == "order_specialized_test":
-            total, breakdown = self._cost_by_type(tool_cfg, parameters, "test_type", "neuropsych_battery")
+            total, breakdown = self._cost_specialized_test(tool_cfg, parameters)
         else:
             # Flat base cost (ECG, literature, drug interactions)
             total = float(tool_cfg.get("base", 0))
@@ -121,6 +121,26 @@ class CostTracker:
         by_type = cfg.get("by_type", {})
         selected = params.get(type_key, default)
         cost = float(by_type.get(selected, by_type.get(default, 0)))
+        return cost, {selected: cost}
+
+    @staticmethod
+    def _cost_specialized_test(
+        cfg: dict, params: dict,
+    ) -> tuple[float, dict[str, float]]:
+        """Cost lookup for `order_specialized_test`.
+
+        Handles the closed-vocabulary case (`test_type` in `by_type`) plus
+        the `genetic_panel:<panel>` syntax, where `<panel>` is looked up in
+        the `genetic_panels` block. See dataset-generation/TOOL_PARAMETER_VOCABULARY.md.
+        """
+        by_type = cfg.get("by_type", {})
+        genetic_panels = cfg.get("genetic_panels", {})
+        selected = params.get("test_type", "neuropsych_battery")
+        if isinstance(selected, str) and selected.startswith("genetic_panel:"):
+            panel = selected.split(":", 1)[1]
+            cost = float(genetic_panels.get(panel, 1500))  # default ~mid-size panel
+            return cost, {selected: cost}
+        cost = float(by_type.get(selected, by_type.get("neuropsych_battery", 0)))
         return cost, {selected: cost}
 
     @staticmethod
