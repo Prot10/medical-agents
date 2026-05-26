@@ -124,28 +124,71 @@ def _resolve_field_path(case: dict, path: str) -> bool:
     return True
 
 
+def _sig(tool_name: str | None, params: dict | None) -> tuple[str, str]:
+    """Return a (tool_name, params_signature) tuple for dedup/intersection.
+
+    Two entries are "the same tool" only if both name AND parameters match.
+    Required for the catchall tools (`order_specialized_test`,
+    `order_advanced_imaging`) where the same tool_name covers many distinct
+    tests via tool_parameters. Without this, marking `FDG_PET` as required
+    and `DaTscan` as useless triggers a bogus contradiction.
+    """
+    import json as _json
+
+    name = tool_name or ""
+    if not params:
+        return (name, "")
+    try:
+        return (name, _json.dumps(params, sort_keys=True, default=str))
+    except Exception:
+        return (name, str(params))
+
+
 def validate_case(case: dict) -> list[str]:
     issues: list[str] = []
     gt = case.get("ground_truth", {})
 
-    optimal_tools = [
-        (i, a.get("tool_name"))
+    optimal_entries = [
+        (i, a.get("tool_name"), a.get("tool_parameters") or {})
         for i, a in enumerate(gt.get("optimal_actions", []) or [])
         if a.get("tool_name")
     ]
-    optimal_set = {t for _, t in optimal_tools}
-    useless = {ut.get("tool_name") for ut in (gt.get("useless_tools") or [])}
-    harmful = {ht.get("tool_name") for ht in (gt.get("harmful_tools") or [])}
+    optimal_tools = [(i, t) for i, t, _ in optimal_entries]
+    optimal_set_name = {t for _, t in optimal_tools}
+    optimal_set_sig = {_sig(t, p) for _, t, p in optimal_entries}
 
-    # 1. optimal ∩ useless
-    for t in optimal_set & useless:
-        issues.append(f"contradiction: `{t}` in BOTH optimal_actions AND useless_tools")
-    # 2. optimal ∩ harmful
-    for t in optimal_set & harmful:
-        issues.append(f"contradiction: `{t}` in BOTH optimal_actions AND harmful_tools")
-    # useless ∩ harmful is also a contradiction
-    for t in useless & harmful:
-        issues.append(f"contradiction: `{t}` in BOTH useless_tools AND harmful_tools")
+    useless_entries = [
+        (ut.get("tool_name"), ut.get("tool_parameters") or {})
+        for ut in (gt.get("useless_tools") or [])
+    ]
+    useless = {t for t, _ in useless_entries if t}
+    useless_set_sig = {_sig(t, p) for t, p in useless_entries if t}
+
+    harmful_entries = [
+        (ht.get("tool_name"), ht.get("tool_parameters") or {})
+        for ht in (gt.get("harmful_tools") or [])
+    ]
+    harmful = {t for t, _ in harmful_entries if t}
+    harmful_set_sig = {_sig(t, p) for t, p in harmful_entries if t}
+
+    # 1. optimal ∩ useless — by (tool_name, params) signature
+    for sig in optimal_set_sig & useless_set_sig:
+        issues.append(
+            f"contradiction: `{sig[0]}` with same parameters in BOTH "
+            f"optimal_actions AND useless_tools"
+        )
+    # 2. optimal ∩ harmful — by signature
+    for sig in optimal_set_sig & harmful_set_sig:
+        issues.append(
+            f"contradiction: `{sig[0]}` with same parameters in BOTH "
+            f"optimal_actions AND harmful_tools"
+        )
+    # 3. useless ∩ harmful — by signature
+    for sig in useless_set_sig & harmful_set_sig:
+        issues.append(
+            f"contradiction: `{sig[0]}` with same parameters in BOTH "
+            f"useless_tools AND harmful_tools"
+        )
 
     # 3. Tools in 12-tool universe
     for i, t in optimal_tools:
