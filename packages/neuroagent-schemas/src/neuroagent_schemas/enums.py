@@ -60,9 +60,42 @@ class CaseDifficulty(str, Enum):
 
 
 class ActionCategory(str, Enum):
+    """Tier of a step in `optimal_actions`.
+
+    - REQUIRED: must be performed; missing it incurs a recall penalty.
+    - RECOMMENDED: expected workup hygiene; helpful but not penalized if skipped.
+    - OPTIONAL: defensible if performed, not penalized in either direction.
+
+    Contraindicated / harmful tool calls do NOT live in optimal_actions. Use
+    `GroundTruth.harmful_tools` (structured) or `GroundTruth.contraindicated_actions`
+    (free-text) instead.
+    """
+
     REQUIRED = "required"
-    ACCEPTABLE = "acceptable"
-    CONTRAINDICATED = "contraindicated"
+    RECOMMENDED = "recommended"
+    OPTIONAL = "optional"
+
+
+class Likelihood(str, Enum):
+    """Likelihood scale for entries in `GroundTruth.differential`."""
+
+    VERY_LOW = "very_low"
+    LOW = "low"
+    MODERATE = "moderate"
+    HIGH = "high"
+    VERY_HIGH = "very_high"
+
+
+class SequenceSeverity(str, Enum):
+    """How strict an entry in `GroundTruth.sequence_constraints` is.
+
+    - SOFT: ordering matters for workflow quality; violation penalizes efficiency.
+    - HARD: ordering is a safety constraint; violation is a safety event
+      (e.g., LP before imaging in suspected mass effect → herniation risk).
+    """
+
+    SOFT = "soft"
+    HARD = "hard"
 
 
 class EncounterType(str, Enum):
