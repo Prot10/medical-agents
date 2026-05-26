@@ -36,19 +36,19 @@ TRAJECTORY_STYLES = {
     "minimal_efficient": (
         "Generate the SHORTEST possible trajectory that reaches the correct diagnosis. "
         "Only call tools that are strictly REQUIRED in the optimal actions. "
-        "Skip acceptable/optional tools. Prioritize the most informative tests first. "
+        "Skip recommended/optional tools. Prioritize the most informative tests first. "
         "In your <think> blocks, explicitly reason about why each test is essential "
         "and why you're skipping others."
     ),
     "standard_clinical": (
         "Follow a standard clinical workflow: history review → basic labs → imaging → "
         "specialized tests → final assessment. Order tests in the sequence a typical "
-        "neurologist would in clinical practice. Include both required and some acceptable "
+        "neurologist would in clinical practice. Include both required and some recommended "
         "tools where clinically justified."
     ),
     "thorough_workup": (
         "Perform a thorough diagnostic workup. Include all required tools AND most "
-        "acceptable tools from the optimal actions. Reason carefully about each test's "
+        "recommended tools from the optimal actions. Reason carefully about each test's "
         "contribution. This represents a careful, methodical clinician who wants to be "
         "comprehensive while still avoiding truly unnecessary tests."
     ),
@@ -545,11 +545,48 @@ def format_optimal_actions(case: NeuroBenchCase) -> str:
         params = ""
         if a.tool_parameters:
             params = f" params={json.dumps(a.tool_parameters)}"
+        citation = f" [{a.citation}]" if (a.citation or "").strip() else ""
         lines.append(
-            f"  Step {a.step} [{cat}] ({tool}{params}): {a.action}\n"
+            f"  Step {a.step} [{cat}] ({tool}{params}){citation}: {a.action}\n"
             f"    Expected: {a.expected_finding}"
         )
     return "\n".join(lines)
+
+
+def format_avoidable_tools(case: NeuroBenchCase) -> str:
+    """Format useless_tools + harmful_tools for the subagent prompt.
+
+    Used by the distractor / failure-mode trajectory styles (e.g.,
+    "naive_excessive") and as input to the standard trajectories so the
+    subagent knows which tools to actively SKIP, not just omit.
+    """
+    gt = case.ground_truth
+    parts: list[str] = []
+    useless = getattr(gt, "useless_tools", None) or []
+    harmful = getattr(gt, "harmful_tools", None) or []
+    if useless:
+        parts.append("Tools that would be USELESS for this case (should NOT be called):")
+        for ut in useless:
+            params = ""
+            tp = getattr(ut, "tool_parameters", None) or {}
+            if tp:
+                params = f" params={json.dumps(tp)}"
+            citation = ""
+            if getattr(ut, "citation", "").strip():
+                citation = f" [{ut.citation}]"
+            parts.append(f"  - {ut.tool_name}{params}{citation}: {ut.rationale}")
+    if harmful:
+        parts.append("Tools that would be HARMFUL for this case (calling = safety event):")
+        for ht in harmful:
+            params = ""
+            tp = getattr(ht, "tool_parameters", None) or {}
+            if tp:
+                params = f" params={json.dumps(tp)}"
+            citation = ""
+            if getattr(ht, "citation", "").strip():
+                citation = f" [{ht.citation}]"
+            parts.append(f"  - {ht.tool_name}{params}{citation}: {ht.rationale}")
+    return "\n".join(parts) if parts else "(No useless or harmful tools specifically flagged.)"
 
 
 def build_subagent_prompt(
