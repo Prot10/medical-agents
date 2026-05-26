@@ -679,191 +679,226 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Cardiac syncope due to intermittent high-degree atrioventricular block in the setting of trifascicular conduction disease",
-    "icd_code": "R55",
+    "primary_diagnosis": "Cardiac syncope due to paroxysmal high-grade AV block on a background of trifascicular conduction disease",
+    "icd_code": "I44.1",
     "differential": [
       {
-        "diagnosis": "Epileptic seizure",
-        "likelihood": "low",
-        "key_features": "Brief convulsive movements (convulsive syncope) mimic seizure, but duration is only 10-15 seconds, no tonic phase, no post-ictal confusion beyond seconds, no tongue biting, no incontinence, normal EEG. Rapid return to baseline is atypical for seizure."
+        "diagnosis": "Sustained ventricular tachycardia",
+        "likelihood": "moderate",
+        "key_features": "Structural heart disease and PVC burden raise concern for VT; must be excluded by monitoring and EP study.",
+        "icd_code": "I47.2"
       },
       {
-        "diagnosis": "Vasovagal syncope",
+        "diagnosis": "Sick sinus syndrome",
+        "likelihood": "moderate",
+        "key_features": "Baseline bradycardia could be SA-node disease; SNRT and atrial pacing on EP study clarify.",
+        "icd_code": "I49.5"
+      },
+      {
+        "diagnosis": "Convulsive epileptic seizure",
         "likelihood": "low",
-        "key_features": "No identifiable trigger for episodes, no prodrome of nausea/warmth/diaphoresis, age and cardiac conduction disease make cardiac etiology far more likely. Negative tilt table test."
+        "key_features": "Brief jerks (~5-15 s), no post-ictal confusion, no tongue bite, normal EEG — convulsive syncope rather than epilepsy.",
+        "icd_code": "G40.909"
       },
       {
         "diagnosis": "Orthostatic hypotension",
         "likelihood": "low",
-        "key_features": "Two of three episodes occurred while seated, not on standing. On antihypertensives and thiazide which could contribute, but positional component is absent. Initial misdiagnosis by PCP addressed this incorrectly."
+        "key_features": "On multiple antihypertensives including HCTZ but episodes not positional and tilt-table negative.",
+        "icd_code": "I95.1"
       },
       {
-        "diagnosis": "Ventricular tachycardia",
+        "diagnosis": "Vasovagal syncope",
         "likelihood": "low",
-        "key_features": "Structural heart disease and conduction abnormalities could predispose to VT, but Holter showed no VT, low PVC burden, and documented high-degree AV block as the culprit arrhythmia."
-      },
-      {
-        "diagnosis": "Aortic stenosis-related syncope",
-        "likelihood": "very_low",
-        "key_features": "Patient has only mild aortic stenosis (valve area 1.5 cm2, mean gradient 15 mmHg), which is insufficient to cause hemodynamically significant obstruction. Episodes not exertion-related."
+        "key_features": "No clear trigger or prodrome, age and ECG argue against vasovagal etiology.",
+        "icd_code": "R55"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain 12-lead ECG immediately upon presentation",
+        "action": "12-lead ECG immediately",
         "tool_name": "analyze_ecg",
-        "expected_finding": "Bifascicular block (RBBB + LAFB) with first-degree AV block (trifascicular pattern)",
-        "category": "required"
+        "expected_finding": "Sinus bradycardia with bifascicular block (RBBB + LAFB) and first-degree AV block — trifascicular disease",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.2"
       },
       {
         "step": 2,
-        "action": "Initiate continuous cardiac telemetry monitoring",
-        "tool_name": null,
-        "expected_finding": "Monitor for intermittent high-degree AV block or pauses",
-        "category": "required"
-      },
-      {
-        "step": 3,
-        "action": "Obtain comprehensive labs including CBC, BMP, troponin, BNP, magnesium, TSH",
+        "action": "Labs: CBC, BMP, Mg, glucose, troponin, BNP, TSH",
         "tool_name": "interpret_labs",
-        "expected_finding": "Mild hypokalemia and hypomagnesemia (thiazide-related), elevated BNP, normal troponin",
+        "expected_finding": "Possible hypokalemia/hypomagnesemia from HCTZ; troponin negative",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
-            "thyroid",
-            "troponin"
+            "magnesium",
+            "troponin",
+            "BNP",
+            "TSH"
           ]
-        }
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.3"
       },
       {
-        "step": 4,
-        "action": "Correct electrolyte abnormalities: IV magnesium and potassium supplementation",
-        "tool_name": null,
-        "expected_finding": "Correction of hypokalemia and hypomagnesemia to reduce arrhythmia risk",
-        "category": "required"
-      },
-      {
-        "step": 5,
-        "action": "Obtain EEG to evaluate for epileptiform activity given witnessed convulsive movements",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Normal EEG, no epileptiform abnormalities",
-        "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
-      },
-      {
-        "step": 6,
-        "action": "Recognize convulsive syncope as the explanation for witnessed jerking movements, not epilepsy",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
-      },
-      {
-        "step": 7,
-        "action": "Urgent cardiology consultation for evaluation of trifascicular block with syncope",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
-      },
-      {
-        "step": 8,
-        "action": "Obtain transthoracic echocardiogram to assess for structural heart disease",
+        "step": 3,
+        "action": "Echocardiogram for structural assessment",
         "tool_name": "order_echocardiogram",
-        "expected_finding": "Concentric LVH, mildly reduced LVEF, mild aortic stenosis with calcification",
+        "expected_finding": "LVH, LV function and valvular assessment",
         "category": "required",
         "tool_parameters": {
           "echo_type": "TTE"
-        }
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §4.1"
+      },
+      {
+        "step": 4,
+        "action": "Inpatient telemetry plus Holter to capture paroxysmal arrhythmia",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "High-grade AV block with significant pauses",
+        "category": "required",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "citation": "[Locati_2014]",
+        "guideline_source": "Locati 2014"
+      },
+      {
+        "step": 5,
+        "action": "Review medications for AV-nodal and QT-prolonging agents",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "HCTZ contributes to electrolyte loss; AV-nodal blockers to avoid",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §6"
+      },
+      {
+        "step": 6,
+        "action": "Confirm pacing indications per society guideline",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Trifascicular block with syncope is a Class I/IIa indication for pacing",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[ACC_AHA_HRS_2017]",
+        "guideline_source": "ACC/AHA/HRS 2017 §4"
+      },
+      {
+        "step": 7,
+        "action": "Cardiology / EP consult for pacemaker evaluation",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "EP confirms infranodal block and plans pacing",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ACC_AHA_HRS_2017]",
+        "guideline_source": "ACC/AHA/HRS 2017 §4"
+      },
+      {
+        "step": 8,
+        "action": "Hold thiazide; correct K+, Mg++",
+        "tool_name": null,
+        "expected_finding": "HCTZ held; electrolytes normalised",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §6"
       },
       {
         "step": 9,
-        "action": "Arrange extended cardiac monitoring (Holter or event monitor) to capture intermittent arrhythmia",
-        "tool_name": "order_cardiac_monitoring",
-        "expected_finding": "Intermittent Mobitz type II block and transient complete heart block",
-        "category": "required",
-        "tool_parameters": {
-          "monitor_type": "event_monitor_30d"
-        }
+        "action": "Optimise OSA therapy (CPAP adherence) given known apnoea",
+        "tool_name": null,
+        "expected_finding": "Improved CPAP adherence reduces nocturnal bradyarrhythmia",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §6.3"
       },
       {
         "step": 10,
-        "action": "Admit to telemetry unit with transcutaneous pacing pads applied as precaution",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Cardiac MRI for ischaemic vs non-ischaemic substrate if EP/echo unclear",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Septal mid-wall fibrosis or LGE patterns suggestive of conduction-system disease",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "perfusion_MRI"
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §4.3"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No clinical features of meningitis or encephalopathy.",
+        "citation": ""
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_ecg",
+        "after": "consult_medical_specialist",
+        "reason": "Disposition and EP referral depend on the baseline ECG findings.",
+        "citation": "[ESC_2018]",
+        "severity": "hard"
       },
       {
-        "step": 11,
-        "action": "Hold hydrochlorothiazide given electrolyte abnormalities exacerbating conduction disease",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended"
-      },
-      {
-        "step": 12,
-        "action": "Plan for permanent dual-chamber (DDD) pacemaker implantation",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "before": "interpret_labs",
+        "after": "order_cardiac_monitoring",
+        "reason": "Troponin assessment for ACS before settling on long-term monitoring strategy.",
+        "citation": "[ROSE_2010]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Obtain 12-lead ECG to identify bifascicular block with first-degree AV block (trifascicular pattern)",
-      "Initiate continuous cardiac telemetry monitoring",
-      "Recognize that brief convulsive movements represent convulsive syncope rather than epileptic seizures",
-      "Urgent cardiology consultation for trifascicular block with recurrent syncope",
-      "Correct hypokalemia and hypomagnesemia",
-      "Have transcutaneous pacing available given high risk for complete heart block",
-      "Admit to monitored setting and plan for permanent pacemaker implantation"
+      "Recognise trifascicular block as a high-risk ECG pattern requiring inpatient monitoring",
+      "Hold thiazide and correct electrolytes",
+      "Cardiology / EP consult for pacemaker",
+      "Counsel on driving restriction",
+      "Identify convulsive movements as syncope rather than epilepsy"
     ],
     "contraindicated_actions": [
-      "Starting antiepileptic drugs based on witnessed convulsive movements without confirmed epilepsy diagnosis",
-      "Discharging the patient without cardiac monitoring and pacemaker evaluation",
-      "Administering AV-nodal blocking agents (beta-blockers, non-dihydropyridine calcium channel blockers, digoxin)",
-      "Performing lumbar puncture (no indication for CSF analysis in this presentation)",
-      "Administering IV adenosine (would worsen AV block)",
-      "Attributing syncope to orthostatic hypotension without investigating cardiac conduction disease"
+      "Do not start antiepileptic drugs based on convulsive syncope",
+      "Do not give further AV-nodal blockers (beta-blockers, non-DHP CCBs, digoxin)",
+      "Do not perform lumbar puncture; no indication",
+      "Do not discharge home before pacing plan and clearance",
+      "Do not allow driving until pacemaker implant and physician clearance"
     ],
     "key_reasoning_points": [
-      "Convulsive syncope (brief myoclonic jerks from cerebral hypoperfusion during cardiac arrest) is commonly mistaken for epileptic seizures; the key distinction is the brevity of jerking (<30 seconds), absence of tonic phase, and rapid return to full alertness without post-ictal confusion",
-      "The trifascicular block pattern on ECG (first-degree AV block + RBBB + LAFB) indicates disease in all three fascicles of the infranodal conduction system, with only the left posterior fascicle partially conducting",
-      "Syncope in the setting of trifascicular block is presumed to be due to intermittent complete heart block until proven otherwise and is an indication for pacemaker even without documentation of complete block",
-      "The initial misdiagnosis as orthostatic hypotension (first episode while standing) demonstrates anchoring bias; the second and third episodes while seated should have redirected the evaluation to cardiac causes",
-      "Hypokalemia and hypomagnesemia from thiazide diuretic use can exacerbate conduction abnormalities and should be corrected, though they are not the primary cause",
-      "A normal EEG does not definitively exclude epilepsy, but combined with the clinical features of rapid recovery, no post-ictal state, and cardiac conduction disease on ECG, it strongly supports a cardiac etiology",
-      "The ECG finding of bifascicular block is the key moderate-difficulty feature: unlike complete heart block which is immediately obvious, the clinician must recognize that intermittent progression to complete block is the likely mechanism even when not captured on the presenting ECG",
-      "Aortic valve calcification extending into the conduction system (Lev disease) is a common mechanism for progressive conduction system disease in older adults"
+      "Bifascicular plus first-degree AV block constitutes trifascicular disease with high risk of progression to complete heart block",
+      "Convulsive syncope can mimic seizure — clinical features and ECG distinguish",
+      "Thiazide-induced electrolyte loss aggravates conduction-system disease",
+      "Paroxysmal high-grade block can be missed on a single ECG; prolonged monitoring is essential",
+      "OSA contributes to nocturnal bradyarrhythmia and must be addressed concurrently"
     ],
     "red_herrings": [
       {
-        "data_point": "Witnessed 10 to 15 seconds of bilateral arm and leg jerking during the episodes",
-        "location": "history",
-        "intended_effect": "Suggests an epileptic seizure and led to a neurology referral for new-onset seizures",
-        "correct_interpretation": "Brief irregular limb jerking during loss of consciousness is convulsive syncope from cerebral hypoperfusion; rapid return to full alertness with no post-ictal confusion, tongue biting, or incontinence indicates a cardiac mechanism.",
-        "field_path": ""
+        "data_point": "Witnessed limb jerking",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Suggests epileptic seizure work-up.",
+        "correct_interpretation": "Convulsive syncope; resolves within 60 s with no post-ictal phase."
       },
       {
-        "data_point": "First episode occurred while standing in line and was attributed to orthostatic hypotension by the primary care physician, who reduced the hydrochlorothiazide dose",
-        "location": "history",
-        "intended_effect": "Anchors the evaluation on orthostatic hypotension as the cause",
-        "correct_interpretation": "Two of the three episodes occurred while seated, the tilt table test was negative, and the ECG shows trifascicular block; orthostatic hypotension does not explain the presentation.",
-        "field_path": ""
+        "data_point": "Prior 'orthostatic hypotension' attribution after first event",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "May anchor clinician to orthostatic mechanism and HCTZ reduction.",
+        "correct_interpretation": "Tilt-table negative; events not positional; trifascicular block on ECG is the operative substrate."
       },
       {
-        "data_point": "Mild aortic stenosis on echocardiogram (peak gradient 28 mmHg, mean gradient 15 mmHg, valve area 1.5 cm2)",
-        "location": "echo",
-        "intended_effect": "Suggests aortic stenosis as the structural cause of exertional syncope",
-        "correct_interpretation": "Only mild aortic stenosis is present, which is not hemodynamically significant enough to cause syncope; the intermittent high-degree AV block is the true mechanism.",
-        "field_path": ""
+        "data_point": "Normal EEG",
+        "location": "initial_tool_outputs.eeg.classification",
+        "field_path": "initial_tool_outputs.eeg.classification",
+        "intended_effect": "Falsely reassuring re: epilepsy as the missing piece.",
+        "correct_interpretation": "Normal EEG neither confirms nor excludes epilepsy; the diagnostic chain is cardiac."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "1.0",
@@ -880,6 +915,14 @@
       "csf": "normal",
       "literature_search": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SYNC-CARD",
+    "difficulty_rationale": "5 required tools, 3 red herrings, requires recognition of trifascicular pattern, integration of HCTZ-induced electrolyte loss, and overriding a prior anchoring diagnosis of orthostatic hypotension.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -465,107 +465,257 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Amyotrophic lateral sclerosis (ALS), limb-onset, probable (progressing to definite)",
+    "primary_diagnosis": "Amyotrophic lateral sclerosis (ALS), limb-onset, probable progressing to definite",
     "icd_code": "G12.21",
     "differential": [
       {
-        "diagnosis": "Lead neuropathy (plumbism)",
-        "likelihood": "very_low",
-        "key_features": "Lead level 28 mcg/dL below symptomatic threshold; lead neuropathy causes wrist drop with conduction slowing, NOT paraspinal denervation or UMN signs; pure motor pattern with normal sensory NCS inconsistent with lead neuropathy"
-      },
-      {
-        "diagnosis": "Multifocal motor neuropathy",
-        "likelihood": "very_low",
-        "key_features": "Anti-GM1 negative, no conduction block, paraspinal denervation, UMN signs"
-      },
-      {
-        "diagnosis": "Brachial amyotrophic diplegia (flail arm ALS variant)",
+        "diagnosis": "Lead toxic motor neuropathy",
         "likelihood": "moderate",
-        "key_features": "Left arm predominant presentation could represent flail arm variant; EMG shows lumbosacral involvement as well, supporting generalized ALS rather than flail arm variant alone"
+        "key_features": "Occupational exposure history; blood lead and NCS pattern distinguish — ALS has axonal pattern with UMN signs, not lead",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Multifocal motor neuropathy (MMN)",
+        "likelihood": "low",
+        "key_features": "No conduction block, anti-GM1 negative",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Hereditary motor neuropathy / CMT2 motor variant",
+        "likelihood": "low",
+        "key_features": "Adult-onset, no family history, UMN signs argue against",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Cervical myelopathy",
+        "likelihood": "low",
+        "key_features": "Multi-region EMG denervation including bulbar cannot be explained by cervical disease",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Inclusion body myositis",
+        "likelihood": "very_low",
+        "key_features": "Fasciculations and neurogenic EMG pattern distinguish from IBM",
+        "icd_code": null
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "MRI brain and spine",
+        "action": "Obtain brain MRI (with cervical spine sequences) to exclude structural mimics — cervical myelopathy, demyelination, brainstem tumor",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Corticospinal tract signal change; no lead encephalopathy changes",
+        "expected_finding": "No structural lesion explaining the motor/bulbar findings; corticospinal-tract signal change or non-specific findings may be seen but are not by themselves diagnostic",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "DWI",
+            "T1+Gd"
+          ],
+          "include_cervical_spine": true
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       },
       {
         "step": 2,
-        "action": "Heavy metals panel including lead, mercury, arsenic",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Lead mildly elevated but below symptomatic threshold; mercury and arsenic normal",
+        "action": "Perform EMG with nerve conduction studies sampling bulbar plus ≥2 spinal regions to document lower motor neuron involvement (fibrillations, positive sharp waves, complex fasciculation potentials, large-amplitude long-duration polyphasic MUPs with reduced recruitment) and exclude conduction block",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Active denervation and chronic reinnervation in ≥2 body regions with normal sensory NCS and no conduction block — meets Awaji / El Escorial revised criteria",
         "category": "required",
         "tool_parameters": {
-          "panels": [
-            "blood lead",
-            "mercury",
-            "arsenic"
-          ]
-        }
+          "test_type": "emg_ncs"
+        },
+        "citation": "[Awaji_2008]",
+        "guideline_source": "Awaji_2008"
       },
       {
         "step": 3,
-        "action": "EMG/NCS with attention to pattern distinguishing ALS from lead neuropathy",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Multi-region neurogenic denervation, paraspinal involvement, normal sensory NCS, NO conduction slowing — ALS pattern",
+        "action": "Order a mimic-exclusion lab panel: CK, B12, TSH, HbA1c, HIV, RPR, SPEP, anti-GM1 IgM antibodies, and (in males) androgen receptor CAG repeat for Kennedy disease",
+        "tool_name": "interpret_labs",
+        "expected_finding": "CK often mildly to moderately elevated (2–5× ULN); reversible mimics (B12, TSH, HIV, RPR) negative; anti-GM1 negative; SPEP without high-titer M-spike; CAG repeat normal",
         "category": "required",
         "tool_parameters": {
-          "test_type": "EMG/NCS all regions"
-        }
+          "panels": [
+            "CBC",
+            "BMP",
+            "LFTs",
+            "CK",
+            "B12",
+            "TSH",
+            "Free T4",
+            "HIV",
+            "RPR",
+            "SPEP",
+            "anti-GM1 IgM",
+            "androgen receptor CAG repeat"
+          ]
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       },
       {
         "step": 4,
-        "action": "Literature review of lead neuropathy vs ALS to clarify occupational exposure significance",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Lead toxicity at this level does not cause ALS pattern; occupational ALS risk is epidemiological not causative",
-        "category": "recommended",
+        "action": "Measure respiratory function (FVC, MIP/MEP, SNIP/NIF) at baseline to inform NIV timing and prognostication",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "FVC and SNIP/MIP often reduced even in early disease; values guide timing of NIV (FVC <50% predicted or SNIP <40 cmH₂O are conventional thresholds)",
+        "category": "required",
         "tool_parameters": {
-          "query": "lead neuropathy ALS occupational firefighter"
-        }
+          "test_type": "respiratory_function"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       },
       {
         "step": 5,
-        "action": "Initiate riluzole — advise alcohol cessation given hepatotoxicity risk",
+        "action": "Search the medical literature to confirm Awaji and Gold Coast diagnostic thresholds and AAN practice-parameter recommendations relevant to this presentation",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Awaji-Shima 2008 / Gold Coast 2020 diagnostic criteria; AAN 2009 practice parameter on ALS care",
+        "category": "recommended",
+        "tool_parameters": {
+          "query": "ALS diagnostic criteria Awaji Gold Coast AAN practice parameter"
+        },
+        "citation": "[Awaji_2008]",
+        "guideline_source": "Awaji_2008"
+      },
+      {
+        "step": 6,
+        "action": "Order an ALS-focused genetic panel (C9orf72 repeat expansion, SOD1, TARDBP, FUS, TBK1) — required when family history is positive or onset is young (<50)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "C9orf72 expansion in ~40% of familial cases; SOD1/TARDBP/FUS in additional familial subset; ~10% of apparently sporadic cases also carry a variant",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "genetic_panel:ALS"
+        },
+        "citation": "[Brown_2017]",
+        "guideline_source": "Brown_2017"
+      },
+      {
+        "step": 7,
+        "action": "Obtain CSF for neurofilament light chain (NfL) for prognostic stratification when the diagnosis remains uncertain or when prognostic information will change management",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Markedly elevated CSF NfL (typically >5,000 pg/mL) supports a motor-neuron-disease degenerative process and correlates with faster progression",
+        "category": "recommended",
+        "tool_parameters": {
+          "tests": [
+            "cell count",
+            "protein",
+            "glucose",
+            "NfL",
+            "NfH",
+            "oligoclonal bands",
+            "cytology"
+          ]
+        },
+        "citation": "[ENCALS_2018]",
+        "guideline_source": "ENCALS_2018"
+      },
+      {
+        "step": 8,
+        "action": "Check interactions before initiating riluzole 50 mg twice daily; review baseline LFTs and CBC and counsel on monitoring",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "No medication interactions; alcohol cessation required",
-        "category": "required",
+        "expected_finding": "No major interactions for typical chronic medications; advise alcohol and grapefruit-juice avoidance (CYP1A2 modulators); monthly LFTs for first 3 months",
+        "category": "recommended",
         "tool_parameters": {
           "proposed_drug": "riluzole"
-        }
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "ALS is a motor-neuron disease without cortical electrical signature; EEG has no diagnostic role and adds cost without benefit.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG is unrelated to motor neuron disease and not part of the standard ALS workup absent specific cardiac symptoms or pre-medication QTc checks.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is unrelated to ALS diagnosis; no indication absent comorbid cardiac disease.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring has no role in ALS diagnostic workup.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "MRI is the standard structural study for ALS workup; head CT adds no diagnostic value and exposes the patient to ionizing radiation.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in ALS diagnosis (motor-neuron rather than amyloid pathology) and carries a high cost.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan evaluates nigrostriatal dopaminergic integrity; it has no role in ALS, which spares the dopaminergic system.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "FDG-PET has no established diagnostic role in ALS and adds substantial cost.",
+        "citation": "[AAN_2009]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "EMG pattern distinguishes ALS from lead neuropathy — conduction velocity is normal in ALS, slowed in lead neuropathy; paraspinal denervation indicates motor neuron disease",
-      "Do not delay ALS treatment while investigating lead exposure — lead level is occupational and does not explain ALS pattern",
-      "Advise alcohol cessation before initiating riluzole — hepatotoxicity risk",
-      "Occupational disability assessment and documentation of firefighting exposure risk factor"
+      "Perform EMG/NCS sampling the bulbar region plus ≥2 spinal regions to document lower-motor-neuron involvement and exclude conduction block.",
+      "Obtain brain MRI to exclude structural mimics (cervical myelopathy, demyelinating disease, brainstem tumor).",
+      "Order a mimic-exclusion lab panel (CK, B12, TSH, HIV, RPR, SPEP, anti-GM1 IgM, androgen receptor CAG repeat in males).",
+      "Measure baseline respiratory function (FVC, MIP/MEP, SNIP) to inform NIV timing.",
+      "Apply Awaji-Shima 2008 / Gold Coast 2020 criteria to confirm the diagnosis.",
+      "Initiate riluzole 50 mg twice daily after baseline LFTs unless contraindicated; arrange monthly LFT monitoring for the first 3 months.",
+      "Refer to a multidisciplinary ALS clinic for SLP, dietetics, respiratory, and social-work input."
     ],
     "contraindicated_actions": [
-      "EDTA chelation therapy for lead level 28 mcg/dL — below symptomatic threshold; chelation would not treat ALS and has significant adverse effects",
-      "Delaying ALS diagnosis and treatment to await lead chelation response — ALS progression continues; treatment delay harmful"
+      "Do not commit the patient to cervical spine surgery on the basis of incidental spondylotic changes when EMG findings extend beyond the cervical cord.",
+      "Do not start chronic immunosuppression (steroids, IVIG, plasma exchange) for ALS — there is no benefit and treatment delays correct diagnosis.",
+      "Do not defer respiratory assessment in a symptomatic patient — even mild FVC reduction warrants close monitoring and NIV planning.",
+      "Do not dismiss bulbar or progressive symptoms as functional / psychiatric without a complete neurological workup."
     ],
     "key_reasoning_points": [
-      "Lead neuropathy vs ALS: lead causes predominantly motor neuropathy with wrist drop and radial nerve predilection, WITH conduction velocity slowing. ALS shows multi-region denervation with paraspinal involvement, normal conduction velocities, and UMN signs. These patterns are distinct.",
-      "Blood lead 28 mcg/dL: occupational exposure level, not at symptomatic chelation threshold (>70 mcg/dL for adults); absence of basophilic stippling on peripheral smear supports non-toxic exposure",
-      "Firefighting as ALS risk factor: epidemiological association described in literature but does not imply causation; this patient likely has sporadic ALS with incidental occupational metal exposure",
-      "Disability considerations: ALS is a progressive fatal disease; proactive occupational disability evaluation and advance care planning are important aspects of management"
+      "Diagnosis requires evidence of both upper-motor-neuron involvement (hyperreflexia, Babinski, Hoffman, brisk jaw jerk, spasticity) and lower-motor-neuron involvement (atrophy, fasciculations, EMG denervation) with progressive spread, while excluding mimics — Awaji 2008 / Gold Coast 2020.",
+      "EMG in bulbar plus ≥2 spinal regions documenting fibrillations, positive sharp waves, complex fasciculation potentials, and large-amplitude long-duration polyphasic MUPs with reduced recruitment satisfies the electrodiagnostic criterion.",
+      "Normal sensory NCS and absence of conduction block are pivotal: they exclude common mimics including multifocal motor neuropathy, CIDP, and Kennedy disease.",
+      "Mild-to-moderate CK elevation (2–5× ULN) is consistent with ALS and does not itself indicate a primary myopathy.",
+      "Cervical spondylotic changes on MRI are common incidental findings in the at-risk age group; bulbar findings or multi-region EMG denervation cannot be attributed to cervical disease.",
+      "Baseline FVC, MIP/MEP, and SNIP/NIF inform NIV timing — NIV initiation at FVC <50% predicted or SNIP <40 cmH₂O prolongs survival and improves quality of life.",
+      "Markedly elevated CSF neurofilament light chain (>5,000 pg/mL) supports motor neuron degeneration and correlates with progression rate (ENCALS prediction model)."
     ],
     "red_herrings": [
       {
-        "data_point": "Blood lead level 28 mcg/dL with occupational heavy metal exposure history",
-        "location": "Heavy metals panel",
-        "intended_effect": "Attribute progressive weakness to lead toxicity requiring chelation therapy",
-        "correct_interpretation": "Lead level below symptomatic threshold. Lead neuropathy does not produce combined UMN/LMN syndrome with paraspinal denervation. EMG pattern (normal conduction velocities, paraspinal involvement, UMN signs) is incompatible with lead neuropathy.",
-        "field_path": ""
+        "data_point": "Occupational lead exposure history",
+        "location": "Social history",
+        "field_path": "patient.clinical_history.social_history",
+        "intended_effect": "Suggests reversible lead-induced motor neuropathy",
+        "correct_interpretation": "Lead neuropathy is wrist-drop predominant and has demyelinating NCS features; blood lead level + literature search supports ALS rather than lead toxicity"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "v5",
@@ -577,6 +727,20 @@
       "echo": "incidental",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:ALS",
+    "difficulty_rationale": "Occupational lead exposure history requires explicit rule-out; 4 required tools with literature support",
+    "case_body_concerns": [
+      {
+        "field_path": "followup_outputs",
+        "concern": "ALS genetic panel is wired to `interpret_labs` rather than `order_specialized_test` with `test_type: genetic_panel:ALS`. Per the criteria pack and TOOL_PARAMETER_VOCABULARY, genetic testing should resolve via order_specialized_test. The gold trajectory routes the action via order_specialized_test; the case body fix is a tool-name swap in followup_outputs without changing the report payload.",
+        "suggested_fix": "Change followup tool_name from interpret_labs to order_specialized_test for the ALS_Genetic_Panel followup; payload structure can stay."
+      }
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

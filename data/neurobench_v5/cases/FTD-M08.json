@@ -476,111 +476,286 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Behavioral variant frontotemporal dementia — sporadic — in HIV-positive patient with well-controlled viremia; HIV-associated neurocognitive disorder and opportunistic infections excluded by CSF analysis",
+    "primary_diagnosis": "Behavioral variant frontotemporal dementia (bvFTD), probable, sporadic — in HIV-positive patient (well-controlled; HIV-associated neurocognitive disorder and opportunistic infections excluded)",
     "icd_code": "G31.09",
     "differential": [
       {
         "diagnosis": "HIV-associated neurocognitive disorder (HAND)",
-        "likelihood": "very_low",
-        "key_features": "CSF HIV RNA undetectable — confirms CNS viral suppression; FDG-PET shows focal frontotemporal hypometabolism (not diffuse subcortical-frontal HAND pattern); behavioral syndrome (disinhibition, compulsive, social cognition loss) is FTD pattern not HAND pattern"
+        "likelihood": "moderate",
+        "key_features": "HIV well-controlled (undetectable VL 8 years); HAND can still occur but pattern is typically subcortical, not frontotemporal lobar."
+      },
+      {
+        "diagnosis": "Alzheimer disease (frontal variant)",
+        "likelihood": "moderate",
+        "key_features": "Amyloid biomarker workup distinguishes."
       },
       {
         "diagnosis": "Progressive multifocal leukoencephalopathy (PML)",
-        "likelihood": "very_low",
-        "key_features": "JC PCR negative in CSF; no white matter lesion on MRI — PML definitively excluded"
+        "likelihood": "low",
+        "key_features": "MRI would show asymmetric T2 hyperintensities; CSF JCV PCR helps; not the pattern here."
       },
       {
-        "diagnosis": "Cryptococcal meningitis",
-        "likelihood": "very_low",
-        "key_features": "Cryptococcal antigen negative in both serum and CSF; no meningeal enhancement"
+        "diagnosis": "Treatment-resistant depression / late-onset psychiatric disorder",
+        "likelihood": "low",
+        "key_features": "Two failed antidepressant trials; imaging confirms neurodegeneration."
       },
       {
-        "diagnosis": "CNS toxoplasmosis",
+        "diagnosis": "CNS toxoplasmosis / cryptococcal meningitis",
         "likelihood": "very_low",
-        "key_features": "CD4 680 (toxoplasmosis requires CD4 <100 typically); no ring-enhancing lesion on MRI; toxoplasma CSF PCR negative"
-      },
-      {
-        "diagnosis": "Alzheimer's disease",
-        "likelihood": "very_low",
-        "key_features": "Amyloid PET negative; CSF Abeta42 normal; FDG-PET frontal pattern without posterior cingulate sign"
+        "key_features": "Acute / subacute opportunistic infection with focal mass-effect lesions; not the described pattern."
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "MRI brain with gadolinium — frontal atrophy; exclude HIV OI lesions (PML, toxoplasmosis, CMV, lymphoma)",
+        "action": "Obtain brain MRI with volumetric coronal T1 to assess frontal/anterior temporal atrophy and exclude alternative structural cause",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Frontal atrophy; no OI lesion; no PML white matter change",
+        "expected_finding": "Bilateral frontal and/or anterior temporal atrophy in a lobar pattern with relative posterior sparing",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "DWI",
+            "volumetric"
+          ]
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky 2011 bvFTD criteria"
       },
       {
         "step": 2,
-        "action": "CSF HIV RNA + JC PCR + complete OI panel — CNS compartment analysis",
-        "tool_name": "analyze_csf",
-        "expected_finding": "CSF HIV RNA undetectable; JC PCR negative; no OI; elevated NfL",
+        "action": "Order metabolic dementia panel (TSH, B12, CMP, RPR/HIV per risk) to exclude reversible mimics",
+        "tool_name": "interpret_labs",
+        "expected_finding": "No reversible metabolic or infectious cause of cognitive decline identified",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "TSH",
+            "B12",
+            "RPR",
+            "HIV"
+          ]
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
       },
       {
         "step": 3,
-        "action": "FDG-PET brain — metabolic pattern (FTD vs HAND patterns differ)",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Frontotemporal hypometabolism with posterior preservation — FTD pattern, not diffuse HAND pattern",
+        "action": "Order comprehensive neuropsychological battery characterising executive function, social cognition, language and memory",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Frontal-executive and social-cognition deficits with relative sparing of episodic memory and visuospatial function",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky 2011 bvFTD criteria"
       },
       {
         "step": 4,
-        "action": "Amyloid PET — AD exclusion",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Negative",
+        "action": "Search medical literature for ftd vs hiv-associated neurocognitive disorder",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirms Rascovsky 2011 criteria, FDG-PET evidence (Foster 2007), and management approach (Bang 2015)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "query": "FTD vs HIV-associated neurocognitive disorder"
+        },
+        "citation": "[Bang_2015]",
+        "guideline_source": "Bang 2015 Lancet review"
       },
       {
         "step": 5,
-        "action": "Standard labs including CD4, viral load, RPR for complete HIV and metabolic workup",
-        "tool_name": "interpret_labs",
-        "expected_finding": "CD4 680, undetectable VL, RPR negative",
+        "action": "Consult behavioral/cognitive neurology for syndromic diagnosis, biomarker interpretation, and longitudinal care plan",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Behavioral neurology confirms bvFTD syndrome, coordinates biomarkers and disclosure",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "specialty": "behavioral_neurology"
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
+      },
+      {
+        "step": 6,
+        "action": "Order FDG-PET brain to characterise frontotemporal hypometabolism and distinguish bvFTD from AD",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Bifrontal and/or anterior temporal hypometabolism with relative posterior sparing",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[Foster_2007]",
+        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
+      },
+      {
+        "step": 7,
+        "action": "Order CSF analysis with HIV-related panel (cell count, protein, glucose, HIV RNA, JCV PCR, cryptococcal antigen, Aβ42/p-tau) to exclude opportunistic infections and stratify AD biomarkers",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Bland CSF without inflammation; HIV CSF compartment controlled; non-AD biomarker pattern",
+        "category": "required",
+        "tool_parameters": {
+          "tests": [
+            "cell_count",
+            "protein",
+            "glucose",
+            "Abeta42",
+            "phospho_tau",
+            "total_tau",
+            "HIV_RNA",
+            "JCV_PCR",
+            "cryptococcal_antigen"
+          ]
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
+      },
+      {
+        "step": 8,
+        "action": "Order FTD genetic panel (C9orf72, GRN, MAPT) given maternal aunt with dementia of uncertain type",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Identifies or excludes pathogenic C9orf72 / GRN / MAPT variant relevant to prognosis and cascade testing",
+        "category": "optional",
+        "tool_parameters": {
+          "test_type": "genetic_panel:FTD"
+        },
+        "citation": "[Pottier_2016]",
+        "guideline_source": "Pottier 2016 FTLD genetics review"
+      },
+      {
+        "step": 9,
+        "action": "Review ART regimen for CNS-related interactions and possible behavioural side effects",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Biktarvy (BIC/FTC/TAF) appropriate; no contraindication to symptomatic SSRI",
+        "category": "recommended",
+        "tool_parameters": {
+          "drugs": [
+            "Biktarvy",
+            "sertraline"
+          ],
+          "indication": "behavioural symptoms with comorbid HIV"
+        },
+        "citation": "[Bang_2015]",
+        "guideline_source": "Bang 2015 Lancet review"
+      },
+      {
+        "step": 10,
+        "action": "Consider amyloid PET to exclude AD biomarker overlap",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Negative amyloid PET",
+        "category": "optional",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "citation": "[Foster_2007]",
+        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is non-specific in FTD; not part of the standard dementia workup unless seizures or rapidly progressive course suggest CJD or autoimmune encephalitis.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG has no role in the cognitive workup of suspected FTD; reserved for syncope, palpitations, or pre-procedure clearance.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is unrelated to a neurodegenerative cognitive syndrome and adds cost without diagnostic value.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is unrelated to FTD and not indicated absent syncope or palpitations.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT lacks the resolution and lobar specificity needed to characterise frontotemporal atrophy; MRI is the standard structural study.",
+        "citation": "[AAN_dementia_2018]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "MR_spectroscopy"
+        },
+        "rationale": "MR spectroscopy has no established role in the routine FTD diagnostic pathway.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "perfusion_MRI"
+        },
+        "rationale": "Perfusion MRI is not indicated in the standard FTD workup once a structural MRI and FDG-PET (or amyloid PET) have characterised the lobar pattern.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is a vascular study with no diagnostic role in primary neurodegenerative dementia.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan evaluates presynaptic dopaminergic terminals; it is not indicated unless overt parkinsonism raises concern for PD, DLB, or atypical parkinsonism (PSP/CBS overlap).",
+        "citation": "[Bang_2015]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "Exclude structural cause of focal cognitive symptoms and screen for elevated ICP before lumbar puncture.",
+        "citation": "[AAN_dementia_2018]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "CSF JC PCR is MANDATORY in any HIV patient with new neurological or behavioral syndrome — PML requires CSF JC PCR for diagnosis (MRI can be negative early)",
-      "CSF HIV RNA (not just plasma) must be checked — plasma suppression does not guarantee CNS suppression in HAND",
-      "Antiretroviral therapy must NOT be interrupted — ART is essential and does not worsen FTD"
+      "Exclude opportunistic CNS infections with CSF and HIV-specific markers given immunocompromised history.",
+      "Coordinate ART continuation and CNS-penetrant regimen review.",
+      "Apply Rascovsky 2011 bvFTD criteria explicitly (≥3 of 6 core features within 3 years) and document functional decline.",
+      "Assess and document decision-making, financial, and driving capacity given the high risk of impulsivity and impaired judgment in FTD.",
+      "Provide caregiver education, safety planning, and referral to FTD-focused support resources.",
+      "Offer genetic counselling and discuss cascade testing options if a pathogenic variant is identified or suspected."
     ],
     "contraindicated_actions": [
-      "Discontinuing ART — this would allow HIV rebound and increase OI risk",
-      "Cholinesterase inhibitors in FTD"
+      "Do not start acetylcholinesterase inhibitors (donepezil, rivastigmine, galantamine): no benefit in FTD and may worsen behavioral symptoms.",
+      "Do not start memantine: no evidence of benefit in bvFTD and may worsen behavioral symptoms.",
+      "Avoid antipsychotics as first-line behavioral therapy given increased cerebrovascular and mortality risk in dementia; reserve for refractory dangerous agitation with specialist oversight.",
+      "Avoid benzodiazepines for behavioral control: risk of paradoxical disinhibition and falls."
     ],
     "key_reasoning_points": [
-      "In HIV-positive patients with behavioral or cognitive syndrome, a complete CSF panel is essential: CSF HIV RNA (CNS compartment may differ from plasma), JC PCR (PML), cryptococcal antigen, and full OI panel — plasma suppression does not rule out CNS disease",
-      "HIV-associated neurocognitive disorder (HAND) in the ART era typically presents with ATTENTIONAL and processing speed deficits, not the behavioral disinhibition/perseveration/social cognition loss pattern of bvFTD",
-      "The FDG-PET pattern distinguishes: HAND shows diffuse or subcortical-frontal metabolism reduction; bvFTD shows focal frontotemporal hypometabolism with posterior preservation — these patterns are distinguishable",
-      "ART must be continued in HIV-positive bvFTD patients — there is no drug interaction concern with integrase-based regimens and standard FTD symptomatic medications"
+      "Well-controlled HIV with progressive lobar frontotemporal pattern is not HAND; HAND is typically subcortical.",
+      "Opportunistic infections must be excluded but are unlikely with sustained virologic control.",
+      "Failed antidepressant trials reinforce that this is a primary neurodegenerative process, not refractory depression."
     ],
     "red_herrings": [
       {
-        "data_point": "Positive toxoplasma IgG (1:64)",
-        "location": "Lab results",
-        "intended_effect": "Raise concern for CNS toxoplasmosis as cause of neurological syndrome",
-        "correct_interpretation": "Toxoplasma IgG positive indicates past exposure (common in general population); active toxoplasmosis requires CD4 <100 (this patient: CD4 680); no ring-enhancing lesion on MRI; toxoplasma PCR negative in CSF — active toxoplasmosis excluded",
-        "field_path": ""
-      },
-      {
-        "data_point": "HIV diagnosis — undetectable but known carrier",
-        "location": "Past medical history",
-        "intended_effect": "Attribute entire cognitive and behavioral syndrome to HAND",
-        "correct_interpretation": "CSF HIV RNA undetectable confirms CNS suppression; FDG-PET shows focal frontotemporal (not diffuse HAND) pattern; behavioral syndrome is FTD-specific (disinhibition, compulsive, social cognition loss) — bvFTD confirmed",
-        "field_path": ""
+        "data_point": "HIV-positive status (controlled on Biktarvy for 8 years)",
+        "location": "past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Could mislead toward HAND or opportunistic CNS infection as the primary explanation.",
+        "correct_interpretation": "Sustained virologic control argues strongly against HAND or active opportunistic infection; the lobar pattern is consistent with primary FTD."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "v5",
@@ -592,6 +767,19 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (condition-expert:FTD)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FTD",
+    "difficulty_rationale": "5 required tools + 1–2 recommended biomarkers and a substantial differential (psychiatric, alcohol, vascular, or AD-overlap); 1–3 grounded red herrings (alcohol, family history, comorbid HIV / bipolar / GRN status); requires multi-modal synthesis.",
+    "case_body_concerns": [
+      "required tool `order_specialized_test` (step 3, params={'test_type': 'neuropsych_battery'}) has no initial_tool_outputs or followup_outputs entry — case body should add a order_specialized_test output to support this required step",
+      "validator flags `order_advanced_imaging` in both optimal_actions (FDG_PET / amyloid_PET) and useless_tools (MR_spectroscopy / DaTscan / perfusion_MRI / carotid_duplex) — these are distinct modalities of the same catchall tool. Known systemic validator limitation: the coherence script ignores `tool_parameters.modality`. No fix at case level.",
+      "required tool `order_specialized_test` has no matching `initial_tool_outputs` or `followup_outputs` entry — case body should add a corresponding output so the agent gets a meaningful result when calling this required step.",
+      "fallback output for `order_advanced_imaging` is missing in `fallback_tool_outputs` — calling the useless tool will return empty; case body needs an off-pathway fallback entry."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

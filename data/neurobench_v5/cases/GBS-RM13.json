@@ -404,6 +404,17 @@
         "impression": "1. Moderate gadolinium enhancement of bilateral lumbosacral nerve roots. 2. No intrinsic spinal cord signal abnormality. 3. Mild degenerative disc changes L4–L5 without canal stenosis. Nerve root enhancement consistent with an inflammatory polyradiculopathy. Clinical correlation recommended.",
         "recommended_actions": []
       }
+    },
+    {
+      "trigger_action": "search_gbs_treatment",
+      "tool_name": "search_medical_literature",
+      "output": {
+        "general": {
+          "query": "general",
+          "results": [],
+          "summary": "No directly applicable, high-quality evidence was retrieved for this query. Recommend correlating with current society guidelines."
+        }
+      }
     }
   ],
   "fallback_tool_outputs": {
@@ -482,118 +493,193 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Guillain-Barré syndrome, AIDP (post-bronchitis), with concurrent PBC-associated mitochondrial myopathy explaining elevated CK",
+    "primary_diagnosis": "Guillain-Barré syndrome, AIDP (post-bronchitis), with concurrent PBC-associated immunologic background",
     "icd_code": "G61.0",
     "differential": [
       {
-        "diagnosis": "Statin-induced myopathy",
-        "likelihood": "low",
-        "key_features": "Atorvastatin use with elevated CK — but NCS shows demyelinating polyradiculoneuropathy; statin myopathy does not cause areflexia"
+        "diagnosis": "PBC-associated peripheral neuropathy / vasculitic neuropathy",
+        "likelihood": "moderate",
+        "key_features": "Primary biliary cholangitis can be associated with cryoglobulinaemia and vasculitic neuropathy — typically asymmetric mononeuropathy multiplex, not symmetric ascending areflexic weakness.",
+        "icd_code": "M31.7"
       },
       {
-        "diagnosis": "PBC-associated inflammatory myositis",
-        "likelihood": "low",
-        "key_features": "AMA-positive myopathy known in PBC — but NCS shows neuropathic pattern; biopsy showed limited necrosis not explaining weakness"
+        "diagnosis": "Acute-onset CIDP",
+        "likelihood": "moderate",
+        "key_features": "Time course at presentation is too short to discriminate; revisit beyond 8 weeks.",
+        "icd_code": "G61.81"
       },
       {
-        "diagnosis": "CIDP",
+        "diagnosis": "Hepatic encephalopathy / metabolic neuropathy",
         "likelihood": "low",
-        "key_features": "6-week duration approaches CIDP — but acute onset post-infection and progressive course without relapse favor GBS"
+        "key_features": "Encephalopathic features absent; bilirubin / ammonia not consistent.",
+        "icd_code": "K72.90"
       },
       {
-        "diagnosis": "Hepatic myopathy",
+        "diagnosis": "Drug-induced (UDCA-related) neuropathy",
         "likelihood": "very_low",
-        "key_features": "End-stage liver disease can cause muscle wasting — but areflexia and demyelinating NCS are not features of hepatic myopathy"
+        "key_features": "UDCA is not a recognised cause of acute polyradiculoneuropathy.",
+        "icd_code": "G62.0"
+      },
+      {
+        "diagnosis": "Critical illness polyneuropathy",
+        "likelihood": "very_low",
+        "key_features": "Community presentation, no ICU course.",
+        "icd_code": "G62.81"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "NCS/EMG",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Demyelinating polyradiculoneuropathy with concurrent myopathic changes",
+        "action": "Obtain CBC, CMP, HIV, anti-GM1/anti-GQ1b ganglioside antibodies, and stool culture / Campylobacter serology if recent diarrhea",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Mild leukocytosis / elevated inflammatory markers reflecting antecedent infection; ganglioside antibodies for variant typing; trigger identification (Campylobacter, CMV, EBV, Mycoplasma, HIV)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Yuki_2012]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 2,
-        "action": "Labs including CK, LFTs, INR, AMA",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Elevated CK and AMA — but NCS confirms GBS not primary myopathy",
+        "action": "Order nerve conduction studies and needle EMG (EMG/NCS)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Demyelinating pattern (prolonged DML, conduction block, reduced CV, absent F-waves) consistent with AIDP, or reduced CMAP amplitudes in axonal variants (AMAN/AMSAN)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[Hadden_1998]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 3,
-        "action": "Lumbar puncture (after INR correction with FFP)",
+        "action": "Perform lumbar puncture for CSF analysis",
         "tool_name": "analyze_csf",
-        "expected_finding": "Albumino-cytologic dissociation 96 mg/dL",
+        "expected_finding": "Albuminocytologic dissociation — elevated protein with cell count <10/μL; may be normal in the first week of illness",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 4,
-        "action": "IVIG 0.4 g/kg/day x 5 days (non-sucrose formulation)",
-        "tool_name": null,
-        "expected_finding": "Treatment initiated",
+        "action": "Order bedside respiratory function testing (FVC, MIP/MEP, NIF) and repeat every 4–6 hours",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline and serial FVC, MIP/MEP, NIF; deterioration to FVC <20 mL/kg, MIP worse than -30 cmH2O, or VC <40% predicted triggers ICU transfer / intubation",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[Sharshar_2003]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 5,
-        "action": "Hold atorvastatin during acute illness",
-        "tool_name": null,
-        "expected_finding": "Eliminate statin myopathy confounding",
+        "action": "Search the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[van_den_Berg_2014]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 6,
-        "action": "Serial FVC/NIF — declining respiratory reserve",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Monitor for intubation threshold",
+        "action": "Check drug interactions / contraindications for IVIG (renal function, IgA deficiency screen) and/or plasma exchange (coagulation, calcium, hemodynamics)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Confirmation that IVIG can be given safely (no severe renal impairment, no IgA deficiency) or that plasma exchange is appropriate (adequate vascular access, stable coagulation)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[van_den_Berg_2014]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 7,
+        "action": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Sinus tachycardia or bradycardia; conduction or repolarisation abnormalities reflecting autonomic involvement",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 8,
+        "action": "Initiate continuous cardiac telemetry for the first 1–2 weeks for moderate/severe disease — autonomic instability (bradyarrhythmias, BP lability) is common",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Documentation of sinus pauses, bradyarrhythmias, BP lability, or non-sustained tachyarrhythmias",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "GBS is a peripheral nerve / nerve-root disorder; EEG has no role in diagnosis unless atypical CNS features (encephalopathy, seizures) are present.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated in typical GBS; reserve for pre-existing cardiac disease or unexplained hemodynamic instability after autonomic causes are excluded.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT contributes no diagnostic information in GBS; the disease is peripheral and CT does not visualise nerve roots reliably.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is reserved for atypical features (encephalopathy, CNS signs, transverse myelitis on differential). In classic GBS it does not aid diagnosis.",
+        "citation": "[van_den_Berg_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_specialized_test",
+        "after": "check_drug_interactions",
+        "reason": "Document respiratory status (FVC/NIF) before committing to IVIG vs plasma exchange — severe respiratory compromise mandates ICU triage and may influence treatment choice and timing.",
+        "citation": "[Sharshar_2003]",
+        "severity": "soft"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Renal function, IgA screen, and CBC must be reviewed before IVIG to mitigate renal failure, anaphylaxis (IgA-deficient patients), and aseptic meningitis risk.",
+        "citation": "[van_den_Berg_2014]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Recognize GBS despite elevated CK — CK is rarely elevated in GBS but does not exclude the diagnosis; NCS pattern (demyelinating, absent F-waves, absent H-reflex) is decisive",
-      "Correct coagulopathy (INR 1.9) with FFP before LP — thrombocytopenia also requires assessment",
-      "Use non-sucrose IVIG formulation to avoid sucrose nephropathy in this patient with hepatic/renal vulnerability",
-      "Hold atorvastatin — eliminate statin contribution to elevated CK",
-      "Serial respiratory monitoring — dual restriction from liver disease and GBS"
+      "Initiate IVIG 0.4 g/kg/day for 5 days; verify hepatic synthetic function (coagulation, albumin) prior to treatment.",
+      "Document baseline liver function and avoid hepatotoxic adjuncts.",
+      "Continuous cardiac telemetry.",
+      "Coordinate care with hepatology for PBC comanagement."
     ],
     "contraindicated_actions": [
-      "Corticosteroids",
-      "Succinylcholine for RSI if intubation required — use rocuronium",
-      "Sucrose-based IVIG in liver/renal impairment"
+      "Do not give corticosteroids as monotherapy in GBS.",
+      "Do not start plasma exchange without considering coagulation status given PBC."
     ],
     "key_reasoning_points": [
-      "Elevated CK in GBS is rare but documented — elevated CK does NOT exclude GBS; the NCS/EMG pattern is the gold standard",
-      "PBC-associated AMA M2 antibodies can mediate direct muscle injury — explains the elevated CK and myoglobin, not the weakness",
-      "The angulated fibers on biopsy (if performed) reflect neurogenic atrophy from GBS, not primary myopathy",
-      "6-week duration is at the upper boundary for GBS (defined as <4 weeks to nadir) — but onset post-infection and progressive course favor GBS over CIDP",
-      "Coagulopathy in liver disease requires INR correction before LP — this is a modifiable risk; do not forego LP"
+      "Coexisting autoimmune liver disease may complicate workup but does not change the GBS diagnostic threshold.",
+      "Vasculitic neuropathy associated with autoimmune comorbidities is typically asymmetric, distinguishing it from symmetric GBS.",
+      "Treatment choice between IVIG and PLEX should incorporate hepatic synthetic and coagulation status."
     ],
     "red_herrings": [
       {
-        "data_point": "CK 642 U/L and myoglobin 580 µg/L (elevated)",
-        "location": "initial_tool_outputs.labs.Muscle_Enzymes",
-        "intended_effect": "Suggest primary myopathy (statin-induced or PBC-associated) rather than GBS",
-        "correct_interpretation": "Elevated CK in GBS is rare but occurs; PBC-associated mitochondrial myopathy explains the elevated muscle enzymes; NCS/EMG demyelinating pattern confirms GBS as primary diagnosis",
-        "field_path": ""
-      },
-      {
-        "data_point": "Atorvastatin on medication list",
-        "location": "patient.clinical_history.medications",
-        "intended_effect": "Suggest statin-induced myopathy as cause of proximal weakness and elevated CK",
-        "correct_interpretation": "Statin myopathy does not cause areflexia or demyelinating NCS changes; statin should be held but is not the primary diagnosis",
-        "field_path": ""
+        "data_point": "Background PBC and autoimmune serology",
+        "location": "patient.clinical_history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Anchor on a vasculitic or autoimmune neuropathy specific to PBC.",
+        "correct_interpretation": "PBC-associated neuropathy is typically asymmetric and chronic; the symmetric, ascending, areflexic, albuminocytologic-dissociation profile is GBS."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -611,6 +697,17 @@
       "ct": "incidental",
       "echo": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:GBS",
+    "difficulty_rationale": "6 required tools, 1 red herring(s); classic or near-classic GBS workup with one or more plausible mimics that need active exclusion.",
+    "case_body_concerns": [
+      "Bedside respiratory function (FVC/MIP/MEP/NIF) is delivered via an `interpret_labs` followup panel rather than `order_specialized_test{test_type=respiratory_function}` as the criteria pack mandates. Agents calling order_specialized_test{respiratory_function} will hit the EMG/NCS output instead. Recommend adding a respiratory_function followup keyed to order_specialized_test in a follow-up case-body pass.",
+      "Mirrored fallback_tool_outputs into followup_outputs for required tools that previously only existed in the fallback bucket: ['search_medical_literature']. Content is unchanged; the move makes the coherence validator see an explicit primary output for criteria-pack-required tools."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

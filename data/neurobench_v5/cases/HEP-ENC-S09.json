@@ -709,182 +709,166 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Hepatic encephalopathy, Grade 2-3, precipitated by spontaneous bacterial peritonitis",
-    "icd_code": "K72.9",
+    "primary_diagnosis": "Hepatic encephalopathy (West Haven grade II-III), hepatitis C cirrhosis with small HCC on transplant list (Child-Pugh B, MELD 16) — precipitated by spontaneous bacterial peritonitis.",
+    "icd_code": "K72.90",
     "differential": [
       {
-        "diagnosis": "Drug intoxication (opiates/benzodiazepines)",
-        "likelihood": "very_low",
-        "key_features": "Toxicology not obtained initially but patient's medication list includes no CNS depressants; alcohol abstinent 8 years; urine tox negative"
+        "diagnosis": "Hepatorenal syndrome from SBP",
+        "likelihood": "moderate",
+        "key_features": "Reassess Cr after volume + albumin.",
+        "icd_code": "K76.7"
       },
       {
-        "diagnosis": "Uremic encephalopathy",
+        "diagnosis": "HCC progression / vascular invasion",
         "likelihood": "low",
-        "key_features": "Creatinine elevated (1.6) at CKD2 baseline but insufficient to cause encephalopathy at this level; ammonia markedly elevated (142 umol/L) pointing to hepatic cause"
+        "key_features": "MRI if clinical course atypical or focal deficits develop.",
+        "icd_code": "C22.0"
       },
       {
-        "diagnosis": "Hyponatremic encephalopathy",
+        "diagnosis": "Variceal hemorrhage (occult)",
         "likelihood": "low",
-        "key_features": "Na 131 mEq/L — contributes to encephalopathy but not sufficiently low (<125) to be sole cause; HE is primary"
+        "key_features": "Banded varices history; check Hgb/BUN.",
+        "icd_code": "I85.01"
       },
       {
-        "diagnosis": "Bacterial meningitis",
+        "diagnosis": "Drug-induced encephalopathy",
         "likelihood": "very_low",
-        "key_features": "No meningismus, fever is low-grade (38.4), CT normal, SBP confirmed as infection source; LP not indicated"
-      },
-      {
-        "diagnosis": "HCC brain metastasis",
-        "likelihood": "very_low",
-        "key_features": "CT head shows no intracranial metastases; HCC rarely metastasizes to brain"
+        "key_features": "Med reconciliation.",
+        "icd_code": "G92"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Perform CT head to exclude structural cause of encephalopathy",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "Normal CT head — no hemorrhage, infarct, or HCC brain metastasis",
+        "action": "Comprehensive labs: CMP including AST/ALT/bilirubin/INR/albumin, ammonia, CBC, glucose, electrolytes (Na, K, Mg), BUN/Cr, lactate, blood cultures and urine cultures; toxicology if substance use plausible. Confirms liver dysfunction and screens for precipitants.",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Ammonia elevated; cultures; cirrhosis features.",
         "category": "required",
-        "tool_parameters": {
-          "region": "head",
-          "contrast": false
-        }
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 2,
-        "action": "Order stat labs: ammonia, CBC, CMP, LFTs, coagulation, CRP, procalcitonin, blood cultures",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Ammonia 142 umol/L markedly elevated; elevated inflammatory markers (CRP 48.2, PCT 1.8) suggesting infection; liver dysfunction markers",
+        "action": "Non-contrast CT head — exclude structural alternate cause of AMS (hemorrhage, large stroke, mass) before any LP.",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No acute intracranial process.",
         "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "ammonia",
-            "CBC",
-            "CMP",
-            "LFT",
-            "coagulation",
-            "CRP",
-            "procalcitonin",
-            "blood_cultures"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 3,
-        "action": "Perform EEG to characterize encephalopathy and exclude NCSE",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Triphasic waves with generalized slowing — metabolic encephalopathy pattern consistent with HE; no ictal activity",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Literature/guideline search to confirm West Haven grading, precipitant management, and lactulose/rifaximin dosing (SBP empiric therapy; AASLD HE; transplant prioritization).",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "AASLD/EASL 2014 guidance retrieved; West Haven criteria and precipitant-driven management framework confirmed.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 4,
-        "action": "Perform diagnostic paracentesis to exclude SBP (given fever, abdominal symptoms, leukocytosis)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "PMN 380/mm3 — SBP confirmed; Gram-negative rods on Gram stain (E. coli)",
+        "action": "Drug-interaction and medication-reconciliation review covering antibiotics, lactulose, rifaximin, immunosuppression as relevant; flag any CNS depressants (benzodiazepines, opioids, sedating antiemetics, antihistamines) and confirm lactulose/rifaximin dosing in liver disease.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sedating/CNS-depressant medications identified; lactulose and rifaximin reviewed for hepatic dose adjustment.",
         "category": "required",
-        "tool_parameters": {
-          "test": "ascitic_fluid_analysis"
-        }
+        "tool_parameters": {},
+        "citation": "[Bajaj_2011]",
+        "guideline_source": "Bajaj 2011 HE management review"
       },
       {
         "step": 5,
-        "action": "Start IV cefotaxime 2g q8h for SBP (patient has sulfa allergy — do NOT use TMP-SMX)",
-        "tool_name": null,
-        "expected_finding": "Antibiotic treatment initiated; SBP precipitant addressed",
+        "action": "Diagnostic paracentesis — SBP exclusion mandatory.",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Ascitic PMN ≥250 confirms SBP; start ceftriaxone + albumin.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 6,
-        "action": "Administer IV albumin 1.5 g/kg on day 1 to prevent hepatorenal syndrome in SBP",
-        "tool_name": null,
-        "expected_finding": "Renal function preserved; creatinine stabilizes",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "EEG — characterize HE pattern. Triphasic waves are classic but non-specific (metabolic encephalopathies broadly); main role is exclusion of non-convulsive status epilepticus where the differential supports it.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Generalized slowing.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Ferenci_2002]",
+        "guideline_source": "Ferenci 2002 HE nomenclature/quantification"
       },
       {
         "step": 7,
-        "action": "Optimize lactulose (30mL q2h until 2-3 stools/day) and continue rifaximin 550mg BID",
-        "tool_name": null,
-        "expected_finding": "Ammonia trending down; encephalopathy grade improving",
-        "category": "required",
-        "tool_parameters": {}
-      },
-      {
-        "step": 8,
-        "action": "Check drug interactions for cefotaxime with current medications given sulfa allergy",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Cefotaxime safe — not a sulfonamide; no significant interactions with current regimen",
+        "action": "Consult hepatology + transplant team — coordinate definitive care, transplant candidacy assessment where applicable.",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Hepatology / critical-care guidance integrated into management.",
         "category": "recommended",
         "tool_parameters": {
-          "proposed": "cefotaxime",
-          "current_medications": [
-            "rifaximin",
-            "lactulose",
-            "carvedilol",
-            "insulin_glargine"
-          ]
-        }
+          "specialty": "hepatology"
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No clinical suspicion for hepatopulmonary syndrome, portopulmonary hypertension, or endocarditis; echocardiography is not part of the HE workup.",
+        "citation": "[AASLD_2014]"
       },
       {
-        "step": 9,
-        "action": "Notify liver transplant team of SBP episode and update MELD score",
-        "tool_name": "interpret_labs",
-        "expected_finding": "MELD 22, MELD-Na 25 — patient remains transplant candidate; SBP may qualify for exception points",
-        "category": "required",
+        "tool_name": "order_advanced_imaging",
         "tool_parameters": {
-          "test": "meld_calculation"
-        }
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in HE workup; reversible metabolic encephalopathy is the issue, not Alzheimer pathology.",
+        "citation": "[AASLD_2014]"
       },
       {
-        "step": 10,
-        "action": "Repeat paracentesis at 48 hours to confirm antibiotic response (PMN reduction >25%)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "PMN 142/mm3 at 48h — confirmed response; E. coli pansensitive on culture",
-        "category": "required",
+        "tool_name": "order_advanced_imaging",
         "tool_parameters": {
-          "test": "repeat_ascitic_fluid"
-        }
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan has no role in HE workup; the question is metabolic encephalopathy, not nigrostriatal degeneration.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "genetic_panel:early_onset_AD"
+        },
+        "rationale": "Early-onset AD genetic panel has no role in HE workup; reversible metabolic encephalopathy is the diagnosis under consideration.",
+        "citation": "[AASLD_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "In altered mental status, exclude intracranial mass effect / hemorrhage on imaging before LP to avoid herniation risk.",
+        "citation": "[AASLD_2014]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Perform diagnostic paracentesis to identify SBP as the precipitant",
-      "Start IV cefotaxime (NOT sulfa-containing antibiotics — patient has sulfa allergy) for confirmed SBP",
-      "Administer IV albumin 1.5 g/kg on day 1 to prevent hepatorenal syndrome",
-      "Optimize lactulose and rifaximin for ammonia reduction",
-      "Notify transplant team of SBP episode immediately",
-      "CT head to exclude structural cause including HCC brain metastasis",
-      "Repeat paracentesis at 48 hours to document antibiotic response",
-      "After SBP resolution, initiate secondary prophylaxis with norfloxacin (NOT TMP-SMX — sulfa allergy)"
+      "Empiric ceftriaxone for SBP; albumin per protocol.",
+      "Lactulose to 2-4 stools/day; rifaximin.",
+      "Update transplant team — HE episode affects MELD-Na exception logic."
     ],
     "contraindicated_actions": [
-      "Do NOT use trimethoprim-sulfamethoxazole (TMP-SMX) — patient has documented sulfa allergy (anaphylaxis)",
-      "Do NOT use benzodiazepines for agitation — worsens hepatic encephalopathy",
-      "Do NOT rapidly correct hyponatremia (osmotic demyelination risk)",
-      "Do NOT delay paracentesis — SBP is the primary precipitant that must be identified and treated"
+      "Do not prescribe benzodiazepines for anxiety/agitation — they precipitate and prolong HE (use haloperidol or non-pharmacologic measures for agitation).",
+      "Do not prescribe sedating opioids — they worsen HE; consider acetaminophen at hepatic-safe dosing for pain.",
+      "Do not perform LP before neuroimaging excludes mass effect when the patient has altered mental status."
     ],
     "key_reasoning_points": [
-      "Fever + abdominal symptoms + leukocytosis + elevated CRP/procalcitonin in a cirrhotic patient mandates diagnostic paracentesis to rule out SBP",
-      "SBP (PMN 380/mm3, E. coli) was the primary precipitant for hepatic encephalopathy (ammonia 142 umol/L)",
-      "Patient had sulfa allergy (anaphylaxis) — cefotaxime, not TMP-SMX, is the appropriate first-line SBP treatment",
-      "IV albumin co-administration with SBP antibiotics reduces hepatorenal syndrome risk by 66%",
-      "Known HCC within Milan criteria — transplant team notification is critical; SBP episode is a decompensating event",
-      "EEG triphasic waves confirm metabolic (hepatic) encephalopathy and exclude NCSE",
-      "After SBP resolution, secondary prophylaxis is mandatory given >70% 1-year recurrence rate"
+      "HE is a clinical diagnosis: West Haven grading + evidence of liver dysfunction + exclusion of other causes of AMS — ammonia level is supportive only and correlates poorly with grade (AASLD 2014).",
+      "Precipitant identification is more actionable than the ammonia number: infection (SBP especially), GI bleed, electrolyte disturbance (hypokalemia/hyponatremia), constipation, sedative/CNS-depressant use, dehydration, dietary protein load, renal failure.",
+      "Documented overt HE episodes affect transplant prioritization decisions and should be communicated to the transplant team."
     ],
-    "red_herrings": [
-      {
-        "data_point": "Known hepatocellular carcinoma",
-        "location": "past medical history",
-        "intended_effect": "Clinician may suspect HCC brain metastasis or paraneoplastic syndrome as cause of encephalopathy",
-        "correct_interpretation": "CT head shows no brain metastases; HCC rarely metastasizes to brain; hyperammonemia and EEG triphasic waves confirm metabolic HE from SBP precipitant",
-        "field_path": ""
-      }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": []
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -905,6 +889,14 @@
       "advanced_imaging": "normal",
       "specialized_test": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (HEP-ENC)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:HEP-ENC",
+    "difficulty_rationale": "4 required tools + paracentesis; single clear precipitant (SBP) with classic management; few distractors.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

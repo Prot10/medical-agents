@@ -75,98 +75,112 @@
     "extremities": "No edema"
   },
   "ground_truth": {
-    "primary_diagnosis": "Migraine with typical visual aura (G43.1), ICHD-3 criteria met; episodic migraine increasing in frequency",
-    "primary_diagnosis_icd": "G43.1",
+    "primary_diagnosis": "Migraine with typical visual aura (ICHD-3 1.2.1)",
+    "icd_code": "G43.109",
     "differential": [
       {
-        "diagnosis": "Occipital lobe seizure (Panayiotopoulos syndrome variant)",
-        "likelihood": "very_low",
-        "key_features": "Visual seizures typically <2 min, stereotyped colored phosphenes; spreading visual aura over 20-25 min is migraine; normal EEG; family history of migraine"
+        "diagnosis": "Migraine without aura",
+        "likelihood": "low",
+        "key_features": "Visual aura is reproducible and stereotyped — this is migraine with aura, not migraine without aura",
+        "icd_code": null
       },
       {
-        "diagnosis": "TIA (posterior circulation)",
+        "diagnosis": "Focal occipital seizure",
         "likelihood": "very_low",
-        "key_features": "5-year identical history; slow spreading over 20 min; followed by headache; normal DWI; young age without vascular risk factors"
+        "key_features": "Aura duration 20-30 min is too long for seizure propagation; no impaired awareness",
+        "icd_code": "G40.109"
+      },
+      {
+        "diagnosis": "Idiopathic intracranial hypertension",
+        "likelihood": "very_low",
+        "key_features": "No papilledema, no diurnal pattern, no visual obscurations; normal exam",
+        "icd_code": "G93.2"
+      },
+      {
+        "diagnosis": "Tension-type headache",
+        "likelihood": "very_low",
+        "key_features": "Severe unilateral throbbing with photophobia, phonophobia and nausea is migrainous, not tension-type",
+        "icd_code": "G44.2"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI to exclude structural cause",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Normal brain MRI; no secondary structural cause for visual aura",
-        "category": "recommended",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
+        "category": "required",
         "tool_parameters": {
-          "contrast": true
-        }
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "Laboratory workup including inflammatory markers and antiphospholipid antibodies",
-        "tool_name": "interpret_labs",
-        "expected_finding": "All values within normal limits",
-        "category": "recommended",
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Acute therapy (triptan) and preventive options (topiramate, propranolol) reviewed; caffeine reduction counselled",
+        "category": "required",
         "tool_parameters": {
-          "lab_type": "headache_workup"
-        }
-      },
-      {
-        "step": 3,
-        "action": "Prescribe sumatriptan 100 mg for acute treatment",
-        "tool_name": null,
-        "expected_finding": "Clinical assessment and management as per ICHD-3 migraine with aura guidelines",
-        "category": "recommended",
-        "tool_parameters": {}
-      },
-      {
-        "step": 4,
-        "action": "Address lifestyle triggers: caffeine taper, sleep schedule",
-        "tool_name": null,
-        "expected_finding": "Clinical assessment and management as per ICHD-3 migraine with aura guidelines",
-        "category": "recommended",
-        "tool_parameters": {}
-      },
-      {
-        "step": 5,
-        "action": "Initiate preventive therapy if lifestyle modification insufficient — topiramate 25 mg titrating to 50 mg BID",
-        "tool_name": null,
-        "expected_finding": "Clinical assessment and management as per ICHD-3 migraine with aura guidelines",
-        "category": "recommended",
-        "tool_parameters": {}
+          "context": "migraine_with_aura_pharmacotherapy"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis — neither present here",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Routine transthoracic / bubble echocardiogram (PFO screening) is NOT indicated in migraine with aura; PFO-migraine association is controversial and PFO closure does not reduce migraine [Charles_2017]",
+        "citation": "[Charles_2017]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated in typical migraine with aura — no role unless cardioembolic stroke is on the differential",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "Brain MRI to exclude structural cause",
-      "Recognize classic visual aura pattern (spreading over 20-25 minutes) as migraine",
-      "Prescribe triptan for acute treatment",
-      "Address caffeine overuse as contributing trigger",
-      "Assess for medication overuse headache risk (ibuprofen frequency)"
+      "Confirm ICHD-3 1.2 criteria are met",
+      "Initiate triptan acute therapy (sumatriptan / rizatriptan)",
+      "Discuss caffeine and lifestyle triggers",
+      "Consider preventive therapy if frequency continues to escalate (≥4 attacks/month)"
     ],
     "contraindicated_actions": [
-      "Do not use ibuprofen more than 10-15 days/month (medication overuse headache risk)",
-      "Do not start combined OCP",
-      "Do not give triptan during visual aura phase"
+      "Do not start combined oestrogen-progestogen contraception",
+      "Do not co-administer ergotamines with triptans"
     ],
     "key_reasoning_points": [
-      "Classic expanding fortification spectra over 20-25 min is pathognomonic for migraine cortical spreading depression",
-      "Strong family history (mother and grandmother) with identical pattern strongly supports genetic migraine",
-      "Increase in frequency correlates with PhD stress and high caffeine intake — modifiable factors",
-      "Normal MRI excludes structural cause",
-      "ICHD-3 criteria clearly met"
+      "Classic visual aura (expanding fortification spectra) over 20-30 min is the most common form of migraine aura",
+      "Routine MRI not indicated when ICHD-3 criteria are met and exam is normal [AAN_2000]",
+      "Increasing frequency in a young patient warrants preventive consideration but not extra diagnostic testing"
     ],
     "red_herrings": [
       {
-        "data_point": "High caffeine intake potentially causing secondary headaches",
-        "location": "patient.history_present_illness",
-        "intended_effect": "High caffeine can cause daily headache and analgesic overuse headache, potentially obscuring migraine diagnosis",
-        "correct_interpretation": "5-year history predates PhD; high caffeine increases frequency but doesn't change the underlying migraine diagnosis; address as modifiable trigger",
-        "field_path": ""
+        "data_point": "Brain MRI ordered as part of routine workup",
+        "location": "initial_tool_outputs.mri",
+        "field_path": "initial_tool_outputs.mri",
+        "intended_effect": "Presence of imaging suggests it was clinically required",
+        "correct_interpretation": "MRI was over-investigation; ICHD-3 diagnosis is clinical when criteria are met and exam is normal"
       }
-    ],
-    "icd_code": "G43.1",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -185,7 +199,17 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Straightforward: classic visual aura, young patient, no red flags, increasing frequency is a treatment question not a diagnostic puzzle",
+    "case_body_concerns": [
+      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide §1): ['analyze_brain_mri', 'analyze_ecg', 'analyze_eeg', 'interpret_labs', 'order_advanced_imaging']"
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "initial_tool_outputs": {
     "mri": {

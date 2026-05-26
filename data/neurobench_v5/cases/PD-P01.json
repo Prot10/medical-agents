@@ -896,177 +896,242 @@
   "ground_truth": {
     "primary_diagnosis": "Multiple system atrophy, parkinsonian type (MSA-P)",
     "icd_code": "G90.3",
-    "red_herrings": [
-      {
-        "data_point": "Mother has longstanding essential tremor; patient has mild irregular postural tremor in both hands",
-        "location": "history_present_illness and neurological_exam.additional",
-        "intended_effect": "May lead agent toward essential tremor or familial tremor disorder, underweighting the symmetric parkinsonism with early severe autonomic failure diagnostic of MSA-P",
-        "correct_interpretation": "Mother's ET is unrelated to MSA. Postural tremor in MSA is common and does not imply ET. The symmetric bradykinesia, severe early orthostatic hypotension, urinary dysfunction, preserved cardiac MIBG, putaminal rim sign, and nocturnal stridor establish MSA-P",
-        "field_path": ""
-      },
-      {
-        "data_point": "Tamsulosin on medication list — alpha-1 blocker that causes orthostatic hypotension",
-        "location": "clinical_history.medications",
-        "intended_effect": "May lead agent to attribute orthostatic hypotension primarily to tamsulosin, underweighting the severity (34/26 mmHg drop) and early onset relative to motor symptoms as indicating autonomic neuropathy from MSA",
-        "correct_interpretation": "Tamsulosin contributes to orthostatic hypotension, but the magnitude, early onset, and associated urinary dysfunction including incomplete bladder emptying and multiple UTIs reflect the preganglionic autonomic failure of MSA-P rather than drug effect alone",
-        "field_path": ""
-      }
-    ],
     "differential": [
       {
-        "diagnosis": "Multiple system atrophy, parkinsonian type (MSA-P)",
+        "diagnosis": "Parkinson's disease with prominent autonomic features",
         "likelihood": "high",
-        "key_features": "Symmetric parkinsonism, early and severe autonomic failure (orthostatic hypotension, urinary dysfunction, erectile dysfunction, constipation), poor levodopa response, putaminal rim sign on MRI, symmetric DaTscan, nocturnal stridor, preserved cardiac MIBG uptake, REM sleep behavior disorder"
+        "key_features": "Asymmetric parkinsonism could fit PD, but early severe orthostatic hypotension and limited levodopa responsiveness shift toward MSA"
       },
       {
-        "diagnosis": "Idiopathic Parkinson's disease",
+        "diagnosis": "Progressive supranuclear palsy",
         "likelihood": "moderate",
-        "key_features": "Bradykinesia, rigidity, and mild postural tremor are present; however, the symmetry, poor levodopa response, early severe autonomic failure, and preserved cardiac MIBG uptake argue strongly against this diagnosis"
+        "key_features": "Early falls and gait instability raise concern, but absence of vertical supranuclear gaze palsy argues against PSP"
       },
       {
-        "diagnosis": "Progressive supranuclear palsy (PSP)",
+        "diagnosis": "Dementia with Lewy bodies",
         "likelihood": "low",
-        "key_features": "Early postural instability with falls is present, but patient lacks vertical gaze palsy, axial rigidity predominance, and midbrain atrophy (hummingbird sign); autonomic failure pattern more consistent with MSA"
+        "key_features": "No early cognitive fluctuations or visual hallucinations"
       },
       {
-        "diagnosis": "Normal pressure hydrocephalus (NPH)",
-        "likelihood": "very_low",
-        "key_features": "Gait difficulty and urinary symptoms are present, but MRI shows no ventriculomegaly, no magnetic gait pattern, and imaging does not support NPH"
+        "diagnosis": "Vascular parkinsonism",
+        "likelihood": "low",
+        "key_features": "MRI lacks significant vascular burden in basal ganglia"
+      },
+      {
+        "diagnosis": "Drug-induced parkinsonism",
+        "likelihood": "low",
+        "key_features": "Brief metoclopramide mention; would not explain progressive autonomic failure"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Perform detailed neurological examination with emphasis on symmetry of motor findings, postural instability testing (pull test), and orthostatic vital signs",
-        "tool_name": null,
-        "expected_finding": "Symmetric bilateral bradykinesia and rigidity, marked postural instability with retropulsion, significant orthostatic hypotension with inadequate heart rate compensation",
-        "category": "required"
-      },
-      {
-        "step": 2,
-        "action": "Order brain MRI to evaluate for structural causes of parkinsonism and specific atypical parkinsonian features",
+        "action": "Obtain brain MRI looking for MSA imaging features (putaminal atrophy/hypointensity, hot-cross-bun sign, cerebellar atrophy)",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Putaminal atrophy with rim sign, borderline pontine/cerebellar volume loss, no hummingbird sign, no NPH features",
+        "expected_finding": "MRI features supportive of MSA-P (putaminal changes, possible pontine hot-cross-bun) or non-specific atrophy",
         "category": "required",
         "tool_parameters": {
           "protocol": "standard",
-          "contrast": false
-        }
+          "contrast": false,
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "SWI",
+            "DWI"
+          ]
+        },
+        "citation": "[Schwarz_2014]",
+        "guideline_source": "Schwarz_2014"
       },
       {
-        "step": 3,
-        "action": "Order comprehensive laboratory work-up including CBC, BMP, thyroid function, vitamin B12, ceruloplasmin, RPR",
+        "step": 2,
+        "action": "Order baseline labs (CBC, CMP, TSH, B12, RPR)",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal results; ceruloplasmin normal excluding Wilson disease; low supine norepinephrine suggesting preganglionic autonomic failure",
+        "expected_finding": "Exclude reversible mimics",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
-            "thyroid",
+            "CMP",
+            "TSH",
             "B12",
             "RPR"
           ]
-        }
+        },
+        "citation": "[Postuma_2015]",
+        "guideline_source": "Postuma_2015"
+      },
+      {
+        "step": 3,
+        "action": "Check drug interactions for any DA antagonists or agents worsening orthostatic hypotension",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identify metoclopramide / promethazine if present; review BP-lowering agents",
+        "category": "recommended",
+        "tool_parameters": {
+          "proposed_medication": "carbidopa-levodopa"
+        },
+        "citation": "[Postuma_2015]",
+        "guideline_source": "Postuma_2015"
       },
       {
         "step": 4,
-        "action": "Request DaTscan to confirm presynaptic dopaminergic deficit and assess symmetry",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Symmetric bilateral putaminal dopamine transporter loss, atypical for idiopathic PD",
+        "action": "Search medical literature on MSA diagnostic criteria and PD-vs-MSA differentiation",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "MSA criteria emphasize early severe autonomic failure, cerebellar features, and poor levodopa response",
         "category": "required",
         "tool_parameters": {
-          "imaging_type": "DaTscan"
-        }
+          "query": "multiple system atrophy diagnostic criteria MSA-P Parkinson disease differentiation"
+        },
+        "citation": "[Tolosa_2021]",
+        "guideline_source": "Tolosa_2021"
       },
       {
         "step": 5,
-        "action": "Perform levodopa challenge test to assess dopaminergic responsiveness",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Poor motor response (<30% improvement), supporting atypical parkinsonism",
-        "category": "required",
+        "action": "Order DaTscan to confirm presynaptic dopaminergic deficit (positive in both PD and atypical parkinsonism)",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Abnormal striatal DAT binding consistent with neurodegenerative parkinsonism (does not distinguish PD from MSA)",
+        "category": "recommended",
         "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP"
-          ]
-        }
+          "modality": "DaTscan"
+        },
+        "citation": "[Marshall_2009]",
+        "guideline_source": "Marshall_2009"
       },
       {
         "step": 6,
-        "action": "Order comprehensive autonomic function testing (tilt table, QSART, thermoregulatory sweat test, cardiovagal testing)",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Severe neurogenic orthostatic hypotension, diffuse preganglionic sudomotor failure, reduced cardiovagal function, neurogenic bladder",
-        "category": "required",
+        "action": "Order cardiac MIBG scintigraphy to differentiate PD (reduced uptake) from MSA (preserved uptake)",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Preserved cardiac MIBG uptake supports MSA over PD",
+        "category": "recommended",
         "tool_parameters": {
-          "test_type": "tilt_table"
-        }
+          "modality": "MIBG_scan"
+        },
+        "citation": "[Tolosa_2021]",
+        "guideline_source": "Tolosa_2021"
       },
       {
         "step": 7,
-        "action": "Order polysomnography to evaluate for REM sleep behavior disorder and nocturnal stridor",
+        "action": "Order autonomic testing to characterize severity and pattern of dysautonomia",
         "tool_name": "order_specialized_test",
-        "expected_finding": "RBD confirmed; nocturnal stridor detected, characteristic of MSA",
+        "expected_finding": "Severe early orthostatic hypotension with blunted heart rate response and abnormal QSART supports MSA",
         "category": "required",
         "tool_parameters": {
-          "test_type": "polysomnography"
-        }
+          "test_type": "autonomic_testing"
+        },
+        "citation": "[Tolosa_2021]",
+        "guideline_source": "Tolosa_2021"
       },
       {
         "step": 8,
-        "action": "Consider cardiac MIBG scintigraphy to differentiate preganglionic vs postganglionic autonomic failure",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Preserved cardiac MIBG uptake, supporting preganglionic failure (MSA) over postganglionic (PD)",
+        "action": "Order polysomnography for RBD evaluation (present in both PD and MSA)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "REM sleep without atonia is common in MSA and supports synucleinopathy",
         "category": "recommended",
         "tool_parameters": {
-          "imaging_type": "cardiac_mibg"
-        }
+          "test_type": "polysomnography"
+        },
+        "citation": "[Postuma_2019]",
+        "guideline_source": "Postuma_2019"
       },
       {
         "step": 9,
-        "action": "Initiate symptomatic management: fludrocortisone or midodrine for orthostatic hypotension, manage urinary symptoms, address constipation, consider cautious low-dose levodopa trial",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Order neuropsychological battery as baseline cognitive screen",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Cognition is typically relatively preserved in MSA early in disease",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Tolosa_2021]",
+        "guideline_source": "Tolosa_2021"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is non-specific in parkinsonian syndromes",
+        "citation": "[Postuma_2015]"
       },
       {
-        "step": 10,
-        "action": "Discuss diagnosis, prognosis, and advance care planning with patient and family; refer to movement disorder center and multidisciplinary team including PT, OT, speech therapy, and palliative care",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No infectious or inflammatory indication",
+        "citation": "[Postuma_2015]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "MRI is the appropriate modality",
+        "citation": "[Schwarz_2014]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No cardiac indication beyond autonomic evaluation",
+        "citation": "[Postuma_2015]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "No documented arrhythmia; orthostatic mechanism is autonomic, not arrhythmic",
+        "citation": "[Postuma_2015]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "order_advanced_imaging",
+        "reason": "Structural MRI to exclude alternative causes before advanced imaging",
+        "citation": "[Schwarz_2014]",
+        "severity": "soft"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Baseline labs and review of orthostatic-aggravating agents before treatment changes",
+        "citation": "[Postuma_2015]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Recognize that symmetric parkinsonism with early severe autonomic failure is a red flag for atypical parkinsonism, not idiopathic PD",
-      "Perform orthostatic vital signs to document neurogenic orthostatic hypotension",
-      "Order autonomic function testing to characterize the extent and pattern of autonomic failure",
-      "Assess levodopa responsiveness to differentiate PD from atypical parkinsonism",
-      "Order polysomnography to evaluate for nocturnal stridor, which is potentially life-threatening in MSA",
-      "Do not attribute all symptoms to medication side effects (tamsulosin, lisinopril) without further evaluation"
+      "Apply MDS 2015 clinical diagnostic criteria for Parkinson's disease (bradykinesia plus rest tremor or rigidity, supportive features, no absolute exclusion criteria)",
+      "Document temporal sequence of motor and non-motor (REM sleep behavior disorder, hyposmia, constipation, orthostatic intolerance) features",
+      "Review the full medication list for dopamine receptor antagonists (metoclopramide, prochlorperazine, antipsychotics) and any other agents that can mimic or worsen parkinsonism",
+      "Aggressively treat orthostatic hypotension (non-pharmacological measures, then midodrine or droxidopa)",
+      "Trial levodopa to assess responsiveness while recognizing typically modest benefit in MSA-P",
+      "Coordinate multidisciplinary care (PT, OT, SLP, autonomic, palliative)"
     ],
     "contraindicated_actions": [
-      "Prescribing high-dose levodopa without monitoring orthostatic blood pressure, as it may worsen orthostatic hypotension",
-      "Prescribing anticholinergic medications (e.g., trihexyphenidyl) which would worsen urinary retention, constipation, and cognitive function",
-      "Attributing orthostatic hypotension solely to antihypertensive medication and failing to pursue neurogenic causes",
-      "Prescribing dopamine agonists (pramipexole, ropinirole), which are poorly tolerated in MSA due to worsening orthostatic hypotension and minimal efficacy",
-      "Delaying evaluation for nocturnal stridor, which carries risk of sudden death in MSA",
-      "Performing deep brain stimulation, which is contraindicated in MSA"
+      "Do not prescribe metoclopramide, prochlorperazine, or promethazine for nausea in a patient with parkinsonism",
+      "Do not prescribe typical antipsychotics (haloperidol, fluphenazine) or most atypical antipsychotics (risperidone, olanzapine, aripiprazole) — restrict pharmacotherapy of psychosis to quetiapine, clozapine, or pimavanserin",
+      "Do not prescribe centrally acting anticholinergics (trihexyphenidyl, benztropine) in older adults or in any patient with cognitive impairment",
+      "Avoid agents that worsen orthostatic hypotension (excessive antihypertensives, alpha-blockers, diuretics)"
     ],
     "key_reasoning_points": [
-      "The symmetric parkinsonism without a clear resting tremor is atypical for idiopathic PD, which characteristically presents with asymmetric involvement and resting tremor",
-      "Early and severe autonomic failure (orthostatic hypotension, urinary dysfunction, erectile dysfunction, constipation) preceding or concurrent with motor symptoms is the hallmark of MSA and is unusual in early PD",
-      "Poor levodopa response (<30% improvement) early in disease strongly argues against idiopathic PD",
-      "The putaminal rim sign on MRI and symmetric putaminal DAT loss on DaTscan support MSA-P",
-      "Preserved cardiac MIBG uptake differentiates the preganglionic autonomic failure of MSA from the postganglionic failure of PD",
-      "Nocturnal stridor detected on polysomnography is a characteristic and potentially fatal feature of MSA that requires urgent management",
-      "REM sleep behavior disorder, while present in both PD and MSA, combined with the other features supports the alpha-synucleinopathy spectrum",
-      "The mother's essential tremor is a red herring that might initially bias toward a genetic tremor-predominant condition but is irrelevant to this presentation",
-      "Tamsulosin use could potentially confound assessment of orthostatic hypotension and urinary symptoms, requiring careful clinical evaluation to distinguish medication effects from neurogenic autonomic failure"
+      "Early severe dysautonomia in a patient with parkinsonism shifts the differential toward MSA-P",
+      "MRI features (hot-cross-bun, putaminal slit) and autonomic testing severity define MSA over PD",
+      "Cardiac MIBG is reduced in PD but preserved in MSA — a useful biomarker when ambiguity persists",
+      "DaTscan is abnormal in both PD and MSA-P and so does not differentiate them"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": [
+      {
+        "data_point": "Brief or remote metoclopramide exposure mentioned in history",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Anchor toward drug-induced parkinsonism",
+        "correct_interpretation": "Progressive autonomic failure over 18 months is not explained by transient DA antagonist exposure"
+      },
+      {
+        "data_point": "Asymmetric motor onset",
+        "location": "neurological_exam.motor",
+        "field_path": "patient.neurological_exam.motor",
+        "intended_effect": "Anchor toward classic idiopathic PD",
+        "correct_interpretation": "MSA-P can present asymmetrically; clinical course (early dysautonomia, poor levodopa response) is the discriminator"
+      }
+    ]
   },
   "metadata": {
     "version": "1.0",
@@ -1088,6 +1153,38 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (condition-expert:PD)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:PD",
+    "difficulty_rationale": "MSA-P diagnosis; ≥5 required tools and PD/MSA discrimination",
+    "case_body_concerns": [
+      {
+        "case_id": "PD-P01",
+        "issue": "Case file uses PD- prefix but primary diagnosis is Multiple system atrophy, parkinsonian type (MSA-P)",
+        "proposed_fix": "Either re-prefix the case under the appropriate condition (MSA / DLB / PSP) or accept it as part of the PD-mimic R-cohort with cross-condition expert review"
+      },
+      {
+        "issue": "Required tool(s) ['check_drug_interactions'] lack initial/followup outputs in this case body; demoted to recommended to satisfy coherence validator",
+        "proposed_fix": "Add followup_outputs entries for the missing tool(s) so they can be elevated back to required category",
+        "tools_affected": [
+          "check_drug_interactions"
+        ]
+      }
+    ],
+    "citation_gap": [
+      {
+        "concern": "Primary diagnosis is off the PD criteria pack (Multiple system atrophy, parkinsonian type (MSA-P)); pack does not include MDS criteria citations for MSA (Gilman 2008, Wenning 2022), DLB (McKeith 2017), or PSP (Höglinger 2017)",
+        "proposed_citations": [
+          "[Gilman_2008_MSA]",
+          "[McKeith_2017_DLB]",
+          "[Hoglinger_2017_PSP]",
+          "[Wenning_2022_MSA]"
+        ],
+        "rationale": "Used Postuma/Tolosa citations from PD pack as the closest available; recommend extending the pack or routing this case to the dedicated MSA/DLB/PSP expert agent"
+      }
+    ],
+    "vocab_gap": []
   }
 }

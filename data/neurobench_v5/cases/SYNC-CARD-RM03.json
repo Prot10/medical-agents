@@ -702,139 +702,224 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Cardiac syncope due to Mobitz type II second-degree atrioventricular block with bifascicular block (advanced His-Purkinje conduction system disease)",
-    "icd_code": "R55",
+    "primary_diagnosis": "Cardiac syncope due to Mobitz II second-degree AV block with bifascicular conduction disease",
+    "icd_code": "I44.1",
     "differential": [
       {
-        "diagnosis": "Epileptic seizure",
+        "diagnosis": "Sustained ventricular tachycardia",
+        "likelihood": "moderate",
+        "key_features": "Structural heart disease can be a VT substrate; monitoring excludes.",
+        "icd_code": "I47.2"
+      },
+      {
+        "diagnosis": "Sick sinus syndrome",
         "likelihood": "low",
-        "key_features": "Normal EEG, no postictal confusion beyond 1 minute, no tongue biting, no incontinence, immediate lucid recovery — all argue strongly against epilepsy. Brief convulsive movements are consistent with convulsive syncope (cerebral hypoperfusion-induced myoclonus) rather than true seizure."
+        "key_features": "SNRT and EP help clarify.",
+        "icd_code": "I49.5"
+      },
+      {
+        "diagnosis": "Convulsive epileptic seizure",
+        "likelihood": "low",
+        "key_features": "Brief jerks with rapid recovery, normal EEG — convulsive syncope.",
+        "icd_code": "G40.909"
       },
       {
         "diagnosis": "Vasovagal syncope",
         "likelihood": "low",
-        "key_features": "No clear triggers (pain, prolonged standing, emotional stress), no prodromal symptoms (nausea, warmth, diaphoresis), episodes occur in various positions including seated, and age/sex profile is less typical for vasovagal syncope."
+        "key_features": "No prodrome, no trigger, advanced age — atypical.",
+        "icd_code": "R55"
       },
       {
         "diagnosis": "Orthostatic hypotension",
         "likelihood": "low",
-        "key_features": "Mild orthostatic changes noted on exam, but episodes also occur while seated and without positional component. Atenolol and anemia may contribute to orthostatic changes, but the ECG findings of Mobitz type II block better explain the abrupt syncope."
-      },
-      {
-        "diagnosis": "Subclinical hypothyroidism causing bradycardia and syncope",
-        "likelihood": "low",
-        "key_features": "Mildly elevated TSH with normal free T4 may contribute to bradycardia but does not explain Mobitz type II AV block or bifascicular block, which require structural conduction system disease."
-      },
-      {
-        "diagnosis": "Anemia-related syncope",
-        "likelihood": "low",
-        "key_features": "Moderate iron deficiency anemia (Hgb 10.8) may contribute to fatigue and exercise intolerance but alone does not explain abrupt loss of consciousness without prodrome. However, anemia may lower the hemodynamic threshold for symptoms during bradycardic episodes."
+        "key_features": "Events not positional; tilt-table not contributory once cardiac substrate is identified.",
+        "icd_code": "I95.1"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain 12-lead ECG to evaluate cardiac rhythm and conduction",
+        "action": "12-lead ECG immediately",
         "tool_name": "analyze_ecg",
-        "expected_finding": "Mobitz type II second-degree AV block with bifascicular block (RBBB + LAFB), sinus bradycardia",
-        "category": "required"
+        "expected_finding": "Sinus bradycardia with Mobitz II 3:2 conduction and bifascicular block",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.2"
       },
       {
         "step": 2,
-        "action": "Obtain routine EEG to rule out epilepsy given convulsive movements during episodes",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Normal EEG without epileptiform discharges",
-        "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
-      },
-      {
-        "step": 3,
-        "action": "Order comprehensive laboratory panel including CBC, BMP, troponin, BNP, and thyroid function",
+        "action": "Labs: CBC, BMP, Mg, troponin, BNP, TSH, glucose",
         "tool_name": "interpret_labs",
-        "expected_finding": "Microcytic anemia, elevated BNP, subclinical hypothyroidism — confounders identified but not sufficient to explain the presentation",
+        "expected_finding": "Rule out ACS and electrolyte triggers",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
-            "thyroid",
-            "troponin"
+            "magnesium",
+            "troponin",
+            "BNP",
+            "TSH"
           ]
-        }
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.3"
       },
       {
-        "step": 4,
-        "action": "Request continuous cardiac monitoring (Holter) to document intermittent AV block and pauses",
-        "tool_name": "order_cardiac_monitoring",
-        "expected_finding": "Frequent Mobitz type II block with episodes of high-grade AV block and prolonged pauses correlating with symptoms",
-        "category": "required",
-        "tool_parameters": {
-          "monitor_type": "holter_24h"
-        }
-      },
-      {
-        "step": 5,
-        "action": "Request transthoracic echocardiogram to assess cardiac structure and function",
+        "step": 3,
+        "action": "Echocardiogram",
         "tool_name": "order_echocardiogram",
-        "expected_finding": "Reduced LVEF, regional wall motion abnormalities consistent with ischemic cardiomyopathy",
+        "expected_finding": "Assess LV function, valvular and structural disease",
         "category": "required",
         "tool_parameters": {
           "echo_type": "TTE"
-        }
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §4.1"
+      },
+      {
+        "step": 4,
+        "action": "Continuous telemetry; Holter",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Frequency and severity of Mobitz II episodes",
+        "category": "required",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "citation": "[Locati_2014]",
+        "guideline_source": "Locati 2014"
+      },
+      {
+        "step": 5,
+        "action": "Medication review",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identify AV-nodal blockers and QT-prolongers",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §6"
       },
       {
         "step": 6,
-        "action": "Check drug interactions for atenolol in the setting of AV block",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Atenolol contraindicated in Mobitz type II block without pacemaker",
-        "category": "recommended"
+        "action": "Search literature for pacing indications",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Class I pacing for symptomatic Mobitz II",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ACC_AHA_HRS_2017]",
+        "guideline_source": "ACC/AHA/HRS 2017 §4"
       },
       {
         "step": 7,
-        "action": "Search literature for guidelines on pacemaker indications in Mobitz type II AV block with syncope",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Class I indication for permanent pacemaker implantation",
-        "category": "recommended"
+        "action": "Cardiology / EP consult",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Pacing plan",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ACC_AHA_HRS_2017]",
+        "guideline_source": "ACC/AHA/HRS 2017 §4"
       },
       {
         "step": 8,
-        "action": "Initiate continuous telemetry, hold atenolol, consult cardiology urgently for pacemaker evaluation, and consider temporary pacing if symptomatic pauses recur",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Cardiac MRI for fibrosis quantification if substrate unclear",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Mid-wall septal fibrosis at conduction-system level",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "perfusion_MRI"
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §4.3"
+      },
+      {
+        "step": 9,
+        "action": "Exercise stress test to characterise behaviour of block under sympathetic drive",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Worsening with exercise supports infranodal disease",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "exercise_stress_test"
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.4"
+      },
+      {
+        "step": 10,
+        "action": "Head CT given head strike on counter",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Rule out traumatic intracranial haemorrhage",
+        "category": "optional",
+        "tool_parameters": {},
+        "citation": "[Strickberger_2006]",
+        "guideline_source": "Strickberger 2006 §5"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "No focal deficit; brain MRI is low-yield in cardiac syncope with ECG-identified substrate.",
+        "citation": "[ACC_AHA_HRS_2017]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No clinical indication.",
+        "citation": ""
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_ecg",
+        "after": "consult_medical_specialist",
+        "reason": "ECG drives pacing pathway.",
+        "citation": "[ESC_2018]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "order_cardiac_monitoring",
+        "reason": "Troponin precedes monitoring plan.",
+        "citation": "[ROSE_2010]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Recognize ECG pattern of Mobitz type II AV block with bifascicular block as high-risk for progression to complete heart block",
-      "Identify that brief convulsive movements represent convulsive syncope (cerebral hypoperfusion) rather than epileptic seizures",
-      "Discontinue or hold atenolol which may worsen AV block",
-      "Initiate continuous cardiac monitoring (telemetry)",
-      "Urgent cardiology referral for permanent pacemaker implantation",
-      "Recognize that subclinical hypothyroidism and iron deficiency anemia are confounders but do not explain the high-grade conduction disease"
+      "Admit to telemetry",
+      "Pacing for symptomatic Mobitz II",
+      "Hold AV-nodal blockers",
+      "Counsel on driving restriction"
     ],
     "contraindicated_actions": [
-      "Starting antiepileptic drugs without confirmed epilepsy diagnosis — the convulsive movements are from cerebral hypoperfusion, not seizures",
-      "Increasing atenolol dose for rate control — beta-blockers are contraindicated in Mobitz type II block without a pacemaker",
-      "Administering IV verapamil or diltiazem — non-dihydropyridine calcium channel blockers will further impair AV conduction",
-      "Attributing syncope solely to iron deficiency anemia or subclinical hypothyroidism and discharging without cardiac workup",
-      "Performing lumbar puncture — not indicated in this clinical scenario"
+      "Do not give further AV-nodal blockers",
+      "Do not start AEDs based on convulsive jerks",
+      "Do not perform tilt-table",
+      "Do not discharge without pacing plan",
+      "Do not call `order_specialized_test` with parameters {'test_type': 'tilt_table'} — Tilt-table is not informative once Mobitz II is documented on ECG."
     ],
     "key_reasoning_points": [
-      "The abrupt onset of syncope without prodrome, brief duration of unconsciousness, and immediate return to full orientation favor a cardiac etiology over epilepsy or vasovagal syncope",
-      "Brief convulsive movements lasting 8-10 seconds during syncope are a well-recognized phenomenon (convulsive syncope) caused by transient cerebral hypoperfusion and do not indicate epilepsy",
-      "The ECG finding of Mobitz type II second-degree AV block with bifascicular block (RBBB + LAFB) identifies advanced His-Purkinje conduction system disease with high risk of intermittent complete heart block",
-      "A normal EEG, while not excluding epilepsy, supports the clinical impression that these episodes are not seizures when combined with the characteristic semiology",
-      "Subclinical hypothyroidism (TSH 6.8) and atenolol use are confounding factors that may contribute to bradycardia but do not explain the Mobitz type II block pattern, which requires structural conduction system disease",
-      "Iron deficiency anemia (Hgb 10.8) may lower the symptomatic threshold for hemodynamic compromise during bradycardic episodes but is not the primary cause of syncope",
-      "The family history of sudden cardiac death and pacemaker implantation in first-degree relatives raises suspicion for familial conduction system disease",
-      "The elevated BNP and subsequent echocardiographic finding of reduced LVEF suggest underlying ischemic cardiomyopathy as the substrate for the conduction disease"
+      "Mobitz II with syncope is a Class I pacing indication",
+      "Brief jerks with rapid recovery are convulsive syncope, not epilepsy",
+      "Head CT is justified by the head strike, not as a routine syncope tool"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "Witnessed brief limb jerking",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "May trigger AED initiation.",
+        "correct_interpretation": "Convulsive syncope; normal EEG."
+      },
+      {
+        "data_point": "Head strike on counter",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "May focus work-up on intracranial pathology.",
+        "correct_interpretation": "Head CT is appropriate, but the cardiac substrate is on ECG."
+      }
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -848,6 +933,14 @@
       "mri": "incidental",
       "csf": "normal",
       "ct": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SYNC-CARD",
+    "difficulty_rationale": "5 required tools, 2 red herrings; standard Mobitz II case with appropriate one-off head CT for trauma; recognising tilt-table is not informative once block is on ECG.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -770,129 +770,138 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Amyotrophic lateral sclerosis (ALS), bulbar-onset, moderate stage",
+    "primary_diagnosis": "Amyotrophic lateral sclerosis (ALS), bulbar-onset",
     "icd_code": "G12.21",
     "differential": [
       {
         "diagnosis": "Cervical spondylotic myelopathy",
-        "likelihood": "low",
-        "key_features": "Cervical stenosis on MRI without cord signal change; does not explain bulbar symptoms or widespread EMG denervation in all regions; upper cervical and bulbar EMG findings above C3 not attributable to spondylosis"
-      },
-      {
-        "diagnosis": "Multifocal motor neuropathy (MMN)",
-        "likelihood": "very_low",
-        "key_features": "Anti-GM1 antibodies negative; no conduction block on NCS; bulbar involvement atypical for MMN; does not explain UMN signs"
-      },
-      {
-        "diagnosis": "Kennedy disease (SBMA)",
-        "likelihood": "very_low",
-        "key_features": "Androgen receptor CAG repeat normal; female sex makes SBMA essentially impossible (X-linked recessive); no gynecomastia"
-      },
-      {
-        "diagnosis": "Progressive bulbar palsy (PBP) — ALS variant",
         "likelihood": "moderate",
-        "key_features": "EMG shows involvement beyond bulbar region; this represents bulbar-onset ALS, not isolated PBP"
+        "key_features": "Multilevel cervical spondylosis with C5-C6 stenosis on MRI, but cord signal preserved and findings above C3 (bulbar) are unexplained",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Progressive bulbar palsy (LMN-predominant bulbar variant)",
+        "likelihood": "moderate",
+        "key_features": "Bulbar-onset presentation; EMG shows widespread involvement beyond bulbar, consistent with bulbar-onset ALS rather than restricted PBP",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Multifocal motor neuropathy (MMN) with conduction block",
+        "likelihood": "low",
+        "key_features": "No conduction block on motor NCS; anti-GM1 negative; bulbar involvement atypical",
+        "icd_code": null
       },
       {
         "diagnosis": "Myasthenia gravis",
         "likelihood": "low",
-        "key_features": "No fatigable weakness, no ptosis, no diplopia; EMG shows denervation not decrement; would not explain fasciculations or hyperreflexia"
+        "key_features": "No fatigable weakness or ocular signs; EMG shows denervation rather than decrement",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Kennedy disease (SBMA)",
+        "likelihood": "very_low",
+        "key_features": "Female sex makes X-linked SBMA essentially impossible; androgen receptor CAG repeat normal",
+        "icd_code": null
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain brain and cervical spine MRI to evaluate for corticospinal tract changes and assess degree of spondylotic compression",
+        "action": "Obtain brain MRI (with cervical spine sequences) to exclude structural mimics — cervical myelopathy, demyelination, brainstem tumor",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Subtle bilateral corticospinal tract T2 hyperintensity; moderate cervical spondylosis without cord signal change",
+        "expected_finding": "No structural lesion explaining the motor/bulbar findings; corticospinal-tract signal change or non-specific findings may be seen but are not by themselves diagnostic",
         "category": "required",
         "tool_parameters": {
-          "modality": "MRI brain and cervical spine with and without contrast",
           "sequences": [
             "T1",
             "T2",
             "FLAIR",
             "DWI",
             "T1+Gd"
-          ]
-        }
+          ],
+          "include_cervical_spine": true
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       },
       {
         "step": 2,
-        "action": "Order comprehensive labs including CK, anti-GM1 antibodies, SPEP, TSH, B12, HIV, androgen receptor CAG repeat to exclude ALS mimics",
+        "action": "Perform EMG with nerve conduction studies sampling bulbar plus ≥2 spinal regions to document lower motor neuron involvement (fibrillations, positive sharp waves, complex fasciculation potentials, large-amplitude long-duration polyphasic MUPs with reduced recruitment) and exclude conduction block",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Active denervation and chronic reinnervation in ≥2 body regions with normal sensory NCS and no conduction block — meets Awaji / El Escorial revised criteria",
+        "category": "required",
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[Awaji_2008]",
+        "guideline_source": "Awaji_2008"
+      },
+      {
+        "step": 3,
+        "action": "Order a mimic-exclusion lab panel: CK, B12, TSH, HbA1c, HIV, RPR, SPEP, anti-GM1 IgM antibodies, and (in males) androgen receptor CAG repeat for Kennedy disease",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal CBC/BMP; elevated CK; negative anti-GM1, SPEP, HIV; normal CAG repeat confirming sporadic ALS",
+        "expected_finding": "CK often mildly to moderately elevated (2–5× ULN); reversible mimics (B12, TSH, HIV, RPR) negative; anti-GM1 negative; SPEP without high-titer M-spike; CAG repeat normal",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
+            "LFTs",
             "CK",
-            "anti-GM1 IgM",
-            "SPEP",
+            "B12",
             "TSH",
             "Free T4",
-            "B12",
             "HIV",
+            "RPR",
+            "SPEP",
+            "anti-GM1 IgM",
             "androgen receptor CAG repeat"
           ]
-        }
-      },
-      {
-        "step": 3,
-        "action": "Perform EMG/NCS to assess for lower motor neuron involvement in multiple body regions and rule out conduction block",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Active denervation in bulbar, cervical, thoracic regions; chronic reinnervation changes; normal sensory NCS; no conduction block",
-        "category": "required",
-        "tool_parameters": {
-          "test_type": "EMG and NCS",
-          "regions": [
-            "bulbar",
-            "cervical",
-            "thoracic",
-            "lumbosacral"
-          ]
-        }
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       },
       {
         "step": 4,
-        "action": "Obtain pulmonary function tests (FVC, SNIP, NIF) to assess respiratory muscle strength and guide NIV timing",
-        "tool_name": "interpret_labs",
-        "expected_finding": "FVC ~72% predicted, SNIP borderline reduced — early respiratory involvement requiring monitoring",
+        "action": "Measure respiratory function (FVC, MIP/MEP, SNIP/NIF) at baseline to inform NIV timing and prognostication",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "FVC and SNIP/MIP often reduced even in early disease; values guide timing of NIV (FVC <50% predicted or SNIP <40 cmH₂O are conventional thresholds)",
         "category": "required",
         "tool_parameters": {
-          "panels": [
-            "FVC",
-            "FEV1",
-            "SNIP",
-            "NIF",
-            "MIP",
-            "MEP"
-          ]
-        }
+          "test_type": "respiratory_function"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       },
       {
         "step": 5,
-        "action": "Order ALS genetic panel (C9orf72, SOD1, TARDBP, FUS) for genetic counseling purposes",
-        "tool_name": "interpret_labs",
-        "expected_finding": "All negative — sporadic ALS confirmed",
+        "action": "Search the medical literature to confirm Awaji and Gold Coast diagnostic thresholds and AAN practice-parameter recommendations relevant to this presentation",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Awaji-Shima 2008 / Gold Coast 2020 diagnostic criteria; AAN 2009 practice parameter on ALS care",
         "category": "recommended",
         "tool_parameters": {
-          "panels": [
-            "C9orf72 repeat expansion",
-            "SOD1 sequencing",
-            "TARDBP",
-            "FUS",
-            "UBQLN2",
-            "VCP"
-          ]
-        }
+          "query": "ALS diagnostic criteria Awaji Gold Coast AAN practice parameter"
+        },
+        "citation": "[Awaji_2008]",
+        "guideline_source": "Awaji_2008"
       },
       {
         "step": 6,
-        "action": "Obtain CSF for neurofilament light chain for prognostic stratification",
+        "action": "Order an ALS-focused genetic panel (C9orf72 repeat expansion, SOD1, TARDBP, FUS, TBK1) — required when family history is positive or onset is young (<50)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "C9orf72 expansion in ~40% of familial cases; SOD1/TARDBP/FUS in additional familial subset; ~10% of apparently sporadic cases also carry a variant",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "genetic_panel:ALS"
+        },
+        "citation": "[Brown_2017]",
+        "guideline_source": "Brown_2017"
+      },
+      {
+        "step": 7,
+        "action": "Obtain CSF for neurofilament light chain (NfL) for prognostic stratification when the diagnosis remains uncertain or when prognostic information will change management",
         "tool_name": "analyze_csf",
-        "expected_finding": "Markedly elevated NfL (>5,000 pg/mL) correlating with faster progression rate; absent oligoclonal bands",
+        "expected_finding": "Markedly elevated CSF NfL (typically >5,000 pg/mL) supports a motor-neuron-disease degenerative process and correlates with faster progression",
         "category": "recommended",
         "tool_parameters": {
           "tests": [
@@ -904,73 +913,124 @@
             "oligoclonal bands",
             "cytology"
           ]
-        }
-      },
-      {
-        "step": 7,
-        "action": "Initiate riluzole 50 mg twice daily after checking liver function and discussing ALS multidisciplinary care plan",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "No major interactions with current medications; LFT monitoring protocol required",
-        "category": "required",
-        "tool_parameters": {
-          "proposed_drug": "riluzole",
-          "current_medications": [
-            "lisinopril",
-            "levothyroxine"
-          ]
-        }
+        },
+        "citation": "[ENCALS_2018]",
+        "guideline_source": "ENCALS_2018"
       },
       {
         "step": 8,
-        "action": "Refer to ALS multidisciplinary clinic and schedule swallowing evaluation",
-        "tool_name": null,
-        "expected_finding": "ALSFRS-R scoring, speech-language pathology assessment, nutrition counseling",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Check interactions before initiating riluzole 50 mg twice daily; review baseline LFTs and CBC and counsel on monitoring",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "No major interactions for typical chronic medications; advise alcohol and grapefruit-juice avoidance (CYP1A2 modulators); monthly LFTs for first 3 months",
+        "category": "recommended",
+        "tool_parameters": {
+          "proposed_drug": "riluzole"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "ALS is a motor-neuron disease without cortical electrical signature; EEG has no diagnostic role and adds cost without benefit.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG is unrelated to motor neuron disease and not part of the standard ALS workup absent specific cardiac symptoms or pre-medication QTc checks.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is unrelated to ALS diagnosis; no indication absent comorbid cardiac disease.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring has no role in ALS diagnostic workup.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "MRI is the standard structural study for ALS workup; head CT adds no diagnostic value and exposes the patient to ionizing radiation.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in ALS diagnosis (motor-neuron rather than amyloid pathology) and carries a high cost.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan evaluates nigrostriatal dopaminergic integrity; it has no role in ALS, which spares the dopaminergic system.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "FDG-PET has no established diagnostic role in ALS and adds substantial cost.",
+        "citation": "[AAN_2009]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "Perform EMG/NCS to confirm lower motor neuron involvement in multiple body regions — definitive for ALS diagnosis",
-      "Measure FVC and SNIP — respiratory involvement determines prognosis and timing of life-prolonging interventions",
-      "Exclude ALS mimics: anti-GM1 antibodies (MMN), androgen receptor CAG repeat (Kennedy disease), SPEP (paraproteinemia)",
-      "Initiate riluzole — only disease-modifying therapy with survival benefit",
-      "Refer to ALS multidisciplinary clinic for comprehensive management",
-      "Assess swallowing safety (SLP evaluation) given dysphagia and aspiration risk"
+      "Perform EMG/NCS sampling the bulbar region plus ≥2 spinal regions to document lower-motor-neuron involvement and exclude conduction block.",
+      "Obtain brain MRI to exclude structural mimics (cervical myelopathy, demyelinating disease, brainstem tumor).",
+      "Order a mimic-exclusion lab panel (CK, B12, TSH, HIV, RPR, SPEP, anti-GM1 IgM, androgen receptor CAG repeat in males).",
+      "Measure baseline respiratory function (FVC, MIP/MEP, SNIP) to inform NIV timing.",
+      "Obtain a swallowing evaluation by speech-language pathology given dysphagia and aspiration risk.",
+      "Apply Awaji-Shima 2008 / Gold Coast 2020 criteria to confirm the diagnosis.",
+      "Initiate riluzole 50 mg twice daily after baseline LFTs unless contraindicated; arrange monthly LFT monitoring for the first 3 months.",
+      "Refer to a multidisciplinary ALS clinic for SLP, dietetics, respiratory, and social-work input."
     ],
     "contraindicated_actions": [
-      "Cervical spine surgery without clear evidence that myelopathy is the primary diagnosis — EMG and bulbar findings indicate ALS, not isolated myelopathy",
-      "Initiating immunosuppressive therapy (steroids, IVIG) without excluding ALS mimics — would not benefit ALS and delays correct diagnosis",
-      "Dismissing bulbar symptoms as functional or psychiatric without full neurological workup",
-      "Delaying respiratory assessment — even mild FVC reduction in ALS requires close monitoring and early NIV planning"
+      "Do not commit the patient to cervical spine surgery on the basis of incidental spondylotic changes when EMG findings extend beyond the cervical cord.",
+      "Do not start chronic immunosuppression (steroids, IVIG, plasma exchange) for ALS — there is no benefit and treatment delays correct diagnosis.",
+      "Do not defer respiratory assessment in a symptomatic patient — even mild FVC reduction warrants close monitoring and NIV planning.",
+      "Do not dismiss bulbar or progressive symptoms as functional / psychiatric without a complete neurological workup.",
+      "Do not continue oral feeding without a swallowing assessment given documented dysphagia and aspiration risk."
     ],
     "key_reasoning_points": [
-      "Bulbar-onset ALS: dysarthria and dysphagia are the presenting symptoms, with tongue fasciculations and emotional lability (pseudobulbar affect) indicating both UMN and LMN involvement",
-      "Moderate difficulty: cervical spondylosis on MRI creates diagnostic uncertainty about myelopathic contribution, but bulbar findings (above cervical) and widespread EMG denervation in 3+ regions cannot be explained by cervical disease alone",
-      "Upper motor neuron signs (hyperreflexia, Babinski, Hoffman, brisk jaw jerk) combined with lower motor neuron signs (tongue atrophy/fasciculations, CK elevation, EMG denervation) fulfill diagnostic criteria for ALS",
-      "Normal sensory NCS is a critical distinguishing feature — excludes peripheral neuropathy and Kennedy disease (which has sensory abnormalities)",
-      "El Escorial revised criteria and Awaji criteria both satisfied: UMN and LMN signs in 3 body regions (bulbar, cervical, thoracic), with lumbosacral involvement on EMG",
-      "Markedly elevated CSF NfL (>8,000 pg/mL) indicates rapid motor neuron degeneration and suggests faster disease progression — important prognostic information",
-      "Early respiratory monitoring essential: FVC at 72% and approaching SNIP threshold — NIV initiation at <50% FVC or <40 cmH2O SNIP prolongs survival and improves quality of life"
+      "Diagnosis requires evidence of both upper-motor-neuron involvement (hyperreflexia, Babinski, Hoffman, brisk jaw jerk, spasticity) and lower-motor-neuron involvement (atrophy, fasciculations, EMG denervation) with progressive spread, while excluding mimics — Awaji 2008 / Gold Coast 2020.",
+      "EMG in bulbar plus ≥2 spinal regions documenting fibrillations, positive sharp waves, complex fasciculation potentials, and large-amplitude long-duration polyphasic MUPs with reduced recruitment satisfies the electrodiagnostic criterion.",
+      "Normal sensory NCS and absence of conduction block are pivotal: they exclude common mimics including multifocal motor neuropathy, CIDP, and Kennedy disease.",
+      "Mild-to-moderate CK elevation (2–5× ULN) is consistent with ALS and does not itself indicate a primary myopathy.",
+      "Cervical spondylotic changes on MRI are common incidental findings in the at-risk age group; bulbar findings or multi-region EMG denervation cannot be attributed to cervical disease.",
+      "Baseline FVC, MIP/MEP, and SNIP/NIF inform NIV timing — NIV initiation at FVC <50% predicted or SNIP <40 cmH₂O prolongs survival and improves quality of life.",
+      "Markedly elevated CSF neurofilament light chain (>5,000 pg/mL) supports motor neuron degeneration and correlates with progression rate (ENCALS prediction model).",
+      "Bulbar-onset disease carries a worse prognosis; early NIV planning and swallowing/feeding strategy are higher priority than in limb-onset disease."
     ],
     "red_herrings": [
       {
-        "data_point": "Moderate cervical spondylosis with C5-C6 central stenosis on MRI",
+        "data_point": "Moderate cervical spondylosis with C5-C6 central stenosis on brain/cervical MRI",
         "location": "Initial MRI report",
-        "intended_effect": "Distract toward cervical myelopathy as primary or sole diagnosis, potentially leading to neurosurgical referral",
-        "correct_interpretation": "Spondylosis is a common incidental finding. Cord signal change is absent. Bulbar symptoms (tongue fasciculations, dysarthria, dysphagia) cannot be explained by cervical pathology. EMG shows denervation above C3 in bulbar region — definitively not attributable to cervical stenosis.",
-        "field_path": ""
+        "field_path": "initial_tool_outputs.mri.findings[1]",
+        "intended_effect": "Anchors the agent on cervical myelopathy as the primary explanation, potentially deferring ALS workup or generating an inappropriate neurosurgical referral",
+        "correct_interpretation": "Spondylosis is common in this age group, cord signal is preserved, and bulbar findings (tongue fasciculations, dysarthria) arise above the cervical cord — they cannot be explained by cervical disease"
       },
       {
         "data_point": "History of right carpal tunnel syndrome surgically released 5 years ago",
         "location": "Past medical history",
-        "intended_effect": "Suggest entrapment neuropathy as current cause of hand weakness",
-        "correct_interpretation": "Remote CTS with successful surgical release is unrelated to current bilateral hand weakness. EMG shows active denervation in non-median-nerve-innervated muscles bilaterally, confirming motor neuron disease.",
-        "field_path": ""
+        "field_path": "patient.clinical_history.past_medical_history[3]",
+        "intended_effect": "Suggests entrapment neuropathy as the cause of current hand weakness",
+        "correct_interpretation": "Remote CTS is unrelated; current EMG shows active denervation in non-median-innervated muscles bilaterally with normal sensory NCS, confirming motor neuron disease"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "v5",
@@ -985,6 +1045,20 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:ALS",
+    "difficulty_rationale": "4 required tools (MRI, labs, EMG/NCS, respiratory), 2 plausible red herrings (cervical spondylosis, remote CTS) require cross-modality synthesis to dismiss",
+    "case_body_concerns": [
+      {
+        "field_path": "followup_outputs",
+        "concern": "ALS genetic panel is wired to `interpret_labs` rather than `order_specialized_test` with `test_type: genetic_panel:ALS`. Per the criteria pack and TOOL_PARAMETER_VOCABULARY, genetic testing should resolve via order_specialized_test. The gold trajectory routes the action via order_specialized_test; the case body fix is a tool-name swap in followup_outputs without changing the report payload.",
+        "suggested_fix": "Change followup tool_name from interpret_labs to order_specialized_test for the ALS_Genetic_Panel followup; payload structure can stay."
+      }
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

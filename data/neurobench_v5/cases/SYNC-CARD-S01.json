@@ -659,151 +659,196 @@
   },
   "ground_truth": {
     "primary_diagnosis": "Cardiac syncope due to complete (third-degree) atrioventricular block",
-    "icd_code": "R55",
+    "icd_code": "I44.2",
     "differential": [
       {
-        "diagnosis": "Epileptic seizure",
+        "diagnosis": "Sustained ventricular tachycardia",
+        "likelihood": "moderate",
+        "key_features": "Prior CAD is a substrate for VT; monitoring and EP study address.",
+        "icd_code": "I47.2"
+      },
+      {
+        "diagnosis": "Sick sinus syndrome / tachy-brady",
         "likelihood": "low",
-        "key_features": "No tonic-clonic activity witnessed, no post-ictal confusion, no tongue bite, no urinary incontinence, normal EEG. Wife specifically noted this looked different from seizures."
+        "key_features": "Paroxysmal AF with conversion pauses can cause syncope; the documented complete AV block is the primary mechanism here.",
+        "icd_code": "I49.5"
+      },
+      {
+        "diagnosis": "Acute coronary syndrome with bradyarrhythmia",
+        "likelihood": "low",
+        "key_features": "Inferior wall MI can cause complete AV block; troponin and serial ECG distinguish.",
+        "icd_code": "I21.9"
       },
       {
         "diagnosis": "Vasovagal syncope",
-        "likelihood": "low",
-        "key_features": "No identifiable trigger (pain, prolonged standing, emotional stress), no prodromal symptoms of nausea or diaphoresis, age and cardiac history favor cardiac etiology."
+        "likelihood": "very_low",
+        "key_features": "Sudden collapse without prodrome in a high-risk patient is not vasovagal.",
+        "icd_code": "R55"
       },
       {
         "diagnosis": "Orthostatic hypotension",
-        "likelihood": "low",
-        "key_features": "Event occurred while seated (not on standing), on antihypertensives and beta-blocker but no positional component. Any orthostatic changes are secondary to fixed low heart rate."
-      },
-      {
-        "diagnosis": "Transient ischemic attack",
         "likelihood": "very_low",
-        "key_features": "No focal neurological deficits, TIA rarely causes true loss of consciousness, normal neurological exam, normal brain imaging."
-      },
-      {
-        "diagnosis": "Pulmonary embolism",
-        "likelihood": "very_low",
-        "key_features": "No dyspnea, chest pain, tachycardia, or hypoxia. SpO2 96%. No risk factors for DVT. Syncope mechanism is clearly explained by complete heart block."
+        "key_features": "Events not positional; ECG shows the substrate.",
+        "icd_code": "I95.1"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain 12-lead ECG immediately upon presentation",
+        "action": "12-lead ECG immediately",
         "tool_name": "analyze_ecg",
-        "expected_finding": "Complete heart block with ventricular escape rhythm at 35 bpm",
-        "category": "required"
+        "expected_finding": "Third-degree AV block with slow ventricular escape ~35 bpm",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.2"
       },
       {
         "step": 2,
-        "action": "Continuous telemetry monitoring and establish IV access",
-        "tool_name": null,
-        "expected_finding": "Persistent bradycardia with complete AV dissociation",
-        "category": "required"
-      },
-      {
-        "step": 3,
-        "action": "Obtain comprehensive laboratory studies including CBC, BMP, troponin, BNP, coagulation studies, TSH",
+        "action": "Labs: CBC, BMP, Mg, troponin, BNP, TSH, glucose, INR (if anticoagulated)",
         "tool_name": "interpret_labs",
-        "expected_finding": "No metabolic cause for syncope, troponin borderline, BNP elevated",
+        "expected_finding": "Troponin negative excludes ACS-related AV block; electrolytes documented",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
-            "coagulation",
-            "thyroid",
-            "troponin"
+            "magnesium",
+            "troponin",
+            "BNP",
+            "TSH"
           ]
-        }
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.3"
       },
       {
-        "step": 4,
-        "action": "Prepare for transcutaneous pacing and have atropine available for symptomatic bradycardia",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
-      },
-      {
-        "step": 5,
-        "action": "Urgent cardiology consultation for temporary pacing and permanent pacemaker planning",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
-      },
-      {
-        "step": 6,
-        "action": "Obtain EEG to evaluate for epileptiform abnormalities and rule out seizure",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Normal EEG, no epileptiform abnormalities",
-        "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
-      },
-      {
-        "step": 7,
-        "action": "Obtain transthoracic echocardiogram to assess structural heart disease",
+        "step": 3,
+        "action": "Echocardiogram for structural assessment",
         "tool_name": "order_echocardiogram",
-        "expected_finding": "Mildly reduced LVEF, aortic sclerosis, LA dilation",
+        "expected_finding": "LV function, valvular assessment, regional wall motion",
         "category": "required",
         "tool_parameters": {
           "echo_type": "TTE"
-        }
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §4.1"
+      },
+      {
+        "step": 4,
+        "action": "Continuous inpatient telemetry; arrange permanent pacing",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Persistent third-degree AV block on telemetry",
+        "category": "required",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "citation": "[Locati_2014]",
+        "guideline_source": "Locati 2014"
+      },
+      {
+        "step": 5,
+        "action": "Medication review for AV-nodal blockers and QT-prolonging agents",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identify AV-nodal blockers contributing to block (beta-blocker, digoxin, AAD)",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §6"
+      },
+      {
+        "step": 6,
+        "action": "Confirm pacing indication for complete heart block",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Class I indication for permanent pacemaker in symptomatic third-degree AV block",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[ACC_AHA_HRS_2017]",
+        "guideline_source": "ACC/AHA/HRS 2017 §4"
+      },
+      {
+        "step": 7,
+        "action": "Cardiology / EP consult for pacemaker implant",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Dual-chamber pacemaker plan",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ACC_AHA_HRS_2017]",
+        "guideline_source": "ACC/AHA/HRS 2017 §4"
       },
       {
         "step": 8,
-        "action": "Hold metoprolol and other AV-nodal blocking agents",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Cardiac MRI for ischaemic vs degenerative substrate if dx unclear",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Characterise scar burden and conduction-system involvement",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "perfusion_MRI"
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §4.3"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No clinical features suggesting CNS infection or haemorrhage.",
+        "citation": ""
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_ecg",
+        "after": "consult_medical_specialist",
+        "reason": "ECG diagnosis of complete AV block drives immediate pacing pathway.",
+        "citation": "[ESC_2018]",
+        "severity": "hard"
       },
       {
-        "step": 9,
-        "action": "Admit to telemetry unit or CCU for monitoring pending pacemaker implantation",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
-      },
-      {
-        "step": 10,
-        "action": "Plan for permanent pacemaker implantation (dual-chamber DDD or CRT-P given reduced LVEF)",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "before": "interpret_labs",
+        "after": "order_cardiac_monitoring",
+        "reason": "Troponin and electrolytes must be available before pacing strategy is committed.",
+        "citation": "[ROSE_2010]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Obtain 12-lead ECG immediately to identify complete heart block",
-      "Initiate continuous cardiac monitoring",
-      "Urgent cardiology consultation for pacing",
-      "Hold metoprolol and all AV-nodal blocking agents immediately",
-      "Have transcutaneous pacing pads applied and ready",
-      "Recognize that the syncope is cardiac in origin and not a seizure"
+      "Immediate admission and continuous telemetry",
+      "Cardiology / EP consult for urgent permanent pacemaker",
+      "Hold AV-nodal blockers contributing to AV block",
+      "Consider temporary transvenous pacing if haemodynamically unstable",
+      "Counsel on driving restriction until pacing is in place"
     ],
     "contraindicated_actions": [
-      "Initiating antiepileptic drugs based on syncope misdiagnosed as seizure",
-      "Administering beta-blockers or calcium channel blockers that further suppress AV conduction",
-      "Discharging the patient without cardiac monitoring and pacemaker evaluation",
-      "Performing lumbar puncture (no indication, patient is on anticoagulation)",
-      "Administering IV adenosine (would worsen AV block)",
-      "Ordering carotid Doppler as primary evaluation (syncope is not TIA)"
+      "Do not give further beta-blockers, non-DHP CCBs, digoxin, or adenosine",
+      "Do not discharge without pacing",
+      "Do not delay pacing waiting for outpatient follow-up",
+      "Do not allow driving until clearance"
     ],
     "key_reasoning_points": [
-      "The sudden, unheralded loss of consciousness without warning or prodrome is characteristic of cardiac syncope (Stokes-Adams attack) rather than vasovagal syncope or seizure",
-      "The absence of tonic-clonic activity, post-ictal confusion, tongue biting, and urinary incontinence argues strongly against an epileptic seizure",
-      "Rapid return to full alertness after the event is typical of cardiac syncope and atypical for seizure (which usually has a post-ictal period)",
-      "The ECG showing complete heart block with ventricular escape at 35 bpm provides the definitive diagnosis and explains the syncopal mechanism",
-      "The patient's history of coronary artery disease, atrial fibrillation, and aortic sclerosis suggests degenerative conduction system disease (Lenegre-Lev disease) as the underlying etiology",
-      "Metoprolol (a beta-blocker) may be contributing to the severity of the bradycardia and must be held immediately",
-      "The normal EEG supports the cardiac rather than epileptic etiology of the transient loss of consciousness",
-      "Elevated BNP suggests chronic cardiac dysfunction from sustained bradycardia, further supporting the need for permanent pacing"
+      "Third-degree AV block with syncope is a Class I indication for permanent pacing",
+      "AV-nodal blockers must be held while pacing is being arranged",
+      "Holter and EP study are confirmatory but should not delay pacing in clear-cut cases",
+      "Driving must be restricted until pacing and clearance"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "Small forehead laceration from fall",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "May trigger reflexive head CT for minor laceration.",
+        "correct_interpretation": "Without persistent neurological signs or anticoagulation in a CT-warranted scenario, head CT does not change management; the diagnostic chain is cardiac."
+      },
+      {
+        "data_point": "Past palpitations attributed to anxiety",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "May anchor to functional/anxiety attribution for prior near-syncopes.",
+        "correct_interpretation": "In hindsight likely paroxysmal arrhythmia; the recurrent presyncope-then-collapse trajectory and ECG findings clarify."
+      }
+    ]
   },
   "metadata": {
     "version": "1.0",
@@ -820,6 +865,14 @@
       "csf": "normal",
       "literature_search": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SYNC-CARD",
+    "difficulty_rationale": "ECG-diagnostic complete AV block makes the diagnosis straightforward; required tools are 4-5 with limited cross-modality synthesis once the rhythm is identified.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

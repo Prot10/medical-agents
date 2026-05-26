@@ -503,95 +503,194 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Status epilepticus from concurrent eclampsia with HELLP syndrome AND breakthrough epilepsy from subtherapeutic lamotrigine at 28 weeks gestation",
-    "icd_code": "G41.9",
+    "primary_diagnosis": "Convulsive status epilepticus from concurrent eclampsia with HELLP syndrome and breakthrough epilepsy from subtherapeutic lamotrigine at 28 weeks gestation",
+    "icd_code": "G41.0",
     "differential": [
       {
-        "diagnosis": "Eclampsia alone (without underlying epilepsy)",
-        "likelihood": "low",
-        "key_features": "Both eclampsia (BP 168/104, proteinuria, HELLP, PRES) and subtherapeutic lamotrigine contribute"
+        "diagnosis": "Eclampsia alone (without breakthrough epilepsy)",
+        "likelihood": "very_high",
+        "key_features": "BP 168/104, proteinuria, HELLP labs (AST 142, ALT 118, LDH 684, plt 88) — eclampsia confirmed",
+        "icd_code": "O15.1"
       },
       {
-        "diagnosis": "Breakthrough epilepsy alone (not eclampsia)",
-        "likelihood": "low",
-        "key_features": "Hypertension 168/104, proteinuria, HELLP, PRES all indicate eclampsia"
+        "diagnosis": "PRES from eclampsia",
+        "likelihood": "high",
+        "key_features": "CT shows bilateral parieto-occipital hypodensity consistent with PRES; characteristic of eclampsia",
+        "icd_code": "I67.4"
       },
       {
-        "diagnosis": "New-onset autoimmune encephalitis in pregnancy",
-        "likelihood": "very_low",
-        "key_features": "NMDAR negative; HELLP laboratory pattern; lamotrigine subtherapeutic"
+        "diagnosis": "Subtherapeutic lamotrigine breakthrough alone",
+        "likelihood": "high",
+        "key_features": "LTG 2.8 critically subtherapeutic — pregnancy increases LTG clearance markedly",
+        "icd_code": "G40.909"
+      },
+      {
+        "diagnosis": "Cerebral venous sinus thrombosis (pregnancy risk)",
+        "likelihood": "moderate",
+        "key_features": "Pregnancy hypercoagulable; MRV indicated if standard MRI inconclusive",
+        "icd_code": "I67.6"
+      },
+      {
+        "diagnosis": "Stroke (ischemic or hemorrhagic)",
+        "likelihood": "low",
+        "key_features": "CT shows no acute hemorrhage; MRI to assess for stroke",
+        "icd_code": "I63.9"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Recognize dual diagnosis - eclampsia AND breakthrough epilepsy SE",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Lamotrigine 2.8 subtherapeutic + HELLP (Plt 88, AST/ALT elevated, proteinuria 4.2) + BP 168/104",
+        "action": "EEG — confirm SE or post-ictal state",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Post-ictal diffuse 2-3 Hz delta slowing; no ongoing ictal activity after first-line treatment",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "EEG confirms SE; PRES pattern post-ictally",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Post-ictal slowing; no NCSE; posterior slowing from PRES",
+        "action": "Labs: CBC, CMP, glucose, Ca/Mg, AED level (LTG), LFTs, LDH, haptoglobin, smear, proteinuria, beta-hCG, uric acid, coags",
+        "tool_name": "interpret_labs",
+        "expected_finding": "LTG 2.8 (CRITICAL low), platelets 88, AST 142, ALT 118, LDH 684 — HELLP; proteinuria 4.2",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Magnesium sulfate for eclampsia + lamotrigine increase for epilepsy",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Both can be given together; avoid valproate in pregnancy; levetiracetam preferred AED add-on",
+        "action": "Non-contrast head CT — exclude hemorrhage",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Bilateral parieto-occipital hypodensity — PRES pattern; no hemorrhage",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "MRI confirms PRES from eclampsia",
+        "action": "MRI brain — characterize PRES vs CVST vs stroke (consider MRV)",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Bilateral parieto-occipital PRES; no DWI restriction",
+        "expected_finding": "Parieto-occipital FLAIR hyperintensity without DWI restriction — PRES; MRV to exclude CVST",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "HELLP + eclampsia: delivery planning with obstetrics",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "HELLP worsening = delivery indication; betamethasone for fetal lungs at 28 weeks",
+        "action": "Drug-interaction check: magnesium sulfate + LTG; antihypertensives in pregnancy",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "IV magnesium sulfate first-line for eclampsia; labetalol/hydralazine/nifedipine safe in pregnancy; LTG safe",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[ESETT_2019]",
+        "guideline_source": ""
+      },
+      {
+        "step": 6,
+        "action": "Literature: eclampsia + epilepsy in pregnancy — delivery decisions",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Magnesium sulfate is first-line in eclampsia (not benzodiazepines alone); delivery is definitive treatment for HELLP",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 7,
+        "action": "Obstetric / maternal-fetal medicine consultation",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Delivery planning at 28 weeks given HELLP",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "study_type": "TTE"
+        },
+        "rationale": "No clinical suspicion of cardiac source of embolus or cardiogenic seizure; routine echo is not indicated in SE workup absent cardiac findings.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No suspicion of arrhythmogenic syncope or cardiac comorbidity precipitating SE; routine telemetry beyond standard ICU monitoring adds cost without yield.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in acute SE evaluation; dementia biomarker imaging does not change acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is for ischemic stroke workup; SE without focal vascular suspicion does not warrant carotid imaging.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "DaTscan / dopamine transporter imaging has no role in SE; no parkinsonism question relevant to acute management.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Confirm platelets, LFTs and beta-hCG (28 weeks pregnancy) before AED choice.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Both eclampsia AND breakthrough epilepsy SE are present - treat both simultaneously",
-      "Magnesium sulfate 4-6 g IV loading + 2 g/h maintenance for eclampsia",
-      "Lamotrigine dose increase (pregnancy dramatically increases clearance up to 300%)",
-      "IV levetiracetam add-on for breakthrough epilepsy (NOT valproate - teratogenic)",
-      "HELLP worsening (platelets declining) = delivery indication",
-      "Betamethasone for fetal lung maturity at 28 weeks before delivery",
-      "Continuous fetal heart monitoring",
-      "Multidisciplinary: neurology + maternal-fetal medicine + neonatology"
+      "IV magnesium sulfate 4-6 g bolus then infusion — FIRST-line for eclampsia (not benzodiazepine alone)",
+      "Lower blood pressure with labetalol/hydralazine/nifedipine (pregnancy-safe)",
+      "Reload lamotrigine to therapeutic levels (pregnancy markedly increases clearance)",
+      "Obstetric consultation for delivery planning (HELLP)",
+      "IV lorazepam if seizures persist despite magnesium"
     ],
     "contraindicated_actions": [
-      "Do not use valproate in pregnancy - teratogenic (neural tube defects, cognitive effects)",
-      "Magnesium sulfate does NOT treat primary epilepsy SE - levetiracetam or lamotrigine must be added",
-      "Do not miss HELLP syndrome - declining platelets indicate need for urgent delivery decision",
-      "Do not delay fetal monitoring - fetal distress assessment mandatory"
+      "Do NOT use valproate in pregnancy — major teratogen",
+      "Do NOT perform LP with HELLP coagulopathy",
+      "Do NOT delay delivery in HELLP regardless of gestational age once mother is stabilized",
+      "Do NOT use ACE inhibitors / ARBs in pregnancy",
+      "LP contraindicated with HELLP coagulopathy (platelets 88, abnormal coags) — spinal hematoma risk.",
+      "Do NOT use valproate in pregnancy — major teratogen; do NOT use phenytoin without obstetric monitoring — fetal effects."
     ],
     "key_reasoning_points": [
-      "Dual diagnosis: eclampsia (confirmed by HELLP + BP + proteinuria + PRES) AND breakthrough epilepsy (subtherapeutic lamotrigine in pregnancy)",
-      "Magnesium sulfate is first-line for eclampsia but does NOT treat primary epilepsy SE - both must be addressed",
-      "Lamotrigine clearance increases 50-300% in pregnancy - therapeutic monitoring critical",
-      "HELLP syndrome with declining platelets = delivery is definitive treatment at 28 weeks",
-      "PRES is reversible with BP control and delivery - no DWI restriction means no permanent infarction",
-      "Valproate contraindicated in pregnancy due to teratogenicity"
+      "Eclampsia is treated with IV magnesium sulfate FIRST — not benzodiazepines alone",
+      "Pregnancy markedly increases lamotrigine clearance; doses often need to double by third trimester",
+      "HELLP coagulopathy contraindicates LP",
+      "Delivery is the definitive treatment for HELLP"
     ],
-    "red_herrings": [],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": [
+      {
+        "data_point": "AST 142, ALT 118, LDH 684, platelets 88",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests primary hepatitis or coagulopathy",
+        "correct_interpretation": "These labs define HELLP syndrome — a pregnancy-specific microangiopathy requiring delivery and magnesium"
+      }
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -600,6 +699,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "7 required tools; key teaching is magnesium-first for eclampsia, LTG clearance in pregnancy, avoiding teratogens; LP harmful; 1 grounded red herring.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

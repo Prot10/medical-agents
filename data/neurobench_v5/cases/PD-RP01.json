@@ -893,168 +893,233 @@
   "ground_truth": {
     "primary_diagnosis": "Parkinson's disease with autonomic dysfunction and mild cognitive impairment",
     "icd_code": "G20",
-    "red_herrings": [
-      {
-        "data_point": "Known Wolff-Parkinson-White syndrome with delta waves on ECG, short PR interval, history of prior syncope from documented pre-excitation, and two new syncopal episodes attributed to WPW by outside cardiologist",
-        "location": "past_medical_history, initial_tool_outputs.ecg, and history_present_illness",
-        "intended_effect": "The WPW pattern on ECG is a major structural red herring — the ECG's delta waves and short PR interval provide a plausible and well-documented cardiac explanation for the syncopal episodes, potentially preventing the agent from investigating orthostatic hypotension or recognizing that syncope has a neurogenic etiology",
-        "correct_interpretation": "Syncope in this patient is positional (standing from seated, standing in garage), associated with documented orthostatic hypotension (BP drop 26/16 mmHg with blunted heart rate response), and occurs in the context of progressive parkinsonism with autonomic failure. Holter monitoring shows no tachyarrhythmias and no correlation between symptoms and rhythm changes. The WPW, though present, is not causing the syncope",
-        "field_path": ""
-      },
-      {
-        "data_point": "Father died of cardiac arrhythmia and had WPW syndrome; paternal uncle had cardiac conduction abnormalities",
-        "location": "family_history",
-        "intended_effect": "The strong family history of WPW and cardiac conduction disease reinforces the attribution bias toward a heritable cardiac syndrome as the cause of syncope, further discouraging neurological investigation",
-        "correct_interpretation": "The familial WPW inheritance pattern explains the patient's conduction abnormality but does not explain the full clinical syndrome of progressive parkinsonism, RBD, hyposmia, constipation, and orthostatic hypotension, which together form a prodromal alpha-synucleinopathy constellation",
-        "field_path": ""
-      }
-    ],
     "differential": [
       {
-        "diagnosis": "Multiple system atrophy, parkinsonian type (MSA-P)",
+        "diagnosis": "Multiple system atrophy (MSA-P)",
+        "likelihood": "high",
+        "key_features": "Prominent autonomic failure raises MSA concern; however asymmetric onset, gradual course, and lack of cerebellar findings favor PD with autonomic involvement"
+      },
+      {
+        "diagnosis": "Dementia with Lewy bodies",
         "likelihood": "moderate",
-        "key_features": "Symmetric parkinsonism, early prominent autonomic failure, moderate levodopa response. However, absence of cerebellar signs, normal brainstem/cerebellum on MRI, and positive (though moderate) levodopa response argue against MSA-P"
+        "key_features": "Cognitive features present, but visual hallucinations and fluctuations not prominent at onset"
       },
       {
-        "diagnosis": "Dementia with Lewy bodies (DLB)",
-        "likelihood": "low",
-        "key_features": "RBD and cognitive changes present, but motor features preceded cognitive symptoms by >1 year (PD convention), no visual hallucinations or fluctuating cognition"
+        "diagnosis": "Cardiac syncope (Wolff-Parkinson-White)",
+        "likelihood": "moderate",
+        "key_features": "WPW history must be re-evaluated as a contributor to syncope independent of orthostatic mechanism"
       },
       {
-        "diagnosis": "WPW-related cardiac syncope",
+        "diagnosis": "Drug-induced parkinsonism",
         "likelihood": "low",
-        "key_features": "Known WPW is a red herring for syncope etiology; episodes are orthostatic in nature with no captured arrhythmias on Holter. WPW syncope typically involves rapid pre-excited AF, not positional lightheadedness"
+        "key_features": "Any metoclopramide mention noted; would not explain progressive autonomic failure"
       },
       {
-        "diagnosis": "Progressive supranuclear palsy (PSP)",
+        "diagnosis": "Progressive supranuclear palsy",
         "likelihood": "low",
-        "key_features": "No vertical gaze palsy, no axial-predominant rigidity, no hummingbird sign on MRI, moderate levodopa response present"
-      },
-      {
-        "diagnosis": "Essential tremor",
-        "likelihood": "low",
-        "key_features": "Mother has ET which may confuse family history, but patient has bradykinesia, rigidity, and postural instability distinguishing from ET"
+        "key_features": "No vertical supranuclear gaze palsy"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain brain MRI to evaluate structural causes of parkinsonism and distinguish PD from atypical parkinsonism",
+        "action": "Obtain brain MRI looking for MSA imaging features and excluding structural / vascular cause",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Subtle putaminal changes; normal brainstem and cerebellum (no MSA-C or PSP features)",
+        "expected_finding": "No hot-cross-bun or putaminal slit; mild non-specific changes",
         "category": "required",
         "tool_parameters": {
           "protocol": "standard",
-          "contrast": false
-        }
+          "contrast": false,
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "SWI"
+          ]
+        },
+        "citation": "[Schwarz_2014]",
+        "guideline_source": "Schwarz_2014"
       },
       {
         "step": 2,
-        "action": "Order comprehensive laboratory workup including CBC, BMP, thyroid function, B12, ceruloplasmin, RPR to exclude secondary causes of parkinsonism",
+        "action": "Order baseline labs (CBC, CMP, TSH, B12, RPR)",
         "tool_name": "interpret_labs",
-        "expected_finding": "All normal, excluding metabolic and toxic etiologies",
+        "expected_finding": "Exclude reversible mimics",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
-            "thyroid",
+            "CMP",
+            "TSH",
             "B12",
             "RPR"
           ]
-        }
+        },
+        "citation": "[Postuma_2015]",
+        "guideline_source": "Postuma_2015"
       },
       {
         "step": 3,
-        "action": "Review ECG findings and recognize that WPW pattern does not explain orthostatic syncope",
-        "tool_name": "analyze_ecg",
-        "expected_finding": "Known WPW pattern; clinical correlation notes orthostatic mechanism inconsistent with arrhythmic syncope",
-        "category": "required"
+        "action": "Check drug interactions; screen for DA antagonists and orthostatic-aggravating agents",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identify any DA antagonist; review BP-lowering medications and any agents worsening orthostasis",
+        "category": "required",
+        "tool_parameters": {
+          "proposed_medication": "carbidopa-levodopa"
+        },
+        "citation": "[Postuma_2015]",
+        "guideline_source": "Postuma_2015"
       },
       {
         "step": 4,
-        "action": "Request DaTscan to confirm presynaptic dopaminergic deficit",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Asymmetric reduced putaminal DAT uptake with caudate preservation, confirming neurodegenerative parkinsonism",
+        "action": "Search medical literature on PD with autonomic features vs MSA",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Discriminating features: severity/onset of dysautonomia, cerebellar findings, MRI signature, MIBG profile",
         "category": "required",
         "tool_parameters": {
-          "imaging_type": "DaTscan"
-        }
+          "query": "MSA versus Parkinson disease clinical differentiation autonomic failure"
+        },
+        "citation": "[Tolosa_2021]",
+        "guideline_source": "Tolosa_2021"
       },
       {
         "step": 5,
-        "action": "Perform levodopa challenge test to assess dopaminergic responsiveness",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Moderate positive response (36% UPDRS-III improvement) supporting PD over MSA/PSP",
-        "category": "required",
+        "action": "Order DaTscan to confirm dopaminergic deficit (positive in PD and atypical parkinsonism)",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Asymmetric reduced striatal DAT binding consistent with neurodegenerative parkinsonism",
+        "category": "recommended",
         "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP"
-          ]
-        }
+          "modality": "DaTscan"
+        },
+        "citation": "[Marshall_2009]",
+        "guideline_source": "Marshall_2009"
       },
       {
         "step": 6,
-        "action": "Request autonomic testing to characterize orthostatic hypotension etiology",
+        "action": "Order autonomic testing to characterize orthostatic mechanism and severity",
         "tool_name": "order_specialized_test",
-        "expected_finding": "Mild-moderate autonomic failure with neurogenic orthostatic hypotension, consistent with PD autonomic dysfunction",
-        "category": "recommended",
+        "expected_finding": "Pattern of orthostatic hypotension; severe early failure would shift toward MSA",
+        "category": "required",
         "tool_parameters": {
-          "test_type": "tilt_table"
-        }
+          "test_type": "autonomic_testing"
+        },
+        "citation": "[Tolosa_2021]",
+        "guideline_source": "Tolosa_2021"
       },
       {
         "step": 7,
-        "action": "Review polysomnography findings confirming RBD as alpha-synucleinopathy marker",
+        "action": "Order tilt-table testing to formally quantify orthostatic and neurally-mediated syncope risk",
         "tool_name": "order_specialized_test",
-        "expected_finding": "Confirmed RBD supporting alpha-synucleinopathy diagnosis",
+        "expected_finding": "Reproduce orthostatic hypotension and characterize HR response",
         "category": "recommended",
         "tool_parameters": {
-          "test_type": "polysomnography"
-        }
+          "test_type": "tilt_table"
+        },
+        "citation": "[Tolosa_2021]",
+        "guideline_source": "Tolosa_2021"
       },
       {
         "step": 8,
-        "action": "Search medical literature on distinguishing cardiac vs autonomic syncope in parkinsonian patients with WPW",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Literature supports orthostatic mechanism over arrhythmic in positional syncope",
-        "category": "recommended"
+        "action": "Order polysomnography for RBD evaluation",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "REM without atonia is a synucleinopathy biomarker",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "citation": "[Postuma_2019]",
+        "guideline_source": "Postuma_2019"
       },
       {
         "step": 9,
-        "action": "Check drug interactions before initiating carbidopa/levodopa",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Monitor for worsened orthostatic hypotension; omeprazole may reduce absorption",
-        "category": "recommended"
+        "action": "Order neuropsychological battery to characterize MCI profile",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Frontal-subcortical or amnestic pattern; document PD-MCI vs early DLB-pattern",
+        "category": "required",
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Tolosa_2021]",
+        "guideline_source": "Tolosa_2021"
+      },
+      {
+        "step": 10,
+        "action": "Order cardiac monitoring to evaluate WPW-related arrhythmia contribution to syncope",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Document or exclude arrhythmic mechanism for syncope episodes",
+        "category": "recommended",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "citation": "[Tolosa_2021]",
+        "guideline_source": "Tolosa_2021"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG not indicated for parkinsonism with syncope",
+        "citation": "[Postuma_2015]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No infectious/inflammatory indication",
+        "citation": "[Postuma_2015]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "MRI is the appropriate modality",
+        "citation": "[Schwarz_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Baseline metabolic profile and medication review precede dopaminergic therapy initiation",
+        "citation": "[Postuma_2015]",
+        "severity": "soft"
+      },
+      {
+        "before": "analyze_brain_mri",
+        "after": "order_advanced_imaging",
+        "reason": "Exclude structural mimics on MRI before committing to DaTscan and a PD diagnosis",
+        "citation": "[Schwarz_2014]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Recognize that the WPW pattern is a red herring and does not explain orthostatic syncope",
-      "Identify the constellation of bradykinesia, rigidity, RBD, hyposmia, constipation, and orthostatic hypotension as pointing to an alpha-synucleinopathy",
-      "Order DaTscan to confirm presynaptic dopaminergic deficit",
-      "Perform levodopa challenge to assess response and help differentiate PD from atypical parkinsonism",
-      "Evaluate for orthostatic hypotension as cause of syncope rather than attributing to WPW"
+      "Apply MDS 2015 clinical diagnostic criteria for Parkinson's disease (bradykinesia plus rest tremor or rigidity, supportive features, no absolute exclusion criteria)",
+      "Document temporal sequence of motor and non-motor (REM sleep behavior disorder, hyposmia, constipation, orthostatic intolerance) features",
+      "Review the full medication list for dopamine receptor antagonists (metoclopramide, prochlorperazine, antipsychotics) and any other agents that can mimic or worsen parkinsonism",
+      "Co-manage syncope with cardiology to address WPW contribution",
+      "Treat orthostatic hypotension non-pharmacologically first, then midodrine, droxidopa, or fludrocortisone as needed",
+      "Document baseline cognition for surveillance of PDD/DLB conversion"
     ],
     "contraindicated_actions": [
-      "Attributing syncope solely to WPW without evaluating orthostatic hypotension",
-      "Prescribing dopamine-blocking antiemetics (metoclopramide, prochlorperazine) for levodopa-induced nausea",
-      "Starting a dopamine agonist (pramipexole, ropinirole) in a patient with significant orthostatic hypotension",
-      "Initiating antipsychotics for any behavioral symptoms without considering dopaminergic sensitivity",
-      "Recommending catheter ablation for WPW as treatment for syncope without first establishing arrhythmic mechanism"
+      "Do not prescribe metoclopramide, prochlorperazine, or promethazine for nausea in a patient with parkinsonism",
+      "Do not prescribe typical antipsychotics (haloperidol, fluphenazine) or most atypical antipsychotics (risperidone, olanzapine, aripiprazole) — restrict pharmacotherapy of psychosis to quetiapine, clozapine, or pimavanserin",
+      "Do not prescribe centrally acting anticholinergics (trihexyphenidyl, benztropine) in older adults or in any patient with cognitive impairment",
+      "Avoid agents that worsen orthostatic hypotension unless cardiologic indication outweighs"
     ],
     "key_reasoning_points": [
-      "The source case's WPW finding serves as a major red herring — the ECG's delta waves and short PR interval may lead the agent to attribute syncope to cardiac arrhythmia rather than autonomic dysfunction",
-      "Syncope in this patient is positional (standing from seated, standing in line) with documented orthostatic hypotension, which is characteristic of neurogenic OH rather than WPW-related arrhythmia",
-      "The prodromal features of alpha-synucleinopathy (RBD diagnosed 3 years prior, hyposmia, constipation, erectile dysfunction) significantly predate the overt motor signs and are strong diagnostic clues",
-      "The relatively symmetric parkinsonism with early postural instability and orthostatic hypotension raises the differential of MSA-P, but the moderate levodopa response, absence of cerebellar signs, and normal brainstem on MRI favor PD",
-      "DaTscan confirms presynaptic dopaminergic deficit but cannot alone distinguish PD from MSA-P; the full clinical picture must be integrated",
-      "The mother's essential tremor may mislead toward a familial tremor diagnosis, but the patient's motor syndrome includes rigidity and bradykinesia that are not features of ET",
-      "The father's WPW and cardiac death may reinforce the cardiac attribution bias for the patient's syncope"
+      "Recurrent syncope in a PD patient requires careful disambiguation of orthostatic vs arrhythmic mechanisms (WPW history)",
+      "Severity and timing of dysautonomia and any cerebellar findings determine MSA vs PD",
+      "Cognitive screening provides baseline for PD-MCI vs DLB-trajectory monitoring"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": [
+      {
+        "data_point": "Long-standing WPW syndrome history",
+        "location": "past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Anchor syncope toward arrhythmia alone",
+        "correct_interpretation": "WPW must be re-evaluated, but orthostatic hypotension from PD-related autonomic involvement is the more likely dominant mechanism; both can coexist"
+      }
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -1069,6 +1134,14 @@
       "csf": "normal",
       "ct": "incidental",
       "echo": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (condition-expert:PD)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:PD",
+    "difficulty_rationale": "Recurrent syncope with WPW comorbidity layered on PD with autonomic dysfunction and MCI; ≥5 required tools and multi-modality synthesis",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

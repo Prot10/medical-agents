@@ -542,112 +542,257 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Amyotrophic lateral sclerosis (ALS), concurrent with rheumatoid arthritis",
+    "primary_diagnosis": "Amyotrophic lateral sclerosis (ALS) with concurrent rheumatoid arthritis",
     "icd_code": "G12.21",
     "differential": [
       {
-        "diagnosis": "RA-associated vasculitic mononeuritis multiplex",
-        "likelihood": "very_low",
-        "key_features": "Vasculitic neuropathy produces multifocal sensory AND motor loss with conduction block; this patient has pure motor involvement, paraspinal denervation, and UMN signs — not consistent with vasculitic pattern"
+        "diagnosis": "Rheumatoid muscle/tendon disease",
+        "likelihood": "moderate",
+        "key_features": "Patient has active RA, but wasting is muscular rather than tenosynovial and UMN signs are present",
+        "icd_code": null
       },
       {
-        "diagnosis": "Methotrexate neurotoxicity",
-        "likelihood": "very_low",
-        "key_features": "MTX neurotoxicity affects CNS (leukoencephalopathy) not motor neurons; normal MRI white matter; motor neuron disease not a recognized MTX adverse effect"
-      },
-      {
-        "diagnosis": "RA-associated inflammatory myopathy",
+        "diagnosis": "Vasculitic neuropathy (RA-associated)",
         "likelihood": "low",
-        "key_features": "Myopathy would show myopathic EMG not neurogenic; CK <1000 makes primary inflammatory myopathy less likely; UMN signs not explained by myopathy"
+        "key_features": "Sensory NCS normal; RA-vasculitis typically painful and sensorimotor",
+        "icd_code": null
       },
       {
-        "diagnosis": "Multifocal motor neuropathy (MMN)",
+        "diagnosis": "Inclusion body myositis",
+        "likelihood": "low",
+        "key_features": "Quadriceps and finger flexor preference not seen; EMG shows denervation pattern, not myopathic",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Cervical myelopathy from RA cervical spine disease",
+        "likelihood": "low",
+        "key_features": "Brain/cervical MRI does not show significant cord compromise",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Methotrexate myopathy",
         "likelihood": "very_low",
-        "key_features": "Anti-GM1 negative, no conduction block, paraspinal denervation, UMN signs — all exclude MMN"
+        "key_features": "MTX rarely causes weakness of this pattern; EMG is neurogenic",
+        "icd_code": null
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "MRI brain and cervical spine including C1-C2 junction (RA pannus assessment)",
+        "action": "Obtain brain MRI (with cervical spine sequences) to exclude structural mimics — cervical myelopathy, demyelination, brainstem tumor",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Corticospinal tract signal change; no C1-C2 pannus; no cord compression",
+        "expected_finding": "No structural lesion explaining the motor/bulbar findings; corticospinal-tract signal change or non-specific findings may be seen but are not by themselves diagnostic",
         "category": "required",
         "tool_parameters": {
-          "modality": "MRI brain and cervical spine with gadolinium"
-        }
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "DWI",
+            "T1+Gd"
+          ],
+          "include_cervical_spine": true
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       },
       {
         "step": 2,
-        "action": "EMG/NCS to distinguish ALS from RA-related neuropathy",
+        "action": "Perform EMG with nerve conduction studies sampling bulbar plus ≥2 spinal regions to document lower motor neuron involvement (fibrillations, positive sharp waves, complex fasciculation potentials, large-amplitude long-duration polyphasic MUPs with reduced recruitment) and exclude conduction block",
         "tool_name": "order_specialized_test",
-        "expected_finding": "Multi-region pure motor denervation — not multifocal with sensory involvement as in vasculitic neuropathy",
+        "expected_finding": "Active denervation and chronic reinnervation in ≥2 body regions with normal sensory NCS and no conduction block — meets Awaji / El Escorial revised criteria",
         "category": "required",
         "tool_parameters": {
-          "test_type": "EMG/NCS all regions"
-        }
+          "test_type": "emg_ncs"
+        },
+        "citation": "[Awaji_2008]",
+        "guideline_source": "Awaji_2008"
       },
       {
         "step": 3,
-        "action": "Labs including ANCA, anti-GM1, CK, inflammatory markers, MTX level",
+        "action": "Order a mimic-exclusion lab panel: CK, B12, TSH, HbA1c, HIV, RPR, SPEP, anti-GM1 IgM antibodies, and (in males) androgen receptor CAG repeat for Kennedy disease",
         "tool_name": "interpret_labs",
-        "expected_finding": "ANCA negative, anti-GM1 negative, CK elevated in denervation range",
+        "expected_finding": "CK often mildly to moderately elevated (2–5× ULN); reversible mimics (B12, TSH, HIV, RPR) negative; anti-GM1 negative; SPEP without high-titer M-spike; CAG repeat normal",
         "category": "required",
         "tool_parameters": {
           "panels": [
+            "CBC",
+            "BMP",
+            "LFTs",
             "CK",
-            "anti-GM1",
-            "ANCA",
-            "anti-dsDNA",
-            "RF",
-            "anti-CCP"
+            "B12",
+            "TSH",
+            "Free T4",
+            "HIV",
+            "RPR",
+            "SPEP",
+            "anti-GM1 IgM",
+            "androgen receptor CAG repeat"
           ]
-        }
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       },
       {
         "step": 4,
-        "action": "Check riluzole interaction with methotrexate — enhanced hepatotoxicity risk",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Heightened LFT monitoring required",
+        "action": "Measure respiratory function (FVC, MIP/MEP, SNIP/NIF) at baseline to inform NIV timing and prognostication",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "FVC and SNIP/MIP often reduced even in early disease; values guide timing of NIV (FVC <50% predicted or SNIP <40 cmH₂O are conventional thresholds)",
         "category": "required",
         "tool_parameters": {
-          "proposed_drug": "riluzole",
-          "current_medications": [
-            "methotrexate",
-            "hydroxychloroquine"
+          "test_type": "respiratory_function"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
+      },
+      {
+        "step": 5,
+        "action": "Search the medical literature to confirm Awaji and Gold Coast diagnostic thresholds and AAN practice-parameter recommendations relevant to this presentation",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Awaji-Shima 2008 / Gold Coast 2020 diagnostic criteria; AAN 2009 practice parameter on ALS care",
+        "category": "recommended",
+        "tool_parameters": {
+          "query": "ALS diagnostic criteria Awaji Gold Coast AAN practice parameter"
+        },
+        "citation": "[Awaji_2008]",
+        "guideline_source": "Awaji_2008"
+      },
+      {
+        "step": 6,
+        "action": "Order an ALS-focused genetic panel (C9orf72 repeat expansion, SOD1, TARDBP, FUS, TBK1) — required when family history is positive or onset is young (<50)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "C9orf72 expansion in ~40% of familial cases; SOD1/TARDBP/FUS in additional familial subset; ~10% of apparently sporadic cases also carry a variant",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "genetic_panel:ALS"
+        },
+        "citation": "[Brown_2017]",
+        "guideline_source": "Brown_2017"
+      },
+      {
+        "step": 7,
+        "action": "Obtain CSF for neurofilament light chain (NfL) for prognostic stratification when the diagnosis remains uncertain or when prognostic information will change management",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Markedly elevated CSF NfL (typically >5,000 pg/mL) supports a motor-neuron-disease degenerative process and correlates with faster progression",
+        "category": "recommended",
+        "tool_parameters": {
+          "tests": [
+            "cell count",
+            "protein",
+            "glucose",
+            "NfL",
+            "NfH",
+            "oligoclonal bands",
+            "cytology"
           ]
-        }
+        },
+        "citation": "[ENCALS_2018]",
+        "guideline_source": "ENCALS_2018"
+      },
+      {
+        "step": 8,
+        "action": "Check interactions before initiating riluzole 50 mg twice daily; review baseline LFTs and CBC and counsel on monitoring",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "No major interactions for typical chronic medications; advise alcohol and grapefruit-juice avoidance (CYP1A2 modulators); monthly LFTs for first 3 months",
+        "category": "recommended",
+        "tool_parameters": {
+          "proposed_drug": "riluzole"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "ALS is a motor-neuron disease without cortical electrical signature; EEG has no diagnostic role and adds cost without benefit.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG is unrelated to motor neuron disease and not part of the standard ALS workup absent specific cardiac symptoms or pre-medication QTc checks.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is unrelated to ALS diagnosis; no indication absent comorbid cardiac disease.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring has no role in ALS diagnostic workup.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "MRI is the standard structural study for ALS workup; head CT adds no diagnostic value and exposes the patient to ionizing radiation.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in ALS diagnosis (motor-neuron rather than amyloid pathology) and carries a high cost.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan evaluates nigrostriatal dopaminergic integrity; it has no role in ALS, which spares the dopaminergic system.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "FDG-PET has no established diagnostic role in ALS and adds substantial cost.",
+        "citation": "[AAN_2009]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "EMG must assess ALL four body regions including paraspinals — vasculitic neuropathy would not affect paraspinals in this pattern",
-      "ANCA panel to formally exclude systemic vasculitis",
-      "Riluzole-MTX interaction: both hepatotoxic — mandatory intensive LFT monitoring; consider AMX0035 as alternative",
-      "MRI cervical spine including craniocervical junction — RA pannus at C1-C2 is a rare but serious cause of cervical myelopathy"
+      "Perform EMG/NCS sampling the bulbar region plus ≥2 spinal regions to document lower-motor-neuron involvement and exclude conduction block.",
+      "Obtain brain MRI to exclude structural mimics (cervical myelopathy, demyelinating disease, brainstem tumor).",
+      "Order a mimic-exclusion lab panel (CK, B12, TSH, HIV, RPR, SPEP, anti-GM1 IgM, androgen receptor CAG repeat in males).",
+      "Measure baseline respiratory function (FVC, MIP/MEP, SNIP) to inform NIV timing.",
+      "Apply Awaji-Shima 2008 / Gold Coast 2020 criteria to confirm the diagnosis.",
+      "Initiate riluzole 50 mg twice daily after baseline LFTs unless contraindicated; arrange monthly LFT monitoring for the first 3 months.",
+      "Refer to a multidisciplinary ALS clinic for SLP, dietetics, respiratory, and social-work input."
     ],
     "contraindicated_actions": [
-      "Stopping methotrexate abruptly — RA flare risk; rheumatology input required for any dose adjustment",
-      "Attributing all weakness to RA without EMG — misses treatable differentials and delays ALS diagnosis",
-      "Prescribing riluzole without warning about MTX hepatotoxicity interaction — LFT monitoring protocol must be established"
+      "Do not commit the patient to cervical spine surgery on the basis of incidental spondylotic changes when EMG findings extend beyond the cervical cord.",
+      "Do not start chronic immunosuppression (steroids, IVIG, plasma exchange) for ALS — there is no benefit and treatment delays correct diagnosis.",
+      "Do not defer respiratory assessment in a symptomatic patient — even mild FVC reduction warrants close monitoring and NIV planning.",
+      "Do not dismiss bulbar or progressive symptoms as functional / psychiatric without a complete neurological workup."
     ],
     "key_reasoning_points": [
-      "RA complicates ALS diagnosis because joint deformities and inflammatory disease create diagnostic noise; however, muscular atrophy with fasciculations and UMN signs are not features of RA",
-      "Vasculitic mononeuritis multiplex in RA produces patchy sensory AND motor deficits with conduction block; the pure motor UMN+LMN pattern here with paraspinal involvement is not consistent with vasculitic neuropathy",
-      "MTX does not cause motor neuron disease — this is not a medication adverse effect",
-      "Concurrent RA and ALS requires careful co-management: riluzole-MTX interaction mandates enhanced LFT monitoring or consideration of alternative ALS therapy (AMX0035)"
+      "Diagnosis requires evidence of both upper-motor-neuron involvement (hyperreflexia, Babinski, Hoffman, brisk jaw jerk, spasticity) and lower-motor-neuron involvement (atrophy, fasciculations, EMG denervation) with progressive spread, while excluding mimics — Awaji 2008 / Gold Coast 2020.",
+      "EMG in bulbar plus ≥2 spinal regions documenting fibrillations, positive sharp waves, complex fasciculation potentials, and large-amplitude long-duration polyphasic MUPs with reduced recruitment satisfies the electrodiagnostic criterion.",
+      "Normal sensory NCS and absence of conduction block are pivotal: they exclude common mimics including multifocal motor neuropathy, CIDP, and Kennedy disease.",
+      "Mild-to-moderate CK elevation (2–5× ULN) is consistent with ALS and does not itself indicate a primary myopathy.",
+      "Cervical spondylotic changes on MRI are common incidental findings in the at-risk age group; bulbar findings or multi-region EMG denervation cannot be attributed to cervical disease.",
+      "Baseline FVC, MIP/MEP, and SNIP/NIF inform NIV timing — NIV initiation at FVC <50% predicted or SNIP <40 cmH₂O prolongs survival and improves quality of life.",
+      "Markedly elevated CSF neurofilament light chain (>5,000 pg/mL) supports motor neuron degeneration and correlates with progression rate (ENCALS prediction model)."
     ],
     "red_herrings": [
       {
-        "data_point": "Active RA on methotrexate with elevated CK, RF, anti-CCP",
-        "location": "Past medical history and lab results",
-        "intended_effect": "Attribute progressive weakness to RA-associated myopathy or vasculitic neuropathy",
-        "correct_interpretation": "RA does not cause motor neuron disease with fasciculations and UMN signs. CK elevation in denervation range (580 U/L) is lower than typical inflammatory myopathy. EMG shows neurogenic not myopathic pattern. ANCA negative excludes vasculitis.",
-        "field_path": ""
+        "data_point": "Active rheumatoid arthritis on methotrexate",
+        "location": "Past medical history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Anchors weakness on RA-related joint/tendon pathology",
+        "correct_interpretation": "Muscle (not articular) wasting with fasciculations, UMN signs, and multi-region EMG denervation cannot be attributed to RA"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "v5",
@@ -659,6 +804,20 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:ALS",
+    "difficulty_rationale": "Comorbid RA anchors the team on inflammatory/articular explanation; 4 required tools, distinguishing muscular vs articular wasting is the key reasoning step",
+    "case_body_concerns": [
+      {
+        "field_path": "followup_outputs",
+        "concern": "ALS genetic panel is wired to `interpret_labs` rather than `order_specialized_test` with `test_type: genetic_panel:ALS`. Per the criteria pack and TOOL_PARAMETER_VOCABULARY, genetic testing should resolve via order_specialized_test. The gold trajectory routes the action via order_specialized_test; the case body fix is a tool-name swap in followup_outputs without changing the report payload.",
+        "suggested_fix": "Change followup tool_name from interpret_labs to order_specialized_test for the ALS_Genetic_Panel followup; payload structure can stay."
+      }
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -436,103 +436,156 @@
     "icd_code": "G93.49",
     "differential": [
       {
-        "diagnosis": "FND (functional neurological disorder)",
-        "likelihood": "very_low",
-        "key_features": "ABNORMAL EEG with generalized slowing and triphasic-like discharges — FND produces completely normal EEG; encephalopathic EEG cannot be attributed to FND; CSF shows pleocytosis and oligoclonal bands — FND has normal CSF"
+        "diagnosis": "Hypothyroid encephalopathy (myxedema-related cognitive dysfunction)",
+        "likelihood": "moderate",
+        "key_features": "Patient has Hashimoto's thyroiditis on levothyroxine; under-replacement or non-adherence could produce confusion, tremor, and weakness. Repeat TSH and anti-TPO are the immediate next steps.",
+        "icd_code": null
       },
       {
-        "diagnosis": "Hypothyroid encephalopathy from undertreated levothyroxine",
+        "diagnosis": "Functional neurological disorder",
+        "likelihood": "moderate",
+        "key_features": "Initial impression given stress and psychiatric history; diffuse encephalopathic features (cognitive slowing, generalized tremor) and lack of confirmatory positive rule-in signs make FND an inadequate unifying diagnosis.",
+        "icd_code": "F44.7"
+      },
+      {
+        "diagnosis": "Autoimmune encephalitis (NMDAR, LGI1)",
         "likelihood": "low",
-        "key_features": "TSH 4.8 (undertreated) — hypothyroidism contributes to cognitive symptoms and EEG slowing; however, the degree of encephalopathy, very high anti-TPO (2840 IU/mL), CSF pleocytosis, and dramatic steroid response all suggest primary Hashimoto's encephalopathy rather than simple hypothyroidism"
+        "key_features": "Subacute cognitive decline with movement disorder fits autoimmune encephalitis; antibody panel and CSF needed to confirm or exclude.",
+        "icd_code": "G04.81"
       },
       {
-        "diagnosis": "NMDAR or LGI1 autoimmune encephalitis",
-        "likelihood": "very_low",
-        "key_features": "Anti-NMDAR and anti-LGI1 antibodies not tested here but clinical context (Hashimoto's, elevated anti-TPO) strongly favors HE; anti-TPO positive in CSF is diagnostic of HE"
-      },
-      {
-        "diagnosis": "Sleep deprivation encephalopathy from OSA/CPAP non-compliance",
+        "diagnosis": "Sleep deprivation / OSA-related cognitive dysfunction",
         "likelihood": "low",
-        "key_features": "CPAP suboptimal use contributes to cognitive impairment but cannot explain CSF pleocytosis, oligoclonal bands, or marked anti-TPO elevation; steroid response confirms autoimmune etiology"
+        "key_features": "Prolonged work hours and reported sleep disturbance can produce cognitive symptoms; unlikely sole explanation given exam findings.",
+        "icd_code": "G47.30"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "MRI brain — structural exclusion",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Normal MRI — does not exclude Hashimoto's encephalopathy",
+        "action": "Repeat thyroid panel (TSH, free T4, anti-TPO antibodies) to assess for under-replacement and confirm autoimmune thyroid disease",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Elevated TSH and/or high anti-TPO antibodies indicating under-replaced Hashimoto's with possible Hashimoto's encephalopathy",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "thyroid",
+            "anti_TPO"
+          ]
+        },
+        "citation": "",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "EEG — CRITICAL: encephalopathic slowing confirms organic (not FND) process",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "ABNORMAL — generalized theta slowing and triphasic-like discharges: cannot be FND",
+        "action": "Order brain MRI with contrast to exclude structural causes of subacute encephalopathy",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Normal MRI or non-specific white-matter changes — excludes mass, stroke, demyelination",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "contrast": true
+        },
+        "citation": "[Espay_2018]",
+        "guideline_source": "FND criteria pack — image to exclude structural cause"
       },
       {
         "step": 3,
-        "action": "Thyroid panel and anti-TPO/anti-TG antibodies — Hashimoto's encephalopathy exclusion",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Anti-TPO 2840 IU/mL, elevated anti-TG, TSH 4.8 (undertreated)",
+        "action": "Order EEG to evaluate the staring episodes and assess for diffuse slowing",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Generalized slowing supports encephalopathy; absence of epileptiform discharges argues against epilepsy",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "eeg_type": "routine"
+        },
+        "citation": "",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "CSF for HE confirmation — protein, cells, oligoclonal bands, anti-TPO",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Mild pleocytosis, elevated protein, oligoclonal bands, positive CSF anti-TPO",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Review medications and supplements for contributors to cognitive dysfunction",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identification of any sedating or anticholinergic agents that may worsen confusion",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "IV methylprednisolone — steroid trial for Hashimoto's encephalopathy",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Dramatic improvement — confirms steroid-responsive encephalopathy",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Search current literature on Hashimoto's encephalopathy (SREAT) diagnostic criteria and steroid responsiveness",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirms diagnostic criteria for SREAT and supports trial of corticosteroids after exclusion of infection and autoimmune encephalitis",
+        "category": "recommended",
+        "tool_parameters": {
+          "query": "Hashimoto encephalopathy SREAT steroid responsive"
+        },
+        "citation": "",
+        "guideline_source": ""
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG has no diagnostic role in FND; cardiac etiology is not on the differential for the presenting neurological deficit.",
+        "citation": "[Stone_2018]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography has no role in FND; no structural cardiac question is raised by the presentation.",
+        "citation": "[Stone_2018]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac rhythm monitoring is not indicated; the events are non-syncopal and the rule-in signs point to FND.",
+        "citation": "[Stone_2018]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT adds no information beyond MRI for an FND workup and contributes diagnostic noise plus radiation exposure.",
+        "citation": "[Espay_2018]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "EEG is the KEY discriminator — FND = normal EEG; Hashimoto's encephalopathy = encephalopathic EEG changes",
-      "Anti-TPO antibodies mandatory in Hashimoto's patient with encephalopathy",
-      "CSF to confirm intrathecal synthesis",
-      "IV methylprednisolone is potentially curative — urgent administration once diagnosis confirmed"
+      "Repeat TSH and anti-TPO antibody testing to assess for under-replaced Hashimoto's thyroiditis",
+      "Order EEG to characterize the staring episodes and assess for diffuse encephalopathic slowing",
+      "Obtain brain MRI to exclude structural and demyelinating causes",
+      "Consider empiric corticosteroid trial after infection and autoimmune encephalitis are reasonably excluded, in line with SREAT diagnostic criteria",
+      "Reassess working diagnosis: cognitive symptoms with diffuse tremor and reported staring episodes are inadequately explained by FND alone",
+      "Obtain a neuropsychological battery to characterize the pattern of cognitive deficits and rule out a primary psychiatric explanation"
     ],
     "contraindicated_actions": [
-      "Diagnosing FND with an abnormal EEG — FND NEVER produces encephalopathic EEG changes; abnormal EEG mandates organic encephalopathy workup",
-      "Withholding steroids if Hashimoto's encephalopathy is confirmed — this is a potentially reversible encephalopathy"
+      "Do not anchor on the initial FND impression without re-evaluating in light of cognitive and movement symptoms",
+      "Do not start corticosteroids before infection and autoimmune encephalitis (NMDAR, LGI1) are reasonably excluded",
+      "Do not pursue invasive workup (brain biopsy, repeated LPs) without a clear indication"
     ],
     "key_reasoning_points": [
-      "FND CANNOT produce encephalopathic EEG changes — generalized slowing and triphasic-like discharges mandate an organic encephalopathy workup before any FND diagnosis",
-      "Anti-TPO antibodies >1000 IU/mL in a patient with encephalopathy, EEG slowing, and cognitive decline is HASHIMOTO'S ENCEPHALOPATHY (SREAT) until proven otherwise",
-      "CSF anti-TPO positive confirms intrathecal antibody synthesis — this is not just a systemic autoimmune response",
-      "This case is a critical teaching example of why organic encephalopathy must be excluded before FND diagnosis — the steroid-responsive encephalopathy would have been missed if FND was diagnosed based on psychosocial stressors alone"
+      "Cognitive confusion with tremor and bilateral weakness in a patient with under-replaced Hashimoto's thyroiditis raises Hashimoto's encephalopathy (SREAT) — not FND.",
+      "FND can be a 'magnet diagnosis' in stressed patients with psychiatric comorbidity; positive rule-in signs are required, and they are absent or insufficient here.",
+      "Diffuse encephalopathic features (cognitive slowing, generalized tremor) are not typical of FND and warrant reconsideration of the differential.",
+      "TSH, anti-TPO antibodies, and EEG (looking for diffuse slowing) are the highest-yield next steps; a therapeutic trial of corticosteroids may both diagnose and treat SREAT."
     ],
     "red_herrings": [
       {
-        "data_point": "Extreme work stress (14-hour days), sleep deprivation, CPAP non-compliance",
-        "location": "Social history",
-        "intended_effect": "Attribute all symptoms to stress and sleep deprivation (functional/psychosocial), leading to FND diagnosis without thorough organic workup",
-        "correct_interpretation": "Psychosocial stress is present but EEG is ABNORMAL — FND cannot explain encephalopathic EEG; anti-TPO 2840 and CSF pleocytosis confirm Hashimoto's encephalopathy",
-        "field_path": ""
+        "data_point": "Pre-existing psychiatric diagnosis (anxiety or depression) in the past medical history",
+        "location": "Past medical history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Premature anchoring on a 'psychosomatic' label without obtaining positive rule-in signs; conversely, dismissing FND as a serious diagnosis because the patient is 'just anxious'",
+        "correct_interpretation": "Psychiatric comorbidity neither establishes nor refutes FND. Diagnosis requires positive rule-in signs on examination; psychiatric history is relevant for treatment planning, not for diagnosis."
       },
       {
-        "data_point": "Positive Hoover sign and give-way weakness on exam",
-        "location": "Neurological exam",
-        "intended_effect": "Confirm FND diagnosis based on positive functional signs and stop organic workup",
-        "correct_interpretation": "Positive functional signs can occur in Hashimoto's encephalopathy due to diffuse cortical dysfunction affecting voluntary motor output — organic encephalopathy CAN produce some functional-appearing signs; the KEY is the abnormal EEG which cannot be attributed to FND",
-        "field_path": ""
+        "data_point": "Symptom onset coincident with a major psychosocial stressor",
+        "location": "History of present illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Conclude prematurely that stress 'caused' the symptoms and that the workup can be abbreviated",
+        "correct_interpretation": "Many organic conditions (MS, migraine, epilepsy) also flare with stress. Stress at onset is supportive context, not a diagnostic substitute for the positive rule-in signs."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "v5",
@@ -544,6 +597,18 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FND",
+    "difficulty_rationale": "FND mimic case (Hashimoto's encephalopathy / SREAT) embedded in the FND directory; requires recognizing that diffuse encephalopathic features are inadequately explained by FND and re-opening the differential.",
+    "case_body_concerns": [
+      "Case located in FND directory but the case body's primary diagnosis is Hashimoto's encephalopathy (SREAT) — i.e., an FND mimic, not FND. Ground truth reflects the actual case-body diagnosis. Consider moving this case to a different condition directory or splitting the dataset to indicate it is the 'reverse mimic' case."
+    ],
+    "citation_gap": [
+      "Hashimoto's encephalopathy (SREAT) is outside the FND criteria pack citation allow-list. Need a Castillo 2006 / Mocellin 2007 reference for SREAT diagnostic criteria; left out for now per the strict allow-list rule."
+    ],
+    "vocab_gap": []
   }
 }

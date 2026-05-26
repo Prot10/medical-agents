@@ -457,114 +457,283 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Behavioral variant frontotemporal dementia — C9orf72 pathogenic expansion — presenting with NORMAL MRI and subtle FDG-PET, previously attributed to bipolar disorder",
+    "primary_diagnosis": "Behavioral variant frontotemporal dementia (bvFTD), probable, C9orf72-associated — presenting with subtle imaging despite clinical progression",
     "icd_code": "G31.09",
     "differential": [
       {
         "diagnosis": "Bipolar disorder type II decompensation",
-        "likelihood": "very_low",
-        "key_features": "Progressive unremitting course (not episodic); perseverative stereotyped behaviors not typical of bipolar; anosognosia; severely impaired social cognition (Eyes test, Faux Pas) — not a feature of bipolar disorder; structural and metabolic neuroimaging findings inconsistent with bipolar"
+        "likelihood": "high",
+        "key_features": "Established psychiatric history confounds presentation; informant denial / loss of insight and progressive course argue for organic process."
       },
       {
-        "diagnosis": "Valproate toxicity/hyperammonemia",
-        "likelihood": "very_low",
-        "key_features": "Valproate level therapeutic (68 mcg/mL); ammonia only mildly elevated (38); valproate hyperammonemia causes sedation and confusion, not behavioral disinhibition/perseveration; behavioral syndrome has 18-month progressive course predating valproate level changes"
+        "diagnosis": "Familial bvFTD (C9orf72 or related)",
+        "likelihood": "high",
+        "key_features": "Paternal 'schizophrenia' starting in 50s with institutional decline is suggestive of misdiagnosed FTD."
       },
       {
-        "diagnosis": "Alzheimer's disease (behavioral variant)",
-        "likelihood": "very_low",
-        "key_features": "Amyloid PET negative; no hippocampal atrophy; FDG-PET frontal without posterior cingulate sign; behavioral profile (perseveration, disinhibition, social cognition loss) is FTD, not AD"
+        "diagnosis": "Valproate-related cognitive / metabolic syndrome (hyperammonemia)",
+        "likelihood": "moderate",
+        "key_features": "Valproate can cause cognitive blunting and asterixis; ammonia level and dose review needed."
       },
       {
-        "diagnosis": "Primary psychiatric disorder (personality disorder, schizophrenia)",
-        "likelihood": "very_low",
-        "key_features": "New onset of progressive symptoms at age 54 without prior personality disorder history; C9orf72 genetic confirmation; elevated CSF NfL indicating active neurodegeneration — no psychiatric disorder produces neurodegeneration biomarkers"
+        "diagnosis": "Alzheimer disease (behavioral / frontal variant)",
+        "likelihood": "moderate",
+        "key_features": "Biomarker workup distinguishes; FDG and amyloid PET clarify."
+      },
+      {
+        "diagnosis": "Primary psychiatric disorder (late-onset personality / schizophrenia)",
+        "likelihood": "low",
+        "key_features": "Progressive informant-reported decline distinct from prior psychiatric episodes argues against."
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "MRI brain — expected normal in C9orf72-FTD; do not stop workup if normal",
+        "action": "Obtain brain MRI with volumetric coronal T1 to assess frontal/anterior temporal atrophy and exclude alternative structural cause",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Normal MRI — does not exclude bvFTD; 10-15% of bvFTD has normal MRI",
+        "expected_finding": "Bilateral frontal and/or anterior temporal atrophy in a lobar pattern with relative posterior sparing",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "DWI",
+            "volumetric"
+          ]
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky 2011 bvFTD criteria"
       },
       {
         "step": 2,
-        "action": "Standard labs including valproate level and ammonia — exclude valproate toxicity",
+        "action": "Order metabolic dementia panel (TSH, B12, CMP, RPR/HIV per risk) to exclude reversible mimics",
         "tool_name": "interpret_labs",
-        "expected_finding": "Therapeutic valproate; mildly elevated ammonia (not causing syndrome)",
+        "expected_finding": "No reversible metabolic or infectious cause of cognitive decline identified",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "TSH",
+            "B12",
+            "RPR",
+            "HIV"
+          ]
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
       },
       {
         "step": 3,
-        "action": "FDG-PET brain — critical even when MRI normal; shows subtle frontal changes",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Subtle frontotemporal hypometabolism (borderline); preserved posterior cortex",
+        "action": "Order comprehensive neuropsychological battery characterising executive function, social cognition, language and memory",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Frontal-executive and social-cognition deficits with relative sparing of episodic memory and visuospatial function",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky 2011 bvFTD criteria"
       },
       {
         "step": 4,
-        "action": "Comprehensive neuropsych with social cognition battery — standard tests miss early bvFTD",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Severely impaired social cognition (Eyes test, Faux Pas) despite near-normal standard testing",
+        "action": "Search medical literature for subtle / mri-negative bvftd and c9orf72-associated ftd",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirms Rascovsky 2011 criteria, FDG-PET evidence (Foster 2007), and management approach (Bang 2015)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "query": "Subtle / MRI-negative bvFTD and C9orf72-associated FTD"
+        },
+        "citation": "[Bang_2015]",
+        "guideline_source": "Bang 2015 Lancet review"
       },
       {
         "step": 5,
-        "action": "C9orf72 genetic testing — normal MRI + subtle FDG-PET combination",
-        "tool_name": "interpret_labs",
-        "expected_finding": "C9orf72 pathogenic expansion confirmed",
+        "action": "Consult behavioral/cognitive neurology for syndromic diagnosis, biomarker interpretation, and longitudinal care plan",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Behavioral neurology confirms bvFTD syndrome, coordinates biomarkers and disclosure",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "specialty": "behavioral_neurology"
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
+      },
+      {
+        "step": 6,
+        "action": "Order FDG-PET brain to characterise frontotemporal hypometabolism and distinguish bvFTD from AD",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Bifrontal and/or anterior temporal hypometabolism with relative posterior sparing",
+        "category": "required",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[Foster_2007]",
+        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
+      },
+      {
+        "step": 7,
+        "action": "Order FTD genetic panel (C9orf72, GRN, MAPT) given paternal late-onset 'schizophrenia' and progressive cognitive decline highly suggestive of familial FTD",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Identifies or excludes pathogenic C9orf72 / GRN / MAPT variant relevant to prognosis and cascade testing",
+        "category": "required",
+        "tool_parameters": {
+          "test_type": "genetic_panel:FTD"
+        },
+        "citation": "[Pottier_2016]",
+        "guideline_source": "Pottier 2016 FTLD genetics review"
+      },
+      {
+        "step": 8,
+        "action": "Verify valproate level and check ammonia / liver chemistry to exclude metabolic contribution before attributing to neurodegeneration",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Valproate level therapeutic; ammonia not significantly elevated; rule out hyperammonemia",
+        "category": "required",
+        "tool_parameters": {
+          "drugs": [
+            "valproate"
+          ],
+          "indication": "rule out hyperammonemia / toxicity"
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
+      },
+      {
+        "step": 9,
+        "action": "Order amyloid PET to confirm non-AD etiology in young/atypical presentation",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Negative amyloid PET supports FTD over AD",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "citation": "[Foster_2007]",
+        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
+      },
+      {
+        "step": 10,
+        "action": "Baseline EMG/NCS surveillance for ALS given C9orf72 risk",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline normal or subclinical denervation; repeat if motor features emerge",
+        "category": "optional",
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[Pottier_2016]",
+        "guideline_source": "Pottier 2016 FTLD genetics review"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is non-specific in FTD; not part of the standard dementia workup unless seizures or rapidly progressive course suggest CJD or autoimmune encephalitis.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG has no role in the cognitive workup of suspected FTD; reserved for syncope, palpitations, or pre-procedure clearance.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is unrelated to a neurodegenerative cognitive syndrome and adds cost without diagnostic value.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is unrelated to FTD and not indicated absent syncope or palpitations.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT lacks the resolution and lobar specificity needed to characterise frontotemporal atrophy; MRI is the standard structural study.",
+        "citation": "[AAN_dementia_2018]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "MR_spectroscopy"
+        },
+        "rationale": "MR spectroscopy has no established role in the routine FTD diagnostic pathway.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "perfusion_MRI"
+        },
+        "rationale": "Perfusion MRI is not indicated in the standard FTD workup once a structural MRI and FDG-PET (or amyloid PET) have characterised the lobar pattern.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is a vascular study with no diagnostic role in primary neurodegenerative dementia.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan evaluates presynaptic dopaminergic terminals; it is not indicated unless overt parkinsonism raises concern for PD, DLB, or atypical parkinsonism (PSP/CBS overlap).",
+        "citation": "[Bang_2015]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "Exclude structural cause of focal cognitive symptoms and screen for elevated ICP before lumbar puncture.",
+        "citation": "[AAN_dementia_2018]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "NORMAL MRI does NOT exclude bvFTD — FDG-PET must be performed; 10-15% of bvFTD (especially C9orf72) has normal or minimal MRI",
-      "Social cognition battery (Reading the Mind in the Eyes, Faux Pas) is ESSENTIAL in suspected bvFTD — standard cognitive tests (MoCA, MMSE) miss the social cognition deficit that is pathognomonic",
-      "C9orf72 genetic testing should be prioritized when MRI is normal and FDG-PET changes are subtle — this combination is the C9orf72 signature"
+      "Recognise that subtle / normal early MRI does not exclude bvFTD; FDG-PET and genetic testing are diagnostic.",
+      "Coordinate with treating psychiatrist; distinguish bvFTD progression from bipolar relapse.",
+      "Exclude valproate-induced hyperammonemia and toxicity before attributing to neurodegeneration.",
+      "Apply Rascovsky 2011 bvFTD criteria explicitly (≥3 of 6 core features within 3 years) and document functional decline.",
+      "Assess and document decision-making, financial, and driving capacity given the high risk of impulsivity and impaired judgment in FTD.",
+      "Provide caregiver education, safety planning, and referral to FTD-focused support resources.",
+      "Offer genetic counselling and discuss cascade testing options if a pathogenic variant is identified or suspected."
     ],
     "contraindicated_actions": [
-      "Stopping neurological workup because MRI is normal — this is the critical diagnostic error in bvFTD",
-      "Cholinesterase inhibitors in FTD",
-      "Increasing valproate based on mildly elevated ammonia without clinical encephalopathy — not the cause"
+      "Do not start acetylcholinesterase inhibitors (donepezil, rivastigmine, galantamine): no benefit in FTD and may worsen behavioral symptoms.",
+      "Do not start memantine: no evidence of benefit in bvFTD and may worsen behavioral symptoms.",
+      "Avoid antipsychotics as first-line behavioral therapy given increased cerebrovascular and mortality risk in dementia; reserve for refractory dangerous agitation with specialist oversight.",
+      "Avoid benzodiazepines for behavioral control: risk of paradoxical disinhibition and falls."
     ],
     "key_reasoning_points": [
-      "10-15% of bvFTD — particularly C9orf72 expansion carriers — have NORMAL or near-normal MRI; a normal MRI in a patient with behavioral syndrome consistent with bvFTD MUST be followed by FDG-PET",
-      "Standard cognitive screening (MoCA, MMSE) is insensitive for early bvFTD in high-premorbid-IQ individuals — social cognition testing (Reading the Mind in the Eyes, Faux Pas, Theory of Mind) is the key diagnostic tool",
-      "The DISSOCIATION between near-normal standard testing and severely impaired social cognition is pathognomonic of bvFTD",
-      "Family history of 'late-onset schizophrenia' or 'late-onset psychosis' in a parent of a bvFTD patient should raise suspicion for FTD misdiagnosis, particularly C9orf72 spectrum"
+      "FTD can present with normal or subtle MRI in the first 1–2 years; FDG-PET is more sensitive (criteria pack red-herring category).",
+      "Paternal late-onset 'schizophrenia' in the 50s with institutional decline is more likely misdiagnosed FTD.",
+      "Long-standing bipolar disorder is a confounder, not the explanation, given the new informant-reported progressive trajectory."
     ],
     "red_herrings": [
       {
-        "data_point": "Normal MRI",
-        "location": "MRI findings",
-        "intended_effect": "Conclude no organic brain disease; attribute behavioral syndrome to psychiatric disorder",
-        "correct_interpretation": "10-15% of bvFTD has normal MRI, especially C9orf72; normal MRI is NOT reassuring in the context of behavioral bvFTD syndrome — FDG-PET must be performed",
-        "field_path": ""
+        "data_point": "15-year history of bipolar disorder type II on valproate",
+        "location": "past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Could mislead toward bipolar decompensation as the primary diagnosis.",
+        "correct_interpretation": "Informant explicitly describes the change as qualitatively different from prior episodes; progressive trajectory and family history support an organic process."
       },
       {
-        "data_point": "Mildly elevated ammonia (38 mcg/dL) on valproate",
-        "location": "Lab results",
-        "intended_effect": "Attribute cognitive and behavioral changes to valproate-induced hyperammonemia",
-        "correct_interpretation": "Ammonia 38 mcg/dL is only mildly above normal; clinical valproate hyperammonemic encephalopathy requires >100 mcg/dL and causes sedation/confusion, not perseverative disinhibition; behavioral syndrome has 18-month progressive course inconsistent with valproate effect",
-        "field_path": ""
-      },
-      {
-        "data_point": "MoCA 26/30 — near-normal",
-        "location": "Mental status exam",
-        "intended_effect": "Conclude no significant cognitive impairment; attribute behavioral changes to psychiatric disorder",
-        "correct_interpretation": "MoCA 26/30 in a high-premorbid-IQ novelist represents significant decline; MoCA misses the social cognition deficit that is the key feature of bvFTD",
-        "field_path": ""
+        "data_point": "Paternal 'schizophrenia' diagnosed in his 50s",
+        "location": "family_history",
+        "field_path": "patient.clinical_history.family_history",
+        "intended_effect": "Suggests inherited primary psychiatric disorder.",
+        "correct_interpretation": "Late-onset 'schizophrenia' with institutional cognitive decline is more likely undiagnosed FTD (potentially C9orf72) than primary psychiatric illness."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "v5",
@@ -577,6 +746,18 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (condition-expert:FTD)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FTD",
+    "difficulty_rationale": "≥5 required tools, multi-axis confounders (psychiatric comorbidity, normal/subtle MRI, parkinsonism overlap, or APOE-driven AD anchoring), and 2+ grounded red herrings — requires sophisticated biomarker / genetic reasoning to overcome anchoring on a comorbidity.",
+    "case_body_concerns": [
+      "validator flags `order_advanced_imaging` in both optimal_actions (FDG_PET / amyloid_PET) and useless_tools (MR_spectroscopy / DaTscan / perfusion_MRI / carotid_duplex) — these are distinct modalities of the same catchall tool. Known systemic validator limitation: the coherence script ignores `tool_parameters.modality`. No fix at case level.",
+      "required tool `check_drug_interactions` has no matching `initial_tool_outputs` or `followup_outputs` entry — case body should add a corresponding output so the agent gets a meaningful result when calling this required step.",
+      "fallback output for `order_advanced_imaging` is missing in `fallback_tool_outputs` — calling the useless tool will return empty; case body needs an off-pathway fallback entry."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

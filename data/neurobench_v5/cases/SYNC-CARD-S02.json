@@ -691,153 +691,212 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Cardiac syncope due to complete (third-degree) atrioventricular block secondary to calcific aortic stenosis with conduction system involvement",
-    "icd_code": "R55",
+    "primary_diagnosis": "Cardiac syncope due to complete (third-degree) atrioventricular block secondary to calcific aortic stenosis with conduction-system involvement",
+    "icd_code": "I44.2",
     "differential": [
       {
-        "diagnosis": "Epileptic seizure",
+        "diagnosis": "Severe aortic stenosis with exertional syncope",
+        "likelihood": "high",
+        "key_features": "Moderate AS may be under-staged; gradient should be reassessed on echo and consider exertional component.",
+        "icd_code": "I35.0"
+      },
+      {
+        "diagnosis": "Sustained ventricular tachycardia",
+        "likelihood": "moderate",
+        "key_features": "Structural heart disease is a VT substrate; monitoring excludes.",
+        "icd_code": "I47.2"
+      },
+      {
+        "diagnosis": "Acute coronary syndrome with bradyarrhythmia",
         "likelihood": "low",
-        "key_features": "No witnessed tonic-clonic activity, no post-ictal confusion, immediate return to full alertness, no tongue biting or incontinence, normal EEG."
+        "key_features": "Troponin and ECG distinguish.",
+        "icd_code": "I21.9"
+      },
+      {
+        "diagnosis": "Sick sinus syndrome",
+        "likelihood": "low",
+        "key_features": "SNRT and EP study clarify if needed.",
+        "icd_code": "I49.5"
       },
       {
         "diagnosis": "Vasovagal syncope",
-        "likelihood": "low",
-        "key_features": "No identifiable vasovagal trigger, no prodromal nausea or diaphoresis, exertional pattern more consistent with cardiac etiology, age and cardiac risk factors argue against vasovagal."
-      },
-      {
-        "diagnosis": "Orthostatic hypotension",
-        "likelihood": "low",
-        "key_features": "Syncope occurred during exertion (climbing stairs) not on standing from sitting or lying. Patient is on tamsulosin and amlodipine which can cause orthostatic hypotension, but any orthostatic component is secondary to fixed bradycardia."
-      },
-      {
-        "diagnosis": "Aortic stenosis-related syncope (exertional)",
-        "likelihood": "low",
-        "key_features": "Severe aortic stenosis can independently cause exertional syncope through inability to augment cardiac output; however, the complete heart block provides the primary mechanism and is the more immediately actionable diagnosis."
-      },
-      {
-        "diagnosis": "Transient ischemic attack",
         "likelihood": "very_low",
-        "key_features": "No focal neurological symptoms, TIA very rarely causes true loss of consciousness, normal neurological exam, normal brain imaging."
+        "key_features": "Exertional collapse in advanced age with calcific valvular disease is not vasovagal.",
+        "icd_code": "R55"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain 12-lead ECG immediately upon presentation",
+        "action": "12-lead ECG immediately",
         "tool_name": "analyze_ecg",
-        "expected_finding": "Complete heart block with ventricular escape rhythm at 32 bpm, prolonged QTc 512 ms",
-        "category": "required"
+        "expected_finding": "Third-degree AV block with wide-complex escape rhythm; LBBB morphology",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.2"
       },
       {
         "step": 2,
-        "action": "Initiate continuous telemetry monitoring and establish IV access",
-        "tool_name": null,
-        "expected_finding": "Persistent bradycardia with complete AV dissociation, monitor for pauses and ventricular arrhythmia",
-        "category": "required"
-      },
-      {
-        "step": 3,
-        "action": "Apply transcutaneous pacing pads and have atropine and isoproterenol available at bedside",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
-      },
-      {
-        "step": 4,
-        "action": "Obtain comprehensive laboratory studies including CBC, BMP, troponin, BNP, coagulation studies, TSH, magnesium",
+        "action": "Labs: CBC, BMP, Mg, troponin, BNP, TSH, glucose, lactate",
         "tool_name": "interpret_labs",
-        "expected_finding": "No metabolic cause for syncope; mildly elevated troponin (demand), significantly elevated BNP",
+        "expected_finding": "Exclude ACS and electrolyte contributors",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
-            "coagulation",
-            "thyroid",
-            "troponin"
+            "magnesium",
+            "troponin",
+            "BNP",
+            "TSH"
           ]
-        }
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.3"
       },
       {
-        "step": 5,
-        "action": "Urgent cardiology consultation for temporary pacing and permanent pacemaker planning",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
-      },
-      {
-        "step": 6,
-        "action": "Obtain EEG to rule out epileptiform etiology for loss of consciousness",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Normal EEG, no epileptiform abnormalities",
-        "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
-      },
-      {
-        "step": 7,
-        "action": "Obtain transthoracic echocardiogram to evaluate structural heart disease and aortic stenosis severity",
+        "step": 3,
+        "action": "Echocardiogram including AV peak velocity and mean gradient (re-stage AS)",
         "tool_name": "order_echocardiogram",
-        "expected_finding": "Severe aortic stenosis (AVA 0.9 cm2), reduced LVEF 40%, LVH, calcification extending toward conduction system",
+        "expected_finding": "Severity restaging of AS; LV function and hypertrophy",
         "category": "required",
         "tool_parameters": {
           "echo_type": "TTE"
-        }
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §4.1"
+      },
+      {
+        "step": 4,
+        "action": "Continuous telemetry; expedite pacing",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Persistent complete AV block; document escape stability",
+        "category": "required",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "citation": "[Locati_2014]",
+        "guideline_source": "Locati 2014"
+      },
+      {
+        "step": 5,
+        "action": "Medication review for AV-nodal blockers and QT-prolongers",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Hold AV-nodal blockers",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §6"
+      },
+      {
+        "step": 6,
+        "action": "Search for pacing and TAVR/SAVR indications given combined AS plus conduction disease",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Pacing indication confirmed; AV intervention timing should be co-ordinated",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[ACC_AHA_HRS_2017]",
+        "guideline_source": "ACC/AHA/HRS 2017 §4"
+      },
+      {
+        "step": 7,
+        "action": "Cardiology / EP consult for pacing; structural-heart team for AS",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Pacemaker plan; structural valve evaluation",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ACC_AHA_HRS_2017]",
+        "guideline_source": "ACC/AHA/HRS 2017 §4"
       },
       {
         "step": 8,
-        "action": "Review and adjust medications: hold tamsulosin (alpha-blocker causing vasodilation), continue losartan with caution given potassium",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Cardiac MRI if etiology of conduction disease unclear",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Quantify fibrosis and scar burden in conduction system territory",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "perfusion_MRI"
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §4.3"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No infection or encephalopathy features.",
+        "citation": ""
+      }
+    ],
+    "harmful_tools": [
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "tilt_table"
+        },
+        "rationale": "Tilt-table is relatively contraindicated in moderate-to-severe aortic stenosis (haemodynamic risk) and is irrelevant when complete AV block is already documented.",
+        "citation": "[ESC_2018]"
+      }
+    ],
+    "sequence_constraints": [
+      {
+        "before": "analyze_ecg",
+        "after": "consult_medical_specialist",
+        "reason": "ECG diagnosis of complete AV block drives the urgent pacing pathway.",
+        "citation": "[ESC_2018]",
+        "severity": "hard"
       },
       {
-        "step": 9,
-        "action": "Admit to CCU or monitored telemetry bed for continuous monitoring pending pacemaker implantation",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "before": "interpret_labs",
+        "after": "order_cardiac_monitoring",
+        "reason": "Troponin/electrolytes before committing pacing/monitoring plan.",
+        "citation": "[ROSE_2010]",
+        "severity": "hard"
       },
       {
-        "step": 10,
-        "action": "Plan for permanent pacemaker implantation, with consideration for CRT-P given reduced LVEF, and subsequent evaluation for TAVR for severe symptomatic aortic stenosis",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "before": "order_echocardiogram",
+        "after": "consult_medical_specialist",
+        "reason": "AS severity informs combined valve-and-device strategy.",
+        "citation": "[ESC_2018]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Obtain 12-lead ECG immediately to identify complete heart block",
-      "Initiate continuous cardiac telemetry monitoring",
-      "Apply transcutaneous pacing pads as a safety measure given critically slow rate and prolonged QTc",
-      "Urgent cardiology consultation for temporary and permanent pacing",
-      "Recognize that syncope is cardiac in origin (not epileptic) despite the dramatic nature of the collapse",
-      "Identify severe aortic stenosis as the underlying etiology of the conduction disease"
+      "Admit to telemetry — high-risk combination of AS and complete AV block",
+      "Urgent pacing plan (consider temporary transvenous pacing if escape unstable)",
+      "Restage aortic stenosis on echo",
+      "Hold AV-nodal blockers",
+      "Counsel on driving restriction"
     ],
     "contraindicated_actions": [
-      "Initiating antiepileptic drugs without evidence of epilepsy",
-      "Administering calcium channel blockers (amlodipine should be held, and non-dihydropyridine CCBs like verapamil or diltiazem are absolutely contraindicated as they suppress AV conduction)",
-      "Performing exercise stress test in a patient with severe symptomatic aortic stenosis (absolute contraindication)",
-      "Discharging the patient without cardiac monitoring and pacemaker evaluation",
-      "Administering IV adenosine (would worsen AV block)",
-      "Starting beta-blockers (would worsen bradycardia)",
-      "Performing lumbar puncture (no indication and would delay critical cardiac management)"
+      "Do not perform tilt-table in moderate-to-severe AS",
+      "Do not give further AV-nodal blockers",
+      "Do not discharge home prior to pacing",
+      "Do not allow driving until clearance"
     ],
     "key_reasoning_points": [
-      "Sudden unheralded loss of consciousness during exertion with no prodrome and immediate return to full alertness is the hallmark of cardiac syncope, not epilepsy",
-      "The absence of tonic-clonic movements, post-ictal confusion, tongue biting, and incontinence argues strongly against seizure",
-      "Exertional pattern of syncope and pre-syncopal episodes raises concern for both cardiac arrhythmia and severe aortic stenosis, both of which are confirmed",
-      "The ECG showing complete heart block with a ventricular escape rate of 32 bpm and prolonged QTc provides the immediate diagnosis and explains the syncopal mechanism",
-      "Severe aortic stenosis with calcification extending into the conduction system is the underlying structural etiology of the complete heart block",
-      "The significantly elevated BNP (614 pg/mL) indicates substantial cardiac dysfunction from the combined hemodynamic burden of aortic stenosis and bradycardia",
-      "The normal EEG confirms a non-epileptic etiology for the transient loss of consciousness",
-      "This patient requires a dual management strategy: urgent pacemaker implantation for the conduction disease, followed by evaluation for TAVR for the severe aortic stenosis"
+      "Calcific AS extends into the membranous septum and conduction system, producing AV block",
+      "Tilt-table is relatively contraindicated in moderate-to-severe AS",
+      "Pacing plan and valve-intervention plan should be co-ordinated (avoid repeat hospitalisation)"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "History of moderate AS",
+        "location": "patient.clinical_history.past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Could focus attention solely on AS as the cause of syncope.",
+        "correct_interpretation": "Conduction-system involvement is a related but separate substrate; both must be addressed."
+      },
+      {
+        "data_point": "Wide-complex escape rhythm on ECG",
+        "location": "initial_tool_outputs.ecg.interpretation",
+        "field_path": "initial_tool_outputs.ecg.interpretation",
+        "intended_effect": "May be misinterpreted as VT.",
+        "correct_interpretation": "AV dissociation with stable wide-complex escape is the escape pacemaker below the block, not VT."
+      }
+    ]
   },
   "metadata": {
     "version": "1.0",
@@ -855,6 +914,14 @@
       "csf": "normal",
       "literature_search": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SYNC-CARD",
+    "difficulty_rationale": "ECG-diagnostic complete AV block; 4-5 required tools; key nuance is co-ordinating pacing with valvular intervention and noting tilt-table contraindication in significant AS.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

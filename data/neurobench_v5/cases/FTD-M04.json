@@ -498,106 +498,268 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Behavioral variant frontotemporal dementia — sporadic, early-onset (age 53) — with prominent anosognosia and high premorbid functioning masking clinical severity on standard testing",
+    "primary_diagnosis": "Behavioral variant frontotemporal dementia (bvFTD), probable, sporadic, young-onset",
     "icd_code": "G31.09",
     "differential": [
       {
-        "diagnosis": "Hashimoto's encephalopathy (SREAT)",
-        "likelihood": "very_low",
-        "key_features": "Anti-TPO 320 IU/mL (not in SREAT range >1000); TSH controlled (euthyroid); CSF without pleocytosis or intrathecal anti-TPO; EEG normal; SREAT is typically subacute and fluctuating — different course than this progressive 14-month syndrome"
+        "diagnosis": "Alzheimer disease (early-onset, frontal variant)",
+        "likelihood": "high",
+        "key_features": "Paternal 'probable AD' raises EOAD concern; biomarker workup (amyloid PET, CSF Aβ42/p-tau) is critical."
       },
       {
-        "diagnosis": "Alzheimer's disease (early-onset, familial)",
-        "likelihood": "very_low",
-        "key_features": "Amyloid PET negative; CSF Abeta42 normal; FDG-PET shows frontotemporal hypometabolism without posterior cingulate sign; hippocampal volumes preserved; APOE e4 heterozygosity increases AD risk but negative amyloid PET confirms no current AD pathology"
+        "diagnosis": "Primary psychiatric disorder (late-onset depression, personality change)",
+        "likelihood": "moderate",
+        "key_features": "Anosognosia and high premorbid functioning can mask deficits; imaging confirms neurodegeneration."
       },
       {
-        "diagnosis": "Late-onset occupational burnout/depression",
-        "likelihood": "very_low",
-        "key_features": "Structural frontal atrophy on MRI; frontotemporal FDG-PET hypometabolism; severe social cognition impairment on neuropsychological testing — structural neurodegeneration cannot be attributed to burnout"
+        "diagnosis": "Familial FTD (C9orf72 / GRN / MAPT)",
+        "likelihood": "moderate",
+        "key_features": "Young onset warrants genetic testing even with limited family history."
       },
       {
-        "diagnosis": "Primary progressive aphasia",
+        "diagnosis": "Autoimmune / Hashimoto encephalopathy",
+        "likelihood": "low",
+        "key_features": "Subacute behavioural change can be autoimmune; TPO/anti-thyroglobulin and CSF inflammatory profile help."
+      },
+      {
+        "diagnosis": "Vascular cognitive impairment",
         "likelihood": "very_low",
-        "key_features": "Language-predominant PPA would show left perisylvian atrophy and language impairment; this patient's syndrome is behavioral (disinhibition, social cognition loss) with frontal predominance bilaterally"
+        "key_features": "Not supported by imaging."
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "MRI brain — structural atrophy pattern; assess for Hashimoto's encephalopathy features",
+        "action": "Obtain brain MRI with volumetric coronal T1 to assess frontal/anterior temporal atrophy and exclude alternative structural cause",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Mild frontal atrophy; no thalamic signal change; hippocampi preserved",
+        "expected_finding": "Bilateral frontal and/or anterior temporal atrophy in a lobar pattern with relative posterior sparing",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "DWI",
+            "volumetric"
+          ]
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky 2011 bvFTD criteria"
       },
       {
         "step": 2,
-        "action": "TSH, anti-TPO — confirm euthyroid status; assess for Hashimoto's encephalopathy range",
+        "action": "Order metabolic dementia panel (TSH, B12, CMP, RPR/HIV per risk) to exclude reversible mimics",
         "tool_name": "interpret_labs",
-        "expected_finding": "TSH controlled; anti-TPO elevated but <1000 (not SREAT range)",
+        "expected_finding": "No reversible metabolic or infectious cause of cognitive decline identified",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "TSH",
+            "B12",
+            "RPR",
+            "HIV"
+          ]
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
       },
       {
         "step": 3,
-        "action": "FDG-PET brain — metabolic characterization",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Left frontotemporal hypometabolism; absent posterior cingulate sign",
+        "action": "Order comprehensive neuropsychological battery characterising executive function, social cognition, language and memory",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Frontal-executive and social-cognition deficits with relative sparing of episodic memory and visuospatial function",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky 2011 bvFTD criteria"
       },
       {
         "step": 4,
-        "action": "Amyloid PET — AD exclusion given father's possible AD and APOE e4",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Negative — AD excluded despite family history and APOE e4",
+        "action": "Search medical literature for young-onset ftd vs early-onset ad",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirms Rascovsky 2011 criteria, FDG-PET evidence (Foster 2007), and management approach (Bang 2015)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "query": "Young-onset FTD vs early-onset AD"
+        },
+        "citation": "[Bang_2015]",
+        "guideline_source": "Bang 2015 Lancet review"
       },
       {
         "step": 5,
-        "action": "Comprehensive neuropsych with education-corrected norms",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Severely impaired executive function and social cognition; relative episodic memory preservation; large premorbid-current discrepancy",
+        "action": "Consult behavioral/cognitive neurology for syndromic diagnosis, biomarker interpretation, and longitudinal care plan",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Behavioral neurology confirms bvFTD syndrome, coordinates biomarkers and disclosure",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "specialty": "behavioral_neurology"
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
+      },
+      {
+        "step": 6,
+        "action": "Order FDG-PET brain to characterise frontotemporal hypometabolism and distinguish bvFTD from AD",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Bifrontal and/or anterior temporal hypometabolism with relative posterior sparing",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[Foster_2007]",
+        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
+      },
+      {
+        "step": 7,
+        "action": "Order FTD genetic panel (C9orf72, GRN, MAPT) given young onset (age 53) and paternal dementia",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Identifies or excludes pathogenic C9orf72 / GRN / MAPT variant relevant to prognosis and cascade testing",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "genetic_panel:FTD"
+        },
+        "citation": "[Pottier_2016]",
+        "guideline_source": "Pottier 2016 FTLD genetics review"
+      },
+      {
+        "step": 8,
+        "action": "Order amyloid PET (and/or CSF Aβ42/p-tau) to exclude early-onset AD",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Negative amyloid PET expected — would secure FTD diagnosis",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "citation": "[Foster_2007]",
+        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
+      },
+      {
+        "step": 9,
+        "action": "Add Hashimoto encephalopathy screen (TPO, thyroglobulin antibodies) and CSF inflammatory profile if rapid decline or atypical features",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Bland CSF; absent inflammatory markers; AD biomarkers help stratify",
+        "category": "optional",
+        "tool_parameters": {
+          "tests": [
+            "cell_count",
+            "protein",
+            "glucose",
+            "Abeta42",
+            "phospho_tau",
+            "total_tau",
+            "oligoclonal_bands"
+          ]
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is non-specific in FTD; not part of the standard dementia workup unless seizures or rapidly progressive course suggest CJD or autoimmune encephalitis.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG has no role in the cognitive workup of suspected FTD; reserved for syncope, palpitations, or pre-procedure clearance.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is unrelated to a neurodegenerative cognitive syndrome and adds cost without diagnostic value.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is unrelated to FTD and not indicated absent syncope or palpitations.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT lacks the resolution and lobar specificity needed to characterise frontotemporal atrophy; MRI is the standard structural study.",
+        "citation": "[AAN_dementia_2018]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "MR_spectroscopy"
+        },
+        "rationale": "MR spectroscopy has no established role in the routine FTD diagnostic pathway.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "perfusion_MRI"
+        },
+        "rationale": "Perfusion MRI is not indicated in the standard FTD workup once a structural MRI and FDG-PET (or amyloid PET) have characterised the lobar pattern.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is a vascular study with no diagnostic role in primary neurodegenerative dementia.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan evaluates presynaptic dopaminergic terminals; it is not indicated unless overt parkinsonism raises concern for PD, DLB, or atypical parkinsonism (PSP/CBS overlap).",
+        "citation": "[Bang_2015]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "Exclude structural cause of focal cognitive symptoms and screen for elevated ICP before lumbar puncture.",
+        "citation": "[AAN_dementia_2018]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Anti-TPO >1000 IU/mL would warrant CSF and EEG for Hashimoto's encephalopathy — but at 320 IU/mL with controlled TSH and normal EEG/CSF, SREAT is excluded",
-      "High premorbid IQ requires education-corrected neuropsychological norms — standard norms will underestimate impairment",
-      "Capacity and fitness-for-duty evaluation must be performed",
-      "Negative amyloid PET conclusively excludes AD despite APOE e4 carrier status and family history"
+      "Address anosognosia explicitly: prioritise informant history and functional status over patient self-report.",
+      "Discuss employment / leave-of-absence status with HR and document professional capacity assessment.",
+      "Apply Rascovsky 2011 bvFTD criteria explicitly (≥3 of 6 core features within 3 years) and document functional decline.",
+      "Assess and document decision-making, financial, and driving capacity given the high risk of impulsivity and impaired judgment in FTD.",
+      "Provide caregiver education, safety planning, and referral to FTD-focused support resources.",
+      "Offer genetic counselling and discuss cascade testing options if a pathogenic variant is identified or suspected."
     ],
     "contraindicated_actions": [
-      "Cholinesterase inhibitors — contraindicated in FTD",
-      "Initiating corticosteroids for presumed Hashimoto's encephalopathy without meeting diagnostic criteria — moderately elevated anti-TPO alone is not sufficient"
+      "Do not start acetylcholinesterase inhibitors (donepezil, rivastigmine, galantamine): no benefit in FTD and may worsen behavioral symptoms.",
+      "Do not start memantine: no evidence of benefit in bvFTD and may worsen behavioral symptoms.",
+      "Avoid antipsychotics as first-line behavioral therapy given increased cerebrovascular and mortality risk in dementia; reserve for refractory dangerous agitation with specialist oversight.",
+      "Avoid benzodiazepines for behavioral control: risk of paradoxical disinhibition and falls."
     ],
     "key_reasoning_points": [
-      "Hashimoto's encephalopathy (SREAT) requires very high anti-TPO (typically >1000 IU/mL), CSF pleocytosis or intrathecal IgG synthesis, and EEG abnormalities — moderately elevated anti-TPO in a controlled euthyroid patient with Hashimoto's thyroiditis is not diagnostic of encephalopathy",
-      "APOE e4 increases lifetime Alzheimer's risk but does NOT diagnose Alzheimer's disease — negative amyloid PET definitively excludes AD regardless of APOE genotype",
-      "High-premorbid-IQ patients require education-corrected norms and have higher cognitive reserve — their cognitive tests may appear near-normal while profound executive and social cognition impairment is present"
+      "Anosognosia plus high premorbid IQ produces ceiling effects on standard cognitive testing; comprehensive neuropsych with social cognition is essential.",
+      "Young onset mandates early-onset AD biomarker exclusion and a genetic panel.",
+      "Imaging pattern still drives the diagnosis once AD biomarkers are negative."
     ],
     "red_herrings": [
       {
-        "data_point": "Anti-TPO 320 IU/mL (elevated)",
-        "location": "Lab results",
-        "intended_effect": "Diagnose Hashimoto's encephalopathy and treat with corticosteroids",
-        "correct_interpretation": "Anti-TPO 320 IU/mL represents Hashimoto's thyroiditis (known); SREAT requires >1000 IU/mL typically plus CSF/EEG changes; treating with steroids would be incorrect and delay bvFTD diagnosis",
-        "field_path": ""
-      },
-      {
-        "data_point": "Father with possible Alzheimer's dementia and APOE e4/e3",
-        "location": "Family history and genetics",
-        "intended_effect": "Diagnose early-onset familial Alzheimer's disease",
-        "correct_interpretation": "Amyloid PET negative conclusively excludes AD pathology; APOE e4 is a risk factor, not diagnostic; FDG-PET pattern (frontal, absent posterior cingulate sign) and negative amyloid PET confirm bvFTD",
-        "field_path": ""
+        "data_point": "Paternal 'probable Alzheimer's disease' diagnosed at age 67",
+        "location": "family_history",
+        "field_path": "patient.clinical_history.family_history",
+        "intended_effect": "Anchors the agent on familial AD as the dominant hypothesis.",
+        "correct_interpretation": "Late-life AD diagnosis in a single relative does not confer high heritability; biomarkers are the discriminator."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "v5",
@@ -609,6 +771,17 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (condition-expert:FTD)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FTD",
+    "difficulty_rationale": "5 required tools + 1–2 recommended biomarkers and a substantial differential (psychiatric, alcohol, vascular, or AD-overlap); 1–3 grounded red herrings (alcohol, family history, comorbid HIV / bipolar / GRN status); requires multi-modal synthesis.",
+    "case_body_concerns": [
+      "validator flags `order_advanced_imaging` in both optimal_actions (FDG_PET / amyloid_PET) and useless_tools (MR_spectroscopy / DaTscan / perfusion_MRI / carotid_duplex) — these are distinct modalities of the same catchall tool. Known systemic validator limitation: the coherence script ignores `tool_parameters.modality`. No fix at case level.",
+      "fallback output for `order_advanced_imaging` is missing in `fallback_tool_outputs` — calling the useless tool will return empty; case body needs an off-pathway fallback entry."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -512,116 +512,180 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Hepatic encephalopathy, grade 2, PBC cirrhosis — precipitated by zinc toxicity (OTC zinc supplementation) inhibiting urea cycle arginase + constipation",
-    "icd_code": "K72.9",
+    "primary_diagnosis": "Hepatic encephalopathy (West Haven grade II), primary biliary cholangitis cirrhosis (Child-Pugh B, MELD 15) — precipitated by zinc toxicity from OTC supplementation (serum zinc 180 µg/dL inhibits urea cycle arginase) plus constipation.",
+    "icd_code": "K72.90",
     "differential": [
       {
         "diagnosis": "Hypothyroid encephalopathy",
-        "likelihood": "very_low",
-        "key_features": "TSH normal (3.8) — hypothyroidism controlled; levothyroxine dose appropriate; not contributing"
+        "likelihood": "low",
+        "key_features": "Hypothyroidism on levothyroxine; cognitive contribution possible but does not cause asterixis or rapid lactulose response.",
+        "icd_code": "E03.5"
       },
       {
-        "diagnosis": "Drug-induced encephalopathy (ursodeoxycholic acid)",
-        "likelihood": "very_low",
-        "key_features": "UDCA has no known CNS toxicity; standard PBC treatment; not contributing"
+        "diagnosis": "Spontaneous bacterial peritonitis",
+        "likelihood": "low",
+        "key_features": "Paracentesis if ascites present.",
+        "icd_code": "K65.2"
       },
       {
-        "diagnosis": "Progressive PBC cognitive decline",
+        "diagnosis": "Drug-induced encephalopathy (ursodeoxycholic acid or other)",
         "likelihood": "very_low",
-        "key_features": "Acute-subacute 2-week course inconsistent with chronic degenerative decline; reversible with zinc cessation confirms HE"
+        "key_features": "UDCA is well tolerated and does not cause encephalopathy.",
+        "icd_code": "G92"
       },
       {
-        "diagnosis": "Uremic encephalopathy",
+        "diagnosis": "Wilson disease (copper deposition)",
         "likelihood": "very_low",
-        "key_features": "Creatinine 0.8 — normal renal function; BUN 14 — no uremia"
+        "key_features": "PBC is an established diagnosis; low serum copper (68) is likely from zinc excess displacing copper rather than Wilson disease.",
+        "icd_code": "E83.01"
+      },
+      {
+        "diagnosis": "Progressive cognitive decline / neurodegenerative",
+        "likelihood": "very_low",
+        "key_features": "Acute 2-week course with reversibility on lactulose argues against neurodegeneration.",
+        "icd_code": "G31.84"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Labs including ammonia, LFTs, thyroid, and TRACE ELEMENTS (zinc, copper) — medication reconciliation revealing OTC zinc",
+        "action": "Comprehensive labs: CMP including AST/ALT/bilirubin/INR/albumin, ammonia, CBC, glucose, electrolytes (Na, K, Mg), BUN/Cr, lactate, blood cultures and urine cultures; toxicology if substance use plausible. Confirms liver dysfunction and screens for precipitants.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Zinc 180 (elevated) — OTC supplement identified as precipitant; ammonia 78",
+        "expected_finding": "Ammonia 78; serum zinc 180 µg/dL (high) — pinpoints urea-cycle inhibition mechanism; serum copper low (zinc-displaced); cirrhosis features.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 2,
-        "action": "CT head — exclude structural cause",
+        "action": "Non-contrast CT head — exclude structural alternate cause of AMS (hemorrhage, large stroke, mass) before any LP.",
         "tool_name": "order_ct_scan",
-        "expected_finding": "CT normal",
+        "expected_finding": "No acute intracranial process — alternate structural cause excluded.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 3,
-        "action": "EEG — characterize encephalopathy",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Theta slowing — mild-moderate HE; no classic triphasic waves",
+        "action": "Literature/guideline search to confirm West Haven grading, precipitant management, and lactulose/rifaximin dosing (Zinc toxicity and hepatic encephalopathy / urea-cycle inhibition; AASLD/EASL HE management).",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "AASLD/EASL 2014 guidance retrieved; West Haven criteria and precipitant-driven management framework confirmed.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 4,
-        "action": "Discontinue OTC zinc supplement — primary precipitant",
-        "tool_name": null,
-        "expected_finding": "Zinc normalizes over 2 weeks",
+        "action": "Drug-interaction and medication-reconciliation review covering ursodeoxycholic acid, levothyroxine, lactulose, rifaximin; review OTC supplements (zinc) and discontinue zinc; flag any CNS depressants (benzodiazepines, opioids, sedating antiemetics, antihistamines) and confirm lactulose/rifaximin dosing in liver disease.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sedating/CNS-depressant medications identified; lactulose and rifaximin reviewed for hepatic dose adjustment.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Bajaj_2011]",
+        "guideline_source": "Bajaj 2011 HE management review"
       },
       {
         "step": 5,
-        "action": "Increase lactulose + add rifaximin; treat constipation",
-        "tool_name": null,
-        "expected_finding": "Ammonia trending to normal",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Consult hepatology — coordinate definitive care, transplant candidacy assessment where applicable.",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Hepatology / critical-care guidance integrated into management.",
+        "category": "recommended",
+        "tool_parameters": {
+          "specialty": "hepatology"
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 6,
-        "action": "Counsel patient: no OTC supplements without hepatologist approval in cirrhosis",
-        "tool_name": null,
-        "expected_finding": "Education intervention",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "EEG — consider if no clinical improvement with lactulose and zinc cessation. Triphasic waves are classic but non-specific (metabolic encephalopathies broadly); main role is exclusion of non-convulsive status epilepticus where the differential supports it.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Generalized slowing if obtained.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Ferenci_2002]",
+        "guideline_source": "Ferenci 2002 HE nomenclature/quantification"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No clinical suspicion for hepatopulmonary syndrome, portopulmonary hypertension, or endocarditis; echocardiography is not part of the HE workup.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in HE workup; reversible metabolic encephalopathy is the issue, not Alzheimer pathology.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan has no role in HE workup; the question is metabolic encephalopathy, not nigrostriatal degeneration.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "FDG PET has no role in HE workup; metabolic encephalopathy is reversible with precipitant control and does not require nuclear functional imaging.",
+        "citation": "[AASLD_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "In altered mental status, exclude intracranial mass effect / hemorrhage on imaging before LP to avoid herniation risk.",
+        "citation": "[AASLD_2014]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Medication reconciliation including OTC supplements is critical — patients often do not volunteer OTC supplement use; zinc excess is an underrecognized HE precipitant",
-      "Zinc DEFICIENCY is common in cirrhosis and is appropriately treated — but EXCESS zinc is harmful; the balance matters",
-      "Antihistamines are contraindicated for pruritus in cirrhosis — sedating antihistamines worsen HE",
-      "Trace element panel (zinc, copper, manganese) should be checked in unexplained HE without obvious precipitant"
+      "Stop OTC zinc supplementation immediately and counsel against future use.",
+      "Lactulose titrated to 2-4 soft stools/day; rifaximin 550 mg BID.",
+      "Address constipation and review dietary protein.",
+      "Counsel about evidence-free supplement use in cirrhosis."
     ],
     "contraindicated_actions": [
-      "OTC zinc supplementation without physician guidance in cirrhosis",
-      "Sedating antihistamines for pruritus (diphenhydramine, hydroxyzine) — worsen HE",
-      "Protein restriction in HE management"
+      "Do not prescribe benzodiazepines for anxiety/agitation — they precipitate and prolong HE (use haloperidol or non-pharmacologic measures for agitation).",
+      "Do not prescribe sedating opioids — they worsen HE; consider acetaminophen at hepatic-safe dosing for pain.",
+      "Do not perform LP before neuroimaging excludes mass effect when the patient has altered mental status.",
+      "Do not start oral zinc supplementation for HE without confirming a deficiency (zinc supplementation for HE has weak evidence and is harmful when serum levels are already elevated)."
     ],
     "key_reasoning_points": [
-      "Zinc excess inhibits arginase (urea cycle enzyme) → hyperammonemia → HE; OTC supplement use must be specifically asked about in all cirrhotic patients presenting with HE",
-      "Zinc deficiency is common in cirrhosis and legitimate reason to supplement — but over-supplementation is harmful; serum zinc monitoring guides appropriate dosing",
-      "PBC is a cholestatic disease with pruritus as a major symptom — patients frequently self-medicate; clinician must ask about all OTC supplements, vitamins, and herbal products",
-      "EEG without classic triphasic waves does NOT exclude HE — mild and moderate HE often shows only non-specific generalized slowing"
+      "HE is a clinical diagnosis: West Haven grading + evidence of liver dysfunction + exclusion of other causes of AMS — ammonia level is supportive only and correlates poorly with grade (AASLD 2014).",
+      "Precipitant identification is more actionable than the ammonia number: infection (SBP especially), GI bleed, electrolyte disturbance (hypokalemia/hyponatremia), constipation, sedative/CNS-depressant use, dehydration, dietary protein load, renal failure.",
+      "Zinc has been variously suggested to help (deficient patients) or harm (toxic levels) HE; check a level before supplementing — toxicity precipitates HE by inhibiting urea-cycle arginase.",
+      "OTC supplement use is a frequently missed precipitant in cirrhotics; ask about supplements specifically."
     ],
     "red_herrings": [
       {
-        "data_point": "Elevated ALP 284, GGT 142",
-        "location": "initial_tool_outputs.labs.panels.LFTs",
-        "intended_effect": "Attribute encephalopathy to acute PBC exacerbation with worsening cholestatic liver injury; initiate higher UDCA doses or steroid",
-        "correct_interpretation": "ALP/GGT elevation is the expected cholestatic pattern of PBC — not acutely elevated vs prior; the encephalopathy is from ammonia (zinc toxicity), not from PBC worsening per se",
-        "field_path": ""
+        "data_point": "Serum copper 68 µg/dL (low)",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs.panels",
+        "intended_effect": "Pursue Wilson disease workup (24-hour urine copper, ceruloplasmin, slit-lamp KF rings).",
+        "correct_interpretation": "Low copper here is the consequence of zinc-induced copper malabsorption (a well-described iatrogenic finding), not Wilson disease. PBC etiology is established."
       },
       {
-        "data_point": "Low copper 68 µg/dL",
-        "location": "initial_tool_outputs.labs.panels.Trace_Elements",
-        "intended_effect": "Diagnose Wilson's disease or copper deficiency myelopathy as cause of neurological symptoms; initiate copper supplementation",
-        "correct_interpretation": "Low copper is SECONDARY to zinc excess — zinc competitively inhibits copper absorption (Menkes transporter competition); Wilson's disease would cause elevated serum copper, not low; discontinue zinc and copper will self-correct",
-        "field_path": ""
+        "data_point": "PBC well-controlled on UDCA",
+        "location": "patient.clinical_history.past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history[0]",
+        "intended_effect": "Attribute encephalopathy to PBC progression or UDCA-related toxicity.",
+        "correct_interpretation": "UDCA is not encephalopathic; PBC is stably treated; zinc supplementation is the precipitant."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -641,6 +705,14 @@
       "cardiac_monitoring": "incidental",
       "advanced_imaging": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (HEP-ENC)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:HEP-ENC",
+    "difficulty_rationale": "4 required tools; the precipitant (zinc supplementation) requires asking the right history question and identifying the lab marker (zinc 180); 2 grounded distractors (low copper, PBC context).",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -519,116 +519,178 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Concurrent Wernicke encephalopathy + hepatic encephalopathy — in NASH cirrhosis patient with celiac disease malabsorption; 7 days of vomiting causes thiamine depletion (24 nmol/L); ophthalmoparesis, nystagmus, and ataxia = Wernicke (not HE); MRI confirms periaqueductal and mammillary body signal",
-    "icd_code": "K72.9",
+    "primary_diagnosis": "Concurrent Wernicke encephalopathy and hepatic encephalopathy in NASH cirrhosis (Child-Pugh B, MELD 13) with celiac disease — thiamine 24 nmol/L from 7 days of vomiting and chronic malabsorption; ophthalmoparesis, nystagmus, ataxia mandate Wernicke treatment regardless of MRI.",
+    "icd_code": "K72.90",
     "differential": [
       {
-        "diagnosis": "Wernicke encephalopathy alone (without HE)",
-        "likelihood": "moderate",
-        "key_features": "Ophthalmoparesis + nystagmus + ataxia + confusion in nutritionally deficient patient = Wernicke; BUT ammonia 68 with cirrhosis confirms concurrent HE; both diagnoses are present simultaneously"
+        "diagnosis": "Wernicke encephalopathy (concurrent diagnosis)",
+        "likelihood": "very_high",
+        "key_features": "Ophthalmoparesis + nystagmus + ataxia + thiamine 24 nmol/L = Wernicke; MRI may confirm but does not exclude when absent.",
+        "icd_code": "E51.2"
       },
       {
-        "diagnosis": "Hepatic encephalopathy alone (without Wernicke)",
-        "likelihood": "very_low",
-        "key_features": "HE does NOT cause ophthalmoparesis or nystagmus — eye movement abnormalities are incompatible with HE; the presence of these findings mandates Wernicke workup and thiamine treatment"
-      },
-      {
-        "diagnosis": "Celiac neuropathy with encephalopathy",
+        "diagnosis": "Cerebellar stroke",
         "likelihood": "low",
-        "key_features": "Celiac neuropathy causes peripheral and cerebellar ataxia; however, the acute presentation with ophthalmoparesis and very low thiamine points to Wernicke, not slow celiac neurodegeneration"
+        "key_features": "MRI DWI to exclude.",
+        "icd_code": "I63.9"
       },
       {
-        "diagnosis": "Miller Fisher syndrome (anti-GQ1b GBS variant)",
+        "diagnosis": "Celiac-related neurological syndrome (gluten ataxia, peripheral neuropathy)",
+        "likelihood": "low",
+        "key_features": "Acute onset less typical; treat celiac with strict gluten-free diet regardless.",
+        "icd_code": "G31.84"
+      },
+      {
+        "diagnosis": "Brainstem encephalitis",
         "likelihood": "very_low",
-        "key_features": "MFS causes ophthalmoplegia + ataxia + areflexia — but no antecedent infection; liver disease present; thiamine deficient; LFTs abnormal; MFS is seronegative; Wernicke is far more likely in this context"
+        "key_features": "MRI + CSF if indicated.",
+        "icd_code": "G04.90"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "URGENT: IV thiamine 500 mg BEFORE any dextrose — severely deficient thiamine (24 nmol/L), celiac malabsorption + 7 days vomiting, non-alcoholic Wernicke",
-        "tool_name": null,
-        "expected_finding": "Thiamine administered; ophthalmoparesis begins to improve within hours",
+        "action": "Comprehensive labs: CMP including AST/ALT/bilirubin/INR/albumin, ammonia, CBC, glucose, electrolytes (Na, K, Mg), BUN/Cr, lactate, blood cultures and urine cultures; toxicology if substance use plausible. Confirms liver dysfunction and screens for precipitants.",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Ammonia (mildly elevated); thiamine 24 nmol/L; cirrhosis features; celiac serologies; B12, folate.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 2,
-        "action": "IV Magnesium sulfate — hypomagnesemia prevents thiamine activation",
-        "tool_name": null,
-        "expected_finding": "Mg corrected; thiamine more effective",
+        "action": "Non-contrast CT head — exclude structural alternate cause of AMS (hemorrhage, large stroke, mass) before any LP.",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Baseline; MRI is the key imaging.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 3,
-        "action": "Labs — thiamine, ammonia, Mg, K, Na, LFTs, folate, B12",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Thiamine 24 (severely deficient), Mg 1.3, ammonia 68 — dual diagnosis confirmed",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "MRI brain with and without gadolinium — exclude alternate causes of AMS (acute ischemia, mass, Wernicke periaqueductal/mammillary changes, leptomeningeal disease) when CT is non-diagnostic or specific alternate diagnoses are suspected.",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "MRI brain — periaqueductal gray and mammillary body T2/FLAIR signal confirms Wernicke; absence does NOT exclude.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 4,
-        "action": "MRI brain urgently — confirm Wernicke (periaqueductal + mammillary body T2)",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Classic Wernicke MRI pattern confirmed",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Literature/guideline search to confirm West Haven grading, precipitant management, and lactulose/rifaximin dosing (Wernicke encephalopathy diagnosis and high-dose IV thiamine dosing; celiac neurologic manifestations; AASLD HE).",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "AASLD/EASL 2014 guidance retrieved; West Haven criteria and precipitant-driven management framework confirmed.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 5,
-        "action": "CT head — exclude hemorrhage",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "CT normal — no hemorrhage; MRI required for Wernicke confirmation",
+        "action": "Drug-interaction and medication-reconciliation review covering lactulose, rifaximin; high-dose parenteral thiamine; treat any vomiting with non-sedating antiemetics avoiding metoclopramide if extrapyramidal concern; flag any CNS depressants (benzodiazepines, opioids, sedating antiemetics, antihistamines) and confirm lactulose/rifaximin dosing in liver disease.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sedating/CNS-depressant medications identified; lactulose and rifaximin reviewed for hepatic dose adjustment.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Bajaj_2011]",
+        "guideline_source": "Bajaj 2011 HE management review"
       },
       {
         "step": 6,
-        "action": "EEG — characterize encephalopathy; lactulose + rifaximin for HE component",
+        "action": "Consult neurology + hepatology + gastroenterology for celiac — coordinate definitive care, transplant candidacy assessment where applicable.",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Hepatology / critical-care guidance integrated into management.",
+        "category": "recommended",
+        "tool_parameters": {
+          "specialty": "hepatology"
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      },
+      {
+        "step": 7,
+        "action": "EEG — characterize encephalopathy and exclude NCSE. Triphasic waves are classic but non-specific (metabolic encephalopathies broadly); main role is exclusion of non-convulsive status epilepticus where the differential supports it.",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Non-specific theta slowing — HE + Wernicke both present",
-        "category": "required",
-        "tool_parameters": {}
+        "expected_finding": "Generalized slowing.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Ferenci_2002]",
+        "guideline_source": "Ferenci 2002 HE nomenclature/quantification"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No clinical suspicion for hepatopulmonary syndrome, portopulmonary hypertension, or endocarditis; echocardiography is not part of the HE workup.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "genetic_panel:early_onset_AD"
+        },
+        "rationale": "Early-onset AD genetic panel has no role in HE workup; reversible metabolic encephalopathy is the diagnosis under consideration.",
+        "citation": "[AASLD_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "In altered mental status, exclude intracranial mass effect / hemorrhage on imaging before LP to avoid herniation risk.",
+        "citation": "[AASLD_2014]",
+        "severity": "hard"
+      },
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "In altered mental status, exclude intracranial mass effect on neuroimaging before LP to avoid herniation risk.",
+        "citation": "[AASLD_2014]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Ophthalmoparesis + nystagmus is INCOMPATIBLE with hepatic encephalopathy alone — these findings mandate Wernicke workup and empiric IV thiamine IMMEDIATELY",
-      "Hypomagnesemia must be corrected WITH thiamine — Mg is required for thiamine pyrophosphate (active form); thiamine without Mg correction is less effective",
-      "Non-alcoholic Wernicke (from celiac malabsorption) is underrecognized — Wernicke is not exclusive to alcoholics; celiac, cancer, prolonged vomiting, bariatric surgery all cause Wernicke",
-      "IV thiamine must be given at HIGH dose (500 mg TID) for established Wernicke — standard prophylactic doses (100-200 mg) are insufficient for treatment of established disease"
+      "High-dose IV thiamine 500 mg TID for 3 days then 250 mg IV daily for 5 days BEFORE any dextrose (Wernicke treatment dose, not prophylaxis).",
+      "Lactulose 30 mL TID; rifaximin 550 mg BID for HE.",
+      "Strict gluten-free diet; nutrition consult for celiac + cirrhosis.",
+      "Multivitamin / folate / B12 replacement.",
+      "Address vomiting (ondansetron preferred; avoid metoclopramide if possible)."
     ],
     "contraindicated_actions": [
-      "Any dextrose before thiamine — risks precipitating/worsening Wernicke by consuming the remaining thiamine for glucose metabolism",
-      "Treating only HE and missing Wernicke — Korsakoff syndrome (permanent amnesia) results from untreated Wernicke",
-      "Low-dose thiamine (100 mg) for established Wernicke — treatment requires 500 mg TID IV"
+      "Do not prescribe benzodiazepines for anxiety/agitation — they precipitate and prolong HE (use haloperidol or non-pharmacologic measures for agitation).",
+      "Do not prescribe sedating opioids — they worsen HE; consider acetaminophen at hepatic-safe dosing for pain.",
+      "Do not perform LP before neuroimaging excludes mass effect when the patient has altered mental status.",
+      "Do not give dextrose before parenteral thiamine.",
+      "Do not under-dose thiamine — oral or IM are insufficient for active Wernicke; IV at 500 mg TID is the active-treatment regimen."
     ],
     "key_reasoning_points": [
-      "Ophthalmoparesis and nystagmus = Wernicke encephalopathy until proven otherwise in a nutritionally deficient patient — these are NEVER features of HE",
-      "Wernicke encephalopathy occurs in non-alcoholics — celiac disease, cancer cachexia, prolonged vomiting, post-bariatric surgery, and hyperemesis gravidarum are all recognized causes",
-      "Hypomagnesemia blocks thiamine activation — correcting Mg simultaneously with thiamine is essential for full treatment effect",
-      "HE and Wernicke can coexist — both require simultaneous treatment; treating only one will result in partial recovery and risk permanent Korsakoff neurological injury"
+      "HE is a clinical diagnosis: West Haven grading + evidence of liver dysfunction + exclusion of other causes of AMS — ammonia level is supportive only and correlates poorly with grade (AASLD 2014).",
+      "Precipitant identification is more actionable than the ammonia number: infection (SBP especially), GI bleed, electrolyte disturbance (hypokalemia/hyponatremia), constipation, sedative/CNS-depressant use, dehydration, dietary protein load, renal failure.",
+      "Ophthalmoparesis and nystagmus are NEVER features of HE — they point to Wernicke; treat both concurrently.",
+      "Wernicke is a clinical diagnosis; MRI is supportive but normal MRI does NOT exclude Wernicke.",
+      "Non-alcoholic Wernicke is well-described in celiac disease, hyperemesis, bariatric surgery, and chronic malabsorption."
     ],
     "red_herrings": [
       {
-        "data_point": "NASH cirrhosis with prior HE + ammonia 68 µmol/L",
-        "location": "patient.clinical_history + initial_tool_outputs.labs",
-        "intended_effect": "Attribute all confusion to HE; initiate lactulose + rifaximin; miss Wernicke encephalopathy",
-        "correct_interpretation": "Ophthalmoparesis and nystagmus are NOT features of HE — their presence demands Wernicke evaluation and immediate IV thiamine; missing Wernicke leads to Korsakoff syndrome",
-        "field_path": ""
+        "data_point": "Celiac disease on otherwise stable management",
+        "location": "patient.clinical_history.past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history[1]",
+        "intended_effect": "Attribute the issue to celiac flare alone.",
+        "correct_interpretation": "Celiac contributed via malabsorption-driven thiamine deficiency, but the immediate diagnoses are Wernicke + HE."
       },
       {
-        "data_point": "Celiac disease allergy notation 'Gluten'",
-        "location": "patient.clinical_history.allergies",
-        "intended_effect": "Focus on celiac neuropathy or gluten ataxia as cause of cerebellar findings; initiate gluten-free diet adjustment; miss Wernicke",
-        "correct_interpretation": "While celiac can cause cerebellar ataxia (gluten ataxia), the ACUTE presentation with ophthalmoparesis, severely low thiamine (24 nmol/L), and 7 days of vomiting points to Wernicke as the acute precipitant — treat Wernicke immediately, then optimize celiac management long-term",
-        "field_path": ""
+        "data_point": "NASH cirrhosis label leading toward only-HE workup",
+        "location": "patient.clinical_history.past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history[0]",
+        "intended_effect": "Treat only HE and miss Wernicke.",
+        "correct_interpretation": "Ophthalmoparesis and nystagmus mandate Wernicke treatment even when cirrhosis 'explains' the confusion."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -648,6 +710,14 @@
       "cardiac_monitoring": "normal",
       "specialized_test": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (HEP-ENC)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:HEP-ENC",
+    "difficulty_rationale": "5 required tools including MRI; two simultaneous diagnoses (Wernicke + HE) both requiring active treatment; non-alcoholic Wernicke is easy to miss.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

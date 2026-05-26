@@ -1,7 +1,7 @@
 {
   "case_id": "MIG-AURA-S06",
   "condition": "migraine_with_aura",
-  "difficulty": "straightforward",
+  "difficulty": "moderate",
   "encounter_type": "outpatient",
   "patient": {
     "age": 30,
@@ -75,94 +75,110 @@
     "extremities": "No edema"
   },
   "ground_truth": {
-    "primary_diagnosis": "Migraine with typical visual aura (G43.1); menstrually-related; exacerbated postpartum",
-    "primary_diagnosis_icd": "G43.1",
+    "primary_diagnosis": "Migraine with typical visual aura (ICHD-3 1.2.1), postpartum exacerbation with menstrually-related pattern",
+    "icd_code": "G43.109",
     "differential": [
       {
-        "diagnosis": "Postpartum cerebral venous thrombosis",
+        "diagnosis": "Migraine without aura",
         "likelihood": "low",
-        "key_features": "CVT can present postpartum with headache; however, this patient is 6 months postpartum (peak CVT risk is <4 weeks); identical episodes for 4 years predating pregnancy; normal MRI"
+        "key_features": "Aura is stereotyped — this is migraine with aura",
+        "icd_code": null
       },
       {
-        "diagnosis": "Post-dural puncture headache (if epidural during delivery)",
+        "diagnosis": "Postpartum cerebral venous sinus thrombosis",
         "likelihood": "very_low",
-        "key_features": "Normal vaginal delivery (no epidural mentioned); post-dural puncture headache is postural; visual aura pattern is different"
+        "key_features": "Should be considered postpartum; stereotyped aura over 4 years and normal imaging argue against CVST",
+        "icd_code": "I67.6"
+      },
+      {
+        "diagnosis": "Postpartum PRES",
+        "likelihood": "very_low",
+        "key_features": "Requires marked hypertension and encephalopathy — absent here",
+        "icd_code": "G93.49"
+      },
+      {
+        "diagnosis": "Pituitary apoplexy",
+        "likelihood": "very_low",
+        "key_features": "Acute thunderclap headache and visual field loss — not the pattern here",
+        "icd_code": "E23.6"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI — appropriate for increased frequency; exclude CVT and structural cause",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Normal brain MRI; no structural cause for postpartum migraine exacerbation with visual aura",
-        "category": "recommended",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
+        "category": "required",
         "tool_parameters": {
-          "contrast": true
-        }
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "Iron supplementation for postpartum anemia (hemoglobin 11.8, ferritin borderline low)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "All values within normal limits; postpartum labs including thyroid function, CBC",
-        "category": "recommended",
-        "tool_parameters": {}
-      },
-      {
-        "step": 3,
-        "action": "Add ibuprofen to acetaminophen for acute treatment; sumatriptan is compatible with breastfeeding",
-        "tool_name": null,
-        "expected_finding": "Breastfeeding-compatible management: sumatriptan safe during breastfeeding; propranolol for prevention if needed",
-        "category": "recommended",
-        "tool_parameters": {}
-      },
-      {
-        "step": 4,
-        "action": "Resume amitriptyline 10 mg QHS for prevention (prior effective response; compatible with breastfeeding)",
-        "tool_name": null,
-        "expected_finding": "Breastfeeding-compatible management: sumatriptan safe during breastfeeding; propranolol for prevention if needed",
-        "category": "recommended",
-        "tool_parameters": {}
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sumatriptan compatible with breastfeeding (low transfer); avoid amitriptyline/topiramate during breastfeeding if possible; propranolol acceptable [Holland_2012]",
+        "category": "required",
+        "tool_parameters": {
+          "context": "migraine_with_aura_pharmacotherapy"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis — neither present here",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Routine transthoracic / bubble echocardiogram (PFO screening) is NOT indicated in migraine with aura; PFO-migraine association is controversial and PFO closure does not reduce migraine [Charles_2017]",
+        "citation": "[Charles_2017]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated in typical migraine with aura — no role unless cardioembolic stroke is on the differential",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "Brain MRI appropriate for increased frequency and postpartum period",
-      "Treat postpartum anemia — contributes to headache burden",
-      "Use breastfeeding-compatible medications — ibuprofen and sumatriptan are safe",
-      "Resume amitriptyline (prior effective response; LactMed compatible)"
+      "Confirm ICHD-3 1.2 criteria are met",
+      "Counsel on breastfeeding-compatible acute and preventive options [Holland_2012]",
+      "Counsel against combined oestrogen-progestogen contraception"
     ],
     "contraindicated_actions": [
-      "Do not prescribe topiramate while breastfeeding",
-      "Do not prescribe ergotamines (contraindicated in breastfeeding)",
-      "Do not give combined OCP (migraine with aura + contraception)"
+      "Do not start combined oestrogen-progestogen contraception (combined with breastfeeding is doubly contraindicated)",
+      "Do not co-administer triptans with ergotamines"
     ],
     "key_reasoning_points": [
-      "Classic visual aura pattern for 4 years; postpartum exacerbation due to hormonal fluctuations, sleep deprivation, and mild anemia",
-      "Postpartum period (6 months) is past peak CVT risk but brain MRI appropriate for increased frequency",
-      "Breastfeeding considerations critically affect medication choices",
-      "Iron deficiency anemia identified — treat to reduce headache burden",
-      "Prior amitriptyline response is informative; LactMed classifies it as probably compatible at low doses"
+      "Postpartum and menstrual exacerbations of migraine with aura are recognised; the diagnosis is unchanged",
+      "Acute and preventive drug selection in breastfeeding follows LactMed / [Holland_2012] guidance"
     ],
     "red_herrings": [
       {
-        "data_point": "Postpartum period raising CVT concern",
+        "data_point": "Postpartum onset of worsening headache",
         "location": "patient.history_present_illness",
-        "intended_effect": "Postpartum period is a risk factor for CVT, which can present with headache",
-        "correct_interpretation": "Peak CVT risk is <4 weeks postpartum; patient is 6 months postpartum; 4-year identical history predates pregnancy; normal MRI",
-        "field_path": ""
-      },
-      {
-        "data_point": "Mild postpartum anemia as potential headache cause",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Mild anemia can cause headache",
-        "correct_interpretation": "Anemia may contribute to headache burden but does not cause visual aura; treat anemia as adjunct measure",
-        "field_path": ""
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "May anchor on postpartum CVST or PRES",
+        "correct_interpretation": "4-year stereotyped pre-existing pattern with normal exam and imaging argues against acute postpartum vascular pathology"
       }
-    ],
-    "icd_code": "G43.1",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -186,7 +202,17 @@
       "echo": "normal",
       "cardiac_monitoring": "incidental",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Moderate: pharmacotherapy in breastfeeding adds nuance; diagnosis itself is straightforward",
+    "case_body_concerns": [
+      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide §1): ['analyze_brain_mri', 'analyze_ecg', 'analyze_eeg', 'interpret_labs', 'order_advanced_imaging']"
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "initial_tool_outputs": {
     "mri": {

@@ -1,7 +1,7 @@
 {
   "case_id": "MG-RS14",
   "condition": "myasthenia_gravis",
-  "difficulty": "straightforward",
+  "difficulty": "diagnostic_puzzle",
   "encounter_type": "inpatient",
   "patient": {
     "age": 75,
@@ -88,140 +88,218 @@
     "extremities": "No edema; no rash"
   },
   "ground_truth": {
-    "primary_diagnosis": "MuSK-antibody–positive myasthenia gravis (G70.01) — bulbar predominant with ophthalmoplegia without ptosis",
-    "primary_diagnosis_icd": "G70.01",
+    "primary_diagnosis": "MuSK antibody-positive myasthenia gravis, bulbar-predominant, with ophthalmoplegia without ptosis",
+    "icd_code": "G70.01",
     "differential": [
       {
-        "diagnosis": "Progressive supranuclear palsy (PSP)",
+        "diagnosis": "Parkinson's disease with bulbar progression",
         "likelihood": "moderate",
-        "key_features": "Supranuclear gaze palsy, axial rigidity, frequent falls; however PSP does not cause relapsing-remitting dysphagia or serological NMJ markers"
+        "key_features": "Asymmetric rest tremor labeled as possible PD; modest levodopa response and bulbar fluctuation with fatigability point to MG; nigral changes on SWI may reflect age.",
+        "icd_code": "G20"
       },
       {
-        "diagnosis": "Multiple system atrophy (MSA)",
-        "likelihood": "low",
-        "key_features": "MSA-P has parkinsonism + autonomic failure; no hot cross bun sign on MRI; no autonomic dysfunction documented here"
+        "diagnosis": "ALS bulbar onset",
+        "likelihood": "moderate",
+        "key_features": "Bulbar ALS produces dysphagia/dysarthria with tongue fasciculations and UMN signs; SFEMG and clinical exam discriminate.",
+        "icd_code": "G12.21"
       },
       {
-        "diagnosis": "Motor neuron disease with bulbar onset (ALS)",
-        "likelihood": "low",
-        "key_features": "Normal EMG (no fasciculations, no denervation); relapsing-remitting course unlike ALS; normal CK; ALS is relentlessly progressive"
+        "diagnosis": "AChR-positive MG",
+        "likelihood": "moderate",
+        "key_features": "Standard test; AChR may be negative in MuSK MG — pursue MuSK antibodies and SFEMG.",
+        "icd_code": "G70.01"
       },
       {
-        "diagnosis": "Paraneoplastic neurological syndrome",
+        "diagnosis": "Atypical parkinsonism (PSP, MSA)",
         "likelihood": "low",
-        "key_features": "Anti-Hu, anti-Yo, anti-Ri all negative; normal chest CT; no malignancy identified"
+        "key_features": "PSP/MSA have prominent eye movement abnormalities and autonomic features; fatigable bulbar weakness is not typical.",
+        "icd_code": "G23.1"
+      },
+      {
+        "diagnosis": "Brainstem stroke",
+        "likelihood": "very_low",
+        "key_features": "Fluctuating fatigable pattern incompatible with vascular event.",
+        "icd_code": "G46.3"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI to exclude structural brainstem lesion and assess parkinsonism pattern",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Order serologies: anti-AChR (binding, blocking, modulating), anti-MuSK, anti-LRP4, and TSH/free-T4 for thyroid autoimmunity",
+        "tool_name": "interpret_labs",
+        "expected_finding": "AChR antibody positive; TSH evaluates for comorbid thyroid disease",
+        "category": "required",
         "tool_parameters": {
-          "contrast": true,
-          "sequences": [
-            "DWI",
-            "T2",
-            "FLAIR",
-            "SWI"
+          "panels": [
+            "anti_AChR",
+            "anti_MuSK",
+            "anti_LRP4",
+            "TSH"
           ]
-        }
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 2,
-        "action": "CSF analysis to exclude inflammatory/paraneoplastic etiology",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Order repetitive nerve stimulation (RNS) at 2-3 Hz across proximal and facial muscles",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Decrement >10% in symptomatic muscles supports postsynaptic NMJ disorder",
+        "category": "required",
         "tool_parameters": {
-          "indication": "bulbar dysfunction workup"
-        }
+          "test_type": "repetitive_nerve_stimulation"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 3,
-        "action": "Anti-MuSK antibody testing — AChR already negative; MuSK-MG presents with bulbar-predominant disease without ptosis",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Order single-fiber EMG (gold standard >95% sensitivity)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Increased jitter on facial or proximal muscles — RNS in MuSK MG is often non-diagnostic, SFEMG is the test of choice",
+        "category": "required",
         "tool_parameters": {
-          "lab_type": "mg_antibody_panel",
-          "include_musk": true
-        }
+          "test_type": "emg_single_fiber"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 4,
-        "action": "RNS in bulbar muscles (nasalis, orbicularis oculi) to confirm NMJ dysfunction",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Order CT chest with contrast for thymoma screening",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No thymoma; thymic involution appropriate for age",
+        "category": "required",
         "tool_parameters": {
-          "test_type": "repetitive_nerve_stimulation",
-          "muscles": [
-            "nasalis",
-            "orbicularis_oculi"
-          ]
-        }
+          "region": "chest",
+          "contrast": true,
+          "indication": "thymoma_screening"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 5,
-        "action": "Initiate rituximab for MuSK-MG; PLEX for acute bulbar crisis; maintain NGT nutrition",
-        "tool_name": null,
-        "expected_finding": "",
+        "action": "Review MGFA classification and current treatment guidance (pyridostigmine, prednisone, steroid-sparing, IVIG/PLEX, thymectomy)",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "MGFA classification stages disease severity; thymectomy benefits AChR+ generalized MG (MGTX); IVIG/PLEX for crisis",
+        "category": "required",
+        "tool_parameters": {
+          "query": "myasthenia gravis MGFA classification treatment thymectomy"
+        },
+        "citation": "[Sanders_2016]",
+        "guideline_source": "Sanders_2016"
+      },
+      {
+        "step": 6,
+        "action": "Check drug interactions for MG-exacerbating agents (aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, neuromuscular blockers, procainamide)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Flag aminoglycosides, fluoroquinolones, IV magnesium, telithromycin, NMBs as contraindicated or use-with-caution in MG",
+        "category": "required",
+        "tool_parameters": {
+          "proposed": "pyridostigmine_start",
+          "screen_for": [
+            "aminoglycosides",
+            "fluoroquinolones",
+            "telithromycin",
+            "magnesium_IV",
+            "neuromuscular_blockers"
+          ]
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
+      },
+      {
+        "step": 7,
+        "action": "Bedside respiratory function testing (FVC, MIP/MEP, NIF) — repeat q4h in crisis",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline FVC/NIF to assess crisis risk in patients with bulbar or limb involvement",
         "category": "recommended",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[Sanders_2016]",
+        "guideline_source": "Sanders_2016"
+      },
+      {
+        "step": 8,
+        "action": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Improvement of ptosis after 2 minutes of cooling supports MG",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "ice_pack_test"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "MG is a peripheral neuromuscular junction disorder; EEG has no diagnostic role.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated for MG unless a comorbid cardiac question exists.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring is not indicated for MG unless arrhythmia or autonomic disease is independently suspected.",
+        "citation": "[Wolfe_2016]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "order_specialized_test",
+        "reason": "Order AChR/MuSK/LRP4 serologies first; reserve single-fiber EMG for seronegative or RNS-non-diagnostic cases (resource stewardship).",
+        "citation": "[Wolfe_2016]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Do not stop at negative AChR antibody — order anti-MuSK separately",
-      "RNS of bulbar muscles is more sensitive than limb RNS in MuSK-MG",
-      "Recognize that ophthalmoplegia WITHOUT ptosis is characteristic of MuSK-MG",
-      "Thymectomy is NOT indicated in MuSK-MG",
-      "Rituximab is the preferred long-term treatment for MuSK-MG",
-      "Maintain NGT nutrition until bulbar function improves after immunotherapy"
+      "Confirm MuSK antibody positivity (often AChR-negative)",
+      "SFEMG — required given RNS is often non-diagnostic in MuSK MG",
+      "CT chest for thymoma (often negative in MuSK MG)",
+      "Initiate immunosuppression — MuSK MG often responds less to pyridostigmine and better to rituximab or steroids",
+      "Coordinate with movement disorder team to clarify Parkinson label"
     ],
     "contraindicated_actions": [
-      "Do not perform thymectomy in MuSK-MG (not beneficial)",
-      "Do not use high-dose pyridostigmine in MuSK-MG (limited benefit, may worsen secretions)",
-      "Do not attribute all bulbar symptoms to Parkinsonism",
-      "Do not stop workup after negative AChR antibody"
+      "Do NOT prescribe aminoglycoside antibiotics (gentamicin, tobramycin, amikacin) — risk of precipitating myasthenic crisis",
+      "Do NOT prescribe fluoroquinolones (ciprofloxacin, levofloxacin, moxifloxacin) — FDA black-box warning for MG exacerbation",
+      "Do NOT prescribe telithromycin — contraindicated in MG",
+      "Do NOT administer IV magnesium for MG patients (e.g., for hypomagnesaemia, eclampsia prophylaxis) without alternative — blocks NMJ transmission",
+      "Do NOT use non-depolarizing neuromuscular blockers without anaesthesia/MG-aware dosing protocols",
+      "Do NOT initiate high-dose corticosteroids as sole outpatient therapy without hospitalization or pyridostigmine bridge — risk of paradoxical worsening at days 5-10",
+      "Do NOT attribute fluctuating fatigable weakness to a functional disorder before completing serology + RNS + single-fiber EMG workup",
+      "Do NOT rely solely on pyridostigmine in MuSK MG — response is often poor; consider early immunotherapy."
     ],
     "key_reasoning_points": [
-      "AChR-negative MG with relapsing-remitting bulbar dysfunction should prompt anti-MuSK testing as the next critical step",
-      "MuSK-MG has a distinctive phenotype: bulbar and facial predominance, ophthalmoplegia without ptosis, tongue atrophy in severe cases, poor pyridostigmine response",
-      "The co-occurring parkinsonism is real but explains only the tremor and gait features — not the bulbar dysfunction",
-      "FDG-PET brainstem hypometabolism is non-diagnostic; anti-MuSK serology is the pivotal result",
-      "Rituximab has >75% efficacy in MuSK-MG — should be initiated early rather than after multiple failed immunosuppressant trials",
-      "Normal SFEMG of facial muscles in MuSK-MG can occur if performed between episodes; RNS during crisis is more sensitive"
+      "Fluctuating, fatigable weakness with diurnal pattern (worse evening) is the clinical hallmark of MG — fixed weakness suggests an alternative diagnosis.",
+      "Ocular involvement (ptosis, diplopia) is asymmetric and fatigable in MG; thyroid eye disease causes restrictive (not fatigable) ophthalmoplegia.",
+      "Single-fiber EMG (sensitivity >95%) is the most sensitive electrodiagnostic test — order when RNS is non-diagnostic or serology is negative.",
+      "All confirmed MG cases require CT chest for thymoma — present in roughly 10-15% of generalized MG; thymectomy (MGTX trial) improves long-term outcomes in non-thymoma AChR+ MG as well.",
+      "Aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, and neuromuscular blockers can precipitate myasthenic crisis and must be screened against any new prescription.",
+      "MuSK MG: bulbar predominant, often without prominent ptosis; RNS frequently non-diagnostic; SFEMG is essential.",
+      "Rituximab has demonstrated good efficacy in MuSK MG.",
+      "Asymmetric rest tremor with modest levodopa response can be a Parkinson red herring; clarify with movement disorder evaluation if MG treatment does not resolve all features."
     ],
     "red_herrings": [
       {
-        "data_point": "Parkinsonism features (tremor, gait, masked facies) suggesting PSP or MSA",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Supranuclear eye movement restriction + axial rigidity + poor levodopa response fits PSP or MSA pattern",
-        "correct_interpretation": "Eye movement restriction is from MuSK-MG (NMJ dysfunction), not supranuclear; relapsing-remitting course incompatible with PSP/MSA; anti-MuSK positive is diagnostic",
-        "field_path": ""
-      },
-      {
-        "data_point": "Initial elevated lactate (2.5 mmol/L) suggesting mitochondrial disease",
-        "location": "initial_tool_outputs.labs.interpretation",
-        "intended_effect": "Episodic bulbar dysfunction + mildly elevated lactate raises MELAS concern",
-        "correct_interpretation": "Repeat lactate was 0.9 mmol/L (normal); initial elevation was spurious; no other mitochondrial features; anti-MuSK confirms NMJ etiology",
-        "field_path": ""
-      },
-      {
-        "data_point": "Negative AChR antibody on initial testing",
-        "location": "followup_outputs[0].output.interpretation",
-        "intended_effect": "Negative AChR antibody might suggest MG is not the diagnosis",
-        "correct_interpretation": "MuSK-MG is AChR-negative by definition; requires separate anti-MuSK testing which is STRONGLY positive",
-        "field_path": ""
+        "data_point": "Asymmetric rest tremor diagnosed as possible Parkinson's disease; reduced nigral signal on SWI",
+        "location": "past medical history / MRI",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Attribute bulbar dysphagia to PD progression and miss MuSK MG.",
+        "correct_interpretation": "Fatigable bulbar weakness, fluctuating ophthalmoplegia, and MuSK antibody positivity are MG; Parkinson can coexist but does not explain the fatigable pattern."
       }
-    ],
-    "icd_code": "G70.01",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -252,7 +330,17 @@
       "eeg": "normal",
       "echo": "normal",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MG",
+    "difficulty_rationale": "6 required tools, 1 red herrings, MuSK MG with bulbar predominance",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": [
+      "emg_ncs_useless_via_param_conflation: pack lists order_specialized_test:emg_ncs as USELESS, but coherence validator treats tool_name overlap as a contradiction regardless of tool_parameters; cannot encode without removing required RNS/SFEMG entries. Suggest extending validator to compare tool_name + tool_parameters or fleet-wide pattern."
+    ]
   },
   "initial_tool_outputs": {
     "mri": {

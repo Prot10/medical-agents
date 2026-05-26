@@ -537,111 +537,168 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Hepatic encephalopathy, grade 3, alcoholic cirrhosis (Child-Pugh C) — precipitated by recurrent UTI (E. coli urosepsis) causing systemic infection-driven hyperammonemia; ammonia 168 µmol/L; classic EEG triphasic waves",
-    "icd_code": "K72.9",
+    "primary_diagnosis": "Hepatic encephalopathy (West Haven grade III), alcoholic cirrhosis (Child-Pugh C, MELD 20) — precipitated by E. coli urosepsis (recurrent UTI driving inflammatory hyperammonemia); ascites requires SBP exclusion.",
+    "icd_code": "K72.91",
     "differential": [
       {
-        "diagnosis": "Septic encephalopathy from urosepsis",
+        "diagnosis": "Spontaneous bacterial peritonitis (concurrent)",
         "likelihood": "moderate",
-        "key_features": "E. coli bacteremia is the primary trigger; but HE (ammonia 168 + cirrhosis) is the mechanism — sepsis-precipitated HE is the combined diagnosis"
+        "key_features": "Ascites + infected state — paracentesis mandatory regardless of UTI source.",
+        "icd_code": "K65.2"
       },
       {
-        "diagnosis": "Meningitis/encephalitis from bacteria",
-        "likelihood": "very_low",
-        "key_features": "CSF not yet done (paracentesis first); but bacteremia is urinary source; CT normal; no meningismus; classic HE EEG triphasic waves; LP not needed when diagnosis is clear"
+        "diagnosis": "Septic shock / bacteremia",
+        "likelihood": "moderate",
+        "key_features": "Vitals/labs to track sepsis criteria.",
+        "icd_code": "A41.9"
       },
       {
-        "diagnosis": "Urosepsis without HE",
-        "likelihood": "very_low",
-        "key_features": "GCS 11 + asterixis + ammonia 168 + classic EEG triphasic waves = HE; not just septic encephalopathy"
+        "diagnosis": "Acute alcohol intake (daughter reports drinking 2 weeks ago)",
+        "likelihood": "low",
+        "key_features": "Contributing precipitant via dehydration and ammonia load; not the primary current driver.",
+        "icd_code": "F10.230"
+      },
+      {
+        "diagnosis": "Hepatorenal syndrome",
+        "likelihood": "low",
+        "key_features": "Reassess Cr after fluid/albumin given sepsis.",
+        "icd_code": "K76.7"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Labs — ammonia, LFTs, CBC, urinalysis, blood cultures, urine culture",
+        "action": "Comprehensive labs: CMP including AST/ALT/bilirubin/INR/albumin, ammonia, CBC, glucose, electrolytes (Na, K, Mg), BUN/Cr, lactate, blood cultures and urine cultures; toxicology if substance use plausible. Confirms liver dysfunction and screens for precipitants.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Ammonia 168, WBC 16.8, UTI/bacteremia confirmed; E. coli ciprofloxacin-resistant",
+        "expected_finding": "Ammonia 168, leukocytosis, urinalysis with pyuria; cirrhosis features; cultures.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 2,
-        "action": "CT head — exclude structural cause, hemorrhage",
+        "action": "Non-contrast CT head — exclude structural alternate cause of AMS (hemorrhage, large stroke, mass) before any LP.",
         "tool_name": "order_ct_scan",
-        "expected_finding": "CT normal",
+        "expected_finding": "No acute intracranial process.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 3,
-        "action": "EEG — classic triphasic waves confirm HE; exclude NCSE",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Classic fronto-predominant triphasic waves — grade 3 HE",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Literature/guideline search to confirm West Haven grading, precipitant management, and lactulose/rifaximin dosing (AASLD/EASL HE management; infection-precipitated HE; UTI in cirrhosis).",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "AASLD/EASL 2014 guidance retrieved; West Haven criteria and precipitant-driven management framework confirmed.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 4,
-        "action": "Paracentesis — exclude concurrent SBP",
-        "tool_name": "interpret_labs",
-        "expected_finding": "PMN 186 — SBP excluded",
+        "action": "Drug-interaction and medication-reconciliation review covering antibiotic selection appropriate for urosepsis + cirrhosis; lactulose, rifaximin; flag any CNS depressants (benzodiazepines, opioids, sedating antiemetics, antihistamines) and confirm lactulose/rifaximin dosing in liver disease.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sedating/CNS-depressant medications identified; lactulose and rifaximin reviewed for hepatic dose adjustment.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Bajaj_2011]",
+        "guideline_source": "Bajaj 2011 HE management review"
       },
       {
         "step": 5,
-        "action": "Ceftriaxone 2g IV daily for E. coli bacteremia (ciprofloxacin-resistant)",
-        "tool_name": null,
-        "expected_finding": "Infection treated; ammonia falling as infection clears",
+        "action": "Diagnostic paracentesis to exclude concurrent SBP.",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Ascitic PMN to confirm or exclude SBP.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 6,
-        "action": "Lactulose + rifaximin for HE; IV fluids for AKI and urosepsis",
-        "tool_name": null,
-        "expected_finding": "Ammonia normalizing 168 → 42",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "EEG — characterize HE pattern. Triphasic waves are classic but non-specific (metabolic encephalopathies broadly); main role is exclusion of non-convulsive status epilepticus where the differential supports it.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Triphasic waves likely.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Ferenci_2002]",
+        "guideline_source": "Ferenci 2002 HE nomenclature/quantification"
+      },
+      {
+        "step": 7,
+        "action": "Consult hepatology + ID for recurrent UTI workup — coordinate definitive care, transplant candidacy assessment where applicable.",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Hepatology / critical-care guidance integrated into management.",
+        "category": "recommended",
+        "tool_parameters": {
+          "specialty": "hepatology"
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No clinical suspicion for hepatopulmonary syndrome, portopulmonary hypertension, or endocarditis; echocardiography is not part of the HE workup.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in HE workup; reversible metabolic encephalopathy is the issue, not Alzheimer pathology.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan has no role in HE workup; the question is metabolic encephalopathy, not nigrostriatal degeneration.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "genetic_panel:early_onset_AD"
+        },
+        "rationale": "Early-onset AD genetic panel has no role in HE workup; reversible metabolic encephalopathy is the diagnosis under consideration.",
+        "citation": "[AASLD_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "In altered mental status, exclude intracranial mass effect / hemorrhage on imaging before LP to avoid herniation risk.",
+        "citation": "[AASLD_2014]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Treat the precipitant — infection is the primary HE driver; ceftriaxone for E. coli bacteremia is the primary treatment alongside lactulose",
-      "Prior ciprofloxacin course selected for resistant E. coli — must check susceptibilities; do not re-treat with ciprofloxacin",
-      "SBP must be excluded even when UTI/bacteremia found — multiple infections can coexist in decompensated cirrhosis",
-      "Albumin is critical for hepatorenal syndrome prevention in sepsis — albumin 1.5 g/kg given concurrent with antibiotics"
+      "Empiric IV antibiotics covering E. coli urosepsis (e.g., ceftriaxone) pending culture susceptibilities.",
+      "Lactulose to 2-4 stools/day; rifaximin 550 mg BID.",
+      "IV albumin if SBP is also present.",
+      "Address recurrent UTI etiology in outpatient follow-up."
     ],
     "contraindicated_actions": [
-      "Ciprofloxacin for recurrent E. coli UTI after recent ciprofloxacin course — resistance likely; use ceftriaxone",
-      "Lactulose alone without treating infection — infection will sustain elevated ammonia regardless of lactulose dosing",
-      "Benzodiazepines for agitation"
+      "Do not prescribe benzodiazepines for anxiety/agitation — they precipitate and prolong HE (use haloperidol or non-pharmacologic measures for agitation).",
+      "Do not prescribe sedating opioids — they worsen HE; consider acetaminophen at hepatic-safe dosing for pain.",
+      "Do not perform LP before neuroimaging excludes mass effect when the patient has altered mental status.",
+      "Avoid nephrotoxic antibiotics (aminoglycosides) in cirrhosis."
     ],
     "key_reasoning_points": [
-      "Infection is one of the most common HE precipitants — any infection (UTI, SBP, pneumonia, bacteremia) in a cirrhotic patient can trigger HE via systemic inflammation",
-      "Prior antibiotic course selects for resistant organisms — always check susceptibilities before re-treating with the same class of antibiotic",
-      "Classic triphasic waves on EEG in the context of markedly elevated ammonia (168) and cirrhosis = HE; the diagnosis is straightforward with this combination",
-      "Infection-precipitated HE responds to treating the infection — ammonia falls as the infection is cleared; lactulose and rifaximin are still needed concurrently"
+      "HE is a clinical diagnosis: West Haven grading + evidence of liver dysfunction + exclusion of other causes of AMS — ammonia level is supportive only and correlates poorly with grade (AASLD 2014).",
+      "Precipitant identification is more actionable than the ammonia number: infection (SBP especially), GI bleed, electrolyte disturbance (hypokalemia/hyponatremia), constipation, sedative/CNS-depressant use, dehydration, dietary protein load, renal failure.",
+      "Any infection in cirrhosis (UTI, pneumonia, cellulitis, SBP, bacteremia) can precipitate HE through cytokine-mediated hepatic dysfunction and increased ammonia production."
     ],
-    "red_herrings": [
-      {
-        "data_point": "E. coli bacteremia and UTI positive cultures",
-        "location": "initial_tool_outputs.labs.panels.Cultures",
-        "intended_effect": "Focus entirely on sepsis treatment; attribute encephalopathy solely to septic encephalopathy; skip HE workup",
-        "correct_interpretation": "Urosepsis is the precipitant but HE (ammonia 168, classic EEG triphasic waves, cirrhosis) is the mechanism; BOTH diagnoses require treatment — antibiotics alone will not reverse HE without lactulose/rifaximin",
-        "field_path": ""
-      },
-      {
-        "data_point": "Alcohol use 2 weeks ago reported by daughter",
-        "location": "patient.neurological_exam.additional",
-        "intended_effect": "Attribute all encephalopathy to active alcohol intoxication; check ethanol level and wait",
-        "correct_interpretation": "Ethanol is negative on admission (< 10 mg/dL) — alcohol use 2 weeks ago may have contributed to hepatic decompensation but is not the current precipitant; UTI/bacteremia with ammonia 168 is the current precipitant",
-        "field_path": ""
-      }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": []
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -662,6 +719,14 @@
       "advanced_imaging": "normal",
       "specialized_test": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (HEP-ENC)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:HEP-ENC",
+    "difficulty_rationale": "4 required tools + paracentesis; single clear infectious precipitant (urosepsis) with a textbook presentation; minimal distractors.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

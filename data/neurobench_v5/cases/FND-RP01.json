@@ -892,204 +892,219 @@
   },
   "ground_truth": {
     "primary_diagnosis": "Functional neurological disorder - psychogenic non-epileptic seizures (PNES) with dissociative episodes, misdiagnosed as posttraumatic epilepsy for 26 years",
-    "icd_code": "F44.5",
+    "icd_code": "F44.7",
     "differential": [
       {
-        "diagnosis": "Posttraumatic epilepsy",
+        "diagnosis": "Epileptic seizures",
+        "likelihood": "high",
+        "key_features": "Witnessed convulsive-appearing events; ictal video-EEG showing absence of electrographic correlate during a captured habitual event is the key differentiator.",
+        "icd_code": "G40.909"
+      },
+      {
+        "diagnosis": "Structural CNS lesion (tumor, demyelination, stroke)",
         "likelihood": "low",
-        "key_features": "Would expect epileptiform discharges on interictal EEG, ictal EEG changes during events, post-ictal confusion, elevated post-event prolactin, stereotyped semiology. None present."
+        "key_features": "Focal complaints warrant imaging; normal brain MRI without lesion, mass, or enhancement effectively excludes a structural cause for the presenting deficit.",
+        "icd_code": null
       },
       {
-        "diagnosis": "Epileptic seizures coexisting with PNES",
+        "diagnosis": "Autoimmune or paraneoplastic encephalitis",
         "likelihood": "very_low",
-        "key_features": "Would require at least some events with EEG correlate or interictal epileptiform discharges. Neither was found."
-      },
-      {
-        "diagnosis": "Frontal lobe epilepsy",
-        "likelihood": "very_low",
-        "key_features": "Frontal seizures are typically brief (<30s), highly stereotyped, may arise from sleep, and usually show some EEG correlate with prolonged monitoring. This patient's events do not match."
-      },
-      {
-        "diagnosis": "Syncope or cardiac arrhythmia",
-        "likelihood": "very_low",
-        "key_features": "Would expect ECG abnormalities, hemodynamic changes during events, brief loss of consciousness. Not present."
+        "key_features": "Episodic neurological symptoms can occur in autoimmune encephalitis; normal MRI, normal EEG background, and (when obtained) negative antibody panel render this very unlikely.",
+        "icd_code": "G04.81"
       },
       {
         "diagnosis": "Malingering or factitious disorder",
         "likelihood": "very_low",
-        "key_features": "Would expect failure on symptom validity testing, evidence of external incentives, inconsistency in reporting. Patient passes validity testing and is genuinely distressed."
+        "key_features": "FND is involuntary; preserved effort on symptom-validity testing and absence of clear secondary gain argue against feigning. The rule-in signs do not distinguish FND from malingering by themselves, but the clinical context does not support a feigning explanation.",
+        "icd_code": "F68.10"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain comprehensive history including detailed characterization of seizure-like episodes (semiology, frequency, duration, awareness, post-event state), temporal relationship to head injury, response to antiepileptic medications, and psychosocial context",
+        "action": "Elicit positive rule-in signs on bedside examination (Hoover sign for functional leg weakness, tremor entrainment / distractibility for functional tremor, give-way weakness, non-dermatomal sensory loss with midline splitting). Diagnosis of FND is made by these positive signs, not by exclusion alone.",
         "tool_name": null,
-        "expected_finding": "26-year history of refractory episodes despite therapeutic AED levels, two distinct event types (motor episodes with retained awareness and no post-ictal confusion, and dissociative staring episodes), onset 4 months after TBI — raising suspicion for non-epileptic events",
-        "category": "required"
+        "expected_finding": "At least one reliable positive functional sign documented",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Espay_2018]",
+        "guideline_source": "FND criteria pack — positive diagnosis"
       },
       {
         "step": 2,
-        "action": "Review prior workup and medication history, noting therapeutic AED levels with continued high seizure frequency as a red flag for non-epileptic events",
-        "tool_name": null,
-        "expected_finding": "Therapeutic carbamazepine and phenytoin levels despite 2-3 episodes per week for 26 years is highly suggestive that episodes are not epileptic seizures",
-        "category": "required"
+        "action": "Order brain MRI with and without contrast to exclude a structural cause of the presenting deficit",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "No structural lesion, mass, demyelination, or stroke",
+        "category": "required",
+        "tool_parameters": {
+          "contrast": true
+        },
+        "citation": "[Espay_2018]",
+        "guideline_source": "FND criteria pack — exclude structural cause"
       },
       {
         "step": 3,
-        "action": "Order initial routine EEG to assess for interictal epileptiform activity",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Normal interictal EEG with nonspecific bitemporal theta slowing (likely medication effect), no epileptiform discharges. No events captured. Findings insufficient to confirm or exclude epilepsy — prolonged monitoring needed.",
-        "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
-      },
-      {
-        "step": 4,
-        "action": "Order brain MRI with contrast to evaluate for structural epileptogenic lesion",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Small right anterior temporal encephalomalacia from remote TBI — a potential red herring that could support the epilepsy diagnosis but is insufficient to explain the clinical presentation. No mesial temporal sclerosis.",
-        "category": "required",
-        "tool_parameters": {
-          "protocol": "tumor",
-          "contrast": true
-        }
-      },
-      {
-        "step": 5,
-        "action": "Order comprehensive laboratory workup including CBC, BMP, thyroid function, AED levels, and baseline prolactin",
+        "action": "Order basic laboratory workup (CBC, CMP, TSH, vitamin B12) to exclude common reversible mimics",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal labs except mild GGT elevation (AED effect) and low vitamin D (AED effect). Therapeutic AED levels confirming compliance despite continued events. Normal baseline prolactin for future comparison.",
+        "expected_finding": "No metabolic, thyroid, or B12 abnormality that explains symptoms",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
-            "thyroid",
-            "prolactin",
-            "AED_levels"
+            "CMP",
+            "TSH",
+            "B12"
           ]
-        }
+        },
+        "citation": "[Stone_2018]",
+        "guideline_source": "FND criteria pack — exclude reversible causes"
+      },
+      {
+        "step": 4,
+        "action": "Search current literature on FND diagnostic signs and evidence-based treatment (CBT for PNES, specialized physiotherapy for functional motor symptoms)",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirms multidisciplinary CBT + physiotherapy is the evidence-based treatment for FND",
+        "category": "required",
+        "tool_parameters": {
+          "query": "functional neurological disorder diagnosis treatment"
+        },
+        "citation": "[Nielsen_2015]",
+        "guideline_source": "FND criteria pack — treatment evidence"
+      },
+      {
+        "step": 5,
+        "action": "Obtain video-EEG monitoring with intent to capture a habitual event (prolonged inpatient video-EEG is the gold standard for distinguishing PNES from epileptic seizures)",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Captured event with no ictal EEG correlate during clinically apparent seizure-like activity",
+        "category": "recommended",
+        "tool_parameters": {
+          "eeg_type": "video"
+        },
+        "citation": "[ILAE_PNES_2013]",
+        "guideline_source": "ILAE PNES Task Force minimum diagnostic standards"
       },
       {
         "step": 6,
-        "action": "Proceed with prolonged continuous video-EEG monitoring (3-5 days) with AED taper to capture habitual events and determine whether they have an electrographic correlate",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Five habitual events captured (three major motor episodes and two staring episodes), all without electrographic correlate, diagnostic of psychogenic non-epileptic seizures and dissociative episodes. No epileptiform discharges during entire 5-day recording even during AED taper.",
-        "category": "required",
-        "tool_parameters": {
-          "eeg_type": "video"
-        }
+        "action": "Review current medications for agents that may exacerbate symptoms (e.g., benzodiazepines, dopamine-blocking antipsychotics, AEDs initiated for PNES)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identification of medication contributors that should be tapered or discontinued",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "",
+        "guideline_source": "FND criteria pack — medication review"
       },
       {
         "step": 7,
-        "action": "Diagnose psychogenic non-epileptic seizures (PNES) as a subtype of functional neurological disorder based on video-EEG evidence and positive clinical features (retained awareness, non-stereotyped movements, no post-ictal confusion)",
+        "action": "Communicate the diagnosis transparently using positive language anchored on the rule-in signs; explicitly state the diagnosis is FND, the symptoms are real and involuntary, and there is an evidence-based treatment plan",
         "tool_name": null,
-        "expected_finding": "Definitive diagnosis of PNES, reclassifying 26 years of presumed posttraumatic epilepsy",
-        "category": "required"
+        "expected_finding": "Patient understanding and treatment engagement — strong predictor of recovery",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Stone_2018]",
+        "guideline_source": "FND criteria pack — diagnostic communication"
       },
       {
         "step": 8,
-        "action": "Communicate diagnosis to patient clearly and empathically, explaining that her episodes are real neurological events but not epileptic seizures, and that effective treatments exist",
+        "action": "Refer to specialized FND-informed physiotherapy (for functional motor symptoms) and to CBT / psychological therapy (for PNES and comorbid mood / anxiety)",
         "tool_name": null,
-        "expected_finding": "Patient understands that PNES is a recognized neurological condition, not fabricated symptoms, and that antiepileptic medications are not the appropriate treatment",
-        "category": "required"
-      },
-      {
-        "step": 9,
-        "action": "Plan gradual tapering and discontinuation of unnecessary antiepileptic medications (carbamazepine, phenytoin) and careful benzodiazepine taper, with appropriate drug interaction monitoring",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Identify that AED discontinuation will affect sertraline metabolism and that diazepam taper must be slow to prevent withdrawal",
-        "category": "required"
-      },
-      {
-        "step": 10,
-        "action": "Refer for psychotherapy (CBT for PNES, trauma-focused therapy for PTSD related to MVA) and psychiatric optimization of depression and anxiety treatment",
-        "tool_name": null,
-        "expected_finding": "Initiation of evidence-based treatment for PNES including psychotherapy and psychiatric care",
-        "category": "required"
+        "expected_finding": "Engagement in evidence-based multidisciplinary care",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Nielsen_2015]",
+        "guideline_source": "Nielsen 2015 — physiotherapy consensus"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography has no role in FND; no structural cardiac question is raised by the presentation.",
+        "citation": "[Stone_2018]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac rhythm monitoring is not indicated; the events are non-syncopal and the rule-in signs point to FND.",
+        "citation": "[Stone_2018]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT adds no information beyond MRI for an FND workup and contributes diagnostic noise plus radiation exposure.",
+        "citation": "[Espay_2018]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in typical FND; invasive testing reinforces somatic illness model and adds iatrogenic risk without changing management.",
+        "citation": "[Stone_2018]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "Advanced PET imaging has no indication in FND; standard MRI is the appropriate structural workup.",
+        "citation": "[Espay_2018]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "Perform prolonged video-EEG monitoring to capture habitual events and determine whether they have an electrographic correlate — this is the gold standard diagnostic test for differentiating epileptic seizures from PNES",
-      "Recognize that therapeutic AED levels with continued high seizure frequency for 26 years is a major red flag for non-epileptic events, not simply refractory epilepsy",
-      "Do not be anchored by the 26-year diagnosis of posttraumatic epilepsy or the small temporal encephalomalacia on MRI — these do not confirm that the episodes are epileptic",
-      "Diagnose PNES based on positive video-EEG evidence (events without electrographic correlate) combined with clinical features (retained awareness, no post-ictal confusion, non-stereotyped movements), not merely by exclusion",
-      "Communicate the diagnosis with empathy, validating that symptoms are real, explaining the mechanism, and providing hope for improvement with appropriate treatment",
-      "Plan gradual discontinuation of unnecessary AEDs, with particular attention to slow benzodiazepine taper to avoid withdrawal",
-      "Address the underlying psychiatric comorbidity (depression, anxiety, PTSD) that is maintaining the condition"
+      "Document at least one positive rule-in sign (Hoover sign, tremor entrainment, distractibility, give-way pattern, non-dermatomal sensory loss with midline split)",
+      "Obtain brain MRI to exclude structural pathology",
+      "Obtain video-EEG capturing a habitual event with normal interictal EEG to confirm PNES",
+      "Communicate the diagnosis transparently using positive language and the rule-in signs as the basis",
+      "Refer for FND-informed physiotherapy and CBT / psychological therapy",
+      "Order a comprehensive neuropsychological battery to characterize comorbid depression, anxiety, somatization, and trauma exposure — informs treatment planning (criteria-pack 'recommended' tier)"
     ],
     "contraindicated_actions": [
-      "Adding more antiepileptic drugs or increasing current AED doses for presumed refractory epilepsy without first performing video-EEG to confirm the episodes are epileptic",
-      "Attributing the right temporal encephalomalacia as definitive proof of posttraumatic epilepsy without EEG confirmation that events arise from this region",
-      "Abruptly discontinuing diazepam after years of chronic use — this risks benzodiazepine withdrawal seizures",
-      "Telling the patient that her episodes are fake, imagined, or that nothing is wrong — this is harmful and clinically incorrect",
-      "Suggesting the patient is malingering — she passes symptom validity testing and is genuinely distressed",
-      "Performing epilepsy surgery evaluation or resective surgery based on the temporal encephalomalacia without evidence of epileptic seizures",
-      "Starting additional CNS-active medications without reviewing the current polypharmacy burden",
-      "Dismissing the psychiatric comorbidity (depression, anxiety, PTSD) as secondary or unimportant — these are maintaining factors for PNES"
+      "Do not pursue ever-expanding negative investigations — per Stone 2018, repeated negative workups reinforce illness conviction and worsen prognosis",
+      "Do not frame the diagnosis as 'all in your head', 'nothing wrong', or 'we couldn't find anything' — this damages the therapeutic alliance and is the most common avoidable harm in FND",
+      "Do not perform invasive testing (lumbar puncture, nerve biopsy, muscle biopsy, cerebral angiography) when positive rule-in signs are present and there is no clinical indication",
+      "Do not order EMG/NCS, muscle biopsy, or nerve biopsy as part of an FND workup — these invasive tests reinforce the somatic illness model per Stone 2018",
+      "Do not start or continue long-term anti-epileptic drugs for functional (psychogenic non-epileptic) seizures — AEDs are ineffective for PNES and expose the patient to side effects",
+      "Do not give benzodiazepines as abortive therapy for witnessed PNES events (no benefit and risk of respiratory depression)"
     ],
     "key_reasoning_points": [
-      "The key diagnostic puzzle in this case is that the patient has a plausible organic explanation for epilepsy (post-TBI onset, right temporal encephalomalacia on MRI) that anchors clinicians toward the epilepsy diagnosis for 26 years, making PNES the unexpected finding.",
-      "Therapeutic AED levels with continued high seizure frequency is one of the strongest clinical red flags for PNES. A patient having 2-3 seizures per week on three AEDs at therapeutic levels for 26 years should prompt reconsideration of the diagnosis.",
-      "The bitemporal theta slowing on interictal EEG is a nonspecific finding (likely from medications) that could be misinterpreted as supporting an epilepsy diagnosis, adding to the diagnostic misdirection.",
-      "The right anterior temporal encephalomalacia from remote TBI is a significant red herring — it provides a plausible structural substrate for posttraumatic epilepsy, but video-EEG proves the events are non-epileptic.",
-      "Video-EEG monitoring is the gold standard for diagnosing PNES. The absence of EEG correlate during five captured habitual events (including both event types) is diagnostic, especially given the bilateral motor manifestations that would invariably produce EEG changes if epileptic.",
-      "The family history of a paternal uncle with epilepsy is another anchoring red herring that could reinforce the epilepsy diagnosis.",
-      "The preserved awareness during motor events, absence of post-ictal confusion, ability to respond to questions during events, and non-stereotyped bizarre movements are all positive clinical features of PNES.",
-      "Post-event prolactin remaining at baseline (14.1 vs 12.4 ng/mL) after a captured motor event supports non-epileptic etiology, as generalized tonic-clonic and complex partial epileptic seizures typically elevate prolactin >2x baseline.",
-      "The temporal relationship between the traumatic MVA and symptom onset, combined with PTSD features, moderate depression, severe anxiety, and elevated dissociative experiences, illustrates the biopsychosocial model of PNES development.",
-      "Iatrogenic harm from 26 years of misdiagnosis includes unnecessary AED polytherapy with metabolic consequences (low vitamin D, elevated GGT), chronic benzodiazepine dependence, social disability (unemployment, agoraphobia-like avoidance), and adoption of a chronic illness identity.",
-      "Gradual AED discontinuation is both therapeutic and logistically complex — particularly the benzodiazepine taper, which requires careful management to avoid withdrawal seizures (which would be true epileptic seizures from withdrawal, not PNES)."
+      "FND is a positive diagnosis based on rule-in signs (Hoover, tremor entrainment, give-way weakness, non-dermatomal sensory loss with midline split) — not a diagnosis of exclusion (Espay 2018, Stone 2018).",
+      "Brain MRI and basic labs (CBC, CMP, TSH, B12) are due-diligence to exclude structural and reversible causes — they are NOT the route to the diagnosis, which is established at the bedside.",
+      "Over-investigation is the principal iatrogenic harm in FND; every additional negative test reinforces the patient's illness conviction and worsens prognosis (Stone 2018).",
+      "Psychiatric comorbidity (anxiety, depression, trauma) is common and informs treatment planning but is NOT required for the diagnosis and does not 'explain' the symptoms in a reductive sense.",
+      "Diagnostic communication matters: using positive language anchored on the rule-in signs is associated with better engagement and outcomes (Stone 2018).",
+      "Evidence-based treatment is multidisciplinary — CBT for PNES and FND-informed physiotherapy for functional motor symptoms (Nielsen 2015).",
+      "Video-EEG capturing a habitual event with normal interictal EEG is diagnostic for PNES (ILAE PNES Task Force 2013); routine EEG alone is insufficient."
     ],
     "red_herrings": [
       {
-        "data_point": "Right anterior temporal encephalomalacia from remote TBI",
-        "location": "Brain MRI findings",
-        "intended_effect": "Provides plausible structural basis for posttraumatic epilepsy, anchoring clinicians to the epilepsy diagnosis",
-        "correct_interpretation": "Small anterior temporal encephalomalacia is insufficient to explain the clinical presentation; video-EEG shows no ictal correlate during events and no interictal epileptiform discharges",
-        "field_path": ""
-      },
-      {
-        "data_point": "Paternal uncle with epilepsy",
+        "data_point": "Family history of epilepsy in a relative",
         "location": "Family history",
-        "intended_effect": "Suggests genetic predisposition to epilepsy, reinforcing the posttraumatic epilepsy diagnosis",
-        "correct_interpretation": "Family history of epilepsy does not exclude PNES; each case requires video-EEG evaluation regardless of family history",
-        "field_path": ""
+        "field_path": "patient.clinical_history.family_history",
+        "intended_effect": "Anchor on an epileptic etiology and pursue prolonged AED trials before confirming PNES with video-EEG",
+        "correct_interpretation": "Family history of epilepsy does not establish the patient's events as epileptic. Video-EEG capturing the habitual event without ictal correlate is the gold standard."
       },
       {
-        "data_point": "Bitemporal theta slowing on interictal EEG",
-        "location": "Routine EEG findings",
-        "intended_effect": "Could be misinterpreted as supporting temporal lobe epilepsy with bilateral propagation",
-        "correct_interpretation": "Bitemporal theta slowing is a nonspecific finding, likely from chronic AED use; no epileptiform discharges were seen over 5 days of continuous monitoring including during AED taper",
-        "field_path": ""
+        "data_point": "Pre-existing psychiatric diagnosis (anxiety or depression) in the past medical history",
+        "location": "Past medical history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Premature anchoring on a 'psychosomatic' label without obtaining positive rule-in signs; conversely, dismissing FND as a serious diagnosis because the patient is 'just anxious'",
+        "correct_interpretation": "Psychiatric comorbidity neither establishes nor refutes FND. Diagnosis requires positive rule-in signs on examination; psychiatric history is relevant for treatment planning, not for diagnosis."
       },
       {
-        "data_point": "26-year history of diagnosed posttraumatic epilepsy",
-        "location": "Medical history",
-        "intended_effect": "Creates strong anchoring bias toward epilepsy diagnosis, making PNES the unexpected finding",
-        "correct_interpretation": "Therapeutic AED levels with continued high seizure frequency for 26 years is a major red flag for non-epileptic events; prior diagnosis does not preclude reassessment",
-        "field_path": ""
+        "data_point": "Reported history of psychological trauma or recent stressor",
+        "location": "Social history",
+        "field_path": "patient.clinical_history.social_history.psychosocial_stressors",
+        "intended_effect": "Use trauma history to make FND a 'foregone conclusion' without verifying positive rule-in signs",
+        "correct_interpretation": "Trauma is enriched in FND populations (Stone 2018) but is neither necessary nor sufficient for diagnosis. Positive rule-in signs remain the diagnostic anchor."
       },
       {
-        "data_point": "Mildly elevated GGT from chronic AED use",
-        "location": "Laboratory results",
-        "intended_effect": "Could distract from the central question of whether the episodes are epileptic, implying ongoing AED necessity",
-        "correct_interpretation": "GGT elevation is an AED-related hepatic induction effect, not evidence that the episodes are epileptic seizures requiring AEDs",
-        "field_path": ""
-      },
-      {
-        "data_point": "Low vitamin D from chronic enzyme-inducing AED use",
-        "location": "Laboratory results",
-        "intended_effect": "Represents a real metabolic consequence of AED use but is unrelated to seizure etiology",
-        "correct_interpretation": "Vitamin D deficiency is a well-recognized complication of enzyme-inducing AEDs (carbamazepine, phenytoin) and supports discontinuation, but does not inform seizure etiology",
-        "field_path": ""
+        "data_point": "Symptom onset coincident with a major psychosocial stressor",
+        "location": "History of present illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Conclude prematurely that stress 'caused' the symptoms and that the workup can be abbreviated",
+        "correct_interpretation": "Many organic conditions (MS, migraine, epilepsy) also flare with stress. Stress at onset is supportive context, not a diagnostic substitute for the positive rule-in signs."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -1118,6 +1133,14 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FND",
+    "difficulty_rationale": "Disabling, multi-region or refractory functional symptoms — often with comorbid organic disease (e.g., established MS, post-stroke deficit, prior epilepsy) or extensive prior workup. Differentiating new functional symptoms from organic progression requires careful synthesis of rule-in signs against negative imaging and EEG, plus discriminating communication.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

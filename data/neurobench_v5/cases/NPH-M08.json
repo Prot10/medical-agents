@@ -1,7 +1,7 @@
 {
   "case_id": "NPH-M08",
   "condition": "nph",
-  "difficulty": "moderate",
+  "difficulty": "diagnostic_puzzle",
   "encounter_type": "inpatient",
   "patient": {
     "patient_id": "NPH-M08",
@@ -499,117 +499,200 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Secondary normal pressure hydrocephalus (post-meningitis arachnoiditis)",
+    "primary_diagnosis": "Secondary normal pressure hydrocephalus, post-meningitic arachnoiditis",
     "icd_code": "G91.2",
     "differential": [
       {
-        "diagnosis": "Hepatic encephalopathy",
+        "diagnosis": "Vascular cognitive impairment / subcortical ischaemic vascular disease",
         "likelihood": "high",
-        "key_features": "Cirrhosis, lactulose/rifaximin prophylaxis — but ammonia normal, no asterixis, cognitive pattern is frontal-subcortical not typical encephalopathy; hepatic encephalopathy not active"
+        "key_features": "Small-vessel disease can produce gait apraxia and executive slowing, but ventriculomegaly out of proportion to white-matter burden and a positive tap test favour NPH",
+        "icd_code": "F01.50"
       },
       {
-        "diagnosis": "Manganese deposition (acquired hepatocerebral degeneration)",
+        "diagnosis": "Parkinson's disease / atypical parkinsonism",
         "likelihood": "moderate",
-        "key_features": "Bilateral globus pallidus T1 hyperintensity — Parkinsonism from cirrhotic manganese deposition; contributing but tap trial shows NPH as primary driver"
+        "key_features": "Shuffling gait overlaps, but absence of resting tremor, asymmetric rigidity, or L-dopa response and presence of magnetic gait + DESH favour NPH",
+        "icd_code": "G20"
       },
       {
-        "diagnosis": "Idiopathic NPH",
-        "likelihood": "low",
-        "key_features": "Post-meningitis leptomeningeal changes support secondary NPH etiology rather than idiopathic"
+        "diagnosis": "Alzheimer's disease",
+        "likelihood": "moderate",
+        "key_features": "Cognitive decline overlaps; AD typically presents with episodic-memory predominance and hippocampal atrophy rather than frontal-subcortical pattern and magnetic gait; CSF biomarkers / amyloid PET resolve copathology",
+        "icd_code": "G30.9"
       },
       {
-        "diagnosis": "Alcoholic cerebellar atrophy",
-        "likelihood": "low",
-        "key_features": "Remote heavy alcohol use — but cerebellar atrophy not prominent on MRI; gait quality is magnetic not cerebellar"
+        "diagnosis": "Cerebral atrophy with secondary ex-vacuo ventriculomegaly",
+        "likelihood": "moderate",
+        "key_features": "Ventriculomegaly proportionate to sulcal widening, callosal angle >90°, and absence of DESH or transependymal signal argue against true NPH",
+        "icd_code": "G31.9"
+      },
+      {
+        "diagnosis": "Post-traumatic / post-SAH / post-meningitic communicating hydrocephalus",
+        "likelihood": "moderate",
+        "key_features": "Prior intracranial event (SAH, subdural, meningitis) can cause delayed communicating hydrocephalus clinically indistinguishable from iNPH; designation as 'secondary' affects research classification but not management",
+        "icd_code": "G91.0"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI with gadolinium to assess for leptomeningeal changes",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Evans 0.33, callosal angle 86, post-meningitis arachnoiditis, manganese deposits in globus pallidus",
+        "action": "Literature review of iNPH diagnostic criteria and shunt-response predictors",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Relkin 2005 INPH Study Group criteria; Tisell 2011 tap-test predictors; Williams 2016 review",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Williams_2016]",
+        "guideline_source": "NPH_pack"
       },
       {
         "step": 2,
-        "action": "Comprehensive labs including LFTs, INR, ammonia, CBC",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Thrombocytopenia, elevated INR — cirrhosis; normal ammonia",
+        "action": "Brain MRI — measure Evans index, callosal angle, assess DESH pattern; exclude mass effect, hydrocephalus from secondary cause, and atrophy",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Ventriculomegaly with Evans index >0.3, DESH pattern (tight high-convexity sulci + widened Sylvian fissures), callosal angle <90°, periventricular transependymal signal; no mass effect or aqueductal obstruction",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Relkin_2005]",
+        "guideline_source": "NPH_pack"
       },
       {
         "step": 3,
-        "action": "Correct coagulopathy before LP (platelet transfusion to >100K, vitamin K for INR)",
-        "tool_name": null,
-        "expected_finding": "Safe LP conditions",
+        "action": "Reversible-cause labs (TSH, B12, RPR, HIV) to exclude metabolic / infectious dementia mimics",
+        "tool_name": "interpret_labs",
+        "expected_finding": "TSH, B12, RPR, HIV negative or within normal range; reversible mimics excluded",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Relkin_2005]",
+        "guideline_source": "NPH_pack"
       },
       {
         "step": 4,
-        "action": "High-volume tap trial after coagulopathy correction",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Normal opening pressure; borderline-positive tap (22%)",
+        "action": "Baseline neuropsychological battery — subcortical/frontal pattern, and reference for pre/post-tap comparison",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Frontal-subcortical pattern: executive dysfunction and slowed processing predominate over episodic amnesia",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Relkin_2005]",
+        "guideline_source": "NPH_pack"
       },
       {
         "step": 5,
-        "action": "Extended lumbar drainage trial",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "30% improvement confirms secondary NPH",
-        "category": "recommended",
-        "tool_parameters": {}
+        "action": "Large-volume lumbar puncture (30-50 mL tap test) with opening pressure and pre/post gait + neuropsych assessment",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Opening pressure <25 cmH2O (normal); 30-50 mL CSF removed; pre/post tap gait and neuropsych assessment shows objective improvement supporting shunt-responsive iNPH",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Tisell_2011]",
+        "guideline_source": "NPH_pack"
       },
       {
         "step": 6,
-        "action": "VP shunt with hepatology clearance, perioperative coagulopathy management",
-        "tool_name": null,
-        "expected_finding": "Surgical treatment with cirrhosis-related precautions",
+        "action": "Neurosurgery consultation for VP shunt candidacy and perioperative planning",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Neurosurgery accepts patient for VP shunt evaluation with programmable valve",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "specialty": "neurosurgery"
+        },
+        "citation": "[Marmarou_2005]",
+        "guideline_source": "NPH_pack"
+      },
+      {
+        "step": 7,
+        "action": "Amyloid PET (optional) — screen for AD copathology that may temper cognitive (but not gait) shunt benefit",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Inform shunt prognosis: AD copathology common (~50% iNPH)",
+        "category": "optional",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "citation": "[Williams_2016]",
+        "guideline_source": "NPH_pack"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is non-specific for NPH and does not distinguish from neurodegenerative alternatives in this chronic gait/cognitive presentation",
+        "citation": ""
+      },
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG is unrelated to the diagnostic workup of chronic gait + cognitive + urinary triad once cardiogenic syncope is not on the differential",
+        "citation": ""
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography does not contribute to NPH evaluation in the absence of syncope or cardioembolic stroke workup",
+        "citation": ""
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is inferior to MRI for measuring Evans index and callosal angle and for excluding secondary causes; only justified if MRI is contraindicated",
+        "citation": ""
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring has no diagnostic role in NPH and is reserved for syncope or arrhythmia workup",
+        "citation": ""
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "MRI must precede large-volume LP to exclude mass effect or secondary obstructive hydrocephalus before removing 30-50 mL of CSF",
+        "citation": "[Relkin_2005]",
+        "severity": "hard"
+      },
+      {
+        "before": "order_specialized_test",
+        "after": "analyze_csf",
+        "reason": "Baseline neuropsychological and gait assessment must be obtained before the tap test so that pre/post change can be measured (tap response is the shunt-response predictor)",
+        "citation": "[Tisell_2011]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Correct coagulopathy (INR and platelets) before LP — cirrhosis increases bleeding risk significantly",
-      "Normal ammonia and absence of asterixis argue against active hepatic encephalopathy",
-      "Secondary NPH from remote meningitis is confirmed by post-meningitis leptomeningeal changes on MRI",
-      "Perioperative management for VP shunt surgery in cirrhosis is complex — hepatology involvement required"
+      "Obtain brain MRI before lumbar puncture to exclude mass effect or obstructive hydrocephalus",
+      "Document objective pre-tap gait (TUG and 10-metre walk) and neuropsychological baseline so that pre/post-tap change can be quantified",
+      "Remove 30-50 mL of CSF during the tap test (a low-volume LP under-samples and biases the test toward false negative)",
+      "Re-assess gait and cognition 1-4 hours after the tap and again at 24 hours (the response window for tap-test prediction of shunt benefit)",
+      "Refer to neurosurgery for VP shunt evaluation when imaging, clinical, and tap-test criteria support iNPH",
+      "Recognise that an antecedent SAH or meningitis reclassifies the hydrocephalus as secondary (G91.0) but does not preclude shunt benefit"
     ],
     "contraindicated_actions": [
-      "LP without correcting coagulopathy (INR 1.4, platelets 88K) — high bleeding risk",
-      "Attributing all symptoms to hepatic encephalopathy when ammonia is normal and no asterixis",
-      "VP shunt surgery without hepatology clearance and coagulopathy correction"
+      "Do not perform large-volume lumbar puncture before MRI excludes mass effect or obstructive hydrocephalus",
+      "Do not infer iNPH from ventriculomegaly alone — DESH, callosal angle <90°, and a clinical triad are required",
+      "Do not diagnose Alzheimer's disease in a patient with gait-predominant presentation and ventriculomegaly without first excluding NPH",
+      "Do not attribute the syndrome to 'normal ageing' or 'deconditioning' once the imaging criteria for ventriculomegaly are met"
     ],
     "key_reasoning_points": [
-      "Secondary NPH from remote bacterial meningitis (arachnoiditis disrupting CSF absorption) is confirmed by post-meningitis leptomeningeal enhancement on MRI",
-      "Hepatic encephalopathy must be actively excluded (normal ammonia, no asterixis, no fluctuating consciousness) before proceeding with NPH diagnosis",
-      "Bilateral globus pallidus T1 hyperintensity (manganese) represents a secondary complication of cirrhosis causing Parkinsonism — a complicating factor",
-      "Coagulopathy from cirrhosis requires careful management for both LP and neurosurgery",
-      "Negative amyloid PET provides excellent prognosis for shunt response"
+      "iNPH diagnosis (Relkin 2005 INPH Study Group) requires (a) Hakim's triad of gait disturbance, cognitive impairment, and urinary urgency/incontinence — gait is typically first and most prominent; (b) ventriculomegaly with Evans >0.3 and DESH on MRI without mass effect; (c) age >40 and chronic course; (d) opening pressure <25 cmH2O; (e) absence of an alternative explanation",
+      "MRI is the imaging modality of choice — measure Evans index and callosal angle (<90° supports NPH) and confirm DESH (tight high-convexity sulci + wide Sylvian fissures)",
+      "The tap test is a 30-50 mL large-volume LP with pre/post objective gait (TUG, 10-metre walk) and neuropsychological assessment; opening pressure must be normal (<25 cmH2O) to satisfy the 'normal pressure' criterion",
+      "Tap-test sensitivity is only 50-80%; a single negative tap does not exclude NPH — an extended (3-5 day) lumbar drainage trial can resolve borderline cases",
+      "Reversible-cause labs (TSH, B12, RPR, HIV) are mandatory before attributing the syndrome to NPH",
+      "Approximately 50% of iNPH patients have AD copathology — this lowers cognitive benefit from shunting but does not negate gait benefit",
+      "Shunt response is best predicted by an objectively positive tap test or extended drainage trial in a patient who meets imaging and clinical criteria",
+      "Post-meningitic arachnoiditis can produce delayed communicating hydrocephalus years after the inciting infection"
     ],
     "red_herrings": [
       {
-        "data_point": "Alcoholic cirrhosis with lactulose/rifaximin for hepatic encephalopathy prophylaxis",
-        "location": "clinical_history",
-        "intended_effect": "Progressive cognitive and motor decline attributed to hepatic encephalopathy",
-        "correct_interpretation": "Ammonia is normal; no asterixis; lactulose/rifaximin prophylaxis is working; hepatic encephalopathy is not the active diagnosis — NPH is",
-        "field_path": ""
-      },
-      {
-        "data_point": "Bilateral globus pallidus T1 hyperintensity (manganese deposition)",
-        "location": "initial_tool_outputs.mri",
-        "intended_effect": "Parkinsonian features attributed to manganese deposition (acquired hepatocerebral degeneration) rather than NPH",
-        "correct_interpretation": "Manganese deposits contribute Parkinsonian features; however, the ventriculomegaly, callosal angle, and positive tap trial confirm NPH as a superimposed and dominant treatable process",
-        "field_path": ""
+        "data_point": "Compensated cirrhosis (abstinent) with potential for hepatic encephalopathy",
+        "location": "clinical_history.past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "The syndrome is attributed to hepatic encephalopathy",
+        "correct_interpretation": "Hepatic encephalopathy fluctuates with ammonia and protein load and does not cause magnetic gait or progressive ventriculomegaly with DESH"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "created_by": "NeuroBench v5 generator",
@@ -621,6 +704,17 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:NPH",
+    "difficulty_rationale": "6 required tools (MRI, labs, neuropsych baseline, large-volume LP/tap, neurosurgery consult, literature), 1 grounded red herrings; differential includes 5 active alternatives. Antecedent intracranial event reclassifies the hydrocephalus as secondary but management is unchanged.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": [
+      "Phase-contrast (CSF flow) MRI is referenced in followup outputs but is not in the TOOL_PARAMETER_VOCABULARY closed list for order_advanced_imaging — recommend adding 'phase_contrast_MRI' or 'CSF_flow_MRI' to the modality vocabulary",
+      "Extended 72-hour external lumbar drainage trial is referenced in followup outputs but has no explicit key in TOOL_PARAMETER_VOCABULARY (currently subsumed under neuropsych_battery for the pre/post assessment) — recommend adding an explicit 'extended_lumbar_drainage' specialized_test key"
+    ]
   }
 }

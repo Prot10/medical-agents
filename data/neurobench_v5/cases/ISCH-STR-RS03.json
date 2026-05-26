@@ -1,7 +1,7 @@
 {
   "case_id": "ISCH-STR-RS03",
   "condition": "ischemic_stroke",
-  "difficulty": "straightforward",
+  "difficulty": "diagnostic_puzzle",
   "encounter_type": "emergency",
   "patient": {
     "patient_id": "NB-ISCH-STR-RS03",
@@ -689,7 +689,7 @@
           "Risk of GI bleeding is elevated given recent esophageal surgery and anastomotic healing",
           "Low albumin (2.8 g/dL) may affect drug protein binding but clinically insignificant for apixaban",
           "Monitor for signs of bleeding given recent surgical status",
-          "Anemia (Hgb 11.2) — monitor hemoglobin serially after initiating anticoagulation"
+          "Anemia (Hgb 11.2) \u2014 monitor hemoglobin serially after initiating anticoagulation"
         ],
         "formulary_status": "Preferred formulary, prior authorization not required",
         "alternatives": [
@@ -785,155 +785,283 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Acute ischemic stroke, right posterior cerebral artery territory, cardioembolic etiology secondary to atrial fibrillation",
-    "icd_code": "I63.9",
+    "primary_diagnosis": "Acute ischemic stroke, right PCA territory, cardioembolic etiology from atrial fibrillation off anticoagulation, in the postoperative period after esophagectomy",
+    "icd_code": "I63.432",
     "differential": [
       {
-        "diagnosis": "Brain metastasis from esophageal adenocarcinoma",
+        "diagnosis": "Large-artery atherosclerotic stroke",
         "likelihood": "low",
-        "key_features": "MRI shows vascular territory DWI restriction without enhancement; no ring-enhancing or nodular lesions; metastatic protocol MRI negative. The lesion conforms to a vascular territory rather than appearing as a round mass."
+        "key_features": "Cardiac source dominant given recent anticoagulation discontinuation and known AF",
+        "icd_code": null
       },
       {
-        "diagnosis": "Primary brain neoplasm (glioma or lymphoma)",
-        "likelihood": "very_low",
-        "key_features": "No enhancement on post-contrast imaging, lesion respects vascular territory boundaries, no infiltrative pattern, DWI/ADC pattern consistent with ischemia rather than tumor cellularity"
+        "diagnosis": "Septic embolism (postoperative)",
+        "likelihood": "low",
+        "key_features": "Assess inflammatory markers; possible from surgical site infection",
+        "icd_code": null
       },
       {
         "diagnosis": "Hemorrhagic stroke",
         "likelihood": "very_low",
-        "key_features": "No evidence of hemorrhage on any MRI sequence including SWI; DWI pattern characteristic of ischemic rather than hemorrhagic event"
+        "key_features": "CT/MRI exclude hemorrhage",
+        "icd_code": null
       },
       {
-        "diagnosis": "Cancer-associated hypercoagulability (Trousseau syndrome)",
-        "likelihood": "low",
-        "key_features": "Stroke pattern is single-territory (right PCA) consistent with cardioembolism rather than multi-territory embolic shower seen in Trousseau syndrome; atrial fibrillation without anticoagulation provides sufficient mechanistic explanation"
-      },
-      {
-        "diagnosis": "Posterior reversible encephalopathy syndrome (PRES)",
+        "diagnosis": "Air or particulate embolism",
         "likelihood": "very_low",
-        "key_features": "DWI restriction with ADC confirmation indicates true infarction rather than vasogenic edema; lesion is unilateral and conforms to vascular territory rather than bilateral parietal-occipital distribution of PRES"
+        "key_features": "Less likely given timing days after surgery",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Postoperative delirium or metabolic encephalopathy",
+        "likelihood": "very_low",
+        "key_features": "Persistent focal deficits and DWI-positive infarct exclude metabolic-only cause",
+        "icd_code": null
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Activate stroke alert and perform rapid neurological assessment including NIHSS and establish last known well time",
-        "tool_name": null,
-        "expected_finding": "NIHSS 8, LKW approximately 22:00 previous evening (10.5 hours prior)",
-        "category": "required"
+        "action": "Obtain emergent non-contrast CT head as first imaging to exclude intracranial hemorrhage before any thrombolytic decision",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No hemorrhage; exclude postoperative complications and assess for early ischemic changes",
+        "category": "required",
+        "tool_parameters": {
+          "contrast": false,
+          "angiography": false
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 2,
-        "action": "Obtain emergent brain MRI with DWI (or CT head if MRI unavailable) to differentiate stroke from brain metastasis",
+        "action": "Obtain CT angiography of head and neck to evaluate for large vessel occlusion and assess thrombectomy candidacy",
         "tool_name": "order_ct_scan",
-        "expected_finding": "Acute right parietal-occipital infarction with DWI restriction in PCA territory, no enhancement to suggest metastasis",
+        "expected_finding": "Assess intracranial vessels for distal PCA occlusion and rule out competing mechanism",
         "category": "required",
         "tool_parameters": {
-          "angiography": false,
-          "contrast": false
-        }
+          "contrast": true,
+          "angiography": true
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 3,
-        "action": "Obtain stat labs including CBC, BMP, coagulation studies, and troponin",
+        "action": "Order stat labs: CBC, BMP (including glucose), coagulation panel (INR/PTT), troponin",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal coagulation confirming no therapeutic anticoagulation, anemia related to surgery/cancer, stress hyperglycemia",
+        "expected_finding": "CBC, BMP, coagulation, troponin; CRP/procalcitonin if infection concern given recent surgery",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
+            "glucose",
             "coagulation",
             "troponin"
           ]
-        }
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 4,
-        "action": "Obtain 12-lead ECG to identify cardiac rhythm and assess for cardioembolic source",
+        "action": "Obtain 12-lead ECG to assess for atrial fibrillation and concurrent cardiac ischemia",
         "tool_name": "analyze_ecg",
-        "expected_finding": "Atrial fibrillation with rapid ventricular response confirming cardioembolic source",
-        "category": "required"
+        "expected_finding": "Atrial fibrillation likely present given history",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 5,
-        "action": "Determine thrombolysis eligibility: patient is outside 4.5-hour window (wake-up stroke, LKW >10 hours ago) and recent major surgery within 3 weeks is a relative contraindication to IV tPA",
-        "tool_name": null,
-        "expected_finding": "IV alteplase contraindicated due to recent major surgery (3 weeks) and outside standard time window",
-        "category": "required"
+        "action": "Review current AHA/ASA guidelines for IV thrombolysis windows, late-window selection, and mechanical thrombectomy eligibility",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Perioperative stroke after major non-cardiac surgery: anticoagulation bridging, IV tPA eligibility within postoperative window",
+        "category": "required",
+        "tool_parameters": {
+          "query": "Perioperative stroke after major non-cardiac surgery: anticoagulation bridging, IV tPA eligibility within postoperative window"
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 6,
-        "action": "Obtain CTA head and neck to evaluate for large vessel occlusion and plan for potential thrombectomy",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "Right PCA P2 occlusion; no significant carotid stenosis",
+        "action": "Confirm absence of contraindications to IV thrombolysis (recent anticoagulation, surgery, bleeding, drug interactions)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "tPA contraindications screened; medication-anticoagulant interactions reviewed",
         "category": "required",
-        "tool_parameters": {
-          "angiography": true,
-          "contrast": false
-        }
+        "tool_parameters": {},
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 7,
-        "action": "Assess thrombectomy candidacy: posterior circulation LVO, but NIHSS 8 is below typical thrombectomy threshold for PCA occlusion, and time from LKW is >10 hours",
-        "tool_name": null,
-        "expected_finding": "Thrombectomy may not be indicated for PCA territory stroke with moderate deficit",
-        "category": "recommended"
+        "action": "Obtain brain MRI with DWI and FLAIR to confirm acute infarct, localize territory, and assess vintage",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "DWI-positive infarct in right PCA territory (visual cortex/thalamus); characterize embolic pattern",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "stroke",
+          "sequences": [
+            "DWI",
+            "ADC",
+            "FLAIR",
+            "T2",
+            "T1",
+            "GRE/SWI"
+          ],
+          "contrast": false
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 8,
-        "action": "Order echocardiogram to evaluate cardiac structure and function and assess for additional cardioembolic risk",
+        "action": "Obtain transthoracic echocardiogram to evaluate for cardioembolic source of stroke",
         "tool_name": "order_echocardiogram",
-        "expected_finding": "Dilated left atrium, mildly reduced EF, consistent with AF-related structural heart disease and high cardioembolic risk",
+        "expected_finding": "TTE for cardiac source; TEE if needed and feasible despite recent esophagectomy (relative contraindication \u2014 coordinate carefully)",
         "category": "required",
         "tool_parameters": {
           "echo_type": "TTE"
-        }
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 9,
-        "action": "Plan anticoagulation strategy: coordinate with surgical team regarding timing of full anticoagulation given recent esophagectomy (3 weeks); consider bridging with therapeutic-dose enoxaparin",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Apixaban appropriate for AF-related stroke prevention; coordinate with surgery for timing given recent esophagectomy",
-        "category": "required"
+        "action": "Initiate inpatient telemetry plus 24-hour Holter monitoring (extend to 30-day event monitor if no source identified)",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Confirm AF burden post-operatively",
+        "category": "required",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "citation": "[Sanna_2014]",
+        "guideline_source": "[Sanna_2014]"
       },
       {
         "step": 10,
-        "action": "Admit to stroke unit for monitoring, optimize rate control for atrial fibrillation, and manage vascular risk factors",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Obtain carotid duplex ultrasound to quantify cervical carotid stenosis and characterize plaque morphology",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Cervical carotid assessment",
+        "category": "required",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
+      },
+      {
+        "step": 11,
+        "action": "Consider MR angiography of head and neck if CTA was contraindicated or as confirmatory vascular study",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Alternative non-iodinated vascular assessment when CTA is limited",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "MR_angiography"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
+      },
+      {
+        "step": 12,
+        "action": "Consider transcranial Doppler for microembolic signal detection or hemodynamic assessment in selected mechanisms",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Microembolic signals support active embolic mechanism; can monitor vasospasm or right-to-left shunt",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "transcranial_doppler"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "No seizure features; EEG not part of stroke workup",
+        "citation": "[AHA_ASA_2019]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No SAH or CNS infection suspicion; LP not indicated",
+        "citation": "[AHA_ASA_2019]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "rationale": "EMG/NCS evaluates peripheral nerve disease; not applicable to central ischemic stroke",
+        "citation": "[AHA_ASA_2019]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "check_drug_interactions",
+        "reason": "Non-contrast head CT MUST exclude intracranial hemorrhage before IV thrombolysis is considered (tPA decision modeled here through drug-interaction/contraindication check).",
+        "citation": "[AHA_ASA_2019]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Glucose, INR/PTT, and platelet count must be reviewed before IV thrombolysis to exclude hypoglycemia mimic and coagulopathy contraindications.",
+        "citation": "[AHA_ASA_2019]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Obtain emergent neuroimaging to differentiate acute ischemic stroke from brain metastasis given cancer history",
-      "Identify atrial fibrillation as stroke mechanism and recognize that perioperative discontinuation of anticoagulation is the precipitating factor",
-      "Correctly determine that IV tPA is contraindicated (outside time window and recent major surgery within 3 weeks)",
-      "Recognize the MRI pattern as ischemic stroke (DWI restriction in vascular territory, no enhancement) rather than brain tumor despite cancer history",
-      "Plan for anticoagulation restart with appropriate multidisciplinary coordination (neurology, surgery, oncology)",
-      "Admit to stroke unit for monitoring and secondary prevention"
+      "Establish time of last known well (LKW) and apply NIHSS to determine acute treatment eligibility",
+      "Obtain non-contrast CT head FIRST to exclude intracranial hemorrhage before any thrombolytic decision",
+      "Achieve door-to-needle time <60 minutes if IV thrombolysis is indicated",
+      "Maintain blood pressure <185/110 mmHg prior to IV tPA and <180/105 mmHg for 24 hours after",
+      "Verify glucose to exclude hypoglycemia as a stroke mimic",
+      "Initiate continuous telemetry and obtain prolonged cardiac monitoring to detect paroxysmal atrial fibrillation",
+      "Begin secondary prevention (antiplatelet or anticoagulation) and high-intensity statin per mechanism",
+      "Reassess timing of anticoagulation resumption post-esophagectomy \u2014 bleeding vs cardioembolic risk balance",
+      "If LVO present, consider mechanical thrombectomy (surgery recency is not an absolute contraindication)",
+      "Avoid TEE in immediate post-esophagectomy window unless essential"
     ],
     "contraindicated_actions": [
-      "Administering IV alteplase: patient is outside the 4.5-hour time window and had major surgery 3 weeks ago, which is a contraindication",
-      "Assuming the brain lesion is metastatic and initiating radiation therapy or chemotherapy without completing stroke workup",
-      "Performing stereotactic brain biopsy of what is actually an acute infarct",
-      "Aggressively lowering blood pressure below 140/90 in the acute phase (risk of worsening ischemia in penumbral tissue)",
-      "Performing lumbar puncture without clinical indication in a patient with acute large territory stroke",
-      "Administering full-dose anticoagulation immediately without coordinating with surgical team regarding recent esophagectomy"
+      "Do not administer IV tPA before non-contrast CT excludes intracranial hemorrhage",
+      "Do not give IV tPA if INR >1.7, platelet count <100,000, recent major surgery, or other guideline-listed contraindications",
+      "Do not aggressively lower blood pressure below 140/90 mmHg in the acute phase outside the tPA window \u2014 risks worsening penumbral perfusion",
+      "Do not delay non-contrast CT for additional imaging or labs in a stroke alert presentation",
+      "Do not start full-dose anticoagulation in the acute phase of a large infarct without considering hemorrhagic transformation risk",
+      "Do not perform TEE in immediate post-esophagectomy patients without surgical consultation",
+      "Do not delay anticoagulation indefinitely once acute stroke risk window passes \u2014 recurrence risk is high",
+      "Avoid check_drug_interactions with proposed=alteplase: IV alteplase contraindicated within 14 days of major surgery \u2014 postoperative day ~21 places this patient on the cusp; weigh bleeding risk carefully",
+      "Avoid order_echocardiogram with echo_type=TEE: TEE shortly after esophagectomy carries risk of anastomotic disruption \u2014 pursue TTE first and defer TEE unless absolutely necessary"
     ],
     "key_reasoning_points": [
-      "New focal neurological deficits (left homonymous hemianopsia, confusion, left-sided weakness) in a patient with cancer history requires urgent differentiation between stroke and brain metastasis — MRI is the key discriminating investigation",
-      "MRI demonstrates DWI restriction conforming to a vascular territory (right PCA) with ADC confirmation and absence of enhancement, which is pathognomonic for acute ischemic stroke and inconsistent with brain metastasis",
-      "Known atrial fibrillation with perioperative discontinuation of anticoagulation is a well-established and sufficient mechanism for cardioembolic stroke — this eliminates the need to invoke cancer-related hypercoagulability",
-      "IV tPA is contraindicated both because of the wake-up stroke timing (LKW >10 hours) and recent major surgery (esophagectomy 3 weeks ago)",
-      "The initial differential between stroke and brain metastasis was reasonable and reflects real clinical uncertainty that occurs in cancer patients with new neurological deficits — this mirrors the published case's diagnostic dilemma",
-      "Secondary prevention requires careful multidisciplinary coordination: anticoagulation timing must balance stroke recurrence risk against postoperative bleeding risk from recent esophagectomy",
-      "The right PCA territory distribution explains the left homonymous hemianopsia (occipital involvement) and the left-sided neglect and confusion (parietal involvement)"
+      "Acute ischemic stroke is a clinical syndrome plus neuroimaging diagnosis; CT first excludes hemorrhage and unmasks the tPA decision",
+      "Time of last known well governs IV thrombolysis eligibility (\u22644.5h standard; selected up to 9h with imaging mismatch per WAKE-UP/EXTEND)",
+      "Large vessel occlusion on CTA opens the mechanical thrombectomy pathway up to 24h per DAWN/DEFUSE-3 selection criteria",
+      "TOAST classification by mechanism (large-artery, cardioembolic, small-vessel, other, undetermined) drives secondary prevention strategy",
+      "Normal sinus rhythm on initial ECG does NOT exclude paroxysmal AF \u2014 extended cardiac monitoring is required, especially in cryptogenic stroke",
+      "Perioperative period with AF off anticoagulation has very high stroke risk",
+      "Reinitiating anticoagulation post-major surgery requires individualized bleeding risk assessment",
+      "PCA territory infarct presents with visual field loss and may be underrecognized in delirious/postoperative patients",
+      "Off-pathway modality for order_advanced_imaging (modality=amyloid_PET): Amyloid PET has no role in acute ischemic stroke evaluation and incurs substantial cost without altering management",
+      "Off-pathway modality for order_advanced_imaging (modality=DaTscan): Dopamine transporter SPECT is indicated for parkinsonian syndromes, not vascular stroke workup",
+      "Off-pathway modality for order_advanced_imaging (modality=FDG_PET): FDG-PET (neurodegenerative/oncologic indications) has no role in routine ischemic stroke workup"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "Recent esophagectomy and ongoing rehabilitation course",
+        "location": "past medical history",
+        "field_path": "patient.clinical_history.past_medical_history[0]",
+        "intended_effect": "Attribute new confusion to delirium, deconditioning, or medication effect",
+        "correct_interpretation": "New focal deficits (visual field loss, hemiparesis) with DWI-positive infarct require stroke evaluation, not just delirium management"
+      }
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -947,6 +1075,14 @@
       "eeg": "normal",
       "csf": "normal",
       "specialized_test": "incidental"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:ISCH-STR",
+    "difficulty_rationale": "Postoperative PCA stroke in esophagectomy patient with AF off anticoagulation; recognition delayed by rehabilitation setting; TEE contraindication; tPA timing constraints.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

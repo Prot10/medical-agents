@@ -472,143 +472,214 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Organophosphate poisoning with seizures (organophosphate-induced cholinergic toxidrome with nicotinic CNS seizures presenting as apparent NCSE), intermediate syndrome at 48 hours",
-    "icd_code": "G41.9",
+    "primary_diagnosis": "Organophosphate poisoning with cholinergic toxidrome and nicotinic CNS seizures presenting as apparent non-convulsive status epilepticus, complicated by intermediate syndrome at 48 hours",
+    "icd_code": "T60.0X1A",
     "differential": [
       {
-        "diagnosis": "Autoimmune encephalitis (anti-NMDAR)",
-        "likelihood": "low",
-        "key_features": "Autoimmune panel negative; onset too acute for autoimmune; cholinesterase critically low = specific for organophosphate; SLUDGE features present"
+        "diagnosis": "Other cholinergic toxidrome (carbamate insecticide)",
+        "likelihood": "high",
+        "key_features": "Carbamates produce similar toxidrome; cholinesterase reactivation different (carbamates spontaneously reactivate)",
+        "icd_code": "T60.0X1A"
       },
       {
-        "diagnosis": "Serotonin syndrome",
-        "likelihood": "low",
-        "key_features": "No serotonergic drugs identified; cholinesterase critically low is not seen in serotonin syndrome; organophosphate exposure confirmed from backpack"
+        "diagnosis": "Nerve agent exposure (sarin, VX) bioterrorism / accidental",
+        "likelihood": "moderate",
+        "key_features": "Identical clinical picture; ascertainment from history",
+        "icd_code": "T59.94XA"
       },
       {
-        "diagnosis": "Metabolic encephalopathy with coincidental seizure",
+        "diagnosis": "Sepsis with septic shock",
+        "likelihood": "moderate",
+        "key_features": "Hyperthermia 40.6, hypotension, leukocytosis overlap; tox screen and cholinesterase distinguish",
+        "icd_code": "A41.9"
+      },
+      {
+        "diagnosis": "Heat stroke",
+        "likelihood": "moderate",
+        "key_features": "Hyperthermia 40.6; muscle activity and rhabdo overlap; tox screen distinguishes",
+        "icd_code": "T67.0XXA"
+      },
+      {
+        "diagnosis": "Anti-NMDAR encephalitis with autonomic instability",
         "likelihood": "low",
-        "key_features": "Cholinesterase level is diagnostic; toxic etiology confirmed; metabolic derangements are secondary to organophosphate poisoning"
+        "key_features": "Autonomic instability + altered mental status overlap; CSF antibody confirms or excludes",
+        "icd_code": "G04.81"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Rocuronium (NOT succinylcholine) for RSI intubation — pseudocholinesterase inhibited, succinylcholine causes prolonged paralysis",
-        "tool_name": null,
-        "expected_finding": "Safe intubation without prolonged paralysis",
+        "action": "Continuous video-EEG — characterize ictal pattern",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Diffuse continuous low-voltage fast (beta) activity replacing background — beta coma pattern of cholinergic crisis; assess for true ictal correlate",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "Atropine 2 mg IV immediately, repeat q5 min until secretions controlled — titrate to dry secretions not to HR",
-        "tool_name": null,
-        "expected_finding": "Secretion control; HR may remain elevated (acceptable)",
+        "action": "Labs: CBC, CMP, glucose, ABG, lactate, plasma + RBC cholinesterase (specific for OP), tox screen (urine and serum), CK, troponin",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Plasma pseudo-cholinesterase 0.18 (CRITICAL low) and RBC cholinesterase 0.8 (CRITICAL low) — CONFIRMS organophosphate poisoning; lactate 12.8 severe; glucose 62 hypoglycemia; K 2.8 hypokalemia",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Pralidoxime (2-PAM) 1-2g IV over 15 minutes immediately — reactivate acetylcholinesterase before aging",
-        "tool_name": null,
-        "expected_finding": "Cholinesterase recovering on serial measurements",
+        "action": "Non-contrast head CT — exclude structural cause",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Normal CT — tox cause",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "IV diazepam or lorazepam for seizures — GABA-mediated mechanism effective for organophosphate seizures",
-        "tool_name": null,
-        "expected_finding": "Seizure cessation with benzodiazepines",
+        "action": "Drug-interaction check: atropine + pralidoxime + benzodiazepines + AED",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Atropine titrated to bronchial secretion control; pralidoxime 1-2 g IV (must be early before aging); benzodiazepines for seizures; avoid succinylcholine (prolonged paralysis from cholinesterase inhibition)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[ESETT_2019]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "Obtain cholinesterase levels (plasma pseudocholinesterase + RBC acetylcholinesterase) to confirm organophosphate diagnosis",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Both cholinesterases critically reduced — diagnostic for organophosphate",
+        "action": "Literature: organophosphate poisoning treatment + intermediate syndrome",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Atropine + pralidoxime + benzodiazepines; intermediate syndrome at 24-96h requires prolonged ventilation; do not extubate prematurely",
         "category": "required",
-        "tool_parameters": {
-          "tests": [
-            "pseudocholinesterase",
-            "RBC_cholinesterase"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 6,
-        "action": "EEG monitoring to track seizure cessation and beta coma resolution",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Beta coma with ictal bursts resolving with treatment",
+        "action": "Toxicology consultation",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Poison control + ICU + toxicology",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 7,
-        "action": "IV glucose 50 mL D50 for hypoglycemia (62 mg/dL)",
-        "tool_name": null,
-        "expected_finding": "Glucose normalized",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Respiratory function monitoring (FVC / NIF) for intermediate syndrome",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Track respiratory muscle strength; intermediate syndrome at 24-96h",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 8,
-        "action": "Check drug interactions: phenytoin ineffective for organophosphate SE; pralidoxime timing urgency",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Phenytoin NOT effective; succinylcholine contraindicated; pralidoxime must be given early",
+        "action": "Repeat cholinesterase levels to monitor recovery",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Sequential cholinesterase recovery tracks reactivation",
         "category": "required",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
         "tool_parameters": {
-          "drugs": [
-            "phenytoin",
-            "pralidoxime",
-            "succinylcholine",
-            "benzodiazepines"
-          ]
-        }
+          "study_type": "TTE"
+        },
+        "rationale": "No clinical suspicion of cardiac source of embolus or cardiogenic seizure; routine echo is not indicated in SE workup absent cardiac findings.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No suspicion of arrhythmogenic syncope or cardiac comorbidity precipitating SE; routine telemetry beyond standard ICU monitoring adds cost without yield.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in acute SE evaluation; dementia biomarker imaging does not change acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is for ischemic stroke workup; SE without focal vascular suspicion does not warrant carotid imaging.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "No structural workup needed acutely — tox cause clear; MRI may be considered later if encephalopathy persists.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Cholinesterase level confirms OP etiology before pralidoxime; do not delay empiric treatment if strongly suspected.",
+        "citation": "[Brophy_2012]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Rocuronium for RSI intubation — succinylcholine causes prolonged paralysis from pseudocholinesterase inhibition",
-      "Atropine immediately — titrate to secretion dryness, not heart rate",
-      "Pralidoxime immediately — cholinesterase reactivation before aging (must give within 24-48h)",
-      "Benzodiazepines for seizures — phenytoin is INEFFECTIVE for organophosphate SE",
-      "Plasma pseudocholinesterase level — confirms organophosphate diagnosis",
-      "Monitor for intermediate syndrome at 24-96h — respiratory failure from NMJ dysfunction"
+      "Decontamination (remove clothes, wash skin)",
+      "Atropine IV titrated to bronchial secretion control — large doses often needed",
+      "Pralidoxime 1-2 g IV early — before enzyme aging (typically <24h)",
+      "Benzodiazepines for seizures (lorazepam/diazepam) — first-line",
+      "Mechanical ventilation; do NOT use succinylcholine for intubation",
+      "Anticipate intermediate syndrome at 24-96h — prolonged ventilation",
+      "Treat hypoglycemia and hypokalemia"
     ],
     "contraindicated_actions": [
-      "Succinylcholine for RSI intubation — pseudocholinesterase critically inhibited; prolonged paralysis hours not minutes",
-      "Phenytoin for organophosphate seizures — ineffective (randomized trials confirm); delayed effective treatment",
-      "Delaying pralidoxime — aging of organophosphate-AChE complex occurs after 24-48h making pralidoxime ineffective",
-      "Extubating too early — intermediate syndrome causes delayed respiratory failure 24-96h post-poisoning; keep intubated until NMJ function confirmed"
+      "Do NOT use succinylcholine — prolonged paralysis from cholinesterase inhibition",
+      "Do NOT use morphine — worsens respiratory depression",
+      "Do NOT extubate prematurely — intermediate syndrome can cause delayed respiratory failure",
+      "Do NOT use phenytoin as first-line — benzodiazepines are first-line in OP seizures",
+      "Do NOT use succinylcholine for paralysis in OP poisoning — prolonged paralysis due to pseudocholinesterase inhibition.",
+      "Avoid morphine and other agents that can worsen bronchorrhea and respiratory depression in cholinergic crisis."
     ],
     "key_reasoning_points": [
-      "Organophosphate poisoning diagnosis: critically low pseudocholinesterase and RBC acetylcholinesterase — standard urine drug screens do NOT detect organophosphates",
-      "Succinylcholine is metabolized by pseudocholinesterase — in organophosphate poisoning this enzyme is inhibited; succinylcholine causes hours of paralysis; use rocuronium exclusively",
-      "Phenytoin is ineffective for organophosphate seizures — randomized trial evidence; organophosphate CNS seizures are GABA-receptor mediated, not sodium channel; benzodiazepines are first AND second line",
-      "Intermediate syndrome: organophosphate NMJ toxicity causing respiratory failure at 24-96h post-poisoning despite apparent improvement from initial poisoning — keep ventilated",
-      "Pralidoxime effectiveness requires early administration (<24-48h) — aging of the phosphorylated AChE makes the bond permanent; pralidoxime becomes ineffective"
+      "Cholinergic toxidrome (DUMBELS: diarrhea, urination, miosis, bronchorrhea/bronchospasm, emesis, lacrimation, salivation) + nicotinic features (fasciculation, weakness, tachycardia, hypertension)",
+      "Cholinesterase levels (plasma + RBC) confirm diagnosis",
+      "Pralidoxime must be given early before enzyme aging (24-48h for most OPs)",
+      "Intermediate syndrome at 24-96h causes delayed respiratory failure requiring continued ventilation",
+      "Succinylcholine is contraindicated — pseudocholinesterase inhibition causes prolonged paralysis"
     ],
     "red_herrings": [
       {
-        "data_point": "Bilateral mydriasis (dilated pupils, 7mm unreactive)",
-        "location": "neurological exam",
-        "intended_effect": "Suggest non-cholinergic etiology — classic organophosphate causes miosis (constricted pupils), so mydriasis appears to exclude organophosphate",
-        "correct_interpretation": "Central organophosphate toxicity can cause paradoxical mydriasis via central nicotinic receptor effects; also co-ingestion of sympathomimetic is possible. The critically low cholinesterase level is diagnostic regardless of pupil size. Do not be misled by atypical pupil findings when cholinesterase is critically reduced.",
-        "field_path": ""
+        "data_point": "Fever 40.6°C with hypotension and tachycardia",
+        "location": "patient.vitals",
+        "field_path": "patient.vitals",
+        "intended_effect": "Suggests septic shock requiring broad-spectrum antibiotics and sepsis bundle",
+        "correct_interpretation": "Vital signs reflect cholinergic crisis with autonomic instability and muscle activity; tox screen and cholinesterase confirm OP"
       },
       {
-        "data_point": "Urine drug screen negative",
-        "location": "initial labs",
-        "intended_effect": "Suggest organophosphate excluded on negative UDS — redirect to autoimmune or viral SE",
-        "correct_interpretation": "Standard urine drug screens do NOT detect organophosphates. Cholinesterase level is the specific diagnostic test. Negative UDS with clinical toxidrome = check cholinesterase.",
-        "field_path": ""
+        "data_point": "Negative routine toxicology screen",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests no toxic exposure",
+        "correct_interpretation": "Routine tox screens do NOT include organophosphates; specific cholinesterase levels are required"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -617,6 +688,14 @@
       "echo": "normal",
       "cardiac_monitoring": "incidental",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "7 required + 1 recommended; OP poisoning with cholinergic crisis mistaken for NCSE; teaching is succinylcholine contraindication, pralidoxime timing, intermediate syndrome anticipation; 2 grounded red herrings.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

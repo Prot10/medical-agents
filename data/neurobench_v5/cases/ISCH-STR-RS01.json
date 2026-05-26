@@ -1,7 +1,7 @@
 {
   "case_id": "ISCH-STR-RS01",
   "condition": "ischemic_stroke",
-  "difficulty": "straightforward",
+  "difficulty": "moderate",
   "encounter_type": "emergency",
   "patient": {
     "patient_id": "NB-ISCH-STR-RS01",
@@ -727,174 +727,282 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Acute ischemic stroke, left middle cerebral artery territory, cardioembolic etiology secondary to atrial fibrillation",
-    "icd_code": "I63.9",
+    "primary_diagnosis": "Acute ischemic stroke, left MCA territory, cardioembolic etiology from atrial fibrillation off anticoagulation",
+    "icd_code": "I63.412",
     "differential": [
+      {
+        "diagnosis": "Large-artery atherosclerotic stroke",
+        "likelihood": "moderate",
+        "key_features": "Vessel imaging assesses competing atherosclerotic mechanism; AF off anticoagulation is the dominant mechanism",
+        "icd_code": null
+      },
       {
         "diagnosis": "Hemorrhagic stroke",
         "likelihood": "low",
-        "key_features": "CT/MRI shows no hemorrhage; DWI restriction in vascular territory confirms ischemic etiology"
+        "key_features": "CT/MRI exclude hemorrhage; AF off anticoagulation does not preclude bleeding in the future",
+        "icd_code": null
       },
       {
-        "diagnosis": "Todd's paralysis (post-ictal)",
+        "diagnosis": "Lacunar (small-vessel) infarct",
         "likelihood": "very_low",
-        "key_features": "No seizure activity witnessed, no history of epilepsy, imaging confirms acute infarction with large vessel occlusion"
+        "key_features": "Cortical MCA-territory lesion is not lacunar",
+        "icd_code": null
       },
       {
-        "diagnosis": "Hemiplegic migraine",
+        "diagnosis": "Hypoglycemia or metabolic mimic",
         "likelihood": "very_low",
-        "key_features": "Age 68 with no migraine history, persistent deficits, and imaging confirmation of ischemic infarction"
+        "key_features": "Glucose checked; persistent focal deficit",
+        "icd_code": null
       },
       {
-        "diagnosis": "COVID-19-associated coagulopathy as primary mechanism",
-        "likelihood": "low",
-        "key_features": "Although recent COVID-19 may have contributed to a prothrombotic state, the primary mechanism is cardioembolic given established AF without anticoagulation. Hypercoagulability panel is negative for acquired thrombophilia. COVID-19 infection was 8 weeks prior."
-      },
-      {
-        "diagnosis": "Hypoglycemia",
+        "diagnosis": "Brain tumor",
         "likelihood": "very_low",
-        "key_features": "Field glucose 142 mg/dL and ED glucose 172 mg/dL; hypoglycemia is ruled out"
+        "key_features": "Acute vascular-territory DWI restriction without mass",
+        "icd_code": null
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Activate stroke code and perform rapid triage including last known well time, NIHSS assessment, and fingerstick glucose",
-        "tool_name": null,
-        "expected_finding": "NIHSS 16, LKW approximately 2h52m prior, glucose 142 mg/dL in field",
-        "category": "required"
+        "action": "Obtain emergent non-contrast CT head as first imaging to exclude intracranial hemorrhage before any thrombolytic decision",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No hemorrhage; possible subtle early ischemic changes in left MCA territory",
+        "category": "required",
+        "tool_parameters": {
+          "contrast": false,
+          "angiography": false
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 2,
-        "action": "Obtain emergent non-contrast CT head to rule out hemorrhage",
+        "action": "Obtain CT angiography of head and neck to evaluate for large vessel occlusion and assess thrombectomy candidacy",
         "tool_name": "order_ct_scan",
-        "expected_finding": "No hemorrhage; possible early ischemic changes in left MCA territory",
+        "expected_finding": "Evaluate for LVO (M1/M2 occlusion) and cervical vessel disease \u2014 large embolus from cardiac source likely",
         "category": "required",
         "tool_parameters": {
-          "angiography": false,
-          "contrast": false
-        }
+          "contrast": true,
+          "angiography": true
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 3,
-        "action": "Obtain stat labs including CBC, BMP, coagulation studies, troponin, and glucose",
+        "action": "Order stat labs: CBC, BMP (including glucose), coagulation panel (INR/PTT), troponin",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal coagulation confirming patient not anticoagulated, stress hyperglycemia, elevated D-dimer and CRP",
+        "expected_finding": "Glucose, INR (off warfarin), platelets, troponin \u2014 verify lack of anticoagulation status for tPA decision",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
+            "glucose",
             "coagulation",
             "troponin"
           ]
-        }
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 4,
-        "action": "Obtain 12-lead ECG",
+        "action": "Obtain 12-lead ECG to assess for atrial fibrillation and concurrent cardiac ischemia",
         "tool_name": "analyze_ecg",
-        "expected_finding": "Atrial fibrillation with rapid ventricular response confirming cardioembolic source",
-        "category": "required"
+        "expected_finding": "Atrial fibrillation likely present on initial ECG",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 5,
-        "action": "Administer IV alteplase 0.9 mg/kg (max 90 mg), 10% as bolus and remainder over 60 minutes, given patient is within the 4.5-hour window",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Review current AHA/ASA guidelines for IV thrombolysis windows, late-window selection, and mechanical thrombectomy eligibility",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Acute ischemic stroke from atrial fibrillation: IV tPA criteria, mechanical thrombectomy, secondary prevention with DOACs",
+        "category": "required",
+        "tool_parameters": {
+          "query": "Acute ischemic stroke from atrial fibrillation: IV tPA criteria, mechanical thrombectomy, secondary prevention with DOACs"
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 6,
-        "action": "Obtain CTA head and neck to evaluate for large vessel occlusion and candidacy for thrombectomy",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "Left MCA M1 occlusion confirmed, mild bilateral carotid atherosclerosis",
+        "action": "Confirm absence of contraindications to IV thrombolysis (recent anticoagulation, surgery, bleeding, drug interactions)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "tPA contraindications screened; medication-anticoagulant interactions reviewed",
         "category": "required",
-        "tool_parameters": {
-          "angiography": true,
-          "contrast": false
-        }
+        "tool_parameters": {},
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 7,
-        "action": "Consult neurointerventional surgery for emergent mechanical thrombectomy given large vessel occlusion",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
-      },
-      {
-        "step": 8,
-        "action": "Obtain brain MRI with DWI to confirm infarct extent and assess for hemorrhagic transformation",
+        "action": "Obtain brain MRI with DWI and FLAIR to confirm acute infarct, localize territory, and assess vintage",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Acute left MCA territory infarction with restricted diffusion, left MCA M1 occlusion on MRA",
+        "expected_finding": "DWI-positive infarct in left MCA territory; characterize size, hemorrhagic transformation risk",
         "category": "required",
         "tool_parameters": {
           "protocol": "stroke",
+          "sequences": [
+            "DWI",
+            "ADC",
+            "FLAIR",
+            "T2",
+            "T1",
+            "GRE/SWI"
+          ],
           "contrast": false
-        }
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
+      },
+      {
+        "step": 8,
+        "action": "Obtain transthoracic echocardiogram to evaluate for cardioembolic source of stroke",
+        "tool_name": "order_echocardiogram",
+        "expected_finding": "Cardioembolic source: left atrial enlargement, possible LA appendage thrombus on TEE if visualized",
+        "category": "required",
+        "tool_parameters": {
+          "echo_type": "TTE"
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 9,
-        "action": "Manage blood pressure permissively (target <185/110 pre-tPA, then <180/105 for 24 hours post-tPA)",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Initiate inpatient telemetry plus 24-hour Holter monitoring (extend to 30-day event monitor if no source identified)",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Confirm AF burden and rate control adequacy",
+        "category": "required",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "citation": "[Sanna_2014]",
+        "guideline_source": "[Sanna_2014]"
       },
       {
         "step": 10,
-        "action": "Initiate anticoagulation with DOAC (e.g., apixaban 5 mg BID or rivaroxaban 20 mg daily) for secondary stroke prevention once acute phase is stable and hemorrhagic transformation excluded, typically 4-14 days post-stroke",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Obtain carotid duplex ultrasound to quantify cervical carotid stenosis and characterize plaque morphology",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Cervical carotid stenosis assessment to rule out competing mechanism",
+        "category": "required",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
       },
       {
         "step": 11,
-        "action": "Order transthoracic echocardiogram to evaluate cardiac structure and function",
-        "tool_name": "order_echocardiogram",
-        "expected_finding": "Dilated left atrium, LVH, mildly reduced EF consistent with AF-related cardiomyopathy",
+        "action": "Consider MR angiography of head and neck if CTA was contraindicated or as confirmatory vascular study",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Alternative non-iodinated vascular assessment when CTA is limited",
         "category": "recommended",
         "tool_parameters": {
-          "echo_type": "TTE"
-        }
+          "modality": "MR_angiography"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
       },
       {
         "step": 12,
-        "action": "Admit to neurological ICU or dedicated stroke unit for close monitoring",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Consider transcranial Doppler for microembolic signal detection or hemodynamic assessment in selected mechanisms",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Microembolic signals support active embolic mechanism; can monitor vasospasm or right-to-left shunt",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "transcranial_doppler"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "No seizure features; EEG not part of cardioembolic stroke workup",
+        "citation": "[AHA_ASA_2019]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No SAH or CNS infection suspicion; LP not indicated",
+        "citation": "[AHA_ASA_2019]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "rationale": "EMG/NCS evaluates peripheral nerve disease; not applicable to central ischemic stroke",
+        "citation": "[AHA_ASA_2019]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "check_drug_interactions",
+        "reason": "Non-contrast head CT MUST exclude intracranial hemorrhage before IV thrombolysis is considered (tPA decision modeled here through drug-interaction/contraindication check).",
+        "citation": "[AHA_ASA_2019]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Glucose, INR/PTT, and platelet count must be reviewed before IV thrombolysis to exclude hypoglycemia mimic and coagulopathy contraindications.",
+        "citation": "[AHA_ASA_2019]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Establish last known well time to determine thrombolysis eligibility",
-      "Obtain emergent non-contrast CT head to exclude hemorrhage before thrombolysis",
-      "Administer IV alteplase within the 4.5-hour treatment window",
-      "Identify large vessel occlusion and consult for mechanical thrombectomy",
-      "Obtain ECG to identify atrial fibrillation as the stroke mechanism",
-      "Initiate anticoagulation for secondary stroke prevention once safe to do so",
-      "Monitor in ICU or stroke unit with serial neurological assessments"
+      "Establish time of last known well (LKW) and apply NIHSS to determine acute treatment eligibility",
+      "Obtain non-contrast CT head FIRST to exclude intracranial hemorrhage before any thrombolytic decision",
+      "Achieve door-to-needle time <60 minutes if IV thrombolysis is indicated",
+      "Maintain blood pressure <185/110 mmHg prior to IV tPA and <180/105 mmHg for 24 hours after",
+      "Verify glucose to exclude hypoglycemia as a stroke mimic",
+      "Initiate continuous telemetry and obtain prolonged cardiac monitoring to detect paroxysmal atrial fibrillation",
+      "Begin secondary prevention (antiplatelet or anticoagulation) and high-intensity statin per mechanism",
+      "Verify anticoagulation status \u2014 patient discontinued warfarin 6 months prior; INR/anti-Xa needed for tPA decision",
+      "If within IV tPA window and no contraindications, administer alteplase or tenecteplase",
+      "Initiate oral anticoagulation (DOAC preferred unless valvular AF) at appropriate interval post-stroke based on infarct size",
+      "Engage anticoagulation counseling and shared decision-making to address adherence barriers"
     ],
     "contraindicated_actions": [
-      "Administering anticoagulation (heparin, DOAC) in the acute phase before excluding hemorrhagic transformation",
-      "Aggressively lowering blood pressure below 140/90 in the acute phase (risk of worsening ischemia in penumbral tissue)",
-      "Administering antiplatelet agents concurrently with IV alteplase within 24 hours",
-      "Delaying IV alteplase to obtain MRI in a patient within the treatment window",
-      "Performing lumbar puncture in the setting of acute large territory stroke with mass effect",
-      "Administering IV alteplase if INR were elevated above 1.7"
+      "Do not administer IV tPA before non-contrast CT excludes intracranial hemorrhage",
+      "Do not give IV tPA if INR >1.7, platelet count <100,000, recent major surgery, or other guideline-listed contraindications",
+      "Do not aggressively lower blood pressure below 140/90 mmHg in the acute phase outside the tPA window \u2014 risks worsening penumbral perfusion",
+      "Do not delay non-contrast CT for additional imaging or labs in a stroke alert presentation",
+      "Do not start full-dose anticoagulation in the acute phase of a large infarct without considering hemorrhagic transformation risk",
+      "Do not restart antiplatelet alone for AF-related cardioembolic stroke \u2014 anticoagulation is indicated unless absolutely contraindicated",
+      "Do not delay anticoagulation indefinitely based on minor prior bleeding \u2014 perform shared decision making with bleeding risk modification"
     ],
     "key_reasoning_points": [
-      "Sudden onset focal neurological deficit (right hemiparesis, expressive aphasia) with last known well within 4.5 hours defines an acute stroke presentation eligible for IV thrombolysis",
-      "Known atrial fibrillation without anticoagulation (warfarin self-discontinued 6 months ago) is the most likely cardioembolic mechanism, confirmed by ECG showing AF with rapid ventricular response",
-      "MRI demonstrates classic acute ischemic stroke: DWI hyperintensity with ADC hypointensity in the left MCA territory with M1 occlusion on MRA, consistent with large vessel occlusion",
-      "Normal INR confirms the patient is not anticoagulated, making her eligible for IV alteplase and reinforcing the clinical history of warfarin discontinuation",
-      "Recent COVID-19 infection (8 weeks prior) may have contributed to a prothrombotic and inflammatory state (elevated D-dimer and CRP), but the primary mechanism remains cardioembolic from AF. Hypercoagulability workup is negative for antiphospholipid syndrome and inherited thrombophilia",
-      "Large vessel occlusion (left MCA M1) mandates consideration of mechanical thrombectomy in addition to IV thrombolysis (bridging therapy)",
-      "Multiple modifiable risk factors (AF, hypertension, diabetes, hyperlipidemia, obesity) compound stroke risk and must be addressed for secondary prevention"
+      "Acute ischemic stroke is a clinical syndrome plus neuroimaging diagnosis; CT first excludes hemorrhage and unmasks the tPA decision",
+      "Time of last known well governs IV thrombolysis eligibility (\u22644.5h standard; selected up to 9h with imaging mismatch per WAKE-UP/EXTEND)",
+      "Large vessel occlusion on CTA opens the mechanical thrombectomy pathway up to 24h per DAWN/DEFUSE-3 selection criteria",
+      "TOAST classification by mechanism (large-artery, cardioembolic, small-vessel, other, undetermined) drives secondary prevention strategy",
+      "Normal sinus rhythm on initial ECG does NOT exclude paroxysmal AF \u2014 extended cardiac monitoring is required, especially in cryptogenic stroke",
+      "AF off anticoagulation is a high-risk cardioembolic stroke mechanism with high recurrence risk",
+      "DOACs have superior safety-efficacy profile to warfarin for non-valvular AF",
+      "Post-COVID AF and inflammation may increase short-term thromboembolic risk",
+      "Off-pathway modality for order_advanced_imaging (modality=amyloid_PET): Amyloid PET has no role in acute ischemic stroke evaluation and incurs substantial cost without altering management",
+      "Off-pathway modality for order_advanced_imaging (modality=DaTscan): Dopamine transporter SPECT is indicated for parkinsonian syndromes, not vascular stroke workup",
+      "Off-pathway modality for order_advanced_imaging (modality=FDG_PET): FDG-PET (neurodegenerative/oncologic indications) has no role in routine ischemic stroke workup"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "COVID-19 infection 8 weeks prior, mild and managed at home",
+        "location": "past medical history",
+        "field_path": "patient.clinical_history.past_medical_history[4]",
+        "intended_effect": "Attribute stroke to COVID-related coagulopathy alone",
+        "correct_interpretation": "Remote COVID can contribute to thromboembolic risk but the documented AF off anticoagulation is the primary mechanism"
+      }
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -908,6 +1016,14 @@
       "eeg": "normal",
       "csf": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:ISCH-STR",
+    "difficulty_rationale": "AF off anticoagulation with prior COVID \u2014 primary cardioembolic mechanism with secondary inflammatory considerations.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -1,7 +1,7 @@
 {
   "case_id": "FTD-S01",
   "condition": "ftd",
-  "difficulty": "straightforward",
+  "difficulty": "moderate",
   "encounter_type": "outpatient",
   "patient": {
     "patient_id": "NB-FTD-S01",
@@ -548,36 +548,41 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Behavioral variant frontotemporal dementia (bvFTD), sporadic",
+    "primary_diagnosis": "Behavioral variant frontotemporal dementia (bvFTD), probable, sporadic",
     "icd_code": "G31.09",
     "differential": [
       {
-        "diagnosis": "Alzheimer disease",
-        "likelihood": "very_low",
-        "key_features": "Amyloid PET negative, CSF Abeta42 normal, frontal-predominant pattern with posterior sparing on MRI and FDG-PET"
+        "diagnosis": "Alzheimer disease (frontal-presenting variant)",
+        "likelihood": "moderate",
+        "key_features": "Older adult with cognitive decline; would expect posterior parietotemporal hypometabolism and positive amyloid biomarkers — case shows frontal-predominant atrophy and negative amyloid PET."
       },
       {
-        "diagnosis": "Primary psychiatric disorder",
-        "likelihood": "very_low",
-        "key_features": "Age of onset 58, progressive neurodegeneration on imaging, severe neuropsychological deficits"
+        "diagnosis": "Primary psychiatric disorder (late-onset mood / personality disorder, frontal alcoholism)",
+        "likelihood": "moderate",
+        "key_features": "Heavy alcohol escalation could mimic disinhibition; severe knife-blade frontal atrophy, frontal release signs, and utilisation behavior are organic findings inconsistent with a primary psychiatric diagnosis."
+      },
+      {
+        "diagnosis": "Alcohol-related (Korsakoff / frontal alcohol-related) cognitive disorder",
+        "likelihood": "low",
+        "key_features": "Recent alcohol escalation; pattern of frontal atrophy + posterior sparing is more severe and focal than typical alcohol-related changes; alcohol escalation itself is likely a symptom of frontal disinhibition."
       },
       {
         "diagnosis": "Normal pressure hydrocephalus",
-        "likelihood": "very_low",
-        "key_features": "No urinary incontinence, no gait apraxia, atrophic pattern on MRI rather than hydrocephalus"
+        "likelihood": "low",
+        "key_features": "Gait shuffling could suggest NPH but no urinary incontinence, no disproportionate ventriculomegaly, and atrophic pattern dominates."
       },
       {
-        "diagnosis": "Creutzfeldt-Jakob disease",
-        "likelihood": "very_low",
-        "key_features": "2-year course too slow for CJD, no myoclonus, no DWI restriction, 14-3-3 negative"
+        "diagnosis": "FTD-MND (motor neuron disease) overlap",
+        "likelihood": "low",
+        "key_features": "No fasciculations, bulbar dysfunction, or limb weakness; EMG not yet pursued but no clinical motor neuron signs."
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain brain MRI with volumetric sequences",
+        "action": "Obtain brain MRI with volumetric coronal T1 to assess frontal/anterior temporal atrophy and exclude alternative structural cause",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Severe bilateral frontal and anterior temporal atrophy with knife-blade pattern",
+        "expected_finding": "Bilateral frontal and/or anterior temporal atrophy in a lobar pattern with relative posterior sparing",
         "category": "required",
         "tool_parameters": {
           "sequences": [
@@ -585,25 +590,17 @@
             "T2",
             "FLAIR",
             "DWI",
-            "volumetrics"
+            "volumetric"
           ]
-        }
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky 2011 bvFTD criteria"
       },
       {
         "step": 2,
-        "action": "Order FDG-PET brain",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Severe bifrontal hypometabolism, posterior cortex spared",
-        "category": "required",
-        "tool_parameters": {
-          "modality": "FDG-PET"
-        }
-      },
-      {
-        "step": 3,
-        "action": "Order metabolic labs to exclude reversible causes",
+        "action": "Order metabolic dementia panel (TSH, B12, CMP, RPR/HIV per risk) to exclude reversible mimics",
         "tool_name": "interpret_labs",
-        "expected_finding": "All normal",
+        "expected_finding": "No reversible metabolic or infectious cause of cognitive decline identified",
         "category": "required",
         "tool_parameters": {
           "panels": [
@@ -612,74 +609,219 @@
             "TSH",
             "B12",
             "RPR",
-            "HIV",
-            "copper"
+            "HIV"
           ]
-        }
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
+      },
+      {
+        "step": 3,
+        "action": "Order comprehensive neuropsychological battery characterising executive function, social cognition, language and memory",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Frontal-executive and social-cognition deficits with relative sparing of episodic memory and visuospatial function",
+        "category": "required",
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky 2011 bvFTD criteria"
       },
       {
         "step": 4,
-        "action": "Order amyloid PET to exclude Alzheimer disease",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Negative — confirms non-AD etiology",
+        "action": "Search medical literature for behavioural variant ftd diagnosis and management",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirms Rascovsky 2011 criteria, FDG-PET evidence (Foster 2007), and management approach (Bang 2015)",
         "category": "required",
         "tool_parameters": {
-          "modality": "amyloid PET"
-        }
+          "query": "Behavioural variant FTD diagnosis and management"
+        },
+        "citation": "[Bang_2015]",
+        "guideline_source": "Bang 2015 Lancet review"
       },
       {
         "step": 5,
-        "action": "Order comprehensive neuropsychological testing",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Severe frontal-executive and social cognition deficits",
+        "action": "Consult behavioral/cognitive neurology for syndromic diagnosis, biomarker interpretation, and longitudinal care plan",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Behavioral neurology confirms bvFTD syndrome, coordinates biomarkers and disclosure",
         "category": "required",
         "tool_parameters": {
-          "test_type": "comprehensive neuropsychological evaluation with social cognition"
-        }
+          "specialty": "behavioral_neurology"
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
       },
       {
         "step": 6,
-        "action": "Order FTD genetic panel given clinical picture",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Negative in sporadic case",
+        "action": "Order FDG-PET brain to characterise frontotemporal hypometabolism and distinguish bvFTD from AD",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Bifrontal and/or anterior temporal hypometabolism with relative posterior sparing",
         "category": "recommended",
         "tool_parameters": {
-          "panel": "FTD genetic panel"
-        }
+          "modality": "FDG_PET"
+        },
+        "citation": "[Foster_2007]",
+        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
       },
       {
         "step": 7,
-        "action": "Refer to social work for caregiver support and safety planning",
-        "tool_name": null,
-        "expected_finding": "Financial and driving safety concerns addressed",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Order FTD genetic panel (C9orf72, GRN, MAPT) given negative family history but to formally exclude C9orf72/GRN/MAPT given young age and severity",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Identifies or excludes pathogenic C9orf72 / GRN / MAPT variant relevant to prognosis and cascade testing",
+        "category": "optional",
+        "tool_parameters": {
+          "test_type": "genetic_panel:FTD"
+        },
+        "citation": "[Pottier_2016]",
+        "guideline_source": "Pottier 2016 FTLD genetics review"
+      },
+      {
+        "step": 8,
+        "action": "Consider amyloid PET to exclude AD biomarker positivity when FDG and MRI alone leave residual diagnostic uncertainty",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Negative amyloid PET supports non-AD (bvFTD) etiology",
+        "category": "optional",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "citation": "[Foster_2007]",
+        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
+      },
+      {
+        "step": 9,
+        "action": "Consider symptomatic SSRI (e.g., sertraline) for disinhibition / compulsive behaviors and review drug interactions",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sertraline safe with current regimen; no contraindication; advise against AChE inhibitors",
+        "category": "optional",
+        "tool_parameters": {
+          "drugs": [
+            "sertraline"
+          ],
+          "indication": "behavioural symptoms in FTD"
+        },
+        "citation": "[Bang_2015]",
+        "guideline_source": "Bang 2015 Lancet review"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is non-specific in FTD; not part of the standard dementia workup unless seizures or rapidly progressive course suggest CJD or autoimmune encephalitis.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG has no role in the cognitive workup of suspected FTD; reserved for syncope, palpitations, or pre-procedure clearance.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is unrelated to a neurodegenerative cognitive syndrome and adds cost without diagnostic value.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is unrelated to FTD and not indicated absent syncope or palpitations.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT lacks the resolution and lobar specificity needed to characterise frontotemporal atrophy; MRI is the standard structural study.",
+        "citation": "[AAN_dementia_2018]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "MR_spectroscopy"
+        },
+        "rationale": "MR spectroscopy has no established role in the routine FTD diagnostic pathway.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "perfusion_MRI"
+        },
+        "rationale": "Perfusion MRI is not indicated in the standard FTD workup once a structural MRI and FDG-PET (or amyloid PET) have characterised the lobar pattern.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is a vascular study with no diagnostic role in primary neurodegenerative dementia.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan evaluates presynaptic dopaminergic terminals; it is not indicated unless overt parkinsonism raises concern for PD, DLB, or atypical parkinsonism (PSP/CBS overlap).",
+        "citation": "[Bang_2015]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "Exclude structural cause of focal cognitive symptoms and screen for elevated ICP before lumbar puncture.",
+        "citation": "[AAN_dementia_2018]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Diagnose bvFTD based on clinical criteria (Rascovsky 2011): progressive behavioral syndrome with disinhibition, apathy, compulsive behaviors, hyperorality, executive dysfunction, and frontal atrophy/hypometabolism",
-      "Do NOT initiate acetylcholinesterase inhibitors",
-      "Assess driving safety and financial decision-making capacity — patient has already caused significant financial harm",
-      "Consider SSRI (sertraline, fluvoxamine) for compulsive behaviors and disinhibition",
-      "Provide caregiver education and refer to FTD Association"
+      "Address escalating alcohol use as a symptom of frontal disinhibition rather than the primary cause; coordinate medical and behavioural intervention.",
+      "Initiate driving safety assessment and remove access to large financial transactions until capacity is formally evaluated.",
+      "Apply Rascovsky 2011 bvFTD criteria explicitly (≥3 of 6 core features within 3 years) and document functional decline.",
+      "Assess and document decision-making, financial, and driving capacity given the high risk of impulsivity and impaired judgment in FTD.",
+      "Provide caregiver education, safety planning, and referral to FTD-focused support resources.",
+      "Offer genetic counselling and discuss cascade testing options if a pathogenic variant is identified or suspected."
     ],
     "contraindicated_actions": [
-      "Acetylcholinesterase inhibitors (no benefit; may worsen agitation)",
-      "Memantine (limited/no evidence in bvFTD; may worsen behavioral symptoms)",
-      "High-dose benzodiazepines (worsen disinhibition and increase fall risk)",
-      "Reassurance that changes are due to alcohol — escalating alcohol use is a symptom of frontal disinhibition in FTD, not the cause"
+      "Do not start acetylcholinesterase inhibitors (donepezil, rivastigmine, galantamine): no benefit in FTD and may worsen behavioral symptoms.",
+      "Do not start memantine: no evidence of benefit in bvFTD and may worsen behavioral symptoms.",
+      "Avoid antipsychotics as first-line behavioral therapy given increased cerebrovascular and mortality risk in dementia; reserve for refractory dangerous agitation with specialist oversight.",
+      "Avoid benzodiazepines for behavioral control: risk of paradoxical disinhibition and falls.",
+      "Do not attribute the syndrome to alcohol alone: the structural and metabolic frontotemporal pattern is not explained by alcohol-related cognitive disorder."
     ],
     "key_reasoning_points": [
-      "Classic bvFTD triad: disinhibition + compulsive behaviors + loss of empathy with frontal-predominant atrophy and hypometabolism",
-      "The combination of knife-blade frontal atrophy on MRI and severe frontal hypometabolism on FDG-PET is highly characteristic of FTD",
-      "Preserved episodic memory (better with cues) and absence of posterior cortex involvement distinguishes bvFTD from Alzheimer disease",
-      "Alcoholic beverages escalation is a symptom of frontal disinhibition in FTD — not the cause of cognitive decline",
-      "Financial and driving safety must be addressed urgently in bvFTD due to impaired judgment and impulsivity"
+      "Five Rascovsky core features are present (disinhibition, apathy, loss of empathy, perseverative/compulsive behavior, hyperorality) plus executive dysfunction on FAB and neuropsychological testing — comfortably meets ≥3 of 6.",
+      "Knife-blade gyral atrophy on coronal T1 with bifrontal and anterior temporal volume loss is highly characteristic of FTLD; preserved hippocampal volume and posterior cortex argue against AD.",
+      "Severe bifrontal hypometabolism on FDG-PET with preserved posterior cingulate metabolism is the classic FTD pattern (Foster 2007).",
+      "Negative amyloid PET and normal CSF Aβ42/p-tau effectively exclude underlying AD pathology, securing the bvFTD diagnosis.",
+      "Mild bilateral upper-extremity rigidity and shuffling gait do not justify DaTscan — extrapyramidal features can occur in advanced bvFTD and the imaging pattern already explains the syndrome."
     ],
-    "red_herrings": [],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": [
+      {
+        "data_point": "Escalation of alcohol intake from 1–2 to 6–8 beers nightly",
+        "location": "social_history.alcohol",
+        "field_path": "patient.clinical_history.social_history.alcohol",
+        "intended_effect": "Suggests primary alcohol-related cognitive disorder driving disinhibition.",
+        "correct_interpretation": "Escalating alcohol use in this context is itself a manifestation of frontal disinhibition; the structural/metabolic frontotemporal pattern is not explained by alcohol."
+      },
+      {
+        "data_point": "Mild bilateral cogwheel upper-extremity rigidity and shuffling gait",
+        "location": "neurological_exam.motor / gait",
+        "field_path": "patient.neurological_exam.motor",
+        "intended_effect": "Could prompt DaTscan for suspected parkinsonism.",
+        "correct_interpretation": "Mild extrapyramidal features are common in advanced bvFTD and do not warrant DaTscan once the frontotemporal imaging pattern is established."
+      },
+      {
+        "data_point": "Glucose 112 mg/dL flagged as abnormal in BMP",
+        "location": "labs.BMP.Glucose",
+        "field_path": "initial_tool_outputs.labs.panels.BMP",
+        "intended_effect": "Could be over-interpreted as metabolic contribution; agent might pursue additional metabolic workup.",
+        "correct_interpretation": "Mild hyperglycaemia is consistent with the patient's known type 2 diabetes mellitus and does not explain frontotemporal degeneration."
+      }
+    ]
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -693,6 +835,18 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (condition-expert:FTD)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FTD",
+    "difficulty_rationale": "5 required tools (MRI, labs, neuropsych, literature, consult) plus recommended FDG-PET / amyloid PET / genetic panel; 1–2 red herrings (mild rigidity ± family history); requires cross-modal synthesis (structural + metabolic + biomarker + neuropsych) to exclude AD and document Rascovsky criteria.",
+    "case_body_concerns": [
+      "validator flags `order_advanced_imaging` in both optimal_actions (FDG_PET / amyloid_PET) and useless_tools (MR_spectroscopy / DaTscan / perfusion_MRI / carotid_duplex) — these are distinct modalities of the same catchall tool. Known systemic validator limitation: the coherence script ignores `tool_parameters.modality`. No fix at case level.",
+      "required tool `search_medical_literature` has no matching `initial_tool_outputs` or `followup_outputs` entry — case body should add a corresponding output so the agent gets a meaningful result when calling this required step.",
+      "fallback output for `order_advanced_imaging` is missing in `fallback_tool_outputs` — calling the useless tool will return empty; case body needs an off-pathway fallback entry."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -500,116 +500,180 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Hepatic encephalopathy, grade 2, NASH cirrhosis — precipitated by insulin-induced hypoglycemia (glucose 42 from skipped meal) triggering HE; concurrent ammonia 74; confusion persists after glucose correction",
-    "icd_code": "K72.9",
+    "primary_diagnosis": "Hepatic encephalopathy (West Haven grade II), NASH cirrhosis (Child-Pugh B, MELD 11) — precipitated by insulin-induced hypoglycemia event (glucose nadir 42) and skipped meal; persistent confusion after glucose correction reveals concurrent HE (ammonia 74).",
+    "icd_code": "K72.90",
     "differential": [
       {
-        "diagnosis": "Hypoglycemic encephalopathy (sole cause)",
-        "likelihood": "low",
-        "key_features": "Hypoglycemia (glucose 42) is confirmed and treated; HOWEVER confusion persists 2 hours after glucose correction to 84 — suggesting HE as concurrent and persistent cause; ammonia 74 confirms this"
-      },
-      {
-        "diagnosis": "Postictal state from hypoglycemic seizure",
-        "likelihood": "very_low",
-        "key_features": "No seizure witnessed; no tongue bite or urinary incontinence reported; EEG no epileptiform discharges; CT normal"
-      },
-      {
-        "diagnosis": "Drug-induced encephalopathy (insulin overdose with cerebral injury)",
-        "likelihood": "very_low",
-        "key_features": "Glucose corrected promptly; insulin level elevated from exogenous dose (expected); no cerebral ischemia on CT; hypoglycemia-triggered HE not permanent neurological injury"
+        "diagnosis": "Post-hypoglycemic cognitive impairment (resolved hypoglycemia)",
+        "likelihood": "moderate",
+        "key_features": "Glucose corrected but confusion persists — argues for a second pathology (HE) on top of resolved hypoglycemia.",
+        "icd_code": "E16.2"
       },
       {
         "diagnosis": "Spontaneous bacterial peritonitis",
+        "likelihood": "low",
+        "key_features": "Paracentesis if ascites; SBP often subtle in NASH cirrhotics.",
+        "icd_code": "K65.2"
+      },
+      {
+        "diagnosis": "Stroke / TIA",
+        "likelihood": "low",
+        "key_features": "CT head and exam without focal deficits exclude.",
+        "icd_code": "G45.9"
+      },
+      {
+        "diagnosis": "Insulinoma / non-diabetic hypoglycemia",
         "likelihood": "very_low",
-        "key_features": "PMN 62 — SBP excluded; afebrile; no leukocytosis"
+        "key_features": "Clear iatrogenic insulin trigger (skipped meal + insulin); no need to pursue insulinoma.",
+        "icd_code": "D13.7"
+      },
+      {
+        "diagnosis": "Diabetic ketoacidosis / HHS",
+        "likelihood": "very_low",
+        "key_features": "Acidosis and glucose pattern would differ; not supported by current labs.",
+        "icd_code": "E11.10"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "IMMEDIATE: Check point-of-care glucose — hypoglycemia identified (42 mg/dL)",
-        "tool_name": null,
-        "expected_finding": "Glucose 42 — treat with D50W 50 mL IV",
+        "action": "Comprehensive labs: CMP including AST/ALT/bilirubin/INR/albumin, ammonia, CBC, glucose, electrolytes (Na, K, Mg), BUN/Cr, lactate, blood cultures and urine cultures; toxicology if substance use plausible. Confirms liver dysfunction and screens for precipitants.",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Ammonia 74; cirrhosis features (NASH); glucose corrected after initial 42; identify any electrolyte derangement.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 2,
-        "action": "Repeat glucose after dextrose — if confusion persists, check ammonia",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Glucose corrected to 84 but confusion persists → ammonia 74 → concurrent HE identified",
+        "action": "Non-contrast CT head — exclude structural alternate cause of AMS (hemorrhage, large stroke, mass) before any LP.",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No acute intracranial process — exclude stroke given diabetes and obesity.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 3,
-        "action": "CT head — exclude structural cause",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "CT normal",
+        "action": "Literature/guideline search to confirm West Haven grading, precipitant management, and lactulose/rifaximin dosing (AASLD/EASL HE management; hypoglycemia as HE precipitant in cirrhotic diabetics).",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "AASLD/EASL 2014 guidance retrieved; West Haven criteria and precipitant-driven management framework confirmed.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 4,
-        "action": "EEG — characterize persistent encephalopathy",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Theta slowing persistent after glucose correction — consistent with HE",
+        "action": "Drug-interaction and medication-reconciliation review covering insulin, metformin, lactulose, rifaximin — review insulin regimen and glucose monitoring; consider reducing insulin and adding hepatic-safe glucose surveillance; flag any CNS depressants (benzodiazepines, opioids, sedating antiemetics, antihistamines) and confirm lactulose/rifaximin dosing in liver disease.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sedating/CNS-depressant medications identified; lactulose and rifaximin reviewed for hepatic dose adjustment.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Bajaj_2011]",
+        "guideline_source": "Bajaj 2011 HE management review"
       },
       {
         "step": 5,
-        "action": "Increase lactulose + rifaximin 550 mg BID for HE treatment",
-        "tool_name": null,
-        "expected_finding": "Ammonia normalizing 74 → 42",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Consult endocrinology and hepatology for insulin regimen + cirrhosis-tailored diabetes management — coordinate definitive care, transplant candidacy assessment where applicable.",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Hepatology / critical-care guidance integrated into management.",
+        "category": "recommended",
+        "tool_parameters": {
+          "specialty": "hepatology"
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 6,
-        "action": "Reduce glargine insulin dose — cirrhosis impairs gluconeogenesis; risk of recurrent hypoglycemia",
-        "tool_name": null,
-        "expected_finding": "Insulin dose reduced; endocrinology consult",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "EEG — consider only if no improvement with HE management. Triphasic waves are classic but non-specific (metabolic encephalopathies broadly); main role is exclusion of non-convulsive status epilepticus where the differential supports it.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Generalized slowing supports metabolic encephalopathy.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Ferenci_2002]",
+        "guideline_source": "Ferenci 2002 HE nomenclature/quantification"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No clinical suspicion for hepatopulmonary syndrome, portopulmonary hypertension, or endocarditis; echocardiography is not part of the HE workup.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in HE workup; reversible metabolic encephalopathy is the issue, not Alzheimer pathology.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan has no role in HE workup; the question is metabolic encephalopathy, not nigrostriatal degeneration.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "genetic_panel:early_onset_AD"
+        },
+        "rationale": "Early-onset AD genetic panel has no role in HE workup; reversible metabolic encephalopathy is the diagnosis under consideration.",
+        "citation": "[AASLD_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "In altered mental status, exclude intracranial mass effect / hemorrhage on imaging before LP to avoid herniation risk.",
+        "citation": "[AASLD_2014]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Glucose must be checked IMMEDIATELY in any confused patient — hypoglycemia (glucose 42) is a treatable emergency; dextrose should not wait for other workup",
-      "Persistent confusion after glucose correction MUST prompt HE workup — ammonia measurement is the critical next step",
-      "Cirrhosis impairs gluconeogenesis — insulin-dependent diabetics with cirrhosis have paradoxically HIGH hypoglycemia risk despite insulin resistance; insulin doses should be conservative",
-      "Metformin must be held in cirrhosis during decompensation — lactic acidosis risk"
+      "Lactulose titrated to 2-4 soft stools/day; rifaximin 550 mg BID.",
+      "Reduce insulin and revise sliding scale; ensure patient eats with insulin doses; consider basal-only or short-acting around meals only.",
+      "Glucose monitoring q1-2h until stable.",
+      "Identify and educate around skipped-meal hypoglycemia."
     ],
     "contraindicated_actions": [
-      "Metformin in decompensated cirrhosis — lactic acidosis risk",
-      "Waiting to treat hypoglycemia until all workup complete — glucose must be corrected immediately",
-      "Attributing all confusion to hypoglycemia without checking ammonia when confusion persists after correction"
+      "Do not prescribe benzodiazepines for anxiety/agitation — they precipitate and prolong HE (use haloperidol or non-pharmacologic measures for agitation).",
+      "Do not prescribe sedating opioids — they worsen HE; consider acetaminophen at hepatic-safe dosing for pain.",
+      "Do not perform LP before neuroimaging excludes mass effect when the patient has altered mental status.",
+      "Do not stop NPH/long-acting insulin abruptly without basal coverage strategy — diabetic ketoacidosis risk."
     ],
     "key_reasoning_points": [
-      "The biphasic confusion pattern (partially improves with glucose, persists at lower level) is the clinical clue to dual etiology: initial hypoglycemia + concurrent HE",
-      "Hypoglycemia precipitates HE via glutamine synthetase activation in astrocytes → ammonia accumulation in the setting of cirrhotic baseline",
-      "NASH cirrhosis impairs both gluconeogenesis AND fatty acid oxidation — insulin use requires reduced dosing and close monitoring compared to non-cirrhotic diabetics",
-      "Ammonia is moderately elevated (74 µmol/L) not markedly elevated — this is a moderate HE case; treatment response is expected but requires recognition of the dual diagnosis"
+      "HE is a clinical diagnosis: West Haven grading + evidence of liver dysfunction + exclusion of other causes of AMS — ammonia level is supportive only and correlates poorly with grade (AASLD 2014).",
+      "Precipitant identification is more actionable than the ammonia number: infection (SBP especially), GI bleed, electrolyte disturbance (hypokalemia/hyponatremia), constipation, sedative/CNS-depressant use, dehydration, dietary protein load, renal failure.",
+      "Hypoglycemia in NASH cirrhotics is dangerous and prolonged because hepatic gluconeogenesis is impaired; insulin regimens must account for liver disease.",
+      "Persistent confusion after glucose correction is a key signal that a second pathology (often HE) is present."
     ],
     "red_herrings": [
       {
-        "data_point": "Point-of-care glucose 42 mg/dL",
-        "location": "patient.neurological_exam.additional",
-        "intended_effect": "Attribute all confusion solely to hypoglycemia; treat glucose and discharge when improved; miss concurrent HE with ammonia 74",
-        "correct_interpretation": "Hypoglycemia is confirmed and treated, but persistent confusion 2 hours after glucose correction demands ammonia measurement — HE is the second concurrent diagnosis explaining the persistent encephalopathy",
-        "field_path": ""
+        "data_point": "Hypoglycemia 42 mg/dL at presentation",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs.panels.BMP",
+        "intended_effect": "Attribute all confusion to hypoglycemia and discharge once glucose normalizes.",
+        "correct_interpretation": "Glucose 42 caused the index event, but persistent confusion despite correction + ammonia 74 + NASH cirrhosis = concurrent HE that needs treatment."
       },
       {
-        "data_point": "Diabetic peripheral neuropathy on exam (decreased foot sensation)",
-        "location": "patient.neurological_exam.sensory",
-        "intended_effect": "Attribute confusion to autonomic diabetic neuropathy causing syncope/confusion, or suspect CNS diabetic complications",
-        "correct_interpretation": "Diabetic peripheral neuropathy causes sensory loss in feet — it does not cause confusion or encephalopathy; the encephalopathy is from hypoglycemia + HE, not from neuropathy",
-        "field_path": ""
+        "data_point": "Morbid obesity (BMI 31 with bariatric history)",
+        "location": "patient.clinical_history.past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Pursue obesity-related causes (OSA, hypercapnia) as primary.",
+        "correct_interpretation": "Obesity is a NASH risk factor; the immediate precipitant is hypoglycemia + HE, not OSA."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -629,6 +693,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (HEP-ENC)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:HEP-ENC",
+    "difficulty_rationale": "4 required tools and endocrine consult; identifying 'persistent confusion after glucose correction' as a flag for second pathology (HE) is the key reasoning step.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

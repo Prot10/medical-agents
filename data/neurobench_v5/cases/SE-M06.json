@@ -569,161 +569,218 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Herpes simplex encephalitis type 1 (HSV-1) with non-convulsive status epilepticus (NCSE) from right temporal lobe involvement",
-    "icd_code": "G41.9",
+    "primary_diagnosis": "Herpes simplex encephalitis (HSV-1) with non-convulsive status epilepticus from right temporal lobe involvement",
+    "icd_code": "G41.2",
     "differential": [
       {
-        "diagnosis": "Anti-NMDAR or other autoimmune encephalitis",
+        "diagnosis": "Other viral encephalitis (enterovirus, VZV, arboviruses)",
         "likelihood": "moderate",
-        "key_features": "Subacute behavioral decline + NCSE + limbic MRI changes overlap; however HSV PCR positive 10,400 copies/mL is definitive; autoimmune antibodies negative"
+        "key_features": "Fever, temporal seizures and pleocytosis overlap; multiplex viral PCR will discriminate; HSV PCR is the priority",
+        "icd_code": "A86"
       },
       {
-        "diagnosis": "Paraneoplastic limbic encephalitis",
-        "likelihood": "low",
-        "key_features": "Age 66 male with subacute decline warrants paraneoplastic consideration; HSV PCR positive is definitive diagnosis; paraneoplastic panel would be sent as secondary workup"
+        "diagnosis": "Autoimmune encephalitis (anti-NMDAR, LGI1)",
+        "likelihood": "moderate",
+        "key_features": "Limbic encephalopathy overlap; CSF autoimmune panel pending; HSV must be excluded first (and HSV can trigger post-infectious NMDAR encephalitis)",
+        "icd_code": "G04.81"
       },
       {
-        "diagnosis": "Bacterial meningitis",
-        "likelihood": "low",
-        "key_features": "CSF shows lymphocytic predominance (not neutrophilic); gram stain/culture negative; procalcitonin only mildly elevated; clinical picture supports viral encephalitis"
+        "diagnosis": "Bacterial meningoencephalitis",
+        "likelihood": "moderate",
+        "key_features": "Fever 38.4 and leukocytosis raise concern; CSF profile (PMN vs lymphocytic predominance) and culture distinguish",
+        "icd_code": "G04.2"
       },
       {
-        "diagnosis": "Post-stroke epilepsy with encephalopathy",
+        "diagnosis": "Brain abscess / ring-enhancing lesion",
         "likelihood": "low",
-        "key_features": "No prior stroke history; MRI shows active encephalitic changes not chronic infarct; fever and CSF pleocytosis indicate acute infection"
+        "key_features": "CT shows subtle temporal change without ring enhancement; MRI clarifies",
+        "icd_code": "G06.0"
+      },
+      {
+        "diagnosis": "Hypoglycemia / metabolic encephalopathy",
+        "likelihood": "very_low",
+        "key_features": "Glucose 148 mildly elevated, not the cause; metabolic encephalopathy unlikely",
+        "icd_code": "G93.41"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Start empiric acyclovir 10 mg/kg IV q8h immediately — HSV encephalitis diagnosis cannot be delayed pending test results",
-        "tool_name": null,
-        "expected_finding": "Initiates antiviral treatment before confirmatory testing",
+        "action": "Continuous video-EEG — confirm NCSE",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Right temporal continuous rhythmic 1.5-2.5 Hz sharp-wave complexes — focal NCSE concordant with HSV temporal lobe predilection; possible periodic lateralized epileptiform discharges (PLEDs/LPDs)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "Emergent EEG to diagnose NCSE",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Right temporal NCSE",
+        "action": "Labs: CBC, CMP, glucose, Ca/Mg, AED level, lactate, ABG, blood cultures, CRP, procalcitonin",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Mild leukocytosis, elevated CRP, mild fever; consistent with CNS infection",
         "category": "required",
-        "tool_parameters": {
-          "urgency": "stat"
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Non-contrast CT head to exclude hemorrhage before LP",
+        "action": "Non-contrast head CT to exclude mass effect before LP",
         "tool_name": "order_ct_scan",
-        "expected_finding": "Subtle right temporal hypodensity; no herniation",
+        "expected_finding": "Subtle right mesial temporal hypodensity; no hemorrhage; no contraindication to LP",
         "category": "required",
-        "tool_parameters": {
-          "contrast": false
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "MRI brain with gadolinium to characterize encephalitis pattern",
+        "action": "MRI brain with gadolinium — HSV signature is unilateral temporal FLAIR + DWI",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Right temporal FLAIR/DWI changes — classic HSV-1 distribution",
+        "expected_finding": "Right mesial temporal FLAIR hyperintensity with DWI restriction — HSV pattern",
         "category": "required",
-        "tool_parameters": {
-          "sequences": [
-            "FLAIR",
-            "DWI",
-            "T1+Gd",
-            "SWI"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "LP for CSF: HSV PCR, cell count, protein, glucose, autoimmune encephalitis panel",
+        "action": "Urgent lumbar puncture: cell count, protein, glucose, HSV-1/-2 PCR, enterovirus PCR, autoimmune panel, culture, cytology",
         "tool_name": "analyze_csf",
-        "expected_finding": "HSV-1 PCR positive; lymphocytic pleocytosis; elevated protein",
+        "expected_finding": "Lymphocytic pleocytosis, elevated protein, normal/mildly low glucose, HSV-1 PCR positive — definitive",
         "category": "required",
-        "tool_parameters": {
-          "tests": [
-            "cell_count",
-            "protein",
-            "glucose",
-            "HSV_PCR",
-            "autoimmune_panel"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 6,
-        "action": "IV lorazepam 2 mg for NCSE + load levetiracetam 1500 mg IV",
-        "tool_name": null,
-        "expected_finding": "NCSE suppression",
+        "action": "Drug-interaction check: acyclovir + AED + nephrotoxic considerations",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Acyclovir dose adjusted for renal function; levetiracetam preferred AED with no significant interaction",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[ESETT_2019]",
+        "guideline_source": ""
       },
       {
         "step": 7,
-        "action": "Check drug interactions: acyclovir + TMP-SMX nephrotoxicity and metformin hold",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Stop TMP-SMX to reduce nephrotoxicity; hold metformin",
+        "action": "Literature: HSV encephalitis treatment and AED selection for NCSE",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "IV acyclovir 10 mg/kg q8h for 14-21 days; continue AED; consider repeat LP at end of treatment",
         "category": "required",
-        "tool_parameters": {
-          "drugs": [
-            "acyclovir",
-            "TMP-SMX",
-            "metformin"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 8,
-        "action": "Continuous cEEG monitoring 24-48 hours",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Progressive NCSE resolution with antiviral + AED treatment",
-        "category": "required",
+        "action": "Infectious-disease consultation",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Confirm acyclovir regimen and duration; consider repeat LP",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 9,
+        "action": "Autoimmune encephalitis panel (NMDAR most relevant — HSV-triggered post-infectious autoimmunity)",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Negative on initial draw; repeat if clinical deterioration after HSV treatment",
+        "category": "optional",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
         "tool_parameters": {
-          "modality": "continuous_ceeg"
-        }
+          "study_type": "TTE"
+        },
+        "rationale": "No clinical suspicion of cardiac source of embolus or cardiogenic seizure; routine echo is not indicated in SE workup absent cardiac findings.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No suspicion of arrhythmogenic syncope or cardiac comorbidity precipitating SE; routine telemetry beyond standard ICU monitoring adds cost without yield.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in acute SE evaluation; dementia biomarker imaging does not change acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is for ischemic stroke workup; SE without focal vascular suspicion does not warrant carotid imaging.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "DaTscan / dopamine transporter imaging has no role in SE; no parkinsonism question relevant to acute management.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "CT must precede LP to exclude mass effect / herniation risk.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
+      },
+      {
+        "before": "check_drug_interactions",
+        "after": "interpret_labs",
+        "reason": "Renal function must be confirmed before acyclovir dose adjustment; repeat creatinine during treatment.",
+        "citation": "[Brophy_2012]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Empiric acyclovir IMMEDIATELY — fatal delay if HSV diagnosis missed",
-      "LP with HSV PCR — definitive diagnostic test",
-      "MRI brain with FLAIR + DWI — classic right temporal HSV-1 pattern",
-      "Stop TMP-SMX — nephrotoxicity with IV acyclovir; hold metformin",
-      "21-day acyclovir course — do NOT stop early when patient improves"
+      "Administer IV lorazepam 0.1 mg/kg first-line",
+      "Start empiric IV acyclovir 10 mg/kg q8h IMMEDIATELY once HSV is suspected — do not wait for PCR",
+      "Adequate IV fluids during acyclovir to prevent crystal nephropathy",
+      "Load IV levetiracetam as ESETT second-line",
+      "Continuous EEG to monitor NCSE response"
     ],
     "contraindicated_actions": [
-      "Delaying acyclovir pending MRI or LP results — HSV encephalitis is fatal without early treatment",
-      "Stopping acyclovir prematurely (before 21 days) — relapses are common; must complete full course",
-      "Continuing TMP-SMX with IV acyclovir — combined nephrotoxicity; also TMP elevates creatinine artifactually"
+      "Do NOT delay empiric acyclovir while waiting for HSV PCR — early treatment dramatically improves outcomes",
+      "Do NOT perform LP without prior CT exclusion of mass effect",
+      "Do NOT use phenytoin in the setting of fever + dehydration without close cardiac monitoring"
     ],
     "key_reasoning_points": [
-      "HSV-1 encephalitis classically affects temporal and frontal limbic structures — right or bilateral temporal FLAIR changes + behavioral symptoms + fever",
-      "NCSE complicating HSV encephalitis arises from acute temporal lobe destruction — treat both the infection (acyclovir) and the seizures (AED)",
-      "Empiric acyclovir should never wait for CSF results — mortality increases dramatically with every hour of delay",
-      "TMP-SMX falsely elevates creatinine and competes with acyclovir for tubular secretion — stop TMP-SMX during acyclovir therapy",
-      "Resident-level challenge: distinguish HSV encephalitis from autoimmune limbic encephalitis; both show temporal FLAIR changes; CSF HSV PCR is definitive"
+      "HSV encephalitis classically involves the unilateral temporal lobe with mesial temporal FLAIR / DWI signal",
+      "Empiric acyclovir must start immediately whenever HSV is on the differential — delays cost lives",
+      "Post-HSV NMDAR encephalitis can emerge during recovery; repeat autoimmune panel if clinical deterioration after HSV treatment",
+      "NCSE accompanies HSV encephalitis in many patients and requires both antiviral and AED treatment"
     ],
     "red_herrings": [
       {
-        "data_point": "Procalcitonin 0.6 ng/mL (elevated) with WBC 11.8 and temperature 38.4°C",
-        "location": "labs — Inflammatory Markers",
-        "intended_effect": "Suggests bacterial meningitis or sepsis, prompting empiric broad-spectrum antibiotics as primary treatment and potentially delaying acyclovir",
-        "correct_interpretation": "Procalcitonin mildly elevated but well below thresholds for bacterial meningitis (typically >2 ng/mL); WBC and temperature elevations are consistent with viral encephalitis; CSF lymphocytic pleocytosis and negative gram stain/culture confirm viral not bacterial etiology",
-        "field_path": ""
-      },
-      {
-        "data_point": "Family history of Alzheimer's dementia + 2-week subacute cognitive decline (memory difficulty, confusion, behavioral changes, hypersomnia)",
-        "location": "patient history",
-        "intended_effect": "Suggests rapidly progressive Alzheimer's or prion disease (e.g., CJD), prompting dementia workup and cognitive referral rather than urgent encephalitis treatment",
-        "correct_interpretation": "2-week subacute timeline is too rapid for Alzheimer's (which progresses over months to years); fever, CSF pleocytosis, and positive HSV PCR confirm acute infectious encephalitis; family history of Alzheimer's is incidental",
-        "field_path": ""
+        "data_point": "Trimethoprim-sulfamethoxazole on medication list",
+        "location": "patient.clinical_history.medications",
+        "field_path": "patient.clinical_history.medications",
+        "intended_effect": "Suggests recent UTI and possible aseptic meningitis from TMP-SMX",
+        "correct_interpretation": "TMP-SMX rarely causes aseptic meningitis but does not explain the unilateral temporal lobe NCSE pattern — HSV-1 confirmed by PCR"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -732,6 +789,14 @@
       "cardiac_monitoring": "incidental",
       "advanced_imaging": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "8 required tools + 1 optional; unilateral temporal lobe NCSE + HSV PCR positive is the canonical HSV-1 picture; teaching point is empiric acyclovir must start immediately; 1 grounded red herring (TMP-SMX).",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

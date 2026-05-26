@@ -512,92 +512,198 @@
   },
   "ground_truth": {
     "primary_diagnosis": "MDMA-associated status epilepticus from severe hyponatremia (Na 124), hyperthermia, and serotonin syndrome",
-    "icd_code": "G41.9",
+    "icd_code": "G41.0",
     "differential": [
       {
-        "diagnosis": "Primary SE from new-onset epilepsy",
-        "likelihood": "very_low",
-        "key_features": "MDMA use confirmed; Na 124; hyperthermia; serotonin syndrome signs; all explained by MDMA toxidrome"
+        "diagnosis": "Pure water-intoxication hyponatremia from MDMA-induced SIADH",
+        "likelihood": "very_high",
+        "key_features": "Na 124 in setting of MDMA + water intake; SIADH from MDMA is the classic mechanism",
+        "icd_code": "E22.2"
       },
       {
-        "diagnosis": "CNS infection with SE",
-        "likelihood": "very_low",
-        "key_features": "CSF normal; MDMA tox positive; typical MDMA toxidrome"
+        "diagnosis": "Heat stroke / exertional hyperthermia",
+        "likelihood": "high",
+        "key_features": "Temp 40.2°C, severe CK 8640 — heat stroke and rhabdo overlap with serotonin syndrome",
+        "icd_code": "T67.0XXA"
       },
       {
-        "diagnosis": "Sympathomimetic crisis alone",
+        "diagnosis": "Other sympathomimetic toxidrome (cocaine, methamphetamine)",
+        "likelihood": "moderate",
+        "key_features": "Vital signs consistent with sympathomimetic + serotonergic; tox screen identifies",
+        "icd_code": "T43.625A"
+      },
+      {
+        "diagnosis": "Neuroleptic malignant syndrome",
         "likelihood": "low",
-        "key_features": "MDMA causes sympathomimetic crisis but serotonin syndrome and hyponatremia (SIADH) are additional mechanisms"
+        "key_features": "On buspirone but not antipsychotic; NMS unlikely",
+        "icd_code": "G21.0"
+      },
+      {
+        "diagnosis": "Idiopathic generalized epilepsy with first SE",
+        "likelihood": "very_low",
+        "key_features": "No prior epilepsy; tox / metabolic explains presentation",
+        "icd_code": "G40.409"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Identify critical hyponatremia Na 124 and hyperthermia 40.2 from MDMA",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Na 124 MDMA-SIADH; CK 8640 rhabdomyolysis; MDMA tox positive",
+        "action": "EEG — confirm SE",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Continuous generalized 2-4 Hz spike-wave with evolving frequency — generalized SE",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "EEG confirms SE; treat with benzodiazepines",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Continuous generalized ictal; sympathomimetic background",
+        "action": "Labs: CBC, CMP, glucose, Ca/Mg, ABG, lactate, CK, ammonia, urinalysis, urine and serum tox screen, beta-hCG, CK",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Na 124 (CRITICAL), CK 8640 (severe rhabdo), Cr 2.2 (AKI), K 5.6 hyperkalemia from rhabdo, MDMA positive",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Hypertonic saline + active cooling simultaneously",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "3% NaCl 100-150 mL for Na 124 SE; cooling for 40.2°C; buspirone + MDMA serotonin interaction",
+        "action": "Non-contrast head CT — exclude structural cause",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Mild diffuse sulcal effacement consistent with cerebral edema from hyponatremia",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "CT head - cerebral edema from hyponatremia",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "Diffuse cerebral edema from Na 124; no hemorrhage",
+        "action": "Drug-interaction check: MDMA + buspirone (serotonin syndrome) + AED + cooling agents",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Discontinue buspirone; cyproheptadine for serotonin syndrome if severe; avoid SSRIs; supportive cooling",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "Serotonin syndrome management",
+        "action": "Literature: MDMA-induced SIADH and hyperthermia management",
         "tool_name": "search_medical_literature",
-        "expected_finding": "Hunter criteria met; cyproheptadine; hold buspirone",
+        "expected_finding": "Hypertonic saline for severe symptomatic hyponatremia; aggressive cooling; avoid antipsychotics that worsen hyperthermia",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 6,
+        "action": "Rhabdomyolysis and AKI management",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Aggressive IV fluids; monitor for compartment syndrome; renal replacement if needed",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 7,
+        "action": "MRI brain — assess for cerebral edema if persistent encephalopathy",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "May show cerebral edema; not initial priority",
+        "category": "optional",
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "study_type": "TTE"
+        },
+        "rationale": "No clinical suspicion of cardiac source of embolus or cardiogenic seizure; routine echo is not indicated in SE workup absent cardiac findings.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No suspicion of arrhythmogenic syncope or cardiac comorbidity precipitating SE; routine telemetry beyond standard ICU monitoring adds cost without yield.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in acute SE evaluation; dementia biomarker imaging does not change acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is for ischemic stroke workup; SE without focal vascular suspicion does not warrant carotid imaging.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "DaTscan / dopamine transporter imaging has no role in SE; no parkinsonism question relevant to acute management.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Confirm sodium and CK/Cr before fluid resuscitation strategy.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Sodium 124 with SE: 3% NaCl 100-150 mL IV bolus - symptomatic hyponatremia requires urgent treatment",
-      "Hyperthermia 40.2°C: active cooling urgently - temperature drives ongoing rhabdomyolysis and neuronal injury",
-      "Serotonin syndrome confirmed (Hunter criteria): benzodiazepines + cyproheptadine + hold buspirone",
-      "CK 8640 with AKI: aggressive IV hydration, target UO 1-3 mL/kg/h, nephrology consultation",
-      "Hyperkalemia 5.6 from rhabdomyolysis: cardiac monitoring, calcium gluconate if ECG changes",
-      "Sodium correction rate: ≤10-12 mEq/L per 24h - avoid osmotic demyelination"
+      "Administer IV lorazepam 0.1 mg/kg first-line",
+      "Hypertonic 3% saline 100 mL bolus for severely symptomatic hyponatremia (Na 124)",
+      "Aggressive cooling for hyperthermia 40.2°C",
+      "IV fluids for rhabdomyolysis (CK 8640)",
+      "Discontinue all serotonergic agents",
+      "Cyproheptadine 12 mg PO/NG for severe serotonin syndrome"
     ],
     "contraindicated_actions": [
-      "Do not correct sodium faster than 10-12 mEq/L per 24h",
-      "Do not ignore hyperthermia - it is driving ongoing rhabdomyolysis and must be treated simultaneously with SE",
-      "Do not continue buspirone during acute serotonin syndrome",
-      "Do not miss serotonin syndrome component - buspirone + MDMA interaction"
+      "Do NOT correct sodium faster than 8 mEq/L per 24h after initial 4-6 mEq bolus correction",
+      "Do NOT use antipsychotics for agitation — worsen hyperthermia and seizure threshold",
+      "Do NOT use cooling blankets alone — need invasive cooling for temp >40°C"
     ],
     "key_reasoning_points": [
-      "MDMA causes SIADH + user overdrinks water = dilutional hyponatremia - primary SE precipitant",
-      "Buspirone (5-HT1A partial agonist) + MDMA (serotonin releaser) = serotonin syndrome by Hunter criteria",
-      "Hyperthermia 40.2°C drives ongoing rhabdomyolysis - active cooling is treatment not just comfort measure",
-      "CK 8640 with AKI: rhabdomyolysis from hyperthermia + prolonged SE; nephrology for potential CRRT",
-      "Hyperkalemia from rhabdomyolysis requires cardiac monitoring and treatment",
-      "Maximum sodium correction rate 10-12 mEq/L per 24h prevents osmotic demyelination"
+      "MDMA causes SIADH (especially with concurrent water intake at events) leading to severe hyponatremia",
+      "MDMA hyperthermia overlaps with serotonin syndrome and heat stroke; aggressive cooling required",
+      "Severely symptomatic hyponatremia requires bolus 3% saline to raise Na by 4-6 mEq quickly, then rate-limit",
+      "Avoid antipsychotics — they raise temp and lower seizure threshold"
     ],
-    "red_herrings": [],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": [
+      {
+        "data_point": "MDMA positive on tox screen with hyperthermia",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests focus on temperature management alone",
+        "correct_interpretation": "Severe hyponatremia (Na 124) is the dominant seizure mechanism; correct both"
+      },
+      {
+        "data_point": "Buspirone on medication list",
+        "location": "patient.clinical_history.medications",
+        "field_path": "patient.clinical_history.medications",
+        "intended_effect": "Could be missed contributor to serotonin syndrome",
+        "correct_interpretation": "Buspirone is a partial 5HT1A agonist; combined with MDMA increases serotonergic load; discontinue"
+      }
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -607,6 +713,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "6 required + 1 optional; tox-metabolic SE with three layered drivers; sodium-correction limits and avoiding antipsychotics are key teaching; 2 grounded red herrings.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

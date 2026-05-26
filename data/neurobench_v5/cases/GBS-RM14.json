@@ -1,7 +1,7 @@
 {
   "case_id": "GBS-RM14",
   "condition": "guillain_barre",
-  "difficulty": "moderate",
+  "difficulty": "diagnostic_puzzle",
   "encounter_type": "emergency",
   "patient": {
     "patient_id": "NB-GBS-RM14",
@@ -381,6 +381,17 @@
           "Plasmapheresis: requires interruption of breastfeeding for 24-48h; IVIG preferred in breastfeeding patient"
         ]
       }
+    },
+    {
+      "trigger_action": "search_gbs_treatment",
+      "tool_name": "search_medical_literature",
+      "output": {
+        "general": {
+          "query": "general",
+          "results": [],
+          "summary": "No directly applicable, high-quality evidence was retrieved for this query. Recommend correlating with current society guidelines."
+        }
+      }
     }
   ],
   "fallback_tool_outputs": {
@@ -451,118 +462,193 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Guillain-Barré syndrome, AMSAN variant (post-cesarean section trigger), requiring step-down admission",
+    "primary_diagnosis": "Guillain-Barré syndrome, AMSAN variant (post-partum / post-cesarean trigger)",
     "icd_code": "G61.0",
     "differential": [
       {
-        "diagnosis": "Epidural hematoma",
-        "likelihood": "very_low",
-        "key_features": "No back pain, no bladder dysfunction, MRI excludes hematoma at surgical site"
+        "diagnosis": "Spinal anaesthesia-related neuropathy / cauda equina injury",
+        "likelihood": "moderate",
+        "key_features": "Anatomically restricted (one or two nerve roots) and asymmetric — pattern here is symmetric bilateral ascending, inconsistent with anaesthetic injury.",
+        "icd_code": "G97.0"
       },
       {
-        "diagnosis": "Epidural abscess",
-        "likelihood": "very_low",
-        "key_features": "No fever, no back pain, no leukocytosis, MRI negative"
+        "diagnosis": "Postpartum acute-onset CIDP",
+        "likelihood": "moderate",
+        "key_features": "Pregnancy and the post-partum period are recognised triggers for autoimmune polyneuropathies; differentiated longitudinally.",
+        "icd_code": "G61.81"
       },
       {
-        "diagnosis": "Transverse myelitis",
-        "likelihood": "very_low",
-        "key_features": "No sensory level, no UMN signs, no cord T2 change on MRI, areflexia"
+        "diagnosis": "Vitamin / B12 deficiency neuropathy",
+        "likelihood": "low",
+        "key_features": "Subacute and length-dependent; areflexia possible but no acute progression with elevated CSF protein.",
+        "icd_code": "E53.8"
       },
       {
-        "diagnosis": "Residual spinal anesthesia effect",
+        "diagnosis": "Vasculitic neuropathy",
+        "likelihood": "low",
+        "key_features": "Asymmetric mononeuropathy multiplex; symmetric ascending pattern argues against.",
+        "icd_code": "M31.7"
+      },
+      {
+        "diagnosis": "Critical illness polyneuropathy",
         "likelihood": "very_low",
-        "key_features": "Spinal anesthesia resolves within hours — 22-day progressive course excludes this"
+        "key_features": "Patient was discharged from uncomplicated post-op and represented at home.",
+        "icd_code": "G62.81"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "MRI lumbar and cervical spine with gadolinium — exclude surgical complication",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "No hematoma/abscess; nerve root enhancement",
+        "action": "Obtain CBC, CMP, HIV, anti-GM1/anti-GQ1b ganglioside antibodies, and stool culture / Campylobacter serology if recent diarrhea",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Mild leukocytosis / elevated inflammatory markers reflecting antecedent infection; ganglioside antibodies for variant typing; trigger identification (Campylobacter, CMV, EBV, Mycoplasma, HIV)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Yuki_2012]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 2,
-        "action": "NCS/EMG",
+        "action": "Order nerve conduction studies and needle EMG (EMG/NCS)",
         "tool_name": "order_specialized_test",
-        "expected_finding": "AMSAN pattern — axonal GBS",
+        "expected_finding": "Demyelinating pattern (prolonged DML, conduction block, reduced CV, absent F-waves) consistent with AIDP, or reduced CMAP amplitudes in axonal variants (AMAN/AMSAN)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[Hadden_1998]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 3,
-        "action": "Labs",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Postpartum anemia; negative serology",
+        "action": "Perform lumbar puncture for CSF analysis",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Albuminocytologic dissociation — elevated protein with cell count <10/μL; may be normal in the first week of illness",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 4,
-        "action": "Lumbar puncture",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Albumino-cytologic dissociation protein 71.6 mg/dL",
+        "action": "Order bedside respiratory function testing (FVC, MIP/MEP, NIF) and repeat every 4–6 hours",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline and serial FVC, MIP/MEP, NIF; deterioration to FVC <20 mL/kg, MIP worse than -30 cmH2O, or VC <40% predicted triggers ICU transfer / intubation",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[Sharshar_2003]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 5,
-        "action": "IVIG 0.4 g/kg/day x 5 days (safe in breastfeeding)",
-        "tool_name": null,
-        "expected_finding": "Treatment initiated",
+        "action": "Search the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[van_den_Berg_2014]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 6,
-        "action": "Serial FVC/NIF — AMSAN can progress rapidly",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Monitor declining FVC",
+        "action": "Check drug interactions / contraindications for IVIG (renal function, IgA deficiency screen) and/or plasma exchange (coagulation, calcium, hemodynamics)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Confirmation that IVIG can be given safely (no severe renal impairment, no IgA deficiency) or that plasma exchange is appropriate (adequate vascular access, stable coagulation)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[van_den_Berg_2014]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 7,
+        "action": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Sinus tachycardia or bradycardia; conduction or repolarisation abnormalities reflecting autonomic involvement",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 8,
+        "action": "Initiate continuous cardiac telemetry for the first 1–2 weeks for moderate/severe disease — autonomic instability (bradyarrhythmias, BP lability) is common",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Documentation of sinus pauses, bradyarrhythmias, BP lability, or non-sustained tachyarrhythmias",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "GBS is a peripheral nerve / nerve-root disorder; EEG has no role in diagnosis unless atypical CNS features (encephalopathy, seizures) are present.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated in typical GBS; reserve for pre-existing cardiac disease or unexplained hemodynamic instability after autonomic causes are excluded.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT contributes no diagnostic information in GBS; the disease is peripheral and CT does not visualise nerve roots reliably.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is reserved for atypical features (encephalopathy, CNS signs, transverse myelitis on differential). In classic GBS it does not aid diagnosis.",
+        "citation": "[van_den_Berg_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_specialized_test",
+        "after": "check_drug_interactions",
+        "reason": "Document respiratory status (FVC/NIF) before committing to IVIG vs plasma exchange — severe respiratory compromise mandates ICU triage and may influence treatment choice and timing.",
+        "citation": "[Sharshar_2003]",
+        "severity": "soft"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Renal function, IgA screen, and CBC must be reviewed before IVIG to mitigate renal failure, anaphylaxis (IgA-deficient patients), and aseptic meningitis risk.",
+        "citation": "[van_den_Berg_2014]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Exclude surgical complication with urgent MRI spine before lumbar puncture — epidural hematoma and abscess must be ruled out",
-      "Recognize cesarean section as GBS trigger — surgery/physiological stress is a recognized trigger",
-      "AMSAN variant carries slower recovery than AIDP — prognosis counseling important",
-      "IVIG is safe in breastfeeding — breastfeeding can continue",
-      "Distinguish residual spinal anesthesia from GBS — 22-day progressive course is not spinal anesthesia"
+      "Initiate IVIG 0.4 g/kg/day for 5 days.",
+      "Monitor respiratory function and autonomic stability closely.",
+      "Continuous cardiac telemetry.",
+      "Lactation-safe medication review; IVIG and PLEX are compatible with breastfeeding."
     ],
     "contraindicated_actions": [
-      "Corticosteroids",
-      "Succinylcholine if intubation required — use rocuronium",
-      "Delaying diagnosis as residual spinal anesthesia — progressive 2-week course excludes this"
+      "Do not give corticosteroids as monotherapy.",
+      "Do not attribute neuropathy to spinal anaesthesia without consideration of timing (3+ weeks post-op argues against direct injury)."
     ],
     "key_reasoning_points": [
-      "Cesarean section and surgical procedures are recognized GBS triggers — immune activation during surgery/delivery can precipitate GBS",
-      "AMSAN variant features axonal NCS pattern (reduced CMAP amplitudes, absent SNAPs) rather than demyelinating slowing",
-      "Anti-GD1a IgG is the serological marker for AMSAN — associated with more severe axonal injury and slower recovery",
-      "Initial mild tingling attributed to spinal anesthesia — physicians and patients may delay presentation if early symptoms are attributed to the procedure",
-      "MRI spine with gadolinium is mandatory in post-spinal surgery GBS to exclude epidural hematoma and abscess before LP"
+      "AMSAN variant: symmetric motor + sensory axonal involvement on EMG with low CMAP and SNAP amplitudes.",
+      "Pregnancy and post-partum period are recognised immune-trigger windows; do not require an additional infectious antecedent.",
+      "Spinal anaesthesia-related neuropathy is anatomically restricted and asymmetric; the symmetric ascending presentation does not fit."
     ],
     "red_herrings": [
       {
-        "data_point": "Spinal anesthesia 22 days prior",
-        "location": "patient.clinical_history.past_medical_history",
-        "intended_effect": "Attribute progressive lower limb weakness to residual spinal anesthesia effect or post-procedural complication",
-        "correct_interpretation": "Spinal anesthesia resolves within hours; 22-day progressive course is GBS triggered by surgical/physiological stress",
-        "field_path": ""
-      },
-      {
-        "data_point": "Elevated ESR 42 mm/hr and CRP 6.8",
-        "location": "initial_tool_outputs.labs",
-        "intended_effect": "Suggest post-surgical infection, endometritis, or wound infection as cause of symptoms",
-        "correct_interpretation": "ESR and CRP are physiologically elevated postpartum and post-surgically; the neurological syndrome drives the diagnosis, not nonspecific inflammatory markers",
-        "field_path": ""
+        "data_point": "Recent spinal anaesthesia 22 days before presentation",
+        "location": "patient.history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Anchor on a direct anaesthetic injury rather than an autoimmune polyneuropathy.",
+        "correct_interpretation": "Anaesthetic injuries are anatomically restricted and present within days, not 3+ weeks; the symmetric ascending GBS pattern is inconsistent with that mechanism."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -580,6 +666,17 @@
       "ct": "normal",
       "echo": "incidental",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:GBS",
+    "difficulty_rationale": "6 required tools, 1 red herring(s); atypical or multi-comorbidity presentation requires substantial cross-modality synthesis and active rule-out of strong mimics.",
+    "case_body_concerns": [
+      "Bedside respiratory function (FVC/MIP/MEP/NIF) is delivered via an `interpret_labs` followup panel rather than `order_specialized_test{test_type=respiratory_function}` as the criteria pack mandates. Agents calling order_specialized_test{respiratory_function} will hit the EMG/NCS output instead. Recommend adding a respiratory_function followup keyed to order_specialized_test in a follow-up case-body pass.",
+      "Mirrored fallback_tool_outputs into followup_outputs for required tools that previously only existed in the fallback bucket: ['search_medical_literature']. Content is unchanged; the move makes the coherence validator see an explicit primary output for criteria-pack-required tools."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

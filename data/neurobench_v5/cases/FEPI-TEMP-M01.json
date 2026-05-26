@@ -687,154 +687,233 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Focal epilepsy - temporal lobe (right mesial temporal lobe epilepsy with subtle hippocampal sclerosis)",
-    "icd_code": "G40.109",
+    "primary_diagnosis": "Focal epilepsy of right temporal lobe origin with mesial temporal sclerosis (focal-onset seizures with impaired awareness)",
+    "icd_code": "G40.219",
     "differential": [
       {
-        "diagnosis": "Psychogenic non-epileptic seizures (PNES)",
-        "likelihood": "low",
-        "key_features": "Episodes initially attributed to anxiety. However, stereotyped semiology with oral and manual automatisms, post-ictal confusion, and occasional cheek biting favor epileptic etiology. Video-EEG capturing an event with electrographic correlate definitively excludes PNES."
+        "diagnosis": "Psychogenic non-epileptic spells (PNES)",
+        "likelihood": "moderate",
+        "key_features": "Pre-existing anxiety diagnosis raises possibility; however stereotyped semiology, post-ictal confusion, and cheek biting argue against pure PNES. Definitive distinction requires video-EEG capture of an event.",
+        "icd_code": "F44.5"
       },
       {
-        "diagnosis": "Anxiety disorder with dissociative episodes",
-        "likelihood": "low",
-        "key_features": "Patient has a pre-existing anxiety diagnosis and describes depersonalization during events. However, the brief stereotyped episodes with unresponsiveness, automatisms, and post-ictal confusion are more consistent with focal impaired awareness seizures than dissociative episodes."
+        "diagnosis": "Panic attacks / anxiety with derealization",
+        "likelihood": "moderate",
+        "key_features": "Patient carries an anxiety diagnosis and describes depersonalization, but the brief stereotyped behavioral arrest with oroalimentary automatisms and post-ictal confusion is not typical of panic.",
+        "icd_code": "F41.0"
       },
       {
-        "diagnosis": "Syncope (vasovagal)",
+        "diagnosis": "Frontal lobe focal epilepsy",
         "likelihood": "low",
-        "key_features": "No prodrome of lightheadedness or presyncope. Prolonged post-event confusion and automatisms during the events are inconsistent with typical vasovagal syncope. Normal ECG."
+        "key_features": "Hypermotor or bizarre nocturnal events would suggest frontal-lobe origin; this patient's epigastric aura and oroalimentary automatisms localize to temporal lobe.",
+        "icd_code": "G40.219"
+      },
+      {
+        "diagnosis": "Convulsive (vasovagal) syncope",
+        "likelihood": "low",
+        "key_features": "No prodromal lightheadedness, no postural trigger; post-event confusion is too prolonged for syncope.",
+        "icd_code": "R55"
       },
       {
         "diagnosis": "Migraine with aura",
         "likelihood": "low",
-        "key_features": "Patient has a history of migraine without aura, but the current episodes differ markedly — they are brief (seconds to one minute), lack the gradual spread of migrainous aura, and feature altered awareness with automatisms rather than visual or sensory symptoms."
+        "key_features": "Prior migraine without aura, but current events lack the gradual visual or sensory march and feature altered awareness with automatisms.",
+        "icd_code": "G43.109"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain detailed history of the episodes including semiology, duration, frequency, associated symptoms, and witness accounts. Specifically ask about aura, automatisms, post-event confusion, and tongue or cheek biting.",
+        "action": "Obtain detailed seizure history including semiology, aura, automatisms, duration, frequency, witness accounts, and post-ictal features.",
         "tool_name": null,
-        "expected_finding": "Recurrent stereotyped episodes of altered awareness with automatisms, vague aura with depersonalization and abdominal discomfort, post-ictal confusion — consistent with focal impaired awareness seizures",
-        "category": "required"
+        "expected_finding": "Stereotyped focal impaired-awareness events with temporal-lobe aura and post-ictal confusion.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 2,
-        "action": "Perform complete neurological examination",
+        "action": "Perform complete neurological examination.",
         "tool_name": null,
-        "expected_finding": "Normal interictal exam; subtle finding of 2/3 recall at 5 minutes may hint at temporal lobe dysfunction but is nonspecific",
-        "category": "required"
+        "expected_finding": "Interictal exam typically normal; subtle memory deficit may be present.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Order routine EEG",
+        "action": "Order EEG (routine first; pursue ambulatory or video-EEG if non-diagnostic) to identify interictal epileptiform discharges and capture habitual events.",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Equivocal right temporal sharp transients and intermittent temporal slowing — suggestive but not diagnostic",
+        "expected_finding": "Interictal sharps/spikes and/or focal slowing in the anterior temporal region; ictal correlate confirms diagnosis.",
         "category": "required",
         "tool_parameters": {
           "eeg_type": "routine"
-        }
+        },
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 4,
-        "action": "Order MRI brain to evaluate for structural etiology",
+        "action": "Order MRI brain with dedicated epilepsy protocol (thin-cut coronal T1/FLAIR/T2/DWI through the hippocampi).",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Subtle hippocampal asymmetry, equivocal signal change on 1.5T — needs dedicated epilepsy protocol at 3T",
+        "expected_finding": "Hippocampal sclerosis, low-grade tumor (DNET, ganglioglioma), cavernoma, or focal cortical dysplasia; rule out alternative structural causes.",
         "category": "required",
         "tool_parameters": {
-          "protocol": "standard",
-          "contrast": false
-        }
+          "protocol": "epilepsy",
+          "contrast": true
+        },
+        "citation": "[AAN_2007]",
+        "guideline_source": "AAN_2007"
       },
       {
         "step": 5,
-        "action": "Obtain basic labs including BMP, CBC, TSH, and urine drug screen to exclude metabolic and toxic causes",
+        "action": "Obtain CBC, comprehensive metabolic panel, prolactin (if drawn within 10–20 min of event), and AED levels if on therapy.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal metabolic panel, normal CBC, normal TSH, negative drug screen",
+        "expected_finding": "Exclude metabolic provocation (hypoglycemia, hyponatremia, uremia); baseline organ function for AED selection; AED level for adherence and dosing.",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
-            "thyroid",
-            "drug_screen"
+            "CMP",
+            "prolactin"
           ]
-        }
+        },
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 6,
-        "action": "Request prolonged video-EEG monitoring to capture a habitual event and clarify equivocal routine EEG findings",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Capture of focal impaired awareness seizure with right temporal electrographic onset, confirming epilepsy diagnosis",
+        "action": "Search current literature for AED selection in focal epilepsy and ILAE 2017 seizure classification.",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Evidence-based AED options for focal epilepsy (levetiracetam, lamotrigine, oxcarbazepine, lacosamide); ILAE classification framework.",
         "category": "required",
-        "tool_parameters": {
-          "eeg_type": "video"
-        }
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 7,
-        "action": "Request 3T MRI with dedicated epilepsy protocol given equivocal findings on standard MRI",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Confirmation of right mesial temporal sclerosis with definite hippocampal volume loss and signal abnormality",
+        "action": "Check drug interactions before initiating or modifying AED therapy (enzyme inducers, OCP, other CNS-active drugs).",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identify pharmacokinetic interactions (CYP induction by carbamazepine/phenytoin) and CNS adverse-effect overlap.",
         "category": "required",
-        "tool_parameters": {
-          "protocol": "epilepsy",
-          "contrast": false
-        }
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 8,
-        "action": "Initiate antiepileptic drug therapy appropriate for focal epilepsy, checking drug interactions with sertraline",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Levetiracetam or lamotrigine as first-line options; no major pharmacokinetic interactions with sertraline but monitor for psychiatric side effects",
-        "category": "required"
+        "action": "Pursue prolonged video-EEG monitoring to capture habitual events, confirm lateralization, and evaluate surgical candidacy.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Capture of habitual focal seizure with electrographic correlate; concordance with imaging supports surgical workup.",
+        "category": "recommended",
+        "tool_parameters": {
+          "eeg_type": "video"
+        },
+        "citation": "[Engel_2003]",
+        "guideline_source": "Engel_2003"
       },
       {
         "step": 9,
-        "action": "Counsel patient on driving restrictions, seizure safety precautions, and correct the prior misattribution of events to anxiety",
-        "tool_name": null,
-        "expected_finding": "Patient informed of seizure diagnosis, driving laws, and safety measures",
-        "category": "required"
+        "action": "Order comprehensive neuropsychological battery to lateralize memory function and inform surgical risk.",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Material-specific memory deficit consistent with side of seizure focus (verbal memory deficit in dominant TLE; visuospatial in non-dominant).",
+        "category": "optional",
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Engel_2003]",
+        "guideline_source": "Engel_2003"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No clinical features of CNS infection, encephalitis, or immunocompromise; CSF analysis is not indicated for routine focal epilepsy workup and exposes the patient to procedural risk and cost.",
+        "citation": "[AAN_2007]"
       },
       {
-        "step": 10,
-        "action": "Refer to comprehensive epilepsy center for ongoing management and consideration of surgical evaluation if seizures are refractory to medical therapy",
-        "tool_name": null,
-        "expected_finding": "Referral for epilepsy center follow-up",
-        "category": "recommended"
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "echo_type": "TTE"
+        },
+        "rationale": "No syncope-versus-seizure question and no structural-heart concern; echocardiogram contributes nothing to epilepsy workup.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "Ambulatory cardiac monitoring is reserved for syncope-versus-seizure differentiation; not indicated when semiology is clearly epileptic.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT is inferior to MRI for detecting epileptogenic substrates (hippocampal sclerosis, FCD, low-grade tumor) and adds ionizing radiation without diagnostic yield.",
+        "citation": "[AAN_2007]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "check_drug_interactions",
+        "reason": "Structural cause influences AED choice (e.g., low-grade tumor → consider AEDs with CYP-neutral profile; hippocampal sclerosis → multiple equally appropriate options). MRI should inform drug selection.",
+        "citation": "[ILAE_drug_2017]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Recognize that stereotyped episodes of altered awareness with automatisms and post-ictal confusion are more consistent with focal impaired awareness seizures than anxiety or panic attacks",
-      "Order EEG to evaluate for epileptiform activity — and when routine EEG is equivocal, pursue prolonged video-EEG monitoring",
-      "Order brain MRI, and when initial MRI is equivocal, escalate to 3T with dedicated epilepsy protocol",
-      "Obtain basic metabolic panel and CBC to exclude metabolic causes",
-      "Initiate antiepileptic drug therapy once diagnosis is established",
-      "Counsel patient on driving restrictions and seizure safety",
-      "Reassess the prior anxiety diagnosis in light of the new epilepsy diagnosis"
+      "Recognize that stereotyped behavioral arrest with oroalimentary or manual automatisms and post-ictal confusion is a focal impaired-awareness seizure, not a panic attack.",
+      "Pursue prolonged video-EEG monitoring when routine EEG is equivocal and clinical suspicion remains high.",
+      "Repeat MRI with dedicated 3T epilepsy protocol (thin coronal cuts through the hippocampi) when standard MRI is equivocal.",
+      "Initiate an appropriate first-line AED for focal epilepsy (levetiracetam, lamotrigine, oxcarbazepine, or lacosamide) after diagnosis is confirmed.",
+      "Counsel the patient on driving restrictions, seizure-safety precautions, and sleep hygiene.",
+      "Reassess the prior anxiety diagnosis in light of the new epilepsy diagnosis."
     ],
     "contraindicated_actions": [
-      "Dismissing the episodes as anxiety or panic attacks without adequate neurological workup",
-      "Increasing the sertraline dose or adding benzodiazepines as anxiolytics in lieu of proper epilepsy evaluation",
-      "Performing lumbar puncture — there is no clinical indication for CSF analysis in this scenario",
-      "Prescribing bupropion for anxiety or depression, as it lowers the seizure threshold",
-      "Discharging without arranging prolonged video-EEG monitoring when the routine EEG is equivocal and clinical suspicion for epilepsy is significant",
-      "Advising the patient that she may continue driving without restriction"
+      "Do not dismiss the events as anxiety or panic without neurological workup.",
+      "Do not escalate sertraline or add benzodiazepines as anxiolytics in lieu of epilepsy evaluation.",
+      "Do not perform lumbar puncture — no clinical indication for CSF analysis.",
+      "Do not prescribe bupropion (lowers seizure threshold) for any indication.",
+      "Do not clear the patient to drive without observing the locally applicable seizure-free interval."
     ],
     "key_reasoning_points": [
-      "The stereotyped nature of the episodes (abrupt onset, brief duration, automatisms, post-ictal confusion) strongly favors focal impaired awareness seizures over anxiety or dissociative episodes, even in a patient with a known anxiety disorder",
-      "The vague abdominal discomfort and depersonalization described by the patient are subtle temporal lobe aura equivalents that were misattributed to anxiety — this is a well-documented diagnostic pitfall",
-      "An equivocal routine EEG does not exclude epilepsy. Approximately 50% of patients with epilepsy have a normal first EEG. Prolonged monitoring significantly increases diagnostic yield.",
-      "Subtle hippocampal sclerosis can be missed on standard 1.5T MRI. A dedicated 3T epilepsy protocol with thin coronal cuts is essential when clinical suspicion persists despite equivocal initial imaging.",
-      "The remote history of a febrile seizure in childhood is a risk factor for subsequent mesial temporal sclerosis, supporting the diagnosis even when initial imaging is subtle",
-      "Cross-modal concordance (right temporal EEG focus, right hippocampal sclerosis on 3T MRI, right temporal hypometabolism on PET, visuospatial memory deficit on neuropsych) is essential for confident localization",
-      "The non-specific white matter foci on MRI are likely incidental and should not distract from the primary temporal lobe pathology — this is a potential red herring at the moderate difficulty level"
+      "Stereotypy and post-ictal confusion are the cardinal features distinguishing focal impaired-awareness seizures from psychogenic or anxiety-driven events.",
+      "Subtle epigastric aura and depersonalization are well-described temporal-lobe aura equivalents and are frequently mislabeled as anxiety.",
+      "An equivocal routine EEG does not exclude epilepsy; prolonged monitoring captures a habitual event in ~50–70% of definite cases.",
+      "Subtle hippocampal sclerosis can be missed on 1.5T; dedicated 3T epilepsy-protocol MRI catches additional lesions in 15–20% of MRI-negative cases.",
+      "Remote febrile seizure in childhood is a recognized risk factor for subsequent mesial temporal sclerosis and lends weight to the diagnosis.",
+      "Cross-modal concordance (right temporal EEG focus, right hippocampal sclerosis on 3T, right temporal hypometabolism on FDG-PET, visuospatial memory deficit) confirms localization."
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "Two non-specific 2–3 mm T2/FLAIR-hyperintense foci in right frontal subcortical white matter on the initial 1.5T MRI.",
+        "location": "MRI report — additional_observations",
+        "field_path": "initial_tool_outputs.mri.additional_observations[3]",
+        "intended_effect": "Anchor on white-matter foci and pursue a demyelinating or vascular workup, missing the subtle hippocampal asymmetry.",
+        "correct_interpretation": "Non-specific small white-matter foci are common, do not enhance, and are clinically silent here. Focus belongs on the hippocampal asymmetry that warrants 3T epilepsy-protocol MRI."
+      },
+      {
+        "data_point": "Pre-existing anxiety disorder with recent sertraline dose escalation and 'depersonalization' during episodes.",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Attribute the episodes to anxiety / panic and increase psychotropic dose without neurological workup.",
+        "correct_interpretation": "Stereotyped behavioral arrest with automatisms and post-ictal confusion is a focal-aware-then-impaired-awareness seizure, not panic; anxiety diagnosis must be revisited."
+      },
+      {
+        "data_point": "Mildly equivocal sharp transients on routine 45-min EEG, classified as 'not clearly epileptiform.'",
+        "location": "EEG impression",
+        "field_path": "initial_tool_outputs.eeg.impression",
+        "intended_effect": "Conclude EEG is normal and dismiss the epilepsy hypothesis.",
+        "correct_interpretation": "A single equivocal routine EEG has 25–50% sensitivity. Prolonged video-EEG is needed when clinical suspicion is high."
+      }
+    ]
   },
   "metadata": {
     "version": "1.0",
@@ -848,6 +927,16 @@
       "ct": "normal",
       "echo": "normal",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (FEPI-TEMP)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FEPI-TEMP",
+    "difficulty_rationale": "Five required tools, three red herrings (equivocal routine EEG, non-specific white-matter foci, prior anxiety label), requires escalation to 3T epilepsy-protocol MRI and video-EEG with synthesis across modalities.",
+    "case_body_concerns": [
+      "useless_tools entry for `analyze_ecg` dropped: tool output is provided up-front in initial_tool_outputs, so declaring it useless to call would be incoherent (agent never had to call it)."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

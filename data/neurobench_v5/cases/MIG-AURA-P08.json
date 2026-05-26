@@ -79,106 +79,161 @@
   },
   "ground_truth": {
     "primary_diagnosis": "MELAS (Mitochondrial Encephalomyopathy, Lactic Acidosis, Stroke-like episodes) — m.3243A>G mutation confirmed; stroke-like episodes misdiagnosed as hemiplegic migraine",
-    "primary_diagnosis_icd": "G43.1",
+    "icd_code": "E88.49",
     "differential": [
       {
-        "diagnosis": "Sporadic hemiplegic migraine",
-        "likelihood": "very_low",
-        "key_features": "Prior diagnosis; gradual motor spread is consistent with both CSD and MELAS; however, m.3243A>G mutation confirmed; maternal MELAS; bilateral sensorineural hearing loss; short stature; elevated lactate; mitochondrial cardiomyopathy — all consistent with MELAS"
+        "diagnosis": "Sporadic hemiplegic migraine (ICHD-3 1.2.3)",
+        "likelihood": "high",
+        "key_features": "Phenotype overlaps; key differentiators are short stature, sensorineural hearing loss, mathematics learning difficulty, and a mother with confirmed MELAS — all point to mitochondrial disease",
+        "icd_code": null
       },
       {
-        "diagnosis": "Familial hemiplegic migraine (CACNA1A/ATP1A2)",
+        "diagnosis": "Familial hemiplegic migraine (CACNA1A / ATP1A2 / SCN1A)",
+        "likelihood": "low",
+        "key_features": "No family history of hemiplegic migraine specifically; mother's MELAS diagnosis directs workup to m.3243A>G",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Mitochondrial disease other than MELAS",
+        "likelihood": "low",
+        "key_features": "Could be MELAS-MERRF overlap; m.3243A>G testing definitive",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Cardioembolic TIA",
         "likelihood": "very_low",
-        "key_features": "No family history of hemiplegic migraine (mother has MELAS); mother's headaches were MELAS manifestation; no CACNA1A testing indicated given m.3243A>G confirmed"
+        "key_features": "Young patient with normal cardiac workup",
+        "icd_code": "G45.9"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Mitochondrial DNA analysis — m.3243A>G mutation in blood AND urine (urine preferred — higher heteroplasmy)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "m.3243A>G confirmed heteroplasmy 62% in urine — MELAS confirmed",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
         "category": "required",
         "tool_parameters": {
-          "lab_type": "mitochondrial_dna_analysis"
-        }
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "Measure resting lactate and lactate/pyruvate ratio",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Elevated resting lactate 2.8 mmol/L — suspicious for mitochondrial dysfunction",
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "TRIPTANS AND ERGOTAMINES CONTRAINDICATED in MELAS (vasoconstriction risk); valproate and metformin generally avoided in MELAS; arginine for acute stroke-like episodes [Holland_2012]",
         "category": "required",
         "tool_parameters": {
-          "lab_type": "metabolic_workup"
-        }
+          "context": "MELAS_triptan_valproate_contraindication"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 3,
-        "action": "MELAS acute management protocol: IV L-arginine during stroke-like episodes; preventive CoQ10 + riboflavin + oral L-arginine",
-        "tool_name": null,
-        "expected_finding": "MELAS treatment differs fundamentally from hemiplegic migraine",
+        "action": "Mitochondrial workup — lactate, m.3243A>G testing (peripheral blood ± urine epithelial cells)",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Elevated lactate; m.3243A>G confirmed (mtDNA heteroplasmy)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "lab_type": "mitochondrial_workup_m3243"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 4,
-        "action": "Triptans CONTRAINDICATED — do not prescribe; use paracetamol/NSAIDs for headache",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Triptans contraindicated in MELAS",
+        "action": "Brain MRI review — MELAS pattern of stroke-like lesions crossing vascular territories",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Cortical or subcortical lesions not respecting vascular territories — characteristic MELAS pattern; consider MR spectroscopy for lactate peak",
         "category": "required",
         "tool_parameters": {
-          "condition": "MELAS"
-        }
+          "contrast": false,
+          "sequences": [
+            "DWI",
+            "FLAIR",
+            "T2",
+            "SWI"
+          ]
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 5,
-        "action": "Cardiac screening echocardiogram; audiological assessment; ophthalmology (retinopathy screening)",
-        "tool_name": null,
-        "expected_finding": "Mitochondrial cardiomyopathy (mild LVH); bilateral sensorineural hearing loss; MELAS multisystem screening",
+        "action": "Cardiology evaluation with echocardiogram (mitochondrial cardiomyopathy screening)",
+        "tool_name": "order_echocardiogram",
+        "expected_finding": "Screen for mitochondrial cardiomyopathy / conduction disease",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
+      },
+      {
+        "step": 6,
+        "action": "MR spectroscopy to confirm lactate peak in affected territory",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Elevated lactate peak in affected territory — supports MELAS",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "MR_spectroscopy"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis — neither present here",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated in typical migraine with aura — no role unless cardioembolic stroke is on the differential",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "m.3243A>G mutation testing in urine (preferred over blood — higher heteroplasmy) is the definitive test",
-      "Elevated resting lactate 2.8 mmol/L is a diagnostic clue — should trigger MELAS workup in appropriate clinical context",
-      "Triptans are CONTRAINDICATED in MELAS — rescind any triptan prescription",
-      "MELAS acute treatment is IV L-arginine (not triptan) — educate patient and family",
-      "Multisystem MELAS screening: cardiac (echocardiogram), audiological (hearing aids), ophthalmology, diabetes monitoring, annual MRI"
+      "Test for m.3243A>G in peripheral blood and urine epithelial cells",
+      "Cardiology evaluation (echo, ECG) — mitochondrial cardiomyopathy / conduction disease screen",
+      "Audiology evaluation — sensorineural hearing loss",
+      "Glucose monitoring — increased diabetes risk",
+      "Genetic counselling — maternal inheritance, heteroplasmy",
+      "Avoid triptans, ergotamines, valproate, metformin",
+      "L-arginine for acute stroke-like episodes (off-label, low-level evidence)"
     ],
     "contraindicated_actions": [
-      "Do not prescribe triptans — CONTRAINDICATED in MELAS (vasoconstrictive, worsens stroke-like episodes)",
-      "Do not prescribe valproate for seizures if they occur — mitochondrial toxicity",
-      "Do not prescribe metformin if diabetes develops — worsens lactic acidosis in MELAS"
+      "Do not prescribe triptans or ergotamines in MELAS",
+      "Do not prescribe valproate or metformin in MELAS where alternatives exist",
+      "Do not assume episodes are 'just hemiplegic migraine' in the presence of MELAS family history and red-flag features"
     ],
     "key_reasoning_points": [
-      "MELAS phenotype clues: maternal family history (MELAS is maternally inherited), bilateral sensorineural hearing loss, short stature, learning difficulties, elevated resting lactate — all present in this patient",
-      "Urine testing is preferred over blood for m.3243A>G detection — higher heteroplasmy in urinary epithelial cells; blood heteroplasmy may be falsely low",
-      "MELAS stroke-like episodes have gradual onset that can mimic hemiplegic migraine clinically — genetics is the definitive test",
-      "Treatment for MELAS is fundamentally different: IV arginine, CoQ10, riboflavin; avoid triptans, valproate, metformin",
-      "Diagnostic puzzle: hemiplegic migraine is a plausible diagnosis; MELAS clues (hearing loss, short stature, elevated lactate, maternal inheritance) are the key to the correct diagnosis"
+      "MELAS commonly presents with stroke-like episodes that overlap with hemiplegic migraine phenotype",
+      "Maternal inheritance pattern, short stature, sensorineural hearing loss, learning difficulty, and confirmed MELAS in mother all direct workup to m.3243A>G",
+      "MELAS-specific MRI pattern (non-vascular territory lesions, lactate peak on MRS) supports the diagnosis"
     ],
     "red_herrings": [
       {
-        "data_point": "Episodic left arm weakness with gradual onset and subsequent headache — hemiplegic migraine pattern",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Gradual motor arm weakness over 15-20 minutes followed by severe headache is a classic hemiplegic migraine description",
-        "correct_interpretation": "MELAS stroke-like episodes can present identically; MELAS clues (maternal inheritance of MELAS, bilateral sensorineural hearing loss, short stature, elevated lactate) distinguish MELAS from hemiplegic migraine; m.3243A>G confirmed",
-        "field_path": ""
-      },
-      {
-        "data_point": "Mother has MELAS — patient may have hemiplegic migraine (different condition from MELAS)",
-        "location": "patient.history_present_illness",
-        "intended_effect": "MELAS and hemiplegic migraine are different disorders; having a parent with MELAS does not mean the patient has MELAS (though maternal transmission is the mechanism)",
-        "correct_interpretation": "m.3243A>G is maternally transmitted — the patient inherited it from her mother; mutation confirmed in patient's own testing; MELAS diagnosis established",
-        "field_path": ""
+        "data_point": "Initial 'hemiplegic migraine' label",
+        "location": "patient.chief_complaint",
+        "field_path": "patient.chief_complaint",
+        "intended_effect": "May lock in migraine diagnosis without further workup",
+        "correct_interpretation": "Family history of MELAS plus phenotypic stigmata mandate mitochondrial workup before accepting hemiplegic migraine label"
       }
-    ],
-    "icd_code": "G71.3",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -201,7 +256,17 @@
       "ct": "incidental",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Diagnostic puzzle: MELAS masquerading as hemiplegic migraine — requires mitochondrial workup, MR spectroscopy, multisystem screen",
+    "case_body_concerns": [
+      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide §1): ['analyze_ecg']"
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "initial_tool_outputs": {
     "mri": {

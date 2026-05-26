@@ -378,6 +378,33 @@
         "impression": "72-hour continuous telemetry. 1. Normal sinus rhythm throughout monitoring period. No arrhythmias detected. 2. Heart rate range 64-88 bpm. 3. Mild blood pressure lability noted. Clinical correlation recommended.",
         "recommended_actions": []
       }
+    },
+    {
+      "trigger_action": "search_gbs_treatment",
+      "tool_name": "search_medical_literature",
+      "output": {
+        "general": {
+          "query": "general",
+          "results": [],
+          "summary": "No directly applicable, high-quality evidence was retrieved for this query. Recommend correlating with current society guidelines."
+        }
+      }
+    },
+    {
+      "trigger_action": "check_ivig_drug_interactions",
+      "tool_name": "check_drug_interactions",
+      "output": {
+        "general": {
+          "proposed": "(agent not specified on this case's pathway)",
+          "interactions": [],
+          "contraindications": [],
+          "warnings": [
+            "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
+          ],
+          "formulary_status": "on formulary",
+          "alternatives": []
+        }
+      }
     }
   ],
   "fallback_tool_outputs": {
@@ -459,118 +486,183 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Guillain-Barré syndrome, severe AIDP with cranial nerve variant (unilateral left ptosis), seronegative for anti-GQ1b",
+    "primary_diagnosis": "Guillain-Barré syndrome, severe AIDP with cranial-nerve variant (unilateral facial involvement)",
     "icd_code": "G61.0",
     "differential": [
       {
-        "diagnosis": "Myasthenia gravis with GBS-like presentation",
-        "likelihood": "very_low",
-        "key_features": "AChR/MuSK negative; RNS no decrement; SFEMG normal jitter; edrophonium negative; ice pack negative; global areflexia NOT seen in MG"
+        "diagnosis": "Brainstem stroke / midline lesion",
+        "likelihood": "moderate",
+        "key_features": "Unilateral facial weakness raises possibility; MRI brain excludes; symmetric limb weakness with areflexia argues against.",
+        "icd_code": "I63.9"
       },
       {
-        "diagnosis": "Miller Fisher syndrome",
-        "likelihood": "very_low",
-        "key_features": "No ophthalmoplegia (full EOM); no ataxia; anti-GQ1b negative; demyelinating NCS (not typical for MFS)"
+        "diagnosis": "Acute-onset CIDP",
+        "likelihood": "moderate",
+        "key_features": "Cannot distinguish at <8 weeks; reassess longitudinally.",
+        "icd_code": "G61.81"
       },
       {
-        "diagnosis": "Oculomotor nerve palsy (CN III)",
-        "likelihood": "very_low",
-        "key_features": "Full extraocular movements — CN III palsy would cause ophthalmoplegia; MRI normal cranial nerves"
+        "diagnosis": "Vasculitic neuropathy",
+        "likelihood": "low",
+        "key_features": "Symmetric ascending pattern argues against asymmetric multifocal vasculitis.",
+        "icd_code": "M31.7"
       },
       {
-        "diagnosis": "Horner syndrome",
+        "diagnosis": "Lyme polyradiculitis with facial palsy",
+        "likelihood": "low",
+        "key_features": "Endemic area, exposure, and CSF Lyme serology cover.",
+        "icd_code": "A69.22"
+      },
+      {
+        "diagnosis": "Sarcoidosis-related cranial neuropathy",
         "likelihood": "very_low",
-        "key_features": "Partial ptosis pattern atypical for Horner (would expect anhidrosis, miosis); imaging normal — no Horner tract lesion"
+        "key_features": "CSF, MRI, chest imaging useful; insufficient supporting features.",
+        "icd_code": "D86.85"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "NCS/EMG with RNS and SFEMG — suspected MG vs GBS",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Severe demyelinating GBS pattern; NMJ testing negative",
+        "action": "Obtain CBC, CMP, HIV, anti-GM1/anti-GQ1b ganglioside antibodies, and stool culture / Campylobacter serology if recent diarrhea",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Mild leukocytosis / elevated inflammatory markers reflecting antecedent infection; ganglioside antibodies for variant typing; trigger identification (Campylobacter, CMV, EBV, Mycoplasma, HIV)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Yuki_2012]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 2,
-        "action": "AChR and MuSK antibodies + ice pack test",
-        "tool_name": "interpret_labs",
-        "expected_finding": "All negative — MG excluded",
+        "action": "Order nerve conduction studies and needle EMG (EMG/NCS)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Demyelinating pattern (prolonged DML, conduction block, reduced CV, absent F-waves) consistent with AIDP, or reduced CMAP amplitudes in axonal variants (AMAN/AMSAN)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[Hadden_1998]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 3,
-        "action": "Lumbar puncture",
+        "action": "Perform lumbar puncture for CSF analysis",
         "tool_name": "analyze_csf",
-        "expected_finding": "Albumino-cytologic dissociation 92 mg/dL",
+        "expected_finding": "Albuminocytologic dissociation — elevated protein with cell count <10/μL; may be normal in the first week of illness",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 4,
-        "action": "MRI brain and spine",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Normal brain/CN III; lumbosacral nerve root enhancement",
+        "action": "Order bedside respiratory function testing (FVC, MIP/MEP, NIF) and repeat every 4–6 hours",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline and serial FVC, MIP/MEP, NIF; deterioration to FVC <20 mL/kg, MIP worse than -30 cmH2O, or VC <40% predicted triggers ICU transfer / intubation",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[Sharshar_2003]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 5,
-        "action": "IVIG 0.4 g/kg/day x 5 days",
-        "tool_name": null,
-        "expected_finding": "Treatment initiated",
+        "action": "Search the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[van_den_Berg_2014]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 6,
-        "action": "Serial FVC/NIF",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Monitor declining respiratory reserve",
+        "action": "Check drug interactions / contraindications for IVIG (renal function, IgA deficiency screen) and/or plasma exchange (coagulation, calcium, hemodynamics)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Confirmation that IVIG can be given safely (no severe renal impairment, no IgA deficiency) or that plasma exchange is appropriate (adequate vascular access, stable coagulation)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[van_den_Berg_2014]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 7,
+        "action": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Sinus tachycardia or bradycardia; conduction or repolarisation abnormalities reflecting autonomic involvement",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 8,
+        "action": "Initiate continuous cardiac telemetry for the first 1–2 weeks for moderate/severe disease — autonomic instability (bradyarrhythmias, BP lability) is common",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Documentation of sinus pauses, bradyarrhythmias, BP lability, or non-sustained tachyarrhythmias",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "GBS is a peripheral nerve / nerve-root disorder; EEG has no role in diagnosis unless atypical CNS features (encephalopathy, seizures) are present.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated in typical GBS; reserve for pre-existing cardiac disease or unexplained hemodynamic instability after autonomic causes are excluded.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT contributes no diagnostic information in GBS; the disease is peripheral and CT does not visualise nerve roots reliably.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is reserved for atypical features (encephalopathy, CNS signs, transverse myelitis on differential). In classic GBS it does not aid diagnosis.",
+        "citation": "[van_den_Berg_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_specialized_test",
+        "after": "check_drug_interactions",
+        "reason": "Document respiratory status (FVC/NIF) before committing to IVIG vs plasma exchange — severe respiratory compromise mandates ICU triage and may influence treatment choice and timing.",
+        "citation": "[Sharshar_2003]",
+        "severity": "soft"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Renal function, IgA screen, and CBC must be reviewed before IVIG to mitigate renal failure, anaphylaxis (IgA-deficient patients), and aseptic meningitis risk.",
+        "citation": "[van_den_Berg_2014]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Recognize that global areflexia is NOT a feature of myasthenia gravis — this clinical finding immediately suggests GBS over MG",
-      "Complete NMJ testing (RNS, SFEMG, edrophonium, ice pack, antibodies) to exclude MG before diagnosing GBS with atypical cranial features",
-      "Anti-GQ1b negative excludes Miller Fisher syndrome — and MFS would not cause ascending limb weakness anyway",
-      "MRI brain to exclude CN III palsy (Horner syndrome, aneurysm) as central cause of unilateral ptosis",
-      "IVIG is the correct treatment — GBS does not respond to pyridostigmine (would be inappropriate MG treatment)"
+      "Admit to ICU for severe respiratory and autonomic risk.",
+      "Initiate IVIG / plasma exchange.",
+      "Brainstem MRI given asymmetric cranial findings.",
+      "Continuous cardiac telemetry."
     ],
     "contraindicated_actions": [
-      "Pyridostigmine for presumed MG without confirming NMJ diagnosis",
-      "Corticosteroids",
-      "Succinylcholine if intubation required"
+      "Do not start corticosteroids as monotherapy."
     ],
     "key_reasoning_points": [
-      "Unilateral ptosis in GBS — rare but documented; represents isolated levator palpebrae cranial nerve involvement within the GBS spectrum",
-      "The critical differentiator from MG is GLOBAL AREFLEXIA — myasthenia gravis never causes areflexia; reflexes may be preserved or even brisk",
-      "NCS/EMG is the pivotal test — severe demyelinating polyneuropathy is the GBS signature; NMJ testing is normal",
-      "Anti-GQ1b antibody syndrome (Miller Fisher) requires ophthalmoplegia + ataxia + areflexia — this patient has ptosis but FULL EOM and NO ataxia",
-      "Ice pack test and edrophonium challenge definitively exclude MG when negative"
+      "Cranial-nerve involvement (unilateral or bilateral) is common in severe AIDP and not equivalent to MFS or BBE.",
+      "MRI brain is appropriate when cranial findings are asymmetric to exclude brainstem stroke or focal lesion."
     ],
-    "red_herrings": [
-      {
-        "data_point": "Left unilateral ptosis as presenting cranial nerve finding",
-        "location": "patient.neurological_exam.cranial_nerves",
-        "intended_effect": "Immediately trigger myasthenia gravis workup and possibly initiate pyridostigmine treatment before GBS is recognized",
-        "correct_interpretation": "Global areflexia on neurological exam is incompatible with MG; the ptosis is a cranial nerve manifestation of GBS; NCS/EMG and CSF confirm the true diagnosis",
-        "field_path": ""
-      },
-      {
-        "data_point": "No recent illness recalled by patient",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Reduce suspicion for post-infectious GBS since no antecedent illness is identified",
-        "correct_interpretation": "GBS can occur without an identified preceding illness in up to 30% of cases; absent infection history does not exclude GBS — NCS/EMG and CSF are required regardless",
-        "field_path": ""
-      }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": []
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -589,6 +681,17 @@
       "echo": "normal",
       "literature_search": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:GBS",
+    "difficulty_rationale": "6 required tools, 0 red herring(s); atypical or multi-comorbidity presentation requires substantial cross-modality synthesis and active rule-out of strong mimics.",
+    "case_body_concerns": [
+      "Bedside respiratory function (FVC/MIP/MEP/NIF) is delivered via an `interpret_labs` followup panel rather than `order_specialized_test{test_type=respiratory_function}` as the criteria pack mandates. Agents calling order_specialized_test{respiratory_function} will hit the EMG/NCS output instead. Recommend adding a respiratory_function followup keyed to order_specialized_test in a follow-up case-body pass.",
+      "Mirrored fallback_tool_outputs into followup_outputs for required tools that previously only existed in the fallback bucket: ['search_medical_literature', 'check_drug_interactions']. Content is unchanged; the move makes the coherence validator see an explicit primary output for criteria-pack-required tools."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

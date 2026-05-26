@@ -622,133 +622,151 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Hepatic encephalopathy, grade 2-3, hepatitis C cirrhosis (Child-Pugh C) — precipitated by constipation and opioid (codeine) accumulation",
+    "primary_diagnosis": "Hepatic encephalopathy (West Haven grade II-III), hepatitis C cirrhosis (Child-Pugh C, MELD-Na 22) — precipitated by constipation and codeine accumulation (opioid in liver disease); ammonia 164.",
+    "icd_code": "K72.90",
+    "differential": [
+      {
+        "diagnosis": "Opioid (codeine) toxicity contributing primarily",
+        "likelihood": "moderate",
+        "key_features": "Tox screen positive for codeine/opiates; opioids both directly depress consciousness and precipitate HE through constipation and CNS depression.",
+        "icd_code": "T40.2X5A"
+      },
+      {
+        "diagnosis": "SBP",
+        "likelihood": "low",
+        "key_features": "Paracentesis if ascites.",
+        "icd_code": "K65.2"
+      },
+      {
+        "diagnosis": "Recurrent HCV cirrhosis decompensation",
+        "likelihood": "low",
+        "key_features": "Awaiting DAA therapy; continue plan.",
+        "icd_code": "B18.2"
+      },
+      {
+        "diagnosis": "Recent alcohol use",
+        "likelihood": "very_low",
+        "key_features": "Tox screen does not suggest.",
+        "icd_code": "F10.230"
+      }
+    ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Interpret labs — STAT ammonia, CBC, BMP, LFTs/INR, urine drug screen, HCV RNA",
+        "action": "Comprehensive labs: CMP including AST/ALT/bilirubin/INR/albumin, ammonia, CBC, glucose, electrolytes (Na, K, Mg), BUN/Cr, lactate, blood cultures and urine cultures; toxicology if substance use plausible. Confirms liver dysfunction and screens for precipitants.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Ammonia 164; urine opiates positive (codeine); no infection (WBC 5.4, afebrile); INR 2.0",
+        "expected_finding": "Ammonia 164; tox positive for codeine; cirrhosis features.",
         "category": "required",
-        "tool_parameters": {
-          "test_type": "comprehensive_metabolic_hepatic_ammonia_toxicology_hcv"
-        }
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 2,
-        "action": "Order CT head without contrast — exclude structural cause, HCC metastasis (known liver disease with HCV)",
+        "action": "Non-contrast CT head — exclude structural alternate cause of AMS (hemorrhage, large stroke, mass) before any LP.",
         "tool_name": "order_ct_scan",
-        "expected_finding": "No hemorrhage, no mass — chronic hepatocerebral changes only",
+        "expected_finding": "No acute intracranial process.",
         "category": "required",
-        "tool_parameters": {
-          "body_part": "head",
-          "contrast": false
-        }
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 3,
-        "action": "Analyze EEG — confirm HE pattern, exclude NCSE",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Classic fronto-predominant triphasic waves — HE grade 2-3 confirmed",
+        "action": "Literature/guideline search to confirm West Haven grading, precipitant management, and lactulose/rifaximin dosing (AASLD/EASL HE; opioid use in cirrhosis; constipation as HE precipitant).",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "AASLD/EASL 2014 guidance retrieved; West Haven criteria and precipitant-driven management framework confirmed.",
         "category": "required",
-        "tool_parameters": {
-          "indication": "encephalopathy grading, NCSE exclusion"
-        }
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 4,
-        "action": "STOP codeine immediately — opioids are contraindicated in cirrhosis due to reduced hepatic metabolism and encephalopathy risk",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Partial naloxone reversal confirms opioid contribution — stop codeine, do not restart opioids",
-        "category": "required",
-        "tool_parameters": {
-          "test_name": "naloxone_challenge_opioid_reversal"
-        }
+        "action": "Drug-interaction and medication-reconciliation review covering codeine (DISCONTINUE), lactulose, rifaximin; substitute non-opioid analgesia (acetaminophen at hepatic-safe doses); flag any CNS depressants (benzodiazepines, opioids, sedating antiemetics, antihistamines) and confirm lactulose/rifaximin dosing in liver disease.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sedating/CNS-depressant medications identified; lactulose and rifaximin reviewed for hepatic dose adjustment.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Bajaj_2011]",
+        "guideline_source": "Bajaj 2011 HE management review"
       },
       {
         "step": 5,
-        "action": "Diagnostic paracentesis — exclude concurrent SBP",
-        "tool_name": "interpret_labs",
-        "expected_finding": "PMN 114 — SBP excluded",
-        "category": "required",
-        "tool_parameters": {
-          "test_type": "ascitic_fluid_cell_count_culture"
-        }
+        "action": "EEG — consider if no improvement with opioid hold and lactulose. Triphasic waves are classic but non-specific (metabolic encephalopathies broadly); main role is exclusion of non-convulsive status epilepticus where the differential supports it.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Generalized slowing.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Ferenci_2002]",
+        "guideline_source": "Ferenci 2002 HE nomenclature/quantification"
       },
       {
         "step": 6,
-        "action": "Lactulose 30 mL TID/QID (increase from admission dose) to treat constipation — 2-3 stools/day target",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Ammonia declining 164 → 38 at 72h; constipation resolved",
-        "category": "required",
-        "tool_parameters": {
-          "test_type": "ammonia_trend_bowel_function"
-        }
-      },
-      {
-        "step": 7,
-        "action": "Search medical literature — DAA therapy for HCV cirrhosis and HE recurrence prevention",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "SVR12 with DAA reduces HE recurrence and improves MELD; sofosbuvir/velpatasvir preferred for Child-Pugh C genotype 1a",
+        "action": "Consult hepatology and pain medicine for non-opioid alternatives; expedite DAA therapy — coordinate definitive care, transplant candidacy assessment where applicable.",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Hepatology / critical-care guidance integrated into management.",
         "category": "recommended",
         "tool_parameters": {
-          "query": "direct-acting antiviral therapy HCV decompensated cirrhosis hepatic encephalopathy prevention"
-        }
+          "specialty": "hepatology"
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No clinical suspicion for hepatopulmonary syndrome, portopulmonary hypertension, or endocarditis; echocardiography is not part of the HE workup.",
+        "citation": "[AASLD_2014]"
       },
       {
-        "step": 8,
-        "action": "Refer for liver transplant evaluation — MELD-Na 22, two overt HE episodes, HCV awaiting DAA",
-        "tool_name": "interpret_labs",
-        "expected_finding": "MELD-Na 22, two overt HE episodes — transplant evaluation indicated",
-        "category": "required",
+        "tool_name": "order_advanced_imaging",
         "tool_parameters": {
-          "test_type": "meld_transplant_assessment"
-        }
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in HE workup; reversible metabolic encephalopathy is the issue, not Alzheimer pathology.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan has no role in HE workup; the question is metabolic encephalopathy, not nigrostriatal degeneration.",
+        "citation": "[AASLD_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "In altered mental status, exclude intracranial mass effect / hemorrhage on imaging before LP to avoid herniation risk.",
+        "citation": "[AASLD_2014]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "STOP codeine immediately — opioids accumulate in cirrhosis (reduced CYP2D6 and hepatic first-pass metabolism) and are contraindicated",
-      "Increase lactulose dose to treat constipation — constipation is an independent HE precipitant; titrate to 2-3 stools/day",
-      "Diagnostic paracentesis — exclude SBP even with clear constipation/opioid precipitant",
-      "DAA therapy referral — HCV eradication reduces HE recurrence and improves MELD",
-      "Educate family — codeine and other opioids are contraindicated in cirrhosis",
-      "Transplant evaluation — MELD-Na 22 + two overt HE episodes"
+      "Discontinue codeine; replace with acetaminophen at hepatic-safe dosing (max 2-3 g/day).",
+      "Lactulose to 2-4 stools/day; rifaximin 550 mg BID.",
+      "Address constipation directly.",
+      "Expedite DAA therapy planning once acute HE resolves."
     ],
     "contraindicated_actions": [
-      "Continue or restart opioids (codeine, morphine, oxycodone) for pain management: Opioids are contraindicated in cirrhosis — hepatic impairment causes drug accumulation (reduced first-pass metabolism); all opioids worsen hepatic encephalopathy and increase mortality",
-      "Use NSAIDs (ibuprofen, naproxen, diclofenac) as opioid alternative in cirrhosis: NSAIDs are also contraindicated in cirrhosis — nephrotoxic via prostaglandin inhibition, worsen portal hypertension; use acetaminophen ≤2g/day instead",
-      "Defer lactulose because patient already on lactulose prophylaxis: Constipation indicates underdosing — increase lactulose dose until 2-3 stools/day achieved",
-      "Administer naloxone as full treatment without addressing HE: Opioid reversal alone does not treat hyperammonemia — ammonia-reducing therapy (lactulose/rifaximin) is the primary treatment"
-    ],
-    "differential": [
-      {
-        "diagnosis": "Pure opioid intoxication",
-        "likelihood": "low",
-        "key_features": "Urine opiates positive but partial naloxone response — complete normalization would suggest pure intoxication; dual mechanism confirmed by ammonia 164 µmol/L driving the encephalopathy"
-      },
-      {
-        "diagnosis": "Non-convulsive status epilepticus (NCSE)",
-        "likelihood": "low",
-        "key_features": "EEG shows triphasic waves without epileptiform discharges — metabolic HE pattern confirmed; no seizure activity"
-      },
-      {
-        "diagnosis": "Spontaneous bacterial peritonitis (SBP)",
-        "likelihood": "low",
-        "key_features": "No fever, normal WBC, PMN 114 on paracentesis (<250) — SBP excluded; constipation and opioid use are the confirmed precipitants"
-      }
+      "Do not prescribe benzodiazepines for anxiety/agitation — they precipitate and prolong HE (use haloperidol or non-pharmacologic measures for agitation).",
+      "Do not prescribe sedating opioids — they worsen HE; consider acetaminophen at hepatic-safe dosing for pain.",
+      "Do not perform LP before neuroimaging excludes mass effect when the patient has altered mental status.",
+      "Do not give NSAIDs in cirrhosis (renal failure risk).",
+      "Avoid all opioids unless absolutely necessary; if essential, use low-dose, short-acting and add aggressive lactulose."
     ],
     "key_reasoning_points": [
-      "Codeine in cirrhosis is a classic teaching error — patients with hepatic impairment have reduced hepatic CYP2D6 first-pass metabolism, causing codeine (and its active metabolite morphine) to accumulate to supratherapeutic plasma levels at standard doses",
-      "Constipation is the most frequently overlooked HE precipitant — prolonged colonic transit time allows urease-producing gut bacteria to generate more ammonia from dietary protein substrates; lactulose treats both constipation and HE",
-      "Partial naloxone reversal is the key diagnostic finding — full normalization of consciousness with naloxone suggests pure opioid intoxication; partial reversal with residual encephalopathy confirms dual-mechanism (opioid + HE)",
-      "Active HCV viremia (1.24 million IU/mL) contributes to ongoing hepatic inflammation and progressive cirrhosis — DAA therapy after stabilization is urgent; SVR12 reduces HE recurrence risk",
-      "NSAIDs are as dangerous as opioids in cirrhosis — prostaglandin inhibition reduces renal perfusion causing acute kidney injury and worsen portal hypertension; acetaminophen ≤2g/day is the safe analgesic in cirrhosis"
+      "HE is a clinical diagnosis: West Haven grading + evidence of liver dysfunction + exclusion of other causes of AMS — ammonia level is supportive only and correlates poorly with grade (AASLD 2014).",
+      "Precipitant identification is more actionable than the ammonia number: infection (SBP especially), GI bleed, electrolyte disturbance (hypokalemia/hyponatremia), constipation, sedative/CNS-depressant use, dehydration, dietary protein load, renal failure.",
+      "Opioids precipitate HE via both direct CNS depression and constipation; codeine specifically has reduced clearance in cirrhosis and accumulates."
     ],
-    "red_herrings": [],
-    "icd_code": "K72.9",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": []
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -768,6 +786,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (HEP-ENC)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:HEP-ENC",
+    "difficulty_rationale": "4 required tools; dual precipitants (constipation + codeine) but the trigger is unambiguous from medication history; minimal distractors.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -393,144 +393,225 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Hereditary small fiber neuropathy due to SCN9A (Nav1.7) gain-of-function variant c.2215A>G, p.Ile739Val (autosomal dominant sodium channelopathy)",
-    "critical_actions": [
-      "Order sodium channel gene panel (SCN9A, SCN10A, SCN11A) in all SFN patients under 40 with family history or early onset",
-      "Exclude Fabry disease (alpha-galactosidase A, lyso-Gb3, GLA sequencing) — treatable hereditary SFN mimic",
-      "Confirm SFN with skin biopsy IENFD and QSART — NCS is always normal in SFN (normal NCS does NOT exclude SFN)",
-      "Trial lacosamide for Nav1.7 gain-of-function (sodium channel-directed therapy superior to standard agents)",
-      "Genetic counseling for first-degree relatives — autosomal dominant, son at 50% risk and already symptomatic",
-      "Refer son to pediatric neurology for genetic testing and early monitoring",
-      "Cardiac MRI to evaluate for fibrosis given mother's unexplained cardiac death — annual monitoring",
-      "Autonomic management: increased fluid/salt, compression stockings, consider midodrine or fludrocortisone for orthostatic hypotension"
+    "primary_diagnosis": "Hereditary small-fiber neuropathy due to SCN9A (Nav1.7) gain-of-function variant",
+    "icd_code": "G60.3",
+    "differential": [
+      {
+        "diagnosis": "Fabry disease (alpha-galactosidase A deficiency)",
+        "likelihood": "high",
+        "key_features": "X-linked; small-fiber neuropathy with acroparesthesia, angiokeratoma, renal/cardiac involvement; lyso-Gb3 elevated; needs enzymatic + GLA sequencing.",
+        "icd_code": "E75.21"
+      },
+      {
+        "diagnosis": "Idiopathic small-fiber neuropathy",
+        "likelihood": "moderate",
+        "key_features": "Diagnosis of exclusion.",
+        "icd_code": "G60.3"
+      },
+      {
+        "diagnosis": "Sjögren's small-fiber neuropathy",
+        "likelihood": "moderate",
+        "key_features": "Common autoimmune cause; need anti-SSA/SSB + sicca.",
+        "icd_code": "G63"
+      },
+      {
+        "diagnosis": "Fibromyalgia / functional pain disorder",
+        "likelihood": "low",
+        "key_features": "Should not be diagnosed by exclusion alone in the presence of objective IENFD reduction.",
+        "icd_code": "M79.7"
+      },
+      {
+        "diagnosis": "Erythromelalgia (acquired or hereditary)",
+        "likelihood": "low",
+        "key_features": "Burning extremity pain with erythema and warmth, often SCN9A gain-of-function variants — same gene, overlapping phenotype.",
+        "icd_code": "I73.81"
+      }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "interpret_labs (CBC, CMP, HbA1c, OGTT, TSH, B12, SPEP, immunofixation, ANA, anti-SSA, anti-SSB, Fabry: alpha-galactosidase A + lyso-Gb3)",
+        "action": "Order broad neuropathy labs (CBC, CMP, HbA1c, B12 + MMA, TSH, SPEP/IFE, urinalysis)",
         "tool_name": "interpret_labs",
-        "expected_finding": "All standard metabolic causes negative (no diabetes, no Sjögren's, no MGUS, no vasculitis); alpha-galactosidase A activity normal in female; lyso-Gb3 normal; GLA sequencing negative",
+        "expected_finding": "Identify reversible/treatable etiologies (diabetes, B12 deficiency, monoclonal gammopathy, thyroid disease)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "HbA1c",
+            "B12",
+            "MMA",
+            "TSH",
+            "SPEP",
+            "IFE",
+            "UA"
+          ]
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
       },
       {
         "step": 2,
-        "action": "interpret_labs (NCS/EMG — confirms normal large fibers, excludes large fiber neuropathy)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Completely normal NCS/EMG — confirms large fibers spared; SFN invisible to standard electrophysiology; explains prior 'normal' NCS reports",
+        "action": "Order EMG/NCS to characterize axonal vs demyelinating pattern and distribution",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Length-dependent axonal vs demyelinating vs multifocal pattern; severity and distribution",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
       },
       {
         "step": 3,
-        "action": "order_specialized_test (skin biopsy IENFD + QSART autonomic testing)",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "IENFD 1.4 fibers/mm (3.3 SD below normal) on skin biopsy; QSART anhidrosis bilateral feet — confirms SFN with autonomic involvement",
+        "action": "Search literature for DSP evaluation guidelines and etiology-specific recommendations",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirm AAN 2009 DSP workup, etiology-specific evaluations",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "query": "distal symmetric polyneuropathy evaluation AAN 2009"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
       },
       {
         "step": 4,
-        "action": "interpret_labs (SCN9A/SCN10A/SCN11A sodium channel gene panel + GLA sequencing)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "SCN9A c.2215A>G (p.Ile739Val) pathogenic gain-of-function variant confirmed; Fabry disease excluded (normal GLA sequencing)",
+        "action": "Review medications for neurotoxic agents and check interactions for symptomatic therapy",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identify potentially neurotoxic drugs (chemotherapy, metronidazole, megadose B6, nitrofurantoin); guide neuropathic-pain pharmacotherapy",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "medications": []
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
       },
       {
         "step": 5,
-        "action": "order_echocardiogram (cardiac evaluation for unexplained family cardiac death)",
-        "tool_name": "order_echocardiogram",
-        "expected_finding": "EF 58%, normal LV wall thickness — no Nav1.7 cardiomyopathy at this time; cardiac MRI recommended given mother's cardiac death",
+        "action": "Skin biopsy for intraepidermal nerve fiber density (IENFD)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "IENFD below 97.5% lower limit for age/sex confirms small-fiber neuropathy",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "skin_biopsy_iencf"
+        },
+        "citation": "[Lauria_2010]",
+        "guideline_source": "EFNS/PNS 2010 small-fiber guideline"
       },
       {
         "step": 6,
-        "action": "search_medical_literature (SCN9A Nav1.7 SFN treatment lacosamide)",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Lacosamide (slow sodium channel inactivator) superior to gabapentin/pregabalin for Nav1.7 gain-of-function SFN; SCN9A/SCN10A/SCN11A in 28% of young-onset idiopathic SFN",
+        "action": "Autonomic function testing (QSART, deep-breathing HRV, Valsalva)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Sudomotor and/or cardiovagal dysfunction supports small-fiber / autonomic involvement",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "autonomic_testing"
+        },
+        "citation": "[Lauria_2010]",
+        "guideline_source": "EFNS/PNS 2010 small-fiber guideline"
       },
       {
         "step": 7,
-        "action": "check_drug_interactions (lacosamide + duloxetine + gabapentin)",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Lacosamide + duloxetine: minor interaction; carbamazepine + duloxetine: significant CYP1A2 induction; lacosamide preferred over carbamazepine",
+        "action": "Hereditary small-fiber neuropathy gene panel (SCN9A, SCN10A, SCN11A) and Fabry workup (alpha-galactosidase A activity in males, GLA sequencing in females, plasma globotriaosylsphingosine [lyso-Gb3])",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Pathogenic SCN9A variant confirms hereditary sodium channelopathy small-fiber neuropathy; excludes Fabry disease",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "genetic_panel:CMT"
+        },
+        "citation": "[Lauria_2010]",
+        "guideline_source": "EFNS/PNS 2010 small-fiber guideline"
       },
       {
         "step": 8,
-        "action": "order_specialized_test (tilt table test + autonomic battery for orthostatic hypotension management)",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Orthostatic hypotension confirmed (30 mmHg systolic drop); sympathetic adrenergic failure; QSART anhidrosis 50% BSA",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Sjögren's, paraneoplastic, and autoimmune workup (anti-SSA/SSB, paraneoplastic panel)",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Rule out acquired autoimmune and paraneoplastic causes of small-fiber neuropathy",
+        "category": "recommended",
+        "tool_parameters": {
+          "panels": [
+            "anti_SSA",
+            "anti_SSB",
+            "paraneoplastic_panel"
+          ]
+        },
+        "citation": "[Said_2007]",
+        "guideline_source": "Said 2007 vasculitic neuropathy"
       }
     ],
-    "differential": [
+    "useless_tools": [
       {
-        "diagnosis": "Fabry disease (alpha-galactosidase A deficiency)",
-        "likelihood": "low",
-        "key_features": "Fabry disease is the most important treatable hereditary SFN cause; enzyme replacement therapy available. In this patient: alpha-galactosidase A normal activity, lyso-Gb3 normal (<2.0), GLA sequencing no pathogenic variant — Fabry excluded. SCN9A pathogenic variant identified as actual cause."
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is a cortical test and is non-contributory in peripheral nerve disease.",
+        "citation": "[AAN_2009]"
       },
       {
-        "diagnosis": "Idiopathic small fiber neuropathy",
-        "likelihood": "low",
-        "key_features": "Idiopathic SFN should not be diagnosed in patients under 40 with autosomal dominant family history without exhaustive genetic workup. The 3-generation family history, early onset at age 22, and multi-system dysautonomia all mandate genetic testing."
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head/brain CT has no role in peripheral neuropathy evaluation.",
+        "citation": "[AAN_2009]"
       },
       {
-        "diagnosis": "Fibromyalgia / functional disorder",
-        "likelihood": "very_low",
-        "key_features": "Four prior physicians labeled symptoms as fibromyalgia or anxiety. Skin biopsy shows IENFD 1.4 fibers/mm (3.3 SD below normal) — this is objective anatomical evidence of neuropathy, not a functional disorder. QSART confirms autonomic C-fiber loss. Pathogenic SCN9A variant confirms genetic etiology."
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is not indicated in typical distal symmetric polyneuropathy without CNS signs.",
+        "citation": "[AAN_2009]"
       },
       {
-        "diagnosis": "Sjögren's syndrome small fiber neuropathy",
-        "likelihood": "very_low",
-        "key_features": "Anti-SSA and anti-SSB both negative; no sicca symptoms; no salivary gland enlargement. Family history with autosomal dominant pattern is not consistent with Sjögren's."
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {},
+        "rationale": "Advanced cerebral imaging (PET/MRA/MRV/perfusion) has no routine role in peripheral neuropathy.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated unless cardiac amyloid is suspected.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated unless there is syncope or symptomatic dysautonomia with arrhythmia concern.",
+        "citation": "[AAN_2009]"
       }
     ],
-    "key_reasoning_points": [
-      "DIAGNOSTIC PUZZLE: The case represents a 12-year diagnostic odyssey — four physicians told the patient 'nothing is wrong' because standard NCS is ALWAYS NORMAL in SFN. Normal NCS is expected and confirmatory, not a reason to dismiss symptoms.",
-      "THREE-GENERATION AUTOSOMAL DOMINANT FAMILY HISTORY: Mother (same phenotype, cardiac death), maternal uncle (wheelchair-bound), and son (episodic fever-triggered pain) spanning 3 generations — this is the critical clue pointing toward hereditary etiology",
-      "SON'S FEVER-TRIGGERED PAIN CRISES: Nav1.7 gain-of-function channels open at lower temperature thresholds — fever exacerbates channel activation causing episodic pain crises in the child. This is pathognomonic for Nav1.7 temperature-sensitive gain-of-function.",
-      "NORMAL NCS DOES NOT EXCLUDE NEUROPATHY: Standard NCS measures only large A-alpha and A-beta fibers — C-fibers (pain, temperature, autonomic) are INVISIBLE to NCS. Skin biopsy IENFD and QSART are required to diagnose SFN.",
-      "FABRY DISEASE MUST ALWAYS BE EXCLUDED FIRST: Fabry disease is the most common treatable hereditary SFN cause with specific enzyme replacement therapy; always test alpha-galactosidase A, lyso-Gb3, and GLA sequencing before attributing to sodium channelopathy"
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "order_specialized_test",
+        "reason": "Tier the workup — basic labs first, then targeted electrodiagnostic and tissue studies.",
+        "citation": "[AAN_2009]",
+        "severity": "soft"
+      }
+    ],
+    "critical_actions": [
+      "Recognize early adult-onset distal burning pain with normal large-fiber findings as small-fiber neuropathy",
+      "Skin biopsy for IENFD (diagnostic gold standard)",
+      "Hereditary sodium channelopathy panel (SCN9A/10A/11A) given age at onset and family pattern",
+      "Exclude Fabry disease (enzymatic + genetic + lyso-Gb3)",
+      "Symptomatic therapy (sodium channel blockers — mexiletine, oxcarbazepine, carbamazepine) tailored to variant pharmacology"
     ],
     "contraindicated_actions": [
-      "Do not diagnose fibromyalgia or anxiety in a patient with burning pain and normal NCS — always perform skin biopsy for IENFD before concluding 'functional disorder'",
-      "Do not stop workup after confirming 'SFN of unknown etiology' — hereditary causes must be actively sought; SCN9A/SCN10A/SCN11A genetic testing is mandatory in all young-onset SFN with family history",
-      "Do not use carbamazepine as first sodium channel agent without considering duloxetine interaction — carbamazepine is a strong CYP1A2 and CYP3A4 inducer that reduces duloxetine plasma levels by 30-50%"
+      "Do not dismiss as functional / fibromyalgia — chronic small-fiber neuropathy is under-recognized",
+      "Do not stop at normal EMG/NCS; large-fiber tests cannot diagnose small-fiber neuropathy"
+    ],
+    "key_reasoning_points": [
+      "Onset in early adulthood + lifelong burning pain + normal EMG/NCS + reduced IENFD = small-fiber neuropathy, likely hereditary",
+      "SCN9A gain-of-function variants cause inherited erythromelalgia and small-fiber neuropathy",
+      "Fabry disease must be excluded — disease-modifying enzyme replacement / chaperone therapy is available"
     ],
     "red_herrings": [
       {
-        "data_point": "Multiple prior neurologists reported 'completely normal nerve conduction studies' and attributed symptoms to anxiety or fibromyalgia",
-        "location": "clinical_history / HPI",
-        "intended_effect": "Creates anchoring toward a functional disorder diagnosis, relying on the authority of prior 'expert' evaluations that used an inappropriate test (NCS) to exclude neuropathy",
-        "correct_interpretation": "Standard NCS is ALWAYS NORMAL in small fiber neuropathy — it tests A-alpha and A-beta fibers only. Normal NCS in a patient with burning pain and temperature loss is confirmatory for SFN, not reassuring. The appropriate test is skin biopsy (IENFD) or quantitative sensory testing (QST).",
-        "field_path": ""
-      },
-      {
-        "data_point": "Prior diagnosis of 'small fiber neuropathy of unknown etiology' by outside institution 2 years ago — no further workup initiated",
-        "location": "clinical_history / PMH",
-        "intended_effect": "May create satisfaction with the existing diagnosis label, preventing further etiological workup for hereditary causes",
-        "correct_interpretation": "A diagnosis of 'SFN of unknown etiology' in a 32-year-old with a 3-generation family history and early onset at age 22 is incomplete — hereditary etiologies (Fabry, SCN9A/SCN10A/SCN11A) must be excluded before labeling any case idiopathic. The outside institution's workup was incomplete.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Alpha-galactosidase A enzyme activity 0.82 nmol/hr/mL reported as 'normal for females'",
-        "location": "followup_outputs / interpret_labs",
-        "intended_effect": "May provide false reassurance that Fabry disease has been excluded, when enzyme activity can be normal in female carriers due to lyonization — lyso-Gb3 and GLA sequencing are still required",
-        "correct_interpretation": "Female Fabry carriers may have normal or borderline enzyme activity due to lyonization (X-inactivation). Alpha-galactosidase A activity alone cannot exclude Fabry disease in females — lyso-Gb3 (more sensitive in females) and GLA sequencing are required. In this case, lyso-Gb3 normal AND GLA sequencing negative confirm Fabry exclusion.",
-        "field_path": ""
+        "data_point": "Multiple prior physicians told her 'nothing is wrong'",
+        "location": "history",
+        "field_path": "patient.chief_complaint",
+        "intended_effect": "Functional / psychiatric attribution",
+        "correct_interpretation": "Three normal EMG/NCS studies do not exclude small-fiber neuropathy; IENFD is the right test."
       }
-    ],
-    "icd_code": "G60.3",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -541,6 +622,16 @@
       "ct": "incidental",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:PERI-NEURO",
+    "difficulty_rationale": "7 required tools, 1 red herrings; classification reflects clinical complexity per PERI-NEURO pack section 6 (M/S/P/R variants).",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": [
+      "SCN9A/SCN10A/SCN11A panel and GLA (Fabry) sequencing are not in the closed `genetic_panel:` vocabulary; used `genetic_panel:CMT` as placeholder and described accurately in action text."
+    ]
   }
 }

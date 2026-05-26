@@ -693,193 +693,250 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Cardiac syncope due to exercise-induced ventricular tachycardia in the setting of arrhythmogenic right ventricular cardiomyopathy (ARVC)",
-    "icd_code": "R55",
+    "primary_diagnosis": "Cardiac syncope due to exercise-induced sustained ventricular tachycardia in arrhythmogenic right ventricular cardiomyopathy (ARVC)",
+    "icd_code": "I47.2",
     "differential": [
       {
-        "diagnosis": "Epileptic seizure (exercise-induced)",
-        "likelihood": "low",
-        "key_features": "The witnessed shaking and urinary incontinence initially suggest seizure. However, the exertional trigger, very brief LOC (<30 seconds), rapid return to baseline without prolonged post-ictal confusion, absence of aura, and normal EEG argue against epilepsy. Convulsive syncope explains the motor phenomena."
-      },
-      {
-        "diagnosis": "Vasovagal syncope",
-        "likelihood": "low",
-        "key_features": "No clear vasovagal trigger (pain, emotional stress, prolonged standing). Events occurred during vigorous exercise, which is atypical for vasovagal syncope. Negative tilt table test."
-      },
-      {
-        "diagnosis": "Hypertrophic cardiomyopathy (HCM)",
-        "likelihood": "low",
-        "key_features": "Can cause exertional syncope and sudden death. Echocardiogram did not show LV hypertrophy or LVOT obstruction. Cardiac MRI shows RV rather than LV pathology."
-      },
-      {
-        "diagnosis": "Long QT syndrome",
-        "likelihood": "low",
-        "key_features": "QTc is borderline (448 ms) but not clearly prolonged. Exercise-induced VT in LQTS is typically polymorphic (torsades de pointes), and the primary structural substrate here is RV fibro-fatty replacement consistent with ARVC."
+        "diagnosis": "Hypertrophic cardiomyopathy with outflow obstruction",
+        "likelihood": "high",
+        "key_features": "Exertional syncope in a young athlete is the prototypical HCM presentation; echo and CMR distinguish from ARVC.",
+        "icd_code": "I42.1"
       },
       {
         "diagnosis": "Catecholaminergic polymorphic ventricular tachycardia (CPVT)",
+        "likelihood": "moderate",
+        "key_features": "Exercise-induced syncope with normal resting ECG can be CPVT — exercise stress test for bidirectional VT and family history help differentiate.",
+        "icd_code": "I47.2"
+      },
+      {
+        "diagnosis": "Long QT / Brugada channelopathies",
+        "likelihood": "moderate",
+        "key_features": "Inherited arrhythmia syndromes can present with exertional or stress-triggered syncope; resting ECG must be scrutinised for subtle markers.",
+        "icd_code": "I49.8"
+      },
+      {
+        "diagnosis": "Convulsive epileptic seizure",
         "likelihood": "low",
-        "key_features": "CPVT causes exercise-induced bidirectional or polymorphic VT, typically in younger patients with structurally normal hearts. This patient has structural RV abnormalities on MRI, excluding CPVT."
+        "key_features": "Brief jerks during collapse, immediate recovery, no post-ictal confusion, normal EEG — convulsive syncope, not epilepsy.",
+        "icd_code": "G40.909"
+      },
+      {
+        "diagnosis": "Vasovagal syncope",
+        "likelihood": "very_low",
+        "key_features": "Exertional syncope is essentially never vasovagal and must trigger cardiac work-up.",
+        "icd_code": "R55"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain 12-lead ECG immediately upon arrival and place on continuous telemetry",
-        "tool_name": "order_cardiac_monitoring",
-        "expected_finding": "Normal sinus rhythm with occasional PVCs and subtle T-wave inversions V1-V2; no diagnostic arrhythmia captured at rest",
+        "action": "12-lead ECG with high lead positioning (V1-V3 high) on arrival",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Epsilon waves, T-wave inversions V1-V3, RVOT-morphology PVCs — ARVC pattern",
         "category": "required",
-        "tool_parameters": {
-          "monitor_type": "telemetry"
-        }
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.2"
       },
       {
         "step": 2,
-        "action": "Obtain comprehensive laboratory studies including CBC, BMP, troponin, BNP, magnesium, lactate, TSH, and toxicology screen",
+        "action": "Labs: CBC, BMP, Mg, troponin, BNP, TSH, glucose, CK",
         "tool_name": "interpret_labs",
-        "expected_finding": "Mildly elevated troponin (demand-related), mildly elevated lactate (post-exertional), no metabolic cause identified",
+        "expected_finding": "Troponin negative excludes ACS; electrolytes and TSH normal",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
-            "thyroid",
+            "magnesium",
             "troponin",
-            "drug_screen"
+            "BNP",
+            "TSH"
           ]
-        }
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.3"
       },
       {
         "step": 3,
-        "action": "Obtain EEG to evaluate for epileptiform activity given the referral diagnosis of seizures",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Normal EEG, no epileptiform abnormalities",
-        "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
-      },
-      {
-        "step": 4,
-        "action": "Critically re-evaluate the seizure diagnosis: recognize that exertional trigger, brief LOC with rapid recovery, normal EEG, and family history of sudden cardiac death suggest cardiac syncope rather than epilepsy",
-        "tool_name": null,
-        "expected_finding": "Clinical reasoning shifts from neurological to cardiac etiology",
-        "category": "required"
-      },
-      {
-        "step": 5,
-        "action": "Obtain transthoracic echocardiogram to evaluate cardiac structure",
+        "action": "Echocardiogram for RV/LV structure and function",
         "tool_name": "order_echocardiogram",
-        "expected_finding": "Mild RV dilation and dysfunction, raising concern for ARVC",
+        "expected_finding": "RV dilation, regional wall motion abnormalities, possible LV involvement",
         "category": "required",
         "tool_parameters": {
           "echo_type": "TTE"
-        }
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §4.1"
       },
       {
-        "step": 6,
-        "action": "Order Holter monitor or continuous cardiac monitoring",
+        "step": 4,
+        "action": "Continuous inpatient telemetry and outpatient Holter",
         "tool_name": "order_cardiac_monitoring",
-        "expected_finding": "Frequent PVCs and non-sustained VT of RVOT morphology",
+        "expected_finding": "Frequent PVCs, runs of NSVT, document VT burden",
         "category": "required",
         "tool_parameters": {
           "monitor_type": "holter_24h"
-        }
+        },
+        "citation": "[Locati_2014]",
+        "guideline_source": "Locati 2014"
       },
       {
-        "step": 7,
-        "action": "Order exercise stress test to provoke the exertion-related arrhythmia",
+        "step": 5,
+        "action": "Cardiac MRI for ARVC task-force criteria (RV fibro-fatty replacement, dyskinesis)",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "RV fibro-fatty infiltration and dyskinesis fulfilling task-force criteria",
+        "category": "required",
+        "tool_parameters": {
+          "modality": "perfusion_MRI"
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §4.3"
+      },
+      {
+        "step": 6,
+        "action": "Exercise stress test under monitored conditions",
         "tool_name": "order_specialized_test",
-        "expected_finding": "Exercise-induced sustained VT reproducing the clinical event",
+        "expected_finding": "Exercise-induced VT reproducing symptoms",
         "category": "required",
         "tool_parameters": {
           "test_type": "exercise_stress_test"
-        }
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.4"
+      },
+      {
+        "step": 7,
+        "action": "Review drug list for QT-prolonging and proarrhythmic agents",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identify QT-prolongers / sympathomimetics to avoid; plan beta-blocker initiation",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §6"
       },
       {
         "step": 8,
-        "action": "Order cardiac MRI with late gadolinium enhancement to evaluate for ARVC",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "RV fibro-fatty replacement, regional dyskinesia, RV dilation — meeting major Task Force Criteria for ARVC",
+        "action": "Confirm ICD indication and exercise restriction guidance against current evidence",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Class I ICD indication for ARVC with sustained VT or syncope; exercise restriction recommended",
         "category": "required",
-        "tool_parameters": {
-          "imaging_type": "perfusion_MRI"
-        }
+        "tool_parameters": {},
+        "citation": "[ACC_AHA_HRS_2017]",
+        "guideline_source": "ACC/AHA/HRS 2017 §5"
       },
       {
         "step": 9,
-        "action": "Discontinue levetiracetam (started inappropriately at outside hospital) and restrict patient from all vigorous physical activity",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Cardiology / EP consult for ICD implantation and family screening",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Plan secondary-prevention ICD; family genetic counselling",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ACC_AHA_HRS_2017]",
+        "guideline_source": "ACC/AHA/HRS 2017 §5"
       },
       {
         "step": 10,
-        "action": "Urgent electrophysiology consultation for ICD implantation (secondary prevention) and consider antiarrhythmic therapy",
+        "action": "Counsel on cessation of competitive exercise pending ICD and EP clearance",
         "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "expected_finding": "Documented sports-restriction counselling",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §10"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "No focal neurological deficit and the witnessed convulsive movements are convulsive syncope; brain MRI is low-yield.",
+        "citation": "[ACC_AHA_HRS_2017]"
       },
       {
-        "step": 11,
-        "action": "Order genetic testing for desmosomal mutations and initiate first-degree family screening",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended"
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "No significant head trauma; head CT is not indicated in this work-up.",
+        "citation": "[ACC_AHA_HRS_2017]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No meningismus, no encephalopathy — CSF has no role.",
+        "citation": ""
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_ecg",
+        "after": "consult_medical_specialist",
+        "reason": "ECG findings drive admission and EP/ICD referral.",
+        "citation": "[ESC_2018]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "order_cardiac_monitoring",
+        "reason": "Troponin and electrolytes must be available before monitoring strategy is committed.",
+        "citation": "[ROSE_2010]",
+        "severity": "hard"
+      },
+      {
+        "before": "order_echocardiogram",
+        "after": "consult_medical_specialist",
+        "reason": "Structural and functional data inform device strategy.",
+        "citation": "[ESC_2018]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Recognize that exertional syncope with convulsive features and family history of sudden cardiac death requires urgent cardiac evaluation, not just a seizure workup",
-      "Do not discharge with a diagnosis of epilepsy without cardiac evaluation",
-      "Restrict the patient from all competitive athletics and vigorous exercise immediately",
-      "Obtain cardiac imaging (echocardiogram and cardiac MRI) to evaluate for structural heart disease",
-      "Arrange electrophysiology consultation for ICD evaluation given high risk of sudden cardiac death",
-      "Screen first-degree family members given the heritable nature of ARVC"
+      "Admit to telemetry — exertional syncope plus suspected ARVC is high-risk",
+      "Restrict from competitive exercise immediately",
+      "Obtain cardiac MRI for ARVC task-force criteria",
+      "Initiate beta-blocker therapy unless contraindicated",
+      "EP consult for ICD implantation",
+      "Genetic counselling and first-degree relative screening"
     ],
     "contraindicated_actions": [
-      "Continuing long-term antiepileptic drug therapy without cardiac evaluation — misdiagnosis as epilepsy can be fatal",
-      "Allowing return to competitive sports or vigorous exercise before cardiac evaluation is complete",
-      "Discharging the patient home with a seizure diagnosis and outpatient neurology follow-up only",
-      "Administering isoproterenol or high-dose catecholamines without defibrillator backup (risk of VT/VF)",
-      "Prescribing QT-prolonging medications given borderline QTc and arrhythmic substrate",
-      "Performing a lumbar puncture (no indication — this is not a neurological condition)"
+      "Do not discharge home without ICD evaluation",
+      "Do not perform tilt-table testing — risk without benefit in suspected malignant arrhythmia",
+      "Do not start antiepileptic drugs based on the witnessed jerks",
+      "Do not initiate QT-prolonging or proarrhythmic agents",
+      "Do not clear for competitive sport until definitive therapy and EP clearance",
+      "Do not call `order_specialized_test` with parameters {'test_type': 'tilt_table'} — Tilt-table is contraindicated as a 'reassurance' test in a patient with documented exertional syncope and suspected malignant arrhythmia — it provokes haemodynamic stress without clarifying the cardiac cause."
     ],
     "key_reasoning_points": [
-      "Exertional syncope is a red flag for cardiac arrhythmia — seizures triggered specifically by exercise are rare, whereas exercise-induced VT is a well-known presentation of ARVC",
-      "Convulsive syncope (brief tonic-clonic movements from cerebral hypoperfusion during VT) is commonly misdiagnosed as epileptic seizures, leading to dangerous diagnostic delays",
-      "The rapid return to full alertness within 30-60 seconds without prolonged post-ictal confusion is characteristic of cardiac syncope, not epilepsy",
-      "A normal resting ECG does not exclude a paroxysmal arrhythmia — the PVCs of RVOT morphology and subtle T-wave inversions in V1-V2 are important diagnostic clues that can be easily overlooked",
-      "The family history of sudden cardiac death at age 49 during exercise is a critical clue pointing to an inherited arrhythmic condition such as ARVC",
-      "The mildly elevated troponin likely reflects demand ischemia during the VT episode, not a primary coronary event",
-      "Urinary incontinence, while more commonly associated with seizures, can also occur during cardiac syncope and should not be used as a sole discriminator",
-      "The outside hospital's decision to load levetiracetam before completing cardiac evaluation represents a common diagnostic pitfall — anchoring on the seizure diagnosis based on the witnessed convulsive movements"
+      "Exertional syncope in a young athlete is an arrhythmia substrate until proven otherwise — never 'just vasovagal'",
+      "ARVC diagnosis uses task-force criteria combining ECG (epsilon waves, V1-V3 TWI), imaging (RV dyskinesis on echo/CMR), and ventricular arrhythmias",
+      "Witnessed convulsive movements during the collapse are convulsive syncope, not epilepsy",
+      "CMR is the highest-yield imaging modality for fibro-fatty infiltration",
+      "Secondary-prevention ICD is a Class I indication after sustained VT or syncope in ARVC",
+      "First-degree relatives need ECG screening and genetic counselling"
     ],
     "red_herrings": [
       {
-        "data_point": "Brief urinary incontinence noted by EMS during the second episode",
-        "location": "neurological_exam",
-        "intended_effect": "Suggests a generalized epileptic seizure",
-        "correct_interpretation": "The patient's wife clarifies he had been drinking water heavily during the game and likely had a full bladder; urinary incontinence can also occur with cardiac syncope and is not a reliable discriminator from seizure.",
-        "field_path": ""
+        "data_point": "Witness reports 10-15 s of jerking movements during collapse",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "May be interpreted as new-onset epilepsy and trigger AED initiation.",
+        "correct_interpretation": "Convulsive syncope; recovery <60 s with no post-ictal phase; ECG and CMR identify ARVC."
       },
       {
-        "data_point": "Outside hospital diagnosis of new-onset seizures with intravenous loading of levetiracetam 1000 mg",
-        "location": "history",
-        "intended_effect": "Anchors the clinician on an established epilepsy diagnosis",
-        "correct_interpretation": "The exertional trigger, very brief loss of consciousness with rapid recovery, normal EEG, and family history of sudden cardiac death point to a cardiac arrhythmic cause; the levetiracetam should be discontinued.",
-        "field_path": ""
+        "data_point": "Normal interictal EEG",
+        "location": "initial_tool_outputs.eeg.classification",
+        "field_path": "initial_tool_outputs.eeg.classification",
+        "intended_effect": "Could falsely close out the cardiac work-up via reassurance.",
+        "correct_interpretation": "EEG cannot exclude epilepsy and has no role in suspected ARVC."
       },
       {
-        "data_point": "Mildly elevated troponin I at 0.05 ng/mL",
-        "location": "labs",
-        "intended_effect": "Suggests an acute coronary syndrome as the primary event",
-        "correct_interpretation": "The minimal troponin elevation reflects demand ischemia during the ventricular tachycardia episode, not a primary coronary event; there are no ischemic ECG changes and the substrate is arrhythmogenic right ventricular cardiomyopathy.",
-        "field_path": ""
+        "data_point": "Apparently normal-looking resting ECG",
+        "location": "initial_tool_outputs.ecg.interpretation",
+        "field_path": "initial_tool_outputs.ecg.interpretation",
+        "intended_effect": "May be interpreted as low-risk cardiac aetiology.",
+        "correct_interpretation": "Subtle ARVC findings (epsilon waves, V1-V3 TWI, RVOT PVCs) require deliberate inspection; CMR is needed for definitive substrate characterisation."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "1.0",
@@ -898,6 +955,14 @@
       "csf": "normal",
       "ct": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SYNC-CARD",
+    "difficulty_rationale": "6 required tools including CMR and exercise stress; multimodal task-force criteria synthesis; resting ECG and EEG both deceptively bland; sports-restriction and ICD decisions hinge on careful integration.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

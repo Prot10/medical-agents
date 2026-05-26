@@ -662,177 +662,231 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Brugada syndrome with fever-triggered ventricular arrhythmia causing syncope",
-    "icd_code": "R55",
+    "primary_diagnosis": "Cardiac syncope due to Brugada syndrome with fever-triggered polymorphic ventricular arrhythmia",
+    "icd_code": "I49.8",
     "differential": [
       {
-        "diagnosis": "Epilepsy",
-        "likelihood": "low",
-        "key_features": "Normal EEG, normal brain MRI, no post-ictal confusion, no tongue biting, no incontinence, all episodes linked exclusively to fever, one episode with documented pulselessness"
+        "diagnosis": "Long QT syndrome (acquired or congenital)",
+        "likelihood": "high",
+        "key_features": "Fever and inflammation can unmask QT prolongation; baseline ECG and provocation testing distinguish from Brugada.",
+        "icd_code": "I49.8"
       },
       {
-        "diagnosis": "Vasovagal syncope",
-        "likelihood": "low",
-        "key_features": "No typical vasovagal triggers (standing, emotional stress, pain); all episodes during fever; pulseless episode during one event is inconsistent with vasovagal mechanism; family history of sudden death is a red flag"
+        "diagnosis": "Catecholaminergic polymorphic ventricular tachycardia",
+        "likelihood": "moderate",
+        "key_features": "CPVT typically exercise-triggered rather than fever-triggered, but family history of sudden death warrants consideration.",
+        "icd_code": "I47.2"
       },
       {
-        "diagnosis": "Arrhythmogenic right ventricular cardiomyopathy (ARVC)",
-        "likelihood": "low",
-        "key_features": "Normal cardiac MRI with no RV dilation, wall motion abnormalities, fatty infiltration, or fibrosis; structurally normal heart excludes ARVC"
+        "diagnosis": "Myocarditis / fulminant viral myocarditis with ventricular arrhythmia",
+        "likelihood": "moderate",
+        "key_features": "Influenza-like illness can cause acute myocarditis with VT; troponin, CMR and echo discriminate.",
+        "icd_code": "I40.9"
       },
       {
-        "diagnosis": "Long QT syndrome",
+        "diagnosis": "Pulmonary embolism with syncope",
         "likelihood": "low",
-        "key_features": "Normal QTc on multiple ECGs (406-412 ms); fever-triggered pattern is classic Brugada, not LQTS; LQTS syncope is typically triggered by auditory stimuli (LQT2) or exercise/swimming (LQT1), not fever"
+        "key_features": "PE can present with syncope, but the immediate post-arrest ECG and CMR/CT-PA findings clarify.",
+        "icd_code": "I26.99"
       },
       {
-        "diagnosis": "Febrile seizures (adult)",
-        "likelihood": "very_low",
-        "key_features": "Adult febrile seizures are exceedingly rare; no seizure activity witnessed; brief twitching is consistent with convulsive syncope; one episode with documented pulselessness confirms cardiac mechanism; normal EEG"
+        "diagnosis": "Convulsive epileptic seizure / febrile seizure",
+        "likelihood": "low",
+        "key_features": "Adult febrile seizures are uncommon; brief jerks with no post-ictal phase and pulselessness during the event point to arrhythmic syncope.",
+        "icd_code": "G40.909"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Perform ECG during active fever — Brugada pattern may only manifest during febrile states",
+        "action": "12-lead ECG (standard and high-lead positioning V1-V3) on arrival",
         "tool_name": "analyze_ecg",
-        "expected_finding": "Initial ECG at 38.6°C shows only subtle non-diagnostic changes; repeat ECG at 39.4°C reveals Type 1 Brugada pattern",
-        "category": "required"
+        "expected_finding": "Type 1 Brugada coved-pattern ST elevation in right precordial leads when febrile; may be subtle when afebrile",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.2"
       },
       {
         "step": 2,
-        "action": "Obtain comprehensive labs including electrolytes, cardiac markers, and identify the febrile illness",
+        "action": "Labs: CBC, BMP, Mg, troponin, BNP, TSH, glucose, lactate, blood cultures, viral panel",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal electrolytes, normal troponin/BNP, influenza A positive — confirms fever is from a benign infection, not the primary problem",
+        "expected_finding": "Exclude myocarditis (troponin), electrolyte triggers; document fever workup",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP"
+            "BMP",
+            "magnesium",
+            "troponin",
+            "BNP",
+            "TSH"
           ]
-        }
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.3"
       },
       {
         "step": 3,
-        "action": "Obtain EEG to evaluate for epileptiform activity given referral pattern of recurrent loss of consciousness",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Normal EEG, no epileptiform discharges — supports cardiac rather than epileptic etiology",
-        "category": "required",
+        "action": "Echocardiogram to exclude structural disease and myocarditis",
+        "tool_name": "order_echocardiogram",
+        "expected_finding": "Structurally normal heart (typical of channelopathy) vs evidence of myocarditis",
+        "category": "recommended",
         "tool_parameters": {
-          "eeg_type": "routine"
-        }
+          "echo_type": "TTE"
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §4.1"
       },
       {
         "step": 4,
-        "action": "Obtain brain MRI to exclude structural neurological cause",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Normal brain MRI — redirects focus to cardiac evaluation",
-        "category": "recommended",
+        "action": "Continuous telemetry monitoring; outpatient Holter only when stable",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Capture polymorphic VT or self-terminating VF episodes",
+        "category": "required",
         "tool_parameters": {
-          "protocol": "standard",
-          "contrast": false
-        }
+          "monitor_type": "holter_24h"
+        },
+        "citation": "[Locati_2014]",
+        "guideline_source": "Locati 2014"
       },
       {
         "step": 5,
-        "action": "Initiate continuous cardiac monitoring and aggressively manage fever with antipyretics",
-        "tool_name": null,
-        "expected_finding": "Telemetry reveals polymorphic ventricular ectopy correlating with fever spikes",
-        "category": "required"
+        "action": "Cardiac MRI for myocarditis exclusion and structural review",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Absence of LGE / oedema makes myocarditis less likely; structurally normal RV",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "perfusion_MRI"
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §4.3"
       },
       {
         "step": 6,
-        "action": "Perform ajmaline or procainamide provocation test when afebrile to confirm Brugada syndrome diagnosis",
-        "tool_name": "analyze_ecg",
-        "expected_finding": "Positive ajmaline test unmasking Type 1 Brugada pattern in V1-V3",
-        "category": "required"
+        "action": "Review and screen all medications for Brugada-aggravating agents",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Avoid sodium-channel blockers (class IA/IC antiarrhythmics, TCAs, propofol), serotonergic agents, alcohol",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §6"
       },
       {
         "step": 7,
-        "action": "Order cardiac MRI to exclude structural heart disease",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Structurally normal heart — excludes ARVC, HCM, myocarditis",
+        "action": "Aggressive fever control with antipyretics",
+        "tool_name": null,
+        "expected_finding": "Temperature normalised; ECG re-evaluated when afebrile",
         "category": "required",
-        "tool_parameters": {
-          "imaging_type": "perfusion_MRI"
-        }
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §6.2"
       },
       {
         "step": 8,
-        "action": "Refer for ICD implantation (class I indication given syncope with spontaneous Type 1 pattern)",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Confirm ICD indication for syncopal Brugada with type 1 pattern",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Class I/IIa indication for ICD in symptomatic Brugada with type 1 pattern and syncope of arrhythmic cause",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[ACC_AHA_HRS_2017]",
+        "guideline_source": "ACC/AHA/HRS 2017 §5"
       },
       {
         "step": 9,
-        "action": "Order genetic testing for SCN5A and cascade screening of first-degree family members (brother and daughter)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Pathogenic SCN5A variant confirmed",
+        "action": "Cardiology / EP consult; genetic counselling and family screening",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "ICD evaluation; SCN5A genetic testing; first-degree relative ECG screening",
         "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "genetic"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[ACC_AHA_HRS_2017]",
+        "guideline_source": "ACC/AHA/HRS 2017 §5"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "No head injury; head CT is not part of the work-up for syncope in this setting.",
+        "citation": "[ACC_AHA_HRS_2017]"
       },
       {
-        "step": 10,
-        "action": "Educate patient to aggressively treat fever with antipyretics during any illness and seek immediate medical attention",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No meningismus, no encephalopathy — CSF analysis has no role.",
+        "citation": ""
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "tilt_table"
+        },
+        "rationale": "Tilt-table is irrelevant when the working diagnosis is a channelopathy with documented arrhythmia.",
+        "citation": ""
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_ecg",
+        "after": "consult_medical_specialist",
+        "reason": "ECG identification of type 1 Brugada drives EP/ICD pathway.",
+        "citation": "[ESC_2018]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "order_cardiac_monitoring",
+        "reason": "Troponin and infection markers must be assessed before settling on monitoring/imaging strategy.",
+        "citation": "[ROSE_2010]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Perform ECG during active fever (Brugada pattern may only appear with fever)",
-      "Aggressive fever management with antipyretics in ALL febrile illnesses",
-      "Perform ajmaline/procainamide provocation test when afebrile to confirm",
-      "ICD implantation (class I indication given syncope + spontaneous Type 1 pattern)",
-      "Genetic testing for SCN5A and cascade screening of family members (brother)",
-      "Educate patient to seek immediate care and treat fever aggressively during any illness"
+      "Aggressive antipyresis — fever unmasks Brugada arrhythmia",
+      "Inpatient telemetry with defibrillator availability",
+      "Avoid Brugada-aggravating agents (class IA/IC AAD, TCAs, propofol)",
+      "EP consult for ICD and genetic counselling",
+      "Family ECG screening and counselling"
     ],
     "contraindicated_actions": [
-      "Prescribing sodium channel blocking antiarrhythmics (flecainide, propafenone) — these drugs worsen the Brugada phenotype and can trigger VF",
-      "Starting antiepileptic drugs for presumed seizures without cardiac workup — convulsive syncope mimics seizures",
-      "Dismissing syncope as vasovagal given the red flags (family sudden death, pulseless episode, exclusive fever association)",
-      "Discharging without continuous monitoring during febrile episode — patient is at high risk for VF while febrile"
+      "Do not give class IA/IC antiarrhythmics, TCAs, propofol, or serotonergic agents",
+      "Do not discharge home without ICD risk stratification",
+      "Do not perform tilt-table — irrelevant and may delay definitive care",
+      "Do not start antiepileptic drugs based on the brief twitching",
+      "Do not call `check_drug_interactions` with parameters {'agent': 'flecainide'} — Class IC sodium-channel blockers (flecainide/ajmaline) can provoke Brugada arrhythmia and should not be used as 'rate control' — only as carefully monitored diagnostic challenge."
     ],
     "key_reasoning_points": [
-      "Syncope exclusively during febrile episodes is a hallmark presentation of Brugada syndrome — fever unmasks the ECG pattern by further reducing sodium channel function in patients with SCN5A loss-of-function mutations",
-      "Fever accelerates voltage-gated sodium channel inactivation kinetics, reducing the already diminished INa current in Brugada patients below the threshold for stable repolarization, creating the substrate for phase-2 reentry and polymorphic VT/VF",
-      "Southeast Asian (Filipino) ethnicity has the highest prevalence of Brugada syndrome worldwide — it is a leading cause of sudden unexplained nocturnal death syndrome (SUNDS, known as 'bangungot' in the Philippines)",
-      "Family history of sudden unexplained death at age 42 in a Filipino man is highly suspicious for Brugada syndrome — the father likely died from fever-triggered or nocturnal VF",
-      "Normal resting ECG does NOT exclude Brugada — up to 60% of Brugada patients have intermittent or concealed ECG patterns that require fever or pharmacologic provocation (ajmaline, procainamide, flecainide) to unmask",
-      "Briefly pulseless episode during the COVID infection event strongly suggests polymorphic VT or VF as the mechanism, not simple vasovagal syncope — this is a cardiac arrest survivor",
-      "Brother's febrile syncope in Manila suggests familial Brugada syndrome — cascade genetic screening is essential and potentially life-saving"
+      "Brugada syndrome can be unmasked by fever — the diagnostic ECG must be obtained while the patient is febrile and again when afebrile",
+      "Family history of sudden cardiac death plus syncope during a febrile illness is a classic Brugada presentation",
+      "An afebrile resting ECG can look benign — high-lead positioning and provocation testing increase sensitivity",
+      "Brief twitching during the collapse with rapid recovery is convulsive syncope, not febrile seizure",
+      "ICD is the only proven mortality-reducing therapy in symptomatic Brugada with type 1 pattern",
+      "First-degree relatives require ECG screening and genetic counselling"
     ],
     "red_herrings": [
       {
-        "data_point": "Normal resting ECG with only subtle V1-V2 changes",
-        "location": "ecg",
-        "intended_effect": "May lead clinician to dismiss cardiac etiology entirely based on a 'normal' ECG",
-        "correct_interpretation": "Brugada ECG pattern can be concealed at baseline and only manifest during fever or with pharmacologic provocation; subtle V1-V2 changes should raise suspicion in the right clinical context",
-        "field_path": ""
+        "data_point": "Coworkers initially attribute to febrile seizure",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Frames episode as neurological, deflecting from cardiac work-up.",
+        "correct_interpretation": "Adult febrile seizures are rare; pulselessness during the event and Brugada ECG pattern identify arrhythmic syncope."
       },
       {
-        "data_point": "Normal brain MRI and normal EEG",
-        "location": "mri",
-        "intended_effect": "May lead to a 'diagnosis of exclusion' as vasovagal syncope after ruling out neurological causes, providing false reassurance",
-        "correct_interpretation": "Normal neuro workup should redirect diagnostic focus to cardiac etiology, especially in a patient with fever-exclusive syncope, pulseless episodes, and family history of sudden death",
-        "field_path": ""
+        "data_point": "Influenza-like illness immediately prior",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "May anchor diagnosis to viral myocarditis or simple syncope from dehydration.",
+        "correct_interpretation": "Fever is the Brugada-unmasking trigger; ECG with febrile state is diagnostic."
       },
       {
-        "data_point": "Current influenza A infection",
-        "location": "labs",
-        "intended_effect": "May attribute syncope to influenza-related dehydration, hypotension, or febrile seizure rather than recognizing fever as the trigger for a channelopathy",
-        "correct_interpretation": "The specific illness is irrelevant — the fever itself is the unmasking agent for Brugada syndrome. Any febrile illness would trigger the same arrhythmic events.",
-        "field_path": ""
+        "data_point": "ECG read as 'normal or nonspecific' in isolation",
+        "location": "initial_tool_outputs.ecg.interpretation",
+        "field_path": "initial_tool_outputs.ecg.interpretation",
+        "intended_effect": "May reassure clinician and delay channelopathy work-up.",
+        "correct_interpretation": "Repeat ECG while febrile and high-lead V1-V3 positioning unmask the type 1 Brugada pattern."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "1.0",
@@ -860,6 +914,14 @@
       "specialized_test": "normal",
       "literature_search": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SYNC-CARD",
+    "difficulty_rationale": "5 required tools, 3 red herrings (febrile seizure framing, viral illness anchoring, deceptive afebrile ECG); requires deliberate febrile ECG re-acquisition and recognition of channelopathy in absence of structural disease.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -805,198 +805,222 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Posterior cortical atrophy (visual variant of early-stage Alzheimer's disease)",
+    "primary_diagnosis": "Posterior cortical atrophy variant of early-onset Alzheimer's disease",
     "icd_code": "G30.0",
     "differential": [
       {
-        "diagnosis": "Posterior cortical atrophy due to Alzheimer's disease",
-        "likelihood": "high",
-        "key_features": "Progressive visuospatial deficits with relatively preserved episodic memory, posterior-predominant cortical atrophy on MRI, features of Balint syndrome (simultanagnosia, optic ataxia). Confirmed by positive amyloid PET and AD-pattern CSF biomarkers."
+        "diagnosis": "Corticobasal syndrome (CBS)",
+        "likelihood": "moderate",
+        "key_features": "Visuospatial deficits and apraxia overlap; CBS classically has asymmetric rigidity, alien-limb, or myoclonus, which are absent here; FDG/amyloid PET helps distinguish",
+        "icd_code": "G23.8"
       },
       {
-        "diagnosis": "Vascular cognitive impairment / vascular dementia",
-        "likelihood": "low",
-        "key_features": "Fazekas grade 2 white matter changes could contribute to cognitive deficits, but the progressive visuospatial-predominant pattern and positive amyloid biomarkers favor AD pathology as primary etiology. No stepwise decline or discrete vascular events."
+        "diagnosis": "Dementia with Lewy bodies",
+        "likelihood": "moderate",
+        "key_features": "Visual symptoms overlap; DLB requires hallucinations, parkinsonism, fluctuations, or RBD; absent here. DaTscan would clarify if needed",
+        "icd_code": "G31.83"
       },
       {
-        "diagnosis": "Lewy body dementia",
+        "diagnosis": "Occipital/parietal mass lesion or stroke",
         "likelihood": "low",
-        "key_features": "Can present with visuospatial deficits and posterior cortical involvement, but patient lacks core features: no visual hallucinations, no parkinsonism, no REM sleep behavior disorder, no fluctuating cognition. Family history of aunt with LBD noted but insufficient to shift diagnosis."
-      },
-      {
-        "diagnosis": "Corticobasal degeneration",
-        "likelihood": "low",
-        "key_features": "Can cause asymmetric parietal atrophy and apraxia, but typically presents with asymmetric rigidity, alien limb phenomenon, and cortical sensory loss. Patient lacks motor findings."
+        "key_features": "Excluded by structural MRI showing atrophy rather than lesion",
+        "icd_code": null
       },
       {
         "diagnosis": "Creutzfeldt-Jakob disease (Heidenhain variant)",
-        "likelihood": "very_low",
-        "key_features": "Heidenhain variant of CJD can present with visual cortical symptoms, but progression is far more rapid (weeks to months), and negative CSF 14-3-3 protein and normal EEG (no periodic sharp wave complexes) argue strongly against prion disease."
+        "likelihood": "low",
+        "key_features": "Rapidly progressive visual variant of CJD; tempo here is over many months rather than weeks, and CSF RT-QuIC / 14-3-3 are negative",
+        "icd_code": "A81.00"
       },
       {
-        "diagnosis": "Depression-related pseudodementia",
+        "diagnosis": "Primary ophthalmologic disease",
         "likelihood": "very_low",
-        "key_features": "History of depression treated with fluoxetine, but depressive symptoms are below clinical threshold on GDS. Progressive visuospatial deficits over 18 months with structural brain changes are not explained by depression."
+        "key_features": "Symptoms reflect higher-order visual processing (Balint, simultanagnosia, alexia) rather than acuity; ophthalmologic exam is normal",
+        "icd_code": null
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain comprehensive history focusing on visuospatial symptoms, functional decline, and temporal progression",
+        "action": "Obtain detailed clinical history from patient and informant, including timeline, cognitive domains affected, functional decline, mood, sleep, and medication review",
         "tool_name": null,
-        "expected_finding": "Progressive visuospatial deficits with preserved episodic memory over 18 months",
-        "category": "required"
+        "expected_finding": "Gradually progressive cognitive change with informant-confirmed functional impairment in IADLs",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[NIA_AA_2011]",
+        "guideline_source": "NIA_AA_2011"
       },
       {
         "step": 2,
-        "action": "Perform detailed neurological examination including assessment for Balint syndrome components",
+        "action": "Perform bedside cognitive assessment (MMSE and/or MoCA) and detailed neurological examination",
         "tool_name": null,
-        "expected_finding": "Simultanagnosia, optic ataxia, impaired graphesthesia/stereognosis; preserved motor function and gait",
-        "category": "required"
+        "expected_finding": "Objective cognitive impairment on MoCA more sensitive than MMSE; non-focal neurological exam (or variant-specific findings — visuospatial in PCA, language in lvPPA, behavioral in frontal AD)",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN_dementia_2018"
       },
       {
         "step": 3,
-        "action": "Order brain MRI to evaluate for structural causes and pattern of atrophy",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Posterior-predominant cortical atrophy with spared medial temporal structures; white matter disease as confounder",
-        "category": "required",
-        "tool_parameters": {
-          "protocol": "standard",
-          "contrast": false
-        }
-      },
-      {
-        "step": 4,
-        "action": "Order routine dementia workup labs (CBC, BMP, TSH, B12, folate, RPR, HIV)",
+        "action": "Order reversible-cause labs (CBC, CMP, TSH, vitamin B12, folate; consider RPR/HIV per risk)",
         "tool_name": "interpret_labs",
-        "expected_finding": "All within normal limits, ruling out reversible metabolic causes",
+        "expected_finding": "Reversible mimics (hypothyroidism, B12 deficiency, neurosyphilis) excluded; identify and address co-morbid metabolic factors",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
-            "thyroid",
+            "CMP",
+            "TSH",
             "B12",
-            "folate",
-            "RPR",
-            "HIV",
-            "dementia_workup"
+            "folate"
           ]
-        }
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN_dementia_2018"
+      },
+      {
+        "step": 4,
+        "action": "Obtain brain MRI with dementia (volumetric) protocol to assess medial-temporal atrophy and exclude vascular disease, hippocampal sclerosis, NPH, and mass lesions",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Posterior-predominant parieto-occipital cortical atrophy with relative sparing of medial temporal structures",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "dementia",
+          "contrast": false
+        },
+        "citation": "[NIA_AA_2011]",
+        "guideline_source": "NIA_AA_2011"
       },
       {
         "step": 5,
-        "action": "Request formal neuropsychological testing to characterize the cognitive profile",
+        "action": "Order comprehensive neuropsychological testing to characterize the cognitive profile and establish a baseline for tracking",
         "tool_name": "order_specialized_test",
-        "expected_finding": "Severely impaired visuospatial function with preserved episodic memory — PCA pattern",
+        "expected_finding": "Visuospatial / dorsal-stream deficits (Balint features, simultanagnosia, alexia) with relatively preserved memory early on",
         "category": "required",
         "tool_parameters": {
           "test_type": "neuropsych_battery"
-        }
+        },
+        "citation": "[NIA_AA_2011]",
+        "guideline_source": "NIA_AA_2011"
       },
       {
         "step": 6,
-        "action": "Order amyloid PET or CSF AD biomarkers to confirm Alzheimer pathology",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Positive amyloid PET with posterior-predominant deposition OR abnormal CSF Abeta42/tau profile",
+        "action": "Order CSF biomarkers (Aβ42, Aβ42/40 ratio, p-tau, total tau) for ATN classification",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Reduced Aβ42 (or reduced Aβ42/40 ratio) with elevated p-tau supporting A+T+ profile consistent with Alzheimer pathology",
         "category": "required",
         "tool_parameters": {
-          "imaging_type": "amyloid_PET"
-        }
+          "tests": [
+            "Abeta42",
+            "Abeta42_40_ratio",
+            "phospho_tau",
+            "total_tau"
+          ]
+        },
+        "citation": "[NIA_AA_2018]",
+        "guideline_source": "NIA_AA_2018"
       },
       {
         "step": 7,
-        "action": "Consider FDG-PET to evaluate regional metabolic patterns if diagnosis remains uncertain",
+        "action": "Order amyloid PET when CSF biomarkers are unavailable or when diagnostic uncertainty persists after clinical assessment and MRI",
         "tool_name": "order_advanced_imaging",
-        "expected_finding": "Posterior-predominant hypometabolism with spared medial temporal structures",
-        "category": "recommended",
+        "expected_finding": "Positive cortical amyloid retention (SUVr above positivity threshold) confirming amyloid pathology",
+        "category": "required",
         "tool_parameters": {
-          "imaging_type": "FDG_PET"
-        }
+          "modality": "amyloid_PET"
+        },
+        "citation": "[Appropriate_Use_Amyloid_PET]",
+        "guideline_source": "Appropriate_Use_Amyloid_PET"
       },
       {
         "step": 8,
-        "action": "Search medical literature on posterior cortical atrophy diagnostic criteria",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Consensus criteria for PCA supporting the clinical and biomarker diagnosis",
-        "category": "recommended"
+        "action": "Order FDG-PET to assess regional metabolism and distinguish AD from frontotemporal dementia or other neurodegenerative patterns",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Bilateral parieto-occipital and posterior cingulate hypometabolism with relative sparing of frontal cortex",
+        "category": "required",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[Foster_2007]",
+        "guideline_source": "Foster_2007"
       },
       {
         "step": 9,
-        "action": "Check drug interactions before initiating cholinesterase inhibitor therapy",
+        "action": "Check drug interactions before initiating cholinesterase inhibitor (donepezil, rivastigmine, or galantamine)",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "Moderate interaction with fluoxetine; monitoring needed; safe to proceed with donepezil",
-        "category": "recommended"
+        "expected_finding": "No clinically significant interactions; counsel on GI side effects and bradycardia risk",
+        "category": "optional",
+        "tool_parameters": {},
+        "citation": "[NIA_AA_2011]",
+        "guideline_source": "NIA_AA_2011"
       },
       {
         "step": 10,
-        "action": "Request APOE genotyping for risk stratification",
-        "tool_name": "interpret_labs",
-        "expected_finding": "APOE e3/e4 heterozygosity — increased AD risk, supportive but not diagnostic",
-        "category": "recommended",
-        "tool_parameters": {
-          "panels": [
-            "genetic"
-          ]
-        }
+        "action": "Disclose the diagnosis to patient and family, discuss prognosis, advance directives, and driving / safety assessment",
+        "tool_name": null,
+        "expected_finding": "Patient and caregiver engaged in care planning; safety concerns (driving, finances, medication management) addressed",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[NIA_AA_2011]",
+        "guideline_source": "NIA_AA_2011"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is unrelated to the dementia workup; no cardioembolic indication in this presentation",
+        "citation": "[AAN_dementia_2018]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring is not indicated; no arrhythmia, syncope, or palpitations described",
+        "citation": "[AAN_dementia_2018]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT adds little when MRI is available; MRI is the preferred structural modality for dementia workup",
+        "citation": "[NIA_AA_2011]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "Obtain structural imaging before lumbar puncture to exclude mass effect / herniation risk, particularly in older patients",
+        "citation": "[NIA_AA_2011]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Recognize that visuospatial-predominant cognitive decline with preserved memory suggests posterior cortical atrophy, not typical amnestic AD",
-      "Order brain MRI to identify the posterior-predominant atrophy pattern",
-      "Order routine dementia screening labs to exclude reversible causes (TSH, B12, RPR, HIV)",
-      "Request formal neuropsychological testing to document the dissociation between impaired visuospatial function and preserved memory",
-      "Obtain biomarker confirmation of Alzheimer pathology (amyloid PET or CSF Abeta42/tau)",
-      "Do not dismiss symptoms as age-related visual changes or attribute them solely to cataracts or epilepsy"
+      "Obtain collateral history from an informant who knows the patient well",
+      "Exclude reversible causes of cognitive decline with screening labs (CBC, CMP, TSH, B12, folate; HIV/RPR per risk)",
+      "Obtain structural brain MRI with dementia/volumetric protocol",
+      "Quantify cognitive impairment with a standardized cognitive battery (MoCA at minimum; formal neuropsychological testing when feasible)",
+      "Assess safety: driving, medication management, finances, and need for caregiver support",
+      "Disclose the diagnosis and discuss prognosis, advance directives, and treatment options with the patient and family",
+      "Pursue biomarker confirmation (CSF AT(N) markers or amyloid PET) when MRI is equivocal or when an atypical AD variant is suspected",
+      "Use FDG-PET to characterize the regional metabolic pattern and distinguish atypical AD from FTD or DLB"
     ],
     "contraindicated_actions": [
-      "Attributing all symptoms to the patient's known epilepsy without investigating neurodegenerative causes",
-      "Attributing visuospatial symptoms solely to ophthalmologic disease without neurological evaluation",
-      "Diagnosing typical amnestic Alzheimer's disease without recognizing the atypical PCA presentation",
-      "Starting anticholinergic medications, which would worsen cognitive function",
-      "Discontinuing levetiracetam without clear indication, potentially unmasking seizures",
-      "Prescribing antipsychotics for irritability without excluding Lewy body pathology",
-      "Performing lumbar puncture without brain imaging first in a patient with cognitive decline"
-    ],
-    "red_herrings": [
-      {
-        "data_point": "History of focal epilepsy on levetiracetam",
-        "location": "past_medical_history",
-        "intended_effect": "May lead clinician to attribute progressive cognitive decline to the seizure disorder or medication side effects",
-        "correct_interpretation": "The well-controlled epilepsy (no seizures in >3 years) and therapeutic levetiracetam level do not explain progressive visuospatial decline; these are independent conditions",
-        "field_path": ""
-      },
-      {
-        "data_point": "Major depressive disorder on fluoxetine",
-        "location": "past_medical_history",
-        "intended_effect": "May suggest depression-related pseudodementia as the cause of cognitive complaints",
-        "correct_interpretation": "Geriatric Depression Scale score is below clinical threshold and the structural posterior cortical atrophy on MRI cannot be explained by mood disorder alone",
-        "field_path": ""
-      },
-      {
-        "data_point": "Maternal aunt with Lewy body dementia",
-        "location": "family_history",
-        "intended_effect": "May shift differential toward Lewy body dementia given familial precedent",
-        "correct_interpretation": "Patient lacks core LBD features (no visual hallucinations, no parkinsonism, no REM sleep behavior disorder, no cognitive fluctuations); positive amyloid biomarkers confirm AD pathology",
-        "field_path": ""
-      }
+      "Do not prescribe anticholinergic medications (e.g., diphenhydramine, oxybutynin, tricyclics) which worsen cognition in patients with AD",
+      "Do not prescribe benzodiazepines as first-line management of anxiety or insomnia given fall and cognitive risk",
+      "Do not start antipsychotics without a clear behavioral indication given the FDA boxed warning for increased mortality in dementia",
+      "Do not attribute symptoms entirely to normal aging, depression, or sleep apnea without completing the dementia workup",
+      "Do not start memantine monotherapy at the mild stage (memantine is approved for moderate-to-severe AD)"
     ],
     "key_reasoning_points": [
-      "Progressive visuospatial deficits (reading difficulty, spatial disorientation, impaired object localization) with preserved episodic memory is the hallmark presentation of posterior cortical atrophy (PCA)",
-      "PCA is most commonly caused by Alzheimer's disease pathology (~80% of cases) but presents with visual/spatial rather than memory symptoms",
-      "Features of Balint syndrome (simultanagnosia, optic ataxia) on examination are characteristic of PCA and should prompt consideration of this diagnosis",
-      "Normal ophthalmologic examination with progressive 'visual' complaints should raise suspicion for cortical visual processing disorder rather than primary eye disease",
-      "MRI showing posterior-predominant cortical atrophy with relative hippocampal sparing distinguishes PCA from typical amnestic AD",
-      "White matter hyperintensities (Fazekas grade 2) are a significant confounder — vascular cognitive impairment must be considered but does not explain the posterior-predominant syndrome",
-      "The EEG is essentially normal, which is expected in early PCA and argues against rapidly progressive conditions like CJD",
-      "History of well-controlled epilepsy is a red herring — the current progressive decline is unrelated to the seizure disorder",
-      "Fluoxetine for depression is another potential confounder, but depression screening scores are below threshold and the structural brain changes cannot be explained by mood disorder",
-      "Family history of maternal aunt with Lewy body dementia and mother with unspecified dementia adds complexity but should not override the clinical and biomarker evidence for AD-PCA",
-      "Positive amyloid PET or abnormal CSF Abeta42/tau profile provides biomarker confirmation of underlying AD pathology in this atypical presentation"
+      "Definite hippocampal and temporoparietal atrophy on MRI with a multi-domain amnestic cognitive profile is sufficient to make a clinical diagnosis of probable AD by NIA-AA 2011 criteria",
+      "The hallmark cognitive feature of AD is impaired delayed recall with rapid forgetting and limited benefit from cueing, reflecting a storage-type (hippocampal) memory deficit",
+      "In PCA, visuospatial deficits (alexia, simultanagnosia, Balint features) dominate while memory may be relatively preserved early on; the FDG/amyloid biomarker pair confirms underlying AD pathology",
+      "APOE genotyping is a risk modifier and is not used to make the diagnosis; an E3/E4 or E4/E4 result is supportive but neither sufficient nor required for diagnosis",
+      "Low-normal B12 should prompt methylmalonic acid testing before being dismissed as a non-contributor",
+      "Cholinesterase inhibitors are first-line symptomatic therapy in mild-to-moderate AD; memantine is reserved for moderate-to-severe disease"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": []
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -1010,6 +1034,14 @@
       "ct": "normal",
       "echo": "normal",
       "cardiac_monitoring": "incidental"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:ALZ-EARLY",
+    "difficulty_rationale": "Visuospatial-predominant atypical AD variant; requires FDG-PET pattern and biomarker confirmation",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

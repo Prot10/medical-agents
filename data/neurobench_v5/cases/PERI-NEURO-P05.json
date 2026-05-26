@@ -482,56 +482,222 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Immune thrombotic thrombocytopenic purpura (iTTP) with acute TTP-mediated peripheral neuropathy, presenting as acute exacerbation of prior 'idiopathic small fiber neuropathy'",
-    "critical_actions": [
-      "Check CBC STAT in postpartum patient with neuropathy exacerbation — thrombocytopenia + schistocytes = TTP",
-      "ADAMTS13 activity and inhibitor — the definitive TTP diagnostic test",
-      "Plasma exchange WITHIN HOURS — delay is fatal; TTP mortality approaches 90% without TPE",
-      "Caplacizumab for rapid microvascular thrombosis cessation (prevents organ damage while TPE removes inhibitor)",
-      "Do NOT give IVIG or steroids alone — TTP requires plasma exchange as primary treatment"
-    ],
-    "contraindicated_actions": [
-      "Do not attribute neuropathy worsening solely to idiopathic SFN without checking CBC and peripheral smear",
-      "Do not delay TPE for further neuropathy workup — TTP is a medical emergency requiring immediate treatment",
-      "Do not transfuse platelets in TTP without hematology guidance — platelet transfusion in TTP can worsen microvascular thrombosis",
-      "Do not miss the connection between prior 'idiopathic SFN' and TTP — small fiber neuropathy as the presenting manifestation of TTP is rare but documented"
-    ],
-    "optimal_actions": [],
+    "primary_diagnosis": "Immune (acquired) thrombotic thrombocytopenic purpura (iTTP) with thrombotic microangiopathy-mediated acute exacerbation of small-fiber neuropathy",
+    "icd_code": "G62.89",
     "differential": [
       {
-        "diagnosis": "Idiopathic small fiber neuropathy (prior diagnosis)",
-        "likelihood": "low",
-        "key_features": "Prior SFN IENFD 4.8 fibers/mm may represent mild subclinical TTP small fiber involvement; acute exacerbation with TTP criteria (schistocytes, low ADAMTS13, renal impairment) definitively indicates TTP as the etiology"
+        "diagnosis": "HELLP / postpartum HELLP variant",
+        "likelihood": "moderate",
+        "key_features": "Pregnancy-associated; differentiate by ADAMTS13 activity (≥10% in HELLP, <10% in TTP), AST/ALT, and timing.",
+        "icd_code": "O14.20"
       },
       {
-        "diagnosis": "HELLP syndrome / postpartum HELLP",
-        "likelihood": "low",
-        "key_features": "HELLP: thrombocytopenia + elevated LDH + elevated transaminases in peripartum period — but transaminases are normal here; ADAMTS13 activity low (TTP not HELLP); HELLP typically resolves postpartum without TPE"
+        "diagnosis": "Atypical HUS (complement-mediated TMA)",
+        "likelihood": "moderate",
+        "key_features": "Renal predominant; ADAMTS13 normal; complement panel and genetic testing.",
+        "icd_code": "D59.31"
       },
       {
-        "diagnosis": "Systemic lupus erythematosus with TMA",
-        "likelihood": "low",
-        "key_features": "ANA 1:40 (negative threshold); anti-dsDNA not elevated; no SLE organ involvement beyond neuropathy; ADAMTS13 critically low (TTP pattern, not lupus-TMA)"
+        "diagnosis": "SLE with TMA",
+        "likelihood": "moderate",
+        "key_features": "ANA + anti-dsDNA + low complement; secondary TTP overlap can occur.",
+        "icd_code": "M32.10"
       },
       {
-        "diagnosis": "CIDP with acute pregnancy-related relapse",
-        "likelihood": "very_low",
-        "key_features": "CIDP does not cause thrombocytopenia, schistocytes, hemolysis, or acute kidney injury; NCS shows axonal not demyelinating pattern; ADAMTS13 low is pathognomonic for TTP not CIDP"
+        "diagnosis": "CIDP relapse during pregnancy",
+        "likelihood": "low",
+        "key_features": "Demyelinating NCS pattern would shift toward CIDP; here axonal small-fiber pattern + hematologic findings argue otherwise.",
+        "icd_code": "G61.81"
+      },
+      {
+        "diagnosis": "Idiopathic small-fiber neuropathy (prior)",
+        "likelihood": "low",
+        "key_features": "Prior baseline; the new acute exacerbation needs a new explanation (TMA).",
+        "icd_code": "G60.3"
       }
     ],
-    "key_reasoning_points": [
-      "DIAGNOSTIC PUZZLE: 'Idiopathic SFN' with acute postpartum exacerbation — the critical leap is connecting CBC abnormalities (thrombocytopenia, schistocytes) to TTP as the cause of neuropathy",
-      "TTP NEUROLOGICAL MANIFESTATIONS: Classic TTP produces neurological signs in 60-80% — typically encephalopathy, but neuropathy from endoneurial microvascular thrombosis is documented; prior SFN may have been subclinical TTP",
-      "PREGNANCY TRIGGER: ADAMTS13 activity physiologically decreases in pregnancy (cleaves vWF multimers — reduced cleavage = platelet aggregation); in iTTP, this unmasks the inhibitor and triggers relapse",
-      "MAHA TRIAD: Thrombocytopenia + schistocytes + hemolysis (low haptoglobin, elevated LDH) = microangiopathic hemolytic anemia — must check ADAMTS13 STAT",
-      "CAPLACIZUMAB: Anti-vWF nanobody that blocks vWF-platelet interaction — prevents ongoing microvascular thrombosis while TPE removes the ADAMTS13 inhibitor; reduces TTP mortality significantly",
-      "LIVEDO RETICULARIS: Skin finding from cutaneous microvascular thrombosis — in young woman with acute neuropathy + thrombocytopenia, this combination should trigger TTP workup"
+    "optimal_actions": [
+      {
+        "step": 1,
+        "action": "Order broad neuropathy labs (CBC, CMP, HbA1c, B12 + MMA, TSH, SPEP/IFE, urinalysis)",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Identify reversible/treatable etiologies (diabetes, B12 deficiency, monoclonal gammopathy, thyroid disease)",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "HbA1c",
+            "B12",
+            "MMA",
+            "TSH",
+            "SPEP",
+            "IFE",
+            "UA"
+          ]
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 2,
+        "action": "Order EMG/NCS to characterize axonal vs demyelinating pattern and distribution",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Length-dependent axonal vs demyelinating vs multifocal pattern; severity and distribution",
+        "category": "required",
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 3,
+        "action": "Search literature for DSP evaluation guidelines and etiology-specific recommendations",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirm AAN 2009 DSP workup, etiology-specific evaluations",
+        "category": "required",
+        "tool_parameters": {
+          "query": "distal symmetric polyneuropathy evaluation AAN 2009"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 4,
+        "action": "Review medications for neurotoxic agents and check interactions for symptomatic therapy",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identify potentially neurotoxic drugs (chemotherapy, metronidazole, megadose B6, nitrofurantoin); guide neuropathic-pain pharmacotherapy",
+        "category": "required",
+        "tool_parameters": {
+          "medications": []
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 5,
+        "action": "Urgent CBC + peripheral smear (schistocytes), LDH, haptoglobin, indirect bilirubin, ADAMTS13 activity + inhibitor",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Microangiopathic hemolytic anemia (schistocytes, ↑LDH, ↓haptoglobin), thrombocytopenia, and ADAMTS13 activity <10% with inhibitor confirms iTTP",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "smear",
+            "LDH",
+            "haptoglobin",
+            "bilirubin",
+            "ADAMTS13_activity",
+            "ADAMTS13_inhibitor",
+            "creatinine",
+            "complement",
+            "C3",
+            "C4"
+          ]
+        },
+        "citation": "[Said_2007]",
+        "guideline_source": "Said 2007 vasculitic neuropathy"
+      },
+      {
+        "step": 6,
+        "action": "Skin biopsy for intraepidermal nerve fiber density (IENFD)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "IENFD below 97.5% lower limit for age/sex confirms small-fiber neuropathy",
+        "category": "required",
+        "tool_parameters": {
+          "test_type": "skin_biopsy_iencf"
+        },
+        "citation": "[Lauria_2010]",
+        "guideline_source": "EFNS/PNS 2010 small-fiber guideline"
+      },
+      {
+        "step": 7,
+        "action": "Autonomic function testing (QSART, deep-breathing HRV, Valsalva)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Sudomotor and/or cardiovagal dysfunction supports small-fiber / autonomic involvement",
+        "category": "required",
+        "tool_parameters": {
+          "test_type": "autonomic_testing"
+        },
+        "citation": "[Lauria_2010]",
+        "guideline_source": "EFNS/PNS 2010 small-fiber guideline"
+      }
     ],
-    "red_herrings": [],
-    "icd_code": "G62.89",
-    "useless_tools": [],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is a cortical test and is non-contributory in peripheral nerve disease.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head/brain CT has no role in peripheral neuropathy evaluation.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is not indicated in typical distal symmetric polyneuropathy without CNS signs.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {},
+        "rationale": "Advanced cerebral imaging (PET/MRA/MRV/perfusion) has no routine role in peripheral neuropathy.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated unless cardiac amyloid is suspected.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated unless there is syncope or symptomatic dysautonomia with arrhythmia concern.",
+        "citation": "[AAN_2009]"
+      }
+    ],
     "harmful_tools": [],
-    "sequence_constraints": []
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "order_specialized_test",
+        "reason": "Tier the workup — basic labs first, then targeted electrodiagnostic and tissue studies.",
+        "citation": "[AAN_2009]",
+        "severity": "soft"
+      }
+    ],
+    "critical_actions": [
+      "Recognize MAHA + thrombocytopenia + neurologic symptoms = thrombotic microangiopathy; obtain ADAMTS13 urgently",
+      "Initiate plasma exchange and immunosuppression (rituximab, corticosteroids) without waiting for ADAMTS13 if iTTP suspected (PLASMIC score)",
+      "Manage in coordination with hematology / maternal-fetal medicine",
+      "Address the small-fiber neuropathy component with IENFD and autonomic testing once stable"
+    ],
+    "contraindicated_actions": [
+      "Do not transfuse platelets (in TTP, platelet transfusion can worsen thrombosis)",
+      "Do not delay plasma exchange while waiting for ADAMTS13 result",
+      "Do not attribute acute exacerbation to idiopathic SFN — the hematologic picture demands TMA workup"
+    ],
+    "key_reasoning_points": [
+      "Microangiopathic hemolytic anemia + thrombocytopenia + neurologic symptoms = TMA spectrum",
+      "ADAMTS13 activity <10% with inhibitor confirms acquired TTP (iTTP)",
+      "TTP can cause peripheral nerve ischemia and small-fiber damage",
+      "Pregnancy is a known precipitant of iTTP"
+    ],
+    "red_herrings": [
+      {
+        "data_point": "Prior diagnosis of 'idiopathic small fiber neuropathy'",
+        "location": "history",
+        "field_path": "patient.clinical_history.past_medical_history[0]",
+        "intended_effect": "Anchor acute presentation as 'flare of prior SFN'",
+        "correct_interpretation": "The new acute deterioration with hematologic findings demands TMA workup; the prior label does not explain the systemic picture."
+      }
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -544,6 +710,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:PERI-NEURO",
+    "difficulty_rationale": "7 required tools, 1 red herrings; classification reflects clinical complexity per PERI-NEURO pack section 6 (M/S/P/R variants).",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

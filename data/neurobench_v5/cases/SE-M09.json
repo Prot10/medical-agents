@@ -579,157 +579,238 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Acute-on-chronic subdural hematoma causing NCSE, precipitated by warfarin supratherapeutic INR (4.8) from ibuprofen-warfarin interaction in elderly woman with Alzheimer's dementia; UTI and hyponatremia as secondary precipitants",
-    "icd_code": "G41.9",
+    "primary_diagnosis": "Acute-on-chronic subdural hematoma causing non-convulsive status epilepticus, precipitated by supratherapeutic warfarin (INR 4.8) from ibuprofen-warfarin interaction, with concurrent UTI and hyponatremia",
+    "icd_code": "G41.2",
     "differential": [
       {
-        "diagnosis": "Ischemic stroke with post-ictal confusion",
+        "diagnosis": "Acute ischemic stroke with seizure",
         "likelihood": "moderate",
-        "key_features": "Right focal signs (facial droop, left arm drift) initially suggest ischemic stroke; however CT shows SDH not ischemic lesion; NCSE from SDH mass effect explains the confusion and focal signs"
+        "key_features": "Confusion and focal exam features overlap; CT shows SDH and midline shift — SDH is the structural cause",
+        "icd_code": "I63.9"
       },
       {
-        "diagnosis": "UTI-related delirium/encephalopathy (without structural lesion)",
-        "likelihood": "low",
-        "key_features": "UTI present but alone insufficient to explain new focal signs and NCSE; EEG shows focal ictal not just diffuse encephalopathy; SDH is the structural driver"
+        "diagnosis": "UTI-precipitated delirium without SE",
+        "likelihood": "moderate",
+        "key_features": "UTI present (WBC > 50, nitrites, GNRs); explains fever but does not explain focal NCSE pattern",
+        "icd_code": "F05"
       },
       {
-        "diagnosis": "Hyponatremic encephalopathy",
+        "diagnosis": "Symptomatic seizure from hyponatremia alone",
         "likelihood": "low",
-        "key_features": "Sodium 130 contributes to lowered seizure threshold but is not the primary cause; SDH + NCSE explain the clinical picture; hyponatremia is secondary from ibuprofen water retention + UTI SIADH"
+        "key_features": "Sodium 130 mildly low; would not alone cause focal NCSE without structural focus",
+        "icd_code": "E87.1"
+      },
+      {
+        "diagnosis": "Alzheimer's disease progression with delirium",
+        "likelihood": "low",
+        "key_features": "Known Alzheimer dementia is background; new focal NCSE pattern requires structural / metabolic explanation",
+        "icd_code": "G30.9"
+      },
+      {
+        "diagnosis": "Sepsis-associated encephalopathy",
+        "likelihood": "low",
+        "key_features": "Mild bacteremia possible but does not explain SDH and focal NCSE",
+        "icd_code": "G93.41"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Stat CT head non-contrast to exclude hemorrhage — MUST precede LP and AED in anticoagulated patient with new focal signs",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "Acute-on-chronic right frontoparietal SDH 12 mm, 8 mm midline shift, early herniation",
+        "action": "Continuous video-EEG — confirm NCSE and concordance with SDH side",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Right temporal-parietal evolving rhythmic 1.8-2.5 Hz sharp-wave complexes — NCSE concordant with right-sided SDH",
         "category": "required",
-        "tool_parameters": {
-          "contrast": false,
-          "urgency": "stat"
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "Check INR and coagulation immediately — patient on warfarin with new hemorrhage",
+        "action": "Labs: CBC, CMP, glucose, Ca/Mg, AED level, lactate, ABG, INR/PT/aPTT, ammonia, blood and urine cultures, urinalysis, tox screen",
         "tool_name": "interpret_labs",
-        "expected_finding": "INR 4.8 critical — supratherapeutic from ibuprofen-warfarin interaction",
+        "expected_finding": "WBC 14.6 (UTI source), Na 130, BUN 32 / Cr 1.4, INR 4.8 (CRITICAL — supratherapeutic warfarin)",
         "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "coagulation",
-            "CBC",
-            "BMP"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Identify drug interaction: ibuprofen-warfarin causing critical INR",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Major interaction — NSAIDs potentiate warfarin causing hemorrhagic SDH; stop ibuprofen",
+        "action": "Non-contrast head CT — characterize SDH and midline shift",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Acute-on-chronic right frontoparietal SDH 12 mm with 8 mm midline shift",
         "category": "required",
-        "tool_parameters": {
-          "drugs": [
-            "warfarin",
-            "ibuprofen"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "Immediate 4-factor PCC (Kcentra) + IV vitamin K 10 mg for emergent warfarin reversal (SDH with herniation)",
-        "tool_name": null,
-        "expected_finding": "INR corrected to <1.5 within 15-30 minutes",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "MRI brain — assess for additional acute infarct/lesions and characterize SDH age",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Confirms SDH and any additional lesions; not the urgent imaging",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "Emergent neurosurgery consultation for SDH evacuation with herniation signs",
-        "tool_name": null,
-        "expected_finding": "Surgical decompression — resolves mass effect driving NCSE",
+        "action": "Drug-interaction check: warfarin + ibuprofen interaction; reversal options",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Ibuprofen displaces warfarin from albumin and inhibits platelet function — explains INR elevation; reverse with 4F-PCC + vitamin K",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 6,
-        "action": "EEG to characterize NCSE before and after surgery",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Right temporal NCSE; resolves post-SDH evacuation",
+        "action": "Anticoagulant reversal labs (PT/INR after PCC + vitamin K)",
+        "tool_name": "interpret_labs",
+        "expected_finding": "INR target <1.5 prior to any neurosurgical procedure",
         "category": "required",
-        "tool_parameters": {
-          "urgency": "urgent"
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 7,
-        "action": "IV lorazepam for NCSE after INR correction and neurosurgery consult",
-        "tool_name": null,
-        "expected_finding": "NCSE partial suppression",
+        "action": "Neurosurgery consultation for SDH evacuation candidacy",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "12 mm SDH with midline shift and NCSE — surgical evacuation likely indicated after INR reversal",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 8,
-        "action": "Load levetiracetam 1500 mg IV for NCSE (renally adjust for AKI Cr 1.4 — 750 mg BID maintenance)",
-        "tool_name": null,
-        "expected_finding": "AED therapeutic seizure control",
+        "action": "Literature: anticoagulation restart timing after SDH and AED choice in elderly",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Restart anticoagulation 2-4 weeks post-bleed depending on bleed control and stroke risk; levetiracetam preferred",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 9,
-        "action": "Treat UTI with IV ceftriaxone (urine culture E. coli — avoid nitrofurantoin in AKI)",
-        "tool_name": null,
-        "expected_finding": "UTI treatment reduces systemic inflammation lowering seizure threshold",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Urine culture and treat UTI",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Empiric gram-negative coverage pending culture",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "study_type": "TTE"
+        },
+        "rationale": "No clinical suspicion of cardiac source of embolus or cardiogenic seizure; routine echo is not indicated in SE workup absent cardiac findings.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No suspicion of arrhythmogenic syncope or cardiac comorbidity precipitating SE; routine telemetry beyond standard ICU monitoring adds cost without yield.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in acute SE evaluation; dementia biomarker imaging does not change acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is for ischemic stroke workup; SE without focal vascular suspicion does not warrant carotid imaging.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "DaTscan / dopamine transporter imaging has no role in SE; no parkinsonism question relevant to acute management.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {
+          "tests": [
+            "routine"
+          ]
+        },
+        "rationale": "LP is contraindicated with a 12 mm SDH and 8 mm midline shift — herniation risk; no clinical indication for LP when SDH explains presentation.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "INR must be confirmed before initiating reversal therapy.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
+      },
+      {
+        "before": "check_drug_interactions",
+        "after": "consult_medical_specialist",
+        "reason": "Anticoagulant reversal must be initiated before neurosurgical evacuation can proceed.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Stat CT head BEFORE any other intervention in anticoagulated patient with new focal signs — exclude SDH/hemorrhage",
-      "4-factor PCC + vitamin K for CRITICAL INR 4.8 with active hemorrhage — emergent reversal",
-      "Stop ibuprofen immediately — major warfarin interaction causing life-threatening SDH",
-      "Emergent neurosurgery for SDH evacuation with early herniation",
-      "Do NOT perform LP before CT when focal signs present and anticoagulation supratherapeutic",
-      "Levetiracetam dose reduction for AKI — 750 mg BID not 1000 mg BID"
+      "Administer IV lorazepam 0.1 mg/kg first-line",
+      "Urgent anticoagulant reversal: 4-factor PCC + IV vitamin K 10 mg",
+      "Load IV levetiracetam (avoid phenytoin in elderly with cardiac risk)",
+      "Urgent neurosurgical consultation for SDH evacuation",
+      "Hold warfarin; review need for anticoagulation given bleed",
+      "Treat UTI"
     ],
     "contraindicated_actions": [
-      "LP before CT and INR correction — catastrophic herniation risk in anticoagulated patient with SDH and midline shift",
-      "Continuing ibuprofen or NSAIDs with warfarin — caused the hemorrhagic complication",
-      "Administering tPA — SDH and hemorrhagic emergency, no ischemic stroke",
-      "Standard levetiracetam dose (1000 mg BID) without renal adjustment — AKI Cr 1.4 requires dose reduction",
-      "Using warfarin long-term without consideration of CAA — cerebral amyloid angiopathy on MRI warrants apixaban or anticoagulation risk-benefit reassessment"
+      "Do NOT perform LP — SDH with midline shift contraindicates LP",
+      "Do NOT continue warfarin or restart prematurely after bleed",
+      "Do NOT proceed to surgery before INR reversal (target <1.5)",
+      "Do NOT continue ibuprofen — drug interaction with warfarin must be removed"
     ],
     "key_reasoning_points": [
-      "NSAIDs + warfarin = major interaction via protein-binding displacement + platelet inhibition — INR can surge dramatically; ibuprofen caused SDH by raising INR from 2.4 to 4.8",
-      "In any anticoagulated patient with new focal signs + seizure, CT head FIRST to exclude hemorrhage before LP or anticoagulant continuation",
-      "4-factor PCC (Kcentra) corrects INR within 15-30 minutes — vitamin K alone takes 6-12 hours (too slow for emergent SDH)",
-      "UTI + hyponatremia are secondary precipitants that lower seizure threshold in demented elderly — but the structural lesion (SDH) is the primary driver of NCSE",
-      "Levetiracetam dose must be renally adjusted in AKI — Cr 1.4 in 77yo female = GFR ~35-40 mL/min; 750 mg BID maximum",
-      "CAA pattern on MRI: anticoagulation restart after SDH requires careful risk-benefit analysis; apixaban has lower ICH risk than warfarin in AF"
+      "Ibuprofen + warfarin interaction is a classic geriatric polypharmacy hazard, with bleeding risk amplified",
+      "Acute-on-chronic SDH in an elderly patient can present as encephalopathy with focal NCSE",
+      "Anticoagulant reversal precedes neurosurgical intervention; INR target <1.5",
+      "Levetiracetam is the safer AED in elderly with cardiac and renal comorbidity"
     ],
     "red_herrings": [
       {
-        "data_point": "Urinalysis: WBC >50 cells/hpf, nitrites positive, many gram-negative rods; temperature 38.2°C; WBC 14.6",
-        "location": "labs — Urinalysis; vitals",
-        "intended_effect": "Strongly suggests UTI-related sepsis encephalopathy as the primary cause of confusion and seizure — prompting empiric antibiotics and sepsis workup without urgent CT head, potentially delaying life-saving SDH diagnosis",
-        "correct_interpretation": "UTI is a real secondary precipitant that lowered seizure threshold but cannot alone cause focal NCSE with right hemisphere lateralization; the critical INR 4.8, focal neurological signs (left facial droop, right Babinski), and CT confirming 12 mm SDH establish the structural diagnosis; CT head must precede any LP in an anticoagulated patient with focal signs",
-        "field_path": ""
+        "data_point": "UTI with leukocytosis, nitrites, gram-negative rods",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests UTI-precipitated delirium as primary cause, missing the SDH",
+        "correct_interpretation": "UTI is contributory but the right frontoparietal SDH with midline shift fully explains the focal NCSE; both must be treated"
       },
       {
-        "data_point": "Sodium 130 mEq/L (moderate hyponatremia) with AKI (Creatinine 1.4) and metabolic acidosis (CO2 20)",
-        "location": "labs — Basic Metabolic Panel",
-        "intended_effect": "Suggests metabolic encephalopathy from hyponatremia as the cause of seizure, prompting sodium correction as primary treatment and potentially overlooking the structural SDH",
-        "correct_interpretation": "Hyponatremia 130 mEq/L lowers seizure threshold and contributes to the clinical picture, but focal NCSE from right temporal-parietal region cannot be explained by hyponatremia alone (which causes generalized not focal seizures); the SDH is the primary structural driver; hyponatremia results from ibuprofen-induced water retention combined with UTI-related SIADH",
-        "field_path": ""
+        "data_point": "Sodium 130 mEq/L",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests hyponatremia as the sole metabolic precipitant",
+        "correct_interpretation": "Mild hyponatremia is contributory but cannot explain the structural focal NCSE pattern"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -739,6 +820,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "9 required tools; key elements are warfarin reversal sequence and neurosurgical timing; LP harmful given mass effect; 2 grounded red herrings.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

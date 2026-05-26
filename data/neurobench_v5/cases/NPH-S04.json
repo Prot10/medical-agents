@@ -1,7 +1,7 @@
 {
   "case_id": "NPH-S04",
   "condition": "nph",
-  "difficulty": "straightforward",
+  "difficulty": "moderate",
   "encounter_type": "inpatient",
   "patient": {
     "patient_id": "NPH-S04",
@@ -497,127 +497,194 @@
     "icd_code": "G91.2",
     "differential": [
       {
-        "diagnosis": "Parkinson's disease",
-        "likelihood": "very_low",
-        "key_features": "No resting tremor, no rigidity, normal DaTscan. Gait is wide-based magnetic, not narrow-based festinant."
+        "diagnosis": "Vascular cognitive impairment / subcortical ischaemic vascular disease",
+        "likelihood": "high",
+        "key_features": "Small-vessel disease can produce gait apraxia and executive slowing, but ventriculomegaly out of proportion to white-matter burden and a positive tap test favour NPH",
+        "icd_code": "F01.50"
+      },
+      {
+        "diagnosis": "Parkinson's disease / atypical parkinsonism",
+        "likelihood": "moderate",
+        "key_features": "Shuffling gait overlaps, but absence of resting tremor, asymmetric rigidity, or L-dopa response and presence of magnetic gait + DESH favour NPH",
+        "icd_code": "G20"
       },
       {
         "diagnosis": "Alzheimer's disease",
-        "likelihood": "very_low",
-        "key_features": "Normal CSF biomarkers, negative amyloid PET. Memory impairment is mild, frontal pattern."
+        "likelihood": "moderate",
+        "key_features": "Cognitive decline overlaps; AD typically presents with episodic-memory predominance and hippocampal atrophy rather than frontal-subcortical pattern and magnetic gait; CSF biomarkers / amyloid PET resolve copathology",
+        "icd_code": "G30.9"
       },
       {
-        "diagnosis": "Vascular dementia with gait disorder",
+        "diagnosis": "Cerebral atrophy with secondary ex-vacuo ventriculomegaly",
+        "likelihood": "moderate",
+        "key_features": "Ventriculomegaly proportionate to sulcal widening, callosal angle >90°, and absence of DESH or transependymal signal argue against true NPH",
+        "icd_code": "G31.9"
+      },
+      {
+        "diagnosis": "Post-traumatic or post-SAH communicating hydrocephalus",
         "likelihood": "low",
-        "key_features": "Mild white matter changes (Fazekas 1); Evans 0.37 and positive tap trial explain the syndrome"
-      },
-      {
-        "diagnosis": "Diabetic peripheral neuropathy",
-        "likelihood": "very_low",
-        "key_features": "HbA1c 6.8% well-controlled; mild vibration loss at toes does not explain wide-based magnetic gait"
+        "key_features": "No history of trauma, SAH, or meningitis on review; would be considered if history suggested antecedent intracranial event",
+        "icd_code": "G91.0"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI with FLAIR",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Evans 0.37, callosal angle 76°, DESH, periventricular transependymal signal",
+        "action": "Literature review of iNPH diagnostic criteria and shunt-response predictors",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Relkin 2005 INPH Study Group criteria; Tisell 2011 tap-test predictors; Williams 2016 review",
         "category": "required",
-        "tool_parameters": {
-          "sequences": [
-            "T1",
-            "T2",
-            "FLAIR",
-            "DWI"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Williams_2016]",
+        "guideline_source": "NPH_pack"
       },
       {
         "step": 2,
-        "action": "Metabolic labs (CBC, BMP, HbA1c, TSH, B12, RPR)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Normal except mildly elevated glucose (known T2DM)",
+        "action": "Brain MRI — measure Evans index, callosal angle, assess DESH pattern; exclude mass effect, hydrocephalus from secondary cause, and atrophy",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Ventriculomegaly with Evans index >0.3, DESH pattern (tight high-convexity sulci + widened Sylvian fissures), callosal angle <90°, periventricular transependymal signal; no mass effect or aqueductal obstruction",
         "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP",
-            "HbA1c",
-            "TSH",
-            "B12",
-            "RPR"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Relkin_2005]",
+        "guideline_source": "NPH_pack"
       },
       {
         "step": 3,
-        "action": "High-volume tap trial (40 mL) with quantitative gait analysis",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Normal OP 14 cmH2O; clearly positive (32% TUG)",
+        "action": "Reversible-cause labs (TSH, B12, RPR, HIV) to exclude metabolic / infectious dementia mimics",
+        "tool_name": "interpret_labs",
+        "expected_finding": "TSH, B12, RPR, HIV negative or within normal range; reversible mimics excluded",
         "category": "required",
-        "tool_parameters": {
-          "volume_removed_mL": 40,
-          "tap_trial": true
-        }
+        "tool_parameters": {},
+        "citation": "[Relkin_2005]",
+        "guideline_source": "NPH_pack"
       },
       {
         "step": 4,
-        "action": "Amyloid PET to exclude concurrent AD",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Negative (CL 14)",
-        "category": "recommended",
+        "action": "Baseline neuropsychological battery — subcortical/frontal pattern, and reference for pre/post-tap comparison",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Frontal-subcortical pattern: executive dysfunction and slowed processing predominate over episodic amnesia",
+        "category": "required",
         "tool_parameters": {
-          "modality": "Amyloid PET"
-        }
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Relkin_2005]",
+        "guideline_source": "NPH_pack"
       },
       {
         "step": 5,
-        "action": "VP shunt referral to neurosurgery",
-        "tool_name": null,
-        "expected_finding": "Excellent candidate given clearly positive tap trial and negative amyloid PET",
+        "action": "Large-volume lumbar puncture (30-50 mL tap test) with opening pressure and pre/post gait + neuropsych assessment",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Opening pressure <25 cmH2O (normal); 30-50 mL CSF removed; pre/post tap gait and neuropsych assessment shows objective improvement supporting shunt-responsive iNPH",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Tisell_2011]",
+        "guideline_source": "NPH_pack"
+      },
+      {
+        "step": 6,
+        "action": "Neurosurgery consultation for VP shunt candidacy and perioperative planning",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Neurosurgery accepts patient for VP shunt evaluation with programmable valve",
+        "category": "required",
+        "tool_parameters": {
+          "specialty": "neurosurgery"
+        },
+        "citation": "[Marmarou_2005]",
+        "guideline_source": "NPH_pack"
+      },
+      {
+        "step": 7,
+        "action": "Amyloid PET (optional) — screen for AD copathology that may temper cognitive (but not gait) shunt benefit",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Inform shunt prognosis: AD copathology common (~50% iNPH)",
+        "category": "optional",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "citation": "[Williams_2016]",
+        "guideline_source": "NPH_pack"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is non-specific for NPH and does not distinguish from neurodegenerative alternatives in this chronic gait/cognitive presentation",
+        "citation": ""
+      },
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG is unrelated to the diagnostic workup of chronic gait + cognitive + urinary triad once cardiogenic syncope is not on the differential",
+        "citation": ""
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography does not contribute to NPH evaluation in the absence of syncope or cardioembolic stroke workup",
+        "citation": ""
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is inferior to MRI for measuring Evans index and callosal angle and for excluding secondary causes; only justified if MRI is contraindicated",
+        "citation": ""
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring has no diagnostic role in NPH and is reserved for syncope or arrhythmia workup",
+        "citation": ""
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "MRI must precede large-volume LP to exclude mass effect or secondary obstructive hydrocephalus before removing 30-50 mL of CSF",
+        "citation": "[Relkin_2005]",
+        "severity": "hard"
+      },
+      {
+        "before": "order_specialized_test",
+        "after": "analyze_csf",
+        "reason": "Baseline neuropsychological and gait assessment must be obtained before the tap test so that pre/post change can be measured (tap response is the shunt-response predictor)",
+        "citation": "[Tisell_2011]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Confirm normal CSF opening pressure (≤18 cmH2O)",
-      "Quantify TUG improvement at 24 hours post-tap (>20% required)",
-      "Exclude Parkinson's disease clinically (no tremor, no rigidity, normal DaTscan)",
-      "Prompt neurosurgery referral — VP shunt with programmable valve"
+      "Obtain brain MRI before lumbar puncture to exclude mass effect or obstructive hydrocephalus",
+      "Document objective pre-tap gait (TUG and 10-metre walk) and neuropsychological baseline so that pre/post-tap change can be quantified",
+      "Remove 30-50 mL of CSF during the tap test (a low-volume LP under-samples and biases the test toward false negative)",
+      "Re-assess gait and cognition 1-4 hours after the tap and again at 24 hours (the response window for tap-test prediction of shunt benefit)",
+      "Refer to neurosurgery for VP shunt evaluation when imaging, clinical, and tap-test criteria support iNPH"
     ],
     "contraindicated_actions": [
-      "Empirical trial of levodopa without DaTscan — delays correct diagnosis",
-      "Attributing gait disorder to diabetic neuropathy without NPH workup",
-      "Deferring tap trial because of patient anxiety — counsel and proceed"
+      "Do not perform large-volume lumbar puncture before MRI excludes mass effect or obstructive hydrocephalus",
+      "Do not infer iNPH from ventriculomegaly alone — DESH, callosal angle <90°, and a clinical triad are required",
+      "Do not diagnose Alzheimer's disease in a patient with gait-predominant presentation and ventriculomegaly without first excluding NPH",
+      "Do not attribute the syndrome to 'normal ageing' or 'deconditioning' once the imaging criteria for ventriculomegaly are met"
     ],
     "key_reasoning_points": [
-      "Classic Hakim's triad over 18 months in a 71-year-old man",
-      "Evans index 0.37, callosal angle 76°, DESH — clear iNPH imaging",
-      "Normal opening pressure (14 cmH2O) — meets required criterion",
-      "32% TUG improvement is a robust positive tap trial response",
-      "Normal DaTscan effectively excludes Parkinson's disease",
-      "Negative amyloid PET confirms iNPH-only pathology for excellent shunt prognosis"
+      "iNPH diagnosis (Relkin 2005 INPH Study Group) requires (a) Hakim's triad of gait disturbance, cognitive impairment, and urinary urgency/incontinence — gait is typically first and most prominent; (b) ventriculomegaly with Evans >0.3 and DESH on MRI without mass effect; (c) age >40 and chronic course; (d) opening pressure <25 cmH2O; (e) absence of an alternative explanation",
+      "MRI is the imaging modality of choice — measure Evans index and callosal angle (<90° supports NPH) and confirm DESH (tight high-convexity sulci + wide Sylvian fissures)",
+      "The tap test is a 30-50 mL large-volume LP with pre/post objective gait (TUG, 10-metre walk) and neuropsychological assessment; opening pressure must be normal (<25 cmH2O) to satisfy the 'normal pressure' criterion",
+      "Tap-test sensitivity is only 50-80%; a single negative tap does not exclude NPH — an extended (3-5 day) lumbar drainage trial can resolve borderline cases",
+      "Reversible-cause labs (TSH, B12, RPR, HIV) are mandatory before attributing the syndrome to NPH",
+      "Approximately 50% of iNPH patients have AD copathology — this lowers cognitive benefit from shunting but does not negate gait benefit",
+      "Shunt response is best predicted by an objectively positive tap test or extended drainage trial in a patient who meets imaging and clinical criteria"
     ],
     "red_herrings": [
       {
-        "data_point": "Family history of memory problems in father after age 75",
-        "location": "clinical_history",
-        "intended_effect": "Concern for familial Alzheimer's disease may delay NPH workup",
-        "correct_interpretation": "CSF biomarkers and amyloid PET are negative. Cognitive impairment is from NPH, not familial AD.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Reduced arm swing bilaterally with gait freezing — potential Parkinsonism",
-        "location": "neurological_exam",
-        "intended_effect": "Gait features may be misinterpreted as parkinsonian, prompting levodopa trial instead of NPH workup",
-        "correct_interpretation": "Gait is wide-based magnetic (NPH), not narrow-based festinant (PD). No tremor or rigidity. Normal DaTscan confirms no nigrostriatal degeneration.",
-        "field_path": ""
+        "data_point": "Long-standing type 2 diabetes (potential peripheral neuropathy)",
+        "location": "clinical_history.past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Gait ataxia is attributed to diabetic peripheral neuropathy",
+        "correct_interpretation": "Diabetic neuropathy produces sensory ataxia with reduced ankle vibration, not magnetic gait with freezing; ventriculomegaly + DESH indicate NPH"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "created_by": "NeuroBench v5 generator",
@@ -629,6 +696,16 @@
       "echo": "incidental",
       "cardiac_monitoring": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:NPH",
+    "difficulty_rationale": "6 required tools (MRI, labs, neuropsych baseline, large-volume LP/tap, neurosurgery consult, literature), 1 grounded red herrings; differential includes 5 active alternatives. ",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": [
+      "Phase-contrast (CSF flow) MRI is referenced in followup outputs but is not in the TOOL_PARAMETER_VOCABULARY closed list for order_advanced_imaging — recommend adding 'phase_contrast_MRI' or 'CSF_flow_MRI' to the modality vocabulary"
+    ]
   }
 }

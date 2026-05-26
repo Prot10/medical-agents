@@ -502,116 +502,189 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Covert/minimal hepatic encephalopathy (PHES -5) in well-compensated NASH cirrhosis (Child-Pugh A, MELD 8) — precipitated by CPAP non-compliance (nocturnal hypoxemia) + long-term PPI use (gut dysbiosis → hyperammonemia); borderline ammonia (48 µmol/L); no asterixis; diagnosis requires PHES testing",
-    "icd_code": "K72.9",
+    "primary_diagnosis": "Covert/minimal hepatic encephalopathy (PHES -5), well-compensated NASH cirrhosis (Child-Pugh A, MELD 8) — precipitated by CPAP non-compliance (nocturnal hypoxemia impairs ammonia metabolism) and long-term PPI use (gut dysbiosis); ammonia borderline (48 µmol/L); no asterixis.",
+    "icd_code": "K72.90",
     "differential": [
       {
-        "diagnosis": "Type 2 diabetes-related cognitive decline",
-        "likelihood": "low",
-        "key_features": "HbA1c 7.4, mild hyperglycemia — diabetes contributes to cognitive impairment; but PHES confirms HE as the primary driver; both treated"
-      },
-      {
-        "diagnosis": "Obstructive sleep apnea cognitive dysfunction",
+        "diagnosis": "Obstructive sleep apnea cognitive decline (untreated CPAP)",
         "likelihood": "moderate",
-        "key_features": "CPAP non-compliance (T90 18%, 3.2 h/night) causes significant nocturnal hypoxemia — OSA independently causes attention and processing speed deficits; contributing to covert HE picture; both diagnoses treated"
+        "key_features": "Untreated OSA causes cognitive dysfunction; addressing CPAP adherence may resolve some symptoms.",
+        "icd_code": "G47.33"
       },
       {
-        "diagnosis": "Early Alzheimer's disease / MCI",
-        "likelihood": "very_low",
-        "key_features": "PHES confirms HE pattern; treatment response with rifaximin confirms HE; Alzheimer's does not respond to rifaximin; age 58 is young for Alzheimer's"
+        "diagnosis": "Early Alzheimer / age-related cognitive change",
+        "likelihood": "low",
+        "key_features": "PHES is sensitive to covert HE specifically; AD workup if PHES improves with HE management and symptoms persist.",
+        "icd_code": "G30.9"
       },
       {
-        "diagnosis": "Major depression with pseudodementia",
-        "likelihood": "very_low",
-        "key_features": "Irritability and sleep disruption could suggest depression; however PHES cognitive impairment pattern (psychomotor slowing, processing speed reduction) is more consistent with HE than depressive pseudodementia"
+        "diagnosis": "Medication-induced cognitive impairment",
+        "likelihood": "low",
+        "key_features": "Review home medications.",
+        "icd_code": "G92"
+      },
+      {
+        "diagnosis": "Depression-related cognitive complaints",
+        "likelihood": "low",
+        "key_features": "Screen with PHQ-9.",
+        "icd_code": "F32.9"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Labs — ammonia (borderline 48), LFTs, glucose, HbA1c; download CPAP compliance data",
+        "action": "Comprehensive labs: CMP including AST/ALT/bilirubin/INR/albumin, ammonia, CBC, glucose, electrolytes (Na, K, Mg), BUN/Cr, lactate, blood cultures and urine cultures; toxicology if substance use plausible. Confirms liver dysfunction and screens for precipitants.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Ammonia borderline 48, HbA1c 7.4, CPAP non-compliant (T90 18%) — multiple contributors identified",
+        "expected_finding": "Ammonia 48 (borderline); cirrhosis features (Child-Pugh A); TSH; B12; folate.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 2,
-        "action": "CT head — exclude structural cause in 58yo with 6-week cognitive decline",
+        "action": "Non-contrast CT head — exclude structural alternate cause of AMS (hemorrhage, large stroke, mass) before any LP.",
         "tool_name": "order_ct_scan",
-        "expected_finding": "CT normal — structural cause excluded",
+        "expected_finding": "Baseline non-contrast — exclude alternate structural cause of cognitive decline.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 3,
-        "action": "EEG — subtle slowing; non-specific; PHES is more sensitive for covert HE",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Mildly slowed PDR 8 Hz — non-specific; consistent with covert HE or OSA effects",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Literature/guideline search to confirm West Haven grading, precipitant management, and lactulose/rifaximin dosing (Covert/minimal HE; PHES testing; PPI and gut dysbiosis; OSA and HE).",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "AASLD/EASL 2014 guidance retrieved; West Haven criteria and precipitant-driven management framework confirmed.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 4,
-        "action": "PHES psychometric testing — the definitive diagnostic test for covert HE",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "PHES -5 — covert HE confirmed; more sensitive than EEG or clinical exam",
+        "action": "Drug-interaction and medication-reconciliation review covering omeprazole (REASSESS necessity), metformin, CPAP adherence counseling, lactulose initiation; flag any CNS depressants (benzodiazepines, opioids, sedating antiemetics, antihistamines) and confirm lactulose/rifaximin dosing in liver disease.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sedating/CNS-depressant medications identified; lactulose and rifaximin reviewed for hepatic dose adjustment.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Bajaj_2011]",
+        "guideline_source": "Bajaj 2011 HE management review"
       },
       {
         "step": 5,
-        "action": "Rifaximin 550 mg BID — evidence-based for covert HE (SONIC trial)",
-        "tool_name": null,
-        "expected_finding": "PHES improves to -2 at 4 weeks",
+        "action": "PHES psychometric battery — diagnostic gold standard for covert HE.",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "PHES -5 (below threshold -4) confirms covert HE.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Ferenci_2002]",
+        "guideline_source": "Ferenci 2002 (PHES)"
       },
       {
         "step": 6,
-        "action": "CPAP optimization referral + PPI deprescription trial (omeprazole → famotidine PRN)",
-        "tool_name": null,
-        "expected_finding": "CPAP compliance improving; ammonia 48 → 32",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Consult hepatology + sleep medicine for CPAP optimization — coordinate definitive care, transplant candidacy assessment where applicable.",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Hepatology / critical-care guidance integrated into management.",
+        "category": "recommended",
+        "tool_parameters": {
+          "specialty": "hepatology"
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      },
+      {
+        "step": 7,
+        "action": "EEG — consider if PHES improvement does not match clinical improvement. Triphasic waves are classic but non-specific (metabolic encephalopathies broadly); main role is exclusion of non-convulsive status epilepticus where the differential supports it.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Mild slowing or normal.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Ferenci_2002]",
+        "guideline_source": "Ferenci 2002 HE nomenclature/quantification"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No clinical suspicion for hepatopulmonary syndrome, portopulmonary hypertension, or endocarditis; echocardiography is not part of the HE workup.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in HE workup; reversible metabolic encephalopathy is the issue, not Alzheimer pathology.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan has no role in HE workup; the question is metabolic encephalopathy, not nigrostriatal degeneration.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "FDG PET has no role in HE workup; metabolic encephalopathy is reversible with precipitant control and does not require nuclear functional imaging.",
+        "citation": "[AASLD_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "In altered mental status, exclude intracranial mass effect / hemorrhage on imaging before LP to avoid herniation risk.",
+        "citation": "[AASLD_2014]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "PHES is more sensitive than clinical exam or EEG for covert HE — standard neurological exam can be completely normal in covert HE; PHES testing must be performed",
-      "CPAP non-compliance is an underappreciated HE precipitant — nocturnal hypoxemia impairs hepatic urea cycle capacity; reviewing CPAP download data is part of HE workup in OSA patients",
-      "PPI deprescription should be considered in cirrhosis — long-term PPI use causes gut dysbiosis with increased urease-producing bacteria → higher ammonia",
-      "Covert HE in well-compensated cirrhosis (MELD 8) is real and clinically significant — impacts quality of life, driving safety, and occupational performance"
+      "PHES testing to formally diagnose covert HE.",
+      "Trial lactulose 30 mL TID titrated to 2-3 soft stools/day; re-test PHES at 4-6 weeks.",
+      "CPAP adherence optimization with sleep medicine.",
+      "Reassess long-term PPI necessity; deprescribe if not indicated; consider H2 blocker if needed.",
+      "Driver-safety counseling — covert HE impairs driving (well-documented)."
     ],
     "contraindicated_actions": [
-      "Sedating hypnotics for insomnia in CPAP non-compliant OSA patient — worsens hypoxemia and HE",
-      "Benzodiazepines for sleep in cirrhosis",
-      "Dismissing cognitive symptoms as 'stress' or 'normal aging' in cirrhotic patients without PHES testing"
+      "Do not prescribe benzodiazepines for anxiety/agitation — they precipitate and prolong HE (use haloperidol or non-pharmacologic measures for agitation).",
+      "Do not prescribe sedating opioids — they worsen HE; consider acetaminophen at hepatic-safe dosing for pain.",
+      "Do not perform LP before neuroimaging excludes mass effect when the patient has altered mental status.",
+      "Do not dismiss subtle cognitive complaints in a cirrhotic just because ammonia is 'low' or Child-Pugh is 'good'.",
+      "Avoid starting cholinesterase inhibitors before confirming HE is the diagnosis."
     ],
     "key_reasoning_points": [
-      "Covert HE occurs even in Child-Pugh A MELD 8 well-compensated cirrhosis — it is defined by psychometric impairment without obvious clinical signs; routine PHES screening is recommended in all cirrhotic patients",
-      "CPAP non-compliance is a non-obvious HE precipitant — OSA-related nocturnal hypoxemia impairs hepatic ammonia metabolism; reviewing CPAP download data is a valuable diagnostic step",
-      "PPIs increase ammonia in cirrhosis via gut microbiome dysbiosis — long-term PPI use without ongoing indication should be reassessed in all cirrhotic patients",
-      "Rifaximin is evidence-based for covert HE (SONIC trial, 2012) — reduces overt HE episodes and improves quality of life in cirrhosis"
+      "HE is a clinical diagnosis: West Haven grading + evidence of liver dysfunction + exclusion of other causes of AMS — ammonia level is supportive only and correlates poorly with grade (AASLD 2014).",
+      "Precipitant identification is more actionable than the ammonia number: infection (SBP especially), GI bleed, electrolyte disturbance (hypokalemia/hyponatremia), constipation, sedative/CNS-depressant use, dehydration, dietary protein load, renal failure.",
+      "Covert/minimal HE affects ~30-50% of compensated cirrhotics; PHES is the diagnostic gold standard; treatment reduces overt HE risk and improves QOL (AASLD).",
+      "PPIs have been associated with HE risk via gut dysbiosis; deprescribe when not indicated.",
+      "Driving safety is impaired in covert HE — counsel and document."
     ],
     "red_herrings": [
       {
-        "data_point": "Child-Pugh A, MELD 8, no ascites, no jaundice, normal-appearing patient",
-        "location": "patient.clinical_history.past_medical_history + vitals + exam",
-        "intended_effect": "Dismiss HE as unlikely in well-compensated cirrhosis — 'he looks too well for HE'; attribute cognitive symptoms to diabetes or stress; miss covert HE",
-        "correct_interpretation": "Covert/minimal HE occurs in 20-40% of compensated cirrhotic patients — the diagnosis requires PHES testing, not clinical appearance; 'looking well' does NOT exclude covert HE",
-        "field_path": ""
+        "data_point": "Child-Pugh A, MELD 8 (well-compensated)",
+        "location": "patient.clinical_history.past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history[0]",
+        "intended_effect": "Dismiss HE concern because liver disease is mild.",
+        "correct_interpretation": "Covert HE occurs in compensated cirrhotics; PHES sensitivity does not depend on Child-Pugh class."
       },
       {
-        "data_point": "Ammonia 48 µmol/L — borderline elevated (1-3 µmol/L above upper limit of normal)",
+        "data_point": "Ammonia 48 µmol/L (just at/below upper-normal)",
         "location": "initial_tool_outputs.labs.panels.LFTs",
-        "intended_effect": "Dismiss HE because ammonia is 'essentially normal' — 48 vs ULN 45 is clinically insignificant; do not pursue HE diagnosis",
-        "correct_interpretation": "Ammonia level correlates POORLY with HE severity in covert HE; borderline ammonia (48) in the context of cirrhosis and abnormal PHES testing IS consistent with minimal HE; the PHES is the definitive test, not the ammonia level",
-        "field_path": ""
+        "field_path": "initial_tool_outputs.labs.panels.LFTs",
+        "intended_effect": "Dismiss HE.",
+        "correct_interpretation": "Ammonia correlates poorly with HE grade; covert HE is diagnosed psychometrically (PHES), not by ammonia."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -631,6 +704,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (HEP-ENC)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:HEP-ENC",
+    "difficulty_rationale": "Subtle presentation in well-compensated patient; PHES required; multiple subtle modifiable contributors (CPAP, PPI); easy miss in routine practice.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -498,115 +498,273 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Behavioral variant frontotemporal dementia — GRN c.1477C>T pathogenic nonsense variant — young onset age 48 — presenting with minimal MRI changes; previously misdiagnosed as new-onset psychiatric disorder",
+    "primary_diagnosis": "Behavioral variant frontotemporal dementia (bvFTD), probable, GRN-associated (young-onset, c.1477C>T) — previously misdiagnosed as a new-onset psychiatric disorder",
     "icd_code": "G31.09",
     "differential": [
       {
-        "diagnosis": "New-onset psychiatric disorder (bipolar, personality disorder)",
-        "likelihood": "very_low",
-        "key_features": "No psychiatric history; PHQ-9 4 (no depression); anosognosia; perseverative stereotyped behaviors; frontal FDG-PET hypometabolism; GRN genetic confirmation — no psychiatric disorder causes neurodegenerative biomarkers or frontotemporal hypometabolism"
+        "diagnosis": "New-onset primary psychiatric disorder (late-onset bipolar / schizophrenia)",
+        "likelihood": "high",
+        "key_features": "Treating psychiatrist's referral note flags concern for organic process; progressive informant-reported decline distinguishes."
       },
       {
-        "diagnosis": "Autoimmune encephalitis (anti-NMDA receptor, LGI1)",
-        "likelihood": "very_low",
-        "key_features": "Serum anti-NMDA, anti-LGI1, anti-CASPR2 negative; 20-month progressive course without relapse (autoimmune encephalitis is typically subacute and fluctuating); no seizures or movement disorders; MRI normal (NMDA encephalitis often shows T2/FLAIR changes)"
+        "diagnosis": "Familial bvFTD (C9orf72 / GRN / MAPT)",
+        "likelihood": "high",
+        "key_features": "Young-onset progressive behavioural syndrome warrants genetic panel even without strong family history."
       },
       {
-        "diagnosis": "Alzheimer's disease (early onset)",
-        "likelihood": "very_low",
-        "key_features": "Amyloid PET negative; no hippocampal atrophy; FDG-PET frontal without posterior cingulate sign; behavioral disinhibition profile is FTD not AD"
+        "diagnosis": "Quetiapine-related cognitive blunting / sedation",
+        "likelihood": "moderate",
+        "key_features": "Antipsychotic side effects can mimic; persistence after discontinuation argues against."
       },
       {
-        "diagnosis": "Wilson disease (young age)",
-        "likelihood": "very_low",
-        "key_features": "Normal ceruloplasmin; no Kayser-Fleischer rings; age 48 is beyond typical Wilson disease onset (usually <40); normal copper"
+        "diagnosis": "Alzheimer disease (early-onset, frontal variant)",
+        "likelihood": "moderate",
+        "key_features": "Young onset warrants AD biomarker exclusion."
+      },
+      {
+        "diagnosis": "Autoimmune / Hashimoto encephalopathy",
+        "likelihood": "low",
+        "key_features": "Subacute behavioural change; TPO antibody and CSF inflammatory profile screen."
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "MRI brain — expected minimal changes in GRN-FTD young onset",
+        "action": "Obtain brain MRI with volumetric coronal T1 to assess frontal/anterior temporal atrophy and exclude alternative structural cause",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Borderline minimal right frontal sulcal widening — subtle",
+        "expected_finding": "Bilateral frontal and/or anterior temporal atrophy in a lobar pattern with relative posterior sparing",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "DWI",
+            "volumetric"
+          ]
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky 2011 bvFTD criteria"
       },
       {
         "step": 2,
-        "action": "Labs including Wilson disease exclusion (ceruloplasmin), autoimmune encephalitis panel (NMDA, LGI1), standard dementia workup",
+        "action": "Order metabolic dementia panel (TSH, B12, CMP, RPR/HIV per risk) to exclude reversible mimics",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal — autoimmune encephalitis excluded; Wilson excluded",
+        "expected_finding": "No reversible metabolic or infectious cause of cognitive decline identified",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "TSH",
+            "B12",
+            "RPR",
+            "HIV"
+          ]
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
       },
       {
         "step": 3,
-        "action": "FDG-PET brain — essential when MRI minimal",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Right frontotemporal hypometabolism; absent posterior cingulate sign",
+        "action": "Order comprehensive neuropsychological battery characterising executive function, social cognition, language and memory",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Frontal-executive and social-cognition deficits with relative sparing of episodic memory and visuospatial function",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky 2011 bvFTD criteria"
       },
       {
         "step": 4,
-        "action": "Amyloid PET — AD exclusion especially in young patient",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Negative",
+        "action": "Search medical literature for young-onset bvftd and grn-related ftld",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirms Rascovsky 2011 criteria, FDG-PET evidence (Foster 2007), and management approach (Bang 2015)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "query": "Young-onset bvFTD and GRN-related FTLD"
+        },
+        "citation": "[Bang_2015]",
+        "guideline_source": "Bang 2015 Lancet review"
       },
       {
         "step": 5,
-        "action": "Young-onset FTD genetic panel (C9orf72, GRN, MAPT) — young onset strongly increases genetic probability",
-        "tool_name": "interpret_labs",
-        "expected_finding": "GRN pathogenic nonsense variant confirmed",
+        "action": "Consult behavioral/cognitive neurology for syndromic diagnosis, biomarker interpretation, and longitudinal care plan",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Behavioral neurology confirms bvFTD syndrome, coordinates biomarkers and disclosure",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "specialty": "behavioral_neurology"
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
+      },
+      {
+        "step": 6,
+        "action": "Order FDG-PET brain to characterise frontotemporal hypometabolism and distinguish bvFTD from AD",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Bifrontal and/or anterior temporal hypometabolism with relative posterior sparing",
+        "category": "required",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[Foster_2007]",
+        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
+      },
+      {
+        "step": 7,
+        "action": "Order FTD genetic panel (C9orf72, GRN, MAPT) given young onset (age 48), progressive behavioural syndrome — exclude an autosomal-dominant cause",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Identifies or excludes pathogenic C9orf72 / GRN / MAPT variant relevant to prognosis and cascade testing",
+        "category": "required",
+        "tool_parameters": {
+          "test_type": "genetic_panel:FTD"
+        },
+        "citation": "[Pottier_2016]",
+        "guideline_source": "Pottier 2016 FTLD genetics review"
+      },
+      {
+        "step": 8,
+        "action": "Plasma progranulin level (confirmatory once GRN variant identified)",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Reduced plasma progranulin confirming pathogenic loss-of-function GRN variant",
+        "category": "recommended",
+        "tool_parameters": {
+          "panels": [
+            "plasma_progranulin"
+          ]
+        },
+        "citation": "[Pottier_2016]",
+        "guideline_source": "Pottier 2016 FTLD genetics review"
+      },
+      {
+        "step": 9,
+        "action": "Order amyloid PET to exclude early-onset AD",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Negative amyloid PET supports FTD over EOAD",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "citation": "[Foster_2007]",
+        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
+      },
+      {
+        "step": 10,
+        "action": "Address financial / legal capacity urgently (senior partner role) and discuss any need for surrogate decision-making",
+        "tool_name": null,
+        "expected_finding": "Capacity assessment performed; surrogate identified if needed",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is non-specific in FTD; not part of the standard dementia workup unless seizures or rapidly progressive course suggest CJD or autoimmune encephalitis.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG has no role in the cognitive workup of suspected FTD; reserved for syncope, palpitations, or pre-procedure clearance.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is unrelated to a neurodegenerative cognitive syndrome and adds cost without diagnostic value.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is unrelated to FTD and not indicated absent syncope or palpitations.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT lacks the resolution and lobar specificity needed to characterise frontotemporal atrophy; MRI is the standard structural study.",
+        "citation": "[AAN_dementia_2018]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "MR_spectroscopy"
+        },
+        "rationale": "MR spectroscopy has no established role in the routine FTD diagnostic pathway.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "perfusion_MRI"
+        },
+        "rationale": "Perfusion MRI is not indicated in the standard FTD workup once a structural MRI and FDG-PET (or amyloid PET) have characterised the lobar pattern.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is a vascular study with no diagnostic role in primary neurodegenerative dementia.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan evaluates presynaptic dopaminergic terminals; it is not indicated unless overt parkinsonism raises concern for PD, DLB, or atypical parkinsonism (PSP/CBS overlap).",
+        "citation": "[Bang_2015]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "Exclude structural cause of focal cognitive symptoms and screen for elevated ICP before lumbar puncture.",
+        "citation": "[AAN_dementia_2018]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Young-onset behavioral syndrome (<60 years) with no psychiatric history MUST have full FTD workup — do not diagnose as primary psychiatric disorder without neuroimaging",
-      "Financial capacity assessment is URGENT — patient has already signed $850,000 in contracts; impaired financial decision-making is a medical-legal emergency in bvFTD",
-      "Genetic testing in young-onset bvFTD has >50% yield for identifiable genetic cause",
-      "Autoimmune encephalitis panel must be sent in young patients with behavioral syndrome — treatable if caught early"
+      "Young-onset progressive personality change with minimal MRI changes mandates FDG-PET and genetic panel.",
+      "Address financial / legal capacity at a senior fiduciary role urgently.",
+      "Discontinue inappropriate quetiapine if pre-empted as cause of decline.",
+      "Apply Rascovsky 2011 bvFTD criteria explicitly (≥3 of 6 core features within 3 years) and document functional decline.",
+      "Assess and document decision-making, financial, and driving capacity given the high risk of impulsivity and impaired judgment in FTD.",
+      "Provide caregiver education, safety planning, and referral to FTD-focused support resources.",
+      "Offer genetic counselling and discuss cascade testing options if a pathogenic variant is identified or suspected."
     ],
     "contraindicated_actions": [
-      "Cholinesterase inhibitors — contraindicated in FTD",
-      "Stopping workup after minimal MRI — this is the primary diagnostic error; FDG-PET must follow",
-      "Prescribing high-dose antipsychotics for behavioral control without FTD workup"
+      "Do not start acetylcholinesterase inhibitors (donepezil, rivastigmine, galantamine): no benefit in FTD and may worsen behavioral symptoms.",
+      "Do not start memantine: no evidence of benefit in bvFTD and may worsen behavioral symptoms.",
+      "Avoid antipsychotics as first-line behavioral therapy given increased cerebrovascular and mortality risk in dementia; reserve for refractory dangerous agitation with specialist oversight.",
+      "Avoid benzodiazepines for behavioral control: risk of paradoxical disinhibition and falls."
     ],
     "key_reasoning_points": [
-      "Young-onset bvFTD (<60 years) has much higher genetic yield than late-onset — genetic testing is mandatory, not optional, in young-onset cases",
-      "AUTOIMMUNE ENCEPHALITIS must be actively excluded in young patients with new behavioral syndrome — anti-NMDA receptor, LGI1, CASPR2 encephalitis can mimic early bvFTD and are TREATABLE",
-      "Financial disinhibition leading to large unauthorized purchases or contracts is a medical-legal emergency in bvFTD — formal capacity assessment and power of attorney planning must be initiated urgently",
-      "Minimal MRI with abnormal FDG-PET is the characteristic pattern of GRN-FTD (as well as C9orf72) — when behavioral syndrome is present and MRI is minimal, FDG-PET must be performed before concluding no organic disease"
+      "Young-onset progressive behavioural syndrome — genetic FTD must be excluded.",
+      "Minimal early MRI does not exclude bvFTD; FDG-PET is the more sensitive early biomarker.",
+      "Antipsychotic-induced cognitive blunting persistence after dose change indicates underlying organic process."
     ],
     "red_herrings": [
       {
-        "data_point": "Quetiapine-associated borderline glucose and LDL",
-        "location": "Lab results",
-        "intended_effect": "Focus on metabolic side effects of quetiapine rather than underlying FTD",
-        "correct_interpretation": "Borderline metabolic findings represent quetiapine side effects; they do not explain the behavioral syndrome and should not distract from the FTD workup",
-        "field_path": ""
-      },
-      {
-        "data_point": "ANA 1:40 low titer",
-        "location": "Lab results",
-        "intended_effect": "Pursue autoimmune or lupus workup",
-        "correct_interpretation": "ANA 1:40 is a common non-specific finding in the general population; not indicative of NPSLE or autoimmune encephalitis; full neuropsychiatric lupus workup is not needed",
-        "field_path": ""
-      },
-      {
-        "data_point": "No family history of FTD",
-        "location": "Family history",
-        "intended_effect": "Consider the syndrome unlikely to be genetic FTD without family history",
-        "correct_interpretation": "GRN mutations can be de novo or have reduced penetrance in prior generations; young onset bvFTD with no family history still requires genetic panel — the GRN pathogenic variant was found despite negative family history",
-        "field_path": ""
+        "data_point": "Treating psychiatrist's presumed 'new-onset mood instability'",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Anchors initial workup toward primary psychiatric disorder.",
+        "correct_interpretation": "Psychiatrist's own referral concern and progressive informant-reported course indicate an organic process — bvFTD until proven otherwise."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "v5",
@@ -619,6 +777,20 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (condition-expert:FTD)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FTD",
+    "difficulty_rationale": "≥5 required tools, multi-axis confounders (psychiatric comorbidity, normal/subtle MRI, parkinsonism overlap, or APOE-driven AD anchoring), and 2+ grounded red herrings — requires sophisticated biomarker / genetic reasoning to overcome anchoring on a comorbidity.",
+    "case_body_concerns": [
+      "required tool `order_specialized_test` (step 3, params={'test_type': 'neuropsych_battery'}) has no initial_tool_outputs or followup_outputs entry — case body should add a order_specialized_test output to support this required step",
+      "required tool `order_specialized_test` (step 7, params={'test_type': 'genetic_panel:FTD'}) has no initial_tool_outputs or followup_outputs entry — case body should add a order_specialized_test output to support this required step",
+      "validator flags `order_advanced_imaging` in both optimal_actions (FDG_PET / amyloid_PET) and useless_tools (MR_spectroscopy / DaTscan / perfusion_MRI / carotid_duplex) — these are distinct modalities of the same catchall tool. Known systemic validator limitation: the coherence script ignores `tool_parameters.modality`. No fix at case level.",
+      "required tool `order_specialized_test` has no matching `initial_tool_outputs` or `followup_outputs` entry — case body should add a corresponding output so the agent gets a meaningful result when calling this required step.",
+      "fallback output for `order_advanced_imaging` is missing in `fallback_tool_outputs` — calling the useless tool will return empty; case body needs an off-pathway fallback entry."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

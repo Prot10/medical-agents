@@ -1,7 +1,7 @@
 {
   "case_id": "ISCH-STR-RS04",
   "condition": "ischemic_stroke",
-  "difficulty": "straightforward",
+  "difficulty": "diagnostic_puzzle",
   "encounter_type": "emergency",
   "patient": {
     "patient_id": "NB-ISCH-STR-RS04",
@@ -559,8 +559,8 @@
         },
         "interpretation": "Abnormal values: Protein C Activity 68 % (L), Protein S Activity 42 % (L).",
         "abnormal_values_summary": [
-          "Protein C Activity 68% (borderline low — may be artifactual in pregnancy/acute thrombosis)",
-          "Protein S Activity 42% (low — physiologically decreased in pregnancy)"
+          "Protein C Activity 68% (borderline low \u2014 may be artifactual in pregnancy/acute thrombosis)",
+          "Protein S Activity 42% (low \u2014 physiologically decreased in pregnancy)"
         ]
       }
     },
@@ -621,7 +621,7 @@
       "output": {
         "proposed": "Alteplase (IV tPA) in pregnancy",
         "interactions": [
-          "Alteplase is FDA pregnancy category C — animal studies show adverse effects but no adequate human studies",
+          "Alteplase is FDA pregnancy category C \u2014 animal studies show adverse effects but no adequate human studies",
           "Alteplase does not cross the placenta due to its large molecular weight",
           "Concurrent use with antiplatelet agents increases bleeding risk"
         ],
@@ -637,7 +637,7 @@
           "Close obstetric monitoring required during and after administration",
           "Fibrinogen levels should be monitored as a marker of consumptive coagulopathy"
         ],
-        "formulary_status": "Available — requires multidisciplinary approval for use in pregnancy",
+        "formulary_status": "Available \u2014 requires multidisciplinary approval for use in pregnancy",
         "alternatives": [
           "Mechanical thrombectomy alone (avoids systemic thrombolysis risk)",
           "Tenecteplase (single-bolus, same pregnancy considerations as alteplase)",
@@ -724,184 +724,314 @@
   },
   "ground_truth": {
     "primary_diagnosis": "Acute ischemic stroke, posterior circulation, due to basilar artery occlusion in the setting of pregnancy-associated hypercoagulability",
-    "icd_code": "I63.9",
+    "icd_code": "I63.22",
     "differential": [
       {
-        "diagnosis": "Viral meningoencephalitis",
-        "likelihood": "low",
-        "key_features": "Initial presentation with headache, vomiting, and altered consciousness could mimic meningoencephalitis; however, focal lateralizing deficits, vascular territory infarction on MRI, and basilar artery occlusion on MRA confirm ischemic stroke. No fever, no meningismus, and dengue serologies are negative."
-      },
-      {
-        "diagnosis": "Hemorrhagic stroke",
-        "likelihood": "low",
-        "key_features": "Non-contrast CT showed no acute intracranial hemorrhage. MRI demonstrates ischemic pattern (DWI restriction) rather than hemorrhage. No T1 hyperintensity to suggest blood products."
-      },
-      {
         "diagnosis": "Cerebral venous sinus thrombosis",
+        "likelihood": "high",
+        "key_features": "Pregnancy is a major CVST risk factor; MRV essential to confirm or exclude",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "PRES / eclampsia spectrum",
         "likelihood": "moderate",
-        "key_features": "Pregnancy is a risk factor for CVST and can present with headache and focal deficits; however, MRI findings are in an arterial vascular territory, MRA shows arterial occlusion, and no venous sinus thrombosis was identified on available sequences."
+        "key_features": "Pregnancy-related; imaging pattern (parieto-occipital edema) differs from arterial infarct",
+        "icd_code": null
       },
       {
-        "diagnosis": "Eclampsia or preeclampsia with PRES",
-        "likelihood": "low",
-        "key_features": "Patient is only 15 weeks pregnant (preeclampsia typically presents after 20 weeks), blood pressure is 130/70 (not hypertensive), no proteinuria, and MRI shows vascular territory infarction rather than the bilateral posterior white matter edema typical of PRES."
+        "diagnosis": "Cardioembolic stroke (occult AF, peripartum cardiomyopathy)",
+        "likelihood": "moderate",
+        "key_features": "Echocardiography essential; pregnancy increases cardiac risk",
+        "icd_code": null
       },
       {
-        "diagnosis": "Basilar migraine (migraine with brainstem aura)",
-        "likelihood": "very_low",
-        "key_features": "No prior migraine history. Symptoms are persistent and progressive rather than episodic and self-limited. MRI confirms structural infarction with vessel occlusion, excluding a functional migrainous etiology."
+        "diagnosis": "Cervical arterial dissection",
+        "likelihood": "moderate",
+        "key_features": "Cervical imaging important; pregnancy/labor can precipitate dissection",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Antiphospholipid syndrome",
+        "likelihood": "moderate",
+        "key_features": "Pregnancy losses and thrombosis are red flags; serology required",
+        "icd_code": null
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Activate stroke code and perform rapid neurological assessment including GCS, NIHSS, and fingerstick glucose",
-        "tool_name": null,
-        "expected_finding": "GCS 10, NIHSS ~22, glucose within acceptable range",
-        "category": "required"
+        "action": "Obtain emergent non-contrast CT head as first imaging to exclude intracranial hemorrhage before any thrombolytic decision",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Non-contrast CT may show hyperdense basilar artery sign; exclude hemorrhage; weigh minimal fetal radiation",
+        "category": "required",
+        "tool_parameters": {
+          "contrast": false,
+          "angiography": false
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 2,
-        "action": "Obtain emergent non-contrast CT head to rule out hemorrhage",
+        "action": "Obtain CT angiography of head and neck to evaluate for large vessel occlusion and assess thrombectomy candidacy",
         "tool_name": "order_ct_scan",
-        "expected_finding": "No acute intracranial hemorrhage",
+        "expected_finding": "CTA neck and intracranial vessels demonstrate basilar artery occlusion \u2014 thrombectomy-eligible",
         "category": "required",
         "tool_parameters": {
-          "angiography": false,
-          "contrast": false
-        }
+          "contrast": true,
+          "angiography": true
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 3,
-        "action": "Obtain stat laboratory studies including CBC, BMP, coagulation panel, and fibrinogen",
+        "action": "Order stat labs: CBC, BMP (including glucose), coagulation panel (INR/PTT), troponin",
         "tool_name": "interpret_labs",
-        "expected_finding": "Leukocytosis, hyponatremia, hypokalemia, elevated fibrinogen, normal coagulation times",
+        "expected_finding": "CBC (platelet count), coagulation (DIC screen), troponin, D-dimer (interpret cautiously in pregnancy), liver/renal function (PRES/HELLP overlap)",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
-            "coagulation"
+            "glucose",
+            "coagulation",
+            "troponin"
           ]
-        }
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 4,
-        "action": "Obtain 12-lead ECG to evaluate for arrhythmia as embolic source",
+        "action": "Obtain 12-lead ECG to assess for atrial fibrillation and concurrent cardiac ischemia",
         "tool_name": "analyze_ecg",
-        "expected_finding": "Sinus tachycardia, no atrial fibrillation or other arrhythmia",
-        "category": "required"
+        "expected_finding": "Sinus rhythm or pregnancy-related tachycardia; exclude concurrent ischemia",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 5,
-        "action": "Obtain brain MRI with DWI and MRA to characterize the ischemic lesion and vascular occlusion",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Acute infarction in right pons and right cerebellar peduncle with basilar artery occlusion and right vertebral artery V3 occlusion",
+        "action": "Review current AHA/ASA guidelines for IV thrombolysis windows, late-window selection, and mechanical thrombectomy eligibility",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Stroke in pregnancy: thrombolysis and thrombectomy in pregnant patients, basilar artery occlusion management",
         "category": "required",
         "tool_parameters": {
-          "protocol": "stroke",
-          "contrast": false
-        }
+          "query": "Stroke in pregnancy: thrombolysis and thrombectomy in pregnant patients, basilar artery occlusion management"
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 6,
-        "action": "Obtain CTA head and neck to further characterize basilar artery occlusion and plan endovascular intervention",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "Complete basilar artery occlusion confirmed, thrombus length approximately 12 mm",
+        "action": "IV tPA in pregnancy \u2014 case-by-case multidisciplinary decision; coordinate with maternal-fetal medicine and OB anesthesia",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "tPA contraindications screened; medication-anticoagulant interactions reviewed",
         "category": "required",
-        "tool_parameters": {
-          "angiography": true,
-          "contrast": false
-        }
+        "tool_parameters": {},
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 7,
-        "action": "Consult neurointerventional radiology for emergent mechanical thrombectomy of basilar artery occlusion",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Obtain brain MRI with DWI and FLAIR to confirm acute infarct, localize territory, and assess vintage",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "MRI without gadolinium: DWI-positive lesions in posterior circulation (brainstem, thalami, occipital); MRA confirms basilar occlusion",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "stroke",
+          "sequences": [
+            "DWI",
+            "ADC",
+            "FLAIR",
+            "T2",
+            "T1",
+            "GRE/SWI"
+          ],
+          "contrast": false
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 8,
-        "action": "Consult obstetrics for fetal monitoring, pregnancy-safe treatment planning, and abdominal lead shielding during endovascular procedure",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Obtain transthoracic echocardiogram to evaluate for cardioembolic source of stroke",
+        "tool_name": "order_echocardiogram",
+        "expected_finding": "TTE to screen for cardiac source and PFO; bubble study generally deferred during acute window",
+        "category": "required",
+        "tool_parameters": {
+          "echo_type": "TTE"
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 9,
-        "action": "Consider IV alteplase as bridge to thrombectomy after multidisciplinary risk-benefit discussion (pregnancy is relative contraindication, not absolute)",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended"
+        "action": "Initiate inpatient telemetry plus 24-hour Holter monitoring (extend to 30-day event monitor if no source identified)",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Telemetry; AF less likely at age 33 but document",
+        "category": "required",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "citation": "[Sanna_2014]",
+        "guideline_source": "[Sanna_2014]"
       },
       {
         "step": 10,
-        "action": "Correct electrolyte abnormalities (hyponatremia, hypokalemia) with careful IV fluid and electrolyte replacement",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Obtain carotid duplex ultrasound to quantify cervical carotid stenosis and characterize plaque morphology",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Cervical vessel assessment",
+        "category": "required",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
       },
       {
         "step": 11,
-        "action": "Obtain hypercoagulability workup including antiphospholipid antibodies, protein C, protein S, and genetic thrombophilia testing",
+        "action": "Pregnancy-related hypercoagulability workup (antiphospholipid antibodies, lupus anticoagulant, factor V Leiden, prothrombin G20210A, protein S \u2014 note pregnancy reduces baseline protein S); rule out PRES/eclampsia overlap",
         "tool_name": "interpret_labs",
-        "expected_finding": "Antiphospholipid antibodies negative, protein C borderline low, protein S low (expected in pregnancy)",
-        "category": "recommended",
+        "expected_finding": "Identify treatable hypercoagulable contributors",
+        "category": "required",
         "tool_parameters": {
           "panels": [
-            "coagulation",
-            "lipid",
-            "genetic"
+            "antiphospholipid",
+            "lupus anticoagulant",
+            "factor V Leiden",
+            "prothrombin G20210A",
+            "protein S",
+            "homocysteine"
           ]
-        }
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
       },
       {
         "step": 12,
-        "action": "Initiate therapeutic anticoagulation with low-molecular-weight heparin for secondary stroke prevention (preferred over warfarin/DOACs in pregnancy)",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "MR venography to exclude cerebral venous sinus thrombosis, which is a leading pregnancy-related stroke mechanism",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Patent venous sinuses exclude CVST; basilar occlusion confirmed on MRA",
+        "category": "required",
+        "tool_parameters": {
+          "modality": "MR_venography"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
       },
       {
         "step": 13,
-        "action": "Admit to neurological ICU for close monitoring with serial neurological assessments and fetal monitoring",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Consider MR angiography of head and neck if CTA was contraindicated or as confirmatory vascular study",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Alternative non-iodinated vascular assessment when CTA is limited",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "MR_angiography"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
+      },
+      {
+        "step": 14,
+        "action": "Consider transcranial Doppler for microembolic signal detection or hemodynamic assessment in selected mechanisms",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Microembolic signals support active embolic mechanism; can monitor vasospasm or right-to-left shunt",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "transcranial_doppler"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "No seizure features (although EEG indicated if eclamptic seizures suspected); not part of routine BAO workup",
+        "citation": "[AHA_ASA_2019]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No SAH or CNS infection suspicion; LP not indicated",
+        "citation": "[AHA_ASA_2019]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "rationale": "EMG/NCS evaluates peripheral nerve disease; not applicable to central ischemic stroke",
+        "citation": "[AHA_ASA_2019]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "check_drug_interactions",
+        "reason": "Non-contrast head CT MUST exclude intracranial hemorrhage before IV thrombolysis is considered (tPA decision modeled here through drug-interaction/contraindication check).",
+        "citation": "[AHA_ASA_2019]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Glucose, INR/PTT, and platelet count must be reviewed before IV thrombolysis to exclude hypoglycemia mimic and coagulopathy contraindications.",
+        "citation": "[AHA_ASA_2019]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Obtain emergent non-contrast CT head to exclude hemorrhage",
-      "Identify basilar artery occlusion on MRI/MRA or CTA as the stroke mechanism",
-      "Consult neurointerventional radiology for emergent mechanical thrombectomy",
-      "Involve obstetrics for multidisciplinary pregnancy-safe management",
-      "Initiate appropriate anticoagulation (LMWH) for secondary prevention in pregnancy",
-      "Correct electrolyte derangements (hyponatremia, hypokalemia)",
-      "Admit to ICU with serial neurological and fetal monitoring"
+      "Establish time of last known well (LKW) and apply NIHSS to determine acute treatment eligibility",
+      "Obtain non-contrast CT head FIRST to exclude intracranial hemorrhage before any thrombolytic decision",
+      "Achieve door-to-needle time <60 minutes if IV thrombolysis is indicated",
+      "Maintain blood pressure <185/110 mmHg prior to IV tPA and <180/105 mmHg for 24 hours after",
+      "Verify glucose to exclude hypoglycemia as a stroke mimic",
+      "Initiate continuous telemetry and obtain prolonged cardiac monitoring to detect paroxysmal atrial fibrillation",
+      "Begin secondary prevention (antiplatelet or anticoagulation) and high-intensity statin per mechanism",
+      "Engage maternal-fetal medicine, OB anesthesia, and neurointerventional team early",
+      "Consider mechanical thrombectomy for basilar occlusion regardless of pregnancy \u2014 outcomes favor maternal benefit",
+      "Use MRI/MRA without gadolinium when possible to minimize fetal exposure",
+      "Initiate anticoagulation (LMWH preferred in pregnancy) per mechanism after acute treatment"
     ],
     "contraindicated_actions": [
-      "Administering warfarin during pregnancy (teratogenic, crosses placenta)",
-      "Administering direct oral anticoagulants (DOACs) during pregnancy (insufficient safety data, potential teratogenicity)",
-      "Aggressively lowering blood pressure in acute posterior circulation stroke (risk of worsening brainstem ischemia)",
-      "Performing lumbar puncture in the setting of posterior fossa infarction with risk of herniation",
-      "Delaying thrombectomy consultation to obtain additional non-urgent workup in basilar artery occlusion",
-      "Administering contrast-enhanced CT unnecessarily without abdominal shielding in pregnancy"
+      "Do not administer IV tPA before non-contrast CT excludes intracranial hemorrhage",
+      "Do not give IV tPA if INR >1.7, platelet count <100,000, recent major surgery, or other guideline-listed contraindications",
+      "Do not aggressively lower blood pressure below 140/90 mmHg in the acute phase outside the tPA window \u2014 risks worsening penumbral perfusion",
+      "Do not delay non-contrast CT for additional imaging or labs in a stroke alert presentation",
+      "Do not start full-dose anticoagulation in the acute phase of a large infarct without considering hemorrhagic transformation risk",
+      "Do not withhold mechanical thrombectomy from a pregnant patient with basilar occlusion solely because of pregnancy",
+      "Do not use warfarin in pregnancy (teratogenic in first trimester, fetal bleeding throughout)",
+      "Do not use gadolinium unless essential",
+      "Avoid analyze_brain_mri with contrast=True: Gadolinium MRI in pregnancy carries fetal risk and should be avoided unless absolutely necessary"
     ],
     "key_reasoning_points": [
-      "Acute onset headache, vomiting, altered consciousness, and lateralizing motor deficits in a young pregnant woman should raise immediate concern for cerebrovascular event, even without traditional vascular risk factors",
-      "Pregnancy is an independent risk factor for arterial ischemic stroke due to the physiological hypercoagulable state, particularly elevated fibrinogen and reduced protein S",
-      "Viral meningoencephalitis is a reasonable initial differential given headache, vomiting, and altered consciousness, but focal lateralizing deficits (left-sided weakness, bilateral Babinski signs) and vascular territory infarction on MRI argue strongly for ischemic stroke",
-      "MRI demonstrates acute pontine and cerebellar infarction with DWI restriction, and MRA reveals basilar artery occlusion — this is a posterior circulation large vessel occlusion requiring emergent intervention",
-      "Basilar artery occlusion carries very high mortality (>80%) without intervention; recent trials (ATTENTION, BAOCHE 2023) support thrombectomy up to 24 hours from onset",
-      "Pregnancy is a relative, not absolute, contraindication to IV thrombolysis and thrombectomy; multidisciplinary management is essential",
-      "Antiphospholipid syndrome must be excluded as a reversible cause of pregnancy-associated stroke; negative serologies in this case support pregnancy-related hypercoagulability as the primary risk factor",
-      "Secondary prevention in pregnancy requires low-molecular-weight heparin rather than warfarin (teratogenic) or DOACs (insufficient safety data)"
+      "Acute ischemic stroke is a clinical syndrome plus neuroimaging diagnosis; CT first excludes hemorrhage and unmasks the tPA decision",
+      "Time of last known well governs IV thrombolysis eligibility (\u22644.5h standard; selected up to 9h with imaging mismatch per WAKE-UP/EXTEND)",
+      "Large vessel occlusion on CTA opens the mechanical thrombectomy pathway up to 24h per DAWN/DEFUSE-3 selection criteria",
+      "TOAST classification by mechanism (large-artery, cardioembolic, small-vessel, other, undetermined) drives secondary prevention strategy",
+      "Normal sinus rhythm on initial ECG does NOT exclude paroxysmal AF \u2014 extended cardiac monitoring is required, especially in cryptogenic stroke",
+      "Pregnancy is a hypercoagulable state with elevated stroke risk; CVST, PRES, and arterial stroke must all be considered",
+      "Basilar artery occlusion is life-threatening regardless of pregnancy status; thrombectomy benefits maternal survival and indirectly fetal viability",
+      "Antiphospholipid syndrome and inherited thrombophilias must be evaluated in young pregnancy-related strokes",
+      "Off-pathway modality for order_advanced_imaging (modality=amyloid_PET): Amyloid PET has no role in acute ischemic stroke evaluation and incurs substantial cost without altering management",
+      "Off-pathway modality for order_advanced_imaging (modality=DaTscan): Dopamine transporter SPECT is indicated for parkinsonian syndromes, not vascular stroke workup",
+      "Off-pathway modality for order_advanced_imaging (modality=FDG_PET): FDG-PET (neurodegenerative/oncologic indications) has no role in routine ischemic stroke workup"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "No prior medical history",
+        "location": "past medical history",
+        "field_path": "patient.clinical_history.past_medical_history[2]",
+        "intended_effect": "Underestimate severity and delay imaging",
+        "correct_interpretation": "Young healthy pregnant patients can still have life-threatening stroke from pregnancy-related hypercoagulability"
+      }
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -909,12 +1039,20 @@
     "source_license": "CC-BY 4.0",
     "generation_method": "real_case_seed",
     "condition_name": "Acute ischemic stroke",
-    "difficulty_description": "Straightforward — young pregnant woman with acute onset focal neurological deficits, MRI clearly shows posterior circulation infarction with basilar artery occlusion on MRA. Despite the atypical demographics (young, no traditional risk factors), the imaging findings are unambiguous and the diagnosis is readily apparent once diagnostic tools are utilized.",
+    "difficulty_description": "Straightforward \u2014 young pregnant woman with acute onset focal neurological deficits, MRI clearly shows posterior circulation infarction with basilar artery occlusion on MRA. Despite the atypical demographics (young, no traditional risk factors), the imaging findings are unambiguous and the diagnosis is readily apparent once diagnostic tools are utilized.",
     "expected_agent_confidence": 0.85,
     "fallback_tool_kinds": {
       "eeg": "normal",
       "csf": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:ISCH-STR",
+    "difficulty_rationale": "Pregnancy-associated basilar artery occlusion \u2014 pregnancy modifies imaging, treatment, and differential (CVST, PRES, eclampsia); thrombectomy decision in pregnancy.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

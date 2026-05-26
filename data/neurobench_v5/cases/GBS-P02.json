@@ -316,6 +316,22 @@
         ],
         "summary": "GBS in HIV-infected patients is a recognized clinical entity. The CSF profile may differ from classic GBS, with mononuclear pleocytosis reported in this population. Published evidence supports use of IVIG or plasmapheresis. Clinical correlation with individual patient findings is required."
       }
+    },
+    {
+      "trigger_action": "check_ivig_drug_interactions",
+      "tool_name": "check_drug_interactions",
+      "output": {
+        "general": {
+          "proposed": "(agent not specified on this case's pathway)",
+          "interactions": [],
+          "contraindications": [],
+          "warnings": [
+            "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
+          ],
+          "formulary_status": "on formulary",
+          "alternatives": []
+        }
+      }
     }
   ],
   "fallback_tool_outputs": {
@@ -406,111 +422,212 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Guillain-Barré syndrome, AIDP — HIV-associated (with characteristic CSF pleocytosis)",
+    "primary_diagnosis": "Guillain-Barré syndrome, AIDP — HIV-associated (with CSF pleocytosis)",
     "icd_code": "G61.0",
     "differential": [
       {
-        "diagnosis": "HIV distal sensorimotor neuropathy",
-        "likelihood": "very_low",
-        "key_features": "Acute 9-day onset with facial weakness and global areflexia cannot be explained by HIV neuropathy; Campylobacter trigger confirmed"
+        "diagnosis": "HIV-related acute inflammatory neuropathy / CIDP (HIV-CIDP)",
+        "likelihood": "high",
+        "key_features": "HIV is associated with both acute (GBS-like) and chronic inflammatory demyelinating polyneuropathies; differentiation depends on course (<4 weeks vs >8 weeks).",
+        "icd_code": "G61.81"
       },
       {
-        "diagnosis": "CMV polyradiculopathy (HIV-related)",
-        "likelihood": "very_low",
-        "key_features": "CMV polyradiculopathy: typically CD4 <50, ascending LMN weakness, CSF shows PMN pleocytosis, CMV PCR positive — none of these present here"
+        "diagnosis": "Opportunistic CMV polyradiculitis",
+        "likelihood": "moderate",
+        "key_features": "CD4 380 makes severe opportunistic disease less likely, but CMV testing and CSF PCR are warranted given pleocytosis; CMV polyradiculitis typically shows marked CSF neutrophilic pleocytosis and lower CD4.",
+        "icd_code": "B25.8"
       },
       {
-        "diagnosis": "Bacterial meningitis/meningitis",
-        "likelihood": "very_low",
-        "key_features": "Gram stain negative, cultures pending, no fever, crypto antigen negative"
-      },
-      {
-        "diagnosis": "CIDP",
+        "diagnosis": "Neurosyphilis / luetic polyradiculitis",
         "likelihood": "low",
-        "key_features": "Acute 9-day onset — CIDP requires >8 weeks of progression"
+        "key_features": "Possible HIV coinfection; RPR / FTA-ABS and CSF VDRL warranted but not the primary picture without other features.",
+        "icd_code": "A52.10"
+      },
+      {
+        "diagnosis": "Antiretroviral-induced toxic neuropathy",
+        "likelihood": "low",
+        "key_features": "Biktarvy regimen has low neuropathy risk; areflexia and acute progression do not fit a chronic toxic axonal pattern.",
+        "icd_code": "G62.0"
+      },
+      {
+        "diagnosis": "Lyme polyradiculitis",
+        "likelihood": "very_low",
+        "key_features": "No endemic exposure or erythema migrans; serology unsupported.",
+        "icd_code": "A69.22"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "NCS/EMG",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Severe AIDP pattern",
+        "action": "Obtain CBC, CMP, HIV, anti-GM1/anti-GQ1b ganglioside antibodies, and stool culture / Campylobacter serology if recent diarrhea",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Mild leukocytosis / elevated inflammatory markers reflecting antecedent infection; ganglioside antibodies for variant typing; trigger identification (Campylobacter, CMV, EBV, Mycoplasma, HIV)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Yuki_2012]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 2,
-        "action": "Lumbar puncture with comprehensive CSF analysis",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Elevated protein with pleocytosis (HIV-GBS pattern) — exclude opportunistic infections",
+        "action": "Order nerve conduction studies and needle EMG (EMG/NCS)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Demyelinating pattern (prolonged DML, conduction block, reduced CV, absent F-waves) consistent with AIDP, or reduced CMAP amplitudes in axonal variants (AMAN/AMSAN)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[Hadden_1998]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 3,
-        "action": "Labs including HIV status, Campylobacter serology",
-        "tool_name": "interpret_labs",
-        "expected_finding": "HIV controlled; Campylobacter positive",
+        "action": "Perform lumbar puncture for CSF analysis",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Albuminocytologic dissociation — elevated protein with cell count <10/μL; may be normal in the first week of illness",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 4,
-        "action": "Serial FVC/NIF every 4-6 hours",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Approaching intubation threshold",
+        "action": "Order bedside respiratory function testing (FVC, MIP/MEP, NIF) and repeat every 4–6 hours",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline and serial FVC, MIP/MEP, NIF; deterioration to FVC <20 mL/kg, MIP worse than -30 cmH2O, or VC <40% predicted triggers ICU transfer / intubation",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[Sharshar_2003]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 5,
-        "action": "Initiate IVIG — continue antiretrovirals throughout",
-        "tool_name": null,
-        "expected_finding": "Treatment appropriate same as HIV-negative GBS",
+        "action": "Search the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[van_den_Berg_2014]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 6,
+        "action": "Check drug interactions / contraindications for IVIG (renal function, IgA deficiency screen) and/or plasma exchange (coagulation, calcium, hemodynamics)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Confirmation that IVIG can be given safely (no severe renal impairment, no IgA deficiency) or that plasma exchange is appropriate (adequate vascular access, stable coagulation)",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[van_den_Berg_2014]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 7,
+        "action": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Sinus tachycardia or bradycardia; conduction or repolarisation abnormalities reflecting autonomic involvement",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 8,
+        "action": "Initiate continuous cardiac telemetry for the first 1–2 weeks for moderate/severe disease — autonomic instability (bradyarrhythmias, BP lability) is common",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Documentation of sinus pauses, bradyarrhythmias, BP lability, or non-sustained tachyarrhythmias",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "GBS is a peripheral nerve / nerve-root disorder; EEG has no role in diagnosis unless atypical CNS features (encephalopathy, seizures) are present.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated in typical GBS; reserve for pre-existing cardiac disease or unexplained hemodynamic instability after autonomic causes are excluded.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT contributes no diagnostic information in GBS; the disease is peripheral and CT does not visualise nerve roots reliably.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "Functional / metabolic brain imaging adds no value in a peripheral demyelinating syndrome.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "MR_angiography"
+        },
+        "rationale": "Cerebrovascular imaging is not indicated in a peripheral neuropathy without focal cerebral signs.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is reserved for atypical features (encephalopathy, CNS signs, transverse myelitis on differential). In classic GBS it does not aid diagnosis.",
+        "citation": "[van_den_Berg_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_specialized_test",
+        "after": "check_drug_interactions",
+        "reason": "Document respiratory status (FVC/NIF) before committing to IVIG vs plasma exchange — severe respiratory compromise mandates ICU triage and may influence treatment choice and timing.",
+        "citation": "[Sharshar_2003]",
+        "severity": "soft"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Renal function, IgA screen, and CBC must be reviewed before IVIG to mitigate renal failure, anaphylaxis (IgA-deficient patients), and aseptic meningitis risk.",
+        "citation": "[van_den_Berg_2014]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Recognize HIV-associated GBS can present with CSF pleocytosis — do not abandon diagnosis due to WBC 22",
-      "Exclude CMV polyradiculopathy (CMV PCR, CD4 count), cryptococcal meningitis, and bacterial infection from CSF",
-      "Continue antiretrovirals throughout — do not interrupt HIV therapy",
-      "Initiate IVIG at same dose as HIV-negative patients",
-      "ICU admission — respiratory function declining"
+      "Continue antiretroviral therapy; consult ID for HIV comanagement.",
+      "Initiate IVIG 0.4 g/kg/day for 5 days (preferred over PLEX in HIV given immune considerations).",
+      "Monitor respiratory function and autonomic status closely.",
+      "CSF CMV PCR, VDRL, and cytology to rule out opportunistic / coinfection polyradiculitis given pleocytosis.",
+      "Continuous cardiac telemetry."
     ],
     "contraindicated_actions": [
-      "Discontinuing antiretroviral therapy",
-      "Diagnosing CMV polyradiculopathy without CMV PCR positivity and CD4 <50",
-      "Corticosteroids — not effective in GBS",
-      "Delaying IVIG due to HIV status"
+      "Do not stop antiretrovirals during the acute phase.",
+      "Do not give corticosteroids as monotherapy.",
+      "Do not assume pleocytosis excludes GBS — HIV-associated GBS classically shows CSF pleocytosis."
     ],
     "key_reasoning_points": [
-      "HIV-associated GBS is a recognized entity at any CD4 count — CSF pleocytosis (10-50 cells) is characteristic and does not invalidate the diagnosis",
-      "The diagnostic puzzle: CSF WBC 22 appears to violate albumino-cytologic dissociation — but HIV-GBS is the exception where pleocytosis is expected",
-      "CMV polyradiculopathy is the critical HIV-related differential — but requires CD4 <50 and CMV PCR positive",
-      "Campylobacter trigger confirmed — same pathophysiology as HIV-negative GBS",
-      "Prognosis is similar to HIV-negative GBS with appropriate treatment"
+      "HIV-associated GBS is a well-described entity; CSF pleocytosis (10–50 WBC/μL) is expected and does NOT rule out GBS.",
+      "Distinguishing HIV-related acute polyneuropathy from opportunistic CMV polyradiculitis is critical — CMV typically has lower CD4 and marked neutrophilic pleocytosis.",
+      "Ganglioside antibody panel and antecedent infection workup remain important even in HIV-positive patients.",
+      "Treatment with IVIG is preferred over PLEX in HIV to avoid removing circulating antiretroviral medication."
     ],
     "red_herrings": [
       {
-        "data_point": "CSF WBC 22 cells/mm3",
+        "data_point": "CSF pleocytosis above the classic GBS expectation",
         "location": "followup_outputs.csf",
-        "intended_effect": "Prompt agent to question GBS diagnosis and search for alternative (meningitis, CMV polyradiculopathy, CIDP)",
-        "correct_interpretation": "HIV-associated GBS characteristically has CSF pleocytosis — this is a recognized exception to the typical albumino-cytologic dissociation rule",
-        "field_path": ""
-      },
-      {
-        "data_point": "HIV-positive status",
-        "location": "clinical_history",
-        "intended_effect": "Distract agent toward HIV-specific complications (CMV, cryptococcal, viral myelitis) rather than recognizing GBS",
-        "correct_interpretation": "HIV infection is a risk factor for GBS but GBS itself occurs via the same autoimmune mechanism — workup and treatment are the same",
-        "field_path": ""
+        "field_path": "followup_outputs",
+        "intended_effect": "Suggest opportunistic / infectious polyradiculitis rather than HIV-associated GBS.",
+        "correct_interpretation": "Mild-moderate CSF pleocytosis is well-recognised in HIV-associated GBS at preserved CD4 counts; in the absence of CMV PCR positivity it does not redirect the diagnosis."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -523,6 +640,17 @@
       "echo": "normal",
       "advanced_imaging": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:GBS",
+    "difficulty_rationale": "6 required tools, 1 red herring(s); atypical or multi-comorbidity presentation requires substantial cross-modality synthesis and active rule-out of strong mimics.",
+    "case_body_concerns": [
+      "Bedside respiratory function (FVC/MIP/MEP/NIF) is delivered via an `interpret_labs` followup panel rather than `order_specialized_test{test_type=respiratory_function}` as the criteria pack mandates. Agents calling order_specialized_test{respiratory_function} will hit the EMG/NCS output instead. Recommend adding a respiratory_function followup keyed to order_specialized_test in a follow-up case-body pass.",
+      "Mirrored fallback_tool_outputs into followup_outputs for required tools that previously only existed in the fallback bucket: ['check_drug_interactions']. Content is unchanged; the move makes the coherence validator see an explicit primary output for criteria-pack-required tools."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

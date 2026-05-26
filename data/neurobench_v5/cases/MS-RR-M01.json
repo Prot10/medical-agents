@@ -755,178 +755,261 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Multiple sclerosis, relapsing-remitting type, with subacute myelopathy as presenting clinical event and evidence of prior subclinical demyelinating episodes",
+    "primary_diagnosis": "Multiple sclerosis, relapsing-remitting type",
     "icd_code": "G35",
     "differential": [
       {
         "diagnosis": "Neuromyelitis optica spectrum disorder (NMOSD)",
-        "likelihood": "low",
-        "key_features": "AQP4 antibodies negative, short-segment spinal cord lesions (<2 vertebral segments), periventricular and juxtacortical brain lesions present — all favoring MS over NMOSD"
+        "likelihood": "high",
+        "key_features": "AQP4-IgG positivity, longitudinally extensive transverse myelitis (≥3 vertebral segments), severe or bilateral optic neuritis, and area postrema syndrome — must be excluded before committing to MS",
+        "icd_code": "G36.0"
       },
       {
-        "diagnosis": "MOG antibody disease (MOGAD)",
-        "likelihood": "low",
-        "key_features": "MOG antibodies negative, T1 black holes and periventricular lesion distribution more typical of MS; MOGAD typically has better recovery and bilateral optic neuritis"
-      },
-      {
-        "diagnosis": "CNS vasculitis",
-        "likelihood": "low",
-        "key_features": "Normal ESR/CRP, open ring enhancement pattern typical of demyelination, periventricular lesion distribution characteristic of MS rather than vasculitis"
+        "diagnosis": "MOG antibody-associated disease (MOGAD)",
+        "likelihood": "high",
+        "key_features": "MOG-IgG positivity (cell-based assay), often bilateral simultaneous optic neuritis, ADEM-like presentations in younger patients, frequent lesion resolution on follow-up MRI",
+        "icd_code": "G36.9"
       },
       {
         "diagnosis": "Neurosarcoidosis",
-        "likelihood": "very_low",
-        "key_features": "No leptomeningeal enhancement, normal ACE level, no pulmonary symptoms, lesion morphology not typical for sarcoid"
+        "likelihood": "moderate",
+        "key_features": "Leptomeningeal/pachymeningeal enhancement, hypothalamic-pituitary involvement, cranial neuropathies, hilar adenopathy on imaging, elevated serum/CSF ACE, lymphopenia",
+        "icd_code": "D86.85"
       },
       {
-        "diagnosis": "Migraine with white matter lesions",
-        "likelihood": "very_low",
-        "key_features": "Enhancing lesion, T1 black holes, spinal cord involvement, CSF oligoclonal bands, and progressive neurological deficits all exclude benign migraine-related white matter changes"
+        "diagnosis": "CNS vasculitis (primary or secondary)",
+        "likelihood": "low",
+        "key_features": "Elevated ESR/CRP, multifocal infarcts crossing vascular territories, vessel-wall enhancement on high-resolution MRA, systemic features (rash, arthritis, renal involvement)",
+        "icd_code": "I67.7"
+      },
+      {
+        "diagnosis": "Susac syndrome",
+        "likelihood": "low",
+        "key_features": "Encephalopathy + branch retinal artery occlusion + sensorineural hearing loss; corpus callosum 'snowball' lesions characteristic",
+        "icd_code": "I77.6"
+      },
+      {
+        "diagnosis": "Acute disseminated encephalomyelitis (ADEM)",
+        "likelihood": "low",
+        "key_features": "Monophasic course, post-infectious/post-vaccination trigger, encephalopathy hallmark, large confluent lesions that often resolve",
+        "icd_code": "G04.81"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain detailed neurological history including temporal profile of symptoms, prior episodes (even transient and resolved), and triggers such as heat sensitivity",
-        "tool_name": null,
-        "expected_finding": "Identifies at least two prior episodes: left optic neuritis 8 months ago and right arm/forearm paresthesias 14 months ago, plus current progressive myelopathy. Uhthoff phenomenon present.",
-        "category": "required"
+        "action": "Obtain contrast-enhanced brain MRI with MS protocol (FLAIR, T2, DWI, pre- and post-gadolinium T1) to assess dissemination in space and time",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Multifocal T2/FLAIR hyperintensities in MS-typical regions (periventricular, juxtacortical/cortical, infratentorial); presence of gadolinium-enhancing lesion(s) supports dissemination in time when also non-enhancing lesions present",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "MS_protocol",
+          "contrast": true,
+          "sequences": [
+            "FLAIR",
+            "T2",
+            "DWI",
+            "T1_pre",
+            "T1_post"
+          ]
+        },
+        "citation": "[McDonald_2017]",
+        "guideline_source": "McDonald 2017"
       },
       {
         "step": 2,
-        "action": "Perform comprehensive neurological examination including cranial nerve assessment with visual acuity, fundoscopy, and RAPD testing",
-        "tool_name": null,
-        "expected_finding": "Left eye visual acuity reduced, RAPD present on left, bilateral gaze-evoked nystagmus, left-predominant lower extremity weakness, positive Babinski on left, Lhermitte sign positive",
-        "category": "required"
+        "action": "Extend MRI to cervical and thoracic spinal cord with contrast — ~80% of MS patients have cord lesions, and cord involvement counts toward dissemination in space",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Short-segment (<2 vertebral bodies) peripheral cord lesions favor MS over NMOSD (which characteristically shows longitudinally extensive transverse myelitis ≥3 segments)",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "MS_protocol",
+          "contrast": true,
+          "region": "cervical_thoracic_spine"
+        },
+        "citation": "[MAGNIMS_2016]",
+        "guideline_source": "MAGNIMS 2016"
       },
       {
         "step": 3,
-        "action": "Order brain MRI with gadolinium contrast",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Multiple white matter lesions in periventricular, juxtacortical, and infratentorial locations with one enhancing lesion showing open ring pattern",
+        "action": "Perform lumbar puncture for CSF analysis including oligoclonal bands (paired serum), IgG index, cell count, protein, and glucose",
+        "tool_name": "analyze_csf",
+        "expected_finding": "CSF-restricted oligoclonal bands (≥2) and/or elevated IgG index support inflammatory CNS demyelination; per McDonald 2017 OCBs can substitute for dissemination in time in CIS with DIS",
         "category": "required",
         "tool_parameters": {
-          "protocol": "standard",
-          "contrast": true
-        }
+          "tests": [
+            "oligoclonal_bands",
+            "IgG_index",
+            "cell_count",
+            "protein",
+            "glucose"
+          ],
+          "paired_serum": true
+        },
+        "citation": "[McDonald_2017]",
+        "guideline_source": "McDonald 2017"
       },
       {
         "step": 4,
-        "action": "Order baseline laboratory studies including CBC, BMP, ESR, CRP, ANA, vitamin B12, vitamin D, and TSH",
+        "action": "Order broad mimic-exclusion serology: CBC, CMP, TSH, vitamin B12, vitamin D, ANA, AQP4-IgG (cell-based assay), MOG-IgG (cell-based assay), HIV, and RPR",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal except mildly low vitamin D; low-titer ANA nonspecific; no alternative systemic diagnosis",
+        "expected_finding": "AQP4-IgG and MOG-IgG negative; B12, TSH, HIV, RPR normal — excludes NMOSD, MOGAD, B12 deficiency, thyroid disease, neurosyphilis, and HIV-associated demyelination (low vitamin D is a modifiable comorbidity and a known MS risk factor, not a mimic finding)",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
-            "thyroid",
+            "CMP",
+            "TSH",
             "B12",
-            "ESR",
-            "CRP"
+            "vitamin_D",
+            "ANA",
+            "AQP4_IgG",
+            "MOG_IgG",
+            "HIV",
+            "RPR"
           ]
-        }
+        },
+        "citation": "[Wingerchuk_2015]",
+        "guideline_source": "Wingerchuk 2015 (NMOSD criteria)"
       },
       {
         "step": 5,
-        "action": "Order aquaporin-4 and MOG antibody testing",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Both negative, excluding NMOSD and MOGAD",
+        "action": "Search the medical literature for the McDonald 2017 diagnostic criteria and current first-line / high-efficacy DMT options for RRMS",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Retrieves McDonald 2017 criteria and contemporary DMT guidance (platform vs. high-efficacy choice, NEDA-3 outcome framework)",
         "category": "required",
         "tool_parameters": {
-          "panels": [
-            "NMO_MOG"
-          ]
-        }
+          "query": "McDonald 2017 criteria multiple sclerosis disease-modifying therapy first-line high-efficacy"
+        },
+        "citation": "[Reich_2018]",
+        "guideline_source": "Reich 2018 NEJM review"
       },
       {
         "step": 6,
-        "action": "Perform lumbar puncture for CSF analysis including oligoclonal bands, IgG index, cell count, protein, and glucose",
-        "tool_name": null,
-        "expected_finding": "Oligoclonal bands present (2 bands), borderline IgG index, mildly elevated myelin basic protein — supportive but borderline findings",
-        "category": "required"
+        "action": "Run a drug-interaction and contraindication check for the proposed disease-modifying therapy, including JC virus serostatus considerations, live-vaccine timing, and (for fingolimod) baseline ECG / first-dose bradyarrhythmia monitoring",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Confirms DMT compatibility with current medications; flags PML risk for natalizumab in JCV-positive patients and first-dose bradyarrhythmia risk for fingolimod",
+        "category": "required",
+        "tool_parameters": {
+          "proposed_class": "MS_DMT",
+          "screen_for": [
+            "JCV_serostatus",
+            "live_vaccines",
+            "hepatic_function",
+            "lymphocyte_count"
+          ]
+        },
+        "citation": "[Reich_2018]",
+        "guideline_source": "Reich 2018 NEJM review"
       },
       {
         "step": 7,
-        "action": "Order MRI of cervical and thoracic spine with contrast to evaluate for spinal cord lesions",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Two short-segment spinal cord lesions at C3-C4 and T8-T9, with thoracic lesion showing enhancement corresponding to current symptoms",
-        "category": "required",
+        "action": "Obtain retinal optical coherence tomography (OCT) to assess for RNFL/GCL thinning supporting prior subclinical optic pathway involvement",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Reduced peripapillary RNFL and ganglion cell layer thickness, particularly asymmetric, supports prior optic neuritis even without acute symptoms — contributes to dissemination in space",
+        "category": "recommended",
         "tool_parameters": {
-          "protocol": "tumor",
-          "contrast": true
-        }
+          "test_type": "optical_coherence_tomography"
+        },
+        "citation": "[Petzold_2017]",
+        "guideline_source": "Petzold 2017"
       },
       {
         "step": 8,
-        "action": "Order visual evoked potentials to objectively document prior optic nerve demyelination",
+        "action": "Obtain visual evoked potentials to detect subclinical optic pathway demyelination",
         "tool_name": "order_specialized_test",
-        "expected_finding": "Prolonged P100 latency in the left eye confirming prior optic neuritis",
+        "expected_finding": "Prolonged P100 latency (with preserved amplitude relative to delay) is the classic VEP signature of demyelinating optic pathway disease — useful for DIS when MRI is borderline",
         "category": "recommended",
         "tool_parameters": {
           "test_type": "vep"
-        }
+        },
+        "citation": "[McDonald_2017]",
+        "guideline_source": "McDonald 2017"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG has no role in MS diagnosis — findings are non-specific and do not contribute to dissemination in space or time.",
+        "citation": "[McDonald_2017]"
       },
       {
-        "step": 9,
-        "action": "Apply 2017 McDonald diagnostic criteria to integrate clinical, MRI, and CSF findings to confirm diagnosis of MS",
-        "tool_name": null,
-        "expected_finding": "Criteria met: DIS (periventricular + juxtacortical + infratentorial + spinal cord) and DIT (enhancing + non-enhancing lesions, plus prior clinical episodes). CSF OCBs provide additional supportive evidence.",
-        "category": "required"
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "CT is markedly inferior to MRI for visualising demyelinating plaques; ordering CT delays diagnosis and adds radiation without clinical benefit.",
+        "citation": "[MAGNIMS_2016]"
       },
       {
-        "step": 10,
-        "action": "Treat acute relapse with IV methylprednisolone 1 g daily for 3-5 days",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No cardiac indication in a typical MS workup; echocardiography does not inform the demyelinating differential.",
+        "citation": "[Reich_2018]"
       },
       {
-        "step": 11,
-        "action": "Initiate disease-modifying therapy for relapsing-remitting MS, discussing options including moderate-efficacy and high-efficacy agents based on disease activity",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Selection of appropriate DMT based on disease activity, patient preferences, and safety profile",
-        "category": "required"
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring is only indicated for first-dose fingolimod initiation (bradyarrhythmia risk) — not as part of MS diagnostic workup.",
+        "citation": "[Reich_2018]"
       },
       {
-        "step": 12,
-        "action": "Arrange follow-up MRI in 3 months to establish new baseline and monitor for treatment response, with clinical follow-up in neurology",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "FDG-PET is not indicated for MS diagnosis or DMT decisions; it does not differentiate demyelination from mimics and adds substantial cost.",
+        "citation": "[Reich_2018]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "Standard pre-LP imaging: confirm absence of mass effect / herniation risk on brain MRI before lumbar puncture",
+        "citation": "[McDonald_2017]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Identify prior clinical episodes (optic neuritis, arm paresthesias) that suggest dissemination in time — these were not initially recognized as demyelinating events",
-      "Order brain and spinal cord MRI with contrast to demonstrate dissemination in space across multiple CNS regions",
-      "Perform lumbar puncture for CSF oligoclonal bands, which can substitute for clinical dissemination in time under 2017 McDonald criteria",
-      "Exclude NMOSD and MOGAD with aquaporin-4 and MOG antibody testing before committing to an MS diagnosis",
-      "Apply 2017 McDonald diagnostic criteria systematically to confirm the diagnosis",
-      "Initiate acute relapse treatment with IV corticosteroids",
-      "Initiate disease-modifying therapy to prevent future relapses and disability accumulation"
+      "Establish dissemination in space (DIS) using brain and spinal-cord MRI in MS-typical regions (periventricular, juxtacortical/cortical, infratentorial, spinal cord)",
+      "Establish dissemination in time (DIT) by demonstrating simultaneous enhancing and non-enhancing lesions, a new lesion on follow-up MRI, or CSF-restricted oligoclonal bands (per McDonald 2017)",
+      "Exclude NMOSD and MOGAD with AQP4-IgG and MOG-IgG cell-based assays before committing to an MS diagnosis and DMT",
+      "Order CSF analysis with paired serum to assess oligoclonal bands and IgG index",
+      "Treat the acute relapse with high-dose IV methylprednisolone (1 g daily for 3–5 days), with plasma exchange reserved for steroid-refractory severe relapses",
+      "Initiate a disease-modifying therapy (DMT) after relapse stabilization; choice between platform vs. high-efficacy agent based on disease activity, MRI burden, and patient preference",
+      "Check JC virus antibody serostatus before considering natalizumab; verify up-to-date vaccinations (especially live-attenuated) before initiating B-cell depleting or S1P-modulator DMTs",
+      "Counsel on Uhthoff phenomenon, heat avoidance, smoking cessation, and vitamin D supplementation as modifiable lifestyle factors"
     ],
     "contraindicated_actions": [
-      "Attributing symptoms to functional neurological disorder without completing a thorough workup including MRI and CSF analysis",
-      "Diagnosing MS based solely on MRI white matter lesions without meeting McDonald criteria and excluding mimics",
-      "Starting natalizumab without first checking JC virus antibody status",
-      "Starting teriflunomide without pregnancy testing and contraception counseling in a woman of childbearing age",
-      "Failing to image the spinal cord when myelopathic signs are present",
-      "Treating with chronic oral corticosteroids rather than pulse IV steroids for acute relapse — chronic steroids are ineffective and harmful in MS"
+      "Do not diagnose MS based on non-specific white-matter lesions alone without meeting McDonald 2017 criteria and excluding mimics",
+      "Do not start natalizumab in a JC virus-antibody-positive patient (especially with high index) without explicit benefit-risk discussion of PML",
+      "Do not initiate fingolimod without a baseline ECG and first-dose bradyarrhythmia monitoring; avoid in patients with second-degree AV block, prior MI, or severe sleep apnea",
+      "Do not start teriflunomide in a woman of child-bearing potential without effective contraception (teratogenic, long elimination half-life)",
+      "Do not use chronic oral corticosteroids as a maintenance treatment for MS — they are ineffective long-term and carry significant harm",
+      "Do not administer live-attenuated vaccines after initiation of B-cell depleting therapy (ocrelizumab, ofatumumab) or S1P modulators (fingolimod, ozanimod)",
+      "Do not omit spinal-cord MRI in a patient with myelopathic signs even if the brain MRI alone meets DIS criteria — cord lesions change relapse counting and management"
     ],
     "key_reasoning_points": [
-      "The patient has three separate clinical episodes affecting different CNS locations (optic neuritis, hand/forearm paresthesias, myelopathy) — this establishes dissemination in time clinically, even though the first two were not initially recognized as demyelinating events",
-      "Brain MRI shows lesions in periventricular, juxtacortical, and infratentorial regions, but the findings are not classic textbook MS (no definite Dawson fingers, borderline lesion characteristics) — requiring spinal cord imaging to complete the DIS assessment",
-      "CSF findings are supportive but borderline (only 2 OCBs, borderline IgG index), reflecting the moderate difficulty — an agent must integrate imperfect data across multiple modalities rather than relying on any single test",
-      "The open ring enhancement pattern on MRI strongly favors demyelination over tumor or infection — this is a key imaging discriminator",
-      "Short-segment spinal cord lesions (<2 vertebral segments) favor MS over NMOSD, where longitudinally extensive transverse myelitis (>=3 segments) is typical",
-      "Lhermitte sign and Uhthoff phenomenon are clinical features highly suggestive of MS that should raise diagnostic suspicion even before imaging",
-      "Negative AQP4 and MOG antibodies are essential to exclude MS mimics before initiating disease-modifying therapy",
-      "Low vitamin D is both a risk factor for MS and a modifiable comorbidity that should be addressed as part of comprehensive management"
+      "MS is a clinical-radiographic diagnosis: McDonald 2017 requires dissemination in space (DIS) and dissemination in time (DIT) plus exclusion of better explanations — no single test confirms it",
+      "MS-typical MRI regions are periventricular, juxtacortical/cortical, infratentorial, and spinal cord — recognising a lesion in three of these regions establishes DIS for an attack-meeting clinical event",
+      "CSF-restricted oligoclonal bands (≥2 bands not present in paired serum) can substitute for DIT under McDonald 2017 when DIS is met — this changes the calculus for clinically isolated syndromes",
+      "Short-segment (<2 vertebral bodies), peripheral, dorsolateral or dorsal-column spinal cord lesions strongly favour MS over NMOSD (which characteristically produces longitudinally extensive transverse myelitis ≥3 segments)",
+      "Open-ring enhancement with the opening oriented toward the cortex is a high-specificity sign of demyelination, distinguishing tumefactive MS from neoplasm and abscess",
+      "AQP4-IgG and MOG-IgG must be ordered as cell-based assays, not ELISA — the older ELISA-based AQP4 assays have unacceptable false-negative rates",
+      "T1 hypointense 'black holes' indicate axonal loss from prior inflammatory episodes and contribute evidence of dissemination in time even without simultaneous enhancing lesions",
+      "Choice of DMT — platform agent (interferon-β, glatiramer, teriflunomide, dimethyl fumarate) vs. high-efficacy agent (natalizumab, ocrelizumab, ofatumumab, cladribine, S1P modulators) — should weigh disease activity, MRI burden, patient comorbidities, JCV serostatus, and reproductive plans",
+      "Low serum vitamin D is a known MS risk factor and a modifiable comorbidity; while it is NOT a diagnostic criterion, supplementation is part of comprehensive management"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "Low vitamin D (29 ng/mL) reported as abnormal",
+        "location": "labs",
+        "field_path": "initial_tool_outputs.labs.panels.Inflammatory and Autoimmune Markers[4]",
+        "intended_effect": "May tempt the agent to attribute the patient's neurological symptoms to vitamin D deficiency or to label this as a 'metabolic' presentation",
+        "correct_interpretation": "Low vitamin D is a recognised MS risk factor and a modifiable comorbidity, NOT a diagnostic criterion — it should be supplemented but does not change or explain the MS workup"
+      }
+    ]
   },
   "metadata": {
     "version": "1.0",
@@ -949,6 +1032,14 @@
       "cardiac_monitoring": "incidental",
       "advanced_imaging": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (condition-expert:MS-RR)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MS-RR",
+    "difficulty_rationale": "Brain MRI shows MS-typical regions with at least one enhancing lesion supporting DIT; CSF and AQP4/MOG still required to confirm and exclude mimics; integration across 3–4 modalities needed",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

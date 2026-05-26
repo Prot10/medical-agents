@@ -1,7 +1,7 @@
 {
   "case_id": "ISCH-STR-RS02",
   "condition": "ischemic_stroke",
-  "difficulty": "straightforward",
+  "difficulty": "diagnostic_puzzle",
   "encounter_type": "emergency",
   "patient": {
     "patient_id": "NB-ISCH-STR-RS02",
@@ -664,18 +664,18 @@
         ],
         "contraindications": [
           "Active intracranial hemorrhage (excluded by imaging in this patient)",
-          "Recent major surgery within 14 days — patient is 6 weeks post aortic arch replacement, which is beyond the high-risk window but warrants caution"
+          "Recent major surgery within 14 days \u2014 patient is 6 weeks post aortic arch replacement, which is beyond the high-risk window but warrants caution"
         ],
         "warnings": [
           "Monitor aPTT every 6 hours and adjust to target 60-80 seconds",
           "Monitor platelets every 2-3 days for heparin-induced thrombocytopenia",
-          "Mild anemia present — monitor hemoglobin closely for bleeding complications",
-          "CKD stage 2 — no dose adjustment required but monitor renal function"
+          "Mild anemia present \u2014 monitor hemoglobin closely for bleeding complications",
+          "CKD stage 2 \u2014 no dose adjustment required but monitor renal function"
         ],
         "formulary_status": "Available on formulary",
         "alternatives": [
-          "Enoxaparin (LMWH) — avoid if creatinine clearance drops below 30 mL/min",
-          "Argatroban — if HIT is suspected"
+          "Enoxaparin (LMWH) \u2014 avoid if creatinine clearance drops below 30 mL/min",
+          "Argatroban \u2014 if HIT is suspected"
         ]
       }
     }
@@ -726,155 +726,302 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Acute ischemic stroke, left MCA territory, secondary to left common carotid artery dissection extending into the internal carotid artery (iatrogenic, post aortic arch replacement)",
-    "icd_code": "I63.9",
+    "primary_diagnosis": "Acute ischemic stroke, left MCA territory, secondary to iatrogenic left common carotid artery dissection extending into the left ICA following recent total aortic arch replacement",
+    "icd_code": "I97.811",
     "differential": [
       {
-        "diagnosis": "Cardioembolic stroke (atrial fibrillation)",
+        "diagnosis": "Postoperative cardioembolic stroke (intraoperative or atheroembolism)",
+        "likelihood": "high",
+        "key_features": "Cardiac surgery is associated with intraoperative embolic strokes; competing mechanism that must be evaluated and managed",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Postoperative atrial fibrillation with embolism",
+        "likelihood": "moderate",
+        "key_features": "Common after cardiac surgery; telemetry assessment needed",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Hemorrhagic stroke",
         "likelihood": "low",
-        "key_features": "ECG and Holter monitoring show normal sinus rhythm throughout; echocardiogram shows no intracardiac thrombus or structural source"
+        "key_features": "CT/MRI exclude hemorrhage; recent surgery increases bleeding risk",
+        "icd_code": null
       },
       {
-        "diagnosis": "Epilepsy with Todd's paralysis",
-        "likelihood": "very_low",
-        "key_features": "No witnessed seizure activity, transient episodes were stereotyped and lateralized without post-ictal confusion, and MRI confirms acute infarction"
-      },
-      {
-        "diagnosis": "Hypoglycemia causing transient focal deficits",
-        "likelihood": "very_low",
-        "key_features": "Blood glucose 158 mg/dL on presentation; HbA1c 6.8% indicates reasonably controlled diabetes without hypoglycemic episodes"
-      },
-      {
-        "diagnosis": "Spinal cord disease (cervical myelopathy)",
-        "likelihood": "very_low",
-        "key_features": "Unilateral cortical signs (facial droop, UMN pattern), DWI-positive brain lesion; pattern inconsistent with spinal cord pathology"
-      },
-      {
-        "diagnosis": "Atherosclerotic large vessel disease with artery-to-artery embolism",
+        "diagnosis": "Septic embolism (graft infection)",
         "likelihood": "low",
-        "key_features": "CTA demonstrates intimal flap and double-lumen sign characteristic of dissection rather than atherosclerotic plaque; onset temporally related to recent aortic surgery"
+        "key_features": "Postoperative endocarditis on prosthetic material is possible; assess inflammatory markers",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Watershed/hypoperfusion stroke",
+        "likelihood": "low",
+        "key_features": "Possible during cardiopulmonary bypass; less likely given delayed presentation",
+        "icd_code": null
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Activate stroke code; establish last known well time (3 hours) and perform NIHSS assessment",
-        "tool_name": null,
-        "expected_finding": "NIHSS 8, LKW 3 hours prior",
-        "category": "required"
+        "action": "Obtain emergent non-contrast CT head as first imaging to exclude intracranial hemorrhage before any thrombolytic decision",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No hemorrhage on non-contrast CT; surgical changes from recent aortic arch replacement visible",
+        "category": "required",
+        "tool_parameters": {
+          "contrast": false,
+          "angiography": false
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 2,
-        "action": "Obtain emergent brain MRI with DWI or non-contrast CT head to assess for acute infarction and exclude hemorrhage",
+        "action": "Obtain CT angiography of head and neck to evaluate for large vessel occlusion and assess thrombectomy candidacy",
         "tool_name": "order_ct_scan",
-        "expected_finding": "Acute left MCA territory infarction with restricted diffusion; reduced left ICA/MCA flow on MRA",
+        "expected_finding": "CTA neck demonstrates left common carotid artery dissection extending into left ICA \u2014 iatrogenic from recent surgery",
         "category": "required",
         "tool_parameters": {
-          "angiography": false,
-          "contrast": false
-        }
+          "contrast": true,
+          "angiography": true
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 3,
-        "action": "Obtain stat labs including CBC, BMP, coagulation studies, D-dimer, and inflammatory markers",
+        "action": "Order stat labs: CBC, BMP (including glucose), coagulation panel (INR/PTT), troponin",
         "tool_name": "interpret_labs",
-        "expected_finding": "Elevated D-dimer, elevated CRP/ESR, normal coagulation, mild anemia",
+        "expected_finding": "CBC, BMP, coagulation, troponin; verify any antithrombotics in use postoperatively",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
+            "glucose",
             "coagulation",
-            "inflammatory_markers"
+            "troponin"
           ]
-        }
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 4,
-        "action": "Obtain 12-lead ECG to evaluate for arrhythmia as a cardioembolic source",
+        "action": "Obtain 12-lead ECG to assess for atrial fibrillation and concurrent cardiac ischemia",
         "tool_name": "analyze_ecg",
-        "expected_finding": "Normal sinus rhythm with LVH; no atrial fibrillation — argues against cardioembolic source",
-        "category": "required"
+        "expected_finding": "Sinus rhythm with post-surgical changes possible; exclude new ischemia",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 5,
-        "action": "Obtain CT angiography of head and neck to evaluate carotid artery pathology given surgical history and reduced ICA flow on MRA",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "Left CCA dissection with intimal flap extending into ICA with significant true lumen narrowing",
+        "action": "Review current AHA/ASA guidelines for IV thrombolysis windows, late-window selection, and mechanical thrombectomy eligibility",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Post-cardiac-surgery stroke: iatrogenic carotid dissection, perioperative antithrombotic strategy",
         "category": "required",
         "tool_parameters": {
-          "angiography": true,
-          "contrast": false
-        }
+          "query": "Post-cardiac-surgery stroke: iatrogenic carotid dissection, perioperative antithrombotic strategy"
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 6,
-        "action": "Consult vascular surgery and neurointerventional radiology for stent placement given recurrent ischemic events progressing to completed stroke despite antiplatelet therapy",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Confirm absence of contraindications to IV thrombolysis (recent anticoagulation, surgery, bleeding, drug interactions)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "tPA contraindications screened; medication-anticoagulant interactions reviewed",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 7,
-        "action": "Initiate systemic anticoagulation (IV heparin) to prevent further thromboembolic events from the dissection while planning definitive intervention",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Heparin safe to use; monitor for HIT and bleeding given recent surgery",
-        "category": "required"
+        "action": "Obtain brain MRI with DWI and FLAIR to confirm acute infarct, localize territory, and assess vintage",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "DWI-positive infarct in left MCA territory; T1 fat-sat cervical MRI confirms dissection-related intramural hematoma",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "stroke",
+          "sequences": [
+            "DWI",
+            "ADC",
+            "FLAIR",
+            "T2",
+            "T1",
+            "GRE/SWI"
+          ],
+          "contrast": false
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 8,
-        "action": "Admit to stroke unit or neurological ICU for close monitoring with serial neurological assessments",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Obtain transthoracic echocardiogram to evaluate for cardioembolic source of stroke",
+        "tool_name": "order_echocardiogram",
+        "expected_finding": "TEE assesses postoperative valve/graft, ventricular function, and aortic arch \u2014 relevant given recent arch replacement",
+        "category": "required",
+        "tool_parameters": {
+          "echo_type": "TEE"
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 9,
-        "action": "Search medical literature for management of carotid dissection post aortic surgery",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Endovascular stenting recommended for recurrent events despite medical therapy",
-        "category": "recommended"
+        "action": "Initiate inpatient telemetry plus 24-hour Holter monitoring (extend to 30-day event monitor if no source identified)",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Telemetry plus Holter \u2014 postoperative AF is common after cardiac surgery",
+        "category": "required",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "citation": "[Sanna_2014]",
+        "guideline_source": "[Sanna_2014]"
       },
       {
         "step": 10,
-        "action": "Order echocardiogram to exclude concurrent cardioembolic source",
-        "tool_name": "order_echocardiogram",
-        "expected_finding": "Normal cardiac function, no thrombus, ruling out cardiac embolism",
+        "action": "Obtain carotid duplex ultrasound to quantify cervical carotid stenosis and characterize plaque morphology",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Duplex shows abnormal flow consistent with dissection in left CCA/ICA",
+        "category": "required",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
+      },
+      {
+        "step": 11,
+        "action": "MR angiography of head and neck if CTA cannot fully characterize dissection extent into intracranial vessels",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Define dissection extent, presence of pseudoaneurysm, and intracranial vessel patency",
+        "category": "required",
+        "tool_parameters": {
+          "modality": "MR_angiography"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
+      },
+      {
+        "step": 12,
+        "action": "Consider MR angiography of head and neck if CTA was contraindicated or as confirmatory vascular study",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Alternative non-iodinated vascular assessment when CTA is limited",
         "category": "recommended",
         "tool_parameters": {
-          "echo_type": "TTE"
-        }
+          "modality": "MR_angiography"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
+      },
+      {
+        "step": 13,
+        "action": "Consider transcranial Doppler for microembolic signal detection or hemodynamic assessment in selected mechanisms",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Microembolic signals support active embolic mechanism; can monitor vasospasm or right-to-left shunt",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "transcranial_doppler"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "No seizure features; EEG not part of stroke workup",
+        "citation": "[AHA_ASA_2019]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No SAH or CNS infection suspicion; LP not indicated",
+        "citation": "[AHA_ASA_2019]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "rationale": "EMG/NCS evaluates peripheral nerve disease; not applicable to central ischemic stroke",
+        "citation": "[AHA_ASA_2019]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "check_drug_interactions",
+        "reason": "Non-contrast head CT MUST exclude intracranial hemorrhage before IV thrombolysis is considered (tPA decision modeled here through drug-interaction/contraindication check).",
+        "citation": "[AHA_ASA_2019]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Glucose, INR/PTT, and platelet count must be reviewed before IV thrombolysis to exclude hypoglycemia mimic and coagulopathy contraindications.",
+        "citation": "[AHA_ASA_2019]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Recognize that recurrent stereotyped transient hemiparesis in a patient with recent aortic arch surgery suggests carotid dissection rather than cardiac embolism",
-      "Obtain urgent brain imaging to confirm acute ischemic stroke and exclude hemorrhage",
-      "Obtain CT angiography to identify the left CCA dissection extending into the ICA as the stroke etiology",
-      "Exclude cardiac sources (ECG, echocardiogram) to confirm the vascular etiology",
-      "Initiate anticoagulation to prevent further thromboembolic events from the dissection",
-      "Consult vascular/neurointerventional surgery for definitive management (stenting) given failure of medical therapy"
+      "Establish time of last known well (LKW) and apply NIHSS to determine acute treatment eligibility",
+      "Obtain non-contrast CT head FIRST to exclude intracranial hemorrhage before any thrombolytic decision",
+      "Achieve door-to-needle time <60 minutes if IV thrombolysis is indicated",
+      "Maintain blood pressure <185/110 mmHg prior to IV tPA and <180/105 mmHg for 24 hours after",
+      "Verify glucose to exclude hypoglycemia as a stroke mimic",
+      "Initiate continuous telemetry and obtain prolonged cardiac monitoring to detect paroxysmal atrial fibrillation",
+      "Begin secondary prevention (antiplatelet or anticoagulation) and high-intensity statin per mechanism",
+      "Recognize recent major surgery as an absolute contraindication to IV thrombolysis (within 14 days)",
+      "Consider mechanical thrombectomy if LVO is present and patient meets other criteria \u2014 surgical recency is not an absolute contraindication to thrombectomy",
+      "Engage cardiothoracic surgery for management of iatrogenic dissection",
+      "Choose antithrombotic strategy carefully \u2014 recent surgery alters bleeding risk"
     ],
     "contraindicated_actions": [
-      "Attributing the ischemic events to epilepsy without performing vascular imaging in a post-aortic surgery patient",
-      "Administering IV thrombolysis without first characterizing the carotid dissection, as stenting may be more appropriate",
-      "Delaying vascular imaging in a patient with recurrent ischemic events and recent aortic surgery",
-      "Performing lumbar puncture — not indicated and risks unnecessary delay",
-      "Aggressively lowering blood pressure below 140/90 in the acute phase, which could worsen hypoperfusion through the stenotic dissection",
-      "Discharging the patient on aspirin alone given progression of ischemic events despite ongoing antiplatelet therapy"
+      "Do not administer IV tPA before non-contrast CT excludes intracranial hemorrhage",
+      "Do not give IV tPA if INR >1.7, platelet count <100,000, recent major surgery, or other guideline-listed contraindications",
+      "Do not aggressively lower blood pressure below 140/90 mmHg in the acute phase outside the tPA window \u2014 risks worsening penumbral perfusion",
+      "Do not delay non-contrast CT for additional imaging or labs in a stroke alert presentation",
+      "Do not start full-dose anticoagulation in the acute phase of a large infarct without considering hemorrhagic transformation risk",
+      "Do not give IV tPA within 14 days of major cardiac surgery",
+      "Do not start full-dose anticoagulation without weighing recent surgical bleeding risk",
+      "Avoid check_drug_interactions with proposed=alteplase: IV alteplase is generally contraindicated within 14 days of major surgery \u2014 recent aortic arch replacement places this patient outside standard tPA eligibility"
     ],
     "key_reasoning_points": [
-      "Recurrent stereotyped transient right-sided hemiparesis beginning weeks after aortic arch surgery should raise immediate suspicion for iatrogenic carotid artery dissection",
-      "The progression from TIAs to completed stroke despite aspirin therapy indicates inadequate medical management and need for escalation to anticoagulation and/or endovascular intervention",
-      "Normal sinus rhythm on ECG and normal echocardiogram exclude cardioembolic sources, redirecting attention to extracranial vascular pathology",
-      "MRA showing reduced left ICA and MCA flow provides the key clue pointing toward upstream carotid pathology rather than in-situ intracranial occlusion",
-      "CT angiography revealing the classic double-lumen sign with intimal flap originating near the aortic graft anastomosis confirms iatrogenic dissection as the etiology",
-      "Exclusion of alternative causes of transient paralysis (epilepsy, electrolyte abnormalities, hypoglycemia, spinal cord disease) is part of the systematic diagnostic process",
-      "Elevated D-dimer supports an active thrombotic process within the false lumen, consistent with ongoing dissection"
+      "Acute ischemic stroke is a clinical syndrome plus neuroimaging diagnosis; CT first excludes hemorrhage and unmasks the tPA decision",
+      "Time of last known well governs IV thrombolysis eligibility (\u22644.5h standard; selected up to 9h with imaging mismatch per WAKE-UP/EXTEND)",
+      "Large vessel occlusion on CTA opens the mechanical thrombectomy pathway up to 24h per DAWN/DEFUSE-3 selection criteria",
+      "TOAST classification by mechanism (large-artery, cardioembolic, small-vessel, other, undetermined) drives secondary prevention strategy",
+      "Normal sinus rhythm on initial ECG does NOT exclude paroxysmal AF \u2014 extended cardiac monitoring is required, especially in cryptogenic stroke",
+      "Recent major surgery is a contraindication to IV tPA but not necessarily to mechanical thrombectomy",
+      "Iatrogenic carotid dissection can present weeks after cardiac surgery; recurrent TIAs in a postoperative patient demand vessel imaging",
+      "Both dissection and postoperative AF can co-occur \u2014 comprehensive workup is needed",
+      "Off-pathway modality for order_advanced_imaging (modality=amyloid_PET): Amyloid PET has no role in acute ischemic stroke evaluation and incurs substantial cost without altering management",
+      "Off-pathway modality for order_advanced_imaging (modality=DaTscan): Dopamine transporter SPECT is indicated for parkinsonian syndromes, not vascular stroke workup",
+      "Off-pathway modality for order_advanced_imaging (modality=FDG_PET): FDG-PET (neurodegenerative/oncologic indications) has no role in routine ischemic stroke workup"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "Recent aortic arch replacement and presumption of 'expected postoperative course'",
+        "location": "past medical history",
+        "field_path": "patient.clinical_history.past_medical_history[0]",
+        "intended_effect": "Dismiss recurrent neurological symptoms as expected post-surgical changes",
+        "correct_interpretation": "Recurrent TIAs after cardiac surgery are NOT expected \u2014 they signal an embolic or dissection source"
+      },
+      {
+        "data_point": "Peripheral arterial disease history",
+        "location": "past medical history",
+        "field_path": "patient.clinical_history.past_medical_history[5]",
+        "intended_effect": "Anchor to systemic atherosclerosis as sole mechanism",
+        "correct_interpretation": "Dissection on imaging is the proximate mechanism; atherosclerosis is a background contributor"
+      }
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -882,12 +1029,20 @@
     "source_license": "CC-BY 4.0",
     "generation_method": "real_case_seed",
     "condition_name": "Acute ischemic stroke",
-    "difficulty_description": "Straightforward — post-surgical patient with recurrent TIAs progressing to completed stroke, clear temporal relationship to aortic arch surgery, and classic carotid dissection findings on CTA",
+    "difficulty_description": "Straightforward \u2014 post-surgical patient with recurrent TIAs progressing to completed stroke, clear temporal relationship to aortic arch surgery, and classic carotid dissection findings on CTA",
     "expected_agent_confidence": 0.85,
     "fallback_tool_kinds": {
       "eeg": "normal",
       "csf": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:ISCH-STR",
+    "difficulty_rationale": "Iatrogenic carotid dissection post-aortic arch replacement \u2014 recurrent TIAs dismissed as post-surgical; multiple competing mechanisms and recent-surgery tPA contraindication.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

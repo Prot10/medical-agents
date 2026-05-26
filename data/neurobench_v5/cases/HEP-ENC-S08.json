@@ -1,7 +1,7 @@
 {
   "case_id": "HEP-ENC-S08",
   "condition": "hepatic_encephalopathy",
-  "difficulty": "straightforward",
+  "difficulty": "moderate",
   "encounter_type": "emergency",
   "patient": {
     "patient_id": "NB-HEP-ENC-S08",
@@ -850,197 +850,163 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Hepatic encephalopathy, Grade 3, acute-on-chronic, with multiple precipitants (GI hemorrhage, hypokalemia, alcohol intoxication, lactulose non-compliance)",
-    "icd_code": "K72.9",
+    "primary_diagnosis": "Hepatic encephalopathy (West Haven grade III), acute-on-chronic, alcoholic cirrhosis (Child-Pugh B, MELD 18) — precipitated by GI hemorrhage, hypokalemia, recent alcohol use, and lactulose non-adherence.",
+    "icd_code": "K72.91",
     "differential": [
+      {
+        "diagnosis": "SBP",
+        "likelihood": "moderate",
+        "key_features": "Paracentesis mandatory if ascites.",
+        "icd_code": "K65.2"
+      },
+      {
+        "diagnosis": "Alcohol withdrawal",
+        "likelihood": "moderate",
+        "key_features": "Monitor with CIWA; non-benzodiazepine-first management.",
+        "icd_code": "F10.230"
+      },
+      {
+        "diagnosis": "Subdural hematoma (coagulopathy + falls)",
+        "likelihood": "low",
+        "key_features": "CT excludes.",
+        "icd_code": "I62.00"
+      },
       {
         "diagnosis": "Wernicke encephalopathy",
         "likelihood": "low",
-        "key_features": "Alcoholism is present but MRI shows no periaqueductal/mammillary T2 signal; classic triad incomplete; thiamine low but HE pattern dominates; give thiamine empirically"
-      },
-      {
-        "diagnosis": "Alcohol intoxication with withdrawal risk",
-        "likelihood": "moderate",
-        "key_features": "BAL 142 mg/dL contributes to altered mental status but does not explain hyperammonemia (187 umol/L) or triphasic waves on EEG; alcohol is co-precipitant for HE"
-      },
-      {
-        "diagnosis": "Uremic encephalopathy",
-        "likelihood": "low",
-        "key_features": "Creatinine only 1.4 mg/dL; BUN elevated predominantly from GI protein load; no history of renal failure; does not explain hyperammonemia"
-      },
-      {
-        "diagnosis": "Bacterial meningitis or encephalitis",
-        "likelihood": "very_low",
-        "key_features": "No fever, no meningismus, CT normal, CSF not indicated in this presentation; triphasic waves on EEG not typical of CNS infection"
-      },
-      {
-        "diagnosis": "Non-convulsive status epilepticus",
-        "likelihood": "low",
-        "key_features": "EEG shows triphasic waves without true epileptiform activity; benzodiazepine challenge negative; no ictal evolution; excluded by cEEG"
+        "key_features": "Empiric thiamine before dextrose.",
+        "icd_code": "E51.2"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Stabilize airway/breathing/circulation; IV access, volume resuscitation with blood products (PRBCs for Hgb 8.1, FFP for INR 2.8)",
-        "tool_name": null,
-        "expected_finding": "Hemodynamic stabilization; target SBP >90, HR <100",
+        "action": "Comprehensive labs: CMP including AST/ALT/bilirubin/INR/albumin, ammonia, CBC, glucose, electrolytes (Na, K, Mg), BUN/Cr, lactate, blood cultures and urine cultures; toxicology if substance use plausible. Confirms liver dysfunction and screens for precipitants.",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Ammonia elevated; Hgb low + BUN high (GI bleed marker); K low; cirrhosis features.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 2,
-        "action": "Administer IV thiamine 100mg immediately before any dextrose infusion (Wernicke prophylaxis)",
-        "tool_name": null,
-        "expected_finding": "Thiamine replaced prophylactically; prevents Wernicke encephalopathy in alcoholic patient",
+        "action": "Non-contrast CT head — exclude structural alternate cause of AMS (hemorrhage, large stroke, mass) before any LP.",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No hemorrhage.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 3,
-        "action": "Correct hypoglycemia: D50W 50mL IV (after thiamine)",
-        "tool_name": null,
-        "expected_finding": "Glucose normalize to >70 mg/dL",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Literature/guideline search to confirm West Haven grading, precipitant management, and lactulose/rifaximin dosing (Multifactorial HE management; variceal bleed; AASLD/EASL).",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "AASLD/EASL 2014 guidance retrieved; West Haven criteria and precipitant-driven management framework confirmed.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 4,
-        "action": "Order CT head non-contrast to exclude intracranial hemorrhage or structural cause",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "Normal CT head — no hemorrhage, mass, or infarct; metabolic etiology confirmed",
-        "category": "required",
-        "tool_parameters": {
-          "region": "head",
-          "contrast": false,
-          "indication": "Altered mental status with cirrhosis — exclude structural cause"
-        }
+        "action": "Drug-interaction and medication-reconciliation review covering lactulose, rifaximin, propranolol (HOLD if active bleed/hypotension); avoid sedatives; flag any CNS depressants (benzodiazepines, opioids, sedating antiemetics, antihistamines) and confirm lactulose/rifaximin dosing in liver disease.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sedating/CNS-depressant medications identified; lactulose and rifaximin reviewed for hepatic dose adjustment.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Bajaj_2011]",
+        "guideline_source": "Bajaj 2011 HE management review"
       },
       {
         "step": 5,
-        "action": "Order stat labs: ammonia, LFTs, CBC, BMP, coagulation, blood cultures, toxicology screen, type and screen",
+        "action": "Diagnostic paracentesis to exclude SBP.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Ammonia markedly elevated (187 umol/L); confirms HE diagnosis; multiple precipitants identified (GI bleed, hypokalemia, hyponatremia)",
+        "expected_finding": "Ascitic PMN.",
         "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "ammonia",
-            "LFT",
-            "CBC",
-            "BMP",
-            "coagulation",
-            "toxicology",
-            "blood_cultures"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 6,
-        "action": "Perform EEG to confirm HE pattern and exclude NCSE",
+        "action": "EEG — characterize and exclude NCSE. Triphasic waves are classic but non-specific (metabolic encephalopathies broadly); main role is exclusion of non-convulsive status epilepticus where the differential supports it.",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Classic triphasic waves with generalized delta slowing — diagnostic of hepatic encephalopathy; no epileptiform activity",
-        "category": "required",
-        "tool_parameters": {
-          "indication": "Altered mental status with liver disease — exclude NCSE"
-        }
+        "expected_finding": "Triphasic waves likely.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Ferenci_2002]",
+        "guideline_source": "Ferenci 2002 HE nomenclature/quantification"
       },
       {
         "step": 7,
-        "action": "Initiate lactulose: 30mL PO/NG every 2 hours until 2-3 soft stools/day, then taper; add rifaximin 550mg PO BID",
-        "tool_name": null,
-        "expected_finding": "Ammonia trending down; mental status improves over 24-48h",
-        "category": "required",
-        "tool_parameters": {}
-      },
-      {
-        "step": 8,
-        "action": "Perform diagnostic paracentesis to exclude spontaneous bacterial peritonitis (PMN >250/mm3)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "PMN 180/mm3 — SBP not confirmed; SAAG 1.8 confirms portal hypertension etiology",
-        "category": "required",
-        "tool_parameters": {
-          "test": "ascitic_fluid_analysis"
-        }
-      },
-      {
-        "step": 9,
-        "action": "Arrange urgent GI consultation for esophagogastroduodenoscopy (EGD) for GI hemorrhage management",
-        "tool_name": null,
-        "expected_finding": "Source of bleeding identified (likely variceal); band ligation or sclerotherapy performed",
-        "category": "required",
-        "tool_parameters": {}
-      },
-      {
-        "step": 10,
-        "action": "Calculate MELD and MELD-Na scores; refer to hepatology for transplant evaluation",
-        "tool_name": "interpret_labs",
-        "expected_finding": "MELD 26, MELD-Na 29 — indicating significant mortality risk and transplant candidacy evaluation",
+        "action": "Consult GI for endoscopy; hepatology — coordinate definitive care, transplant candidacy assessment where applicable.",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Hepatology / critical-care guidance integrated into management.",
         "category": "recommended",
         "tool_parameters": {
-          "test": "meld_calculation"
-        }
+          "specialty": "hepatology"
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in HE workup; reversible metabolic encephalopathy is the issue, not Alzheimer pathology.",
+        "citation": "[AASLD_2014]"
       },
       {
-        "step": 11,
-        "action": "Search literature for optimal ammonia management in acute-on-chronic hepatic encephalopathy with GI hemorrhage",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Evidence supporting lactulose + rifaximin combination; early antibiotic prophylaxis in variceal bleed",
-        "category": "recommended",
+        "tool_name": "order_advanced_imaging",
         "tool_parameters": {
-          "query": "hepatic encephalopathy management acute GI hemorrhage lactulose rifaximin"
-        }
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan has no role in HE workup; the question is metabolic encephalopathy, not nigrostriatal degeneration.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "genetic_panel:early_onset_AD"
+        },
+        "rationale": "Early-onset AD genetic panel has no role in HE workup; reversible metabolic encephalopathy is the diagnosis under consideration.",
+        "citation": "[AASLD_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "In altered mental status, exclude intracranial mass effect / hemorrhage on imaging before LP to avoid herniation risk.",
+        "citation": "[AASLD_2014]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Administer IV thiamine BEFORE dextrose to prevent Wernicke encephalopathy",
-      "Correct hypoglycemia (glucose 61 mg/dL) urgently",
-      "Initiate lactulose (30mL q2h) and rifaximin (550mg BID) for ammonia reduction",
-      "CT head to exclude intracranial hemorrhage before attributing AMS to HE",
-      "Perform EEG to exclude non-convulsive status epilepticus",
-      "Diagnostic paracentesis to exclude spontaneous bacterial peritonitis",
-      "Urgent GI consultation for upper GI hemorrhage (likely variceal)",
-      "Correct coagulopathy with FFP for active bleeding (INR 2.8)",
-      "Correct hypokalemia (precipitant for HE) with IV potassium"
+      "Upper endoscopy with variceal banding if bleeding source confirmed.",
+      "Restrictive transfusion target Hgb 7-8.",
+      "IV ceftriaxone for SBP prophylaxis in bleeding cirrhotic.",
+      "Lactulose enemas / NG; rifaximin via NG.",
+      "IV K repletion and thiamine before any dextrose."
     ],
     "contraindicated_actions": [
-      "Do NOT give dextrose before thiamine in an alcoholic patient",
-      "Do NOT use benzodiazepines (sedatives) in active hepatic encephalopathy — worsens encephalopathy",
-      "Do NOT give NSAIDs (worsen renal function, GI bleeding risk in cirrhosis)",
-      "Do NOT use protein restriction — modern guidelines recommend adequate protein intake even in HE",
-      "Do NOT perform lumbar puncture without first excluding coagulopathy (INR 2.8 — high hemorrhage risk)",
-      "Do NOT use morphine or opioids for agitation (hepatically metabolized; worsen encephalopathy)",
-      "Do NOT rapidly correct hyponatremia (osmotic demyelination risk)"
+      "Do not prescribe benzodiazepines for anxiety/agitation — they precipitate and prolong HE (use haloperidol or non-pharmacologic measures for agitation).",
+      "Do not prescribe sedating opioids — they worsen HE; consider acetaminophen at hepatic-safe dosing for pain.",
+      "Do not perform LP before neuroimaging excludes mass effect when the patient has altered mental status.",
+      "Do not transfuse aggressively to normal Hgb (rebleeding risk)."
     ],
     "key_reasoning_points": [
-      "Markedly elevated ammonia (187 umol/L) with classic triphasic waves on EEG in a patient with known cirrhosis is highly characteristic of hepatic encephalopathy",
-      "Multiple identified precipitants: GI hemorrhage (BUN 64 mg/dL with BUN:Cr >30:1, Hgb 8.1), lactulose non-compliance, alcohol intoxication (BAL 142), hypokalemia",
-      "CT head is normal — structural cause excluded; diagnosis is metabolic",
-      "EEG triphasic waves at 1.5-2.5 Hz are characteristic of HE but not pathognomonic; NCSE must be excluded (benzodiazepine challenge negative)",
-      "Thiamine replacement before glucose is mandatory in any alcoholic presenting with encephalopathy",
-      "AST:ALT ratio >2:1 with markedly elevated GGT suggests alcoholic hepatitis superimposed on cirrhosis",
-      "MELD 26 with recurrent HE and GI hemorrhage warrants transplant evaluation after sobriety establishment",
-      "Hyponatremia (Na 128) is dilutional in cirrhosis — cautious fluid management needed; do NOT rapidly correct",
-      "Hypoglycemia (glucose 61 mg/dL) from impaired hepatic gluconeogenesis is a contributing factor to AMS"
+      "HE is a clinical diagnosis: West Haven grading + evidence of liver dysfunction + exclusion of other causes of AMS — ammonia level is supportive only and correlates poorly with grade (AASLD 2014).",
+      "Precipitant identification is more actionable than the ammonia number: infection (SBP especially), GI bleed, electrolyte disturbance (hypokalemia/hyponatremia), constipation, sedative/CNS-depressant use, dehydration, dietary protein load, renal failure.",
+      "When multiple precipitants coexist, all must be addressed simultaneously — fixing one in isolation will not resolve HE."
     ],
-    "red_herrings": [
-      {
-        "data_point": "Blood alcohol level 142 mg/dL",
-        "location": "toxicology panel",
-        "intended_effect": "Clinician may attribute entire AMS to acute alcohol intoxication and not pursue workup for HE",
-        "correct_interpretation": "Alcohol intoxication is a co-precipitant but cannot explain ammonia 187 umol/L or EEG triphasic waves; HE must be treated simultaneously",
-        "field_path": ""
-      },
-      {
-        "data_point": "Creatinine 1.4 mg/dL with BUN 64 mg/dL",
-        "location": "metabolic panel",
-        "intended_effect": "Clinician may suspect uremic encephalopathy as primary cause",
-        "correct_interpretation": "BUN elevation is due to GI blood protein absorption (BUN:Cr ratio >30:1); creatinine elevation is mild and hepatorenal; uremic encephalopathy unlikely with creatinine of 1.4",
-        "field_path": ""
-      }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": []
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -1060,6 +1026,14 @@
       "specialized_test": "normal",
       "literature_search": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (HEP-ENC)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:HEP-ENC",
+    "difficulty_rationale": "5 required tools + EEG; multiple simultaneous precipitants (bleed, K, EtOH, adherence) push above straightforward.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

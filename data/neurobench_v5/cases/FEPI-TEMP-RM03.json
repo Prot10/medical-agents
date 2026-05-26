@@ -853,134 +853,193 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Focal epilepsy — temporal lobe (right temporal lobe epilepsy secondary to encephalocraniocutaneous lipomatosis with dual pathology including hippocampal sclerosis)",
-    "icd_code": "G40.109",
+    "primary_diagnosis": "Focal epilepsy of right temporal lobe origin (focal-to-bilateral tonic-clonic seizure) secondary to encephalocraniocutaneous lipomatosis with dual pathology (right hippocampal sclerosis)",
+    "icd_code": "G40.219",
     "differential": [
       {
-        "diagnosis": "Focal epilepsy secondary to porencephalic cyst alone",
+        "diagnosis": "Focal epilepsy of right temporal origin without HS",
         "likelihood": "moderate",
-        "key_features": "Porencephalic cyst is parieto-occipital, but EEG and semiology localize to temporal lobe, suggesting the mesial temporal/hippocampal pathology is the primary epileptogenic substrate"
+        "key_features": "Possible if hippocampus is structurally normal; MRI distinguishes.",
+        "icd_code": "G40.219"
       },
       {
-        "diagnosis": "Focal epilepsy secondary to cortical calcifications",
+        "diagnosis": "Status epilepticus / prolonged seizure with post-ictal encephalopathy",
         "likelihood": "moderate",
-        "key_features": "Calcifications extend into mesial temporal structures and may contribute to epileptogenicity, but hippocampal sclerosis on MRI and temporal EEG focus point to mesial temporal onset"
+        "key_features": "Acutely presenting; once stabilized, etiology workup follows.",
+        "icd_code": "G41.9"
       },
       {
-        "diagnosis": "Psychogenic non-epileptic seizures (PNES)",
+        "diagnosis": "Focal cortical dysplasia / hemimegalencephaly variant",
         "likelihood": "low",
-        "key_features": "Elevated post-ictal prolactin, tongue laceration, EEG correlate, and characteristic temporal lobe semiology argue strongly against PNES"
+        "key_features": "Imaging mimics; ECCL has characteristic intracranial lipomas.",
+        "icd_code": "Q04.3"
       },
       {
-        "diagnosis": "Structural epilepsy secondary to brain tumor (low-grade glioma)",
+        "diagnosis": "Brain tumor (low-grade temporal)",
         "likelihood": "low",
-        "key_features": "MRI findings show non-enhancing lipomatous lesions with fat signal (confirming lipomas, not tumor), porencephalic cyst rather than neoplasm, and no enhancing or expansile mass lesion"
+        "key_features": "Lower prior in a patient with longstanding congenital neurocutaneous syndrome but should be excluded on imaging.",
+        "icd_code": "D43.0"
+      },
+      {
+        "diagnosis": "Convulsive syncope",
+        "likelihood": "very_low",
+        "key_features": "Witnessed prolonged tonic-clonic activity with post-ictal coma is not syncope.",
+        "icd_code": "R55"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain EEG to evaluate for epileptiform activity and localize seizure focus",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Right temporal epileptiform discharges with hemispheric asymmetry",
+        "action": "Obtain detailed seizure history including semiology, aura, automatisms, duration, frequency, witness accounts, and post-ictal features.",
+        "tool_name": null,
+        "expected_finding": "Stereotyped focal impaired-awareness events with temporal-lobe aura and post-ictal confusion.",
         "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
+        "tool_parameters": {},
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 2,
-        "action": "Obtain brain MRI to evaluate for structural cause of epilepsy",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Complex right hemispheric abnormalities including porencephalic cyst, lipomas, calcifications, hippocampal asymmetry, and subcutaneous lipoma with overlying alopecia",
+        "action": "Perform complete neurological examination.",
+        "tool_name": null,
+        "expected_finding": "Interictal exam typically normal; subtle memory deficit may be present.",
         "category": "required",
-        "tool_parameters": {
-          "protocol": "standard",
-          "contrast": false
-        }
+        "tool_parameters": {},
+        "citation": "",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Interpret laboratory results including antiepileptic drug levels",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Subtherapeutic phenytoin levels confirming non-compliance; post-ictal lab changes; mildly elevated TSH",
+        "action": "Order EEG (routine first; pursue ambulatory or video-EEG if non-diagnostic) to identify interictal epileptiform discharges and capture habitual events.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Interictal sharps/spikes and/or focal slowing in the anterior temporal region; ictal correlate confirms diagnosis.",
         "category": "required",
         "tool_parameters": {
-          "panels": [
-            "RPR",
-            "AED_levels"
-          ]
-        }
+          "eeg_type": "routine"
+        },
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 4,
-        "action": "Obtain ECG to rule out cardiac etiology",
-        "tool_name": "analyze_ecg",
-        "expected_finding": "Normal sinus rhythm with post-ictal sinus tachycardia, no arrhythmia",
-        "category": "recommended"
-      },
-      {
-        "step": 5,
-        "action": "Request prolonged video-EEG monitoring to capture habitual seizures",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Captured right temporal seizures with characteristic semiology",
-        "category": "required",
-        "tool_parameters": {
-          "eeg_type": "video"
-        }
-      },
-      {
-        "step": 6,
-        "action": "Request epilepsy protocol MRI for detailed hippocampal evaluation",
+        "action": "Order MRI brain with dedicated epilepsy protocol (thin-cut coronal T1/FLAIR/T2/DWI through the hippocampi).",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Confirmed right hippocampal sclerosis with dual pathology",
+        "expected_finding": "Hippocampal sclerosis, low-grade tumor (DNET, ganglioglioma), cavernoma, or focal cortical dysplasia; rule out alternative structural causes.",
         "category": "required",
         "tool_parameters": {
           "protocol": "epilepsy",
-          "contrast": false
-        }
+          "contrast": true
+        },
+        "citation": "[AAN_2007]",
+        "guideline_source": "AAN_2007"
+      },
+      {
+        "step": 5,
+        "action": "Obtain CBC, comprehensive metabolic panel, prolactin (if drawn within 10–20 min of event), and AED levels if on therapy.",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Exclude metabolic provocation (hypoglycemia, hyponatremia, uremia); baseline organ function for AED selection; AED level for adherence and dosing.",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "prolactin"
+          ]
+        },
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
+      },
+      {
+        "step": 6,
+        "action": "Search current literature for AED selection in focal epilepsy and ILAE 2017 seizure classification.",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Evidence-based AED options for focal epilepsy (levetiracetam, lamotrigine, oxcarbazepine, lacosamide); ILAE classification framework.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 7,
-        "action": "Search medical literature on ECCL and epilepsy management",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Evidence supporting surgical evaluation for drug-resistant temporal lobe epilepsy in neurocutaneous syndromes",
-        "category": "recommended"
+        "action": "Check drug interactions before initiating or modifying AED therapy (enzyme inducers, OCP, other CNS-active drugs).",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identify pharmacokinetic interactions (CYP induction by carbamazepine/phenytoin) and CNS adverse-effect overlap.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 8,
-        "action": "Check drug interactions before initiating new AED",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Levetiracetam has no significant interaction with phenytoin",
-        "category": "recommended"
+        "action": "Pursue prolonged video-EEG monitoring to capture habitual events, confirm lateralization, and evaluate surgical candidacy.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Capture of habitual focal seizure with electrographic correlate; concordance with imaging supports surgical workup.",
+        "category": "recommended",
+        "tool_parameters": {
+          "eeg_type": "video"
+        },
+        "citation": "[Engel_2003]",
+        "guideline_source": "Engel_2003"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No clinical features of CNS infection, encephalitis, or immunocompromise; CSF analysis is not indicated for routine focal epilepsy workup and exposes the patient to procedural risk and cost.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "echo_type": "TTE"
+        },
+        "rationale": "No syncope-versus-seizure question and no structural-heart concern; echocardiogram contributes nothing to epilepsy workup.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "Ambulatory cardiac monitoring is reserved for syncope-versus-seizure differentiation; not indicated when semiology is clearly epileptic.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT is inferior to MRI for detecting epileptogenic substrates (hippocampal sclerosis, FCD, low-grade tumor) and adds ionizing radiation without diagnostic yield.",
+        "citation": "[AAN_2007]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "check_drug_interactions",
+        "reason": "Structural cause influences AED choice (e.g., low-grade tumor → consider AEDs with CYP-neutral profile; hippocampal sclerosis → multiple equally appropriate options). MRI should inform drug selection.",
+        "citation": "[ILAE_drug_2017]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Obtain EEG to confirm epilepsy and localize seizure focus",
-      "Obtain brain MRI to identify structural etiology",
-      "Check antiepileptic drug levels given history of non-compliance",
-      "Recognize the constellation of findings (scalp lipoma with alopecia, intracranial lipomas, porencephalic cyst, hemiatrophy) as a neurocutaneous syndrome (ECCL)",
-      "Ensure medication compliance and optimize antiepileptic therapy",
-      "Identify right hippocampal sclerosis as the likely primary epileptogenic substrate"
+      "Stabilize airway, breathing, and circulation; address any ongoing seizure activity per status-epilepticus protocol if applicable.",
+      "Obtain 3T MRI epilepsy protocol to characterize ECCL-related intracranial lesions, hippocampal sclerosis, and the seizure-onset substrate.",
+      "Pursue video-EEG to confirm focal onset zone given complex underlying neurocutaneous syndrome.",
+      "Initiate AED therapy targeted at focal epilepsy after diagnostic confirmation; verify AED levels if patient was previously treated.",
+      "Refer to comprehensive epilepsy center for surgical-candidacy evaluation given dual pathology."
     ],
     "contraindicated_actions": [
-      "Discharging patient without neuroimaging given first-time presentation with complex seizure semiology and abnormal exam",
-      "Attributing seizures solely to medication non-compliance without investigating structural etiology",
-      "Performing lumbar puncture without first ruling out mass effect or elevated intracranial pressure given the complex intracranial pathology",
-      "Initiating carbamazepine without checking for HLA-B*1502 (given South Asian ethnicity — risk of Stevens-Johnson syndrome)",
-      "Abruptly discontinuing phenytoin without bridging to an alternative AED"
+      "Do not assume the GTC was primary generalized epilepsy and prescribe valproate without focal-onset evaluation.",
+      "Do not perform LP without imaging when post-ictal coma is prolonged.",
+      "Do not delay AED initiation in a patient with confirmed unprovoked recurrent seizures."
     ],
     "key_reasoning_points": [
-      "The combination of scalp alopecia with subcutaneous lipoma (nevus psiloliparus), intracranial lipomas, porencephalic cyst, hemicerebral atrophy, and cortical calcifications is characteristic of encephalocraniocutaneous lipomatosis (ECCL)",
-      "While the porencephalic cyst is parieto-occipital, the seizure semiology (auras with epigastric rising and déjà vu, behavioral arrest, oral automatisms) and EEG localization point to a right temporal lobe onset",
-      "Dual pathology — ECCL-related structural abnormalities plus right hippocampal sclerosis — is the most complete explanation for this patient's drug-resistant temporal lobe epilepsy",
-      "Subtherapeutic phenytoin levels from non-compliance are a major reversible factor contributing to seizure breakthrough, but may not be the sole cause given the complex structural pathology",
-      "Mildly elevated TSH is likely a phenytoin effect on thyroid hormone metabolism rather than a primary thyroid disorder — a potential red herring that should not distract from the epilepsy workup",
-      "The differential must distinguish ECCL from other neurocutaneous syndromes: Proteus syndrome (progressive asymmetric overgrowth), Delleman-Oorthuys syndrome (supra-auricular hypoplastic skin defect), oculoectodermal syndrome (no intracranial lipomas), and epidermal nevus syndromes (different cutaneous manifestations)"
+      "Neurocutaneous syndromes commonly produce dual pathology that requires careful identification of the operable focus.",
+      "Focal-to-bilateral tonic-clonic seizures have a focal onset zone that may be silent on scalp EEG.",
+      "Comprehensive MRI clarifies whether the temporal focus, an ECCL-related lipoma, or a cortical malformation is responsible.",
+      "Surgical evaluation is appropriate when the dominant focus is well-localized and pharmaco-resistance is established."
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
     "red_herrings": []
   },
   "metadata": {
@@ -996,6 +1055,16 @@
       "ct": "normal",
       "echo": "normal",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (FEPI-TEMP)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FEPI-TEMP",
+    "difficulty_rationale": "Five required tools with video-EEG; ECCL background contributes diagnostic complexity but the immediate management of focal temporal seizures is well-defined.",
+    "case_body_concerns": [
+      "useless_tools entry for `analyze_ecg` dropped: tool output is provided up-front in initial_tool_outputs, so declaring it useless to call would be incoherent (agent never had to call it)."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

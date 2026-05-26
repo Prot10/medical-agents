@@ -476,106 +476,268 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Behavioral variant frontotemporal dementia — C9orf72 pathogenic expansion — with coexistent Parkinson's disease (FTD-Parkinsonism overlap due to C9orf72)",
+    "primary_diagnosis": "Behavioral variant frontotemporal dementia (bvFTD), probable, C9orf72-associated, with co-existent Parkinson's disease (FTD–Parkinsonism overlap)",
     "icd_code": "G31.09",
     "differential": [
       {
         "diagnosis": "Parkinson's disease dementia (PDD)",
-        "likelihood": "very_low",
-        "key_features": "FDG-PET shows FRONTAL hypometabolism with preserved posterior and occipital cortex — opposite of PDD/DLB pattern (posterior hypometabolism); behavioral profile (disinhibition, perseveration, social cognition loss) is FTD, not PDD (which causes visuospatial impairment, hallucinations, attention fluctuation); PD motor onset only 4 years ago (PDD typically >10 years post-motor onset)"
+        "likelihood": "high",
+        "key_features": "Established PD with motor response to levodopa; however, behavioural phenotype and cognitive trajectory are atypical for PDD."
+      },
+      {
+        "diagnosis": "Familial bvFTD (C9orf72)",
+        "likelihood": "high",
+        "key_features": "C9orf72 can cause concurrent parkinsonism; paternal PD pattern is suggestive."
       },
       {
         "diagnosis": "Dementia with Lewy bodies (DLB)",
-        "likelihood": "very_low",
-        "key_features": "FDG-PET preserved occipital cortex (DLB signature is occipital hypometabolism); amyloid PET negative; no fluctuating cognition; no visual hallucinations; no REM sleep behavior disorder history"
+        "likelihood": "moderate",
+        "key_features": "Visual hallucinations, REM-sleep behaviour, and fluctuating cognition would support; imaging clarifies."
       },
       {
         "diagnosis": "Progressive supranuclear palsy (PSP)",
-        "likelihood": "very_low",
-        "key_features": "No midbrain atrophy (hummingbird sign absent); no falls; no supranuclear gaze palsy; no axial rigidity predominance; frontal behavioral syndrome rather than PSP-Richardson (which has apathy, not disinhibition)"
+        "likelihood": "moderate",
+        "key_features": "Vertical gaze palsy, axial rigidity, postural instability; tau PET can support if positive."
       },
       {
-        "diagnosis": "Alzheimer's disease",
-        "likelihood": "very_low",
-        "key_features": "Amyloid PET negative; frontal FDG-PET without posterior cingulate sign; behavioral disinhibition/perseveration is FTD not AD"
+        "diagnosis": "Alzheimer disease with parkinsonism",
+        "likelihood": "moderate",
+        "key_features": "Amyloid biomarker workup distinguishes."
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "MRI brain — frontal atrophy; midbrain assessment (PSP); posterior cortex assessment",
+        "action": "Obtain brain MRI with volumetric coronal T1 to assess frontal/anterior temporal atrophy and exclude alternative structural cause",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Moderate frontal atrophy; preserved posterior cortex; no midbrain atrophy",
+        "expected_finding": "Bilateral frontal and/or anterior temporal atrophy in a lobar pattern with relative posterior sparing",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "DWI",
+            "volumetric"
+          ]
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky 2011 bvFTD criteria"
       },
       {
         "step": 2,
-        "action": "DaTscan — confirm dopaminergic deficit in PD; note it cannot distinguish PDD from FTD-Parkinsonism",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Bilateral dopaminergic deficit right > left — confirms PD; cannot diagnose cognitive syndrome type",
+        "action": "Order metabolic dementia panel (TSH, B12, CMP, RPR/HIV per risk) to exclude reversible mimics",
+        "tool_name": "interpret_labs",
+        "expected_finding": "No reversible metabolic or infectious cause of cognitive decline identified",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "TSH",
+            "B12",
+            "RPR",
+            "HIV"
+          ]
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
       },
       {
         "step": 3,
-        "action": "FDG-PET brain — CRITICAL to distinguish PDD (posterior) from bvFTD (frontal) pattern",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Severe frontal hypometabolism with preserved posterior and occipital cortex — rules out PDD/DLB, confirms FTD pattern",
+        "action": "Order comprehensive neuropsychological battery characterising executive function, social cognition, language and memory",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Frontal-executive and social-cognition deficits with relative sparing of episodic memory and visuospatial function",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky 2011 bvFTD criteria"
       },
       {
         "step": 4,
-        "action": "Amyloid PET — DLB/AD exclusion (DLB often has amyloid copathology)",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Negative — no amyloid; against DLB with AD copathology",
+        "action": "Search medical literature for c9orf72-associated ftd with concurrent parkinsonism",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirms Rascovsky 2011 criteria, FDG-PET evidence (Foster 2007), and management approach (Bang 2015)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "query": "C9orf72-associated FTD with concurrent parkinsonism"
+        },
+        "citation": "[Bang_2015]",
+        "guideline_source": "Bang 2015 Lancet review"
       },
       {
         "step": 5,
-        "action": "Genetic panel for FTD-Parkinsonism overlap (C9orf72, GBA, LRRK2)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "C9orf72 pathogenic expansion — FTD-Parkinsonism explained by C9orf72",
+        "action": "Consult behavioral/cognitive neurology for syndromic diagnosis, biomarker interpretation, and longitudinal care plan",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Behavioral neurology confirms bvFTD syndrome, coordinates biomarkers and disclosure",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "specialty": "behavioral_neurology"
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
+      },
+      {
+        "step": 6,
+        "action": "Order FDG-PET brain to characterise frontotemporal hypometabolism and distinguish bvFTD from AD",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Bifrontal and/or anterior temporal hypometabolism with relative posterior sparing",
+        "category": "required",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[Foster_2007]",
+        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
+      },
+      {
+        "step": 7,
+        "action": "Order FTD genetic panel (C9orf72, GRN, MAPT) given paternal Parkinson's disease and concurrent FTD-parkinsonism overlap warrant C9orf72/MAPT testing",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Identifies or excludes pathogenic C9orf72 / GRN / MAPT variant relevant to prognosis and cascade testing",
+        "category": "required",
+        "tool_parameters": {
+          "test_type": "genetic_panel:FTD"
+        },
+        "citation": "[Pottier_2016]",
+        "guideline_source": "Pottier 2016 FTLD genetics review"
+      },
+      {
+        "step": 8,
+        "action": "Confirm presynaptic dopaminergic deficit with DaTscan (consistent with PD; supports PD–FTD overlap)",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Abnormal asymmetric dopaminergic terminal loss consistent with idiopathic Parkinson's disease",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "citation": "[Bang_2015]",
+        "guideline_source": "Bang 2015 Lancet review"
+      },
+      {
+        "step": 9,
+        "action": "Order amyloid PET to exclude AD biomarker overlap",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Negative amyloid PET",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "citation": "[Foster_2007]",
+        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
+      },
+      {
+        "step": 10,
+        "action": "Optimise levodopa, monitor for psychosis with motor therapies, and avoid AChE inhibitors",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Levodopa continued; avoid antipsychotics worsening parkinsonism; avoid AChE inhibitors",
+        "category": "required",
+        "tool_parameters": {
+          "drugs": [
+            "carbidopa/levodopa"
+          ],
+          "indication": "Parkinson's motor symptoms in FTD-overlap"
+        },
+        "citation": "[Bang_2015]",
+        "guideline_source": "Bang 2015 Lancet review"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is non-specific in FTD; not part of the standard dementia workup unless seizures or rapidly progressive course suggest CJD or autoimmune encephalitis.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG has no role in the cognitive workup of suspected FTD; reserved for syncope, palpitations, or pre-procedure clearance.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is unrelated to a neurodegenerative cognitive syndrome and adds cost without diagnostic value.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is unrelated to FTD and not indicated absent syncope or palpitations.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT lacks the resolution and lobar specificity needed to characterise frontotemporal atrophy; MRI is the standard structural study.",
+        "citation": "[AAN_dementia_2018]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "MR_spectroscopy"
+        },
+        "rationale": "MR spectroscopy has no established role in the routine FTD diagnostic pathway.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "perfusion_MRI"
+        },
+        "rationale": "Perfusion MRI is not indicated in the standard FTD workup once a structural MRI and FDG-PET (or amyloid PET) have characterised the lobar pattern.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is a vascular study with no diagnostic role in primary neurodegenerative dementia.",
+        "citation": "[Bang_2015]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "Exclude structural cause of focal cognitive symptoms and screen for elevated ICP before lumbar puncture.",
+        "citation": "[AAN_dementia_2018]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "FDG-PET is the key discriminating test between PDD and bvFTD-with-Parkinsonism: PDD/DLB = posterior hypometabolism; bvFTD = frontal hypometabolism with preserved posterior cortex; DaTscan alone CANNOT make this distinction",
-      "Do NOT prescribe cholinesterase inhibitors even though patient has PD — FTD component is primary cognitive diagnosis and cholinesterase inhibitors are contraindicated in FTD",
-      "C9orf72 genetic testing is essential in FTD-Parkinsonism overlap — it explains both the FTD and the Parkinson-like features"
+      "Recognise that PD-MCI does not fully explain the behavioural Rascovsky phenotype — bvFTD must be considered.",
+      "Pursue genetic testing — C9orf72/MAPT can cause FTD-parkinsonism overlap.",
+      "Optimise levodopa; avoid AChE inhibitors and minimise antipsychotics.",
+      "Apply Rascovsky 2011 bvFTD criteria explicitly (≥3 of 6 core features within 3 years) and document functional decline.",
+      "Assess and document decision-making, financial, and driving capacity given the high risk of impulsivity and impaired judgment in FTD.",
+      "Provide caregiver education, safety planning, and referral to FTD-focused support resources.",
+      "Offer genetic counselling and discuss cascade testing options if a pathogenic variant is identified or suspected."
     ],
     "contraindicated_actions": [
-      "Cholinesterase inhibitors (donepezil, rivastigmine) — contraindicated despite PD diagnosis; FTD is the primary cognitive syndrome",
-      "Attributing behavioral syndrome entirely to PD without FDG-PET characterization of the metabolic pattern"
+      "Do not start acetylcholinesterase inhibitors (donepezil, rivastigmine, galantamine): no benefit in FTD and may worsen behavioral symptoms.",
+      "Do not start memantine: no evidence of benefit in bvFTD and may worsen behavioral symptoms.",
+      "Avoid antipsychotics as first-line behavioral therapy given increased cerebrovascular and mortality risk in dementia; reserve for refractory dangerous agitation with specialist oversight.",
+      "Avoid benzodiazepines for behavioral control: risk of paradoxical disinhibition and falls."
     ],
     "key_reasoning_points": [
-      "DaTscan confirms dopaminergic deficit (PD) but is BLIND to the cognitive syndrome type — PDD and bvFTD with Parkinsonism both have abnormal DaTscans; FDG-PET is the discriminating test",
-      "FDG-PET posterior cortex preservation is the KEY: PDD and DLB always show posterior (parietal and/or occipital) hypometabolism; bvFTD shows frontal hypometabolism with PRESERVED posterior cortex — these are opposites",
-      "Behavioral profile is the second key discriminating feature: PDD causes visuospatial impairment, fluctuating cognition, hallucinations; bvFTD causes disinhibition, perseveration, social cognition loss — these syndromes are clinically distinct",
-      "C9orf72 expansion can cause FTD-Parkinsonism overlap syndrome — it causes both the behavioral FTD and contributes to the Parkinsonian motor features via TDP-43 pathology in the substantia nigra"
+      "Overt parkinsonism with prior PD diagnosis justifies DaTscan in this case — it is NOT useless here, contrary to the general FTD rule.",
+      "Behavioural phenotype atypical for PDD; lobar imaging pattern supports FTD overlap.",
+      "C9orf72 expansion or MAPT mutation can produce FTD–parkinsonism."
     ],
     "red_herrings": [
       {
-        "data_point": "Abnormal DaTscan showing bilateral dopaminergic deficit",
-        "location": "DaTscan findings",
-        "intended_effect": "Confirm PD dementia as the primary cognitive-behavioral diagnosis based on DaTscan abnormality",
-        "correct_interpretation": "DaTscan confirms dopaminergic deficit consistent with PD but cannot distinguish PDD from FTD-Parkinsonism; FDG-PET pattern (frontal hypometabolism with preserved posterior cortex) is the discriminating test",
-        "field_path": ""
-      },
-      {
-        "data_point": "PD diagnosis with known PD-MCI label",
-        "location": "Past medical history",
-        "intended_effect": "Attribute all cognitive and behavioral changes to PD-MCI progression to PDD",
-        "correct_interpretation": "Behavioral profile (disinhibition, perseveration, impulsive financial decisions) is inconsistent with PDD; 4-year PD duration is too short for typical PDD onset; frontal FDG-PET pattern clinically and metabolically incompatible with PDD",
-        "field_path": ""
+        "data_point": "Prior diagnosis of Parkinson's disease 4 years ago with motor response to levodopa",
+        "location": "past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Anchors entire syndrome on PDD as explanation.",
+        "correct_interpretation": "Concurrent PD does not explain the behavioural Rascovsky phenotype; FTD must be considered in parallel."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "v5",
@@ -588,6 +750,20 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "specialized_test": "incidental"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (condition-expert:FTD)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FTD",
+    "difficulty_rationale": "≥5 required tools, multi-axis confounders (psychiatric comorbidity, normal/subtle MRI, parkinsonism overlap, or APOE-driven AD anchoring), and 2+ grounded red herrings — requires sophisticated biomarker / genetic reasoning to overcome anchoring on a comorbidity.",
+    "case_body_concerns": [
+      "required tool `order_specialized_test` (step 3, params={'test_type': 'neuropsych_battery'}) has no initial_tool_outputs or followup_outputs entry — case body should add a order_specialized_test output to support this required step",
+      "required tool `order_specialized_test` (step 7, params={'test_type': 'genetic_panel:FTD'}) has no initial_tool_outputs or followup_outputs entry — case body should add a order_specialized_test output to support this required step",
+      "validator flags `order_advanced_imaging` in both optimal_actions (FDG_PET / amyloid_PET) and useless_tools (MR_spectroscopy / DaTscan / perfusion_MRI / carotid_duplex) — these are distinct modalities of the same catchall tool. Known systemic validator limitation: the coherence script ignores `tool_parameters.modality`. No fix at case level.",
+      "required tool `order_specialized_test` has no matching `initial_tool_outputs` or `followup_outputs` entry — case body should add a corresponding output so the agent gets a meaningful result when calling this required step.",
+      "fallback output for `order_advanced_imaging` is missing in `fallback_tool_outputs` — calling the useless tool will return empty; case body needs an off-pathway fallback entry."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

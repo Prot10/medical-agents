@@ -682,150 +682,231 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Cardiac syncope secondary to arrhythmogenic right ventricular cardiomyopathy (ARVC)",
-    "icd_code": "R55",
+    "primary_diagnosis": "Cardiac syncope due to arrhythmogenic right ventricular cardiomyopathy (ARVC) unmasked in the postpartum period",
+    "icd_code": "I42.8",
     "differential": [
       {
-        "diagnosis": "Eclampsia / postpartum seizures",
-        "likelihood": "low",
-        "key_features": "Normal blood pressure at presentation, normal liver function, normal platelets, normal LDH, minimal proteinuria, rapid recovery without post-ictal confusion, no headache or visual changes"
+        "diagnosis": "Eclampsia / postpartum hypertensive encephalopathy",
+        "likelihood": "high",
+        "key_features": "Postpartum context demands immediate exclusion of eclampsia (BP, proteinuria, MRI for PRES); MgSO4 indicated if confirmed.",
+        "icd_code": "O15.2"
       },
       {
-        "diagnosis": "Epileptic seizure (new-onset)",
-        "likelihood": "low",
-        "key_features": "Normal EEG without epileptiform discharges, very brief convulsive movements (<15 seconds), rapid recovery without post-ictal confusion, exertional triggers, pallor before episodes"
+        "diagnosis": "Peripartum cardiomyopathy with arrhythmia",
+        "likelihood": "high",
+        "key_features": "Postpartum syncope must rule out PPCM; echo and BNP are central.",
+        "icd_code": "O90.3"
       },
       {
-        "diagnosis": "Vasovagal syncope",
-        "likelihood": "low",
-        "key_features": "Episodes triggered by exertion rather than typical vasovagal triggers (pain, prolonged standing, emotional stress), negative tilt table test, family history of sudden cardiac death"
+        "diagnosis": "Pulmonary embolism (postpartum hypercoagulable state)",
+        "likelihood": "moderate",
+        "key_features": "Postpartum PE can present with syncope; D-dimer, lower-limb US and CT-PA address.",
+        "icd_code": "I26.99"
       },
       {
-        "diagnosis": "Anemia-related syncope",
-        "likelihood": "low",
-        "key_features": "Hemoglobin 10.2 g/dL is mild anemia, unlikely to cause syncope at this level, does not explain convulsive features or family history"
+        "diagnosis": "Inherited channelopathy (Long QT, CPVT)",
+        "likelihood": "moderate",
+        "key_features": "Postpartum hormonal changes can unmask channelopathies.",
+        "icd_code": "I49.8"
       },
       {
-        "diagnosis": "Postpartum cardiomyopathy",
+        "diagnosis": "Convulsive epileptic seizure / new-onset epilepsy",
         "likelihood": "low",
-        "key_features": "Normal LV ejection fraction on echocardiography, normal BNP, no signs of heart failure; the pathology is right ventricular, not left ventricular"
+        "key_features": "Brief jerks, no post-ictal phase, normal EEG argue for convulsive syncope rather than epilepsy.",
+        "icd_code": "G40.909"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain and analyze 12-lead ECG",
+        "action": "12-lead ECG immediately",
         "tool_name": "analyze_ecg",
-        "expected_finding": "Normal sinus rhythm with PVCs, subtle T-wave inversions V1-V3, borderline QTc",
-        "category": "required"
+        "expected_finding": "V1-V3 T-wave inversions, possible epsilon waves, RVOT-morphology PVCs — ARVC pattern",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.2"
       },
       {
         "step": 2,
-        "action": "Obtain routine EEG to evaluate for epileptiform activity",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Normal EEG — no epileptiform abnormalities, supporting non-epileptic etiology",
-        "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
-      },
-      {
-        "step": 3,
-        "action": "Order comprehensive laboratory panel including CBC, BMP, liver function, cardiac markers, coagulation, and urinalysis",
+        "action": "Labs: CBC, BMP, Mg, troponin, BNP, TSH, glucose, beta-hCG, proteinuria, D-dimer (postpartum)",
         "tool_name": "interpret_labs",
-        "expected_finding": "Mild iron deficiency anemia, elevated magnesium (exogenous), normal liver/renal/cardiac markers — excludes eclampsia and HELLP",
+        "expected_finding": "Exclude eclampsia (proteinuria, BP), PE (D-dimer), PPCM (BNP)",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
-            "LFT",
-            "coagulation"
+            "magnesium",
+            "troponin",
+            "BNP",
+            "TSH"
           ]
-        }
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.3"
       },
       {
-        "step": 4,
-        "action": "Request continuous cardiac monitoring with Holter monitor given exertional syncope and normal resting ECG",
-        "tool_name": "order_cardiac_monitoring",
-        "expected_finding": "Frequent PVCs with RVOT morphology and multiple runs of nonsustained VT",
-        "category": "required",
-        "tool_parameters": {
-          "monitor_type": "holter_24h"
-        }
-      },
-      {
-        "step": 5,
-        "action": "Request transthoracic echocardiogram to evaluate for structural heart disease",
+        "step": 3,
+        "action": "Echocardiogram for RV/LV structure",
         "tool_name": "order_echocardiogram",
-        "expected_finding": "Mildly dilated RV with focal hypokinesis of subtricuspid free wall, normal LV function",
+        "expected_finding": "RV dilation/dyskinesis; rule out PPCM",
         "category": "required",
         "tool_parameters": {
           "echo_type": "TTE"
-        }
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §4.1"
+      },
+      {
+        "step": 4,
+        "action": "Telemetry plus Holter for arrhythmia burden",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "VT runs or sustained polymorphic VT may be captured",
+        "category": "required",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "citation": "[Locati_2014]",
+        "guideline_source": "Locati 2014"
+      },
+      {
+        "step": 5,
+        "action": "Cardiac MRI for ARVC task-force criteria",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "RV fibro-fatty infiltration and regional dysfunction",
+        "category": "required",
+        "tool_parameters": {
+          "modality": "perfusion_MRI"
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §4.3"
       },
       {
         "step": 6,
-        "action": "Request cardiac MRI for detailed structural and tissue characterization of right ventricle",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Fibrofatty infiltration, regional RV akinesia/dyskinesia, RV dilation, reduced RVEF — meets major ARVC criteria",
-        "category": "required",
+        "action": "Exercise stress test under monitored conditions",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Exercise-induced VT",
+        "category": "recommended",
         "tool_parameters": {
-          "imaging_type": "FDG_PET"
-        }
+          "test_type": "exercise_stress_test"
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.4"
       },
       {
         "step": 7,
-        "action": "Search literature for ARVC diagnostic criteria and eclampsia vs cardiac syncope differential",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "2010 Task Force Criteria for ARVC, evidence supporting cardiac etiology over eclampsia",
-        "category": "recommended"
+        "action": "Medication review (lactation-compatible options) and avoid proarrhythmic agents",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Beta-blocker selection appropriate to lactation; avoid QT-prolongers",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §6"
       },
       {
         "step": 8,
-        "action": "Recommend genetic testing for desmosomal gene mutations and first-degree family screening",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended"
+        "action": "Search literature for ARVC management in postpartum and lactation",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Secondary-prevention ICD indication; lactation-compatible therapy",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ACC_AHA_HRS_2017]",
+        "guideline_source": "ACC/AHA/HRS 2017 §5"
       },
       {
         "step": 9,
-        "action": "Recommend electrophysiology consultation for risk stratification and ICD consideration",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Cardiology / EP consult; genetic counselling and family screening",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "ICD plan; SCN5A/desmosomal gene panel; family screening",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ACC_AHA_HRS_2017]",
+        "guideline_source": "ACC/AHA/HRS 2017 §5"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is justified only if PRES/eclampsia is on the differential; once eclampsia is excluded and ARVC is identified, MRI is low-yield. (Per-case caveat: appropriate during initial postpartum work-up.)",
+        "citation": "[ACC_AHA_HRS_2017]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "No head injury; head CT not indicated.",
+        "citation": "[ACC_AHA_HRS_2017]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No meningismus or encephalopathy.",
+        "citation": ""
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_ecg",
+        "after": "consult_medical_specialist",
+        "reason": "ECG drives EP / ICD pathway.",
+        "citation": "[ESC_2018]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "order_cardiac_monitoring",
+        "reason": "Troponin/proteinuria/BNP must be available to exclude eclampsia and PPCM before settling on ARVC pathway.",
+        "citation": "[ROSE_2010]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Recognize that the presentation is more consistent with cardiac syncope than eclampsia or epilepsy based on rapid recovery, exertional triggers, pallor, and family history",
-      "Order continuous cardiac monitoring (Holter) to capture paroxysmal arrhythmia not seen on resting ECG",
-      "Obtain cardiac imaging (echocardiography and/or cardiac MRI) to evaluate for structural right ventricular disease",
-      "Discontinue empiric magnesium sulfate and antiepileptic therapy once eclampsia is excluded",
-      "Recommend exercise restriction pending cardiac evaluation",
-      "Refer to electrophysiology for ICD risk stratification given syncope with ARVC"
+      "Admit to telemetry — postpartum syncope is high-risk",
+      "Exclude eclampsia, PE and PPCM acutely",
+      "CMR for ARVC characterisation",
+      "Beta-blocker therapy compatible with lactation",
+      "EP consult for ICD",
+      "Genetic counselling and family screening"
     ],
     "contraindicated_actions": [
-      "Initiating or continuing antiepileptic drugs (e.g., levetiracetam) without evidence of epilepsy",
-      "Attributing the episodes to eclampsia and treating with magnesium sulfate long-term when labs do not support preeclampsia",
-      "Performing lumbar puncture — no clinical indication and delays appropriate cardiac workup",
-      "Allowing the patient to engage in strenuous physical activity before cardiac evaluation is complete",
-      "Prescribing Class IC antiarrhythmic agents (flecainide, propafenone) which are contraindicated in structural heart disease",
-      "Dismissing the family history of sudden cardiac death as coincidental"
+      "Do not start AEDs based on convulsive jerks",
+      "Do not perform tilt-table",
+      "Do not discharge home without ICD risk stratification",
+      "Do not give proarrhythmic agents",
+      "Do not call `order_specialized_test` with parameters {'test_type': 'tilt_table'} — Tilt-table is not informative in suspected malignant ventricular arrhythmia and is potentially deleterious in a recently postpartum patient."
     ],
     "key_reasoning_points": [
-      "Convulsive syncope (myoclonic jerks during syncope) can closely mimic tonic-clonic seizures and frequently leads to misdiagnosis as epilepsy or eclampsia",
-      "The brief duration of convulsive movements (<15 seconds), rapid recovery without post-ictal confusion (<2 minutes to baseline), and pallor before the event are hallmarks of syncope rather than seizure",
-      "Exertional triggers for loss of consciousness should always prompt cardiac evaluation, even in a young postpartum woman",
-      "Normal resting ECG does not exclude paroxysmal arrhythmia — continuous monitoring is essential when clinical suspicion is high",
-      "ARVC can be unmasked during or shortly after pregnancy due to increased hemodynamic stress, and the peripartum period is a recognized vulnerable window",
-      "Family history of sudden cardiac death (father at age 44, paternal grandmother at age 51) is a critical red flag that must not be overlooked",
-      "Normal blood pressure, normal liver function, normal platelets, and normal LDH effectively exclude eclampsia and HELLP syndrome",
-      "The subtle ECG findings (T-wave inversions V1-V3, PVCs with RVOT morphology, borderline QTc) are individually nonspecific but collectively suggest right ventricular pathology when interpreted in the appropriate clinical context"
+      "Postpartum syncope demands parallel exclusion of eclampsia, PPCM, PE and inherited arrhythmia",
+      "ARVC can be unmasked or accelerated in the peripartum / postpartum state",
+      "CMR is the highest-yield imaging modality for fibro-fatty RV infiltration",
+      "Witnessed jerks during collapse are convulsive syncope, not eclamptic or epileptic seizure",
+      "Family screening and genetic counselling are integral to ARVC management"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "Postpartum context with 'eclampsia rule-out' referral",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Anchors clinician to eclampsia and magnesium therapy.",
+        "correct_interpretation": "BP, proteinuria and MRI rule out eclampsia; ECG and CMR identify ARVC."
+      },
+      {
+        "data_point": "Witnessed convulsive movements",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Triggers AED initiation and EEG.",
+        "correct_interpretation": "Convulsive syncope; recovery <60 s; EEG normal."
+      },
+      {
+        "data_point": "Recent c-section with diaphoresis and pallor",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "May be attributed to postoperative dehydration or vasovagal episode.",
+        "correct_interpretation": "Recurrence with documented arrhythmia substrate excludes pure vasovagal/orthostatic mechanism."
+      }
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -839,6 +920,14 @@
       "mri": "normal",
       "csf": "normal",
       "ct": "incidental"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SYNC-CARD",
+    "difficulty_rationale": "6+ required tools; parallel work-up of eclampsia, PE, PPCM and ARVC in a postpartum patient; 3 red herrings; CMR-driven diagnosis with significant management ramifications (ICD, lactation-compatible therapy, genetic counselling).",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

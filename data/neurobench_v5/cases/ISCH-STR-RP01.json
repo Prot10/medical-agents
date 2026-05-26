@@ -105,7 +105,7 @@
         "MRA of intracranial vessels: bilateral vertebral arteries appear patent, basilar artery signal is diminished in the mid-to-distal segments with possible flow-related artifact versus stenosis",
         "No evidence of venous sinus thrombosis on MRV sequences"
       ],
-      "impression": "No definite acute infarction identified. Diminished flow signal in mid-to-distal basilar artery on MRA — may represent slow flow, stenosis, or artifact. No intracranial hemorrhage. Clinical correlation recommended.",
+      "impression": "No definite acute infarction identified. Diminished flow signal in mid-to-distal basilar artery on MRA \u2014 may represent slow flow, stenosis, or artifact. No intracranial hemorrhage. Clinical correlation recommended.",
       "differential_by_imaging": [],
       "recommended_actions": [
         "Clinical correlation recommended."
@@ -467,7 +467,7 @@
         ],
         "volumetrics": null,
         "additional_observations": [
-          "New findings compared to initial MRI obtained 8 hours earlier — initial study was falsely negative in the hyperacute period",
+          "New findings compared to initial MRI obtained 8 hours earlier \u2014 initial study was falsely negative in the hyperacute period",
           "MRA now demonstrates absent flow signal in mid-to-distal basilar artery, confirming persistent occlusion",
           "Supratentorial brain parenchyma remains normal",
           "No hemorrhagic transformation identified",
@@ -707,7 +707,7 @@
         ],
         "formulary_status": "Available on hospital formulary",
         "alternatives": [
-          "Tenecteplase 0.25 mg/kg IV bolus — single bolus administration, increasingly used in bridging-to-thrombectomy setting",
+          "Tenecteplase 0.25 mg/kg IV bolus \u2014 single bolus administration, increasingly used in bridging-to-thrombectomy setting",
           "Direct endovascular thrombectomy without IV thrombolysis if presentation is beyond IV tPA window"
         ]
       }
@@ -779,175 +779,313 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Acute ischemic stroke due to basilar artery occlusion, posterior circulation",
-    "icd_code": "I63.9",
+    "primary_diagnosis": "Acute ischemic stroke due to basilar artery occlusion (posterior circulation), late-window presentation initially misattributed to alcohol intoxication",
+    "icd_code": "I63.22",
     "differential": [
       {
-        "diagnosis": "Acute alcohol intoxication",
-        "likelihood": "very_low",
-        "key_features": "BAC of 2.3 per mille initially supported this diagnosis; however, the clinical trajectory of improvement followed by acute worsening is inconsistent with simple intoxication, which follows a monotonic improvement curve as alcohol is metabolized"
+        "diagnosis": "Top-of-the-basilar syndrome from cardioembolism",
+        "likelihood": "high",
+        "key_features": "Cardiac workup essential to determine embolic source",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Alcohol intoxication / acute toxic encephalopathy",
+        "likelihood": "low",
+        "key_features": "Initial misattribution; serum ethanol below threshold and persistent focal deficits with confirmed basilar occlusion exclude pure intoxication",
+        "icd_code": null
       },
       {
         "diagnosis": "Wernicke encephalopathy",
         "likelihood": "low",
-        "key_features": "Can present with ataxia, oculomotor abnormalities, and altered consciousness in alcoholic patients, but MRI would show characteristic periaqueductal and mammillary body signal changes, which are absent; the acute fluctuating course with focal brainstem signs favors vascular etiology"
+        "key_features": "Possible in alcohol use disorder; persistent focal deficits with imaging findings of basilar occlusion are not explained by Wernicke alone \u2014 empiric thiamine still indicated",
+        "icd_code": null
       },
       {
-        "diagnosis": "Basilar migraine (migraine with brainstem aura)",
+        "diagnosis": "Bilateral thalamic ischemia from venous origin (Percheron territory)",
         "likelihood": "low",
-        "key_features": "Can present with vertigo, dysarthria, ataxia, and decreased consciousness, but typically in younger patients with migraine history, symptoms fully reversible, and normal imaging"
+        "key_features": "Imaging pattern and basilar occlusion on CTA/MRA support arterial mechanism",
+        "icd_code": null
       },
       {
-        "diagnosis": "Brainstem encephalitis",
-        "likelihood": "low",
-        "key_features": "Would present more subacutely with fever, CSF pleocytosis, and MRI showing brainstem signal abnormality without vascular territory restriction pattern"
-      },
-      {
-        "diagnosis": "Central pontine myelinolysis",
+        "diagnosis": "Hemorrhagic stroke (brainstem hemorrhage)",
         "likelihood": "very_low",
-        "key_features": "Can occur in alcoholic patients but requires rapid sodium correction (not present), has a different temporal profile, and shows characteristic pontine T2 signal on MRI"
+        "key_features": "CT/MRI exclude hemorrhage",
+        "icd_code": null
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Perform initial neurological assessment including GCS, focused neurological examination, and assess for posterior circulation symptoms (ataxia, nystagmus, dysarthria, cranial nerve palsies)",
-        "tool_name": null,
-        "expected_finding": "GCS 11, somnolence, dysarthria, horizontal nystagmus, truncal ataxia, bilateral Babinski signs",
-        "category": "required"
+        "action": "Obtain emergent non-contrast CT head as first imaging to exclude intracranial hemorrhage before any thrombolytic decision",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Non-contrast CT may show hyperdense basilar artery sign or subtle posterior fossa hypodensity; exclude hemorrhage",
+        "category": "required",
+        "tool_parameters": {
+          "contrast": false,
+          "angiography": false
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 2,
-        "action": "Obtain stat labs including CBC, BMP, coagulation studies, ethanol level, liver function, and toxicology screen",
+        "action": "Obtain CT angiography of head and neck to evaluate for large vessel occlusion and assess thrombectomy candidacy",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "CTA head/neck demonstrates basilar artery occlusion (or near-occlusion) with collateral filling \u2014 actionable for mechanical thrombectomy",
+        "category": "required",
+        "tool_parameters": {
+          "contrast": true,
+          "angiography": true
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
+      },
+      {
+        "step": 3,
+        "action": "Order stat labs: CBC, BMP (including glucose), coagulation panel (INR/PTT), troponin",
         "tool_name": "interpret_labs",
-        "expected_finding": "Elevated BAC, macrocytosis, elevated GGT — supporting alcohol use but not explaining the full clinical picture",
+        "expected_finding": "Glucose normal-to-elevated (exclude hypoglycemia mimic); coagulation, troponin, alcohol level",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
-            "LFT",
+            "glucose",
             "coagulation",
-            "drug_screen"
+            "troponin"
           ]
-        }
-      },
-      {
-        "step": 3,
-        "action": "Obtain emergent brain MRI with DWI and MRA to evaluate for posterior circulation stroke",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Initial MRI may be equivocal in hyperacute posterior circulation stroke; diminished basilar MRA signal is a red flag",
-        "category": "required",
-        "tool_parameters": {
-          "protocol": "stroke",
-          "contrast": false
-        }
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 4,
-        "action": "Obtain 12-lead ECG to evaluate for cardioembolic source",
+        "action": "Obtain 12-lead ECG to assess for atrial fibrillation and concurrent cardiac ischemia",
         "tool_name": "analyze_ecg",
-        "expected_finding": "Normal sinus rhythm — no atrial fibrillation identified, making cryptogenic stroke mechanism more likely",
-        "category": "required"
+        "expected_finding": "Assess for AF; sinus rhythm common",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 5,
-        "action": "Recognize that the fluctuating course (improvement then acute worsening) is a red flag for basilar artery occlusion and obtain CT angiography of head and neck urgently",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "Mid-to-distal basilar artery occlusion on CTA confirming the diagnosis",
+        "action": "Review current AHA/ASA guidelines for IV thrombolysis windows, late-window selection, and mechanical thrombectomy eligibility",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Basilar artery occlusion thrombectomy criteria (ATTENTION, BAOCHE), late-window posterior circulation strategy",
         "category": "required",
         "tool_parameters": {
-          "angiography": true,
-          "contrast": false
-        }
+          "query": "Basilar artery occlusion thrombectomy criteria (ATTENTION, BAOCHE), late-window posterior circulation strategy"
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 6,
-        "action": "Consult neurointerventional radiology for emergent basilar artery thrombectomy",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Confirm absence of contraindications to IV thrombolysis (recent anticoagulation, surgery, bleeding, drug interactions)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "tPA contraindications screened; medication-anticoagulant interactions reviewed",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 7,
-        "action": "Consider IV thrombolysis (alteplase or tenecteplase) as bridge to thrombectomy, verifying no absolute contraindications",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "No absolute contraindications; SSRI use is a relative concern for increased bleeding but not a contraindication",
-        "category": "required"
+        "action": "Urgent brain MRI with DWI/FLAIR if non-leaky for ischemia and to guide late-window thrombectomy decisions; MRA confirms basilar occlusion",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "DWI-positive lesions in posterior circulation (brainstem, cerebellum, occipital) plus basilar occlusion on MRA confirm diagnosis",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "stroke",
+          "sequences": [
+            "DWI",
+            "ADC",
+            "FLAIR",
+            "T2",
+            "GRE",
+            "MRA"
+          ],
+          "contrast": false
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 8,
-        "action": "Admit to neurological ICU with continuous monitoring and preparation for possible airway protection given brainstem involvement",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "TTE first; pursue TEE if cryptogenic etiology emerges, given young/middle-aged patient with potential paradoxical embolism",
+        "tool_name": "order_echocardiogram",
+        "expected_finding": "Screen for cardiac thrombus, vegetation, depressed EF, and intracardiac shunt",
+        "category": "required",
+        "tool_parameters": {
+          "echo_type": "TTE"
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 9,
-        "action": "Administer empiric IV thiamine 500 mg before glucose-containing fluids given alcohol use history",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended"
+        "action": "Inpatient telemetry plus 24-hour Holter; escalate to 30-day event monitor if mechanism remains cryptogenic",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Detect paroxysmal AF as occult stroke mechanism",
+        "category": "required",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "citation": "[Sanna_2014]",
+        "guideline_source": "[Sanna_2014]"
       },
       {
         "step": 10,
-        "action": "Order echocardiogram with bubble study to evaluate for PFO/cardioembolic source",
-        "tool_name": "order_echocardiogram",
-        "expected_finding": "PFO with right-to-left shunt identified — raises possibility of paradoxical embolism",
+        "action": "Carotid duplex provides incomplete posterior-circulation assessment; transcranial Doppler may add hemodynamic information",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Confirm cervical vessel patency; TCD can demonstrate microemboli or absent flow in basilar distribution",
         "category": "recommended",
         "tool_parameters": {
-          "echo_type": "bubble_study"
-        }
+          "modality": "transcranial_doppler"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
       },
       {
         "step": 11,
-        "action": "Order hypercoagulability workup given history of prior DVT and possible paradoxical embolism",
+        "action": "Secondary prevention labs: HbA1c, lipid panel; hypercoagulability workup if mechanism remains undetermined",
         "tool_name": "interpret_labs",
-        "expected_finding": "Factor V Leiden heterozygous mutation and hyperhomocysteinemia identified",
+        "expected_finding": "Lipids and hypercoagulability inform secondary prevention strategy",
         "category": "recommended",
         "tool_parameters": {
           "panels": [
-            "coagulation"
+            "HbA1c",
+            "lipid panel",
+            "antiphospholipid",
+            "homocysteine"
           ]
-        }
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
       },
       {
         "step": 12,
-        "action": "Initiate anticoagulation for secondary stroke prevention once acute phase stable, particularly given PFO with DVT history and thrombophilia",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Consider MR angiography of head and neck if CTA was contraindicated or as confirmatory vascular study",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Alternative non-iodinated vascular assessment when CTA is limited",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "MR_angiography"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
+      },
+      {
+        "step": 13,
+        "action": "Consider transcranial Doppler for microembolic signal detection or hemodynamic assessment in selected mechanisms",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Microembolic signals support active embolic mechanism; can monitor vasospasm or right-to-left shunt",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "transcranial_doppler"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "No seizure features (although consider EEG only if encephalopathy persists out of proportion to imaging) \u2014 not part of routine BAO workup",
+        "citation": "[AHA_ASA_2019]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No SAH or CNS infection suspicion; LP not indicated",
+        "citation": "[AHA_ASA_2019]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "rationale": "EMG/NCS evaluates peripheral nerve disease; not applicable to central ischemic stroke",
+        "citation": "[AHA_ASA_2019]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "check_drug_interactions",
+        "reason": "Non-contrast head CT MUST exclude intracranial hemorrhage before IV thrombolysis is considered (tPA decision modeled here through drug-interaction/contraindication check).",
+        "citation": "[AHA_ASA_2019]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Glucose, INR/PTT, and platelet count must be reviewed before IV thrombolysis to exclude hypoglycemia mimic and coagulopathy contraindications.",
+        "citation": "[AHA_ASA_2019]",
+        "severity": "soft"
+      },
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_brain_mri",
+        "reason": "Non-contrast CT and CTA performed first to identify basilar occlusion and rule out hemorrhage; MRI follows for tissue-clock and selection refinement.",
+        "citation": "[AHA_ASA_2019]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Recognize that the pattern of initial improvement followed by acute worsening is inconsistent with alcohol intoxication and warrants urgent vascular imaging",
-      "Obtain CT angiography to confirm basilar artery occlusion despite equivocal initial MRI",
-      "Emergently consult for endovascular thrombectomy — basilar artery occlusion carries >85% mortality if untreated",
-      "Consider IV thrombolysis as bridge to thrombectomy",
-      "Monitor in ICU with preparedness for airway protection due to brainstem involvement",
-      "Administer thiamine before glucose-containing fluids in an alcoholic patient to prevent precipitation of Wernicke encephalopathy"
+      "Establish time of last known well (LKW) and apply NIHSS to determine acute treatment eligibility",
+      "Obtain non-contrast CT head FIRST to exclude intracranial hemorrhage before any thrombolytic decision",
+      "Achieve door-to-needle time <60 minutes if IV thrombolysis is indicated",
+      "Maintain blood pressure <185/110 mmHg prior to IV tPA and <180/105 mmHg for 24 hours after",
+      "Verify glucose to exclude hypoglycemia as a stroke mimic",
+      "Initiate continuous telemetry and obtain prolonged cardiac monitoring to detect paroxysmal atrial fibrillation",
+      "Begin secondary prevention (antiplatelet or anticoagulation) and high-intensity statin per mechanism",
+      "Recognize basilar artery occlusion as a time-critical, thrombectomy-eligible diagnosis even in late-window presentations (ATTENTION, BAOCHE)",
+      "Activate stroke team and prepare for emergent mechanical thrombectomy",
+      "Empiric thiamine and glucose management for any alcohol-use-disorder patient with encephalopathy \u2014 do not delay imaging",
+      "Reassess any patient with focal deficits attributed to alcohol or sedatives \u2014 exam-imaging mismatch demands neuroimaging"
     ],
     "contraindicated_actions": [
-      "Attributing all symptoms to alcohol intoxication and discharging without vascular imaging, especially after the secondary deterioration",
-      "Delaying vascular imaging because initial MRI was equivocal",
-      "Administering IV glucose-containing fluids before thiamine in an alcoholic patient",
-      "Aggressively lowering blood pressure below 140/90 in the setting of acute basilar artery occlusion (risks worsening brainstem ischemia)",
-      "Performing lumbar puncture in the presence of posterior fossa mass effect from cerebellar edema (risk of tonsillar herniation)",
-      "Discharging the patient after initial improvement without explaining the fluctuating clinical course"
+      "Do not administer IV tPA before non-contrast CT excludes intracranial hemorrhage",
+      "Do not give IV tPA if INR >1.7, platelet count <100,000, recent major surgery, or other guideline-listed contraindications",
+      "Do not aggressively lower blood pressure below 140/90 mmHg in the acute phase outside the tPA window \u2014 risks worsening penumbral perfusion",
+      "Do not delay non-contrast CT for additional imaging or labs in a stroke alert presentation",
+      "Do not start full-dose anticoagulation in the acute phase of a large infarct without considering hemorrhagic transformation risk",
+      "Do not anchor on alcohol intoxication when focal neurologic signs (gaze palsy, dysarthria, ataxia) persist or worsen \u2014 pursue immediate stroke imaging",
+      "Do not delay non-contrast CT and CTA on the basis of 'sobering up' the patient"
     ],
     "key_reasoning_points": [
-      "The initial presentation with somnolence, dysarthria, nystagmus, and ataxia in a patient with elevated BAC is a classic mimic scenario — alcohol intoxication can mask or mimic posterior circulation stroke symptoms",
-      "The fluctuating course (improvement then acute deterioration) is a hallmark of basilar artery occlusion, as the stuttering collateral supply alternately compensates and fails; this pattern should never be attributed to simple alcohol intoxication",
-      "DWI-negative MRI does not exclude posterior circulation stroke in the hyperacute phase; the posterior fossa is particularly susceptible to false-negative DWI due to susceptibility artifacts and small vessel territory involvement",
-      "Diminished basilar artery signal on MRA, even when read as possibly artifactual, should prompt urgent CTA when clinical suspicion exists",
-      "Transcranial Doppler showing high pulsatility index with low flow velocity in the basilar artery is a key bedside finding that can be obtained rapidly and supports the diagnosis before CTA",
-      "The combination of PFO, prior DVT, and Factor V Leiden suggests paradoxical embolism as a potential stroke mechanism in this patient without atrial fibrillation",
-      "Basilar artery occlusion is a time-sensitive emergency with mortality approaching 85-95% without recanalization; recent trials (ATTENTION, BAOCHE) demonstrate clear benefit of thrombectomy"
+      "Acute ischemic stroke is a clinical syndrome plus neuroimaging diagnosis; CT first excludes hemorrhage and unmasks the tPA decision",
+      "Time of last known well governs IV thrombolysis eligibility (\u22644.5h standard; selected up to 9h with imaging mismatch per WAKE-UP/EXTEND)",
+      "Large vessel occlusion on CTA opens the mechanical thrombectomy pathway up to 24h per DAWN/DEFUSE-3 selection criteria",
+      "TOAST classification by mechanism (large-artery, cardioembolic, small-vessel, other, undetermined) drives secondary prevention strategy",
+      "Normal sinus rhythm on initial ECG does NOT exclude paroxysmal AF \u2014 extended cardiac monitoring is required, especially in cryptogenic stroke",
+      "Basilar artery occlusion is highly lethal without recanalization; thrombectomy benefit extends well beyond 24h in selected cases (ATTENTION, BAOCHE)",
+      "Posterior circulation strokes are commonly misdiagnosed because deficits (vertigo, dysarthria, gaze abnormalities) overlap with intoxication and benign vestibular conditions",
+      "HINTS-plus and a careful gaze/saccade examination help differentiate central from peripheral causes",
+      "Off-pathway modality for order_advanced_imaging (modality=amyloid_PET): Amyloid PET has no role in acute ischemic stroke evaluation and incurs substantial cost without altering management",
+      "Off-pathway modality for order_advanced_imaging (modality=DaTscan): Dopamine transporter SPECT is indicated for parkinsonian syndromes, not vascular stroke workup",
+      "Off-pathway modality for order_advanced_imaging (modality=FDG_PET): FDG-PET (neurodegenerative/oncologic indications) has no role in routine ischemic stroke workup"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "Alcohol use disorder with episodic heavy use",
+        "location": "past medical history",
+        "field_path": "patient.clinical_history.past_medical_history[0]",
+        "intended_effect": "Attribute all symptoms to alcohol intoxication and defer neuroimaging",
+        "correct_interpretation": "Persistent gaze and ataxia findings with confirmed basilar occlusion override the intoxication narrative"
+      },
+      {
+        "data_point": "History of deep vein thrombosis with completed warfarin course",
+        "location": "past medical history",
+        "field_path": "patient.clinical_history.past_medical_history[4]",
+        "intended_effect": "Anchor to recurrent VTE/hypercoagulability as primary stroke mechanism",
+        "correct_interpretation": "Distant DVT with completed treatment does not preclude evaluation for ongoing hypercoagulability or arterial atherosclerosis; basilar occlusion is the proximate cause requiring acute treatment"
+      }
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -955,7 +1093,7 @@
     "source_license": "CC-BY 4.0",
     "generation_method": "real_case_seed",
     "condition_name": "Acute ischemic stroke",
-    "difficulty_description": "Diagnostic puzzle — initial presentation mimics alcohol intoxication with elevated BAC, initial MRI is equivocal/falsely negative for posterior circulation stroke, and the critical diagnostic clue (fluctuating course and basilar artery occlusion) only emerges on follow-up evaluation and CTA. Multiple red herrings from alcohol-related lab abnormalities.",
+    "difficulty_description": "Diagnostic puzzle \u2014 initial presentation mimics alcohol intoxication with elevated BAC, initial MRI is equivocal/falsely negative for posterior circulation stroke, and the critical diagnostic clue (fluctuating course and basilar artery occlusion) only emerges on follow-up evaluation and CTA. Multiple red herrings from alcohol-related lab abnormalities.",
     "expected_agent_confidence": 0.35,
     "clinical_pearls": [
       "Posterior circulation strokes are missed more frequently than anterior circulation strokes because their symptoms (vertigo, ataxia, diplopia, dysarthria) overlap with common benign conditions and intoxication",
@@ -967,6 +1105,14 @@
       "eeg": "incidental",
       "csf": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:ISCH-STR",
+    "difficulty_rationale": "Basilar artery occlusion misattributed to alcohol intoxication \u2014 late-window thrombectomy decision (ATTENTION, BAOCHE), exam-imaging mismatch recognition.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

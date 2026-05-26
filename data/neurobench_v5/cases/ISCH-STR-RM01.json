@@ -804,189 +804,312 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Acute ischemic stroke secondary to left internal carotid artery dissection, likely traumatic",
-    "icd_code": "I63.9",
+    "primary_diagnosis": "Acute ischemic stroke secondary to left internal carotid artery dissection",
+    "icd_code": "I63.232",
     "differential": [
       {
-        "diagnosis": "Focal epilepsy with post-ictal deficit",
-        "likelihood": "moderate",
-        "key_features": "EEG shows focal slowing consistent with structural lesion rather than primary epileptiform activity; MRI confirms ischemic infarction rather than epileptic focus"
-      },
-      {
-        "diagnosis": "Hemorrhagic stroke",
+        "diagnosis": "Focal motor seizure (Todd's paralysis)",
         "likelihood": "low",
-        "key_features": "No evidence of hemorrhage on MRI in subarachnoid space or brain parenchyma"
+        "key_features": "Stereotyped tonic hand posturing on history fits focal motor seizure pattern, but persistent deficit with DWI-positive infarct establishes ischemic stroke; consider concurrent seizure if EEG suggests",
+        "icd_code": null
       },
       {
-        "diagnosis": "Cardioembolic stroke (PFO or occult arrhythmia)",
-        "likelihood": "moderate",
-        "key_features": "Normal echocardiogram, normal sinus rhythm on ECG; vascular imaging confirms carotid dissection as the embolic source"
-      },
-      {
-        "diagnosis": "Autoimmune vasculitis (CNS or systemic)",
+        "diagnosis": "Cardioembolic stroke (occult AF/PFO)",
         "likelihood": "low",
-        "key_features": "Normal inflammatory markers, negative ANA, negative ANCA, negative rheumatoid factor; no vessel wall enhancement on imaging"
+        "key_features": "Less likely in confirmed cervical dissection; cardiac workup still appropriate",
+        "icd_code": null
       },
       {
-        "diagnosis": "Antiphospholipid syndrome",
-        "likelihood": "low",
-        "key_features": "Lupus anticoagulant weakly positive but likely transient (OCP use); anticardiolipin and beta-2 glycoprotein antibodies negative; does not meet diagnostic criteria without confirmation at 12 weeks"
+        "diagnosis": "Hemiplegic migraine",
+        "likelihood": "very_low",
+        "key_features": "Persistent deficit and DWI restriction exclude migraine",
+        "icd_code": null
       },
       {
-        "diagnosis": "Connective tissue disorder (Ehlers-Danlos, Loeys-Dietz) predisposing to dissection",
-        "likelihood": "low",
-        "key_features": "No hypermobility, normal aortic root, genetic panel negative for COL3A1, FBN1, TGFBR1/2 mutations"
+        "diagnosis": "Functional neurological disorder",
+        "likelihood": "very_low",
+        "key_features": "Objective DWI-positive infarct and vessel imaging findings exclude FND",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Multiple sclerosis (relapse)",
+        "likelihood": "very_low",
+        "key_features": "Vascular-territory DWI restriction without demyelinating MRI features",
+        "icd_code": null
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Perform urgent neurological assessment including NIHSS and detailed history focusing on timeline, trauma history, and risk factors for stroke in a young patient",
-        "tool_name": null,
-        "expected_finding": "NIHSS 3, history of cervical trauma 3 weeks prior, recurrent transient neurological events",
-        "category": "required"
+        "action": "Obtain emergent non-contrast CT head as first imaging to exclude intracranial hemorrhage before any thrombolytic decision",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No hemorrhage on non-contrast CT; possible subtle hypodensity",
+        "category": "required",
+        "tool_parameters": {
+          "contrast": false,
+          "angiography": false
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 2,
-        "action": "Obtain EEG to evaluate for possible epileptic etiology of the episodic symptoms",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Focal slowing in left frontocentral region suggesting structural lesion rather than primary epilepsy",
+        "action": "Obtain CT angiography of head and neck to evaluate for large vessel occlusion and assess thrombectomy candidacy",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "CTA neck shows left ICA dissection (luminal narrowing, intimal flap, or pseudoaneurysm); intracranial vessels otherwise patent",
         "category": "required",
         "tool_parameters": {
-          "eeg_type": "routine"
-        }
+          "contrast": true,
+          "angiography": true
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 3,
-        "action": "Obtain brain MRI with diffusion-weighted imaging to evaluate for acute ischemic lesion or other structural pathology",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Acute-to-subacute ischemic infarction in left frontoparietal region with older lesion in left globus pallidus; no hemorrhage",
-        "category": "required",
-        "tool_parameters": {
-          "protocol": "stroke",
-          "contrast": false
-        }
-      },
-      {
-        "step": 4,
-        "action": "Obtain stat labs including CBC, BMP, coagulation studies, and inflammatory markers to evaluate for systemic causes",
+        "action": "Order stat labs: CBC, BMP (including glucose), coagulation panel (INR/PTT), troponin",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal labs except mildly elevated TSH; normal inflammatory markers and coagulation studies",
+        "expected_finding": "Normal CBC, BMP, coagulation; pregnancy test if applicable",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
+            "glucose",
             "coagulation",
-            "inflammatory_markers"
+            "troponin"
           ]
-        }
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
+      },
+      {
+        "step": 4,
+        "action": "Obtain 12-lead ECG to assess for atrial fibrillation and concurrent cardiac ischemia",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Likely sinus rhythm; assess for AF",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 5,
-        "action": "Obtain ECG to evaluate for cardiac arrhythmia as potential embolic source",
-        "tool_name": "analyze_ecg",
-        "expected_finding": "Normal sinus rhythm, no arrhythmia identified",
-        "category": "required"
+        "action": "Review current AHA/ASA guidelines for IV thrombolysis windows, late-window selection, and mechanical thrombectomy eligibility",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Cervical artery dissection: antiplatelet vs anticoagulation (CADISS), management of dissection-related stroke",
+        "category": "required",
+        "tool_parameters": {
+          "query": "Cervical artery dissection: antiplatelet vs anticoagulation (CADISS), management of dissection-related stroke"
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 6,
-        "action": "Obtain CT angiography or MR angiography of head and neck to evaluate for arterial dissection given history of cervical trauma and multi-territory infarctions",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "Left internal carotid artery dissection with severe stenosis and distal MCA irregularity",
+        "action": "Confirm absence of contraindications to IV thrombolysis (recent anticoagulation, surgery, bleeding, drug interactions)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "tPA contraindications screened; medication-anticoagulant interactions reviewed",
         "category": "required",
-        "tool_parameters": {
-          "angiography": true,
-          "contrast": false
-        }
+        "tool_parameters": {},
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 7,
-        "action": "Initiate antithrombotic therapy (anticoagulation or antiplatelet) for secondary stroke prevention in cervical artery dissection",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Obtain brain MRI with DWI and FLAIR to confirm acute infarct, localize territory, and assess vintage",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "DWI-positive infarct downstream of dissected ICA; T1 fat-sat MRI of neck demonstrates intramural hematoma",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "stroke",
+          "sequences": [
+            "DWI",
+            "ADC",
+            "FLAIR",
+            "T2",
+            "T1",
+            "GRE/SWI"
+          ],
+          "contrast": false
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 8,
-        "action": "Discontinue combined oral contraceptive pill given new diagnosis of ischemic stroke and discuss alternative contraception",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "OCP contraindicated after ischemic stroke; progestin-only or non-hormonal alternatives recommended",
-        "category": "required"
+        "action": "Obtain transthoracic echocardiogram to evaluate for cardioembolic source of stroke",
+        "tool_name": "order_echocardiogram",
+        "expected_finding": "Screen for cardiac source \u2014 typically negative in dissection-related stroke; pursue TEE only if cryptogenic after dissection management",
+        "category": "required",
+        "tool_parameters": {
+          "echo_type": "TTE"
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       },
       {
         "step": 9,
-        "action": "Order echocardiogram with bubble study to evaluate for cardiac source and PFO",
-        "tool_name": "order_echocardiogram",
-        "expected_finding": "Normal echocardiogram, no structural cardiac abnormality",
-        "category": "recommended",
+        "action": "Initiate inpatient telemetry plus 24-hour Holter monitoring (extend to 30-day event monitor if no source identified)",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Detect occult AF \u2014 lower yield in young patient with confirmed dissection",
+        "category": "required",
         "tool_parameters": {
-          "echo_type": "bubble_study"
-        }
+          "monitor_type": "holter_24h"
+        },
+        "citation": "[Sanna_2014]",
+        "guideline_source": "[Sanna_2014]"
       },
       {
         "step": 10,
-        "action": "Order hypercoagulability panel to evaluate for underlying thrombophilia",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Largely normal with transient weakly positive lupus anticoagulant",
-        "category": "recommended",
+        "action": "Obtain carotid duplex ultrasound to quantify cervical carotid stenosis and characterize plaque morphology",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Carotid duplex may show dissected ICA flow disturbance, but CTA/MRA is the imaging standard for dissection",
+        "category": "required",
         "tool_parameters": {
-          "panels": [
-            "coagulation"
-          ]
-        }
+          "modality": "carotid_duplex"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
       },
       {
         "step": 11,
-        "action": "Screen for connective tissue disorders to evaluate for predisposition to arterial dissection",
-        "tool_name": "interpret_labs",
-        "expected_finding": "No connective tissue disorder identified",
-        "category": "recommended",
+        "action": "MR angiography of head and neck with fat-saturated T1 cervical sequences to definitively characterize ICA dissection",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Crescentic intramural hematoma in the ICA wall confirms dissection",
+        "category": "required",
         "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP"
-          ]
-        }
+          "modality": "MR_angiography"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
       },
       {
         "step": 12,
-        "action": "Plan follow-up vascular imaging in 3-6 months to assess for recanalization of the dissected artery",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended"
+        "action": "Targeted secondary workup: hypercoagulability panel in young stroke if dissection equivocal; consider connective tissue disease evaluation if dissection without trauma",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Identify treatable contributors (antiphospholipid, factor V Leiden) and clues to fibromuscular dysplasia or Ehlers-Danlos",
+        "category": "recommended",
+        "tool_parameters": {
+          "panels": [
+            "antiphospholipid",
+            "factor V Leiden",
+            "prothrombin G20210A",
+            "homocysteine"
+          ]
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
+      },
+      {
+        "step": 13,
+        "action": "Consider MR angiography of head and neck if CTA was contraindicated or as confirmatory vascular study",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Alternative non-iodinated vascular assessment when CTA is limited",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "MR_angiography"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
+      },
+      {
+        "step": 14,
+        "action": "Consider transcranial Doppler for microembolic signal detection or hemodynamic assessment in selected mechanisms",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Microembolic signals support active embolic mechanism; can monitor vasospasm or right-to-left shunt",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "transcranial_doppler"
+        },
+        "citation": "[AHA_ASA_2014]",
+        "guideline_source": "[AHA_ASA_2014]"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No SAH or CNS infection suspicion; LP not indicated",
+        "citation": "[AHA_ASA_2019]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "rationale": "EMG/NCS evaluates peripheral nerve disease; not applicable to central ischemic stroke",
+        "citation": "[AHA_ASA_2019]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "check_drug_interactions",
+        "reason": "Non-contrast head CT MUST exclude intracranial hemorrhage before IV thrombolysis is considered (tPA decision modeled here through drug-interaction/contraindication check).",
+        "citation": "[AHA_ASA_2019]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Glucose, INR/PTT, and platelet count must be reviewed before IV thrombolysis to exclude hypoglycemia mimic and coagulopathy contraindications.",
+        "citation": "[AHA_ASA_2019]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Obtain brain MRI to confirm ischemic stroke and assess for multi-territory involvement",
-      "Obtain vascular imaging (CTA or MRA of head and neck) to diagnose carotid artery dissection",
-      "Identify the cervical trauma as a key historical detail linking to dissection etiology",
-      "Initiate antithrombotic therapy for secondary stroke prevention",
-      "Discontinue combined oral contraceptive pill",
-      "Rule out alternative etiologies (epilepsy, vasculitis, hypercoagulable state, cardioembolic source)"
+      "Establish time of last known well (LKW) and apply NIHSS to determine acute treatment eligibility",
+      "Obtain non-contrast CT head FIRST to exclude intracranial hemorrhage before any thrombolytic decision",
+      "Achieve door-to-needle time <60 minutes if IV thrombolysis is indicated",
+      "Maintain blood pressure <185/110 mmHg prior to IV tPA and <180/105 mmHg for 24 hours after",
+      "Verify glucose to exclude hypoglycemia as a stroke mimic",
+      "Initiate continuous telemetry and obtain prolonged cardiac monitoring to detect paroxysmal atrial fibrillation",
+      "Begin secondary prevention (antiplatelet or anticoagulation) and high-intensity statin per mechanism",
+      "Recognize neck/face/eye pain preceding focal deficit as a dissection alert",
+      "Pursue cervical vessel imaging (CTA or MRA) to confirm dissection",
+      "Initiate antiplatelet or anticoagulation per CADISS for 3-6 months",
+      "Evaluate for and treat focal motor seizures if EEG or clinical features support concurrent epileptic activity"
     ],
     "contraindicated_actions": [
-      "Administering IV thrombolysis (alteplase) when symptom onset is unclear or beyond the treatment window, and deficits are mild and improving",
-      "Continuing combined oral contraceptive pill in a patient with newly diagnosed ischemic stroke",
-      "Starting antiepileptic drugs as sole treatment without pursuing imaging workup for structural etiology",
-      "Performing aggressive anticoagulation with IV heparin in the acute phase without excluding hemorrhagic transformation",
-      "Dismissing the transient neurological episodes as benign without imaging evaluation",
-      "Performing lumbar puncture when clinical and imaging findings already suggest ischemic stroke etiology"
+      "Do not administer IV tPA before non-contrast CT excludes intracranial hemorrhage",
+      "Do not give IV tPA if INR >1.7, platelet count <100,000, recent major surgery, or other guideline-listed contraindications",
+      "Do not aggressively lower blood pressure below 140/90 mmHg in the acute phase outside the tPA window \u2014 risks worsening penumbral perfusion",
+      "Do not delay non-contrast CT for additional imaging or labs in a stroke alert presentation",
+      "Do not start full-dose anticoagulation in the acute phase of a large infarct without considering hemorrhagic transformation risk",
+      "Do not skip dedicated cervical vessel imaging in a young stroke patient \u2014 dissection is the leading mechanism",
+      "Do not anchor on functional or migraine diagnoses in the face of objective infarct and dissection findings"
     ],
     "key_reasoning_points": [
-      "The episodic involuntary hand clenching and transient speech/motor difficulties in a young patient without epilepsy history should prompt evaluation for both seizure and vascular etiologies",
-      "EEG showing focal slowing without definite epileptiform activity suggests a structural lesion causing secondary cortical irritability rather than primary epilepsy",
-      "The history of cervical trauma from a volleyball impact 3 weeks prior is the critical diagnostic clue linking to carotid artery dissection",
-      "MRI showing multi-territory infarctions of differing ages (acute frontoparietal + late subacute pallidal) in a young patient without traditional vascular risk factors strongly suggests a proximal arterial source",
-      "Normal inflammatory markers, negative autoimmune panel, and negative connective tissue screening systematically exclude vasculitis and hereditary connective tissue disorders",
-      "The weakly positive lupus anticoagulant is likely transient (common with OCP use) and should not distract from the primary diagnosis of carotid dissection confirmed on CTA",
-      "The normal ECG and echocardiogram argue against a primary cardioembolic source, directing attention to the cervicocerebral vasculature",
-      "Discontinuation of the combined OCP is an important management step as estrogen-containing contraceptives are contraindicated after ischemic stroke"
+      "Acute ischemic stroke is a clinical syndrome plus neuroimaging diagnosis; CT first excludes hemorrhage and unmasks the tPA decision",
+      "Time of last known well governs IV thrombolysis eligibility (\u22644.5h standard; selected up to 9h with imaging mismatch per WAKE-UP/EXTEND)",
+      "Large vessel occlusion on CTA opens the mechanical thrombectomy pathway up to 24h per DAWN/DEFUSE-3 selection criteria",
+      "TOAST classification by mechanism (large-artery, cardioembolic, small-vessel, other, undetermined) drives secondary prevention strategy",
+      "Normal sinus rhythm on initial ECG does NOT exclude paroxysmal AF \u2014 extended cardiac monitoring is required, especially in cryptogenic stroke",
+      "Cervical arterial dissection is the most common stroke etiology in young adults; neck/face pain and prior trauma raise pretest probability",
+      "Stereotyped focal motor episodes can coexist with ischemic stroke (irritative cortical focus from infarct) \u2014 EEG can clarify",
+      "T1 fat-saturated MRI of the neck reveals intramural hematoma \u2014 the diagnostic hallmark",
+      "Off-pathway modality for order_advanced_imaging (modality=amyloid_PET): Amyloid PET has no role in acute ischemic stroke evaluation and incurs substantial cost without altering management",
+      "Off-pathway modality for order_advanced_imaging (modality=DaTscan): Dopamine transporter SPECT is indicated for parkinsonian syndromes, not vascular stroke workup",
+      "Off-pathway modality for order_advanced_imaging (modality=FDG_PET): FDG-PET (neurodegenerative/oncologic indications) has no role in routine ischemic stroke workup"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "Initial EEG findings",
+        "location": "initial tool outputs",
+        "field_path": "initial_tool_outputs.eeg",
+        "intended_effect": "Anchor diagnosis to focal seizure as primary etiology and miss the dissection-related infarct",
+        "correct_interpretation": "Focal cortical irritability can result from an underlying infarct; the dissection and infarct are the primary diagnoses, with seizure activity (if present) as a downstream phenomenon"
+      },
+      {
+        "data_point": "Hypothyroidism on stable levothyroxine",
+        "location": "past medical history",
+        "field_path": "patient.clinical_history.past_medical_history[2]",
+        "intended_effect": "Distract toward metabolic causes of neurologic symptoms",
+        "correct_interpretation": "Stable hypothyroidism is unrelated to focal cortical deficits and DWI-positive infarct"
+      }
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -1000,6 +1123,16 @@
       "csf": "normal",
       "cardiac_monitoring": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:ISCH-STR",
+    "difficulty_rationale": "Carotid dissection presenting with seizure-like episodes preceding completed infarct; vessel imaging required despite young/healthy phenotype.",
+    "case_body_concerns": [
+      "Required tool `order_cardiac_monitoring` (step 9) has no pre-generated output in initial_tool_outputs/followup_outputs \u2014 agent will receive only the generic fallback_tool_outputs entry. Recommend adding a case-specific followup_outputs entry to match the ground-truth expected_finding."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

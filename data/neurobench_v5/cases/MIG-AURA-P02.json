@@ -83,118 +83,134 @@
     "extremities": "No edema"
   },
   "ground_truth": {
-    "primary_diagnosis": "Migraine with aphasic aura (G43.1) co-existing with paroxysmal AF (incidental, nocturnal, alcohol-related); AF and aphasic episodes temporally dissociated on ILR",
-    "primary_diagnosis_icd": "G43.1",
+    "primary_diagnosis": "Migraine with aphasic aura (ICHD-3 1.2.1) co-existing with paroxysmal atrial fibrillation (alcohol-related, nocturnal); AF and aphasic episodes temporally dissociated on implantable loop recorder",
+    "icd_code": "G43.109",
     "differential": [
       {
         "diagnosis": "Cardioembolic TIA from paroxysmal AF",
+        "likelihood": "high",
+        "key_features": "Most important alternative; ILR shows AF episodes temporally dissociated from aphasic episodes — AF is comorbid not causal",
+        "icd_code": "G45.9"
+      },
+      {
+        "diagnosis": "Focal (temporal) seizure with language disturbance",
         "likelihood": "low",
-        "key_features": "Confirmed PAF on Holter — real embolic risk; however, ILR shows AF and aphasic episodes are temporally dissociated (AF nocturnal; episodes in sinus rhythm); normal DWI; no LA thrombus on TOE; gradual aphasia onset over 8-10 min inconsistent with embolic TIA"
+        "key_features": "Duration 15-20 min and no impaired awareness argue against seizure",
+        "icd_code": "G40.109"
       },
       {
-        "diagnosis": "PFO-related embolism",
-        "likelihood": "very_low",
-        "key_features": "Moderate PFO detected on TOE; however, ILR shows sinus rhythm during all 3 aphasic episodes — no PFO-mediated embolism during these episodes; apixaban covers PFO embolism risk"
+        "diagnosis": "Atherosclerotic large-artery TIA",
+        "likelihood": "low",
+        "key_features": "Normal MRA argues against",
+        "icd_code": "G45.9"
       },
       {
-        "diagnosis": "Focal left temporal seizure (ictal aphasia)",
+        "diagnosis": "Transient global amnesia",
         "likelihood": "very_low",
-        "key_features": "Gradual 8-10 minute onset inconsistent with seizure propagation; EEG no left temporal epileptiform activity; mother has visual migraine aura — family history of migraine"
+        "key_features": "Language-specific, not amnestic",
+        "icd_code": "G45.4"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI with DWI — exclude acute infarction; TIA vs migraine assessment",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Normal DWI; non-specific WMH; normal MRA",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
         "category": "required",
         "tool_parameters": {
-          "contrast": true,
-          "sequences": [
-            "DWI",
-            "FLAIR",
-            "T1+Gd",
-            "MRA"
-          ]
-        }
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "Implantable loop recorder (ILR) with patient symptom logging — temporal correlation between AF and aphasic episodes is the definitive test",
-        "tool_name": "order_cardiac_monitoring",
-        "expected_finding": "AF and aphasic episodes temporally dissociated; AF nocturnal; episodes in sinus rhythm",
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Anticoagulation decision based on CHA2DS2-VASc; review triptan safety on anticoagulation; preventive options compatible with anticoagulation",
         "category": "required",
         "tool_parameters": {
-          "type": "implantable_loop_recorder",
-          "duration_days": 30
-        }
+          "context": "migraine_with_aura_pharmacotherapy"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 3,
-        "action": "TOE echocardiogram — exclude LA thrombus given confirmed PAF; assess PFO",
-        "tool_name": "order_echocardiogram",
-        "expected_finding": "No LA thrombus; moderate PFO; covered by apixaban anticoagulation",
+        "action": "Brain MRI with MRA to exclude infarct and large-vessel disease",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Normal MRI / no infarct / normal MRA",
         "category": "required",
         "tool_parameters": {
-          "type": "transoesophageal"
-        }
+          "contrast": false,
+          "sequences": [
+            "DWI",
+            "FLAIR",
+            "T2",
+            "SWI",
+            "MRA"
+          ]
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 4,
-        "action": "Counsel on alcohol reduction — primary intervention for AF (REDUCE-AF trial) and migraine trigger reduction; target <7 units/week",
-        "tool_name": null,
-        "expected_finding": "12-15 units/week → <7 reduces AF recurrence 37% and reduces migraine frequency",
+        "action": "Prolonged cardiac monitoring (already in place via ILR) — interpret AF and headache event correlation",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "AF episodes documented but temporally dissociated from aphasic episodes — AF is comorbid",
         "category": "required",
-        "tool_parameters": {}
-      },
-      {
-        "step": 5,
-        "action": "Switch ibuprofen to paracetamol/triptan (NSAID contraindicated with apixaban); initiate topiramate preventive",
-        "tool_name": null,
-        "expected_finding": "NSAIDs increase bleeding risk with apixaban; switch acute treatment; prevent migraine with topiramate",
-        "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "duration_days": 180,
+          "device": "implantable_loop_recorder"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis — neither present here",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "ILR temporal correlation is the definitive investigation — temporal dissociation between AF and aphasic episodes is the key diagnostic finding",
-      "Continue apixaban for PAF — AF requires anticoagulation regardless of whether it caused the aphasic episodes",
-      "Alcohol reduction: addresses both AF (primary trigger) and migraine (contributing trigger); also normalises ALT/GGT",
-      "Switch from ibuprofen to paracetamol ± triptan — NSAIDs increase bleeding risk with apixaban",
-      "Statin therapy: LDL 142 with AF and borderline hypertension requires statin initiation"
+      "Brain MRI with DWI/MRA required to exclude infarction",
+      "Document temporal dissociation between AF and aphasic episodes on ILR",
+      "Anticoagulation decision based on CHA2DS2-VASc score (independent of migraine)",
+      "Counsel reduction in alcohol intake (AF trigger)",
+      "Triptan safety in patient on anticoagulation: not contraindicated but cardiovascular risk needs review"
     ],
     "contraindicated_actions": [
-      "Do not stop apixaban — AF requires anticoagulation regardless of neurological diagnosis",
-      "Do not prescribe NSAIDs (ibuprofen) for acute migraine in an anticoagulated patient",
-      "Do not close PFO — apixaban anticoagulation covers embolism risk; PFO closure provides no additional benefit"
+      "Do not attribute aphasic episodes to AF when temporally dissociated on ILR",
+      "Do not co-administer triptans with ergotamines",
+      "Do not assume migraine is excluded by presence of AF — both can coexist"
     ],
     "key_reasoning_points": [
-      "The ILR temporal dissociation is the critical finding — AF occurs nocturnally in sinus rhythm-recovery phase; aphasic episodes occur during daytime in sinus rhythm; these are two independent conditions",
-      "Gradual 8-10 minute aphasia onset is characteristic of CSD spread from left posterior to perisylvian cortex, not embolic TIA (abrupt onset)",
-      "Heavy alcohol (12-15 units/week) is a major modifier — drives nocturnal vagally-mediated AF and lowers migraine threshold; alcohol reduction addresses both conditions",
-      "Diagnostic puzzle difficulty: confirmed PAF creates enormous clinical pressure to diagnose all aphasic episodes as TIA; only ILR temporal analysis resolves this"
+      "Two coexisting diagnoses: paroxysmal AF and migraine with aphasic aura — temporal dissociation on ILR distinguishes them",
+      "AF management is independent of the migraine diagnosis (anticoagulation per CHA2DS2-VASc)",
+      "Alcohol is both an AF and a migraine trigger and should be addressed"
     ],
     "red_herrings": [
       {
-        "data_point": "Confirmed paroxysmal AF on Holter — attributing all aphasic episodes to cardioembolic TIA",
+        "data_point": "Incidentally discovered paroxysmal AF",
         "location": "patient.history_present_illness",
-        "intended_effect": "Paroxysmal AF is a confirmed cause of cryptogenic stroke; aphasia in a patient with AF = TIA until proven otherwise",
-        "correct_interpretation": "ILR shows AF and aphasic episodes are temporally dissociated — AF is nocturnal, aphasic episodes occur during daytime in sinus rhythm; the AF is a separate condition (alcohol-driven, vagally-mediated) co-existing with migraine with aphasic aura",
-        "field_path": ""
-      },
-      {
-        "data_point": "Moderate PFO on TOE — potential additional cardioembolic mechanism",
-        "location": "followup_outputs.order_echocardiogram.impression",
-        "intended_effect": "Moderate PFO in a patient with aphasic episodes and confirmed AF might suggest PFO closure recommendation",
-        "correct_interpretation": "Apixaban anticoagulation covers both AF and PFO embolism risk; ILR shows no temporal correlation with symptoms; PFO closure not indicated",
-        "field_path": ""
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Anchors on cardioembolic TIA as cause of aphasic episodes",
+        "correct_interpretation": "ILR shows AF and aphasic episodes are temporally dissociated; AF is comorbid, not the cause of the episodes"
       }
-    ],
-    "icd_code": "G43.1",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -218,7 +234,18 @@
       "advanced_imaging": "normal",
       "specialized_test": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Diagnostic puzzle: parsing AF as comorbid rather than causal via temporal-correlation analysis on ILR",
+    "case_body_concerns": [
+      "Required tool(s) lacking initial or followup outputs in the case body — agent calling them will fall back to off-pathway tier or empty result; tools: ['check_drug_interactions (only fallback)']",
+      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide §1): ['analyze_eeg', 'interpret_labs', 'order_echocardiogram']"
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "initial_tool_outputs": {
     "mri": {

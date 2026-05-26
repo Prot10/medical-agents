@@ -678,140 +678,180 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Focal epilepsy - temporal lobe (right mesial temporal lobe epilepsy secondary to dysembryoplastic neuroepithelial tumor)",
-    "icd_code": "G40.109",
+    "primary_diagnosis": "Focal epilepsy of right mesial temporal lobe origin secondary to dysembryoplastic neuroepithelial tumor (DNET)",
+    "icd_code": "G40.219",
     "differential": [
       {
-        "diagnosis": "Psychogenic non-epileptic seizures (PNES)",
-        "likelihood": "low",
-        "key_features": "Semiology is classic for temporal lobe seizures with stereotyped olfactory aura, epigastric rising, behavioral arrest, oral automatisms, and secondary generalization. Elevated post-ictal prolactin and clear EEG epileptiform abnormalities argue strongly against PNES."
+        "diagnosis": "Ganglioglioma",
+        "likelihood": "high",
+        "key_features": "Indistinguishable clinically from DNET; histology distinguishes.",
+        "icd_code": "D43.0"
       },
       {
-        "diagnosis": "Syncope (vasovagal or cardiac)",
+        "diagnosis": "Mesial temporal sclerosis without tumor",
         "likelihood": "low",
-        "key_features": "No prodrome of lightheadedness, pallor, or diaphoresis. Prolonged post-ictal confusion is inconsistent with syncope. Normal ECG. The duration of tonic-clonic activity (2 minutes) far exceeds the brief myoclonic jerks (5-10 seconds) that may accompany syncope."
+        "key_features": "MRI distinguishes a discrete lesion from sclerosis.",
+        "icd_code": "G40.219"
+      },
+      {
+        "diagnosis": "Focal cortical dysplasia",
+        "likelihood": "low",
+        "key_features": "Can coexist with low-grade tumor (type IIIb FCD).",
+        "icd_code": "Q04.3"
+      },
+      {
+        "diagnosis": "Convulsive syncope",
+        "likelihood": "low",
+        "key_features": "Aura with stereotyped automatisms is not syncope.",
+        "icd_code": "R55"
       },
       {
         "diagnosis": "Migraine with aura",
         "likelihood": "very_low",
-        "key_features": "Migraine aura spreads gradually over 5-60 minutes and is typically visual or somatosensory. The patient's episodes are brief (seconds), involve olfactory hallucination and epigastric sensation, and progress to impaired awareness - a temporal lobe seizure pattern, not migraine."
-      },
-      {
-        "diagnosis": "Panic disorder",
-        "likelihood": "low",
-        "key_features": "While the patient initially attributed events to panic, classic panic attacks do not feature stereotyped olfactory hallucinations, behavioral arrest with oral automatisms, or post-ictal confusion. The brief, stereotyped, involuntary nature of the episodes with clear EEG correlate establishes an epileptic etiology."
+        "key_features": "Migraine aura does not progress to a tonic-clonic seizure.",
+        "icd_code": "G43.109"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain detailed history including seizure semiology from both the patient and the witness, with attention to aura features, automatisms, duration, and post-ictal state",
+        "action": "Obtain detailed seizure history including semiology, aura, automatisms, duration, frequency, witness accounts, and post-ictal features.",
         "tool_name": null,
-        "expected_finding": "Olfactory aura with epigastric rising followed by behavioral arrest, oral automatisms, left hand automatisms, and focal to bilateral tonic-clonic seizure with prolonged post-ictal confusion",
-        "category": "required"
+        "expected_finding": "Stereotyped focal impaired-awareness events with temporal-lobe aura and post-ictal confusion.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 2,
-        "action": "Perform complete neurological examination",
+        "action": "Perform complete neurological examination.",
         "tool_name": null,
-        "expected_finding": "Normal interictal neurological exam with evidence of lateral tongue bite from the witnessed seizure",
-        "category": "required"
+        "expected_finding": "Interictal exam typically normal; subtle memory deficit may be present.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Order routine EEG",
+        "action": "Order EEG (routine first; pursue ambulatory or video-EEG if non-diagnostic) to identify interictal epileptiform discharges and capture habitual events.",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Right anterior temporal spike-and-slow-wave complexes and TIRDA, consistent with right temporal epileptogenic focus",
+        "expected_finding": "Interictal sharps/spikes and/or focal slowing in the anterior temporal region; ictal correlate confirms diagnosis.",
         "category": "required",
         "tool_parameters": {
           "eeg_type": "routine"
-        }
+        },
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 4,
-        "action": "Order MRI brain with epilepsy protocol",
+        "action": "Order MRI brain with dedicated epilepsy protocol (thin-cut coronal T1/FLAIR/T2/DWI through the hippocampi).",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Right mesial temporal cortically-based lesion consistent with DNET involving amygdala and anterior hippocampus",
+        "expected_finding": "Hippocampal sclerosis, low-grade tumor (DNET, ganglioglioma), cavernoma, or focal cortical dysplasia; rule out alternative structural causes.",
         "category": "required",
         "tool_parameters": {
           "protocol": "epilepsy",
-          "contrast": false
-        }
+          "contrast": true
+        },
+        "citation": "[AAN_2007]",
+        "guideline_source": "AAN_2007"
       },
       {
         "step": 5,
-        "action": "Obtain basic laboratories including BMP, CBC, prolactin, TSH, and urine drug screen",
+        "action": "Obtain CBC, comprehensive metabolic panel, prolactin (if drawn within 10–20 min of event), and AED levels if on therapy.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal metabolic panel, elevated post-ictal prolactin, negative drug screen",
+        "expected_finding": "Exclude metabolic provocation (hypoglycemia, hyponatremia, uremia); baseline organ function for AED selection; AED level for adherence and dosing.",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
-            "thyroid",
-            "drug_screen",
+            "CMP",
             "prolactin"
           ]
-        }
+        },
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 6,
-        "action": "Obtain ECG to rule out cardiac etiology",
-        "tool_name": null,
-        "expected_finding": "Normal sinus rhythm, no arrhythmia",
-        "category": "recommended"
+        "action": "Search current literature for AED selection in focal epilepsy and ILAE 2017 seizure classification.",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Evidence-based AED options for focal epilepsy (levetiracetam, lamotrigine, oxcarbazepine, lacosamide); ILAE classification framework.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 7,
-        "action": "Initiate antiepileptic drug therapy appropriate for focal epilepsy with structural lesion",
+        "action": "Check drug interactions before initiating or modifying AED therapy (enzyme inducers, OCP, other CNS-active drugs).",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "Levetiracetam or lamotrigine selected with no significant drug interactions with current medications",
-        "category": "required"
+        "expected_finding": "Identify pharmacokinetic interactions (CYP induction by carbamazepine/phenytoin) and CNS adverse-effect overlap.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No clinical features of CNS infection, encephalitis, or immunocompromise; CSF analysis is not indicated for routine focal epilepsy workup and exposes the patient to procedural risk and cost.",
+        "citation": "[AAN_2007]"
       },
       {
-        "step": 8,
-        "action": "Counsel patient on driving restrictions and seizure safety precautions",
-        "tool_name": null,
-        "expected_finding": "Patient informed of state-specific driving laws, need to avoid heights and swimming alone",
-        "category": "required"
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "echo_type": "TTE"
+        },
+        "rationale": "No syncope-versus-seizure question and no structural-heart concern; echocardiogram contributes nothing to epilepsy workup.",
+        "citation": "[AAN_2007]"
       },
       {
-        "step": 9,
-        "action": "Refer to comprehensive epilepsy center for surgical evaluation given structural lesion (DNET) associated with medically intractable potential",
-        "tool_name": null,
-        "expected_finding": "Early surgical referral placed, as DNETs are highly amenable to curative resection with 80-90% seizure-free outcomes",
-        "category": "required"
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "Ambulatory cardiac monitoring is reserved for syncope-versus-seizure differentiation; not indicated when semiology is clearly epileptic.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT is inferior to MRI for detecting epileptogenic substrates (hippocampal sclerosis, FCD, low-grade tumor) and adds ionizing radiation without diagnostic yield.",
+        "citation": "[AAN_2007]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "check_drug_interactions",
+        "reason": "Structural cause influences AED choice (e.g., low-grade tumor → consider AEDs with CYP-neutral profile; hippocampal sclerosis → multiple equally appropriate options). MRI should inform drug selection.",
+        "citation": "[ILAE_drug_2017]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Obtain EEG to characterize epileptiform activity and lateralize the epileptogenic focus",
-      "Obtain brain MRI with epilepsy protocol to identify the structural lesion (DNET)",
-      "Obtain basic metabolic panel and CBC to exclude metabolic causes of seizure",
-      "Initiate antiepileptic drug therapy appropriate for focal epilepsy with structural lesion",
-      "Counsel patient on driving restrictions and seizure safety precautions",
-      "Refer to epilepsy surgery center given structural lesion with high likelihood of surgical cure",
-      "Document seizure semiology including aura to support localization"
+      "Recognize olfactory aura with epigastric / nausea sensation as a classic mesial-temporal seizure pattern.",
+      "Obtain MRI with contrast and dedicated epilepsy protocol.",
+      "Refer to a comprehensive epilepsy center / neurosurgery for resection planning.",
+      "Initiate first-line focal-epilepsy AED (lamotrigine, levetiracetam, lacosamide).",
+      "Counsel on driving restrictions and seizure-safety precautions."
     ],
     "contraindicated_actions": [
-      "Prescribing enzyme-inducing AEDs (carbamazepine, phenytoin, phenobarbital) as first-line without considering side effect profiles and drug interactions",
-      "Performing lumbar puncture in this clinical scenario (no indication for CSF analysis; no signs of infection, inflammation, or elevated intracranial pressure)",
-      "Discharging patient without initiating antiepileptic therapy after a focal to bilateral tonic-clonic seizure with a structural brain lesion",
-      "Prescribing bupropion, which lowers seizure threshold",
-      "Advising that the patient can continue driving immediately after a seizure",
-      "Ordering brain biopsy as a first step - the MRI characteristics of DNET are sufficiently characteristic, and surgical resection (not biopsy) is the appropriate intervention if surgery is pursued"
+      "Do not pursue an ENT workup for the olfactory hallucinations.",
+      "Do not perform LP without indication.",
+      "Do not start carbamazepine without verifying baseline sodium and HLA-B*1502 status if Asian ancestry suggests risk."
     ],
     "key_reasoning_points": [
-      "Olfactory hallucinations (unpleasant burning smell) are a localizing aura pointing to the mesial temporal lobe, particularly the amygdala and uncus, which is concordant with the lesion location",
-      "The prior brief stereotyped episodes of olfactory hallucination and epigastric rising represent focal aware seizures that were unrecognized by the patient, indicating chronic epilepsy rather than a first-ever seizure",
-      "The bubbly, non-enhancing, cortically-based MRI appearance in a young patient with chronic seizures is classic for DNET, a WHO grade I tumor with an excellent prognosis after complete resection",
-      "Cross-modal concordance is present: right temporal EEG focus, right mesial temporal MRI lesion, right temporal PET hypometabolism, and visual memory deficit lateralizing to the right temporal lobe",
-      "The choice of AED should consider the patient's comorbidities and potential drug interactions",
-      "DNETs are associated with focal cortical dysplasia (FCD type IIIb by ILAE classification), and resection of both the lesion and surrounding dysplastic cortex improves seizure-free surgical outcomes",
-      "Left-handedness raises the possibility of atypical (right hemisphere or bilateral) language dominance, which should be evaluated with fMRI or Wada testing before right temporal surgery"
+      "Episodic olfactory + epigastric aura with witnessed GTC is highly localizing to mesial-temporal structures.",
+      "DNET / ganglioglioma are the most common surgical pathologies in adult-onset focal temporal epilepsy with a discrete lesion.",
+      "Surgical resection is potentially curative; AED therapy is bridging."
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
     "red_herrings": []
   },
   "metadata": {
@@ -826,6 +866,16 @@
       "ct": "normal",
       "echo": "normal",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (FEPI-TEMP)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FEPI-TEMP",
+    "difficulty_rationale": "Adult-onset symptomatic focal TLE with a temporal lesion; standard workup with surgical referral.",
+    "case_body_concerns": [
+      "useless_tools entry for `analyze_ecg` dropped: tool output is provided up-front in initial_tool_outputs, so declaring it useless to call would be incoherent (agent never had to call it)."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

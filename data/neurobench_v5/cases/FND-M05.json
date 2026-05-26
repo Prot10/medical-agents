@@ -409,96 +409,180 @@
     "icd_code": "F44.4",
     "differential": [
       {
-        "diagnosis": "Neuropsychiatric SLE (NPSLE) — cerebrovascular",
-        "likelihood": "very_low",
-        "key_features": "Quiescent SLE serology (complement normal, anti-dsDNA negative, SLEDAI 0), negative APS serology (triple negative aCL/LAC/anti-beta2GPI), normal MRI without infarcts or white matter disease, normal CSF — all EULAR attribution criteria favor against NPSLE"
+        "diagnosis": "Multiple sclerosis (demyelinating disease)",
+        "likelihood": "low",
+        "key_features": "Sensorimotor symptoms in a young adult raise demyelinating disease; brain (and when indicated spine) MRI without T2/FLAIR lesions or enhancement argues against an active demyelinating process.",
+        "icd_code": "G35"
       },
       {
-        "diagnosis": "Antiphospholipid syndrome stroke",
-        "likelihood": "very_low",
-        "key_features": "Triple-negative APS serology (aCL, lupus anticoagulant, anti-beta2GPI all negative) definitively excludes APS; MRI DWI negative"
+        "diagnosis": "Structural CNS lesion (tumor, demyelination, stroke)",
+        "likelihood": "low",
+        "key_features": "Focal complaints warrant imaging; normal brain MRI without lesion, mass, or enhancement effectively excludes a structural cause for the presenting deficit.",
+        "icd_code": null
       },
       {
-        "diagnosis": "CNS vasculitis (lupus-related)",
+        "diagnosis": "Autoimmune or paraneoplastic encephalitis",
         "likelihood": "very_low",
-        "key_features": "No MRI enhancement or infarct pattern of vasculitis; normal CSF without pleocytosis; quiescent disease activity"
-      },
-      {
-        "diagnosis": "Acute ischemic stroke",
-        "likelihood": "very_low",
-        "key_features": "MRI DWI negative; age 29 with no traditional vascular risk factors; antiphospholipid syndrome excluded"
+        "key_features": "Episodic neurological symptoms can occur in autoimmune encephalitis; normal MRI, normal EEG background, and (when obtained) negative antibody panel render this very unlikely.",
+        "icd_code": "G04.81"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "MRI brain with DWI — exclude NPSLE ischemia and APS stroke",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Normal — no infarct, no CNS lupus white matter disease",
+        "action": "Elicit positive rule-in signs on bedside examination (Hoover sign for functional leg weakness, tremor entrainment / distractibility for functional tremor, give-way weakness, non-dermatomal sensory loss with midline splitting). Diagnosis of FND is made by these positive signs, not by exclusion alone.",
+        "tool_name": null,
+        "expected_finding": "At least one reliable positive functional sign documented",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Espay_2018]",
+        "guideline_source": "FND criteria pack — positive diagnosis"
       },
       {
         "step": 2,
-        "action": "SLE activity panel (complement, anti-dsDNA, SLEDAI) + APS triple panel",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Quiescent SLE; APS triple-negative",
+        "action": "Order brain MRI with and without contrast to exclude a structural cause of the presenting deficit",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "No structural lesion, mass, demyelination, or stroke",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "contrast": true
+        },
+        "citation": "[Espay_2018]",
+        "guideline_source": "FND criteria pack — exclude structural cause"
       },
       {
         "step": 3,
-        "action": "CSF — exclude CNS lupus inflammation",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Normal CSF — no pleocytosis, no elevated protein, no oligoclonal bands",
+        "action": "Order basic laboratory workup (CBC, CMP, TSH, vitamin B12) to exclude common reversible mimics",
+        "tool_name": "interpret_labs",
+        "expected_finding": "No metabolic, thyroid, or B12 abnormality that explains symptoms",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "TSH",
+            "B12"
+          ]
+        },
+        "citation": "[Stone_2018]",
+        "guideline_source": "FND criteria pack — exclude reversible causes"
       },
       {
         "step": 4,
-        "action": "EEG — exclude focal epileptic activity from CNS lupus",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Normal — no focal slowing or epileptiform activity",
+        "action": "Search current literature on FND diagnostic signs and evidence-based treatment (CBT for PNES, specialized physiotherapy for functional motor symptoms)",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirms multidisciplinary CBT + physiotherapy is the evidence-based treatment for FND",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "query": "functional neurological disorder diagnosis treatment"
+        },
+        "citation": "[Nielsen_2015]",
+        "guideline_source": "FND criteria pack — treatment evidence"
       },
       {
         "step": 5,
-        "action": "Clinical FND sign assessment and psychiatric evaluation",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Positive Hoover sign, distractibility; depression and academic stress precipitant",
+        "action": "Review current medications for agents that may exacerbate symptoms (e.g., benzodiazepines, dopamine-blocking antipsychotics, AEDs initiated for PNES)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identification of medication contributors that should be tapered or discontinued",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "",
+        "guideline_source": "FND criteria pack — medication review"
+      },
+      {
+        "step": 6,
+        "action": "Communicate the diagnosis transparently using positive language anchored on the rule-in signs; explicitly state the diagnosis is FND, the symptoms are real and involuntary, and there is an evidence-based treatment plan",
+        "tool_name": null,
+        "expected_finding": "Patient understanding and treatment engagement — strong predictor of recovery",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Stone_2018]",
+        "guideline_source": "FND criteria pack — diagnostic communication"
+      },
+      {
+        "step": 7,
+        "action": "Refer to specialized FND-informed physiotherapy (for functional motor symptoms) and to CBT / psychological therapy (for PNES and comorbid mood / anxiety)",
+        "tool_name": null,
+        "expected_finding": "Engagement in evidence-based multidisciplinary care",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Nielsen_2015]",
+        "guideline_source": "Nielsen 2015 — physiotherapy consensus"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG has no diagnostic role in FND; cardiac etiology is not on the differential for the presenting neurological deficit.",
+        "citation": "[Stone_2018]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography has no role in FND; no structural cardiac question is raised by the presentation.",
+        "citation": "[Stone_2018]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac rhythm monitoring is not indicated; the events are non-syncopal and the rule-in signs point to FND.",
+        "citation": "[Stone_2018]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT adds no information beyond MRI for an FND workup and contributes diagnostic noise plus radiation exposure.",
+        "citation": "[Espay_2018]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "Advanced PET imaging has no indication in FND; standard MRI is the appropriate structural workup.",
+        "citation": "[Espay_2018]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "APS triple panel — must exclude antiphospholipid syndrome stroke in SLE patient",
-      "CSF for NPSLE exclusion",
-      "Document positive FND signs (Hoover, distractibility)",
-      "Rheumatology consultation for SLE activity assessment"
+      "Document at least one positive rule-in sign (Hoover sign, tremor entrainment, distractibility, give-way pattern, non-dermatomal sensory loss with midline split)",
+      "Obtain brain MRI to exclude structural pathology",
+      "Communicate the diagnosis transparently using positive language and the rule-in signs as the basis",
+      "Refer for FND-informed physiotherapy and CBT / psychological therapy",
+      "Order a comprehensive neuropsychological battery to characterize comorbid depression, anxiety, somatization, and trauma exposure — informs treatment planning (criteria-pack 'recommended' tier)"
     ],
     "contraindicated_actions": [
-      "High-dose corticosteroids or cyclophosphamide without confirmed active NPSLE — quiescent disease does not require escalation",
-      "Ignoring SLE history and jumping to FND without rigorous NPSLE exclusion"
+      "Do not pursue ever-expanding negative investigations — per Stone 2018, repeated negative workups reinforce illness conviction and worsen prognosis",
+      "Do not frame the diagnosis as 'all in your head', 'nothing wrong', or 'we couldn't find anything' — this damages the therapeutic alliance and is the most common avoidable harm in FND",
+      "Do not perform invasive testing (lumbar puncture, nerve biopsy, muscle biopsy, cerebral angiography) when positive rule-in signs are present and there is no clinical indication",
+      "Do not order EMG/NCS, muscle biopsy, or nerve biopsy as part of an FND workup — these invasive tests reinforce the somatic illness model per Stone 2018"
     ],
     "key_reasoning_points": [
-      "SLE patients with neurological symptoms require rigorous exclusion of NPSLE before FND diagnosis — EULAR criteria require positive biomarkers AND neuroimaging evidence for NPSLE attribution",
-      "Triple-negative APS serology (aCL, lupus anticoagulant, anti-beta2GPI) definitively excludes antiphospholipid syndrome — this is the most common cause of stroke in young SLE patients",
-      "Quiescent SLE (complement normal, anti-dsDNA negative, SLEDAI 0) makes acute CNS lupus flare very unlikely",
-      "After rigorous organic exclusion, positive functional signs (Hoover, distractibility) confirm FND as the diagnosis"
+      "FND is a positive diagnosis based on rule-in signs (Hoover, tremor entrainment, give-way weakness, non-dermatomal sensory loss with midline split) — not a diagnosis of exclusion (Espay 2018, Stone 2018).",
+      "Brain MRI and basic labs (CBC, CMP, TSH, B12) are due-diligence to exclude structural and reversible causes — they are NOT the route to the diagnosis, which is established at the bedside.",
+      "Over-investigation is the principal iatrogenic harm in FND; every additional negative test reinforces the patient's illness conviction and worsens prognosis (Stone 2018).",
+      "Psychiatric comorbidity (anxiety, depression, trauma) is common and informs treatment planning but is NOT required for the diagnosis and does not 'explain' the symptoms in a reductive sense.",
+      "Diagnostic communication matters: using positive language anchored on the rule-in signs is associated with better engagement and outcomes (Stone 2018).",
+      "Evidence-based treatment is multidisciplinary — CBT for PNES and FND-informed physiotherapy for functional motor symptoms (Nielsen 2015)."
     ],
     "red_herrings": [
       {
-        "data_point": "Known SLE diagnosis in a young Black female",
+        "data_point": "Pre-existing psychiatric diagnosis (anxiety or depression) in the past medical history",
         "location": "Past medical history",
-        "intended_effect": "Attribute all neurological symptoms to NPSLE without checking activity biomarkers",
-        "correct_interpretation": "SLE is quiescent with normal complement, negative anti-dsDNA, and SLEDAI 0; APS triple-negative; normal CSF and MRI — NPSLE attribution criteria not met; FND with identified psychological precipitant is the correct diagnosis",
-        "field_path": ""
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Premature anchoring on a 'psychosomatic' label without obtaining positive rule-in signs; conversely, dismissing FND as a serious diagnosis because the patient is 'just anxious'",
+        "correct_interpretation": "Psychiatric comorbidity neither establishes nor refutes FND. Diagnosis requires positive rule-in signs on examination; psychiatric history is relevant for treatment planning, not for diagnosis."
+      },
+      {
+        "data_point": "Symptom onset coincident with a major psychosocial stressor",
+        "location": "History of present illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Conclude prematurely that stress 'caused' the symptoms and that the workup can be abbreviated",
+        "correct_interpretation": "Many organic conditions (MS, migraine, epilepsy) also flare with stress. Stress at onset is supportive context, not a diagnostic substitute for the positive rule-in signs."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "v5",
@@ -510,6 +594,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FND",
+    "difficulty_rationale": "Mixed motor and/or seizure phenotype with at least one prominent comorbidity or compelling red herring (family history of MS, antipsychotic exposure, comorbid SLE). Standard FND workup (MRI + basic labs + video-EEG when seizure phenotype) plus disciplined diagnostic communication.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -816,139 +816,197 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Focal epilepsy — temporal lobe, secondary to tuberous sclerosis complex with left mesial temporal cortical tuber and dual pathology (hippocampal sclerosis)",
-    "icd_code": "G40.109",
+    "primary_diagnosis": "Focal epilepsy of left temporal lobe origin secondary to tuberous sclerosis complex (mesial-temporal cortical tuber and ipsilateral hippocampal sclerosis — dual pathology)",
+    "icd_code": "G40.219",
     "differential": [
       {
-        "diagnosis": "Focal epilepsy due to cortical tuber alone (TSC)",
-        "likelihood": "high",
-        "key_features": "MRI shows cortical tuber in left mesial temporal lobe; EEG localizes to left temporal region. Dual pathology with hippocampal sclerosis is additive."
-      },
-      {
-        "diagnosis": "Psychogenic non-epileptic seizures (PNES)",
-        "likelihood": "low",
-        "key_features": "Elevated post-ictal prolactin, witnessed tongue bite, stereotyped semiology with EEG correlate all argue against PNES."
-      },
-      {
-        "diagnosis": "Cardiac arrhythmia (syncope with convulsive movements)",
-        "likelihood": "low",
-        "key_features": "ECG abnormality is incidental and due to known rhabdomyoma. Normal cardiac biomarkers, normal echocardiogram, and clear epileptiform EEG changes exclude cardiac syncope."
-      },
-      {
-        "diagnosis": "Drug-induced seizure (valproic acid withdrawal)",
+        "diagnosis": "Focal cortical dysplasia (non-TSC type II)",
         "likelihood": "moderate",
-        "key_features": "Subtherapeutic valproic acid level is a precipitating factor, not the underlying etiology. Structural lesion is the primary cause."
+        "key_features": "Indistinguishable on imaging from a TSC tuber without skin/genetic context.",
+        "icd_code": "Q04.3"
       },
       {
-        "diagnosis": "Frontal lobe epilepsy (from right frontal tuber)",
+        "diagnosis": "Multifocal epilepsy of TSC (multiple tubers)",
+        "likelihood": "moderate",
+        "key_features": "TSC commonly has multiple tubers; localization to a single focus must be confirmed by video-EEG.",
+        "icd_code": "Q85.1"
+      },
+      {
+        "diagnosis": "Subependymal giant-cell astrocytoma (SEGA) with secondary seizures",
         "likelihood": "low",
-        "key_features": "Seizure semiology (epigastric aura, oral automatisms) is classic for temporal onset, not frontal. EEG and PET localize to left temporal, not right frontal."
+        "key_features": "TSC complication producing obstructive hydrocephalus; MRI would show enhancing intraventricular lesion.",
+        "icd_code": "D33.0"
+      },
+      {
+        "diagnosis": "Psychogenic non-epileptic spells",
+        "likelihood": "low",
+        "key_features": "Excluded by capture on video-EEG.",
+        "icd_code": "F44.5"
+      },
+      {
+        "diagnosis": "Convulsive syncope",
+        "likelihood": "very_low",
+        "key_features": "Semiology with rising epigastric sensation and automatisms is not syncope.",
+        "icd_code": "R55"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain routine EEG to evaluate for interictal epileptiform activity",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Left anterior temporal sharp transients and intermittent temporal slowing",
+        "action": "Obtain detailed seizure history including semiology, aura, automatisms, duration, frequency, witness accounts, and post-ictal features.",
+        "tool_name": null,
+        "expected_finding": "Stereotyped focal impaired-awareness events with temporal-lobe aura and post-ictal confusion.",
         "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
+        "tool_parameters": {},
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 2,
-        "action": "Order brain MRI to identify structural epileptogenic lesion",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Left mesial temporal cortical tuber, hippocampal asymmetry, and additional TSC features",
+        "action": "Perform complete neurological examination.",
+        "tool_name": null,
+        "expected_finding": "Interictal exam typically normal; subtle memory deficit may be present.",
         "category": "required",
-        "tool_parameters": {
-          "protocol": "tumor",
-          "contrast": false
-        }
+        "tool_parameters": {},
+        "citation": "",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Obtain comprehensive labs including AED levels, metabolic panel, and post-ictal markers",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Subtherapeutic valproic acid level, elevated post-ictal prolactin, normal electrolytes",
+        "action": "Order EEG (routine first; pursue ambulatory or video-EEG if non-diagnostic) to identify interictal epileptiform discharges and capture habitual events.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Interictal sharps/spikes and/or focal slowing in the anterior temporal region; ictal correlate confirms diagnosis.",
         "category": "required",
         "tool_parameters": {
-          "panels": [
-            "AED_levels"
-          ]
-        }
+          "eeg_type": "routine"
+        },
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 4,
-        "action": "Review ECG abnormality in context of cardiac history",
-        "tool_name": "analyze_ecg",
-        "expected_finding": "ST elevation in V2-V3 attributed to known cardiac rhabdomyoma, not acute cardiac pathology",
-        "category": "recommended"
-      },
-      {
-        "step": 5,
-        "action": "Request prolonged video-EEG monitoring to capture habitual seizure and confirm localization",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Left temporal seizure onset with classic mesial temporal semiology",
-        "category": "required",
-        "tool_parameters": {
-          "eeg_type": "video"
-        }
-      },
-      {
-        "step": 6,
-        "action": "Request 3T MRI with epilepsy protocol for hippocampal characterization",
+        "action": "Order MRI brain with dedicated epilepsy protocol (thin-cut coronal T1/FLAIR/T2/DWI through the hippocampi).",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Confirmed dual pathology: cortical tuber + significant hippocampal sclerosis",
+        "expected_finding": "Hippocampal sclerosis, low-grade tumor (DNET, ganglioglioma), cavernoma, or focal cortical dysplasia; rule out alternative structural causes.",
         "category": "required",
         "tool_parameters": {
           "protocol": "epilepsy",
-          "contrast": false
-        }
+          "contrast": true
+        },
+        "citation": "[AAN_2007]",
+        "guideline_source": "AAN_2007"
+      },
+      {
+        "step": 5,
+        "action": "Obtain CBC, comprehensive metabolic panel, prolactin (if drawn within 10–20 min of event), and AED levels if on therapy.",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Exclude metabolic provocation (hypoglycemia, hyponatremia, uremia); baseline organ function for AED selection; AED level for adherence and dosing.",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "prolactin"
+          ]
+        },
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
+      },
+      {
+        "step": 6,
+        "action": "Search current literature for AED selection in focal epilepsy and ILAE 2017 seizure classification.",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Evidence-based AED options for focal epilepsy (levetiracetam, lamotrigine, oxcarbazepine, lacosamide); ILAE classification framework.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 7,
-        "action": "Check drug interactions for AED optimization",
+        "action": "Check drug interactions before initiating or modifying AED therapy (enzyme inducers, OCP, other CNS-active drugs).",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "Valproic acid-lamotrigine interaction, contraception considerations, pregnancy risk",
-        "category": "recommended"
+        "expected_finding": "Identify pharmacokinetic interactions (CYP induction by carbamazepine/phenytoin) and CNS adverse-effect overlap.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 8,
-        "action": "Search literature for TSC-associated epilepsy management guidelines",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Evidence supporting AED optimization, mTOR inhibitors, and surgical evaluation for refractory cases",
-        "category": "recommended"
+        "action": "Pursue prolonged video-EEG monitoring to capture habitual events, confirm lateralization, and evaluate surgical candidacy.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Capture of habitual focal seizure with electrographic correlate; concordance with imaging supports surgical workup.",
+        "category": "recommended",
+        "tool_parameters": {
+          "eeg_type": "video"
+        },
+        "citation": "[Engel_2003]",
+        "guideline_source": "Engel_2003"
+      },
+      {
+        "step": 9,
+        "action": "Order comprehensive neuropsychological battery to lateralize memory function and inform surgical risk.",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Material-specific memory deficit consistent with side of seizure focus (verbal memory deficit in dominant TLE; visuospatial in non-dominant).",
+        "category": "optional",
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Engel_2003]",
+        "guideline_source": "Engel_2003"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No clinical features of CNS infection, encephalitis, or immunocompromise; CSF analysis is not indicated for routine focal epilepsy workup and exposes the patient to procedural risk and cost.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "Ambulatory cardiac monitoring is reserved for syncope-versus-seizure differentiation; not indicated when semiology is clearly epileptic.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT is inferior to MRI for detecting epileptogenic substrates (hippocampal sclerosis, FCD, low-grade tumor) and adds ionizing radiation without diagnostic yield.",
+        "citation": "[AAN_2007]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "check_drug_interactions",
+        "reason": "Structural cause influences AED choice (e.g., low-grade tumor → consider AEDs with CYP-neutral profile; hippocampal sclerosis → multiple equally appropriate options). MRI should inform drug selection.",
+        "citation": "[ILAE_drug_2017]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Obtain EEG to identify epileptiform focus",
-      "Obtain brain MRI to identify structural lesion (cortical tuber)",
-      "Check antiepileptic drug levels to identify subtherapeutic valproic acid as a precipitating factor",
-      "Correctly attribute ECG abnormality to known cardiac rhabdomyoma rather than pursuing unnecessary acute cardiac workup",
-      "Recognize the diagnosis of focal temporal lobe epilepsy in the context of tuberous sclerosis complex",
-      "Recommend optimization of antiepileptic therapy as the immediate management priority"
+      "Recognize rising epigastric aura with oroalimentary and manual automatisms as mesial-temporal seizure semiology in a TSC patient.",
+      "Obtain prolonged video-EEG to confirm that the dominant focus is the mesial-temporal tuber, given multiple tubers in TSC.",
+      "Obtain 3T MRI with epilepsy protocol to characterize the mesial-temporal tuber, hippocampal sclerosis, and inventory all tubers.",
+      "Initiate or optimize AED selected for focal TSC-related epilepsy (lacosamide, lamotrigine; consider everolimus for TSC-specific therapy).",
+      "Engage TSC multidisciplinary clinic for surgical evaluation if refractory."
     ],
     "contraindicated_actions": [
-      "Initiating anticoagulation or thrombolysis based on ECG changes (no acute coronary syndrome)",
-      "Performing lumbar puncture without clear indication (no signs of infection or inflammation)",
-      "Abruptly discontinuing valproic acid (risk of seizure exacerbation or status epilepticus)",
-      "Prescribing carbamazepine or oxcarbazepine without addressing contraceptive interaction",
-      "Ordering urgent cardiac catheterization for the ST-segment elevation (known rhabdomyoma)"
+      "Do not start carbamazepine without considering TSC-related psychiatric comorbidities and drug interactions.",
+      "Do not biopsy a presumed tuber without comprehensive presurgical evaluation.",
+      "Do not skip ophthalmologic and renal screening — multisystem TSC surveillance is needed regardless of seizure control."
     ],
     "key_reasoning_points": [
-      "The ECG abnormality (ST elevation in V2-V3) is a red herring attributable to the known cardiac rhabdomyoma in the interventricular septum, not an acute cardiac event — the dome-shaped morphology, absence of reciprocal changes, normal cardiac biomarkers, and patient history all support this",
-      "Subtherapeutic valproic acid level is a precipitating factor for seizure recurrence in a patient with an established structural epileptogenic lesion, not a new diagnosis",
-      "The presence of tuberous sclerosis complex (ash-leaf spots, cortical tubers, subependymal nodule, cardiac rhabdomyoma) provides the unifying diagnosis explaining both the neurological and cardiac findings",
-      "EEG findings require careful interpretation — wicket spikes are a benign variant and must not be conflated with pathological epileptiform discharges",
-      "Multiple cortical tubers (left temporal and right frontal) necessitate careful localization of the epileptogenic zone; seizure semiology and EEG must guide which tuber is epileptogenic",
-      "The mildly elevated TSH is an incidental finding (subclinical hypothyroidism) that should not distract from the epilepsy diagnosis but should be monitored",
-      "Dual pathology (cortical tuber + hippocampal sclerosis) is a recognized phenomenon in TSC and affects surgical planning"
+      "TSC patients with focal seizures localize to a dominant tuber in ~60–80% of cases; surgical resection can be curative when the focus is well-defined.",
+      "Dual pathology (tuber + HS) is common; comprehensive imaging clarifies the operable focus.",
+      "Material-specific memory deficit on neuropsych helps lateralize and informs surgical risk.",
+      "Everolimus (mTOR inhibitor) is TSC-specific add-on therapy with growing evidence for seizure control."
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
     "red_herrings": []
   },
   "metadata": {
@@ -963,6 +1021,17 @@
       "csf": "normal",
       "ct": "normal",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (FEPI-TEMP)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FEPI-TEMP",
+    "difficulty_rationale": "Five required tools plus video-EEG and neuropsych; TSC adds multifocal seizure-source uncertainty without changing the temporal-lobe identification.",
+    "case_body_concerns": [
+      "useless_tools entry for `analyze_ecg` dropped: tool output is provided up-front in initial_tool_outputs, so declaring it useless to call would be incoherent (agent never had to call it).",
+      "useless_tools entry for `order_echocardiogram` dropped: case lacks a fallback_tool_outputs entry, so the agent calling it would error out. Recommend adding a stripped/normal fallback in a follow-up pass."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

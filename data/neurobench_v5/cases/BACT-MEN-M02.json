@@ -1,7 +1,7 @@
 {
   "case_id": "BACT-MEN-M02",
   "condition": "bacterial_meningitis",
-  "difficulty": "moderate",
+  "difficulty": "diagnostic_puzzle",
   "encounter_type": "emergency",
   "patient": {
     "patient_id": "NB-BACT-MEN-M02",
@@ -816,201 +816,220 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Acute bacterial meningitis due to Streptococcus pneumoniae (pneumococcal meningitis), partially treated, in an asplenic patient",
+    "primary_diagnosis": "Acute bacterial meningitis due to Streptococcus pneumoniae, partially treated, in an asplenic patient",
     "icd_code": "G00.1",
     "differential": [
       {
-        "diagnosis": "Viral meningitis",
-        "likelihood": "low",
-        "key_features": "Viral meningitis typically shows lymphocytic pleocytosis, normal glucose, lower protein, and normal procalcitonin. The mixed pleocytosis here could initially suggest viral etiology but low glucose ratio (0.18), elevated CSF lactate (6.8), and markedly elevated serum procalcitonin (4.8) strongly favor bacterial infection."
+        "diagnosis": "Viral (aseptic) meningitis",
+        "likelihood": "moderate",
+        "key_features": "Lymphocyte-predominant CSF, normal-to-mildly elevated glucose, lower protein, lower CRP/procalcitonin — clinically distinguished by less toxic appearance",
+        "icd_code": "A87.9"
       },
       {
-        "diagnosis": "Viral encephalitis (HSV)",
-        "likelihood": "low",
-        "key_features": "HSV encephalitis presents with personality changes, seizures, and temporal lobe involvement on MRI. No temporal lobe abnormality seen on MRI, no seizures, and clinical presentation is more consistent with meningitis than encephalitis."
+        "diagnosis": "Viral encephalitis (HSV-1)",
+        "likelihood": "moderate",
+        "key_features": "Temporal lobe MRI changes, seizures or focal deficits, lymphocytic CSF; HSV PCR required to exclude",
+        "icd_code": "B00.4"
       },
       {
         "diagnosis": "Tuberculous meningitis",
         "likelihood": "low",
-        "key_features": "TB meningitis has a more subacute course (weeks), basilar meningeal enhancement, very low glucose, and lymphocytic predominance. This patient has a more acute course (days), and the CSF pneumococcal antigen is positive."
+        "key_features": "Subacute onset, lymphocytic CSF, basilar enhancement, very low glucose — different tempo and pattern from this case",
+        "icd_code": "A17.0"
       },
       {
-        "diagnosis": "Fungal meningitis (Cryptococcal)",
+        "diagnosis": "Cryptococcal meningitis",
         "likelihood": "low",
-        "key_features": "Cryptococcal meningitis typically occurs in severely immunocompromised patients (HIV/AIDS, transplant). While this patient is asplenic, she is not at high risk for cryptococcal disease. CSF India ink and CrAg would be negative, and PCR panel was negative for Cryptococcus."
+        "key_features": "Typically in severely immunocompromised host; cryptococcal antigen and India ink exclude",
+        "icd_code": "B45.1"
       },
       {
-        "diagnosis": "Sinusitis with secondary headache",
-        "likelihood": "low",
-        "key_features": "Imaging confirms sinusitis, which is likely the source of contiguous spread to the meninges, but the CSF findings, meningeal signs, and systemic toxicity are not explained by sinusitis alone."
+        "diagnosis": "Subarachnoid hemorrhage",
+        "likelihood": "very_low",
+        "key_features": "Sudden thunderclap headache, xanthochromic CSF, hemorrhage on CT — none of these features present",
+        "icd_code": "I60.9"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Recognize clinical triad of headache, fever, and altered mental status with meningeal signs as a neurological emergency requiring immediate evaluation for meningitis",
-        "tool_name": null,
-        "expected_finding": "Nuchal rigidity, Kernig sign positive, photophobia, confusion, petechial rash",
-        "category": "required"
+        "action": "Obtain non-contrast CT head to exclude mass effect, midline shift, basal cistern obliteration, or hydrocephalus that would contraindicate lumbar puncture in this patient with altered mental status and/or immunocompromise.",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Absence of mass lesion, midline shift, or signs of impending herniation — confirms LP is safe.",
+        "category": "required",
+        "tool_parameters": {
+          "contrast": false
+        },
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §V"
       },
       {
         "step": 2,
-        "action": "Obtain stat blood cultures (two sets) before initiating antibiotics",
+        "action": "Draw two sets of peripheral blood cultures BEFORE the first antibiotic dose and send CBC with differential, CMP, procalcitonin, CRP, and lactate.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Cultures subsequently positive for Streptococcus pneumoniae in 2/2 sets",
-        "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP"
-          ]
-        }
-      },
-      {
-        "step": 3,
-        "action": "Obtain CT head prior to lumbar puncture given altered mental status to exclude mass lesion or elevated ICP",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "No acute intracranial pathology, no contraindication to LP, sinus disease identified",
-        "category": "required",
-        "tool_parameters": {
-          "angiography": false,
-          "contrast": false
-        }
-      },
-      {
-        "step": 4,
-        "action": "Initiate empiric IV antibiotics immediately (ceftriaxone 2g IV plus vancomycin 15-20 mg/kg IV) and adjunctive dexamethasone (0.15 mg/kg IV) — do not delay for LP",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
-      },
-      {
-        "step": 5,
-        "action": "Administer dexamethasone before or concurrently with the first dose of antibiotics to reduce mortality and hearing loss in pneumococcal meningitis",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
-      },
-      {
-        "step": 6,
-        "action": "Perform lumbar puncture with opening pressure measurement and send CSF for cell count, protein, glucose, Gram stain, culture, and meningitis/encephalitis PCR panel",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Elevated opening pressure, mixed pleocytosis with neutrophil predominance, elevated protein, low glucose, negative Gram stain (partially treated), positive pneumococcal antigen",
-        "category": "required",
-        "tool_parameters": {
-          "special_tests": [
-            "meningitis_panel"
-          ]
-        }
-      },
-      {
-        "step": 7,
-        "action": "Obtain stat labs including CBC, BMP, CRP, procalcitonin, lactate, and coagulation studies",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Leukocytosis with left shift, hyponatremia (SIADH), elevated inflammatory markers, elevated lactate",
+        "expected_finding": "Peripheral leukocytosis with left shift, elevated procalcitonin/CRP, eventual blood-culture growth of the pathogen.",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
-            "coagulation",
-            "CRP"
+            "blood_cultures",
+            "inflammatory_markers"
           ]
-        }
+        },
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §VI"
       },
       {
-        "step": 8,
-        "action": "Obtain brain MRI with contrast to assess for meningeal enhancement and complications (empyema, cerebritis, hydrocephalus)",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Subtle leptomeningeal enhancement, no complications, sinus disease as potential source",
+        "step": 3,
+        "action": "Perform lumbar puncture with opening-pressure measurement and send CSF for cell count with differential, glucose (with paired serum), protein, Gram stain, bacterial culture, meningitis multiplex PCR panel, and CSF lactate.",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Elevated opening pressure, PMN-predominant pleocytosis, low CSF:serum glucose ratio (<0.4), elevated protein, elevated CSF lactate; PCR or culture identifies the organism.",
         "category": "required",
         "tool_parameters": {
-          "protocol": "standard",
+          "special_tests": [
+            "meningitis_panel"
+          ]
+        },
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §V"
+      },
+      {
+        "step": 4,
+        "action": "Verify compatibility of empiric vancomycin + ceftriaxone (+ ampicillin if Listeria coverage indicated) and adjunctive dexamethasone with the patient's current medications, and confirm timing of dexamethasone BEFORE or WITH the first antibiotic dose.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "No prohibitive interactions; confirmation of standard guideline-directed empiric regimen with dose adjustments as required.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[De_Gans_2002]",
+        "guideline_source": "De Gans 2002"
+      },
+      {
+        "step": 5,
+        "action": "Search the literature for current guideline-directed empiric antibiotic selection by age and host factors and for the evidence base supporting adjunctive dexamethasone in pneumococcal meningitis.",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Retrieval of IDSA 2004, ESCMID 2016, and De Gans 2002 to support empiric regimen and steroid timing.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §VII"
+      },
+      {
+        "step": 6,
+        "action": "Obtain contrast-enhanced brain MRI to assess for parenchymal complications (cerebritis, abscess, subdural empyema, ventriculitis, venous sinus thrombosis, infarction).",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Leptomeningeal enhancement; identification or exclusion of complications that modify management.",
+        "category": "recommended",
+        "tool_parameters": {
           "contrast": true
-        }
+        },
+        "citation": "[Brouwer_2012]",
+        "guideline_source": "Brouwer 2012"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG does not contribute to the diagnosis or acute management of bacterial meningitis.",
+        "citation": "[IDSA_2004]"
       },
       {
-        "step": 9,
-        "action": "Recognize the significance of asplenia as a major risk factor for encapsulated organism infection (S. pneumoniae, N. meningitidis, H. influenzae) and lapsed pneumococcal vaccination",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No evidence of endocarditis as a primary source in this case; echocardiography is not part of routine meningitis workup.",
+        "citation": "[IDSA_2004]"
       },
       {
-        "step": 10,
-        "action": "De-escalate vancomycin once ceftriaxone susceptibility is confirmed from blood cultures; continue ceftriaxone monotherapy for 10-14 days",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended"
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "No arrhythmia indication; continuous cardiac monitoring contributes nothing to meningitis diagnosis or treatment.",
+        "citation": "[IDSA_2004]"
       },
       {
-        "step": 11,
-        "action": "Monitor for complications: assess hearing (audiometry), monitor sodium for SIADH, watch for seizures, and repeat LP at 48 hours if clinical improvement is inadequate",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "PET imaging has no role in acute meningitis diagnosis; CT and MRI cover the indications.",
+        "citation": "[IDSA_2004]"
       },
       {
-        "step": 12,
-        "action": "Plan vaccination update upon discharge: administer PCV20 followed by PPSV23 at least 8 weeks later, plus MenACWY and MenB if not previously given, given asplenic status",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET is a dementia biomarker tool with no role in acute infectious meningitis.",
+        "citation": "[IDSA_2004]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "Per IDSA 2004, non-contrast CT head must precede lumbar puncture whenever any imaging-first criterion is present (altered mental status, focal neurological deficit, papilledema, recent seizure, immunocompromise, or age >60). LP performed in undetected mass effect can precipitate fatal herniation.",
+        "citation": "[IDSA_2004]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "analyze_csf",
+        "reason": "Blood cultures must be drawn (under interpret_labs) before the first dose of empiric antibiotics so that culture yield is not lost; in practice this means peripheral cultures are collected at the same draw as the CSF analysis is initiated, and the lab tube sequencing prevents antibiotic exposure before specimen acquisition.",
+        "citation": "[IDSA_2004]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Administer empiric IV antibiotics (ceftriaxone plus vancomycin) immediately — do not delay for imaging or LP results",
-      "Administer adjunctive dexamethasone before or with the first dose of antibiotics for suspected pneumococcal meningitis",
-      "Obtain blood cultures before initiating IV antibiotics",
-      "Perform lumbar puncture with CSF analysis including bacterial antigen testing and PCR panel, especially given negative Gram stain in a partially treated patient",
-      "Recognize asplenia as a critical risk factor for overwhelming infection with encapsulated organisms and the importance of inadequate vaccination",
-      "Monitor for and manage SIADH (fluid restriction, serial sodium monitoring)",
-      "Assess for sensorineural hearing loss as a complication of pneumococcal meningitis"
+      "Administer the first dose of empiric IV antibiotics (vancomycin 15-20 mg/kg + ceftriaxone 2 g) within 60 minutes of clinical suspicion; do NOT delay antibiotics for LP or imaging beyond what is strictly needed for safety.",
+      "Give adjunctive dexamethasone 10 mg IV before or with the first antibiotic dose; continue q6h for 4 days in confirmed pneumococcal meningitis.",
+      "Draw two sets of peripheral blood cultures before the first antibiotic dose.",
+      "Obtain CT head before LP because imaging-first criteria are present (altered mental status, immunocompromise, focal signs, papilledema, or age >60).",
+      "Send full CSF panel (cell count, differential, glucose, protein, Gram stain, culture, meningitis multiplex PCR, lactate) at the LP.",
+      "Reassess and de-escalate antibiotics based on Gram stain, culture, and susceptibility results.",
+      "Place patient on droplet precautions until meningococcal disease is excluded.",
+      "Recognise functional asplenia and ensure coverage of encapsulated organisms (S. pneumoniae, N. meningitidis, H. influenzae); arrange post-recovery vaccination per ACIP."
     ],
     "contraindicated_actions": [
-      "Delaying empiric antibiotics to wait for CT, LP, or culture results — meningitis is a time-critical emergency",
-      "Performing LP before CT in a patient with altered mental status without first excluding mass lesion or elevated ICP",
-      "Withholding dexamethasone or administering it after antibiotics have already been started (benefit is diminished)",
-      "Relying solely on negative Gram stain to exclude bacterial meningitis in a partially treated patient",
-      "Continuing oral amoxicillin alone as adequate therapy for suspected bacterial meningitis",
-      "Dismissing the presentation as simple sinusitis or viral illness given prior oral antibiotics and worsening course"
+      "Do NOT delay empiric antimicrobial therapy while awaiting imaging or LP results when bacterial meningitis is clinically suspected.",
+      "Do NOT perform lumbar puncture before CT head when any imaging-first criterion (altered mental status, focal deficit, papilledema, seizure, immunocompromise, age >60) is present.",
+      "Do NOT discontinue dexamethasone solely because the Gram stain is negative — completion of the 4-day course is appropriate in suspected pneumococcal meningitis until alternative organism is identified.",
+      "Do NOT rely on a negative Gram stain or a 'normal CT' to rule out bacterial meningitis when the clinical syndrome is present.",
+      "Do NOT treat with oral antibiotics alone; CNS penetration is inadequate for meningitis."
     ],
     "key_reasoning_points": [
-      "The triad of headache, fever, and altered mental status in a patient with meningeal signs should prompt immediate evaluation for bacterial meningitis regardless of partial antibiotic treatment",
-      "Asplenia is a critical predisposing factor for invasive pneumococcal disease; post-splenectomy patients with fever require urgent evaluation and empiric treatment for encapsulated organisms",
-      "Prior oral antibiotic therapy can significantly modify CSF findings: Gram stain may be negative, cultures may be sterilized, and the pleocytosis may be more mixed than the typical neutrophilic predominance seen in untreated bacterial meningitis",
-      "CSF bacterial antigen testing (latex agglutination) and PCR panels are essential adjunctive diagnostics in partially treated meningitis, as they remain positive despite prior antibiotic exposure",
-      "Elevated serum procalcitonin (>2 ng/mL) and CSF lactate (>3.5 mmol/L) are helpful biomarkers for distinguishing bacterial from viral meningitis, particularly in equivocal cases",
-      "The very low CSF-to-serum glucose ratio (0.18) is highly specific for bacterial meningitis and should not be ignored even when other findings are modified by treatment",
-      "Adjunctive dexamethasone reduces mortality and hearing loss in pneumococcal meningitis but must be given before or with the first dose of antibiotics to be effective",
-      "Petechial rash, while classically associated with meningococcal disease, can also occur in pneumococcal meningitis with bacteremia, especially in asplenic patients"
+      "Acute bacterial meningitis presents with fever, headache, meningismus, and altered mental status; the full triad is present in only ~40%, so partial syndromes warrant aggressive workup.",
+      "Antibiotic timing matters: every hour of delay after the first hour increases mortality. Antibiotics MUST precede imaging or LP if either would delay treatment >60 minutes.",
+      "CT before LP is mandated when any imaging-first criterion is present (altered mental status, focal signs, papilledema, recent seizure, immunocompromise, or age >60).",
+      "Adjunctive dexamethasone (10 mg IV q6h × 4 days) given BEFORE or WITH the first antibiotic dose reduces mortality and unfavourable outcomes in pneumococcal meningitis (De Gans 2002, NEJM).",
+      "A negative CSF Gram stain (sensitivity ~60-90%, lower if antibiotic pretreated) does not exclude bacterial meningitis; multiplex PCR or antigen testing retains sensitivity.",
+      "CSF:serum glucose ratio <0.4 is more reliable than absolute CSF glucose for distinguishing bacterial from viral meningitis.",
+      "Empiric coverage must include vancomycin + ceftriaxone in adults; add ampicillin for Listeria coverage if age >50 or immunocompromised.",
+      "Asplenia (anatomic or functional) dramatically increases risk of overwhelming infection with encapsulated organisms (S. pneumoniae, N. meningitidis, H. influenzae); these patients require lifelong vaccination and a low threshold for empiric antibiotics."
     ],
     "red_herrings": [
       {
-        "data_point": "Petechial rash on bilateral lower extremities and trunk",
-        "location": "patient.neurological_exam.additional",
-        "intended_effect": "Suggest Neisseria meningitidis (meningococcal meningitis) as the organism and redirect empiric coverage away from pneumococcal management",
-        "correct_interpretation": "Petechiae can occur in pneumococcal bacteremia as well as meningococcal disease, particularly in asplenic patients with impaired immune clearance; the positive pneumococcal antigen and PCR confirm S. pneumoniae; empiric coverage for meningococcus should still be included until culture results return, but the rash alone does not change the final diagnosis",
-        "field_path": ""
+        "data_point": "Negative CSF Gram stain in a patient with prior oral antibiotic exposure",
+        "location": "initial_tool_outputs.csf.special_tests.Gram_stain",
+        "field_path": "initial_tool_outputs.csf",
+        "intended_effect": "Suggest viral or aseptic meningitis and lower the threshold for withholding empiric antibiotics.",
+        "correct_interpretation": "Prior antibiotics commonly sterilise the CSF and reduce Gram-stain sensitivity; with neutrophilic pleocytosis, low CSF:serum glucose, and elevated CSF lactate, the diagnosis remains bacterial meningitis until proven otherwise."
       },
       {
-        "data_point": "Mixed CSF pleocytosis (72% neutrophils, 24% lymphocytes) rather than purely neutrophilic predominance",
-        "location": "initial_tool_outputs.csf.cell_count",
-        "intended_effect": "Suggest viral meningitis rather than bacterial meningitis given the lymphocytic component",
-        "correct_interpretation": "Prior oral antibiotic therapy partially attenuates the CSF response and shifts the differential toward a more mixed picture; the CSF-to-serum glucose ratio of 0.18, CSF lactate of 6.8 mmol/L, and procalcitonin of 4.8 ng/mL are all highly specific for bacterial etiology despite the mixed pleocytosis",
-        "field_path": ""
+        "data_point": "Hyponatremia on admission labs",
+        "location": "initial_tool_outputs.labs.panels.BMP",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Redirect workup toward primary endocrine or volume-status causes of hyponatremia.",
+        "correct_interpretation": "SIADH is a common complication OF bacterial meningitis itself; treat with fluid restriction while addressing the underlying CNS infection — do not let it distract from the meningitis diagnosis."
       },
       {
-        "data_point": "HbA1c 7.4% and glucose 194 mg/dL with known type 2 diabetes",
-        "location": "initial_tool_outputs.labs.panels.Other / initial_tool_outputs.labs.panels.BMP",
-        "intended_effect": "Implicate hyperglycemic encephalopathy or diabetic ketoacidosis as the cause of confusion",
-        "correct_interpretation": "A glucose of 194 mg/dL in a known diabetic does not cause significant alteration of consciousness; the presence of meningeal signs, fever, and markedly abnormal CSF clearly indicates CNS infection; hyperglycemia likely reflects stress response and dexamethasone effect on top of baseline poor glycemic control",
-        "field_path": ""
+        "data_point": "Low-grade fever (38.2 C) rather than classic high fever",
+        "location": "patient.vitals.temp",
+        "field_path": "patient.vitals",
+        "intended_effect": "Reduce clinical concern for invasive bacterial infection.",
+        "correct_interpretation": "Prior oral antibiotic exposure attenuates the febrile response; the full clinical syndrome and CSF findings remain diagnostic."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "1.0",
@@ -1032,6 +1051,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:BACT-MEN",
+    "difficulty_rationale": "5 required tools; 3 red herrings; partially treated CSF reduces Gram-stain sensitivity; asplenia broadens encapsulated-organism risk",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

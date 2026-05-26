@@ -83,109 +83,146 @@
     "extremities": "No edema"
   },
   "ground_truth": {
-    "primary_diagnosis": "Hemiplegic migraine (probable sporadic, G43.1) with incidental 4mm unruptured left MCA bifurcation aneurysm — familial intracranial aneurysm; MRA screening enabled detection; BP optimisation critical",
-    "primary_diagnosis_icd": "G43.1",
+    "primary_diagnosis": "Hemiplegic migraine (probable sporadic, ICHD-3 1.2.3) with incidental 4mm unruptured left MCA bifurcation aneurysm — familial intracranial aneurysm; MRA screening enabled detection; BP optimisation critical",
+    "icd_code": "G43.109",
     "differential": [
       {
-        "diagnosis": "TIA from unruptured aneurysm thromboembolism or compression",
-        "likelihood": "very_low",
-        "key_features": "4mm unruptured MCA aneurysm — aneurysms this size rarely cause thromboembolic TIA; gradual 20-25 min onset typical of CSD not embolism; no DWI restriction; clinical episodes predated aneurysm detection on MRA"
+        "diagnosis": "Cardioembolic / large-artery TIA",
+        "likelihood": "moderate",
+        "key_features": "Motor aura always requires TIA exclusion; gradual march and normal MRI/MRA exclude acute infarction",
+        "icd_code": "G45.9"
       },
       {
-        "diagnosis": "Familial hemiplegic migraine (CACNA1A/ATP1A2)",
+        "diagnosis": "Familial hemiplegic migraine (CACNA1A / ATP1A2 / SCN1A)",
         "likelihood": "low",
-        "key_features": "Five episodes with motor + language aura; however no family history of hemiplegic migraine (father had aneurysm, sister has typical migraine); sporadic form more likely if migraine diagnosis confirmed"
+        "key_features": "No specific family history of hemiplegic migraine; sporadic form more likely",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Aneurysmal sentinel headache / unruptured aneurysm symptoms",
+        "likelihood": "low",
+        "key_features": "Unruptured 4mm aneurysm rarely symptomatic; episodes are migrainous in character",
+        "icd_code": "I67.1"
+      },
+      {
+        "diagnosis": "Vascular malformation (AVM, cavernoma)",
+        "likelihood": "very_low",
+        "key_features": "MRI shows aneurysm only; no AVM or cavernoma",
+        "icd_code": "Q28.2"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI with HIGH-RESOLUTION MRA — this is the first MRI for this patient; essential for both diagnosis and familial aneurysm screening given father's SAH",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "4mm left MCA bifurcation aneurysm — CRITICAL incidental finding; no DWI restriction",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
         "category": "required",
         "tool_parameters": {
-          "contrast": true,
-          "sequences": [
-            "DWI",
-            "FLAIR",
-            "T1+Gd",
-            "MRA_3T_high_resolution"
-          ]
-        }
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "URGENT neurovascular referral for unruptured 4mm MCA aneurysm — familial context increases significance",
-        "tool_name": null,
-        "expected_finding": "Conservative management with annual MRA monitoring; BP optimisation to <130/80",
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "TRIPTANS RELATIVELY CONTRAINDICATED in hemiplegic migraine; avoid triptans/ergotamines in unruptured aneurysm (theoretical vasoconstriction); BP target <130/80; consider beta-blocker or topiramate for prevention",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "context": "hemiplegic_migraine_unruptured_aneurysm_triptan_contraindication"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 3,
-        "action": "BP optimisation to <130/80 — add amlodipine; hypertension is the strongest modifiable aneurysm rupture risk factor",
-        "tool_name": null,
-        "expected_finding": "Current BP 136/84 on propranolol — add amlodipine 5 mg for target <130/80",
+        "action": "Brain MRI with MRA (already performed) for vascular evaluation",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "4mm unruptured left MCA bifurcation aneurysm; no infarct or other malformation",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "contrast": false,
+          "sequences": [
+            "DWI",
+            "FLAIR",
+            "T2",
+            "SWI",
+            "MRA"
+          ]
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 4,
-        "action": "Switch preventive from propranolol to topiramate (propranolol failed — 2 further episodes)",
-        "tool_name": null,
-        "expected_finding": "Topiramate 25-100 mg/day — more effective for hemiplegic migraine than propranolol",
+        "action": "Neurovascular / neurosurgery referral for aneurysm risk-benefit assessment",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "4mm MCA bifurcation aneurysm in a patient with first-degree family history of SAH — high enough risk profile to discuss surveillance versus elective treatment",
         "category": "required",
-        "tool_parameters": {}
-      },
-      {
-        "step": 5,
-        "action": "Offer MRA screening to patient's sister — first-degree relative of SAH patient; familial intracranial aneurysm risk",
-        "tool_name": null,
-        "expected_finding": "Sister has 4x increased risk as first-degree relative of SAH patient",
-        "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "specialty": "neurosurgery_neurovascular"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis — neither present here",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Routine transthoracic / bubble echocardiogram (PFO screening) is NOT indicated in migraine with aura; PFO-migraine association is controversial and PFO closure does not reduce migraine [Charles_2017]",
+        "citation": "[Charles_2017]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated in typical migraine with aura — no role unless cardioembolic stroke is on the differential",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "MRA was not performed at initial TIA assessment — critical omission; 4mm left MCA aneurysm found on first MRA",
-      "URGENT neurovascular referral for unruptured aneurysm — management involves annual monitoring and BP optimisation",
-      "BP target <130/80 — hypertension is the strongest modifiable aneurysm rupture risk factor; add amlodipine",
-      "Avoid triptans — cautioned in hemiplegic migraine AND theoretical concern with unruptured intracranial aneurysm",
-      "Offer MRA screening to patient's sister — familial intracranial aneurysm protocol"
+      "Brain MRI/MRA required (first hemiplegic migraine, family history of SAH)",
+      "Neurovascular referral for aneurysm risk-benefit (surveillance vs treatment)",
+      "Blood pressure optimisation (<130/80) — modifiable rupture risk factor",
+      "Avoid triptans and ergotamines in hemiplegic migraine and unruptured aneurysm",
+      "Smoking cessation if applicable",
+      "Counsel on warning signs of SAH (thunderclap headache, sudden severe deficit)"
     ],
     "contraindicated_actions": [
-      "Do not prescribe triptans — cautioned in both hemiplegic migraine and unruptured intracranial aneurysm",
-      "Do not ignore BP — hypertension is the primary modifiable aneurysm rupture risk factor",
-      "Do not delay neurovascular referral — unruptured aneurysm in familial SAH context requires specialist review"
+      "Do not prescribe triptans or ergotamines",
+      "Do not anticoagulate without specific indication — increases rupture risk",
+      "Do not co-administer triptans with ergotamines"
     ],
     "key_reasoning_points": [
-      "High-resolution MRA was never performed in this patient despite 5 episodes of focal neurological deficit — incidental aneurysm detection was the most critical finding",
-      "Familial intracranial aneurysm: father's SAH from left MCA aneurysm + patient's 4mm left MCA aneurysm = confirmed familial pattern; sister should be screened",
-      "The hemiplegic migraine diagnosis may still be correct (gradual motor/language aura over 20-25 min + subsequent headache); but the aneurysm changes management — avoid triptans, optimise BP, annual MRA",
-      "PHASES scoring guides aneurysm management: 4mm MCA aneurysm, 36-year-old male, no prior SAH = ~3% 5-year rupture risk ≈ treatment risk; conservative monitoring is appropriate",
-      "Diagnostic puzzle: the aneurysm is the hidden critical finding that a complete MRA at the first assessment would have revealed"
+      "Hemiplegic migraine requires MRI/MRA at first presentation — incidental aneurysm detection is a recognised consequence",
+      "Familial intracranial aneurysms (first-degree relative with SAH) carry higher rupture risk and warrant lower thresholds for treatment",
+      "Triptans are relatively contraindicated in both hemiplegic migraine and unruptured aneurysm"
     ],
     "red_herrings": [
       {
-        "data_point": "Hemiplegic migraine diagnosis seems secure — propranolol was started; focus on migraine prevention",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Prior neurologist diagnosed hemiplegic migraine and started treatment; no MRA was considered necessary",
-        "correct_interpretation": "First-ever MRI/MRA was never performed despite 5 episodes with focal neurological deficits; father's SAH made MRA urgently necessary; 4mm MCA aneurysm found; this changes multiple management decisions",
-        "field_path": ""
-      },
-      {
-        "data_point": "Father's SAH from aneurysm — focus on aneurysm screening only, not migraine diagnosis",
-        "location": "patient.history_present_illness",
-        "intended_effect": "The aneurysm finding might overwhelm the clinical consultation and divert from migraine management",
-        "correct_interpretation": "Both diagnoses are important: hemiplegic migraine is managed with topiramate (not propranolol which failed); unruptured aneurysm is managed conservatively with BP optimisation and annual MRA",
-        "field_path": ""
+        "data_point": "Parent's recent SAH",
+        "location": "patient.clinical_history (family_history)",
+        "field_path": "",
+        "intended_effect": "May anchor on imminent SAH risk in this patient",
+        "correct_interpretation": "Family history raises baseline risk but the patient's 4mm aneurysm risk stratification depends on size, location, and modifiable factors; episodes themselves are migrainous"
       }
-    ],
-    "icd_code": "G43.1",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -209,7 +246,17 @@
       "echo": "incidental",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Diagnostic puzzle: hemiplegic migraine + incidental aneurysm with positive family history requires MRA, neurovascular referral, and BP optimisation",
+    "case_body_concerns": [
+      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide §1): ['analyze_ecg', 'analyze_eeg', 'interpret_labs']"
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "initial_tool_outputs": {
     "mri": {

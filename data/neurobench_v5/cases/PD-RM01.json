@@ -742,166 +742,227 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Parkinson's disease with freezing of saccades due to subtherapeutic dopaminergic treatment",
+    "primary_diagnosis": "Parkinson's disease with motor and oculomotor symptoms attributable to subtherapeutic dopaminergic treatment",
     "icd_code": "G20",
-    "red_herrings": [
-      {
-        "data_point": "Prominent saccadic freezing on oculomotor examination — arrest of horizontal saccades with blink-to-break initiation",
-        "location": "neurological_exam.cranial_nerves",
-        "intended_effect": "May lead agent to incorrectly diagnose progressive supranuclear palsy (PSP) given the oculomotor abnormality resembling supranuclear gaze palsy",
-        "correct_interpretation": "Saccadic freezing in PD is distinct from the vertical supranuclear gaze palsy of PSP. In this patient, smooth pursuit can break the freezing episode, there is no vertical gaze palsy, and the oculomotor abnormality resolves with dopaminergic dose optimization, confirming it is a dopamine-deficiency phenomenon rather than PSP",
-        "field_path": ""
-      }
-    ],
     "differential": [
       {
         "diagnosis": "Progressive supranuclear palsy (PSP)",
         "likelihood": "moderate",
-        "key_features": "Freezing of saccades initially mimics supranuclear gaze palsy of PSP; however, preserved smooth pursuit that can break the freezing, absence of vertical gaze palsy, absence of eyelid-opening apraxia, absence of compensatory head thrust/blink, and dramatic dopamine responsiveness all argue against PSP"
+        "key_features": "Oculomotor symptoms raise concern, but slow horizontal saccades without vertical supranuclear gaze palsy and good levodopa responsiveness argue against PSP"
       },
       {
-        "diagnosis": "Corticobasal degeneration (CBD)",
+        "diagnosis": "Levodopa-induced motor fluctuations / wearing-off",
+        "likelihood": "moderate",
+        "key_features": "Long PD duration and underdosed regimen are most parsimonious explanation for fluctuating oculomotor freezing"
+      },
+      {
+        "diagnosis": "Dementia with Lewy bodies",
         "likelihood": "low",
-        "key_features": "Acquired ocular motor apraxia can occur in CBD, but would expect asymmetric cortical signs (alien limb, cortical sensory loss, apraxia), and saccade initiation failure in CBD is not dopamine-responsive"
+        "key_features": "No early prominent cognitive fluctuations or visual hallucinations described"
       },
       {
-        "diagnosis": "Acquired ocular motor apraxia",
+        "diagnosis": "Multiple system atrophy",
         "likelihood": "low",
-        "key_features": "In acquired ocular motor apraxia, voluntary saccades are impaired while reflexive saccades are preserved — the opposite of this patient's pattern. Patients with ocular motor apraxia typically use head thrusts or blinks to initiate saccades, which this patient does not"
+        "key_features": "No early severe dysautonomia or cerebellar findings"
       },
       {
-        "diagnosis": "Medication side effect (clonazepam-induced saccade dysfunction)",
+        "diagnosis": "Functional / non-organic oculomotor symptoms",
         "likelihood": "low",
-        "key_features": "Clonazepam can increase saccadic latency, but typically causes continuous mild impairment rather than episodic complete freezing. The dramatic improvement with increased levodopa rather than clonazepam discontinuation argues against this"
-      },
-      {
-        "diagnosis": "Medication side effect (levodopa-induced oculomotor dysfunction)",
-        "likelihood": "very_low",
-        "key_features": "If levodopa were causing the oculomotor symptoms, increasing the dose would worsen rather than resolve them; the opposite was observed"
+        "key_features": "Intermittent character could fit, but exam findings are consistent with hypodopaminergic state"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain detailed history of the oculomotor episodes including timing relative to levodopa doses, duration, frequency, and associated features",
-        "tool_name": null,
-        "expected_finding": "Episodes of saccade freezing lasting ~20 seconds, occurring intermittently, associated with worsening dysarthria and reduced blinking, can be broken by smooth pursuit",
-        "category": "required"
-      },
-      {
-        "step": 2,
-        "action": "Perform detailed neuro-ophthalmological examination including saccade testing, pursuit, convergence, and assessment for vertical gaze palsy",
-        "tool_name": null,
-        "expected_finding": "Intermittent saccade freezing without vertical gaze palsy, no eyelid-opening apraxia, no square-wave jerks, preserved optokinetic responses, smooth pursuit can break freezing",
-        "category": "required"
-      },
-      {
-        "step": 3,
-        "action": "Order brain MRI to evaluate for structural causes and features of atypical parkinsonism",
+        "action": "Obtain brain MRI to exclude PSP-pattern atrophy (hummingbird sign), structural cause, or new vascular insult",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "No midbrain atrophy (no hummingbird sign), no pontine/cerebellar atrophy, no features of PSP or MSA; mild periventricular white matter changes consistent with vascular risk factors",
+        "expected_finding": "No midbrain atrophy, no putaminal slit, no acute vascular event",
         "category": "required",
         "tool_parameters": {
           "protocol": "standard",
-          "contrast": false
-        }
+          "contrast": false,
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "SWI"
+          ]
+        },
+        "citation": "[Schwarz_2014]",
+        "guideline_source": "Schwarz_2014"
+      },
+      {
+        "step": 2,
+        "action": "Order baseline labs to exclude reversible mimics and reassess metabolic status",
+        "tool_name": "interpret_labs",
+        "expected_finding": "No metabolic explanation for symptom worsening",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "TSH",
+            "B12"
+          ]
+        },
+        "citation": "[Postuma_2015]",
+        "guideline_source": "Postuma_2015"
+      },
+      {
+        "step": 3,
+        "action": "Check drug interactions for the current PD regimen, including levodopa absorption issues and serotonergic/sertraline interactions",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Confirm no DA antagonists; note sertraline interaction profile with future MAO-B inhibitors; review levodopa absorption",
+        "category": "required",
+        "tool_parameters": {
+          "proposed_medication": "increased carbidopa-levodopa",
+          "current_medications": [
+            "carbidopa-levodopa",
+            "clonazepam",
+            "sertraline"
+          ]
+        },
+        "citation": "[Postuma_2015]",
+        "guideline_source": "Postuma_2015"
       },
       {
         "step": 4,
-        "action": "Order routine laboratory studies including CBC, BMP, thyroid function, vitamin B12, RPR",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Normal results except for diabetes-related glucose elevation; no metabolic cause of oculomotor or movement disorder",
+        "action": "Search medical literature on oculomotor manifestations and treatment optimization in advanced PD",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Oculomotor freezing and saccadic abnormalities can reflect hypodopaminergic state and improve with levodopa optimization",
         "category": "required",
         "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP",
-            "thyroid",
-            "B12",
-            "RPR"
-          ]
-        }
+          "query": "Parkinson disease oculomotor freezing levodopa dose optimization"
+        },
+        "citation": "[Tolosa_2021]",
+        "guideline_source": "Tolosa_2021"
       },
       {
         "step": 5,
-        "action": "Search medical literature on freezing of saccades in PD versus PSP and acquired ocular motor apraxia",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Literature supporting that oculomotor dysfunction in PD is dopamine-responsive, unlike PSP where it is progressive and dopamine-unresponsive",
-        "category": "recommended"
+        "action": "Order DaTscan only if a competing atypical parkinsonism diagnosis is being seriously entertained",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Reduced striatal DAT binding consistent with established PD",
+        "category": "optional",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "citation": "[Marshall_2009]",
+        "guideline_source": "Marshall_2009"
       },
       {
         "step": 6,
-        "action": "Check drug interactions for clonazepam and carbidopa-levodopa regarding oculomotor effects",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Clonazepam can increase saccadic latency but typically does not cause episodic complete freezing; medication effect is possible confounder but not primary explanation",
-        "category": "recommended"
+        "action": "Order neuropsychological battery for PD-MCI / dementia screening given disease duration",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Frontal-subcortical pattern consistent with PD cognitive trajectory",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Tolosa_2021]",
+        "guideline_source": "Tolosa_2021"
       },
       {
         "step": 7,
-        "action": "Order DaTscan to confirm and quantify dopaminergic denervation",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Abnormal DaTscan showing asymmetric bilateral putaminal DAT loss consistent with advancing PD, suggesting current dose may be subtherapeutic",
-        "category": "recommended",
+        "action": "Order polysomnography only if dream-enactment behaviors are reported",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "REM without atonia is expected in established PD",
+        "category": "optional",
         "tool_parameters": {
-          "imaging_type": "DaTscan"
-        }
+          "test_type": "polysomnography"
+        },
+        "citation": "[Postuma_2019]",
+        "guideline_source": "Postuma_2019"
       },
       {
         "step": 8,
-        "action": "Consider levodopa challenge test at supratherapeutic dose to assess whether oculomotor symptoms are dopamine-responsive",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Robust motor improvement (47%) with complete resolution of saccade freezing episodes, confirming dopaminergic etiology",
-        "category": "required",
+        "action": "Order autonomic testing if dysautonomia is clinically significant",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Mild PD-related autonomic involvement; not the early prominent failure of MSA",
+        "category": "optional",
         "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP"
-          ]
-        }
+          "test_type": "autonomic_testing"
+        },
+        "citation": "[Tolosa_2021]",
+        "guideline_source": "Tolosa_2021"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG has no role in diagnosing typical PD",
+        "citation": "[Postuma_2015]"
       },
       {
-        "step": 9,
-        "action": "Increase carbidopa-levodopa dosing based on evidence of subtherapeutic treatment with dopamine-responsive oculomotor symptoms",
-        "tool_name": null,
-        "expected_finding": "Resolution of saccade freezing episodes and improvement in motor symptoms with optimized levodopa dosing",
-        "category": "required"
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "CSF is not part of routine PD workup",
+        "citation": "[Postuma_2015]"
       },
       {
-        "step": 10,
-        "action": "Schedule follow-up to reassess oculomotor function, motor symptoms, and medication tolerance after dose adjustment",
-        "tool_name": null,
-        "expected_finding": "Sustained improvement in both motor and oculomotor symptoms with optimized dopaminergic therapy",
-        "category": "required"
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "MRI is the appropriate structural study; CT adds nothing",
+        "citation": "[Schwarz_2014]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No cardiac indication",
+        "citation": "[Postuma_2015]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "No syncope or arrhythmia concern",
+        "citation": "[Postuma_2015]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Baseline metabolic profile and medication review precede dopaminergic therapy initiation",
+        "citation": "[Postuma_2015]",
+        "severity": "soft"
+      },
+      {
+        "before": "analyze_brain_mri",
+        "after": "order_advanced_imaging",
+        "reason": "Exclude structural mimics on MRI before committing to DaTscan and a PD diagnosis",
+        "citation": "[Schwarz_2014]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Recognize that the intermittent saccade freezing could represent either advancing PD with subtherapeutic dopaminergic treatment or an atypical parkinsonian syndrome (PSP/CBD)",
-      "Perform detailed neuro-ophthalmological examination distinguishing PD oculomotor features from PSP features (no vertical gaze palsy, no eyelid-opening apraxia, preserved OKN)",
-      "Identify key clinical clue: patient can break saccade freezing with smooth pursuit, and lacks compensatory head thrust/blink — distinguishing from acquired ocular motor apraxia",
-      "Assess dopamine responsiveness of oculomotor symptoms through levodopa challenge or dose adjustment",
-      "Recognize that complete resolution of saccade freezing with increased levodopa confirms dopaminergic etiology and rules out PSP/CBD"
+      "Apply MDS 2015 clinical diagnostic criteria for Parkinson's disease (bradykinesia plus rest tremor or rigidity, supportive features, no absolute exclusion criteria)",
+      "Document temporal sequence of motor and non-motor (REM sleep behavior disorder, hyposmia, constipation, orthostatic intolerance) features",
+      "Review the full medication list for dopamine receptor antagonists (metoclopramide, prochlorperazine, antipsychotics) and any other agents that can mimic or worsen parkinsonism",
+      "Optimize carbidopa-levodopa dose and timing before pursuing further imaging",
+      "Document oculomotor exam in detail (saccade speed, vertical gaze, ranges) to distinguish from PSP",
+      "Refer to movement disorders specialist for advanced therapy candidacy (DBS, infusion) if fluctuations persist after dose optimization"
     ],
     "contraindicated_actions": [
-      "Diagnosing PSP or CBD based solely on the presence of prominent oculomotor dysfunction without evaluating dopamine responsiveness",
-      "Reducing or discontinuing levodopa in response to the oculomotor symptoms (would worsen them)",
-      "Starting anticholinergic medications for oculomotor symptoms in an elderly patient with PD",
-      "Prescribing typical antipsychotics or dopamine-blocking antiemetics",
-      "Ordering invasive diagnostic procedures (brain biopsy) when a levodopa challenge can clarify the diagnosis"
+      "Do not prescribe metoclopramide, prochlorperazine, or promethazine for nausea in a patient with parkinsonism",
+      "Do not prescribe typical antipsychotics (haloperidol, fluphenazine) or most atypical antipsychotics (risperidone, olanzapine, aripiprazole) — restrict pharmacotherapy of psychosis to quetiapine, clozapine, or pimavanserin",
+      "Do not prescribe centrally acting anticholinergics (trihexyphenidyl, benztropine) in older adults or in any patient with cognitive impairment"
     ],
     "key_reasoning_points": [
-      "The intermittent saccade freezing episodes are a prominent oculomotor abnormality that initially raises concern for an atypical parkinsonian syndrome such as PSP or CBD rather than idiopathic PD",
-      "Key negative findings for PSP: no vertical supranuclear gaze palsy, no eyelid-opening apraxia, no square-wave jerks, and preserved optokinetic responses",
-      "Key negative findings for acquired ocular motor apraxia: reflexive saccades are affected (not just voluntary), no compensatory head thrusts or blinks used to initiate saccades",
-      "The ability to break saccade freezing episodes with smooth pursuit is a distinctive clinical feature suggesting the freezing involves saccade-generating circuits specifically, not a global oculomotor palsy",
-      "The association of saccade freezing episodes with worsening dysarthria and reduced blinking suggests a global basal ganglia hypodopaminergic state during these episodes",
-      "Complete resolution of saccade freezing with increased levodopa dose provides the strongest evidence that this is a dopaminergic phenomenon related to PD motor fluctuations, not a separate pathology",
-      "The current carbidopa-levodopa dose (25-100 mg TID) may have become subtherapeutic relative to advancing disease, and the saccade freezing may represent a form of wearing-off or underdosing",
-      "Clonazepam can increase saccadic latency but is unlikely to cause the episodic complete saccade freezing described; its contribution should be considered but is not the primary explanation",
-      "Normal brain MRI without midbrain or pontine atrophy supports idiopathic PD over PSP or MSA"
+      "An 8-year-established PD patient with new oculomotor symptoms most commonly reflects a hypodopaminergic state rather than PSP",
+      "Slow horizontal saccades without vertical supranuclear gaze palsy is not PSP",
+      "Levodopa dose optimization should precede expensive functional imaging when the prior diagnosis is firm",
+      "Sertraline coadministration is relevant for future MAO-B inhibitor selection (serotonergic risk)"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": [
+      {
+        "data_point": "Episodes labeled as 'freezing of saccades' raising concern for PSP",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Anchor toward PSP",
+        "correct_interpretation": "Symptom description and exam fit hypodopaminergic oculomotor manifestations of established PD; PSP would require vertical supranuclear gaze palsy and early postural instability"
+      }
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -917,6 +978,14 @@
       "ct": "normal",
       "echo": "normal",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (condition-expert:PD)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:PD",
+    "difficulty_rationale": "Established PD with oculomotor symptoms vs PSP; emphasizes dose optimization over expensive imaging",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

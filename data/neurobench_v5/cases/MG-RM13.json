@@ -474,98 +474,203 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Lambert-Eaton Myasthenic Syndrome (LEMS), paraneoplastic, secondary to SCLC recurrence (anti-VGCC positive, anti-SOX1 positive)",
+    "primary_diagnosis": "Lambert-Eaton myasthenic syndrome (LEMS), paraneoplastic, secondary to recurrent small cell lung cancer; anti-VGCC P/Q positive, anti-SOX1 positive",
     "icd_code": "G73.1",
     "differential": [
       {
         "diagnosis": "Myasthenia gravis",
-        "likelihood": "very_low",
-        "key_features": "Anti-AChR negative; low baseline CMAP not seen in MG; >100% increment at 50 Hz confirms LEMS; proximal leg weakness > ocular (typical LEMS distribution)"
-      },
-      {
-        "diagnosis": "Carboplatin peripheral neuropathy",
         "likelihood": "low",
-        "key_features": "Axonal sensory neuropathy from carboplatin confirmed but cannot explain low CMAP with 118% facilitation or proximal motor weakness"
+        "key_features": "MG produces fatigable ocular/bulbar weakness with normal baseline CMAP and decrement; here baseline CMAP low with facilitation pattern; AChR negative.",
+        "icd_code": "G70.0"
       },
       {
-        "diagnosis": "Paraneoplastic sensorimotor neuropathy",
+        "diagnosis": "Chemotherapy-induced proximal myopathy",
+        "likelihood": "low",
+        "key_features": "Etoposide/carboplatin can cause weakness but not >100% RNS facilitation.",
+        "icd_code": "G72.0"
+      },
+      {
+        "diagnosis": "Hypothyroid myopathy",
         "likelihood": "very_low",
-        "key_features": "Anti-Hu negative; NCS pattern is pre-synaptic NMJ not demyelinating neuropathy; VGCC antibodies confirm LEMS"
+        "key_features": "Treated hypothyroidism; thyroid panel reassuring.",
+        "icd_code": "E03.9"
+      },
+      {
+        "diagnosis": "Diabetic / age-related polyneuropathy",
+        "likelihood": "very_low",
+        "key_features": "Could explain mild sensory findings but not pre-synaptic NMJ facilitation pattern.",
+        "icd_code": "G63"
+      },
+      {
+        "diagnosis": "Radiation plexopathy",
+        "likelihood": "very_low",
+        "key_features": "Prior thoracic radiation could cause brachial plexopathy but does not produce symmetric proximal LE weakness with facilitation.",
+        "icd_code": "G54.0"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Perform RNS including high-rate (50 Hz) when low baseline CMAP identified",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "118% increment at 50 Hz — pathognomonic for LEMS; post-exercise facilitation",
+        "action": "Order anti-VGCC P/Q-type, anti-SOX1, anti-AChR, anti-MuSK, anti-LRP4, and TSH",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Anti-VGCC P/Q positive and anti-SOX1 positive confirm LEMS with paraneoplastic mechanism; AChR negative",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "anti_VGCC_PQ",
+            "anti_SOX1",
+            "anti_AChR",
+            "anti_MuSK",
+            "anti_LRP4",
+            "TSH"
+          ]
+        },
+        "citation": "[Gilhus_2016]",
+        "guideline_source": "Gilhus_2016"
       },
       {
         "step": 2,
-        "action": "Anti-VGCC antibody and anti-SOX1",
-        "tool_name": "interpret_labs",
-        "expected_finding": "VGCC 0.48 nmol/L elevated; anti-SOX1 positive — SCLC recurrence concern",
+        "action": "Order RNS with high-rate (50 Hz) facilitation protocol",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Low baseline CMAP with >100% increment confirms pre-synaptic LEMS pattern",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "repetitive_nerve_stimulation"
+        },
+        "citation": "[Gilhus_2016]",
+        "guideline_source": "Gilhus_2016"
       },
       {
         "step": 3,
-        "action": "PET-CT for SCLC recurrence (standard CT insufficient)",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Hypermetabolic paratracheal node 1.2 cm SUV 6.8 — SCLC recurrence",
+        "action": "CT chest with contrast for SCLC recurrence",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Post-treatment changes — may not show new recurrence; PET-CT required for definitive staging",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "region": "chest",
+          "contrast": true,
+          "indication": "SCLC_recurrence_surveillance"
+        },
+        "citation": "[Gilhus_2016]",
+        "guideline_source": "Gilhus_2016"
       },
       {
         "step": 4,
-        "action": "EBUS biopsy of hypermetabolic node",
-        "tool_name": null,
-        "expected_finding": "SCLC confirmed — paraneoplastic LEMS",
+        "action": "FDG-PET to identify metabolically active recurrent SCLC",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Hypermetabolic foci concerning for recurrence — guides biopsy",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[Gilhus_2016]",
+        "guideline_source": "Gilhus_2016"
       },
       {
         "step": 5,
-        "action": "Initiate amifampridine for symptomatic LEMS control while oncology manages SCLC",
+        "action": "Autonomic testing (QSART, tilt-table) — autonomic features support LEMS",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Cholinergic autonomic failure",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "autonomic_testing"
+        },
+        "citation": "[Gilhus_2016]",
+        "guideline_source": "Gilhus_2016"
+      },
+      {
+        "step": 6,
+        "action": "Literature search: LEMS management with amifampridine, immunotherapy, and oncologic treatment of SCLC",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "3,4-DAP (amifampridine) is first-line symptomatic; treating recurrent SCLC often improves LEMS",
+        "category": "recommended",
+        "tool_parameters": {
+          "query": "LEMS paraneoplastic SCLC amifampridine treatment"
+        },
+        "citation": "[Gilhus_2016]",
+        "guideline_source": "Gilhus_2016"
+      },
+      {
+        "step": 7,
+        "action": "Check drug interactions for amifampridine and exclude MG-exacerbating drugs (still relevant in NMJ disease)",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "Amifampridine safe; QT monitoring needed",
+        "expected_finding": "Amifampridine: QT and seizure threshold; avoid aminoglycosides/fluoroquinolones/IV magnesium",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "proposed": "amifampridine_start"
+        },
+        "citation": "[Gilhus_2016]",
+        "guideline_source": "Gilhus_2016"
+      },
+      {
+        "step": 8,
+        "action": "Single-fiber EMG if RNS facilitation pattern equivocal",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Increased jitter — non-specific for NMJ disease; LEMS-specific discriminators remain low baseline CMAP and high-rate facilitation",
+        "category": "optional",
+        "tool_parameters": {
+          "test_type": "emg_single_fiber"
+        },
+        "citation": "[Gilhus_2016]",
+        "guideline_source": "Gilhus_2016"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG non-contributory for NMJ disease.",
+        "citation": "[Gilhus_2016]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "CSF non-contributory for LEMS.",
+        "citation": "[Gilhus_2016]"
+      },
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI non-contributory unless CNS recurrence suspected.",
+        "citation": "[Gilhus_2016]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "High-rate RNS (50 Hz) is diagnostic — >100% CMAP increment is pathognomonic for LEMS",
-      "Anti-VGCC antibody confirms LEMS (NOT anti-AChR)",
-      "PET-CT for SCLC recurrence — standard CT misses small recurrence",
-      "SCLC treatment is primary therapy — LEMS often dramatically improves with cancer control",
-      "Amifampridine (FDA-approved for LEMS) initiated for symptomatic relief"
+      "Confirm anti-VGCC positivity",
+      "PET-CT for SCLC recurrence after standard CT",
+      "Oncology referral for SCLC recurrence staging and treatment",
+      "Initiate amifampridine after ECG and drug-interaction review",
+      "Coordinate with palliative care given prior SCLC history"
     ],
     "contraindicated_actions": [
-      "Do NOT diagnose MG without performing high-rate RNS in patients with low baseline CMAP",
-      "Do NOT use standard CT alone to exclude SCLC recurrence in LEMS — PET-CT required",
-      "Do NOT treat as simple carboplatin neuropathy — LEMS is the primary NMJ diagnosis"
+      "Do NOT diagnose this as MG — pre-synaptic facilitation pattern and anti-VGCC positivity place this in LEMS.",
+      "Do NOT prescribe aminoglycosides, fluoroquinolones, IV magnesium, NMBs.",
+      "Do NOT defer oncology workup pending serology — paraneoplastic syndromes often precede radiographic recurrence."
     ],
     "key_reasoning_points": [
-      "Low baseline CMAP amplitude is the key differentiator of LEMS from MG — in MG, baseline CMAP is normal",
-      "Greater than 100% CMAP increment at 50 Hz is pathognomonic for LEMS (pre-synaptic calcium accumulation enables transient NMJ improvement)",
-      "Anti-VGCC antibodies confirm the diagnosis; anti-SOX1 positive predicts SCLC etiology",
-      "SCLC treatment is the definitive treatment for paraneoplastic LEMS — amifampridine provides symptomatic relief",
-      "PET-CT detects SCLC recurrences invisible on standard CT — mandatory in anti-SOX1 positive LEMS"
+      "Proximal weakness improving with brief exercise (post-activation facilitation) is the LEMS signature — opposite of MG.",
+      "Anti-VGCC P/Q positive in 85-90% of LEMS; anti-SOX1 strongly indicates SCLC.",
+      "Standard CT may miss small recurrent SCLC; PET-CT is the imaging of choice.",
+      "3,4-DAP (amifampridine) is first-line symptomatic; pyridostigmine adjunctive."
     ],
     "red_herrings": [
       {
-        "data_point": "Prior completed SCLC treatment with 'complete response'",
-        "location": "past medical history",
-        "intended_effect": "Clinician assumes SCLC is cured and attributes weakness to carboplatin neuropathy or deconditioning, not pursuing LEMS/SCLC recurrence workup",
-        "correct_interpretation": "LEMS onset after apparently complete SCLC remission is a classic presentation of occult SCLC recurrence; anti-SOX1 positive and anti-VGCC confirm LEMS-SCLC; PET-CT reveals recurrence",
-        "field_path": ""
+        "data_point": "Negative anti-AChR antibody",
+        "location": "labs",
+        "field_path": "initial_tool_outputs.labs.panels",
+        "intended_effect": "Conclude 'NMJ disorder excluded' and miss LEMS.",
+        "correct_interpretation": "AChR-negative does not exclude LEMS; anti-VGCC is the discriminating test."
+      },
+      {
+        "data_point": "CT chest post-treatment changes without new mass",
+        "location": "CT chest",
+        "field_path": "initial_tool_outputs.ct.impression",
+        "intended_effect": "Reassurance that SCLC is in remission and stop oncology workup.",
+        "correct_interpretation": "Standard CT has limited sensitivity for small recurrence; PET-CT is required; LEMS often precedes radiographic recurrence by months."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "v5",
@@ -585,6 +690,16 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MG",
+    "difficulty_rationale": "5 required tools, 2 red herrings, reverse-mimic LEMS workup",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": [
+      "emg_ncs_useless_via_param_conflation: pack lists order_specialized_test:emg_ncs as USELESS, but coherence validator treats tool_name overlap as a contradiction regardless of tool_parameters; cannot encode without removing required RNS/SFEMG entries. Suggest extending validator to compare tool_name + tool_parameters or fleet-wide pattern."
+    ]
   }
 }

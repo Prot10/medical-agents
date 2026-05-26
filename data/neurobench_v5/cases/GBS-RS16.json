@@ -1,7 +1,7 @@
 {
   "case_id": "GBS-RS16",
   "condition": "guillain_barre",
-  "difficulty": "straightforward",
+  "difficulty": "moderate",
   "encounter_type": "emergency",
   "patient": {
     "patient_id": "NB-GBS-RS16",
@@ -420,6 +420,17 @@
         "impression": "Severe demyelinating polyradiculoneuropathy with secondary axonal injury. Markedly prolonged distal motor latencies, severely reduced conduction velocities, absent F-waves in all tested nerves, H-reflex absent. CMAP amplitudes markedly reduced in lower limb nerves indicating significant axonal degeneration. Absent sural sensory responses. Findings are consistent with severe acute demyelinating polyradiculoneuropathy with secondary axonal features. Clinical correlation recommended.",
         "recommended_actions": []
       }
+    },
+    {
+      "trigger_action": "search_gbs_treatment",
+      "tool_name": "search_medical_literature",
+      "output": {
+        "general": {
+          "query": "general",
+          "results": [],
+          "summary": "No directly applicable, high-quality evidence was retrieved for this query. Recommend correlating with current society guidelines."
+        }
+      }
     }
   ],
   "fallback_tool_outputs": {
@@ -497,107 +508,199 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Guillain-Barré syndrome, severe AIDP (post-MI/PCI trigger), multi-antibody seropositive (anti-GT1a, anti-GM1, anti-GM2), requiring mechanical ventilation",
+    "primary_diagnosis": "Guillain-Barré syndrome, severe AIDP (post-MI / PCI trigger), multi-antibody positive",
     "icd_code": "G61.0",
     "differential": [
       {
-        "diagnosis": "Critical illness polyneuropathy (CIP)",
-        "likelihood": "very_low",
-        "key_features": "CIP requires multi-organ failure and sepsis — not present at GBS onset; GBS preceded ICU admission; multi-antibody seropositivity specific to GBS"
+        "diagnosis": "Heparin-induced thrombocytopenia with neurological complication",
+        "likelihood": "moderate",
+        "key_features": "Recent PCI with heparin exposure; thrombocytopenia and HIT antibody testing cover; pattern would be focal ischaemic.",
+        "icd_code": "D75.82"
       },
       {
-        "diagnosis": "Critical illness myopathy (CIM)",
-        "likelihood": "very_low",
-        "key_features": "CIM requires prolonged high-dose NMJ blockers or steroids — not given; ascending weakness predated ICU"
+        "diagnosis": "Post-cardiac-surgery critical illness polyneuropathy",
+        "likelihood": "moderate",
+        "key_features": "ICU and sepsis context; CSF dissociation and demyelinating EMG favour GBS.",
+        "icd_code": "G62.81"
       },
       {
-        "diagnosis": "Post-MI embolic stroke causing quadriplegia",
+        "diagnosis": "Acute-onset CIDP",
+        "likelihood": "low",
+        "key_features": "Reassess at 8 weeks.",
+        "icd_code": "G61.81"
+      },
+      {
+        "diagnosis": "Acute embolic stroke (cardio-embolic)",
+        "likelihood": "low",
+        "key_features": "Focal and asymmetric; symmetric ascending pattern argues against.",
+        "icd_code": "I63.4"
+      },
+      {
+        "diagnosis": "Vasculitic neuropathy",
         "likelihood": "very_low",
-        "key_features": "CT head normal; bilateral ascending pattern not stroke; areflexia not stroke; GBS antibodies strongly positive"
+        "key_features": "Asymmetric multifocal pattern.",
+        "icd_code": "M31.7"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "IVIG 0.4 g/kg/day x 5 days — initiated on clinical grounds (multi-antibody + CSF + clinical)",
-        "tool_name": null,
-        "expected_finding": "Treatment initiated",
+        "action": "Obtain CBC, CMP, HIV, anti-GM1/anti-GQ1b ganglioside antibodies, and stool culture / Campylobacter serology if recent diarrhea",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Mild leukocytosis / elevated inflammatory markers reflecting antecedent infection; ganglioside antibodies for variant typing; trigger identification (Campylobacter, CMV, EBV, Mycoplasma, HIV)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Yuki_2012]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 2,
-        "action": "Labs including ganglioside antibody panel (GT1a, GM1, GM2)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Multi-antibody positive — diagnostic without NCS",
+        "action": "Order nerve conduction studies and needle EMG (EMG/NCS)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Demyelinating pattern (prolonged DML, conduction block, reduced CV, absent F-waves) consistent with AIDP, or reduced CMAP amplitudes in axonal variants (AMAN/AMSAN)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[Hadden_1998]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 3,
-        "action": "Lumbar puncture (after anticoagulation level check)",
+        "action": "Perform lumbar puncture for CSF analysis",
         "tool_name": "analyze_csf",
-        "expected_finding": "Classic albumino-cytologic dissociation",
+        "expected_finding": "Albuminocytologic dissociation — elevated protein with cell count <10/μL; may be normal in the first week of illness",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 4,
-        "action": "Hold metoprolol if bradycardia — GBS autonomic dysfunction",
-        "tool_name": null,
-        "expected_finding": "Medication adjustment",
+        "action": "Order bedside respiratory function testing (FVC, MIP/MEP, NIF) and repeat every 4–6 hours",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline and serial FVC, MIP/MEP, NIF; deterioration to FVC <20 mL/kg, MIP worse than -30 cmH2O, or VC <40% predicted triggers ICU transfer / intubation",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[Sharshar_2003]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 5,
-        "action": "ICU cardiac monitoring — post-MI + GBS = highest autonomic risk category",
-        "tool_name": "order_cardiac_monitoring",
-        "expected_finding": "Life-threatening autonomic events requiring intervention",
+        "action": "Search the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[van_den_Berg_2014]",
+        "guideline_source": "GBS criteria pack §2"
       },
       {
         "step": 6,
-        "action": "Delayed NCS/EMG when stable",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Severe AIDP confirmed",
+        "action": "Check drug interactions / contraindications for IVIG (renal function, IgA deficiency screen) and/or plasma exchange (coagulation, calcium, hemodynamics)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Confirmation that IVIG can be given safely (no severe renal impairment, no IgA deficiency) or that plasma exchange is appropriate (adequate vascular access, stable coagulation)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[van_den_Berg_2014]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 7,
+        "action": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Sinus tachycardia or bradycardia; conduction or repolarisation abnormalities reflecting autonomic involvement",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
+      },
+      {
+        "step": 8,
+        "action": "Initiate continuous cardiac telemetry for the first 1–2 weeks for moderate/severe disease — autonomic instability (bradyarrhythmias, BP lability) is common",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Documentation of sinus pauses, bradyarrhythmias, BP lability, or non-sustained tachyarrhythmias",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Asbury_1990]",
+        "guideline_source": "GBS criteria pack §2"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "GBS is a peripheral nerve / nerve-root disorder; EEG has no role in diagnosis unless atypical CNS features (encephalopathy, seizures) are present.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated in typical GBS; reserve for pre-existing cardiac disease or unexplained hemodynamic instability after autonomic causes are excluded.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT contributes no diagnostic information in GBS; the disease is peripheral and CT does not visualise nerve roots reliably.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "Functional / metabolic brain imaging adds no value in a peripheral demyelinating syndrome.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "MR_angiography"
+        },
+        "rationale": "Cerebrovascular imaging is not indicated in a peripheral neuropathy without focal cerebral signs.",
+        "citation": "[van_den_Berg_2014]"
+      },
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is reserved for atypical features (encephalopathy, CNS signs, transverse myelitis on differential). In classic GBS it does not aid diagnosis.",
+        "citation": "[van_den_Berg_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_specialized_test",
+        "after": "check_drug_interactions",
+        "reason": "Document respiratory status (FVC/NIF) before committing to IVIG vs plasma exchange — severe respiratory compromise mandates ICU triage and may influence treatment choice and timing.",
+        "citation": "[Sharshar_2003]",
+        "severity": "soft"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Renal function, IgA screen, and CBC must be reviewed before IVIG to mitigate renal failure, anaphylaxis (IgA-deficient patients), and aseptic meningitis risk.",
+        "citation": "[van_den_Berg_2014]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Hold metoprolol when bradycardia occurs — beta-blocker worsens GBS autonomic bradycardia; dual risk from GBS + post-MI autonomic instability",
-      "Multi-antibody seropositivity (GT1a + GM1 + GM2) allows clinical diagnosis of GBS without NCS when patient too unstable",
-      "Plasmapheresis is contraindicated — patient on triple antithrombotic therapy post-PCI; IVIG is the only feasible treatment",
-      "Atropine at bedside is mandatory — GBS bradycardia in post-MI context is particularly dangerous",
-      "Avoid QT-prolonging medications — QTc already 472 ms post-MI + GBS"
+      "Initiate IVIG / plasma exchange; weigh PLEX against recent PCI and dual antiplatelet therapy.",
+      "Continuous cardiac telemetry — recent MI raises arrhythmia risk in addition to autonomic dysfunction.",
+      "Coordinate with cardiology for dual antiplatelet and anticoagulation decisions."
     ],
     "contraindicated_actions": [
-      "Succinylcholine for RSI — patient already intubated; if re-intubation needed use rocuronium",
-      "Corticosteroids",
-      "Plasmapheresis — contraindicated with triple antithrombotic therapy",
-      "Escalating metoprolol during GBS bradycardia"
+      "Do not stop dual antiplatelet therapy abruptly without cardiology input — stent thrombosis risk.",
+      "Do not start corticosteroids as monotherapy."
     ],
     "key_reasoning_points": [
-      "Acute MI and PCI are surgical/physiological stress triggers for GBS — the temporal relationship (GBS onset 20 hours post-PCI) is the key clinical clue",
-      "Multi-antibody seropositivity (GT1a + GM1 + GM2) allows Level 2 GBS diagnosis when NCS cannot be performed — ganglioside antibodies provide diagnostic certainty",
-      "Beta-blockers (metoprolol) must be held during GBS autonomic bradycardia — post-MI rate control with beta-blockers risks life-threatening bradycardia in GBS",
-      "Post-MI + GBS is the highest-risk autonomic scenario: two conditions each causing autonomic instability, combined with AF, triple antithrombotic therapy, and prolonged QTc",
-      "Critical illness polyneuropathy requires ICU multi-organ failure and sepsis — these were NOT present at GBS onset; GBS caused the ICU admission, not the other way around"
+      "MI / PCI is a recognised trigger for autoimmune polyneuropathies through inflammation and cytokine release.",
+      "Anticoagulation, antiplatelet, and treatment-choice considerations are central — PLEX may not be preferred in the immediate post-PCI window."
     ],
-    "red_herrings": [
-      {
-        "data_point": "Post-MI/PCI context with elevated procalcitonin 1.69 and BNP 526",
-        "location": "initial_tool_outputs.labs",
-        "intended_effect": "Attribute neurological deterioration to sepsis, critical illness polyneuropathy, or embolic stroke from MI rather than GBS",
-        "correct_interpretation": "Procalcitonin elevation is post-procedure inflammatory response (blood cultures negative); CIP requires multi-organ failure; multi-antibody seropositivity and ascending neurological decline preceding ICU admission confirms GBS as primary diagnosis",
-        "field_path": ""
-      }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": []
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -616,6 +719,17 @@
       "echo": "normal",
       "advanced_imaging": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:GBS",
+    "difficulty_rationale": "6 required tools, 0 red herring(s); classic or near-classic GBS workup with one or more plausible mimics that need active exclusion.",
+    "case_body_concerns": [
+      "Bedside respiratory function (FVC/MIP/MEP/NIF) is delivered via an `interpret_labs` followup panel rather than `order_specialized_test{test_type=respiratory_function}` as the criteria pack mandates. Agents calling order_specialized_test{respiratory_function} will hit the EMG/NCS output instead. Recommend adding a respiratory_function followup keyed to order_specialized_test in a follow-up case-body pass.",
+      "Mirrored fallback_tool_outputs into followup_outputs for required tools that previously only existed in the fallback bucket: ['search_medical_literature']. Content is unchanged; the move makes the coherence validator see an explicit primary output for criteria-pack-required tools."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

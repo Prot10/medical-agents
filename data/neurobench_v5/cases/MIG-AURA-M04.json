@@ -84,119 +84,132 @@
     "extremities": "No edema"
   },
   "ground_truth": {
-    "primary_diagnosis": "Migraine with brainstem aura (G43.1); combined OCP contraindicated; preventive therapy indicated",
-    "primary_diagnosis_icd": "G43.1",
+    "primary_diagnosis": "Migraine with brainstem aura (ICHD-3 1.2.2); combined OCP contraindicated (WHO Category 4); preventive therapy indicated",
+    "icd_code": "G43.109",
     "differential": [
       {
-        "diagnosis": "Posterior circulation TIA / basilar insufficiency",
-        "likelihood": "low",
-        "key_features": "Normal posterior circulation MRA — no basilar stenosis; normal DWI — no posterior fossa infarction; age 33, no vascular risk factors; normal ECG/Holter; gradual onset bilateral visual phenomenon with subsequent headache — pattern of CSD, not embolism"
-      },
-      {
-        "diagnosis": "Posterior fossa AVM",
-        "likelihood": "very_low",
-        "key_features": "Normal MRI — no vascular malformation; no haemorrhage history"
+        "diagnosis": "Posterior circulation TIA",
+        "likelihood": "moderate",
+        "key_features": "Brainstem symptoms always require posterior circulation TIA exclusion; gradual aura march and subsequent migrainous headache argue against TIA",
+        "icd_code": "G45.9"
       },
       {
         "diagnosis": "Vestibular migraine",
-        "likelihood": "moderate",
-        "key_features": "Vestibular migraine may explain vertigo + headache; however, this patient also has bilateral visual aura and dysarthria — meeting ICHD-3 brainstem aura criteria; migraine with brainstem aura is the correct ICHD-3 classification"
+        "likelihood": "low",
+        "key_features": "Overlapping concept; ICHD-3 1.2.2 brainstem aura is the appropriate label when criteria met",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Posterior fossa structural lesion",
+        "likelihood": "very_low",
+        "key_features": "MRI to exclude; episodic pattern argues against",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Vertebrobasilar dissection",
+        "likelihood": "very_low",
+        "key_features": "No neck pain, no fixed deficit; MRA to exclude",
+        "icd_code": "I77.71"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI including posterior fossa and MRA posterior circulation",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Normal posterior fossa; normal posterior circulation MRA; no basilar stenosis",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
         "category": "required",
         "tool_parameters": {
-          "contrast": true,
-          "sequences": [
-            "DWI",
-            "FLAIR",
-            "T1+Gd",
-            "MRA",
-            "posterior_circulation"
-          ]
-        }
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "URGENT: Discontinue combined OCP (Rigevidon) — WHO Category 4 in migraine with aura",
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "Rigevidon contraindicated in migraine with brainstem aura",
+        "expected_finding": "Combined OCP is WHO Category 4 — discontinue; TRIPTANS ARE CONTRAINDICATED in migraine with brainstem aura — use NSAIDs, antiemetics, or gepants/lasmiditan",
         "category": "required",
         "tool_parameters": {
-          "drug_1": "combined_oral_contraceptive",
-          "condition": "migraine_with_brainstem_aura"
-        }
+          "context": "brainstem_aura_triptan_contraindication_OCP"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 3,
-        "action": "Diagnose migraine with brainstem aura (ICHD-3) — 3 qualifying episodes with bilateral visual + vertigo + ataxia + dysarthria",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "ICHD-3 MBA criteria met",
+        "action": "Brain MRI with posterior-circulation MRA to exclude vascular and structural posterior fossa pathology",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Normal MRI/MRA; no posterior fossa lesion or vertebrobasilar disease",
         "category": "required",
         "tool_parameters": {
-          "query": "migraine brainstem aura ICHD-3 criteria"
-        }
-      },
-      {
-        "step": 4,
-        "action": "Initiate preventive therapy — topiramate 25 mg/day titrating to 50-100 mg",
-        "tool_name": null,
-        "expected_finding": "3 attacks in 4 months with significant disability = preventive therapy indicated",
-        "category": "required",
-        "tool_parameters": {}
-      },
-      {
-        "step": 5,
-        "action": "Counsel that bilateral visual aura is consistent with migraine (bilateral occipital CSD) — not TIA; reassure",
-        "tool_name": null,
-        "expected_finding": "Patient has extensive internet-sourced anxiety; accurate psychoeducation critical",
-        "category": "required",
-        "tool_parameters": {}
+          "contrast": false,
+          "sequences": [
+            "DWI",
+            "FLAIR",
+            "T2",
+            "SWI",
+            "MRA"
+          ]
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis — neither present here",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated in typical migraine with aura — no role unless cardioembolic stroke is on the differential",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is not indicated for migraine with aura; reserve for cases where focal seizure is genuinely on the differential",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "Stop combined OCP immediately — WHO Category 4 in any migraine with aura subtype",
-      "Recognise ICHD-3 migraine with brainstem aura (formerly basilar-type migraine) — bilateral visual aura + ≥2 brainstem symptoms",
-      "Reassure patient — bilateral visual aura is characteristic of migraine, not TIA; normal posterior circulation MRA is definitive",
-      "Avoid triptans for acute treatment in MBA — NSAIDs + antiemetics preferred"
+      "Brain MRI/MRA required for first brainstem aura presentations",
+      "Discontinue combined OCP — WHO Category 4 contraindication",
+      "Avoid triptans (contraindicated in migraine with brainstem aura)",
+      "Initiate preventive therapy (topiramate, propranolol contra-indicated only if asthma) [Holland_2012]"
     ],
     "contraindicated_actions": [
-      "Do not continue combined OCP — WHO Category 4",
-      "Do not prescribe triptans without caution discussion (cautioned in brainstem aura)",
-      "Do not label as 'basilar artery insufficiency' — this is an outdated TIA diagnostic label; ICHD-3 diagnoses migraine with brainstem aura"
+      "Do not prescribe triptans in migraine with brainstem aura",
+      "Do not prescribe ergotamines in migraine with brainstem aura",
+      "Do not continue combined oestrogen-progestogen contraception"
     ],
     "key_reasoning_points": [
-      "Bilateral visual aura (both temporal fields simultaneously) is characteristic of bilateral occipital cortex CSD, not TIA — TIA causes abrupt monocular loss or hemianopia",
-      "ICHD-3 renamed 'basilar-type migraine' to 'migraine with brainstem aura' because the vascular mechanism is not established; CSD spreading to brainstem territories explains the symptoms",
-      "3 qualifying episodes = ICHD-3 criteria met; preventive therapy indicated",
-      "Combined OCP contraindicated applies to ALL subtypes of migraine with aura, including MBA",
-      "Moderate difficulty stems from recognising MBA subtype (non-classic visual aura) and reassuring against TIA misdiagnosis"
+      "ICHD-3 1.2.2 brainstem aura requires ≥2 brainstem features (dysarthria, vertigo, tinnitus, hypacusis, diplopia, ataxia, decreased consciousness) and no motor weakness",
+      "Triptans are contraindicated due to theoretical vasoconstriction risk in posterior circulation territory",
+      "Combined OCP must be stopped"
     ],
     "red_herrings": [
       {
-        "data_point": "Bilateral visual disturbance — patient believes this means it cannot be migraine",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Classic migraine aura education often emphasises unilateral visual aura; patient's research suggested bilateral symptoms = vascular disease",
-        "correct_interpretation": "Bilateral occipital CSD produces bilateral visual phenomena — characteristic of migraine with brainstem aura; ICHD-3 specifically classifies this subtype",
-        "field_path": ""
-      },
-      {
-        "data_point": "Vertigo, ataxia, and dysarthria suggesting posterior circulation TIA",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Posterior circulation TIA characteristically causes vertigo, ataxia, and dysarthria — referred by GPs as 'basilar insufficiency'",
-        "correct_interpretation": "Normal posterior circulation MRA and DWI; episodic pattern with gradual onset and subsequent headache; meets ICHD-3 MBA criteria; age 33 without vascular risk factors",
-        "field_path": ""
+        "data_point": "Patient concerned about brain tumour",
+        "location": "patient.chief_complaint",
+        "field_path": "patient.chief_complaint",
+        "intended_effect": "May prompt unnecessary contrast imaging or broad workup",
+        "correct_interpretation": "Stereotyped episodic pattern with normal interictal exam and normal MRI argues strongly against tumour"
       }
-    ],
-    "icd_code": "G43.1",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -220,7 +233,17 @@
       "ct": "normal",
       "cardiac_monitoring": "normal",
       "specialized_test": "incidental"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Moderate: brainstem aura requires MRI/MRA; medication-safety overlay (OCP + triptan contraindication)",
+    "case_body_concerns": [
+      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide §1): ['analyze_ecg', 'interpret_labs', 'order_echocardiogram']"
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "initial_tool_outputs": {
     "mri": {

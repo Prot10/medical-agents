@@ -854,193 +854,214 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Acute bacterial meningitis due to Streptococcus pneumoniae in an HIV-infected patient with atypical initial CSF presentation",
+    "primary_diagnosis": "Acute bacterial meningitis due to Streptococcus pneumoniae in an HIV-infected patient with low CSF cell count",
     "icd_code": "G00.1",
     "differential": [
       {
-        "diagnosis": "Neurosyphilis",
-        "likelihood": "very_low",
-        "key_features": "CSF VDRL nonreactive, serum RPR and FTA-ABS nonreactive; oral ulcer is aphthous not chancre"
-      },
-      {
         "diagnosis": "Cryptococcal meningitis",
-        "likelihood": "moderate",
-        "key_features": "Negative India ink, negative cryptococcal antigen, negative CSF PCR for Cryptococcus"
+        "likelihood": "high",
+        "key_features": "Advanced HIV with prior empiric cryptococcal treatment 2 months ago — must rule out relapse with CrAg and culture",
+        "icd_code": "B45.1"
       },
       {
-        "diagnosis": "Tuberculous meningitis",
+        "diagnosis": "Viral (aseptic) meningitis",
         "likelihood": "moderate",
-        "key_features": "GeneXpert negative for M. tuberculosis, AFB stain negative; TB meningitis typically shows more lymphocytic predominance and very low glucose"
+        "key_features": "Lymphocyte-predominant CSF, normal-to-mildly elevated glucose, lower protein, lower CRP/procalcitonin — clinically distinguished by less toxic appearance",
+        "icd_code": "A87.9"
+      },
+      {
+        "diagnosis": "Viral encephalitis (HSV-1)",
+        "likelihood": "moderate",
+        "key_features": "Temporal lobe MRI changes, seizures or focal deficits, lymphocytic CSF; HSV PCR required to exclude",
+        "icd_code": "B00.4"
       },
       {
         "diagnosis": "Progressive multifocal leukoencephalopathy (PML)",
-        "likelihood": "low",
-        "key_features": "PML typically presents with focal deficits without meningeal signs; JC virus PCR would be needed to exclude"
+        "likelihood": "moderate",
+        "key_features": "HIV with subcortical white matter lesion raises PML concern; CSF JCV PCR required",
+        "icd_code": "A81.2"
       },
       {
-        "diagnosis": "Immune reconstitution inflammatory syndrome (IRIS)",
+        "diagnosis": "Tuberculous meningitis",
         "likelihood": "low",
-        "key_features": "IRIS typically occurs 2-8 weeks after ART start with paradoxical worsening; would need to identify underlying pathogen"
-      },
-      {
-        "diagnosis": "HIV-associated neurocognitive disorder",
-        "likelihood": "low",
-        "key_features": "Does not cause meningeal signs, elevated opening pressure, or markedly elevated CSF protein"
+        "key_features": "Subacute onset, lymphocytic CSF, basilar enhancement, very low glucose — different tempo and pattern from this case",
+        "icd_code": "A17.0"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain CT head to exclude mass lesion or raised ICP before lumbar puncture",
+        "action": "Obtain non-contrast CT head to exclude mass effect, midline shift, basal cistern obliteration, or hydrocephalus that would contraindicate lumbar puncture in this patient with altered mental status and/or immunocompromise.",
         "tool_name": "order_ct_scan",
-        "expected_finding": "Right frontal hypodense lesion and meningeal enhancement; no contraindication to LP",
+        "expected_finding": "Absence of mass lesion, midline shift, or signs of impending herniation — confirms LP is safe.",
         "category": "required",
         "tool_parameters": {
-          "angiography": false,
           "contrast": false
-        }
+        },
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §V"
       },
       {
         "step": 2,
-        "action": "Analyze initial CSF results including cell count, protein, glucose, Gram stain, cultures, and special tests",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Atypical CSF with elevated protein but near-normal cell count; negative Gram stain and cultures; negative cryptococcal and TB markers",
-        "category": "required",
-        "tool_parameters": {
-          "special_tests": [
-            "meningitis_panel"
-          ]
-        }
-      },
-      {
-        "step": 3,
-        "action": "Review laboratory results including CBC, BMP, inflammatory markers, and HIV parameters",
+        "action": "Draw two sets of peripheral blood cultures BEFORE the first antibiotic dose and send CBC with differential, CMP, procalcitonin, CRP, and lactate.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Leukopenia, lymphopenia, moderately elevated CRP, procalcitonin in gray zone, low CD4 count",
+        "expected_finding": "Peripheral leukocytosis with left shift, elevated procalcitonin/CRP, eventual blood-culture growth of the pathogen.",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
-            "HIV",
+            "blood_cultures",
             "inflammatory_markers"
           ]
-        }
+        },
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §VI"
+      },
+      {
+        "step": 3,
+        "action": "Perform lumbar puncture with opening-pressure measurement and send CSF for cell count with differential, glucose (with paired serum), protein, Gram stain, bacterial culture, meningitis multiplex PCR panel, and CSF lactate.",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Elevated opening pressure, PMN-predominant pleocytosis, low CSF:serum glucose ratio (<0.4), elevated protein, elevated CSF lactate; PCR or culture identifies the organism.",
+        "category": "required",
+        "tool_parameters": {
+          "special_tests": [
+            "meningitis_panel"
+          ]
+        },
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §V"
       },
       {
         "step": 4,
-        "action": "Order blood cultures before starting empiric antibiotics",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Streptococcus pneumoniae isolated from blood cultures",
+        "action": "Verify compatibility of empiric vancomycin + ceftriaxone (+ ampicillin if Listeria coverage indicated) and adjunctive dexamethasone with the patient's current medications, and confirm timing of dexamethasone BEFORE or WITH the first antibiotic dose.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "No prohibitive interactions; confirmation of standard guideline-directed empiric regimen with dose adjustments as required.",
         "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[De_Gans_2002]",
+        "guideline_source": "De Gans 2002"
       },
       {
         "step": 5,
-        "action": "Start empiric IV antibiotics (ceftriaxone + vancomycin) and adjunctive dexamethasone immediately, do not wait for culture results",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "action": "Search the literature for current guideline-directed empiric antibiotic selection by age and host factors and for the evidence base supporting adjunctive dexamethasone in pneumococcal meningitis.",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Retrieval of IDSA 2004, ESCMID 2016, and De Gans 2002 to support empiric regimen and steroid timing.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §VII"
       },
       {
         "step": 6,
-        "action": "Request CSF meningitis/encephalitis PCR panel for rapid pathogen identification",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Streptococcus pneumoniae detected on PCR",
-        "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP"
-          ]
-        }
-      },
-      {
-        "step": 7,
-        "action": "Order syphilis testing (serum RPR, FTA-ABS, and CSF VDRL) given HIV status and oral ulcer",
-        "tool_name": "interpret_labs",
-        "expected_finding": "All syphilis serologies nonreactive, excluding neurosyphilis",
+        "action": "Obtain contrast-enhanced brain MRI to assess for parenchymal complications (cerebritis, abscess, subdural empyema, ventriculitis, venous sinus thrombosis, infarction).",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Leptomeningeal enhancement; identification or exclusion of complications that modify management.",
         "category": "recommended",
         "tool_parameters": {
-          "panels": [
-            "RPR",
-            "HIV"
-          ]
-        }
+          "contrast": true
+        },
+        "citation": "[Brouwer_2012]",
+        "guideline_source": "Brouwer 2012"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No evidence of endocarditis as a primary source in this case; echocardiography is not part of routine meningitis workup.",
+        "citation": "[IDSA_2004]"
       },
       {
-        "step": 8,
-        "action": "Check drug interactions between meningitis treatment and current ART regimen",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Dexamethasone-efavirenz CYP3A4 interaction; vancomycin-tenofovir nephrotoxicity risk",
-        "category": "recommended"
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "No arrhythmia indication; continuous cardiac monitoring contributes nothing to meningitis diagnosis or treatment.",
+        "citation": "[IDSA_2004]"
       },
       {
-        "step": 9,
-        "action": "Request repeat lumbar puncture at 48 hours to assess treatment response",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Repeat LP now shows neutrophilic pleocytosis, low glucose, S. pneumoniae on Gram stain and culture confirming diagnosis",
-        "category": "recommended"
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "PET imaging has no role in acute meningitis diagnosis; CT and MRI cover the indications.",
+        "citation": "[IDSA_2004]"
       },
       {
-        "step": 10,
-        "action": "Search medical literature on bacterial meningitis in HIV patients with atypical CSF",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "HIV patients can have blunted CSF pleocytosis; pneumococcal meningitis most common in this population",
-        "category": "recommended"
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET is a dementia biomarker tool with no role in acute infectious meningitis.",
+        "citation": "[IDSA_2004]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "Per IDSA 2004, non-contrast CT head must precede lumbar puncture whenever any imaging-first criterion is present (altered mental status, focal neurological deficit, papilledema, recent seizure, immunocompromise, or age >60). LP performed in undetected mass effect can precipitate fatal herniation.",
+        "citation": "[IDSA_2004]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "analyze_csf",
+        "reason": "Blood cultures must be drawn (under interpret_labs) before the first dose of empiric antibiotics so that culture yield is not lost; in practice this means peripheral cultures are collected at the same draw as the CSF analysis is initiated, and the lab tube sequencing prevents antibiotic exposure before specimen acquisition.",
+        "citation": "[IDSA_2004]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Start empiric IV antibiotics (ceftriaxone + vancomycin) immediately without waiting for culture confirmation",
-      "Administer adjunctive dexamethasone before or with the first dose of antibiotics",
-      "Obtain blood cultures before starting antibiotics",
-      "Request CSF meningitis/encephalitis PCR panel given negative Gram stain in an immunocompromised host",
-      "Do not discontinue antiretroviral therapy during meningitis treatment",
-      "Recognize that blunted CSF pleocytosis in an HIV-infected patient does not exclude bacterial meningitis"
+      "Administer the first dose of empiric IV antibiotics (vancomycin 15-20 mg/kg + ceftriaxone 2 g) within 60 minutes of clinical suspicion; do NOT delay antibiotics for LP or imaging beyond what is strictly needed for safety.",
+      "Give adjunctive dexamethasone 10 mg IV before or with the first antibiotic dose; continue q6h for 4 days in confirmed pneumococcal meningitis.",
+      "Draw two sets of peripheral blood cultures before the first antibiotic dose.",
+      "Obtain CT head before LP because imaging-first criteria are present (altered mental status, immunocompromise, focal signs, papilledema, or age >60).",
+      "Send full CSF panel (cell count, differential, glucose, protein, Gram stain, culture, meningitis multiplex PCR, lactate) at the LP.",
+      "Reassess and de-escalate antibiotics based on Gram stain, culture, and susceptibility results.",
+      "Place patient on droplet precautions until meningococcal disease is excluded.",
+      "Confirm HIV status (CD4, viral load) and assess for opportunistic infections including cryptococcosis and TB."
     ],
     "contraindicated_actions": [
-      "Delaying empiric antibiotics pending confirmatory CSF culture results",
-      "Dismissing bacterial meningitis based on low CSF WBC count alone in an immunocompromised patient",
-      "Performing lumbar puncture without prior CT imaging in a patient with focal neurological signs or altered mental status",
-      "Administering carbamazepine without checking interactions with efavirenz (both CYP3A4 substrates/inducers)",
-      "Discontinuing ART during acute meningitis treatment",
-      "Empiric treatment with fluconazole alone assuming recurrent cryptococcal disease without confirmatory testing"
+      "Do NOT delay empiric antimicrobial therapy while awaiting imaging or LP results when bacterial meningitis is clinically suspected.",
+      "Do NOT perform lumbar puncture before CT head when any imaging-first criterion (altered mental status, focal deficit, papilledema, seizure, immunocompromise, age >60) is present.",
+      "Do NOT discontinue dexamethasone solely because the Gram stain is negative — completion of the 4-day course is appropriate in suspected pneumococcal meningitis until alternative organism is identified.",
+      "Do NOT rely on a negative Gram stain or a 'normal CT' to rule out bacterial meningitis when the clinical syndrome is present.",
+      "Do NOT treat with oral antibiotics alone; CNS penetration is inadequate for meningitis."
     ],
     "key_reasoning_points": [
-      "The initial CSF shows albuminocytologic dissociation (markedly elevated protein 204.7 mg/dL with only 3 WBC/uL), which is atypical for bacterial meningitis but can occur in immunocompromised patients with blunted inflammatory response",
-      "HIV-related immunosuppression (CD4 312) can mask the classic neutrophilic pleocytosis of bacterial meningitis, leading to falsely reassuring initial CSF cell counts",
-      "Negative initial Gram stain and cultures may reflect prior empiric antibiotic treatment (ceftriaxone given 2 months ago) or early disease stage",
-      "The oral ulcer and behavioral changes (disinhibition, inappropriate laughter) are red herrings that suggest neurosyphilis but are explained by aphthous ulceration and frontal lobe cerebritis respectively",
-      "Streptococcus pneumoniae is the most common cause of bacterial meningitis in HIV-infected adults and can present indolently",
-      "The right frontal subcortical lesion on MRI represents early cerebritis, a known complication of pneumococcal meningitis",
-      "Elevated opening pressure (28 cmH2O) with near-normal cell count should raise suspicion for partially treated infection or an atypical pathogen",
-      "The prior empiric treatment 2 months ago may have suppressed but not eradicated the infection, leading to this recurrent or persistent presentation",
-      "Repeat LP, blood cultures, and CSF PCR panel are essential when initial cultures are negative in a high-suspicion clinical scenario"
+      "Acute bacterial meningitis presents with fever, headache, meningismus, and altered mental status; the full triad is present in only ~40%, so partial syndromes warrant aggressive workup.",
+      "Antibiotic timing matters: every hour of delay after the first hour increases mortality. Antibiotics MUST precede imaging or LP if either would delay treatment >60 minutes.",
+      "CT before LP is mandated when any imaging-first criterion is present (altered mental status, focal signs, papilledema, recent seizure, immunocompromise, or age >60).",
+      "Adjunctive dexamethasone (10 mg IV q6h × 4 days) given BEFORE or WITH the first antibiotic dose reduces mortality and unfavourable outcomes in pneumococcal meningitis (De Gans 2002, NEJM).",
+      "A negative CSF Gram stain (sensitivity ~60-90%, lower if antibiotic pretreated) does not exclude bacterial meningitis; multiplex PCR or antigen testing retains sensitivity.",
+      "CSF:serum glucose ratio <0.4 is more reliable than absolute CSF glucose for distinguishing bacterial from viral meningitis.",
+      "Empiric coverage must include vancomycin + ceftriaxone in adults; add ampicillin for Listeria coverage if age >50 or immunocompromised.",
+      "In advanced HIV, bacterial meningitis can present with pauci-cellular CSF; PCR-based and antigen-based diagnostics retain sensitivity when cellular response is blunted."
     ],
     "red_herrings": [
       {
-        "data_point": "HIV infection with low CD4 count",
-        "location": "history",
-        "intended_effect": "Suggests opportunistic infection (cryptococcal meningitis, CMV, TB) rather than typical bacterial meningitis",
-        "correct_interpretation": "While HIV predisposes to opportunistic infections, Streptococcus pneumoniae remains the leading cause of bacterial meningitis in HIV-positive adults, especially with CD4 >100. CSF Gram stain showing Gram-positive diplococci and the fulminant course support bacterial over opportunistic etiology.",
-        "field_path": ""
+        "data_point": "Negative CSF Gram stain",
+        "location": "initial_tool_outputs.csf.special_tests.Gram_stain",
+        "field_path": "initial_tool_outputs.csf",
+        "intended_effect": "Lower the index of suspicion for bacterial meningitis.",
+        "correct_interpretation": "Gram-stain sensitivity is only 60-90% even untreated; multiplex PCR and antigen testing must be used to confirm the organism."
       },
       {
-        "data_point": "CD4 count 312 cells/mm3",
-        "location": "labs",
-        "intended_effect": "Suggests profound immunosuppression and favors cryptococcal or TB meningitis workup as first priority",
-        "correct_interpretation": "CD4 312 is below the normal range but is not in the severely immunosuppressed range (<200); S. pneumoniae meningitis occurs across the CD4 spectrum. Cryptococcal antigen and India ink should be sent but should not delay empiric bacterial coverage.",
-        "field_path": ""
+        "data_point": "Surprisingly low CSF white-cell count",
+        "location": "initial_tool_outputs.csf.cell_count",
+        "field_path": "initial_tool_outputs.csf",
+        "intended_effect": "Suggest viral or non-infectious aetiology rather than bacterial meningitis.",
+        "correct_interpretation": "Humoral immunodeficiency (HIV, CVID) blunts the CSF inflammatory response; bacterial meningitis can present with pauci-cellular CSF, and PCR/antigen testing must be used."
+      },
+      {
+        "data_point": "Subcortical white-matter lesion on MRI consistent with PML or low-grade glioma",
+        "location": "initial_tool_outputs.mri",
+        "field_path": "initial_tool_outputs.mri",
+        "intended_effect": "Redirect workup toward chronic HIV-associated CNS disease and away from bacterial meningitis.",
+        "correct_interpretation": "Parenchymal HIV-related lesions can coexist with acute bacterial meningitis; CSF Gram stain/PCR and culture identify the acute infection while the parenchymal lesion is worked up separately."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -1054,6 +1075,15 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "version": "1.0",
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:BACT-MEN",
+    "difficulty_rationale": "5 required tools; 3 red herrings; immunocompromise produces pauci-cellular or atypical CSF response",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

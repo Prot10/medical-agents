@@ -582,135 +582,220 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Cardiac syncope due to Wolff-Parkinson-White (WPW) syndrome with accessory pathway-mediated tachyarrhythmia",
-    "icd_code": "R55",
+    "primary_diagnosis": "Cardiac syncope due to Wolff-Parkinson-White syndrome with accessory pathway-mediated tachyarrhythmia",
+    "icd_code": "I45.6",
     "differential": [
       {
-        "diagnosis": "Wolff-Parkinson-White syndrome with re-entrant tachycardia",
+        "diagnosis": "Atrial fibrillation with rapid conduction via accessory pathway",
         "likelihood": "high",
-        "key_features": "Short PR interval, delta waves, and wide QRS on ECG forming the classic WPW triad; young patient with syncope and intermittent palpitations; structurally normal heart"
+        "key_features": "AF in WPW can degenerate into ventricular fibrillation — Holter and EP study address.",
+        "icd_code": "I48.91"
       },
       {
-        "diagnosis": "Epileptic seizure",
-        "likelihood": "low",
-        "key_features": "No tonic-clonic movements witnessed, no post-ictal confusion, no tongue bite, no incontinence, normal EEG; immediate return to lucidity after the event argues strongly against seizure"
+        "diagnosis": "AV-nodal reentrant tachycardia",
+        "likelihood": "moderate",
+        "key_features": "AVNRT can present with syncope but is less likely to be lethal than AF-WPW.",
+        "icd_code": "I47.1"
+      },
+      {
+        "diagnosis": "Sustained ventricular tachycardia",
+        "likelihood": "moderate",
+        "key_features": "Less likely in structurally normal heart but should be ruled out.",
+        "icd_code": "I47.2"
       },
       {
         "diagnosis": "Vasovagal syncope",
         "likelihood": "low",
-        "key_features": "No identifiable trigger (pain, prolonged standing, emotional stress), no prodromal symptoms (lightheadedness, warmth, nausea), and negative tilt table test argue against vasovagal mechanism"
+        "key_features": "Sudden without prodrome and ECG with delta waves point to pre-excitation.",
+        "icd_code": "R55"
       },
       {
-        "diagnosis": "Ischemic heart disease",
-        "likelihood": "very_low",
-        "key_features": "Normal troponin, no ST changes on ECG apart from pre-excitation, young age without cardiac risk factors; WPW can mimic ischemic patterns on ECG"
-      },
-      {
-        "diagnosis": "Familial PRKAG2-related conduction disorder",
-        "likelihood": "very_low",
-        "key_features": "Can present with pre-excitation and conduction abnormalities similar to WPW but is familial with associated ventricular hypertrophy; no family history of similar ECG findings or conduction disease, no LVH on echocardiography"
+        "diagnosis": "Inherited channelopathy",
+        "likelihood": "low",
+        "key_features": "Resting ECG and exercise test screen.",
+        "icd_code": "I49.8"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain 12-lead ECG to evaluate for cardiac cause of syncope",
+        "action": "12-lead ECG immediately",
         "tool_name": "analyze_ecg",
-        "expected_finding": "Short PR interval, delta waves, wide QRS consistent with WPW syndrome",
-        "category": "required"
+        "expected_finding": "Short PR (~120 ms), delta waves, wide QRS — classic WPW pattern",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.2"
       },
       {
         "step": 2,
-        "action": "Order routine blood work including CBC, BMP, troponin, and BNP to rule out metabolic and myocardial causes",
+        "action": "Labs: CBC, BMP, Mg, troponin, BNP, TSH, glucose",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal labs ruling out metabolic, electrolyte, and myocardial injury causes",
+        "expected_finding": "Baseline metabolic profile; troponin negative",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
-            "troponin"
+            "magnesium",
+            "troponin",
+            "BNP",
+            "TSH"
           ]
-        }
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.3"
       },
       {
         "step": 3,
-        "action": "Obtain EEG to exclude epileptic etiology for loss of consciousness",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Normal EEG without epileptiform discharges",
-        "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
-      },
-      {
-        "step": 4,
-        "action": "Request transthoracic echocardiogram to assess for structural heart disease",
+        "action": "Echocardiogram",
         "tool_name": "order_echocardiogram",
-        "expected_finding": "Structurally normal heart with normal systolic function",
+        "expected_finding": "Structurally normal heart in classic WPW",
         "category": "required",
         "tool_parameters": {
           "echo_type": "TTE"
-        }
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §4.1"
+      },
+      {
+        "step": 4,
+        "action": "Telemetry and Holter",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Capture AF or orthodromic AVRT events",
+        "category": "required",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "citation": "[Locati_2014]",
+        "guideline_source": "Locati 2014"
       },
       {
         "step": 5,
-        "action": "Request Holter monitor to capture paroxysmal arrhythmias related to accessory pathway",
-        "tool_name": "order_cardiac_monitoring",
-        "expected_finding": "Persistent pre-excitation with captured episodes of SVT/AVRT",
+        "action": "Exercise stress test for pathway behaviour and disappearance of delta wave",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Loss of pre-excitation at higher rates argues for low-risk pathway",
         "category": "recommended",
         "tool_parameters": {
-          "monitor_type": "holter_24h"
-        }
+          "test_type": "exercise_stress_test"
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §3.4"
       },
       {
         "step": 6,
-        "action": "Search medical literature on WPW syndrome management with syncope",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Class I recommendation for catheter ablation in symptomatic WPW with syncope",
-        "category": "recommended"
+        "action": "Medication review",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Avoid AV-nodal blockers (digoxin, verapamil) in WPW with AF — they can accelerate accessory pathway conduction",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §6"
       },
       {
         "step": 7,
-        "action": "Check drug interactions for antiarrhythmic management, particularly contraindications to AV nodal blocking agents",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "AV nodal blockers contraindicated in WPW; procainamide or electrical cardioversion preferred",
-        "category": "recommended"
+        "action": "Search literature for WPW management and ablation indications",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Symptomatic WPW with syncope is a Class I indication for catheter ablation",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ACC_AHA_HRS_2017]",
+        "guideline_source": "ACC/AHA/HRS 2017 §5"
       },
       {
         "step": 8,
-        "action": "Refer for electrophysiology study and catheter ablation of accessory pathway",
-        "tool_name": null,
-        "expected_finding": "Definitive treatment for WPW with syncope",
-        "category": "required"
+        "action": "Cardiology / EP consult for ablation planning",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Ablation candidacy and pathway mapping",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ACC_AHA_HRS_2017]",
+        "guideline_source": "ACC/AHA/HRS 2017 §5"
+      },
+      {
+        "step": 9,
+        "action": "Cardiac MRI only if structural disease suspected (case-by-case)",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Structural heart disease is uncommon in classic WPW",
+        "category": "optional",
+        "tool_parameters": {
+          "modality": "perfusion_MRI"
+        },
+        "citation": "[ESC_2018]",
+        "guideline_source": "ESC 2018 §4.3"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "No focal deficit; brain MRI is low-yield in arrhythmic syncope with diagnostic ECG.",
+        "citation": "[ACC_AHA_HRS_2017]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "No head injury; head CT not indicated.",
+        "citation": "[ACC_AHA_HRS_2017]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No CNS infection or encephalopathy.",
+        "citation": ""
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_ecg",
+        "after": "consult_medical_specialist",
+        "reason": "ECG identification of WPW drives EP referral for ablation.",
+        "citation": "[ESC_2018]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "order_cardiac_monitoring",
+        "reason": "Troponin precedes monitoring strategy.",
+        "citation": "[ROSE_2010]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Obtain 12-lead ECG and identify the WPW pattern (short PR, delta waves, wide QRS)",
-      "Recognize that syncope in WPW is a high-risk feature requiring urgent cardiology referral",
-      "Avoid AV nodal blocking agents (adenosine, verapamil, diltiazem, digoxin) which are contraindicated in WPW",
-      "Order echocardiogram to rule out structural heart disease",
-      "Recommend electrophysiology study and catheter ablation as definitive treatment"
+      "Admit to telemetry",
+      "EP consult for ablation",
+      "Avoid digoxin/verapamil if AF develops",
+      "Counsel on activity / driving restriction until ablation"
     ],
     "contraindicated_actions": [
-      "Administering adenosine, verapamil, diltiazem, or digoxin which could precipitate ventricular fibrillation in WPW",
-      "Discharging the patient without cardiology consultation given syncope with WPW pattern",
-      "Initiating antiepileptic medications based on the single syncopal event without evidence of seizure",
-      "Attributing the syncope to vasovagal mechanism without investigating the ECG findings"
+      "Do not give digoxin or verapamil",
+      "Do not perform tilt-table",
+      "Do not discharge home without ablation plan",
+      "Do not call `order_specialized_test` with parameters {'test_type': 'tilt_table'} — Tilt-table is not informative once a pre-excitation pattern is identified on ECG.",
+      "Do not call `check_drug_interactions` with parameters {'agent': 'digoxin'} — Digoxin and verapamil are contraindicated in WPW with AF because they preferentially block AV-nodal conduction, accelerating accessory-pathway conduction and risking VF."
     ],
     "key_reasoning_points": [
-      "The ECG pattern of short PR interval, delta waves, and widened QRS forms the classic triad of Wolff-Parkinson-White syndrome, which can mimic bundle branch block and ischemic heart disease",
-      "WPW syndrome involves an accessory conduction pathway that bypasses the AV node, creating a substrate for re-entrant tachycardia that can cause syncope through hemodynamic compromise",
-      "The published case demonstrated that what initially appeared to be RBBB with posterior left hemiblock was actually a pre-excitation pattern mimicking conduction disease",
-      "Syncope in WPW is a high-risk feature that warrants urgent risk stratification because rapid conduction through the accessory pathway during atrial fibrillation can degenerate into ventricular fibrillation and sudden cardiac death",
-      "Normal EEG and absence of post-ictal features effectively exclude epileptic seizure as the etiology",
-      "A structurally normal heart on echocardiography in the setting of WPW points to arrhythmia-mediated syncope rather than structural cardiac disease",
-      "The absence of family history of similar ECG findings makes familial PRKAG2-related conduction disorder unlikely, as reported in the source case discussion"
+      "Symptomatic WPW with syncope mandates ablation",
+      "AF in WPW can degenerate to VF if AV nodal blockers are used",
+      "Loss of pre-excitation at high rates on exercise testing suggests low-risk pathway"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "Brief palpitations attributed to caffeine",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "May be dismissed as benign.",
+        "correct_interpretation": "Episodes of fast accessory-pathway conduction; the WPW pattern on ECG identifies the substrate."
+      },
+      {
+        "data_point": "Resting ECG can intermittently lose delta waves",
+        "location": "initial_tool_outputs.ecg.interpretation",
+        "field_path": "initial_tool_outputs.ecg.interpretation",
+        "intended_effect": "May be missed on a single tracing.",
+        "correct_interpretation": "Repeat ECG, ambulatory monitoring or exercise test confirm pre-excitation."
+      }
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -724,6 +809,14 @@
       "mri": "normal",
       "csf": "normal",
       "ct": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SYNC-CARD",
+    "difficulty_rationale": "Pre-excitation pattern on ECG simplifies diagnosis; 5 required tools; ablation is definitive.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

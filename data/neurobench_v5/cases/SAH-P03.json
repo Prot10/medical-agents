@@ -188,7 +188,7 @@
         "T-wave inversions V2-V4",
         "QTc mildly prolonged 472 ms"
       ],
-      "interpretation": "Normal sinus rhythm, rate 88. T-wave inversions V2–V4. QTc 472 ms. No ST-segment elevation. No pathological Q waves.",
+      "interpretation": "Normal sinus rhythm, rate 88. T-wave inversions V2\u2013V4. QTc 472 ms. No ST-segment elevation. No pathological Q waves.",
       "clinical_correlation": ""
     }
   },
@@ -308,7 +308,7 @@
         ],
         "impression": "Normal echocardiogram. LVEF 58%. Normal wall motion. No Takotsubo pattern.",
         "recommended_actions": [
-          "Repeat echo in 4–6 weeks recommended"
+          "Repeat echo in 4\u20136 weeks recommended"
         ]
       }
     },
@@ -391,110 +391,342 @@
   },
   "ground_truth": {
     "primary_diagnosis": "Aneurysmal subarachnoid hemorrhage from left posterior communicating artery aneurysm (Hunt-Hess 2, delayed presentation)",
-    "icd_code": "I60.9",
+    "icd_code": "I60.3",
     "differential": [
       {
-        "diagnosis": "Fibromyalgia headache exacerbation",
-        "likelihood": "very_low",
-        "key_features": "CSF xanthochromia confirms SAH; sudden onset atypical for fibromyalgia headache"
+        "diagnosis": "Reversible cerebral vasoconstriction syndrome (RCVS)",
+        "likelihood": "moderate",
+        "key_features": "Recurrent thunderclap headaches; vasoconstriction may evolve over 1-2 weeks \u2014 repeat CTA day 7-14"
       },
       {
-        "diagnosis": "Chronic daily headache with acute exacerbation",
-        "likelihood": "very_low",
-        "key_features": "Thunderclap onset and CSF positive for SAH"
+        "diagnosis": "Primary thunderclap / new daily persistent headache",
+        "likelihood": "low",
+        "key_features": "Diagnosis of exclusion after negative SAH workup; xanthochromia rules out for current episode"
       },
       {
-        "diagnosis": "Tension headache exacerbation",
-        "likelihood": "very_low",
-        "key_features": "LP findings definitive for SAH"
+        "diagnosis": "Cervical artery dissection",
+        "likelihood": "low",
+        "key_features": "Persistent post-thunderclap headache; cervical CTA/MRA would screen"
+      },
+      {
+        "diagnosis": "Cerebral venous sinus thrombosis",
+        "likelihood": "low",
+        "key_features": "Subacute persistent headache pattern; MR venography indicated if SAH workup negative"
+      },
+      {
+        "diagnosis": "Spontaneous intracranial hypotension",
+        "likelihood": "low",
+        "key_features": "Headache often positional; MRI with contrast showing pachymeningeal enhancement would suggest"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "CT head - negative at 18 hours",
+        "action": "Obtain urgent non-contrast CT head as first imaging modality for suspected SAH",
         "tool_name": "order_ct_scan",
-        "expected_finding": "Negative CT - expected at 18 hours; LP still required",
+        "expected_finding": "Non-contrast CT may be negative or subtle given timing / low hematocrit; sensitivity drops sharply after 6-24 h",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Connolly_2012]",
+        "guideline_source": "Connolly_2012"
       },
       {
         "step": 2,
-        "action": "LP with spectrophotometry - despite chronic headache history",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Xanthochromia confirmed - subacute SAH 18 hours ago",
+        "action": "Obtain CT angiography (CTA) of the head and neck to characterize aneurysm location, size, and morphology",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Saccular aneurysm at the culprit location; morphologic features (neck width, dome-to-neck ratio, lobulation) inform clipping vs coiling",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "angiography": true
+        },
+        "citation": "[Connolly_2012]",
+        "guideline_source": "Connolly_2012"
       },
       {
         "step": 3,
-        "action": "CTA for aneurysm",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Left PComA aneurysm 4.6 mm",
+        "action": "Perform lumbar puncture \u22656-12 h after symptom onset for CSF analysis with spectrophotometry given clinical suspicion despite non-diagnostic CT",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Xanthochromia on spectrophotometry confirming SAH (oxyhemoglobin/bilirubin peaks); non-clearing RBCs across tubes 1-4 if performed early enough",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "opening_pressure": true,
+          "xanthochromia": true,
+          "rbc_count": true,
+          "spectrophotometry": true
+        },
+        "citation": "[Edlow_2008]",
+        "guideline_source": "Edlow_2008"
       },
       {
         "step": 4,
-        "action": "Check duloxetine interaction with nimodipine",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Monitor QTc - duloxetine has mild QT effect",
+        "action": "Interpret labs: CBC, BMP (sodium for cerebral salt wasting / SIADH), coagulation panel, type & screen, troponin, BNP",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Mild leukocytosis (stress response), troponin elevation (neurogenic stress cardiomyopathy), normal coagulation if not on anticoagulation",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "coagulation",
+            "type_and_screen",
+            "troponin",
+            "BNP"
+          ]
+        },
+        "citation": "[Connolly_2012]",
+        "guideline_source": "Connolly_2012"
       },
       {
         "step": 5,
-        "action": "Literature search - chronic headache SAH pitfall",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Chronic headache history is a red herring - thunderclap always requires workup",
+        "action": "Obtain 12-lead ECG to evaluate for neurogenic stress changes and exclude concurrent primary cardiac event",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Neurogenic T-wave inversions, QTc prolongation, ST changes typical of catecholamine surge in SAH; not primary ACS",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Connolly_2012]",
+        "guideline_source": "Connolly_2012"
+      },
+      {
+        "step": 6,
+        "action": "Search medical literature for current SAH grading scales (Hunt-Hess, WFNS, modified Fisher) and clipping vs endovascular coiling indications",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Society guidelines (AHA/ASA 2012/2023) confirm grading, vasospasm prophylaxis with nimodipine, and timing of definitive aneurysm securing",
+        "category": "required",
+        "tool_parameters": {
+          "query": "aneurysmal SAH management Hunt-Hess WFNS Fisher coiling clipping"
+        },
+        "citation": "[Hoh_2023]",
+        "guideline_source": "Hoh_2023"
+      },
+      {
+        "step": 7,
+        "action": "Urgent consultation with neurosurgery and interventional neuroradiology for definitive aneurysm securing within 24-72 hours",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Joint decision for endovascular coiling versus surgical clipping based on aneurysm morphology, location, and patient factors",
+        "category": "required",
+        "tool_parameters": {
+          "specialty": "neurosurgery_and_interventional_neuroradiology",
+          "urgency": "emergent"
+        },
+        "citation": "[Connolly_2012]",
+        "guideline_source": "Connolly_2012"
+      },
+      {
+        "step": 8,
+        "action": "Check drug interactions for nimodipine and any pre-existing antithrombotic / antihypertensive regimen; plan anticoagulation reversal if applicable",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Nimodipine well-tolerated with most antihypertensives (monitor for hypotension); anticoagulation reversed if patient is on a DOAC or warfarin pre-securing aneurysm",
+        "category": "required",
+        "tool_parameters": {
+          "drugs": [
+            "nimodipine"
+          ]
+        },
+        "citation": "[Hoh_2023]",
+        "guideline_source": "Hoh_2023"
+      },
+      {
+        "step": 9,
+        "action": "Initiate continuous cardiac telemetry for early detection of arrhythmias and neurogenic cardiac complications",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Sinus rhythm with intermittent neurogenic changes; rare malignant arrhythmias warrant intervention",
+        "category": "recommended",
+        "tool_parameters": {
+          "monitor_type": "telemetry"
+        },
+        "citation": "[Connolly_2012]",
+        "guideline_source": "Connolly_2012"
+      },
+      {
+        "step": 10,
+        "action": "Obtain transthoracic echocardiogram given troponin elevation and neurogenic ECG changes",
+        "tool_name": "order_echocardiogram",
+        "expected_finding": "Apical ballooning / regional wall motion abnormality consistent with neurogenic (Takotsubo) stress cardiomyopathy; not primary ACS",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Connolly_2012]",
+        "guideline_source": "Connolly_2012"
+      },
+      {
+        "step": 11,
+        "action": "Initiate daily transcranial Doppler monitoring days 4-14 post-bleed for vasospasm surveillance",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Mean flow velocities and Lindegaard ratios to detect cerebral vasospasm preceding delayed cerebral ischemia",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "transcranial_doppler"
+        },
+        "citation": "[Hoh_2023]",
+        "guideline_source": "Hoh_2023"
+      },
+      {
+        "step": 12,
+        "action": "Obtain brain MRI with susceptibility-weighted imaging (SWI/GRE) and FLAIR to detect subarachnoid blood when CT timing is past sensitivity window",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "FLAIR hyperintensity and SWI blooming in subarachnoid spaces confirms blood products when CT is non-diagnostic",
+        "category": "recommended",
+        "tool_parameters": {
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "SWI",
+            "GRE"
+          ]
+        },
+        "citation": "[Edlow_2008]",
+        "guideline_source": "Edlow_2008"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is not part of standard SAH workup; reserve for evaluation of unexplained altered mental status suggesting non-convulsive status epilepticus.",
+        "citation": "[Connolly_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "rationale": "EMG/NCS has no role in acute SAH evaluation or management.",
+        "citation": "[Connolly_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "Sleep study is irrelevant to acute SAH workup.",
+        "citation": "[Connolly_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET evaluates Alzheimer biomarkers and has no role in acute hemorrhagic stroke workup.",
+        "citation": "[Connolly_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "Dopamine-transporter SPECT is for parkinsonism differentiation and has no role in SAH.",
+        "citation": "[Connolly_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "FDG PET has no role in acute SAH diagnosis or management.",
+        "citation": "[Connolly_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "Non-contrast CT must precede lumbar puncture to exclude mass effect, hydrocephalus, and to confirm/exclude SAH before invasive LP.",
+        "citation": "[Edlow_2008]",
+        "severity": "hard"
+      },
+      {
+        "before": "consult_medical_specialist",
+        "after": "check_drug_interactions",
+        "reason": "Neurosurgical / interventional neuroradiology consultation precedes definitive aneurysm securing within 24-72 hours; medication planning (nimodipine, anticoagulant reversal) aligns with this window.",
+        "citation": "[Connolly_2012]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "analyze_csf",
+        "reason": "Coagulation studies (PT/INR/PTT) must be reviewed and any coagulopathy corrected before invasive procedures including lumbar puncture or aneurysm intervention.",
+        "citation": "[Connolly_2012]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "LP mandatory despite chronic headache history and negative CT",
-      "Do not attribute thunderclap headache to chronic headache without LP",
-      "CTA for aneurysm identification",
-      "Nimodipine urgently - day 2 approaching peak vasospasm window",
-      "Recognize fibromyalgia/chronic headache as diagnostic red herring"
+      "Initiate non-contrast CT head as the first diagnostic step in suspected SAH; do not delay for other workup.",
+      "Perform lumbar puncture with CSF spectrophotometry \u22656-12 h after symptom onset when CT is non-diagnostic and clinical suspicion remains.",
+      "Obtain CT angiography of the head and neck immediately after positive non-contrast CT to characterize the aneurysm.",
+      "Start nimodipine 60 mg orally every 4 hours within hours of SAH confirmation and continue for 21 days for vasospasm prophylaxis.",
+      "Obtain urgent neurosurgery and interventional neuroradiology consultation for definitive aneurysm securing (clipping or coiling) within 24-72 hours.",
+      "Admit to a neurocritical care unit with continuous neurologic checks, blood-pressure control (SBP target generally <160 mmHg pre-securing), and cardiac telemetry.",
+      "Monitor serum sodium closely for cerebral salt wasting / SIADH and avoid hypotonic fluids.",
+      "Initiate daily transcranial Doppler monitoring days 4-14 post-bleed for vasospasm surveillance."
     ],
     "contraindicated_actions": [
-      "Do not discharge with diagnosis of chronic headache exacerbation without SAH workup",
-      "Do not let chronic headache history cause premature diagnostic closure",
-      "Do not skip LP because CT is negative"
+      "Do not perform lumbar puncture before non-contrast CT in suspected SAH.",
+      "Do not perform lumbar puncture when CT already confirms SAH with mass effect, intraventricular hemorrhage, or hydrocephalus \u2014 herniation risk.",
+      "Do not start aspirin or other antiplatelet agents before the aneurysm is secured \u2014 increases rebleeding risk.",
+      "Do not administer nimodipine intravenously \u2014 IV administration has caused fatal cardiovascular collapse; oral or NG only.",
+      "Do not give NSAIDs (e.g., ibuprofen, ketorolac) for headache control before aneurysm securing \u2014 antiplatelet effect raises rebleeding risk.",
+      "Do not pursue cardiac catheterization for neurogenic troponin elevation without strong primary-ACS evidence \u2014 delays aneurysm treatment.",
+      "Do not allow uncontrolled hypertension (SBP >160 mmHg) pre-securing; do not over-correct to systemic hypotension."
     ],
     "key_reasoning_points": [
-      "Fibromyalgia and chronic headache history are classic diagnostic red herrings for SAH misdiagnosis",
-      "The key feature distinguishing this from chronic headache: instantaneous thunderclap onset",
-      "CT negative at 18 hours is expected (sensitivity ~90%); LP with spectrophotometry is still required",
-      "Xanthochromia without fresh blood confirms subacute SAH from 12-24 hours prior",
-      "18-hour delay in diagnosis is common in patients with chronic headache - education is important",
-      "Husband's observation of behavioral change is an important clinical clue"
+      "Sudden, peak-in-seconds 'thunderclap' headache is SAH until proven otherwise \u2014 peak intensity \u22641 minute is the highest-yield historical feature.",
+      "Non-contrast CT sensitivity for SAH is ~98% within 6 hours of symptom onset, declining to ~80-85% by 24 hours and substantially lower thereafter; CT negativity does not exclude SAH in late presenters.",
+      "Lumbar puncture is indicated when CT is non-diagnostic and clinical suspicion remains; xanthochromia by spectrophotometry develops 6-12 hours post-bleed and persists 2-3 weeks.",
+      "Distinguish SAH from traumatic LP using non-clearing RBC counts across tubes 1-4 and xanthochromia (absent in traumatic).",
+      "Once SAH is confirmed, CT angiography of the head and neck characterizes the aneurysm and drives the clipping-versus-coiling decision.",
+      "Hunt-Hess and WFNS grades stratify clinical severity and outcome; modified Fisher grade predicts vasospasm risk from CT blood distribution.",
+      "Neurogenic stress cardiomyopathy (Takotsubo pattern, troponin elevation, T-wave inversions, QTc prolongation) is common in SAH and should not divert attention to a primary cardiac workup.",
+      "Nimodipine 60 mg PO every 4 hours for 21 days is the only proven pharmacologic prophylaxis for delayed cerebral ischemia in aneurysmal SAH \u2014 it does not prevent angiographic vasospasm but improves outcomes.",
+      "Definitive aneurysm securing (coiling or clipping) within 24-72 hours dramatically reduces rebleeding risk, which carries ~50% mortality.",
+      "Vasospasm peaks days 4-14 post-bleed; daily transcranial Doppler monitoring plus clinical exam guides escalation to CT perfusion, angiography, and intra-arterial therapy when needed.",
+      "Late presentation (>24 h) markedly reduces CT sensitivity but increases LP yield because xanthochromia persists for weeks \u2014 LP becomes the diagnostic linchpin."
     ],
     "red_herrings": [
       {
-        "data_point": "History of fibromyalgia and chronic headaches",
-        "location": "past_medical_history",
-        "intended_effect": "Lead clinician to attribute severe headache to fibromyalgia or chronic headache exacerbation",
-        "correct_interpretation": "Chronic headache history does not reduce SAH risk; thunderclap onset is always an alarm sign",
-        "field_path": ""
+        "data_point": "Troponin elevation with neurogenic ECG changes (T-wave inversions and QTc prolongation)",
+        "location": "initial_tool_outputs / labs and ecg",
+        "field_path": "initial_tool_outputs.ecg.findings",
+        "intended_effect": "Cardiac biomarker rise plus ST/T-wave changes may anchor the workup toward a primary acute coronary syndrome and a cardiology-first pathway.",
+        "correct_interpretation": "Catecholamine surge from acute SAH causes neurogenic myocardial injury (Takotsubo physiology) in up to 30-40% of patients; echocardiogram showing apical ballooning confirms etiology and the focus remains on aneurysm securing."
       },
       {
-        "data_point": "Patient attributes neck stiffness to fibromyalgia flare",
-        "location": "neurological_exam and HPI",
-        "intended_effect": "Lead clinician to accept patient's attribution and not perform LP",
-        "correct_interpretation": "Neck stiffness + thunderclap headache = SAH until proven otherwise; patient self-attribution is unreliable in this context",
-        "field_path": ""
+        "data_point": "Non-contrast CT read as negative or only subtly positive",
+        "location": "initial_tool_outputs / ct",
+        "field_path": "initial_tool_outputs.ct.impression",
+        "intended_effect": "A negative or near-negative CT may falsely reassure the clinician that SAH has been excluded, particularly in late presenters or anemic patients.",
+        "correct_interpretation": "CT sensitivity for SAH declines sharply after 6-24 hours and is reduced further in anemia; LP with CSF spectrophotometry is required when clinical suspicion remains, and MRI with SWI/FLAIR can also detect subacute blood."
+      },
+      {
+        "data_point": "Past history of migraines, chronic headaches, or fibromyalgia framing the current event as a familiar pattern",
+        "location": "patient.clinical_history.past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Prior headache history can lead to anchoring on a primary headache disorder and under-weighting the abrupt 'worst-ever' character of the current event.",
+        "correct_interpretation": "Peak-in-seconds, qualitatively different headache in a known migraineur is still SAH until excluded \u2014 the prior diagnosis raises rather than lowers risk if it changes character."
+      },
+      {
+        "data_point": "Bloody CSF in tube 1 raising the possibility of a traumatic tap",
+        "location": "initial_tool_outputs / csf",
+        "field_path": "initial_tool_outputs.csf.appearance",
+        "intended_effect": "A traumatic tap can mimic SAH and falsely reassure if the clinician interprets the blood as procedural.",
+        "correct_interpretation": "Non-clearing RBCs across tubes 1-4 plus xanthochromia on spectrophotometry confirm SAH; traumatic taps show clearing across tubes and lack xanthochromia within the first ~6-12 h."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
       "eeg": "normal",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SAH",
+    "difficulty_rationale": "Rare or complicated SAH presentation (late presenter, perimesencephalic, anemic CT-attenuation, postpartum/eclampsia, IIH overlap, dual antiplatelet, or severe Fisher 4 / hydrocephalus) requiring specialized imaging, MRI/SWI, and multi-specialty coordination; \u22656 required tools and \u22653 red herrings.",
+    "case_body_concerns": [
+      "followup_outputs entry uses order_specialized_test for transcranial Doppler, but per TOOL_PARAMETER_VOCABULARY.md TCD should be order_advanced_imaging with modality=transcranial_doppler. Suggest re-tagging the followup tool_name."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -571,116 +571,200 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Hepatic encephalopathy, grade 3, alcoholic cirrhosis — precipitated by spontaneous bacterial peritonitis (PMN 310/mm3) + acute alcohol use + rifaximin non-adherence",
-    "icd_code": "K72.9",
+    "primary_diagnosis": "Hepatic encephalopathy (West Haven grade III), alcoholic cirrhosis (Child-Pugh C, MELD 19) with treated HCC — precipitated by spontaneous bacterial peritonitis (ascitic PMN 310/mm³) plus rifaximin non-adherence and recent alcohol use.",
+    "icd_code": "K72.90",
     "differential": [
       {
-        "diagnosis": "Acute alcohol intoxication / withdrawal",
-        "likelihood": "moderate",
-        "key_features": "Serum ethanol 14 mg/dL — recent alcohol use; contributes to confusion; but HE is primary given ammonia 88 + SBP; alcohol withdrawal risk also present"
+        "diagnosis": "Septic encephalopathy from SBP (primary precipitant rather than separate diagnosis)",
+        "likelihood": "high",
+        "key_features": "Ascitic PMN 310/mm³ confirms SBP; cytokine-driven hyperammonemia and reduced hepatic clearance both contribute — treat as HE precipitated by SBP rather than 'septic encephalopathy' alone.",
+        "icd_code": "K65.2"
       },
       {
-        "diagnosis": "Septic encephalopathy from SBP",
+        "diagnosis": "Acute alcohol intoxication / impending withdrawal",
         "likelihood": "moderate",
-        "key_features": "SBP confirmed (PMN 310) — septic encephalopathy and HE coexist; SBP is the precipitant"
+        "key_features": "Ethanol 14 mg/dL is too low to drive grade III obtundation in a tolerant alcoholic; withdrawal risk exists 48-72 h post-stop and warrants monitoring with non-benzodiazepine first-line measures.",
+        "icd_code": "F10.230"
+      },
+      {
+        "diagnosis": "Subdural hematoma from unwitnessed fall",
+        "likelihood": "low",
+        "key_features": "Coagulopathy (INR 2.2) + thrombocytopenia raise risk; non-contrast CT head excludes hemorrhage.",
+        "icd_code": "I62.00"
       },
       {
         "diagnosis": "Wernicke encephalopathy",
         "likelihood": "low",
-        "key_features": "Thiamine 42 (deficient) in active alcoholic; but MRI no periaqueductal changes; treat empirically with IV thiamine"
+        "key_features": "Chronic alcohol use places patient at risk; no ophthalmoplegia / classic triad; give empiric thiamine before dextrose regardless.",
+        "icd_code": "E51.2"
       },
       {
-        "diagnosis": "Subdural hematoma from fall",
+        "diagnosis": "HCC progression / brain metastasis",
         "likelihood": "very_low",
-        "key_features": "CT head no hemorrhage; no trauma history"
+        "key_features": "Solitary 1.8 cm post-TACE HCC; no focal deficits; MRI would assess if clinical course atypical.",
+        "icd_code": "C22.0"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "IV thiamine 500 mg BEFORE any dextrose — active alcoholic with thiamine 42",
-        "tool_name": null,
-        "expected_finding": "Wernicke prophylaxis",
+        "action": "Comprehensive labs: CMP including AST/ALT/bilirubin/INR/albumin, ammonia, CBC, glucose, electrolytes (Na, K, Mg), BUN/Cr, lactate, blood cultures and urine cultures; toxicology if substance use plausible. Confirms liver dysfunction and screens for precipitants.",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Cirrhosis confirmed (INR 2.2, bilirubin 5.2, albumin 2.1); ammonia 88; WBC 12.4; ethanol low-level; thrombocytopenia 62. Blood cultures sent to screen for sepsis.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 2,
-        "action": "CT head — exclude hemorrhage (thrombocytopenia + coagulopathy risk)",
+        "action": "Non-contrast CT head — exclude structural alternate cause of AMS (hemorrhage, large stroke, mass) before any LP.",
         "tool_name": "order_ct_scan",
-        "expected_finding": "No hemorrhage",
+        "expected_finding": "No acute intracranial process — hemorrhage and mass effect excluded despite coagulopathy.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 3,
-        "action": "Labs — ammonia, LFTs, CBC, coags, toxicology, ethanol",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Ammonia 88, ethanol 14, INR 2.2, thrombocytopenia 62",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Literature/guideline search to confirm West Haven grading, precipitant management, and lactulose/rifaximin dosing (AASLD/EASL HE precipitant management; SBP empiric therapy; rifaximin secondary prophylaxis).",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "AASLD/EASL 2014 guidance retrieved; West Haven criteria and precipitant-driven management framework confirmed.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 4,
-        "action": "Diagnostic paracentesis — exclude SBP (CRITICAL)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "PMN 310 — SBP CONFIRMED; start ceftriaxone + albumin immediately",
+        "action": "Drug-interaction and medication-reconciliation review covering spironolactone, furosemide, propranolol, lactulose, rifaximin — confirm hepatic dosing and screen for any sedatives; flag any CNS depressants (benzodiazepines, opioids, sedating antiemetics, antihistamines) and confirm lactulose/rifaximin dosing in liver disease.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sedating/CNS-depressant medications identified; lactulose and rifaximin reviewed for hepatic dose adjustment.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Bajaj_2011]",
+        "guideline_source": "Bajaj 2011 HE management review"
       },
       {
         "step": 5,
-        "action": "Restart rifaximin 550 mg BID + lactulose 30 mL TID",
-        "tool_name": null,
-        "expected_finding": "Ammonia trending down",
+        "action": "Diagnostic paracentesis with ascitic fluid cell count and culture — mandatory in any cirrhotic with ascites + AMS or fever.",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Ascitic PMN 310/mm³ — SBP confirmed; start empiric ceftriaxone 2 g IV daily + albumin 1.5 g/kg day 1, 1 g/kg day 3.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 6,
-        "action": "EEG — exclude NCSE, characterize encephalopathy",
+        "action": "EEG — exclude NCSE in obtunded cirrhotic with grade III HE pattern. Triphasic waves are classic but non-specific (metabolic encephalopathies broadly); main role is exclusion of non-convulsive status epilepticus where the differential supports it.",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Generalized slowing — HE/metabolic encephalopathy pattern; no NCSE",
-        "category": "required",
-        "tool_parameters": {}
+        "expected_finding": "Generalized slowing supports metabolic encephalopathy; no NCSE.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Ferenci_2002]",
+        "guideline_source": "Ferenci 2002 HE nomenclature/quantification"
+      },
+      {
+        "step": 7,
+        "action": "Consult hepatology and critical care (grade III HE) — coordinate definitive care, transplant candidacy assessment where applicable.",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Hepatology / critical-care guidance integrated into management.",
+        "category": "recommended",
+        "tool_parameters": {
+          "specialty": "hepatology"
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No clinical suspicion for hepatopulmonary syndrome, portopulmonary hypertension, or endocarditis; echocardiography is not part of the HE workup.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in HE workup; reversible metabolic encephalopathy is the issue, not Alzheimer pathology.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan has no role in HE workup; the question is metabolic encephalopathy, not nigrostriatal degeneration.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "genetic_panel:early_onset_AD"
+        },
+        "rationale": "Early-onset AD genetic panel has no role in HE workup; reversible metabolic encephalopathy is the diagnosis under consideration.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "FDG PET has no role in HE workup; metabolic encephalopathy is reversible with precipitant control and does not require nuclear functional imaging.",
+        "citation": "[AASLD_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "In altered mental status, exclude intracranial mass effect / hemorrhage on imaging before LP to avoid herniation risk.",
+        "citation": "[AASLD_2014]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Paracentesis is mandatory in any cirrhotic with ascites + confusion + fever — SBP (PMN 310) is the primary precipitant and requires immediate antibiotics + albumin",
-      "Albumin administration with SBP treatment: 1.5 g/kg day 1, 1 g/kg day 3 — prevents hepatorenal syndrome in SBP",
-      "IV thiamine before ANY dextrose-containing fluid — alcoholic with thiamine 42 nmol/L (deficient); Wernicke risk real",
-      "Avoid benzodiazepines as sedatives — worsen HE; concurrent alcohol withdrawal risk requires careful lowest-effective-dose lorazepam with CIWA monitoring"
+      "Empiric IV ceftriaxone 2 g daily for SBP — initiate immediately on PMN ≥250; do not wait for culture.",
+      "IV albumin 1.5 g/kg on day 1 and 1 g/kg on day 3 — reduces hepatorenal syndrome in SBP (AASLD).",
+      "Lactulose to 2-4 soft stools/day plus rifaximin 550 mg BID — restart secondary prophylaxis.",
+      "Empiric IV thiamine 100 mg before any dextrose; multivitamin replacement in chronic alcoholic.",
+      "Withdrawal protocol with symptom-triggered scoring; prefer phenobarbital or careful gabapentin/clonidine adjuncts; avoid scheduled benzodiazepines given HE."
     ],
     "contraindicated_actions": [
-      "Diazepam or chlordiazepoxide for alcohol withdrawal — accumulate in cirrhosis; use lorazepam or phenobarbital",
-      "Benzodiazepines as anxiolytics without CIWA indication — will precipitate/worsen HE",
-      "Dextrose before thiamine in alcoholic patient"
+      "Do not prescribe benzodiazepines for anxiety/agitation — they precipitate and prolong HE (use haloperidol or non-pharmacologic measures for agitation).",
+      "Do not prescribe sedating opioids — they worsen HE; consider acetaminophen at hepatic-safe dosing for pain.",
+      "Do not perform LP before neuroimaging excludes mass effect when the patient has altered mental status.",
+      "Do not hold antibiotics waiting for culture — empiric therapy on suspected SBP is standard.",
+      "Avoid scheduled benzodiazepines for withdrawal in a cirrhotic with overt HE; use the lowest possible doses of short-acting agents (e.g., lorazepam) ONLY for severe withdrawal symptoms."
     ],
     "key_reasoning_points": [
-      "SBP can present with grade 3 HE without classic peritoneal signs — abdominal exam may be unremarkable; paracentesis must not be delayed by clinical suspicion threshold",
-      "Multiple concurrent precipitants of HE are common: this case has alcohol (direct neurotoxin), SBP (cytokines + ammonia), and rifaximin non-adherence — each contributes independently",
-      "Concurrent alcohol withdrawal and HE is a challenging dual diagnosis — alcohol withdrawal worsening tracked separately by CIWA; benzodiazepine use in liver failure requires careful monitoring",
-      "Albumin infusion with SBP treatment is a critical intervention that reduces hepatorenal syndrome risk by 50% — evidence-based standard of care"
+      "HE is a clinical diagnosis: West Haven grading + evidence of liver dysfunction + exclusion of other causes of AMS — ammonia level is supportive only and correlates poorly with grade (AASLD 2014).",
+      "Precipitant identification is more actionable than the ammonia number: infection (SBP especially), GI bleed, electrolyte disturbance (hypokalemia/hyponatremia), constipation, sedative/CNS-depressant use, dehydration, dietary protein load, renal failure.",
+      "Infection (especially SBP) is the single most common HE precipitant in decompensated cirrhotics with ascites; diagnostic paracentesis is mandatory.",
+      "Rifaximin non-adherence is an under-recognized but very common precipitant of overt HE in patients on secondary prophylaxis."
     ],
     "red_herrings": [
       {
-        "data_point": "Serum ethanol 14 mg/dL",
-        "location": "initial_tool_outputs.labs.panels.Toxicology",
-        "intended_effect": "Attribute all confusion to acute alcohol intoxication and defer HE workup, missing SBP as primary precipitant",
-        "correct_interpretation": "Ethanol 14 mg/dL is low and contributes but does not fully explain the severity of encephalopathy (GCS 11); ammonia 88 + cirrhosis + fever demands SBP exclusion first",
-        "field_path": ""
+        "data_point": "Ethanol 14 mg/dL",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs.panels.Toxicology[0]",
+        "intended_effect": "Attribute grade III obtundation to acute alcohol intoxication and adopt 'wait it out' management.",
+        "correct_interpretation": "Ethanol at 14 mg/dL cannot cause grade III HE in a tolerant alcoholic; ammonia 88 + ascitic PMN 310 = HE precipitated by SBP."
       },
       {
-        "data_point": "Leukocytosis WBC 12.4 with fever 37.9°C",
-        "location": "initial_tool_outputs.labs",
-        "intended_effect": "Attribute to alcohol withdrawal rather than infection, delaying paracentesis",
-        "correct_interpretation": "Fever + leukocytosis in cirrhotic = infection until proven otherwise; SBP confirmed on paracentesis PMN 310; empiric antibiotics should not wait for culture results",
-        "field_path": ""
+        "data_point": "Treated HCC (1.8 cm post-TACE)",
+        "location": "patient.clinical_history.past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history[1]",
+        "intended_effect": "Pursue HCC progression / brain metastasis workup as primary cause of AMS.",
+        "correct_interpretation": "Solitary post-TACE HCC and no focal deficits make CNS metastasis very unlikely; treat HE with SBP precipitant first; MRI only if clinical course atypical."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -701,6 +785,14 @@
       "advanced_imaging": "normal",
       "specialized_test": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (HEP-ENC)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:HEP-ENC",
+    "difficulty_rationale": "5 required tools (labs, CT, lit, drug, paracentesis) plus EEG recommended; multiple co-existing precipitants (SBP + rifaximin non-adherence + recent alcohol + thrombocytopenia/coag) require synthesis but the diagnosis is not in doubt.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

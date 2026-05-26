@@ -1,7 +1,7 @@
 {
   "case_id": "FEPI-TEMP-RS01",
   "condition": "focal_epilepsy_temporal",
-  "difficulty": "straightforward",
+  "difficulty": "diagnostic_puzzle",
   "encounter_type": "inpatient",
   "patient": {
     "patient_id": "NB-FEPI-TEMP-RS01",
@@ -736,128 +736,205 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Focal epilepsy — temporal lobe, secondary to hypothalamic hamartoma with dual pathology (secondary left mesial temporal sclerosis)",
-    "icd_code": "G40.109",
+    "primary_diagnosis": "Focal epilepsy of left temporal lobe origin with mesial temporal sclerosis, secondary to hypothalamic hamartoma with gelastic seizures (dual pathology)",
+    "icd_code": "G40.219",
     "differential": [
       {
-        "diagnosis": "Hypothalamic hamartoma with gelastic epilepsy and secondary temporal lobe epilepsy",
-        "likelihood": "high",
-        "key_features": "Gelastic seizures since infancy, sessile non-enhancing isointense hypothalamic mass on MRI, central precocious puberty, left MTS on imaging"
+        "diagnosis": "Isolated mesial temporal lobe epilepsy",
+        "likelihood": "moderate",
+        "key_features": "Possible if gelastic seizures are non-hamartomatous; hypothalamic hamartoma on MRI explains them definitively.",
+        "icd_code": "G40.219"
       },
       {
-        "diagnosis": "Primary mesial temporal lobe epilepsy due to hippocampal sclerosis",
-        "likelihood": "high",
-        "key_features": "Left hippocampal sclerosis present but gelastic semiology and hypothalamic mass indicate hamartoma as primary pathology"
+        "diagnosis": "Frontal lobe focal epilepsy (cingulate)",
+        "likelihood": "low",
+        "key_features": "Mirthless laughter / vocalization can occasionally come from cingulate gyrus; imaging clarifies.",
+        "icd_code": "G40.219"
       },
       {
-        "diagnosis": "Hypothalamic low-grade glioma (pilocytic astrocytoma)",
+        "diagnosis": "Lennox-Gastaut syndrome",
+        "likelihood": "low",
+        "key_features": "Multiple seizure types from infancy and slow spike-wave EEG; gelastic seizures with hamartoma are distinctive.",
+        "icd_code": "G40.812"
+      },
+      {
+        "diagnosis": "Psychogenic non-epileptic spells",
         "likelihood": "very_low",
-        "key_features": "Lack of contrast enhancement, stable size over 17 years, normal MR spectroscopy — all argue against neoplasm"
+        "key_features": "Stereotyped gelastic seizures from infancy with documented electrographic correlate exclude PNES as primary.",
+        "icd_code": "F44.5"
       },
       {
-        "diagnosis": "Craniopharyngioma",
+        "diagnosis": "Convulsive syncope",
         "likelihood": "very_low",
-        "key_features": "No calcification, no cystic components, no enhancement on imaging"
-      },
-      {
-        "diagnosis": "Psychogenic non-epileptic seizures",
-        "likelihood": "very_low",
-        "key_features": "Clear EEG correlate with captured seizures, elevated postictal prolactin, stereotyped semiology with post-ictal confusion"
+        "key_features": "Gelastic semiology is not syncope.",
+        "icd_code": "R55"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain EEG to evaluate for epileptiform discharges and characterize seizure focus",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Left anterior temporal sharp waves, TIRDA, captured gelastic seizures with temporal onset",
+        "action": "Obtain detailed seizure history including semiology, aura, automatisms, duration, frequency, witness accounts, and post-ictal features.",
+        "tool_name": null,
+        "expected_finding": "Stereotyped focal impaired-awareness events with temporal-lobe aura and post-ictal confusion.",
         "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
+        "tool_parameters": {},
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 2,
-        "action": "Obtain brain MRI to identify structural lesion",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Hypothalamic hamartoma arising from tuber cinereum, left mesial temporal sclerosis",
+        "action": "Perform complete neurological examination.",
+        "tool_name": null,
+        "expected_finding": "Interictal exam typically normal; subtle memory deficit may be present.",
         "category": "required",
-        "tool_parameters": {
-          "protocol": "tumor",
-          "contrast": false
-        }
+        "tool_parameters": {},
+        "citation": "",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Obtain laboratory studies including AED levels and basic metabolic panel",
-        "tool_name": "interpret_labs",
-        "expected_finding": "AED levels therapeutic, elevated postictal prolactin confirming epileptic seizure",
-        "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "BMP",
-            "AED_levels"
-          ]
-        }
-      },
-      {
-        "step": 4,
-        "action": "Obtain ECG to rule out cardiac etiology of episodic loss of awareness",
-        "tool_name": "analyze_ecg",
-        "expected_finding": "Normal sinus rhythm, no arrhythmia",
-        "category": "recommended"
-      },
-      {
-        "step": 5,
-        "action": "Request prolonged video-EEG monitoring for detailed seizure characterization",
+        "action": "Order EEG (long-term video-EEG monitoring) to identify interictal epileptiform discharges and capture habitual events.",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Multiple gelastic seizures captured with EEG onset pattern suggesting hypothalamic-temporal network",
+        "expected_finding": "Interictal sharps/spikes and/or focal slowing in the anterior temporal region; ictal correlate confirms diagnosis.",
         "category": "required",
         "tool_parameters": {
           "eeg_type": "video"
-        }
+        },
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
+      },
+      {
+        "step": 4,
+        "action": "Order MRI brain with dedicated epilepsy protocol (thin-cut coronal T1/FLAIR/T2/DWI through the hippocampi).",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Hippocampal sclerosis, low-grade tumor (DNET, ganglioglioma), cavernoma, or focal cortical dysplasia; rule out alternative structural causes.",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "epilepsy",
+          "contrast": true
+        },
+        "citation": "[AAN_2007]",
+        "guideline_source": "AAN_2007"
+      },
+      {
+        "step": 5,
+        "action": "Obtain CBC, comprehensive metabolic panel, prolactin (if drawn within 10–20 min of event), and AED levels if on therapy.",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Exclude metabolic provocation (hypoglycemia, hyponatremia, uremia); baseline organ function for AED selection; AED level for adherence and dosing.",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "prolactin"
+          ]
+        },
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 6,
-        "action": "Search medical literature on hypothalamic hamartoma surgical outcomes",
+        "action": "Search current literature for AED selection in focal epilepsy and ILAE 2017 seizure classification.",
         "tool_name": "search_medical_literature",
-        "expected_finding": "Evidence supporting LITT for HH, staged approach for dual pathology",
-        "category": "recommended"
+        "expected_finding": "Evidence-based AED options for focal epilepsy (levetiracetam, lamotrigine, oxcarbazepine, lacosamide); ILAE classification framework.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 7,
-        "action": "Check drug interactions for current AED regimen",
+        "action": "Check drug interactions before initiating or modifying AED therapy (enzyme inducers, OCP, other CNS-active drugs).",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "Valproic acid-clonazepam interaction, monitoring recommendations",
-        "category": "recommended"
+        "expected_finding": "Identify pharmacokinetic interactions (CYP induction by carbamazepine/phenytoin) and CNS adverse-effect overlap.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
+      },
+      {
+        "step": 8,
+        "action": "Order interictal FDG-PET when MRI is non-localizing or as part of surgical evaluation.",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Focal hypometabolism ipsilateral to the seizure focus, providing concordant localization for surgical planning.",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[Willmann_2007]",
+        "guideline_source": "Willmann_2007"
+      },
+      {
+        "step": 9,
+        "action": "Order comprehensive neuropsychological battery to lateralize memory function and inform surgical risk.",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Material-specific memory deficit consistent with side of seizure focus (verbal memory deficit in dominant TLE; visuospatial in non-dominant).",
+        "category": "optional",
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Engel_2003]",
+        "guideline_source": "Engel_2003"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No clinical features of CNS infection, encephalitis, or immunocompromise; CSF analysis is not indicated for routine focal epilepsy workup and exposes the patient to procedural risk and cost.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "echo_type": "TTE"
+        },
+        "rationale": "No syncope-versus-seizure question and no structural-heart concern; echocardiogram contributes nothing to epilepsy workup.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "Ambulatory cardiac monitoring is reserved for syncope-versus-seizure differentiation; not indicated when semiology is clearly epileptic.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT is inferior to MRI for detecting epileptogenic substrates (hippocampal sclerosis, FCD, low-grade tumor) and adds ionizing radiation without diagnostic yield.",
+        "citation": "[AAN_2007]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "check_drug_interactions",
+        "reason": "Structural cause influences AED choice (e.g., low-grade tumor → consider AEDs with CYP-neutral profile; hippocampal sclerosis → multiple equally appropriate options). MRI should inform drug selection.",
+        "citation": "[ILAE_drug_2017]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Obtain EEG to confirm epileptiform activity and localize seizure focus",
-      "Obtain brain MRI to identify the hypothalamic hamartoma and evaluate for mesial temporal sclerosis",
-      "Recognize the association between gelastic seizures, hypothalamic hamartoma, and history of central precocious puberty",
-      "Classify patient as having drug-resistant epilepsy and recommend surgical evaluation",
-      "Identify dual pathology (hypothalamic hamartoma + secondary mesial temporal sclerosis)"
+      "Recognize gelastic seizures as nearly pathognomonic for hypothalamic hamartoma; obtain dedicated MRI with thin sections through the hypothalamus.",
+      "Obtain prolonged video-EEG to characterize secondary temporal seizures and confirm dual pathology.",
+      "Order FDG-PET when MRI localization is incomplete and surgical evaluation is contemplated.",
+      "Refer to a comprehensive epilepsy center for surgical evaluation (gamma knife, MR-guided laser ablation, or open resection of the hamartoma).",
+      "Engage endocrine for evaluation of precocious puberty / hypothalamic dysfunction associated with the hamartoma."
     ],
     "contraindicated_actions": [
-      "Diagnosing psychogenic non-epileptic seizures without EEG evidence — gelastic seizures are often misdiagnosed as psychiatric",
-      "Prescribing carbamazepine or phenytoin as first-line without recognizing potential for seizure exacerbation in some generalized seizure types",
-      "Recommending temporal lobectomy without addressing the hypothalamic hamartoma — the primary epileptogenic lesion",
-      "Discontinuing all AEDs abruptly without seizure monitoring in place",
-      "Performing lumbar puncture — not indicated in this clinical scenario and would not contribute to diagnosis"
+      "Do not assume primary generalized epilepsy and start broad-spectrum AED without imaging.",
+      "Do not attempt LP without imaging in a patient with intracranial structural lesion.",
+      "Do not delay surgical referral when refractoriness is established."
     ],
     "key_reasoning_points": [
-      "Gelastic seizures (mirthless laughter) beginning in infancy are the hallmark of hypothalamic hamartoma and should prompt MRI evaluation of the hypothalamus",
-      "Hypothalamic hamartoma is supported by the classic triad: gelastic seizures, central precocious puberty, and a non-enhancing isointense sessile mass on the tuber cinereum",
-      "The imaging appearance (isointense on T1/T2, no gadolinium enhancement, stable over years) distinguishes hamartoma from hypothalamic glioma, craniopharyngioma, and other neoplasms",
-      "Secondary mesial temporal sclerosis develops in many patients with hypothalamic hamartoma due to chronic seizure propagation through the fornix and mammillary body pathways",
-      "Drug-resistant epilepsy in the setting of hypothalamic hamartoma warrants surgical evaluation — LITT has emerged as a preferred approach with seizure freedom rates of 58-63%",
-      "In dual pathology cases, a staged surgical approach targeting the hamartoma first is recommended before considering temporal lobe resection",
-      "Elevated postictal prolactin (>2x baseline) supports epileptic seizure origin and helps distinguish from psychogenic events"
+      "Gelastic seizures from infancy plus epileptogenic temporal substrate is classic hypothalamic hamartoma + dual pathology.",
+      "Surgical or stereotactic treatment of the hamartoma is potentially curative.",
+      "AED therapy alone is rarely sufficient for refractory hamartoma-associated epilepsy.",
+      "Neuropsych and FDG-PET inform surgical risk and target."
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
     "red_herrings": []
   },
   "metadata": {
@@ -873,6 +950,16 @@
       "ct": "normal",
       "echo": "normal",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (FEPI-TEMP)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FEPI-TEMP",
+    "difficulty_rationale": "Drug-resistant epilepsy from infancy with dual pathology (hypothalamic hamartoma + MTS); requires video-EEG, FDG-PET, neuropsych, and multidisciplinary surgical evaluation.",
+    "case_body_concerns": [
+      "useless_tools entry for `analyze_ecg` dropped: tool output is provided up-front in initial_tool_outputs, so declaring it useless to call would be incoherent (agent never had to call it)."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -1,7 +1,7 @@
 {
   "case_id": "MG-RM14",
   "condition": "myasthenia_gravis",
-  "difficulty": "moderate",
+  "difficulty": "diagnostic_puzzle",
   "encounter_type": "inpatient",
   "patient": {
     "patient_id": "MG-RM14",
@@ -480,109 +480,262 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Myasthenic crisis (MGFA Class V), triggered by ciprofloxacin in patient with known AChR-positive MG",
+    "primary_diagnosis": "Myasthenic crisis (MGFA Class V), AChR-positive MG, triggered by ciprofloxacin",
     "icd_code": "G70.01",
     "differential": [
       {
-        "diagnosis": "Sepsis-related neuromuscular weakness",
-        "likelihood": "very_low",
-        "key_features": "UTI is mild and not septic; NIF -18 cmH2O and anti-AChR elevation are NMJ-specific; ciprofloxacin temporal correlation is definitive"
-      },
-      {
         "diagnosis": "Cholinergic crisis from pyridostigmine overdose",
-        "likelihood": "very_low",
-        "key_features": "Pyridostigmine dose unchanged at 60mg TID for 2 years; cholinergic crisis presents with excessive secretions, bradycardia, miosis; this patient has tachycardia and no cholinergic features"
+        "likelihood": "moderate",
+        "key_features": "Pyridostigmine overdose can cause crisis with fasciculations, secretions, bradycardia, miosis — clinically distinguishable but in doubt edrophonium test or pyridostigmine cessation can clarify.",
+        "icd_code": "T44.0"
       },
       {
-        "diagnosis": "Other medication-induced crisis",
-        "likelihood": "very_low",
-        "key_features": "No other new medications except ciprofloxacin 4 days ago; clear temporal correlation with fluoroquinolone initiation"
+        "diagnosis": "Aspiration pneumonia / sepsis as primary driver",
+        "likelihood": "moderate",
+        "key_features": "Crisis precipitants overlap — sepsis can both trigger and complicate; chest imaging and infection workup are essential.",
+        "icd_code": "J69.0"
+      },
+      {
+        "diagnosis": "Pulmonary embolism",
+        "likelihood": "low",
+        "key_features": "Acute respiratory failure differential; D-dimer and CT angiography may be warranted depending on risk factors.",
+        "icd_code": "I26.9"
+      },
+      {
+        "diagnosis": "Cardiac decompensation",
+        "likelihood": "low",
+        "key_features": "Echocardiogram and troponin if any concern; not the primary picture here.",
+        "icd_code": "I50.9"
+      },
+      {
+        "diagnosis": "New thymoma flare",
+        "likelihood": "low",
+        "key_features": "Possible underlying driver; CT chest update warranted but not the acute target.",
+        "icd_code": "C37"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "STOP CIPROFLOXACIN IMMEDIATELY — identify it as the MG crisis trigger",
-        "tool_name": null,
-        "expected_finding": "Trigger identified and removed — crisis may partially improve after discontinuation",
+        "action": "Order serologies: anti-AChR (binding, blocking, modulating), anti-MuSK, anti-LRP4, and TSH/free-T4 for thyroid autoimmunity",
+        "tool_name": "interpret_labs",
+        "expected_finding": "AChR antibody positive; TSH evaluates for comorbid thyroid disease",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "anti_AChR",
+            "anti_MuSK",
+            "anti_LRP4",
+            "TSH"
+          ]
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 2,
-        "action": "ICU admission; BiPAP/NIV bridge; prepare for intubation (NIF -18, FVC 38%)",
-        "tool_name": null,
-        "expected_finding": "Respiratory support provided; intubation if NIF worsens beyond -25",
+        "action": "Order repetitive nerve stimulation (RNS) at 2-3 Hz across proximal and facial muscles",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Decrement >10% in symptomatic muscles supports postsynaptic NMJ disorder",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "repetitive_nerve_stimulation"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 3,
-        "action": "Initiate plasmapheresis (preferred over IVIG in acute crisis — faster onset)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "NIF -18 → -38, FVC 38% → 65% after 3 sessions; AChR declining",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Order single-fiber EMG (gold standard >95% sensitivity)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Increased jitter and blocking on extensor digitorum communis or orbicularis oculi confirms NMJ transmission failure",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "emg_single_fiber"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 4,
-        "action": "Switch UTI antibiotic to nitrofurantoin (check drug interaction for MG-safe alternative)",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Nitrofurantoin safe in MG; E. coli sensitive to nitrofurantoin",
+        "action": "Order CT chest with contrast for thymoma screening",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No thymoma; thymic involution appropriate for age",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "region": "chest",
+          "contrast": true,
+          "indication": "thymoma_screening"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 5,
-        "action": "Add prednisone + azathioprine for long-term immunosuppression (prevent future crisis)",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Immunosuppression plan established; TPMT testing ordered",
+        "action": "Review MGFA classification and current treatment guidance (pyridostigmine, prednisone, steroid-sparing, IVIG/PLEX, thymectomy)",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "MGFA classification stages disease severity; thymectomy benefits AChR+ generalized MG (MGTX); IVIG/PLEX for crisis",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "query": "myasthenia gravis MGFA classification treatment thymectomy"
+        },
+        "citation": "[Sanders_2016]",
+        "guideline_source": "Sanders_2016"
       },
       {
         "step": 6,
-        "action": "Patient education — medical alert ID and comprehensive contraindicated medication list",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Education provided; all MG patients should know to disclose diagnosis to prescribers",
+        "action": "Check drug interactions for MG-exacerbating agents (aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, neuromuscular blockers, procainamide)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Flag aminoglycosides, fluoroquinolones, IV magnesium, telithromycin, NMBs as contraindicated or use-with-caution in MG",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "proposed": "pyridostigmine_start",
+          "screen_for": [
+            "aminoglycosides",
+            "fluoroquinolones",
+            "telithromycin",
+            "magnesium_IV",
+            "neuromuscular_blockers"
+          ]
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
+      },
+      {
+        "step": 7,
+        "action": "Bedside respiratory function testing (FVC, MIP/MEP, NIF) — repeat q4h in crisis",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "FVC <20 mL/kg or NIF less negative than -30 cmH2O = intubation criteria",
+        "category": "required",
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[Sanders_2016]",
+        "guideline_source": "Sanders_2016"
+      },
+      {
+        "step": 8,
+        "action": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Improvement of ptosis after 2 minutes of cooling supports MG",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "ice_pack_test"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
+      },
+      {
+        "step": 9,
+        "action": "Plasma exchange (PLEX) or IVIG initiation for myasthenic crisis",
+        "tool_name": null,
+        "expected_finding": "PLEX 5 cycles or IVIG 0.4 g/kg/day for 5 days; expect clinical improvement within days",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Sanders_2016]",
+        "guideline_source": "Sanders_2016"
+      },
+      {
+        "step": 10,
+        "action": "Discontinue ciprofloxacin immediately; substitute non-fluoroquinolone if antibiotic still needed",
+        "tool_name": null,
+        "expected_finding": "Removal of precipitant; clinical improvement over days",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "MG is a peripheral neuromuscular junction disorder; EEG has no diagnostic role.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No CSF role in MG; LP risks complications without diagnostic yield.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "Advanced imaging (PET/MR spectroscopy/perfusion) is not indicated for MG diagnosis or staging; CT chest covers thymoma screening.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is non-contributory in typical MG; reserve for cases where an alternative CNS cause (brainstem lesion, demyelination) is genuinely in the differential.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated for MG unless a comorbid cardiac question exists.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring is not indicated for MG unless arrhythmia or autonomic disease is independently suspected.",
+        "citation": "[Wolfe_2016]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_specialized_test",
+        "after": "search_medical_literature",
+        "reason": "Document respiratory function (FVC, NIF) before initiating crisis-specific therapy (IVIG/PLEX) and ICU disposition.",
+        "citation": "[Sanders_2016]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "STOP CIPROFLOXACIN IMMEDIATELY — fluoroquinolone is the crisis trigger",
-      "Intubation threshold: NIF worse than -25 cmH2O or FVC <20 mL/kg — NIF -18 is at threshold NOW",
-      "Plasmapheresis is preferred over IVIG in acute crisis for faster onset",
-      "Switch to MG-safe antibiotic for UTI (nitrofurantoin, amoxicillin-clavulanate)",
-      "ICU admission mandatory",
-      "Add long-term immunosuppression to prevent future crisis"
+      "ICU admission with continuous respiratory monitoring",
+      "Discontinue ciprofloxacin — the precipitant",
+      "FVC and NIF every 2-4 hours; intubation if FVC <15 mL/kg or NIF less negative than -25 cmH2O",
+      "Initiate PLEX or IVIG within 24 hours",
+      "Document drug-interaction review for all current and prescribed medications",
+      "Patient education to refuse fluoroquinolones in future encounters",
+      "Long-term immunosuppression review (steroid-sparing agents — azathioprine, mycophenolate, rituximab)"
     ],
     "contraindicated_actions": [
-      "Do NOT continue ciprofloxacin or any fluoroquinolone — ciprofloxacin is the precipitant",
-      "Do NOT give pyridostigmine in excess — risk of cholinergic crisis compounding myasthenic crisis",
-      "Do NOT discharge without comprehensive medication education and medical alert ID",
-      "Do NOT use aminoglycosides for UTI — also contraindicated in MG"
+      "Do NOT prescribe aminoglycoside antibiotics (gentamicin, tobramycin, amikacin) — risk of precipitating myasthenic crisis",
+      "Do NOT prescribe fluoroquinolones (ciprofloxacin, levofloxacin, moxifloxacin) — FDA black-box warning for MG exacerbation",
+      "Do NOT prescribe telithromycin — contraindicated in MG",
+      "Do NOT administer IV magnesium for MG patients (e.g., for hypomagnesaemia, eclampsia prophylaxis) without alternative — blocks NMJ transmission",
+      "Do NOT use non-depolarizing neuromuscular blockers without anaesthesia/MG-aware dosing protocols",
+      "Do NOT initiate high-dose corticosteroids as sole outpatient therapy without hospitalization or pyridostigmine bridge — risk of paradoxical worsening at days 5-10",
+      "Do NOT attribute fluctuating fatigable weakness to a functional disorder before completing serology + RNS + single-fiber EMG workup",
+      "Do NOT continue ciprofloxacin — confirmed precipitant of this crisis.",
+      "Do NOT delay intubation if respiratory parameters cross threshold; bedside intubation is safer than emergency intubation after collapse."
     ],
     "key_reasoning_points": [
-      "Ciprofloxacin initiated 4 days ago with immediate progressive MG deterioration — temporal correlation is diagnostic of fluoroquinolone-triggered myasthenic crisis",
-      "ALL fluoroquinolones are contraindicated in MG — mechanism includes NMJ blockade that overwhelms compensatory pyridostigmine dosing",
-      "NIF -18 cmH2O is at the critical threshold (intubation typically indicated at -25) — immediate ICU admission and respiratory monitoring mandatory",
-      "Plasmapheresis preferred over IVIG in crisis for faster antibody removal (days vs weeks)",
-      "UTI must still be treated — nitrofurantoin is safe in MG and effective for E. coli UTI",
-      "Patient was on pyridostigmine alone for 2 years — crisis indicates need for escalation to immunosuppression"
+      "Fluctuating, fatigable weakness with diurnal pattern (worse evening) is the clinical hallmark of MG — fixed weakness suggests an alternative diagnosis.",
+      "Ocular involvement (ptosis, diplopia) is asymmetric and fatigable in MG; thyroid eye disease causes restrictive (not fatigable) ophthalmoplegia.",
+      "Single-fiber EMG (sensitivity >95%) is the most sensitive electrodiagnostic test — order when RNS is non-diagnostic or serology is negative.",
+      "All confirmed MG cases require CT chest for thymoma — present in roughly 10-15% of generalized MG; thymectomy (MGTX trial) improves long-term outcomes in non-thymoma AChR+ MG as well.",
+      "Aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, and neuromuscular blockers can precipitate myasthenic crisis and must be screened against any new prescription.",
+      "Myasthenic crisis = respiratory failure or imminent failure (FVC <20 mL/kg, MIP less negative than -30 cmH2O, weak cough, bulbar collapse) — ICU admission, urgent IVIG or PLEX, intubation criteria documented serially.",
+      "Ciprofloxacin is a well-documented precipitant of myasthenic crisis — FDA black-box warning since 2008.",
+      "Crisis management priorities: identify and remove precipitant, support ventilation, accelerate antibody removal (PLEX) or modulation (IVIG).",
+      "Cholinergic vs myasthenic crisis distinction: muscarinic symptoms (miosis, fasciculations, bradycardia, hypersecretion) suggest cholinergic; their absence and ongoing weakness suggest myasthenic."
     ],
     "red_herrings": [
       {
-        "data_point": "Prior MG in remission on pyridostigmine alone for 2 years",
-        "location": "past medical history",
-        "intended_effect": "Clinician or urgent care provider might not associate UTI antibiotics with MG exacerbation; might attribute crisis to UTI infection itself rather than ciprofloxacin",
-        "correct_interpretation": "UTI can be a mild MG trigger but the dramatic 4-day deterioration directly correlates with ciprofloxacin initiation; fluoroquinolone is the primary precipitant; UTI infection alone would cause modest changes, not crisis",
-        "field_path": ""
+        "data_point": "Recent ciprofloxacin course for UTI",
+        "location": "history of present illness / medications",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Treat the UTI as the crisis cause and continue ciprofloxacin.",
+        "correct_interpretation": "Ciprofloxacin itself is the precipitant via NMJ blockade — must be stopped and substituted with non-fluoroquinolone."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "v5",
@@ -602,6 +755,16 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MG",
+    "difficulty_rationale": "8 required tools, 1 red herrings, myasthenic crisis management",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": [
+      "emg_ncs_useless_via_param_conflation: pack lists order_specialized_test:emg_ncs as USELESS, but coherence validator treats tool_name overlap as a contradiction regardless of tool_parameters; cannot encode without removing required RNS/SFEMG entries. Suggest extending validator to compare tool_name + tool_parameters or fleet-wide pattern."
+    ]
   }
 }

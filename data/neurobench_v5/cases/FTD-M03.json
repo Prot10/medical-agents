@@ -531,105 +531,258 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Behavioral variant frontotemporal dementia — sporadic — with concurrent small vessel cerebrovascular disease (secondary contributor)",
+    "primary_diagnosis": "Behavioral variant frontotemporal dementia (bvFTD), probable, sporadic, with concurrent small-vessel cerebrovascular disease (secondary contributor)",
     "icd_code": "G31.09",
     "differential": [
       {
-        "diagnosis": "Wernicke-Korsakoff syndrome (alcohol-related dementia)",
-        "likelihood": "very_low",
-        "key_features": "Normal thiamine level; normal mammillary bodies on MRI; no thalamic signal change; behavioral profile is disinhibition/social dysfunction rather than amnestic predominance — WKS produces amnestic dementia, not disinhibition syndrome"
+        "diagnosis": "Vascular cognitive impairment (subcortical small-vessel disease)",
+        "likelihood": "high",
+        "key_features": "Hypertension and diabetes plus small-vessel changes on MRI may contribute, but the dominant pattern is lobar frontotemporal degeneration."
       },
       {
-        "diagnosis": "Vascular dementia (subcortical small vessel)",
+        "diagnosis": "Wernicke-Korsakoff / alcohol-related cognitive disorder",
+        "likelihood": "moderate",
+        "key_features": "Remote alcohol use disorder (12 years sober) is too remote to explain progressive 2-year decline; thiamine reasonable but unlikely to be the cause."
+      },
+      {
+        "diagnosis": "Alzheimer disease (frontal variant)",
+        "likelihood": "moderate",
+        "key_features": "Amyloid biomarker negativity expected to exclude."
+      },
+      {
+        "diagnosis": "Behavioural manifestation of treated OSA (untreated component)",
         "likelihood": "low",
-        "key_features": "Fazekas 2 white matter present but FDG-PET frontal hypometabolism substantially exceeds what white matter disease alone would produce; primary FTD pathology with secondary vascular contribution"
+        "key_features": "OSA already treated; should not produce progressive degenerative imaging pattern."
       },
       {
-        "diagnosis": "Alzheimer's disease",
+        "diagnosis": "Normal pressure hydrocephalus",
         "likelihood": "very_low",
-        "key_features": "Amyloid PET negative; no posterior cingulate sign on FDG-PET; behavioral disinhibition/social dysfunction profile more typical of FTD than AD"
-      },
-      {
-        "diagnosis": "Behavioral change from CPAP-treated OSA",
-        "likelihood": "very_low",
-        "key_features": "CPAP-adherent with confirmed improved sleep quality — OSA adequately treated; behavioral changes predate CPAP initiation and progressive despite treatment"
+        "key_features": "No urinary incontinence; atrophic pattern dominates."
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "MRI brain — frontal atrophy pattern; mammillary body assessment for WKS",
+        "action": "Obtain brain MRI with volumetric coronal T1 to assess frontal/anterior temporal atrophy and exclude alternative structural cause",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Moderate frontal atrophy; normal mammillary bodies; Fazekas 2 white matter",
+        "expected_finding": "Bilateral frontal and/or anterior temporal atrophy in a lobar pattern with relative posterior sparing",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "DWI",
+            "volumetric"
+          ]
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky 2011 bvFTD criteria"
       },
       {
         "step": 2,
-        "action": "Thiamine level and standard dementia labs including GGT/MCV for alcohol use assessment",
+        "action": "Order metabolic dementia panel (TSH, B12, CMP, RPR/HIV per risk) to exclude reversible mimics",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal thiamine, normal GGT/MCV — WKS and active alcohol use excluded",
+        "expected_finding": "No reversible metabolic or infectious cause of cognitive decline identified",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "TSH",
+            "B12",
+            "RPR",
+            "HIV"
+          ]
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
       },
       {
         "step": 3,
-        "action": "FDG-PET brain — metabolic pattern; distinguish FTD from vascular dementia",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Severe frontal hypometabolism exceeding vascular white matter contribution; absent posterior cingulate sign",
+        "action": "Order comprehensive neuropsychological battery characterising executive function, social cognition, language and memory",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Frontal-executive and social-cognition deficits with relative sparing of episodic memory and visuospatial function",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky 2011 bvFTD criteria"
       },
       {
         "step": 4,
-        "action": "Amyloid PET — AD exclusion",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Negative",
+        "action": "Search medical literature for behavioural variant ftd with vascular comorbidity",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirms Rascovsky 2011 criteria, FDG-PET evidence (Foster 2007), and management approach (Bang 2015)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "query": "Behavioural variant FTD with vascular comorbidity"
+        },
+        "citation": "[Bang_2015]",
+        "guideline_source": "Bang 2015 Lancet review"
       },
       {
         "step": 5,
-        "action": "Neuropsychological testing — executive and social cognition profile",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Severely impaired executive function and social cognition; bvFTD profile",
+        "action": "Consult behavioral/cognitive neurology for syndromic diagnosis, biomarker interpretation, and longitudinal care plan",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Behavioral neurology confirms bvFTD syndrome, coordinates biomarkers and disclosure",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "specialty": "behavioral_neurology"
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
+      },
+      {
+        "step": 6,
+        "action": "Order FDG-PET brain to characterise frontotemporal hypometabolism and distinguish bvFTD from AD",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Bifrontal and/or anterior temporal hypometabolism with relative posterior sparing",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[Foster_2007]",
+        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
+      },
+      {
+        "step": 7,
+        "action": "Order FTD genetic panel (C9orf72, GRN, MAPT) given negative family history",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Identifies or excludes pathogenic C9orf72 / GRN / MAPT variant relevant to prognosis and cascade testing",
+        "category": "optional",
+        "tool_parameters": {
+          "test_type": "genetic_panel:FTD"
+        },
+        "citation": "[Pottier_2016]",
+        "guideline_source": "Pottier 2016 FTLD genetics review"
+      },
+      {
+        "step": 8,
+        "action": "Consider amyloid PET if biomarker clarification is needed",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Negative amyloid PET supports FTD",
+        "category": "optional",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "citation": "[Foster_2007]",
+        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
+      },
+      {
+        "step": 9,
+        "action": "Aggressively manage vascular risk factors (blood pressure, glycaemic control, lipids) to minimise vascular contribution",
+        "tool_name": null,
+        "expected_finding": "Vascular risk modification slows further small-vessel injury",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is non-specific in FTD; not part of the standard dementia workup unless seizures or rapidly progressive course suggest CJD or autoimmune encephalitis.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG has no role in the cognitive workup of suspected FTD; reserved for syncope, palpitations, or pre-procedure clearance.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is unrelated to a neurodegenerative cognitive syndrome and adds cost without diagnostic value.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is unrelated to FTD and not indicated absent syncope or palpitations.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT lacks the resolution and lobar specificity needed to characterise frontotemporal atrophy; MRI is the standard structural study.",
+        "citation": "[AAN_dementia_2018]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "MR_spectroscopy"
+        },
+        "rationale": "MR spectroscopy has no established role in the routine FTD diagnostic pathway.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "perfusion_MRI"
+        },
+        "rationale": "Perfusion MRI is not indicated in the standard FTD workup once a structural MRI and FDG-PET (or amyloid PET) have characterised the lobar pattern.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is a vascular study with no diagnostic role in primary neurodegenerative dementia.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan evaluates presynaptic dopaminergic terminals; it is not indicated unless overt parkinsonism raises concern for PD, DLB, or atypical parkinsonism (PSP/CBS overlap).",
+        "citation": "[Bang_2015]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "Exclude structural cause of focal cognitive symptoms and screen for elevated ICP before lumbar puncture.",
+        "citation": "[AAN_dementia_2018]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Wernicke-Korsakoff must be excluded in any patient with history of alcohol use and behavioral/cognitive syndrome — thiamine level and MRI mammillary body assessment are required",
-      "Amyloid PET or CSF Abeta42 must exclude AD before bvFTD diagnosis",
-      "Do NOT prescribe cholinesterase inhibitors in FTD"
+      "Optimise vascular risk factors (BP, glycaemia, lipids, OSA adherence).",
+      "Do not attribute the syndrome to remote alcohol use; ensure thiamine replete if any current intake.",
+      "Apply Rascovsky 2011 bvFTD criteria explicitly (≥3 of 6 core features within 3 years) and document functional decline.",
+      "Assess and document decision-making, financial, and driving capacity given the high risk of impulsivity and impaired judgment in FTD.",
+      "Provide caregiver education, safety planning, and referral to FTD-focused support resources.",
+      "Offer genetic counselling and discuss cascade testing options if a pathogenic variant is identified or suspected."
     ],
     "contraindicated_actions": [
-      "Cholinesterase inhibitors — contraindicated in bvFTD",
-      "Prescribing oral hypoglycemics with high hypoglycemia risk (sulfonylureas) in cognitively impaired patient — simplify diabetes management"
+      "Do not start acetylcholinesterase inhibitors (donepezil, rivastigmine, galantamine): no benefit in FTD and may worsen behavioral symptoms.",
+      "Do not start memantine: no evidence of benefit in bvFTD and may worsen behavioral symptoms.",
+      "Avoid antipsychotics as first-line behavioral therapy given increased cerebrovascular and mortality risk in dementia; reserve for refractory dangerous agitation with specialist oversight.",
+      "Avoid benzodiazepines for behavioral control: risk of paradoxical disinhibition and falls."
     ],
     "key_reasoning_points": [
-      "Prior alcohol use history is a red herring — Wernicke-Korsakoff syndrome is excluded by normal thiamine, normal mammillary bodies on MRI, and a behavioral profile (disinhibition, social dysfunction) rather than the amnestic profile typical of Korsakoff dementia",
-      "FDG-PET is essential to distinguish primary FTD from vascular dementia — Fazekas 2 white matter changes can cause cognitive decline but the frontal FDG-PET hypometabolism far exceeds the expected metabolic effect of the white matter disease alone",
-      "The diagnostic order matters: MRI first to assess structural pattern and exclude WKS, then FDG-PET for metabolic characterization, then amyloid PET to definitively exclude AD"
+      "The frontotemporal lobar pattern is the dominant finding; small-vessel disease is a comorbidity, not the primary aetiology.",
+      "Remote (12-year sober) alcohol use does not explain progressive decline beginning long after cessation.",
+      "Aggressive vascular risk modification is beneficial regardless of the primary diagnosis."
     ],
     "red_herrings": [
       {
-        "data_point": "12-year history of alcohol use disorder",
-        "location": "Social history",
-        "intended_effect": "Attribute behavioral syndrome to alcohol-related dementia or Wernicke-Korsakoff syndrome",
-        "correct_interpretation": "12 years sobriety with normal thiamine, normal GGT, normal mammillary bodies on MRI, and a disinhibition-predominant (not amnestic) behavioral profile excludes WKS and alcohol-related dementia",
-        "field_path": ""
-      },
-      {
-        "data_point": "Fazekas grade 2 periventricular white matter changes",
-        "location": "MRI findings",
-        "intended_effect": "Diagnose vascular dementia as primary cause",
-        "correct_interpretation": "Fazekas 2 cannot explain the severity of behavioral syndrome; FDG-PET shows frontal metabolic changes far exceeding expected vascular white matter contribution — primary FTD with secondary vascular component",
-        "field_path": ""
+        "data_point": "Remote alcohol use disorder (12 years sober)",
+        "location": "past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Could mislead toward alcohol-related cognitive disorder.",
+        "correct_interpretation": "Sobriety of 12 years duration cannot produce a new progressive 2-year decline; alcohol-related dementia is not the cause."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "v5",
@@ -641,6 +794,17 @@
       "ct": "normal",
       "echo": "normal",
       "cardiac_monitoring": "incidental"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (condition-expert:FTD)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FTD",
+    "difficulty_rationale": "5 required tools + 1–2 recommended biomarkers and a substantial differential (psychiatric, alcohol, vascular, or AD-overlap); 1–3 grounded red herrings (alcohol, family history, comorbid HIV / bipolar / GRN status); requires multi-modal synthesis.",
+    "case_body_concerns": [
+      "validator flags `order_advanced_imaging` in both optimal_actions (FDG_PET / amyloid_PET) and useless_tools (MR_spectroscopy / DaTscan / perfusion_MRI / carotid_duplex) — these are distinct modalities of the same catchall tool. Known systemic validator limitation: the coherence script ignores `tool_parameters.modality`. No fix at case level.",
+      "fallback output for `order_advanced_imaging` is missing in `fallback_tool_outputs` — calling the useless tool will return empty; case body needs an off-pathway fallback entry."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

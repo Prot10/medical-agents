@@ -490,57 +490,199 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Rheumatoid arthritis-associated peripheral neuropathy (axonal polyneuropathy) in a patient with type 2 diabetes",
-    "critical_actions": [
-      "Order anti-CCP antibody — morning stiffness and proximal weakness should trigger RA workup in neuropathy evaluation",
-      "Nerve biopsy to differentiate vasculitic from non-vasculitic RA neuropathy (determines treatment intensity)",
-      "Address patient concern about statins with CK + anti-HMGCR testing — do NOT simply discontinue statin without evidence",
-      "Initiate DMARD therapy through rheumatology — RA-associated neuropathy responds to RA disease control",
-      "Do not over-attribute all findings to diabetes — anti-CCP 186 is specific for RA and demands diagnosis"
-    ],
-    "contraindicated_actions": [
-      "Do not discontinue atorvastatin without evidence of statin neuropathy — CK and anti-HMGCR are normal",
-      "Do not diagnose as pure diabetic neuropathy and miss treatable RA",
-      "Do not start cyclophosphamide/high-dose steroids for vasculitic neuropathy — nerve biopsy shows no vasculitis",
-      "Do not give symptomatic treatment only without DMARD initiation for active RA with erosive disease"
-    ],
-    "optimal_actions": [],
+    "primary_diagnosis": "Rheumatoid arthritis-associated axonal peripheral neuropathy in a patient with comorbid type 2 diabetes",
+    "icd_code": "G63",
     "differential": [
       {
-        "diagnosis": "Diabetic polyneuropathy (primary diagnosis)",
-        "likelihood": "low",
-        "key_features": "HbA1c 7.1% explains mild length-dependent axonal component; does NOT explain proximal weakness, morning stiffness, highly positive anti-CCP/RF, or MRI synovitis"
+        "diagnosis": "Diabetic polyneuropathy",
+        "likelihood": "high",
+        "key_features": "16 years of T2DM with HbA1c 7.1% — substantial contributor; differentiate from RA-driven pattern by progression rate and asymmetry.",
+        "icd_code": "E11.40"
       },
       {
-        "diagnosis": "Statin-induced neuropathy (atorvastatin)",
-        "likelihood": "very_low",
-        "key_features": "CK normal, anti-HMGCR negative; statin neuropathy is rare and primarily myopathic; discontinuing statin would miss the real RA diagnosis"
+        "diagnosis": "RA with vasculitic neuropathy (rheumatoid vasculitis)",
+        "likelihood": "moderate",
+        "key_features": "Asymmetric or rapidly progressive features would shift toward vasculitis; need ANCA, complement, biopsy if asymmetric.",
+        "icd_code": "G63"
+      },
+      {
+        "diagnosis": "B12 / nutritional deficiency neuropathy",
+        "likelihood": "low",
+        "key_features": "Routine screen needed; PPI/metformin can lower B12.",
+        "icd_code": "G62.9"
+      },
+      {
+        "diagnosis": "Statin-associated neuropathy",
+        "likelihood": "low",
+        "key_features": "Atorvastatin neuropathy is controversial; mild, non-progressive typically.",
+        "icd_code": "G62.0"
       },
       {
         "diagnosis": "CIDP",
         "likelihood": "low",
-        "key_features": "NCS shows axonal predominance not demyelinating velocities; CSF protein only mildly elevated (52 mg/dL); CIDP does not cause morning stiffness or joint symptoms"
-      },
-      {
-        "diagnosis": "RA with vasculitic neuropathy",
-        "likelihood": "low",
-        "key_features": "Nerve biopsy shows no vasculitis — non-vasculitic RA neuropathy; would not require cyclophosphamide; methotrexate DMARD therapy appropriate"
+        "key_features": "Demyelinating features and proximal weakness on NCS would be needed.",
+        "icd_code": "G61.81"
       }
     ],
-    "key_reasoning_points": [
-      "MODERATE DIFFICULTY: Anchoring bias on 16-year diabetes history — easy to attribute everything to diabetic neuropathy",
-      "KEY CLUE 1: Morning stiffness >30 minutes in someone presenting as 'neuropathy' should trigger anti-CCP/RF testing",
-      "KEY CLUE 2: Proximal weakness (vastus lateralis on EMG) is NOT a feature of typical diabetic length-dependent axonal neuropathy",
-      "KEY CLUE 3: Patient raised statin concern — must be taken seriously and formally evaluated (CK, anti-HMGCR) rather than dismissed",
-      "RA neuropathy is underrecognized — seropositive RA patients with inadequate disease control develop axonal polyneuropathy",
-      "Nerve biopsy differentiates vasculitic (requires cyclophosphamide) from non-vasculitic (methotrexate DMARD) RA neuropathy",
-      "Statin neuropathy trap: common patient belief, must be formally excluded to reassure and prevent unnecessary discontinuation of cardiovascular-protective medication"
+    "optimal_actions": [
+      {
+        "step": 1,
+        "action": "Order broad neuropathy labs (CBC, CMP, HbA1c, B12 + MMA, TSH, SPEP/IFE, urinalysis)",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Identify reversible/treatable etiologies (diabetes, B12 deficiency, monoclonal gammopathy, thyroid disease)",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "HbA1c",
+            "B12",
+            "MMA",
+            "TSH",
+            "SPEP",
+            "IFE",
+            "UA"
+          ]
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 2,
+        "action": "Order EMG/NCS to characterize axonal vs demyelinating pattern and distribution",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Length-dependent axonal vs demyelinating vs multifocal pattern; severity and distribution",
+        "category": "required",
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 3,
+        "action": "Search literature for DSP evaluation guidelines and etiology-specific recommendations",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirm AAN 2009 DSP workup, etiology-specific evaluations",
+        "category": "required",
+        "tool_parameters": {
+          "query": "distal symmetric polyneuropathy evaluation AAN 2009"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 4,
+        "action": "Review medications for neurotoxic agents and check interactions for symptomatic therapy",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identify potentially neurotoxic drugs (chemotherapy, metronidazole, megadose B6, nitrofurantoin); guide neuropathic-pain pharmacotherapy",
+        "category": "required",
+        "tool_parameters": {
+          "medications": []
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 5,
+        "action": "Connective-tissue / vasculitis serologies (RF, anti-CCP, ANA, ANCA, ESR, CRP, complement)",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Document RA activity / exclude overlapping vasculitis",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "RF",
+            "anti_CCP",
+            "ANA",
+            "ANCA",
+            "ESR",
+            "CRP",
+            "complement"
+          ]
+        },
+        "citation": "[Said_2007]",
+        "guideline_source": "Said 2007 vasculitic neuropathy"
+      }
     ],
-    "red_herrings": [],
-    "icd_code": "G63",
-    "useless_tools": [],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is a cortical test and is non-contributory in peripheral nerve disease.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head/brain CT has no role in peripheral neuropathy evaluation.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is not indicated in typical distal symmetric polyneuropathy without CNS signs.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {},
+        "rationale": "Advanced cerebral imaging (PET/MRA/MRV/perfusion) has no routine role in peripheral neuropathy.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated unless cardiac amyloid is suspected.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated unless there is syncope or symptomatic dysautonomia with arrhythmia concern.",
+        "citation": "[AAN_2009]"
+      }
+    ],
     "harmful_tools": [],
-    "sequence_constraints": []
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "order_specialized_test",
+        "reason": "Tier the workup — basic labs first, then targeted electrodiagnostic and tissue studies.",
+        "citation": "[AAN_2009]",
+        "severity": "soft"
+      }
+    ],
+    "critical_actions": [
+      "Differentiate axonal RA-associated neuropathy from concurrent diabetic neuropathy and vasculitis",
+      "Document RA disease activity (RF, anti-CCP, ESR/CRP) and screen for overlap vasculitis (ANCA, complement)",
+      "Optimize glycemic control given 16-year history of T2DM",
+      "Review medications (DMARDs, statins) for neurotoxic contributions"
+    ],
+    "contraindicated_actions": [
+      "Do not escalate immunosuppression without electrodiagnostic and serologic support for an inflammatory neuropathy",
+      "Do not attribute everything to diabetes without addressing RA activity"
+    ],
+    "key_reasoning_points": [
+      "Two plausible contributors (T2DM 16y and RA) — define dominant driver by NCS pattern and serology",
+      "Asymmetry, mononeuritis multiplex, or systemic features would shift toward vasculitic neuropathy",
+      "Routine B12 / MMA screen is required given comorbid PPI use"
+    ],
+    "red_herrings": [
+      {
+        "data_point": "Prior lumbar disc herniation L4-L5 (resolved)",
+        "location": "history",
+        "field_path": "patient.clinical_history.past_medical_history[4]",
+        "intended_effect": "Anchor on residual radiculopathy as cause of leg symptoms",
+        "correct_interpretation": "Resolved disc herniation does not produce bilateral hand + foot length-dependent symptoms."
+      },
+      {
+        "data_point": "Atorvastatin therapy",
+        "location": "medications",
+        "field_path": "patient.clinical_history.medications[1]",
+        "intended_effect": "Premature statin discontinuation as putative cause",
+        "correct_interpretation": "Statin-related neuropathy is controversial and rarely the dominant cause; discontinue only if pattern fits and benefit-risk supports it."
+      }
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -552,6 +694,14 @@
       "advanced_imaging": "normal",
       "literature_search": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:PERI-NEURO",
+    "difficulty_rationale": "5 required tools, 2 red herrings; classification reflects clinical complexity per PERI-NEURO pack section 6 (M/S/P/R variants).",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

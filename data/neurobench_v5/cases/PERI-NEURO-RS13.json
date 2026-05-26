@@ -525,99 +525,189 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "POEMS syndrome from multifocal osteosclerotic myeloma (IgA lambda) — straightforward presentation with classical features",
-    "critical_actions": [
-      "Order VEGF level — markedly elevated VEGF is pathognomonic for POEMS and drives all organ manifestations",
-      "Perform fundoscopy in EVERY neuropathy evaluation — papilledema would be missed without it",
-      "Comprehensive endocrine panel — POEMS causes multiple simultaneous endocrine deficiencies",
-      "Provide adrenal insufficiency stress dosing protocol — risk of adrenal crisis if patient becomes ill or has surgery without doubled hydrocortisone dose",
-      "FDG-PET/CT — identifies multifocal vs solitary osteosclerotic disease, determining if radiation alone is possible"
-    ],
-    "contraindicated_actions": [
-      "Do not treat with IVIG — POEMS is IVIG-refractory",
-      "Do not attribute endocrine abnormalities to independent coincidental findings — all are VEGF-mediated manifestations of POEMS",
-      "Do not attribute neuropathy to prostate cancer without excluding POEMS when M-protein is present",
-      "Do not miss stress dosing instruction for adrenal insufficiency — patient must double hydrocortisone dose during illness or surgery"
+    "primary_diagnosis": "POEMS syndrome (multifocal osteosclerotic myeloma, IgA lambda)",
+    "icd_code": "G63",
+    "differential": [
+      {
+        "diagnosis": "CIDP",
+        "likelihood": "moderate",
+        "key_features": "Demyelinating polyneuropathy; differentiates from POEMS by absence of monoclonal protein, lambda restriction, elevated VEGF, and osteosclerotic lesions.",
+        "icd_code": "G61.81"
+      },
+      {
+        "diagnosis": "Anti-MAG IgM MGUS neuropathy",
+        "likelihood": "low",
+        "key_features": "Demyelinating with terminal slowing; IgM (vs IgA/IgG lambda in POEMS); anti-MAG antibody.",
+        "icd_code": "G61.81"
+      },
+      {
+        "diagnosis": "Multiple myeloma with neuropathy",
+        "likelihood": "low",
+        "key_features": "Lytic (not sclerotic) bone lesions; renal failure, anemia, hypercalcemia.",
+        "icd_code": "C90.00"
+      },
+      {
+        "diagnosis": "Amyloid (AL) neuropathy",
+        "likelihood": "low",
+        "key_features": "Painful small-fiber + autonomic + cardiac amyloidosis; lambda light chain restriction.",
+        "icd_code": "E85.81"
+      },
+      {
+        "diagnosis": "Hereditary demyelinating neuropathy (CMT1)",
+        "likelihood": "very_low",
+        "key_features": "No childhood features or family history.",
+        "icd_code": "G60.0"
+      }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "interpret_labs (CBC, SPEP, immunofixation, VEGF level, comprehensive endocrine panel: TSH, free T4, cortisol, testosterone, LH, HbA1c)",
+        "action": "Order broad neuropathy labs (CBC, CMP, HbA1c, B12 + MMA, TSH, SPEP/IFE, urinalysis)",
         "tool_name": "interpret_labs",
-        "expected_finding": "IgA lambda M-spike 1.4 g/dL; VEGF 2240 pg/mL (>4x upper limit — pathognomonic for POEMS); multiple simultaneous endocrine deficiencies; thrombocytosis",
+        "expected_finding": "Identify reversible/treatable etiologies (diabetes, B12 deficiency, monoclonal gammopathy, thyroid disease)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "HbA1c",
+            "B12",
+            "MMA",
+            "TSH",
+            "SPEP",
+            "IFE",
+            "UA"
+          ]
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
       },
       {
         "step": 2,
-        "action": "order_specialized_test (NCS/EMG — confirm demyelinating sensorimotor polyneuropathy with secondary axonal loss)",
+        "action": "Order EMG/NCS to characterize axonal vs demyelinating pattern and distribution",
         "tool_name": "order_specialized_test",
-        "expected_finding": "Markedly prolonged DML (8-8.8 ms), severely slow velocities (30-32 m/s), low amplitudes — mixed demyelinating-axonal pattern consistent with POEMS neuropathy",
+        "expected_finding": "Length-dependent axonal vs demyelinating vs multifocal pattern; severity and distribution",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
       },
       {
         "step": 3,
-        "action": "order_advanced_imaging (FDG-PET/CT whole body — identify osteosclerotic plasmacytoma lesions, determine if solitary vs multifocal)",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Two osteosclerotic lesions: L2 vertebra and left iliac bone; no lytic lesions; no lymphoma pattern; prostate cancer remission confirmed",
+        "action": "Search literature for DSP evaluation guidelines and etiology-specific recommendations",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirm AAN 2009 DSP workup, etiology-specific evaluations",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "query": "distal symmetric polyneuropathy evaluation AAN 2009"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
       },
       {
         "step": 4,
-        "action": "order_specialized_test (Bone marrow biopsy — confirm osteosclerotic myeloma, quantify plasma cell %)",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "IgA lambda plasma cells 6% with osteosclerotic changes; no Castleman disease; lambda-restricted plasma cell clusters",
+        "action": "Review medications for neurotoxic agents and check interactions for symptomatic therapy",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identify potentially neurotoxic drugs (chemotherapy, metronidazole, megadose B6, nitrofurantoin); guide neuropathic-pain pharmacotherapy",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "medications": []
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
       },
       {
         "step": 5,
-        "action": "order_specialized_test (Ophthalmology — confirm and grade papilledema, establish RNFL baseline)",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Bilateral papilledema grade 1, RNFL thickening on OCT; visual acuity preserved; POEMS-mediated intracranial hypertension",
+        "action": "SPEP / IFE / serum free light chains; VEGF level; bone marrow biopsy; whole-body skeletal survey or FDG-PET/CT for osteosclerotic lesions; endocrine panel",
+        "tool_name": "interpret_labs",
+        "expected_finding": "IgA lambda monoclonal protein, markedly elevated VEGF, multiple osteosclerotic lesions on skeletal survey supports POEMS",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "SPEP",
+            "IFE",
+            "serum_free_light_chains",
+            "VEGF",
+            "TSH",
+            "endocrine_panel"
+          ]
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
       },
       {
         "step": 6,
-        "action": "interpret_labs (Comprehensive endocrine replacement monitoring — TSH, cortisol, testosterone, HbA1c post-initiation)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "TSH normalizing on levothyroxine; cortisol stable on hydrocortisone; testosterone improving with TRT",
+        "action": "FDG-PET/CT or whole-body MRI for osteosclerotic plasmacytoma",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Multiple osteosclerotic lesions support POEMS",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
       }
     ],
-    "differential": [
+    "useless_tools": [
       {
-        "diagnosis": "CIDP",
-        "likelihood": "low",
-        "key_features": "CIDP does not cause papilledema, edema, endocrinopathy, skin changes, or markedly elevated VEGF; M-protein 1.4 g/dL and thrombocytosis are not CIDP features"
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is a cortical test and is non-contributory in peripheral nerve disease.",
+        "citation": "[AAN_2009]"
       },
       {
-        "diagnosis": "Prostate cancer recurrence with paraneoplastic neuropathy",
-        "likelihood": "very_low",
-        "key_features": "PSA undetectable, PET-CT negative at prostatectomy bed; osteosclerotic lesions are plasma cell lesions (IgA lambda), not prostate metastases"
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head/brain CT has no role in peripheral neuropathy evaluation.",
+        "citation": "[AAN_2009]"
       },
       {
-        "diagnosis": "Multiple endocrine neoplasia (MEN)",
-        "likelihood": "very_low",
-        "key_features": "MEN involves pituitary + parathyroid + pancreas/thyroid; endocrine failure here is VEGF-mediated (all three affected simultaneously), not MEN; no hypercalcemia, no insulinoma features"
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is not indicated in typical distal symmetric polyneuropathy without CNS signs.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated unless cardiac amyloid is suspected.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated unless there is syncope or symptomatic dysautonomia with arrhythmia concern.",
+        "citation": "[AAN_2009]"
       }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "order_specialized_test",
+        "reason": "Tier the workup — basic labs first, then targeted electrodiagnostic and tissue studies.",
+        "citation": "[AAN_2009]",
+        "severity": "soft"
+      }
+    ],
+    "critical_actions": [
+      "Send SPEP / IFE / light chains AND VEGF — POEMS is defined by lambda monoclonal protein + elevated VEGF",
+      "Whole-body skeletal survey / FDG-PET/CT for osteosclerotic plasmacytoma (multifocal here)",
+      "Endocrine workup (TSH, testosterone, prolactin, cortisol, glucose) and skin / organomegaly exam",
+      "Refer to hematology for definitive treatment (radiation for limited lesions, ASCT or systemic therapy for multifocal disease)"
+    ],
+    "contraindicated_actions": [
+      "Do not label as 'CIDP' and miss POEMS — definitive treatment is markedly different",
+      "Do not give chronic IVIG in suspected POEMS — typically refractory"
     ],
     "key_reasoning_points": [
-      "STRAIGHTFORWARD REAL-SEEDED: Classic POEMS presentation with all major features visible — the real-seeded element is the prostate cancer history creating initial anchoring toward malignant neuropathy",
-      "POEMS DIAGNOSIS FRAMEWORK: Mandatory criteria (polyneuropathy + monoclonal protein) plus major criteria (VEGF elevation, papilledema, osteosclerotic lesions) make this a straightforward POEMS diagnosis once the workup is systematically pursued",
-      "VEGF IS KEY: Measuring VEGF converts a confusing multi-system presentation into a single pathogenic explanation — all manifestations (neuropathy, edema, papilledema, endocrinopathy, skin changes) are VEGF-mediated",
-      "PROSTATE CANCER RED HERRING: Prior cancer history in neuropathy patients always requires exclusion; PSA undetectable and PET-CT negative at prostatectomy bed definitively exclude recurrence",
-      "MULTIFOCAL OSTEOSCLEROTIC MYELOMA: Two lesions require systemic treatment (lenalidomide + dexamethasone → ASCT) rather than radiation alone (which is for solitary plasmacytoma)"
+      "Demyelinating polyneuropathy + IgA lambda monoclonal + osteosclerotic lesions = POEMS",
+      "VEGF is the most sensitive biomarker",
+      "Disseminated osteosclerotic disease requires systemic therapy (ASCT)"
     ],
-    "red_herrings": [],
-    "icd_code": "G63",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": []
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -630,6 +720,14 @@
       "cardiac_monitoring": "normal",
       "literature_search": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:PERI-NEURO",
+    "difficulty_rationale": "6 required tools, 0 red herrings; classification reflects clinical complexity per PERI-NEURO pack section 6 (M/S/P/R variants).",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

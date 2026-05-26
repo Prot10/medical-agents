@@ -84,117 +84,135 @@
     "extremities": "No edema"
   },
   "ground_truth": {
-    "primary_diagnosis": "First episode migraine with sensory aura (G43.1); combined OCP contraindicated — requires immediate switch",
-    "primary_diagnosis_icd": "G43.1",
+    "primary_diagnosis": "First-episode migraine with sensory aura (ICHD-3 1.2.1) — combined OCP requires immediate discontinuation (WHO Category 4)",
+    "icd_code": "G43.109",
     "differential": [
       {
-        "diagnosis": "Transient ischemic attack (TIA)",
+        "diagnosis": "Transient ischemic attack",
         "likelihood": "low",
-        "key_features": "Normal DWI on MRI performed 5 days post-episode; gradual sensory march over 10-12 min is characteristic of CSD not embolism; positive tingling (not negative numbness); subsequent severe headache; age 35, no vascular risk factors; normal MRA; no atrial fibrillation"
+        "key_features": "Gradual 10-12 min sensory march is incompatible with TIA (abrupt onset); positive (tingling) rather than negative (numbness) symptom; subsequent severe migrainous headache; normal MRI/MRA expected",
+        "icd_code": "G45.9"
       },
       {
-        "diagnosis": "Focal sensory seizure (Jacksonian march)",
-        "likelihood": "low",
-        "key_features": "Sensory march over 10-12 minutes is TOO SLOW for focal seizure (seizures propagate in seconds); no loss of awareness; followed by contralateral severe headache; EEG shows no focal parietal epileptiform activity"
-      },
-      {
-        "diagnosis": "Cerebral arteriovenous malformation (AVM)",
+        "diagnosis": "Focal sensory (Jacksonian) seizure",
         "likelihood": "very_low",
-        "key_features": "Normal MRI/MRA — no structural lesion; no prior haemorrhage history; episodic pattern without progressive deficit"
+        "key_features": "Seizure propagation is seconds, not 10-12 minutes; no impaired awareness; normal EEG (mild non-specific posterior slowing is not epileptiform)",
+        "icd_code": "G40.109"
+      },
+      {
+        "diagnosis": "AVM / cavernoma",
+        "likelihood": "very_low",
+        "key_features": "No haemorrhage history; MRI to exclude given first episode",
+        "icd_code": "Q28.2"
+      },
+      {
+        "diagnosis": "Multiple sclerosis (first sensory attack)",
+        "likelihood": "very_low",
+        "key_features": "Sensory aura is too brief and too stereotyped for MS attack; no other deficits",
+        "icd_code": "G35"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI with DWI to exclude acute infarction (TIA exclusion) — performed 5 days post-episode",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Normal DWI; non-specific subcortical WMH; normal MRA",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
         "category": "required",
         "tool_parameters": {
-          "contrast": true,
-          "sequences": [
-            "DWI",
-            "FLAIR",
-            "T1+Gd",
-            "MRA"
-          ]
-        }
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "URGENT: Discontinue combined OCP (Microgynon) — WHO Category 4 contraindication",
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "Combined OCP + migraine with aura = unacceptable stroke risk; switch to progestin-only or non-hormonal contraception",
+        "expected_finding": "Combined OCP is WHO Category 4 in migraine with aura — discontinue and switch to progestin-only / non-hormonal; prescribe sumatriptan for future attacks (avoid during aura)",
         "category": "required",
         "tool_parameters": {
-          "drug_1": "combined_oral_contraceptive",
-          "condition": "migraine_with_aura"
-        }
+          "context": "combined_OCP_migraine_with_aura_first_episode"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 3,
-        "action": "Laboratory workup including antiphospholipid antibodies and thrombophilia screen",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Normal; no autoimmune or thrombophilic cause",
-        "category": "required",
-        "tool_parameters": {
-          "lab_type": "headache_workup"
-        }
-      },
-      {
-        "step": 4,
-        "action": "Prescribe sumatriptan 100 mg for subsequent attacks; counsel to take at headache onset",
-        "tool_name": null,
-        "expected_finding": "Effective acute treatment for future attacks",
-        "category": "required",
-        "tool_parameters": {}
-      },
-      {
-        "step": 5,
-        "action": "Provide headache diary; follow-up in 3 months",
-        "tool_name": null,
-        "expected_finding": "ICHD-3 diagnosis requires ≥2 attacks; diary will confirm pattern",
+        "action": "Brain MRI with DWI to exclude acute infarction (first-episode TIA differential)",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Normal DWI, non-specific WMH; normal MRA — no acute infarct, dissection, or vascular malformation",
         "category": "recommended",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "contrast": false,
+          "sequences": [
+            "DWI",
+            "FLAIR",
+            "T2",
+            "SWI",
+            "MRA"
+          ]
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis — neither present here",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated in typical migraine with aura — no role unless cardioembolic stroke is on the differential",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "STOP combined OCP immediately — WHO Category 4 contraindication applies from first episode of migraine with aura",
-      "Brain MRI with DWI to exclude TIA — normal result clarifies diagnosis",
-      "Differentiate sensory march rate: 10-12 minutes = too slow for seizure, characteristic of CSD",
-      "Prescribe sumatriptan for future attacks; do not take during aura phase"
+      "Discontinue combined OCP immediately — WHO Category 4 contraindication applies from first confirmed episode",
+      "Brain MRI with DWI to exclude TIA in this first-episode presentation",
+      "Document gradual sensory march (10-12 min) as characteristic of CSD, not TIA or seizure",
+      "Prescribe sumatriptan for future attacks; counsel to take at headache onset, not during aura",
+      "Provide headache diary; ICHD-3 requires ≥2 attacks for definitive diagnosis (clinically very likely after this episode)"
     ],
     "contraindicated_actions": [
-      "Do not continue combined OCP — absolute contraindication in migraine with aura",
-      "Do not anticoagulate — no confirmed TIA on DWI; anticoagulation not indicated for sensory migraine aura",
-      "Do not take triptan during sensory aura phase — only at headache onset"
+      "Do not continue combined oestrogen-progestogen contraception in migraine with aura (WHO Category 4)",
+      "Do not anticoagulate — normal DWI excludes TIA",
+      "Do not take triptans during the aura phase — only at headache onset",
+      "Do not co-administer triptans with ergotamines"
     ],
     "key_reasoning_points": [
-      "Sensory march from fingertips → arm → face over 10-12 minutes is the hallmark of somatosensory cortical spreading depression — the rate is too slow for TIA (abrupt) and too slow for seizure (seconds)",
-      "Combined OCP is WHO Category 4 (unacceptable risk) in migraine with aura — must be stopped at first diagnosis regardless of duration of use",
-      "Normal DWI on MRI 5 days after episode essentially excludes TIA; DWI lesions in TIA are visible for 7-10 days",
-      "Moderate difficulty stems from TIA vs sensory aura differentiation and recognising OCP contraindication"
+      "Sensory march from fingertips → arm → face over 10-12 minutes is the hallmark of somatosensory cortical spreading depression — too slow for TIA (abrupt) and far too slow for seizure (seconds)",
+      "Combined OCP in migraine with aura is WHO Category 4 from first diagnosis — must be stopped",
+      "Normal DWI 5 days after the episode is sufficient to exclude TIA (DWI lesions persist 7-10 days)"
     ],
     "red_herrings": [
       {
-        "data_point": "Right arm sensory symptoms in a 35-year-old prompting urgent TIA referral",
-        "location": "patient.history_present_illness",
-        "intended_effect": "GP appropriately referred for urgent TIA evaluation given unilateral sensory symptoms",
-        "correct_interpretation": "Gradual Jacksonian march from fingertips to face over 10-12 minutes = characteristic cortical spreading depression; TIA onset is abrupt; normal DWI confirms no infarction; family history of visual migraine aura",
-        "field_path": ""
+        "data_point": "Mild non-specific bilateral posterior slowing on EEG",
+        "location": "initial_tool_outputs.eeg.impression",
+        "field_path": "initial_tool_outputs.eeg.impression",
+        "intended_effect": "Non-specific slowing might prompt anticonvulsant consideration",
+        "correct_interpretation": "Non-specific posterior slowing is a known inter-ictal finding in migraineurs; no focal epileptiform discharges; the aura is migrainous CSD"
       },
       {
-        "data_point": "Mild intermittent posterior slowing on EEG suggesting epileptic focus",
-        "location": "initial_tool_outputs.eeg.impression",
-        "intended_effect": "Non-specific EEG slowing might prompt anticonvulsant consideration",
-        "correct_interpretation": "Non-specific posterior slowing is a known inter-ictal finding in migraineurs; no focal parietal epileptiform discharges; aura duration far too long for seizure propagation",
-        "field_path": ""
+        "data_point": "Unilateral right arm sensory symptoms in a 35-year-old prompting urgent GP TIA referral",
+        "location": "patient.history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "May anchor on TIA",
+        "correct_interpretation": "Gradual Jacksonian march from fingertips to face over 10-12 minutes is CSD, not embolism; normal DWI confirms no infarction; positive family history of migraine with visual aura supports diagnosis"
       }
-    ],
-    "icd_code": "G43.1",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -217,7 +235,17 @@
       "ct": "normal",
       "cardiac_monitoring": "normal",
       "specialized_test": "incidental"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Moderate: first-episode TIA differential plus combined OCP medication-safety event",
+    "case_body_concerns": [
+      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide §1): ['analyze_ecg', 'analyze_eeg', 'interpret_labs', 'order_echocardiogram']"
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "initial_tool_outputs": {
     "mri": {

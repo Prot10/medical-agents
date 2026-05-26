@@ -84,7 +84,7 @@
         "Fisher grade 3 SAH in a postpartum patient - this is NOT eclampsia alone",
         "PRES changes visible posteriorly - can co-occur with SAH in postpartum hypertension"
       ],
-      "impression": "1. Moderate subarachnoid hemorrhage (Fisher grade 3) — hyperdense blood in basal cisterns and bilateral Sylvian fissures. 2. Subtle cortical hypodensity in bilateral occipital and parietal regions, consistent with posterior reversible encephalopathy syndrome (PRES). 3. No parenchymal hematoma. 4. No midline shift.",
+      "impression": "1. Moderate subarachnoid hemorrhage (Fisher grade 3) \u2014 hyperdense blood in basal cisterns and bilateral Sylvian fissures. 2. Subtle cortical hypodensity in bilateral occipital and parietal regions, consistent with posterior reversible encephalopathy syndrome (PRES). 3. No parenchymal hematoma. 4. No midline shift.",
       "recommended_actions": [
         "CT angiography of the head and neck recommended"
       ]
@@ -231,7 +231,7 @@
         "QTc mildly prolonged 488 ms",
         "Note: magnesium IV can affect ECG"
       ],
-      "interpretation": "Sinus tachycardia, rate 110. T-wave inversions V1–V4. QTc 488 ms — mildly prolonged. No ST-segment elevation. No pathological Q waves.",
+      "interpretation": "Sinus tachycardia, rate 110. T-wave inversions V1\u2013V4. QTc 488 ms \u2014 mildly prolonged. No ST-segment elevation. No pathological Q waves.",
       "clinical_correlation": ""
     }
   },
@@ -294,7 +294,7 @@
         ],
         "volumetrics": null,
         "additional_observations": [],
-        "impression": "1. Bilateral posterior white matter FLAIR hyperintensity in occipital, parietal, and posterior temporal regions — consistent with posterior reversible encephalopathy syndrome. 2. Sulcal FLAIR hyperintensity in basal cisterns and Sylvian fissures; GRE/SWI confirms subarachnoid hemorrhage signal. 3. No parenchymal infarction. 4. No restricted diffusion.",
+        "impression": "1. Bilateral posterior white matter FLAIR hyperintensity in occipital, parietal, and posterior temporal regions \u2014 consistent with posterior reversible encephalopathy syndrome. 2. Sulcal FLAIR hyperintensity in basal cisterns and Sylvian fissures; GRE/SWI confirms subarachnoid hemorrhage signal. 3. No parenchymal infarction. 4. No restricted diffusion.",
         "differential_by_imaging": [
           {
             "diagnosis": "PRES (posterior reversible encephalopathy syndrome) co-existing with SAH",
@@ -399,10 +399,10 @@
           "Mild Takotsubo pattern",
           "EF 54% mildly reduced"
         ],
-        "impression": "1. Mild apical wall motion abnormality with mild anterior apical hypokinesis. LVEF 54%. Pattern consistent with Takotsubo (stress) cardiomyopathy. 2. No significant valvular abnormality. 3. No intracardiac thrombus. Cardiology consultation recommended. Repeat echo in 4–6 weeks recommended.",
+        "impression": "1. Mild apical wall motion abnormality with mild anterior apical hypokinesis. LVEF 54%. Pattern consistent with Takotsubo (stress) cardiomyopathy. 2. No significant valvular abnormality. 3. No intracardiac thrombus. Cardiology consultation recommended. Repeat echo in 4\u20136 weeks recommended.",
         "recommended_actions": [
           "Cardiology consultation recommended",
-          "Repeat echocardiogram in 4–6 weeks recommended"
+          "Repeat echocardiogram in 4\u20136 weeks recommended"
         ]
       }
     }
@@ -451,119 +451,295 @@
   },
   "ground_truth": {
     "primary_diagnosis": "Aneurysmal subarachnoid hemorrhage in postpartum period with co-existing eclampsia and PRES",
-    "icd_code": "I60.9",
+    "icd_code": "I60.7",
     "differential": [
       {
-        "diagnosis": "Eclampsia without SAH",
-        "likelihood": "very_low",
-        "key_features": "CT and CSF confirm SAH; aneurysm on CTA - SAH co-exists with eclampsia"
-      },
-      {
-        "diagnosis": "RCVS with convexity SAH",
-        "likelihood": "very_low",
-        "key_features": "CTA shows saccular aneurysm not beading pattern; distribution is basal cistern not convexity"
-      },
-      {
-        "diagnosis": "Peripartum cardiomyopathy",
+        "diagnosis": "Reversible cerebral vasoconstriction syndrome (RCVS)",
         "likelihood": "low",
-        "key_features": "Echo shows mild Takotsubo; serial echo needed; neurogenic vs peripartum difficult to distinguish"
+        "key_features": "Thunderclap onset overlaps with SAH; segmental arterial beading on CTA absent in this case"
+      },
+      {
+        "diagnosis": "Cervical artery dissection (carotid or vertebral)",
+        "likelihood": "low",
+        "key_features": "Sudden severe headache and/or neck pain; CTA head and neck without dissection findings"
+      },
+      {
+        "diagnosis": "Posterior reversible encephalopathy syndrome (PRES) / eclampsia",
+        "likelihood": "high",
+        "key_features": "Postpartum, BP variability, posterior MRI changes; co-existing with SAH in this case"
+      },
+      {
+        "diagnosis": "Pituitary apoplexy",
+        "likelihood": "low",
+        "key_features": "Sudden severe headache with visual changes; pituitary MRI without enlargement excludes"
+      },
+      {
+        "diagnosis": "Thunderclap migraine (primary)",
+        "likelihood": "very_low",
+        "key_features": "Diagnosis of exclusion; positive CT / CSF xanthochromia rules out for this presentation"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "CT head - do not assume eclampsia alone; confirm SAH",
+        "action": "Obtain urgent non-contrast CT head as first imaging modality for suspected SAH",
         "tool_name": "order_ct_scan",
-        "expected_finding": "SAH in basal cisterns + PRES changes - SAH co-existing with eclampsia",
+        "expected_finding": "Hyperdense blood in subarachnoid spaces (basal cisterns, Sylvian or interhemispheric fissures); CT sensitivity ~98% within 6 h, declines thereafter",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Connolly_2012]",
+        "guideline_source": "Connolly_2012"
       },
       {
         "step": 2,
-        "action": "LP to confirm SAH",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Non-clearing bloody CSF with xanthochromia",
+        "action": "Obtain CT angiography (CTA) of the head and neck to characterize aneurysm location, size, and morphology",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Saccular aneurysm at the culprit location; morphologic features (neck width, dome-to-neck ratio, lobulation) inform clipping vs coiling",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "angiography": true
+        },
+        "citation": "[Connolly_2012]",
+        "guideline_source": "Connolly_2012"
       },
       {
         "step": 3,
-        "action": "CTA for aneurysm - exclude RCVS",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Saccular right MCA aneurysm (not RCVS beading)",
+        "action": "Interpret labs: CBC, BMP (sodium for cerebral salt wasting / SIADH), coagulation panel, type & screen, troponin, BNP",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Mild leukocytosis (stress response), troponin elevation (neurogenic stress cardiomyopathy), normal coagulation if not on anticoagulation",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "coagulation",
+            "type_and_screen",
+            "troponin",
+            "BNP"
+          ]
+        },
+        "citation": "[Connolly_2012]",
+        "guideline_source": "Connolly_2012"
       },
       {
         "step": 4,
-        "action": "Check magnesium + nimodipine interaction",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Additive calcium channel blockade - monitor BP and Mg levels",
+        "action": "Obtain 12-lead ECG to evaluate for neurogenic stress changes and exclude concurrent primary cardiac event",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Neurogenic T-wave inversions, QTc prolongation, ST changes typical of catecholamine surge in SAH; not primary ACS",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Connolly_2012]",
+        "guideline_source": "Connolly_2012"
       },
       {
         "step": 5,
-        "action": "Literature search - postpartum SAH eclampsia overlap",
+        "action": "Search medical literature for current SAH grading scales (Hunt-Hess, WFNS, modified Fisher) and clipping vs endovascular coiling indications",
         "tool_name": "search_medical_literature",
-        "expected_finding": "SAH and eclampsia can co-exist; CT/CTA mandatory in postpartum severe headache",
+        "expected_finding": "Society guidelines (AHA/ASA 2012/2023) confirm grading, vasospasm prophylaxis with nimodipine, and timing of definitive aneurysm securing",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "query": "aneurysmal SAH management Hunt-Hess WFNS Fisher coiling clipping"
+        },
+        "citation": "[Hoh_2023]",
+        "guideline_source": "Hoh_2023"
       },
       {
         "step": 6,
-        "action": "MRI for PRES confirmation",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "PRES + SAH both confirmed on MRI",
+        "action": "Urgent consultation with neurosurgery and interventional neuroradiology for definitive aneurysm securing within 24-72 hours",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Joint decision for endovascular coiling versus surgical clipping based on aneurysm morphology, location, and patient factors",
+        "category": "required",
+        "tool_parameters": {
+          "specialty": "neurosurgery_and_interventional_neuroradiology",
+          "urgency": "emergent"
+        },
+        "citation": "[Connolly_2012]",
+        "guideline_source": "Connolly_2012"
+      },
+      {
+        "step": 7,
+        "action": "Check drug interactions for nimodipine and any pre-existing antithrombotic / antihypertensive regimen; plan anticoagulation reversal if applicable",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Nimodipine well-tolerated with most antihypertensives (monitor for hypotension); anticoagulation reversed if patient is on a DOAC or warfarin pre-securing aneurysm",
+        "category": "required",
+        "tool_parameters": {
+          "drugs": [
+            "nimodipine"
+          ]
+        },
+        "citation": "[Hoh_2023]",
+        "guideline_source": "Hoh_2023"
+      },
+      {
+        "step": 8,
+        "action": "Initiate continuous cardiac telemetry for early detection of arrhythmias and neurogenic cardiac complications",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Sinus rhythm with intermittent neurogenic changes; rare malignant arrhythmias warrant intervention",
         "category": "recommended",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "monitor_type": "telemetry"
+        },
+        "citation": "[Connolly_2012]",
+        "guideline_source": "Connolly_2012"
+      },
+      {
+        "step": 9,
+        "action": "Obtain transthoracic echocardiogram given troponin elevation and neurogenic ECG changes",
+        "tool_name": "order_echocardiogram",
+        "expected_finding": "Apical ballooning / regional wall motion abnormality consistent with neurogenic (Takotsubo) stress cardiomyopathy; not primary ACS",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Connolly_2012]",
+        "guideline_source": "Connolly_2012"
+      },
+      {
+        "step": 10,
+        "action": "Initiate daily transcranial Doppler monitoring days 4-14 post-bleed for vasospasm surveillance",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Mean flow velocities and Lindegaard ratios to detect cerebral vasospasm preceding delayed cerebral ischemia",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "transcranial_doppler"
+        },
+        "citation": "[Hoh_2023]",
+        "guideline_source": "Hoh_2023"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is not part of standard SAH workup; reserve for evaluation of unexplained altered mental status suggesting non-convulsive status epilepticus.",
+        "citation": "[Connolly_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "rationale": "EMG/NCS has no role in acute SAH evaluation or management.",
+        "citation": "[Connolly_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "Sleep study is irrelevant to acute SAH workup.",
+        "citation": "[Connolly_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET evaluates Alzheimer biomarkers and has no role in acute hemorrhagic stroke workup.",
+        "citation": "[Connolly_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "Dopamine-transporter SPECT is for parkinsonism differentiation and has no role in SAH.",
+        "citation": "[Connolly_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "FDG PET has no role in acute SAH diagnosis or management.",
+        "citation": "[Connolly_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "Non-contrast CT must precede lumbar puncture to exclude mass effect, hydrocephalus, and to confirm/exclude SAH before invasive LP.",
+        "citation": "[Edlow_2008]",
+        "severity": "hard"
+      },
+      {
+        "before": "consult_medical_specialist",
+        "after": "check_drug_interactions",
+        "reason": "Neurosurgical / interventional neuroradiology consultation precedes definitive aneurysm securing within 24-72 hours; medication planning (nimodipine, anticoagulant reversal) aligns with this window.",
+        "citation": "[Connolly_2012]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "analyze_csf",
+        "reason": "Coagulation studies (PT/INR/PTT) must be reviewed and any coagulopathy corrected before invasive procedures including lumbar puncture or aneurysm intervention.",
+        "citation": "[Connolly_2012]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Do not attribute all symptoms to eclampsia - SAH must be excluded with CT and LP",
-      "CTA to identify aneurysm and differentiate from RCVS",
-      "Continue magnesium for eclampsia; add nimodipine for SAH vasospasm prophylaxis",
-      "Monitor magnesium levels - toxicity risk",
-      "BP control serves both eclampsia/PRES and SAH management",
-      "Urgent aneurysm treatment post-delivery"
+      "Initiate non-contrast CT head as the first diagnostic step in suspected SAH; do not delay for other workup.",
+      "Obtain CT angiography of the head and neck immediately after positive non-contrast CT to characterize the aneurysm.",
+      "Start nimodipine 60 mg orally every 4 hours within hours of SAH confirmation and continue for 21 days for vasospasm prophylaxis.",
+      "Obtain urgent neurosurgery and interventional neuroradiology consultation for definitive aneurysm securing (clipping or coiling) within 24-72 hours.",
+      "Admit to a neurocritical care unit with continuous neurologic checks, blood-pressure control (SBP target generally <160 mmHg pre-securing), and cardiac telemetry.",
+      "Monitor serum sodium closely for cerebral salt wasting / SIADH and avoid hypotonic fluids.",
+      "Initiate daily transcranial Doppler monitoring days 4-14 post-bleed for vasospasm surveillance.",
+      "Coordinate with obstetrics and maternal-fetal medicine; manage co-existing eclampsia/PRES with magnesium and BP control while planning aneurysm securing."
     ],
     "contraindicated_actions": [
-      "Do not diagnose eclampsia alone without CT and LP in postpartum thunderclap headache",
-      "Do not withhold CT from postpartum patient with thunderclap headache",
-      "Do not give sumatriptan (often used for postpartum headache) in confirmed SAH"
+      "Do not perform lumbar puncture before non-contrast CT in suspected SAH.",
+      "Do not perform lumbar puncture when CT already confirms SAH with mass effect, intraventricular hemorrhage, or hydrocephalus \u2014 herniation risk.",
+      "Do not start aspirin or other antiplatelet agents before the aneurysm is secured \u2014 increases rebleeding risk.",
+      "Do not administer nimodipine intravenously \u2014 IV administration has caused fatal cardiovascular collapse; oral or NG only.",
+      "Do not give NSAIDs (e.g., ibuprofen, ketorolac) for headache control before aneurysm securing \u2014 antiplatelet effect raises rebleeding risk.",
+      "Do not pursue cardiac catheterization for neurogenic troponin elevation without strong primary-ACS evidence \u2014 delays aneurysm treatment.",
+      "Do not allow uncontrolled hypertension (SBP >160 mmHg) pre-securing; do not over-correct to systemic hypotension."
     ],
     "key_reasoning_points": [
-      "SAH and eclampsia/PRES can co-exist in postpartum patients - thunderclap headache always requires imaging",
-      "CTA differentiates aneurysmal SAH from RCVS: saccular aneurysm (SAH) vs arterial beading (RCVS)",
-      "Prior eclampsia history is a red herring - increases pre-test probability for eclampsia but does not exclude SAH",
-      "Magnesium sulfate blocks calcium channels - additive effect with nimodipine, monitor closely",
-      "HELLP syndrome component (elevated LDH, AST, borderline platelets) adds complexity to management",
-      "Postpartum period is a high-risk time for both SAH (aneurysm) and RCVS"
+      "Sudden, peak-in-seconds 'thunderclap' headache is SAH until proven otherwise \u2014 peak intensity \u22641 minute is the highest-yield historical feature.",
+      "Non-contrast CT sensitivity for SAH is ~98% within 6 hours of symptom onset, declining to ~80-85% by 24 hours and substantially lower thereafter; CT negativity does not exclude SAH in late presenters.",
+      "Lumbar puncture is indicated when CT is non-diagnostic and clinical suspicion remains; xanthochromia by spectrophotometry develops 6-12 hours post-bleed and persists 2-3 weeks.",
+      "Distinguish SAH from traumatic LP using non-clearing RBC counts across tubes 1-4 and xanthochromia (absent in traumatic).",
+      "Once SAH is confirmed, CT angiography of the head and neck characterizes the aneurysm and drives the clipping-versus-coiling decision.",
+      "Hunt-Hess and WFNS grades stratify clinical severity and outcome; modified Fisher grade predicts vasospasm risk from CT blood distribution.",
+      "Neurogenic stress cardiomyopathy (Takotsubo pattern, troponin elevation, T-wave inversions, QTc prolongation) is common in SAH and should not divert attention to a primary cardiac workup.",
+      "Nimodipine 60 mg PO every 4 hours for 21 days is the only proven pharmacologic prophylaxis for delayed cerebral ischemia in aneurysmal SAH \u2014 it does not prevent angiographic vasospasm but improves outcomes.",
+      "Definitive aneurysm securing (coiling or clipping) within 24-72 hours dramatically reduces rebleeding risk, which carries ~50% mortality.",
+      "Vasospasm peaks days 4-14 post-bleed; daily transcranial Doppler monitoring plus clinical exam guides escalation to CT perfusion, angiography, and intra-arterial therapy when needed.",
+      "Postpartum thunderclap headache mandates SAH workup; co-existing eclampsia or PRES does not exclude aneurysmal bleeding, and CTA/MRA is required before attributing all findings to PRES."
     ],
     "red_herrings": [
       {
-        "data_point": "Prior eclampsia history and eclampsia diagnosis in current pregnancy",
-        "location": "past_medical_history and HPI",
-        "intended_effect": "Lead clinician to attribute all symptoms to eclampsia and skip SAH workup",
-        "correct_interpretation": "Eclampsia and SAH can co-exist; thunderclap headache requires CT and CTA regardless of eclampsia diagnosis",
-        "field_path": ""
+        "data_point": "Troponin elevation with neurogenic ECG changes (T-wave inversions and QTc prolongation)",
+        "location": "initial_tool_outputs / labs and ecg",
+        "field_path": "initial_tool_outputs.ecg.findings",
+        "intended_effect": "Cardiac biomarker rise plus ST/T-wave changes may anchor the workup toward a primary acute coronary syndrome and a cardiology-first pathway.",
+        "correct_interpretation": "Catecholamine surge from acute SAH causes neurogenic myocardial injury (Takotsubo physiology) in up to 30-40% of patients; echocardiogram showing apical ballooning confirms etiology and the focus remains on aneurysm securing."
       },
       {
-        "data_point": "Seizure attributed to eclampsia by nursing staff",
-        "location": "HPI",
-        "intended_effect": "Confirm eclampsia diagnosis and skip further workup",
-        "correct_interpretation": "SAH also causes seizures; CT showing SAH and CTA showing aneurysm confirm primary diagnosis is aneurysmal SAH with co-existing eclampsia",
-        "field_path": ""
+        "data_point": "Bloody CSF in tube 1 raising the possibility of a traumatic tap",
+        "location": "initial_tool_outputs / csf",
+        "field_path": "initial_tool_outputs.csf.appearance",
+        "intended_effect": "A traumatic tap can mimic SAH and falsely reassure if the clinician interprets the blood as procedural.",
+        "correct_interpretation": "Non-clearing RBCs across tubes 1-4 plus xanthochromia on spectrophotometry confirm SAH; traumatic taps show clearing across tubes and lack xanthochromia within the first ~6-12 h."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
       "eeg": "normal",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SAH",
+    "difficulty_rationale": "Rare or complicated SAH presentation (late presenter, perimesencephalic, anemic CT-attenuation, postpartum/eclampsia, IIH overlap, dual antiplatelet, or severe Fisher 4 / hydrocephalus) requiring specialized imaging, MRI/SWI, and multi-specialty coordination; \u22656 required tools and \u22653 red herrings.",
+    "case_body_concerns": [
+      "followup_outputs entry uses order_specialized_test for transcranial Doppler, but per TOOL_PARAMETER_VOCABULARY.md TCD should be order_advanced_imaging with modality=transcranial_doppler. Suggest re-tagging the followup tool_name."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

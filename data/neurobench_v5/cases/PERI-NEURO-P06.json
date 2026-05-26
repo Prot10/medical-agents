@@ -517,57 +517,221 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Acute intermittent porphyria (AIP) with porphyric neuropathy — HMBS pathogenic variant c.518G>A",
-    "critical_actions": [
-      "Order urine PBG DURING a symptomatic episode — collecting during remission may miss the diagnosis",
-      "IV hemin URGENTLY — hemin suppresses ALAS1, reducing porphyrin precursor accumulation",
-      "STRICT DRUG SAFETY: Avoid all porphyrinogenic drugs — the safe drug list must be printed and given to patient; anticonvulsants (phenytoin, carbamazepine, valproate) are UNSAFE if seizure management is needed; use levetiracetam/benzodiazepines",
-      "STOP FASTING REGIMEN — caloric restriction is a major precipitant; patient must NOT fast",
-      "Genetic counseling for family — autosomal dominant condition; sister is a carrier"
-    ],
-    "contraindicated_actions": [
-      "Do NOT attribute to IBS or anxiety — elevated PBG is objective; psychiatric misattribution in AIP can be fatal if attack progresses to respiratory failure",
-      "Do NOT use phenytoin, carbamazepine, or valproate for seizure management in AIP — these are PORPHYRINOGENIC and will worsen the attack",
-      "Do NOT prescribe oral contraceptives or hormonal therapy — porphyrinogenic",
-      "Do NOT allow patient to continue intermittent fasting — carbohydrate restriction directly triggers ALAS1 upregulation and AIP attacks"
-    ],
-    "optimal_actions": [],
+    "primary_diagnosis": "Acute intermittent porphyria (AIP) with porphyric polyneuropathy (HMBS variant)",
+    "icd_code": "G62.89",
     "differential": [
       {
-        "diagnosis": "Functional abdominal pain / IBS",
-        "likelihood": "very_low",
-        "key_features": "IBS does not cause peripheral neuropathy, encephalopathy, port-wine urine, hyponatremia, or tachycardia; recurrent severe colicky pain requiring ER visits is NOT IBS pattern; PBG 42 mmol/mol is objective"
+        "diagnosis": "Lead / heavy-metal toxic neuropathy",
+        "likelihood": "moderate",
+        "key_features": "Motor-predominant, abdominal pain, basophilic stippling; need blood/urine heavy metal panel.",
+        "icd_code": "G62.2"
       },
       {
-        "diagnosis": "Anxiety disorder with somatization",
-        "likelihood": "very_low",
-        "key_features": "Elevated urine PBG and ALA are objective biochemical findings; hyponatremia and tachycardia are not somatoform; psychiatric misattribution is one of the most dangerous errors in AIP"
+        "diagnosis": "Guillain-Barré syndrome (GBS, AMAN variant)",
+        "likelihood": "moderate",
+        "key_features": "Acute motor axonal; areflexia, monophasic; CSF albuminocytologic dissociation; relevant if rapidly ascending.",
+        "icd_code": "G61.0"
       },
       {
-        "diagnosis": "Heavy metal toxicity (lead, arsenic)",
+        "diagnosis": "Functional / somatization disorder",
         "likelihood": "low",
-        "key_features": "Heavy metals screen normal; arsenic/lead can cause abdominal pain + neuropathy but do not cause port-wine urine or elevated PBG"
+        "key_features": "Multiple ER visits with negative imaging anchor here; but objective NCS abnormalities argue otherwise.",
+        "icd_code": "F45.1"
       },
       {
         "diagnosis": "CIDP with autonomic involvement",
-        "likelihood": "very_low",
-        "key_features": "CIDP is not episodic with abdominal crisis; CIDP is demyelinating on NCS; CIDP does not cause port-wine urine, hyponatremia, or elevated porphyrins"
+        "likelihood": "low",
+        "key_features": "Demyelinating, chronic relapsing pattern; less explosive than porphyric crisis.",
+        "icd_code": "G61.81"
+      },
+      {
+        "diagnosis": "Vasculitic neuropathy",
+        "likelihood": "low",
+        "key_features": "Asymmetric multifocal axonal; need ANCA / ANA / biopsy.",
+        "icd_code": "G63"
       }
     ],
-    "key_reasoning_points": [
-      "DIAGNOSTIC PUZZLE: Three levels of misdirection — (1) 3 normal abdominal CT scans labeled as functional, (2) psychiatric symptoms labeled as anxiety/somatization, (3) neuropathy worked up without considering AIP",
-      "KEY CLUE: PORT-WINE URINE during attacks is pathognomonic — must ALWAYS check urine color during attacks and test PBG immediately",
-      "FASTING PRECIPITANT: Patient's self-prescribed 24-hour intermittent fasting 2-3x/month was directly triggering attacks for 2 years — carbohydrate restriction is one of the most potent AIP precipitants",
-      "NCS PATTERN: Predominantly MOTOR axonal with PROXIMAL > DISTAL = porphyric neuropathy (distinct from diabetic distal sensorimotor, CIDP demyelinating, or axonal length-dependent patterns)",
-      "HYPONATREMIA IN AIP: SIADH from hypothalamic involvement — a unique metabolic clue not present in other neuropathy causes",
-      "DRUG SAFETY: AIP drug list is critically important — many common hospital medications are unsafe; patients must carry an emergency drug list",
-      "AUTOSOMAL DOMINANT: 50% risk to siblings and children; maternal cousin's 'seizures and blood disorder' were unrecognized AIP attacks"
+    "optimal_actions": [
+      {
+        "step": 1,
+        "action": "Order broad neuropathy labs (CBC, CMP, HbA1c, B12 + MMA, TSH, SPEP/IFE, urinalysis)",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Identify reversible/treatable etiologies (diabetes, B12 deficiency, monoclonal gammopathy, thyroid disease)",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "HbA1c",
+            "B12",
+            "MMA",
+            "TSH",
+            "SPEP",
+            "IFE",
+            "UA"
+          ]
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 2,
+        "action": "Order EMG/NCS to characterize axonal vs demyelinating pattern and distribution",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Length-dependent axonal vs demyelinating vs multifocal pattern; severity and distribution",
+        "category": "required",
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 3,
+        "action": "Search literature for DSP evaluation guidelines and etiology-specific recommendations",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirm AAN 2009 DSP workup, etiology-specific evaluations",
+        "category": "required",
+        "tool_parameters": {
+          "query": "distal symmetric polyneuropathy evaluation AAN 2009"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 4,
+        "action": "Review medications for neurotoxic agents and check interactions for symptomatic therapy",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identify potentially neurotoxic drugs (chemotherapy, metronidazole, megadose B6, nitrofurantoin); guide neuropathic-pain pharmacotherapy",
+        "category": "required",
+        "tool_parameters": {
+          "medications": []
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 5,
+        "action": "Spot urine porphobilinogen (PBG), δ-aminolevulinic acid (ALA), total porphyrins, and quantification on a freshly-voided light-protected sample during an attack",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Markedly elevated urine PBG and ALA during attack confirm acute hepatic porphyria",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "urine_PBG",
+            "urine_ALA",
+            "urine_porphyrins",
+            "fecal_porphyrins",
+            "plasma_porphyrins"
+          ]
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 6,
+        "action": "Targeted porphyria gene panel (HMBS, ALAS1, CPOX, PPOX) when biochemistry positive",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Pathogenic variant in HMBS confirms acute intermittent porphyria",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "genetic_panel:CMT"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      },
+      {
+        "step": 7,
+        "action": "Heavy metal screen (lead, arsenic, thallium) — porphyric crisis differential and lead inhibits ALAD",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Rule out lead poisoning (mimics porphyric crisis and elevates ALA)",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "blood_lead",
+            "urine_arsenic",
+            "urine_thallium",
+            "blood_mercury"
+          ]
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN 2009 DSP Practice Parameter"
+      }
     ],
-    "red_herrings": [],
-    "icd_code": "G62.89",
-    "useless_tools": [],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is a cortical test and is non-contributory in peripheral nerve disease.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head/brain CT has no role in peripheral neuropathy evaluation.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is not indicated in typical distal symmetric polyneuropathy without CNS signs.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {},
+        "rationale": "Advanced cerebral imaging (PET/MRA/MRV/perfusion) has no routine role in peripheral neuropathy.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated unless cardiac amyloid is suspected.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated unless there is syncope or symptomatic dysautonomia with arrhythmia concern.",
+        "citation": "[AAN_2009]"
+      }
+    ],
     "harmful_tools": [],
-    "sequence_constraints": []
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "order_specialized_test",
+        "reason": "Tier the workup — basic labs first, then targeted electrodiagnostic and tissue studies.",
+        "citation": "[AAN_2009]",
+        "severity": "soft"
+      }
+    ],
+    "critical_actions": [
+      "Recognize acute motor-predominant axonal neuropathy + recurrent abdominal pain + psychiatric symptoms = porphyric crisis",
+      "Obtain spot urine PBG and ALA on a fresh, light-protected sample DURING the attack (key timing)",
+      "Heavy metal screen to exclude lead poisoning",
+      "Confirm with HMBS gene sequencing",
+      "Treat with IV hemin (heme arginate or Panhematin), high-dose glucose, and pain control with safe agents",
+      "Avoid porphyrinogenic drugs (barbiturates, sulfonamides, valproate, oral contraceptives, rifampin, etc.)"
+    ],
+    "contraindicated_actions": [
+      "Do not give porphyrinogenic medications (barbiturates, sulfonamides, valproate, rifampin, OCPs, ergots)",
+      "Do not dismiss as IBS or anxiety without checking urine PBG during an attack"
+    ],
+    "key_reasoning_points": [
+      "The triad of abdominal pain + neuropsychiatric symptoms + motor neuropathy is the classic porphyric crisis",
+      "Diagnosis requires urine PBG/ALA testing DURING an attack (light-protected, fresh)",
+      "HMBS gene confirmation supports family screening and trigger avoidance counseling"
+    ],
+    "red_herrings": [
+      {
+        "data_point": "Multiple negative ER imaging studies for abdominal pain",
+        "location": "history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Functional / somatization attribution",
+        "correct_interpretation": "Recurrent unexplained severe abdominal pain with neurologic and psychiatric features = porphyric crisis until proven otherwise."
+      }
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -580,6 +744,16 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:PERI-NEURO",
+    "difficulty_rationale": "6 required tools, 1 red herrings; classification reflects clinical complexity per PERI-NEURO pack section 6 (M/S/P/R variants).",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": [
+      "Porphyria-specific gene panel (HMBS/ALAS1/CPOX/PPOX) is not in the closed `genetic_panel:` vocabulary; used `genetic_panel:CMT` as placeholder and described accurately in action text."
+    ]
   }
 }

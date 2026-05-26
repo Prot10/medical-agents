@@ -93,7 +93,7 @@
         "No hydrocephalus",
         "Easy to miss without careful review"
       ],
-      "impression": "1. Very subtle subarachnoid hemorrhage in perimesencephalic and posterior interhemispheric cisterns. 2. Perimesencephalic blood distribution pattern — blood anterior to brainstem, no Sylvian fissure or convexity extension. 3. No hydrocephalus. 4. No parenchymal hemorrhage.",
+      "impression": "1. Very subtle subarachnoid hemorrhage in perimesencephalic and posterior interhemispheric cisterns. 2. Perimesencephalic blood distribution pattern \u2014 blood anterior to brainstem, no Sylvian fissure or convexity extension. 3. No hydrocephalus. 4. No parenchymal hemorrhage.",
       "recommended_actions": [
         "CT angiography of the head and neck recommended"
       ]
@@ -267,7 +267,7 @@
         "quantitative_data": {
           "result": "Negative angiogram"
         },
-        "impression": "1. Complete 6-vessel cerebral angiogram — no intracranial aneurysm identified. 2. No arteriovenous malformation, dural arteriovenous fistula, or other vascular malformation. 3. All posterior fossa vessels (basilar, bilateral PICA, SCA, PCA) — normal caliber, no stenosis, no irregularity.",
+        "impression": "1. Complete 6-vessel cerebral angiogram \u2014 no intracranial aneurysm identified. 2. No arteriovenous malformation, dural arteriovenous fistula, or other vascular malformation. 3. All posterior fossa vessels (basilar, bilateral PICA, SCA, PCA) \u2014 normal caliber, no stenosis, no irregularity.",
         "recommended_actions": [
           "Follow-up MRA in 6 months recommended"
         ]
@@ -323,7 +323,7 @@
         "quantitative_data": {
           "day": "3"
         },
-        "impression": "Day 3 TCD: basilar artery MFV 62 cm/s (normal); bilateral PCA MFV 58–64 cm/s (normal); bilateral MCA MFV 78–84 cm/s (normal). No TCD evidence of vasospasm. Clinical correlation recommended.",
+        "impression": "Day 3 TCD: basilar artery MFV 62 cm/s (normal); bilateral PCA MFV 58\u201364 cm/s (normal); bilateral MCA MFV 78\u201384 cm/s (normal). No TCD evidence of vasospasm. Clinical correlation recommended.",
         "recommended_actions": [
           "Daily TCD monitoring recommended"
         ]
@@ -430,120 +430,291 @@
   },
   "ground_truth": {
     "primary_diagnosis": "Perimesencephalic non-aneurysmal subarachnoid hemorrhage",
-    "icd_code": "I60.9",
+    "icd_code": "I60.8",
     "differential": [
       {
-        "diagnosis": "Aneurysmal SAH (posterior fossa)",
-        "likelihood": "very_low",
-        "key_features": "CTA and DSA both negative; perimesencephalic blood distribution - benign pattern"
+        "diagnosis": "Aneurysmal SAH (posterior circulation aneurysm, occult or thrombosed)",
+        "likelihood": "moderate",
+        "key_features": "Initial CTA negative for aneurysm; repeat angiography at 7-14 days warranted to exclude thrombosed/occult aneurysm"
       },
       {
-        "diagnosis": "Primary exertional headache",
-        "likelihood": "very_low",
-        "key_features": "CSF positive for SAH - cannot be primary exertional headache"
+        "diagnosis": "Reversible cerebral vasoconstriction syndrome (RCVS)",
+        "likelihood": "moderate",
+        "key_features": "Thunderclap headache during exertion; vascular imaging without segmental beading argues against"
       },
       {
-        "diagnosis": "RCVS",
+        "diagnosis": "Cervical artery dissection (vertebral)",
+        "likelihood": "low",
+        "key_features": "Exertional thunderclap headache and posterior fossa blood pattern; no neck pain or stroke deficit"
+      },
+      {
+        "diagnosis": "Cerebral venous sinus thrombosis",
+        "likelihood": "low",
+        "key_features": "Headache phenotype possible; CT venogram / MRV would be definitive ruling-out test"
+      },
+      {
+        "diagnosis": "Thunderclap migraine (primary)",
         "likelihood": "very_low",
-        "key_features": "Angiogram shows no arterial beading; blood pattern and DSA consistent with perimesencephalic SAH"
+        "key_features": "Diagnosis of exclusion; CT-positive SAH precludes"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "CT head - note subtle perimesencephalic blood pattern",
+        "action": "Obtain urgent non-contrast CT head as first imaging modality for suspected SAH",
         "tool_name": "order_ct_scan",
-        "expected_finding": "Subtle perimesencephalic SAH pattern - easy to miss",
+        "expected_finding": "Hyperdense blood in subarachnoid spaces (basal cisterns, Sylvian or interhemispheric fissures); CT sensitivity ~98% within 6 h, declines thereafter",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Connolly_2012]",
+        "guideline_source": "Connolly_2012"
       },
       {
         "step": 2,
-        "action": "LP despite improving headache and no meningism - confirm SAH",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Non-clearing bloody CSF with xanthochromia - confirms SAH despite benign appearance",
+        "action": "Obtain CT angiography (CTA) of the head and neck to characterize aneurysm location, size, and morphology",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No aneurysm identified \u2014 consistent with perimesencephalic non-aneurysmal SAH; repeat vascular imaging at 7-14 days advised",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "angiography": true
+        },
+        "citation": "[Connolly_2012]",
+        "guideline_source": "Connolly_2012"
       },
       {
         "step": 3,
-        "action": "CTA - no aneurysm found",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "CTA negative - no aneurysm; perimesencephalic pattern",
+        "action": "Interpret labs: CBC, BMP (sodium for cerebral salt wasting / SIADH), coagulation panel, type & screen, troponin, BNP",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Mild leukocytosis (stress response), troponin elevation (neurogenic stress cardiomyopathy), normal coagulation if not on anticoagulation",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "coagulation",
+            "type_and_screen",
+            "troponin",
+            "BNP"
+          ]
+        },
+        "citation": "[Connolly_2012]",
+        "guideline_source": "Connolly_2012"
       },
       {
         "step": 4,
-        "action": "Conventional DSA to definitively exclude aneurysm",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "DSA negative - confirms perimesencephalic non-aneurysmal SAH",
+        "action": "Obtain 12-lead ECG to evaluate for neurogenic stress changes and exclude concurrent primary cardiac event",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Neurogenic T-wave inversions, QTc prolongation, ST changes typical of catecholamine surge in SAH; not primary ACS",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Connolly_2012]",
+        "guideline_source": "Connolly_2012"
       },
       {
         "step": 5,
-        "action": "Nimodipine (still recommended even in perimesencephalic SAH)",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Hold amlodipine to avoid additive hypotension",
+        "action": "Search medical literature for current SAH grading scales (Hunt-Hess, WFNS, modified Fisher) and clipping vs endovascular coiling indications",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Society guidelines (AHA/ASA 2012/2023) confirm grading, vasospasm prophylaxis with nimodipine, and timing of definitive aneurysm securing",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "query": "aneurysmal SAH management Hunt-Hess WFNS Fisher coiling clipping"
+        },
+        "citation": "[Hoh_2023]",
+        "guideline_source": "Hoh_2023"
       },
       {
         "step": 6,
-        "action": "Literature search - perimesencephalic SAH prognosis",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Excellent prognosis; <1% rebleed; no aneurysm treatment needed",
+        "action": "Urgent consultation with neurosurgery and interventional neuroradiology for definitive aneurysm securing within 24-72 hours",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Joint decision for endovascular coiling versus surgical clipping based on aneurysm morphology, location, and patient factors",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "specialty": "neurosurgery_and_interventional_neuroradiology",
+          "urgency": "emergent"
+        },
+        "citation": "[Connolly_2012]",
+        "guideline_source": "Connolly_2012"
+      },
+      {
+        "step": 7,
+        "action": "Check drug interactions for nimodipine and any pre-existing antithrombotic / antihypertensive regimen; plan anticoagulation reversal if applicable",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Nimodipine well-tolerated with most antihypertensives (monitor for hypotension); anticoagulation reversed if patient is on a DOAC or warfarin pre-securing aneurysm",
+        "category": "required",
+        "tool_parameters": {
+          "drugs": [
+            "nimodipine"
+          ]
+        },
+        "citation": "[Hoh_2023]",
+        "guideline_source": "Hoh_2023"
+      },
+      {
+        "step": 8,
+        "action": "Initiate continuous cardiac telemetry for early detection of arrhythmias and neurogenic cardiac complications",
+        "tool_name": "order_cardiac_monitoring",
+        "expected_finding": "Sinus rhythm with intermittent neurogenic changes; rare malignant arrhythmias warrant intervention",
+        "category": "recommended",
+        "tool_parameters": {
+          "monitor_type": "telemetry"
+        },
+        "citation": "[Connolly_2012]",
+        "guideline_source": "Connolly_2012"
+      },
+      {
+        "step": 9,
+        "action": "Initiate daily transcranial Doppler monitoring days 4-14 post-bleed for vasospasm surveillance",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Mean flow velocities and Lindegaard ratios to detect cerebral vasospasm preceding delayed cerebral ischemia",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "transcranial_doppler"
+        },
+        "citation": "[Hoh_2023]",
+        "guideline_source": "Hoh_2023"
+      },
+      {
+        "step": 10,
+        "action": "Consider repeat MR angiography at 7-14 days to exclude occult thrombosed aneurysm in perimesencephalic pattern",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "No occult aneurysm \u2014 confirms non-aneurysmal perimesencephalic SAH (benign natural history)",
+        "category": "optional",
+        "tool_parameters": {
+          "modality": "MR_angiography"
+        },
+        "citation": "[Hoh_2023]",
+        "guideline_source": "Hoh_2023"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is not part of standard SAH workup; reserve for evaluation of unexplained altered mental status suggesting non-convulsive status epilepticus.",
+        "citation": "[Connolly_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "rationale": "EMG/NCS has no role in acute SAH evaluation or management.",
+        "citation": "[Connolly_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "Sleep study is irrelevant to acute SAH workup.",
+        "citation": "[Connolly_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET evaluates Alzheimer biomarkers and has no role in acute hemorrhagic stroke workup.",
+        "citation": "[Connolly_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "Dopamine-transporter SPECT is for parkinsonism differentiation and has no role in SAH.",
+        "citation": "[Connolly_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "FDG PET has no role in acute SAH diagnosis or management.",
+        "citation": "[Connolly_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "Non-contrast CT must precede lumbar puncture to exclude mass effect, hydrocephalus, and to confirm/exclude SAH before invasive LP.",
+        "citation": "[Edlow_2008]",
+        "severity": "hard"
+      },
+      {
+        "before": "consult_medical_specialist",
+        "after": "check_drug_interactions",
+        "reason": "Neurosurgical / interventional neuroradiology consultation precedes definitive aneurysm securing within 24-72 hours; medication planning (nimodipine, anticoagulant reversal) aligns with this window.",
+        "citation": "[Connolly_2012]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "analyze_csf",
+        "reason": "Coagulation studies (PT/INR/PTT) must be reviewed and any coagulopathy corrected before invasive procedures including lumbar puncture or aneurysm intervention.",
+        "citation": "[Connolly_2012]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "LP despite improving symptoms - asymptomatic improvement does not exclude SAH",
-      "CTA and DSA to exclude posterior fossa aneurysm",
-      "Recognize perimesencephalic pattern as distinct from aneurysmal SAH",
-      "Nimodipine still recommended per protocol",
-      "Do not send home based on benign appearance and improving headache without workup"
+      "Initiate non-contrast CT head as the first diagnostic step in suspected SAH; do not delay for other workup.",
+      "Obtain CT angiography of the head and neck immediately after positive non-contrast CT to characterize the aneurysm.",
+      "Start nimodipine 60 mg orally every 4 hours within hours of SAH confirmation and continue for 21 days for vasospasm prophylaxis.",
+      "Obtain urgent neurosurgery and interventional neuroradiology consultation for definitive aneurysm securing (clipping or coiling) within 24-72 hours.",
+      "Admit to a neurocritical care unit with continuous neurologic checks, blood-pressure control (SBP target generally <160 mmHg pre-securing), and cardiac telemetry.",
+      "Monitor serum sodium closely for cerebral salt wasting / SIADH and avoid hypotonic fluids.",
+      "Initiate daily transcranial Doppler monitoring days 4-14 post-bleed for vasospasm surveillance.",
+      "Plan repeat vascular imaging at 7-14 days to exclude an occult thrombosed posterior-circulation aneurysm before assigning a non-aneurysmal label."
     ],
     "contraindicated_actions": [
-      "Do not diagnose primary exertional headache without excluding SAH",
-      "Do not skip LP because patient appears well and headache improved",
-      "Do not skip DSA because CTA is negative - CTA can miss small posterior fossa aneurysms",
-      "Do not falsely reassure about no risk - rebleed risk is low but not zero even in perimesencephalic SAH"
+      "Do not perform lumbar puncture before non-contrast CT in suspected SAH.",
+      "Do not perform lumbar puncture when CT already confirms SAH with mass effect, intraventricular hemorrhage, or hydrocephalus \u2014 herniation risk.",
+      "Do not start aspirin or other antiplatelet agents before the aneurysm is secured \u2014 increases rebleeding risk.",
+      "Do not administer nimodipine intravenously \u2014 IV administration has caused fatal cardiovascular collapse; oral or NG only.",
+      "Do not give NSAIDs (e.g., ibuprofen, ketorolac) for headache control before aneurysm securing \u2014 antiplatelet effect raises rebleeding risk.",
+      "Do not pursue cardiac catheterization for neurogenic troponin elevation without strong primary-ACS evidence \u2014 delays aneurysm treatment.",
+      "Do not allow uncontrolled hypertension (SBP >160 mmHg) pre-securing; do not over-correct to systemic hypotension."
     ],
     "key_reasoning_points": [
-      "Thunderclap headache with exertional onset requires SAH workup regardless of clinical improvement",
-      "Perimesencephalic blood distribution (anterior brainstem cisterns) with negative CTA and DSA is diagnostic of perimesencephalic non-aneurysmal SAH",
-      "Perimesencephalic SAH has excellent prognosis (<1% rebleed, minimal vasospasm) in contrast to aneurysmal SAH",
-      "Normal ECG and normal troponin are consistent with perimesencephalic SAH (less neurogenic cardiac injury)",
-      "DSA is required despite negative CTA - CTA can miss small posterior fossa or basilar perforator aneurysms",
-      "The diagnostic puzzle: patient appears well, no nuchal rigidity, headache improved, but LP confirms SAH"
+      "Sudden, peak-in-seconds 'thunderclap' headache is SAH until proven otherwise \u2014 peak intensity \u22641 minute is the highest-yield historical feature.",
+      "Non-contrast CT sensitivity for SAH is ~98% within 6 hours of symptom onset, declining to ~80-85% by 24 hours and substantially lower thereafter; CT negativity does not exclude SAH in late presenters.",
+      "Lumbar puncture is indicated when CT is non-diagnostic and clinical suspicion remains; xanthochromia by spectrophotometry develops 6-12 hours post-bleed and persists 2-3 weeks.",
+      "Distinguish SAH from traumatic LP using non-clearing RBC counts across tubes 1-4 and xanthochromia (absent in traumatic).",
+      "Once SAH is confirmed, CT angiography of the head and neck characterizes the aneurysm and drives the clipping-versus-coiling decision.",
+      "Hunt-Hess and WFNS grades stratify clinical severity and outcome; modified Fisher grade predicts vasospasm risk from CT blood distribution.",
+      "Neurogenic stress cardiomyopathy (Takotsubo pattern, troponin elevation, T-wave inversions, QTc prolongation) is common in SAH and should not divert attention to a primary cardiac workup.",
+      "Nimodipine 60 mg PO every 4 hours for 21 days is the only proven pharmacologic prophylaxis for delayed cerebral ischemia in aneurysmal SAH \u2014 it does not prevent angiographic vasospasm but improves outcomes.",
+      "Definitive aneurysm securing (coiling or clipping) within 24-72 hours dramatically reduces rebleeding risk, which carries ~50% mortality.",
+      "Vasospasm peaks days 4-14 post-bleed; daily transcranial Doppler monitoring plus clinical exam guides escalation to CT perfusion, angiography, and intra-arterial therapy when needed.",
+      "Perimesencephalic non-aneurysmal SAH (blood limited to pre-pontine / interpeduncular cisterns, no aneurysm on initial high-quality CTA) carries a benign natural history; repeat vascular imaging at 7-14 days is required before assigning the label."
     ],
     "red_herrings": [
       {
-        "data_point": "Patient appears well, headache improved to 3/10, no nuchal rigidity",
-        "location": "neurological_exam and HPI",
-        "intended_effect": "Agent dismisses SAH given benign clinical appearance and sends patient home",
-        "correct_interpretation": "Clinical improvement does not exclude SAH; LP is required for all thunderclap headaches",
-        "field_path": ""
-      },
-      {
-        "data_point": "Exertional headache during heavy squat",
-        "location": "HPI",
-        "intended_effect": "Agent diagnoses primary exertional headache (benign) without SAH workup",
-        "correct_interpretation": "Exertional trigger is classic for SAH; primary exertional headache is a diagnosis of exclusion after SAH ruled out",
-        "field_path": ""
+        "data_point": "Bloody CSF in tube 1 raising the possibility of a traumatic tap",
+        "location": "initial_tool_outputs / csf",
+        "field_path": "initial_tool_outputs.csf.appearance",
+        "intended_effect": "A traumatic tap can mimic SAH and falsely reassure if the clinician interprets the blood as procedural.",
+        "correct_interpretation": "Non-clearing RBCs across tubes 1-4 plus xanthochromia on spectrophotometry confirm SAH; traumatic taps show clearing across tubes and lack xanthochromia within the first ~6-12 h."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
       "eeg": "normal",
       "echo": "normal",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SAH",
+    "difficulty_rationale": "Rare or complicated SAH presentation (late presenter, perimesencephalic, anemic CT-attenuation, postpartum/eclampsia, IIH overlap, dual antiplatelet, or severe Fisher 4 / hydrocephalus) requiring specialized imaging, MRI/SWI, and multi-specialty coordination; \u22656 required tools and \u22653 red herrings.",
+    "case_body_concerns": [
+      "followup_outputs entry uses order_specialized_test for transcranial Doppler, but per TOOL_PARAMETER_VOCABULARY.md TCD should be order_advanced_imaging with modality=transcranial_doppler. Suggest re-tagging the followup tool_name."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

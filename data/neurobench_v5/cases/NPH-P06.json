@@ -460,125 +460,201 @@
     "icd_code": "G91.2",
     "differential": [
       {
-        "diagnosis": "Leptomeningeal carcinomatosis (breast cancer recurrence)",
-        "likelihood": "very_low",
-        "key_features": "Negative CSF cytology x3, negative flow cytometry, normal CSF CEA, negative post-contrast MRI, negative staging CT — LMC comprehensively excluded"
+        "diagnosis": "Vascular cognitive impairment / subcortical ischaemic vascular disease",
+        "likelihood": "high",
+        "key_features": "Small-vessel disease can produce gait apraxia and executive slowing, but ventriculomegaly out of proportion to white-matter burden and a positive tap test favour NPH",
+        "icd_code": "F01.50"
       },
       {
-        "diagnosis": "Brain parenchymal metastases from breast cancer",
-        "likelihood": "very_low",
-        "key_features": "No parenchymal metastases on post-contrast MRI; negative staging CT"
+        "diagnosis": "Leptomeningeal carcinomatosis",
+        "likelihood": "moderate",
+        "key_features": "Active malignancy mandates exclusion by CSF cytology and gadolinium-enhanced MRI; iNPH is supported when CSF cytology is negative on adequate sampling",
+        "icd_code": "C79.32"
       },
       {
-        "diagnosis": "Chemotherapy-related cognitive impairment (chemo-brain)",
-        "likelihood": "low",
-        "key_features": "Prior chemotherapy 6 years ago may contribute mildly to cognitive slowing; however gait apraxia and positive tap trial confirm NPH as dominant cause"
+        "diagnosis": "Parkinson's disease / atypical parkinsonism",
+        "likelihood": "moderate",
+        "key_features": "Shuffling gait overlaps, but absence of resting tremor, asymmetric rigidity, or L-dopa response and presence of magnetic gait + DESH favour NPH",
+        "icd_code": "G20"
       },
       {
         "diagnosis": "Alzheimer's disease",
-        "likelihood": "very_low",
-        "key_features": "Normal CSF biomarkers, negative amyloid PET (CL 9)"
+        "likelihood": "moderate",
+        "key_features": "Cognitive decline overlaps; AD typically presents with episodic-memory predominance and hippocampal atrophy rather than frontal-subcortical pattern and magnetic gait; CSF biomarkers / amyloid PET resolve copathology",
+        "icd_code": "G30.9"
+      },
+      {
+        "diagnosis": "Cerebral atrophy with secondary ex-vacuo ventriculomegaly",
+        "likelihood": "moderate",
+        "key_features": "Ventriculomegaly proportionate to sulcal widening, callosal angle >90°, and absence of DESH or transependymal signal argue against true NPH",
+        "icd_code": "G31.9"
+      },
+      {
+        "diagnosis": "Post-traumatic or post-SAH communicating hydrocephalus",
+        "likelihood": "low",
+        "key_features": "No history of trauma, SAH, or meningitis on review; would be considered if history suggested antecedent intracranial event",
+        "icd_code": "G91.0"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI with post-contrast T1 (critical to exclude LMC and metastases)",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Evans 0.35, callosal angle 81°, DESH. No leptomeningeal enhancement, no parenchymal metastases",
+        "action": "Literature review of iNPH diagnostic criteria and shunt-response predictors",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Relkin 2005 INPH Study Group criteria; Tisell 2011 tap-test predictors; Williams 2016 review",
         "category": "required",
-        "tool_parameters": {
-          "sequences": [
-            "T1",
-            "T2",
-            "FLAIR",
-            "DWI",
-            "T1_post_contrast"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Williams_2016]",
+        "guideline_source": "NPH_pack"
       },
       {
         "step": 2,
-        "action": "LP with CSF cytology x3, flow cytometry, CEA — before tap trial",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Negative cytology x3, negative flow cytometry, normal CSF CEA — LMC excluded. Normal OP 15 cmH2O. 30% TUG improvement on tap trial.",
+        "action": "Brain MRI — measure Evans index, callosal angle, assess DESH pattern; exclude mass effect, hydrocephalus from secondary cause, and atrophy",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Ventriculomegaly with Evans index >0.3, DESH pattern (tight high-convexity sulci + widened Sylvian fissures), callosal angle <90°, periventricular transependymal signal; no mass effect or aqueductal obstruction",
         "category": "required",
-        "tool_parameters": {
-          "cytology_preparations": 3,
-          "flow_cytometry": true,
-          "CEA": true
-        }
+        "tool_parameters": {},
+        "citation": "[Relkin_2005]",
+        "guideline_source": "NPH_pack"
       },
       {
         "step": 3,
-        "action": "CT chest/abdomen/pelvis staging",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "No systemic breast cancer recurrence",
+        "action": "Reversible-cause labs (TSH, B12, RPR, HIV) to exclude metabolic / infectious dementia mimics",
+        "tool_name": "interpret_labs",
+        "expected_finding": "TSH, B12, RPR, HIV negative or within normal range; reversible mimics excluded",
         "category": "required",
-        "tool_parameters": {
-          "regions": [
-            "chest",
-            "abdomen",
-            "pelvis"
-          ],
-          "contrast": true
-        }
+        "tool_parameters": {},
+        "citation": "[Relkin_2005]",
+        "guideline_source": "NPH_pack"
       },
       {
         "step": 4,
-        "action": "High-volume tap trial after negative cytology confirmed",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Clearly positive — 30% TUG improvement",
+        "action": "Baseline neuropsychological battery — subcortical/frontal pattern, and reference for pre/post-tap comparison",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Frontal-subcortical pattern: executive dysfunction and slowed processing predominate over episodic amnesia",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Relkin_2005]",
+        "guideline_source": "NPH_pack"
       },
       {
         "step": 5,
-        "action": "VP shunt with perioperative tamoxifen continuation",
-        "tool_name": null,
-        "expected_finding": "LMC excluded — shunt appropriate; continue tamoxifen",
+        "action": "Large-volume lumbar puncture (30-50 mL tap test) with opening pressure and pre/post gait + neuropsych assessment",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Opening pressure <25 cmH2O (normal); 30-50 mL CSF removed; pre/post tap gait and neuropsych assessment shows objective improvement supporting shunt-responsive iNPH",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Tisell_2011]",
+        "guideline_source": "NPH_pack"
+      },
+      {
+        "step": 6,
+        "action": "Neurosurgery consultation for VP shunt candidacy and perioperative planning",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Neurosurgery accepts patient for VP shunt evaluation with programmable valve",
+        "category": "required",
+        "tool_parameters": {
+          "specialty": "neurosurgery"
+        },
+        "citation": "[Marmarou_2005]",
+        "guideline_source": "NPH_pack"
+      },
+      {
+        "step": 7,
+        "action": "Amyloid PET (optional) — screen for AD copathology that may temper cognitive (but not gait) shunt benefit",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Inform shunt prognosis: AD copathology common (~50% iNPH)",
+        "category": "optional",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "citation": "[Williams_2016]",
+        "guideline_source": "NPH_pack"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is non-specific for NPH and does not distinguish from neurodegenerative alternatives in this chronic gait/cognitive presentation",
+        "citation": ""
+      },
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG is unrelated to the diagnostic workup of chronic gait + cognitive + urinary triad once cardiogenic syncope is not on the differential",
+        "citation": ""
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography does not contribute to NPH evaluation in the absence of syncope or cardioembolic stroke workup",
+        "citation": ""
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is inferior to MRI for measuring Evans index and callosal angle and for excluding secondary causes; only justified if MRI is contraindicated",
+        "citation": ""
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring has no diagnostic role in NPH and is reserved for syncope or arrhythmia workup",
+        "citation": ""
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "MRI must precede large-volume LP to exclude mass effect or secondary obstructive hydrocephalus before removing 30-50 mL of CSF",
+        "citation": "[Relkin_2005]",
+        "severity": "hard"
+      },
+      {
+        "before": "order_specialized_test",
+        "after": "analyze_csf",
+        "reason": "Baseline neuropsychological and gait assessment must be obtained before the tap test so that pre/post change can be measured (tap response is the shunt-response predictor)",
+        "citation": "[Tisell_2011]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Cytology x3 and flow cytometry BEFORE tap trial — cannot perform tap trial if LMC not excluded (malignant cells in CSF would change management entirely)",
-      "Post-contrast MRI brain before LP in any cancer patient with new neurological symptoms",
-      "Staging CT to exclude systemic recurrence",
-      "Continue tamoxifen perioperatively — do not hold",
-      "Document negative LMC clearly in medical record before proceeding to VP shunt"
+      "Obtain brain MRI before lumbar puncture to exclude mass effect or obstructive hydrocephalus",
+      "Document objective pre-tap gait (TUG and 10-metre walk) and neuropsychological baseline so that pre/post-tap change can be quantified",
+      "Remove 30-50 mL of CSF during the tap test (a low-volume LP under-samples and biases the test toward false negative)",
+      "Re-assess gait and cognition 1-4 hours after the tap and again at 24 hours (the response window for tap-test prediction of shunt benefit)",
+      "Refer to neurosurgery for VP shunt evaluation when imaging, clinical, and tap-test criteria support iNPH"
     ],
     "contraindicated_actions": [
-      "Performing tap trial before cytology results in a cancer patient — could remove malignant CSF before cytology is adequately evaluated",
-      "Diagnosing NPH without ruling out LMC in a breast cancer survivor",
-      "Holding tamoxifen for surgical procedure — risk of cancer recurrence"
+      "Do not perform large-volume lumbar puncture before MRI excludes mass effect or obstructive hydrocephalus",
+      "Do not infer iNPH from ventriculomegaly alone — DESH, callosal angle <90°, and a clinical triad are required",
+      "Do not diagnose Alzheimer's disease in a patient with gait-predominant presentation and ventriculomegaly without first excluding NPH",
+      "Do not attribute the syndrome to 'normal ageing' or 'deconditioning' once the imaging criteria for ventriculomegaly are met",
+      "Do not commit to iNPH without ruling out leptomeningeal disease by CSF cytology when active or recent malignancy is in the history"
     ],
     "key_reasoning_points": [
-      "In any cancer patient with neurological decline, LMC must be definitively excluded before NPH workup proceeds",
-      "Three cytospin preparations of CSF cytology increases sensitivity for LMC from 45-60% to >85%",
-      "NPH imaging (Evans 0.35, callosal angle 81°, DESH) and positive tap (30%) confirm NPH after LMC exclusion",
-      "Negative post-contrast MRI combined with negative cytology and negative staging CT comprehensively excludes cancer recurrence",
-      "Tamoxifen must be continued perioperatively — not a reason to defer shunt surgery"
+      "iNPH diagnosis (Relkin 2005 INPH Study Group) requires (a) Hakim's triad of gait disturbance, cognitive impairment, and urinary urgency/incontinence — gait is typically first and most prominent; (b) ventriculomegaly with Evans >0.3 and DESH on MRI without mass effect; (c) age >40 and chronic course; (d) opening pressure <25 cmH2O; (e) absence of an alternative explanation",
+      "MRI is the imaging modality of choice — measure Evans index and callosal angle (<90° supports NPH) and confirm DESH (tight high-convexity sulci + wide Sylvian fissures)",
+      "The tap test is a 30-50 mL large-volume LP with pre/post objective gait (TUG, 10-metre walk) and neuropsychological assessment; opening pressure must be normal (<25 cmH2O) to satisfy the 'normal pressure' criterion",
+      "Tap-test sensitivity is only 50-80%; a single negative tap does not exclude NPH — an extended (3-5 day) lumbar drainage trial can resolve borderline cases",
+      "Reversible-cause labs (TSH, B12, RPR, HIV) are mandatory before attributing the syndrome to NPH",
+      "Approximately 50% of iNPH patients have AD copathology — this lowers cognitive benefit from shunting but does not negate gait benefit",
+      "Shunt response is best predicted by an objectively positive tap test or extended drainage trial in a patient who meets imaging and clinical criteria"
     ],
     "red_herrings": [
       {
-        "data_point": "Breast cancer history (in clinical remission 6 years) with new gait, cognitive, and urinary symptoms",
-        "location": "clinical_history",
-        "intended_effect": "All symptoms attributed to leptomeningeal carcinomatosis recurrence; NPH diagnosis missed or deferred pending cancer workup",
-        "correct_interpretation": "Comprehensive LMC exclusion (cytology x3, flow cytometry, CSF CEA, post-contrast MRI, staging CT) is all negative. NPH is the primary diagnosis confirmed by positive tap trial.",
-        "field_path": ""
-      },
-      {
-        "data_point": "CA 15-3 at upper normal limit (28 U/mL)",
-        "location": "labs",
-        "intended_effect": "Borderline CA 15-3 interpreted as evidence of cancer recurrence, delaying NPH evaluation",
-        "correct_interpretation": "CA 15-3 is at upper normal limit and stable compared to prior surveillance (per oncology). Not a marker of recurrence in this context. NPH evaluation should proceed.",
-        "field_path": ""
+        "data_point": "Past breast cancer (currently in clinical remission)",
+        "location": "clinical_history.past_medical_history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "The syndrome is presumptively attributed to leptomeningeal carcinomatosis and NPH is not pursued",
+        "correct_interpretation": "Negative CSF cytology on adequate sampling and absence of leptomeningeal enhancement on gadolinium MRI exclude leptomeningeal disease; iNPH remains the operative diagnosis"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "created_by": "NeuroBench v5 generator",
@@ -589,6 +665,16 @@
       "ecg": "normal",
       "echo": "normal",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:NPH",
+    "difficulty_rationale": "6 required tools (MRI, labs, neuropsych baseline, large-volume LP/tap, neurosurgery consult, literature), 1 grounded red herrings; differential includes 6 active alternatives. Active malignancy mandates parallel exclusion of leptomeningeal disease.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": [
+      "Phase-contrast (CSF flow) MRI is referenced in followup outputs but is not in the TOOL_PARAMETER_VOCABULARY closed list for order_advanced_imaging — recommend adding 'phase_contrast_MRI' or 'CSF_flow_MRI' to the modality vocabulary"
+    ]
   }
 }

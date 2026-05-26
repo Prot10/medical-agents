@@ -1,7 +1,7 @@
 {
   "case_id": "ALS-M08",
   "condition": "als",
-  "difficulty": "moderate",
+  "difficulty": "diagnostic_puzzle",
   "encounter_type": "outpatient",
   "patient": {
     "patient_id": "NB-ALS-M08",
@@ -459,119 +459,253 @@
     "icd_code": "G12.21",
     "differential": [
       {
-        "diagnosis": "MS relapse or progressive MS causing new weakness",
+        "diagnosis": "MS relapse or progression",
+        "likelihood": "moderate",
+        "key_features": "Known RRMS, but new finding of fasciculations and widespread LMN denervation are inconsistent with MS",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "PML (natalizumab-associated)",
         "likelihood": "low",
-        "key_features": "MS causes purely UMN (demyelinating) pathology — LMN denervation (fibrillations, atrophy, fasciculations) cannot be explained by MS. No new lesions on MRI. No enhancement."
+        "key_features": "Brain MRI does not show typical PML lesions; JCV status assessment indicated",
+        "icd_code": null
       },
       {
-        "diagnosis": "Progressive MS with motor predominance",
+        "diagnosis": "Cervical demyelinating myelopathy",
         "likelihood": "low",
-        "key_features": "Progressive MS would show spinal cord atrophy, progressive white matter changes, no LMN signs on EMG"
+        "key_features": "MRI and EMG argue against a single cord-level explanation",
+        "icd_code": null
       },
       {
-        "diagnosis": "PML (JC virus) on natalizumab",
-        "likelihood": "very_low",
-        "key_features": "MRI shows no PML lesions. CSF JC virus PCR negative. PML excluded."
+        "diagnosis": "Combined CNS-PNS demyelinating disease",
+        "likelihood": "low",
+        "key_features": "Sensory NCS normal; no conduction block",
+        "icd_code": null
       },
       {
-        "diagnosis": "Natalizumab-related myopathy/neuropathy",
+        "diagnosis": "Functional / non-organic weakness",
         "likelihood": "very_low",
-        "key_features": "Natalizumab does not cause motor neuron disease. CK elevation is new and motor neuron disease pattern. No recognized natalizumab neurotoxicity causing this pattern."
+        "key_features": "EMG denervation and CK elevation are organic findings",
+        "icd_code": null
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "MRI brain and spine with comparison to prior MS imaging",
+        "action": "Obtain brain MRI (with cervical spine sequences) to exclude structural mimics — cervical myelopathy, demyelination, brainstem tumor",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "No new MS lesions; new bilateral motor cortex changes DISTINCT from prior MS pattern",
+        "expected_finding": "No structural lesion explaining the motor/bulbar findings; corticospinal-tract signal change or non-specific findings may be seen but are not by themselves diagnostic",
         "category": "required",
         "tool_parameters": {
-          "modality": "MRI brain and spine with gadolinium, comparison to prior"
-        }
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "DWI",
+            "T1+Gd"
+          ],
+          "include_cervical_spine": true
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       },
       {
         "step": 2,
-        "action": "EMG/NCS — MS never causes LMN signs; fibrillations would confirm concurrent ALS",
+        "action": "Perform EMG with nerve conduction studies sampling bulbar plus ≥2 spinal regions to document lower motor neuron involvement (fibrillations, positive sharp waves, complex fasciculation potentials, large-amplitude long-duration polyphasic MUPs with reduced recruitment) and exclude conduction block",
         "tool_name": "order_specialized_test",
-        "expected_finding": "Active LMN denervation in multiple regions — not explained by MS",
+        "expected_finding": "Active denervation and chronic reinnervation in ≥2 body regions with normal sensory NCS and no conduction block — meets Awaji / El Escorial revised criteria",
         "category": "required",
         "tool_parameters": {
-          "test_type": "EMG/NCS all regions"
-        }
+          "test_type": "emg_ncs"
+        },
+        "citation": "[Awaji_2008]",
+        "guideline_source": "Awaji_2008"
       },
       {
         "step": 3,
-        "action": "CSF analysis including JC virus PCR and NfL",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Oligoclonal bands (MS); NfL markedly elevated above MS range; JC PCR negative (PML excluded)",
+        "action": "Order a mimic-exclusion lab panel: CK, B12, TSH, HbA1c, HIV, RPR, SPEP, anti-GM1 IgM antibodies, and (in males) androgen receptor CAG repeat for Kennedy disease",
+        "tool_name": "interpret_labs",
+        "expected_finding": "CK often mildly to moderately elevated (2–5× ULN); reversible mimics (B12, TSH, HIV, RPR) negative; anti-GM1 negative; SPEP without high-titer M-spike; CAG repeat normal",
         "category": "required",
         "tool_parameters": {
-          "tests": [
-            "JC virus PCR",
-            "NfL",
-            "oligoclonal bands",
-            "cytology"
+          "panels": [
+            "CBC",
+            "BMP",
+            "LFTs",
+            "CK",
+            "B12",
+            "TSH",
+            "Free T4",
+            "HIV",
+            "RPR",
+            "SPEP",
+            "anti-GM1 IgM",
+            "androgen receptor CAG repeat"
           ]
-        }
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       },
       {
         "step": 4,
-        "action": "Literature review on concurrent ALS and MS management",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Both conditions treated independently; EMG essential for ALS confirmation",
-        "category": "recommended",
+        "action": "Measure respiratory function (FVC, MIP/MEP, SNIP/NIF) at baseline to inform NIV timing and prognostication",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "FVC and SNIP/MIP often reduced even in early disease; values guide timing of NIV (FVC <50% predicted or SNIP <40 cmH₂O are conventional thresholds)",
+        "category": "required",
         "tool_parameters": {
-          "query": "concurrent ALS MS management"
-        }
+          "test_type": "respiratory_function"
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       },
       {
         "step": 5,
-        "action": "Drug interaction check for riluzole with natalizumab",
+        "action": "Search the medical literature to confirm Awaji and Gold Coast diagnostic thresholds and AAN practice-parameter recommendations relevant to this presentation",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Awaji-Shima 2008 / Gold Coast 2020 diagnostic criteria; AAN 2009 practice parameter on ALS care",
+        "category": "recommended",
+        "tool_parameters": {
+          "query": "ALS diagnostic criteria Awaji Gold Coast AAN practice parameter"
+        },
+        "citation": "[Awaji_2008]",
+        "guideline_source": "Awaji_2008"
+      },
+      {
+        "step": 6,
+        "action": "Order an ALS-focused genetic panel (C9orf72 repeat expansion, SOD1, TARDBP, FUS, TBK1) — required when family history is positive or onset is young (<50)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "C9orf72 expansion in ~40% of familial cases; SOD1/TARDBP/FUS in additional familial subset; ~10% of apparently sporadic cases also carry a variant",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "genetic_panel:ALS"
+        },
+        "citation": "[Brown_2017]",
+        "guideline_source": "Brown_2017"
+      },
+      {
+        "step": 7,
+        "action": "Obtain CSF for neurofilament light chain (NfL) for prognostic stratification when the diagnosis remains uncertain or when prognostic information will change management",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Markedly elevated CSF NfL (typically >5,000 pg/mL) supports a motor-neuron-disease degenerative process and correlates with faster progression",
+        "category": "recommended",
+        "tool_parameters": {
+          "tests": [
+            "cell count",
+            "protein",
+            "glucose",
+            "NfL",
+            "NfH",
+            "oligoclonal bands",
+            "cytology"
+          ]
+        },
+        "citation": "[ENCALS_2018]",
+        "guideline_source": "ENCALS_2018"
+      },
+      {
+        "step": 8,
+        "action": "Check interactions before initiating riluzole 50 mg twice daily; review baseline LFTs and CBC and counsel on monitoring",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "No significant interaction; LFT monitoring required",
-        "category": "required",
+        "expected_finding": "No major interactions for typical chronic medications; advise alcohol and grapefruit-juice avoidance (CYP1A2 modulators); monthly LFTs for first 3 months",
+        "category": "recommended",
         "tool_parameters": {
           "proposed_drug": "riluzole"
-        }
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "ALS is a motor-neuron disease without cortical electrical signature; EEG has no diagnostic role and adds cost without benefit.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG is unrelated to motor neuron disease and not part of the standard ALS workup absent specific cardiac symptoms or pre-medication QTc checks.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is unrelated to ALS diagnosis; no indication absent comorbid cardiac disease.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring has no role in ALS diagnostic workup.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "MRI is the standard structural study for ALS workup; head CT adds no diagnostic value and exposes the patient to ionizing radiation.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in ALS diagnosis (motor-neuron rather than amyloid pathology) and carries a high cost.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan evaluates nigrostriatal dopaminergic integrity; it has no role in ALS, which spares the dopaminergic system.",
+        "citation": "[AAN_2009]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "FDG-PET has no established diagnostic role in ALS and adds substantial cost.",
+        "citation": "[AAN_2009]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "EMG is essential — MS never produces LMN signs (fibrillations, fasciculations, large MUPs); finding these confirms concurrent ALS",
-      "JC virus PCR in CSF to exclude PML — critical safety check given high JC antibody index on natalizumab",
-      "Initiate riluzole — ALS is a distinct condition from MS requiring its own treatment",
-      "Maintain MS therapy (natalizumab) unless progression necessitates change — MS control independent of ALS management"
+      "Perform EMG/NCS sampling the bulbar region plus ≥2 spinal regions to document lower-motor-neuron involvement and exclude conduction block.",
+      "Obtain brain MRI to exclude structural mimics (cervical myelopathy, demyelinating disease, brainstem tumor).",
+      "Order a mimic-exclusion lab panel (CK, B12, TSH, HIV, RPR, SPEP, anti-GM1 IgM, androgen receptor CAG repeat in males).",
+      "Measure baseline respiratory function (FVC, MIP/MEP, SNIP) to inform NIV timing.",
+      "Apply Awaji-Shima 2008 / Gold Coast 2020 criteria to confirm the diagnosis.",
+      "Initiate riluzole 50 mg twice daily after baseline LFTs unless contraindicated; arrange monthly LFT monitoring for the first 3 months.",
+      "Refer to a multidisciplinary ALS clinic for SLP, dietetics, respiratory, and social-work input."
     ],
     "contraindicated_actions": [
-      "Attributing all new weakness to MS and increasing steroids — steroids do not treat ALS; inappropriate escalation of MS therapy",
-      "Stopping natalizumab abruptly without MS management plan — risk of severe MS rebound syndrome",
-      "Delaying EMG because 'patient already has MS' — EMG is diagnostic for ALS and must not be deferred based on known MS diagnosis"
+      "Do not commit the patient to cervical spine surgery on the basis of incidental spondylotic changes when EMG findings extend beyond the cervical cord.",
+      "Do not start chronic immunosuppression (steroids, IVIG, plasma exchange) for ALS — there is no benefit and treatment delays correct diagnosis.",
+      "Do not defer respiratory assessment in a symptomatic patient — even mild FVC reduction warrants close monitoring and NIV planning.",
+      "Do not dismiss bulbar or progressive symptoms as functional / psychiatric without a complete neurological workup."
     ],
     "key_reasoning_points": [
-      "Multiple sclerosis is a purely upper motor neuron demyelinating disease — it NEVER causes lower motor neuron signs (no fibrillations, no fasciculations, no denervation on EMG). Finding these features in an MS patient requires a second diagnosis.",
-      "Concurrent MS + ALS: both conditions exist independently. Treating one does not affect the other. Both need active management.",
-      "NfL markedly elevated (>9,800 pg/mL) — MS alone produces NfL <5,000 pg/mL in most active cases; level >8,000 pg/mL strongly suggests concurrent ALS with rapid motor neuron degeneration",
-      "JC virus PCR in CSF essential given high antibody index and natalizumab use — PML must be formally excluded"
+      "Diagnosis requires evidence of both upper-motor-neuron involvement (hyperreflexia, Babinski, Hoffman, brisk jaw jerk, spasticity) and lower-motor-neuron involvement (atrophy, fasciculations, EMG denervation) with progressive spread, while excluding mimics — Awaji 2008 / Gold Coast 2020.",
+      "EMG in bulbar plus ≥2 spinal regions documenting fibrillations, positive sharp waves, complex fasciculation potentials, and large-amplitude long-duration polyphasic MUPs with reduced recruitment satisfies the electrodiagnostic criterion.",
+      "Normal sensory NCS and absence of conduction block are pivotal: they exclude common mimics including multifocal motor neuropathy, CIDP, and Kennedy disease.",
+      "Mild-to-moderate CK elevation (2–5× ULN) is consistent with ALS and does not itself indicate a primary myopathy.",
+      "Cervical spondylotic changes on MRI are common incidental findings in the at-risk age group; bulbar findings or multi-region EMG denervation cannot be attributed to cervical disease.",
+      "Baseline FVC, MIP/MEP, and SNIP/NIF inform NIV timing — NIV initiation at FVC <50% predicted or SNIP <40 cmH₂O prolongs survival and improves quality of life.",
+      "Markedly elevated CSF neurofilament light chain (>5,000 pg/mL) supports motor neuron degeneration and correlates with progression rate (ENCALS prediction model)."
     ],
     "red_herrings": [
       {
-        "data_point": "Known MS on natalizumab with longstanding spasticity and sensory deficits",
+        "data_point": "Established relapsing-remitting MS on natalizumab",
         "location": "Past medical history",
-        "intended_effect": "Attribute new weakness to MS relapse or progressive MS, leading to MS escalation without ALS diagnosis",
-        "correct_interpretation": "MS does not cause lower motor neuron signs. Tongue atrophy, arm wasting, bilateral fasciculations, and EMG denervation are ALS features superimposed on stable MS. No new MS lesions on MRI.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Elevated JC antibody index 3.8 on natalizumab",
-        "location": "Lab results",
-        "intended_effect": "Focus diagnostic attention on PML as explanation for neurological deterioration",
-        "correct_interpretation": "PML excluded by MRI (no PML lesions) and CSF JC PCR negative. JC antibody elevation indicates monitoring requirement but is not the etiology of new symptoms.",
-        "field_path": ""
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Anchors weakness on MS relapse or progression",
+        "correct_interpretation": "Tongue fasciculations and EMG-confirmed denervation in multiple body regions are not MS findings; the new pattern is ALS superimposed on MS"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "v5",
@@ -583,6 +717,20 @@
       "echo": "incidental",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:ALS",
+    "difficulty_rationale": "Pre-existing MS on natalizumab raises pseudo-relapse vs ALS; 4+ required tools, literature search essential; comorbidity makes synthesis substantively harder",
+    "case_body_concerns": [
+      {
+        "field_path": "followup_outputs",
+        "concern": "ALS genetic panel is wired to `interpret_labs` rather than `order_specialized_test` with `test_type: genetic_panel:ALS`. Per the criteria pack and TOOL_PARAMETER_VOCABULARY, genetic testing should resolve via order_specialized_test. The gold trajectory routes the action via order_specialized_test; the case body fix is a tool-name swap in followup_outputs without changing the report payload.",
+        "suggested_fix": "Change followup tool_name from interpret_labs to order_specialized_test for the ALS_Genetic_Panel followup; payload structure can stay."
+      }
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

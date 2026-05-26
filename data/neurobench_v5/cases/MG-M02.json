@@ -598,152 +598,245 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Myasthenia gravis, generalized, AChR antibody-positive (MGFA Class IIb), without thymoma, in setting of SLE/Sjögren overlap",
+    "primary_diagnosis": "Myasthenia gravis, generalized (MGFA Class IIb), AChR antibody-positive, without thymoma, in setting of SLE/Sjögren overlap (polyautoimmunity)",
     "icd_code": "G70.01",
     "differential": [
       {
-        "diagnosis": "SLE-related cranial neuropathy",
-        "likelihood": "very_low",
-        "key_features": "SLE can cause cranial nerve palsies but not fatigable pattern; anti-dsDNA mildly elevated but lupus cerebritis rare without other CNS signs; SFEMG would be normal"
+        "diagnosis": "Lupus myositis / SLE-related myopathy",
+        "likelihood": "moderate",
+        "key_features": "SLE can produce myopathy with fatigability; CK was normal (142) and RNS shows decrement consistent with NMJ rather than myopathy.",
+        "icd_code": "M32.19"
       },
       {
-        "diagnosis": "Lambert-Eaton Myasthenic Syndrome",
-        "likelihood": "very_low",
-        "key_features": "No baseline CMAP reduction; no >100% increment at 50Hz; no anti-VGCC; ocular symptoms prominent which is atypical for LEMS"
-      },
-      {
-        "diagnosis": "Inflammatory myopathy (polymyositis)",
+        "diagnosis": "Sjögren-related sensorimotor neuropathy",
         "likelihood": "low",
-        "key_features": "CK normal; EMG shows NMJ pattern not inflammatory; no proximal limb pain; no skin rash (no overlap with dermatomyositis)"
+        "key_features": "Sjögren can cause neuropathy but does not produce fatigable ptosis/diplopia or RNS decrement.",
+        "icd_code": "G63"
       },
       {
-        "diagnosis": "Hydroxychloroquine-induced myopathy",
+        "diagnosis": "Lambert-Eaton myasthenic syndrome (LEMS)",
+        "likelihood": "low",
+        "key_features": "LEMS shows low baseline CMAP with >100% facilitation; here baseline CMAP normal, no SCLC history, anti-VGCC negative expected.",
+        "icd_code": "G73.1"
+      },
+      {
+        "diagnosis": "Drug-induced myasthenia (penicillamine, statins)",
         "likelihood": "very_low",
-        "key_features": "HCQ myopathy is rare, causes vacuolar myopathy with elevated CK; CK normal here; fatigable ocular symptoms not explained by HCQ myopathy"
+        "key_features": "Patient not on penicillamine; statins can cause myopathy but not fatigable bulbar weakness.",
+        "icd_code": "G70.1"
+      },
+      {
+        "diagnosis": "Brainstem lesion (SLE CNS vasculitis)",
+        "likelihood": "very_low",
+        "key_features": "No focal neurological signs other than fatigable cranial weakness; pattern inconsistent with focal CNS lesion.",
+        "icd_code": "G46.3"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Order anti-AChR (binding, blocking, modulating) and anti-MuSK antibody panel",
+        "action": "Order serologies: anti-AChR (binding, blocking, modulating), anti-MuSK, anti-LRP4, and TSH/free-T4 for thyroid autoimmunity",
         "tool_name": "interpret_labs",
-        "expected_finding": "Borderline positive AChR binding (0.6); clearly abnormal blocking (22%) and modulating (28%); anti-MuSK negative",
+        "expected_finding": "AChR antibody positive; TSH evaluates for comorbid thyroid disease",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "anti_AChR",
-            "anti_MuSK"
+            "anti_MuSK",
+            "anti_LRP4",
+            "TSH"
           ]
-        }
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 2,
-        "action": "Order RNS at 3 Hz of multiple muscle groups (deltoid, trapezius, nasalis)",
+        "action": "Order repetitive nerve stimulation (RNS) at 2-3 Hz across proximal and facial muscles",
         "tool_name": "order_specialized_test",
-        "expected_finding": "8-10% decremental responses — borderline; nasalis meets threshold",
+        "expected_finding": "Decrement >10% in symptomatic muscles supports postsynaptic NMJ disorder",
         "category": "required",
         "tool_parameters": {
-          "test": "RNS_3Hz"
-        }
+          "test_type": "repetitive_nerve_stimulation"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 3,
-        "action": "Order SFEMG for definitive diagnosis (serology borderline, RNS borderline)",
+        "action": "Order single-fiber EMG (gold standard >95% sensitivity)",
         "tool_name": "order_specialized_test",
-        "expected_finding": "MCD 58 us, 40% blocking — markedly abnormal; confirms MG",
-        "category": "required",
+        "expected_finding": "Increased jitter and blocking on extensor digitorum communis or orbicularis oculi confirms NMJ transmission failure",
+        "category": "recommended",
         "tool_parameters": {
-          "test": "sfemg"
-        }
+          "test_type": "emg_single_fiber"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 4,
-        "action": "CT chest with contrast for thymoma evaluation",
+        "action": "Order CT chest with contrast for thymoma screening",
         "tool_name": "order_ct_scan",
-        "expected_finding": "No thymoma — fatty thymus; but thymectomy still beneficial per MGTX trial",
+        "expected_finding": "No thymoma; thymic involution appropriate for age",
         "category": "required",
         "tool_parameters": {
           "region": "chest",
-          "contrast": true
-        }
+          "contrast": true,
+          "indication": "thymoma_screening"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 5,
-        "action": "Monitor respiratory function serially (NIF, FVC) given neck weakness and dysphagia",
-        "tool_name": "interpret_labs",
-        "expected_finding": "NIF -38, FVC 78% — borderline; warrants q4-6h monitoring",
+        "action": "Review MGFA classification and current treatment guidance (pyridostigmine, prednisone, steroid-sparing, IVIG/PLEX, thymectomy)",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "MGFA classification stages disease severity; thymectomy benefits AChR+ generalized MG (MGTX); IVIG/PLEX for crisis",
         "category": "required",
         "tool_parameters": {
-          "test": "pulmonary_function"
-        }
+          "query": "myasthenia gravis MGFA classification treatment thymectomy"
+        },
+        "citation": "[Sanders_2016]",
+        "guideline_source": "Sanders_2016"
       },
       {
         "step": 6,
-        "action": "Initiate IVIG 2g/kg over 5 days given borderline respiratory function and bulbar symptoms",
-        "tool_name": null,
-        "expected_finding": "NIF improves to -52, FVC 93% predicted after IVIG",
+        "action": "Check drug interactions for MG-exacerbating agents (aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, neuromuscular blockers, procainamide)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Flag aminoglycosides, fluoroquinolones, IV magnesium, telithromycin, NMBs as contraindicated or use-with-caution in MG",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "proposed": "pyridostigmine_start",
+          "screen_for": [
+            "aminoglycosides",
+            "fluoroquinolones",
+            "telithromycin",
+            "magnesium_IV",
+            "neuromuscular_blockers"
+          ]
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 7,
-        "action": "Start pyridostigmine 60mg q4-6h; check interactions with hydroxychloroquine and SLE medications",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Pyridostigmine safe; pilocarpine + pyridostigmine additive cholinergic — monitor; hydroxychloroquine generally safe",
-        "category": "required",
+        "action": "Bedside respiratory function testing (FVC, MIP/MEP, NIF) — repeat q4h in crisis",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline FVC/NIF to assess crisis risk in patients with bulbar or limb involvement",
+        "category": "recommended",
         "tool_parameters": {
-          "proposed": "pyridostigmine",
-          "current_medications": [
-            "hydroxychloroquine",
-            "pilocarpine"
-          ]
-        }
+          "test_type": "respiratory_function"
+        },
+        "citation": "[Sanders_2016]",
+        "guideline_source": "Sanders_2016"
       },
       {
         "step": 8,
-        "action": "Coordinate with rheumatology — choose mycophenolate as dual immunosuppressant for SLE and MG",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Literature supports MMF for both conditions in MG-SLE overlap",
+        "action": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Improvement of ptosis after 2 minutes of cooling supports MG",
         "category": "recommended",
         "tool_parameters": {
-          "query": "MG SLE overlap mycophenolate"
-        }
+          "test_type": "ice_pack_test"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "MG is a peripheral neuromuscular junction disorder; EEG has no diagnostic role.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No CSF role in MG; LP risks complications without diagnostic yield.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "Advanced imaging (PET/MR spectroscopy/perfusion) is not indicated for MG diagnosis or staging; CT chest covers thymoma screening.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "analyze_brain_mri",
+        "tool_parameters": {},
+        "rationale": "Brain MRI is non-contributory in typical MG; reserve for cases where an alternative CNS cause (brainstem lesion, demyelination) is genuinely in the differential.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated for MG unless a comorbid cardiac question exists.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring is not indicated for MG unless arrhythmia or autonomic disease is independently suspected.",
+        "citation": "[Wolfe_2016]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "order_specialized_test",
+        "reason": "Order AChR/MuSK/LRP4 serologies first; reserve single-fiber EMG for seronegative or RNS-non-diagnostic cases (resource stewardship).",
+        "citation": "[Wolfe_2016]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "SFEMG is definitive — should not be deferred when serology and RNS are both borderline",
-      "Serial respiratory monitoring (NIF, FVC q4-6h) given borderline values and bulbar symptoms",
-      "Initiate IVIG or plasmapheresis if respiratory function worsens",
-      "Coordinate immunosuppression with rheumatology to avoid undertreating either SLE or MG",
-      "Thymectomy referral even without thymoma (MGTX trial supports benefit in generalized MG age <65)",
-      "Avoid hydroxychloroquine dose escalation during acute MG treatment phase"
+      "Confirm AChR antibody positivity (binding borderline 0.6 nmol/L, blocking 22%, modulating 28%)",
+      "CT chest with contrast — required in all confirmed MG (here negative for thymoma, fatty involution)",
+      "Single-fiber EMG given borderline RNS (8-10% decrement) and ambiguous serology",
+      "Coordinate immunosuppression with rheumatology — overlap of SLE and MG affects steroid and steroid-sparing choices",
+      "Bedside FVC and NIF given progressive dysphagia and dysphonia",
+      "Initiate pyridostigmine 30-60 mg q4-6h titrated to response"
     ],
     "contraindicated_actions": [
-      "Do NOT dismiss borderline serology as negative — AChR blocking and modulating antibodies confirm MG",
-      "Do NOT delay SFEMG when diagnosis uncertain — it has >95% sensitivity for generalized MG",
-      "Do NOT initiate high-dose steroids without hospitalization given borderline respiratory function (crisis risk)",
-      "Do NOT use fluoroquinolones (sulfa allergy noted; avoid fluoroquinolones separately as they worsen MG)"
+      "Do NOT prescribe aminoglycoside antibiotics (gentamicin, tobramycin, amikacin) — risk of precipitating myasthenic crisis",
+      "Do NOT prescribe fluoroquinolones (ciprofloxacin, levofloxacin, moxifloxacin) — FDA black-box warning for MG exacerbation",
+      "Do NOT prescribe telithromycin — contraindicated in MG",
+      "Do NOT administer IV magnesium for MG patients (e.g., for hypomagnesaemia, eclampsia prophylaxis) without alternative — blocks NMJ transmission",
+      "Do NOT use non-depolarizing neuromuscular blockers without anaesthesia/MG-aware dosing protocols",
+      "Do NOT initiate high-dose corticosteroids as sole outpatient therapy without hospitalization or pyridostigmine bridge — risk of paradoxical worsening at days 5-10",
+      "Do NOT attribute fluctuating fatigable weakness to a functional disorder before completing serology + RNS + single-fiber EMG workup",
+      "Do NOT escalate hydroxychloroquine to high dose during MG initial workup — rare exacerbation reports."
     ],
     "key_reasoning_points": [
-      "Borderline AChR binding antibody alone is insufficient — abnormal blocking and modulating antibodies are independently diagnostic of AChR-MG",
-      "Polyautoimmunity (SLE + Sjögren + family history of MG) is a strong clinical predictor of MG diagnosis",
-      "SFEMG is the most sensitive test (>95%) and should be ordered whenever serology or RNS is borderline",
-      "CT chest shows no thymoma but thymectomy is still indicated per MGTX trial (Class I evidence) for generalized AChR-MG patients under 65",
-      "Mycophenolate mofetil is the preferred steroid-sparing agent in MG-SLE overlap as it benefits both conditions",
-      "Neck weakness with NIF -38 cmH2O represents moderate crisis risk — inpatient monitoring with serial pulmonary function is appropriate"
+      "Fluctuating, fatigable weakness with diurnal pattern (worse evening) is the clinical hallmark of MG — fixed weakness suggests an alternative diagnosis.",
+      "Ocular involvement (ptosis, diplopia) is asymmetric and fatigable in MG; thyroid eye disease causes restrictive (not fatigable) ophthalmoplegia.",
+      "Single-fiber EMG (sensitivity >95%) is the most sensitive electrodiagnostic test — order when RNS is non-diagnostic or serology is negative.",
+      "All confirmed MG cases require CT chest for thymoma — present in roughly 10-15% of generalized MG; thymectomy (MGTX trial) improves long-term outcomes in non-thymoma AChR+ MG as well.",
+      "Aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, and neuromuscular blockers can precipitate myasthenic crisis and must be screened against any new prescription.",
+      "Polyautoimmunity (SLE + Sjögren + MG) is well described — coexistence supports rather than refutes MG diagnosis.",
+      "Borderline RNS (8-10%) plus borderline AChR titer (0.6 nmol/L) is a paradigmatic indication for single-fiber EMG."
     ],
     "red_herrings": [
       {
-        "data_point": "Attributing ptosis and fatigue to SLE/Sjögren flare",
-        "location": "history and referring physician reasoning",
-        "intended_effect": "Prior rheumatologist increased hydroxychloroquine thinking neurological symptoms were SLE — delay in MG diagnosis",
-        "correct_interpretation": "SLE does not cause fatigable ptosis and fatigable diplopia; NMJ dysfunction pattern is specific to MG; family history of MG and diurnal variation are strong MG clues",
-        "field_path": ""
+        "data_point": "Mild SLE activity (anti-dsDNA 28, low C3)",
+        "location": "labs / SLE serology",
+        "field_path": "initial_tool_outputs.labs.panels",
+        "intended_effect": "Attribute fatigable weakness to lupus flare or lupus myositis and pursue SLE treatment escalation instead of MG workup.",
+        "correct_interpretation": "Mild SLE activity does not explain fatigable ptosis, diplopia, dysphagia, or RNS decrement; AChR antibodies are diagnostic; SLE comorbidity is real but separate."
+      },
+      {
+        "data_point": "AChR binding 0.6 nmol/L (borderline)",
+        "location": "labs / neuromuscular antibodies",
+        "field_path": "initial_tool_outputs.labs.panels",
+        "intended_effect": "Dismiss as a non-specific positive in the setting of polyautoimmunity.",
+        "correct_interpretation": "Borderline binding with clearly abnormal blocking and modulating antibodies confirms AChR+ MG; clinical picture is consistent."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "v5",
@@ -758,6 +851,16 @@
       "echo": "incidental",
       "cardiac_monitoring": "incidental",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MG",
+    "difficulty_rationale": "5 required tools, 2 red herrings, typical AChR+ generalized MG",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": [
+      "emg_ncs_useless_via_param_conflation: pack lists order_specialized_test:emg_ncs as USELESS, but coherence validator treats tool_name overlap as a contradiction regardless of tool_parameters; cannot encode without removing required RNS/SFEMG entries. Suggest extending validator to compare tool_name + tool_parameters or fleet-wide pattern."
+    ]
   }
 }

@@ -732,146 +732,224 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Idiopathic Parkinson's disease",
+    "primary_diagnosis": "Parkinson's disease (idiopathic)",
     "icd_code": "G20",
     "differential": [
       {
-        "diagnosis": "Drug-induced parkinsonism (lithium)",
-        "likelihood": "low",
-        "key_features": "Lithium causes action/postural tremor at therapeutic levels, not asymmetric resting tremor with progressive bradykinesia. Patient's lithium level is therapeutic. Asymmetric resting tremor, progressive course, RBD, and hyposmia all favor idiopathic PD."
-      },
-      {
         "diagnosis": "Essential tremor",
+        "likelihood": "moderate",
+        "key_features": "Sister with ET and pre-existing 'tremor' phenotype, but rest tremor with re-emergent pattern, micrographia, and unilateral bradykinesia argue strongly against pure ET",
+        "icd_code": "G25.0"
+      },
+      {
+        "diagnosis": "Drug-induced parkinsonism",
         "likelihood": "low",
-        "key_features": "ET produces bilateral action/postural tremor without rigidity or bradykinesia. This patient has prominent resting tremor with cogwheel rigidity and bradykinesia, which are not features of ET. Brother has ET, but presentation is distinct."
+        "key_features": "No exposure to dopamine receptor antagonists, antiemetics, or antipsychotics by history",
+        "icd_code": "G21.19"
       },
       {
-        "diagnosis": "Multiple system atrophy (MSA)",
-        "likelihood": "very_low",
-        "key_features": "MSA presents with early and severe autonomic failure, symmetric parkinsonism, and poor levodopa response. This patient has no orthostatic hypotension, has asymmetric presentation, and demonstrates good levodopa response."
+        "diagnosis": "Vascular parkinsonism",
+        "likelihood": "low",
+        "key_features": "Asymmetric upper-limb predominant onset rather than lower-body, and MRI without significant vascular burden",
+        "icd_code": "G21.4"
       },
       {
-        "diagnosis": "Progressive supranuclear palsy (PSP)",
-        "likelihood": "very_low",
-        "key_features": "PSP presents with early postural instability and falls, vertical supranuclear gaze palsy, axial rigidity greater than limb rigidity, and poor levodopa response. This patient has no gaze abnormalities and has a good levodopa response."
+        "diagnosis": "Multiple system atrophy (MSA-P)",
+        "likelihood": "low",
+        "key_features": "No early or severe dysautonomia, no cerebellar findings, no pontine/putaminal MRI signature",
+        "icd_code": "G90.3"
       },
       {
-        "diagnosis": "Normal pressure hydrocephalus (NPH)",
+        "diagnosis": "Progressive supranuclear palsy",
         "likelihood": "very_low",
-        "key_features": "NPH presents with magnetic gait, urinary incontinence, and cognitive decline with ventriculomegaly on imaging. MRI shows no ventriculomegaly. Patient has no urinary symptoms or dementia."
+        "key_features": "No vertical supranuclear gaze palsy, no early backward falls, no axial-predominant rigidity",
+        "icd_code": "G23.1"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain brain MRI to rule out structural causes of parkinsonism including stroke, NPH, and mass lesion",
+        "action": "Obtain brain MRI to exclude structural, vascular, or NPH mimics and look for the SWI swallow-tail sign of substantia nigra",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Normal brain MRI with age-appropriate changes, no structural cause for parkinsonism",
+        "expected_finding": "No vascular, structural, or NPH features; substantia nigra changes (loss of swallow-tail sign) supportive but not required for diagnosis",
         "category": "required",
         "tool_parameters": {
-          "protocol": "stroke",
-          "contrast": false
-        }
+          "protocol": "standard",
+          "contrast": false,
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "SWI",
+            "DWI"
+          ]
+        },
+        "citation": "[Schwarz_2014]",
+        "guideline_source": "Schwarz_2014"
       },
       {
         "step": 2,
-        "action": "Order comprehensive laboratory studies including CBC, BMP, thyroid function, vitamin B12, RPR, and lithium level to exclude metabolic and drug-related causes",
+        "action": "Order baseline labs (CBC, CMP, TSH, B12, RPR) to exclude reversible mimics and obtain pre-treatment baseline",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal labs except for expected diabetes-related findings; therapeutic lithium level",
+        "expected_finding": "Normal CBC/CMP/TSH/B12/RPR — no metabolic or infectious mimic identified",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
-            "thyroid",
+            "CMP",
+            "TSH",
             "B12",
             "RPR"
           ]
-        }
+        },
+        "citation": "[Postuma_2015]",
+        "guideline_source": "Postuma_2015"
       },
       {
         "step": 3,
-        "action": "Review medication list for dopamine-blocking agents and assess for drug-induced parkinsonism",
-        "tool_name": null,
-        "expected_finding": "No dopamine-blocking agents on current medication list; lithium at therapeutic level",
-        "category": "required"
+        "action": "Review medications for dopamine receptor antagonists and check interactions before starting dopaminergic therapy",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "No dopamine receptor antagonists in current regimen; tamsulosin and lisinopril interactions with levodopa reviewed (orthostatic risk)",
+        "category": "required",
+        "tool_parameters": {
+          "proposed_medication": "carbidopa-levodopa",
+          "current_medications": [
+            "lisinopril",
+            "atorvastatin",
+            "tamsulosin",
+            "acetaminophen"
+          ]
+        },
+        "citation": "[Postuma_2015]",
+        "guideline_source": "Postuma_2015"
       },
       {
         "step": 4,
-        "action": "Search medical literature for diagnostic criteria and differentiation of idiopathic PD from drug-induced parkinsonism",
+        "action": "Search medical literature for MDS diagnostic criteria and first-line therapy options",
         "tool_name": "search_medical_literature",
-        "expected_finding": "MDS criteria confirm clinical diagnosis; features distinguish PD from DIP",
-        "category": "recommended"
+        "expected_finding": "MDS 2015 criteria support clinically established PD; carbidopa-levodopa or dopamine agonists are first-line",
+        "category": "required",
+        "tool_parameters": {
+          "query": "Parkinson disease MDS clinical diagnostic criteria levodopa initial treatment"
+        },
+        "citation": "[Postuma_2015]",
+        "guideline_source": "Postuma_2015"
       },
       {
         "step": 5,
-        "action": "Request DaTscan to confirm presynaptic dopaminergic deficit",
+        "action": "Order DaTscan only if diagnostic uncertainty exists between PD and essential tremor / drug-induced parkinsonism",
         "tool_name": "order_advanced_imaging",
-        "expected_finding": "Abnormal DaTscan showing asymmetric reduced putaminal uptake consistent with PD",
+        "expected_finding": "Asymmetric reduced striatal DAT binding, more pronounced contralateral to clinically affected side — confirms presynaptic nigrostriatal degeneration",
         "category": "recommended",
         "tool_parameters": {
-          "imaging_type": "DaTscan"
-        }
+          "modality": "DaTscan"
+        },
+        "citation": "[Marshall_2009]",
+        "guideline_source": "Marshall_2009"
       },
       {
         "step": 6,
-        "action": "Perform levodopa challenge to assess dopaminergic responsiveness",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Greater than 30% improvement in UPDRS-III, supporting PD diagnosis",
+        "action": "Order neuropsychological battery as baseline cognitive screen for PD-MCI",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Mild executive / visuospatial dysfunction within PD-MCI spectrum versus normal cognition for age",
         "category": "recommended",
         "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP"
-          ]
-        }
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Tolosa_2021]",
+        "guideline_source": "Tolosa_2021"
       },
       {
         "step": 7,
-        "action": "Check drug interactions before initiating dopaminergic therapy",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "No major contraindications to levodopa with current medications",
-        "category": "recommended"
-      },
-      {
-        "step": 8,
-        "action": "Refer for polysomnography to evaluate dream enactment behavior and confirm RBD",
+        "action": "Order polysomnography only if dream-enactment behaviors are reported (premotor synucleinopathy marker)",
         "tool_name": "order_specialized_test",
-        "expected_finding": "RBD confirmed, providing supportive evidence for alpha-synucleinopathy",
-        "category": "recommended",
+        "expected_finding": "REM sleep without atonia confirms RBD when present; absent here, polysomnography is optional",
+        "category": "optional",
         "tool_parameters": {
           "test_type": "polysomnography"
-        }
+        },
+        "citation": "[Postuma_2019]",
+        "guideline_source": "Postuma_2019"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG has no role in diagnosing idiopathic PD; non-specific in this clinical picture",
+        "citation": "[Postuma_2015]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "CSF analysis is not part of routine PD workup; α-synuclein seed amplification remains a research tool",
+        "citation": "[Postuma_2015]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "MRI already obtained and superior for parkinsonism workup; CT adds no information",
+        "citation": "[Schwarz_2014]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No cardiac indication; not part of PD evaluation",
+        "citation": "[Postuma_2015]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "No syncope, palpitations, or arrhythmia concern documented",
+        "citation": "[Postuma_2015]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Baseline metabolic/renal/hepatic profile informs safe levodopa initiation and interaction review",
+        "citation": "[Postuma_2015]",
+        "severity": "soft"
+      },
+      {
+        "before": "analyze_brain_mri",
+        "after": "order_advanced_imaging",
+        "reason": "Structural MRI to exclude secondary parkinsonism before committing to DaTscan and a PD diagnosis",
+        "citation": "[Schwarz_2014]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Obtain brain MRI to exclude structural causes of parkinsonism",
-      "Order basic laboratory studies including thyroid function and vitamin B12 to exclude reversible causes",
-      "Check lithium level to assess for drug-related contribution to symptoms",
-      "Perform a systematic neurological examination documenting asymmetry, tremor type, rigidity, and bradykinesia",
-      "Apply MDS clinical diagnostic criteria for Parkinson's disease"
+      "Apply MDS 2015 clinical diagnostic criteria for Parkinson's disease (bradykinesia plus rest tremor or rigidity, supportive features, no absolute exclusion criteria)",
+      "Document temporal sequence of motor and non-motor (REM sleep behavior disorder, hyposmia, constipation, orthostatic intolerance) features",
+      "Review the full medication list for dopamine receptor antagonists (metoclopramide, prochlorperazine, antipsychotics) and any other agents that can mimic or worsen parkinsonism",
+      "Confirm asymmetric onset with rest tremor and re-emergent tremor on posture — classic for idiopathic PD",
+      "Counsel on motor and non-motor course and initiate carbidopa-levodopa or a dopamine agonist as first-line therapy",
+      "Arrange physical therapy, occupational therapy, and speech-language pathology referral (LSVT-LOUD/BIG)"
     ],
     "contraindicated_actions": [
-      "Prescribing typical antipsychotics (e.g., haloperidol) which would worsen parkinsonism",
-      "Prescribing metoclopramide for any GI symptoms (dopamine blocker that worsens PD)",
-      "Abruptly discontinuing lithium without psychiatric consultation",
-      "Starting anticholinergic medications as first-line in a 69-year-old (cognitive risk)",
-      "Diagnosing essential tremor without accounting for resting tremor, bradykinesia, and rigidity"
+      "Do not prescribe metoclopramide, prochlorperazine, or promethazine for nausea in a patient with parkinsonism",
+      "Do not prescribe typical antipsychotics (haloperidol, fluphenazine) or most atypical antipsychotics (risperidone, olanzapine, aripiprazole) — restrict pharmacotherapy of psychosis to quetiapine, clozapine, or pimavanserin",
+      "Do not prescribe centrally acting anticholinergics (trihexyphenidyl, benztropine) in older adults or in any patient with cognitive impairment"
     ],
     "key_reasoning_points": [
-      "The asymmetric resting tremor with pill-rolling quality, cogwheel rigidity, and progressive bradykinesia constitute the cardinal motor features of Parkinson's disease",
-      "Non-motor prodromal features (REM sleep behavior disorder, hyposmia, constipation) strongly support an alpha-synucleinopathy diagnosis",
-      "Lithium at therapeutic levels primarily causes action/postural tremor, not the asymmetric resting tremor with bradykinesia and rigidity seen here — drug-induced parkinsonism is unlikely",
-      "Family history of PD in the father is a supportive but not diagnostic feature",
-      "Normal brain MRI excludes structural causes including vascular parkinsonism and NPH",
-      "The progressive course over 18 months with gradually worsening motor and non-motor symptoms is characteristic of a neurodegenerative process",
-      "Hoehn and Yahr stage 2.5 indicates bilateral involvement with mild postural instability, appropriate for the described clinical findings",
-      "The brother's essential tremor is a potential confounding family history element but the clinical presentation is clearly distinct from ET"
+      "Asymmetric rest tremor, re-emergent tremor on posture, cogwheel rigidity, bradykinesia, and micrographia satisfy MDS 2015 motor criteria for clinically established PD",
+      "No absolute exclusion criteria are present: no vertical supranuclear gaze palsy, no cerebellar signs, no cortical sensory loss, no drug exposure",
+      "Family history of ET in a sister and BPH-related tamsulosin use are not relevant exclusionary features",
+      "DaTscan is not strictly required when clinical criteria are satisfied; reserve for genuine uncertainty (per Marshall 2009)",
+      "Baseline labs and a structural MRI suffice as the minimum workup; baseline neuropsych is good practice for PD-MCI surveillance"
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "Sister with essential tremor and former 10 pack-year smoking history",
+        "location": "family_history and social_history",
+        "field_path": "patient.clinical_history.family_history",
+        "intended_effect": "Anchor toward essential tremor or a non-degenerative tremor etiology",
+        "correct_interpretation": "Family ET is a separate condition; this patient's rest tremor, micrographia, and unilateral bradykinesia clearly fit idiopathic PD"
+      }
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -887,6 +965,14 @@
       "ct": "normal",
       "echo": "normal",
       "cardiac_monitoring": "incidental"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (condition-expert:PD)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:PD",
+    "difficulty_rationale": "Classic asymmetric PD",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

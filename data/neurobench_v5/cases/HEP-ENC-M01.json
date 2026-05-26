@@ -673,119 +673,187 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Hepatic encephalopathy, grade 2-3 (overt), NAFLD cirrhosis — precipitated by hypokalemia from diuretics and constipation",
-    "icd_code": "K72.9",
+    "primary_diagnosis": "Hepatic encephalopathy (West Haven grade II), NAFLD-related cirrhosis (Child-Pugh B, MELD 14) — precipitated by hypokalemia (K 3.2 from diuretics), constipation (5 days), and likely diuretic non-adherence; concurrent hyponatremia is contributory but not primary.",
+    "icd_code": "K72.90",
     "differential": [
       {
-        "diagnosis": "Wernicke encephalopathy",
-        "likelihood": "very_low",
-        "key_features": "Thiamine borderline low but MRI has no periaqueductal or mammillary body changes; no ophthalmoplegia; no classic Wernicke triad; treated empirically with thiamine to be safe"
-      },
-      {
         "diagnosis": "Hyponatremia-induced encephalopathy",
-        "likelihood": "low",
-        "key_features": "Sodium 128 is contributory but not severe enough (<120) to be sole cause; ammonia 95 with cirrhosis points to HE as primary; both contributing"
+        "likelihood": "moderate",
+        "key_features": "Na 128 mEq/L — contributory but not severe enough alone (typically <120) to fully account for grade II HE; correct slowly while addressing HE.",
+        "icd_code": "E87.1"
       },
       {
-        "diagnosis": "Drug intoxication / benzodiazepine",
+        "diagnosis": "Spontaneous bacterial peritonitis driving HE",
+        "likelihood": "low",
+        "key_features": "Diagnostic paracentesis required to exclude (ascites present); follow-up PMN 82 ultimately rules out.",
+        "icd_code": "K65.2"
+      },
+      {
+        "diagnosis": "Wernicke encephalopathy",
+        "likelihood": "low",
+        "key_features": "Thiamine borderline low; no ophthalmoplegia/nystagmus on exam, no MRI periaqueductal signal; give empiric IV thiamine before any dextrose regardless.",
+        "icd_code": "E51.2"
+      },
+      {
+        "diagnosis": "Non-convulsive status epilepticus",
         "likelihood": "very_low",
-        "key_features": "Toxicology negative; no benzodiazepines on medication list; urine screen negative"
+        "key_features": "EEG shows generalized slowing with atypical triphasic-like waves but no electrographic seizures; benzodiazepine challenge negative on follow-up cEEG.",
+        "icd_code": "G41.2"
       },
       {
-        "diagnosis": "Septic encephalopathy (SBP)",
-        "likelihood": "low",
-        "key_features": "SBP excluded by paracentesis (PMN 82/mm3 < 250); no fever; no leukocytosis; blood cultures pending but patient afebrile"
+        "diagnosis": "Occult intracranial hemorrhage (thrombocytopenia, coagulopathy)",
+        "likelihood": "very_low",
+        "key_features": "Platelets 88, INR 1.8 raise risk; CT head excludes hemorrhage.",
+        "icd_code": "I62.9"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Interpret labs — ammonia, LFTs, electrolytes, CBC, toxicology",
+        "action": "Comprehensive labs: CMP including AST/ALT/bilirubin/INR/albumin, ammonia, CBC, glucose, electrolytes (Na, K, Mg), BUN/Cr, lactate, blood cultures and urine cultures; toxicology if substance use plausible. Confirms liver dysfunction and screens for precipitants.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Ammonia 95, hypokalemia, low albumin, INR 1.8 — HE with precipitants identified",
+        "expected_finding": "Confirms cirrhosis (low albumin 2.4, INR 1.8, bilirubin 3.8), identifies precipitants (hypokalemia K 3.2, hyponatremia Na 128), and rules out sepsis; ammonia 95 is supportive but not diagnostic.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 2,
-        "action": "CT head — exclude structural cause",
+        "action": "Non-contrast CT head — exclude structural alternate cause of AMS (hemorrhage, large stroke, mass) before any LP.",
         "tool_name": "order_ct_scan",
-        "expected_finding": "CT normal — no hemorrhage, no infarct",
+        "expected_finding": "No acute intracranial process; mild diffuse cortical atrophy — alternate structural cause of AMS excluded.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 3,
-        "action": "EEG — characterize encephalopathy pattern, exclude NCSE",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Generalized theta-delta with atypical triphasic-like waves — moderate HE pattern; NCSE not excluded without challenge",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Literature/guideline search to confirm West Haven grading, precipitant management, and lactulose/rifaximin dosing (AASLD/EASL HE management; West Haven grading; hypokalemia as HE precipitant).",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "AASLD/EASL 2014 guidance retrieved; West Haven criteria and precipitant-driven management framework confirmed.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 4,
-        "action": "Diagnostic paracentesis — exclude SBP",
-        "tool_name": "interpret_labs",
-        "expected_finding": "PMN 82 — SBP excluded",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Drug-interaction and medication-reconciliation review covering spironolactone, furosemide, omeprazole, metformin — confirm none are HE-precipitating sedatives; flag any CNS depressants (benzodiazepines, opioids, sedating antiemetics, antihistamines) and confirm lactulose/rifaximin dosing in liver disease.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sedating/CNS-depressant medications identified; lactulose and rifaximin reviewed for hepatic dose adjustment.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Bajaj_2011]",
+        "guideline_source": "Bajaj 2011 HE management review"
       },
       {
         "step": 5,
-        "action": "Lactulose 30 mL TID + rifaximin 550 mg BID; IV KCl repletion; fluid restriction",
-        "tool_name": null,
-        "expected_finding": "Ammonia trending down, potassium corrected",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "EEG — characterize encephalopathy pattern and exclude NCSE given atypical (non-classic) triphasic-like activity on initial study. Triphasic waves are classic but non-specific (metabolic encephalopathies broadly); main role is exclusion of non-convulsive status epilepticus where the differential supports it.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Generalized theta-delta slowing without classic triphasic waves; benzodiazepine challenge on follow-up cEEG excludes NCSE.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Ferenci_2002]",
+        "guideline_source": "Ferenci 2002 HE nomenclature/quantification"
       },
       {
         "step": 6,
-        "action": "Empiric IV thiamine before dextrose — Wernicke prophylaxis",
-        "tool_name": null,
-        "expected_finding": "Thiamine given; borderline level 68 nmol/L confirmed",
+        "action": "Lumbar puncture for CSF analysis — only if meningitis suspected from focal signs or persistent fever — not initially indicated here. Must be performed AFTER neuroimaging confirms no mass effect.",
+        "tool_name": "analyze_csf",
+        "expected_finding": "CSF results to confirm or refute CNS infection on the differential.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      },
+      {
+        "step": 7,
+        "action": "Consult hepatology — coordinate definitive care, transplant candidacy assessment where applicable.",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Hepatology / critical-care guidance integrated into management.",
+        "category": "recommended",
+        "tool_parameters": {
+          "specialty": "hepatology"
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      },
+      {
+        "step": 8,
+        "action": "Diagnostic paracentesis to exclude SBP given ascites and encephalopathy.",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Ascitic PMN 82/mm³ — SBP excluded.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No clinical suspicion for hepatopulmonary syndrome, portopulmonary hypertension, or endocarditis; echocardiography is not part of the HE workup.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "genetic_panel:early_onset_AD"
+        },
+        "rationale": "Early-onset AD genetic panel has no role in HE workup; reversible metabolic encephalopathy is the diagnosis under consideration.",
+        "citation": "[AASLD_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "In altered mental status, exclude intracranial mass effect / hemorrhage on imaging before LP to avoid herniation risk.",
+        "citation": "[AASLD_2014]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "IV thiamine BEFORE dextrose-containing fluids — even borderline thiamine deficiency in cirrhosis warrants empiric thiamine to prevent precipitating Wernicke encephalopathy",
-      "Lactulose titrated to 3-4 soft stools/day — the most important immediate intervention to reduce ammonia",
-      "Paracentesis to exclude SBP — SBP is a major precipitant of HE and must be excluded in any cirrhotic with ascites and confusion",
-      "Correct hypokalemia — hypokalemia promotes renal ammoniagenesis; electrolyte repletion is a critical component of HE management",
-      "EEG with benzodiazepine challenge if NCSE cannot be excluded based on clinical + standard EEG"
+      "Lactulose titrated orally to 2-4 soft stools/day (typical start 30-45 mL TID); first-line treatment.",
+      "Rifaximin 550 mg PO BID as adjunct (especially given recurrence risk).",
+      "IV potassium repletion to correct hypokalemia — hypokalemia drives renal ammoniagenesis and is a classic HE precipitant.",
+      "Empiric IV thiamine 100 mg before any dextrose-containing fluids — borderline thiamine 68 nmol/L warrants prophylaxis.",
+      "Diagnostic paracentesis to exclude SBP in any cirrhotic with ascites + AMS.",
+      "Slow sodium correction (≤8-10 mEq/L per 24 h) to avoid osmotic demyelination."
     ],
     "contraindicated_actions": [
-      "Benzodiazepines as anxiolytics — worsen HE; use haloperidol for agitation if needed",
-      "Sedating opioids — worsen HE",
-      "Lactulose via enema only (oral route preferred for compliance and scheduling)",
-      "Sodium correction faster than 10-12 mEq/L per 24 hours — osmotic demyelination risk"
+      "Do not prescribe benzodiazepines for anxiety/agitation — they precipitate and prolong HE (use haloperidol or non-pharmacologic measures for agitation).",
+      "Do not prescribe sedating opioids — they worsen HE; consider acetaminophen at hepatic-safe dosing for pain.",
+      "Do not perform LP before neuroimaging excludes mass effect when the patient has altered mental status.",
+      "Do not correct hyponatremia faster than 8-10 mEq/L per 24 h — osmotic demyelination risk.",
+      "Do not anchor on ammonia 95 µmol/L being only moderately elevated; ammonia correlates poorly with HE grade."
     ],
     "key_reasoning_points": [
-      "Moderate HE has atypical features: ammonia only moderately elevated (95 µmol/L), EEG shows generalized slowing without classic triphasic waves — these are MODERATE difficulty features requiring more thought than classic HE",
-      "Hypokalemia is an underappreciated HE precipitant — hypokalemia promotes renal ammoniagenesis by increasing glutamine synthesis in the kidney",
-      "The EEG in moderate HE may not show classic triphasic waves — intermittent atypical triphasic-like waves are non-specific and require benzodiazepine challenge to exclude NCSE",
-      "SBP must always be excluded in cirrhotic with ascites + confusion — even without fever or leukocytosis, SBP can be subtle",
-      "NAFLD cirrhosis HE has the same management principles as alcoholic cirrhosis HE — precipitants must be identified and corrected"
+      "HE is a clinical diagnosis: West Haven grading + evidence of liver dysfunction + exclusion of other causes of AMS — ammonia level is supportive only and correlates poorly with grade (AASLD 2014).",
+      "Precipitant identification is more actionable than the ammonia number: infection (SBP especially), GI bleed, electrolyte disturbance (hypokalemia/hyponatremia), constipation, sedative/CNS-depressant use, dehydration, dietary protein load, renal failure.",
+      "Hypokalemia promotes renal ammoniagenesis by increasing glutamine extraction in the proximal tubule — an under-recognized but very common HE precipitant.",
+      "EEG triphasic waves are non-specific (any metabolic encephalopathy); their absence does not rule out HE, and atypical morphology should not deflect the diagnosis but warrants NCSE exclusion."
     ],
     "red_herrings": [
       {
-        "data_point": "Sodium 128 mEq/L (hyponatremia)",
-        "location": "initial_tool_outputs.labs",
-        "intended_effect": "Diagnose as hyponatremia encephalopathy and initiate aggressive sodium correction, missing HE as primary diagnosis",
-        "correct_interpretation": "Hyponatremia at 128 is contributory but not sole cause — ammonia 95 with cirrhosis history, EEG generalized slowing, and low albumin/INR all point to HE as primary; treat HE first, correct hyponatremia slowly",
-        "field_path": ""
+        "data_point": "Sodium 128 mEq/L (mild-moderate hyponatremia)",
+        "location": "initial_tool_outputs.labs.panels.BMP",
+        "field_path": "initial_tool_outputs.labs.panels.BMP[0]",
+        "intended_effect": "Diagnose hyponatremic encephalopathy as primary and pursue aggressive sodium correction.",
+        "correct_interpretation": "Na 128 is contributory; HE remains primary given ammonia 95 with cirrhosis, hypokalemia, constipation, and characteristic exam (asterixis). Correct sodium slowly; treat HE."
       },
       {
-        "data_point": "EEG without classic triphasic waves — only atypical triphasic-like activity",
+        "data_point": "Atypical (non-classic) triphasic-like waves on EEG",
         "location": "initial_tool_outputs.eeg",
-        "intended_effect": "Dismiss HE diagnosis because EEG is not classic; pursue alternate diagnoses or delay treatment",
-        "correct_interpretation": "Classic EEG triphasic waves are NOT required for HE diagnosis — the EEG supports but does not confirm HE; moderate HE can have non-specific generalized slowing; clinical + labs + CT together establish diagnosis",
-        "field_path": ""
+        "field_path": "initial_tool_outputs.eeg.findings[1]",
+        "intended_effect": "Dismiss HE because EEG is not 'classic'.",
+        "correct_interpretation": "Classic triphasic waves are not required for HE; atypical morphology is common in moderate HE. Pursue benzodiazepine challenge / continuous EEG to exclude NCSE rather than abandoning the HE diagnosis."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -806,6 +874,14 @@
       "specialized_test": "normal",
       "literature_search": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (HEP-ENC)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:HEP-ENC",
+    "difficulty_rationale": "5 required tools (labs, CT, lit, drug, paracentesis) + recommended EEG and consult; 2 grounded red herrings (atypical EEG, concurrent hyponatremia); precipitant identification across hypokalemia/constipation/diuretics requires synthesis across labs and history.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

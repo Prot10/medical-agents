@@ -455,106 +455,260 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Behavioral variant frontotemporal dementia — GRN (progranulin) pathogenic variant (c.709-1G>A) — FTLD-TDP type A pathology — presenting with combined bvFTD and early corticobasal syndrome features",
+    "primary_diagnosis": "Behavioral variant frontotemporal dementia (bvFTD), probable, GRN-associated (with early corticobasal syndrome features)",
     "icd_code": "G31.09",
     "differential": [
       {
-        "diagnosis": "Grief/adjustment reaction (caregiver stress)",
-        "likelihood": "very_low",
-        "key_features": "Structural left frontoparietal atrophy on MRI, low plasma progranulin (42 ng/mL), elevated CSF NfL, left frontoparietal FDG-PET hypometabolism — all confirm active neurodegeneration, not reactive behavioral changes"
+        "diagnosis": "Corticobasal syndrome (GRN-associated FTLD-TDP type A)",
+        "likelihood": "high",
+        "key_features": "GRN variants produce CBS phenotypes; watch for asymmetric apraxia, alien limb, cortical sensory loss."
       },
       {
-        "diagnosis": "Corticobasal syndrome from Alzheimer's disease (AD-CBS)",
-        "likelihood": "very_low",
-        "key_features": "Amyloid PET negative — CBS can be caused by AD pathology (in which case amyloid PET would be positive). Negative amyloid PET confirms FTLD-TDP pathology consistent with GRN mutation."
+        "diagnosis": "AD-related corticobasal syndrome",
+        "likelihood": "moderate",
+        "key_features": "AD can present as CBS; amyloid PET helps distinguish."
       },
       {
-        "diagnosis": "Sporadic bvFTD (without GRN cause)",
+        "diagnosis": "Progressive supranuclear palsy (PSP)",
         "likelihood": "low",
-        "key_features": "Pathogenic GRN splice site mutation confirmed; low plasma progranulin; family history consistent with autosomal dominant FTD-GRN"
+        "key_features": "Vertical gaze palsy or postural instability not described — but motor exam should be monitored."
       },
       {
-        "diagnosis": "Progressive supranuclear palsy (PSP) — GRN variant",
-        "likelihood": "low",
-        "key_features": "No supranuclear gaze palsy, no falls, no midbrain atrophy — GRN mutations can rarely cause PSP-syndrome but pattern here is CBS/bvFTD not PSP"
+        "diagnosis": "Caregiver-stress / adjustment reaction",
+        "likelihood": "very_low",
+        "key_features": "Personality / behavioural changes in a known GRN carrier with imaging changes are not explained by stress."
+      },
+      {
+        "diagnosis": "Sporadic bvFTD",
+        "likelihood": "very_low",
+        "key_features": "Confirmed GRN carrier — by definition not sporadic."
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "MRI brain — assess atrophy pattern; expect asymmetric frontoparietal in GRN-FTD",
+        "action": "Obtain brain MRI with volumetric coronal T1 to assess frontal/anterior temporal atrophy and exclude alternative structural cause",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Asymmetric left frontoparietal atrophy — characteristic of GRN-FTLD",
+        "expected_finding": "Bilateral frontal and/or anterior temporal atrophy in a lobar pattern with relative posterior sparing",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "DWI",
+            "volumetric"
+          ]
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky 2011 bvFTD criteria"
       },
       {
         "step": 2,
-        "action": "Plasma progranulin level — GRN haploinsufficiency biomarker",
+        "action": "Order metabolic dementia panel (TSH, B12, CMP, RPR/HIV per risk) to exclude reversible mimics",
         "tool_name": "interpret_labs",
-        "expected_finding": "Low plasma progranulin (42 ng/mL) confirming haploinsufficiency",
+        "expected_finding": "No reversible metabolic or infectious cause of cognitive decline identified",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "BMP",
+            "TSH",
+            "B12",
+            "RPR",
+            "HIV"
+          ]
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
       },
       {
         "step": 3,
-        "action": "FDG-PET brain — metabolic characterization of GRN-FTD pattern",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Asymmetric left frontoparietal hypometabolism",
+        "action": "Order comprehensive neuropsychological battery characterising executive function, social cognition, language and memory",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Frontal-executive and social-cognition deficits with relative sparing of episodic memory and visuospatial function",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky 2011 bvFTD criteria"
       },
       {
         "step": 4,
-        "action": "Amyloid PET — exclude AD-CBS (CBS can be AD-pathology)",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Negative — FTLD pathology confirmed",
+        "action": "Search medical literature for grn-associated ftld-tdp and cbs phenotype",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Confirms Rascovsky 2011 criteria, FDG-PET evidence (Foster 2007), and management approach (Bang 2015)",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "query": "GRN-associated FTLD-TDP and CBS phenotype"
+        },
+        "citation": "[Bang_2015]",
+        "guideline_source": "Bang 2015 Lancet review"
       },
       {
         "step": 5,
-        "action": "CBS motor exam — apraxia, cortical sensory loss, alien hand assessment",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Left hand apraxia and cortical sensory loss — early CBS features from right frontoparietal involvement",
+        "action": "Consult behavioral/cognitive neurology for syndromic diagnosis, biomarker interpretation, and longitudinal care plan",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Behavioral neurology confirms bvFTD syndrome, coordinates biomarkers and disclosure",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "specialty": "behavioral_neurology"
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
+      },
+      {
+        "step": 6,
+        "action": "Order FDG-PET brain to characterise frontotemporal hypometabolism and distinguish bvFTD from AD",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Bifrontal and/or anterior temporal hypometabolism with relative posterior sparing",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[Foster_2007]",
+        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
+      },
+      {
+        "step": 7,
+        "action": "Confirmatory genetic / plasma progranulin testing if not already documented",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Confirms GRN pathogenic variant and reduced plasma progranulin",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "genetic_panel:FTD"
+        },
+        "citation": "[Pottier_2016]",
+        "guideline_source": "Pottier 2016 FTLD genetics review"
+      },
+      {
+        "step": 8,
+        "action": "Detailed motor and cortical sensory exam (apraxia, alien limb, cortical sensory loss) given GRN propensity for CBS",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Asymmetric apraxia / cortical signs suggesting CBS overlap",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Pottier_2016]",
+        "guideline_source": "Pottier 2016 FTLD genetics review"
+      },
+      {
+        "step": 9,
+        "action": "Consider amyloid PET to exclude AD-driven CBS",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Negative amyloid PET",
+        "category": "optional",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "citation": "[Foster_2007]",
+        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is non-specific in FTD; not part of the standard dementia workup unless seizures or rapidly progressive course suggest CJD or autoimmune encephalitis.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "analyze_ecg",
+        "tool_parameters": {},
+        "rationale": "ECG has no role in the cognitive workup of suspected FTD; reserved for syncope, palpitations, or pre-procedure clearance.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is unrelated to a neurodegenerative cognitive syndrome and adds cost without diagnostic value.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is unrelated to FTD and not indicated absent syncope or palpitations.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT lacks the resolution and lobar specificity needed to characterise frontotemporal atrophy; MRI is the standard structural study.",
+        "citation": "[AAN_dementia_2018]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "MR_spectroscopy"
+        },
+        "rationale": "MR spectroscopy has no established role in the routine FTD diagnostic pathway.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "perfusion_MRI"
+        },
+        "rationale": "Perfusion MRI is not indicated in the standard FTD workup once a structural MRI and FDG-PET (or amyloid PET) have characterised the lobar pattern.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is a vascular study with no diagnostic role in primary neurodegenerative dementia.",
+        "citation": "[Bang_2015]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan evaluates presynaptic dopaminergic terminals; it is not indicated unless overt parkinsonism raises concern for PD, DLB, or atypical parkinsonism (PSP/CBS overlap).",
+        "citation": "[Bang_2015]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "Exclude structural cause of focal cognitive symptoms and screen for elevated ICP before lumbar puncture.",
+        "citation": "[AAN_dementia_2018]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Plasma progranulin is a disease-specific biomarker for GRN-FTD — should be checked in all GRN carriers to confirm haploinsufficiency",
-      "Amyloid PET must be obtained when CBS features are present — CBS can be caused by AD pathology, which requires different management",
-      "Refer to specialized FTD research center for clinical trial enrollment — GRN-FTD is the most advanced in targeted therapy pipeline (latozinemab)"
+      "Confirm GRN pathogenic variant and reduced plasma progranulin level.",
+      "Discuss GRN-directed clinical trial eligibility and provide cascade genetic counselling to asymptomatic brother and other relatives.",
+      "Apply Rascovsky 2011 bvFTD criteria explicitly (≥3 of 6 core features within 3 years) and document functional decline.",
+      "Assess and document decision-making, financial, and driving capacity given the high risk of impulsivity and impaired judgment in FTD.",
+      "Provide caregiver education, safety planning, and referral to FTD-focused support resources.",
+      "Offer genetic counselling and discuss cascade testing options if a pathogenic variant is identified or suspected."
     ],
     "contraindicated_actions": [
-      "Cholinesterase inhibitors — contraindicated in FTD",
-      "Attributing behavioral changes to grief without structural/biomarker assessment in a known GRN carrier at peak risk age"
+      "Do not start acetylcholinesterase inhibitors (donepezil, rivastigmine, galantamine): no benefit in FTD and may worsen behavioral symptoms.",
+      "Do not start memantine: no evidence of benefit in bvFTD and may worsen behavioral symptoms.",
+      "Avoid antipsychotics as first-line behavioral therapy given increased cerebrovascular and mortality risk in dementia; reserve for refractory dangerous agitation with specialist oversight.",
+      "Avoid benzodiazepines for behavioral control: risk of paradoxical disinhibition and falls."
     ],
     "key_reasoning_points": [
-      "GRN-FTD is caused by haploinsufficiency — plasma progranulin level is a direct biomarker of disease-related biology; level <60 ng/mL in a GRN mutation carrier confirms active disease",
-      "GRN-FTD characteristically shows ASYMMETRIC frontoparietal atrophy (often left-sided) — different from the more symmetric frontal pattern of C9orf72-FTD or sporadic bvFTD; this asymmetry can produce CBS features",
-      "When CBS features are present, amyloid PET is mandatory — CBS is caused by FTLD-TDP (GRN mutations) OR by Alzheimer's disease pathology; these require different treatment approaches",
-      "GRN-FTD is entering the era of targeted therapy — latozinemab (anti-sortilin antibody) is the first disease-modifying candidate; clinical trial referral should be standard of care for GRN carriers"
+      "Known GRN carrier with new behavioural and motor features — high pre-test probability of symptomatic FTLD-TDP.",
+      "GRN mutations classically produce heterogeneous phenotypes (bvFTD, CBS, PPA).",
+      "Cascade testing and clinical-trial discussion are central to management."
     ],
     "red_herrings": [
       {
-        "data_point": "Grief and caregiver stress from daughter's FTD",
-        "location": "History",
-        "intended_effect": "Attribute behavioral changes to reactive psychological response rather than neurodegeneration",
-        "correct_interpretation": "Structural MRI atrophy, low plasma progranulin, elevated CSF NfL, and FDG-PET hypometabolism confirm organic neurodegeneration — grief can coexist but does not cause these findings",
-        "field_path": ""
-      },
-      {
-        "data_point": "Only MoCA 24/30 — relatively preserved score",
-        "location": "Mental status exam",
-        "intended_effect": "Interpret as no significant cognitive decline — below threshold for dementia",
-        "correct_interpretation": "MoCA of 24 in a pharmacist with high premorbid function represents significant decline; social cognition and CBS-related visuospatial impairment are not well-captured by standard MoCA",
-        "field_path": ""
+        "data_point": "'Caregiver stress' framing in narrative",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Could mislead toward an adjustment reaction.",
+        "correct_interpretation": "A known GRN carrier developing new behavioural features at the expected age window is symptomatic FTLD until proven otherwise."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "v5",
@@ -567,6 +721,17 @@
       "echo": "incidental",
       "cardiac_monitoring": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (condition-expert:FTD)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FTD",
+    "difficulty_rationale": "5 required tools + 1–2 recommended biomarkers and a substantial differential (psychiatric, alcohol, vascular, or AD-overlap); 1–3 grounded red herrings (alcohol, family history, comorbid HIV / bipolar / GRN status); requires multi-modal synthesis.",
+    "case_body_concerns": [
+      "validator flags `order_advanced_imaging` in both optimal_actions (FDG_PET / amyloid_PET) and useless_tools (MR_spectroscopy / DaTscan / perfusion_MRI / carotid_duplex) — these are distinct modalities of the same catchall tool. Known systemic validator limitation: the coherence script ignores `tool_parameters.modality`. No fix at case level.",
+      "fallback output for `order_advanced_imaging` is missing in `fallback_tool_outputs` — calling the useless tool will return empty; case body needs an off-pathway fallback entry."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

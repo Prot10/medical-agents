@@ -1,7 +1,7 @@
 {
   "case_id": "MIG-AURA-S09",
   "condition": "migraine_with_aura",
-  "difficulty": "straightforward",
+  "difficulty": "moderate",
   "encounter_type": "outpatient",
   "patient": {
     "age": 38,
@@ -88,88 +88,112 @@
     "extremities": "No edema"
   },
   "ground_truth": {
-    "primary_diagnosis": "Established migraine with typical visual aura (G43.1); seeking preventive therapy optimization; prior 'TIA query' was migraine aura",
-    "primary_diagnosis_icd": "G43.1",
-    "differential": [],
+    "primary_diagnosis": "Established migraine with typical visual aura (ICHD-3 1.2.1); previous 'TIA query' retrospectively was visual aura",
+    "icd_code": "G43.109",
+    "differential": [
+      {
+        "diagnosis": "Migraine without aura",
+        "likelihood": "low",
+        "key_features": "Aura is stereotyped",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Medication-overuse headache",
+        "likelihood": "low",
+        "key_features": "Quantify acute medication use; may complicate the picture",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Transient ischemic attack (historic differential)",
+        "likelihood": "very_low",
+        "key_features": "Re-review shows the prior 'TIA' was actually visual aura with subsequent headache; normal vascular imaging then and now",
+        "icd_code": "G45.9"
+      },
+      {
+        "diagnosis": "Tension-type headache",
+        "likelihood": "very_low",
+        "key_features": "Pattern is clearly migrainous",
+        "icd_code": "G44.2"
+      }
+    ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Repeat brain MRI — confirm prior normal study; exclude new lesions given prior TIA query",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
+        "category": "required",
         "tool_parameters": {
-          "contrast": true,
-          "sequences": [
-            "DWI",
-            "FLAIR",
-            "MRA"
-          ]
-        }
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "Initiate erenumab 70 mg SC monthly — appropriate after 2 failed preventive medications",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
-        "tool_parameters": {}
-      },
-      {
-        "step": 3,
-        "action": "Increase sumatriptan prescription supply (up to 9 tabs/month)",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
-        "tool_parameters": {}
-      },
-      {
-        "step": 4,
-        "action": "Counsel on alcohol reduction (8-10 units/week may be contributing)",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
-        "tool_parameters": {}
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Review current and proposed preventives (topiramate, propranolol, candesartan, CGRP mAb); check for triptan-preventive interactions [Sacco_2022]",
+        "category": "required",
+        "tool_parameters": {
+          "context": "migraine_with_aura_pharmacotherapy"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis — neither present here",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated in typical migraine with aura — no role unless cardioembolic stroke is on the differential",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is not indicated for migraine with aura; reserve for cases where focal seizure is genuinely on the differential",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "Clarify prior TIA query — retrospectively confirmed as typical migraine aura",
-      "Prescribe erenumab — patient meets criteria (≥4 migraine days/month, 2 failed preventives)",
-      "Ensure adequate acute medication supply",
-      "Counsel on alcohol as potential contributing trigger"
+      "Confirm ICHD-3 1.2 criteria are met",
+      "Reframe prior 'TIA' as visual aura on history review — no anticoagulation indicated",
+      "Optimise preventive therapy (escalate / switch class) [Holland_2012]",
+      "Consider CGRP monoclonal antibody if conventional preventives have failed [Sacco_2022]"
     ],
     "contraindicated_actions": [
-      "Do not anticoagulate for 'TIA' without confirmed DWI restriction on MRI",
-      "Do not stop levonorgestrel IUD (appropriate contraception)",
-      "Do not re-trial propranolol (documented intolerance)"
+      "Do not anticoagulate for misattributed 'TIA' that was actually migraine aura",
+      "Do not start combined oestrogen-progestogen contraception",
+      "Do not co-administer triptans with ergotamines"
     ],
     "key_reasoning_points": [
-      "Prior 'TIA query' was a 20-minute visual aura with subsequent headache — this is typical migraine aura, not TIA",
-      "Patient meets criteria for anti-CGRP therapy after failing propranolol and amitriptyline",
-      "Erenumab 70 mg SC monthly is appropriate second-line prevention",
-      "Small PFO detected but closure not indicated for migraine without prior stroke",
-      "Alcohol reduction is a modifiable lifestyle factor"
+      "Careful history review can re-attribute a previous 'TIA' diagnosis to migraine aura — distinguishing positive spreading aura from negative abrupt deficit",
+      "Established migraine with aura with disability is an indication for preventive optimisation, including CGRP mAbs [Sacco_2022]"
     ],
     "red_herrings": [
       {
-        "data_point": "Prior 'TIA query' 4 years ago — investigated with normal MRI",
+        "data_point": "Prior 'TIA query' label in the medical record",
         "location": "patient.history_present_illness",
-        "intended_effect": "A prior TIA diagnosis or query might suggest cerebrovascular disease requiring anticoagulation or intensified vascular workup",
-        "correct_interpretation": "The episode was a 20-minute left visual disturbance with subsequent headache — this is typical migraine aura, not TIA; confirmed by normal MRI and typical migraine characteristics; no anticoagulation indicated",
-        "field_path": ""
-      },
-      {
-        "data_point": "Small PFO on bubble echocardiogram",
-        "location": "followup_outputs",
-        "intended_effect": "PFO in a patient with prior 'TIA query' could trigger cardioembolic workup and closure discussion",
-        "correct_interpretation": "No prior confirmed stroke; prior TIA was migraine aura; PFO closure not indicated for migraine without cryptogenic stroke (PREMIUM, MIST trials negative)",
-        "field_path": ""
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Anchors on cerebrovascular cause and may prompt anticoagulation",
+        "correct_interpretation": "The prior episode was visual aura with subsequent headache — typical CSD, not embolism; no anticoagulation indicated"
       }
-    ],
-    "icd_code": "G43.1",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -193,7 +217,17 @@
       "ct": "normal",
       "cardiac_monitoring": "incidental",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Moderate: distinguishing migraine aura from TIA on review of historic episode; preventive optimisation question",
+    "case_body_concerns": [
+      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide §1): ['analyze_brain_mri', 'analyze_ecg', 'interpret_labs', 'order_advanced_imaging', 'order_echocardiogram']"
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "initial_tool_outputs": {
     "mri": {

@@ -1,7 +1,7 @@
 {
   "case_id": "MG-RS11",
   "condition": "myasthenia_gravis",
-  "difficulty": "straightforward",
+  "difficulty": "moderate",
   "encounter_type": "inpatient",
   "patient": {
     "age": 52,
@@ -88,134 +88,222 @@
     "extremities": "No edema; no rash"
   },
   "ground_truth": {
-    "primary_diagnosis": "Ocular myasthenia gravis, AChR antibody–positive (G70.01)",
-    "primary_diagnosis_icd": "G70.01",
+    "primary_diagnosis": "Ocular myasthenia gravis, AChR antibody-positive (MGFA Class I)",
+    "icd_code": "G70.00",
     "differential": [
       {
-        "diagnosis": "Brainstem TIA causing true INO",
-        "likelihood": "low",
-        "key_features": "Normal brain MRI/MRA/DWI; no basilar territory infarct; fatigable ocular signs argue against fixed vascular deficit"
+        "diagnosis": "Generalized MG progression risk",
+        "likelihood": "high",
+        "key_features": "About 50% of ocular MG generalizes within 2 years — monitor for limb/bulbar involvement.",
+        "icd_code": "G70.01"
       },
       {
-        "diagnosis": "Miller-Fisher syndrome (GBS variant)",
+        "diagnosis": "Thyroid eye disease",
         "likelihood": "low",
-        "key_features": "No ataxia, no areflexia; anti-GQ1b negative; no preceding illness; not acute progressive"
+        "key_features": "No proptosis or lid retraction; fatigable rather than restrictive.",
+        "icd_code": "H06.2"
       },
       {
-        "diagnosis": "Orbital cellulitis or cavernous sinus thrombosis",
+        "diagnosis": "Cranial nerve palsy (microvascular)",
         "likelihood": "low",
-        "key_features": "No fever, no chemosis, no proptosis; MRI normal including cavernous sinus; no thrombosis on MRV"
+        "key_features": "Microvascular CN palsy is acute and monocular; this is bilateral and fluctuating.",
+        "icd_code": "H49.9"
       },
       {
-        "diagnosis": "Graves' ophthalmopathy",
-        "likelihood": "low",
-        "key_features": "Normal TSH; no proptosis, no lid retraction; ptosis (not retraction); normal orbital muscles on MRI"
+        "diagnosis": "CPEO / mitochondrial",
+        "likelihood": "very_low",
+        "key_features": "Fluctuating diurnal pattern incompatible with CPEO.",
+        "icd_code": "H49.4"
+      },
+      {
+        "diagnosis": "Miller-Fisher syndrome",
+        "likelihood": "very_low",
+        "key_features": "Anti-GQ1b negative; no antecedent infection; no ataxia/areflexia.",
+        "icd_code": "G61.0"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI with DWI, MRA, and MRV to exclude structural brainstem lesion and vascular etiology",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Order serologies: anti-AChR (binding, blocking, modulating), anti-MuSK, anti-LRP4, and TSH/free-T4 for thyroid autoimmunity",
+        "tool_name": "interpret_labs",
+        "expected_finding": "AChR antibody positive; TSH evaluates for comorbid thyroid disease",
+        "category": "required",
         "tool_parameters": {
-          "sequences": [
-            "DWI",
-            "FLAIR",
-            "MRA",
-            "MRV"
-          ],
-          "contrast": true
-        }
+          "panels": [
+            "anti_AChR",
+            "anti_MuSK",
+            "anti_LRP4",
+            "TSH"
+          ]
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 2,
-        "action": "AChR antibody testing after normal imaging confirms MG etiology",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Order repetitive nerve stimulation (RNS) at 2-3 Hz across proximal and facial muscles",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Decrement >10% in symptomatic muscles supports postsynaptic NMJ disorder",
+        "category": "required",
         "tool_parameters": {
-          "lab_type": "mg_antibody_panel"
-        }
+          "test_type": "repetitive_nerve_stimulation"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 3,
-        "action": "CT chest to exclude thymoma",
-        "tool_name": null,
-        "expected_finding": "",
+        "action": "Order single-fiber EMG (gold standard >95% sensitivity)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Increased jitter and blocking on extensor digitorum communis or orbicularis oculi confirms NMJ transmission failure",
         "category": "recommended",
         "tool_parameters": {
-          "region": "chest",
-          "contrast": true
-        }
+          "test_type": "emg_single_fiber"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 4,
-        "action": "Anti-GQ1b antibody to exclude Miller-Fisher syndrome",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Order CT chest with contrast for thymoma screening",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No thymoma; thymic involution appropriate for age",
+        "category": "required",
         "tool_parameters": {
-          "lab_type": "anti_ganglioside_panel"
-        }
+          "region": "chest",
+          "contrast": true,
+          "indication": "thymoma_screening"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 5,
-        "action": "Initiate pyridostigmine for symptom management and add prednisone for immunosuppression",
-        "tool_name": null,
-        "expected_finding": "",
+        "action": "Review MGFA classification and current treatment guidance (pyridostigmine, prednisone, steroid-sparing, IVIG/PLEX, thymectomy)",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "MGFA classification stages disease severity; thymectomy benefits AChR+ generalized MG (MGTX); IVIG/PLEX for crisis",
+        "category": "required",
+        "tool_parameters": {
+          "query": "myasthenia gravis MGFA classification treatment thymectomy"
+        },
+        "citation": "[Sanders_2016]",
+        "guideline_source": "Sanders_2016"
+      },
+      {
+        "step": 6,
+        "action": "Check drug interactions for MG-exacerbating agents (aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, neuromuscular blockers, procainamide)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Flag aminoglycosides, fluoroquinolones, IV magnesium, telithromycin, NMBs as contraindicated or use-with-caution in MG",
+        "category": "required",
+        "tool_parameters": {
+          "proposed": "pyridostigmine_start",
+          "screen_for": [
+            "aminoglycosides",
+            "fluoroquinolones",
+            "telithromycin",
+            "magnesium_IV",
+            "neuromuscular_blockers"
+          ]
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
+      },
+      {
+        "step": 7,
+        "action": "Bedside respiratory function testing (FVC, MIP/MEP, NIF) — repeat q4h in crisis",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline FVC/NIF to assess crisis risk in patients with bulbar or limb involvement",
         "category": "recommended",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[Sanders_2016]",
+        "guideline_source": "Sanders_2016"
+      },
+      {
+        "step": 8,
+        "action": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Improvement of ptosis after 2 minutes of cooling supports MG",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "ice_pack_test"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "MG is a peripheral neuromuscular junction disorder; EEG has no diagnostic role.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No CSF role in MG; LP risks complications without diagnostic yield.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "Advanced imaging (PET/MR spectroscopy/perfusion) is not indicated for MG diagnosis or staging; CT chest covers thymoma screening.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated for MG unless a comorbid cardiac question exists.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring is not indicated for MG unless arrhythmia or autonomic disease is independently suspected.",
+        "citation": "[Wolfe_2016]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "order_specialized_test",
+        "reason": "Order AChR/MuSK/LRP4 serologies first; reserve single-fiber EMG for seronegative or RNS-non-diagnostic cases (resource stewardship).",
+        "citation": "[Wolfe_2016]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Obtain brain MRI/DWI urgently to exclude brainstem TIA (given hypertension + pseudo-INO pattern)",
-      "Recognize Cogan lid twitch as highly specific sign of MG",
-      "Order AChR antibody after normal imaging",
-      "CT chest for thymoma screening in all newly diagnosed MG",
-      "Assess NIF and FVC — even in ocular MG, monitor for progression to generalized disease"
+      "Confirm AChR antibody positivity",
+      "RNS and ice-pack test as bedside support",
+      "CT chest for thymoma screening (here negative)",
+      "Initiate pyridostigmine and counsel about generalization risk",
+      "Plan follow-up at 3, 6, 12, 24 months for early detection of generalization"
     ],
     "contraindicated_actions": [
-      "Do not initiate anticoagulation without confirmed ischemic etiology",
-      "Do not prescribe fluoroquinolones or aminoglycosides for any concurrent infection",
-      "Do not miss the anti-GQ1b test if Miller-Fisher syndrome remains on differential"
+      "Do NOT prescribe aminoglycoside antibiotics (gentamicin, tobramycin, amikacin) — risk of precipitating myasthenic crisis",
+      "Do NOT prescribe fluoroquinolones (ciprofloxacin, levofloxacin, moxifloxacin) — FDA black-box warning for MG exacerbation",
+      "Do NOT prescribe telithromycin — contraindicated in MG",
+      "Do NOT administer IV magnesium for MG patients (e.g., for hypomagnesaemia, eclampsia prophylaxis) without alternative — blocks NMJ transmission",
+      "Do NOT use non-depolarizing neuromuscular blockers without anaesthesia/MG-aware dosing protocols",
+      "Do NOT initiate high-dose corticosteroids as sole outpatient therapy without hospitalization or pyridostigmine bridge — risk of paradoxical worsening at days 5-10",
+      "Do NOT attribute fluctuating fatigable weakness to a functional disorder before completing serology + RNS + single-fiber EMG workup"
     ],
     "key_reasoning_points": [
-      "Pseudo-INO without brainstem structural correlate on MRI is a classic presentation of ocular MG",
-      "Cogan lid twitch sign is 98% specific for MG when present",
-      "Normal brain MRI/DWI is the key that redirects from vascular to neuromuscular etiology",
-      "AChR antibody 7.6 nmol/L is strongly positive and diagnostic",
-      "Anti-GQ1b negative effectively excludes Miller-Fisher syndrome",
-      "Ocular MG without limb or respiratory involvement: current pyridostigmine + prednisone strategy"
+      "Fluctuating, fatigable weakness with diurnal pattern (worse evening) is the clinical hallmark of MG — fixed weakness suggests an alternative diagnosis.",
+      "Ocular involvement (ptosis, diplopia) is asymmetric and fatigable in MG; thyroid eye disease causes restrictive (not fatigable) ophthalmoplegia.",
+      "Single-fiber EMG (sensitivity >95%) is the most sensitive electrodiagnostic test — order when RNS is non-diagnostic or serology is negative.",
+      "All confirmed MG cases require CT chest for thymoma — present in roughly 10-15% of generalized MG; thymectomy (MGTX trial) improves long-term outcomes in non-thymoma AChR+ MG as well.",
+      "Aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, and neuromuscular blockers can precipitate myasthenic crisis and must be screened against any new prescription.",
+      "Ocular MG: about 50% generalize within 2 years; treatment of ocular MG may reduce generalization risk (modest evidence).",
+      "Bedside ice-pack test is a cheap, ~80% sensitive screen for ptosis."
     ],
-    "red_herrings": [
-      {
-        "data_point": "Pseudo-INO pattern suggesting brainstem TIA",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Pseudo-INO with bilateral horizontal restriction mimics true INO from brainstem lesion",
-        "correct_interpretation": "True INO requires structural MLF lesion; normal brain MRI and fatigable nature confirm MG etiology",
-        "field_path": ""
-      },
-      {
-        "data_point": "Periorbital swelling suggesting orbital cellulitis",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Eyelid swelling + restricted eye movement can resemble orbital cellulitis",
-        "correct_interpretation": "No fever, no chemosis, no proptosis, normal orbital MRI — orbital infection excluded",
-        "field_path": ""
-      },
-      {
-        "data_point": "Hypertension as vascular risk factor",
-        "location": "patient.clinical_history.past_medical_history",
-        "intended_effect": "Hypertension raises pre-test probability for TIA/stroke as cause of focal neurological signs",
-        "correct_interpretation": "Normal MRI/MRA excludes vascular etiology; MG is the diagnosis regardless of vascular risk factors",
-        "field_path": ""
-      }
-    ],
-    "icd_code": "G70.01",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": []
   },
   "red_herrings": [
     {
@@ -248,7 +336,17 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MG",
+    "difficulty_rationale": "5 required tools, 0 red herrings, typical AChR+ generalized MG",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": [
+      "emg_ncs_useless_via_param_conflation: pack lists order_specialized_test:emg_ncs as USELESS, but coherence validator treats tool_name overlap as a contradiction regardless of tool_parameters; cannot encode without removing required RNS/SFEMG entries. Suggest extending validator to compare tool_name + tool_parameters or fleet-wide pattern."
+    ]
   },
   "initial_tool_outputs": {
     "mri": {

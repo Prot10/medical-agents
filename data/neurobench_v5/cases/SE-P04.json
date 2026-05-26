@@ -464,133 +464,211 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Acute left MCA ischemic stroke with post-ischemic LPDs (ictal-interictal continuum) and post-reperfusion seizures requiring concurrent thrombectomy and levetiracetam loading",
-    "icd_code": "G41.9",
+    "primary_diagnosis": "Acute left MCA ischemic stroke with post-ischemic lateralized periodic discharges on ictal-interictal continuum and post-reperfusion seizures",
+    "icd_code": "I63.512",
     "differential": [
       {
-        "diagnosis": "NCSE from another cause (autoimmune, metabolic)",
-        "likelihood": "low",
-        "key_features": "Autoimmune panel negative; acute MCA LVO on CT/CTA is the primary diagnosis; LPDs are post-ischemic, not from independent epileptiform process"
+        "diagnosis": "NCSE alone (without ischemic infarct)",
+        "likelihood": "moderate",
+        "key_features": "LPDs on EEG can be NCSE per Salzburg criteria; coexistence with acute stroke established",
+        "icd_code": "G41.2"
       },
       {
-        "diagnosis": "Todd's paralysis mimicking stroke",
-        "likelihood": "low",
-        "key_features": "CTA confirms left M1 occlusion — true LVO; NIHSS 14 with positive CTA rules out Todd's paralysis; post-tPA NIHSS improvement supports true ischemic stroke treatment response"
+        "diagnosis": "Post-reperfusion injury after thrombectomy",
+        "likelihood": "moderate",
+        "key_features": "Reperfusion can cause seizures and edema; ictal-interictal continuum on EEG",
+        "icd_code": "I63.512"
       },
       {
-        "diagnosis": "Hemiplegic migraine",
-        "likelihood": "very_low",
-        "key_features": "Hyperdense left M1 on CT, positive CTA — LVO confirmed; not hemiplegic migraine"
+        "diagnosis": "Stroke mimic (Todd's paralysis from prior seizure)",
+        "likelihood": "moderate",
+        "key_features": "Initial diagnosis as stroke could be wrong if seizure preceded; MRI/CTA established ischemia",
+        "icd_code": "G83.84"
+      },
+      {
+        "diagnosis": "PRES from hypertensive emergency (BP 188/112)",
+        "likelihood": "moderate",
+        "key_features": "BP severely elevated; PRES on differential but MRI/CTA show MCA territory",
+        "icd_code": "I67.4"
+      },
+      {
+        "diagnosis": "Hemorrhagic transformation post-tPA",
+        "likelihood": "moderate",
+        "key_features": "tPA given; CT/MRI to assess for hemorrhagic transformation",
+        "icd_code": "I63.83"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "IMMEDIATE thrombectomy — left MCA M1 LVO with ASPECTS 7, within time window; do NOT delay for EEG evaluation",
-        "tool_name": null,
-        "expected_finding": "TICI 2b-3 recanalization; penumbral salvage",
+        "action": "Continuous video-EEG — characterize LPDs and assess for NCSE in the ischemic hemisphere",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Left hemisphere LPDs at 1.5-2 Hz — ictal-interictal continuum requiring management",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Salzburg_NCSE_2015]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "IV levetiracetam 1500 mg loading dose CONCURRENTLY with thrombectomy prep — safe, no interaction with tPA or thrombectomy",
-        "tool_name": null,
-        "expected_finding": "Post-reperfusion seizures suppressed",
+        "action": "Labs: CBC, CMP, glucose, AED level, lactate, ABG, coagulation (post-tPA), troponin, BNP, lipid panel, A1c, hypercoagulable workup as indicated",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Glucose 192 (hyperglycemia worsens outcome); coagulation status post-tPA",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Do NOT give IV benzodiazepines for EEG LPDs in acute stroke — lowers BP, worsens cerebral perfusion in penumbra",
-        "tool_name": null,
-        "expected_finding": "BP maintained for penumbral perfusion",
+        "action": "Non-contrast head CT — assess for hemorrhagic transformation post-tPA",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Hyperdense MCA + early ischemic changes; no hemorrhagic transformation",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "EEG monitoring 20 minutes pre-procedure to document LPD pattern",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Left MCA territory LPDs on IIC — post-ischemic",
-        "category": "recommended",
-        "tool_parameters": {
-          "urgency": "urgent",
-          "time_constraint": "do_not_delay_thrombectomy"
-        }
+        "action": "MRI brain + MRA — confirm territory and exclude additional pathology",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Confirmed left MCA territory infarct; post-thrombectomy reperfusion",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "Post-thrombectomy continuous cEEG 24 hours for post-reperfusion seizure monitoring",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Early post-reperfusion seizures controlled with levetiracetam",
+        "action": "Drug-interaction check: tPA + AED + antiplatelet/anticoagulant timing",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Levetiracetam preferred (no bleeding interaction); avoid initiating anticoagulation prematurely after tPA",
         "category": "required",
-        "tool_parameters": {
-          "modality": "continuous_ceeg",
-          "duration_hours": 24
-        }
+        "tool_parameters": {},
+        "citation": "[ESETT_2019]",
+        "guideline_source": ""
       },
       {
         "step": 6,
-        "action": "Treat hyperglycemia — glucose 192 in acute stroke worsens ischemic injury; insulin protocol to target 140-180 mg/dL",
-        "tool_name": null,
-        "expected_finding": "Glucose controlled to 140-180 range during acute ischemia",
+        "action": "Literature: post-stroke / post-reperfusion seizures + AED selection",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "LEV preferred; treat NCSE if Salzburg criteria met; avoid prophylactic AED otherwise",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[ESETT_2019]",
+        "guideline_source": ""
       },
       {
         "step": 7,
-        "action": "MRI brain DWI 24h post-thrombectomy to assess infarct core and penumbral salvage",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Core infarct 40 mL with penumbral salvage",
-        "category": "required",
+        "action": "12-lead ECG — assess for atrial fibrillation as embolic source",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Sinus rhythm or atrial fibrillation; impacts secondary prevention",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 8,
+        "action": "Echocardiogram — cardioembolic source assessment",
+        "tool_name": "order_echocardiogram",
+        "expected_finding": "TTE for cardiac embolic source",
+        "category": "recommended",
         "tool_parameters": {
-          "sequences": [
-            "DWI",
-            "ADC",
-            "FLAIR",
-            "MRA"
+          "study_type": "TTE"
+        },
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 9,
+        "action": "Stroke neurology + neurocritical care consultation",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Integrated stroke and SE management",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 10,
+        "action": "Carotid imaging for embolic source workup",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Carotid duplex or CTA for stenosis",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "rationale": "Neuropsych battery cannot be performed acutely.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {
+          "tests": [
+            "routine"
           ]
-        }
+        },
+        "rationale": "No infectious / autoimmune suspicion; LP not indicated.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "check_drug_interactions",
+        "reason": "MRI/CT confirming no hemorrhagic transformation must precede any anticoagulation decision.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Thrombectomy IMMEDIATELY — do NOT delay for EEG evaluation in acute LVO stroke",
-      "IV levetiracetam (not benzodiazepines) for concurrent post-stroke seizure management — benzodiazepines lower BP and worsen penumbral perfusion",
-      "Insulin protocol for glucose 192 — hyperglycemia worsens stroke outcomes",
-      "Post-thrombectomy cEEG 24 hours for post-reperfusion seizure monitoring"
+      "Continuous EEG to monitor LPDs / NCSE",
+      "Load IV levetiracetam if Salzburg criteria met or clear ictal evolution",
+      "Avoid anticoagulation within 24h of tPA",
+      "Manage blood pressure per stroke guidelines (post-tPA target <180/105)",
+      "Treat hyperglycemia (target 140-180 in stroke)"
     ],
     "contraindicated_actions": [
-      "IV benzodiazepines for EEG LPDs in acute stroke — lowers BP, reduces cerebral perfusion pressure in ischemic penumbra",
-      "Delaying thrombectomy to evaluate and treat EEG LPDs — every minute of LVO delays costs additional penumbra",
-      "Phenytoin for post-stroke seizure prevention — sodium channel blockade worsens ischemic neuronal injury"
+      "Do NOT give prophylactic AEDs to stroke patients without evidence of seizures",
+      "Do NOT initiate anticoagulation prematurely after tPA",
+      "Do NOT delay neurology / stroke team involvement",
+      "Avoid initiating anticoagulation within 24h of tPA — bleeding risk; AED loading must respect this window."
     ],
     "key_reasoning_points": [
-      "Acute LVO stroke + EEG changes: thrombectomy takes absolute priority over seizure management — time is brain",
-      "LPDs in acute stroke are post-ischemic cortical irritability, not independent NCSE — levetiracetam is appropriate concurrent treatment without delaying thrombectomy",
-      "Benzodiazepines in acute stroke: contraindicated as BP-lowering effect reduces cerebral perfusion pressure in ischemic penumbra — levetiracetam is safe",
-      "Post-reperfusion seizures are common and expected after LVO recanalization — levetiracetam pre-loading reduces early post-stroke seizure burden",
-      "Phenytoin worsens ischemic outcomes via sodium channel blockade and local vasoconstriction — never use phenytoin for post-stroke seizures"
+      "LPDs after stroke are on the ictal-interictal continuum; Salzburg criteria guide treatment",
+      "Post-reperfusion seizures can be brief or evolve to NCSE; close EEG monitoring is required",
+      "Hyperglycemia worsens stroke outcome — target 140-180",
+      "Anticoagulation initiation post-tPA must wait 24h with imaging confirming no hemorrhage"
     ],
     "red_herrings": [
       {
-        "data_point": "EEG LPDs noted on urgent EEG — read as 'possible NCSE' by resident",
-        "location": "initial EEG report",
-        "intended_effect": "Delay thrombectomy while treating presumed NCSE with benzodiazepines",
-        "correct_interpretation": "LPDs in acute MCA stroke are post-ischemic — do not delay thrombectomy. Treat with levetiracetam concurrently, not benzodiazepines. Thrombectomy is the priority.",
-        "field_path": ""
+        "data_point": "LPDs on EEG initially read as definite NCSE",
+        "location": "initial_tool_outputs.eeg",
+        "field_path": "initial_tool_outputs.eeg",
+        "intended_effect": "Suggests aggressive AED escalation to anesthetic infusion",
+        "correct_interpretation": "LPDs sit on the ictal-interictal continuum; Salzburg criteria + benzodiazepine response guide whether escalation is needed; not all LPDs require anesthetic infusion"
       },
       {
-        "data_point": "Right arm posturing every 30-60 seconds during EEG recording",
-        "location": "neurological exam",
-        "intended_effect": "Suggest ongoing motor NCSE requiring immediate benzodiazepine treatment",
-        "correct_interpretation": "Right arm posturing in left MCA stroke is a sign of hemispheric dysfunction (posturing from ischemia + possibly post-ischemic cortical irritability) — NOT sufficient to delay thrombectomy. Levetiracetam loading is appropriate without benzodiazepines.",
-        "field_path": ""
+        "data_point": "Initial 'stroke' diagnosis with stiff posturing",
+        "location": "patient.history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Anchoring on stroke alone, missing the ictal-interictal component",
+        "correct_interpretation": "Stiff posturing can be from focal seizure activity (tonic component); EEG identifies the dual diagnosis"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -600,6 +678,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "8 required + 2 recommended; concurrent acute MCA stroke and IIC LPDs; teaching is Salzburg criteria, post-tPA anticoagulation timing, prophylactic AED policy; 2 grounded red herrings.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -574,175 +574,251 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Paraneoplastic limbic encephalitis (anti-Hu antibody, SCLC) presenting with ictal-interictal continuum (LPDs) evolving to NCSE after positive benzodiazepine trial",
-    "icd_code": "G41.9",
+    "primary_diagnosis": "Paraneoplastic limbic encephalitis (anti-Hu, suspected small cell lung carcinoma) presenting with ictal-interictal continuum evolving to non-convulsive status epilepticus after positive benzodiazepine diagnostic trial",
+    "icd_code": "G41.2",
     "differential": [
       {
-        "diagnosis": "Alcohol withdrawal-related seizures and encephalopathy",
+        "diagnosis": "HSV / viral encephalitis",
+        "likelihood": "high",
+        "key_features": "Limbic distribution and behavioral decline overlap HSV; CSF HSV PCR negative, anti-Hu strongly positive",
+        "icd_code": "B00.4"
+      },
+      {
+        "diagnosis": "Non-paraneoplastic autoimmune encephalitis (NMDAR, LGI1, GABA-B)",
+        "likelihood": "high",
+        "key_features": "Limbic encephalitis differential; antibody panel pending; anti-Hu positivity steers to paraneoplastic",
+        "icd_code": "G04.81"
+      },
+      {
+        "diagnosis": "Alcohol withdrawal seizures / withdrawal encephalopathy",
         "likelihood": "moderate",
-        "key_features": "Abrupt cessation 5 days ago is a red herring — alcohol withdrawal seizures occur 6-48 hours post-cessation, not at 5 days; the subacute 3-week behavioral decline precedes alcohol cessation and cannot be explained by withdrawal"
+        "key_features": "Cessation 5 days ago is OUTSIDE the 6-48 h withdrawal-seizure window; 3-week subacute decline pre-dates cessation",
+        "icd_code": "F10.231"
       },
       {
-        "diagnosis": "Herpes simplex encephalitis",
+        "diagnosis": "Wernicke encephalopathy",
         "likelihood": "moderate",
-        "key_features": "Temporal FLAIR changes + encephalopathy + EEG temporal abnormalities overlap with HSV; however anti-Hu 1:3200 and CT chest mass are diagnostic; CSF HSV PCR negative"
+        "key_features": "Thiamine 42 deficient; Wernicke does not produce focal temporal NCSE pattern but coexists and needs aggressive treatment",
+        "icd_code": "E51.2"
       },
       {
-        "diagnosis": "Non-paraneoplastic autoimmune encephalitis (anti-NMDAR, anti-LGI1)",
+        "diagnosis": "Hepatic encephalopathy from NASH",
         "likelihood": "low",
-        "key_features": "Anti-NMDAR and anti-LGI1 negative; anti-Hu positive — paraneoplastic rather than non-paraneoplastic autoimmune; lung mass present"
-      },
-      {
-        "diagnosis": "Wernicke's encephalopathy",
-        "likelihood": "low",
-        "key_features": "Thiamine deficient and contributing — Wernicke's causes ataxia, ophthalmoplegia, confusion triad; MRI would show mammillary body and periaqueductal changes; limbic temporal FLAIR changes are not Wernicke's pattern"
+        "key_features": "Elevated AST:ALT and GGT, but ammonia not reported critical; triphasic-only pattern not seen",
+        "icd_code": "K72.90"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Emergent EEG to characterize IIC/LPD pattern and assess for NCSE",
+        "action": "Continuous video-EEG — characterize LPD pattern and ictal-interictal continuum",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Right temporal LPDs on IIC — ambiguous for NCSE",
+        "expected_finding": "Right temporal LPDs at 1.2-1.8 Hz with LPD-plus features — ictal-interictal continuum",
         "category": "required",
-        "tool_parameters": {
-          "urgency": "stat"
-        }
+        "tool_parameters": {},
+        "citation": "[Salzburg_NCSE_2015]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "IV lorazepam 0.05 mg/kg diagnostic trial — assess EEG + clinical response to determine if LPDs are ictal",
-        "tool_name": null,
-        "expected_finding": "EEG LPD suppression + transient clinical improvement = NCSE confirmed",
+        "action": "IV lorazepam diagnostic trial under EEG — clinical and electrographic response resolves IIC",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "LPD suppression + transient clinical improvement = NCSE confirmed per Salzburg",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Salzburg_NCSE_2015]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Obtain serum autoimmune/paraneoplastic panel including anti-Hu antibody",
+        "action": "Labs: CBC, CMP, glucose, Ca/Mg, AED level, ammonia, ABG, lactate, blood cultures, tox screen, thiamine, beta-hCG; autoimmune/paraneoplastic panel (Hu, NMDAR, LGI1, Ma2, CV2, GAD65, anti-thyroid)",
         "tool_name": "interpret_labs",
-        "expected_finding": "Anti-Hu IgG positive 1:3200 — paraneoplastic limbic encephalitis from SCLC",
+        "expected_finding": "Anti-Hu IgG 1:3200 (CONFIRMS paraneoplastic); thiamine 42 deficient; mild electrolyte derangements",
         "category": "required",
-        "tool_parameters": {
-          "tests": [
-            "anti-Hu",
-            "anti-NMDAR",
-            "anti-LGI1",
-            "anti-Yo",
-            "anti-CV2"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "MRI brain with gadolinium for limbic encephalitis pattern",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Bilateral mesial temporal FLAIR hyperintensity — paraneoplastic limbic encephalitis",
+        "action": "Non-contrast head CT — exclude hemorrhage / mass before LP",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Normal CT — does not exclude limbic encephalitis",
         "category": "required",
-        "tool_parameters": {
-          "sequences": [
-            "FLAIR",
-            "DWI",
-            "T1+Gd"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "CT chest + abdomen + pelvis for primary malignancy (SCLC given anti-Hu positive)",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "Right hilar mass — SCLC",
+        "action": "MRI brain with gadolinium — limbic encephalitis pattern",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Bilateral mesial temporal FLAIR hyperintensity — limbic encephalitis pattern",
         "category": "required",
-        "tool_parameters": {
-          "contrast": true,
-          "area": "chest_abdomen_pelvis"
-        }
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
       },
       {
         "step": 6,
-        "action": "LP with CSF anti-Hu IgG, HSV PCR, cell count",
+        "action": "Lumbar puncture: cell count, protein, glucose, HSV PCR, autoimmune/paraneoplastic CSF antibodies, cytology",
         "tool_name": "analyze_csf",
-        "expected_finding": "Anti-Hu positive in CSF; HSV negative; lymphocytic pleocytosis",
+        "expected_finding": "Lymphocytic pleocytosis, mildly elevated protein, CSF Hu IgG positive, HSV negative",
         "category": "required",
-        "tool_parameters": {
-          "tests": [
-            "anti-Hu_IgG",
-            "HSV_PCR",
-            "cell_count"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 7,
-        "action": "Escalate thiamine to 500 mg IV TID (not 100 mg/day) for documented thiamine deficiency — prevent Wernicke's",
-        "tool_name": null,
-        "expected_finding": "Thiamine level normalizes",
+        "action": "CT chest/abdomen/pelvis for occult SCLC — anti-Hu mandates body imaging",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Right hilar mass — suspicious for SCLC",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 8,
-        "action": "Load IV levetiracetam 1500 mg after positive benzodiazepine trial confirms NCSE",
-        "tool_name": null,
-        "expected_finding": "Reduction in LPD frequency and burden",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "FDG-PET if CT body negative but anti-Hu strongly positive",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Whole-body FDG-PET locates occult primary",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 9,
-        "action": "Stop acyclovir once HSV PCR negative confirmed",
-        "tool_name": null,
-        "expected_finding": "Acyclovir discontinued safely",
+        "action": "Drug-interaction check: AED + acyclovir + immunotherapy + thiamine + glucose order",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Levetiracetam preferred; high-dose IV thiamine 500 mg TID; load LEV after benzo + thiamine",
         "category": "recommended",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[ESETT_2019]",
+        "guideline_source": ""
       },
       {
         "step": 10,
-        "action": "Oncology consultation for SCLC tumor treatment — primary treatment for paraneoplastic limbic encephalitis",
-        "tool_name": null,
-        "expected_finding": "SCLC chemotherapy (etoposide + platinum) initiated",
+        "action": "Literature: paraneoplastic LE treatment — tumor-directed therapy + immunotherapy",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Anti-Hu: treat SCLC chemotherapy + steroids/IVIG; intracellular-antigen syndromes respond poorly to immunotherapy alone",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 11,
+        "action": "Oncology consultation for SCLC tissue diagnosis and chemotherapy",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Etoposide + platinum standard SCLC regimen",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 12,
+        "action": "Continue empiric IV acyclovir until HSV PCR returns negative",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Stop acyclovir once HSV PCR negative",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "study_type": "TTE"
+        },
+        "rationale": "No clinical suspicion of cardiac source of embolus or cardiogenic seizure; routine echo is not indicated in SE workup absent cardiac findings.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No suspicion of arrhythmogenic syncope or cardiac comorbidity precipitating SE; routine telemetry beyond standard ICU monitoring adds cost without yield.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "DaTscan / dopamine transporter imaging has no role in SE; no parkinsonism question relevant to acute management.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "Head CT must precede LP to exclude mass effect.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Thiamine must be administered BEFORE glucose in alcoholic with documented deficiency.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Anti-Hu serology immediately — positive result drives entire treatment approach",
-      "CT chest for SCLC — find tumor, initiate chemotherapy as primary treatment",
-      "IV benzodiazepine diagnostic trial to resolve IIC ambiguity",
-      "Escalate thiamine to 500 mg IV TID — 100 mg/day insufficient for documented deficiency",
-      "Magnesium repletion alongside thiamine — magnesium required for thiamine metabolism"
+      "Administer IV lorazepam 0.1 mg/kg first-line — also diagnostic for IIC",
+      "Empiric IV acyclovir until HSV PCR returns",
+      "IV thiamine 500 mg TID BEFORE any glucose given documented deficiency",
+      "Load levetiracetam to therapeutic level post-diagnostic trial confirmation",
+      "Initiate first-line immunotherapy (steroids + IVIG) once anti-Hu is confirmed",
+      "Urgent body imaging for SCLC and oncology referral for tumor treatment"
     ],
     "contraindicated_actions": [
-      "Attributing encephalopathy to alcohol withdrawal alone — 3-week subacute course pre-cessation is not alcohol withdrawal; positive anti-Hu is definitive",
-      "Insufficient thiamine dosing — 100 mg/day is prophylactic; documented deficiency requires 500 mg TID IV",
-      "Continuing acyclovir after HSV PCR confirmed negative — no indication"
+      "Do NOT attribute encephalopathy to alcohol withdrawal alone — outside window and subacute decline pre-cessation",
+      "Do NOT under-dose thiamine — 500 mg IV TID is treatment dose; 100 mg is prophylactic",
+      "Do NOT continue acyclovir after HSV PCR confirmed negative",
+      "Do NOT delay tumor identification — immunotherapy alone is inadequate for anti-Hu"
     ],
     "key_reasoning_points": [
-      "Ictal-interictal continuum (IIC): LPDs without clear ictal evolution are on the boundary — the benzodiazepine diagnostic trial resolves ambiguity (clinical/EEG improvement confirms NCSE)",
-      "Anti-Hu (ANNA-1) is highly specific for paraneoplastic neurological syndrome: >80% associated with SCLC; urgent CT chest mandatory",
-      "Alcohol cessation 5 days ago is a classic red herring — alcohol withdrawal seizures occur 6-48 hours post-cessation, NOT 5 days later; the subacute 3-week behavioral decline is paraneoplastic",
-      "Thiamine 100 mg/day is prophylactic dose; documented deficiency in alcoholic patient requires 500 mg IV TID for minimum 5 days",
-      "Anti-Hu paraneoplastic encephalitis targets intracellular antigens causing irreversible neuronal destruction — tumor treatment (SCLC chemotherapy) is the only effective treatment; immunotherapy alone has limited benefit"
+      "Ictal-interictal continuum resolves with benzodiazepine diagnostic trial — clinical and EEG improvement confirms NCSE",
+      "Anti-Hu strongly associates with SCLC; intracellular-antigen syndromes respond poorly to immunotherapy alone — tumor-directed therapy is essential",
+      "Alcohol withdrawal seizures occur 6-48 hours after cessation, not 5 days later",
+      "Subacute 3-week behavioral decline pre-dating alcohol cessation is the paraneoplastic timeline",
+      "Wernicke needs 500 mg IV TID thiamine, not 100 mg/day prophylactic dosing"
     ],
     "red_herrings": [
       {
         "data_point": "Abrupt alcohol cessation 5 days ago",
-        "location": "social history",
-        "intended_effect": "Suggest alcohol withdrawal seizures/encephalopathy as primary cause",
-        "correct_interpretation": "Alcohol withdrawal seizures occur 6-48h after cessation, not 5 days. The 3-week subacute behavioral decline preceding cessation is paraneoplastic, not withdrawal.",
-        "field_path": ""
+        "location": "patient.history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Suggests alcohol withdrawal seizures as cause",
+        "correct_interpretation": "Withdrawal seizures occur 6-48 h post-cessation; the subacute 3-week behavioral decline that pre-dates cessation cannot be explained by withdrawal"
       },
       {
-        "data_point": "Thiamine started at 100 mg/day IV at outside hospital",
-        "location": "medications",
-        "intended_effect": "Suggest Wernicke's encephalopathy being treated and resolved",
-        "correct_interpretation": "100 mg/day is prophylactic dose — insufficient for documented deficiency (level 42). Wernicke's would require 500 mg TID. But Wernicke's does not explain the focal temporal EEG and limbic MRI changes.",
-        "field_path": ""
+        "data_point": "Thiamine 100 mg/day already started at outside hospital",
+        "location": "patient.clinical_history.medications",
+        "field_path": "patient.clinical_history.medications",
+        "intended_effect": "Suggests Wernicke is already adequately treated",
+        "correct_interpretation": "100 mg/day is prophylactic dose; documented deficiency (thiamine 42) requires 500 mg IV TID; underdosing perpetuates Wernicke"
+      },
+      {
+        "data_point": "Hypoglycemia (glucose 68 mg/dL)",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests reflexive glucose administration",
+        "correct_interpretation": "In alcoholic patient with documented thiamine deficiency, IV thiamine 500 mg must be given BEFORE glucose to avoid precipitating Wernicke"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -752,6 +828,14 @@
       "advanced_imaging": "normal",
       "specialized_test": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "11 required tools + 1 recommended; classic IIC requiring diagnostic benzo trial; anti-Hu paraneoplastic; layered with Wernicke and alcohol-misattribution traps; 3 grounded red herrings.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

@@ -1,7 +1,7 @@
 {
   "case_id": "FEPI-TEMP-RS02",
   "condition": "focal_epilepsy_temporal",
-  "difficulty": "straightforward",
+  "difficulty": "moderate",
   "encounter_type": "inpatient",
   "patient": {
     "patient_id": "NB-FEPI-TEMP-RS02",
@@ -734,136 +734,191 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Focal epilepsy - temporal lobe (right temporal lobe epilepsy secondary to calcified neurocysticercosis with secondary mesial temporal sclerosis)",
-    "icd_code": "G40.109",
+    "primary_diagnosis": "Focal epilepsy of right temporal lobe origin with mesial temporal sclerosis, secondary to remote calcified neurocysticercosis (dual pathology), presenting at 33 weeks gestation",
+    "icd_code": "G40.219",
     "differential": [
       {
-        "diagnosis": "Syncope (vasovagal or pregnancy-related)",
+        "diagnosis": "Eclampsia",
+        "likelihood": "high",
+        "key_features": "Late-pregnancy seizure with hypertension/proteinuria must be excluded urgently; blood pressure, urine protein, LFTs clarify.",
+        "icd_code": "O15.9"
+      },
+      {
+        "diagnosis": "Hyponatremia / metabolic seizure",
+        "likelihood": "moderate",
+        "key_features": "Pregnancy + homeless + dehydration can produce metabolic provocation; CMP excludes.",
+        "icd_code": "G93.49"
+      },
+      {
+        "diagnosis": "Active neurocysticercosis (viable cyst)",
+        "likelihood": "moderate",
+        "key_features": "If cysts are not all calcified, an active lesion is the proximate cause; MRI distinguishes viable vs calcified.",
+        "icd_code": "B69.0"
+      },
+      {
+        "diagnosis": "Convulsive syncope",
         "likelihood": "low",
-        "key_features": "Obstetrical causes excluded by Ob/Gyn evaluation. Witnessed seizure semiology with tonic-clonic activity lasting >60 seconds and prolonged post-ictal confusion inconsistent with convulsive syncope. Recurrent hypotension during hospitalization responded to IV fluids but was a separate finding."
+        "key_features": "Witnessed tonic-clonic activity with post-ictal confusion is not syncope.",
+        "icd_code": "R55"
       },
       {
-        "diagnosis": "Psychogenic non-epileptic seizures (PNES)",
+        "diagnosis": "Psychogenic non-epileptic spells",
         "likelihood": "low",
-        "key_features": "Classic temporal lobe aura (deja vu, epigastric rising), witnessed motor automatisms, and clear EEG correlate with epileptiform discharges and TIRDA argue strongly against PNES."
-      },
-      {
-        "diagnosis": "Eclampsia or preeclampsia-related seizure",
-        "likelihood": "very_low",
-        "key_features": "Blood pressure normal, no proteinuria, no edema, no headache with visual changes. Obstetrical evaluation unremarkable. Prior history of seizures with known structural etiology."
-      },
-      {
-        "diagnosis": "Toxoplasmosis cerebral calcifications",
-        "likelihood": "very_low",
-        "key_features": "Pattern of calcifications on imaging more consistent with NCC than toxoplasmosis. Clinical context (rural Central American origin, farm exposure) strongly favors NCC. No immunocompromise."
+        "key_features": "Possible but less likely given stereotyped semiology with documented hippocampal sclerosis substrate.",
+        "icd_code": "F44.5"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain detailed seizure history including semiology, aura description, witness account, medication adherence, and duration of post-ictal period",
+        "action": "Obtain detailed seizure history including semiology, aura, automatisms, duration, frequency, witness accounts, and post-ictal features.",
         "tool_name": null,
-        "expected_finding": "Classic temporal lobe aura (deja vu, epigastric rising) with focal to bilateral tonic-clonic seizure and post-ictal confusion. Subtherapeutic AED due to missed doses.",
-        "category": "required"
+        "expected_finding": "Stereotyped focal impaired-awareness events with temporal-lobe aura and post-ictal confusion.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 2,
-        "action": "Perform complete neurological examination",
+        "action": "Perform complete neurological examination.",
         "tool_name": null,
-        "expected_finding": "Normal interictal neurological examination without focal deficits",
-        "category": "required"
+        "expected_finding": "Interictal exam typically normal; subtle memory deficit may be present.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Order EEG to characterize epileptiform activity",
+        "action": "Order EEG (routine first; pursue ambulatory or video-EEG if non-diagnostic) to identify interictal epileptiform discharges and capture habitual events.",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Right anterior temporal sharp waves and TIRDA consistent with right temporal epileptogenic focus",
+        "expected_finding": "Interictal sharps/spikes and/or focal slowing in the anterior temporal region; ictal correlate confirms diagnosis.",
         "category": "required",
         "tool_parameters": {
           "eeg_type": "routine"
-        }
+        },
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 4,
-        "action": "Order brain MRI to identify structural etiology",
+        "action": "Order MRI brain with dedicated epilepsy protocol (thin-cut coronal T1/FLAIR/T2/DWI through the hippocampi).",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Multiple calcified neurocysticercosis lesions and right hippocampal sclerosis",
+        "expected_finding": "Hippocampal sclerosis, low-grade tumor (DNET, ganglioglioma), cavernoma, or focal cortical dysplasia; rule out alternative structural causes.",
         "category": "required",
         "tool_parameters": {
-          "protocol": "standard",
-          "contrast": false
-        }
+          "protocol": "epilepsy",
+          "contrast": true
+        },
+        "citation": "[AAN_2007]",
+        "guideline_source": "AAN_2007"
       },
       {
         "step": 5,
-        "action": "Obtain basic labs including BMP, CBC, levetiracetam level, and infectious workup",
+        "action": "Obtain CBC, comprehensive metabolic panel, prolactin (if drawn within 10–20 min of event), and AED levels if on therapy.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Subtherapeutic levetiracetam level, normal metabolic panel, negative cysticercosis serology",
+        "expected_finding": "Exclude metabolic provocation (hypoglycemia, hyponatremia, uremia); baseline organ function for AED selection; AED level for adherence and dosing.",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP"
+            "CMP",
+            "prolactin"
           ]
-        }
+        },
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 6,
-        "action": "Obtain ECG to exclude cardiac arrhythmia as cause of syncopal episode",
-        "tool_name": null,
-        "expected_finding": "Normal sinus rhythm, no arrhythmia",
-        "category": "recommended"
+        "action": "Search current literature for AED selection in focal epilepsy and ILAE 2017 seizure classification.",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Evidence-based AED options for focal epilepsy (levetiracetam, lamotrigine, oxcarbazepine, lacosamide); ILAE classification framework.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 7,
-        "action": "Optimize levetiracetam dose to achieve therapeutic levels, accounting for pregnancy-related increased clearance",
+        "action": "Check drug interactions before initiating or modifying AED therapy (enzyme inducers, OCP, other CNS-active drugs).",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "No significant drug interactions; dose increase to 750 mg twice daily recommended with monthly monitoring",
-        "category": "required"
+        "expected_finding": "Identify pharmacokinetic interactions (CYP induction by carbamazepine/phenytoin) and CNS adverse-effect overlap.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No clinical features of CNS infection, encephalitis, or immunocompromise; CSF analysis is not indicated for routine focal epilepsy workup and exposes the patient to procedural risk and cost.",
+        "citation": "[AAN_2007]"
       },
       {
-        "step": 8,
-        "action": "Obstetrical consultation to exclude pregnancy-related causes of syncope and monitor fetal well-being",
-        "tool_name": null,
-        "expected_finding": "Unremarkable obstetrical evaluation",
-        "category": "required"
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "echo_type": "TTE"
+        },
+        "rationale": "No syncope-versus-seizure question and no structural-heart concern; echocardiogram contributes nothing to epilepsy workup.",
+        "citation": "[AAN_2007]"
       },
       {
-        "step": 9,
-        "action": "Plan post-partum contrast-enhanced MRI for definitive characterization of calcified lesions and consider referral to comprehensive epilepsy center",
-        "tool_name": null,
-        "expected_finding": "Referral placed for post-partum imaging and epilepsy surgery evaluation",
-        "category": "recommended"
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "Ambulatory cardiac monitoring is reserved for syncope-versus-seizure differentiation; not indicated when semiology is clearly epileptic.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT is inferior to MRI for detecting epileptogenic substrates (hippocampal sclerosis, FCD, low-grade tumor) and adds ionizing radiation without diagnostic yield.",
+        "citation": "[AAN_2007]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "check_drug_interactions",
+        "reason": "Structural cause influences AED choice (e.g., low-grade tumor → consider AEDs with CYP-neutral profile; hippocampal sclerosis → multiple equally appropriate options). MRI should inform drug selection.",
+        "citation": "[ILAE_drug_2017]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Obtain EEG to characterize and lateralize epileptiform activity",
-      "Obtain brain MRI to identify structural etiology (neurocysticercosis calcifications and mesial temporal sclerosis)",
-      "Check levetiracetam level and adjust dose for pregnancy-related increased clearance",
-      "Exclude obstetrical and pregnancy-related causes of seizure (preeclampsia/eclampsia)",
-      "Ensure seizure safety precautions and fetal monitoring during hospitalization",
-      "Recognize that negative cysticercosis serology does not exclude the diagnosis in calcified-stage disease"
+      "Exclude eclampsia FIRST: blood pressure, urine protein, LFTs, platelets, magnesium sulfate readily available.",
+      "Obtain dedicated MRI epilepsy protocol (3T without contrast in pregnancy unless absolutely necessary; gadolinium avoided per ACOG) to characterize neurocysticercosis lesions and hippocampal sclerosis.",
+      "Coordinate immediately with obstetrics for fetal monitoring and maternal-fetal medicine consultation.",
+      "Initiate or continue a pregnancy-appropriate AED (lamotrigine or levetiracetam preferred over valproate or phenytoin).",
+      "Provide social-work referral given homelessness; arrange follow-up resources."
     ],
     "contraindicated_actions": [
-      "Prescribing valproic acid, which is teratogenic and absolutely contraindicated in pregnancy",
-      "Performing lumbar puncture without clear indication (no signs of meningitis or raised intracranial pressure)",
-      "Administering gadolinium contrast for MRI during pregnancy without compelling indication",
-      "Discharging patient without optimizing antiepileptic drug therapy and confirming medication access",
-      "Initiating antihelminthic therapy (albendazole/praziquantel) for calcified-stage NCC, which is not indicated and could provoke perilesional edema"
+      "Do not give valproate (teratogenic, neurodevelopmentally harmful) for new-onset epilepsy in pregnancy.",
+      "Do not delay obstetric evaluation pending neurology workup.",
+      "Do not give gadolinium contrast in pregnancy unless benefits clearly outweigh risks.",
+      "Do not start albendazole during pregnancy without specialist input; calcified cysts do not require treatment."
     ],
     "key_reasoning_points": [
-      "The combination of deja vu and epigastric rising sensation is a classic temporal lobe aura, strongly localizing seizure onset to the mesial temporal structures",
-      "Multiple scattered cerebral calcifications in a patient from a neurocysticercosis-endemic region (rural Guatemala with farm exposure) are characteristic of calcified/involutional stage NCC, even with negative serology",
-      "Negative cysticercosis IgG does not exclude the diagnosis, as serological sensitivity drops to 50-70% in patients with only calcified granulomas",
-      "Subtherapeutic levetiracetam level (5.8 mcg/mL) due to medication non-adherence and pregnancy-related increased clearance is the likely precipitant for the breakthrough seizure",
-      "Right hippocampal sclerosis may represent secondary mesial temporal sclerosis caused by chronic seizure activity originating from a nearby calcified NCC granuloma",
-      "Pregnancy complicates management: increased AED clearance requires dose adjustment, gadolinium contrast is avoided, and eclampsia must be excluded as an alternative seizure etiology",
-      "Concordance across modalities (temporal lobe semiology, right temporal EEG focus, right hippocampal sclerosis on MRI) confirms the epileptogenic zone localization"
+      "Late-pregnancy seizure mandates immediate exclusion of eclampsia.",
+      "Calcified neurocysticercosis is a recognized cause of mesial temporal sclerosis and chronic focal epilepsy in endemic areas.",
+      "Pregnancy AED selection has high stakes for teratogenicity — lamotrigine, levetiracetam preferred.",
+      "Homelessness adds critical psychosocial dimension affecting adherence and follow-up."
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "red_herrings": []
+    "red_herrings": [
+      {
+        "data_point": "Witnessed event labelled by shelter staff as 'syncopal episode'.",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Pursue cardiac syncope workup and miss the seizure diagnosis.",
+        "correct_interpretation": "Tonic-clonic activity with post-ictal confusion is a generalized convulsion, not vasovagal syncope."
+      }
+    ]
   },
   "metadata": {
     "source": "MedCaseReasoning",
@@ -879,6 +934,16 @@
       "ct": "normal",
       "echo": "incidental",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (FEPI-TEMP)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FEPI-TEMP",
+    "difficulty_rationale": "Pregnancy alters AED choice and contrast use; eclampsia must be excluded first; homelessness and calcified neurocysticercosis add complexity but the temporal-lobe localization is straightforward.",
+    "case_body_concerns": [
+      "useless_tools entry for `analyze_ecg` dropped: tool output is provided up-front in initial_tool_outputs, so declaring it useless to call would be incoherent (agent never had to call it)."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

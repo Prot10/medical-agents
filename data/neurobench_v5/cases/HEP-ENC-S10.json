@@ -627,152 +627,167 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Hepatic encephalopathy, Grade 2, precipitated by hypokalemia (iatrogenic from excess furosemide) and lactulose non-compliance",
-    "icd_code": "K72.9",
+    "primary_diagnosis": "Hepatic encephalopathy (West Haven grade II), NASH cirrhosis (Child-Pugh B, MELD 14) — precipitated by iatrogenic hypokalemia from excessive furosemide and lactulose non-adherence.",
+    "icd_code": "K72.90",
     "differential": [
       {
-        "diagnosis": "Uremic encephalopathy",
-        "likelihood": "very_low",
-        "key_features": "Creatinine only 1.3 (baseline 1.0 — mild pre-renal); ammonia 112 umol/L strongly points to hepatic cause; no renal failure history"
-      },
-      {
-        "diagnosis": "Hyponatremic encephalopathy",
+        "diagnosis": "Hypoglycemia-driven AMS",
         "likelihood": "low",
-        "key_features": "Na 134 mEq/L — too mild to cause encephalopathy alone; contributes marginally but HE is primary"
+        "key_features": "Check glucose; type 2 diabetes complicates.",
+        "icd_code": "E16.2"
       },
       {
-        "diagnosis": "Drug toxicity (metformin lactic acidosis)",
-        "likelihood": "very_low",
-        "key_features": "Lactate 1.9 mmol/L normal; metformin does not directly cause encephalopathy without lactic acidosis"
-      },
-      {
-        "diagnosis": "Subdural hematoma",
-        "likelihood": "very_low",
-        "key_features": "CT head normal; no trauma history; coagulopathy present but no clinical signs of herniation or focal deficit"
-      },
-      {
-        "diagnosis": "Wernicke encephalopathy",
+        "diagnosis": "SBP",
         "likelihood": "low",
-        "key_features": "No heavy alcohol history; normal nutrition overall; MRI shows no mammillary body signal; ophthalmoplegia absent"
+        "key_features": "Paracentesis if ascites.",
+        "icd_code": "K65.2"
+      },
+      {
+        "diagnosis": "Stroke / TIA",
+        "likelihood": "low",
+        "key_features": "CT/MRI to exclude; obesity/diabetes raise risk.",
+        "icd_code": "G45.9"
+      },
+      {
+        "diagnosis": "Hypothyroid encephalopathy",
+        "likelihood": "very_low",
+        "key_features": "TSH if cognitive change persists.",
+        "icd_code": "E03.5"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "CT head to exclude structural cause",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "Normal CT head — no hemorrhage, infarct, or mass",
+        "action": "Comprehensive labs: CMP including AST/ALT/bilirubin/INR/albumin, ammonia, CBC, glucose, electrolytes (Na, K, Mg), BUN/Cr, lactate, blood cultures and urine cultures; toxicology if substance use plausible. Confirms liver dysfunction and screens for precipitants.",
+        "tool_name": "interpret_labs",
+        "expected_finding": "K low; ammonia mildly elevated; cirrhosis features; glucose.",
         "category": "required",
-        "tool_parameters": {
-          "region": "head",
-          "contrast": false
-        }
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 2,
-        "action": "Order stat labs: ammonia, CBC, CMP with potassium, LFTs, coagulation",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Ammonia 112 umol/L; hypokalemia (K 2.9) from excess furosemide identified as key precipitant",
+        "action": "Non-contrast CT head — exclude structural alternate cause of AMS (hemorrhage, large stroke, mass) before any LP.",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No acute intracranial process.",
         "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "ammonia",
-            "CBC",
-            "CMP",
-            "LFT",
-            "coagulation"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 3,
-        "action": "Perform EEG to confirm HE pattern and exclude NCSE",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Triphasic waves with theta-delta slowing — metabolic encephalopathy consistent with HE",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Literature/guideline search to confirm West Haven grading, precipitant management, and lactulose/rifaximin dosing (AASLD/EASL HE; diuretic-induced hypokalemia and HE).",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "AASLD/EASL 2014 guidance retrieved; West Haven criteria and precipitant-driven management framework confirmed.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 4,
-        "action": "Administer IV potassium chloride to correct hypokalemia (K 2.9 → target >3.5 mEq/L)",
-        "tool_name": null,
-        "expected_finding": "Potassium normalizes; ammonia production from renal ammoniogenesis decreases",
+        "action": "Drug-interaction and medication-reconciliation review covering furosemide (REDUCE), spironolactone, lactulose, rifaximin — restart and titrate; flag any CNS depressants (benzodiazepines, opioids, sedating antiemetics, antihistamines) and confirm lactulose/rifaximin dosing in liver disease.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sedating/CNS-depressant medications identified; lactulose and rifaximin reviewed for hepatic dose adjustment.",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Bajaj_2011]",
+        "guideline_source": "Bajaj 2011 HE management review"
       },
       {
         "step": 5,
-        "action": "Optimize lactulose: 30mL q4-6h until 2-3 soft stools/day; continue rifaximin 550mg BID",
-        "tool_name": null,
-        "expected_finding": "Ammonia trending down with adequate bowel function",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "EEG — consider if no clinical improvement. Triphasic waves are classic but non-specific (metabolic encephalopathies broadly); main role is exclusion of non-convulsive status epilepticus where the differential supports it.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Mild slowing.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Ferenci_2002]",
+        "guideline_source": "Ferenci 2002 HE nomenclature/quantification"
       },
       {
         "step": 6,
-        "action": "Hold metformin during acute HE episode; use insulin sliding scale for glycemic control",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Metformin held appropriately — restart after metabolic stabilization",
-        "category": "required",
-        "tool_parameters": {
-          "proposed": "hold_metformin"
-        }
-      },
-      {
-        "step": 7,
-        "action": "Reduce furosemide to 40mg daily; do NOT increase diuretics without potassium supplementation in cirrhosis",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Diuretic dose reduced; electrolytes monitored",
-        "category": "required",
-        "tool_parameters": {}
-      },
-      {
-        "step": 8,
-        "action": "Perform diagnostic paracentesis to exclude SBP (ascites present even without fever)",
-        "tool_name": "interpret_labs",
-        "expected_finding": "PMN 95/mm3 — SBP excluded; portal hypertension etiology confirmed",
+        "action": "Consult hepatology — coordinate definitive care, transplant candidacy assessment where applicable.",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Hepatology / critical-care guidance integrated into management.",
         "category": "recommended",
         "tool_parameters": {
-          "test": "ascitic_fluid_analysis"
-        }
+          "specialty": "hepatology"
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No clinical suspicion for hepatopulmonary syndrome, portopulmonary hypertension, or endocarditis; echocardiography is not part of the HE workup.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in HE workup; reversible metabolic encephalopathy is the issue, not Alzheimer pathology.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan has no role in HE workup; the question is metabolic encephalopathy, not nigrostriatal degeneration.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "genetic_panel:early_onset_AD"
+        },
+        "rationale": "Early-onset AD genetic panel has no role in HE workup; reversible metabolic encephalopathy is the diagnosis under consideration.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "vep"
+        },
+        "rationale": "Visual evoked potentials have no role in HE workup; no demyelinating process is on the differential.",
+        "citation": "[AASLD_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "In altered mental status, exclude intracranial mass effect / hemorrhage on imaging before LP to avoid herniation risk.",
+        "citation": "[AASLD_2014]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "Identify and correct hypokalemia (K 2.9 mEq/L) — KEY precipitant driving ammonia production",
-      "Reduce furosemide to prior dose — iatrogenic hypokalemia from dose increase was the precipitant",
-      "Optimize lactulose (patient had missed doses with resulting constipation)",
-      "CT head to exclude structural cause",
-      "EEG to confirm HE and exclude NCSE",
-      "Hold metformin during acute illness",
-      "Diagnostic paracentesis to exclude SBP (even though no fever — SBP can present without fever)"
+      "IV/PO potassium repletion (K target ≥4 mEq/L in HE).",
+      "Reduce furosemide dose to maintain spironolactone:furosemide ratio ~100:40 mg.",
+      "Restart lactulose 30 mL TID titrated to 2-4 stools/day; rifaximin 550 mg BID.",
+      "Patient education on lactulose adherence (titrate to stools, not 'as needed')."
     ],
     "contraindicated_actions": [
-      "Do NOT increase furosemide further — caused hypokalemia that precipitated this HE episode",
-      "Do NOT continue metformin in acute HE with creatinine elevation above baseline",
-      "Do NOT give benzodiazepines for sedation — worsens HE",
-      "Do NOT rapidly correct hyponatremia (Na 134 — no treatment needed at this level)"
+      "Do not prescribe benzodiazepines for anxiety/agitation — they precipitate and prolong HE (use haloperidol or non-pharmacologic measures for agitation).",
+      "Do not prescribe sedating opioids — they worsen HE; consider acetaminophen at hepatic-safe dosing for pain.",
+      "Do not perform LP before neuroimaging excludes mass effect when the patient has altered mental status.",
+      "Do not continue high-dose furosemide once K is depleted — diuretic regimen requires K monitoring."
     ],
     "key_reasoning_points": [
-      "Iatrogenic hypokalemia (K 2.9 mEq/L) from increased furosemide dose is the primary identified precipitant — hypokalemia increases renal ammonia production",
-      "Missed lactulose doses with constipation (last BM 2 days ago) compounded ammonia accumulation",
-      "EEG triphasic waves confirm metabolic (hepatic) encephalopathy — triphasic waves correlate with ammonia level in HE",
-      "CT head normal excludes structural cause — metabolic workup should always follow normal CT in cirrhotic patients with encephalopathy",
-      "Metformin should be held during acute HE in a cirrhotic patient with worsening renal function due to lactic acidosis risk",
-      "SBP can present without fever — diagnostic paracentesis indicated in all cirrhotic patients with ascites presenting with encephalopathy",
-      "Hypokalemia correction is as important as lactulose in treating HE when hypokalemia is the precipitant"
+      "HE is a clinical diagnosis: West Haven grading + evidence of liver dysfunction + exclusion of other causes of AMS — ammonia level is supportive only and correlates poorly with grade (AASLD 2014).",
+      "Precipitant identification is more actionable than the ammonia number: infection (SBP especially), GI bleed, electrolyte disturbance (hypokalemia/hyponatremia), constipation, sedative/CNS-depressant use, dehydration, dietary protein load, renal failure.",
+      "The 100:40 spironolactone-to-furosemide ratio maintains K balance in cirrhotic diuretic regimens.",
+      "Lactulose adherence is the single most common modifiable HE precipitant — counsel about titration to stools and not stopping when feeling well."
     ],
-    "red_herrings": [
-      {
-        "data_point": "Glucose 188 mg/dL and metformin on medication list",
-        "location": "labs and medications",
-        "intended_effect": "Clinician may attribute confusion partly to hyperglycemia or suspect metformin lactic acidosis",
-        "correct_interpretation": "Lactate is normal (1.9 mmol/L); hyperglycemia is mild and unlikely to cause encephalopathy at this level; hypokalemia and hyperammonemia are the primary drivers",
-        "field_path": ""
-      }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": []
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -792,6 +807,14 @@
       "advanced_imaging": "normal",
       "specialized_test": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (HEP-ENC)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:HEP-ENC",
+    "difficulty_rationale": "4 required tools; iatrogenic hypokalemia + adherence gap with classic textbook resolution; few distractors.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

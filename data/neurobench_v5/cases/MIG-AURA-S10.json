@@ -1,7 +1,7 @@
 {
   "case_id": "MIG-AURA-S10",
   "condition": "migraine_with_aura",
-  "difficulty": "straightforward",
+  "difficulty": "moderate",
   "encounter_type": "outpatient",
   "patient": {
     "age": 34,
@@ -82,106 +82,113 @@
     "extremities": "No peripheral edema"
   },
   "ground_truth": {
-    "primary_diagnosis": "Established migraine with typical visual aura (G43.1); MIDAS Grade IV; preventive therapy indicated",
-    "primary_diagnosis_icd": "G43.1",
+    "primary_diagnosis": "Established migraine with typical visual aura (ICHD-3 1.2.1), MIDAS grade IV — preventive therapy indicated",
+    "icd_code": "G43.109",
     "differential": [
       {
-        "diagnosis": "Transient ischemic attack",
-        "likelihood": "very_low",
-        "key_features": "Age 34; no vascular risk factors; 7-year identical pattern; visual phenomenon spreads gradually (spreading depression not embolic); DWI negative; no risk factors"
+        "diagnosis": "Migraine without aura",
+        "likelihood": "low",
+        "key_features": "Aura is stereotyped",
+        "icd_code": null
       },
       {
-        "diagnosis": "Focal occipital epilepsy",
-        "likelihood": "very_low",
-        "key_features": "Visual seizures are brief (<2 min), stereotyped, structured; this patient's aura expands over 20-25 min — characteristic of cortical spreading depression; no epileptiform activity"
+        "diagnosis": "Chronic migraine (≥15 days/month)",
+        "likelihood": "low",
+        "key_features": "Quantify monthly headache days to test the chronic threshold",
+        "icd_code": null
       },
       {
-        "diagnosis": "Cerebral small vessel disease / vasculitis",
+        "diagnosis": "Medication-overuse headache",
+        "likelihood": "low",
+        "key_features": "Quantify acute medication use",
+        "icd_code": null
+      },
+      {
+        "diagnosis": "Tension-type headache",
         "likelihood": "very_low",
-        "key_features": "Normal ESR/CRP; negative ANA; normal MRA; WMH are non-specific subcortical pattern not periventricular; no stroke history"
+        "key_features": "Pattern is clearly migrainous",
+        "icd_code": "G44.2"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI — already performed; confirms non-specific WMH and excludes secondary cause",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Non-specific subcortical WMH; no structural cause; normal MRA",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
         "category": "required",
         "tool_parameters": {
-          "contrast": true,
-          "sequences": [
-            "DWI",
-            "FLAIR",
-            "T1+Gd",
-            "MRA"
-          ]
-        }
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "Confirm MIDAS Grade IV disability and initiate preventive therapy",
-        "tool_name": null,
-        "expected_finding": "MIDAS 18 = Grade IV; preventive therapy clearly indicated",
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Review acute and preventive options; topiramate, propranolol, candesartan, amitriptyline, or CGRP mAb appropriate per [Holland_2012] / [Sacco_2022]",
         "category": "required",
-        "tool_parameters": {}
-      },
-      {
-        "step": 3,
-        "action": "Initiate topiramate 25 mg/day increasing to 50-100 mg as first-line preventive",
-        "tool_name": null,
-        "expected_finding": "Preventive therapy reduces attack frequency 50% in ~50% of patients",
-        "category": "required",
-        "tool_parameters": {}
-      },
-      {
-        "step": 4,
-        "action": "Ensure adequate sumatriptan supply (up to 9 tablets/month to avoid MOH)",
-        "tool_name": null,
-        "expected_finding": "Patient running out of sumatriptan; adequate supply prevents analgesic overuse",
-        "category": "required",
-        "tool_parameters": {}
-      },
-      {
-        "step": 5,
-        "action": "Reassure patient about non-specific WMH — expected finding in 7-year migraine with aura",
-        "tool_name": null,
-        "expected_finding": "Patient education; reduce anxiety about MRI findings",
-        "category": "recommended",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "context": "migraine_with_aura_pharmacotherapy"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis — neither present here",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated in typical migraine with aura — no role unless cardioembolic stroke is on the differential",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "EEG is not indicated for migraine with aura; reserve for cases where focal seizure is genuinely on the differential",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "Confirm preventive therapy indications are met (MIDAS IV, 2-4 attacks/month) — preventive therapy clearly indicated",
-      "Initiate first-line preventive therapy (topiramate, amitriptyline, or propranolol)",
-      "Ensure adequate sumatriptan supply to prevent medication overuse headache",
-      "Reassure regarding non-specific WMH — these are expected in migraine with aura"
+      "Confirm ICHD-3 1.2 criteria are met and quantify headache days",
+      "Initiate preventive therapy (first-line topiramate or propranolol; CGRP mAb if failure / intolerance) [Sacco_2022]",
+      "Counsel against combined oestrogen-progestogen contraception",
+      "Address acute therapy adequacy (avoid medication overuse)"
     ],
     "contraindicated_actions": [
-      "Do not prescribe combined OCP in the future (migraine with aura)",
-      "Do not allow triptan overuse >9 days/month (medication overuse headache risk)",
-      "Do not withhold preventive therapy — MIDAS IV with 2-4 attacks/month clearly meets criteria"
+      "Do not start combined oestrogen-progestogen contraception",
+      "Do not co-administer triptans with ergotamines",
+      "Do not pursue routine PFO bubble study or PFO closure for migraine prevention"
     ],
     "key_reasoning_points": [
-      "MIDAS Grade IV (score 18) with 2-4 attacks/month clearly indicates preventive therapy — this has not been offered in 7 years of migraine management",
-      "Non-specific subcortical WMH are expected in established migraine with aura and do not require additional investigation",
-      "Topiramate is appropriate given effective contraception (partner vasectomy); counsel on teratogenicity for any future reproductive planning changes",
-      "Sumatriptan is effective but supply must be adequate; running out and using paracetamol inadequately for remaining attacks",
-      "Family history (mother and sister with migraine) confirms genetic susceptibility"
+      "MIDAS grade IV with attacks reaching the chronic-migraine threshold is a clear indication for preventive therapy",
+      "PFO closure is not indicated for migraine prevention in the absence of cryptogenic stroke [Charles_2017]",
+      "Routine MRI is not required when ICHD-3 criteria are met"
     ],
     "red_herrings": [
       {
-        "data_point": "Subcortical white matter hyperintensities on MRI in a 34-year-old woman",
+        "data_point": "Non-specific subcortical WMH on MRI in established migraineur",
         "location": "initial_tool_outputs.mri",
-        "intended_effect": "WMH in a young woman might suggest demyelinating disease (MS) or early cerebrovascular disease requiring further workup",
-        "correct_interpretation": "Two small subcortical WMH in a 7-year migraineur are a well-recognised migraine-related finding; pattern is inconsistent with MS (no periventricular lesions, no juxtacortical lesions, Barkhof criteria not met); no additional investigation required beyond preventive therapy optimisation",
-        "field_path": ""
+        "field_path": "initial_tool_outputs.mri",
+        "intended_effect": "May prompt anxiety about demyelinating or vascular disease",
+        "correct_interpretation": "WMH are common in migraineurs and non-actionable in the absence of inflammatory or vascular features [Charles_2017]"
       }
-    ],
-    "icd_code": "G43.1",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -200,7 +207,17 @@
       "ct": "normal",
       "cardiac_monitoring": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Moderate: preventive therapy decision in chronic-borderline migraine with WMH distractor",
+    "case_body_concerns": [
+      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide §1): ['analyze_brain_mri', 'analyze_ecg', 'interpret_labs', 'order_advanced_imaging', 'order_echocardiogram']"
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "initial_tool_outputs": {
     "mri": {

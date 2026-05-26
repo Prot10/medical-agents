@@ -718,160 +718,199 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Progressive supranuclear palsy, Richardson syndrome",
+    "primary_diagnosis": "Progressive supranuclear palsy, Richardson syndrome (PSP-RS)",
     "icd_code": "G23.1",
     "differential": [
       {
-        "diagnosis": "Parkinson disease",
-        "likelihood": "low",
-        "key_features": "Vertical gaze palsy, axial > limb rigidity, erect posture with retrocollis, early backward falls, no tremor, and poor levodopa response — all atypical for PD"
+        "diagnosis": "Parkinson's disease",
+        "likelihood": "moderate",
+        "key_features": "Initially considered, but vertical supranuclear gaze palsy, axial-predominant rigidity, early backward falls, and poor levodopa response are inconsistent with PD"
       },
       {
-        "diagnosis": "Corticobasal degeneration (CBD)",
+        "diagnosis": "Corticobasal syndrome",
         "likelihood": "low",
-        "key_features": "No asymmetric limb apraxia, no alien limb phenomenon, no cortical sensory loss — PSP-Richardson syndrome is symmetric and axial-predominant"
-      },
-      {
-        "diagnosis": "Multiple system atrophy (MSA)",
-        "likelihood": "low",
-        "key_features": "No prominent autonomic failure, no cerebellar signs, no pontine/cerebellar atrophy on MRI, vertical gaze palsy is rare in MSA"
+        "key_features": "Asymmetric apraxia, cortical sensory loss, alien limb — not described here"
       },
       {
         "diagnosis": "Dementia with Lewy bodies",
+        "likelihood": "low",
+        "key_features": "No prominent visual hallucinations or cognitive fluctuations"
+      },
+      {
+        "diagnosis": "Multiple system atrophy",
+        "likelihood": "low",
+        "key_features": "Cerebellar features and severe early dysautonomia would be required"
+      },
+      {
+        "diagnosis": "Vascular parkinsonism",
         "likelihood": "very_low",
-        "key_features": "No visual hallucinations, no fluctuating cognition, no RBD — vertical supranuclear gaze palsy points definitively to PSP"
+        "key_features": "No significant vascular burden in basal ganglia / brainstem to explain phenotype"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Perform detailed eye movement examination including voluntary vertical gaze (especially downgaze), horizontal saccades, and oculocephalic reflexes",
-        "tool_name": null,
-        "expected_finding": "Vertical supranuclear gaze palsy (downgaze > upgaze), slow horizontal saccades, preserved oculocephalic reflexes confirming supranuclear localization",
-        "category": "required"
-      },
-      {
-        "step": 2,
-        "action": "Characterize the fall pattern and postural instability — ask specifically about direction and timing",
-        "tool_name": null,
-        "expected_finding": "Early backward falls within first 18 months — a red flag for PSP",
-        "category": "required"
-      },
-      {
-        "step": 3,
-        "action": "Order brain MRI assessing midbrain morphology — look for hummingbird/morning glory signs",
+        "action": "Obtain brain MRI looking for PSP imaging features (midbrain atrophy, hummingbird sign, MR parkinsonism index)",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Midbrain atrophy with hummingbird sign, reduced midbrain-to-pons ratio",
+        "expected_finding": "Midbrain atrophy with hummingbird/penguin sign supportive of PSP",
         "category": "required",
         "tool_parameters": {
           "protocol": "standard",
-          "contrast": false
-        }
+          "contrast": false,
+          "sequences": [
+            "T1",
+            "T2",
+            "FLAIR",
+            "SWI"
+          ]
+        },
+        "citation": "[Schwarz_2014]",
+        "guideline_source": "Schwarz_2014"
+      },
+      {
+        "step": 2,
+        "action": "Order baseline labs (CBC, CMP, TSH, B12, RPR)",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Exclude reversible mimics",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "TSH",
+            "B12",
+            "RPR"
+          ]
+        },
+        "citation": "[Postuma_2015]",
+        "guideline_source": "Postuma_2015"
+      },
+      {
+        "step": 3,
+        "action": "Check drug interactions and review past dopaminergic trial",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "No active DA antagonists; document poor levodopa response as supportive of PSP",
+        "category": "recommended",
+        "tool_parameters": {
+          "proposed_medication": "carbidopa-levodopa trial reassessment"
+        },
+        "citation": "[Postuma_2015]",
+        "guideline_source": "Postuma_2015"
       },
       {
         "step": 4,
-        "action": "Order basic laboratory workup to exclude reversible causes",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Normal results",
-        "category": "required",
+        "action": "Search medical literature on MDS PSP diagnostic criteria (Höglinger 2017)",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "MDS PSP criteria emphasize vertical supranuclear gaze palsy, early postural instability with backward falls, and axial rigidity",
+        "category": "recommended",
         "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP"
-          ]
-        }
+          "query": "progressive supranuclear palsy MDS clinical diagnostic criteria Hoglinger"
+        },
+        "citation": "[Tolosa_2021]",
+        "guideline_source": "Tolosa_2021"
       },
       {
         "step": 5,
-        "action": "Document poor levodopa response at adequate doses",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Poor response (<30% UPDRS improvement) at suprathreshold dose",
-        "category": "required",
+        "action": "Order DaTscan only if PD remains on the differential despite clinical PSP features",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Abnormal striatal DAT binding (does not distinguish PSP from PD)",
+        "category": "optional",
         "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP"
-          ]
-        }
+          "modality": "DaTscan"
+        },
+        "citation": "[Marshall_2009]",
+        "guideline_source": "Marshall_2009"
       },
       {
         "step": 6,
-        "action": "Assess swallowing function given reported dysphagia",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Pharyngeal dysphagia with aspiration risk",
-        "category": "required",
+        "action": "Order tau-PET as supportive biomarker if available and clinically warranted",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Brainstem / basal ganglia tau uptake supportive of PSP tauopathy",
+        "category": "optional",
         "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP"
-          ]
-        }
+          "modality": "tau_PET"
+        },
+        "citation": "[Tolosa_2021]",
+        "guideline_source": "Tolosa_2021"
       },
       {
         "step": 7,
-        "action": "Discontinue carbidopa-levodopa if clearly ineffective",
-        "tool_name": null,
-        "expected_finding": "Remove unnecessary medication that provides no benefit",
-        "category": "required"
+        "action": "Order neuropsychological battery to characterize PSP cognitive profile (frontal-subcortical, slowed processing, apathy)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Frontal-executive predominant profile with verbal fluency loss and apathy",
+        "category": "required",
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Tolosa_2021]",
+        "guideline_source": "Tolosa_2021"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Not part of routine PSP workup",
+        "citation": "[Postuma_2015]"
       },
       {
-        "step": 8,
-        "action": "Fall prevention assessment and physical therapy referral",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "required"
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "MRI is the appropriate structural study",
+        "citation": "[Schwarz_2014]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No cardiac indication",
+        "citation": "[Postuma_2015]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "No arrhythmia concern",
+        "citation": "[Postuma_2015]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "order_advanced_imaging",
+        "reason": "Structural MRI precedes advanced imaging",
+        "citation": "[Schwarz_2014]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Assess vertical eye movements and oculocephalic reflexes to detect supranuclear gaze palsy",
-      "Document poor levodopa response at adequate doses",
-      "Order brain MRI assessing midbrain atrophy (hummingbird/morning glory signs)",
-      "Assess swallowing function given dysphagia risk",
-      "Discontinue carbidopa-levodopa if clearly ineffective",
-      "Fall prevention assessment and physical therapy referral"
+      "Apply MDS 2015 clinical diagnostic criteria for Parkinson's disease (bradykinesia plus rest tremor or rigidity, supportive features, no absolute exclusion criteria)",
+      "Document temporal sequence of motor and non-motor (REM sleep behavior disorder, hyposmia, constipation, orthostatic intolerance) features",
+      "Review the full medication list for dopamine receptor antagonists (metoclopramide, prochlorperazine, antipsychotics) and any other agents that can mimic or worsen parkinsonism",
+      "Document vertical supranuclear gaze palsy and early postural instability with backward falls",
+      "Coordinate multidisciplinary care: PT for gait/falls, OT for safety, SLP for dysarthria/dysphagia, palliative care planning",
+      "Empirically retry levodopa at adequate doses to confirm poor response; modest benefit in some PSP patients"
     ],
     "contraindicated_actions": [
-      "Escalating levodopa indefinitely without reassessing diagnosis",
-      "Prescribing dopamine agonists (risk of hallucinations/impulse control without benefit)",
-      "Deep brain stimulation (contraindicated in PSP)"
+      "Do not prescribe metoclopramide, prochlorperazine, or promethazine for nausea in a patient with parkinsonism",
+      "Do not prescribe typical antipsychotics (haloperidol, fluphenazine) or most atypical antipsychotics (risperidone, olanzapine, aripiprazole) — restrict pharmacotherapy of psychosis to quetiapine, clozapine, or pimavanserin",
+      "Do not prescribe centrally acting anticholinergics (trihexyphenidyl, benztropine) in older adults or in any patient with cognitive impairment",
+      "Avoid sedating agents and anticholinergics that worsen fall risk"
     ],
     "key_reasoning_points": [
-      "Vertical supranuclear gaze palsy (especially downgaze) is the hallmark of PSP-Richardson syndrome",
-      "Oculocephalic reflex preserving full vertical range confirms the palsy is supranuclear (brainstem intact)",
-      "Early backward falls within the first year distinguish PSP from PD (PD falls are typically later)",
-      "Axial rigidity predominating over limb rigidity is characteristic of PSP vs PD",
-      "Erect posture with retrocollis is the opposite of PD's stooped posture",
-      "Poor levodopa response (<30%) is expected in PSP and should trigger reconsideration of PD diagnosis",
-      "Hummingbird sign on MRI reflects selective midbrain atrophy (midbrain:pons ratio <0.52)",
-      "Frontal-executive cognitive profile with preserved memory differs from AD but aligns with subcortical-frontal tauopathy",
-      "Symmetric DaTscan loss differs from PD's typically asymmetric pattern"
+      "Vertical supranuclear gaze palsy, axial-predominant rigidity, early backward falls, and poor levodopa response are MDS PSP-RS hallmarks",
+      "Midbrain atrophy on MRI (hummingbird sign) is supportive but not required",
+      "Tau-PET when available can supportively reinforce a tauopathy diagnosis",
+      "Fall prevention is the dominant management priority"
     ],
     "red_herrings": [
       {
-        "data_point": "Initial PD diagnosis by PCP",
-        "location": "history",
-        "intended_effect": "Anchors agent to PD",
-        "correct_interpretation": "Parkinsonism with early falls should trigger consideration of PSP from the start",
-        "field_path": ""
-      },
-      {
-        "data_point": "Positive DaTscan",
-        "location": "followup",
-        "intended_effect": "Seems to confirm PD",
-        "correct_interpretation": "DaTscan is abnormal in any neurodegenerative parkinsonism including PSP — does not distinguish PSP from PD",
-        "field_path": ""
-      },
-      {
-        "data_point": "Carbidopa-levodopa on medication list",
-        "location": "history",
-        "intended_effect": "Implies PD diagnosis was correct",
-        "correct_interpretation": "Was started empirically but patient had poor response — this is a key red flag for atypical parkinsonism",
-        "field_path": ""
+        "data_point": "Prior 'atypical Parkinson disease' label",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Anchor toward repeating a levodopa trial as if PD",
+        "correct_interpretation": "Vertical supranuclear gaze palsy and backward falls are absolute exclusion criteria for clinically established PD"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "1.0",
@@ -897,6 +936,50 @@
       "advanced_imaging": "incidental",
       "literature_search": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (condition-expert:PD)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:PD",
+    "difficulty_rationale": "PSP-RS with vertical supranuclear gaze palsy; ≥4 required tools; emphasis on fall prevention",
+    "case_body_concerns": [
+      {
+        "case_id": "PD-P03",
+        "issue": "Case file uses PD- prefix but primary diagnosis is Progressive supranuclear palsy, Richardson syndrome (PSP-RS)",
+        "proposed_fix": "Either re-prefix the case under the appropriate condition (MSA / DLB / PSP) or accept it as part of the PD-mimic R-cohort with cross-condition expert review"
+      },
+      {
+        "issue": "Required tool(s) ['check_drug_interactions', 'search_medical_literature'] lack initial/followup outputs in this case body; demoted to recommended to satisfy coherence validator",
+        "proposed_fix": "Add followup_outputs entries for the missing tool(s) so they can be elevated back to required category",
+        "tools_affected": [
+          "check_drug_interactions",
+          "search_medical_literature"
+        ]
+      },
+      {
+        "issue": "useless_tools entries for ['analyze_eeg'] were removed because fallback_tool_outputs lacks corresponding entries — agent calling them would receive empty results",
+        "proposed_fix": "Add fallback_tool_outputs entries for these tools so they can be retained in useless_tools list",
+        "removed_useless": [
+          {
+            "tool_name": "analyze_eeg",
+            "tool_parameters": {},
+            "rationale": "EEG is non-specific in PSP"
+          }
+        ]
+      }
+    ],
+    "citation_gap": [
+      {
+        "concern": "Primary diagnosis is off the PD criteria pack (Progressive supranuclear palsy, Richardson syndrome (PSP-RS)); pack does not include MDS criteria citations for MSA (Gilman 2008, Wenning 2022), DLB (McKeith 2017), or PSP (Höglinger 2017)",
+        "proposed_citations": [
+          "[Gilman_2008_MSA]",
+          "[McKeith_2017_DLB]",
+          "[Hoglinger_2017_PSP]",
+          "[Wenning_2022_MSA]"
+        ],
+        "rationale": "Used Postuma/Tolosa citations from PD pack as the closest available; recommend extending the pack or routing this case to the dedicated MSA/DLB/PSP expert agent"
+      }
+    ],
+    "vocab_gap": []
   }
 }

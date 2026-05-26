@@ -630,148 +630,213 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Non-convulsive status epilepticus (NCSE) secondary to carbamazepine-induced SIADH causing hyponatremia (Na 132), precipitating breakthrough seizures from chronic post-stroke epileptogenic focus",
-    "icd_code": "G41.9",
+    "primary_diagnosis": "Non-convulsive status epilepticus from carbamazepine-induced SIADH causing hyponatremia (Na 132), precipitating breakthrough seizures from chronic post-stroke epileptogenic focus",
+    "icd_code": "G41.2",
     "differential": [
       {
-        "diagnosis": "Post-ictal encephalopathy (prolonged Todd's paralysis)",
-        "likelihood": "low",
-        "key_features": "Duration >2 hours without return to baseline; EEG confirms ongoing NCSE, not simple post-ictal state"
-      },
-      {
-        "diagnosis": "Hyponatremic encephalopathy without NCSE",
+        "diagnosis": "Acute recurrent stroke with seizure",
         "likelihood": "moderate",
-        "key_features": "Sodium 132 can cause confusion; however EEG shows clear electrographic seizure activity (NCSE not just encephalopathy); both diagnoses coexist — SIADH caused NCSE"
+        "key_features": "Known chronic left MCA encephalomalacia; CT shows no new acute infarct or hemorrhage; recurrent stroke not supported",
+        "icd_code": "I63.9"
       },
       {
-        "diagnosis": "New ischemic stroke",
-        "likelihood": "low",
-        "key_features": "CT shows no new changes; known chronic left MCA encephalomalacia; no acute DWI restriction"
+        "diagnosis": "UTI-precipitated breakthrough seizure",
+        "likelihood": "moderate",
+        "key_features": "WBC 12.4 and fever 37.6 raise concern; urine cultures pending but SIADH-mediated hyponatremia better explains SE",
+        "icd_code": "N39.0"
       },
       {
-        "diagnosis": "Autoimmune encephalitis",
+        "diagnosis": "Carbamazepine toxicity (level supratherapeutic at 14.2)",
+        "likelihood": "moderate",
+        "key_features": "Carbamazepine 14.2 is mildly above range; toxicity can cause seizures, but SIADH-driven hyponatremia is the primary mechanism here",
+        "icd_code": "T42.1X5A"
+      },
+      {
+        "diagnosis": "Subdural hematoma in elderly demented patient",
         "likelihood": "low",
-        "key_features": "Autoimmune panel negative; clear etiology (post-stroke epilepsy + CBZ-SIADH hyponatremia); no lymphocytic pleocytosis or temporal MRI changes"
+        "key_features": "No acute hemorrhage on CT; chronic encephalomalacia is old",
+        "icd_code": "S06.5X9A"
+      },
+      {
+        "diagnosis": "Metabolic / uremic encephalopathy",
+        "likelihood": "low",
+        "key_features": "Mild AKI (Cr 1.6) but BUN/uremia not at level to cause SE alone",
+        "icd_code": "G93.41"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Emergent EEG to distinguish NCSE from prolonged post-ictal state or metabolic encephalopathy",
+        "action": "Continuous video-EEG — confirm NCSE and laterality",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Left temporal NCSE with LPDs on chronic encephalomalacia background",
+        "expected_finding": "Left temporal-parietal evolving rhythmic delta meeting NCSE criteria, concordant with chronic stroke focus",
         "category": "required",
-        "tool_parameters": {
-          "urgency": "stat"
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "Non-contrast CT head to exclude hemorrhage (urgent given anticoagulated patient on apixaban)",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "Chronic left MCA encephalomalacia; no new hemorrhage",
+        "action": "Labs: CBC, CMP, glucose, Ca/Mg, AED level, ammonia, lactate, ABG, urine osm + urine Na, blood and urine cultures, tox screen",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Sodium 132 with urine Na 62 and urine osm 480 = SIADH; carbamazepine 14.2; UTI labs",
         "category": "required",
-        "tool_parameters": {
-          "contrast": false,
-          "urgency": "stat"
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Obtain labs including BMP (sodium critical), CBC, AED levels (carbamazepine), urine sodium + osmolality to evaluate SIADH",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Na 132; carbamazepine supratherapeutic; SIADH pattern (urine Na >40, urine Osm >100 inappropriately concentrated)",
+        "action": "Non-contrast head CT to exclude acute hemorrhage and new structural cause in elderly",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Chronic left MCA encephalomalacia; no acute hemorrhage or new infarct",
         "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "BMP",
-            "CBC",
-            "AED_CBZ_level",
-            "urine_Na",
-            "urine_Osm"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "Check drug interactions — identify carbamazepine + sertraline dual SIADH mechanism",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Dual SIADH risk: carbamazepine + sertraline — switch CBZ to lacosamide",
-        "category": "required",
-        "tool_parameters": {
-          "drugs": [
-            "carbamazepine",
-            "sertraline"
-          ]
-        }
+        "action": "MRI brain to evaluate for any subacute lesion not seen on CT",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Chronic encephalomalacic changes only; no new acute infarct or mass",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "Load IV lacosamide 400 mg as second-line AED plus lorazepam for NCSE",
-        "tool_name": null,
-        "expected_finding": "NCSE suppression on cEEG",
+        "action": "Drug-interaction check: carbamazepine + apixaban (induction), evaluate switch to non-inducing AED",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Carbamazepine induces apixaban metabolism (reduced anticoagulation); SIADH a known CBZ effect; switch to levetiracetam recommended",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[ESETT_2019]",
+        "guideline_source": ""
       },
       {
         "step": 6,
-        "action": "Initiate hyponatremia correction — hypertonic saline or fluid restriction per SIADH protocol; target 0.5-1 mEq/L/hr, max 8-10 mEq/24h",
-        "tool_name": null,
-        "expected_finding": "Sodium correction to 136-138 mEq/L over 24-48 hours",
+        "action": "AED optimization labs — recheck CBZ and free CBZ levels",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Confirm CBZ mildly supratherapeutic and SIADH driving SE; plan taper",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 7,
-        "action": "Continuous cEEG monitoring 24-48 hours to confirm NCSE resolution",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "NCSE resolved after sodium correction + lacosamide",
-        "category": "required",
+        "action": "Lumbar puncture (if encephalitis not excluded after imaging and labs)",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Likely deferred unless cultures negative and altered mental status persists; if performed, expect bland CSF",
+        "category": "optional",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 8,
+        "action": "Literature: SIADH-associated AEDs and hyponatremia-precipitated SE — sodium correction targets",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Correct sodium ≤8 mEq/L per 24h to avoid osmotic demyelination; switch from CBZ to non-SIADH AED",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
         "tool_parameters": {
-          "modality": "continuous_ceeg"
-        }
+          "study_type": "TTE"
+        },
+        "rationale": "No clinical suspicion of cardiac source of embolus or cardiogenic seizure; routine echo is not indicated in SE workup absent cardiac findings.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No suspicion of arrhythmogenic syncope or cardiac comorbidity precipitating SE; routine telemetry beyond standard ICU monitoring adds cost without yield.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in acute SE evaluation; dementia biomarker imaging does not change acute management.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "Carotid duplex is for ischemic stroke workup; SE without focal vascular suspicion does not warrant carotid imaging.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "polysomnography"
+        },
+        "rationale": "DaTscan / dopamine transporter imaging has no role in SE; no parkinsonism question relevant to acute management.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "CT must precede any LP to exclude hemorrhage or mass.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Confirm sodium and AED level before switching AED regimen.",
+        "citation": "[Brophy_2012]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Emergent EEG — NCSE diagnosis requires EEG in confused post-stroke patient",
-      "Check serum sodium and carbamazepine level immediately — CBZ-SIADH is the primary precipitant",
-      "Correct hyponatremia carefully — max 8-10 mEq/L in 24 hours to prevent osmotic demyelination",
-      "Switch carbamazepine to lacosamide to eliminate ongoing SIADH risk",
-      "IV lorazepam + IV lacosamide for NCSE — benzodiazepine alone insufficient"
+      "Administer IV lorazepam 0.1 mg/kg first-line",
+      "Correct sodium gradually (≤8 mEq/L per 24h) with 3% saline + fluid restriction; avoid overcorrection",
+      "Transition off carbamazepine to a non-SIADH AED (levetiracetam) once stable",
+      "Treat UTI empirically pending cultures"
     ],
     "contraindicated_actions": [
-      "Increasing carbamazepine dose — supratherapeutic CBZ is causing SIADH; increasing would worsen hyponatremia",
-      "Rapid sodium correction (>10-12 mEq/24h) — risk osmotic demyelination syndrome, especially in elderly",
-      "Using phenytoin as second-line AED — risk of cardiac arrhythmia in elderly AF patient; also no benefit for CBZ-SIADH-related NCSE",
-      "Fluid restriction alone without AED — NCSE requires both metabolic correction and AED treatment"
+      "Do NOT correct sodium faster than 8 mEq/L per 24h — risk of osmotic demyelination syndrome",
+      "Do NOT continue carbamazepine when it is the SIADH driver",
+      "Do NOT hold apixaban without reviewing thromboembolic risk — discuss with neurology and hematology"
     ],
     "key_reasoning_points": [
-      "Carbamazepine-induced SIADH is a class effect of sodium channel-affecting AEDs; dose increase from 200 to 400 mg BID tripled SIADH risk",
-      "Sertraline (SSRI) dual SIADH mechanism compounds the hyponatremia risk — combination caused sodium to drop to 132",
-      "NCSE diagnostic pearl: EEG essential in any confused post-stroke patient with known epilepsy — 'prolonged post-ictal' should never be assumed without EEG",
-      "CBZ-SIADH paradox: supratherapeutic CBZ level (14.2 mcg/mL) despite NCSE — the drug causing SIADH hyponatremia is also not controlling seizures adequately",
-      "Lacosamide is the preferred AED switch: no SIADH risk, safe in AF, therapeutic at moderate doses in CKD stage 3",
-      "Sodium correction rate is critical — elderly with chronic hyponatremia require slow correction to prevent osmotic demyelination"
+      "Carbamazepine is a classic cause of SIADH; new mild hyponatremia in a chronic CBZ user can lower seizure threshold",
+      "Chronic structural focus (post-stroke epilepsy) lowers the threshold so a modest metabolic perturbation precipitates SE",
+      "Sodium correction in SE must respect the ≤8 mEq/L per 24h limit"
     ],
     "red_herrings": [
       {
-        "data_point": "Supratherapeutic carbamazepine level 14.2 mcg/mL (reference 4-12)",
-        "location": "initial_tool_outputs.labs.panels.AED Levels",
-        "intended_effect": "Suggests carbamazepine toxicity as the primary cause of confusion, leading to empirically holding all AEDs without performing an EEG or recognizing the SIADH-NCSE mechanism",
-        "correct_interpretation": "Supratherapeutic CBZ is the causative agent of SIADH (not the direct toxicity cause of NCSE); the hyponatremia from CBZ-SIADH is what lowered the seizure threshold; EEG confirms NCSE not CBZ toxicity; CBZ should be switched not simply reduced",
-        "field_path": ""
+        "data_point": "Carbamazepine level 14.2 (mildly above range)",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests carbamazepine toxicity as the cause, prompting rapid CBZ removal alone",
+        "correct_interpretation": "CBZ level only mildly elevated; the dominant mechanism is CBZ-induced SIADH with hyponatremia"
       },
       {
-        "data_point": "WBC 12.4 and temperature 37.6 in a nursing home resident",
-        "location": "initial_tool_outputs.labs.panels.Complete Blood Count",
-        "intended_effect": "Suggests urinary tract infection or aspiration pneumonia as the precipitant of seizure, directing empirical antibiotics and delaying NCSE workup and recognition of the CBZ-SIADH mechanism",
-        "correct_interpretation": "Mild leukocytosis and low-grade fever are common post-ictal findings; blood cultures, urine culture, and procalcitonin are all normal confirming no active infection; metabolic and AED derangement (CBZ-SIADH hyponatremia) is the true precipitant",
-        "field_path": ""
+        "data_point": "Mild AKI (creatinine 1.6) and mild fever",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests sepsis as primary driver",
+        "correct_interpretation": "Mild creatinine elevation and low-grade fever are consistent with UTI but do not explain the focal NCSE pattern — chronic stroke focus + SIADH does"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -782,6 +847,14 @@
       "advanced_imaging": "normal",
       "specialized_test": "normal",
       "literature_search": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "7 required tools + 1 optional; mechanism is CBZ-induced SIADH precipitating SE on chronic post-stroke focus; key cognitive trap is attributing to CBZ toxicity alone; 2 grounded red herrings.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

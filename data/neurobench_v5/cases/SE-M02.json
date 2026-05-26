@@ -617,159 +617,218 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Non-convulsive status epilepticus (NCSE) secondary to GBM recurrence with increased peritumoral edema following dexamethasone taper",
-    "icd_code": "G41.9",
+    "primary_diagnosis": "Non-convulsive status epilepticus secondary to glioblastoma recurrence with increased peritumoral edema after dexamethasone taper",
+    "icd_code": "G41.2",
     "differential": [
       {
-        "diagnosis": "Autoimmune encephalitis",
-        "likelihood": "low",
-        "key_features": "Autoimmune panel negative; clear structural etiology (GBM recurrence) explains NCSE; no psychiatric prodrome"
+        "diagnosis": "Subtherapeutic levetiracetam causing breakthrough seizure",
+        "likelihood": "high",
+        "key_features": "Levetiracetam level subtherapeutic and a contributing factor, but the structural driver is tumor edema; AED optimization alone will not control SE",
+        "icd_code": "G40.909"
       },
       {
-        "diagnosis": "Post-ictal confusion (Todd's paralysis)",
-        "likelihood": "low",
-        "key_features": "Duration >25 minutes without recovery makes simple post-ictal state unlikely; EEG confirms ongoing electrographic seizure activity (NCSE)"
+        "diagnosis": "Tumor-related hemorrhage / new structural progression",
+        "likelihood": "moderate",
+        "key_features": "CT shows post-surgical changes without new hemorrhage; MRI needed to characterise recurrence vs radiation effect",
+        "icd_code": "C71.2"
       },
       {
-        "diagnosis": "Metabolic encephalopathy",
-        "likelihood": "low",
-        "key_features": "Mild hyponatremia and hyperglycemia present but insufficient to explain NCSE in isolation; EEG shows focal ictal pattern not diffuse triphasic waves"
+        "diagnosis": "Sepsis / metabolic encephalopathy in chemo patient",
+        "likelihood": "moderate",
+        "key_features": "Lactate 3.8 and CRP 4.2 raise concern; however EEG shows definite NCSE pattern not just diffuse slowing",
+        "icd_code": "G93.41"
       },
       {
-        "diagnosis": "Radiation necrosis with encephalopathy",
+        "diagnosis": "Paraneoplastic / autoimmune encephalitis",
         "likelihood": "low",
-        "key_features": "High rCBV on perfusion MRI favors recurrence over radiation necrosis; timeline (8 months post-treatment, maintenance phase) consistent with recurrence"
+        "key_features": "Known GBM more parsimoniously explains seizure focus; autoimmune panel reasonable but secondary",
+        "icd_code": "G04.81"
+      },
+      {
+        "diagnosis": "Drug-induced seizure (chemotherapy neurotoxicity)",
+        "likelihood": "low",
+        "key_features": "Temozolomide and dexamethasone do not commonly cause SE; subtherapeutic AED + tumor remain primary",
+        "icd_code": "T45.1X5A"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain emergent EEG to confirm NCSE diagnosis",
+        "action": "Continuous video-EEG — confirm NCSE and monitor response to therapy",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Right temporal NCSE with LPDs meeting modified Salzburg criteria",
+        "expected_finding": "Right temporal-parietal evolving rhythmic theta meeting NCSE criteria — concordant with known GBM focus",
         "category": "required",
-        "tool_parameters": {
-          "urgency": "stat",
-          "modality": "standard_eeg",
-          "duration_minutes": 30
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 2,
-        "action": "Order emergent labs including AED levels, BMP, CBC, glucose, CK, lactate",
+        "action": "Labs: CBC, CMP, glucose, Ca/Mg, lactate, ABG, blood cultures, AED level (levetiracetam), ammonia",
         "tool_name": "interpret_labs",
-        "expected_finding": "Levetiracetam therapeutic; mild hyponatremia; elevated lactate/CK post-ictal",
+        "expected_finding": "Subtherapeutic levetiracetam, lactate 3.8, mild thrombocytopenia (post-chemo); identify contributors",
         "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP",
-            "LFT",
-            "AED_levels",
-            "lactate",
-            "CK"
-          ]
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Perform non-contrast CT head to exclude hemorrhage",
+        "action": "Non-contrast CT to exclude new hemorrhage / mass effect before any LP",
         "tool_name": "order_ct_scan",
-        "expected_finding": "Post-surgical changes only; no new hemorrhage",
+        "expected_finding": "Post-surgical cavity unchanged; no new hemorrhage; mild sulcal effacement",
         "category": "required",
-        "tool_parameters": {
-          "contrast": false,
-          "urgency": "stat"
-        }
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
       },
       {
         "step": 4,
-        "action": "Obtain urgent MRI brain with gadolinium including perfusion imaging to assess for GBM recurrence",
+        "action": "MRI brain with gadolinium — tumor recurrence vs radiation necrosis vs increased peritumoral edema",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "New enhancing lesion with high rCBV at surgical cavity margin — GBM recurrence; cortical DWI ictal pseudostroke (NOT ischemic)",
+        "expected_finding": "Increased peritumoral T2/FLAIR edema with enhancing nodularity along resection margin — recurrence with edema",
         "category": "required",
-        "tool_parameters": {
-          "sequences": [
-            "T1",
-            "T2",
-            "FLAIR",
-            "DWI",
-            "T1+Gd",
-            "perfusion"
-          ],
-          "urgency": "urgent"
-        }
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
       },
       {
         "step": 5,
-        "action": "Check drug interactions before escalating dexamethasone with AEDs",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Minor dexamethasone-levetiracetam interaction; no contraindication to escalation; hold metformin around contrast",
+        "action": "Search literature on SE in glioma + dexamethasone-taper-related edema management",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Re-escalate dexamethasone for tumor edema; levetiracetam dose optimization; second-line AED per ESETT",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {},
+        "citation": "[ESETT_2019]",
+        "guideline_source": ""
       },
       {
         "step": 6,
-        "action": "Initiate continuous cEEG monitoring for 24-48 hours to track seizure burden and guide AED titration",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Progressive reduction in NCSE activity with treatment",
+        "action": "Drug-interaction check across temozolomide, dexamethasone, levetiracetam, and second-line AED",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Levetiracetam preferred (minimal interactions); avoid enzyme-inducing AEDs that lower TMZ exposure",
         "category": "required",
-        "tool_parameters": {
-          "modality": "continuous_ceeg",
-          "duration_hours": 48
-        }
+        "tool_parameters": {},
+        "citation": "[Glauser_2016]",
+        "guideline_source": ""
       },
       {
         "step": 7,
-        "action": "Consult neuro-oncology for GBM recurrence management via literature review",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Bevacizumab, re-irradiation, or clinical trial for recurrent GBM; steroid escalation; AED dual therapy appropriate",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Neurology + neuro-oncology consultation for tumor-edema management and SE pathway",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Re-escalate steroids; consider bevacizumab; ICU continuous EEG",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 8,
+        "action": "Baseline ECG before second-line AED in patient on chemo",
+        "tool_name": "analyze_ecg",
+        "expected_finding": "Normal sinus rhythm; safe to load AED",
+        "category": "optional",
+        "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "study_type": "TTE"
+        },
+        "rationale": "No cardiac question; recurrent GBM with edema explains presentation.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "No arrhythmogenic concern beyond standard ICU monitoring.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET / DaTscan irrelevant to SE in known GBM.",
+        "citation": "[Brophy_2012]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "genetic_panel:ALS"
+        },
+        "rationale": "Genetic ALS panel irrelevant.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "harmful_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {
+          "tests": [
+            "routine"
+          ]
+        },
+        "rationale": "LP is relatively contraindicated in a patient with known intracranial mass and increased peritumoral edema — risk of herniation; perform only if CNS infection is strongly suspected and only after expert review of MRI.",
+        "citation": "[Brophy_2012]"
+      }
+    ],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "analyze_csf",
+        "reason": "In suspected mass effect, MRI must precede any LP decision to assess herniation risk.",
+        "citation": "[Brophy_2012]",
+        "severity": "hard"
+      },
+      {
+        "before": "interpret_labs",
+        "after": "check_drug_interactions",
+        "reason": "Confirm AED level and electrolytes before changing the AED regimen.",
+        "citation": "[Brophy_2012]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Emergent EEG to diagnose NCSE — clinical exam alone insufficient",
-      "IV lorazepam immediately followed by IV lacosamide loading for NCSE treatment",
-      "MRI brain with perfusion to diagnose GBM recurrence — CT alone insufficient",
-      "Escalate dexamethasone to treat increased peritumoral edema driving NCSE",
-      "Continuous cEEG monitoring to guide treatment and confirm seizure cessation",
-      "Do NOT administer tPA — cortical DWI changes are ictal pseudostroke, not ischemic"
+      "Administer IV lorazepam 0.1 mg/kg first-line; do not delay for diagnostics",
+      "Re-escalate dexamethasone for peritumoral edema",
+      "Load levetiracetam to therapeutic levels (subtherapeutic on admission) as second-line AED per ESETT",
+      "Continuous EEG until ictal pattern clears, then 24h surveillance",
+      "Urgent neuro-oncology consultation for GBM recurrence management"
     ],
     "contraindicated_actions": [
-      "Administering tPA for cortical ribbon DWI restriction — this is ictal pseudostroke from NCSE, not acute ischemic stroke",
-      "Tapering dexamethasone further — should instead be escalated given tumor recurrence with increased edema",
-      "Stopping levetiracetam — therapeutic level confirms adherence; should be maintained/escalated",
-      "Diagnosing post-ictal confusion without EEG — prolonged confusion >25 minutes requires EEG to exclude NCSE"
+      "Do NOT perform LP without MRI assessment of mass effect first",
+      "Do NOT use enzyme-inducing AEDs (phenytoin, carbamazepine) that reduce temozolomide exposure",
+      "Do NOT defer steroid re-escalation while waiting for full imaging confirmation if MRI shows worsening edema"
     ],
     "key_reasoning_points": [
-      "NCSE presenting as persistent confusion after brief convulsion requires urgent EEG — clinical distinction from post-ictal state impossible without EEG",
-      "GBM recurrence confirmed by high rCBV on perfusion MRI (not radiation necrosis) — recurrence drives seizure breakthrough",
-      "Steroid taper from 6 mg to 4 mg BID was precipitating factor — reduced edema control unmasked epileptogenic recurrent tumor",
-      "Cortical ribbon DWI restriction in active NCSE = ictal pseudostroke; does NOT represent acute ischemic stroke; tPA absolutely contraindicated",
-      "Levetiracetam therapeutic — NCSE not due to non-compliance but structural/oncologic cause requiring treatment escalation",
-      "Lacosamide is preferred second-line AED in tumor-related NCSE with right temporal origin",
-      "Bevacizumab for recurrent GBM may reduce seizure burden via anti-permeability VEGF blockade reducing peritumoral edema"
+      "Patients with brain tumors entering SE require simultaneous tumor-edema control (steroids) and AED escalation — neither alone is sufficient",
+      "Dexamethasone tapers in glioma patients commonly precipitate breakthrough seizures via increased peritumoral edema",
+      "Levetiracetam is the preferred AED in glioma to avoid CYP-mediated reduction of chemotherapy exposure",
+      "LP in a patient with known intracranial mass and edema risks herniation — MRI must guide the decision"
     ],
     "red_herrings": [
       {
-        "data_point": "Cortical ribbon DWI restriction on MRI — right temporal-parietal",
-        "location": "followup_outputs[0].output.findings[1]",
-        "intended_effect": "Mimics acute ischemic stroke in right temporal-parietal territory, prompting tPA administration in a patient already with altered mental status",
-        "correct_interpretation": "Ictal pseudostroke pattern from active NCSE; not in a vascular territory; resolves with seizure control; tPA is absolutely contraindicated",
-        "field_path": ""
+        "data_point": "Lactate 3.8 mmol/L",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests sepsis as primary driver",
+        "correct_interpretation": "Lactate is commonly elevated post-SE from convulsive muscle activity; CRP modestly elevated alone does not establish sepsis"
       },
       {
-        "data_point": "Mild hyponatremia sodium 134 mEq/L combined with elevated glucose 186 mg/dL",
-        "location": "initial_tool_outputs.labs.panels.Basic Metabolic Panel",
-        "intended_effect": "Suggests metabolic encephalopathy as the sole explanation for confusion, potentially diverting from NCSE diagnosis and delaying EEG",
-        "correct_interpretation": "Metabolic abnormalities are mild contributors (hyponatremia lowers seizure threshold) but are insufficient alone to explain NCSE; focal EEG ictal pattern confirms structural-epileptic etiology requiring AED treatment",
-        "field_path": ""
+        "data_point": "Subtherapeutic levetiracetam level",
+        "location": "initial_tool_outputs.labs",
+        "field_path": "initial_tool_outputs.labs",
+        "intended_effect": "Suggests non-adherence as sole etiology, missing the tumor-edema driver",
+        "correct_interpretation": "Subtherapeutic AED is contributory but the radiographic finding of peritumoral edema progression is the dominant mechanism"
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "fallback_tool_kinds": {
@@ -779,6 +838,14 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
       "specialized_test": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:SE",
+    "difficulty_rationale": "8 required tools; etiology is dual (subtherapeutic AED + tumor-edema progression after dex taper) — needs both AED optimization and edema control; LP flagged as harmful given mass effect; 2 grounded red herrings.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

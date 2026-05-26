@@ -715,132 +715,168 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Hepatic encephalopathy, grade 3, hepatitis B cirrhosis (Child-Pugh B) — precipitated by urosepsis (E. coli UTI)",
+    "primary_diagnosis": "Hepatic encephalopathy (West Haven grade III), hepatitis B cirrhosis (Child-Pugh B, MELD 18) — precipitated by E. coli urosepsis (UTI); ascites mandates SBP exclusion.",
+    "icd_code": "K72.91",
+    "differential": [
+      {
+        "diagnosis": "SBP (concurrent)",
+        "likelihood": "moderate",
+        "key_features": "Paracentesis mandatory.",
+        "icd_code": "K65.2"
+      },
+      {
+        "diagnosis": "Bacteremia / sepsis",
+        "likelihood": "moderate",
+        "key_features": "Cultures + lactate; supportive ICU care if shock.",
+        "icd_code": "A41.9"
+      },
+      {
+        "diagnosis": "HBV reactivation / decompensation",
+        "likelihood": "low",
+        "key_features": "Check HBV DNA if not recently done; antiviral therapy continuation.",
+        "icd_code": "B18.1"
+      },
+      {
+        "diagnosis": "Acute alcohol intake",
+        "likelihood": "very_low",
+        "key_features": "Not supported in HBV cirrhotic; tox screen.",
+        "icd_code": "F10.230"
+      }
+    ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Interpret labs — STAT ammonia, CBC, BMP, LFTs, INR, urinalysis, urine culture, blood cultures",
+        "action": "Comprehensive labs: CMP including AST/ALT/bilirubin/INR/albumin, ammonia, CBC, glucose, electrolytes (Na, K, Mg), BUN/Cr, lactate, blood cultures and urine cultures; toxicology if substance use plausible. Confirms liver dysfunction and screens for precipitants.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Ammonia 156 µmol/L; WBC 18.2 (urosepsis); E. coli UTI; AKI Cr 1.8; INR 2.4",
+        "expected_finding": "Ammonia 156; leukocytosis; urinalysis pyuria; HBV DNA if available; cultures.",
         "category": "required",
-        "tool_parameters": {
-          "test_type": "comprehensive_metabolic_hepatic_ammonia_urinalysis_cultures"
-        }
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 2,
-        "action": "Order CT head without contrast — exclude structural/hemorrhagic cause",
+        "action": "Non-contrast CT head — exclude structural alternate cause of AMS (hemorrhage, large stroke, mass) before any LP.",
         "tool_name": "order_ct_scan",
-        "expected_finding": "No hemorrhage or structural cause — chronic hepatocerebral changes only",
+        "expected_finding": "No acute intracranial process.",
         "category": "required",
-        "tool_parameters": {
-          "body_part": "head",
-          "contrast": false
-        }
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 3,
-        "action": "Analyze EEG — confirm HE pattern, exclude NCSE",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Classic fronto-predominant triphasic waves — HE confirmed, no NCSE",
-        "category": "required",
-        "tool_parameters": {
-          "indication": "encephalopathy, NCSE exclusion"
-        }
+        "action": "Literature/guideline search to confirm West Haven grading, precipitant management, and lactulose/rifaximin dosing (AASLD/EASL HE; infection-precipitated HE; HBV management).",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "AASLD/EASL 2014 guidance retrieved; West Haven criteria and precipitant-driven management framework confirmed.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 4,
-        "action": "Start IV ceftriaxone — treat urosepsis precipitant",
-        "tool_name": "interpret_labs",
-        "expected_finding": "E. coli sensitive to ceftriaxone — appropriate empiric choice",
-        "category": "required",
-        "tool_parameters": {
-          "test_type": "culture_sensitivity_results"
-        }
+        "action": "Drug-interaction and medication-reconciliation review covering antibiotic selection; lactulose; rifaximin; continue HBV antiviral; flag any CNS depressants (benzodiazepines, opioids, sedating antiemetics, antihistamines) and confirm lactulose/rifaximin dosing in liver disease.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Sedating/CNS-depressant medications identified; lactulose and rifaximin reviewed for hepatic dose adjustment.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Bajaj_2011]",
+        "guideline_source": "Bajaj 2011 HE management review"
       },
       {
         "step": 5,
-        "action": "Diagnostic paracentesis — exclude SBP concurrent with UTI",
+        "action": "Diagnostic paracentesis to exclude concurrent SBP.",
         "tool_name": "interpret_labs",
-        "expected_finding": "PMN 162 — SBP excluded",
+        "expected_finding": "Ascitic PMN count.",
         "category": "required",
-        "tool_parameters": {
-          "test_type": "ascitic_fluid_cell_count_culture"
-        }
+        "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
       {
         "step": 6,
-        "action": "Lactulose 20-30 mL q4-6h titrated to 2-3 stools/day + rifaximin 550 mg BID",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Ammonia declining — treatment response",
-        "category": "required",
-        "tool_parameters": {
-          "test_type": "ammonia_trend_electrolytes"
-        }
+        "action": "EEG — confirm HE pattern. Triphasic waves are classic but non-specific (metabolic encephalopathies broadly); main role is exclusion of non-convulsive status epilepticus where the differential supports it.",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Triphasic waves expected.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[Ferenci_2002]",
+        "guideline_source": "Ferenci 2002 HE nomenclature/quantification"
       },
       {
         "step": 7,
-        "action": "Correct hypokalemia — potassium supplementation to prevent renal ammoniagenesis",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Potassium correction to >3.5 reduces ammonia",
-        "category": "required",
+        "action": "Consult hepatology + ID — coordinate definitive care, transplant candidacy assessment where applicable.",
+        "tool_name": "consult_medical_specialist",
+        "expected_finding": "Hepatology / critical-care guidance integrated into management.",
+        "category": "recommended",
         "tool_parameters": {
-          "test_type": "electrolyte_monitoring"
-        }
+          "specialty": "hepatology"
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "No clinical suspicion for hepatopulmonary syndrome, portopulmonary hypertension, or endocarditis; echocardiography is not part of the HE workup.",
+        "citation": "[AASLD_2014]"
       },
       {
-        "step": 8,
-        "action": "Transplant evaluation referral — MELD-Na 18 with two HE episodes + HCC within Milan criteria",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Two indications for transplant evaluation: two overt HE episodes + HCC Milan",
-        "category": "required",
+        "tool_name": "order_advanced_imaging",
         "tool_parameters": {
-          "test_type": "meld_transplant_hcc_assessment"
-        }
+          "modality": "amyloid_PET"
+        },
+        "rationale": "Amyloid PET has no role in HE workup; reversible metabolic encephalopathy is the issue, not Alzheimer pathology.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "DaTscan"
+        },
+        "rationale": "DaTscan has no role in HE workup; the question is metabolic encephalopathy, not nigrostriatal degeneration.",
+        "citation": "[AASLD_2014]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "genetic_panel:early_onset_AD"
+        },
+        "rationale": "Early-onset AD genetic panel has no role in HE workup; reversible metabolic encephalopathy is the diagnosis under consideration.",
+        "citation": "[AASLD_2014]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "order_ct_scan",
+        "after": "analyze_csf",
+        "reason": "In altered mental status, exclude intracranial mass effect / hemorrhage on imaging before LP to avoid herniation risk.",
+        "citation": "[AASLD_2014]",
+        "severity": "hard"
       }
     ],
     "critical_actions": [
-      "IV ceftriaxone for E. coli urosepsis — treat the HE precipitant",
-      "Diagnostic paracentesis to exclude concurrent SBP (cannot rely on clinical exam in cirrhosis with fever)",
-      "Lactulose titrated to 2-3 stools/day — not maximum purging",
-      "Correct hypokalemia — potassium worsens HE via renal ammoniagenesis",
-      "Transplant referral — MELD 18 + two overt HE episodes + HCC within Milan criteria = multiple indications",
-      "Address HBV DNA viremia — counsel on tenofovir adherence (no resistance found)"
+      "Empiric IV antibiotics for E. coli UTI (e.g., ceftriaxone) pending sensitivities.",
+      "Lactulose to 2-4 stools/day; rifaximin 550 mg BID.",
+      "Continue HBV antiviral therapy.",
+      "IV albumin if SBP confirmed."
     ],
     "contraindicated_actions": [
-      "Defer paracentesis assuming UTI is the only infection: In decompensated cirrhosis with fever, SBP and UTI can coexist; paracentesis is always required to exclude SBP when patient has ascites and encephalopathy",
-      "Use fluoroquinolone (ciprofloxacin) empirically without culture results: Rising E. coli resistance rates in hospitalized cirrhotic patients — ceftriaxone is preferred empiric choice in sepsis",
-      "Avoid lactulose to prevent diarrhea-induced hypokalemia: Lactulose is essential — titrate to 2-3 stools/day; omitting lactulose in grade 3 HE worsens prognosis"
-    ],
-    "differential": [
-      {
-        "diagnosis": "Spontaneous bacterial peritonitis (SBP)",
-        "likelihood": "moderate",
-        "key_features": "Fever and encephalopathy in a cirrhotic always warrant paracentesis; PMN 162 (<250) excludes SBP; UTI is the confirmed infectious precipitant"
-      },
-      {
-        "diagnosis": "Non-convulsive status epilepticus (NCSE)",
-        "likelihood": "low",
-        "key_features": "EEG shows triphasic waves without epileptiform discharges — metabolic pattern, not NCSE; clinical asterixis and elevated ammonia confirm hepatic etiology"
-      },
-      {
-        "diagnosis": "Meningitis or encephalitis",
-        "likelihood": "low",
-        "key_features": "No meningism on exam; fever explained by UTI; CSF not indicated given strong metabolic explanation"
-      }
+      "Do not prescribe benzodiazepines for anxiety/agitation — they precipitate and prolong HE (use haloperidol or non-pharmacologic measures for agitation).",
+      "Do not prescribe sedating opioids — they worsen HE; consider acetaminophen at hepatic-safe dosing for pain.",
+      "Do not perform LP before neuroimaging excludes mass effect when the patient has altered mental status.",
+      "Do not stop HBV antiviral therapy during acute illness (flare risk)."
     ],
     "key_reasoning_points": [
-      "Urosepsis precipitates HE through two mechanisms: (1) systemic cytokines impair hepatic urea cycle function; (2) infection-driven catabolism increases peripheral glutamine/ammonia production",
-      "SBP and UTI can coexist in cirrhosis with ascites — always perform paracentesis when ascites is present and encephalopathy is unexplained",
-      "Hypokalemia worsens HE by increasing renal ammoniagenesis — H+/K+ exchange in renal tubules shifts ammonium production; correction of K+ reduces ammonia",
-      "Detectable HBV DNA on tenofovir: resistance is rare; first check adherence. No resistance found confirms medication failure.",
-      "HCC within Milan criteria independently qualifies for liver transplant and receives MELD exception points — discuss dual indications (HCC + recurrent HE) with transplant team"
+      "HE is a clinical diagnosis: West Haven grading + evidence of liver dysfunction + exclusion of other causes of AMS — ammonia level is supportive only and correlates poorly with grade (AASLD 2014).",
+      "Precipitant identification is more actionable than the ammonia number: infection (SBP especially), GI bleed, electrolyte disturbance (hypokalemia/hyponatremia), constipation, sedative/CNS-depressant use, dehydration, dietary protein load, renal failure.",
+      "HBV cirrhotics on suppressive antivirals should not have therapy interrupted during acute illness."
     ],
-    "red_herrings": [],
-    "icd_code": "K72.9",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    "red_herrings": []
   },
   "metadata": {
     "generated_by": "claude-sonnet-4-6",
@@ -862,6 +898,14 @@
       "specialized_test": "incidental",
       "literature_search": "normal",
       "drug_interactions": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (HEP-ENC)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:HEP-ENC",
+    "difficulty_rationale": "4 required tools + paracentesis; single clear infectious precipitant; minimal distractors.",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

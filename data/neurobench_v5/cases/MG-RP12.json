@@ -1,7 +1,7 @@
 {
   "case_id": "MG-RP12",
   "condition": "myasthenia_gravis",
-  "difficulty": "diagnostic_puzzle",
+  "difficulty": "moderate",
   "encounter_type": "inpatient",
   "patient": {
     "age": 74,
@@ -96,152 +96,231 @@
     "extremities": "No edema"
   },
   "ground_truth": {
-    "primary_diagnosis": "Myasthenia gravis — bulbar-predominant, late-onset (G70.01)",
-    "primary_diagnosis_icd": "G70.01",
+    "primary_diagnosis": "Bulbar-predominant late-onset AChR-antibody-positive myasthenia gravis",
+    "icd_code": "G70.01",
     "differential": [
       {
-        "diagnosis": "Parkinson's disease-related oropharyngeal dysphagia",
+        "diagnosis": "Recurrent NSCLC with paraneoplastic syndrome",
         "likelihood": "moderate",
-        "key_features": "PD causes dysphagia but typically mild and progressive with motor fluctuations; severity here exceeds PD stage; no response to levodopa titration"
+        "key_features": "Prior NSCLC 7 years ago; surveillance reassuring but paraneoplastic concern persists — PET-CT if any clinical doubt; anti-VGCC and anti-AChR distinguish.",
+        "icd_code": "C34"
       },
       {
-        "diagnosis": "Paraneoplastic neurological syndrome from recurrent lung cancer",
-        "likelihood": "low",
-        "key_features": "No paraneoplastic antibodies (anti-Hu, anti-Yo, ANNA-2 all negative); CEA and NSE normal; CT shows no recurrence"
+        "diagnosis": "Parkinson's disease bulbar progression",
+        "likelihood": "moderate",
+        "key_features": "PD can cause dysphagia and dysarthria but does NOT produce fatigable diurnal pattern or RNS decrement.",
+        "icd_code": "G20"
+      },
+      {
+        "diagnosis": "ALS (bulbar onset)",
+        "likelihood": "moderate",
+        "key_features": "Bulbar ALS produces dysphagia and dysarthria but with tongue fasciculations/atrophy and UMN signs; EMG shows neurogenic pattern, not NMJ.",
+        "icd_code": "G12.21"
       },
       {
         "diagnosis": "Lambert-Eaton myasthenic syndrome",
         "likelihood": "low",
-        "key_features": "Borderline anti-VGCC (non-diagnostic); no 50Hz increment on RNS; no proximal limb weakness pattern; no SCLC on imaging"
+        "key_features": "Smoker, prior lung cancer — but here AChR positive and pattern is bulbar-predominant fatigable.",
+        "icd_code": "G73.1"
       },
       {
-        "diagnosis": "Motor neuron disease with bulbar onset",
-        "likelihood": "low",
-        "key_features": "No fasciculations, no tongue atrophy, no pyramidal signs; normal needle EMG expected in MG (done if needed); RNS shows NMJ dysfunction not MND pattern"
+        "diagnosis": "Esophageal stricture / motility disorder",
+        "likelihood": "very_low",
+        "key_features": "Mechanical dysphagia would not produce fatigable ptosis or dysarthria.",
+        "icd_code": "K22.4"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Brain MRI with contrast to exclude brainstem lesion or brain metastasis from prior lung cancer",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Order serologies: anti-AChR (binding, blocking, modulating), anti-MuSK, anti-LRP4, and TSH/free-T4 for thyroid autoimmunity",
+        "tool_name": "interpret_labs",
+        "expected_finding": "AChR antibody positive; TSH evaluates for comorbid thyroid disease",
+        "category": "required",
         "tool_parameters": {
-          "contrast": true,
-          "sequences": [
-            "T1",
-            "T2",
-            "FLAIR",
-            "DWI",
-            "post-gadolinium"
+          "panels": [
+            "anti_AChR",
+            "anti_MuSK",
+            "anti_LRP4",
+            "TSH"
           ]
-        }
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 2,
-        "action": "CT chest with contrast to exclude lung cancer recurrence",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Order repetitive nerve stimulation (RNS) at 2-3 Hz across proximal and facial muscles",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Decrement >10% in symptomatic muscles supports postsynaptic NMJ disorder",
+        "category": "required",
         "tool_parameters": {
-          "region": "chest",
-          "contrast": true,
-          "indication": "cancer surveillance"
-        }
+          "test_type": "repetitive_nerve_stimulation"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 3,
-        "action": "Paraneoplastic antibody panel (anti-Hu, anti-Yo, ANNA-2) to exclude paraneoplastic syndrome",
-        "tool_name": null,
-        "expected_finding": "",
+        "action": "Order single-fiber EMG (gold standard >95% sensitivity)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Increased jitter and blocking on extensor digitorum communis or orbicularis oculi confirms NMJ transmission failure",
         "category": "recommended",
         "tool_parameters": {
-          "lab_type": "paraneoplastic_panel"
-        }
+          "test_type": "emg_single_fiber"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 4,
-        "action": "Low-rate and high-rate RNS to evaluate NMJ dysfunction",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Order CT chest with contrast for thymoma screening",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No thymoma; thymic involution appropriate for age",
+        "category": "required",
         "tool_parameters": {
-          "test_type": "repetitive_nerve_stimulation",
-          "rates": [
-            "3Hz",
-            "50Hz"
-          ]
-        }
+          "region": "chest",
+          "contrast": true,
+          "indication": "thymoma_screening"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
       },
       {
         "step": 5,
-        "action": "MG antibody panel (AChR binding, blocking, modulating, anti-MuSK)",
-        "tool_name": null,
-        "expected_finding": "",
-        "category": "recommended",
+        "action": "Review MGFA classification and current treatment guidance (pyridostigmine, prednisone, steroid-sparing, IVIG/PLEX, thymectomy)",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "MGFA classification stages disease severity; thymectomy benefits AChR+ generalized MG (MGTX); IVIG/PLEX for crisis",
+        "category": "required",
         "tool_parameters": {
-          "lab_type": "mg_antibody_panel"
-        }
+          "query": "myasthenia gravis MGFA classification treatment thymectomy"
+        },
+        "citation": "[Sanders_2016]",
+        "guideline_source": "Sanders_2016"
       },
       {
         "step": 6,
-        "action": "Initiate pyridostigmine; insert NGT for enteral nutrition; monitor respiratory function closely",
-        "tool_name": null,
-        "expected_finding": "",
+        "action": "Check drug interactions for MG-exacerbating agents (aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, neuromuscular blockers, procainamide)",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Flag aminoglycosides, fluoroquinolones, IV magnesium, telithromycin, NMBs as contraindicated or use-with-caution in MG",
+        "category": "required",
+        "tool_parameters": {
+          "proposed": "pyridostigmine_start",
+          "screen_for": [
+            "aminoglycosides",
+            "fluoroquinolones",
+            "telithromycin",
+            "magnesium_IV",
+            "neuromuscular_blockers"
+          ]
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
+      },
+      {
+        "step": 7,
+        "action": "Bedside respiratory function testing (FVC, MIP/MEP, NIF) — repeat q4h in crisis",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Baseline FVC/NIF to assess crisis risk in patients with bulbar or limb involvement",
         "category": "recommended",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[Sanders_2016]",
+        "guideline_source": "Sanders_2016"
+      },
+      {
+        "step": 8,
+        "action": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Improvement of ptosis after 2 minutes of cooling supports MG",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "ice_pack_test"
+        },
+        "citation": "[Wolfe_2016]",
+        "guideline_source": "Wolfe_2016"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_eeg",
+        "tool_parameters": {},
+        "rationale": "MG is a peripheral neuromuscular junction disorder; EEG has no diagnostic role.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No CSF role in MG; LP risks complications without diagnostic yield.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "rationale": "Advanced imaging (PET/MR spectroscopy/perfusion) is not indicated for MG diagnosis or staging; CT chest covers thymoma screening.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Echocardiography is not indicated for MG unless a comorbid cardiac question exists.",
+        "citation": "[Wolfe_2016]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Cardiac monitoring is not indicated for MG unless arrhythmia or autonomic disease is independently suspected.",
+        "citation": "[Wolfe_2016]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "interpret_labs",
+        "after": "order_specialized_test",
+        "reason": "Order AChR/MuSK/LRP4 serologies first; reserve single-fiber EMG for seronegative or RNS-non-diagnostic cases (resource stewardship).",
+        "citation": "[Wolfe_2016]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Do not attribute dysphagia solely to Parkinson's disease — severity is disproportionate",
-      "Order paraneoplastic panel given prior lung cancer history before concluding MG",
-      "RNS with low-rate AND high-rate stimulation to distinguish MG from LEMS",
-      "AChR antibody testing is definitive diagnostic step",
-      "Insert nasogastric tube for nutrition — aspiration risk is high with bulbar MG",
-      "Monitor NIF and FVC at least daily — bulbar crisis can progress to respiratory failure"
+      "Confirm AChR antibody positivity",
+      "CT chest — no recurrence; thymoma screening (here negative)",
+      "Single-fiber EMG to disambiguate from ALS bulbar onset",
+      "Nutritional support and dysphagia precautions (NG feeds or modified diet) given weight loss",
+      "Coordinate with Parkinson team — anticipate medication adjustments"
     ],
     "contraindicated_actions": [
-      "Do not use fluoroquinolones for aspiration pneumonia in MG (contraindicated)",
-      "Do not rely on levodopa optimization to improve dysphagia — it will not help MG dysphagia",
-      "Do not proceed to general anesthesia for surgical procedure without MG optimization",
-      "Do not delay AChR antibody testing while awaiting cancer workup results"
+      "Do NOT prescribe aminoglycoside antibiotics (gentamicin, tobramycin, amikacin) — risk of precipitating myasthenic crisis",
+      "Do NOT prescribe fluoroquinolones (ciprofloxacin, levofloxacin, moxifloxacin) — FDA black-box warning for MG exacerbation",
+      "Do NOT prescribe telithromycin — contraindicated in MG",
+      "Do NOT administer IV magnesium for MG patients (e.g., for hypomagnesaemia, eclampsia prophylaxis) without alternative — blocks NMJ transmission",
+      "Do NOT use non-depolarizing neuromuscular blockers without anaesthesia/MG-aware dosing protocols",
+      "Do NOT initiate high-dose corticosteroids as sole outpatient therapy without hospitalization or pyridostigmine bridge — risk of paradoxical worsening at days 5-10",
+      "Do NOT attribute fluctuating fatigable weakness to a functional disorder before completing serology + RNS + single-fiber EMG workup",
+      "Do NOT prescribe metoclopramide for nausea/dysphagia in this PD patient with MG — worsens parkinsonism; use ondansetron or domperidone with caution."
     ],
     "key_reasoning_points": [
-      "Dysphagia disproportionate to Parkinson's disease severity is the critical clinical clue — Parkinson's dysphagia at this severity would require more advanced disease",
-      "Prior lung cancer raises paraneoplastic concern, but negative paraneoplastic antibodies and normal imaging effectively exclude this",
-      "Borderline anti-VGCC should not be overinterpreted — diagnostic LEMS threshold requires >0.10 nmol/L; no 50Hz increment on RNS",
-      "Late-onset MG in elderly men with bulbar predominance is a recognized phenotype, often anti-titin positive without thymoma",
-      "Water swallowing test failure + weak pharyngeal reflex + declining repeated swallows = bulbar MG pattern, not PD pattern",
-      "RNS decrement in cranial-innervated muscles without 50Hz increment distinguishes bulbar MG from LEMS"
+      "Fluctuating, fatigable weakness with diurnal pattern (worse evening) is the clinical hallmark of MG — fixed weakness suggests an alternative diagnosis.",
+      "Ocular involvement (ptosis, diplopia) is asymmetric and fatigable in MG; thyroid eye disease causes restrictive (not fatigable) ophthalmoplegia.",
+      "Single-fiber EMG (sensitivity >95%) is the most sensitive electrodiagnostic test — order when RNS is non-diagnostic or serology is negative.",
+      "All confirmed MG cases require CT chest for thymoma — present in roughly 10-15% of generalized MG; thymectomy (MGTX trial) improves long-term outcomes in non-thymoma AChR+ MG as well.",
+      "Aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, and neuromuscular blockers can precipitate myasthenic crisis and must be screened against any new prescription.",
+      "Late-onset bulbar-predominant MG can mimic ALS or PD bulbar progression; SFEMG distinguishes NMJ from motor neuron disease.",
+      "Significant weight loss warrants early dietitian and SLT consultation; aspiration risk is high."
     ],
     "red_herrings": [
       {
-        "data_point": "Prior lung cancer history suggesting paraneoplastic syndrome or LEMS",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Previous lung adenocarcinoma raises concern for paraneoplastic neurological syndrome (anti-Hu, anti-Yo) or LEMS from SCLC",
-        "correct_interpretation": "Cancer resected 7 years ago; paraneoplastic panel negative; no new malignancy on CT; diagnosis is primary AChR+ MG",
-        "field_path": ""
-      },
-      {
-        "data_point": "Borderline anti-VGCC (0.04 nmol/L)",
-        "location": "followup_outputs[1].output.interpretation",
-        "intended_effect": "Any VGCC elevation triggers LEMS concern, especially given lung cancer history",
-        "correct_interpretation": "Non-diagnostic borderline result; LEMS threshold is >0.10 nmol/L; no 50Hz increment on RNS; pattern is MG not LEMS",
-        "field_path": ""
-      },
-      {
-        "data_point": "Parkinson's disease history explaining all symptoms",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Parkinson's causes oropharyngeal dysphagia, hypophonia, and aspiration — all symptoms present here",
-        "correct_interpretation": "PD-level dysphagia at this severity requires advanced disease; patient has mild-moderate PD; RNS and AChR antibody confirm MG as primary etiology",
-        "field_path": ""
+        "data_point": "Parkinson's disease and prior NSCLC",
+        "location": "past medical history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Attribute dysphagia to PD progression or NSCLC recurrence and miss MG.",
+        "correct_interpretation": "PD bulbar dysphagia is non-fatigable; NSCLC recurrence imaging negative; AChR positivity is diagnostic of MG."
       }
-    ],
-    "icd_code": "G70.01",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -274,7 +353,17 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "incidental"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MG",
+    "difficulty_rationale": "5 required tools, 1 red herrings, typical AChR+ generalized MG",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "vocab_gap": [
+      "emg_ncs_useless_via_param_conflation: pack lists order_specialized_test:emg_ncs as USELESS, but coherence validator treats tool_name overlap as a contradiction regardless of tool_parameters; cannot encode without removing required RNS/SFEMG entries. Suggest extending validator to compare tool_name + tool_parameters or fleet-wide pattern."
+    ]
   },
   "initial_tool_outputs": {
     "mri": {

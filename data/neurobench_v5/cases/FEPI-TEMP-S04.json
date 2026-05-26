@@ -676,139 +676,180 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Focal epilepsy - temporal lobe (right mesial temporal lobe epilepsy with hippocampal sclerosis)",
-    "icd_code": "G40.109",
+    "primary_diagnosis": "Focal epilepsy of right mesial temporal lobe origin with hippocampal sclerosis (focal-to-bilateral tonic-clonic seizure with olfactory aura)",
+    "icd_code": "G40.219",
     "differential": [
       {
-        "diagnosis": "Psychogenic non-epileptic seizures (PNES)",
+        "diagnosis": "Focal epilepsy from low-grade temporal tumor (DNET, ganglioglioma)",
+        "likelihood": "moderate",
+        "key_features": "MRI distinguishes tumor from sclerosis.",
+        "icd_code": "D43.0"
+      },
+      {
+        "diagnosis": "Idiopathic generalized epilepsy (JME)",
         "likelihood": "low",
-        "key_features": "Witnessed semiology is classic for temporal lobe epilepsy with olfactory aura, behavioral arrest, oral automatisms, and secondary generalization. Elevated post-ictal prolactin and unequivocal right temporal EEG abnormalities strongly argue against PNES."
+        "key_features": "Adolescent onset could fit JME but the classic temporal aura argues for focal localization.",
+        "icd_code": "G40.319"
       },
       {
-        "diagnosis": "Syncope (vasovagal or cardiac)",
+        "diagnosis": "Provoked seizure (sleep deprivation, alcohol)",
         "likelihood": "low",
-        "key_features": "No prodromal lightheadedness, pallor, or diaphoresis. Prolonged post-ictal confusion with aphasia is inconsistent with syncope. Normal ECG. The prolonged tonic-clonic activity (60-90 seconds) far exceeds the brief myoclonic jerks sometimes seen with convulsive syncope."
+        "key_features": "History clarifies; isolated provocation does not constitute epilepsy on its own.",
+        "icd_code": "R56.9"
       },
       {
-        "diagnosis": "Migraine with aura",
-        "likelihood": "very_low",
-        "key_features": "Migraine aura spreads gradually over 5-60 minutes and is typically visual or sensory. This patient's aura episodes are brief (seconds to one minute), involve olfactory hallucinations and epigastric nausea (classic temporal lobe semiology), and are followed by behavioral arrest and impaired awareness rather than headache."
+        "diagnosis": "Psychogenic non-epileptic spells",
+        "likelihood": "low",
+        "key_features": "Stereotyped aura with witnessed tonic-clonic activity argues against PNES.",
+        "icd_code": "F44.5"
       },
       {
-        "diagnosis": "Transient ischemic attack",
+        "diagnosis": "Convulsive syncope",
         "likelihood": "very_low",
-        "key_features": "Patient is 27 years old with no vascular risk factors. TIAs cause negative neurological symptoms (weakness, numbness, visual loss), not positive phenomena (olfactory hallucinations, automatisms) with altered awareness."
+        "key_features": "Classic aura excludes syncope.",
+        "icd_code": "R55"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain detailed history from patient and witness including seizure semiology, aura characteristics, duration, and post-ictal features",
+        "action": "Obtain detailed seizure history including semiology, aura, automatisms, duration, frequency, witness accounts, and post-ictal features.",
         "tool_name": null,
-        "expected_finding": "Classic temporal lobe aura (olfactory hallucination, epigastric nausea) followed by behavioral arrest, oral automatisms, and focal to bilateral tonic-clonic seizure with post-ictal confusion and aphasia",
-        "category": "required"
+        "expected_finding": "Stereotyped focal impaired-awareness events with temporal-lobe aura and post-ictal confusion.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 2,
-        "action": "Perform thorough neurological examination",
+        "action": "Perform complete neurological examination.",
         "tool_name": null,
-        "expected_finding": "Normal interictal neurological examination with evidence of lateral tongue bite from recent seizure",
-        "category": "required"
+        "expected_finding": "Interictal exam typically normal; subtle memory deficit may be present.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Order routine EEG",
+        "action": "Order EEG (routine first; pursue ambulatory or video-EEG if non-diagnostic) to identify interictal epileptiform discharges and capture habitual events.",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Right anterior temporal spike-and-wave complexes and TIRDA consistent with right temporal epileptogenic focus",
+        "expected_finding": "Interictal sharps/spikes and/or focal slowing in the anterior temporal region; ictal correlate confirms diagnosis.",
         "category": "required",
         "tool_parameters": {
           "eeg_type": "routine"
-        }
+        },
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 4,
-        "action": "Order MRI brain with epilepsy protocol",
+        "action": "Order MRI brain with dedicated epilepsy protocol (thin-cut coronal T1/FLAIR/T2/DWI through the hippocampi).",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Right hippocampal sclerosis with volume loss and T2/FLAIR hyperintensity",
+        "expected_finding": "Hippocampal sclerosis, low-grade tumor (DNET, ganglioglioma), cavernoma, or focal cortical dysplasia; rule out alternative structural causes.",
         "category": "required",
         "tool_parameters": {
           "protocol": "epilepsy",
-          "contrast": false
-        }
+          "contrast": true
+        },
+        "citation": "[AAN_2007]",
+        "guideline_source": "AAN_2007"
       },
       {
         "step": 5,
-        "action": "Order basic laboratory workup including CBC, BMP, prolactin, TSH, and urine drug screen",
+        "action": "Obtain CBC, comprehensive metabolic panel, prolactin (if drawn within 10–20 min of event), and AED levels if on therapy.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal metabolic panel, elevated post-ictal prolactin, negative drug screen",
+        "expected_finding": "Exclude metabolic provocation (hypoglycemia, hyponatremia, uremia); baseline organ function for AED selection; AED level for adherence and dosing.",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
-            "thyroid",
-            "drug_screen",
+            "CMP",
             "prolactin"
           ]
-        }
+        },
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 6,
-        "action": "Obtain ECG to exclude cardiac arrhythmia",
-        "tool_name": null,
-        "expected_finding": "Normal sinus rhythm without arrhythmia",
-        "category": "recommended"
+        "action": "Search current literature for AED selection in focal epilepsy and ILAE 2017 seizure classification.",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Evidence-based AED options for focal epilepsy (levetiracetam, lamotrigine, oxcarbazepine, lacosamide); ILAE classification framework.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 7,
-        "action": "Initiate antiepileptic drug therapy with a non-enzyme-inducing AED (levetiracetam or lamotrigine preferred given oral contraceptive use)",
+        "action": "Check drug interactions before initiating or modifying AED therapy (enzyme inducers, OCP, other CNS-active drugs).",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "Levetiracetam or lamotrigine has no interaction with oral contraceptives; monitor psychiatric side effects given anxiety history",
-        "category": "required"
+        "expected_finding": "Identify pharmacokinetic interactions (CYP induction by carbamazepine/phenytoin) and CNS adverse-effect overlap.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No clinical features of CNS infection, encephalitis, or immunocompromise; CSF analysis is not indicated for routine focal epilepsy workup and exposes the patient to procedural risk and cost.",
+        "citation": "[AAN_2007]"
       },
       {
-        "step": 8,
-        "action": "Counsel patient on driving restrictions, seizure safety precautions, and contraceptive-AED interactions",
-        "tool_name": null,
-        "expected_finding": "Patient informed about state driving laws, need to avoid unsupervised swimming and heights, and importance of non-enzyme-inducing AED selection for contraceptive reliability",
-        "category": "required"
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "echo_type": "TTE"
+        },
+        "rationale": "No syncope-versus-seizure question and no structural-heart concern; echocardiogram contributes nothing to epilepsy workup.",
+        "citation": "[AAN_2007]"
       },
       {
-        "step": 9,
-        "action": "Refer to comprehensive epilepsy center for surgical evaluation given concordant structural lesion",
-        "tool_name": null,
-        "expected_finding": "Referral initiated for pre-surgical workup including video-EEG, neuropsychological testing, and FDG-PET",
-        "category": "recommended"
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "Ambulatory cardiac monitoring is reserved for syncope-versus-seizure differentiation; not indicated when semiology is clearly epileptic.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT is inferior to MRI for detecting epileptogenic substrates (hippocampal sclerosis, FCD, low-grade tumor) and adds ionizing radiation without diagnostic yield.",
+        "citation": "[AAN_2007]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "check_drug_interactions",
+        "reason": "Structural cause influences AED choice (e.g., low-grade tumor → consider AEDs with CYP-neutral profile; hippocampal sclerosis → multiple equally appropriate options). MRI should inform drug selection.",
+        "citation": "[ILAE_drug_2017]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Obtain EEG to characterize and lateralize epileptiform activity",
-      "Obtain brain MRI to identify structural etiology (hippocampal sclerosis)",
-      "Order basic metabolic panel and CBC to exclude metabolic or toxic causes of seizure",
-      "Initiate appropriate antiepileptic drug therapy with attention to oral contraceptive interactions",
-      "Counsel patient on driving restrictions and seizure safety",
-      "Assess and document seizure semiology including aura to support localization"
+      "Recognize the olfactory + nausea aura with chewing automatisms as classic mesial-temporal semiology.",
+      "Obtain 3T MRI with epilepsy protocol to confirm hippocampal sclerosis and exclude tumor.",
+      "Obtain routine EEG; if non-diagnostic, pursue sleep-deprived or ambulatory EEG.",
+      "Initiate AED therapy; in a young woman of reproductive age avoid valproate as first-line.",
+      "Counsel on driving restrictions, occupational considerations (working with hot surfaces in restaurant), and oral contraceptive interactions."
     ],
     "contraindicated_actions": [
-      "Prescribing enzyme-inducing AEDs (carbamazepine, phenytoin, phenobarbital) without addressing reduced oral contraceptive efficacy",
-      "Prescribing valproate in a woman of childbearing age given high teratogenic risk",
-      "Performing lumbar puncture without clinical indication (no signs of infection, inflammation, or subarachnoid hemorrhage)",
-      "Discharging without initiating antiepileptic therapy after a focal to bilateral tonic-clonic seizure with clear epileptogenic lesion on MRI",
-      "Prescribing bupropion which lowers the seizure threshold",
-      "Advising that the patient can continue driving immediately"
+      "Do not prescribe valproate as first-line in a woman of childbearing potential.",
+      "Do not perform LP without indication.",
+      "Do not start enzyme-inducing AEDs without considering OCP interactions and bone-health implications."
     ],
     "key_reasoning_points": [
-      "The olfactory aura (unpleasant smell) with epigastric nausea and subsequent behavioral arrest is classic for mesial temporal lobe seizure onset, as the uncus and entorhinal cortex are common sites of seizure origin in temporal lobe epilepsy",
-      "The prior brief olfactory episodes with detachment represent focal aware seizures that were unrecognized, indicating this is recurrent epilepsy rather than a truly first seizure",
-      "History of prolonged febrile seizure in childhood (25 minutes) is a well-established risk factor for mesial temporal sclerosis and subsequent temporal lobe epilepsy, particularly when the febrile seizure is prolonged or complex",
-      "Concordance across all modalities (right temporal semiology, right temporal EEG focus, right hippocampal sclerosis on MRI) is essential for diagnosis and especially important when considering epilepsy surgery",
-      "In women of childbearing age on hormonal contraception, non-enzyme-inducing AEDs must be selected to avoid reducing contraceptive efficacy, and valproate should be avoided due to teratogenicity",
-      "Left-handedness raises the possibility of atypical language lateralization, which would be important to assess with fMRI or Wada test if surgical intervention is considered",
-      "Post-ictal prolactin elevation supports the diagnosis of an epileptic seizure; it must ideally be drawn within 10-20 minutes of the event for maximum sensitivity"
+      "Classic mesial-temporal semiology in a young adult with concordant MRI findings is unambiguous focal symptomatic epilepsy.",
+      "AED choice must account for reproductive age, occupation, and adherence in a busy worker.",
+      "Routine EEG sensitivity is limited; sleep-deprived or ambulatory EEG increases yield if first EEG is non-diagnostic."
     ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": [],
     "red_herrings": []
   },
   "metadata": {
@@ -823,6 +864,16 @@
       "ct": "normal",
       "echo": "normal",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (FEPI-TEMP)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FEPI-TEMP",
+    "difficulty_rationale": "Adolescent / young adult with classic mesial-temporal aura, concordant MRI; straightforward workup with reproductive-age AED selection.",
+    "case_body_concerns": [
+      "useless_tools entry for `analyze_ecg` dropped: tool output is provided up-front in initial_tool_outputs, so declaring it useless to call would be incoherent (agent never had to call it)."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }

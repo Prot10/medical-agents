@@ -89,106 +89,165 @@
     "extremities": "No edema"
   },
   "ground_truth": {
-    "primary_diagnosis": "CADASIL (NOTCH3 R182C) with migraine with aphasic aura and early vascular cognitive impairment; aphasic episodes represent CADASIL-associated migraine with aura",
-    "primary_diagnosis_icd": "G43.1",
+    "primary_diagnosis": "CADASIL (NOTCH3 R182C confirmed) with migraine with aphasic aura and early vascular cognitive impairment — aphasic episodes are CADASIL-associated migraine with aura",
+    "icd_code": "I67.850",
     "differential": [
       {
-        "diagnosis": "Recurrent TIA from hypertensive small vessel disease",
-        "likelihood": "low",
-        "key_features": "Hypertension and LDL partially controlled are real vascular risk factors; however, CADASIL confirmed by genetics and MRI; CADASIL-specific pathology explains all MRI findings; aphasic episodes are migraine with aura in CADASIL context"
+        "diagnosis": "Migraine with aphasic aura (sporadic, late-onset)",
+        "likelihood": "high",
+        "key_features": "Aphasic aura phenotype is consistent with migraine with aura, but the family history and CADASIL-typical MRI strongly indicate CADASIL as the underlying disease",
+        "icd_code": null
       },
       {
-        "diagnosis": "Multi-infarct dementia",
+        "diagnosis": "Transient ischemic attack / lacunar TIA",
+        "likelihood": "moderate",
+        "key_features": "Lacunar infarcts on MRI indicate established CADASIL-related ischaemic disease but the episodic aphasic episodes themselves have features of migraine aura, not TIA",
+        "icd_code": "G45.9"
+      },
+      {
+        "diagnosis": "Sporadic cerebral small-vessel disease",
+        "likelihood": "low",
+        "key_features": "Strong autosomal-dominant family history and CADASIL-typical pattern make sporadic SVD unlikely",
+        "icd_code": "I67.9"
+      },
+      {
+        "diagnosis": "Multiple sclerosis",
         "likelihood": "very_low",
-        "key_features": "Cognitive testing shows early subcortical impairment but not dementia; works full-time; MOCA 28/30; consistent with CADASIL early vascular cognitive impairment"
+        "key_features": "WMH pattern is CADASIL-typical (anterior temporal pole, external capsule) not MS",
+        "icd_code": "G35"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "NOTCH3 gene sequencing — confirm CADASIL given family history and highly suggestive MRI",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "R182C pathogenic mutation confirmed — CADASIL diagnosis confirmed",
+        "action": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
         "category": "required",
         "tool_parameters": {
-          "test_type": "NOTCH3_full_sequencing"
-        }
+          "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3"
       },
       {
         "step": 2,
-        "action": "CADASIL management: triptans CONTRAINDICATED; aspirin 75 mg for secondary prevention; avoid anticoagulation",
+        "action": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
         "tool_name": "check_drug_interactions",
-        "expected_finding": "Triptans contraindicated; aspirin appropriate; anticoagulation avoided (ICH risk)",
+        "expected_finding": "Triptans relatively contraindicated in CADASIL due to small-vessel disease and stroke risk — prefer NSAIDs, antiemetics, gepants/lasmiditan; antiplatelet decisions individualised; aggressive vascular risk-factor control",
         "category": "required",
         "tool_parameters": {
-          "condition": "CADASIL"
-        }
+          "context": "migraine_with_aura_pharmacotherapy"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 3,
-        "action": "Neuropsychological assessment for CADASIL baseline cognitive function",
+        "action": "NOTCH3 gene testing for confirmation",
         "tool_name": "order_specialized_test",
-        "expected_finding": "Early subcortical cognitive impairment; not dementia",
+        "expected_finding": "NOTCH3 R182C confirmed pathogenic mutation — CADASIL confirmed",
         "category": "required",
         "tool_parameters": {
-          "test_type": "neuropsychological_assessment"
-        }
+          "test_type": "genetic_panel:CADASIL"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 4,
-        "action": "Genetic counselling — offer predictive NOTCH3 testing to three adult children; DVLA notification discussion",
-        "tool_name": null,
-        "expected_finding": "Children have 50% CADASIL risk; predictive testing available",
+        "action": "Brain MRI review for CADASIL-typical pattern",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Periventricular/subcortical WMH; bilateral anterior temporal pole involvement; external capsule lesions; lacunar infarcts — characteristic CADASIL pattern",
         "category": "required",
-        "tool_parameters": {}
+        "tool_parameters": {
+          "contrast": false,
+          "sequences": [
+            "FLAIR",
+            "T2",
+            "DWI",
+            "SWI"
+          ]
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       },
       {
         "step": 5,
-        "action": "Uptitrate atorvastatin (LDL 112 not optimal); address prediabetes; BP optimisation",
-        "tool_name": null,
-        "expected_finding": "Vascular risk factor modification is important in CADASIL; statins may have neuroprotective benefit",
-        "category": "required",
-        "tool_parameters": {}
+        "action": "Neuropsychological battery to establish cognitive baseline for vascular cognitive impairment",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Subcortical pattern of cognitive impairment (executive dysfunction, processing speed)",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[AAN_2000]",
+        "guideline_source": "AAN_2000"
       }
     ],
+    "useless_tools": [
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis — neither present here",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {},
+        "rationale": "Routine transthoracic / bubble echocardiogram (PFO screening) is NOT indicated in migraine with aura; PFO-migraine association is controversial and PFO closure does not reduce migraine [Charles_2017]",
+        "citation": "[Charles_2017]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {},
+        "rationale": "Ambulatory cardiac monitoring is not indicated in typical migraine with aura — no role unless cardioembolic stroke is on the differential",
+        "citation": "[AAN_2000]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "MR_angiography"
+        },
+        "rationale": "Routine MRA is not indicated in typical migraine with aura — reserve for sudden-onset / thunderclap headache, suspected dissection, or focal deficit raising concern for vascular cause",
+        "citation": "[AAN_2000]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [],
     "critical_actions": [
-      "NOTCH3 gene sequencing confirms CADASIL — do this first; definitive diagnosis changes all management",
-      "Triptans are CONTRAINDICATED in CADASIL — prescribe NSAIDs + antiemetics for acute headache instead",
-      "Anticoagulation must be avoided in CADASIL (elevated ICH risk) — aspirin 75 mg monotherapy for secondary prevention",
-      "Genetic counselling for adult children — each has 50% risk; offer predictive testing",
-      "DVLA notification required in UK for CADASIL affecting driving — cognitive assessment supports continued driving at present but annual review"
+      "Confirm CADASIL by NOTCH3 testing",
+      "Establish baseline neuropsychological function",
+      "Aggressive vascular risk-factor management (BP, lipids, smoking)",
+      "Genetic counselling for the patient and family — autosomal-dominant inheritance",
+      "Avoid triptans (relative contraindication in CADASIL)"
     ],
     "contraindicated_actions": [
-      "Do not prescribe triptans — CONTRAINDICATED in CADASIL",
-      "Do not anticoagulate (warfarin or DOAC) for 'TIA-like' aphasic episodes — CADASIL carries elevated ICH risk with anticoagulation",
-      "Do not use valproate as preventive — cognitive concerns in a patient with early CADASIL cognitive impairment"
+      "Do not prescribe triptans in CADASIL (relative contraindication)",
+      "Do not prescribe ergotamines",
+      "Do not anticoagulate without specific indication — risk of intracerebral haemorrhage in CADASIL"
     ],
     "key_reasoning_points": [
-      "CADASIL is confirmed by NOTCH3 R182C gene mutation — the same mutation as the maternal cousin; autosomal dominant inheritance confirmed",
-      "Management in CADASIL fundamentally differs from typical migraine with aura: triptans contraindicated; anticoagulation avoided; genetic counselling mandatory",
-      "The aphasic episodes in CADASIL may represent migraine with aphasic aura OR transient focal neurological episodes from subcortical lacunar disease — MRI confirms both mechanisms are operative",
-      "Diagnostic puzzle difficulty: CADASIL presents with migraine-like aura; confirming the diagnosis changes management substantially; genetic testing is the key investigation"
+      "CADASIL is an inherited small-vessel disease causing migraine with aura, lacunar strokes, and vascular cognitive impairment",
+      "MRI pattern (anterior temporal pole + external capsule + lacunes) is highly characteristic",
+      "NOTCH3 cysteine-altering mutations confirm the diagnosis",
+      "Triptans are relatively contraindicated due to ischaemic stroke risk"
     ],
     "red_herrings": [
       {
-        "data_point": "Aphasic episodes with headache — initially treated as migraine with aphasic aura",
+        "data_point": "Strong family history of 'strokes and dementia'",
         "location": "patient.history_present_illness",
-        "intended_effect": "Clinical features are consistent with migraine with aphasic aura; without NOTCH3 testing, CADASIL may not be considered",
-        "correct_interpretation": "CADASIL is confirmed by genetics and MRI; aphasic episodes in CADASIL require different management (no triptans, no anticoagulation); genetic counselling for family essential",
-        "field_path": ""
-      },
-      {
-        "data_point": "MRI WMH pattern — extensive enough to be clearly CADASIL on radiology report",
-        "location": "patient.history_present_illness",
-        "intended_effect": "Even with a radiologist suggesting CADASIL, the clinical team may defer genetic testing",
-        "correct_interpretation": "MRI pattern is highly consistent with CADASIL; NOTCH3 gene test confirmed R182C mutation; genetic confirmation is required for definitive diagnosis and triggers cascade of management and family testing",
-        "field_path": ""
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Could anchor on familial early-onset Alzheimer or other dementia",
+        "correct_interpretation": "Pattern (migraine with aura + small-vessel strokes + cognitive decline + cousin's confirmed CADASIL) is classic CADASIL"
       }
-    ],
-    "icd_code": "G43.1",
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "red_herrings": [
     {
@@ -212,7 +271,17 @@
       "echo": "normal",
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "difficulty_rationale": "Diagnostic puzzle: CADASIL diagnosis with MRI pattern recognition, NOTCH3 confirmation, baseline neuropsych, and triptan contraindication",
+    "case_body_concerns": [
+      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide §1): ['analyze_ecg']"
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   },
   "initial_tool_outputs": {
     "mri": {

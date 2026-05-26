@@ -732,194 +732,215 @@
     "drug_interactions": null
   },
   "ground_truth": {
-    "primary_diagnosis": "Focal epilepsy - temporal lobe (right temporal lobe epilepsy, MRI-negative on standard imaging, with suspected focal cortical dysplasia on 3T epilepsy protocol)",
-    "icd_code": "G40.109",
+    "primary_diagnosis": "Focal epilepsy of right temporal lobe origin, drug-resistant, with suspected focal cortical dysplasia on 3T epilepsy-protocol MRI",
+    "icd_code": "G40.219",
     "differential": [
       {
-        "diagnosis": "Panic disorder with refractory panic attacks",
+        "diagnosis": "Focal cortical dysplasia (epileptogenic substrate)",
+        "likelihood": "high",
+        "key_features": "Subtle dyslamination/blurring on 3T MRI epilepsy protocol explains the refractory focal seizures.",
+        "icd_code": "Q04.3"
+      },
+      {
+        "diagnosis": "Panic disorder",
+        "likelihood": "moderate",
+        "key_features": "Pre-existing label; however ictal fear with stereotyped behavioral arrest, automatisms and post-ictal confusion is not panic.",
+        "icd_code": "F41.0"
+      },
+      {
+        "diagnosis": "Psychogenic non-epileptic spells",
+        "likelihood": "moderate",
+        "key_features": "Possible given prior anxiety diagnosis; video-EEG capture of ictal pattern excludes PNES.",
+        "icd_code": "F44.5"
+      },
+      {
+        "diagnosis": "Autoimmune limbic encephalitis (LGI1/CASPR2)",
         "likelihood": "low",
-        "key_features": "Pre-existing anxiety disorder makes this a compelling initial diagnosis. However, episodes are stereotyped, brief (30-120 seconds), include olfactory hallucinations and automatisms not typical of panic, occur from sleep, and are followed by confusion. Video-EEG with captured events definitively distinguishes the two."
+        "key_features": "Faciobrachial dystonic seizures or rapidly progressive cognitive decline not present here; antibody panel would distinguish.",
+        "icd_code": "G04.81"
       },
       {
-        "diagnosis": "Psychogenic non-epileptic seizures (PNES)",
-        "likelihood": "very_low",
-        "key_features": "Psychiatric comorbidity (anxiety, panic disorder) is a risk factor for PNES. However, captured events on video-EEG show clear right temporal electrographic seizure onset concordant with clinical semiology, excluding PNES for these specific events."
-      },
-      {
-        "diagnosis": "Syncope (vasovagal or cardiac)",
+        "diagnosis": "Low-grade temporal tumor (DNET, ganglioglioma)",
         "likelihood": "low",
-        "key_features": "Known mitral valve prolapse could raise suspicion for cardiac syncope. However, episodes do not involve loss of postural tone, normal ECG and Holter, and retained consciousness during many events argues against syncope. Palpitations in this context are likely autonomic seizure manifestations."
-      },
-      {
-        "diagnosis": "Transient ischemic attack",
-        "likelihood": "very_low",
-        "key_features": "Patient is young with no vascular risk factors. TIAs cause negative symptoms and do not present with positive phenomena such as fear, olfactory hallucinations, or automatisms."
+        "key_features": "Drug-resistant focal seizures with normal MRI lower the prior; epilepsy-protocol MRI is needed to look carefully.",
+        "icd_code": "D43.0"
       }
     ],
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain detailed history of episode semiology from patient and witnesses, including duration, stereotypy, associated phenomena (olfactory hallucinations, automatisms), occurrence from sleep, and post-episode confusion",
+        "action": "Obtain detailed seizure history including semiology, aura, automatisms, duration, frequency, witness accounts, and post-ictal features.",
         "tool_name": null,
-        "expected_finding": "Stereotyped brief episodes with ictal fear, epigastric rising, olfactory hallucination, automatisms witnessed, post-ictal confusion, and occurrence from sleep - features atypical for panic disorder",
-        "category": "required"
+        "expected_finding": "Stereotyped focal impaired-awareness events with temporal-lobe aura and post-ictal confusion.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
         "step": 2,
-        "action": "Review video recorded by boyfriend showing episode with behavioral arrest and automatisms",
+        "action": "Perform complete neurological examination.",
         "tool_name": null,
-        "expected_finding": "Objective evidence of altered awareness and motor automatisms inconsistent with panic attacks",
-        "category": "required"
+        "expected_finding": "Interictal exam typically normal; subtle memory deficit may be present.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "",
+        "guideline_source": ""
       },
       {
         "step": 3,
-        "action": "Perform complete neurological examination",
-        "tool_name": null,
-        "expected_finding": "Normal interictal exam but observe for subtle clinical events during encounter",
-        "category": "required"
-      },
-      {
-        "step": 4,
-        "action": "Order routine EEG",
+        "action": "Order EEG (long-term video-EEG monitoring) to identify interictal epileptiform discharges and capture habitual events.",
         "tool_name": "analyze_eeg",
-        "expected_finding": "Normal EEG with benign variants (wicket spikes) that must not be over-interpreted as epileptiform",
-        "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        }
-      },
-      {
-        "step": 5,
-        "action": "Recognize that normal routine EEG does not exclude epilepsy and proceed to prolonged video-EEG monitoring",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Captured habitual events with right anterior temporal electrographic seizure onset confirming temporal lobe epilepsy",
+        "expected_finding": "Interictal sharps/spikes and/or focal slowing in the anterior temporal region; ictal correlate confirms diagnosis.",
         "category": "required",
         "tool_parameters": {
           "eeg_type": "video"
-        }
+        },
+        "citation": "[ILAE_2017]",
+        "guideline_source": "ILAE_2017"
       },
       {
-        "step": 6,
-        "action": "Order MRI brain (initially standard, then 3T epilepsy protocol when diagnosis confirmed)",
+        "step": 4,
+        "action": "Order MRI brain with dedicated epilepsy protocol (thin-cut coronal T1/FLAIR/T2/DWI through the hippocampi).",
         "tool_name": "analyze_brain_mri",
-        "expected_finding": "Standard MRI normal (MRI-negative epilepsy); 3T epilepsy protocol reveals subtle right temporal pole FCD",
+        "expected_finding": "Hippocampal sclerosis, low-grade tumor (DNET, ganglioglioma), cavernoma, or focal cortical dysplasia; rule out alternative structural causes.",
         "category": "required",
         "tool_parameters": {
           "protocol": "epilepsy",
-          "contrast": false
-        }
+          "contrast": true
+        },
+        "citation": "[AAN_2007]",
+        "guideline_source": "AAN_2007"
       },
       {
-        "step": 7,
-        "action": "Obtain basic labs including BMP, CBC, and timed prolactin if possible",
+        "step": 5,
+        "action": "Obtain CBC, comprehensive metabolic panel, prolactin (if drawn within 10–20 min of event), and AED levels if on therapy.",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal metabolic workup; prolactin uninformative if drawn outside post-ictal window",
+        "expected_finding": "Exclude metabolic provocation (hypoglycemia, hyponatremia, uremia); baseline organ function for AED selection; AED level for adherence and dosing.",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
+            "CMP",
             "prolactin"
           ]
-        }
+        },
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
+      },
+      {
+        "step": 6,
+        "action": "Search current literature for AED selection in focal epilepsy and ILAE 2017 seizure classification.",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Evidence-based AED options for focal epilepsy (levetiracetam, lamotrigine, oxcarbazepine, lacosamide); ILAE classification framework.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
+      },
+      {
+        "step": 7,
+        "action": "Check drug interactions before initiating or modifying AED therapy (enzyme inducers, OCP, other CNS-active drugs).",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Identify pharmacokinetic interactions (CYP induction by carbamazepine/phenytoin) and CNS adverse-effect overlap.",
+        "category": "required",
+        "tool_parameters": {},
+        "citation": "[ILAE_drug_2017]",
+        "guideline_source": "ILAE_drug_2017"
       },
       {
         "step": 8,
-        "action": "Initiate antiepileptic drug therapy appropriate for focal epilepsy, considering psychiatric comorbidities",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Lamotrigine or lacosamide preferred given anxiety comorbidity; levetiracetam acceptable but higher psychiatric side effect risk",
-        "category": "required"
+        "action": "Order interictal FDG-PET when MRI is non-localizing or as part of surgical evaluation.",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Focal hypometabolism ipsilateral to the seizure focus, providing concordant localization for surgical planning.",
+        "category": "recommended",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[Willmann_2007]",
+        "guideline_source": "Willmann_2007"
       },
       {
         "step": 9,
-        "action": "Counsel patient on diagnosis, driving restrictions, and seizure safety",
-        "tool_name": null,
-        "expected_finding": "Patient informed that episodes are epileptic seizures, not panic attacks; driving restrictions discussed",
-        "category": "required"
+        "action": "Order comprehensive neuropsychological battery to lateralize memory function and inform surgical risk.",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Material-specific memory deficit consistent with side of seizure focus (verbal memory deficit in dominant TLE; visuospatial in non-dominant).",
+        "category": "optional",
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Engel_2003]",
+        "guideline_source": "Engel_2003"
+      }
+    ],
+    "useless_tools": [
+      {
+        "tool_name": "analyze_csf",
+        "tool_parameters": {},
+        "rationale": "No clinical features of CNS infection, encephalitis, or immunocompromise; CSF analysis is not indicated for routine focal epilepsy workup and exposes the patient to procedural risk and cost.",
+        "citation": "[AAN_2007]"
       },
       {
-        "step": 10,
-        "action": "Refer to comprehensive epilepsy center for further workup including neuropsychological testing and FDG-PET",
-        "tool_name": null,
-        "expected_finding": "Referral for epilepsy surgery evaluation given MRI-visible lesion on high-resolution imaging",
-        "category": "recommended"
+        "tool_name": "order_echocardiogram",
+        "tool_parameters": {
+          "echo_type": "TTE"
+        },
+        "rationale": "No syncope-versus-seizure question and no structural-heart concern; echocardiogram contributes nothing to epilepsy workup.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_cardiac_monitoring",
+        "tool_parameters": {
+          "monitor_type": "holter_24h"
+        },
+        "rationale": "Ambulatory cardiac monitoring is reserved for syncope-versus-seizure differentiation; not indicated when semiology is clearly epileptic.",
+        "citation": "[AAN_2007]"
+      },
+      {
+        "tool_name": "order_ct_scan",
+        "tool_parameters": {},
+        "rationale": "Non-contrast head CT is inferior to MRI for detecting epileptogenic substrates (hippocampal sclerosis, FCD, low-grade tumor) and adds ionizing radiation without diagnostic yield.",
+        "citation": "[AAN_2007]"
+      }
+    ],
+    "harmful_tools": [],
+    "sequence_constraints": [
+      {
+        "before": "analyze_brain_mri",
+        "after": "check_drug_interactions",
+        "reason": "Structural cause influences AED choice (e.g., low-grade tumor → consider AEDs with CYP-neutral profile; hippocampal sclerosis → multiple equally appropriate options). MRI should inform drug selection.",
+        "citation": "[ILAE_drug_2017]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
-      "Recognize that stereotyped brief episodes with olfactory hallucinations, automatisms, and post-ictal confusion are atypical for panic disorder and warrant epilepsy evaluation",
-      "Do not accept a normal routine EEG as excluding epilepsy; proceed to prolonged video-EEG monitoring",
-      "Do not over-interpret wicket spikes on routine EEG as epileptiform discharges",
-      "Confirm diagnosis with video-EEG capturing habitual events with electrographic correlate",
-      "Obtain 3T MRI with epilepsy protocol for MRI-negative focal epilepsy",
-      "Initiate appropriate antiepileptic drug therapy once diagnosis is confirmed",
-      "Counsel patient on driving restrictions"
+      "Recognize stereotyped ictal fear with behavioral arrest, automatisms, and post-ictal confusion as focal impaired-awareness seizures rather than panic.",
+      "Apply ILAE drug-resistance criteria (failure of ≥2 appropriately chosen and tolerated AEDs) and refer to a comprehensive epilepsy center.",
+      "Capture habitual events with long-term video-EEG to confirm onset zone.",
+      "Obtain 3T MRI with dedicated epilepsy protocol; if MRI is non-localizing, proceed to FDG-PET for metabolic localization.",
+      "Engage a multidisciplinary epilepsy surgery team for presurgical evaluation."
     ],
     "contraindicated_actions": [
-      "Diagnosing panic disorder solely based on psychiatric history and normal routine EEG without pursuing video-EEG monitoring",
-      "Increasing sertraline or adding another psychiatric medication to treat presumed refractory panic disorder without considering epilepsy",
-      "Over-interpreting wicket spikes or benign EEG variants as epileptiform to prematurely diagnose epilepsy without capturing events",
-      "Prescribing bupropion which lowers seizure threshold",
-      "Attributing the non-specific white matter lesions on MRI to the cause of seizures (red herring)",
-      "Performing lumbar puncture without clinical indication for CNS infection or inflammation",
-      "Allowing continued driving without discussing seizure-related driving restrictions"
+      "Do not escalate anxiolytic therapy or label as treatment-resistant panic without epilepsy workup.",
+      "Do not perform lumbar puncture without specific concern for encephalitis.",
+      "Do not start a third AED at full dose before reviewing adherence, AED levels, and the diagnostic certainty."
     ],
     "key_reasoning_points": [
-      "Ictal fear is the most common aura type in right temporal lobe epilepsy and is frequently misdiagnosed as panic disorder, with mean diagnostic delays of approximately 7 years",
-      "Key features distinguishing temporal lobe seizures from panic attacks include: stereotyped episodes lasting under 2 minutes, olfactory hallucinations, witnessed automatisms with impaired awareness, occurrence from sleep, and post-ictal confusion",
-      "A normal routine EEG has limited sensitivity (29-55%) for detecting interictal epileptiform discharges; prolonged video-EEG monitoring is the definitive diagnostic test",
-      "Wicket spikes are benign EEG variants commonly found in the temporal regions that can be mistaken for epileptiform sharp waves, particularly in the context of suspected temporal lobe epilepsy",
-      "Approximately 20-30% of focal epilepsy is MRI-negative on standard imaging; 3T epilepsy protocol MRI can reveal subtle focal cortical dysplasia not visible on standard studies",
-      "The non-specific white matter lesions are red herrings that could mislead toward a demyelinating diagnosis; their location and morphology do not explain temporal lobe seizures",
-      "The pre-existing psychiatric diagnosis of panic disorder with anxiety creates a strong diagnostic anchoring bias that must be overcome through systematic analysis of episode semiology",
-      "Choice of AED should consider psychiatric comorbidities; levetiracetam can worsen anxiety and irritability, making lamotrigine or lacosamide potentially preferable first-line agents"
+      "Drug-resistant epilepsy (Kwan 2010 criteria) mandates referral to a comprehensive epilepsy center.",
+      "Ictal fear can be a temporal-lobe semiology and is the most common cause of 'medically refractory panic.'",
+      "Long-term video-EEG is required to confirm electrographic onset and lateralization.",
+      "MRI-negative TLE benefits from FDG-PET, which shows focal hypometabolism ipsilateral to the seizure focus in ~70% of cases.",
+      "Neuropsychological lateralization informs surgical risk for memory decline."
     ],
     "red_herrings": [
       {
-        "data_point": "Pre-existing psychiatric diagnoses (GAD, panic disorder)",
-        "location": "history",
-        "intended_effect": "Anchors diagnosis toward psychiatric etiology, attributing all episodes to anxiety or panic attacks rather than epilepsy",
-        "correct_interpretation": "Psychiatric comorbidities are common in epilepsy patients but do not explain the stereotyped ictal semiology, EEG lateralization, and FCD on imaging. The ictal events have objective neurological correlates.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Normal routine EEG with benign variants (wicket spikes)",
-        "location": "eeg",
-        "intended_effect": "Normal routine EEG suggests non-epileptic etiology; wicket spikes could be mistaken for epileptiform activity or, conversely, dismissed entirely",
-        "correct_interpretation": "Interictal sensitivity of routine EEG for focal epilepsy is only 50-60%; a normal routine EEG does not exclude epilepsy. Wicket spikes are a known benign EEG variant. Prolonged monitoring is required.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Normal standard MRI with incidental non-specific white matter lesions",
-        "location": "mri",
-        "intended_effect": "Normal standard MRI could suggest no structural basis for epilepsy, leading to misclassification as functional/non-epileptic",
-        "correct_interpretation": "FCD may be invisible on standard MRI sequences; epilepsy protocol MRI (thin coronal cuts, phase-corrected FLAIR) is required to detect subtle cortical dysplasia.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Known mitral valve prolapse and palpitations",
-        "location": "history",
-        "intended_effect": "Suggests cardiac arrhythmia (from MVP) as cause of episodic altered awareness and palpitations preceding events",
-        "correct_interpretation": "The MVP is incidental. Episodic cardiac arrhythmia does not produce the stereotyped ictal semiology with automatisms, post-ictal confusion, and right anterior temporal EEG changes seen in this patient.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Normal prolactin level drawn outside post-ictal window",
-        "location": "labs",
-        "intended_effect": "Normal prolactin argues against epileptic seizures and supports non-epileptic etiology",
-        "correct_interpretation": "Post-ictal prolactin elevation is a supportive but not required finding. Prolactin must be drawn within 10-20 minutes of a generalized tonic-clonic seizure. Focal seizures without secondary generalization do not reliably elevate prolactin. A normal prolactin does not exclude epilepsy.",
-        "field_path": ""
-      },
-      {
-        "data_point": "Positive urine drug screen for benzodiazepines",
-        "location": "labs",
-        "intended_effect": "Suggests substance use contributing to altered mental status",
-        "correct_interpretation": "The patient is prescribed lorazepam as a rescue medication; a positive benzodiazepine screen reflects prescribed use, not illicit drug use or substance-related seizures.",
-        "field_path": ""
+        "data_point": "Long-standing panic-disorder diagnosis with sertraline + as-needed lorazepam.",
+        "location": "history_present_illness",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Continue to attribute the events to anxiety and escalate psychotropics.",
+        "correct_interpretation": "Stereotyped ictal fear with automatisms and post-ictal confusion is a temporal-lobe seizure, not panic."
       }
-    ],
-    "useless_tools": [],
-    "harmful_tools": [],
-    "sequence_constraints": []
+    ]
   },
   "metadata": {
     "version": "1.0",
@@ -941,6 +962,16 @@
       "ct": "normal",
       "echo": "normal",
       "cardiac_monitoring": "normal"
-    }
+    },
+    "last_revised": "2026-05-26",
+    "revision_reason": "gold trajectory regen v5 (FEPI-TEMP)",
+    "criteria_pack_version": "1.0",
+    "authoring_agent": "condition-expert:FEPI-TEMP",
+    "difficulty_rationale": "MRI-negative temporal lobe epilepsy with refractory seizures requires escalation to video-EEG and FDG-PET; long-standing psychiatric mislabel and ≥2 failed AEDs add complexity.",
+    "case_body_concerns": [
+      "useless_tools entry for `analyze_ecg` dropped: tool output is provided up-front in initial_tool_outputs, so declaring it useless to call would be incoherent (agent never had to call it)."
+    ],
+    "citation_gap": [],
+    "vocab_gap": []
   }
 }
