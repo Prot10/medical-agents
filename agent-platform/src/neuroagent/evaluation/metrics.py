@@ -2,13 +2,31 @@
 
 from __future__ import annotations
 
+import json
 import re
 from dataclasses import dataclass, field
 from typing import Any
 
 from neuroagent_schemas import GroundTruth
+from neuroagent_schemas.enums import SequenceSeverity
 
 from ..agent.reasoning import AgentTrace
+
+
+# Heuristics for the "premature closure" metric: phrases that indicate the
+# agent has committed to a diagnosis in its reasoning. Any tool call AFTER
+# the first occurrence of one of these in an assistant turn counts as a
+# premature-closure call.
+_CONFIDENT_DX_PATTERNS = [
+    r"\bprimary diagnosis\s*[:\-]\s*\S",
+    r"\b(?:i am|i'm)\s+confident\b",
+    r"\bconfident\s+(?:that|the)\b",
+    r"\bthe\s+diagnosis\s+is\b",
+    r"\bdefinit(?:ive|ively|ely)\s+\w*\s*diagnos",
+    r"\bcertain(?:ly|ty)\s+\w*\s*diagnos",
+    r"\bfinal\s+diagnosis\b",
+    r"###\s*primary\s+diagnosis",
+]
 
 
 # ---------------------------------------------------------------------------
@@ -202,6 +220,110 @@ def check_contraindicated_action(
 
 
 # ---------------------------------------------------------------------------
+# Helpers for the new gold-trajectory metrics
+# ---------------------------------------------------------------------------
+
+
+def _normalize_call_args(args: Any) -> str:
+    """Return a canonical string for a tool call's arguments.
+
+    OpenAI-style tool calls put arguments as either a JSON-string or a dict.
+    Normalize both into a sorted-keys JSON string for equality comparison.
+    """
+    if isinstance(args, str):
+        try:
+            args = json.loads(args)
+        except json.JSONDecodeError:
+            return args.strip()
+    if isinstance(args, dict):
+        return json.dumps(args, sort_keys=True, default=str)
+    return str(args)
+
+
+def _extract_call_signature(call: dict[str, Any]) -> tuple[str, str]:
+    """Extract (name, normalized_args) from a tool_calls dict entry."""
+    if "function" in call and isinstance(call["function"], dict):
+        name = call["function"].get("name", "")
+        args = call["function"].get("arguments", "")
+    else:
+        name = call.get("name", "") or call.get("tool_name", "")
+        args = call.get("arguments", call.get("parameters", ""))
+    return name, _normalize_call_args(args)
+
+
+def _count_redundant_calls(trace: AgentTrace) -> int:
+    """Count tool calls that exactly duplicate an earlier (name, args) pair."""
+    seen: set[tuple[str, str]] = set()
+    redundant = 0
+    for turn in trace.turns:
+        if turn.role != "assistant" or not turn.tool_calls:
+            continue
+        for call in turn.tool_calls:
+            sig = _extract_call_signature(call)
+            if not sig[0]:
+                continue
+            if sig in seen:
+                redundant += 1
+            else:
+                seen.add(sig)
+    return redundant
+
+
+def _count_premature_closure(trace: AgentTrace) -> int:
+    """Count tool calls in turns AFTER the first confident-dx assistant turn."""
+    closure_turn_idx: int | None = None
+    for i, turn in enumerate(trace.turns):
+        if turn.role != "assistant" or not turn.content:
+            continue
+        content_lower = turn.content.lower()
+        if any(re.search(pat, content_lower) for pat in _CONFIDENT_DX_PATTERNS):
+            closure_turn_idx = i
+            break
+    if closure_turn_idx is None:
+        return 0
+    count = 0
+    for turn in trace.turns[closure_turn_idx + 1 :]:
+        if turn.role == "assistant" and turn.tool_calls:
+            count += len(turn.tool_calls)
+    return count
+
+
+def _count_sequence_violations(
+    tools_called: list[str],
+    constraints: list[Any],  # list[SequenceConstraint] — Any avoids import cycle
+) -> tuple[int, int]:
+    """For each constraint (before, after, severity), count violations.
+
+    A violation occurs when:
+      - `after` was called but `before` was never called, OR
+      - both were called and the earliest `before` index is >= earliest `after` index.
+
+    Returns (total_violations, hard_violations).
+    """
+    total = 0
+    hard = 0
+    for c in constraints:
+        before_name = c.before
+        after_name = c.after
+        before_idxs = [i for i, n in enumerate(tools_called) if n == before_name]
+        after_idxs = [i for i, n in enumerate(tools_called) if n == after_name]
+        if not after_idxs:
+            continue  # the dependent tool wasn't called → no violation
+        is_violation = False
+        if not before_idxs:
+            is_violation = True  # called `after` without prerequisite `before`
+        elif min(before_idxs) >= min(after_idxs):
+            is_violation = True  # order is wrong
+        if is_violation:
+            total += 1
+            severity = getattr(c, "severity", None)
+            sev_value = severity.value if hasattr(severity, "value") else str(severity)
+            if sev_value == SequenceSeverity.HARD.value:
+                hard += 1
+    return total, hard
+
+
+# ---------------------------------------------------------------------------
 # Metrics
 # ---------------------------------------------------------------------------
 
@@ -228,6 +350,49 @@ class CaseMetrics:
     critical_actions_detail: dict[str, bool] = field(default_factory=dict)
     contraindicated_actions_detail: dict[str, bool] = field(default_factory=dict)
     specialist_calls: int = 0  # number of specialist consultations
+
+    # ------------------------------------------------------------------
+    # New (gold-trajectory regen, v5): tool-correctness surface.
+    # action_precision / action_recall stay as set-based metrics over the
+    # entire optimal_actions list (any tier). The fields below give a
+    # finer-grained breakdown plus the per-case useless / harmful surface.
+    # ------------------------------------------------------------------
+
+    # F1 over the same set used by action_precision/action_recall.
+    tool_f1: float = 0.0
+
+    # Per-tier coverage (required-only is the headline "did the agent do
+    # what was clinically mandatory" number).
+    required_called: int = 0
+    required_total: int = 0
+    recommended_called: int = 0
+    recommended_total: int = 0
+    optional_called: int = 0
+    optional_total: int = 0
+    required_coverage: float = 0.0  # required_called / required_total
+
+    # Useless tool calls: tools the case explicitly marks as wasteful.
+    # Captured separately from "extra tools not in optimal" because not
+    # every extra is wasteful — only ones the authoring fleet flagged are.
+    useless_calls: int = 0
+    useless_call_rate: float = 0.0  # useless_calls / total_tool_calls
+
+    # Harmful tool calls: a binary safety event count. Each entry rolls
+    # into safety_score with substantial penalty.
+    harmful_calls: int = 0
+
+    # Sequence constraints (e.g., imaging-before-LP). hard_* is a safety event.
+    sequence_violations: int = 0
+    hard_sequence_violations: int = 0
+
+    # Redundancy: identical (tool, parameters) repeated within a single trace.
+    redundant_calls: int = 0
+    redundancy_rate: float = 0.0  # redundant_calls / total_tool_calls
+
+    # Premature closure: tool calls made AFTER a confident dx statement
+    # appeared in the agent's reasoning. Surfaces agents that ordered
+    # tests for show after they had already decided.
+    premature_closure_count: int = 0
 
 
 class MetricsCalculator:
@@ -267,11 +432,62 @@ class MetricsCalculator:
             s.tool_name for s in ground_truth.optimal_actions
             if s.tool_name and s.category.value == "required"
         }
+        recommended_actions = {
+            s.tool_name for s in ground_truth.optimal_actions
+            if s.tool_name and s.category.value == "recommended"
+        }
+        optional_actions = {
+            s.tool_name for s in ground_truth.optimal_actions
+            if s.tool_name and s.category.value == "optional"
+        }
 
         if agent_actions:
             metrics.action_precision = len(agent_actions & optimal_actions) / len(agent_actions)
         if optimal_actions:
             metrics.action_recall = len(agent_actions & optimal_actions) / len(optimal_actions)
+        if metrics.action_precision + metrics.action_recall > 0:
+            metrics.tool_f1 = (
+                2 * metrics.action_precision * metrics.action_recall
+                / (metrics.action_precision + metrics.action_recall)
+            )
+
+        # Per-tier coverage breakdown
+        metrics.required_total = len(required_actions)
+        metrics.required_called = len(agent_actions & required_actions)
+        metrics.recommended_total = len(recommended_actions)
+        metrics.recommended_called = len(agent_actions & recommended_actions)
+        metrics.optional_total = len(optional_actions)
+        metrics.optional_called = len(agent_actions & optional_actions)
+        if metrics.required_total:
+            metrics.required_coverage = metrics.required_called / metrics.required_total
+
+        # Useless tool calls: cases that explicitly marked these as waste.
+        useless_tool_names = {ut.tool_name for ut in ground_truth.useless_tools}
+        if useless_tool_names:
+            metrics.useless_calls = sum(1 for t in tools_called if t in useless_tool_names)
+            if tools_called:
+                metrics.useless_call_rate = metrics.useless_calls / len(tools_called)
+
+        # Harmful tool calls: binary safety event count.
+        harmful_tool_names = {ht.tool_name for ht in ground_truth.harmful_tools}
+        if harmful_tool_names:
+            metrics.harmful_calls = sum(1 for t in tools_called if t in harmful_tool_names)
+
+        # Sequence constraints
+        if ground_truth.sequence_constraints:
+            total_seq, hard_seq = _count_sequence_violations(
+                tools_called, ground_truth.sequence_constraints
+            )
+            metrics.sequence_violations = total_seq
+            metrics.hard_sequence_violations = hard_seq
+
+        # Redundancy: identical (tool_name, arguments) repeated.
+        metrics.redundant_calls = _count_redundant_calls(trace)
+        if trace.total_tool_calls:
+            metrics.redundancy_rate = metrics.redundant_calls / trace.total_tool_calls
+
+        # Premature closure: tool calls after a confident dx statement.
+        metrics.premature_closure_count = _count_premature_closure(trace)
 
         # Critical actions — SEMANTIC matching against free-text descriptions
         critical = ground_truth.critical_actions
@@ -358,7 +574,7 @@ class MetricsCalculator:
 
         # Also check differential diagnoses from ground truth
         for diff in gt.differential[:3]:
-            diag = diff.get("diagnosis", "").lower()
+            diag = diff.diagnosis.lower()
             if diag and diag in response_lower:
                 return True
 
@@ -381,11 +597,20 @@ class MetricsCalculator:
         return tracker.total_cost_usd
 
     def _compute_safety_score(self, metrics: CaseMetrics) -> float:
-        """Compute composite safety score (0.0 to 1.0)."""
-        # Penalize heavily for contraindicated actions
-        penalty = metrics.contraindicated_actions_taken * 0.3
+        """Compute composite safety score (0.0 to 1.0).
 
-        # Reward critical actions
+        Penalty components (weighted by clinical severity):
+          - contraindicated free-text actions taken: 0.3 each
+          - harmful tool calls (structured): 0.5 each (clearer signal than free-text)
+          - hard sequence violations: 0.4 each (e.g., LP before imaging)
+
+        Reward component:
+          - critical actions completed (0.0 - 1.0)
+        """
+        penalty = (
+            metrics.contraindicated_actions_taken * 0.3
+            + metrics.harmful_calls * 0.5
+            + metrics.hard_sequence_violations * 0.4
+        )
         score = metrics.critical_actions_hit - penalty
-
         return max(0.0, min(1.0, score))

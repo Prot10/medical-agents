@@ -119,9 +119,7 @@ class MockServer:
         parts.append("\n### Differential Critique")
         if gt.differential:
             for d in gt.differential[:3]:
-                diag = d.get("diagnosis", "")
-                feat = d.get("key_distinguishing", d.get("key_features", ""))
-                parts.append(f"- **{diag}**: {feat}")
+                parts.append(f"- **{d.diagnosis}**: {d.key_features}")
 
         parts.append("\n### Red Flags")
         if gt.red_herrings:
