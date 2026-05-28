@@ -88,12 +88,13 @@ class LiteratureSearchResult(BaseModel):
 
 
 class DrugInteractionResult(BaseModel):
-    proposed: str
+    proposed: str = ""
     interactions: list[str] = []
     contraindications: list[str] = []
     warnings: list[str] = []
     formulary_status: str = ""
     alternatives: list[str] = []
+    summary: str = ""  # free-text pharmacology/interaction review, when not field-structured
 
 
 # -------------------------------------------------------------------
