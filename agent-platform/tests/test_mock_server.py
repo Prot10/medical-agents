@@ -51,6 +51,50 @@ def test_ecg_not_available(mock_server):
     assert not result.success
 
 
+class TestFollowUpOutputResolution:
+    """Regression: FollowUpToolOutput.output must resolve by tool_name, never
+    silently mis-resolve via the overlapping union (which lost content at runtime)."""
+
+    def test_ambiguous_shape_resolves_by_tool_name(self):
+        from neuroagent_schemas.case import FollowUpToolOutput
+        from neuroagent_schemas.tool_outputs import (
+            SpecializedTestReport, AdvancedImagingReport,
+        )
+        # {findings, impression, recommended_actions} validates as BOTH
+        # SpecializedTestReport and AdvancedImagingReport; tool_name must decide.
+        shape = {"findings": [{"test": "EMG", "result": "denervation"}],
+                 "impression": "widespread denervation", "recommended_actions": []}
+        spec = FollowUpToolOutput(trigger_action="x", tool_name="order_specialized_test", output=dict(shape))
+        assert isinstance(spec.output, SpecializedTestReport)
+        adv = FollowUpToolOutput(trigger_action="x", tool_name="order_advanced_imaging", output=dict(shape))
+        assert isinstance(adv.output, AdvancedImagingReport)
+
+    def test_literature_resolves_not_cardiac(self):
+        from neuroagent_schemas.case import FollowUpToolOutput
+        from neuroagent_schemas.tool_outputs import LiteratureSearchResult
+        fu = FollowUpToolOutput(
+            trigger_action="x", tool_name="search_medical_literature",
+            output={"query": "q", "results": [], "summary": "general evidence"},
+        )
+        assert isinstance(fu.output, LiteratureSearchResult)
+        assert fu.output.summary == "general evidence"
+
+    def test_drug_interaction_has_summary_field(self):
+        from neuroagent_schemas.tool_outputs import DrugInteractionResult
+        d = DrugInteractionResult(summary="free-text review")
+        assert d.summary == "free-text review"
+
+    def test_malformed_output_raises_not_silently_dropped(self):
+        from neuroagent_schemas.case import FollowUpToolOutput
+        # An output that cannot be a LiteratureSearchResult must error loudly,
+        # not resolve to an empty wrong-typed object.
+        with pytest.raises(Exception):
+            FollowUpToolOutput(
+                trigger_action="x", tool_name="search_medical_literature",
+                output={"results": "not-a-list-and-no-summary", "query": [1, 2]},
+            )
+
+
 def test_call_log_tracks_all(mock_server):
     mock_server.get_output("analyze_eeg", {"a": 1})
     mock_server.get_output("interpret_labs", {"b": 2})
