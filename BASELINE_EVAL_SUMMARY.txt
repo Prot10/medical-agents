@@ -1,0 +1,192 @@
+================================================================================
+NeuroBench v5 — baseline benchmark on 6 base models
+================================================================================
+
+Run started : 2026-06-16 14:02:45
+Wall time   : ~9h 25min (single A100-40GB, vLLM 0.23, one disconnect recovered)
+Cases       : 50 random v5 cases (seed=42)
+Reps        : 3 per (model, case)
+Mode        : ReAct loop
+Hospital    : us_mayo
+Sampling    : temperature=1.0, top_p=0.95, presence_penalty=1.5
+Total runs  : 900 traces, all judged by an independent llm-judge subagent
+
+Run dir     : /eos/project-d/diagbox/dvc/NeuroAgent/results/baseline_eval_20260616_140245
+
+
+================================================================================
+FINAL RANKING (ordered by LLM-judge composite, 0-1)
+================================================================================
+
+  #  Model                Composite  DA/5   Safety/5  Top-1   Top-3   Tool F1  Tools/case  Safety fails
+  -- -------------------  ---------  -----  --------  ------  ------  -------  ----------  ------------
+  1  qwen3.5-9b           0.779      4.39   3.73      35.3%   63.3%   0.56     4.2         28/150
+  2  qwen3.5-4b           0.671      4.02   3.05      36.7%   48.7%   0.46     3.6         45/150
+  3  nemotron-nano-9b-v2  0.565      3.18   2.72      11.3%   24.0%   0.28     1.3         82/150
+  4  gemma-4-e2b          0.538      2.89   2.70      13.3%   33.3%   0.35     2.2         72/150
+  5  gemma-4-e4b          0.483      2.34   2.50      12.0%   19.3%   0.26     1.4         90/150
+  6  nemotron-3-nano-4b   0.339      1.89   1.51       5.3%    8.0%   0.06     0.3         130/150
+
+
+================================================================================
+RULE-BASED METRIC DETAIL
+================================================================================
+
+  Model                Reqd cov   Useless rate   Harmful/case   Hard-seq viols/case   Cost (USD)   Cost-eff
+  -------------------  ---------  -------------  -------------  --------------------  ----------  ---------
+  qwen3.5-9b           56.78 %     6.79 %         0.020          0.073                 $1239        0.85
+  qwen3.5-4b           46.15 %    10.85 %         0.013          0.060                 $1339        0.80
+  nemotron-nano-9b-v2  26.33 %     5.00 %         0.000          0.040                 $483         0.93
+  gemma-4-e2b          33.79 %    10.46 %         0.013          0.047                 $848         0.88
+  gemma-4-e4b          24.90 %     5.67 %         0.007          0.013                 $408         0.92
+  nemotron-3-nano-4b    4.58 %     3.67 %         0.000          0.000                 $71          0.96
+
+
+================================================================================
+LLM-JUDGE PER-DIMENSION MEANS (all 0-5 scale, n=150 traces per model)
+================================================================================
+
+  Model                Dx Acc   Evi Integ   Tool Eff   Safety   Red Herrings
+  -------------------  -------  ----------  ---------  -------  --------------
+  qwen3.5-9b           4.39     4.05        2.89       3.73     3.99
+  qwen3.5-4b           4.02     3.47        2.29       3.05     3.37
+  nemotron-nano-9b-v2  3.18     2.86        2.33       2.72     2.52
+  gemma-4-e2b          2.89     2.70        2.17       2.70     2.51
+  gemma-4-e4b          2.34     2.32        1.81       2.50     2.54
+  nemotron-3-nano-4b   1.89     1.51        1.67       1.51     1.63
+
+
+================================================================================
+KEY FINDINGS
+================================================================================
+
+1. Qwen3.5 dominates at BOTH sizes.
+   - Qwen3.5-9b is the only model with judge DA > 4 AND judge safety > 3.5.
+   - Top-3 = 63.3 % on the puzzle-heavy v5 sample.
+   - Per the judges, only model that recorded a perfect 1.0 on at least one
+     individual case (PERI-NEURO-S06 rep1, CIDP).
+
+2. Qwen3.5-4b dominates the 4B class.
+   - 0.671 composite is far ahead of every other 4B (Nemotron-3 Nano: 0.339,
+     Gemma E2B: 0.538) and beats the 9B Nemotron-Nano (0.565).
+   - Interestingly the rule-based top-1 (36.7 %) is HIGHER than qwen3.5-9b
+     (35.3 %), but qwen3.5-9b's top-3 (63 vs 49) shows it's better-calibrated
+     overall.
+
+3. Gemma 4 E4B underperforms its smaller E2B sibling.
+   - Composite 0.483 < 0.538 — a counterintuitive size inversion.
+   - Root cause flagged repeatedly by the judges: Gemma 4 E4B systematically
+     emits tool calls as inline TEXT (e.g. "ACT: analyze_brain_mri{...}")
+     rather than structured function calls, so the ReAct loop stalls and
+     produces zero tool outputs in many runs.
+   - This is likely a vLLM parser / chat-template mismatch, not a model
+     capability ceiling.
+
+4. Nemotron-3-Nano-4B is unusable as an agent in this setup.
+   - 0.28 tool calls per case (median 0). When tools are not called the model
+     produces inline reasoning that frequently fabricates drugs ("deltexifen",
+     "Zoluka nasal spray"), disease entities ("Bifida vasculopathy"), and
+     dosing — surfacing in 130 / 150 traces flagged for safety.
+   - Wall-clock per case (~22 s) is the fastest of all six models, but that's
+     because no tool round-trips happen.
+
+5. Nemotron-Nano-9B-v2 has the best judge score per dollar spent.
+   - 0.565 composite at $483 total tool cost across all 150 traces, versus
+     qwen3.5-9b at $1239. Cost-efficiency = 0.93 (highest of the strong-tool
+     models). However, it averages only 1.3 tool calls per case so much of
+     that "savings" reflects underuse rather than smart triage.
+
+6. Difficulty calibration holds.
+   - Across every model the difficulty hierarchy reproduces:
+     straightforward > moderate > diagnostic_puzzle on every dimension.
+   - The puzzle cases (RP02, P01, RP03, P05) account for most of the
+     within-model variance — they consistently dropped composites by 0.2-0.4.
+
+7. Common failure modes (judges' qualitative findings).
+   - LP-before-imaging sequence violation (hard safety event): present in
+     every model on at least one stroke or encephalitis case.
+   - FND diagnosed by exclusion rather than positive rule-in signs (Hoover,
+     tremor entrainment, give-way): pervasive in all models except qwen3.5-9b.
+   - Riluzole / IVIG dosing errors recur in every model.
+   - Memantine recommended at the MILD AD stage (contraindicated) in both
+     Qwens.
+
+
+================================================================================
+OUTPUT LAYOUT (per model, on EOS)
+================================================================================
+
+  <run_dir>/
+    config.json                              # all hyperparams + the 50 case IDs
+    subsample_case_ids.txt                   # the 50 chosen v5 cases (seed=42)
+    summary.json                             # rule-based cross-model rollup
+    final_summary.json                       # rule-based + judge combined
+    final_summary.md                         # human-readable Markdown report
+    benchmark.log                            # full launcher log
+
+    <model_key>/
+      run_config.json                        # per-model serve config
+      checkpoint.json                        # resumable checkpoint
+      model_done.flag                        # written on completion
+      logs/vllm.log                          # full vLLM stdout/stderr
+      traces/<case>_repN.json     × 150      # full ReAct trace + CaseMetrics
+      metrics/<case>_repN.json    × 150      # CaseMetrics only
+      judge_bundles/<case>_repN.json × 150   # input to the llm-judge subagent
+      judge_batches/scores_batchNN.json × 15 # raw batched judge output
+      judge_scores/<case>_repN.json × 150    # per-trace judge score
+      judge_summary.json                     # per-dim means / safety-failure list
+      summary.json                           # rule-based model rollup
+      summary_with_judge.json                # rule-based + judge merged
+
+
+================================================================================
+NEW SCRIPTS ADDED TO THE REPO
+================================================================================
+
+  agent-platform/scripts/run_baseline_eval.py
+      Main benchmark. Sweeps N models × M cases × R reps, fresh MockServer +
+      ToolRegistry per case, writes trace + CaseMetrics + judge bundle.
+      Resumable via per-model checkpoint.json.
+
+  agent-platform/scripts/prepare_judge_batches.py
+      Splits a finished model's bundles into batches of N (default 10) and
+      writes a manifest the dispatcher consumes.
+
+  agent-platform/scripts/aggregate_judge_scores.py
+      Fans batched judge output into per-trace files, computes per-dimension
+      summary stats + a safety-failure surface, merges with the rule-based
+      summary into summary_with_judge.json.
+
+  agent-platform/scripts/final_rollup.py
+      Cross-model rollup. Reads every model's summary_with_judge.json and
+      writes final_summary.{json,md}.
+
+
+================================================================================
+WHAT THE COMPOSITE SCORE MEANS (recap)
+================================================================================
+
+LLM-judge composite = weighted mean of 8 dimensions (each 0-5), normalised to
+[0, 1] by dividing by 5. Defined in agent-platform/config/system_prompts/
+llm_judge.md and .claude/agents/llm-judge.md.
+
+  With red herrings (RH non-null):
+    composite = (DA*0.20 + EI*0.10 + EInt*0.15 + DR*0.15 + TE*0.08
+                + CS*0.17 + RH*0.07 + UC*0.08) / 5
+
+  Without red herrings (RH null):
+    composite = (DA*0.22 + EI*0.11 + EInt*0.16 + DR*0.16 + TE*0.09
+                + CS*0.18 + UC*0.08) / 5
+
+  DA  = diagnostic_accuracy
+  EI  = evidence_identification
+  EInt= evidence_integration
+  DR  = differential_reasoning
+  TE  = tool_efficiency
+  CS  = clinical_safety
+  RH  = red_herring_handling
+  UC  = uncertainty_calibration
+
+Safety + diagnostic accuracy together carry ~40 % of the weight. Tool
+efficiency is intentionally low-weighted (8-9 %). Red herrings only count when
+the case actually has one. Per-trace composite range observed: 0.05 to 1.00.
