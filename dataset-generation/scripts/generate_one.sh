@@ -26,7 +26,7 @@ CASE_ID="$3"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 REPO_ROOT="$(cd "$PROJECT_DIR/.." && pwd)"
-DATA_DIR="$REPO_ROOT/data/neurobench_v1"
+DATA_DIR="$REPO_ROOT/data/neurobench_v5"
 
 mkdir -p "$DATA_DIR/cases" "$DATA_DIR/failed"
 
