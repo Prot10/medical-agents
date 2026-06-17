@@ -44,6 +44,11 @@ DATASETS = {
         "name": "NeuroBench v4",
         "description": "200 cases with 12-tool schema and cost tracking (v3 migrated)",
     },
+    "v5": {
+        "path": DATA_ROOT / "neurobench_v5",
+        "name": "NeuroBench v5",
+        "description": "516 cases across 20 conditions (current default)",
+    },
 }
 
 
@@ -92,8 +97,8 @@ def create_app() -> FastAPI:
         all_datasets[version] = (idx, objs)
         logger.info("Loaded %d cases from %s", len(idx), version)
 
-    # Default to v1
-    default_version = "v1"
+    # Default to v5 (current dataset)
+    default_version = "v5"
     app.state.active_dataset = default_version
     app.state.all_datasets = all_datasets
     app.state.case_index = all_datasets[default_version][0]
