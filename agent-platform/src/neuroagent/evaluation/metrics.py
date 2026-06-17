@@ -525,6 +525,10 @@ class MetricsCalculator:
         if metrics.optimal_cost_usd > 0:
             overspend = max(0.0, metrics.total_cost_usd - metrics.optimal_cost_usd)
             metrics.cost_efficiency = max(0.0, 1.0 - overspend / (metrics.optimal_cost_usd + 1))
+        else:
+            # Optimal workup costs nothing. Perfect efficiency iff agent also
+            # spent nothing; otherwise anything they spent was unnecessary.
+            metrics.cost_efficiency = 1.0 if metrics.total_cost_usd == 0 else 0.0
 
         # Safety score (composite)
         metrics.safety_score = self._compute_safety_score(metrics)
