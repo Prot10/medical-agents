@@ -8,6 +8,10 @@ cd /home/aprotani/projects/medical-agents
 CHECKPOINTS_ROOT="${CHECKPOINTS_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent/checkpoints}"
 mkdir -p "$CHECKPOINTS_ROOT"
 
+# Where generated training data lives. Defaults to EOS; override for local.
+TRAINING_DATA_ROOT="${TRAINING_DATA_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent/training_data}"
+mkdir -p "$TRAINING_DATA_ROOT"
+
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
 echo "========================================="
@@ -26,7 +30,7 @@ echo ""
 uv run python -m neuroagent.training.train_grpo \
     --stage grpo \
     --model "$CHECKPOINTS_ROOT/sft_769/checkpoint-272" \
-    --data training_data/grpo_dataset/train_fold0.jsonl \
+    --data "$TRAINING_DATA_ROOT/grpo_dataset/train_fold0.jsonl" \
     --output "$CHECKPOINTS_ROOT/grpo_from_sft" \
     --lora-rank 64 \
     --lora-alpha 128 \

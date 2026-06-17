@@ -3,13 +3,18 @@
 # Run: bash agent-platform/scripts/run_sft_training.sh
 set -euo pipefail
 
-# Must run from project root where training_data/ lives
+# Must run from the repo root so DATASET / split paths resolve.
 cd /home/aprotani/projects/medical-agents
 
 # Where checkpoint adapters live. Defaults to EOS so finetunes survive across
 # nodes; override (e.g. CHECKPOINTS_ROOT=./checkpoints) for fast local NVMe.
 CHECKPOINTS_ROOT="${CHECKPOINTS_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent/checkpoints}"
 mkdir -p "$CHECKPOINTS_ROOT"
+
+# Where generated training data lives (gold trajectories, DPO pairs, GRPO sets).
+# Defaults to EOS; override (e.g. TRAINING_DATA_ROOT=./training_data) locally.
+TRAINING_DATA_ROOT="${TRAINING_DATA_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent/training_data}"
+mkdir -p "$TRAINING_DATA_ROOT"
 
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
@@ -32,7 +37,7 @@ echo ""
 uv run python -m neuroagent.training.train_grpo \
     --stage sft \
     --model Qwen/Qwen3.5-9B \
-    --data training_data/gold_trajectories/trajectories.jsonl \
+    --data "$TRAINING_DATA_ROOT/gold_trajectories_v5/trajectories.jsonl" \
     --output "$CHECKPOINTS_ROOT/sft_769" \
     --lora-rank 64 \
     --lora-alpha 128 \
