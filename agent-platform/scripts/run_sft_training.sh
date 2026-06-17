@@ -6,6 +6,11 @@ set -euo pipefail
 # Must run from project root where training_data/ lives
 cd /home/aprotani/projects/medical-agents
 
+# Where checkpoint adapters live. Defaults to EOS so finetunes survive across
+# nodes; override (e.g. CHECKPOINTS_ROOT=./checkpoints) for fast local NVMe.
+CHECKPOINTS_ROOT="${CHECKPOINTS_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent/checkpoints}"
+mkdir -p "$CHECKPOINTS_ROOT"
+
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
 echo "========================================="
@@ -28,7 +33,7 @@ uv run python -m neuroagent.training.train_grpo \
     --stage sft \
     --model Qwen/Qwen3.5-9B \
     --data training_data/gold_trajectories/trajectories.jsonl \
-    --output checkpoints/sft_769 \
+    --output "$CHECKPOINTS_ROOT/sft_769" \
     --lora-rank 64 \
     --lora-alpha 128 \
     --epochs 5 \
@@ -41,6 +46,6 @@ uv run python -m neuroagent.training.train_grpo \
 echo ""
 echo "========================================="
 echo " SFT Training Complete"
-echo " Checkpoint: checkpoints/sft_769"
+echo " Checkpoint: $CHECKPOINTS_ROOT/sft_769"
 echo " End time: $(date)"
 echo "========================================="

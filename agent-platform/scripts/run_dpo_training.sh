@@ -6,18 +6,22 @@
 set -euo pipefail
 cd /home/aprotani/projects/medical-agents
 
+# Where checkpoint adapters live. Defaults to EOS; override for local NVMe.
+CHECKPOINTS_ROOT="${CHECKPOINTS_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent/checkpoints}"
+mkdir -p "$CHECKPOINTS_ROOT"
+
 export CUDA_MODULE_LOADING=LAZY
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SFT_MODEL="/home/aprotani/projects/medical-agents/models/qwen3.5-9b-sft769"
-SFT_ADAPTER="checkpoints/sft_769/checkpoint-272"
+SFT_ADAPTER="$CHECKPOINTS_ROOT/sft_769/checkpoint-272"
 SFT_MERGED="/home/aprotani/projects/medical-agents/models/qwen3.5-9b-sft769"
 DATASET="data/neurobench_v4"
 SPLIT_FILE="$DATASET/splits/fold0_train.txt"
 TRAJECTORIES="training_data/dpo_trajectories.json"
 PAIRS="training_data/dpo_pairs.json"
-OUTPUT="checkpoints/dpo_from_sft"
+OUTPUT="$CHECKPOINTS_ROOT/dpo_from_sft"
 ROLLOUTS=8
 HOSPITAL="de_charite"
 PORT=8000
