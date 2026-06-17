@@ -4,6 +4,10 @@
 set -euo pipefail
 cd /home/aprotani/projects/medical-agents
 
+# Where checkpoint adapters live. Defaults to EOS; override for local NVMe.
+CHECKPOINTS_ROOT="${CHECKPOINTS_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent/checkpoints}"
+mkdir -p "$CHECKPOINTS_ROOT"
+
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
 echo "========================================="
@@ -21,9 +25,9 @@ echo ""
 
 uv run python -m neuroagent.training.train_grpo \
     --stage grpo \
-    --model checkpoints/sft_769/checkpoint-272 \
+    --model "$CHECKPOINTS_ROOT/sft_769/checkpoint-272" \
     --data training_data/grpo_dataset/train_fold0.jsonl \
-    --output checkpoints/grpo_from_sft \
+    --output "$CHECKPOINTS_ROOT/grpo_from_sft" \
     --lora-rank 64 \
     --lora-alpha 128 \
     --epochs 5 \
@@ -35,6 +39,6 @@ uv run python -m neuroagent.training.train_grpo \
 echo ""
 echo "========================================="
 echo " GRPO Training Complete"
-echo " Checkpoint: checkpoints/grpo_from_sft"
+echo " Checkpoint: $CHECKPOINTS_ROOT/grpo_from_sft"
 echo " End time: $(date)"
 echo "========================================="

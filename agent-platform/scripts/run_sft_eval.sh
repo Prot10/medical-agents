@@ -12,8 +12,11 @@
 set -euo pipefail
 cd /home/aprotani/projects/medical-agents
 
+# Where checkpoint adapters live. Defaults to EOS; override for local NVMe.
+CHECKPOINTS_ROOT="${CHECKPOINTS_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent/checkpoints}"
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ADAPTER="checkpoints/sft_769/checkpoint-272"
+ADAPTER="$CHECKPOINTS_ROOT/sft_769/checkpoint-272"
 MERGED_MODEL="models/qwen3.5-9b-sft769"
 BASE_MODEL="Qwen/Qwen3.5-9B"
 RESULTS_DIR="results/sft_eval"

@@ -8,7 +8,8 @@ set -euo pipefail
 MODEL="Qwen/Qwen3.5-9B"
 DATASET="data/neurobench_v4"
 TRAINING_DATA="training_data/gold_trajectories"
-CHECKPOINTS="checkpoints"
+# Where checkpoint adapters live. Defaults to EOS; override for local NVMe.
+CHECKPOINTS="${CHECKPOINTS_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent/checkpoints}"
 RESULTS="results/finetuning_comparison"
 
 LORA_RANK=64
