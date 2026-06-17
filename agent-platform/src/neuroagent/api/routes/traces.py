@@ -11,10 +11,16 @@ router = APIRouter(tags=["traces"])
 
 # Reverse mapping: HuggingFace model ID → short key
 _HF_TO_SHORT: dict[str, str] = {
+    "Qwen/Qwen3.5-4B": "qwen3.5-4b",
     "Qwen/Qwen3.5-9B": "qwen3.5-9b",
     "QuantTrio/Qwen3.5-27B-AWQ": "qwen3.5-27b-awq",
     "google/medgemma-1.5-4b-it": "medgemma-4b",
     "ig1/medgemma-27b-text-it-FP8-Dynamic": "medgemma-27b",
+    "nvidia/NVIDIA-Nemotron-Nano-9B-v2": "nemotron-nano-9b-v2",
+    "nvidia/NVIDIA-Nemotron-3-Nano-4B-BF16": "nemotron-3-nano-4b",
+    "google/gemma-4-E2B-it": "gemma-4-e2b",
+    "google/gemma-4-E4B-it": "gemma-4-e4b",
+    "google/gemma-4-12B-it": "gemma-4-12b",
 }
 
 

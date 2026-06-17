@@ -28,10 +28,16 @@ logger = logging.getLogger(__name__)
 router = APIRouter(tags=["agent"])
 
 MODEL_KEY_TO_HF = {
+    "qwen3.5-4b": "Qwen/Qwen3.5-4B",
     "qwen3.5-9b": "Qwen/Qwen3.5-9B",
     "qwen3.5-27b-awq": "QuantTrio/Qwen3.5-27B-AWQ",
     "medgemma-4b": "google/medgemma-1.5-4b-it",
     "medgemma-27b": "ig1/medgemma-27b-text-it-FP8-Dynamic",
+    "nemotron-nano-9b-v2": "nvidia/NVIDIA-Nemotron-Nano-9B-v2",
+    "nemotron-3-nano-4b": "nvidia/NVIDIA-Nemotron-3-Nano-4B-BF16",
+    "gemma-4-e2b": "google/gemma-4-E2B-it",
+    "gemma-4-e4b": "google/gemma-4-E4B-it",
+    "gemma-4-12b": "google/gemma-4-12B-it",
 }
 
 # Ollama models use their tag as both key and model ID, served on port 11434
