@@ -3,10 +3,16 @@
 # Usage: ./serve_model.sh [model_name] [port]
 #
 # Supported models:
-#   qwen3.5-9b         - Qwen3.5-9B fp16 (DEFAULT — fast, good tool calling)
-#   qwen3.5-27b-awq    - Qwen3.5-27B AWQ via Marlin kernels (best quality)
-#   medgemma-4b         - MedGemma-1.5-4B-IT bf16 (medical specialist, fast)
-#   medgemma-27b        - MedGemma-27B-Text-IT FP8 (medical specialist, best quality)
+#   qwen3.5-4b           - Qwen3.5-4B bf16 (smallest, fast iteration)
+#   qwen3.5-9b           - Qwen3.5-9B bf16 (DEFAULT — fast, good tool calling)
+#   qwen3.5-27b-awq      - Qwen3.5-27B AWQ via Marlin kernels (best Qwen quality)
+#   medgemma-4b          - MedGemma-1.5-4B-IT bf16 (medical specialist, fast) [GATED]
+#   medgemma-27b         - MedGemma-27B-Text-IT FP8 (medical specialist, best quality)
+#   nemotron-nano-9b-v2  - NVIDIA Nemotron-Nano-9B-v2 (hybrid Mamba/Transformer)
+#   nemotron-3-nano-4b   - NVIDIA Nemotron-3-Nano-4B BF16 (latest gen, smallest)
+#   gemma-4-e2b          - Gemma 4 E2B (5B total / 2B effective, PLE)
+#   gemma-4-e4b          - Gemma 4 E4B (8B total / 4B effective, PLE)
+#   gemma-4-12b          - Gemma 4 12B (encoder-free multimodal dense)
 #
 # Performance notes:
 #   - AWQ models use awq_marlin kernels (10x faster than plain awq GEMM)
@@ -15,18 +21,26 @@
 #   - --language-model-only disables the vision encoder (text-only, saves VRAM)
 #   - Prefix caching enabled for repeated system prompts
 #   - CUDA graphs enabled (default) — first run takes 1-3 min to compile
+#   - Weights default to EOS — cold load ~3-7 min on EOS vs ~40s on local NVMe
 
 set -euo pipefail
 
 # Fix for driver/library version mismatch on some RHEL/CentOS systems
 export CUDA_MODULE_LOADING=LAZY
 
-# Use local disk for HuggingFace model cache
-export HF_HOME="${HF_HOME:-/home/aprotani/.cache/huggingface}"
+# Models live on EOS by default (~100 GB of weights staged there).
+# Override by exporting HF_HOME before invoking this script if you want to use
+# a local cache. See benchmark in commit history for cold/warm load times.
+export HF_HOME="${HF_HOME:-/eos/project-d/diagbox/dvc/NeuroAgent/models/base/huggingface}"
 
 VLLM_VENV="${VLLM_VENV:-/home/aprotani/projects/medical-agents/.venv-vllm}"
 MODEL="${1:-qwen3.5-9b}"
 PORT="${2:-8000}"
+
+# vLLM 0.23+ spawns engine subprocesses that shell out to 'ninja' for build
+# steps; without prepending the venv's bin to PATH, the engine fails with
+# FileNotFoundError: 'ninja'.
+export PATH="$VLLM_VENV/bin:$PATH"
 
 # Use patched launcher to work around NVML/driver version mismatch
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -54,6 +68,14 @@ QWEN35_FLAGS=(
 echo "Starting vLLM server for model: $MODEL on port $PORT"
 
 case "$MODEL" in
+  qwen3.5-4b)
+    # Qwen3.5-4B bf16 — same architecture/flags as 9B, smaller weights.
+    $VLLM \
+      --model Qwen/Qwen3.5-4B \
+      "${COMMON_FLAGS[@]}" \
+      "${QWEN35_FLAGS[@]}" \
+      --max-model-len 131072
+    ;;
   qwen3.5-9b)
     $VLLM \
       --model Qwen/Qwen3.5-9B \
@@ -94,6 +116,68 @@ case "$MODEL" in
       --enable-auto-tool-choice \
       --tool-call-parser hermes
     ;;
+  nemotron-nano-9b-v2)
+    # NVIDIA Nemotron-Nano-9B-v2 — hybrid Mamba/Transformer architecture.
+    # Native function calling via NVIDIA's custom parser plugin (vendored +
+    # patched for vLLM 0.17.1 — see nemotron_toolcall_parser.py). Verified
+    # end-to-end: emits structured tool_calls in `<TOOLCALL>` JSON format.
+    $VLLM \
+      --model nvidia/NVIDIA-Nemotron-Nano-9B-v2 \
+      "${COMMON_FLAGS[@]}" \
+      --max-model-len 65536 \
+      --trust-remote-code \
+      --mamba-ssm-cache-dtype float32 \
+      --enable-auto-tool-choice \
+      --tool-parser-plugin "$SCRIPT_DIR/nemotron_toolcall_parser.py" \
+      --tool-call-parser nemotron_json
+    ;;
+  nemotron-3-nano-4b)
+    # NVIDIA Nemotron-3-Nano-4B-BF16 — latest Nemotron gen, smallest variant.
+    # Per NVIDIA model card: native tool calling via Qwen3-coder parser +
+    # custom nano_v3 reasoning parser (NOT the TOOLCALL/json scheme used by
+    # Nemotron-Nano-9B-v2). The reasoning plugin is vendored alongside.
+    $VLLM \
+      --model nvidia/NVIDIA-Nemotron-3-Nano-4B-BF16 \
+      "${COMMON_FLAGS[@]}" \
+      --max-model-len 65536 \
+      --trust-remote-code \
+      --enable-auto-tool-choice \
+      --tool-call-parser qwen3_coder \
+      --reasoning-parser-plugin "$SCRIPT_DIR/nano_v3_reasoning_parser.py" \
+      --reasoning-parser nano_v3
+    ;;
+  gemma-4-e2b)
+    # Google Gemma 4 E2B — 5B total / 2B effective parameters via Per-Layer
+    # Embeddings (PLE). Native function calling via vLLM's built-in gemma4
+    # tool/reasoning parsers (added in 0.23.0). Multimodal (text+image+audio).
+    $VLLM \
+      --model google/gemma-4-E2B-it \
+      "${COMMON_FLAGS[@]}" \
+      --max-model-len 32768 \
+      --enable-auto-tool-choice \
+      --tool-call-parser gemma4 \
+      --reasoning-parser gemma4
+    ;;
+  gemma-4-e4b)
+    # Gemma 4 E4B — 8B total / 4B effective (PLE). Same as E2B but bigger.
+    $VLLM \
+      --model google/gemma-4-E4B-it \
+      "${COMMON_FLAGS[@]}" \
+      --max-model-len 32768 \
+      --enable-auto-tool-choice \
+      --tool-call-parser gemma4 \
+      --reasoning-parser gemma4
+    ;;
+  gemma-4-12b)
+    # Gemma 4 12B — encoder-free dense multimodal. 24 GB BF16, fits A100-40GB.
+    $VLLM \
+      --model google/gemma-4-12B-it \
+      "${COMMON_FLAGS[@]}" \
+      --max-model-len 32768 \
+      --enable-auto-tool-choice \
+      --tool-call-parser gemma4 \
+      --reasoning-parser gemma4
+    ;;
   *)
     # If MODEL is a path to a local model directory, serve it with Qwen3.5 flags
     if [ -d "$MODEL" ] || [ -d "$(pwd)/$MODEL" ]; then
@@ -106,7 +190,10 @@ case "$MODEL" in
         --trust-remote-code
     else
       echo "Unknown model: $MODEL"
-      echo "Supported: qwen3.5-9b, qwen3.5-27b-awq, medgemma-4b, medgemma-27b"
+      echo "Supported: qwen3.5-4b, qwen3.5-9b, qwen3.5-27b-awq,"
+      echo "           medgemma-4b, medgemma-27b,"
+      echo "           nemotron-nano-9b-v2, nemotron-3-nano-4b,"
+      echo "           gemma-4-e2b, gemma-4-e4b, gemma-4-12b"
       echo "Or pass a path to a local model directory."
       exit 1
     fi
