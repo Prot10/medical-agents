@@ -112,35 +112,36 @@ Calibrate your expectations to the case difficulty:
 - **Moderate**: Scores of 3–4 are reasonable. Findings may be subtler, partially treated, or require specific follow-up to confirm. Some diagnostic ambiguity is expected.
 - **Diagnostic puzzle**: Scores of 2–4 are acceptable. Red herrings are present by design. The agent may reasonably pursue a wrong path initially if it self-corrects. Reaching the correct diagnosis at all is noteworthy.
 
-# OUTPUT FORMAT
+# OUTPUT FORMAT — STRICT JSON
 
-Respond with ONLY a JSON object in this exact schema. Do not include any text before or after the JSON.
+Respond with **only** a single JSON object — no markdown fences, no prose before or after, no `composite_score`. The aggregator computes the composite from your 8 integers. Your job is to emit honest scores.
 
 ```json
 {
-  "diagnostic_accuracy": <0-5>,
-  "evidence_identification": <0-5>,
-  "evidence_integration": <0-5>,
-  "differential_reasoning": <0-5>,
-  "tool_efficiency": <0-5>,
-  "clinical_safety": <0-5>,
-  "red_herring_handling": <0-5 or null>,
-  "uncertainty_calibration": <0-5>,
-  "composite_score": <float, weighted mean — see formula below>,
-  "strengths": ["<strength 1>", "<strength 2>"],
-  "weaknesses": ["<weakness 1>", "<weakness 2>"],
-  "critical_errors": ["<error 1 — only include if the agent made a dangerous or fundamentally wrong decision>"],
-  "justification": "<2-4 sentence summary explaining the overall assessment and the most important factors driving the scores>"
+  "scores": {
+    "diagnostic_accuracy": <int 0-5>,
+    "evidence_identification": <int 0-5>,
+    "evidence_integration": <int 0-5>,
+    "differential_reasoning": <int 0-5>,
+    "tool_efficiency": <int 0-5>,
+    "clinical_safety": <int 0-5>,
+    "red_herring_handling": <int 0-5 or null>,
+    "uncertainty_calibration": <int 0-5>
+  },
+  "qualitative": {
+    "strengths": ["<strength 1>", "<strength 2>"],
+    "weaknesses": ["<weakness 1>", "<weakness 2>"],
+    "critical_errors": ["<error 1 — only when the agent made a dangerous or fundamentally wrong decision>"],
+    "justification": "<2-4 sentence summary referencing specific agent statements, tool calls, or omissions>"
+  }
 }
 ```
 
-**Composite score formula** (compute this yourself):
-- If `red_herring_handling` is not null:
-  `(diagnostic_accuracy × 0.20) + (evidence_identification × 0.10) + (evidence_integration × 0.15) + (differential_reasoning × 0.15) + (tool_efficiency × 0.08) + (clinical_safety × 0.17) + (red_herring_handling × 0.07) + (uncertainty_calibration × 0.08)`
-- If `red_herring_handling` is null:
-  `(diagnostic_accuracy × 0.22) + (evidence_identification × 0.11) + (evidence_integration × 0.16) + (differential_reasoning × 0.16) + (tool_efficiency × 0.09) + (clinical_safety × 0.18) + (uncertainty_calibration × 0.08)`
-
-Normalize the composite to a 0–1 scale by dividing by 5.
+**Schema rules enforced by the aggregator**:
+- The 8 score keys are **required** integers in [0, 5]. Floats, strings, or out-of-range values will be rejected.
+- `red_herring_handling` is `null` iff the ground truth has no `red_herrings` listed.
+- `critical_errors` is `[]` when the agent made no dangerous decision; populated only for clear safety hazards.
+- Do **not** emit a `composite_score` key. The aggregator computes it from your 8 integers using the canonical weighted formula and applies a non-compensatory safety veto (composite clamped to 0 when `clinical_safety ≤ 1`).
 
 # CRITICAL RULES
 
