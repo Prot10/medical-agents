@@ -13,6 +13,7 @@ Usage:
 from __future__ import annotations
 
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -28,8 +29,12 @@ def main():
     from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
     from trl import SFTConfig, SFTTrainer
 
+    training_data_root = os.environ.get(
+        "TRAINING_DATA_ROOT",
+        "/eos/project-d/diagbox/dvc/NeuroAgent/training_data",
+    )
     model_name = "Qwen/Qwen3.5-9B"
-    data_path = "training_data/gold_trajectories/trajectories.jsonl"
+    data_path = f"{training_data_root}/gold_trajectories_v5/trajectories.jsonl"
     output_dir = "/tmp/smoke_test_qlora"
 
     print(f"GPU: {torch.cuda.get_device_name(0)}")

@@ -10,6 +10,10 @@ cd /home/aprotani/projects/medical-agents
 CHECKPOINTS_ROOT="${CHECKPOINTS_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent/checkpoints}"
 mkdir -p "$CHECKPOINTS_ROOT"
 
+# Where generated training data lives. Defaults to EOS; override for local.
+TRAINING_DATA_ROOT="${TRAINING_DATA_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent/training_data}"
+mkdir -p "$TRAINING_DATA_ROOT"
+
 export CUDA_MODULE_LOADING=LAZY
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
@@ -19,8 +23,8 @@ SFT_ADAPTER="$CHECKPOINTS_ROOT/sft_769/checkpoint-272"
 SFT_MERGED="/home/aprotani/projects/medical-agents/models/qwen3.5-9b-sft769"
 DATASET="data/neurobench_v4"
 SPLIT_FILE="$DATASET/splits/fold0_train.txt"
-TRAJECTORIES="training_data/dpo_trajectories.json"
-PAIRS="training_data/dpo_pairs.json"
+TRAJECTORIES="$TRAINING_DATA_ROOT/dpo_trajectories.json"
+PAIRS="$TRAINING_DATA_ROOT/dpo_pairs.json"
 OUTPUT="$CHECKPOINTS_ROOT/dpo_from_sft"
 ROLLOUTS=8
 HOSPITAL="de_charite"

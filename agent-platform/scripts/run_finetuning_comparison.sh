@@ -7,7 +7,9 @@ set -euo pipefail
 # === Configuration ===
 MODEL="Qwen/Qwen3.5-9B"
 DATASET="data/neurobench_v4"
-TRAINING_DATA="training_data/gold_trajectories"
+# Where generated training data lives. Defaults to EOS; override for local.
+TRAINING_DATA_ROOT="${TRAINING_DATA_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent/training_data}"
+TRAINING_DATA="$TRAINING_DATA_ROOT/gold_trajectories_v5"
 # Where checkpoint adapters live. Defaults to EOS; override for local NVMe.
 CHECKPOINTS="${CHECKPOINTS_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent/checkpoints}"
 RESULTS="results/finetuning_comparison"
@@ -48,7 +50,7 @@ uv run python -m neuroagent.training.data.split_dataset \
     --k 5
 
 echo "  [1.3] Gold trajectories must be generated via Claude Code subagent."
-echo "  Check training_data/gold_trajectories/manifest.json for prompts."
+echo "  Check $TRAINING_DATA/manifest.json for prompts."
 echo "  After generation, run: --validate to check them."
 
 # Check if trajectories exist

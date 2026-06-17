@@ -5,11 +5,15 @@ Reads prompts from the prepared prompts directory, generates trajectories,
 and saves raw outputs to raw_v2/.
 
 Usage:
+    # Defaults read $TRAINING_DATA_ROOT/gold_trajectories_v5/{prompts,raw_v2}
+    # (TRAINING_DATA_ROOT defaults to /eos/.../NeuroAgent/training_data).
     uv run python scripts/batch_generate_trajectories.py \
-        --prompts-dir training_data/gold_trajectories/prompts \
-        --output-dir training_data/gold_trajectories/raw_v2 \
         --styles minimal_efficient cost_conscious \
         --max-cases 200
+
+    # Local override for fast iteration:
+    TRAINING_DATA_ROOT=./training_data \
+        uv run python scripts/batch_generate_trajectories.py ...
 """
 
 from __future__ import annotations
@@ -17,12 +21,21 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
 import time
 from pathlib import Path
 
 import anthropic
 
 logger = logging.getLogger(__name__)
+
+# Where generated trajectory artefacts live. Defaults to EOS so a fresh clone
+# can pull them via filesystem instead of git; override via env var for local
+# iteration (TRAINING_DATA_ROOT=./training_data ...).
+TRAINING_DATA_ROOT = os.environ.get(
+    "TRAINING_DATA_ROOT",
+    "/eos/project-d/diagbox/dvc/NeuroAgent/training_data",
+)
 
 BUDGET_INSTRUCTION = """CRITICAL CONSTRAINT: The total output must be SHORT — roughly 3000-4000 tokens (~12,000-16,000 characters). This is a hard budget.
 
@@ -65,8 +78,14 @@ def generate_trajectory(
 
 def main():
     parser = argparse.ArgumentParser(description="Batch generate gold trajectories")
-    parser.add_argument("--prompts-dir", default="training_data/gold_trajectories/prompts")
-    parser.add_argument("--output-dir", default="training_data/gold_trajectories/raw_v2")
+    parser.add_argument(
+        "--prompts-dir",
+        default=f"{TRAINING_DATA_ROOT}/gold_trajectories_v5/prompts",
+    )
+    parser.add_argument(
+        "--output-dir",
+        default=f"{TRAINING_DATA_ROOT}/gold_trajectories_v5/raw_v2",
+    )
     parser.add_argument("--styles", nargs="+", default=["minimal_efficient", "cost_conscious"])
     parser.add_argument("--max-cases", type=int, default=None)
     parser.add_argument("--model", default="claude-sonnet-4-20250514")
