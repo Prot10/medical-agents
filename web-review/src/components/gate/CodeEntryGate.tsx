@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button"
 
 export function CodeEntryGate() {
   const setProfile = useReviewStore((s) => s.setProfile)
+  const sessionMessage = useReviewStore((s) => s.sessionMessage)
   const [code, setCode] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -80,6 +81,12 @@ export function CodeEntryGate() {
                 Enter the reviewer code you were provided. Your annotations are
                 private to you and saved against this code.
               </p>
+
+              {sessionMessage && !error && (
+                <div className="mb-4 text-sm rounded-md border border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300 px-3 py-2">
+                  {sessionMessage}
+                </div>
+              )}
 
               <form onSubmit={handleSubmit} className="space-y-3">
                 <label className="block">
