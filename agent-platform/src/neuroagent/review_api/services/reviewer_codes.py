@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import secrets
 from pathlib import Path
 from typing import Iterable
 
@@ -78,12 +79,27 @@ class ReviewerCodeRegistry:
         logger.info("Loaded %d reviewer code(s) from %s", len(codes), self._path)
 
     def get(self, raw_code: str | None) -> ReviewerCode | None:
-        """Look up a reviewer code (case-insensitive)."""
+        """Look up a reviewer code (case-insensitive, constant-time).
+
+        Codes are bearer secrets, so we compare against every entry with
+        ``secrets.compare_digest`` and avoid early-return, so lookup time does
+        not leak how much of a guessed code was correct.
+        """
         self.reload_if_stale()
         if not raw_code:
             return None
         normalized = raw_code.strip().upper()
-        return self._codes.get(normalized)
+        # compare_digest raises on non-ASCII; encode so arbitrary header bytes
+        # can't trigger a 500 and are simply treated as a non-match.
+        try:
+            candidate = normalized.encode("utf-8")
+        except Exception:  # pragma: no cover — str.encode is total
+            return None
+        match: ReviewerCode | None = None
+        for code, model in self._codes.items():
+            if secrets.compare_digest(code.encode("utf-8"), candidate):
+                match = model
+        return match
 
     def all(self) -> list[ReviewerCode]:
         self.reload_if_stale()

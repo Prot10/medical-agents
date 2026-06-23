@@ -49,8 +49,10 @@ class CaseReview(BaseModel):
     dataset_version: str
     reviewer_code: str
     status: ReviewStatus = "pending"
-    field_annotations: list[FieldAnnotation] = Field(default_factory=list)
-    case_comments: list[CaseComment] = Field(default_factory=list)
+    field_annotations: list[FieldAnnotation] = Field(
+        default_factory=list, max_length=2000
+    )
+    case_comments: list[CaseComment] = Field(default_factory=list, max_length=500)
     first_opened_at: datetime | None = None
     last_updated_at: datetime = Field(default_factory=_utcnow)
     time_spent_seconds: int = 0

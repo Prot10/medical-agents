@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field, field_validator
 
 ReviewerRole = Literal["reviewer", "admin"]
 
-_CODE_PATTERN = re.compile(r"^[A-Z0-9-]{3,16}$")
+_CODE_PATTERN = re.compile(r"^[A-Z0-9-]{3,64}$")
 
 
 class ReviewerCode(BaseModel):

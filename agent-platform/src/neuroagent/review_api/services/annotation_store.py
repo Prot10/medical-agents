@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 # Defensive validators — these strings end up as path segments.
 _VERSION_PATTERN = re.compile(r"^v\d{1,3}$")
-_CODE_PATTERN = re.compile(r"^[A-Z0-9-]{3,16}$")
+_CODE_PATTERN = re.compile(r"^[A-Z0-9-]{3,64}$")
 _CASE_ID_PATTERN = re.compile(r"^[A-Za-z0-9_\-]+$")
 
 
