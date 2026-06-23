@@ -33,6 +33,12 @@ export async function fetchJSON<T>(
   const url = path.startsWith("http") ? path : `${BASE}${path}`
   const response = await fetch(url, { ...rest, headers })
   if (!response.ok) {
+    // An authenticated request that 401s means the stored code is no longer
+    // valid (disabled/rotated). Drop the session so the gate can re-prompt
+    // instead of leaving the reviewer in a silently-broken state.
+    if (response.status === 401 && !skipAuth) {
+      useReviewStore.getState().handleAuthExpired()
+    }
     let body: unknown = null
     try {
       body = await response.json()

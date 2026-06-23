@@ -36,6 +36,7 @@ export function AnnotationPopover() {
   const [comment, setComment] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [confirmingDiscard, setConfirmingDiscard] = useState(false)
 
   useEffect(() => {
     if (existing) {
@@ -46,10 +47,24 @@ export function AnnotationPopover() {
       setComment("")
     }
     setError(null)
+    setConfirmingDiscard(false)
   }, [open?.fieldPath, open?.annotationId, existing])
+
+  const isDirty =
+    comment.trim() !== (existing?.comment ?? "").trim() ||
+    (existing != null && severity !== existing.severity)
 
   function handleClose() {
     if (submitting) return
+    if (isDirty) {
+      setConfirmingDiscard(true)
+      return
+    }
+    ctx.setOpenPopover(null)
+  }
+
+  function discardAndClose() {
+    setConfirmingDiscard(false)
     ctx.setOpenPopover(null)
   }
 
@@ -168,48 +183,77 @@ export function AnnotationPopover() {
                     <div className="text-xs text-rose-500 mt-2">{error}</div>
                   )}
 
-                  <div className="flex items-center justify-between gap-2 mt-3">
-                    {existing ? (
-                      <button
-                        type="button"
-                        onClick={handleDelete}
-                        disabled={submitting}
-                        className="inline-flex items-center gap-1 text-xs text-rose-500 hover:text-rose-600 disabled:opacity-50"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                        Delete
-                      </button>
-                    ) : (
-                      <span className="text-[11px] text-muted-foreground">
-                        ⌘↵ to save · Esc to dismiss
+                  {confirmingDiscard ? (
+                    <div className="mt-3 rounded-md border border-amber-500/40 bg-amber-500/10 p-2.5 flex items-center justify-between gap-2">
+                      <span className="text-xs text-amber-700 dark:text-amber-300">
+                        Discard your unsaved note?
                       </span>
-                    )}
-                    <div className="flex items-center gap-2 ml-auto">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleClose}
-                        disabled={submitting}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        type="submit"
-                        size="sm"
-                        disabled={submitting || comment.trim().length === 0}
-                      >
-                        {submitting ? (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        ) : (
-                          <>
-                            <Send className="w-3.5 h-3.5" />
-                            {existing ? "Save" : "Add"}
-                          </>
-                        )}
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setConfirmingDiscard(false)}
+                        >
+                          Keep editing
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          onClick={discardAndClose}
+                        >
+                          Discard
+                        </Button>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="flex items-center justify-between gap-2 mt-3">
+                      {existing ? (
+                        <button
+                          type="button"
+                          onClick={handleDelete}
+                          disabled={submitting}
+                          className="inline-flex items-center gap-1 text-xs text-rose-500 hover:text-rose-600 disabled:opacity-50"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          Delete
+                        </button>
+                      ) : (
+                        <span className="text-[11px] text-muted-foreground">
+                          ⌘↵ to save · Esc to dismiss
+                        </span>
+                      )}
+                      <div className="flex items-center gap-2 ml-auto">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleClose}
+                          disabled={submitting}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          type="submit"
+                          size="sm"
+                          disabled={submitting || comment.trim().length === 0}
+                        >
+                          {submitting ? (
+                            <>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              Saving…
+                            </>
+                          ) : (
+                            <>
+                              <Send className="w-3.5 h-3.5" />
+                              {existing ? "Save" : "Add"}
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </form>
               </motion.div>
             </Popover.Content>
