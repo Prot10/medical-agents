@@ -36,8 +36,8 @@ AVAILABLE_DATASETS: dict[str, dict[str, str | Path]] = {
     },
     "v5": {
         "path": DATA_ROOT / "neurobench_v5",
-        "name": "NeuroBench v5",
-        "description": "516 cases across 20 conditions (10 new + 10 v4 carryovers)",
+        "name": "NeuroBench",
+        "description": "Tool-augmented neurology benchmark across 20 conditions.",
     },
 }
 
