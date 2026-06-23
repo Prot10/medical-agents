@@ -8,6 +8,8 @@ interface TabItem {
   label: string
   count?: number
   hidden?: boolean
+  /** Show a small attention dot (e.g. an unfinished onboarding step). */
+  dot?: boolean
 }
 
 export function TabBar({
@@ -45,6 +47,12 @@ export function TabBar({
             >
               <span className="relative z-10 flex items-center gap-1.5 sm:gap-2">
                 {tab.label}
+                {tab.dot && (
+                  <span
+                    aria-label="Action needed"
+                    className="w-1.5 h-1.5 rounded-full bg-primary"
+                  />
+                )}
                 {typeof tab.count === "number" && (
                   <span
                     className={cn(

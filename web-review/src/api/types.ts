@@ -127,10 +127,19 @@ export interface AdminAgreementRow {
   consensus: "unanimous" | "agree" | "in_review" | "disagree"
 }
 
+export interface AgreementKappa {
+  overall: number | null
+  interpretation: string | null
+  method: string
+  pairs: Array<{ a: string; b: string; kappa: number; n: number }>
+  note: string | null
+}
+
 export interface AdminAgreement {
   reviewer_codes: string[]
   rows: AdminAgreementRow[]
   consensus_summary: Record<string, number>
+  kappa: AgreementKappa
 }
 
 export interface AdminReviewerProgress extends MyProgress {
@@ -169,6 +178,85 @@ export interface CaseDiff {
   reviewers: CaseDiffReviewer[]
   field_rows: CaseDiffFieldRow[]
   consensus: "unanimous" | "partial" | "disagree"
+}
+
+// --- Tool review ---------------------------------------------------------
+
+export interface ToolMeta {
+  name: string
+  label: string
+  description: string
+  modality: string | null
+  cost_summary: string | null
+}
+
+export interface ConditionToolMapping {
+  condition: string
+  label: string
+  required_tools: string[]
+  optional_tools: string[]
+}
+
+export interface ToolCatalog {
+  version: string
+  tools: ToolMeta[]
+  universal_tools: string[]
+  conditions: ConditionToolMapping[]
+  unmapped_tools: string[]
+}
+
+export interface ProposedTool {
+  id: string
+  name: string
+  description: string
+  rationale: string
+  target_conditions: string[]
+  modality: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface ToolReview {
+  reviewer_code: string
+  dataset_version: string
+  field_annotations: FieldAnnotation[]
+  proposed_tools: ProposedTool[]
+  completed_at: string | null
+  first_opened_at: string | null
+  last_updated_at: string
+}
+
+export interface AdminToolReviewProposal extends ProposedTool {
+  reviewer_code: string
+  reviewer_name: string
+}
+
+export interface AdminToolReviewCoverage {
+  field_path: string
+  total: number
+  severity_counts: Record<string, number>
+  reviewers: string[]
+  comments: Array<{
+    reviewer_code: string
+    reviewer_name: string
+    severity: Severity
+    comment: string
+  }>
+}
+
+export interface AdminToolReviewStatus {
+  reviewer_code: string
+  reviewer_name: string
+  completed: boolean
+  started: boolean
+  proposal_count: number
+  annotation_count: number
+}
+
+export interface AdminToolReviewSummary {
+  proposals: AdminToolReviewProposal[]
+  coverage: AdminToolReviewCoverage[]
+  reviewer_status: AdminToolReviewStatus[]
 }
 
 // --- Full NeuroBenchCase (used by the case detail view) ------------------
@@ -234,6 +322,21 @@ export interface PatientProfile {
   history_present_illness: string
 }
 
+export interface ToolClassification {
+  tool_name: string
+  tool_parameters?: Record<string, unknown>
+  rationale: string
+  citation?: string
+}
+
+export interface SequenceConstraint {
+  before: string
+  after: string
+  reason: string
+  citation?: string
+  severity: "soft" | "hard"
+}
+
 export interface GroundTruth {
   primary_diagnosis: string
   icd_code?: string
@@ -250,6 +353,9 @@ export interface GroundTruth {
     category?: string
     tool_parameters?: Record<string, unknown>
   }>
+  useless_tools?: ToolClassification[]
+  harmful_tools?: ToolClassification[]
+  sequence_constraints?: SequenceConstraint[]
   critical_actions?: string[]
   contraindicated_actions?: string[]
   key_reasoning_points?: string[]

@@ -6,7 +6,7 @@ const PROFILE_STORAGE_KEY = "neurobench.reviewer"
 const ONBOARDED_STORAGE_KEY = "neurobench.review_onboarded"
 const DARK_MODE_STORAGE_KEY = "neurobench.review_dark_mode"
 
-export type ReviewTab = "overview" | "cases" | "methodology" | "admin"
+export type ReviewTab = "overview" | "cases" | "tools" | "methodology" | "admin"
 
 export interface AnnotationDraft {
   fieldPath: string
@@ -28,7 +28,10 @@ export interface ReviewStore {
   searchText: string
   annotationDraft: AnnotationDraft | null
   onboarded: boolean
+  /** Set when an authenticated request 401s, so the gate can explain why. */
+  sessionMessage: string | null
 
+  handleAuthExpired: () => void
   setProfile: (profile: ReviewerProfile | null) => void
   setDarkMode: (dark: boolean) => void
   setActiveTab: (tab: ReviewTab) => void
@@ -78,7 +81,21 @@ export const useReviewStore = create<ReviewStore>((set) => ({
   searchText: "",
   annotationDraft: null,
   onboarded: loadOnboarded(),
+  sessionMessage: null,
 
+  handleAuthExpired: () => {
+    if (typeof localStorage !== "undefined") {
+      localStorage.removeItem(PROFILE_STORAGE_KEY)
+    }
+    set({
+      profile: null,
+      activeTab: "overview",
+      selectedCaseId: null,
+      annotationDraft: null,
+      sessionMessage:
+        "Your session ended — your reviewer code may have been disabled or rotated. Please re-enter it.",
+    })
+  },
   setProfile: (profile) => {
     if (typeof localStorage !== "undefined") {
       if (profile) {
@@ -87,7 +104,7 @@ export const useReviewStore = create<ReviewStore>((set) => ({
         localStorage.removeItem(PROFILE_STORAGE_KEY)
       }
     }
-    set({ profile })
+    set({ profile, sessionMessage: null })
   },
   setDarkMode: (dark) => {
     if (typeof localStorage !== "undefined") {
