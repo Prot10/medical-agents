@@ -17,8 +17,8 @@ router = APIRouter(tags=["methodology"])
 # methodology copy — no template engine needed.
 _METHODOLOGY_PROSE: dict[str, dict[str, Any]] = {
     "v5": {
-        "title": "NeuroBench v5",
-        "tagline": "516 cases across 20 neurological conditions.",
+        "title": "NeuroBench",
+        "tagline": "A benchmark across 20 neurological conditions.",
         "overview": (
             "NeuroBench v5 is a benchmark for tool-augmented LLM agents on "
             "neurological diagnostic reasoning. Each case is a self-contained "
