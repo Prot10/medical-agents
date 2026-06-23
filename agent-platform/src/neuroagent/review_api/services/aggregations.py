@@ -29,6 +29,98 @@ def _empty_status_counts() -> dict[ReviewStatus, int]:
     return {s: 0 for s in _STATUS_VALUES}
 
 
+# Statuses that represent a settled verdict (agreement is only meaningful here;
+# pending/in_progress mean "not yet judged").
+_TERMINAL_STATUSES: tuple[ReviewStatus, ...] = ("approved", "needs_changes")
+
+
+def _cohen_kappa(pairs: list[tuple[str, str]]) -> float | None:
+    """Cohen's kappa for a list of (rater_a_label, rater_b_label) verdicts.
+
+    Returns None when there is no overlap to score. When chance agreement is
+    total (both raters only ever used one identical category), returns 1.0 if
+    they always matched, else 0.0 — avoiding a divide-by-zero.
+    """
+    n = len(pairs)
+    if n == 0:
+        return None
+    labels = {lbl for pair in pairs for lbl in pair}
+    po = sum(1 for a, b in pairs if a == b) / n
+    pe = 0.0
+    for label in labels:
+        pa = sum(1 for a, _ in pairs if a == label) / n
+        pb = sum(1 for _, b in pairs if b == label) / n
+        pe += pa * pb
+    if pe >= 1.0:
+        return 1.0 if po >= 1.0 else 0.0
+    return (po - pe) / (1.0 - pe)
+
+
+def _kappa_interpretation(kappa: float) -> str:
+    """Landis & Koch (1977) strength-of-agreement bands."""
+    if kappa < 0:
+        return "poor"
+    if kappa < 0.20:
+        return "slight"
+    if kappa < 0.40:
+        return "fair"
+    if kappa < 0.60:
+        return "moderate"
+    if kappa < 0.80:
+        return "substantial"
+    return "almost perfect"
+
+
+def _pairwise_kappa(
+    per_case_statuses: dict[str, dict[str, ReviewStatus]],
+    reviewer_codes: list[str],
+) -> dict[str, Any]:
+    """Mean pairwise Cohen's kappa over settled verdicts (approved vs needs_changes).
+
+    Robust to reviewers having rated different subsets of cases: for each pair we
+    score only the cases both reviewers settled. The overall figure is the mean
+    of the per-pair kappas — interpretable with variable participation, unlike a
+    single Fleiss' kappa that assumes a fixed rater count per case.
+    """
+    pair_rows: list[dict[str, Any]] = []
+    for i, a in enumerate(reviewer_codes):
+        for b in reviewer_codes[i + 1 :]:
+            verdicts: list[tuple[str, str]] = []
+            for statuses in per_case_statuses.values():
+                sa, sb = statuses.get(a), statuses.get(b)
+                if sa in _TERMINAL_STATUSES and sb in _TERMINAL_STATUSES:
+                    verdicts.append((sa, sb))
+            kappa = _cohen_kappa(verdicts)
+            if kappa is None:
+                continue
+            pair_rows.append(
+                {
+                    "a": a,
+                    "b": b,
+                    "kappa": round(kappa, 3),
+                    "n": len(verdicts),
+                }
+            )
+
+    if not pair_rows:
+        return {
+            "overall": None,
+            "interpretation": None,
+            "method": "cohen_pairwise_mean",
+            "pairs": [],
+            "note": "Not enough settled (approved/needs_changes) overlap to score agreement yet.",
+        }
+
+    overall = sum(p["kappa"] for p in pair_rows) / len(pair_rows)
+    return {
+        "overall": round(overall, 3),
+        "interpretation": _kappa_interpretation(overall),
+        "method": "cohen_pairwise_mean",
+        "pairs": sorted(pair_rows, key=lambda p: (-p["n"], p["a"], p["b"])),
+        "note": None,
+    }
+
+
 def reviewer_progress_summary(
     store: AnnotationStore,
     version: str,
@@ -135,6 +227,7 @@ def inter_rater_agreement(
         "reviewer_codes": reviewer_codes,
         "rows": rows,
         "consensus_summary": dict(consensus_counts),
+        "kappa": _pairwise_kappa(per_case_statuses, reviewer_codes),
     }
 
 
