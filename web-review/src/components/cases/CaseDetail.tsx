@@ -4,7 +4,7 @@ import {
   ChevronRight,
   Loader2,
 } from "lucide-react"
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
 import type {
   CaseIndexEntry,
@@ -13,6 +13,7 @@ import type {
   NeuroBenchCase,
   PatientProfile,
   ReviewStatus,
+  ToolClassification,
 } from "@/api/types"
 import {
   useCaseDetail,
@@ -21,6 +22,7 @@ import {
   useCreateComment,
   useDeleteAnnotation,
   useDeleteComment,
+  useHeartbeat,
   useMyReviews,
   useReview,
   useSetStatus,
@@ -54,6 +56,23 @@ export function CaseDetail({ caseId }: { caseId: string }) {
   const createComment = useCreateComment(version)
   const deleteComment = useDeleteComment(version)
   const setStatus = useSetStatus(version)
+  const heartbeat = useHeartbeat()
+
+  // Accumulate time-on-case server-side. Tick every 30s; skip while the tab is
+  // hidden so idle/background time isn't counted.
+  useEffect(() => {
+    let last = Date.now()
+    const id = window.setInterval(() => {
+      const now = Date.now()
+      const seconds = Math.round((now - last) / 1000)
+      last = now
+      if (document.hidden || seconds < 1) return
+      heartbeat.mutate({ version, caseId, seconds: Math.min(600, seconds) })
+    }, 30_000)
+    return () => window.clearInterval(id)
+    // heartbeat.mutate is stable; intentionally keyed on the open case only.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [caseId, version])
 
   const onCreate = useCallback(
     async (vars: Parameters<typeof createAnnotation.mutateAsync>[0]) => {
@@ -100,14 +119,21 @@ export function CaseDetail({ caseId }: { caseId: string }) {
       onUpdate={onUpdate}
       onDelete={onDelete}
     >
-      <button
-        type="button"
-        onClick={() => setSelectedCaseId(null)}
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-5"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Back to all cases
-      </button>
+      <div className="flex items-center justify-between gap-3 mb-5">
+        <button
+          type="button"
+          onClick={() => setSelectedCaseId(null)}
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to all cases
+        </button>
+        {(review.data?.time_spent_seconds ?? 0) > 0 && (
+          <span className="text-[11px] text-muted-foreground tabular-nums">
+            {formatDuration(review.data!.time_spent_seconds)} on this case
+          </span>
+        )}
+      </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_22rem] gap-5">
         <div className="space-y-5 min-w-0">
@@ -717,25 +743,81 @@ function GroundTruthSection({ groundTruth }: { groundTruth: GroundTruth }) {
                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/15 text-primary text-xs font-semibold flex items-center justify-center">
                       {a.step}
                     </span>
-                    <span>
-                      {a.action}
-                      {a.tool_name && (
-                        <span className="ml-2 px-1.5 py-0.5 rounded bg-secondary text-[10px] font-mono">
-                          {a.tool_name}
-                        </span>
+                    <div className="space-y-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span>{a.action}</span>
+                        {a.category && <ActionTierBadge category={a.category} />}
+                        {a.tool_name && (
+                          <span className="px-1.5 py-0.5 rounded bg-secondary text-[10px] font-mono">
+                            {a.tool_name}
+                          </span>
+                        )}
+                      </div>
+                      {a.expected_finding && (
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                          <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70">
+                            Expected ·{" "}
+                          </span>
+                          {a.expected_finding}
+                        </p>
                       )}
-                      {a.category === "contraindicated" && (
-                        <span className="ml-2 text-xs text-rose-500">
-                          contraindicated
-                        </span>
-                      )}
-                    </span>
+                      {a.tool_parameters &&
+                        Object.keys(a.tool_parameters).length > 0 && (
+                          <p className="text-[11px] font-mono text-muted-foreground/80 break-words">
+                            {formatParams(a.tool_parameters)}
+                          </p>
+                        )}
+                    </div>
                   </li>
                 </AnnotatableField>
               ))}
             </ol>
           </div>
         )}
+
+        {groundTruth.sequence_constraints &&
+          groundTruth.sequence_constraints.length > 0 && (
+            <div>
+              <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
+                Ordering constraints
+              </h4>
+              <div className="space-y-2">
+                {groundTruth.sequence_constraints.map((sc, i) => (
+                  <AnnotatableField
+                    key={i}
+                    path={`ground_truth.sequence_constraints[${i}]`}
+                    snippet={`${sc.before} → ${sc.after}`}
+                    attachRight
+                  >
+                    <div className="bg-card border border-border rounded-lg p-3 pr-6">
+                      <div className="flex items-center gap-2 flex-wrap text-sm">
+                        <span className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-secondary">
+                          {sc.before}
+                        </span>
+                        <span className="text-muted-foreground">→</span>
+                        <span className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-secondary">
+                          {sc.after}
+                        </span>
+                        <span
+                          className={cn(
+                            "ml-1 px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider border",
+                            sc.severity === "hard"
+                              ? "border-rose-500/40 bg-rose-500/10 text-rose-600 dark:text-rose-300"
+                              : "border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-300",
+                          )}
+                        >
+                          {sc.severity}
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground leading-relaxed mt-1">
+                        {sc.reason}
+                      </p>
+                    </div>
+                  </AnnotatableField>
+                ))}
+              </div>
+            </div>
+          )}
 
         {groundTruth.critical_actions &&
           groundTruth.critical_actions.length > 0 && (
@@ -756,6 +838,24 @@ function GroundTruthSection({ groundTruth }: { groundTruth: GroundTruth }) {
               basePath="ground_truth.contraindicated_actions"
             />
           )}
+
+        {groundTruth.harmful_tools && groundTruth.harmful_tools.length > 0 && (
+          <ToolClassGroup
+            title="Harmful tools (safety)"
+            tone="danger"
+            items={groundTruth.harmful_tools}
+            basePath="ground_truth.harmful_tools"
+          />
+        )}
+
+        {groundTruth.useless_tools && groundTruth.useless_tools.length > 0 && (
+          <ToolClassGroup
+            title="Useless tools (low yield)"
+            tone="muted"
+            items={groundTruth.useless_tools}
+            basePath="ground_truth.useless_tools"
+          />
+        )}
 
         {groundTruth.red_herrings && groundTruth.red_herrings.length > 0 && (
           <div>
@@ -852,6 +952,103 @@ function ListGroup({
               )}
             >
               {item}
+            </li>
+          </AnnotatableField>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+function formatDuration(seconds: number): string {
+  if (seconds < 60) return `${seconds}s`
+  const m = Math.floor(seconds / 60)
+  if (m < 60) return `${m}m`
+  const h = Math.floor(m / 60)
+  return `${h}h ${m % 60}m`
+}
+
+function ActionTierBadge({ category }: { category: string }) {
+  const style: Record<string, string> = {
+    required:
+      "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
+    recommended:
+      "border-sky-500/40 bg-sky-500/10 text-sky-700 dark:text-sky-300",
+    optional: "border-border bg-secondary/50 text-muted-foreground",
+    contraindicated:
+      "border-rose-500/40 bg-rose-500/10 text-rose-700 dark:text-rose-300",
+  }
+  return (
+    <span
+      className={cn(
+        "px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider border",
+        style[category] ?? style.optional,
+      )}
+    >
+      {category}
+    </span>
+  )
+}
+
+function formatParams(params: Record<string, unknown>): string {
+  return Object.entries(params)
+    .map(([k, v]) => {
+      const value = Array.isArray(v)
+        ? v.join(", ")
+        : v !== null && typeof v === "object"
+          ? JSON.stringify(v)
+          : String(v)
+      return `${k}: ${value}`
+    })
+    .join(" · ")
+}
+
+function ToolClassGroup({
+  title,
+  items,
+  tone,
+  basePath,
+}: {
+  title: string
+  items: ToolClassification[]
+  tone: "danger" | "muted"
+  basePath: string
+}) {
+  const toneClasses =
+    tone === "danger"
+      ? "border-rose-500/40 bg-rose-500/5"
+      : "border-border bg-secondary/30"
+  return (
+    <div>
+      <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
+        {title}
+      </h4>
+      <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        {items.map((t, i) => (
+          <AnnotatableField
+            key={i}
+            path={`${basePath}[${i}]`}
+            snippet={t.tool_name}
+            attachRight
+          >
+            <li
+              className={cn(
+                "text-sm p-2.5 border rounded-md leading-relaxed pr-6",
+                toneClasses,
+              )}
+            >
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-secondary">
+                  {t.tool_name}
+                </span>
+                {t.tool_parameters &&
+                  Object.keys(t.tool_parameters).length > 0 && (
+                    <span className="text-[11px] font-mono text-muted-foreground/80 break-words">
+                      {formatParams(t.tool_parameters)}
+                    </span>
+                  )}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">{t.rationale}</p>
             </li>
           </AnnotatableField>
         ))}
