@@ -4,6 +4,7 @@ import {
   GitCompareArrows,
   Loader2,
   Users,
+  Wrench,
 } from "lucide-react"
 import { useMemo, useState } from "react"
 
@@ -13,6 +14,7 @@ import {
   useAdminHotspots,
   useAdminProgress,
 } from "@/hooks/useReview"
+import { useAdminToolReview } from "@/hooks/useToolReview"
 import { conditionLabel, conditionShort } from "@/lib/conditions"
 import { cn } from "@/lib/utils"
 import { useReviewStore } from "@/stores/reviewStore"
@@ -25,13 +27,14 @@ import type {
   ReviewStatus,
 } from "@/api/types"
 
-type AdminView = "agreement" | "progress" | "hotspots" | "diff"
+type AdminView = "agreement" | "progress" | "hotspots" | "diff" | "tools"
 
 const VIEWS: Array<{ id: AdminView; label: string; icon: React.ComponentType<{ className?: string }> }> = [
   { id: "agreement", label: "Inter-rater agreement", icon: GitCompareArrows },
   { id: "progress", label: "Reviewer progress", icon: ChartColumn },
   { id: "hotspots", label: "Field hotspots", icon: Flame },
   { id: "diff", label: "Side-by-side diff", icon: Users },
+  { id: "tools", label: "Tool proposals", icon: Wrench },
 ]
 
 export function AdminTab() {
@@ -69,6 +72,7 @@ export function AdminTab() {
         {view === "progress" && <ProgressView />}
         {view === "hotspots" && <HotspotsView />}
         {view === "diff" && <DiffView />}
+        {view === "tools" && <ToolReviewView />}
       </div>
     </div>
   )
@@ -96,6 +100,7 @@ function AgreementView() {
 
   return (
     <div className="space-y-4">
+      <KappaCard kappa={data.kappa} />
       <SummaryStrip
         items={[
           {
@@ -183,6 +188,50 @@ function AgreementView() {
           </div>
         )}
       </div>
+    </div>
+  )
+}
+
+function KappaCard({ kappa }: { kappa: import("@/api/types").AgreementKappa }) {
+  const hasValue = kappa.overall != null
+  return (
+    <div className="rounded-2xl border border-border bg-card p-4">
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div>
+          <div className="text-xs uppercase tracking-wider text-muted-foreground">
+            Inter-rater reliability
+          </div>
+          <div className="text-sm text-muted-foreground mt-0.5">
+            Mean pairwise Cohen's κ on settled verdicts (approved vs. needs changes)
+          </div>
+        </div>
+        <div className="text-right">
+          <div className="text-3xl font-semibold tabular-nums">
+            {hasValue ? kappa.overall!.toFixed(2) : "—"}
+          </div>
+          {kappa.interpretation && (
+            <div className="text-xs uppercase tracking-wider text-muted-foreground">
+              {kappa.interpretation}
+            </div>
+          )}
+        </div>
+      </div>
+      {kappa.note && (
+        <p className="text-xs text-muted-foreground mt-2">{kappa.note}</p>
+      )}
+      {kappa.pairs.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mt-3">
+          {kappa.pairs.map((p) => (
+            <span
+              key={`${p.a}-${p.b}`}
+              className="text-[11px] tabular-nums px-2 py-0.5 rounded-full bg-secondary/60 text-muted-foreground"
+              title={`${p.n} cases both settled`}
+            >
+              {p.a}↔{p.b}: <span className="font-mono">{p.kappa.toFixed(2)}</span> (n={p.n})
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -532,6 +581,150 @@ function DiffTable({ diff, showAll }: { diff: CaseDiff; showAll: boolean }) {
             </div>
           ))}
         </div>
+      </div>
+    </div>
+  )
+}
+
+// --- Tool proposals & coverage ---------------------------------------
+
+function ToolReviewView() {
+  const version = useReviewStore((s) => s.datasetVersion)
+  const { data, isLoading, error } = useAdminToolReview(version)
+  if (isLoading) return <CenteredLoader />
+  if (error || !data) return <ErrorBox />
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-sm font-semibold mb-2">Reviewer completion</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+          {data.reviewer_status.map((r) => (
+            <div
+              key={r.reviewer_code}
+              className="rounded-xl border border-border bg-card p-3"
+            >
+              <div className="text-sm font-medium truncate">{r.reviewer_name}</div>
+              <div className="font-mono text-[10px] text-muted-foreground tracking-wider">
+                {r.reviewer_code}
+              </div>
+              <div className="mt-2 flex items-center justify-between text-xs">
+                <span
+                  className={cn(
+                    "px-2 py-0.5 rounded-full border text-[11px]",
+                    r.completed
+                      ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                      : r.started
+                        ? "border-sky-500/40 bg-sky-500/10 text-sky-700 dark:text-sky-300"
+                        : "border-slate-500/30 bg-slate-500/10 text-slate-600 dark:text-slate-300",
+                  )}
+                >
+                  {r.completed ? "Reviewed" : r.started ? "In progress" : "Not started"}
+                </span>
+                <span className="text-muted-foreground tabular-nums">
+                  {r.proposal_count}p · {r.annotation_count}f
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-sm font-semibold mb-2">
+          Proposed tools ({data.proposals.length})
+        </h3>
+        {data.proposals.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-border bg-card/40 p-10 text-center text-sm text-muted-foreground">
+            No tools proposed yet.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            {data.proposals.map((p) => (
+              <div key={p.id} className="rounded-2xl border border-border bg-card p-4">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-sm font-semibold">{p.name}</span>
+                  {p.modality && (
+                    <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-border text-muted-foreground">
+                      {p.modality}
+                    </span>
+                  )}
+                  <span className="text-[11px] text-muted-foreground ml-auto">
+                    {p.reviewer_name}
+                  </span>
+                </div>
+                <p className="text-xs text-foreground/80 mt-1.5 leading-relaxed">
+                  {p.description}
+                </p>
+                {p.rationale && (
+                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                    <span className="font-medium">Why: </span>
+                    {p.rationale}
+                  </p>
+                )}
+                {p.target_conditions.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {p.target_conditions.map((k) => (
+                      <span
+                        key={k}
+                        className="text-[10px] px-1.5 py-0.5 rounded-full bg-secondary/60 text-muted-foreground"
+                      >
+                        {conditionShort(k)}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div>
+        <h3 className="text-sm font-semibold mb-2">
+          Coverage flags ({data.coverage.length})
+        </h3>
+        {data.coverage.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-border bg-card/40 p-10 text-center text-sm text-muted-foreground">
+            No coverage annotations yet.
+          </div>
+        ) : (
+          <div className="overflow-x-auto rounded-2xl border border-border bg-card">
+            <table className="w-full text-sm">
+              <thead className="bg-secondary/40 border-b border-border">
+                <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground">
+                  <th className="px-4 py-2.5 font-semibold">Target</th>
+                  <th className="px-4 py-2.5 font-semibold">Reviewers</th>
+                  <th className="px-4 py-2.5 font-semibold">Comments</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.coverage.map((row) => (
+                  <tr key={row.field_path} className="border-b border-border/60 align-top">
+                    <td className="px-4 py-3 font-mono text-xs tracking-wider">
+                      {row.field_path}
+                    </td>
+                    <td className="px-4 py-3 text-xs">{row.reviewers.join(", ")}</td>
+                    <td className="px-4 py-3 space-y-1.5">
+                      {row.comments.map((c, i) => (
+                        <div key={i} className="flex items-start gap-1.5">
+                          <SeverityPill severity={c.severity} />
+                          <p className="text-xs leading-relaxed text-foreground/90 whitespace-pre-wrap">
+                            {c.comment}
+                            <span className="text-muted-foreground">
+                              {" "}
+                              — {c.reviewer_name}
+                            </span>
+                          </p>
+                        </div>
+                      ))}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   )
