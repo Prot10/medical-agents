@@ -15,6 +15,7 @@ from ..services.aggregations import (
     inter_rater_agreement,
 )
 from ..services.reviewer_codes import ReviewerCodeRegistry
+from ..services.tool_review_aggregations import tool_review_summary
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -96,5 +97,20 @@ def get_case_diff(
         request.app.state.annotation_store,
         version,
         case_id,
+        registry.all(),
+    )
+
+
+@router.get("/datasets/{version}/tool-review")
+def get_tool_review_summary(
+    version: str,
+    request: Request,
+    _admin: ReviewerCode = Depends(require_admin),
+    registry: ReviewerCodeRegistry = Depends(get_reviewer_registry),
+) -> dict[str, Any]:
+    _require_dataset(request, version)
+    return tool_review_summary(
+        request.app.state.tool_review_store,
+        version,
         registry.all(),
     )
