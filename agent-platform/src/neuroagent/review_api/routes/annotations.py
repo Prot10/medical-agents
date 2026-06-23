@@ -30,6 +30,11 @@ from ..services.annotation_store import AnnotationStore
 
 router = APIRouter(tags=["annotations"])
 
+# Per-case caps (mirror the schema max_length) to guard against disk-exhaustion
+# from a single reviewer hammering the create endpoints.
+MAX_ANNOTATIONS_PER_CASE = 2000
+MAX_COMMENTS_PER_CASE = 500
+
 
 def _utcnow() -> datetime:
     return datetime.now(timezone.utc)
@@ -133,6 +138,11 @@ def create_annotation(
             status_code=status.HTTP_409_CONFLICT,
             detail=f"Annotation '{body.id}' already exists",
         )
+    if len(review.field_annotations) >= MAX_ANNOTATIONS_PER_CASE:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Annotation limit reached for this case",
+        )
     now = _utcnow()
     review.field_annotations.append(
         FieldAnnotation(**body.model_dump(), created_at=now, updated_at=now)
@@ -218,6 +228,11 @@ def create_comment(
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail=f"Comment '{body.id}' already exists",
+        )
+    if len(review.case_comments) >= MAX_COMMENTS_PER_CASE:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Comment limit reached for this case",
         )
     now = _utcnow()
     review.case_comments.append(
