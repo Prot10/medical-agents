@@ -16,9 +16,16 @@ _REPO_ROOT = Path(__file__).resolve().parents[4]
 DATA_ROOT = _REPO_ROOT / "data"
 REVIEW_DATA_DIR = DATA_ROOT / "review"
 ANNOTATIONS_DIR = REVIEW_DATA_DIR / "annotations"
+TOOL_REVIEWS_DIR = REVIEW_DATA_DIR / "tool_reviews"
 
 REVIEW_CONFIG_DIR = _REPO_ROOT / "agent-platform" / "config" / "review"
 REVIEWER_CODES_PATH = REVIEW_CONFIG_DIR / "reviewer_codes.yaml"
+
+# Sources for the tool catalog (existing 12-tool list + per-condition mapping).
+TOOL_COSTS_PATH = _REPO_ROOT / "agent-platform" / "config" / "tool_costs.yaml"
+CONDITIONS_YAML_PATH = (
+    _REPO_ROOT / "dataset-generation" / "config" / "conditions.yaml"
+)
 
 WEB_DIST = _REPO_ROOT / "web-review" / "dist"
 
