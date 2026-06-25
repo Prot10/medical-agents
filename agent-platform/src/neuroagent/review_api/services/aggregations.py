@@ -204,11 +204,13 @@ def inter_rater_agreement(
         filled: dict[str, ReviewStatus] = {
             code: statuses.get(code, "pending") for code in reviewer_codes
         }
-        unique = set(filled.values())
-        if len(unique) == 1:
-            consensus = "unanimous"
-        elif "needs_changes" in unique or "approved" in unique:
-            consensus = "disagree" if len(unique) > 1 else "agree"
+        # "Unanimous" only when every reviewer has reached a terminal status
+        # (approved / needs_changes) AND agrees. Mixed terminal+pending is
+        # "in_review" — disagreement can't be measured before everyone weighs in.
+        terminal = {"approved", "needs_changes"}
+        statuses_set = set(filled.values())
+        if statuses_set <= terminal:
+            consensus = "unanimous" if len(statuses_set) == 1 else "disagree"
         else:
             consensus = "in_review"
         consensus_counts[consensus] += 1
