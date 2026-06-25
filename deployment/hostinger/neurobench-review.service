@@ -1,0 +1,35 @@
+[Unit]
+Description=NeuroBench Review API (FastAPI/uvicorn)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=neuroreview
+Group=neuroreview
+WorkingDirectory=/home/neuroreview/medical-agents
+
+# Bind to localhost only — nginx is the public entry point.
+# Use the venv's uvicorn directly (not `uv run`) — avoids a dep-resolution
+# round-trip on every restart and works under ProtectHome=read-only because
+# the venv is already populated. Refresh deps with `uv sync` before restart.
+ExecStart=/home/neuroreview/medical-agents/.venv/bin/uvicorn neuroagent.review_api.app:app --host 127.0.0.1 --port 8889
+
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# Hardening — none of these break a stateless FastAPI app, all reduce blast radius.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/neuroreview/medical-agents/data
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target
