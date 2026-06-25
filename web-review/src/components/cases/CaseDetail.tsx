@@ -140,6 +140,7 @@ export function CaseDetail({ caseId }: { caseId: string }) {
           <CaseHeader caseData={caseDetail.data} status={status} />
           <PatientSection patient={caseDetail.data.patient} />
           <NeuroExamSection patient={caseDetail.data.patient} />
+          <PhysicalExamSection patient={caseDetail.data.patient} />
           <InitialWorkupSection
             toolOutputs={
               caseDetail.data.initial_tool_outputs as Record<string, unknown> | null
@@ -497,6 +498,35 @@ function NeuroExamSection({ patient }: { patient: PatientProfile }) {
               </h4>
               <p className="text-sm leading-relaxed text-foreground/90 whitespace-pre-wrap">
                 {exam[s.key]}
+              </p>
+            </div>
+          </AnnotatableField>
+        ))}
+      </div>
+    </Section>
+  )
+}
+
+function PhysicalExamSection({ patient }: { patient: PatientProfile }) {
+  const exam = patient.physical_exam
+  if (!exam) return null
+  const keys = Object.keys(exam).filter((k) => exam[k])
+  if (keys.length === 0) return null
+  return (
+    <Section title="Physical exam">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {keys.map((k) => (
+          <AnnotatableField
+            key={k}
+            path={`patient.physical_exam.${k}`}
+            snippet={(exam[k] ?? "").slice(0, 200)}
+          >
+            <div className="pr-6">
+              <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 capitalize">
+                {k.replace(/_/g, " ")}
+              </h4>
+              <p className="text-sm leading-relaxed text-foreground/90 whitespace-pre-wrap">
+                {exam[k]}
               </p>
             </div>
           </AnnotatableField>
