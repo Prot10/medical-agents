@@ -155,3 +155,30 @@ class SpecializedTestReport(BaseModel):
     quantitative_data: dict[str, str] | None = None  # scores, latencies, etc.
     impression: str = ""
     recommended_actions: list[str] = []
+
+
+class ConsultationOutput(BaseModel):
+    """Output of `consult_medical_specialist`.
+
+    The upstream generator produced inconsistent shapes across cases:
+    - `recommendation` (singular string) vs `recommendations` (plural string or list)
+    - `findings` as free-text string in some cases, list of strings in others, and
+      list of `{assessment, recommendation}` dicts in three NPH cases.
+
+    Fields are typed permissively to accept every observed shape without rewriting
+    the source case JSON. `extra="allow"` keeps any new generator fields visible
+    to the review platform instead of silently discarding them.
+    """
+
+    specialty: str = ""
+    impression: str = ""
+    findings: str | list[str] | list[dict[str, str]] = ""
+    recommendation: str = ""
+    recommendations: str | list[str] | list[dict[str, str]] = ""
+    recommended_actions: list[str] = []
+    urgency: str = ""
+    consultation_note: str = ""
+    consultation_findings: str = ""
+    reason_for_consult: str = ""
+
+    model_config = {"extra": "allow"}

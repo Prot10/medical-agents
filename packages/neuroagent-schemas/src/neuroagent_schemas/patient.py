@@ -55,6 +55,12 @@ class PatientProfile(BaseModel):
     demographics: Demographics
     clinical_history: ClinicalHistory
     neurological_exam: NeurologicalExam
+    # General physical exam findings, keyed by system (general, chest, abdomen, etc.).
+    # Empty in most cases; populated for inpatient/ICU presentations (e.g., bulbar
+    # MG crisis, MG-RM15) where non-neurological physical findings are diagnostically
+    # relevant. The `neurological` key, when present, is the same content as
+    # `neurological_exam` expressed in a different free-text framing.
+    physical_exam: dict[str, str] = {}
     vitals: Vitals
     chief_complaint: str
     history_present_illness: str

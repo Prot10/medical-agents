@@ -42,17 +42,6 @@ class NeurologicalCondition(str, Enum):
     FUNCTIONAL_NEUROLOGICAL_DISORDER = "functional_neurological_disorder"
 
 
-class Modality(str, Enum):
-    EEG = "eeg"
-    MRI = "mri"
-    FMRI = "fmri"
-    ECG = "ecg"
-    LABS = "labs"
-    CSF = "csf"
-    EMG_NCS = "emg_ncs"
-    CLINICAL_HISTORY = "clinical_history"
-
-
 class CaseDifficulty(str, Enum):
     STRAIGHTFORWARD = "straightforward"
     MODERATE = "moderate"
