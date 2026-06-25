@@ -8,6 +8,7 @@ import {
 } from "lucide-react"
 import { useMemo, useState } from "react"
 
+import { ReviewApiError } from "@/api/client"
 import {
   useAdminAgreement,
   useAdminCaseDiff,
@@ -15,7 +16,7 @@ import {
   useAdminProgress,
 } from "@/hooks/useReview"
 import { useAdminToolReview } from "@/hooks/useToolReview"
-import { conditionLabel, conditionShort } from "@/lib/conditions"
+import { conditionShort } from "@/lib/conditions"
 import { cn } from "@/lib/utils"
 import { useReviewStore } from "@/stores/reviewStore"
 import { SeverityPill } from "@/components/ui/SeverityPill"
@@ -96,7 +97,7 @@ function AgreementView() {
   }, [data, consensusFilter, search])
 
   if (isLoading) return <CenteredLoader />
-  if (error || !data) return <ErrorBox />
+  if (error || !data) return <ErrorBox error={error} />
 
   return (
     <div className="space-y-4">
@@ -265,7 +266,7 @@ function ProgressView() {
   const version = useReviewStore((s) => s.datasetVersion)
   const { data, isLoading, error } = useAdminProgress(version)
   if (isLoading) return <CenteredLoader />
-  if (error || !data) return <ErrorBox />
+  if (error || !data) return <ErrorBox error={error} />
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -343,7 +344,7 @@ function HotspotsView() {
   const { data, isLoading, error } = useAdminHotspots(version)
   const [search, setSearch] = useState("")
   if (isLoading) return <CenteredLoader />
-  if (error || !data) return <ErrorBox />
+  if (error || !data) return <ErrorBox error={error} />
 
   const filtered = data.filter((d) =>
     d.field_path.toLowerCase().includes(search.toLowerCase()),
@@ -458,7 +459,7 @@ function DiffView() {
         </div>
       )}
       {caseId && isLoading && <CenteredLoader />}
-      {caseId && error && <ErrorBox />}
+      {caseId && error && <ErrorBox error={error} />}
       {caseId && data && <DiffTable diff={data} showAll={showAll} />}
     </div>
   )
@@ -592,7 +593,7 @@ function ToolReviewView() {
   const version = useReviewStore((s) => s.datasetVersion)
   const { data, isLoading, error } = useAdminToolReview(version)
   if (isLoading) return <CenteredLoader />
-  if (error || !data) return <ErrorBox />
+  if (error || !data) return <ErrorBox error={error} />
 
   return (
     <div className="space-y-6">
@@ -740,10 +741,17 @@ function CenteredLoader() {
   )
 }
 
-function ErrorBox() {
+function ErrorBox({ error }: { error?: unknown }) {
+  // Only surface ReviewApiError details — generic Error.message can leak
+  // internal stack traces in dev builds, so we keep the fallback generic.
+  const detail =
+    error instanceof ReviewApiError ? error.message : null
   return (
     <div className="text-center py-12 text-rose-500 text-sm">
-      Could not load admin data.
+      <div>Could not load admin data.</div>
+      {detail && (
+        <div className="mt-1 text-xs text-rose-400/80 font-mono">{detail}</div>
+      )}
     </div>
   )
 }
@@ -778,5 +786,3 @@ function SummaryStrip({
   )
 }
 
-// Suppress unused-import warnings if conditionLabel isn't called above.
-void conditionLabel
