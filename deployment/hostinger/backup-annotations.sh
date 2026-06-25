@@ -22,7 +22,7 @@ set -euo pipefail
 DATA_ROOT="/home/neuroreview/medical-agents/data/review"
 ANN_DIR="$DATA_ROOT/annotations"
 BACKUP_DIR="$DATA_ROOT/backups"
-KEEP_DAYS="${KEEP_DAYS:-30}"
+KEEP_DAYS="${KEEP_DAYS:-365}"
 
 mkdir -p "$BACKUP_DIR"
 
