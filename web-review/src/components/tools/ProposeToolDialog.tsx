@@ -132,6 +132,7 @@ export function ProposeToolDialog({
                       autoFocus
                       value={name}
                       onChange={(e) => setName(e.target.value)}
+                      maxLength={120}
                       placeholder="e.g. Order genetic counseling"
                       className="w-full h-9 px-3 bg-background border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                     />
@@ -141,6 +142,7 @@ export function ProposeToolDialog({
                     <textarea
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
+                      maxLength={4000}
                       rows={3}
                       placeholder="Describe the test/action and the output it returns."
                       className="w-full bg-background border border-input rounded-md text-sm p-3 leading-relaxed resize-none focus:outline-none focus:ring-2 focus:ring-ring"
@@ -151,6 +153,7 @@ export function ProposeToolDialog({
                     <textarea
                       value={rationale}
                       onChange={(e) => setRationale(e.target.value)}
+                      maxLength={4000}
                       rows={2}
                       placeholder="What gap in the current tool list does it fill?"
                       className="w-full bg-background border border-input rounded-md text-sm p-3 leading-relaxed resize-none focus:outline-none focus:ring-2 focus:ring-ring"
@@ -161,6 +164,7 @@ export function ProposeToolDialog({
                     <input
                       value={modality}
                       onChange={(e) => setModality(e.target.value)}
+                      maxLength={120}
                       placeholder="e.g. genetics, neurophysiology, imaging"
                       className="w-full h-9 px-3 bg-background border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                     />
