@@ -18,7 +18,8 @@
     "patient_id": "UNKNOWN",
     "demographics": {
       "age": 46,
-      "sex": "female"
+      "sex": "female",
+      "bmi": 25.7
     },
     "clinical_history": {
       "medications": [
@@ -56,31 +57,22 @@
       "gait": "Gait normal."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
-      "hr": 72,
-      "temp": 37.0,
-      "rr": 14,
-      "spo2": 98
+      "bp_systolic": 126,
+      "bp_diastolic": 78,
+      "hr": 74,
+      "temp": 36.7,
+      "rr": 13,
+      "spo2": 99
     },
-    "history_present_illness": "A 46-year-old Australian woman presented to the neurology clinic requesting a second opinion after being started on warfarin 8 months ago for a presumed TIA. She has had four episodes over the past year of transient expressive word-finding difficulty lasting 15-25 minutes, each followed by a severe left temporal throbbing headache with nausea and photophobia lasting 8-12 hours. The treating team at a regional hospital determined that these were 'probable TIA events' and started warfarin after a work-up which included an MRI showing 'white matter changes' and an ECG reportedly showing 'intermittent AF.'\n\nShe is now bleeding from her gums and had a prolonged nosebleed last month. Her INR was 3.8 at last check (above therapeutic range). She has no personal history of stroke, no cardiac disease, and was entirely healthy prior to these episodes. On careful history review, she has had occasional brief 'light shows' in her peripheral vision for several years before the main episodes — these were 'like stars or sparkles' lasting 5-10 minutes and dismissed as tiredness.\n\nOn review of external records: the 'ECG showing AF' appears to have been a rhythm strip taken during a palpitation episode; she subsequently had a normal 24-hour Holter. The 'white matter changes' on the prior MRI report are described as 'small non-specific subcortical foci — non-specific, see clinical correlation.' Her mother had 'bad headaches with visual aura' throughout her reproductive years."
-  },
-  "vitals": {
-    "temperature": 36.7,
-    "heart_rate": 74,
-    "blood_pressure": "126/78",
-    "respiratory_rate": 13,
-    "oxygen_saturation": 99,
-    "weight_kg": 70,
-    "height_cm": 165
-  },
-  "physical_exam": {
-    "general": "Well-appearing; slight gingival bleeding noted on inspection; anxious; concerned about warfarin side effects",
-    "neurological": "Normal language: fluent, normal repetition, normal comprehension, normal naming. Normal cranial nerves. Motor 5/5. DTR 2+ symmetric. Sensation intact. Coordination normal. Gait normal.",
-    "cardiovascular": "Regular rate and rhythm; no murmurs; no carotid bruits",
-    "respiratory": "Clear",
-    "abdomen": "Soft; no hepatosplenomegaly",
-    "extremities": "No edema; no petechiae"
+    "history_present_illness": "A 46-year-old Australian woman presented to the neurology clinic requesting a second opinion after being started on warfarin 8 months ago for a presumed TIA. She has had four episodes over the past year of transient expressive word-finding difficulty lasting 15-25 minutes, each followed by a severe left temporal throbbing headache with nausea and photophobia lasting 8-12 hours. The treating team at a regional hospital determined that these were 'probable TIA events' and started warfarin after a work-up which included an MRI showing 'white matter changes' and an ECG reportedly showing 'intermittent AF.'\n\nShe is now bleeding from her gums and had a prolonged nosebleed last month. Her INR was 3.8 at last check (above therapeutic range). She has no personal history of stroke, no cardiac disease, and was entirely healthy prior to these episodes. On careful history review, she has had occasional brief 'light shows' in her peripheral vision for several years before the main episodes — these were 'like stars or sparkles' lasting 5-10 minutes and dismissed as tiredness.\n\nOn review of external records: the 'ECG showing AF' appears to have been a rhythm strip taken during a palpitation episode; she subsequently had a normal 24-hour Holter. The 'white matter changes' on the prior MRI report are described as 'small non-specific subcortical foci — non-specific, see clinical correlation.' Her mother had 'bad headaches with visual aura' throughout her reproductive years.",
+    "physical_exam": {
+      "general": "Well-appearing; slight gingival bleeding noted on inspection; anxious; concerned about warfarin side effects",
+      "neurological": "Normal language: fluent, normal repetition, normal comprehension, normal naming. Normal cranial nerves. Motor 5/5. DTR 2+ symmetric. Sensation intact. Coordination normal. Gait normal.",
+      "cardiovascular": "Regular rate and rhythm; no murmurs; no carotid bruits",
+      "respiratory": "Clear",
+      "abdomen": "Soft; no hepatosplenomegaly",
+      "extremities": "No edema; no petechiae"
+    }
   },
   "ground_truth": {
     "primary_diagnosis": "Migraine with aphasic aura (ICHD-3 1.2.1) — misdiagnosed as TIA; warfarin overtreatment causing supratherapeutic INR and bleeding; warfarin should be stopped",
@@ -231,21 +223,23 @@
         "field_path": "patient.history_present_illness",
         "intended_effect": "May appear to support vascular diagnosis",
         "correct_interpretation": "The report explicitly notes 'non-specific — see clinical correlation'; WMH are common in migraineurs and non-actionable"
+      },
+      {
+        "data_point": "Prior ECG reportedly showing 'intermittent AF' — TIA anticoagulation appeared justified",
+        "location": "",
+        "field_path": "",
+        "intended_effect": "If AF was confirmed, TIA anticoagulation with warfarin is standard of care",
+        "correct_interpretation": "Review of original records showed a single rhythm strip during palpitations — not diagnostic AF; subsequent 48-hour Holter shows no AF; the original AF diagnosis was incorrect; warfarin was never indicated"
+      },
+      {
+        "data_point": "White matter changes on MRI — supporting TIA/vascular diagnosis",
+        "location": "",
+        "field_path": "",
+        "intended_effect": "WMH are associated with cerebrovascular disease in older adults; original team interpreted them as TIA-related",
+        "correct_interpretation": "WMH are non-specific subcortical lesions consistent with longstanding migraine; no periventricular lesions, no lacunar infarcts, no large vessel territory changes; radiologist clearly stated 'non-specific, clinical correlation'"
       }
     ]
   },
-  "red_herrings": [
-    {
-      "finding": "Prior ECG reportedly showing 'intermittent AF' — TIA anticoagulation appeared justified",
-      "why_misleading": "If AF was confirmed, TIA anticoagulation with warfarin is standard of care",
-      "correct_interpretation": "Review of original records showed a single rhythm strip during palpitations — not diagnostic AF; subsequent 48-hour Holter shows no AF; the original AF diagnosis was incorrect; warfarin was never indicated"
-    },
-    {
-      "finding": "White matter changes on MRI — supporting TIA/vascular diagnosis",
-      "why_misleading": "WMH are associated with cerebrovascular disease in older adults; original team interpreted them as TIA-related",
-      "correct_interpretation": "WMH are non-specific subcortical lesions consistent with longstanding migraine; no periventricular lesions, no lacunar infarcts, no large vessel territory changes; radiologist clearly stated 'non-specific, clinical correlation'"
-    }
-  ],
   "metadata": {
     "condition_name": "Migraine with aphasic aura — misdiagnosed as TIA; warfarin overtreatment causing active bleeding",
     "difficulty_description": "Diagnostic puzzle: prior TIA misdiagnosis with warfarin treatment causing bleeding complications; recognising TIA misdiagnosis and appropriately stopping anticoagulation; supratherapeutic INR is urgent management priority",

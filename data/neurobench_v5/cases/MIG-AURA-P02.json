@@ -18,7 +18,8 @@
     "patient_id": "UNKNOWN",
     "demographics": {
       "age": 44,
-      "sex": "male"
+      "sex": "male",
+      "bmi": 29.1
     },
     "clinical_history": {
       "medications": [
@@ -56,31 +57,22 @@
       "gait": "Gait normal. Mild central adiposity noted; no gait impairment."
     },
     "vitals": {
-      "bp_systolic": 120,
-      "bp_diastolic": 80,
-      "hr": 72,
-      "temp": 37.0,
+      "bp_systolic": 132,
+      "bp_diastolic": 82,
+      "hr": 76,
+      "temp": 36.8,
       "rr": 14,
-      "spo2": 98
+      "spo2": 99
     },
-    "history_present_illness": "A 44-year-old American businessman presented to the neurology outpatient clinic after three episodes of transient language difficulty over the past 5 months. He describes his speech suddenly becoming disorganised — he knows what he wants to say but produces wrong words or cannot select words at all. His wife, who was present for two of the three episodes, confirms he produces paraphasic errors and cannot complete sentences but appears to understand what is said to him. Episodes begin gradually over approximately 8-10 minutes, peak, then resolve over another 5-10 minutes. Total duration 15-25 minutes. Following the language difficulty, he develops a severe right-sided throbbing headache lasting 10-16 hours, with nausea and light sensitivity.\n\nSignificantly: during the cardiac evaluation following the second episode, his GP performed a 24-hour Holter which unexpectedly revealed paroxysmal atrial fibrillation (PAF) — three brief episodes lasting 8-22 minutes. He was immediately started on apixaban 5 mg twice daily and referred to neurology to determine whether his language episodes represent cardioembolic TIA due to AF, or whether the AF is incidental.\n\nHe has no prior stroke, no cardiac history, no hypertension. He is overweight (BMI 29). He drinks 12-15 units alcohol/week (heavy drinker). He has a strong family history — mother had migraines with visual aura; father had AF and a stroke at 67. He is a non-smoker. He works 60-hour weeks in a high-stress financial role. He has had occasional 'flickers of light' that lasted a few minutes over the past 3 years that he did not report."
-  },
-  "vitals": {
-    "temperature": 36.8,
-    "heart_rate": 76,
-    "blood_pressure": "132/82",
-    "respiratory_rate": 14,
-    "oxygen_saturation": 99,
-    "weight_kg": 90,
-    "height_cm": 176
-  },
-  "physical_exam": {
-    "general": "Overweight professional man; alert and fully fluent today; no speech difficulty between episodes; anxious",
-    "neurological": "Normal language: fluent, normal repetition, normal comprehension, normal confrontation naming. Normal cranial nerves II-XII. Motor 5/5. DTR 2+ symmetric. Sensation intact. Coordination normal. Gait normal.",
-    "cardiovascular": "Regular rate and rhythm at rest; no murmurs; no carotid bruits",
-    "respiratory": "Clear",
-    "abdomen": "Soft; mild central adiposity",
-    "extremities": "No edema"
+    "history_present_illness": "A 44-year-old American businessman presented to the neurology outpatient clinic after three episodes of transient language difficulty over the past 5 months. He describes his speech suddenly becoming disorganised — he knows what he wants to say but produces wrong words or cannot select words at all. His wife, who was present for two of the three episodes, confirms he produces paraphasic errors and cannot complete sentences but appears to understand what is said to him. Episodes begin gradually over approximately 8-10 minutes, peak, then resolve over another 5-10 minutes. Total duration 15-25 minutes. Following the language difficulty, he develops a severe right-sided throbbing headache lasting 10-16 hours, with nausea and light sensitivity.\n\nSignificantly: during the cardiac evaluation following the second episode, his GP performed a 24-hour Holter which unexpectedly revealed paroxysmal atrial fibrillation (PAF) — three brief episodes lasting 8-22 minutes. He was immediately started on apixaban 5 mg twice daily and referred to neurology to determine whether his language episodes represent cardioembolic TIA due to AF, or whether the AF is incidental.\n\nHe has no prior stroke, no cardiac history, no hypertension. He is overweight (BMI 29). He drinks 12-15 units alcohol/week (heavy drinker). He has a strong family history — mother had migraines with visual aura; father had AF and a stroke at 67. He is a non-smoker. He works 60-hour weeks in a high-stress financial role. He has had occasional 'flickers of light' that lasted a few minutes over the past 3 years that he did not report.",
+    "physical_exam": {
+      "general": "Overweight professional man; alert and fully fluent today; no speech difficulty between episodes; anxious",
+      "neurological": "Normal language: fluent, normal repetition, normal comprehension, normal confrontation naming. Normal cranial nerves II-XII. Motor 5/5. DTR 2+ symmetric. Sensation intact. Coordination normal. Gait normal.",
+      "cardiovascular": "Regular rate and rhythm at rest; no murmurs; no carotid bruits",
+      "respiratory": "Clear",
+      "abdomen": "Soft; mild central adiposity",
+      "extremities": "No edema"
+    }
   },
   "ground_truth": {
     "primary_diagnosis": "Migraine with aphasic aura (ICHD-3 1.2.1) co-existing with paroxysmal atrial fibrillation (alcohol-related, nocturnal); AF and aphasic episodes temporally dissociated on implantable loop recorder",
@@ -209,21 +201,23 @@
         "field_path": "patient.history_present_illness",
         "intended_effect": "Anchors on cardioembolic TIA as cause of aphasic episodes",
         "correct_interpretation": "ILR shows AF and aphasic episodes are temporally dissociated; AF is comorbid, not the cause of the episodes"
+      },
+      {
+        "data_point": "Confirmed paroxysmal AF on Holter — attributing all aphasic episodes to cardioembolic TIA",
+        "location": "",
+        "field_path": "",
+        "intended_effect": "Paroxysmal AF is a confirmed cause of cryptogenic stroke; aphasia in a patient with AF = TIA until proven otherwise",
+        "correct_interpretation": "ILR shows AF and aphasic episodes are temporally dissociated — AF is nocturnal, aphasic episodes occur during daytime in sinus rhythm; the AF is a separate condition (alcohol-driven, vagally-mediated) co-existing with migraine with aphasic aura"
+      },
+      {
+        "data_point": "Moderate PFO on TOE — potential additional cardioembolic mechanism",
+        "location": "",
+        "field_path": "",
+        "intended_effect": "Moderate PFO in a patient with aphasic episodes and confirmed AF might suggest PFO closure recommendation",
+        "correct_interpretation": "Apixaban anticoagulation covers both AF and PFO embolism risk; ILR shows no temporal correlation with symptoms; PFO closure not indicated"
       }
     ]
   },
-  "red_herrings": [
-    {
-      "finding": "Confirmed paroxysmal AF on Holter — attributing all aphasic episodes to cardioembolic TIA",
-      "why_misleading": "Paroxysmal AF is a confirmed cause of cryptogenic stroke; aphasia in a patient with AF = TIA until proven otherwise",
-      "correct_interpretation": "ILR shows AF and aphasic episodes are temporally dissociated — AF is nocturnal, aphasic episodes occur during daytime in sinus rhythm; the AF is a separate condition (alcohol-driven, vagally-mediated) co-existing with migraine with aphasic aura"
-    },
-    {
-      "finding": "Moderate PFO on TOE — potential additional cardioembolic mechanism",
-      "why_misleading": "Moderate PFO in a patient with aphasic episodes and confirmed AF might suggest PFO closure recommendation",
-      "correct_interpretation": "Apixaban anticoagulation covers both AF and PFO embolism risk; ILR shows no temporal correlation with symptoms; PFO closure not indicated"
-    }
-  ],
   "metadata": {
     "condition_name": "Migraine with aphasic aura co-existing with incidental paroxysmal AF — ILR temporal dissociation is the key diagnostic finding",
     "difficulty_description": "Diagnostic puzzle: confirmed PAF with aphasic episodes creates strong TIA presumption; only ILR temporal correlation analysis resolves the diagnostic question; alcohol as shared modifiable risk for both conditions",

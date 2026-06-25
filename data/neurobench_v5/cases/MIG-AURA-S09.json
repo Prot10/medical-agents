@@ -17,7 +17,8 @@
     "patient_id": "UNKNOWN",
     "demographics": {
       "age": 38,
-      "sex": "female"
+      "sex": "female",
+      "bmi": 24.4
     },
     "clinical_history": {
       "medications": [
@@ -68,24 +69,15 @@
       "rr": 14,
       "spo2": 99
     },
-    "history_present_illness": "A 38-year-old British woman with a 10-year history of migraine with typical visual aura presented to the neurology outpatient clinic requesting more effective preventive therapy. She describes classic episodes beginning with a bright crescent-shaped shimmering arc in the right visual field that expands over 20-25 minutes, followed by a left-sided throbbing headache (7-8/10) with nausea and photophobia lasting 6-10 hours. She has 3-4 episodes per month, increased from 1-2 per month three years ago.\n\nShe has tried sumatriptan 100 mg (effective but 4 episodes/month exhausts her prescription) and naproxen 500 mg (partial relief). Previous preventive attempts include propranolol 40 mg BID (stopped after 3 months — fatigue and bradycardia), amitriptyline 25 mg (poor effect at this dose, then stopped due to dry mouth). She is interested in newer anti-CGRP treatments after reading about them online.\n\nShe has no cardiac disease, no hypertension, and no depression. She had a 'minor TIA' query 4 years ago — on further questioning, this was a typical left-sided 20-minute visual aura without any limb or speech symptoms, which was investigated at the time (MRI was reportedly normal). She is a non-smoker, not on contraception (has an IUD), and has an older MRI brain from 4 years ago reported as normal. She would like to discuss erenumab."
-  },
-  "vitals": {
-    "temperature": 36.8,
-    "heart_rate": 72,
-    "blood_pressure": "116/74",
-    "respiratory_rate": 14,
-    "oxygen_saturation": 99,
-    "weight_kg": 68,
-    "height_cm": 167
-  },
-  "physical_exam": {
-    "general": "Well-appearing; headache-free today",
-    "neurological": "Normal cranial nerves. Visual fields full. No papilledema. Motor 5/5. DTR 2+ symmetric. Sensation intact. Coordination and gait normal.",
-    "cardiovascular": "Regular rate and rhythm; no murmurs",
-    "respiratory": "Clear",
-    "abdomen": "Soft",
-    "extremities": "No edema"
+    "history_present_illness": "A 38-year-old British woman with a 10-year history of migraine with typical visual aura presented to the neurology outpatient clinic requesting more effective preventive therapy. She describes classic episodes beginning with a bright crescent-shaped shimmering arc in the right visual field that expands over 20-25 minutes, followed by a left-sided throbbing headache (7-8/10) with nausea and photophobia lasting 6-10 hours. She has 3-4 episodes per month, increased from 1-2 per month three years ago.\n\nShe has tried sumatriptan 100 mg (effective but 4 episodes/month exhausts her prescription) and naproxen 500 mg (partial relief). Previous preventive attempts include propranolol 40 mg BID (stopped after 3 months — fatigue and bradycardia), amitriptyline 25 mg (poor effect at this dose, then stopped due to dry mouth). She is interested in newer anti-CGRP treatments after reading about them online.\n\nShe has no cardiac disease, no hypertension, and no depression. She had a 'minor TIA' query 4 years ago — on further questioning, this was a typical left-sided 20-minute visual aura without any limb or speech symptoms, which was investigated at the time (MRI was reportedly normal). She is a non-smoker, not on contraception (has an IUD), and has an older MRI brain from 4 years ago reported as normal. She would like to discuss erenumab.",
+    "physical_exam": {
+      "general": "Well-appearing; headache-free today",
+      "neurological": "Normal cranial nerves. Visual fields full. No papilledema. Motor 5/5. DTR 2+ symmetric. Sensation intact. Coordination and gait normal.",
+      "cardiovascular": "Regular rate and rhythm; no murmurs",
+      "respiratory": "Clear",
+      "abdomen": "Soft",
+      "extremities": "No edema"
+    }
   },
   "ground_truth": {
     "primary_diagnosis": "Established migraine with typical visual aura (ICHD-3 1.2.1); previous 'TIA query' retrospectively was visual aura",
@@ -192,21 +184,23 @@
         "field_path": "patient.history_present_illness",
         "intended_effect": "Anchors on cerebrovascular cause and may prompt anticoagulation",
         "correct_interpretation": "The prior episode was visual aura with subsequent headache — typical CSD, not embolism; no anticoagulation indicated"
+      },
+      {
+        "data_point": "Prior 'TIA query' 4 years ago",
+        "location": "",
+        "field_path": "",
+        "intended_effect": "A prior TIA diagnosis or query might suggest cerebrovascular disease requiring anticoagulation",
+        "correct_interpretation": "The episode was a 20-minute left visual disturbance with subsequent headache — this is typical migraine aura, not TIA; confirmed by normal MRI and typical migraine characteristics"
+      },
+      {
+        "data_point": "Small PFO on bubble echo",
+        "location": "",
+        "field_path": "",
+        "intended_effect": "PFO in a patient with prior 'TIA query' could trigger cardioembolic workup and closure discussion",
+        "correct_interpretation": "No prior confirmed stroke; prior TIA was migraine aura; PFO closure not indicated for migraine without stroke (PREMIUM, MIST trials)"
       }
     ]
   },
-  "red_herrings": [
-    {
-      "finding": "Prior 'TIA query' 4 years ago",
-      "why_misleading": "A prior TIA diagnosis or query might suggest cerebrovascular disease requiring anticoagulation",
-      "correct_interpretation": "The episode was a 20-minute left visual disturbance with subsequent headache — this is typical migraine aura, not TIA; confirmed by normal MRI and typical migraine characteristics"
-    },
-    {
-      "finding": "Small PFO on bubble echo",
-      "why_misleading": "PFO in a patient with prior 'TIA query' could trigger cardioembolic workup and closure discussion",
-      "correct_interpretation": "No prior confirmed stroke; prior TIA was migraine aura; PFO closure not indicated for migraine without stroke (PREMIUM, MIST trials)"
-    }
-  ],
   "metadata": {
     "condition_name": "Established migraine with aura — prior TIA misclassification, seeking preventive optimization",
     "difficulty_description": "Straightforward: prior TIA query is actually typical migraine aura; anti-CGRP therapy appropriate after 2 failed preventives",
