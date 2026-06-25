@@ -12,7 +12,7 @@ focal_epilepsy_temporal:
     sex_bias: null
   encounter_type: "inpatient"
   required_modalities: [EEG, MRI, LABS]
-  optional_modalities: [ECG]
+  optional_modalities: [ECG, echo, cardiac_monitoring]
   key_findings:
     eeg:
       straightforward:
@@ -89,7 +89,7 @@ ischemic_stroke:
     sex_bias: "slight_male"
   encounter_type: "emergency"
   required_modalities: [MRI, LABS, ECG]
-  optional_modalities: [EEG, echo, cardiac_monitoring]
+  optional_modalities: [CT, EEG, echo, cardiac_monitoring]
   key_findings:
     mri:
       straightforward:
@@ -261,7 +261,7 @@ alzheimers_early:
     sex_bias: "slight_female"
   encounter_type: "outpatient"
   required_modalities: [MRI, LABS]
-  optional_modalities: [EEG, CSF]
+  optional_modalities: [EEG, ECG, CSF]
   key_findings:
     mri:
       straightforward:
@@ -354,8 +354,10 @@ syncope_cardiac:
     age_range: [50, 80]
     sex_bias: "slight_male"
   encounter_type: "emergency"
-  required_modalities: [ECG, LABS, EEG, echo]
-  optional_modalities: [MRI, cardiac_monitoring]
+  # EEG is used only to rule out seizure as the syncope mimic, not as first-line
+  # workup for cardiac syncope (3 cases legitimately skip EEG).
+  required_modalities: [ECG, LABS, echo]
+  optional_modalities: [EEG, MRI, cardiac_monitoring]
   key_findings:
     ecg:
       straightforward:
@@ -434,7 +436,7 @@ multiple_sclerosis:
     sex_bias: "female_predominant"
   encounter_type: "inpatient"
   required_modalities: [MRI, LABS, CSF]
-  optional_modalities: [EEG, ECG]
+  optional_modalities: [EEG, ECG, specialized_test]
   key_findings:
     mri:
       straightforward:
@@ -524,7 +526,7 @@ bacterial_meningitis:
     sex_bias: null
   encounter_type: "emergency"
   required_modalities: [LABS, CSF, MRI]
-  optional_modalities: [EEG, ECG]
+  optional_modalities: [CT, EEG, ECG]
   key_findings:
     csf:
       straightforward:
@@ -616,7 +618,7 @@ parkinsons:
     sex_bias: "slight_male"
   encounter_type: "outpatient"
   required_modalities: [MRI, LABS]
-  optional_modalities: [EEG, ECG]
+  optional_modalities: [EEG, ECG, specialized_test]
   key_findings:
     mri:
       straightforward:
@@ -686,8 +688,10 @@ brain_tumor_glioma:
     age_range: [45, 75]
     sex_bias: "slight_male"
   encounter_type: "inpatient"
-  required_modalities: [MRI, LABS, EEG]
-  optional_modalities: [ECG]
+  # EEG is required only when the patient presents with seizures; otherwise it
+  # is not first-line for glioma diagnosis (3 cases legitimately skip EEG).
+  required_modalities: [MRI, LABS]
+  optional_modalities: [EEG, ECG]
   key_findings:
     mri:
       straightforward:
@@ -943,7 +947,7 @@ myasthenia_gravis:
     sex_bias: "female_predominant"
   encounter_type: "inpatient"
   required_modalities: [LABS, specialized_test, CT]
-  optional_modalities: [MRI]
+  optional_modalities: [MRI, ECG, CSF]
   key_findings:
     labs:
       straightforward:
@@ -1037,8 +1041,11 @@ subarachnoid_hemorrhage:
     age_range: [40, 70]
     sex_bias: "slight_female"
   encounter_type: "emergency"
-  required_modalities: [CT, LABS, CSF, advanced_imaging]
-  optional_modalities: [ECG, echo]
+  # CSF is only mandatory when the index CT is non-diagnostic; CT-positive
+  # SAH (9 straightforward cases) legitimately skip LP. Keep CSF as optional
+  # to reflect the conditional-required clinical reality.
+  required_modalities: [CT, LABS, advanced_imaging]
+  optional_modalities: [CSF, ECG, echo]
   key_findings:
     ct:
       straightforward:
@@ -1144,7 +1151,7 @@ migraine_with_aura:
     sex_bias: "female_predominant"
   encounter_type: "outpatient"
   required_modalities: [MRI, LABS]
-  optional_modalities: [EEG, ECG, echo]
+  optional_modalities: [EEG, ECG, echo, CSF]
   key_findings:
     mri:
       straightforward:
@@ -1233,7 +1240,7 @@ frontotemporal_dementia:
     sex_bias: null
   encounter_type: "outpatient"
   required_modalities: [MRI, LABS, advanced_imaging]
-  optional_modalities: [specialized_test]
+  optional_modalities: [specialized_test, CT]
   key_findings:
     mri:
       straightforward:
@@ -1442,7 +1449,7 @@ peripheral_neuropathy:
     sex_bias: null
   encounter_type: "outpatient"
   required_modalities: [LABS, specialized_test]
-  optional_modalities: [MRI]
+  optional_modalities: [MRI, CSF, advanced_imaging]
   key_findings:
     labs:
       straightforward:
@@ -1648,7 +1655,7 @@ hepatic_encephalopathy:
     sex_bias: "slight_male"
   encounter_type: "emergency"
   required_modalities: [LABS, EEG, CT]
-  optional_modalities: [MRI]
+  optional_modalities: [MRI, ECG]
   key_findings:
     labs:
       straightforward:
