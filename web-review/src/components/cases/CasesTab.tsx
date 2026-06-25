@@ -1,6 +1,7 @@
 import { Loader2 } from "lucide-react"
 import { useMemo } from "react"
 
+import { ReviewApiError } from "@/api/client"
 import type { CaseReviewSummary } from "@/api/types"
 import { useCases, useMyReviews } from "@/hooks/useReview"
 import { useReviewStore } from "@/stores/reviewStore"
@@ -45,9 +46,14 @@ export function CasesTab() {
   }
 
   if (cases.error || !cases.data) {
+    const detail =
+      cases.error instanceof ReviewApiError ? cases.error.message : null
     return (
-      <div className="text-center py-20 text-rose-500">
-        Could not load cases.
+      <div className="text-center py-20 text-rose-500 text-sm">
+        <div>Could not load cases.</div>
+        {detail && (
+          <div className="mt-1 text-xs text-rose-400/80 font-mono">{detail}</div>
+        )}
       </div>
     )
   }
