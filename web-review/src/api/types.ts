@@ -310,6 +310,7 @@ export interface PatientProfile {
     gait?: string
     additional?: string
   }
+  physical_exam?: Record<string, string>
   vitals: {
     bp_systolic?: number
     bp_diastolic?: number
