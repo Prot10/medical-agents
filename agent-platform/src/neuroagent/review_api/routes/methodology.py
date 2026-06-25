@@ -107,7 +107,12 @@ def get_methodology(
         )
 
     case_objects = all_datasets[version][1]
-    prose = _METHODOLOGY_PROSE.get(version, _METHODOLOGY_PROSE["v5"])
+    prose = _METHODOLOGY_PROSE.get(version)
+    if prose is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No methodology copy registered for dataset '{version}'",
+        )
 
     by_difficulty: Counter[str] = Counter()
     by_encounter: Counter[str] = Counter()
