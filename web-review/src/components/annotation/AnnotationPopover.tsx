@@ -54,6 +54,19 @@ export function AnnotationPopover() {
     comment.trim() !== (existing?.comment ?? "").trim() ||
     (existing != null && severity !== existing.severity)
 
+  // Guard against losing a draft on hard refresh / close-tab. The browser
+  // ignores the custom string for modern UAs but still shows its built-in
+  // "unsaved changes" prompt as long as preventDefault fires.
+  useEffect(() => {
+    if (!isDirty) return
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault()
+      e.returnValue = ""
+    }
+    window.addEventListener("beforeunload", handler)
+    return () => window.removeEventListener("beforeunload", handler)
+  }, [isDirty])
+
   function handleClose() {
     if (submitting) return
     if (isDirty) {
@@ -148,13 +161,20 @@ export function AnnotationPopover() {
               >
                 <FieldPathBreadcrumb path={open.fieldPath} />
 
-                <div className="mt-3 flex items-center gap-1">
+                <div
+                  className="mt-3 flex items-center gap-1"
+                  role="radiogroup"
+                  aria-label="Annotation severity"
+                >
                   {(["note", "issue", "error"] as const).map((sev) => {
                     const active = severity === sev
                     return (
                       <button
                         key={sev}
                         type="button"
+                        role="radio"
+                        aria-checked={active}
+                        aria-label={`Severity: ${SEVERITY_LABEL[sev]}`}
                         onClick={() => setSeverity(sev)}
                         className={cn(
                           "flex-1 px-2.5 py-1.5 text-xs font-medium rounded-md border transition-colors",
