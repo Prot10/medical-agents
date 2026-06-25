@@ -2,7 +2,7 @@
 
 ## What is this project
 
-NeuroAgent: tool-augmented LLM agent for neurological clinical decision support. ReAct loop + 12 diagnostic tools + hospital protocols + patient memory + cost tracking. Targeting Nature Machine Intelligence.
+NeuroAgent: tool-augmented LLM agent for neurological clinical decision support. ReAct loop + 13 diagnostic tools + hospital protocols + patient memory + cost tracking. Targeting Nature Machine Intelligence.
 
 See README.md for full project docs, setup, and architecture.
 
@@ -18,7 +18,7 @@ See README.md for full project docs, setup, and architecture.
 - `data/neurobench_v{1,2}/cases/` — 200 benchmark cases (JSON)
 - `data/neurobench_v3/cases/` — 200 benchmark cases with realistic tool outputs (v1+v2 combined, stripped)
 - `data/neurobench_v4/cases/` — 200 benchmark cases with 12-tool schema and cost tracking (v3 migrated)
-- `data/neurobench_v5/cases/` — 516 benchmark cases across 20 conditions (current default)
+- `data/neurobench_v5/cases/` — 600 benchmark cases across 20 conditions (current default)
 - `data/review/annotations/{version}/{reviewer_code}/{case_id}.json` — per-reviewer annotation runtime data (gitignored)
 - `agent-platform/config/hospital_rules/{hospital}/*.yaml` — clinical pathways
 - `agent-platform/config/review/reviewer_codes.yaml` — review-app reviewer registry (hot-reloads on mtime)
@@ -52,7 +52,7 @@ uv run python agent-platform/scripts/migrate_v3_to_v4.py     # migrate v3→v4 (
 - Commit style: conventional commits (`feat:`, `fix:`, `docs:`, `chore:`)
 - Dataset versions: v1 (synthetic, enhanced outputs), v2 (real-seeded, enhanced), v3 (v1+v2 combined, realistic/stripped outputs), v4 (12-tool schema + cost tracking, migrated from v3)
 - Tool output modes: "enhanced" (v1/v2, interpretive fields present) vs "realistic" (v3/v4, stripped to match real clinical reports)
-- 12 tools: analyze_brain_mri, analyze_eeg, analyze_ecg, interpret_labs, analyze_csf, order_ct_scan, order_echocardiogram, order_cardiac_monitoring, order_advanced_imaging, order_specialized_test, search_medical_literature, check_drug_interactions
+- 13 tools: analyze_brain_mri, analyze_eeg, analyze_ecg, interpret_labs, analyze_csf, order_ct_scan, order_echocardiogram, order_cardiac_monitoring, order_advanced_imaging, order_specialized_test, search_medical_literature, check_drug_interactions, consult_medical_specialist
 - Cost tracking: `CostTracker` in `tools/cost_tracker.py`, config in `config/tool_costs.yaml`, Medicare PFS reference rates
 - Evaluation: `format_patient_info()` in `evaluation/runner.py` is the single source of truth for patient presentation formatting
 
@@ -80,6 +80,6 @@ Separate FastAPI + Vite app for blind triple-review of the NeuroBench dataset. I
 - Frontend: `web-review/` (Vite + React 19 + Tailwind v4 + framer-motion). Vite alias `@web/*` → `../web/src/*` so it can import primitives from the main app without a refactor. Vite proxies `/api` → `http://127.0.0.1:8889`. Light theme is the default.
 - Reviewer registry: `agent-platform/config/review/reviewer_codes.yaml` — hand-edited; backend reloads on YAML mtime change inside the `current_reviewer` FastAPI dependency.
 - Annotation storage: `data/review/annotations/{version}/{reviewer_code}/{case_id}.json` — one file per (reviewer, version, case) triple. Filesystem-level isolation: a reviewer endpoint cannot return another reviewer's data.
-- Tabs: Overview (per-reviewer progress) / Cases (516 v5 cases) / Methodology (showcase) / Admin (4 aggregate views: inter-rater agreement, reviewer progress, field hotspots, side-by-side diff).
+- Tabs: Overview (per-reviewer progress) / Cases (600 v5 cases) / Methodology (showcase) / Admin (4 aggregate views: inter-rater agreement, reviewer progress, field hotspots, side-by-side diff).
 - Annotation gesture: hover an `AnnotatableField` → primary-color Comment pill in margin → Radix Popover with severity (note/issue/error) + textarea + `⌘↵` save. Annotated fields get a persistent left border colored by highest severity + count badge.
 - Status flow per case per reviewer: `pending` → `in_progress` (auto on first annotation) → `needs_changes` / `approved`. Each reviewer's status is independent; admin agreement view aggregates them.

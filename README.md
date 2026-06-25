@@ -1,6 +1,6 @@
 # NeuroAgent
 
-Tool-augmented LLM agent for neurological clinical decision support. Reasons through patient cases using a ReAct loop with 7 diagnostic tools, follows hospital-specific protocols, and maintains longitudinal patient memory.
+Tool-augmented LLM agent for neurological clinical decision support. Reasons through patient cases using a ReAct loop with 13 diagnostic tools, follows hospital-specific protocols, and maintains longitudinal patient memory.
 
 Targeting a **Nature Machine Intelligence** publication.
 
@@ -14,7 +14,7 @@ medical-agents/                     # uv workspace root
 │   │   ├── api/                    # Main FastAPI app (port 8888) — agent runs, traces, models
 │   │   ├── review_api/             # Separate FastAPI app (port 8889) — dataset review
 │   │   ├── llm/                    # LLM client (OpenAI-compatible), prompts
-│   │   ├── tools/                  # 12 diagnostic tools + MockServer + ToolRegistry
+│   │   ├── tools/                  # 13 diagnostic tools + MockServer + ToolRegistry
 │   │   ├── rules/                  # Hospital rules engine (YAML pathways)
 │   │   ├── memory/                 # ChromaDB patient memory
 │   │   └── evaluation/             # Runner, metrics, noise injector, LLM judge
@@ -125,9 +125,9 @@ ReAct loop (up to 15 turns): THINK → ACT (tool call) → OBSERVE → REFLECT. 
 
 System prompt = base prompt + hospital protocols + patient memory.
 
-### 7 Diagnostic Tools
+### 13 Diagnostic Tools
 
-`analyze_eeg`, `analyze_brain_mri`, `analyze_ecg`, `interpret_labs`, `analyze_csf`, `search_medical_literature`, `check_drug_interactions`
+`analyze_brain_mri`, `analyze_eeg`, `analyze_ecg`, `interpret_labs`, `analyze_csf`, `order_ct_scan`, `order_echocardiogram`, `order_cardiac_monitoring`, `order_advanced_imaging`, `order_specialized_test`, `search_medical_literature`, `check_drug_interactions`, `consult_medical_specialist`
 
 In evaluation mode, all backed by `MockServer` returning pre-generated outputs from the NeuroBench case files.
 
