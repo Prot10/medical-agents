@@ -13,6 +13,7 @@ Deployment target for the NeuroBench dataset review platform on the shared Hosti
 | Process supervisor | systemd unit `neurobench-review.service` |
 | Reverse proxy | nginx, vhost `/etc/nginx/conf.d/review.andreaprotani.com.conf` |
 | TLS | Let's Encrypt via `certbot --nginx`, auto-renewed (`certbot-renew.timer`) |
+| Backups | systemd timer `neurobench-review-backup.timer`, daily 03:15 UTC |
 | "Database" | Per-reviewer JSON files at `data/review/annotations/{version}/{reviewer_code}/{case_id}.json` — file-based, no DB server. |
 
 ## Isolation from Kosmico
@@ -97,6 +98,17 @@ ssh hostinger 'systemctl daemon-reload && \
                systemctl enable --now neurobench-review.service && \
                systemctl status neurobench-review.service --no-pager'
 
+# 10. Install the daily backup tooling (timer + service + script).
+scp deployment/hostinger/backup-annotations.sh \
+    hostinger:/home/neuroreview/bin/backup-annotations.sh
+scp deployment/hostinger/neurobench-review-backup.service \
+    hostinger:/etc/systemd/system/neurobench-review-backup.service
+scp deployment/hostinger/neurobench-review-backup.timer \
+    hostinger:/etc/systemd/system/neurobench-review-backup.timer
+ssh hostinger 'chown neuroreview:neuroreview /home/neuroreview/bin/backup-annotations.sh && \
+               chmod 755 /home/neuroreview/bin/backup-annotations.sh && \
+               systemctl daemon-reload && \
+               systemctl enable --now neurobench-review-backup.timer'
 ```
 
 ## Operations cookbook
@@ -126,13 +138,56 @@ ssh hostinger 'nginx -t && systemctl reload nginx'
 ssh hostinger 'pm2 status'
 ```
 
-## Backup
+## Backups
 
-`data/review/annotations/` is the only state worth preserving — schema files come from the deploy and the case fleet is in git. Pull a snapshot to your laptop with:
+`data/review/annotations/` is the only state worth preserving — the schema files come from the deploy and the case fleet is in git. Backups are handled by a systemd timer.
+
+### Schedule
+
+`neurobench-review-backup.timer` fires daily at **03:15 UTC** with `Persistent=true` (a missed run — e.g. host was off — fires at next boot, not silently skipped).
+
+### What it does
+
+`/home/neuroreview/bin/backup-annotations.sh` tars `data/review/annotations/` into `data/review/backups/annotations-YYYY-MM-DD.tar.gz`. Tarballs older than **30 days** are pruned automatically (override with `KEEP_DAYS=N` in the systemd unit's `Environment=` if needed).
+
+The script is atomic (`.tar.gz.tmp` → `mv` rename) and idempotent — running it twice on the same day overwrites that day's snapshot rather than failing.
+
+### Operations
 
 ```bash
-rsync -az hostinger:/home/neuroreview/medical-agents/data/review/annotations/ \
-    ./data/review/annotations.vps-backup/
+# When does the next backup run?
+ssh hostinger 'systemctl list-timers neurobench-review-backup.timer --no-pager'
+
+# Trigger a backup right now (e.g. before a risky change).
+ssh hostinger 'systemctl start neurobench-review-backup.service'
+
+# Inspect the most recent backup.
+ssh hostinger 'ls -lh /home/neuroreview/medical-agents/data/review/backups/ | tail -5'
+
+# Read backup logs.
+ssh hostinger 'journalctl -u neurobench-review-backup.service -n 50 --no-pager'
 ```
 
-A scheduled daily backup is tracked separately — see the follow-up commit that adds `backup-annotations.sh` + the timer.
+### Restore
+
+To restore a specific day's snapshot (this wipes whatever's currently on the VPS — make sure that's what you want):
+
+```bash
+ssh hostinger 'sudo -u neuroreview bash -lc "
+    cd /home/neuroreview/medical-agents/data/review &&
+    mv annotations annotations.before-restore-$(date -u +%Y%m%dT%H%M%SZ) &&
+    tar -xzf backups/annotations-YYYY-MM-DD.tar.gz
+"'
+ssh hostinger 'systemctl restart neurobench-review'
+```
+
+The pre-restore copy of `annotations/` is kept under `annotations.before-restore-<timestamp>/` so you can roll back the rollback.
+
+### Off-VPS copy (optional, manual)
+
+Local snapshots protect against application bugs and accidental deletes but not VPS-level loss. Pull a copy to your laptop when paranoia spikes:
+
+```bash
+rsync -az hostinger:/home/neuroreview/medical-agents/data/review/backups/ \
+    ./data/review/vps-backups/
+```

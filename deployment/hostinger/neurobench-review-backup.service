@@ -1,0 +1,21 @@
+[Unit]
+Description=Daily snapshot of NeuroBench review annotations (tar.gz with rotation)
+# Don't race with the API on a hypothetical restart — annotations are
+# written atomically per request, but reads + tar prefer a quiet moment.
+After=neurobench-review.service
+
+[Service]
+Type=oneshot
+User=neuroreview
+Group=neuroreview
+ExecStart=/home/neuroreview/bin/backup-annotations.sh
+
+# Hardening — backup task only needs to write the data/review/ subtree.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/neuroreview/medical-agents/data/review
+PrivateTmp=true
+
+StandardOutput=journal
+StandardError=journal
