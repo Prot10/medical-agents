@@ -109,6 +109,14 @@ _TOOL_META: list[dict[str, str | None]] = [
         "conditions for interactions and contraindications.",
         "modality": None,
     },
+    {
+        "name": "consult_medical_specialist",
+        "label": "Specialist consultation",
+        "description": "Curbside consult with a subspecialist (e.g. behavioral "
+        "neurology, cardiology, neuro-ophthalmology) for syndromic clarification "
+        "or coordinated care.",
+        "modality": None,
+    },
 ]
 
 # Modality tokens used in conditions.yaml -> canonical tool name.
@@ -119,13 +127,19 @@ _MODALITY_TO_TOOL: dict[str, str] = {
     "LABS": "interpret_labs",
     "CSF": "analyze_csf",
     "CT": "order_ct_scan",
+    "echo": "order_echocardiogram",
+    "cardiac_monitoring": "order_cardiac_monitoring",
     "advanced_imaging": "order_advanced_imaging",
     "specialized_test": "order_specialized_test",
     "EMG_NCS": "order_specialized_test",
 }
 
-# Tools available for every condition regardless of modality (cost $0).
-_UNIVERSAL_TOOLS: list[str] = ["search_medical_literature", "check_drug_interactions"]
+# Tools available for every condition regardless of modality.
+_UNIVERSAL_TOOLS: list[str] = [
+    "search_medical_literature",
+    "check_drug_interactions",
+    "consult_medical_specialist",
+]
 
 # Enum value (in cases) -> conditions.yaml top-level key, where they differ.
 _CONDITION_ALIAS: dict[str, str] = {
