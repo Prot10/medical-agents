@@ -92,7 +92,7 @@ export function OverviewTab({ profile }: { profile: ReviewerProfile }) {
                 Welcome aboard.
               </h2>
               <p className="text-sm text-muted-foreground leading-relaxed max-w-xl mt-1">
-                {stats?.total_cases ?? 516} cases across {Object.keys(stats?.by_condition ?? {}).length || 20}{" "}
+                {stats?.total_cases ?? 600} cases across {Object.keys(stats?.by_condition ?? {}).length || 20}{" "}
                 neurological conditions are waiting for your review. Take a moment
                 to skim the methodology, then start anywhere.
               </p>
