@@ -148,7 +148,7 @@ ssh hostinger 'pm2 status'
 
 ### What it does
 
-`/home/neuroreview/bin/backup-annotations.sh` tars `data/review/annotations/` into `data/review/backups/annotations-YYYY-MM-DD.tar.gz`. Tarballs older than **30 days** are pruned automatically (override with `KEEP_DAYS=N` in the systemd unit's `Environment=` if needed).
+`/home/neuroreview/bin/backup-annotations.sh` tars `data/review/annotations/` into `data/review/backups/annotations-YYYY-MM-DD.tar.gz`. Tarballs older than **365 days** are pruned automatically (override with `KEEP_DAYS=N` in the systemd unit's `Environment=` if needed). At ~3 MB per worst-case tarball that's ~1 GB of disk over a full year — negligible against 45 GB free.
 
 The script is atomic (`.tar.gz.tmp` → `mv` rename) and idempotent — running it twice on the same day overwrites that day's snapshot rather than failing.
 
