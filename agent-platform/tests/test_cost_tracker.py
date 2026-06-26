@@ -1,4 +1,11 @@
-"""Tests for the CostTracker — parameter-dependent cost computation."""
+"""Tests for the CostTracker — parameter-dependent cost computation.
+
+Reference values are in EUR (the CostTracker reads ``tool_costs.yaml`` which is
+EUR-denominated after the 2026-06 conversion). The attribute name ``cost_usd``
+is historical: renaming it cascades into the training/RL pipeline and is left
+for a dedicated PR. Treat ``cost_usd`` as "cost in the configured reference
+currency" — currently EUR.
+"""
 
 import pytest
 
@@ -15,8 +22,8 @@ class TestCostTrackerBasicCosts:
 
     def test_ecg_base_cost(self, tracker: CostTracker):
         entry = tracker.compute_cost("analyze_ecg", {"clinical_context": "syncope"})
-        assert entry.cost_usd == 20.0
-        assert entry.cost_breakdown == {"base": 20.0}
+        assert entry.cost_usd == 18.0
+        assert entry.cost_breakdown == {"base": 18.0}
 
     def test_literature_search_free(self, tracker: CostTracker):
         entry = tracker.compute_cost("search_medical_literature", {"query": "epilepsy"})
@@ -36,15 +43,15 @@ class TestCostTrackerMRI:
 
     def test_mri_no_contrast(self, tracker: CostTracker):
         entry = tracker.compute_cost("analyze_brain_mri", {"protocol": "standard"})
-        assert entry.cost_usd == 320.0
+        assert entry.cost_usd == 294.0
         assert "base" in entry.cost_breakdown
         assert "contrast" not in entry.cost_breakdown
 
     def test_mri_with_contrast(self, tracker: CostTracker):
         entry = tracker.compute_cost("analyze_brain_mri", {"contrast": True, "protocol": "ms"})
-        assert entry.cost_usd == 446.0
-        assert entry.cost_breakdown["base"] == 320.0
-        assert entry.cost_breakdown["contrast"] == 126.0
+        assert entry.cost_usd == 410.0
+        assert entry.cost_breakdown["base"] == 294.0
+        assert entry.cost_breakdown["contrast"] == 116.0
 
     def test_mri_protocol_doesnt_change_cost(self, tracker: CostTracker):
         e1 = tracker.compute_cost("analyze_brain_mri", {"protocol": "standard"})
@@ -58,23 +65,23 @@ class TestCostTrackerEEG:
 
     def test_routine_eeg(self, tracker: CostTracker):
         entry = tracker.compute_cost("analyze_eeg", {"eeg_type": "routine"})
-        assert entry.cost_usd == 250.0
+        assert entry.cost_usd == 230.0
 
     def test_video_eeg(self, tracker: CostTracker):
         entry = tracker.compute_cost("analyze_eeg", {"eeg_type": "video"})
-        assert entry.cost_usd == 1200.0
+        assert entry.cost_usd == 1104.0
 
     def test_ambulatory_eeg(self, tracker: CostTracker):
         entry = tracker.compute_cost("analyze_eeg", {"eeg_type": "ambulatory"})
-        assert entry.cost_usd == 700.0
+        assert entry.cost_usd == 644.0
 
     def test_continuous_icu_eeg(self, tracker: CostTracker):
         entry = tracker.compute_cost("analyze_eeg", {"eeg_type": "continuous_icu"})
-        assert entry.cost_usd == 900.0
+        assert entry.cost_usd == 828.0
 
     def test_default_eeg_type_is_routine(self, tracker: CostTracker):
         entry = tracker.compute_cost("analyze_eeg", {})
-        assert entry.cost_usd == 250.0
+        assert entry.cost_usd == 230.0
 
 
 class TestCostTrackerLabs:
@@ -82,24 +89,24 @@ class TestCostTrackerLabs:
 
     def test_basic_panels(self, tracker: CostTracker):
         entry = tracker.compute_cost("interpret_labs", {"panels": ["CBC", "BMP"]})
-        assert entry.cost_usd == 35.0  # 15 + 20
-        assert entry.cost_breakdown["CBC"] == 15.0
-        assert entry.cost_breakdown["BMP"] == 20.0
+        assert entry.cost_usd == 32.0  # 14 + 18
+        assert entry.cost_breakdown["CBC"] == 14.0
+        assert entry.cost_breakdown["BMP"] == 18.0
 
     def test_specialized_panel_expensive(self, tracker: CostTracker):
         entry = tracker.compute_cost("interpret_labs", {
             "panels": ["CBC", "autoimmune_encephalitis"],
         })
-        assert entry.cost_usd == 2015.0  # 15 + 2000
+        assert entry.cost_usd == 1854.0  # 14 + 1840
 
     def test_empty_panels_default_cost(self, tracker: CostTracker):
         entry = tracker.compute_cost("interpret_labs", {})
-        assert entry.cost_usd == 25.0  # default_panel
+        assert entry.cost_usd == 23.0  # default_panel
         assert "unspecified" in entry.cost_breakdown
 
     def test_unknown_panel_uses_default(self, tracker: CostTracker):
         entry = tracker.compute_cost("interpret_labs", {"panels": ["custom_panel"]})
-        assert entry.cost_usd == 25.0  # default_panel cost
+        assert entry.cost_usd == 23.0  # default_panel cost
 
 
 class TestCostTrackerCSF:
@@ -107,23 +114,23 @@ class TestCostTrackerCSF:
 
     def test_csf_base_only(self, tracker: CostTracker):
         entry = tracker.compute_cost("analyze_csf", {"clinical_context": "meningitis"})
-        assert entry.cost_usd == 250.0
-        assert entry.cost_breakdown["base"] == 250.0
+        assert entry.cost_usd == 230.0
+        assert entry.cost_breakdown["base"] == 230.0
 
     def test_csf_with_special_tests(self, tracker: CostTracker):
         entry = tracker.compute_cost("analyze_csf", {
             "special_tests": ["oligoclonal_bands", "HSV_PCR"],
         })
-        assert entry.cost_usd == 475.0  # 250 + 25 + 200
-        assert entry.cost_breakdown["base"] == 250.0
-        assert entry.cost_breakdown["oligoclonal_bands"] == 25.0
-        assert entry.cost_breakdown["HSV_PCR"] == 200.0
+        assert entry.cost_usd == 437.0  # 230 + 23 + 184
+        assert entry.cost_breakdown["base"] == 230.0
+        assert entry.cost_breakdown["oligoclonal_bands"] == 23.0
+        assert entry.cost_breakdown["HSV_PCR"] == 184.0
 
     def test_csf_autoimmune_panel(self, tracker: CostTracker):
         entry = tracker.compute_cost("analyze_csf", {
             "special_tests": ["autoimmune_panel"],
         })
-        assert entry.cost_usd == 2250.0  # 250 + 2000
+        assert entry.cost_usd == 2070.0  # 230 + 1840
 
 
 class TestCostTrackerCT:
@@ -131,19 +138,19 @@ class TestCostTrackerCT:
 
     def test_ct_plain(self, tracker: CostTracker):
         entry = tracker.compute_cost("order_ct_scan", {})
-        assert entry.cost_usd == 200.0
+        assert entry.cost_usd == 184.0
 
     def test_ct_with_contrast(self, tracker: CostTracker):
         entry = tracker.compute_cost("order_ct_scan", {"contrast": True})
-        assert entry.cost_usd == 300.0
+        assert entry.cost_usd == 276.0
 
     def test_cta(self, tracker: CostTracker):
         entry = tracker.compute_cost("order_ct_scan", {"angiography": True})
-        assert entry.cost_usd == 400.0
+        assert entry.cost_usd == 368.0
 
     def test_cta_with_contrast(self, tracker: CostTracker):
         entry = tracker.compute_cost("order_ct_scan", {"contrast": True, "angiography": True})
-        assert entry.cost_usd == 500.0
+        assert entry.cost_usd == 460.0
 
 
 class TestCostTrackerNewTools:
@@ -151,43 +158,43 @@ class TestCostTrackerNewTools:
 
     def test_echo_tte(self, tracker: CostTracker):
         entry = tracker.compute_cost("order_echocardiogram", {"echo_type": "TTE"})
-        assert entry.cost_usd == 300.0
+        assert entry.cost_usd == 276.0
 
     def test_echo_tee(self, tracker: CostTracker):
         entry = tracker.compute_cost("order_echocardiogram", {"echo_type": "TEE"})
-        assert entry.cost_usd == 600.0
+        assert entry.cost_usd == 552.0
 
     def test_echo_default_tte(self, tracker: CostTracker):
         entry = tracker.compute_cost("order_echocardiogram", {})
-        assert entry.cost_usd == 300.0
+        assert entry.cost_usd == 276.0
 
     def test_holter(self, tracker: CostTracker):
         entry = tracker.compute_cost("order_cardiac_monitoring", {"monitor_type": "holter_24h"})
-        assert entry.cost_usd == 150.0
+        assert entry.cost_usd == 138.0
 
     def test_event_monitor(self, tracker: CostTracker):
         entry = tracker.compute_cost("order_cardiac_monitoring", {"monitor_type": "event_monitor_30d"})
-        assert entry.cost_usd == 300.0
+        assert entry.cost_usd == 276.0
 
     def test_amyloid_pet(self, tracker: CostTracker):
         entry = tracker.compute_cost("order_advanced_imaging", {"imaging_type": "amyloid_PET"})
-        assert entry.cost_usd == 4000.0
+        assert entry.cost_usd == 3680.0
 
     def test_datscan(self, tracker: CostTracker):
         entry = tracker.compute_cost("order_advanced_imaging", {"imaging_type": "DaTscan"})
-        assert entry.cost_usd == 5000.0
+        assert entry.cost_usd == 4600.0
 
     def test_neuropsych(self, tracker: CostTracker):
         entry = tracker.compute_cost("order_specialized_test", {"test_type": "neuropsych_battery"})
-        assert entry.cost_usd == 1200.0
+        assert entry.cost_usd == 1104.0
 
     def test_emg(self, tracker: CostTracker):
         entry = tracker.compute_cost("order_specialized_test", {"test_type": "emg_ncs"})
-        assert entry.cost_usd == 600.0
+        assert entry.cost_usd == 552.0
 
     def test_vep(self, tracker: CostTracker):
         entry = tracker.compute_cost("order_specialized_test", {"test_type": "vep"})
-        assert entry.cost_usd == 200.0
+        assert entry.cost_usd == 184.0
 
 
 class TestCostTrackerAccumulation:
@@ -197,7 +204,7 @@ class TestCostTrackerAccumulation:
         tracker.compute_cost("analyze_ecg", {})
         tracker.compute_cost("analyze_brain_mri", {"contrast": True})
         tracker.compute_cost("interpret_labs", {"panels": ["CBC", "BMP"]})
-        assert tracker.total_cost_usd == 20.0 + 446.0 + 35.0
+        assert tracker.total_cost_usd == 18.0 + 410.0 + 32.0
         assert len(tracker.entries) == 3
 
     def test_reset_clears(self, tracker: CostTracker):
@@ -213,10 +220,10 @@ class TestCostTrackerAccumulation:
         tracker.compute_cost("analyze_brain_mri", {})
         tracker.compute_cost("analyze_brain_mri", {"contrast": True})
         summary = tracker.get_summary()
-        assert summary["total_cost_usd"] == 20.0 + 320.0 + 446.0
+        assert summary["total_cost_usd"] == 18.0 + 294.0 + 410.0
         assert summary["num_tool_calls"] == 3
-        assert summary["cost_by_tool"]["analyze_ecg"] == 20.0
-        assert summary["cost_by_tool"]["analyze_brain_mri"] == 320.0 + 446.0
+        assert summary["cost_by_tool"]["analyze_ecg"] == 18.0
+        assert summary["cost_by_tool"]["analyze_brain_mri"] == 294.0 + 410.0
 
 
 class TestCostTrackerRealisticWorkups:
@@ -230,8 +237,8 @@ class TestCostTrackerRealisticWorkups:
         tracker.compute_cost("interpret_labs", {"panels": ["CBC", "BMP", "coagulation", "troponin", "lipid", "HbA1c"]})
         tracker.compute_cost("order_echocardiogram", {"echo_type": "TTE"})
         tracker.compute_cost("order_cardiac_monitoring", {"monitor_type": "holter_24h"})
-        # Expected: 400 + 320 + 20 + 125 + 300 + 150 = 1315
-        assert tracker.total_cost_usd == 1315.0
+        # Expected (EUR): 368 + 294 + 18 + 114 + 276 + 138 = 1208
+        assert tracker.total_cost_usd == 1208.0
 
     def test_dementia_workup_cost(self, tracker: CostTracker):
         """Early Alzheimer's: labs→MRI→neuropsych→amyloid PET."""
@@ -239,8 +246,8 @@ class TestCostTrackerRealisticWorkups:
         tracker.compute_cost("analyze_brain_mri", {"protocol": "dementia", "contrast": False})
         tracker.compute_cost("order_specialized_test", {"test_type": "neuropsych_battery"})
         tracker.compute_cost("order_advanced_imaging", {"imaging_type": "amyloid_PET"})
-        # Expected: 140 + 320 + 1200 + 4000 = 5660
-        assert tracker.total_cost_usd == 5660.0
+        # Expected (EUR): 129 + 294 + 1104 + 3680 = 5207
+        assert tracker.total_cost_usd == 5207.0
 
     def test_epilepsy_workup_cost(self, tracker: CostTracker):
         """First seizure: labs→ECG→EEG→MRI→drug check."""
@@ -249,5 +256,5 @@ class TestCostTrackerRealisticWorkups:
         tracker.compute_cost("analyze_eeg", {"eeg_type": "routine"})
         tracker.compute_cost("analyze_brain_mri", {"protocol": "epilepsy", "contrast": True})
         tracker.compute_cost("check_drug_interactions", {"drug": "levetiracetam"})
-        # Expected: 90 + 20 + 250 + 446 + 0 = 806
-        assert tracker.total_cost_usd == 806.0
+        # Expected (EUR): 83 + 18 + 230 + 410 + 0 = 741
+        assert tracker.total_cost_usd == 741.0

@@ -62,8 +62,10 @@ class TestToolCatalog:
     def test_cost_summary_is_honest(self, v5_catalog):
         by_name = {t.name: t for t in v5_catalog.tools}
         assert by_name["search_medical_literature"].cost_summary == "free"
-        # MRI is base $320 (the floor), never the $126 contrast modifier alone.
-        assert by_name["analyze_brain_mri"].cost_summary == "from $320"
+        # MRI is base €294 (the floor), never the €116 contrast modifier alone.
+        # Costs are EUR, converted from CMS PFS at 1 USD = 0.92 EUR — see
+        # agent-platform/config/tool_costs.yaml.
+        assert by_name["analyze_brain_mri"].cost_summary == "from €294"
 
 
 class TestToolReviewStore:
