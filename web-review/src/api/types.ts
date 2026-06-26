@@ -189,6 +189,25 @@ export interface ToolMeta {
   description: string
   modality: string | null
   cost_summary: string | null
+  parameters: ToolParameter[]
+  output_fields: ToolOutputField[]
+}
+
+export interface ToolParameter {
+  name: string
+  type: string
+  description: string
+  required: boolean
+  enum: string[] | null
+  default: string | number | boolean | null
+  items_type: string | null
+}
+
+export interface ToolOutputField {
+  name: string
+  type: string
+  description: string
+  required: boolean
 }
 
 export interface ConditionToolMapping {

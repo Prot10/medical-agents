@@ -1,6 +1,7 @@
 import {
   CheckCircle2,
   ChevronDown,
+  Info,
   Loader2,
   MessageSquarePlus,
   Pencil,
@@ -29,6 +30,7 @@ import { CONDITION_META } from "@/lib/conditions"
 import { cn } from "@/lib/utils"
 import { useReviewStore } from "@/stores/reviewStore"
 import { ProposeToolDialog } from "./ProposeToolDialog"
+import { ToolDetailDialog } from "./ToolDetailDialog"
 import {
   ToolAnnotationPopover,
   type ToolAnnotationTarget,
@@ -61,6 +63,7 @@ export function ToolReviewTab() {
   const [annTarget, setAnnTarget] = useState<ToolAnnotationTarget | null>(null)
   const [proposeOpen, setProposeOpen] = useState(false)
   const [editingProposal, setEditingProposal] = useState<ProposedTool | null>(null)
+  const [detailTool, setDetailTool] = useState<ToolMeta | null>(null)
 
   const toolByName = useMemo(() => {
     const map = new Map<string, ToolMeta>()
@@ -244,6 +247,7 @@ export function ToolReviewTab() {
                   onComment={(e) =>
                     openAnnotation(e, path, meta?.label ?? name)
                   }
+                  onOpenDetail={meta ? () => setDetailTool(meta) : undefined}
                 />
               )
             })}
@@ -268,6 +272,7 @@ export function ToolReviewTab() {
                 toolName={name}
                 annotation={annByPath.get(path)}
                 onComment={(e) => openAnnotation(e, path, meta?.label ?? name)}
+                onOpenDetail={meta ? () => setDetailTool(meta) : undefined}
               />
             )
           })}
@@ -312,6 +317,7 @@ export function ToolReviewTab() {
                       toolByName={toolByName}
                       annByPath={annByPath}
                       onComment={openAnnotation}
+                      onOpenDetail={setDetailTool}
                     />
                   ))}
                 </div>
@@ -337,9 +343,21 @@ export function ToolReviewTab() {
         }}
         editing={editingProposal}
       />
+      <ToolDetailDialog
+        tool={detailTool}
+        version={version}
+        review={review.data}
+        open={!!detailTool}
+        onOpenChange={(o) => {
+          if (!o) setDetailTool(null)
+        }}
+      />
         </div>
         <aside className="xl:sticky xl:top-4 xl:self-start xl:max-h-[calc(100vh-2rem)] xl:overflow-y-auto">
-          <ToolReferencePanel tools={catalog.data.tools} />
+          <ToolReferencePanel
+            tools={catalog.data.tools}
+            onOpenDetail={setDetailTool}
+          />
         </aside>
       </div>
     </div>
@@ -348,19 +366,30 @@ export function ToolReviewTab() {
 
 // --- Tool reference (sticky side panel) ------------------------------
 
-function ToolReferencePanel({ tools }: { tools: ToolMeta[] }) {
+function ToolReferencePanel({
+  tools,
+  onOpenDetail,
+}: {
+  tools: ToolMeta[]
+  onOpenDetail: (tool: ToolMeta) => void
+}) {
   return (
     <div className="rounded-2xl border border-border bg-card/60 backdrop-blur p-4">
       <h2 className="text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-3">
         Tool reference
       </h2>
       <p className="text-[11px] text-muted-foreground mb-4 leading-relaxed">
-        Quick glance at what each of the {tools.length} tools does. Stays
-        visible while you scroll through the conditions.
+        Quick glance at what each of the {tools.length} tools does. Click a tool
+        to see what the agent sends and gets back — and annotate the I/O.
       </p>
-      <div className="space-y-3">
+      <div className="space-y-1">
         {tools.map((t) => (
-          <div key={t.name} className="text-sm">
+          <button
+            key={t.name}
+            type="button"
+            onClick={() => onOpenDetail(t)}
+            className="w-full text-left text-sm rounded-lg px-2 py-1.5 hover:bg-secondary/50 transition-colors"
+          >
             <div className="flex items-baseline justify-between gap-2">
               <span className="font-medium text-foreground/95 text-[13px]">
                 {t.label}
@@ -376,7 +405,11 @@ function ToolReferencePanel({ tools }: { tools: ToolMeta[] }) {
                 {t.description}
               </p>
             )}
-          </div>
+            <p className="text-[10px] text-muted-foreground/70 mt-1 inline-flex items-center gap-1">
+              <Info className="w-3 h-3" />
+              {t.parameters.length} params · {t.output_fields.length} return fields
+            </p>
+          </button>
         ))}
       </div>
     </div>
@@ -390,6 +423,7 @@ function ConditionBlock({
   toolByName,
   annByPath,
   onComment,
+  onOpenDetail,
 }: {
   mapping: ConditionToolMapping
   toolByName: Map<string, ToolMeta>
@@ -399,6 +433,7 @@ function ConditionBlock({
     fieldPath: string,
     label: string,
   ) => void
+  onOpenDetail: (tool: ToolMeta) => void
 }) {
   const condPath = `condition:${mapping.condition}`
   const condAnn = annByPath.get(condPath)
@@ -429,6 +464,7 @@ function ConditionBlock({
               onComment={(e) =>
                 onComment(e, path, `${meta?.label ?? name} · ${mapping.label}`)
               }
+              onOpenDetail={meta ? () => onOpenDetail(meta) : undefined}
             />
           )
         })}
@@ -445,6 +481,7 @@ function ConditionBlock({
               onComment={(e) =>
                 onComment(e, path, `${meta?.label ?? name} · ${mapping.label}`)
               }
+              onOpenDetail={meta ? () => onOpenDetail(meta) : undefined}
             />
           )
         })}
@@ -467,12 +504,14 @@ function ToolRow({
   tier,
   annotation,
   onComment,
+  onOpenDetail,
 }: {
   meta: ToolMeta | undefined
   toolName: string
   tier?: "required" | "optional"
   annotation: FieldAnnotation | undefined
   onComment: (e: React.MouseEvent<HTMLButtonElement>) => void
+  onOpenDetail?: () => void
 }) {
   return (
     <div
@@ -511,6 +550,16 @@ function ToolRow({
           </p>
         )}
       </div>
+      {onOpenDetail && (
+        <button
+          type="button"
+          onClick={onOpenDetail}
+          className="flex-shrink-0 inline-flex items-center gap-1 text-[11px] rounded-md px-2 py-1 text-muted-foreground opacity-0 group-hover:opacity-100 focus:opacity-100 hover:bg-secondary/70 transition-colors"
+        >
+          <Info className="w-3.5 h-3.5" />
+          I/O
+        </button>
+      )}
       <CommentButton annotation={annotation} onClick={onComment} />
     </div>
   )
