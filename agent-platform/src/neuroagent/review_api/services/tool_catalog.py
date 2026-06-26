@@ -167,15 +167,16 @@ def _cost_summary(tool_name: str, costs: dict[str, Any]) -> str | None:
 
     Tool specs mix additive forms (``base`` + ``modifiers``) and
     alternative-option maps (``by_type`` / ``by_panel``); a precise range
-    is ambiguous, so we report the entry charge (``from $X``) which is never
-    misleading. Free tools render as ``free``.
+    is ambiguous, so we report the entry charge (``from €X``) which is never
+    misleading. Free tools render as ``free``. Values are in EUR — see
+    ``tool_costs.yaml`` for sourcing notes.
     """
     spec = (costs.get("tools") or {}).get(tool_name)
     if spec is None:
         return None
 
     if isinstance(spec, (int, float)):
-        return "free" if spec == 0 else f"${int(spec)}"
+        return "free" if spec == 0 else f"€{int(spec)}"
 
     if not isinstance(spec, dict):
         return None
@@ -199,7 +200,7 @@ def _cost_summary(tool_name: str, costs: dict[str, Any]) -> str | None:
 
     if floor == 0:
         return "free"
-    return f"from ${int(floor)}"
+    return f"from €{int(floor)}"
 
 
 def build_catalog(
