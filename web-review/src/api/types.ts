@@ -63,6 +63,7 @@ export interface CaseReview {
   case_comments: CaseComment[]
   first_opened_at: string | null
   last_updated_at: string
+  last_active_at: string | null
   time_spent_seconds: number
 }
 

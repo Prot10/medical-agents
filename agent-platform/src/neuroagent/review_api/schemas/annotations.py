@@ -55,6 +55,10 @@ class CaseReview(BaseModel):
     case_comments: list[CaseComment] = Field(default_factory=list, max_length=500)
     first_opened_at: datetime | None = None
     last_updated_at: datetime = Field(default_factory=_utcnow)
+    # Stamped on every heartbeat (which only fires when the tab is visible AND the
+    # user actually interacted within the last minute). Lets the admin progress
+    # view distinguish in-progress-now from in-progress-but-stale.
+    last_active_at: datetime | None = None
     time_spent_seconds: int = 0
 
 

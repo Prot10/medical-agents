@@ -298,6 +298,13 @@ def delete_comment(
 # Heartbeat
 
 
+# Anything beyond ~90 min of active time on a single case is almost certainly
+# a forgotten tab — even a thorough diagnostic-puzzle review tops out under an
+# hour. The client already gates on tab-visibility and user-input recency, but
+# this server cap is the last line against runaway accumulation.
+MAX_CASE_TIME_SECONDS = 5400
+
+
 @router.post("/datasets/{version}/reviews/{case_id}/heartbeat")
 def heartbeat(
     version: str,
@@ -309,6 +316,9 @@ def heartbeat(
     _ensure_case(request, version, case_id)
     store = _store(request)
     review = store.load_or_init(version, reviewer.code, case_id)
-    review.time_spent_seconds += body.seconds
+    review.time_spent_seconds = min(
+        review.time_spent_seconds + body.seconds, MAX_CASE_TIME_SECONDS
+    )
+    review.last_active_at = _utcnow()
     store.save(review)
     return {"time_spent_seconds": review.time_spent_seconds}
