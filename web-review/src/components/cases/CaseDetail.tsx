@@ -58,18 +58,45 @@ export function CaseDetail({ caseId }: { caseId: string }) {
   const setStatus = useSetStatus(version)
   const heartbeat = useHeartbeat()
 
-  // Accumulate time-on-case server-side. Tick every 30s; skip while the tab is
-  // hidden so idle/background time isn't counted.
+  // Accumulate time-on-case server-side. Tick every 30s. Three gates against
+  // counting idle time:
+  //   1. Tab hidden (Page Visibility API) — backgrounded tabs are skipped.
+  //   2. No user input in the last IDLE_MS — counts only "actively reading".
+  //   3. Per-tick interval capped at 60s — browser-throttled ticks can't pile up.
   useEffect(() => {
-    let last = Date.now()
+    const IDLE_MS = 60_000 // 1 min of zero input → treat as idle
+    let lastActivity = Date.now()
+    let lastTick = Date.now()
+    const markActive = () => {
+      lastActivity = Date.now()
+    }
+    const events: (keyof DocumentEventMap)[] = [
+      "mousemove",
+      "keydown",
+      "scroll",
+      "click",
+      "pointerdown",
+    ]
+    events.forEach((e) =>
+      document.addEventListener(e, markActive, { passive: true }),
+    )
     const id = window.setInterval(() => {
       const now = Date.now()
-      const seconds = Math.round((now - last) / 1000)
-      last = now
-      if (document.hidden || seconds < 1) return
-      heartbeat.mutate({ version, caseId, seconds: Math.min(600, seconds) })
+      const interval = Math.round((now - lastTick) / 1000)
+      lastTick = now
+      if (document.hidden) return
+      if (now - lastActivity > IDLE_MS) return
+      if (interval < 1) return
+      heartbeat.mutate({
+        version,
+        caseId,
+        seconds: Math.min(60, interval),
+      })
     }, 30_000)
-    return () => window.clearInterval(id)
+    return () => {
+      window.clearInterval(id)
+      events.forEach((e) => document.removeEventListener(e, markActive))
+    }
     // heartbeat.mutate is stable; intentionally keyed on the open case only.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [caseId, version])
