@@ -12,7 +12,12 @@ focal_epilepsy_temporal:
     sex_bias: null
   encounter_type: "inpatient"
   required_modalities: [EEG, MRI, LABS]
-  optional_modalities: [ECG, echo]
+  # Echo + cardiac_monitoring are used only in atypical presentations where
+  # syncope-mimic ruleout is on the differential (e.g. FEPI-TEMP-P05 was
+  # initially attributed to vasovagal/cardiac syncope before EEG localised
+  # focal temporal onset). Low overall usage; the option must remain so the
+  # clinical pathway can branch.
+  optional_modalities: [ECG, echo, cardiac_monitoring]
   key_findings:
     eeg:
       straightforward:
@@ -951,7 +956,10 @@ myasthenia_gravis:
     sex_bias: "female_predominant"
   encounter_type: "inpatient"
   required_modalities: [LABS, specialized_test, CT]
-  optional_modalities: [MRI, ECG]
+  # CSF appears in 1 puzzle case (MG-RS14, MuSK+ bulbar-predominant) to rule
+  # out brainstem demyelination — the MS-mimic differential is the only
+  # legitimate clinical scenario in which CSF is ordered for an NMJ disorder.
+  optional_modalities: [MRI, ECG, CSF]
   key_findings:
     labs:
       straightforward:
@@ -1244,7 +1252,11 @@ frontotemporal_dementia:
     sex_bias: null
   encounter_type: "outpatient"
   required_modalities: [MRI, LABS, advanced_imaging]
-  optional_modalities: [specialized_test]
+  # CT appears in 2 cases that present acutely via ED (e.g. FTD-M09 brought
+  # by police after shoplifting arrest) — any acute behavioural change in
+  # the ED legitimately gets head CT to exclude haemorrhage/mass/hydrocephalus
+  # before further workup. Not appropriate for outpatient FTD evaluation.
+  optional_modalities: [specialized_test, CT]
   key_findings:
     mri:
       straightforward:
