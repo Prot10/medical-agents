@@ -259,7 +259,8 @@ export function ToolReviewTab() {
       <section className="rounded-2xl border border-border bg-card p-4">
         <h2 className="text-sm font-semibold">Always-available tools</h2>
         <p className="text-xs text-muted-foreground mt-1 mb-3">
-          Available for every condition.
+          Available for every condition — per-tool cost still applies (specialist
+          consultation is not free).
         </p>
         <div className="space-y-1.5">
           {catalog.data.universal_tools.map((name) => {
