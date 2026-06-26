@@ -126,7 +126,9 @@ export function ToolReviewTab() {
   }
 
   return (
-    <div className="px-4 sm:px-6 py-6 sm:py-8 max-w-5xl mx-auto w-full space-y-6">
+    <div className="px-4 sm:px-6 py-6 sm:py-8 max-w-7xl mx-auto w-full">
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_22rem] gap-6">
+        <div className="space-y-6 min-w-0">
       {/* Intro + actions */}
       <div className="space-y-3">
         <div>
@@ -143,6 +145,14 @@ export function ToolReviewTab() {
           check whether the right tools are marked required vs. optional, and flag
           anything missing or inappropriate. If a capability is missing entirely,
           propose it as a new tool. This grounds the tool set before we expand it.
+        </p>
+        <p className="text-xs text-muted-foreground/90 max-w-3xl leading-relaxed border-l-2 border-border pl-3">
+          <span className="font-medium text-foreground/80">Costs:</span>{" "}
+          reference rates in EUR, derived from the US Medicare Physician Fee
+          Schedule (CMS PFS, 2024) converted at 1 USD = 0.92 EUR. Italian SSN
+          tariffs are typically lower for diagnostic studies; EU private-sector
+          rates are typically higher. Use them for relative comparison, not
+          billing accuracy.
         </p>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -327,6 +337,48 @@ export function ToolReviewTab() {
         }}
         editing={editingProposal}
       />
+        </div>
+        <aside className="xl:sticky xl:top-4 xl:self-start xl:max-h-[calc(100vh-2rem)] xl:overflow-y-auto">
+          <ToolReferencePanel tools={catalog.data.tools} />
+        </aside>
+      </div>
+    </div>
+  )
+}
+
+// --- Tool reference (sticky side panel) ------------------------------
+
+function ToolReferencePanel({ tools }: { tools: ToolMeta[] }) {
+  return (
+    <div className="rounded-2xl border border-border bg-card/60 backdrop-blur p-4">
+      <h2 className="text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-3">
+        Tool reference
+      </h2>
+      <p className="text-[11px] text-muted-foreground mb-4 leading-relaxed">
+        Quick glance at what each of the {tools.length} tools does. Stays
+        visible while you scroll through the conditions.
+      </p>
+      <div className="space-y-3">
+        {tools.map((t) => (
+          <div key={t.name} className="text-sm">
+            <div className="flex items-baseline justify-between gap-2">
+              <span className="font-medium text-foreground/95 text-[13px]">
+                {t.label}
+              </span>
+              {t.cost_summary && (
+                <span className="text-[10px] text-muted-foreground tabular-nums whitespace-nowrap">
+                  {t.cost_summary}
+                </span>
+              )}
+            </div>
+            {t.description && (
+              <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">
+                {t.description}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
