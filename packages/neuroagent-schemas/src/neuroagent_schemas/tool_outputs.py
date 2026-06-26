@@ -41,7 +41,11 @@ class MRIReport(BaseModel):
     volumetrics: dict[str, str] | None = None
     additional_observations: list[str] = []
     impression: str
-    differential_by_imaging: list[dict[str, str]] = []
+    # `differential_by_imaging` was removed: the structured `{diagnosis, rationale}`
+    # list was naming the gold-truth diagnosis as its first entry in ~82% of cases
+    # (audit finding) — real radiologists embed any differential considerations in
+    # impression prose, not in a typed list. The field has been emptied across all
+    # 104 affected v5 cases.
     recommended_actions: list[str] = []
 
 
@@ -78,7 +82,9 @@ class ECGReport(BaseModel):
     axis: str = ""
     findings: list[str] = []
     interpretation: str
-    clinical_correlation: str = ""
+    # `clinical_correlation` was removed: 2/602 populated (0.3%) and not a
+    # field real ECG reports carry. Cardiologists put any correlation language
+    # in `interpretation` prose.
 
 
 class LiteratureSearchResult(BaseModel):
