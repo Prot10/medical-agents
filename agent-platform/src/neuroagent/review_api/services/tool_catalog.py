@@ -20,7 +20,14 @@ from typing import Any
 
 import yaml
 
-from ..schemas.tool_review import ConditionToolMapping, ToolCatalog, ToolMeta
+from ..schemas.tool_review import (
+    ConditionToolMapping,
+    ToolCatalog,
+    ToolMeta,
+    ToolOutputField,
+    ToolParameter,
+)
+from .tool_io import output_fields_for, parameters_for
 
 logger = logging.getLogger(__name__)
 
@@ -203,6 +210,53 @@ def _cost_summary(tool_name: str, costs: dict[str, Any]) -> str | None:
     return f"from €{int(floor)}"
 
 
+def _build_parameters(tool_name: str) -> list[ToolParameter]:
+    """Flatten the agent's parameter JSON Schema into the ToolParameter list
+    the review UI renders."""
+    schema = parameters_for(tool_name)
+    if schema is None:
+        return []
+    required = set(schema.get("required") or [])
+    out: list[ToolParameter] = []
+    for key, spec in (schema.get("properties") or {}).items():
+        if not isinstance(spec, dict):
+            continue
+        items = spec.get("items") if isinstance(spec.get("items"), dict) else None
+        default = spec.get("default")
+        # Only surface JSON-serialisable defaults to ToolParameter; complex
+        # defaults (objects, arrays) would inflate the catalog payload.
+        if not isinstance(default, (str, int, bool)) and default is not None:
+            default = None
+        out.append(
+            ToolParameter(
+                name=key,
+                type=str(spec.get("type") or "string"),
+                description=str(spec.get("description") or ""),
+                required=key in required,
+                enum=list(spec["enum"]) if isinstance(spec.get("enum"), list) else None,
+                default=default,
+                items_type=str(items.get("type")) if items else None,
+            )
+        )
+    return out
+
+
+def _build_output_fields(tool_name: str) -> list[ToolOutputField]:
+    """Derive the return-shape summary from the Pydantic output model."""
+    raw = output_fields_for(tool_name)
+    if raw is None:
+        return []
+    return [
+        ToolOutputField(
+            name=r["name"],
+            type=r["type"],
+            description=r["description"],
+            required=r["required"],
+        )
+        for r in raw
+    ]
+
+
 def build_catalog(
     version: str,
     case_objects: dict[str, Any],
@@ -229,6 +283,8 @@ def build_catalog(
             description=m["description"],
             modality=m["modality"],
             cost_summary=_cost_summary(m["name"], tool_costs),
+            parameters=_build_parameters(m["name"]),
+            output_fields=_build_output_fields(m["name"]),
         )
         for m in _TOOL_META
     ]

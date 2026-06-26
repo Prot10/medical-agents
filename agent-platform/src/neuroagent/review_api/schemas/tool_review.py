@@ -21,10 +21,12 @@ from pydantic import BaseModel, Field
 from .annotations import FieldAnnotation
 
 # field_path conventions used by tool-review annotations:
-#   "tool:<tool_name>"                       — a tool in general
-#   "condition:<condition_key>"              — a condition's tool coverage
-#   "condition_tool:<condition_key>:<tool>"  — one tool for one condition
-#   "category:<category>"                    — a pathology category
+#   "tool:<tool_name>"                                   — a tool in general
+#   "tool:<tool_name>:param:<param_key>"                 — one parameter of a tool
+#   "tool:<tool_name>:return:<field_name>"               — one return field of a tool
+#   "condition:<condition_key>"                          — a condition's tool coverage
+#   "condition_tool:<condition_key>:<tool>"              — one tool for one condition
+#   "category:<category>"                                — a pathology category
 # These are plain strings stored in FieldAnnotation.field_path; no new
 # validation is needed beyond FieldAnnotation's own constraints.
 
@@ -107,6 +109,27 @@ class ToolReviewCompleteUpdate(BaseModel):
 # --- Read-only catalog models -----------------------------------------
 
 
+class ToolParameter(BaseModel):
+    """One parameter the agent passes when calling a tool."""
+
+    name: str
+    type: str  # JSON-Schema primitive: "string" | "integer" | "boolean" | "array" | "object"
+    description: str = ""
+    required: bool = False
+    enum: list[str] | None = None
+    default: str | int | bool | None = None
+    items_type: str | None = None  # for arrays: the element type
+
+
+class ToolOutputField(BaseModel):
+    """One top-level field of a tool's returned Pydantic model."""
+
+    name: str
+    type: str  # human-readable: "str", "list[EEGFinding]", "dict[str, str]", ...
+    description: str = ""
+    required: bool = False
+
+
 class ToolMeta(BaseModel):
     """Static description of one diagnostic tool, for display."""
 
@@ -115,6 +138,11 @@ class ToolMeta(BaseModel):
     description: str
     modality: str | None = None
     cost_summary: str | None = None
+    # I/O contract surfaced for tool-review annotations. Reviewers can flag a
+    # specific parameter (`tool:<name>:param:<param>`) or return field
+    # (`tool:<name>:return:<field>`) instead of only the tool as a whole.
+    parameters: list[ToolParameter] = Field(default_factory=list)
+    output_fields: list[ToolOutputField] = Field(default_factory=list)
 
 
 class ConditionToolMapping(BaseModel):
