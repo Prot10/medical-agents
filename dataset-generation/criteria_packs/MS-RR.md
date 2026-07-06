@@ -1,6 +1,6 @@
 # Criteria pack: Multiple Sclerosis, relapsing-remitting
 
-**ICD-10:** G35
+**ICD-10:** G35.A (RRMS — flat G35 retired 2025-10-01; FY2026 split into G35.A relapsing-remitting / G35.B primary-progressive / G35.C secondary-progressive / G35.D unspecified)
 **Condition enum:** `NeurologicalCondition.MULTIPLE_SCLEROSIS`
 **Case ID prefix:** `MS-RR`
 

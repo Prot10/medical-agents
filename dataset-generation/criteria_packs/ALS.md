@@ -27,7 +27,7 @@ electrodiagnostic equivalents of fibrillations under Awaji.
 
 **Recommended:**
 - `order_specialized_test` (`test_type: respiratory_function`) — FVC + MIP/MEP at baseline (informs prognosis and riluzole timing) [AAN_2009]
-- `order_specialized_test` (`test_type: genetic_panel:ALS`) — when family history positive or young onset (<50) [Brown_2017]
+- `order_specialized_test` (`test_type: genetic_panel:ALS`) — when family history positive or young onset (<45) [Brown_2017]
 - MRI of cervical/lumbar spine within the brain MRI workflow — exclude radiculopathy mimicking LMN signs
 
 **Optional:**

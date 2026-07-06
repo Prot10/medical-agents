@@ -1,6 +1,6 @@
 # Criteria pack: Focal epilepsy, temporal lobe
 
-**ICD-10:** G40.2x9 (localization-related symptomatic focal epilepsy)
+**ICD-10:** G40.2x9 (localization-related symptomatic focal epilepsy). Default to the *not-intractable* code (G40.209 / G40.20x); use the *intractable* code (G40.219 / G40.21x) ONLY when the case documents failure of ≥2 adequate AED trials (non-adherence and subtherapeutic dosing do not qualify).
 **Condition enum:** `NeurologicalCondition.FOCAL_EPILEPSY_TEMPORAL`
 **Case ID prefix:** `FEPI-TEMP`
 

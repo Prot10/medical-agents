@@ -1,6 +1,6 @@
-# Criteria pack: Alzheimer's disease, early / MCI due to AD
+# Criteria pack: Alzheimer's disease (mild dementia & MCI due to AD)
 
-**ICD-10:** G30.0 (early-onset), F02.80 (with behavioral disturbance), G31.84 (MCI)
+**ICD-10:** G30.9 (Alzheimer's disease, unspecified — canonical for this mixed-onset cohort; per case use G30.0 only if symptom onset <65 y, G30.1 if onset ≥65 y), F02.80 (with behavioral disturbance), G31.84 (MCI due to AD)
 **Condition enum:** `NeurologicalCondition.ALZHEIMERS_EARLY`
 **Case ID prefix:** `ALZ-EARLY`
 
