@@ -1,6 +1,6 @@
 # Criteria pack: Bacterial meningitis
 
-**ICD-10:** G00.x (by organism), G03.9 (unspecified)
+**ICD-10:** G00.x (by organism), G00.9 (unspecified bacterial)
 **Condition enum:** `NeurologicalCondition.BACTERIAL_MENINGITIS`
 **Case ID prefix:** `BACT-MEN`
 

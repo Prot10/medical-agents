@@ -33,6 +33,7 @@ have free-form parameters — only the two catchalls are vocabulary-constrained.
 | `polysomnography` | Overnight sleep study | RBD, OSA, narcolepsy |
 | `mslt` | Multiple sleep latency test | Narcolepsy diagnosis (post-PSG) |
 | `tilt_table` | Head-up tilt table test | Syncope (vasovagal vs cardiac vs POTS) |
+| `exercise_stress_test` | Graded exercise ECG stress test | Exertional syncope, ischemia, catecholaminergic arrhythmia |
 | `vep` | Visual evoked potentials | MS optic pathway, demyelinating disease |
 | `ssep` | Somatosensory evoked potentials | Myelopathy, brain death adjunct |
 | `baep` | Brainstem auditory evoked potentials | Brainstem demyelination, CPA tumor |

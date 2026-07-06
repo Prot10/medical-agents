@@ -1,4 +1,4 @@
-# Criteria pack: High-grade glioma (glioblastoma, anaplastic astrocytoma)
+# Criteria pack: High-grade glioma (glioblastoma, IDH-mutant astrocytoma grade 3)
 
 **ICD-10:** C71.x
 **Condition enum:** `NeurologicalCondition.BRAIN_TUMOR_GLIOMA`
@@ -15,7 +15,7 @@ contrast-enhancing mass with central necrosis, surrounding T2/FLAIR
 hyperintense edema, mass effect, restricted diffusion at edges, elevated
 rCBV on perfusion, elevated Cho/NAA ratio on MRS, ring enhancement.
 Definitive diagnosis = tissue (biopsy or resection). High-grade = WHO
-grades 3-4 (anaplastic astrocytoma, glioblastoma).
+grades 3-4 (IDH-mutant astrocytoma CNS WHO grade 3, glioblastoma; note "anaplastic astrocytoma" is the retired WHO-2016 synonym).
 
 ## 2. Standard workup hierarchy
 
@@ -55,7 +55,7 @@ grades 3-4 (anaplastic astrocytoma, glioblastoma).
 
 ## 6. Subtype variations
 
-- **M (mild):** small, less aggressive features, possibly grade 3 anaplastic astrocytoma; standard workup
+- **M (mild):** small, less aggressive features, possibly IDH-mutant astrocytoma CNS WHO grade 3; standard workup
 - **S (standard):** typical glioblastoma with classic ring-enhancing necrotic mass; standard workup
 - **P (progressive / aggressive):** large mass, multicentric, brainstem/eloquent location, rapid growth; same diagnostic workup + urgent surgical/radiation referral
 - **R (reverse / mimic):** abscess (restricted diffusion centrally, surrounding edema — different DWI signature), demyelinating lesion (tumefactive MS), metastasis (usually multiple, gray-white junction), lymphoma (centrally restricted, less peripheral edema, HIV/immunocompromised), radiation necrosis (post-RT context); workup adds blood cultures (abscess), HIV (lymphoma), CT chest/abd/pelvis (metastatic), oligoclonal bands (tumefactive MS)

@@ -95,13 +95,13 @@ uv run --project dataset-generation python dataset-generation/scripts/dataset_st
 
 | Abbreviation | Condition | ICD Code |
 |-------------|-----------|----------|
-| `ISCH-STR` | Ischemic stroke | I63.9 |
-| `FEPI-TEMP` | Focal epilepsy (temporal) | G40.109 |
-| `MS-RR` | Multiple sclerosis (relapsing-remitting) | G35 |
-| `ALZ-EARLY` | Early Alzheimer's disease | G30.9 |
+| `ISCH-STR` | Acute ischemic stroke | I63.9 |
+| `FEPI-TEMP` | Focal epilepsy (temporal) | G40.209 |
+| `MS-RR` | Multiple sclerosis (relapsing-remitting) | G35.A |
+| `ALZ-EARLY` | Alzheimer's disease | G30.9 |
 | `PD` | Parkinson's disease | G20 |
 | `GLIO-HG` | High-grade glioma (glioblastoma) | C71.9 |
-| `BACT-MEN` | Bacterial meningitis | G00.1 |
+| `BACT-MEN` | Bacterial meningitis | G00.9 |
 | `NMDAR-ENC` | Anti-NMDAR encephalitis | G04.81 |
 | `FND` | Functional neurological disorder | F44.4 |
 | `SYNC-CARD` | Cardiac syncope | R55 |
