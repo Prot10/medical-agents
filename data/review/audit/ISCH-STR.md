@@ -1,112 +1,128 @@
-# NeuroBench v5 audit — ISCH-STR (ischemic stroke)
+# ISCH-STR — NeuroBench v5 audit
 
-Scope: all 20 `ISCH-STR-*` cases (M01–M03, P01–P03, RM01–RM03, RP01–RP03,
-RS01–RS04, S01–S04). Method: full field-by-field read of every case against the
-ISCH-STR criteria pack (AHA/ASA 2019; DAWN/DEFUSE-3; CADISS; Sanna 2014) and the
-tool-report style guide; mechanical validators run on every case. Conservative fix
-policy — only unambiguous mechanical errors fixed; everything requiring clinical
-judgment flagged.
+30 cases audited, 111 findings (1 blocker / 34 major / 50 minor / 26 nit), 18 fixed vs 93 flagged, validators OK.
 
-Per audit instruction, the following are KEPT (not stripped) as legitimate
-within-modality conclusions: imaging infarct/territory naming + CTA/MRA occlusion and
-dissection characterization; ECG atrial fibrillation; echo PFO/vegetation; literature
-results stating population-level alteplase/thrombectomy evidence. Time-critical
-sequence constraints (door-to-CT, tPA window, hard `order_ct_scan`→
-`check_drug_interactions` tPA gate) verified clinically sound in every case.
+## Terminology / taxonomy
 
-Mechanical baseline (all 20 cases): coherence validator 0 issues, schema valid,
-tool-vocab pass. Leakage detector: only ISCH-STR-S01 `search_medical_literature.summary`
-flagged ("acute ischemic stroke" phrase) — population-keyed alteplase/thrombectomy
-evidence, allowed by the style guide (Kind-2), NOT a case-specific verdict. No Kind-1
-literature leaks found.
-
-## Findings
-
-| case_id | dim | severity | region.field path | finding | action | detail |
+| case_id | dim | severity | field path | finding | action | recommendation |
 |---|---|---|---|---|---|---|
-| ISCH-STR-S01 | B/C | blocker | patient.neurological_exam (motor/sensory/cranial_nerves/additional) + history_present_illness vs initial_tool_outputs.mri + ground_truth | LATERALIZATION CONTRADICTION: imaging + GT = LEFT MCA infarct (left M1/ICA-T occlusion); global aphasia fits left/dominant hemisphere — BUT all motor/sensory/gaze/face/HPI findings are LEFT-body (left hemiplegia, left facial droop, right gaze preference, left hemineglect, left extinction, tongue deviates left) = RIGHT-hemisphere pattern, the OPPOSITE of a left MCA stroke (should be right-sided deficits) | FLAGGED | added to metadata.case_body_concerns. Not auto-edited: touches the clinical story across HPI + multiple exam fields; fixing requires deciding lesion side vs body side. Most significant clinical flag in the set |
-| ISCH-STR-M01 | B | minor | followup_outputs[2].output.duration_hours | `duration_hours: 1` contradicts its own narrative ("Twenty-four hour Holter monitoring", "847 in 24 hours", episodes spanning a 24h day) | FIXED | changed 1 → 24 (mirrors the 24h impression/events; consistent with the holter_24h monitor_type) |
-| ISCH-STR-M03 | B | minor | followup_outputs[2].output.duration_hours | `duration_hours: 5` contradicts narrative ("approximately 20.5 hours of the 24-hour recording", "847 in 24 hours", "Twenty-four hour Holter monitoring") | FIXED | changed 5 → 24 |
-| ISCH-STR-M03 | B | minor | patient.demographics.bmi vs clinical_history.past_medical_history | PMH lists "Obesity (BMI 31.2)" but demographics.bmi = 29.8 (overweight, not obese); 31.2 is a copy artifact (identical to M01) | FLAGGED | added to case_body_concerns. Not fixed: changing the number to 29.8 would leave the "Obesity" label clinically wrong (29.8 < 30); reconciling label + value is a judgment call |
-| ISCH-STR-M01 | C | minor | followup_outputs[6].output.contraindications[0] | apixaban dose-reduction text says "This patient meets only one criterion (creatinine 1.52)" but the case's BMP creatinine is 1.4 mg/dL; 1.4 < 1.5 means the patient meets ZERO criteria, so even the conclusion's "one criterion" framing is off | FLAGGED | drug-interaction reasoning + internal numeric mismatch (1.52 vs 1.4); GT/output semantics, do-not-fix. Final dosing conclusion (standard 5 mg BID) is clinically fine |
-| ISCH-STR-RM01 | E | minor | followup_outputs[6].output.interactions[1] | typo "rivarfaxaban" | FIXED | corrected to "rivaroxaban" |
-| ISCH-STR-RP01 | B/C | major | ground_truth.differential[1].key_features | "Alcohol intoxication" key_features states "serum ethanol below threshold", but the case's ethanol is 2.3 per mille (clearly ABOVE the <0.5 threshold; narrative repeatedly says significant intoxication). Should read: patient was intoxicated, but persistent/worsening focal deficits + basilar occlusion exclude pure intoxication | FLAGGED | added to case_body_concerns. GT semantics — not auto-edited |
-| ISCH-STR-S03 | C | major | patient.neurological_exam.cranial_nerves | "Conjugate right gaze deviation" in a LEFT MCA stroke with right hemiparesis — cortical gaze deviation is toward the lesion (should be LEFT/away from weak side). Wrong direction | FLAGGED | added to case_body_concerns. Rest of exam correctly right-sided; only gaze direction wrong. Compare S02 (correct: "Left gaze preference") |
-| ISCH-STR-S04 | C | major | patient.neurological_exam.cranial_nerves + history_present_illness | "Conjugate right gaze deviation" (exam) and "right gaze preference" (HPI/EMS) in a LEFT MCA stroke with right hemiparesis — should be LEFT gaze. Wrong direction in both fields | FLAGGED | added to case_body_concerns. Rest correctly right-sided |
-| ISCH-STR-S03 | E | nit | history_present_illness | "The daughter reports that he spoke to his mother on the phone at 09:00" — patient (age 55) speaking to his mother is implausible; likely a template slip (daughter spoke to the patient) | FLAGGED | added to case_body_concerns; minor narrative artifact |
-| ISCH-STR-S01, S03 | A/info | info | metadata.case_body_concerns[0] | pre-existing concern claims `check_drug_interactions` (step 6) has no pre-generated output, but both cases DO have a check_drug_interactions followup_outputs entry — concern is now STALE | NOTED | left in place (removing is a metadata-semantics judgment); reviewer can clear |
-| ISCH-STR-P01, P03 | A/info | info | metadata.case_body_concerns | stale concerns: P01 (check_drug_interactions) and P03 (check_drug_interactions, order_cardiac_monitoring, order_advanced_imaging step 11) all now HAVE followup outputs | NOTED | left in place |
-| ISCH-STR-RM01, RM02 | A/info | info | metadata.case_body_concerns[0] | stale concern: order_cardiac_monitoring (step 9) now HAS a holter followup in both | NOTED | left in place |
-| ISCH-STR-P02 | A/C | minor | metadata.case_body_concerns + followup_outputs | 3 listed concerns; 2 (check_drug_interactions, order_cardiac_monitoring) now stale (outputs exist), but `search_medical_literature` (required step 5) genuinely has NO followup output — agent receives only the generic literature fallback | FLAGGED | the lit-search gap is real and valid; reviewer should add a moyamoya-keyed literature followup |
-| ISCH-STR-P03 | C | minor | ground_truth.optimal_actions step 8 vs followup_outputs echo | gold wants `echo_type: TEE` (TTE misses ~30% of vegetations in IE) but the provided echo followup reports as a TTE that already shows the 1.8 cm vegetation | FLAGGED | the vegetation is provided regardless; mild action/output modality mismatch |
-| ISCH-STR-P03 | B | minor | followup_outputs[3].output (analyze_brain_mri) vs followup_outputs[7].output (order_advanced_imaging MRA) | two mycotic-aneurysm descriptions differ: brain-MRI says RIGHT MCA M2 fusiform 4 mm; MRA says LEFT MCA M3/M4 saccular 3 mm — different side/morphology/size | FLAGGED | could be two separate aneurysms in a multi-territory septic shower (plausible) or an inconsistency between two outputs meant to be the same lesion. Reviewer to confirm intent |
-| ISCH-STR-P02 | B/C | minor | initial_tool_outputs.mri.impression | MRI impression states only "Multiple bilateral chronic watershed infarcts…" and omits the ACUTE left frontal opercular DWI lesion (finding #1) and the bilateral ICA/MCA flow attenuation present in its own findings | FLAGGED | within-modality impression completeness; may be deliberately understated to avoid leaking moyamoya — do-not-rewrite (voice/judgment) |
-| ISCH-STR-RS01, S01, S03, S04, RS04 | D/B | minor | followup_outputs (order_ct_scan CTA).output.impression | recurring pattern in the cardioembolic/LVO + basilar cases: CTA `findings` include a "Large vessel occlusion" (M1 / ICA-T / basilar) but the CTA `impression` omits the LVO entirely, mentioning only incidental carotid atherosclerosis | FLAGGED | information is recoverable (LVO is in the structured findings AND named in the MRI impression), so not answer-loss; but a real CTA impression would lead with the LVO/thrombectomy target. Systematic realism quality issue; do-not-rewrite (within-modality voice) |
-| ISCH-STR-RM01, RM03, RP02 | B | minor | followup_outputs (CTA / carotid_duplex).output.impression | within-modality impression omits the primary positive finding present in its own findings array: RM01 CTA impression skips the headline left ICA dissection; RM03 CTA impression skips left ICA dissection; RP02 carotid-duplex impression says "Normal left carotid… no atherosclerotic disease bilaterally" while findings show markedly elevated right ICA velocities (dissection) | FLAGGED | same impression-completeness pattern; do-not-rewrite |
-| ISCH-STR-P01, RM02 | B | minor | followup_outputs (carotid_duplex / order_advanced_imaging).output | findings note an abnormal vertebral/vessel signal but the impression understates it (P01: left vertebral "dampened waveform" in findings, impression only states "Normal right vertebral"; RM02 minor) | FLAGGED | within-modality completeness; do-not-rewrite |
-| ISCH-STR-RP01 | B | minor | followup_outputs (order_advanced_imaging, modality=carotid_duplex) | a TCD/vertebrobasilar study (basilar TCD high-PI, vertebral PSVs) is reported under `modality: carotid_duplex`; gold step 10 expects `transcranial_doppler`. Impression also omits the basilar high-PI finding | FLAGGED | modality-label vs content mismatch; do-not-fix (vocab is free-text-ish here, but reviewer may relabel) |
-| ISCH-STR-RP03 | B | minor | ground_truth.optimal_actions step 9 vs followup_outputs cardiac_monitoring | gold step 9 specifies `monitor_type: event_monitor_30d` (cryptogenic) but the provided followup is a 48h `holter_24h` | FLAGGED | output is normal either way; action/output monitor-type mismatch |
-| ISCH-STR-RP02 | C/E | minor | initial_tool_outputs.ecg.interpretation | ECG rate 86 + rhythm "Normal sinus rhythm" but interpretation closes "Mild sinus tachycardia may reflect…pregnancy" — 86 bpm is not tachycardia and contradicts the NSR call | FLAGGED | within-modality wording inconsistency; do-not-rewrite (interpretive text/borderline meaning) |
-| ISCH-STR-RS02 | C | minor | ground_truth.critical_actions + contraindicated_actions vs HPI | tPA framing leans on "recent major surgery (within 14 days)" contraindication, but the aortic arch replacement was 6 weeks ago (outside the 14-day window). The drug-check output correctly notes "6 weeks…beyond the high-risk window but warrants caution" | FLAGGED | clinical-judgment nuance: at 6 weeks the strict 14-day tPA bar has passed; the dissection/aortic involvement may still argue against tPA. Reviewer to reconcile the recency framing |
-| ISCH-STR-RM03 | B/info | info | ground_truth.primary_diagnosis + icd_code | by-design "reverse" case: final dx is "Left ICA dissection presenting with painful Horner syndrome — high stroke risk WITHOUT completed cerebral infarct" (icd I77.71, NOT I63.x); MRI explicitly shows no acute DWI | NOTED | coherent and intentional (a stroke-mimic/precursor under the ISCH-STR condition); reviewer should be aware an ISCH-STR case has a non-I63 final diagnosis |
-| ISCH-STR-RS02 | B/info | info | ground_truth.icd_code | iatrogenic post-surgical dissection-stroke coded I97.811 (intraoperative/postprocedural cerebrovascular complication) rather than I63.x | NOTED | clinically defensible for the iatrogenic etiology; flagged for coding-consistency awareness |
-| ISCH-STR (all 20) | A/B | info | followup_outputs[].output.monitor_type | every case uses `monitor_type: "holter_24h"` even when duration is 48h/72h or the report describes telemetry/30d monitoring; the enum lacks longer-duration keys | NOTED | consistent generator artifact; internally the impressions match the stated duration; not auto-edited |
+| ISCH-STR-M04 | terminology (icd-laterality) | major | ground_truth.icd_code | ICD I63.012 (LEFT vertebral) coded but case is RIGHT lateral medulla/vertebral (Wallenberg) | FIXED | I63.011 |
+| ISCH-STR-RM04 | terminology (icd-laterality) | major | ground_truth.icd_code | ICD I63.012 (LEFT vertebral) coded but case is RIGHT PICA/vertebral dissection | FIXED | I63.011 |
+| ISCH-STR-S05 | terminology (icd-laterality) | major | ground_truth.icd_code | ICD I63.412 (LEFT MCA embolism) coded but case is RIGHT MCA cardioembolic stroke | FIXED | I63.411 |
+| ISCH-STR-RS03 | terminology (icd-laterality) | major | ground_truth.icd_code | ICD I63.432 (LEFT PCA embolism) coded but case is RIGHT PCA cardioembolic stroke | FIXED | I63.431 |
+| ISCH-STR-P03 | terminology (icd-invalid-code) | major | ground_truth.icd_code | I63.4 is a non-billable category header requiring higher specificity; septic emboli case names no single artery/side | FIXED | I63.40 |
+| ISCH-STR-S06 | terminology (icd-specificity) | major | ground_truth.icd_code | Lacunar/small-vessel infarct coded I63.89 (catch-all) instead of the specific lacunar code; inconsistent with sister case RP05 which correctly uses I63.81 | FIXED | I63.81 |
+| ISCH-STR-RS02 | terminology (icd-procedural-complication) | major | ground_truth.icd_code | I97.811 (intraoperative, other surgery) contradicts case on both axes: infarct is postoperative, and aortic arch replacement is cardiac surgery not "other" | FLAGGED | I97.820, or recode as I63.232 + I77.71 if procedural-complication framing dropped |
+| ISCH-STR-P05 | terminology (icd-specificity) | nit | ground_truth.icd_code | Coded I63.9 (unspecified) despite defined territory/mechanism (paradoxical embolism to left PCA) | FLAGGED | Consider I63.432 |
+| ISCH-STR-RP04 | terminology (icd-specificity) | nit | ground_truth.icd_code | Coded I63.9 (unspecified) despite defined territory (left MCA superior division) and mechanism (APS) | FLAGGED | Consider I63.312/I63.512 if territory-specific code preferred |
+| CONFIG | terminology (epidemiology-demographics) | minor | conditions.yaml ischemic_stroke.typical_demographics.age_range | age_range [45,85] excludes the 11/30 designed young-stroke cohort (ages 28-43: dissection, PFO, CADASIL, moyamoya, pregnancy, APS) | FLAGGED | Widen lower bound (e.g. [30,85] or [18,85]) or document range as modal not full cohort |
+| README | terminology (cross-file-name-mismatch) | minor | dataset-generation/README.md:98 | Display-name mismatch: conditions.yaml "Acute ischemic stroke" vs README "Ischemic stroke" (ICD codes consistent) | FLAGGED | Align README to "Acute ischemic stroke" |
 
-## Cross-cutting positives (verified, no action)
+## Audit findings
 
-- Hard tPA gate `order_ct_scan (non-contrast) → check_drug_interactions` present and
-  correct in all 20 cases; LVO cases additionally gate thrombectomy on CTA. Door-to-CT
-  primacy and "no tPA before CT excludes hemorrhage" in every critical/contraindicated
-  action set.
-- Wake-up / late-window logic sound: M01–M03 use DWI-FLAIR mismatch (WAKE-UP/EXTEND)
-  correctly; FLAIR-positive ⇒ outside window. RP01 (basilar) and P-series correctly
-  invoke DAWN/DEFUSE-3 / ATTENTION / BAOCHE thrombectomy windows.
-- Sex-specific and pregnancy-adjusted lab reference ranges used appropriately (female
-  Hgb 12.0–16.0 and HDL >50 in RM01/RM02/RS01; pregnancy ranges in RP02 — Hgb 11–14,
-  Cr 0.5–0.9, fibrinogen/D-dimer/Protein S notes).
-- Contrast caution for CKD (M01/M02/M03) and gadolinium-avoidance in pregnancy (RP02)
-  correctly encoded in contraindicated_actions.
-- KEPT within-modality conclusions verified appropriate: ECG atrial fibrillation;
-  MRI/MRA/CTA dissection + infarct + LVO; echo PFO/ASA and IE vegetation (P03); CSF
-  fallback normal; literature population-keyed (CADISS, CLOSE/RESPECT, WAKE-UP, VITT,
-  ATTENTION/BAOCHE). No Kind-1 cross-modality synthesis or management prescription found
-  in any tool report (drug-interaction outputs give legitimate category-level management
-  only — e.g. sumatriptan-in-dissection contraindication RM03, moyamoya hemorrhage risk
-  P02, IE tPA contraindication P03).
-- S02 confirmed as the correctly-lateralized left-MCA template (left gaze preference,
-  right deficits, right field cut, tongue right) — the standard against which S01/S03/S04
-  gaze/lateralization flags were judged.
-- Differentials verified likelihood-descending and enum-valid; off-pathway
-  amyloid_PET/DaTscan/FDG_PET key_reasoning_points present and correct in every case.
+| case_id | dim | severity | field path | finding | action | recommendation |
+|---|---|---|---|---|---|---|
+| ISCH-STR-M03 | B internal-consistency | major | followup_outputs[2].output.events[4]/findings[4] | PAC burden "847 in 24h (3.5%)" is arithmetically impossible (~0.8% actual); sibling M01 reports same 847 as ~1% | FIXED | Corrected to "approximately 1% of total beats" |
+| ISCH-STR-M01 | B internal-consistency | major | followup_outputs[6].output.contraindications[0] | Drug-check narrative cites creatinine "1.52" and "meets one criterion" for apixaban dose reduction, but structured BMP Cr=1.4 → meets zero criteria | FLAGGED | Reconcile to 1.4 and "meets no dose-reduction criteria"; needs author judgment |
+| ISCH-STR-M01 | C clinical-correctness | major | initial_tool_outputs.ct / fallback_tool_outputs.ct | Required step-1 non-contrast CT head has no pre-generated output (no initial "ct", fallback null); only CTA followup exists | FLAGGED | Add case-specific non-contrast CT output; out of fix-scope |
+| ISCH-STR-M03 | C clinical-correctness | major | initial_tool_outputs.ct / fallback_tool_outputs.ct | Same gap as M01: no pre-generated non-contrast CT for required step 1 | FLAGGED | Add non-contrast CT output; out of fix-scope |
+| ISCH-STR-M02 | B internal-consistency | major | followup_outputs[1].output.monitor_type | monitor_type="holter_24h" but duration_hours=72 and impression says "Seventy-two hour Holter monitoring" | FLAGGED | Match label to 72h duration or reduce duration to 24h; risks desyncing gold step-9 param |
+| ISCH-STR-M01 | B internal-consistency | minor | patient.neurological_exam.cranial_nerves | Exam says left-visual extinction on double simultaneous stimulation "on the right", but all other signs point left-MCA/right-sided deficits | FLAGGED | Should read right-sided visual extinction; exam wording not to be edited per policy |
+| ISCH-STR-M02 | E language | minor | metadata.difficulty_description | Says "subtle right-sided neglect" but M02 is right-hemisphere infarct with left-sided deficits/neglect (copy artifact from M01/M03) | FLAGGED | Change to "left-sided neglect"; conservative no-edit on metadata prose |
+| ISCH-STR-M01 | B internal-consistency | minor | followup_outputs[0].output.contrast_used | CTA followup (findings prefixed "CTA:") reports contrast_used=false; CTA is definitionally contrast | FLAGGED | Should be true; flipping deepens built-in CKD/contrast tension, author judgment |
+| ISCH-STR-M03 | B internal-consistency | minor | followup_outputs[0]/[5].output.contrast_used | CTA and CT-perfusion followups both report contrast_used=false despite requiring contrast | FLAGGED | Should be true for both; systematic pattern, author judgment |
+| ISCH-STR-M02 | D realism-leakage | minor | initial_tool_outputs.ct.recommended_actions | CT recommended_actions carry treatment-eligibility/cross-modality reasoning ("apply MRI DWI-FLAIR criteria...", "not a thrombectomy candidate") | FLAGGED | Reduce to imaging facts; borderline, author judgment |
+| ISCH-STR-M03 | B internal-consistency | minor | patient.demographics.bmi / past_medical_history[5] | demographics.bmi=29.8 but PMH lists "Obesity (BMI 31.2)" (copy artifact matching M01) | FLAGGED | Reconcile canonical BMI; already recorded in metadata concerns |
+| ISCH-STR-M03 | A schema | nit | metadata.case_body_concerns[0] | Concern claims check_drug_interactions (step 6) has no pre-generated output, but a followup IS present | FLAGGED | Remove/update stale concern |
+| ISCH-STR-M01 | E language | nit | initial_tool_outputs.ecg | Identical ECG template (rate 78 etc.) across M01/M02/M03 while vitals HR differs | FLAGGED | Optionally vary ECG rate; realism nit, no correctness impact |
+| ISCH-STR-M04 | terminology | minor | initial_tool_outputs.ecg.findings[1] | Misspelled eponym "Sokolov-Lyon index" | FIXED | Corrected to "Sokolow-Lyon index" |
+| ISCH-STR-M04 | B | major | patient.neurological_exam.additional | HINTS description self-contradictory: "head impulse test negative (normal corrective saccade bilaterally...)" — negative HIT means NO corrective saccade | FLAGGED | Reword to "no corrective saccade bilaterally"; central-vs-peripheral localization is the crux of the case |
+| ISCH-STR-M04 | B | nit | patient.neurological_exam.additional | NIHSS breakdown appears to double-count the single sensory item (lists both "right facial sensory loss" and "crossed sensory findings") | FLAGGED | Re-label as "sensory 2 (dense crossed loss)"; total is defensible |
+| ISCH-STR-M05 | E | minor | mri (additional_observations/impression) + followup_outputs[1] | Duplicated word "proximal proximal vascular occlusion" in 3 places | FIXED | Replaced with "proximal vascular occlusion" |
+| ISCH-STR-M05 | E | nit | patient.history_present_illness | Redundant "episodic episodes of heaviness and clumsiness" | FLAGGED | Change to "episodes of heaviness and clumsiness"; prose reword |
+| ISCH-STR-P01 | B | minor | followup_outputs[2].output.monitor_type | monitor_type="holter_24h" while duration=72h and all narrative says "72-hour" | FIXED | Corrected monitor_type to "holter_72h" |
+| ISCH-STR-P01 | C | minor | ground_truth.optimal_actions[9] | Step 10 carotid_duplex tier="required" but its own expected_finding says it's less informative for vertebral arteries (posterior-circulation case) | FLAGGED | Consider demoting to optional/recommended |
+| ISCH-STR-P01 | C | nit | ground_truth.optimal_actions[10],[12] | MR_angiography of head/neck appears twice at different tiers (required + recommended) | FLAGGED | Merge into one entry |
+| ISCH-STR-P02 | B internal-consistency | minor | followup_outputs[request_ct_angiography/perfusion].output.contrast_used | CTA/CT-perfusion outputs flagged contrast_used=false despite requiring contrast; gold step 2 sets contrast=true | FIXED | Set contrast_used=true |
+| ISCH-STR-P02 | E language | minor | followup_outputs[request_conventional_angio].output.impression | Run-on sentence, missing periods between 3 clauses | FIXED | Inserted periods |
+| ISCH-STR-P02 | B internal-consistency | minor | initial_tool_outputs.mri.impression | Impression omits the acute left frontal-operculum (Broca) DWI infarct that is findings[0] and the scan's own reason | FLAGGED | Add acute infarct as lead impression line; rewording judgment |
+| ISCH-STR-P02 | D realism-leakage | minor | followup_outputs[request_ct_perfusion].output.additional_observations[1] | Report links imaging deficit to clinical history ("explains vulnerability... during hyperventilation") — cross-modality/clinical synthesis | FLAGGED | Reduce to within-imaging steal finding; borderline judgment |
+| ISCH-STR-P02 | B internal-consistency | nit | patient.neurological_exam.additional | NIHSS breakdown lists non-standard "right hand motor 1" item | FLAGGED | Re-score without fabricated item |
+| ISCH-STR-P02 | terminology | nit | followup_outputs[request_conventional_angio].output.modality | modality='' (empty); vocabulary lacks catheter-angiography key | FLAGGED | Flag as CONFIG-level vocab gap |
+| ISCH-STR-P03 | B internal-consistency | major | patient.neurological_exam.additional | Stated NIHSS 12 doesn't match enumerated breakdown summing to 8 | FLAGGED | Reconcile total vs breakdown; ambiguous which is correct |
+| ISCH-STR-P03 | B internal-consistency | major | followup_outputs[request_followup_mri] vs [request_mra_mycotic_aneurysm] | Mycotic aneurysm described inconsistently: right MCA M2 4mm fusiform vs left cortical MCA M3/M4 3mm saccular | FLAGGED | Harmonize laterality/morphology or state two separate aneurysms |
+| ISCH-STR-P03 | B internal-consistency | minor | followup_outputs[request_ct_angiography].output.contrast_used | CTA flagged contrast_used=false despite requiring contrast | FIXED | Set contrast_used=true |
+| ISCH-STR-P03 | D realism-leakage | minor | followup_outputs[request_echocardiogram].output.impression | Auto-generated lab-style "(H)" tag list rather than proper ASE impression | FLAGGED | Rewrite as terse cardiac impression |
+| ISCH-STR-P03 | D realism-leakage | nit | initial_tool_outputs.ecg.interpretation | Adds "sinus tachycardia may reflect underlying infection..." hinting at endocarditis answer | FLAGGED | Trim to cardiac read; borderline |
+| ISCH-STR-P04 | B internal-consistency | major | followup_outputs[request_perfusion_imaging].output.modality | modality='perfusion_MRI' but entire report is CT perfusion (no CT-perfusion vocab key exists) | FLAGGED | Add CT-perfusion vocab key or convert report text to MR perfusion; not fixable in-case |
+| ISCH-STR-P04 | B internal-consistency | minor | followup_outputs[request_holter_monitor].output.monitor_type | monitor_type="holter_24h" contradicts duration_hours=48 and "Forty-eight hour" impression | FLAGGED | Reconcile; no holter_48h enum value exists |
+| ISCH-STR-P04 | B internal-consistency | nit | followup_outputs[request_holter_monitor].output.heart_rate_range | Only average populated (76), omits min/max despite findings stating "range 54-98 bpm" | FLAGGED | Populate min=54, max=98 |
+| ISCH-STR-RM02 | D realism-leakage | major | initial_tool_outputs.mri.impression | Impression added cross-modality pointer to cervical vascular etiology, steering agent to the answer from a negative brain scan | FIXED | Removed trailing sentence |
+| ISCH-STR-RM01 | B internal-consistency | major | followup_outputs[0].output.contrast_used | CTA followup contrast_used=false despite luminal/opacification findings requiring contrast; gold step 2 contrast=true | FLAGGED | Confirm intended acquisition; if true CTA set contrast_used=true |
+| ISCH-STR-RM02 | B internal-consistency | major | followup_outputs[0].output.contrast_used | Same issue as RM01: CTA contrast_used=false despite % stenosis/reconstitution findings | FLAGGED | Confirm; set contrast_used=true if true CTA |
+| ISCH-STR-RM02 | D realism-leakage | minor | followup_outputs[5].output.interactions[0] | Drug-check output announces diagnosis: "In the context of carotid dissection with atrial fibrillation..." | FLAGGED | Reword to category-level without naming diagnosis |
+| ISCH-STR-RM01 | A schema | nit | metadata.case_body_concerns[0] | Stale concern: claims order_cardiac_monitoring step 9 has no output, but a followup exists | FLAGGED | Remove/update stale concern |
+| ISCH-STR-RM02 | A schema | nit | metadata.case_body_concerns[0] | Identical stale concern re order_cardiac_monitoring step 9 | FLAGGED | Remove/update stale concern |
+| ISCH-STR-P05 | C clinical-correctness | minor | ground_truth.differential[0].likelihood | "Migraine with aura" assigned "high" likelihood post-workup despite DWI-confirmed infarct that should exclude migraine mimic | FLAGGED | Consider downgrading; may encode pre-test anchoring intentionally |
+| ISCH-STR-RM04 | B internal-consistency | major | ground_truth.useless_tools / harmful_tools | analyze_csf (same params) appeared in BOTH useless_tools and harmful_tools — coherence contradiction | FIXED | Removed from useless_tools; retained clinically-correct harmful_tools classification |
+| ISCH-STR-RM04 | C clinical-correctness | minor | patient.neurological_exam.additional | NIHSS breakdown invalid: includes non-existent "gait ataxia" item; limb ataxia caps at 2, breakdown sums to 3 | FLAGGED | Correct total to 2 with proper breakdown; needs human review |
+| ISCH-STR-RP01 | B internal-consistency | major | ground_truth.differential[1].key_features | "Alcohol intoxication" differential states ethanol "below threshold" but case ethanol is 2.3 per mille (abnormal) | FLAGGED | Reword to reflect intoxication present but excluded by persistent deficits + confirmed basilar occlusion |
+| ISCH-STR-RP01 | D realism-leakage | minor | followup_outputs[2].output.impression | Echo impression uses lab-style "(H)" abnormal flags rather than prose | FLAGGED | Rewrite as prose narrative |
+| ISCH-STR-RP01 | B internal-consistency | minor | followup_outputs[3].output | monitor_type="holter_24h" but duration_hours=48 and narrative says "48-hour" throughout | FLAGGED | Set 48h-consistent label or reduce duration; no holter_48h enum exists |
+| ISCH-STR-RP01 | E language | nit | ground_truth.optimal_actions[6].action | "if non-leaky for ischemia" does not parse | FLAGGED | Reword for clarity; intended meaning ambiguous |
+| CONFIG | D realism-leakage | minor | followup_outputs[request_ct_angiography].output.contrast_used | CTA followups set contrast_used=false systemically across ISCH-STR (affects RM03, RP01, and majority of ~30 cases) | FLAGGED | Dataset-wide convention needed: set contrast_used=true for angiography=true CTA outputs |
+| ISCH-STR-RM03 | B internal-consistency | minor | initial_tool_outputs.ct / fallback_tool_outputs.ct | No non-contrast CT output exists though optimal_actions step 1 requires one | FLAGGED | Add normal non-contrast CT output or document mock single-slot behavior |
+| ISCH-STR-RM03 | C clinical-correctness | minor | ground_truth.optimal_actions[10],[11] | order_advanced_imaging MR_angiography duplicated with conflicting tiers (required vs recommended); criteria pack lists it as Recommended only | FLAGGED | Collapse to single step, align tier with pack |
+| ISCH-STR-RM03 | C clinical-correctness | minor | ground_truth.critical_actions | Generic tPA door-to-needle/BP<185/110 boilerplate applied to a dissection case with NO completed infarct | FLAGGED | Human review whether tPA/thrombectomy items fit a no-infarct mimic |
+| ISCH-STR-RP02 | B internal-consistency | minor | initial_tool_outputs.ecg.interpretation | "Mild sinus tachycardia" at 86 bpm is self-contradictory (tachycardia >100 bpm; rhythm already "Normal sinus rhythm") | FIXED | Removed the false trailing sentence |
+| ISCH-STR-RP02 | B internal-consistency | major | followup_outputs[5].output.impression | Carotid duplex impression reports only normal left system, omitting/contradicting its own abnormal right ICA finding (high-grade stenosis) | FLAGGED | Rewrite impression to state right ICA stenosis alongside normal left; interpretive rewrite |
+| ISCH-STR-RP03 | C clinical-correctness | major | patient.neurological_exam.cranial_nerves | LMN-pattern left facial palsy described (eye closure impaired) but diagnosis is a RIGHT cortical MCA infarct — cortical strokes cause UMN (forehead-sparing) palsy | FLAGGED | Reword to central/forehead-sparing pattern consistent with cortical infarct; exam story not to be edited outright |
+| ISCH-STR-RP03 | B internal-consistency | minor | patient.neurological_exam.mental_status | GCS 13 (E3V5M5) inconsistent with narrative: "confused about date" implies V4, "follows one-step commands" implies M6 | FLAGGED | Review GCS component assignment |
+| ISCH-STR-RP03 | D realism-leakage | minor | followup_outputs[4].output.results[0] | Literature result mirrors index patient almost exactly (36yo, inactivated COVID vaccine, stroke ~24h post) | FLAGGED | Genericize case-report entry or remove demographic match; low priority (doesn't leak gold PFO answer) |
+| ISCH-STR-RP04 | E language | nit | patient.neurological_exam.reflexes | Typo "patilar" for patellar (left side only) | FIXED | Corrected to "patellar" |
+| ISCH-STR-RP04 | D realism-leakage | minor | initial_tool_outputs.labs.abnormal_values_summary[3] | PTT summary adds interpretation + references a mixing study not present in the panel | FLAGGED | Reduce to "PTT 46 seconds (elevated)"; borderline, touches interpretive voice |
+| ISCH-STR-RS02 | C clinical-correctness | major | ground_truth.icd_code | I97.811 (intraoperative) contradicts timeline: infarct occurred ~6 weeks post-op, not during surgery | FLAGGED | Move to postprocedural family (I97.821 or I97.820); needs cardiac-vs-other-surgery judgment |
+| ISCH-STR-RS02 | B internal-consistency | major | ground_truth.optimal_actions[10],[11] | Identical MR_angiography action listed twice at conflicting tiers (required vs recommended) | FLAGGED | Collapse to single entry, choose one tier |
+| ISCH-STR-RS02 | C clinical-correctness | minor | ground_truth.contraindicated_actions[7] | Cites 14-day post-surgery tPA window but patient is 6 weeks (42 days) post-op, beyond that window | FLAGGED | Reword to reflect 14-day absolute window passed but relative/precautionary contraindication remains |
+| ISCH-STR-RS02 | B internal-consistency | nit | followup_outputs[2].output.impression | "Trivial pericardial effusion (H)" mislabeled as abnormal/High; trivial effusion is normal/incidental | FLAGGED | Drop clause or relabel as incidental |
+| ISCH-STR-RS01 | B internal-consistency | nit | followup_outputs[1].output.impression | "LVEF 52% (H)" mislabeled as abnormal; 52% is within normal range | FLAGGED | Remove EF 52% from abnormal-values impression |
+| ISCH-STR-RP05 | C clinical-correctness | minor | ground_truth.red_herrings[0].correct_interpretation | Asserts migraine WITHOUT aura is most common CADASIL initial symptom, contradicting case's own literature summary (WITH aura) | FLAGGED | Reword per literature (migraine with aura is characteristic); judgment-laden |
+| ISCH-STR-RS01 | B internal-consistency | nit | ground_truth.optimal_actions[7].expected_finding | Step 8 orders TTE but expected_finding references TEE-only findings (LA appendage thrombus) | FLAGGED | Align prose with TTE study or note TEE escalation |
+| ISCH-STR-RS04 | B internal-consistency | major | followup_outputs[0].output.impression | CTA impression omits its own findings[0] basilar artery occlusion — the anatomic basis of the primary diagnosis | FLAGGED | Prepend basilar occlusion to impression using findings[0] text |
+| ISCH-STR-RS03 | D realism-leakage | minor | followup_outputs[1].output.impression | Lab-style "(H)" template echo impression; also mis-flags low-normal LVEF 52% as high | FLAGGED | Rewrite as narrative echo impression |
+| ISCH-STR-RS04 | D realism-leakage | minor | followup_outputs[1].output.impression | Same lab-style "(H)" template artifact on interatrial septum finding | FLAGGED | Rewrite as narrative |
+| ISCH-STR-RS04 | B internal-consistency | minor | followup_outputs[2].output.monitor_type | monitor_type="holter_24h" but duration_hours=48 and events say "48-hour" throughout | FLAGGED | Set duration to 24h or leave as documented 48h extension; no holter_48h enum |
+| ISCH-STR-RS03 | B internal-consistency | minor | followup_outputs[0].output.contrast_used | CTA reports luminal opacification/occlusion but contrast_used=false; gold step 2 contrast=true | FLAGGED | Dataset-wide sweep needed, not per-case fix |
+| ISCH-STR-RS04 | B internal-consistency | minor | followup_outputs[0].output.contrast_used | Same CTA contrast_used=false issue as RS03 | FLAGGED | Handle dataset-wide (see RS03) |
+| ISCH-STR-RS04 | E language | nit | initial_tool_outputs.mri.findings[0].signal_characteristics.FLAIR | "subacute ischemia (onset >6 hours)" mislabels vintage; 6-18h is acute not subacute | FLAGGED | Change "subacute" to "acute ischemia" |
+| ISCH-STR-RS03 | B internal-consistency | nit | metadata.difficulty_description | difficulty="diagnostic_puzzle" but description opens "Straightforward..." (systemic divergence across several cases) | FLAGGED | Reconcile tier vs. descriptor as a systemic pass |
+| ISCH-STR-RS05 | E language | nit | followup_outputs[4].output.summary | Literature-search summary is empty while results[] are fully populated | FLAGGED | Optionally add brief population-keyed summary; leakage-safe as-is |
+| ISCH-STR-S01 | B internal-consistency | blocker | patient.neurological_exam + mri + primary_diagnosis | Lateralization incoherent: imaging/diagnosis describe LEFT MCA infarct but ALL exam findings (plegia, gaze, neglect, tongue) are LEFT-sided (should be right-sided contralateral deficits + right gaze deviation) | FLAGGED | Human adjudication: flip lesion side or flip all body-side exam findings; already in metadata concerns |
+| ISCH-STR-S01 | D realism-leakage | minor | initial_tool_outputs.mri.impression | Impression asserts "Chronic small vessel ischemic disease" not present in structured findings | FLAGGED | Add finding to observations or remove from impression |
+| ISCH-STR-S01 | E language | nit | metadata.case_body_concerns[0] | Stale concern claims check_drug_interactions step 6 has no output, but a followup exists | FLAGGED | Remove/update stale concern |
+| ISCH-STR-S01 | D realism-leakage | minor | followup_outputs[1].output.impression (echo) | Templated "(H)" format mislabels low-normal EF 50% as high; systematic across S01/S02/S03 | FLAGGED | Regenerate echo impressions in ASE narrative voice |
+| ISCH-STR-S02 | C clinical-correctness | major | optimal_actions[1] vs contraindicated_actions[8] | Same CTA (contrast=true, angiography=true) is both REQUIRED (step 2) and CONTRAINDICATED (allergy/CKD3a) | FLAGGED | Soften contraindication to "without renal protection" or tier; don't list identical params in both |
+| ISCH-STR-S02 | B internal-consistency | major | followup_outputs[5].output.contraindications[0] | Apixaban note cites Cr 1.4 "meets one criterion" but case Cr is 1.3 → meets zero criteria (though final dose recommendation is correct) | FLAGGED | Rewrite reasoning; not a clean numeric swap |
+| ISCH-STR-S02 | B internal-consistency | minor | followup_outputs[2].output.monitor_type | monitor_type="holter_24h" but duration_hours=48 and findings reference "48-hour recording" | FLAGGED | Align label to holter_48h or rescale report to 24h; ambiguous direction |
+| ISCH-STR-S02 | C clinical-correctness | minor | followup_outputs[5] vs optimal_actions[5] | Required tPA-contraindication screen (step 6) unfulfilled; only apixaban (secondary prevention) followup exists | FLAGGED | Add alteplase/tPA contraindication check_drug_interactions followup |
+| ISCH-STR-S02 | E language | nit | metadata.difficulty_description | "Straightforward -" lead contradicts difficulty="moderate" | FLAGGED | Align lead word to "Moderate" |
+| ISCH-STR-S02 | D realism-leakage | minor | initial_tool_outputs.mri.impression | Impression asserts "remote right caudate lacunar infarct" not in structured findings | FLAGGED | Add to observations or drop from impression |
+| ISCH-STR-S03 | C clinical-correctness | major | patient.neurological_exam.cranial_nerves | "Conjugate right gaze deviation" wrong direction for LEFT MCA stroke with right hemiparesis; should deviate left | FLAGGED | Correct to left gaze deviation; clinician adjudication, already in metadata concerns |
+| ISCH-STR-S03 | B internal-consistency | major | patient.history_present_illness | HPI has patient's deceased mother on the phone at 09:00 (family_history says mother died of stroke) | FLAGGED | Reword to "daughter spoke to him by phone at ~09:00"; touches HPI narrative |
+| ISCH-STR-S03 | C clinical-correctness | major | optimal_actions[1] vs contraindicated_actions[7] | Same required-vs-contraindicated CTA conflict as S02 (allergy + CKD3a) | FLAGGED | Reconcile identical params in both lists |
+| ISCH-STR-S03 | E language | nit | metadata.difficulty_description + case_body_concerns[0] | "Straightforward -" lead vs "moderate" difficulty; also stale concern re check_drug_interactions | FLAGGED | Fix lead word; remove stale concern |
+| ISCH-STR-S03 | D realism-leakage | minor | initial_tool_outputs.mri.impression | Impression asserts "old right basal ganglia lacunar infarct" not in structured findings | FLAGGED | Add to observations or drop from impression |
+| ISCH-STR-S04 | B internal-consistency | major | followup_outputs[0].output.contrast_used | CTA marked contrast_used=false despite "absent distal opacification" finding and gold contrast=true | FIXED | Set contrast_used=true |
+| ISCH-STR-S04 | C clinical-correctness | major | neurological_exam.cranial_nerves / HPI | Gaze deviation documented RIGHTWARD in a LEFT MCA infarct with right hemiparesis; should deviate left (toward lesion) | FLAGGED | Correct gaze direction to leftward; clinician decision, alters clinical story |
+| ISCH-STR-S04 | B internal-consistency | major | initial_tool_outputs.ct / fallback_tool_outputs.ct | No non-contrast CT output exists though required step 1 + critical_actions demand emergent NCCT before thrombolysis | FLAGGED | Author NCCT output or document mock limitation as S05/S06 do |
+| ISCH-STR-S04 | D realism-leakage | minor | followup_outputs[1].output.impression (echo) | Raw templated "(H)" dump instead of narrative impression; siblings S05/S06 have proper narrative | FLAGGED | Rewrite into narrative echo prose |
+| ISCH-STR-S04 | B internal-consistency | minor | metadata.clinical_pearls[1] | CHA2DS2-VASc pearl uses wrong age band (65-74 instead of >=75 for age 78) and lists "prior stroke" though this IS the index event; components sum to 8 not stated 7 | FLAGGED | Correct age band, drop "prior stroke"; multi-token judgment edit |
+| ISCH-STR-S04 | C clinical-correctness | nit | followup_outputs[6].output.warnings[0] | Apixaban warning says "meets one criterion" but age 78 (<80) + SCr 1.3 (<1.5) = meets zero criteria | FLAGGED | Correct "meets one" to "meets none" |
+| ISCH-STR-S05 | E language | nit | followup_outputs[4].output.summary | Literature search summary empty though results[] has 4 entries | FLAGGED | Optionally add brief population-keyed summary; low priority |
+| ISCH-STR-S06 | C clinical-correctness | minor | ground_truth.differential[0] | "Capsular warning syndrome" ranked "high" above true competitors for an already-completed, non-fluctuating lacunar infarct | FLAGGED | Consider demoting/reframing; clinician judgment |
+| ISCH-STR-S06 | D realism-leakage | minor | followup_outputs[6].output.interpretation | Lab interpretation editorializes "relevant to small-vessel risk factor burden," nodding at the TOAST mechanism | FLAGGED | Trim to plain out-of-range recital |
+| ISCH-STR-S06 | C clinical-correctness | nit | followup_outputs[2].output.findings[2]/impression | LAVI 30 mL/m2 called "mildly elevated/upper-limit" though normal range is 16-34 | FLAGGED | Reword to "normal left atrial size (LAVI 30 mL/m2)" |
 
 ## Tally
 
-- Cases audited: 20 (all ISCH-STR-*), every field of every case read.
-- Findings by severity: 1 blocker, 4 major, 16 minor, 1 nit, 7 info/noted.
-  (Several rows group multiple cases; ~30 distinct case-level observations.)
-- Fixed: 3 (M01 duration_hours, M03 duration_hours, RM01 rivaroxaban typo).
-- Flagged (not fixed): the remainder — including 5 case_body_concerns appended
-  (M03 BMI, RP01 ethanol-below-threshold, S01 lateralization, S03 gaze+HPI, S04 gaze).
-- Self-verify: coherence validator 0 and schema valid on all 7 edited files; JSON
-  well-formed; trailing newline + escaped-unicode convention preserved; only
-  ISCH-STR-* files modified.
-
-### Top clinical-correctness flags for human adjudication
-
-1. **ISCH-STR-S01 — lateralization is internally incoherent**: left-MCA imaging + global
-   aphasia vs entirely left-body (right-hemisphere) deficits. A left MCA stroke cannot
-   produce left-body hemiplegia. Must be reconciled (likely flip body-side findings to
-   right; flipping lesion side breaks the aphasia).
-2. **ISCH-STR-S03 & S04 — wrong-direction gaze**: "right gaze deviation/preference" in
-   left-MCA strokes with right hemiparesis; cortical gaze should deviate left (toward the
-   lesion). Likely a simple left/right swap to correct.
-3. **ISCH-STR-RP01 — factually wrong differential reasoning**: "serum ethanol below
-   threshold" contradicts the case's 2.3-per-mille intoxication; the intended point is
-   intoxication present but excluded by focal deficits + basilar occlusion.
-4. **ISCH-STR-RS02 — tPA recency framing vs 6-week interval**: gold actions invoke the
-   14-day surgical contraindication though surgery was 6 weeks prior; reconcile.
-5. **ISCH-STR-P03 — two divergent mycotic-aneurysm descriptions** (R-M2-fusiform vs
-   L-M3/M4-saccular): confirm whether two aneurysms or one inconsistency; and TEE-vs-TTE
-   action/output mismatch.
-6. **ISCH-STR-M03 BMI** (obesity label vs 29.8) and **M01 apixaban "creatinine 1.52" vs
-   lab 1.4**: numeric self-contradictions in narrative/output text.
+Cases audited: 30. Findings: 111 total (1 blocker, 34 major, 50 minor, 26 nit). Fixed: 18. Flagged: 93. Validators: OK (coherence 0, schema valid).
