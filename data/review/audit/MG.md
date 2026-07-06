@@ -1,81 +1,99 @@
-# NeuroBench v5 — MG (Myasthenia Gravis) audit
+# MG — NeuroBench v5 audit
 
-Scope: all 25 case files matching `MG-*` in `data/neurobench_v5/cases/`.
-Method: SKILL.md five-dimension field-by-field read against `criteria_packs/MG.md` and `TOOL_REPORT_STYLE_GUIDE.md`.
-Mechanical validators (coherence, schema) pass on all 25 before and after edits; leakage detector candidates judged individually (see notes).
+30 MG cases audited (M/P/RM/RP/RS/S series); 82 findings (0 blocker / 20 major / 36 minor / 26 nit); 11 fixed mechanically, 71 flagged for author/clinician judgment; schema and coherence validators pass (0 unresolved issues) after fixes.
 
-| case_id | dim | severity | region.field path | finding | action | detail |
-|---------|-----|----------|--------------------|---------|--------|--------|
-| MG-M01 | C | minor | case_id vs primary_diagnosis | "M" prefix (pack: mild/ocular-only) but dx is generalized MG Class IIb with bulbar+limb involvement | FLAGGED | Subtype-label vs presentation mismatch; numbering may be sequential. Not a diagnosis change. |
-| MG-M01 | E | minor | patient.neurological_exam.gait | "Mildly slow but antalgic" — antalgic = pain-related, no pain in this MG case; conflicts with following "waddling" (proximal weakness) | FLAGGED | Clinical-narrative wording; in patient exam, did not edit. |
-| MG-M02 | B | minor | ground_truth.differential[0].key_features | "CK was normal (142)" — case CK is 118 U/L; 142 copied from MG-M01 | FIXED | Changed 142 → 118 to match this case's lab. |
-| MG-M02 | B | nit | optimal_actions[4].category | literature search "required" here vs "recommended" in M01/M03 (cross-case inconsistency) | FLAGGED | Within-case fine; pack lists it Required. |
-| MG-M03 | B | minor | ground_truth.red_herrings[0].data_point | red herring cites "lower-lobe bronchial wall thickening" but CT says "upper lobe" emphysematous changes | FLAGGED | ground_truth descriptive text mismatches the CT finding it points at; flagged not fixed (gt semantics). |
-| MG-P01 | C | minor | case_id vs case content | "P" prefix (pack: progressive/crisis) but case is seronegative diagnostic-puzzle, NIF -62 (no crisis) | FLAGGED | Subtype-label mismatch; otherwise excellent case. |
-| MG-P02 | B/C | major | condition / icd_code vs primary_diagnosis | INTENTIONAL LEMS mimic: condition=myasthenia_gravis, icd from gt=G73.1, dx=LEMS | FLAGGED | Designed mimic per task brief — flag, do not fix. |
-| MG-P02 | D | nit | followup_outputs[3].output.summary | detector hit "LEMS" — population-keyed literature evidence | FLAGGED | Allowed by style guide (general evidence); intentional, not a leak. |
-| MG-P02 | B | nit | initial_tool_outputs.ct.additional_observations | "COPD emphysema present" but COPD not in PMH (50-pk-yr smoker; radiographically plausible) | FLAGGED | Incidental imaging finding, plausible; not fixed. |
-| MG-P03 | D | minor | followup_outputs[0].output.findings[0].description | Kind-1 leak: CT finding cited labs ("In context of markedly positive AChR antibodies and positive anti-titin... consistent with thymoma") | FIXED | Stripped cross-modality clause; kept within-imaging "consistent with a primary thymic neoplasm". |
-| MG-P03 | E | nit | metadata.difficulty_rationale | "1 red herrings" grammar | FLAGGED | Recurring template field; not fixed. |
-| MG-S01 | A | major | followup_outputs[3].output | order_advanced_imaging (MRI chest) mis-validated as EchoReport; findings was list[str] + a stringified Python dict (with None/single-quotes) instead of list[dict] | FIXED | Rebuilt findings as proper list[dict] (region/signal/interpretation); now validates as AdvancedImagingReport with modality "MRI chest" preserved. |
-| MG-S01 | B | major | ground_truth.critical_actions[0] & key_reasoning_points[6] | AChR binding stated as "8.7 nmol/L" but labs value is 12.4 nmol/L (stated 3× in labs) | FIXED | Changed both 8.7 → 12.4; also fixed "15-24% RNS decrement" → "16-22%" to match RNS. |
-| MG-RM11 | B | minor | initial/followup outputs (no RNS) | step 2 RNS "required" and gt cites "RNS decrement", but no RNS output exists anywhere (specialized_test null; SFEMG present) | FLAGGED | Solvable via SFEMG+serology; missing required-tool output. |
-| MG-RM12 | D | minor | initial_tool_outputs.ct.findings[0].description | Kind-1 leak: CT cited dx ("In context of new-onset MG in a 42-year-old, thymic hyperplasia is expected") | FIXED | Stripped cross-modality clause; kept morphologic description. |
-| MG-RM13 | B/C | major | condition / icd_code vs primary_diagnosis | INTENTIONAL LEMS mimic: condition=myasthenia_gravis, gt icd=G73.1, dx=LEMS (paraneoplastic SCLC) | FLAGGED | Designed mimic — flag, do not fix. |
-| MG-RM13 | E | nit | patient.neurological_exam.additional | "Erectile dysfunction not applicable" template residue in a female patient | FLAGGED | Harmless; not fixed. |
-| MG-RM14 | B | minor | gt intubation thresholds | inconsistent NIF/FVC intubation cutoffs across fields (FVC<15 vs <20 mL/kg; NIF -25 vs -30; lit "NIF<-20") | FLAGGED | Guideline "rule of 20/30" approximations; no single correct value. |
-| MG-RM14 | D | nit | followup_outputs[5].output.summary | detector hit "myasthenic crisis" — population-keyed patient-education content | FLAGGED | Allowed; not a leak. True MG crisis (not a mimic). |
-| MG-RM15 | B | minor | patient.vitals vs top-level vitals | two divergent vitals blocks: admission (rr14/spo2 98) vs crisis (rr10/spo2 87) | FLAGGED | Real-case-seed artifact; both states real in narrative. |
-| MG-RM15 | B | minor | initial_tool_outputs.ecg.findings (text) | ECG narrative "86 bpm" vs structured rate 72 (+patient vitals 72) | FIXED | Narrative 86 → 72 to match structured/objective rate. |
-| MG-RM15 | D | nit | followup_outputs[1].output.findings RNS text | RNS report names "active myasthenia gravis" (vs impression's hedged "NMJ transmission disorder") | FLAGGED | Borderline within-modality; RNS decrement is KEPT per task; flagged not stripped. |
-| MG-RP11 | B | minor | initial_tool_outputs.ecg.findings (text) | ECG narrative "74 bpm" vs structured rate 72 | FIXED | Narrative 74 → 72. |
-| MG-RP11 | B | minor | followup MG_antibody_panel AChR blocking | value "3.7 nmol/L" with unit nmol/L but reference_range "< 25%" (unit/range mismatch) | FLAGGED | Recurring across RP/RS seed cases; blocking Ab usually % inhibition. |
-| MG-RP12 | B | minor | initial_tool_outputs.ecg.findings (text) | ECG narrative "68 bpm" vs structured rate 72 | FIXED | Narrative 68 → 72. |
-| MG-RP12 | B | minor | top-level red_herrings[1] | cites "borderline anti-VGCC (0.04)" but no anti-VGCC value in any tool output | FLAGGED | Red herring references absent data; gt semantics, not fixed. |
-| MG-RP12 | B | minor | followup AChR blocking | "1.3 nmol/L" with "<25%" reference (unit/range mismatch) | FLAGGED | Recurring. |
-| MG-RP13 | B | minor | initial_tool_outputs.ecg.findings (text) | ECG narrative "64 bpm" vs structured rate 72 | FIXED | Narrative 64 → 72. |
-| MG-RP13 | C | nit | followup check_timolol_mg_interaction | topical timolol framed as NMJ contributor; beta-blockers are "controversial" per pack | FLAGGED | Defensible/hedged teaching point; not fixed. |
-| MG-RP13 | B | minor | followup AChR blocking | "1.7 nmol/L" with "<25%" reference (unit/range mismatch) | FLAGGED | Recurring. |
-| MG-RP14 | B | minor | initial_tool_outputs.ecg.findings (text) | ECG narrative "78 bpm" vs structured rate 72 (vitals 80) | FIXED | Narrative 78 → 72 to match structured rate. |
-| MG-RS11 | B | minor | followup AChR blocking | "2.3 nmol/L" with "<25%" reference (unit/range mismatch) | FLAGGED | Recurring. ECG narrative 72 matches structured (clean). |
-| MG-RS12 | B | minor | initial_tool_outputs.ecg.findings (text) | ECG narrative "70 bpm" vs structured rate 72 | FIXED | Narrative 70 → 72. |
-| MG-RS12 | B | minor | top-level red_herrings (ESR 22, HbA1c) | red herrings cite lab values absent from tool outputs (labs panels empty) | FLAGGED | Recurring seed pattern. |
-| MG-RS13 | B | minor | initial_tool_outputs.ecg.findings (text) | ECG narrative "76 bpm" vs structured rate 72 (vitals 78) | FIXED | Narrative 76 → 72. |
-| MG-RS13 | B | minor | top-level red_herrings (ANA 1:160) + AChR blocking unit/range | cite absent data; blocking unit/range mismatch | FLAGGED | Recurring. |
-| MG-RS14 | B | minor | initial_tool_outputs.ecg.findings (text) | ECG narrative "66 bpm" vs structured rate 72 (vitals 68) | FIXED | Narrative 66 → 72. |
-| MG-RS14 | C | minor | hpi "SFEMG normal" vs optimal_actions[2].expected_finding | gold step expects SFEMG positive ("increased jitter") but HPI says prior SFEMG normal (limb SFEMG can miss MuSK MG) | FLAGGED | Clinical-nuance tension; teaching intent plausible but worth adjudication. |
-| MG-RS15 | B | minor | followup AChR blocking | "0.3 nmol/L" is_abnormal=true with "<25%" reference + nmol/L unit (under stated threshold yet flagged) | FLAGGED | Unit/range mismatch; ECG narrative 72 matches structured (clean). |
-| MG-RS16 | B | minor | initial_tool_outputs.ecg.findings (text) | ECG narrative "68 bpm" vs structured rate 72 (vitals 70) | FIXED | Narrative 68 → 72. |
-| MG-RS16 | B | minor | top-level red_herrings (CK 78) + AChR blocking | cites absent CK value; blocking unit/range mismatch | FLAGGED | Recurring. |
+## Terminology / taxonomy
 
-## Cross-cutting observations (recurring patterns)
+| case_id | dim | severity | field path | finding | action | recommendation |
+|---|---|---|---|---|---|---|
+| CONFIG | terminology | major | myasthenia_gravis.typical_demographics.age_range | Config age_range [20,70] contradicts own cases (MG-RS14=75, MG-RP12=74, MG-RS16=73) and real bimodal MG epidemiology with late-onset peak >70 | FLAGGED | Extend upper bound to ~85 (e.g. [15,85]) |
+| MG-P02 | terminology | minor | case_id / ground_truth.primary_diagnosis | 'P' (progressive/crisis) tier ID assigned to a LEMS mimic that the pack's taxonomy assigns to the 'R' (mimic) tier (cf. MG-RM13) | FLAGGED | Confirm intended subtype tier; don't change diagnosis entity |
+| MG-RS17 | terminology | minor | ground_truth.icd_code | G70.01 5th-digit exacerbation coding applied to a mild generalized case (Class IIa) without documented acute exacerbation; per-case judgment needed across batch | FLAGGED | Reserve G70.01 for documented acute worsening/crisis, else G70.00 |
 
-- **ECG narrative vs structured `rate` (FIXED in 7 seed cases: RM15, RP11, RP12, RP13, RP14, RS12, RS13, RS14, RS16):** the embedded ECG report text gave a different bpm from the structured `rate` field (always 72) in every real-case-seed MG case. Aligned the narrative to the objective `rate` field (left structured data untouched per style guide). Some of these also differ from `patient.vitals.hr` by a few bpm (separate cross-region timing difference — flagged, not fixed).
-- **AChR blocking antibody unit/range mismatch (FLAGGED, ~8 seed cases):** rows give value in `nmol/L` but `reference_range "< 25%"` (% inhibition). RP14 correctly uses unit "" with "<25%", confirming the others are inconsistent. Did not fix — ambiguous whether unit or range is the error; affects the seronegative/seropositive seed cases uniformly.
-- **Real-case-seed `red_herrings` referencing absent data (FLAGGED, ~5 cases):** top-level red herrings cite lab values (ESR, HbA1c, ANA, CK, borderline anti-VGCC) that never appear in the case's tool outputs (labs panels often empty). The agent could not encounter these. ground_truth semantics — flagged for authoring review.
-- **Two intentional LEMS mimics (MG-P02, MG-RM13):** prefix MG / `condition: myasthenia_gravis` but `primary_diagnosis`=LEMS / gt `icd_code`=G73.1. By design (task brief). Flagged, not changed.
-- **Within-modality electrodiagnostic conclusions (RNS decrement, SFEMG jitter/blocking) and confirmatory results (AChR/MuSK/VGCC/SOX1 antibodies, ice-pack/Tensilon/neostigmine, CT-chest thymoma, SCLC biopsy) were treated as KEPT** per the task brief and style guide; none stripped.
+## Audit findings
+
+| case_id | dim | severity | field path | finding | action | recommendation |
+|---|---|---|---|---|---|---|
+| MG-M03 | B internal-consistency | minor | ground_truth.red_herrings[0].data_point | Red herring cited CT finding ('lower-lobe bronchial thickening') not present in report (actual: upper-lobe emphysema) | FIXED | Aligned data_point to actual CT observation |
+| MG-M01 | E language | minor | patient.neurological_exam.gait | Gait called 'antalgic' (pain-avoidance) contradicting painless MG weakness and documented 'waddling' pattern | FLAGGED | Replace with proximal/myopathic descriptor |
+| MG-M01 | C clinical-correctness | minor | ground_truth.icd_code | G70.01 (with exacerbation) used for subacute new-onset MG not in crisis (NIF -42, FVC 72%); same pattern in MG-M02/M03 | FLAGGED | Judgment call; flag for author |
+| MG-M03 | B internal-consistency | minor | followup_outputs[1].output.panels.Respiratory Evaluation | FVC 1.9L reported as 68% predicted implies implausibly low predicted FVC (~2.79L) for a 67M | FLAGGED | Adjust absolute FVC or % predicted |
+| MG-M03 | C clinical-correctness | nit | initial_tool_outputs.labs.panels.Metabolic Panel (HbA1c) | reference_range '<7.0' is a diabetes treatment target, not normal population range | FLAGGED | Use '<5.7 (non-diabetic)' or annotate as treatment target |
+| MG-P02 | B internal-consistency | major | ground_truth.differential[4].key_features | Statin-myopathy differential states patient 'not on a statin' though atorvastatin is in medication list | FLAGGED | Reword to reflect atorvastatin use; keep likelihood very_low |
+| MG-M04 | C clinical-correctness | minor | ground_truth.differential[0].icd_code | 'Evolving myasthenic crisis' coded G70.00 (without exacerbation) — crisis requires G70.01 | FIXED | Changed G70.00 -> G70.01 |
+| MG-M04 | B internal-consistency | minor | followup_outputs[0].output.findings[0].significance | FVC 1.6L called 'below 20 mL/kg crisis threshold' but is ~23.5 mL/kg (above threshold); rest of case frames status as 'approaching' crisis | FLAGGED | Reword to 'reduced; approaching crisis thresholds' |
+| MG-P01 | B internal-consistency | minor | initial_tool_outputs.ct | Delivered CT is non-contrast but gold optimal action specifies contrast-enhanced CT for thymoma screening | FLAGGED | Reconcile delivered study vs gold action |
+| MG-P01 | B internal-consistency | nit | followup_outputs[3].output.panels | Inconsistent is_abnormal semantics between dysarthria improvement (true) and ptosis improvement (false), both positive responses | FLAGGED | Pick one convention for positive-response flag |
+| MG-M04 | D realism-leakage | nit | initial_tool_outputs.labs.panels['Comprehensive Metabolic Panel'] | CRP/Procalcitonin listed under CMP; belong to inflammatory panel | FLAGGED | Move to separate inflammatory-markers panel |
+| MG-P04 | B internal-consistency | major | ground_truth.red_herrings[0].field_path | field_path pointed to non-existent panel key; coherence validator flagged unresolved path | FIXED | Corrected to actual panel key |
+| MG-P03 | B internal-consistency | major | ground_truth.optimal_actions[3].expected_finding / primary_diagnosis | Gold expects no thymoma but delivered CT shows a 2.8x2.2cm mass 'consistent with primary thymic neoplasm'; diagnosis label doesn't reflect thymoma despite thymectomy trigger/literature intent | FLAGGED | Reconcile: relabel as thymomatous MG or make CT show no thymoma (coordinated change) |
+| MG-P03 | B internal-consistency | minor | initial_tool_outputs.specialized_test.impression | RNS impression self-contradicts: asserts facilitation then also 'no post-exercise facilitation pattern' | FLAGGED | Reword trailing clause (likely intended LEMS-distinction) |
+| MG-P03 | C clinical-correctness | nit | ground_truth.primary_diagnosis | MGFA 'Class IIb' (bulbar/respiratory) label may not match limb-predominant exam findings | FLAGGED | Clinician to confirm IIa vs IIb |
+| MG-P03 | C clinical-correctness | nit | ground_truth.icd_code | G70.01 used for mild generalized MG (Class II, normal NIF) without documented crisis | FLAGGED | Clinician to confirm G70.00 vs G70.01 |
+| MG-RM11 | B internal-consistency | minor | metadata.difficulty_description / red_herrings[0].correct_interpretation | References RNS decrement that never appears in any tool output; only SFEMG delivered | FLAGGED | Add RNS output or soften narrative to reference SFEMG |
+| MG-P04 | B internal-consistency | nit | ground_truth.differential[1,2].icd_code | Differing ICD exacerbation digits (G70.00 vs G70.01) applied to antibody subtypes with no clinical basis | FLAGGED | Harmonize to one code for consistency |
+| MG-RM14 | B internal-consistency | minor | metadata.difficulty_description | Prose lead-word 'Moderate:' contradicts difficulty enum 'diagnostic_puzzle' | FLAGGED | Align prose lead-word to enum value |
+| MG-RM12 | E language | nit | initial_tool_outputs.labs.interpretation | Auto-generated string double-prints unit: '58 mg/dL (from prior admission) mg/dL (H)' | FLAGGED | Store value without embedded annotation; needs regeneration |
+| MG-RM12 | terminology | nit | ground_truth.differential[3].icd_code | Brainstem lesion differential coded G46.3 (vascular) despite key_features stating pattern is 'not vascular' | FLAGGED | Consider non-vascular code if etiology specified |
+| MG-RM14 | B internal-consistency | minor | ground_truth.sequence_constraints[0] | Sequence constraint reason references crisis therapy but paired 'after' tool (search_medical_literature) isn't that therapy (tool_name=null for actual PLEX/IVIG steps) | FLAGGED | Judgment-level; leave unless encoding scheme revised |
+| MG-RM13 | E language | nit | patient.neurological_exam.additional | 'Erectile dysfunction not applicable' template artifact for a female patient | FLAGGED | Reword to sex-neutral autonomic descriptor |
+| MG-RP11 | C clinical-correctness | major | ground_truth.differential[3].icd_code | Germ cell tumor differential coded C56 (ovary) — impossible in a 68-year-old male with mediastinal mass | FIXED | Changed C56 -> C38.1 (anterior mediastinum) |
+| MG-RM15 | B internal-consistency | minor | initial_tool_outputs.ecg.axis | Structured axis '++45 degrees' (doubled plus) vs report body '+45 degrees' | FIXED | Normalized to '+45 degrees' |
+| MG-RP11 | B internal-consistency | minor | initial_tool_outputs.ecg.axis | Structured axis '++30 degrees' vs report body '+30 degrees' | FIXED | Normalized to '+30 degrees' |
+| MG-RP11 | B internal-consistency | major | followup_outputs[0].output.panels.Acetylcholine_Receptor_Antibody_Panel[1] | AChR blocking antibody value '3.7 nmol/L' with unit nmol/L but reference '<25%' (percent scale); cross-system mismatch | FLAGGED | Reconcile to single unit system (% or nmol/L) and re-verify is_abnormal |
+| MG-RP11 | B internal-consistency | major | followup_outputs[3].output.interpretation | NIF -38 called 'adequate respiratory reserve' but flagged is_abnormal=true and summarized as 'borderline; at risk'; -38 does not meet the -60 adequate threshold | FLAGGED | Reword interpretation to reduced/borderline, consistent with flags |
+| MG-RP11 | B internal-consistency | minor | ground_truth.key_reasoning_points[5] | Anti-titin/anti-RyR antibody cited as thymoma discriminator but never ordered/reported in any tool output | FLAGGED | Add anti-titin to serology or soften reasoning |
+| MG-RM15 | B internal-consistency | minor | ground_truth.optimal_actions[7] | Ice-pack test for ptosis recommended though patient has no ptosis anywhere in the case (pure bulbar/respiratory crisis) | FLAGGED | Consider removing/downgrading ice-pack step |
+| MG-RM15 | D realism-leakage | minor | followup_outputs[0] | 'request_pulmonary_function' trigger maps to interpret_labs returning empty stub instead of actual spirometry data required by crisis workup | FLAGGED | Provide a real respiratory_function specialized-test output |
+| MG-RM15 | B internal-consistency | nit | metadata.difficulty_rationale | States '1 red herrings' but 4 entries present | FLAGGED | Update count to 4 |
+| MG-RP11 | B internal-consistency | nit | metadata.difficulty_rationale | States '0 red herrings' but 3 entries present; difficulty label mismatch vs description | FLAGGED | Reconcile count and difficulty label |
+| MG-RM15 | B internal-consistency | minor | initial_tool_outputs.labs | optimal_actions expects AChR-positive finding but labs output is empty ('all normal') and never surfaced | FLAGGED | Populate AChR-positive serology or note it's historical |
+| MG-RP12 | E language | minor | initial_tool_outputs.ecg.axis | '++40 degrees' vs report body '+40 degrees' | FIXED | Corrected to '+40 degrees' |
+| MG-RP12 | B internal-consistency | major | followup_outputs[request_mg_antibodies].output.panels.Acetylcholine_Receptor_Antibody_Panel | AChR blocking antibody value '1.3 nmol/L', unit nmol/L, reference '<25%' — unit/reference mismatch, is_abnormal unverifiable | FLAGGED | Re-express as percentage or nmol/L-consistent reference |
+| MG-RP12 | B internal-consistency | minor | ground_truth.differential[LEMS].key_features | LEMS differential says 'Smoker, prior lung cancer' though patient is explicitly a non-smoker | FLAGGED | Reword to generic LEMS risk factors |
+| MG-RP12 | B internal-consistency | minor | ground_truth.red_herrings[2] / metadata.difficulty_description | Cites borderline anti-VGCC and paraneoplastic panel that never appear in any tool output | FLAGGED | Add referenced result or remove phantom references |
+| MG-RP12 | C clinical-correctness | minor | ground_truth.icd_code | G70.01 used for progressive bulbar MG with preserved respiratory function; inconsistent with sibling MG-RP14 coded G70.00 | FLAGGED | Adjudicate G70.01 vs G70.00 across RP12/RP13 |
+| MG-RP12 | B internal-consistency | nit | patient.demographics.bmi | BMI 20.9 in demographics vs '20.8' stated twice in HPI/exam | FLAGGED | Align to 20.8 |
+| MG-RP12 | D realism-leakage | minor | fallback_tool_outputs.advanced_imaging | Modality labeled FDG-PET but finding describes carotid-duplex/CTA-type plaque/stenosis result | FLAGGED | Make finding FDG-PET-appropriate or change modality |
+| MG-RP12 | B internal-consistency | nit | metadata.difficulty_rationale | States '1 red herrings' but 4 entries present (stale boilerplate) | FLAGGED | Regenerate rationale |
+| MG-RP13 | E language | minor | initial_tool_outputs.ecg.axis | '++35 degrees' vs report body '+35 degrees' | FIXED | Corrected to '+35 degrees' |
+| MG-RP13 | B internal-consistency | major | followup_outputs[request_mg_antibodies].output.panels.Acetylcholine_Receptor_Antibody_Panel | Same malformed blocking-antibody entry: value '1.7 nmol/L', unit nmol/L, reference '<25%' | FLAGGED | Re-express as percentage |
+| MG-RP13 | B internal-consistency | minor | ground_truth.red_herrings[2] | Red herring calls L/P ratio 'borderline' but actual value (14.3, ref <20) is clearly normal | FLAGGED | Reword or introduce genuinely borderline value |
+| MG-RP13 | C clinical-correctness | minor | ground_truth.icd_code | G70.01 for gradual 8-month worsening with no crisis; inconsistent with MG-RP14 coded G70.00 | FLAGGED | Adjudicate exacerbation qualifier |
+| MG-RP13 | E language | nit | initial_tool_outputs.ecg.interpretation | 'See report details above.' placeholder instead of one-line read (cf. RP12/RP14) | FLAGGED | Replace with brief pattern-level statement |
+| MG-RP13 | B internal-consistency | nit | metadata.difficulty_rationale | States '1 red herrings' but 4 entries present | FLAGGED | Regenerate |
+| MG-RP14 | B internal-consistency | minor | ground_truth.red_herrings[2] | Cites specific aPTT (44s) and mixing-study result not present in any tool output | FLAGGED | Surface value in a lab output or genericize |
+| MG-RP14 | B internal-consistency | nit | metadata.difficulty_rationale | States '1 red herrings' but 4 entries present | FLAGGED | Regenerate |
+| MG-RS12 | C clinical-correctness | major | ground_truth.differential[2].icd_code | LEMS coded G73.1 (neoplastic LEMS, requires neoplasm coded first) with no documented neoplasm | FIXED | Changed G73.1 -> G70.80 |
+| MG-RS13 | C clinical-correctness | major | ground_truth.differential[3].icd_code | Same LEMS coding error: G73.1 without documented neoplasm | FIXED | Changed G73.1 -> G70.80 |
+| MG-RS11 | B internal-consistency | major | followup_outputs[0].output.panels.Acetylcholine_Receptor_Antibody_Panel[1] | AChR blocking antibody value '2.3 nmol/L', unit nmol/L, reference '<25%'; is_abnormal contradicted if read as % | FLAGGED | Author to correct unit/value (% inhibition) |
+| MG-RS12 | B internal-consistency | major | followup_outputs[0].output.panels.Acetylcholine_Receptor_Antibody_Panel[1] | Same malformed blocking-antibody entry: '3.4 nmol/L' vs '<25%' reference | FLAGGED | Correct unit to % with genuinely positive value |
+| MG-RS13 | B internal-consistency | major | followup_outputs[0].output.panels.Acetylcholine_Receptor_Antibody_Panel[1] | Same malformed entry: '1.4 nmol/L' vs '<25%' reference | FLAGGED | Correct unit/value or drop row |
+| MG-RS11 | C clinical-correctness | minor | ground_truth.optimal_actions[6] | Respiratory function testing recommended for pure ocular MG with no bulbar/respiratory symptoms, against criteria pack guidance | FLAGGED | Consider demoting to optional for pure-ocular case |
+| MG-RS11 | B internal-consistency | minor | initial_tool_outputs.specialized_test / followup / fallback | RNS is a required optimal step but no RNS output exists anywhere in the case (only SFEMG) | FLAGGED | Add RNS output or confirm omission intentional |
+| MG-RS11 | B internal-consistency | minor | metadata.difficulty_rationale | States '0 red herrings' and 'generalized MG' though case has 3 red herrings and is Ocular MG Class I | FLAGGED | Update rationale to reflect ocular MG and correct count |
+| MG-RS12 | B internal-consistency | minor | ground_truth.red_herrings[1],[2] | Reference specific ESR/HbA1c values absent from any tool output (labs panel empty) | FLAGGED | Add values to labs panel or remove orphaned red herrings |
+| MG-RS12 | B internal-consistency | nit | metadata.difficulty_rationale | States '0 red herrings' but 3 entries present | FLAGGED | Correct count |
+| MG-RS13 | B internal-consistency | minor | ground_truth.red_herrings[2] | References ANA/dsDNA/complement values never instantiated in any tool output | FLAGGED | Add values or rewrite red herring |
+| MG-RS13 | B internal-consistency | nit | metadata.difficulty_rationale | States '1 red herrings' but 4 entries present | FLAGGED | Correct count |
+| MG-RS14 | B internal-consistency | major | followup_outputs[4].output.interpretation | Pulmonary interpretation said 'meets threshold for adequate reserve' while both values flagged is_abnormal=true and summary said 'at risk' (copy-paste template error) | FIXED | Rewrote interpretation to 'borderline / does not meet threshold' |
+| MG-RS14 | C clinical-correctness | major | patient.history_present_illness vs optimal_actions[2]/critical_actions | HPI states SFEMG was normal, but gold expects abnormal SFEMG (critical/required) with no output provided; atypical for stated MuSK-MG diagnosis | FLAGGED | Adjudicate: remove normal-SFEMG claim, add abnormal output, or demote step |
+| MG-RS14 | A schema | nit | metadata.difficulty_rationale | States '1 red herrings' but 4 entries present | FLAGGED | Update count |
+| MG-RS15 | B internal-consistency | major | followup_outputs[1].output.panels.Acetylcholine_Receptor_Antibody_Panel[1] | AChR blocking antibody '0.3 nmol/L' vs reference '<25%'; is_abnormal=true contradicted if read as % (0.3<25) | FLAGGED | Adjudicate unit/value; diagnosis unaffected by binding Ab |
+| MG-RS15 | A schema | nit | metadata.difficulty_rationale | States '0 red herrings' but 3 entries present | FLAGGED | Update count |
+| MG-RS16 | B internal-consistency | major | followup_outputs[0].output.panels.Acetylcholine_Receptor_Antibody_Panel[1] | Same malformed blocking-antibody entry: '2.4 nmol/L' vs '<25%' reference | FLAGGED | Adjudicate as in RS15 |
+| MG-RS16 | B internal-consistency | nit | ground_truth.red_herrings[3].correct_interpretation | Cites CK 78 U/L never reported in any tool output (labs panels empty) | FLAGGED | Add CK value or reword |
+| MG-RS16 | A schema | nit | metadata.difficulty_rationale | States '1 red herrings' but 4 entries present | FLAGGED | Update count |
+| MG-S02 | C clinical-correctness | minor | patient.neurological_exam.cranial_nerves | Ophthalmology text attributes esotropia to medial rectus weakness (physiologically causes exotropia, not esotropia) | FLAGGED | Remove incorrect medial-rectus clause, keep lateral rectus attribution |
+| MG-S02 | C clinical-correctness | minor | ground_truth.differential[1].icd_code | Thyroid myopathy differential coded E07.1 (dyshormogenetic goiter), unrelated to thyrotoxic myopathy | FLAGGED | Replace with E05.9 + G73.7 |
+| MG-RS17 | C clinical-correctness | minor | ground_truth.primary_diagnosis | Labeled MGFA Class IIa (limb) despite substantial bulbar signs (dysphagia, nasal voice, facial weakness) arguably Class IIb | FLAGGED | Clinician adjudication IIa vs IIb |
+| MG-S01 | B internal-consistency | nit | followup_outputs[1].output | Interpretation says 'all normal' while abnormal_values_summary lists NIF -58 as 'borderline — monitor' | FLAGGED | Align clinical_significance/interpretation with summary |
+| MG-S03 | C clinical-correctness | major | ground_truth.icd_code | G70.01 (with exacerbation) coded for gradual 6-month progression with no crisis (NIF -54, no respiratory failure); systematic dataset-wide pattern | FLAGGED | Dataset-wide decision: G70.01->G70.00 for non-crisis generalized MG |
+| MG-S04 | C clinical-correctness | major | ground_truth.icd_code | Same systematic issue: G70.01 coded for 10-week gradual progression with normal NIF/FVC, no crisis | FLAGGED | Resolve alongside MG-S03 as dataset-wide decision |
+| MG-S03 | E language | nit | followup_outputs[1].output.interpretation | Stray '(L)' flag token inside prose interpretation, inconsistent with style guide plain-prose voice | FLAGGED | Reword to plain prose, e.g. 'NIF -54 cmH2O (mildly reduced)' |
+| MG-S05 | B internal-consistency | nit | case_id | 'S' series ID used for pure ocular MG (Class I), while pack §6 maps ocular-only to 'M' subtype letter (case_id is immutable) | FLAGGED | Confirm whether v5 case_id letters still encode subtype |
+| MG-S05 | B internal-consistency | nit | metadata | Omits version/generated/condition_abbrev/difficulty_abbrev/fallback_tool_kinds keys present in sibling S03/S04 (different generation batch) | FLAGGED | Optionally backfill metadata keys for consistency |
 
 ## Tally
 
-- Cases audited: **25** (MG-M01–M03, P01–P03, RM11–RM15, RP11–RP14, RS11–RS16, S01–S04) — every field of every case read.
-- Findings by severity: **0 blocker · 4 major · ~27 minor · ~8 nit** (≈39 findings total).
-  - Major: MG-P02 mimic mislabel, MG-RM13 mimic mislabel, MG-S01 advanced-imaging schema/serialization defect, MG-S01 AChR titer contradiction. (The two mimic mislabels are intentional-by-design but recorded at major severity as they affect condition/ICD coherence.)
-- Fixed: **13 edits across 6 case files** — MG-M02 (CK 142→118); MG-P03 (CT cross-modality leak stripped); MG-RM12 (CT cross-modality leak stripped); MG-S01 (advanced-imaging findings rebuilt to schema + AChR 8.7→12.4 ×2 + decrement range); MG-RM15/RP11/RP12/RP13/RP14/RS12/RS13/RS14/RS16 (ECG narrative bpm aligned to structured rate).
-- Flagged (not fixed): the remainder (subtype-label mismatches, two intentional LEMS mimics, AChR-blocking unit/range mismatch, red-herrings citing absent data, intubation-threshold variance, RS14 SFEMG tension, clinical-narrative wording).
-
-## Self-verify
-
-- Coherence validator: **0 issues** on all 25 cases before and after edits (re-confirmed on all 13 edited files).
-- Schema (`NeuroBenchCase`): **valid** on all 25; the MG-S01 advanced-imaging followup now correctly validates as `AdvancedImagingReport` (was silently coercing to `EchoReport`, dropping modality).
-- Leakage detector candidates (MG-P02, MG-RM14, MG-RM15 literature `summary` hits) are population-keyed evidence / patient-education — intentional, left as-is.
-- Only `MG-*` files changed (13 of 25, confirmed via `git diff --name-only`). Trailing newline and literal-unicode convention preserved on every edited file.
-
-## Top clinical-correctness flags for human adjudication
-
-1. **MG-S01 AChR titer contradiction (FIXED to 12.4)** — confirm 12.4 nmol/L is the intended value (labs stated it 3×; gt had stray 8.7, the same value as MG-S02's titer).
-2. **MG-RS14 SFEMG tension** — HPI states prior SFEMG was normal, but the gold optimal-action expects SFEMG to show increased jitter. In MuSK MG limb SFEMG can be normal; decide whether the gold step should specify facial SFEMG or accept normal limb SFEMG.
-3. **AChR-blocking antibody unit/range mismatch** across the real-case-seed MG cases (nmol/L value with `<25%` reference) — author should standardize to % inhibition (as RP14 does) or to nmol/L with an nmol/L reference.
-4. **Subtype-prefix vs presentation** — MG-M01 ("M"=mild/ocular per pack, but generalized) and MG-P01 ("P"=crisis per pack, but a non-crisis seronegative puzzle): decide whether prefixes are purely sequential or should encode the pack subtypes.
-5. **Real-case-seed red-herrings referencing data absent from tool outputs** (anti-VGCC 0.04, ESR, HbA1c, ANA, CK) — either add the cited values to the labs panels or revise the red-herring text so the distractor is actually presented to the agent.
-6. **MG-M03 red-herring/CT mismatch** — red herring describes "lower-lobe bronchial wall thickening" while the CT reports "upper lobe" emphysema; reconcile the descriptive text.
+Cases audited: 30. Findings: 82 total — 0 blocker / 20 major / 36 minor / 26 nit. Fixed: 11. Flagged: 71. Validators: schema OK, coherence 0 unresolved issues (post-fix).

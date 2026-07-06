@@ -1,64 +1,103 @@
-# NeuroBench v5 audit — HEP-ENC (hepatic encephalopathy)
+# HEP-ENC — NeuroBench v5 audit
 
-Auditor: condition-audit pass. Scope: all 25 `HEP-ENC-*` case files, read field-by-field
-against `dataset-generation/criteria_packs/HEP-ENC.md` and
-`dataset-generation/TOOL_REPORT_STYLE_GUIDE.md`.
+30 cases audited (M01–M10, P01–P09, S01–S11) — 83 findings (1 blocker, 19 major, 55 minor, 8 nit); 12 fixed / 71 flagged; validators (coherence, schema, leakage detector) all pass post-fix.
 
-Mechanical gates (whole set): coherence validator **0 issues** on all 25; schema validation
-**passes** on all 25; leakage detector **0 candidate leaks** on all 25; tool-vocab check passes
-(516/516 dataset-wide). KEPT findings per task brief verified intact: labs
-(ammonia/LFTs/INR/albumin) internally consistent and plausible; EEG triphasic-wave findings
-preserved.
+## Terminology / taxonomy
 
-## Findings
-
-| case_id | dim | severity | region.field path | finding | action | detail |
+| case_id | dim | severity | field path | finding | action | recommendation |
 |---|---|---|---|---|---|---|
-| HEP-ENC-M08 | B | minor | ground_truth.red_herrings[1].data_point | Red-herring text said "Low-grade fever 37.8°C" but `patient.vitals.temp`=38.2 (HPI also says 38.2°C); field_path points at that temp | FIXED | Corrected data_point to "38.2°C" to match the value it references; pure descriptor fix, no semantic change |
-| HEP-ENC-P02 | B | minor | ground_truth.red_herrings[1].location / .field_path | `location` pointed to `panels.Toxicology` which does not exist in this case; ethanol 22 is in `panels.Drug_Levels`; field_path was empty | FIXED | Set location → `...panels.Drug_Levels`, field_path → `...Drug_Levels[1]` (actual ethanol location) |
-| HEP-ENC-M04 | A/B | minor | difficulty | Top-level `difficulty="diagnostic_puzzle"` but metadata.difficulty_description, difficulty_rationale, primary_diagnosis and HPI all describe a *moderate* case ("classic moderate-difficulty HE case"); all 7 sibling M cases are "moderate" | FLAGGED | Difficulty enum is a judgment field; body text strongly implies "moderate" was intended. Human should reconcile. Noted for adjudication |
-| HEP-ENC-M07 | B | minor | ground_truth.red_herrings[1].data_point | Says "Morbid obesity (BMI 31 with bariatric history)" but patient BMI=33.6 and there is NO bariatric history anywhere in M07 (PMH/HPI). Phantom history likely cross-contaminated from an S10-style template | FLAGGED | BMI number is wrong (31 vs 33.6) AND a fabricated clinical fact ("bariatric history"); removing the phantom history is a semantic change → flag, don't fix |
-| HEP-ENC-M05 | C | major | ground_truth.primary_diagnosis / HPI / lit followup | Case premise = zinc *excess* (zinc 180) precipitates HE by inhibiting urea-cycle arginase. Mainstream view is the opposite: zinc *deficiency* impairs the urea cycle and zinc supplementation is generally *recommended* in HE. The case is internally self-consistent but the mechanism is unconventional | FLAGGED | Clinical-plausibility call for the clinician reviewers; do not change diagnosis. Low copper 68 as a zinc-displacement red herring is internally coherent |
-| HEP-ENC-M03 | B | minor | patient.clinical_history.medications | TMP-SMX is a load-bearing precipitant (HPI + ground_truth) but is absent from the `medications` list (started by outside PCP 1 wk ago) | FLAGGED | Defensible (outside Rx, may not be on reconciled home-med list) but a reviewer may want it represented; flag-don't-fix |
-| HEP-ENC-S02 | E | minor | metadata.difficulty_description | Stale/templated text: "NASH cirrhosis with constipation and dietary protein excess" — actual case is **alcoholic** cirrhosis precipitated by **rifaximin non-adherence + diarrhea** | FLAGGED | Non-load-bearing metadata description, mismatched to the case; correcting is low-risk but is prose, so flagged for human |
-| HEP-ENC-S03 | E | minor | metadata.difficulty_description | Stale/templated text: "hepatitis B cirrhosis, SBP as precipitant" — actual case is **alcoholic** cirrhosis precipitated by **E. coli urosepsis** (paracentesis here *excludes* SBP, PMN 186) | FLAGGED | Same class as S02; mismatched metadata description |
-| HEP-ENC-P04 | B | minor | metadata.vocab_gap / optimal_actions[6].tool_parameters | ATP7B (Wilson) genetic test uses placeholder `test_type: "genetic_panel:CADASIL"` because no `genetic_panel:wilson` exists in the closed vocab. Already self-documented in metadata.vocab_gap | NOTED | Author flagged "flag-don't-fix"; requires adding to TOOL_PARAMETER_VOCABULARY.md (out of scope). Followup specialized_test text correctly names ATP7B |
-| HEP-ENC-P07 | B | nit | initial_tool_outputs.labs.panels.LFTs (Ammonia ref range) | Ammonia reference_range "11-45" here (and HPI "lab ULN 45"); 23 of 24 sibling cases use "11-51" (S08/S09/S10 use "11-35"). Internally consistent within P07 (48 correctly flagged vs ULN 45) | FLAGGED | Cross-case lab-reference variance, not an intra-case error; touching it would alter P07's deliberate "borderline ammonia" framing. Note only |
-| HEP-ENC-S08 | E | nit | patient.history_present_illness | "dark, tarry stools" (melena = upper-GI) described as "active lower GI blood loss" — imprecise; ground_truth correctly treats it as GI hemorrhage | FLAGGED | Minor language imprecision in HPI prose; not fixed |
-| HEP-ENC-P06 | B | nit | case_id prefix vs primary_diagnosis | Intentional mimic: condition enum `hepatic_encephalopathy` / prefix HEP-ENC, but primary_diagnosis = NCSE (ICD G41.2) with concurrent severe HE. Deliberate per metadata | NOTED | Intentional reverse/mimic design (NCSE superimposed on HE); EEG legitimately makes the electrographic NCSE call (KEPT). No action |
-| HEP-ENC-S01 | D | nit | initial_tool_outputs.eeg.findings[0].morphology | Per-finding morphology says "TEXTBOOK HE triphasic waves" — mild editorializing linking pattern to HE within the EEG | NOTED | Triphasic waves are a standard EEG descriptor and the impression stays electrographic; no cross-modality synthesis. Acceptable Kind-2 |
+| HEP-ENC-S02 | terminology | major | ground_truth.icd_code | ICD K72.91 ("with coma") assigned but West Haven grade III / GCS 12 (E3V4M5) is rousable, not comatose | FIXED | K72.91 → K72.90 |
+| HEP-ENC-S03 | terminology | major | ground_truth.icd_code | ICD K72.91 ("with coma") but West Haven grade III / GCS 11 (E3V3M5), rousable | FIXED | K72.91 → K72.90 |
+| HEP-ENC-S05 | terminology | major | ground_truth.icd_code | ICD K72.91 ("with coma") but West Haven grade III / GCS 11 (E3V3M5), rousable | FIXED | K72.91 → K72.90 |
+| HEP-ENC-S08 | terminology | major | ground_truth.icd_code | ICD K72.91 ("with coma") but West Haven grade III / GCS 12 (E3V4M5), rousable/combative | FIXED | K72.91 → K72.90 |
+| HEP-ENC-P06 | terminology | major | ground_truth.icd_code | Primary dx is generalized NCSE per EEG, but G41.2 = complex-partial (focal) status epilepticus | FLAGGED | Replace G41.2 with G41.8 (or G41.9); G41.2 not appropriate for generalized NCSE |
+| HEP-ENC-S01 | terminology | minor | ground_truth.icd_code | K72.91 ("with coma") for grade III-IV, GCS 10 — objectively not coma but label retains "IV", intent ambiguous | FLAGGED | Clinician to decide: K72.91→K72.90 if non-comatose, or document coma explicitly |
+| HEP-ENC-S04 | terminology | minor | ground_truth.icd_code | K72.91 ("with coma") for grade III-IV, GCS 10 — same borderline issue as S01 | FLAGGED | Clinician to decide: K72.91→K72.90 if non-comatose, or document coma explicitly |
+| CONFIG | terminology | minor | conditions.yaml hepatic_encephalopathy.icd_code | Canonical icd_code "K72.9" is a non-billable ICD-10-CM subcategory (needs 5th char); all case files correctly use K72.90/K72.91 | FLAGGED | Set canonical icd_code to "K72.90"; orchestrator to apply serially |
 
-## Cross-cutting observations (no action)
+## Audit (clinical-correctness / internal-consistency / realism-leakage / language)
 
-- **ICD mapping is internally sound**: grade III–IV / coma cases use K72.91 (with coma);
-  grade II / II–III cases use K72.90 (without coma). Consistent across all 25.
-- **Differential ordering**: every case sorts likelihood descending; all likelihood/category
-  enums valid.
-- **Sequence constraints**: every case has the `order_ct_scan → analyze_csf` (hard) LP-after-imaging
-  constraint; cases adding MRI (M04, P03, P04, P05) also add `analyze_brain_mri → analyze_csf`.
-- **Style-guide compliance**: routine labs carry `clinical_significance: null`; EEG impressions stay
-  electrographic and never say "epilepsy"; advanced-imaging Wilson/Wernicke/PRES/manganese calls are
-  within-modality (Kind-2 KEPT); `check_drug_interactions` gives category-level management as allowed.
-- Confirmatory results legitimately named within-modality (ATP7B variants P04, ascitic Gram-stain/culture
-  S01/S09, MRI Wernicke pattern P05) are KEPT, not leakage.
+| case_id | dim | severity | field path | finding | action | recommendation |
+|---|---|---|---|---|---|---|
+| HEP-ENC-P09 | B internal-consistency | blocker | ground_truth.red_herrings[0].field_path | field_path pointed to non-existent panel "HE_Treatment_Response"; actual panel is "Empiric_Treatment_Response_Monitoring" (only coherence-validator failure in batch) | FIXED | Corrected panel name; coherence now 0 |
+| HEP-ENC-M01 | B internal-consistency | major | ground_truth.optimal_actions vs metadata.difficulty_rationale | difficulty_rationale claims 5 required tools but only 3 optimal_actions tagged "required"; pack lists lit+drug as Required | FLAGGED | Retag lit+drug "required" or amend rationale |
+| HEP-ENC-M02 | B internal-consistency | major | ground_truth.optimal_actions[2] vs difficulty_rationale | Same tier mismatch as M01, and inconsistent with M01's own tagging of drug tool | FLAGGED | Standardise lit/drug tier across HEP-ENC cases |
+| HEP-ENC-M05 | C clinical-correctness | major | primary_diagnosis + literature/drug followups + key_reasoning_points[2] | Designed precipitant (zinc EXCESS → hyperammonemia via arginase inhibition) contradicts mainstream hepatology (zinc deficiency causes hyperammonemia; zinc supplementation is a treatment) | FLAGGED | Clinician to adjudicate zinc-toxicity premise; do not auto-edit core diagnosis |
+| HEP-ENC-P02 | C clinical-correctness | major | ground_truth.contraindicated_actions[0] | Recommends haloperidol for agitation despite documented haloperidol allergy (dystonic reaction) — boilerplate copied from siblings without the allergy | FLAGGED | Reword agitation guidance to avoid haloperidol for this patient; clinical judgment |
+| HEP-ENC-P05 | B internal-consistency | major | patient.neurological_exam.sensory | "Absent Romberg test — significant sway" self-contradictory and conflicts with gait field's "Positive Romberg" | FIXED | Changed to "Positive Romberg test" |
+| HEP-ENC-P03 | D realism-leakage | major | followup_outputs[2].output.alternatives[0] | check_drug_interactions announces "HE is the confirmed diagnosis" and refutes enzalutamide-toxicity differential | FLAGGED | Reword to category-level only |
+| HEP-ENC-P04 | terminology | major | ground_truth.optimal_actions[6].tool_parameters.test_type | ATP7B/Wilson gene test encoded as "genetic_panel:CADASIL" (wrong gene panel; self-documented vocab gap) | FLAGGED | Add genetic_panel:wilson to shared vocabulary/config; not fixable at case level |
+| HEP-ENC-P09 | B internal-consistency | major | labs.interpretation / abnormal_values_summary / critical_actions | WBC/platelets written with unit "x10¹/L" (10^1) instead of "x10^9/L" — physiologically nonsensical | FIXED | Corrected all 4 occurrences to x10^9/L |
+| HEP-ENC-P09 | C clinical-correctness | major | ground_truth.differential[4].diagnosis | Stroke differential mis-lateralized: "right MCA territory given right-sided signs" — right-sided signs localize to LEFT MCA | FIXED | Changed to "left MCA territory" |
+| HEP-ENC-S02 | B internal-consistency | major | metadata.difficulty_description | Describes a different case (NASH cirrhosis/constipation) vs actual (alcoholic cirrhosis, rifaximin non-adherence, diarrhea/hypokalemia) | FLAGGED | Rewrite description to match actual case |
+| HEP-ENC-S02 | B internal-consistency | major | ground_truth.red_herrings[0].data_point | Red herring cites "low-grade fever 37.x°C, normal WBC" but case has temp 38.2°C and WBC 13.6 (flagged abnormal) | FLAGGED | Rewrite red-herring data_point to match case data |
+| HEP-ENC-S03 | B internal-consistency | major | metadata.difficulty_description | Describes different case (HBV cirrhosis/SBP) vs actual (alcoholic cirrhosis, E. coli urosepsis, SBP excluded) | FLAGGED | Rewrite description to match actual case |
+| HEP-ENC-S04 | D realism-leakage | major | patient.clinical_history.medications[Metformin].indication | Indication field editorializes: "CONTRAINDICATED in cirrhosis — lactic acidosis risk," spoiling the documented red herring | FLAGGED | Reduce to plain "Type 2 diabetes" |
+| HEP-ENC-S11 | B internal-consistency | major | fallback_tool_outputs.eeg / metadata.fallback_tool_kinds.eeg | Fallback EEG content is fully normal but metadata labels it "abnormal_nonspecific"; normal EEG implausible for grade II-III HE | FLAGGED | Rewrite fallback EEG as abnormal nonspecific slowing to match metadata and presentation |
+| HEP-ENC-M03 | C clinical-correctness | minor | ground_truth.differential[0].icd_code | Hypothyroid encephalopathy differential coded E03.5 (myxedema COMA) but patient is GCS 13, awake/conversant | FLAGGED | Consider E03.9/E03.8 instead |
+| HEP-ENC-M02 | B internal-consistency | minor | followup_outputs[0].output.panels.Ascitic_Fluid[4].is_abnormal | Pending culture value flagged is_abnormal=true; inconsistent with sibling cases (culture pending ≠ abnormal) | FLAGGED | Set is_abnormal=false for pending culture |
+| HEP-ENC-M03 | D realism-leakage | minor | followup_outputs[1].output.warnings[0] | Drug-interaction warning references "HE picture" — borderline cross-modality synthesis in a drug tool | FLAGGED | Reword to category-level hypothyroidism-cognition language |
+| HEP-ENC-M03 | C clinical-correctness | minor | ground_truth.primary_diagnosis | West Haven grade II assigned but exam is borderline grade I (oriented to person/place, subtle asterixis, mild NCT) | FLAGGED | Reassess grade I vs II |
+| HEP-ENC-M06 | C clinical-correctness | minor | followup_outputs[3].output (check_drug_interactions) | Claims escitalopram must not exceed 5 mg in Child-Pugh B/C; FDA label allows 10 mg max, which patient's dose matches | FLAGGED | Soften "5 mg max" claim to label-consistent 10 mg |
+| HEP-ENC-M04 | C clinical-correctness | minor | ground_truth.optimal_actions[2].category | search_medical_literature tagged "recommended" though pack lists it Required; inconsistent with M05 ("required") | FLAGGED | Harmonize tier across cases |
+| HEP-ENC-M06 | C clinical-correctness | minor | ground_truth.optimal_actions[2].category | Same tier inconsistency as M04 vs M05 | FLAGGED | Harmonize tier across cases |
+| HEP-ENC-M07 | B internal-consistency | minor | ground_truth.red_herrings[1].data_point | "Morbid obesity (BMI 31 with bariatric history)" contradicts case's own bmi=33.6 and PMH (no bariatric surgery) | FIXED | Corrected to "Morbid obesity (BMI 33.6)" |
+| HEP-ENC-M08 | C clinical-correctness | minor | ground_truth.optimal_actions[2].category | search_medical_literature "recommended" vs pack's Required; siblings M07/M09 tag it "required" | FLAGGED | Adjudicate promotion to "required" |
+| HEP-ENC-M09 | B internal-consistency | minor | metadata.fallback_tool_kinds.eeg vs fallback_tool_outputs.eeg | Metadata labels fallback EEG "abnormal_nonspecific" but actual output is fully normal; also atypical for grade II HE | FLAGGED | Regenerate as abnormal or correct metadata label |
+| HEP-ENC-M09 | C clinical-correctness | minor | ground_truth.harmful_tools[0] (analyze_csf) | CSF listed as harmful (coagulopathy) but pack classifies it "recommended if suspected," not harmful | FLAGGED | Adjudicate harmful vs. not-indicated classification |
+| HEP-ENC-P01 | C clinical-correctness | minor | ground_truth.optimal_actions[2].category | search_medical_literature "recommended" vs pack Required; siblings M10/P02 tag it "required"; own difficulty_rationale claims 5 required tools | FLAGGED | Consider promoting to "required" |
+| HEP-ENC-M10 | B internal-consistency | minor | metadata.fallback_tool_kinds.eeg | Labeled "abnormal_metabolic" but fallback EEG is fully normal; also atypical for overt grade II-III HE | FLAGGED | Reconcile metadata label with EEG content |
+| HEP-ENC-P02 | D realism-leakage | minor | initial_tool_outputs.eeg.findings[1].morphology | "No spikes or sharp waves despite bipolar disorder history" — cross-modality reference to psychiatric history in EEG report | FLAGGED | Trim to "No spikes or sharp waves." |
+| HEP-ENC-P04 | C clinical-correctness | minor | ground_truth.differential[0].key_features | Patient described as "young" mandating Wilson workup but is 55; atypical age for neurologic-onset Wilson | FLAGGED | Soften "young patient" phrasing |
+| HEP-ENC-P03 | B internal-consistency | minor | initial_tool_outputs.labs.panels.BMP[3] | Glucose 104 mg/dL (ref 70-100) flagged is_abnormal=false despite exceeding stated range | FLAGGED | Widen reference_range to random-glucose range or drop analyte |
+| HEP-ENC-P05 | D realism-leakage | minor | followup_outputs[0].output.panels.Thiamine_Treatment | interpret_labs panel names diagnosis/therapy ("Wernicke protocol," drug/dose) — systemic dataset convention | FLAGGED | Consider relocating therapeutic-trial responses out of interpret_labs |
+| HEP-ENC-P04 | C clinical-correctness | minor | ground_truth.optimal_actions[3].category | search_medical_literature "recommended" in P04/P05 vs "required" in P03; pack lists it Required | FLAGGED | Align tiering to pack |
+| HEP-ENC-P07 | B internal-consistency | minor | initial_tool_outputs.labs.panels.CBC[1-2] | Hemoglobin 13.2 (ref 13.5-17.5) and Platelets 148 (ref 150-400) flagged is_abnormal=false despite being below range; sibling P08 flags analogous values true | FIXED | Flipped both to is_abnormal=true; updated interpretation |
+| HEP-ENC-P08 | C clinical-correctness | minor | ground_truth.differential[3].icd_code | "Acute metabolic encephalopathy" coded G93.40 (unspecified) instead of G93.41 (metabolic) | FIXED | Changed to G93.41 |
+| HEP-ENC-P06 | C clinical-correctness | minor | ground_truth.icd_code | G41.2 (complex-partial SE) used for generalized NCSE; also G41.x not valid in ICD-10-CM (SE coded under G40) | FLAGGED | Consider G40-series or G41.1; resolve consistently with P08 |
+| HEP-ENC-P06 | B internal-consistency | minor | ground_truth.differential[0].key_features | Cites "asterixis" as supporting HE feature, but exam states asterixis could not be assessed (GCS too low) | FLAGGED | Reword key_features to drop unassessed asterixis |
+| HEP-ENC-P07 | C clinical-correctness | minor | ground_truth.icd_code | K72.90 (hepatic failure) used for covert HE in well-compensated Child-Pugh A patient with no hepatic failure | FLAGGED | Consider K76.82 (HE without acute hepatic failure) |
+| HEP-ENC-P08 | C clinical-correctness | minor | ground_truth.icd_code | K72.90 used for shunt-driven HE with explicitly preserved synthetic function | FLAGGED | Consider K76.82 |
+| HEP-ENC-P08 | D realism-leakage | minor | followup_outputs[1].output.summary | Literature summary edges toward case-specific verdict ("...supports HE") rather than population-keyed evidence | FLAGGED | Reword to fully generic phrasing |
+| HEP-ENC-S03 | B internal-consistency | minor | initial_tool_outputs.labs.panels.BMP[Potassium] | Potassium 3.4 (ref 3.5-5.0) flagged is_abnormal=false; siblings S04/S05 flag sub-3.5 K as abnormal | FIXED | Flipped to is_abnormal=true; added to interpretation |
+| HEP-ENC-S04 | C clinical-correctness | minor | primary_diagnosis / icd_code | Labels "West Haven grade III-IV" with K72.91 (with coma) but exam is GCS 10, not coma | FLAGGED | Reconcile grade label and coma qualifier |
+| HEP-ENC-S04 | B internal-consistency | minor | metadata.difficulty_description | Opens "Straightforward HE" while difficulty='moderate' and rationale explains recalibration from straightforward | FLAGGED | Change lead-in to "Moderate HE" |
+| HEP-ENC-S04 | C clinical-correctness | minor | ground_truth.useless_tools | Omits order_echocardiogram and genetic_panel that siblings S03/S05 and the pack include | FLAGGED | Consider adding for parity |
+| HEP-ENC-S05 | B internal-consistency | minor | followup_outputs (MELD_Assessment) Child-Pugh score | PMH states Child-Pugh B but computed score 10 is Class C per the field's own stated ranges | FLAGGED | Reconcile baseline vs acute Child-Pugh class |
+| HEP-ENC-S06 | C clinical-correctness | minor | ground_truth.primary_diagnosis | "West Haven grade IV — coma" labeled but exam (GCS 8, opens eyes, localizes) is borderline III/IVa | FLAGGED | Clinician to confirm grade; ICD would follow (K72.90 if downgraded) |
+| HEP-ENC-S07 | C clinical-correctness | minor | ground_truth.differential[3].icd_code | "Recent alcohol use" coded F10.230 (dependence WITH withdrawal), not a use/intoxication code | FLAGGED | Confirm intended entity before recoding |
+| HEP-ENC-S07 | C clinical-correctness | minor | ground_truth.differential[0].icd_code | Codeine toxicity coded T40.2X5A (adverse effect) but wife gave supratherapeutic extra doses — closer to T40.2X1A (accidental poisoning) | FLAGGED | Adjudicate poisoning vs adverse-effect coding |
+| HEP-ENC-S07 | D realism-leakage | minor | followup_outputs[1].output.impression (naloxone challenge) | "Additional non-opioid component" is a mild inference beyond raw observation | FLAGGED | Confirm within-test reasoning is acceptable |
+| HEP-ENC-S08 | D realism-leakage | minor | initial_tool_outputs.eeg.impression | Routine EEG (limited by movement artifact) concludes "NCSE excluded"; also prose paragraph vs house numbered-list style | FLAGGED | Soften exclusion claim; defer to continuous EEG followup |
+| HEP-ENC-S08 | D realism-leakage | minor | followup_outputs[6].output.additional_observations / impression (MRI) | "(Wernicke excluded)" parenthetical differential-dismissal in MRI report | FLAGGED | Reduce to plain pertinent-negative |
+| HEP-ENC-S08 | C clinical-correctness | minor | ground_truth.useless_tools | Omits order_echocardiogram, included in pack and siblings S06/S07 | FLAGGED | Consider adding for parity |
+| HEP-ENC-S10 | D realism-leakage | minor | followup_outputs[5].output.interactions[1] | Drug-interaction report states diuretic escalation "precipitated hypokalemia and HE in this patient" — case-specific diagnostic verdict inside drug tool | FLAGGED | Reword to population/category level |
+| HEP-ENC-S09 & S10 | B internal-consistency | minor | ground_truth.optimal_actions[2].expected_finding vs literature output | Expected finding describes populated AASLD/EASL evidence, but literature_search is null with only a generic empty fallback available | FLAGGED | Add populated literature followup mirroring S11 |
+| HEP-ENC-S01 | C clinical-correctness | minor | ground_truth.icd_code | K72.91 for GCS 10 (stupor, not true coma); defensible if convention encodes HE presence + grade IV intent | FLAGGED | Judgment call; not changed |
+| HEP-ENC-S02 | C clinical-correctness | minor | ground_truth.primary_diagnosis | West Haven III labeled but GCS 12 + agitation sits at II/III boundary (III classically "somnolent but rousable") | FLAGGED | Clinical judgment; not changed |
+| HEP-ENC-P09 | D realism-leakage | minor | fallback_tool_outputs.mri.impression | MRI impression compares to prior CT (cross-modality reference) | FLAGGED | Borderline; real radiology does this routinely |
+| HEP-ENC-M04 | B | nit | metadata.difficulty_rationale | Claims "5 required tools" but only 3 optimal_actions tagged "required" (labs, CT, drug) | FLAGGED | Correct count/wording |
+| HEP-ENC-M06 | B | nit | metadata.difficulty_rationale + optimal_actions[4] | Claims "4 required tools + IR consult" but only 3 tagged required; Doppler delivered via order_advanced_imaging, mismatching consult step framing | FLAGGED | Fix count; consider tool-framing |
+| HEP-ENC-M04 | B | nit | ground_truth.optimal_actions[4] (MRI) | category='recommended' but expected_finding text says "Required given high Wernicke pre-test probability" | FLAGGED | Reconcile wording vs tier |
+| HEP-ENC-M08 | D realism-leakage | nit | initial_tool_outputs.ct.impression | Teaching sentence about MRI's superior sensitivity appended to CT impression | FLAGGED | Optionally trim to a crisp recommendation |
+| HEP-ENC-M09 | D realism-leakage | nit | followup_outputs[1].output.results[1].summary | Leakage detector flagged AASLD-2014 summary containing "hepatic encephalopathy" — legitimate population-keyed evidence | FLAGGED | No action — intentional Kind-2, keep |
+| HEP-ENC-M09 | C clinical-correctness | nit | fallback_tool_outputs.ecg.interpretation | QTc 440 ms called "mildly prolonged" but is within normal limits (<450 ms male) | FLAGGED | Optionally reword to "upper-normal" |
+| HEP-ENC-M10 | E language | nit | initial_tool_outputs.ct.impression (and P01/P02 impressions) | Missing terminal punctuation, pervasive dataset-wide pattern | FLAGGED | Optional dataset-wide normalization |
+| HEP-ENC-P05 | B internal-consistency | nit | initial_tool_outputs.labs.panels.Nutritional[3] | Magnesium 1.3 duplicated identically in both BMP and Nutritional panels | FLAGGED | Remove one occurrence |
+| HEP-ENC-P05 | C clinical-correctness | nit | ground_truth.differential[2].icd_code | Celiac-related gluten ataxia coded G31.84 (mild cognitive impairment), not a real match; gluten ataxia lacks a dedicated code | FLAGGED | Consider a cerebellar/neuropathy code |
+| HEP-ENC-P06 | C clinical-correctness | nit | ground_truth.differential[3].icd_code | SDH from seizure-related fall coded I62.00 (nontraumatic); a fall is traumatic (S06.5-) | FLAGGED | Coding nuance; reviewer judgment |
+| HEP-ENC-P06 | E language | nit | eeg/ct impression fields (P06, P08) | Missing terminal periods, dataset-wide pattern | FLAGGED | Cosmetic; left unfixed |
+| HEP-ENC-P07 | B internal-consistency | nit | initial_tool_outputs.eeg (background/findings[0]/impression) | Three different "normal adult PDR" ranges quoted; 8 Hz called both normal and slowed | FLAGGED | Harmonize quoted PDR range and normal-vs-slowed call |
+| HEP-ENC-P09 | E language | nit | ct.impression / mri.impression | Missing terminal punctuation | FLAGGED | Cosmetic; not fixed |
+| HEP-ENC-S06 | B internal-consistency | nit | metadata.difficulty_description / difficulty | Description begins "Straightforward HE" while difficulty='moderate' | FLAGGED | Normalize prefix |
+| HEP-ENC-S06 | B internal-consistency | nit | metadata.difficulty_rationale | Claims "5 required tools" but only 3 optimal_actions tagged required | FLAGGED | Adjust count if desired |
+| HEP-ENC-S08 | B internal-consistency | nit | metadata.difficulty_description / difficulty | Same "Straightforward HE" vs moderate mismatch as S06 | FLAGGED | Normalize prefix |
+| HEP-ENC-S08 | E language | nit | followup_outputs[6].output.additional_observations[3] (MRI) | Grammatically garbled statement about enhancement on a non-contrast study | FLAGGED | Reword for clarity |
+| HEP-ENC-S11 | terminology | nit | initial_tool_outputs.labs.panels.Ammonia[0].reference_range | Reference range "11-51" differs from siblings' "11-35" — intentional, required for red-herring construction | FLAGGED | No change — keep as-is, do not normalize |
 
 ## Tally
 
-- Cases audited: **25** (M01–M08, P01–P07, S01–S10) — every field of every case read.
-- Findings: **13 total** — 0 blocker, 1 major (M05 zinc-mechanism), 8 minor, 4 nit/noted.
-- Fixed: **2** (M08 fever value; P02 red-herring panel pointer) — both unambiguous mechanical descriptor errors.
-- Flagged: **11** (1 major + minors/nits requiring judgment).
-- Self-verify: coherence stayed **0** and schema **valid** on both edited files; only HEP-ENC-M08
-  and HEP-ENC-P02 changed; unicode/no-trailing-newline convention preserved.
-
-## Top clinical flags for human adjudication
-
-1. **HEP-ENC-M05 (major)** — premise that zinc *excess* causes HE via arginase inhibition runs
-   counter to the mainstream teaching that zinc *deficiency* impairs the urea cycle (zinc is usually
-   supplemented in HE). Internally consistent but clinically unconventional; needs a clinician's call.
-2. **HEP-ENC-M07** — red-herring fabricates a "bariatric history" and wrong BMI (31 vs 33.6) not
-   present in the case body; decide whether to correct the descriptor or accept as-is.
-3. **HEP-ENC-M04** — difficulty enum (`diagnostic_puzzle`) contradicts its own metadata/HPI ("moderate");
-   reconcile the label.
-4. **HEP-ENC-S02 / S03** — metadata.difficulty_description copied from a different case template
-   (wrong etiology and precipitant); cosmetic but worth correcting before clinician review.
+- Cases audited: 30
+- Findings: 83 total — 1 blocker, 19 major, 55 minor, 8 nit
+- Fixed: 12 · Flagged: 71
+- Validators (schema, coherence, leakage detector): pass

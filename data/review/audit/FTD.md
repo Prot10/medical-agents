@@ -1,88 +1,88 @@
-# NeuroBench v5 — FTD case audit
+# FTD — NeuroBench v5 audit
 
-Audited 2026-05-28. Scope: all 25 `FTD-*` cases (M01–M08, P01–P07, S01–S10).
-Method: full field-by-field read of every case against `criteria_packs/FTD.md` and
-`TOOL_REPORT_STYLE_GUIDE.md`; mechanical validators (coherence, schema, leakage,
-vocab) run on all 25. Coherence = 0, schema valid, leakage = 0, vocab pass for all.
+23 cases audited (FTD-M01–M10, FTD-P01–P08, FTD-S01–S12); 68 findings (16 major, 29 minor, 23 nit, 0 blocker); 8 fixed, 60 flagged; validators OK (schema/coherence pass after fixes).
 
-Conservative-fix policy applied: only unambiguous mechanical errors fixed inline;
-everything requiring judgment FLAGGED. No diagnosis, clinical story, or `ground_truth`
-meaning altered. Only `FTD-` files touched.
+## Terminology / taxonomy
 
-| case_id | dim (A–E) | severity | region.field path | finding | action | detail |
-| --- | --- | --- | --- | --- | --- | --- |
-| FTD-M05 | B | minor | `followup_outputs[lithium_adjusted_recheck].output.labs.abnormal_values_summary` | `interpretation` names "Creatinine 1.4 mg/dL (H)" (is_abnormal=true, out of range 0.7–1.3) but `abnormal_values_summary` was `[]` — internal contradiction; every other FTD lab block lists flagged abnormals in the summary. | FIXED | Populated summary with `"Creatinine 1.4 mg/dL (stable CKD stage 2)"` to match the interpretation and is_abnormal flag. Coherence/schema/leakage re-verified green; unicode + trailing newline preserved. |
-| FTD-M02 | B | minor | `ground_truth.key_reasoning_points[2]` | Reasoning point says "Symmetric upper-extremity **rigidity** is not parkinsonism warranting DaTscan" but the motor exam explicitly states "no rigidity"; the actual sign is mild bilateral **hyperreflexia** (UMN). The reasoning point cites a sign not present. | FLAGGED | `ground_truth` semantic content — do not edit. Human should reword to "hyperreflexia"/"UMN signs" or remove. Does not change diagnosis (C9orf72 FTD-ALS). |
-| FTD-M02 | C/D | minor | `followup_outputs[request_csf_biomarkers].output.special_tests."TDP-43 biomarker (research-grade)"` | CSF reports "Elevated TDP-43 fragments detected (research assay)." No clinically validated CSF TDP-43 assay exists; labelling as "research-grade/research assay" mitigates, but it points at the molecular proteinopathy (TDP-43 = C9orf72 substrate). | FLAGGED | Plausibility / soft answer-pointer; reasonable reviewers could disagree. Consider removing or further hedging. |
-| FTD-M06 | B/C | major | `followup_outputs[cbs_motor_exam_apraxia]` + `[request_comprehensive_neuropsych]` vs MRI/FDG | Laterality conflict: MRI and FDG-PET are **left-hemisphere** predominant (and HPI says GRN-FTD "often left-sided"), but the CBS exam reports **LEFT-hand** ideomotor apraxia / graphesthesia loss with right hand intact, and the neuropsych says "LEFT-hand dominant constructions impaired — consistent with right hemisphere praxis." Left-hand cortical signs localize to the RIGHT hemisphere, which contradicts the left-predominant imaging. | FLAGGED | Clinical-judgment laterality inconsistency; a clinician would notice. Either the apraxia laterality or the imaging laterality needs reconciling. Diagnosis (bvFTD-GRN with CBS features) unaffected; flag for human adjudication. |
-| FTD-S07 | C | major | `followup_outputs[request_genetic_panel].output.panels.FTD_Genetic_Panel[GRN].value` + `interpretation` + `abnormal_values_summary` | GRN variant `c.1477+1G>A` is labelled a "frameshift mutation," but `+1G>A` at the canonical splice-donor site is a **splice-site** variant, not a frameshift (frameshifts are dup/del/ins). FTD-P02 correctly classifies its GRN `c.1477C>T (p.Arg493*)` as nonsense — so the dataset gets GRN nomenclature right elsewhere; S07 is the outlier. | FLAGGED | Genetics nomenclature is meaning-bearing; fixing requires choosing whether to relabel as "splice-site" or change the variant string — a judgment call. Diagnosis (bvFTD-GRN) unaffected. Recommend human relabel to "splice-site/splice-donor." |
-| FTD-P02 | B | minor | `optimal_actions[7]` (`order_specialized_test test_type:genetic_panel:FTD`) vs delivery | Genetic result is delivered via an `interpret_labs` followup, not via `order_specialized_test`; the mock server has a single `specialized_test` output slot (occupied by neuropsych). | FLAGGED (known) | Documented limitation in `metadata.case_body_concerns` ("RESOLVED (coherence sweep)…single output slot"). Per task: flag, do NOT attempt to fix mock-server behavior. |
-| FTD-P04 | B | minor | `optimal_actions[7]` (`genetic_panel:FTD`) vs delivery | Same single-output-slot pattern as P02: neuropsych occupies the specialized_test slot, genetics delivered via `interpret_labs`. | FLAGGED (known) | Documented in `metadata.case_body_concerns` ("RESOLVED…single output slot"). Per task: flag, don't fix. |
-| FTD-P04 | C | nit (positive) | `ground_truth.useless_tools` / `optimal_actions[8]` | DaTscan is correctly OMITTED from useless_tools and listed as a recommended action because the patient has overt PD (criteria pack: DaTscan useless "unless parkinsonism present"). `key_reasoning_points[0]` flags this exception explicitly. | (none) | No action — noting correct condition-specific handling; the one FTD case where DaTscan is indicated. |
-| FTD-M01 / M02 / M03 / M04 / M05 / M06 | C | minor | `ground_truth.optimal_actions[5].tool_name = consult_medical_specialist`, `category: required` | `consult_medical_specialist` is consistently marked `required`, but the criteria pack lists behavioral/cognitive-neurology consult under **Recommended**. Systematic across the series (and S-cases). | FLAGGED | Tier classification (required vs recommended) is judgment; reasonable to keep consult as required for these complex cases. Flag for human tier decision; do not reclassify unilaterally. Note `consult_medical_specialist` is also not in the 12-tool schema list in CLAUDE.md (it is in the criteria pack workup) — a tool-roster question for humans. |
-| FTD-P05 / P06 / P07 / S01–S10 | C | minor | `ground_truth.optimal_actions[*].tool_name = consult_medical_specialist` | Same `required` vs pack-`Recommended` tier mismatch as above, present in every P/S case. | FLAGGED | Same as above; systematic, judgment-level. |
-| FTD-M07 / M08 | A/E | nit | `metadata.case_body_concerns` | Stale concern claims "required tool `order_specialized_test` (neuropsych) has no initial/followup entry," but the neuropsych report IS present in `initial_tool_outputs.specialized_test`. | FLAGGED | Pre-existing stale metadata note (pre-regen). Skill says append-don't-overwrite metadata; left untouched. Cosmetic. |
-| FTD-P01 | A/E | nit | `metadata.case_body_concerns` | Stale concern claims `check_drug_interactions` has no output, but it IS present in `initial_tool_outputs.drug_interactions` (and as step-8 followup). | FLAGGED | Pre-existing stale metadata; left untouched. Cosmetic. |
-| FTD-S03 / S05 / S10 | A/E | nit | `metadata.case_body_concerns` (order_cardiac_monitoring fallback "missing") | Stale concern says the `order_cardiac_monitoring` fallback is missing, but a normal Holter fallback IS present in `fallback_tool_outputs.cardiac_monitoring`. These cases also provide a redundant `order_cardiac_monitoring` followup for a tool that is simultaneously in `useless_tools` (harmless: returns a normal result). | FLAGGED | Pre-existing stale metadata + benign redundancy. Left untouched. |
-| FTD-P01 | B | nit | `initial_tool_outputs.drug_interactions.valproate.warnings[1]` vs `labs.panels[Ammonia].reference_range` | Warning text says ammonia "upper reference ~32 mcg/dL" (hedged) while the lab panel reference_range for ammonia is "11-35". Soft numeric mismatch (35 vs ~32). | FLAGGED | In hedged interpretive narrative; not a hard contradiction. Cosmetic; reasonable to leave. |
-| FTD-M05 | D | nit | `followup_outputs[lithium_adjustment_monitoring].output` (check_drug_interactions) | Gives a specific dose-titration ("Reduce lithium from 450 mg BID to 300 mg BID", "recheck in 1 week"). Style guide allows `check_drug_interactions` category-level management; specific titration is at the edge of that latitude. | FLAGGED | Within the tool's documented exception; noting realism edge only. Not fixed. |
-| FTD-M08 | E | nit | `initial_tool_outputs.labs.abnormal_values_summary[0]` | "Toxoplasma IgG 1: 64" has a stray space after the colon (titer should read "1:64"; the value field correctly reads "1:64"). | FLAGGED | Cosmetic typo inside an interpretive summary string; low value, edit risk. Left untouched. |
-| FTD-P07 | C | nit | `initial_tool_outputs.labs.panels.Special[CSF 14-3-3 protein]` | A CSF analyte (14-3-3) is listed inside the serum `interpret_labs` panel, though CSF is only obtained later via the `request_csf_biomarkers` followup (which separately reports 14-3-3). A CSF test appearing in a blood-draw panel before any LP is a workflow oddity. | FLAGGED | Plausibility/workflow; could be argued the LP was concurrent. Meaning question — not fixed. |
-| FTD-S09 / S10 | C | minor | `ground_truth.differential` vs HPI/social_history | Escalating heavy alcohol use (S09: 6 glasses wine/day; S10: 8–10 beers/day) is described in HPI/social history but is NOT addressed in the differential (no alcohol-related cognitive disorder entry) — unlike FTD-S01/M07 which carefully list and rebut it as a red herring. | FLAGGED | Differential-completeness judgment; escalating alcohol is a plausible competing/contributing cause a reviewer may want represented. Diagnosis unaffected. |
+| case_id | dim | severity | field path | finding | action | recommendation |
+|---|---|---|---|---|---|---|
+| CONFIG | terminology | major | `conditions.yaml :: frontotemporal_dementia.name` | Display name is the SUBTYPE label "Behavioral variant frontotemporal dementia" but the FTD class is an umbrella including svPPA (FTD-S11) and nfvPPA (FTD-S12), neither of which is bvFTD — mirrors the "Early Alzheimer's" name-implies-subtype failure. | FLAGGED | Rename to "Frontotemporal dementia" (umbrella) to match abbreviation FTD and the criteria-pack title. Shared config — do not edit serially. |
+| CONFIG | terminology | minor | `conditions.yaml :: frontotemporal_dementia.typical_demographics.age_range` | age_range [50,70] excludes the well-established 45–65 FTD onset window; FTD-P02 (age 48) already falls below the stated floor. | FLAGGED | Widen to approximately [45, 65] to match epidemiology and encompass FTD-P02. Shared config — flag only. |
+| FTD-M04 | terminology | nit | `ground_truth.primary_diagnosis` | Verification note: "young-onset" qualifier on FTD-M04 (53) and FTD-P02 (48) is correctly used (onset <65), unlike the ALZ-EARLY failure. No change needed. | FLAGGED | None — correct as written. |
 
-## Cross-cutting observations (informational, not per-case findings)
+## Audit findings
 
-- **Systemic validator note (all 25):** every case's `metadata.case_body_concerns`
-  documents that `order_advanced_imaging` appears in both `optimal_actions`
-  (FDG_PET/amyloid_PET) and `useless_tools` (MR_spectroscopy/DaTscan/perfusion_MRI/
-  carotid_duplex) — distinct modalities of one catchall tool the coherence script
-  cannot disambiguate. Pre-existing, documented, no case-level fix.
-- **Single specialized_test slot (P02, P04 explicitly; also the pattern by which all
-  cases route the genetic panel through `interpret_labs` rather than
-  `order_specialized_test test_type:genetic_panel:FTD`):** mock-server limitation,
-  logged in metadata, flagged not fixed per task instruction.
-- **Kind-2 (KEPT) within-modality conclusions verified appropriate, not stripped:**
-  neuropsych "probable behavioral-variant FTD" (every case); FDG-PET "frontotemporal
-  hypometabolism / frontotemporal metabolic profile" (hedged pattern, never "FTD");
-  amyloid PET strictly binary "Negative — sparse-to-no amyloid"; DaTscan binary
-  "presynaptic dopaminergic deficit" (P04); tau PET regional pattern "consistent with
-  a frontotemporal tauopathy / no Alzheimer-typical tau" (P03, P07, S01, S07);
-  genetics (C9orf72/GRN/MAPT) and plasma progranulin confirmatory. No Kind-1
-  cross-modality synthesis, differential-refutation, or management prescription found
-  in any tool report (literature summaries are population-keyed; drug-interaction
-  outputs stay category-level per the documented exception).
-- **Numeric/units spot-check:** all lab `is_abnormal` flags match stated reference
-  ranges across all 25 cases (e.g., glucose >100 flagged, HbA1c above goal flagged,
-  lithium 1.28 > 1.2 flagged, anti-TPO 320 > 34 flagged). CSF glucose ratios and
-  SUVr/Z-score values internally consistent. Differentials sorted by likelihood
-  descending in all 25; all likelihood/category/severity enums valid.
+| case_id | dim | severity | field path | finding | action | recommendation |
+|---|---|---|---|---|---|---|
+| FTD-M02 | terminology (A) | major | `initial_tool_outputs.mri.findings[1].signal_characteristics.T1` | Hippocampal atrophy graded with ARWMC, a white-matter-hyperintensity scale, not a medial-temporal-atrophy scale. | FIXED | Changed "ARWMC-rated mild" → "MTA-rated mild". |
+| FTD-M02 | B | major | `ground_truth.key_reasoning_points[2]` | Cites "symmetric upper-extremity rigidity" as reason to avoid DaTscan, but the exam documents NO rigidity — only hyperreflexia. | FLAGGED | Reword to reference documented hyperreflexia (UMN sign) and reconcile the DaTscan-avoidance rationale. |
+| FTD-M01 | B | minor | `patient.neurological_exam.mental_status` | MoCA total 22/30 doesn't match itemized losses (3+2+2=7 → should be 23/30). | FLAGGED | Add a 4th lost point or change total to 23. |
+| FTD-M01 | C | minor | `ground_truth.optimal_actions[3].category` | search_medical_literature tiered "recommended" here but "required" in sibling cases and in the criteria pack. | FLAGGED | Align to "required". |
+| FTD-M01 | D | nit | `followup_outputs[3].output.findings[5].finding` | Neuropsych finding names the integrated diagnosis: "...a cardinal feature of bvFTD." | FLAGGED | Trim the bvFTD attribution clause. |
+| FTD-M06 | B | major | `initial_tool_outputs.mri.impression` vs CBS/neuropsych followups | Imaging localizes disease to the LEFT hemisphere, but CBS motor exam/neuropsych attribute apraxia and cortical sensory loss to the LEFT hand — which localizes to the RIGHT hemisphere, contradicting the imaging. | FLAGGED | Human adjudication: flip limb laterality to RIGHT hand, or flip imaging to right-hemisphere predominance. |
+| FTD-M04 | D | minor | `followup_outputs[...work_fitness].output.summary` | Literature summary ends with a case-specific verdict ("the firm was correct to place her on leave"). | FLAGGED | Reword to a generic, population-keyed statement or delete. |
+| FTD-M05 | D | minor | `followup_outputs[bipolar_ftd_medication_management / lithium_adjustment_monitoring].output` | Drug-interaction reports announce/confirm diagnosis ("management of bvFTD...") and do differential reasoning (lithium-exclusion → continue FTD workup). | FLAGGED | Rephrase to interaction-only language; drop diagnosis naming and workup reasoning. |
+| FTD-M04 | B | minor | `initial_tool_outputs.labs.panels...[ANA]` | ANA "1:40 (low titer)" marked is_abnormal=false, but stated reference "<1:40 negative" makes 1:40 technically positive. | FLAGGED | Restate reference range (e.g. "<1:80 significant") or clarify is_abnormal logic. |
+| FTD-M06 | D | minor | `initial_tool_outputs.labs.panels.GRN_Biomarker_Workup[CSF NfL]` | CSF-derived analyte reported inside an interpret_labs blood panel; no analyze_csf output exists in this case. | FLAGGED | Relabel as Plasma NfL or move into an analyze_csf output. |
+| CONFIG | C | minor | `ground_truth.optimal_actions[].category` (M04/M05/M06) | consult_medical_specialist "required" across all three vs pack's "Recommended"; amyloid PET and search_medical_literature tiers also vary inconsistently between siblings and the pack. | FLAGGED | Reconcile tiers vs criteria pack; some upgrades may be defensible case-specific choices. |
+| FTD-M05 | E | nit | `patient.history_present_illness / neurological_exam.additional` | Repetition of the patient's OWN stories labeled "echolalia-like perseveration"; echolalia is repetition of others' speech. | FLAGGED | Consider "palilalia-like perseveration" or "stereotyped verbal perseveration". |
+| FTD-M06 | C | nit | `ground_truth.optimal_actions[step9].category` vs `metadata.notes` | Amyloid PET tiered "optional" but metadata.notes calls it "mandatory when CBS features present". | FLAGGED | Reconcile tier with note (upgrade to recommended or soften note). |
+| FTD-M08 | E | nit | `initial_tool_outputs.labs.abnormal_values_summary[0]` | "Toxoplasma IgG 1: 64" has a stray space vs "1:64" used elsewhere in the same case. | FIXED | Corrected to "1:64". |
+| FTD-M08 | B | minor | `patient.history_present_illness` | Behavioral-change duration stated as both 18 months (referral sentence) and 15 months (informant/chief_complaint). | FLAGGED | Reconcile to a single duration or clarify the 18-month figure refers to a different window. |
+| FTD-M07 | D | minor | `initial_tool_outputs.mri.findings[0].signal_characteristics` | MRI text resolves the central differential ("atrophy disproportionate to what can be attributed to alcohol alone"). | FLAGGED | Reduce to pure morphology ("moderate bifrontal atrophy out of proportion to age"). |
+| FTD-M07 | B | minor | `followup_outputs[2]` vs `ground_truth.optimal_actions[6]` | Genetic panel delivered via tool_name=interpret_labs, but optimal action specifies order_specialized_test; sibling FTD-M09 wires it correctly. | FLAGGED | Re-key followup to order_specialized_test. |
+| FTD-M08 | B | minor | `followup_outputs[3]` vs `ground_truth.optimal_actions[7]` | Same genetic-panel tool mismatch as FTD-M07. | FLAGGED | Re-key to order_specialized_test. |
+| FTD-M07 | C | minor | `ground_truth.optimal_actions[4].category` | consult_medical_specialist tiered "required" vs pack's "Recommended". | FLAGGED | Consider demoting to "recommended" or accept as intentional. |
+| FTD-M08 | C | minor | `ground_truth.optimal_actions[4],[6].category` | consult "required" (pack: Recommended); analyze_csf "required" (pack: Optional, though defensible given HIV status). | FLAGGED | Adjudicate tier alignment vs pack. |
+| FTD-M10 | B | major | `patient.clinical_history.medications` | Sertraline omitted from structured medications[] despite being documented as active in HPI/exam/critical_actions. | FIXED | Added Sertraline 50 mg once daily entry. |
+| FTD-M10 | B | nit | `patient.neurological_exam.mental_status` | MoCA 20/30 doesn't reconcile with itemized deductions (sum to 9, implying 21/30). | FLAGGED | Add missing 1-point deduction or set total to 21/30. |
+| FTD-P01 | C | minor | `ground_truth.primary_diagnosis` | bvFTD labeled "probable" despite confirmed pathogenic C9orf72 expansion, which per pack/Rascovsky 2011 meets "definite". | FLAGGED | Consider relabeling to "definite (genetically confirmed)". |
+| FTD-P01 | B | nit | `initial_tool_outputs.drug_interactions.valproate.warnings` | Ammonia upper reference (~32 mcg/dL) in narrative disagrees with labs panel reference range (11–35 mcg/dL). | FLAGGED | Align narrative upper bound with panel's 35 mcg/dL. |
+| FTD-P01 | A | nit | `metadata.case_body_concerns` | Two stale concerns describe outputs (check_drug_interactions, advanced_imaging fallback) that are actually present in the file. | FLAGGED | Prune resolved concerns. |
+| FTD-P02 | B | major | `followup_outputs[3].output.interpretation` | Plasma progranulin flagged "(H)" though value (38 ng/mL) is below reference range (60–200) — should be low. | FIXED | Changed "(H)" → "(L)". |
+| FTD-P02 | D | minor | `initial_tool_outputs.specialized_test.findings[2].finding` | Neuropsych report names the etiologic diagnosis: "...supports the bvFTD social-cognitive phenotype." | FLAGGED | Soften to "supports a frontal/social-cognitive phenotype" to match sibling cases. |
+| FTD-P02 | C | minor | `ground_truth.primary_diagnosis` | bvFTD "probable" despite confirmed pathogenic GRN nonsense variant + low progranulin (meets "definite" per pack). | FLAGGED | Consider "definite (genetically confirmed)". |
+| FTD-P04 | B | minor | `followup_outputs[0].output.findings[1].finding` | DaTscan left-striatum finding self-contradicts: "Moderately reduced...(binding ratio 1.2 — mildly reduced)". | FIXED | Corrected parenthetical to "moderately reduced". |
+| FTD-P03 | C | major | `ground_truth.primary_diagnosis` | bvFTD "probable" despite confirmed pathogenic MAPT p.P301L variant (meets "definite" per Rascovsky 2011). | FLAGGED | Consider relabeling to "definite"; needs clinician adjudication. |
+| FTD-P04 | C | major | `ground_truth.primary_diagnosis` | bvFTD "probable" despite confirmed pathogenic C9orf72 expansion (meets "definite" tier). | FLAGGED | Clinician adjudication of probable vs definite. |
+| FTD-P05 | C | major | `ground_truth.primary_diagnosis` | bvFTD "probable" despite confirmed pathogenic C9orf72 expansion (>700 repeats). | FLAGGED | Clinician adjudication. |
+| FTD-P04 | D | minor | `followup_outputs[0].output.findings` | DaTscan findings name/stage PD ("established right-predominant PD", "moderate-stage PD") — style guide requires strictly binary DaTscan reporting. | FLAGGED | Reduce findings to "reduced striatal DAT uptake, R>L" without PD staging. |
+| FTD-P04 | D | minor | `followup_outputs[5].output` | check_drug_interactions carries non-drug management and names diagnosis ("bvFTD-C9orf72 with coexistent Parkinsonism"), plus EMG surveillance / genetic counseling advice. | FLAGGED | Trim to interaction-level content; drop diagnosis label and cross-domain management. |
+| FTD-P03 | B | minor | `ground_truth.optimal_actions[9].tool_parameters.drugs` | Proposed drug check uses sertraline, but patient's actual antidepressant is escitalopram. | FLAGGED | Change to escitalopram (or generic "SSRI"). |
+| FTD-P03 | terminology | nit | `initial_tool_outputs.labs.panels...[10].reference_range` | Anti-CCP reference_range malformed: "<17 positive >17". | FLAGGED | Reword to "<17 (positive if >17)". |
+| FTD-P03 | C | minor | `ground_truth.optimal_actions[3].category` | search_medical_literature "recommended" here vs "required" in pack and sibling cases P04/P05. | FLAGGED | Harmonize to "required". |
+| FTD-P04 | C | minor | `ground_truth.optimal_actions[9].category` | check_drug_interactions "required" vs pack's "Optional" (P03 marks it optional). | FLAGGED | Leave or demote to optional per author decision. |
+| FTD-P04 | B | nit | `fallback_tool_outputs.ecg` | Findings note borderline left-axis deviation while structured axis field = "normal". | FLAGGED | Set axis to "borderline left" or drop the LAD phrase. |
+| FTD-P05 | C | minor | `ground_truth.optimal_actions` | FDG-PET/genetic panel/consult marked "required" vs pack's "Recommended"; amyloid PET "recommended" vs pack's "Optional". | FLAGGED | Accept as puzzle-specific weighting or align to pack tiers. |
+| FTD-P08 | A | major | `ground_truth.red_herrings[0].field_path` | Compound unresolvable field_path string failed coherence validator's path-resolution check. | FIXED | Changed to single resolvable path `patient.clinical_history.past_medical_history[0]`. |
+| FTD-P06 | D | nit | `initial_tool_outputs.mri.additional_observations[2]` | MRI observation names AD differential ("inconsistent with typical AD predominance") — borderline-allowable imaging differential. | FLAGGED | Optionally soften to omit naming AD. |
+| FTD-P07 | D | nit | `initial_tool_outputs.labs.panels.Special[3]` | CSF analyte (14-3-3 protein) embedded in an interpret_labs blood panel rather than a CSF report. | FLAGGED | Move to analyze_csf context if revisited. |
+| FTD-P08 | D | nit | `followup_outputs[1].output.impression` | Respiratory impression references NIV initiation threshold — borderline management/threshold language in a diagnostic report. | FLAGGED | Optionally drop the NIV-threshold parenthetical. |
+| FTD-S01 | B | major | `ground_truth.key_reasoning_points[3]` | States negative amyloid/CSF "exclude underlying neurodegenerative pathology, securing the bvFTD diagnosis" — bvFTD IS neurodegenerative; self-contradictory. | FLAGGED | Change to "exclude underlying Alzheimer (AD) pathology". |
+| FTD-S03 | C | minor | `ground_truth.primary_diagnosis` | "bvFTD, probable, C9orf72-associated" despite documented pathogenic C9orf72 expansion (meets "definite" per Rascovsky). | FLAGGED | Consider "definite" tiering; defensible either way. |
+| FTD-S02 | B | nit | `fallback_tool_outputs.ecg` | axis="normal" while findings note borderline left-axis deviation. | FLAGGED | Set axis to "borderline left" or leave as normal-variant. |
+| FTD-S01 | B | nit | `followup_outputs[2].output.glucose_ratio` | CSF glucose_ratio 0.69 implies serum ~88 mg/dL, but documented BMP glucose is 112 mg/dL (would give ~0.54). | FLAGGED | No fix — depends on unstated LP-time serum glucose; both ratios remain normal. |
+| FTD-S04 | C | major | `ground_truth.key_reasoning_points[1]` | "Negative amyloid biomarkers exclude neurodegenerative pathology" is self-contradictory — case's own diagnosis (bvFTD) IS neurodegenerative. | FLAGGED | Reword to "argue against Alzheimer pathology and support a non-AD (FTLD) process". |
+| FTD-S05 | C | major | `ground_truth.primary_diagnosis` | "bvFTD, probable, C9orf72-associated (suspected familial)" despite confirmed pathogenic C9orf72 expansion and affected brother+father — meets "definite"/"familial". | FLAGGED | Consider relabeling "probable"→"definite" and "suspected familial"→"familial". |
+| FTD-S05 | E | nit | `ground_truth.optimal_actions[3].action` | Gene symbol/acronym lowercased: "c9orf72-associated ftd". | FIXED | Corrected casing to "C9orf72-associated FTD". |
+| FTD-S05 | B | minor | `followup_outputs[5]` | order_cardiac_monitoring is listed in useless_tools yet also has a dedicated followup returning a full normal Holter, duplicating the existing fallback. | FLAGGED | Consider removing the cardiac-monitoring followup so it resolves via fallback only. |
+| FTD-S06 | B | nit | `ground_truth.differential[3].key_features` | VCI differential states "No vascular-pattern imaging finding," but MRI documents age-appropriate small vessel ischemic disease. | FLAGGED | Reword to clarify only age-appropriate SVID present, no strategic infarct. |
+| FTD-S07 | terminology | major | `followup_outputs[0].output.panels...[GRN].value` | GRN variant c.1477+1G>A (a canonical splice-donor site variant) mislabeled "frameshift mutation". | FIXED | Corrected "frameshift" → "splice-site" in all 3 locations. |
+| FTD-S07 | C | major | `ground_truth.primary_diagnosis` | bvFTD "probable" despite confirmed pathogenic GRN mutation (meets "definite" per pack §1). | FLAGGED | Consider "bvFTD with definite FTLD pathology, GRN-associated". |
+| FTD-S08 | B | minor | `followup_outputs[2].output.glucose_ratio` | CSF glucose_ratio stated 0.68 vs computed 61/92=0.66 from case's own BMP glucose; siblings compute correctly. | FLAGGED | Change to 0.66 (assumption-dependent, so flagged not fixed). |
+| FTD-S09 | C | nit | `ground_truth.differential` | Escalating alcohol use (6 glasses wine/day) + high-normal MCV not reflected as a differential entry. | FLAGGED | Optionally add a very_low-likelihood alcohol-related cognitive impairment entry. |
+| FTD-S07 | B | nit | `metadata.case_body_concerns[1]` | Stale note claims order_advanced_imaging fallback is "missing," but it is present (also stale in S08/S09). | FLAGGED | Remove/refresh stale metadata bullet. |
+| FTD-S10 | C | major | `ground_truth.primary_diagnosis` | bvFTD "probable" despite confirmed pathogenic C9orf72 expansion (~700 repeats) — meets "definite" per Rascovsky 2011. | FLAGGED | Reviewer to decide relabeling to "definite"; high-risk edit, not auto-fixed. |
+| FTD-S10 | B | minor | `followup_outputs[0].tool_name` | Genetic-panel followup keyed to interpret_labs while optimal_actions step 7 specifies order_specialized_test; fallback for the latter is null. | FLAGGED | Confirm runner's followup-matching semantics; align tool_name with gold path. |
+| FTD-S10 | C | minor | `ground_truth.optimal_actions` | consult_medical_specialist and genetic panel marked "required" vs pack's "Recommended". | FLAGGED | Reviewer decide whether to keep elevation or demote to match pack. |
+| FTD-S11 | B | nit | `patient.neurological_exam.mental_status` | Bedside fluency/digit-span scores (4 F-words; 6/4) disagree numerically with formal neuropsych battery (8 items; 7/5). | FLAGGED | Likely acceptable as separate bedside vs formal sessions; flagged for awareness. |
+| FTD-S11 | D | nit | `initial_tool_outputs.mri.additional_observations[1]` | Single imaging-differential/teaching sentence re: HSV encephalitis sequelae — borderline teaching parenthetical. | FLAGGED | Acceptable per style guide; optionally trim teaching clause. |
+| FTD-S12 | B | nit | `followup_outputs[0].output.findings[0].finding` | FDG-PET narrative states "reduced 20–26%" vs quantitative_data "22–26% reduction" — lower bound mismatch. | FLAGGED | Harmonize to a single range; no downstream impact (impression cites no numbers). |
+| FTD-S12 | C | nit | `ground_truth.differential` | CBS differential coded G31.09 (dedicated code G31.85 exists); lvPPA/AD coded G31.09 vs sibling S11's G30.9 convention. | FLAGGED | Harmonize CBS→G31.85 and align lvPPA/AD coding with S11's convention. |
 
 ## Tally
 
-- **Cases audited:** 25 / 25 (every field of every case read in full).
-- **Mechanical validators:** coherence 0, schema valid, leakage 0, vocab pass — all 25.
-- **Findings by severity:** 0 blocker; 3 major (M06 laterality, S07 GRN nomenclature — both judgment FLAGs; plus the M-series/P-S `consult_medical_specialist` tier rolled up as 1 systematic major-ish FLAG, counted minor below); 0 additional blockers.
-  - blocker: 0
-  - major: 2 (FTD-M06 laterality conflict; FTD-S07 GRN "frameshift" mislabel)
-  - minor: 9 (M05 fixed summary; M02 reasoning rigidity; M02 CSF TDP-43; consult tier mismatch ×2 rollups; P01 ammonia ref; S09/S10 alcohol-in-differential; P07 CSF-in-serum-panel; M05 dose-specificity)
-  - nit: 7 (stale-metadata notes ×4 groups; M08 "1: 64" spacing; P04 positive DaTscan note; P01 stale drug-interaction metadata)
-- **Fixed vs flagged:** 1 FIXED (FTD-M05 abnormal_values_summary); all others FLAGGED.
-- **Files changed:** only `FTD-M05.json` (1 file). Unicode convention (literal, no `\u`)
-  and trailing newline preserved.
-
-## Top clinical-correctness flags for human adjudication
-
-1. **FTD-M06 — laterality conflict (major):** imaging is left-hemisphere predominant
-   but the corticobasal exam + neuropsych describe LEFT-hand cortical signs (→ right
-   hemisphere). Reconcile the apraxia laterality or the imaging laterality.
-2. **FTD-S07 — GRN `c.1477+1G>A` mislabelled "frameshift" (major):** it is a
-   splice-site variant; relabel for genetic accuracy (P02 handles GRN nomenclature
-   correctly as a model).
-3. **`consult_medical_specialist` tier (systematic, M01–M08, P-series, S-series):**
-   marked `required` vs the criteria pack's `Recommended`; also not on the CLAUDE.md
-   12-tool roster. Decide tier + tool-roster status dataset-wide.
-4. **FTD-M02 — CSF "research-grade TDP-43 fragments":** non-validated assay that
-   points at the molecular pathology; consider removing/hedging.
-5. **FTD-S09 / S10 — escalating heavy alcohol absent from the differential:** add an
-   alcohol-related cognitive disorder entry/red herring for consistency with S01/M07,
-   or confirm intentional.
+- Cases audited: 23 (FTD-M01–M10, FTD-P01–P08, FTD-S01–S12)
+- Findings: 68 total — 16 major, 29 minor, 23 nit (0 blocker)
+- Fixed: 8 · Flagged: 60
+- Validators: schema and coherence checks pass after fixes (validators_ok = true)

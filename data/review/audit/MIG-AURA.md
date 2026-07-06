@@ -1,69 +1,123 @@
-# NeuroBench v5 audit — MIG-AURA (migraine with aura)
+# MIG-AURA — NeuroBench v5 audit
 
-Auditor: neurobench-case-audit skill. Scope: all 29 `MIG-AURA-*` cases.
-Mechanical validators run on every case: coherence = 0 for all 29; schema valid for all 29;
-tool-vocab clean for all 29; leakage detector candidates judged per-case (all residual hits are
-population-keyed `search_medical_literature` summaries or category-level `check_drug_interactions`
-content — intentional/allowed, plus within-modality imaging differentials and confirmatory genetics).
+~30 cases audited (M01–M08, P01–P09, RM11, RS11, S01–S11, plus shared CONFIG/PACK-level items) — 108 findings total (0 blocker / 25 major / 54 minor / 29 nit); 27 fixed mechanically, 81 flagged for author/clinical judgment; validators pass (schema OK, coherence 0 on all edited cases).
 
-Clinical note: migraine is an ICHD-3 clinical diagnosis; imaging/EEG are normal or incidental and
-must NOT say "consistent with migraine." Verified: no tool report announces the migraine diagnosis.
-Several cases are deliberate mimics (CADASIL, MELAS, cardioembolic stroke, migrainous infarction) —
-flagged, not altered; their workups do distinguish the mimic.
+## Terminology / taxonomy
 
-| case_id | dim | severity | region.field | finding | action | detail |
+| case_id | dim | severity | field path | finding | action | recommendation |
 |---|---|---|---|---|---|---|
-| MIG-AURA-M01 | B | major | initial_tool_outputs.eeg.classification | `classification:"normal"` contradicts own impression "This is an ABNORMAL EEG due to: ... posterior slowing" (which is a documented GT red herring) and the parallel P-case convention (slowing ⇒ abnormal) | FIXED | set classification → "abnormal" to match impression text + P-case convention; impression/background prose untouched; coherence 0, schema OK |
-| MIG-AURA-M02 | B | major | initial_tool_outputs.eeg.classification | Same `normal`/"ABNORMAL EEG" contradiction (impression names mild posterior slowing) | FIXED | set classification → "abnormal"; coherence 0, schema OK |
-| MIG-AURA-M03 | B | major | initial_tool_outputs.eeg.classification | Same `normal`/"ABNORMAL EEG" contradiction (mild left posterior slowing) | FIXED | set classification → "abnormal"; coherence 0, schema OK |
-| MIG-AURA-M03 | B | minor | ground_truth.red_herrings + followup drug review | Narrative/red-herring cite a specific "Elevated LDL 148" but `interpret_labs` is empty ("All values within normal limits", no panel) — referenced lab value absent from any structured output | FLAGGED | judgment; do not fabricate a lab panel |
-| MIG-AURA-M03/M04/P03/RS11 | C | minor | ground_truth (triptan stance) vs case literature | Gold `critical_actions`/`expected_finding` say triptans/ergotamines "CONTRAINDICATED" in hemiplegic/brainstem migraine & migrainous infarction, but the case's own literature/drug-review followups say "cautioned (not absolutely contraindicated)" | FLAGGED | clinical-nuance tension; reasonable clinicians differ (absolute vs relative); do not edit |
-| MIG-AURA-M05 | C | major | ground_truth.primary_diagnosis / followup literature | ICHD-3 code for "typical aura without headache" is given as 1.2.1.1 in the gold but the acephalic-migraine literature says "ICHD-3 code 1.2.2" (= brainstem aura); both differ from the correct 1.2.1.2 and from each other | FLAGGED | clinical-correctness; changing the diagnosis code is a judgment call — adjudicate |
-| MIG-AURA-M05 | B | minor | ground_truth.red_herrings | Red herrings cite "Borderline LDL / LDL 132 / Elevated FSH and low oestradiol" but no lab output contains these values (`interpret_labs` empty) | FLAGGED | narrative references labs not present; do not fabricate |
-| MIG-AURA-M06/M07/M08/P0x/S0x | B | minor | patient.vitals vs top-level vitals | Dataset-wide: `patient.vitals` is a generic default block (often 120/80, hr72, temp37.0) while top-level `vitals` carries the case-specific values matching HPI/exam (e.g. M03 134/84, M07 hr52 athlete, P06 136/82). Two divergent vitals per case | FLAGGED (systemic) | structural/harness question, not MIG-AURA-specific; rewriting vitals risks regression & touches clinical story |
-| MIG-AURA-M07 | B | minor | initial_tool_outputs.ecg.rate vs findings/interpretation | Structured `rate:72` contradicts the report text "Sinus bradycardia 50 bpm (athlete)" / interpretation "bradycardia"; top-level vitals hr=52 | FLAGGED | `rate` is leave-untouched objective data per style guide; default-72 artefact |
-| MIG-AURA-P01 | B | minor | patient.hpi vs patient.pmh | HPI states "no hypertension" but PMH lists "Mild hypertension — borderline (130-138/82)" and red_herring text references HTN | FLAGGED | internal story contradiction; do not rewrite clinical story |
-| MIG-AURA-P01 | E | nit | ground_truth.red_herrings | Red-herring text references "prediabetes" not present elsewhere in the case | FLAGGED | minor narrative drift |
-| MIG-AURA-P02 | D | minor | followup_outputs[4].output (alcohol literature) | Literature summary phrasing "GGT/ALT elevation consistent with alcohol-related hepatic stress" reads as patient-specific (no GGT/ALT in labs); should stay population-keyed | FLAGGED | borderline Kind-1 (case-specific assertion in a literature tool) |
-| MIG-AURA-P04 | D | minor | initial_tool_outputs.mri.impression | MRI gives worded imaging differential "borderline CADASIL pattern... migraine-related WMH also possible; NOTCH3 testing required" | NOTED (intentional) | permitted Kind-2 imaging differential + further-diagnostic recommendation; not Kind-1 leakage |
-| MIG-AURA-P04/P05/P08/P09/RS11/S0x | E | minor | followup literature/drug outputs | Inconsistent literature-output schema across dataset: some use `results:[{source,finding,evidence_level}]`, others `results:[{title,authors,year,summary}]`, others a top-level `report` key with no `query`/`results` | FLAGGED | format/quality inconsistency; schema validates; restructuring risks regression |
-| MIG-AURA-P05 | B | minor | patient.hpi vs followups | HPI says "a normal 24-hour Holter"; subsequent cardiac-monitoring followup is "48-hour Holter" (and red_herring says 48h) | FLAGGED | minor numeric inconsistency |
-| MIG-AURA-P05 | B | minor | initial_tool_outputs.labs / drug review | Supratherapeutic INR 3.8 (clinically central) appears only in narrative + drug review; absent from any structured lab | FLAGGED | consistent with stripped-labs convention but central value missing from labs |
-| MIG-AURA-P06 | B/C | major | case_id/condition vs ground_truth.primary_diagnosis | MIMIC: `condition=migraine_with_aura` but gold = CADASIL (NOTCH3 R182C), icd I67.850 — gold answer is NOT migraine | FLAGGED (intentional mimic) | per criteria-pack §6; workup distinguishes via NOTCH3 + MRI pattern; verify, do not "fix" |
-| MIG-AURA-P06 | D | minor | initial_tool_outputs.eeg.background.overall | EEG background notes "small vessel disease pattern" — etiologic attribution EEG cannot establish | FLAGGED | minor cross-modality creep; impression itself stays non-specific |
-| MIG-AURA-P07 | B/C | major | case_id/condition vs ground_truth.primary_diagnosis | MIMIC: gold = cardioembolic right-PCA ischaemic stroke (paroxysmal AF on ILR), icd I63.4 — NOT migraine | FLAGGED (intentional mimic) | workup distinguishes via ILR PAF + infarct-size criteria; verify, do not "fix" |
-| MIG-AURA-P08 | B/C | major | case_id/condition vs ground_truth.primary_diagnosis | MIMIC: gold = MELAS (m.3243A>G), icd E88.49 — NOT migraine | FLAGGED (intentional mimic) | workup distinguishes via mtDNA + lactate + hearing loss/short stature; verify, do not "fix" |
-| MIG-AURA-P08 | E | nit | followup_outputs[0].labs (mitochondrial) | Pyruvate 0.14 (ref 0.03-0.10) labelled "borderline elevated" though frankly above range; L/P ratio exactly 20 vs ref "<20" called borderline | FLAGGED | soft descriptor; values otherwise internally consistent |
-| MIG-AURA-P09 | B | minor | ground_truth.optimal_actions[3] vs followup | optimal_action step 4 uses `tool_name:"consult_medical_specialist"` but the matching followup delivers the neurovascular referral via `order_specialized_test` | FLAGGED | tool-reference mismatch (coherence validator tolerates); do not alter fallback routing |
-| MIG-AURA-RM11 | B | minor | duplicate patient.vitals/neurological_exam vs top-level | Real-seed (PMC3420796) structure: two vitals blocks (numeric vs string) and two neurological_exam blocks; top-level `neurological_exam.sensory` is empty "" | FLAGGED | duplication artefact; not load-bearing |
-| MIG-AURA-RM11 | B | minor | initial_tool_outputs.csf.cell_count | CSF `cell_count:{}` empty though interpretation lists OP/protein/glucose; no WBC/RBC reported | FLAGGED | real-seed gap; do not fabricate counts |
-| MIG-AURA-RM11 | E | nit | red_herrings | Top-level red_herrings use `misleading_diagnosis` key (v2 format) vs `why_misleading` used by all other MIG-AURA cases | FLAGGED | format variant; schema valid |
-| MIG-AURA-RS11 | B | minor | exam laterality | Episodic deficits are right-sided (left hemisphere) but residual exam sign is "left frontal" decreased pain sensation (opposite side); physical_exam says "left parietal headache" vs HPI "left occipital" | FLAGGED | minor lateralization/terminology drift (possibly source-derived) |
-| MIG-AURA-S02 | D | minor | followup_outputs[5] (MIDAS) | `request_migraine_diary` delivered via `search_medical_literature` but content is a patient-specific MIDAS score computation, not population-keyed literature | FLAGGED | borderline Kind-1 (case-specific assessment in a literature tool); summary field stays generic |
-| MIG-AURA-S05 | E | nit | difficulty vs metadata | `difficulty:"moderate"` but metadata.difficulty_description begins "Straightforward" | FLAGGED | minor metadata inconsistency |
-| MIG-AURA-S07 | B | nit | OCP stroke-risk figure | followup drug review says combined-OCP risk "4-6 fold" but key_reasoning_points says "6-9x" (M01 also uses "6-9 fold") | FLAGGED | internal numeric inconsistency; both within literature range |
-| MIG-AURA-S08 | E | nit | red_herrings | Red herring calls the aura "monocular visual symptoms" though HPI describes binocular cortical field aura (its own correct_interpretation clarifies it is cortical) | FLAGGED | minor terminology |
-| MIG-AURA-S11 | D | minor | followup_outputs[0] (MOH) | `check_codeine_medication_overuse` via `search_medical_literature` contains patient-specific MOH risk verdict ("CURRENT PATIENT... AT RISK") | FLAGGED | borderline Kind-1; summary field stays population-keyed |
-| MIG-AURA-S06/S11 | C | nit | interpret_labs.clinical_significance | A couple of routine lab values carry a `clinical_significance` string ("Within normal range") where the style guide prefers null for routine panels | NOTED | harmless; values/flags all correct |
+| MIG-AURA-P08 | terminology | major | ground_truth.icd_code | MELAS coded E88.49 ("other mitochondrial") instead of dedicated E88.41 | FIXED | Use E88.41 |
+| MIG-AURA-M03 | terminology | major | ground_truth.icd_code | Hemiplegic migraine coded G43.109 (migraine w/ aura) instead of hemiplegic-migraine family G43.4- | FIXED | G43.409 |
+| MIG-AURA-P09 | terminology | major | ground_truth.icd_code | Hemiplegic migraine coded G43.109 instead of G43.4- | FIXED | G43.409 |
+| MIG-AURA-RM11 | terminology | major | ground_truth.icd_code | Sporadic hemiplegic migraine coded G43.109 instead of G43.4- | FIXED | G43.409 |
+| MIG-AURA-RS11 | terminology | major | ground_truth.icd_code | Sporadic hemiplegic migraine coded G43.109 instead of G43.4- | FIXED | G43.409 |
+| MIG-AURA-M05 | terminology | major | ground_truth.primary_diagnosis / key_reasoning_points | "Typical aura without headache" tagged ICHD-3 1.2.1.1 (= with headache); correct is 1.2.1.2 | FIXED | 1.2.1.2 |
+| MIG-AURA-P03 | terminology | major | ground_truth.primary_diagnosis / key_reasoning_points / optimal_actions | "Migrainous infarction" tagged ICHD-3 1.4.1 (status migrainosus); correct is 1.4.3 | FIXED | 1.4.3 |
+| CONFIG | terminology | major | conditions.yaml migraine_with_aura.name | Display name "Migraine with typical aura" is narrower than the actual case set (hemiplegic, brainstem, infarction, mimic subtypes) | FLAGGED | Rename to "Migraine with aura" to match enum/pack/case set (shared file — orchestrator edit) |
+| MIG-AURA-P03 | terminology | minor | ground_truth.icd_code | Migrainous infarction coded I63.9 (unspecified infarct) instead of dedicated G43.6- | FLAGGED | Consider G43.609, optionally paired with I63.- |
+| MIG-AURA-M06 | terminology | minor | ground_truth.primary_diagnosis | "Migraine with prolonged aura (>60min)" tagged ICHD-3 1.2.1 (typical aura requires 5-60min) | FLAGGED | Drop 1.2.1 tag or reconcile duration; clinician to decide |
+| MIG-AURA-M01, MIG-AURA-M07 | terminology | nit | ground_truth.primary_diagnosis | "First-episode migraine with aura (ICHD-3 1.2.1)" — 1.2.1 requires ≥2 attacks | FLAGGED | Consider "probable migraine with aura (1.5.2)" framing for first-ever presentations |
 
-## Tally
+## Audit findings
 
-- Cases audited: 29 (M01-M08, P01-P09, RM11, RS11, S01-S11) — every field of every case read.
-- Mechanical validators (all 29): coherence = 0; schema valid; tool-vocab clean.
-- Findings by severity: major 7 (3 fixed EEG-classification; 1 ICHD-code mismatch flagged; 3 mimic case_id/gold flags); minor 17; nit 6; plus 2 NOTED (intentional, no action).
-- Fixed: 3 (MIG-AURA-M01, -M02, -M03 — EEG `classification` "normal"→"abnormal" only).
-- Flagged (not fixed): all remaining findings above.
+| case_id | dim | severity | field path | finding | action | recommendation |
+|---|---|---|---|---|---|---|
+| MIG-AURA-M03 | B internal-consistency | major | patient.pmh[2] vs ground_truth / labs | Elevated LDL 148 drives critical_action + red herring but PMH says "no hyperlipidaemia" and no lab output shows it | FLAGGED | Add lipid panel LabValue + fix PMH, or strip the LDL thread |
+| MIG-AURA-M02 | B internal-consistency | major | patient.hpi | HPI says "no family history of stroke" then states father had stroke at 45; contradicted by family_history + 2 red_herrings + difficulty_description | FLAGGED | Remove/reword HPI clause; correct difficulty_description to "positive" |
+| MIG-AURA-M03 | terminology | nit | ground_truth.primary_diagnosis / icd_code | "Sporadic hemiplegic migraine" cites parent code 1.2.3, not granular 1.2.3.2 | FLAGGED | Consider tightening to 1.2.3.2 |
+| MIG-AURA-M01 | B internal-consistency | nit | ecg.rate vs ecg.findings[0] | Structured rate 72 vs narrative "70 bpm" | FLAGGED | Reconcile narrative to structured rate |
+| MIG-AURA-M02 | B internal-consistency | nit | ecg.rate vs ecg.findings[0] | Structured rate 72 vs narrative "66 bpm" | FLAGGED | Reconcile free-text to structured rate |
+| MIG-AURA-M01 | B internal-consistency | nit | eeg.background.overall vs eeg.impression | Background says normal PDR, impression calls EEG abnormal for posterior slowing not reflected in background text | FLAGGED | Optionally add slowing note to background.overall |
+| MIG-AURA-M05 | C/B | major | followup_outputs[0].output.results[0].abstract | Literature abstract labels "typical aura without headache" as ICHD-3 1.2.2 (brainstem aura); contradicts case's own 1.2.1.2 | FIXED | Corrected 1.2.2 → 1.2.1.2 |
+| MIG-AURA-M05 | B/C | major | ground_truth.red_herrings / critical_actions | LDL 132 and FSH/oestradiol referenced in gold text but no lab tool output contains them; labs say "within normal limits" | FLAGGED | Add lipid/hormone panel values or strip references |
+| MIG-AURA-M04 | C clinical-correctness | major | ground_truth.differential[3].icd_code | Vertebrobasilar dissection coded I77.71 (carotid); dataset-wide convention across 5 cases | FLAGGED | Systematic fix: I77.71 → I77.74 or I67.0 for vertebral/basilar |
+| MIG-AURA-M04 | B internal-consistency | minor | mri.impression vs mri.findings | Impression names WMH lesions; structured findings array empty | FLAGGED | Add finding object or drop clause |
+| MIG-AURA-M05 | B internal-consistency | minor | mri.impression vs mri.findings | Same pattern — WMH named in impression, findings array empty | FLAGGED | Populate findings[] or trim impression |
+| MIG-AURA-M06 | B internal-consistency | minor | mri.impression vs mri.findings[0] | Impression says "single" WMH, finding says "bilateral" | FLAGGED | Make impression/finding agree |
+| MIG-AURA-M06 | B internal-consistency | minor | metadata.case_body_concerns / useless_tools | Metadata claims EEG dropped for no output, but EEG output exists and is correctly absent from useless_tools | FLAGGED | Remove stale line |
+| MIG-AURA-M05 | B internal-consistency | minor | ground_truth.differential[0].key_features | TIA differential cites "5-year" aura history vs documented 20-year history elsewhere | FLAGGED | Change 5-year → 20-year |
+| MIG-AURA-M05 | C clinical-correctness | minor | ground_truth.optimal_actions[1].category | check_drug_interactions tiered "recommended" vs "required" in pack/sibling cases | FLAGGED | Align tier or document rationale |
+| MIG-AURA-M05 | E language/D realism | minor | followup_outputs[2].output.test_type | Ophthalmology exam mislabeled test_type="Electrophysiology" | FLAGGED | Rename to ophthalmology_examination/visual_field_perimetry |
+| MIG-AURA-M04 | B internal-consistency | minor | ecg.rate vs findings[0] | Structured rate 72 vs narrative "74 bpm" (pattern across M04/M05/M06) | FLAGGED | Reconcile structured rate with per-case narrative |
+| MIG-AURA-M04 | C/B | minor | followup_outputs[1] abstract vs contraindicated_actions | Literature says triptans "cautioned, not absolutely contraindicated" in MBA; ground truth says contraindicated | FLAGGED | Harmonize wording or note as deliberate tension |
+| MIG-AURA-M05 | E language | nit | patient.hpi | Frequency stated as "twice monthly" then "2-3 per month" | FLAGGED | Harmonize frequency wording |
+| MIG-AURA-M04 | D realism-leakage | nit | followup_outputs[5]/M06 followup_outputs[4] summary | Leakage detector flags condition-name mentions in population-keyed preventive-therapy text; judged benign | FLAGGED | No action — intentional/permitted |
+| MIG-AURA-M07 | B internal-consistency | minor | ecg.rate | Structured rate 72 vs report "sinus bradycardia 50 bpm" + HR 52 | FIXED | Set rate to 50 |
+| MIG-AURA-M07 | clinical-correctness | minor | ground_truth.differential[0].icd_code | PRES coded G93.49 instead of dedicated I67.83 | FIXED | Use I67.83 |
+| MIG-AURA-M07 | clinical-correctness | major | ground_truth.primary_diagnosis | "ICHD-3 1.2.1" applied to confusional aura, which is not a typical-aura symptom per ICHD-3; literature followup also mischaracterizes ICHD-3 as recognizing confusional aura | FLAGGED | Clinical review to re-label aura type or reword |
+| MIG-AURA-M07 | clinical-correctness | minor | ground_truth.optimal_actions | Tool tiers (check_drug_interactions, analyze_brain_mri) diverge from pack and from sibling cases M08/P01 | FLAGGED | Reconcile tiering across batch |
+| MIG-AURA-M07 | B internal-consistency | nit | metadata.case_body_concerns | Claims ECG/EEG/labs/monitoring/echo dropped, but all are populated in the case | FLAGGED | Regenerate stale metadata |
+| MIG-AURA-M08 | B internal-consistency | minor | ecg.rate | Structured rate 72 vs report "74 bpm" (both findings and interpretation) | FIXED | Set rate to 74 |
+| MIG-AURA-M08 | D realism-leakage | nit | followup_outputs[1].output.summary | Leakage detector flags generic "migraine" mention in population-keyed summary | FLAGGED | No change — benign per style guide |
+| MIG-AURA-M08 | D realism-leakage | nit | ecg.findings | Notes "QTc within normal range on sertraline" — legitimate cardiology QT concern, not cross-modality leak | FLAGGED | Acceptable as-is |
+| MIG-AURA-P01 | B internal-consistency | major | patient.history_present_illness | HPI says "no hypertension" but PMH documents borderline HTN and red_herring design relies on vascular risk factors; vitals also support HTN | FLAGGED | Reconcile HPI vs PMH/red_herring/vitals |
+| MIG-AURA-P01 | B internal-consistency | minor | ground_truth.red_herrings[1].intended_effect | Cites "prediabetes" with no supporting HbA1c data anywhere | FLAGGED | Remove reference or add supporting lab value |
+| MIG-AURA-P01 | clinical-correctness | minor | ground_truth.optimal_actions[3] | Step expects ESR/CRP GCA-exclusion result, but labs output is an empty panel | FLAGGED | Populate labs panel with actual ESR/CRP/lipid/HbA1c values |
+| MIG-AURA-P02 | B internal-consistency | minor | ecg.rate | Structured rate 72 vs narrative "74 bpm" (x2) | FIXED | Set rate to 74 |
+| MIG-AURA-P03 | B internal-consistency | minor | ecg.rate | Structured rate 72 vs narrative "68 bpm" | FIXED | Set rate to 68 |
+| MIG-AURA-P04 | B internal-consistency | minor | ecg.rate | Structured rate 72 vs narrative "70 bpm" | FIXED | Set rate to 70 |
+| MIG-AURA-P03 | C clinical-correctness | major | ground_truth.primary_diagnosis / patient.history_present_illness | "Migrainous infarction (1.4.3)" requires aura >60min; HPI documents a 20-minute fully-reversible aura, contradicting the case's own critical_actions criterion | FLAGGED | Revise HPI to prolong aura, or reconsider diagnosis |
+| MIG-AURA-P03 | terminology | minor | ground_truth.icd_code | I63.9 used instead of dedicated G43.6- for migrainous infarction | FLAGGED | Consider G43.609 if diagnosis label retained |
+| MIG-AURA-P03 | terminology | nit | ground_truth.differential[2].icd_code | "Cervical/vertebral artery dissection" coded I77.71 (carotid) instead of I77.74 (vertebral) | FLAGGED | Consider I77.74 |
+| MIG-AURA-P02 | E language | nit | ecg.findings[0] | "Bilateral LA abnormality" is self-contradictory (LA = single chamber, left atrium) | FLAGGED | Reword to "left atrial" or "biatrial abnormality" |
+| MIG-AURA-P02 | clinical-correctness | minor | ground_truth.critical_actions / HPI | CHA2DS2-VASc = 0 but patient started on apixaban; anticoagulation not guideline-indicated at score 0 | FLAGGED | Confirm intended teaching point (overtreatment) |
+| MIG-AURA-P02 | B internal-consistency | nit | metadata.case_body_concerns | Claims EEG/labs/echo dropped for no output, but all are populated | FLAGGED | Regenerate/ignore stale note |
+| MIG-AURA-P04 | A schema | nit | ground_truth.differential[1].icd_code | "Migraine without aura" differential has null icd_code while siblings are coded | FLAGGED | Optionally populate G43.009 |
+| MIG-AURA-P05 | D realism-leakage | major | initial_tool_outputs.drug_interactions.warfarin.contraindications/warnings | Drug-check text announces the final diagnosis ("migraine with aphasic aura") and management once "migraine diagnosis is established" | FLAGGED | Reword to category-level guidance without naming diagnosis |
+| MIG-AURA-P05 | B internal-consistency | minor | optimal_actions[3].tool_parameters vs followup_outputs[0] vs HPI | Requested 14-day ambulatory monitor vs delivered 48h Holter; also 24h/48h Holter references conflict | FLAGGED | Reconcile requested vs delivered monitoring duration |
+| MIG-AURA-P05 | terminology | minor | metadata.case_body_concerns | Claims EEG/labs dropped for no output, but both are populated | FLAGGED | Regenerate stale note |
+| MIG-AURA-P06 | D realism-leakage | minor | eeg.background.overall | Background attributes slowing to "small vessel disease pattern" — etiologic label outside EEG's modality | FIXED | Stripped " — small vessel disease pattern" |
+| MIG-AURA-P06 | B internal-consistency | minor | ecg.rate vs findings/interpretation | Structured rate 72 vs narrative "68 bpm"; direction ambiguous vs sibling P05/P07 convention | FLAGGED | Align the two values (direction TBD) |
+| MIG-AURA-P06 | terminology | nit | case_id | Mimic case (CADASIL) carries "P" tag rather than "R" (reverse/mimic) per pack §6 | FLAGGED | Awareness only; not renaming |
+| MIG-AURA-P07 | D realism | minor | labs / followup_outputs[3] | Gold narrative relies on aCL/lipids/HbA1c results absent from any tool output (labs report "within normal limits", empty panels) | FLAGGED | Add supporting lab values or remove red herring |
+| MIG-AURA-P07 | B internal-consistency | nit | followup_outputs[0].output.duration_hours vs optimal_actions[3] | Requested 365-day ILR vs delivered 720h (30-day) output | FLAGGED | Harmonize requested vs reported duration |
+| MIG-AURA-P08 | B internal-consistency | minor | patient.demographics.bmi | Structured BMI 18.7 vs HPI "18.8" stated twice | FIXED | Aligned to 18.8 |
+| MIG-AURA-P08 | B internal-consistency | minor | ecg.rate | Structured rate 72 vs report/interpretation "68 bpm" | FIXED | Set rate to 68 |
+| MIG-AURA-P09 | B internal-consistency | minor | ecg.rate | Structured rate 72 vs report "sinus bradycardia 60 bpm" + vitals HR 62 | FIXED | Set rate to 60 |
+| MIG-AURA-P08 | B internal-consistency | major | ecg.findings[0] | ECG text states two different PR intervals (156ms then 148ms) and mislabels normal PR as "short" (short PR is <120ms) | FLAGGED | Pick one PR value; correct short-PR distractor logic |
+| MIG-AURA-P08 | B internal-consistency | minor | ground_truth.optimal_actions[3].expected_finding | Expects "characteristic MELAS pattern" MRI lesions; actual initial MRI is entirely normal | FLAGGED | Reconcile expected_finding with normal interictal MRI |
+| MIG-AURA-P08 | B internal-consistency | minor | ground_truth.optimal_actions[5] | Recommends MRS expecting lactate peak; no MRS output exists, fallback is a normal MRA | FLAGGED | Add MRS output showing lactate peak or downgrade expectation |
+| MIG-AURA-P08 | terminology | nit | case_id | MELAS (true diagnosis) is pack §6 "R" (mimic) type but case carries "P" prefix | FLAGGED | Leave case_id; awareness only |
+| MIG-AURA-P09 | C clinical-correctness | major | followup_outputs[0].output.findings[0].description | PHASES score 4 coupled with "3.0% 5-year risk" is internally inconsistent; recomputed score from case facts is actually 3 (~0.7%) | FLAGGED | Recompute PHASES = 3, ~0.7%; revise treatment-risk comparison line |
+| MIG-AURA-P09 | B internal-consistency | major | ground_truth.optimal_actions[3].tool_name | Required action names consult_medical_specialist but the delivering followup is keyed to order_specialized_test; no matching output for the named tool | FLAGGED | Make tool_name consistent with the delivering followup |
+| MIG-AURA-P09 | B internal-consistency | minor | initial_tool_outputs.eeg | Classified "abnormal" with "posterior slowing" impression but PDR is 9-10Hz (normal, not slow) | FLAGGED | Reclassify as normal or specify genuinely slow PDR |
+| MIG-AURA-P09 | C clinical-correctness | minor | ground_truth.icd_code | G43.409 (not intractable) vs two further episodes on propranolol — borderline intractability call | FLAGGED | Clinical reviewer to decide G43.409 vs G43.419 |
+| MIG-AURA-P09 | D realism-leakage | nit | followup_outputs[2].output.summary | Leakage detector flags "hemiplegic migraine" in population-keyed literature text; judged benign | FLAGGED | Keep; optionally neutralize heading wording |
+| MIG-AURA-P09 | A schema | nit | metadata.case_body_concerns | Claims EEG/labs dropped for no output; both are populated | FLAGGED | Regenerate stale note |
+| MIG-AURA-RM11 | D realism-leakage | major | patient.clinical_history.medications[1].indication | Medication indication states "WHO Category 4 — must be stopped," pre-answering a gold critical_action | FLAGGED | Reduce indication to factual "Contraception" |
+| MIG-AURA-RM11 | C clinical-correctness | minor | ground_truth.icd_code | G43.409 (not intractable) vs two failed preventives + ongoing frequent attacks — borderline intractability | FLAGGED | Clinical reviewer to decide G43.409 vs G43.419 |
+| MIG-AURA-RM11 | D realism-leakage | minor | followup_outputs[1].output.recommended_actions[0] | MRA report includes management conclusion "No vascular intervention required" | FLAGGED | Drop or reduce to diagnostic statement |
+| MIG-AURA-RM11 | B internal-consistency | nit | initial_tool_outputs.csf.cell_count | Empty cell_count object; differential relies on CSF excluding encephalitis but no WBC/RBC reported | FLAGGED | Add normal WBC 0-5/uL |
+| MIG-AURA-RS11 | B internal-consistency | minor | ecg.rate | Structured rate 72 vs narrative "68 bpm" | FIXED | Set rate to 68 |
+| MIG-AURA-RS11 | B internal-consistency | major | patient.hpi / physical_exam / neurological_exam | HPI claims "headache-free and fully neurologically intact" but exam documents residual headache and a residual deficit; laterality also mismatched (right-sided episodes, left-sided residual finding) | FLAGGED | Reconcile HPI framing with exam findings and laterality |
+| MIG-AURA-RS11 | terminology | minor | ground_truth.primary_diagnosis | "Sporadic hemiplegic migraine (1.2.3)" uses parent code instead of granular 1.2.3.2 | FLAGGED | Consider tightening to 1.2.3.2 |
+| MIG-AURA-RS11 | C clinical-correctness | minor | followup_outputs[4].output.summary vs optimal_actions[1]/contraindicated_actions | Drug-interaction text softens triptans to "cautioned" contradicting case's contraindicated framing and FDA labeling | FLAGGED | Harmonize drug-interaction prose with contraindicated stance |
+| MIG-AURA-S02 | B internal-consistency | minor | ecg.rate | Structured rate 72 vs narrative "66 bpm" | FIXED | Set rate to 66 |
+| MIG-AURA-S02 | terminology | nit | ground_truth.primary_diagnosis | "Menstrually-related (1.2.1)" — ICHD-3 menstrual subtype formally applies only to migraine without aura | FLAGGED | No change required; descriptive use acceptable |
+| MIG-AURA-S01 | C clinical-correctness | nit | followup_outputs[3].output.summary | Literature states OCP is "WHO category 3-4" in migraine with aura; correct is Category 4 | FLAGGED | Optionally tighten to Category 4 |
+| MIG-AURA-S04 | B internal-consistency | minor | metadata.difficulty_description | Labeled "Straightforward:" while enum/rationale both say "moderate" | FIXED | Relabeled to "Moderate:" |
+| MIG-AURA-S05 | B internal-consistency | minor | metadata.difficulty_description | Labeled "Straightforward:" while enum/rationale both say "moderate" | FIXED | Relabeled to "Moderate:" |
+| MIG-AURA-S05 | E language | minor | followup_outputs[1].output.summary | Literature followup returns empty query/results/summary, unlike siblings | FLAGGED | Populate with SNOOP/new-onset-aura summary or drop followup |
+| MIG-AURA-S03 | C clinical-correctness | minor | followup_outputs[3].output.summary | Claims caffeine enhances sumatriptan absorption "(used in Cafergot preparation)" — Cafergot contains ergotamine, not a triptan | FLAGGED | Remove/replace Cafergot reference |
+| MIG-AURA-S04 | D realism-leakage | minor | ecg.findings[0]/interpretation | ECG attributes LVH to "(Stage 1 HTN)" — cross-modality reference that should be stripped | FLAGGED | Drop HTN attribution, keep "LVH by voltage criteria" |
+| MIG-AURA-S03 | B internal-consistency | nit | ecg.rate vs findings text | Structured rate 72 vs narrative "70 bpm" (pattern across S03/S04/S05) | FLAGGED | Reconcile structured rate with per-case narrative |
+| MIG-AURA-S04 | C clinical-correctness | nit | ground_truth.differential[2].icd_code | PRES coded G93.49 instead of dedicated I67.83 | FLAGGED | Consider I67.83 |
+| MIG-AURA-S03 | C clinical-correctness | nit | initial_tool_outputs.ecg / useless_tools / optimal_actions | ECG present but unaccounted for in optimal_actions/useless_tools/red_herrings | FLAGGED | Justify baseline ECG in optimal_actions or classify |
+| MIG-AURA-S06 | B internal-consistency | minor | ecg.rate | Structured rate 72 vs narrative "70 bpm" | FIXED | Set rate to 70 |
+| MIG-AURA-S07 | B internal-consistency | minor | ecg.rate | Structured rate 72 vs narrative "68 bpm" | FIXED | Set rate to 68 |
+| MIG-AURA-S08 | B internal-consistency | minor | ecg.rate | Structured rate 72 vs narrative "66 bpm" | FIXED | Set rate to 66 |
+| MIG-AURA-S07 | B internal-consistency | major | ground_truth.key_reasoning_points[0] | Stroke-risk magnitude "6-9x" vs drug-interaction output "4-6 fold" for combined OCP + migraine with aura | FLAGGED | Reconcile to a single cited range |
+| MIG-AURA-S07 | B internal-consistency | minor | ground_truth.useless_tools | Echo has a followup output (bubble study) but is absent from useless_tools; metadata falsely claims it was dropped for no output | FLAGGED | Add echo to useless_tools or correct metadata |
+| MIG-AURA-S06 | B internal-consistency | nit | metadata.case_body_concerns[0] | Claims MRI/ECG/labs dropped for no output; all three populated | FLAGGED | Regenerate/correct note |
+| MIG-AURA-S06 | C clinical-correctness | minor | ground_truth.differential[2].icd_code | "Postpartum PRES" coded G93.49 instead of dedicated I67.83 | FLAGGED | Consider I67.83 |
+| MIG-AURA-S08 | C clinical-correctness | nit | ground_truth.differential[2].icd_code | "Cluster headache" coded G44.001 (intractable) with nothing establishing intractability | FLAGGED | Consider G44.009 |
+| MIG-AURA-S10 | C clinical-correctness | major | HPI / social_history / primary_diagnosis / key_reasoning_points / metadata | MIDAS "18/27 (Grade IV)" is wrong on two counts: score 18 = Grade III (11-20), and MIDAS has no "/27" denominator; used pervasively across 6 fields | FLAGGED | Raise score to ≥21 to match Grade IV framing, or relabel Grade III and drop "/27" |
+| MIG-AURA-S09 | B internal-consistency | minor | ecg.rate | Structured rate 72 vs narrative "70 bpm" | FIXED | Set rate to 70 |
+| MIG-AURA-S11 | B internal-consistency | minor | ecg.rate | Structured rate 72 vs narrative "76 bpm" | FIXED | Set rate to 76 |
+| MIG-AURA-S11 | clinical-coding | major | ground_truth.differential[0].icd_code | MOH differential coded G44.41 (intractable) but case documents only borderline overuse expected to respond to withdrawal | FLAGGED | Recommend G44.41 → G44.40 |
+| MIG-AURA-S11 | B internal-consistency | minor | ground_truth.differential[0].key_features | Claims co-codamol alone meets ≥10-day MOH threshold; documented use is 6-8 days/month (threshold only met combined with rizatriptan) | FLAGGED | Reconcile wording and "high" likelihood with documented use |
+| MIG-AURA-S11 | E language | nit | patient.clinical_history.medications[2].indication | Indication field editorializes "OVERUSE" in all caps | FLAGGED | Consider removing the annotation |
+| MIG-AURA-S09, MIG-AURA-S10, MIG-AURA-S11 | B internal-consistency | minor | metadata.case_body_concerns[0] | Claims analyze_brain_mri dropped for no output; MRI is populated in all three cases | FLAGGED | Correct or drop from "dropped" list |
+| PACK | terminology | nit | criteria_packs/MIG-AURA.md §8 [Charles_2017] | Citation key year (2017) mismatches actual publication year (2018) | FLAGGED | Shared pack file — off-limits to case-agent edits |
 
-## Top clinical-correctness flags for human adjudication
-
-1. MIG-AURA-M05: ICHD-3 code for "typical aura without headache" is internally inconsistent — gold says 1.2.1.1, case literature says 1.2.2; correct is 1.2.1.2. Diagnosis-code change needed but is a judgment call (do not silently change the diagnosis).
-2. MIG-AURA-P06 / P07 / P08: three intentional mimics (CADASIL, cardioembolic AF stroke, MELAS) carry `condition=migraine_with_aura` but non-migraine gold diagnoses/ICD codes. Confirm this prefixing is acceptable for the benchmark; workups correctly distinguish each mimic.
-3. Triptan stance (M03/M04/P03/RS11): gold actions state absolute contraindication while the cases' own literature says relative ("cautioned"); decide which the benchmark should reward.
-4. M03/M05: red-herring narratives reference specific abnormal labs (LDL 148, LDL 132, FSH/oestradiol) that do not exist in any structured lab output — decide whether to add the panels or soften the narrative.
-
-## Self-verification
-
-- Re-ran coherence (0) and schema (pass) on all three fixed cases.
-- `git diff` confirms the only MIG-AURA files changed are M01/M02/M03, and the only line changed in each is the EEG `classification` value.
-- Trailing newline and literal-unicode convention preserved in all three.
-- Residual leakage-detector hits are intentional (population-keyed literature, category-level drug interactions, within-modality imaging differentials, confirmatory genetics) — not chased to zero.
+**Tally:** 30 cases audited · 108 findings (0 blocker / 25 major / 54 minor / 29 nit) · 27 fixed / 81 flagged · validators pass (schema OK, coherence 0 on all edited cases).
