@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from ..llm.client import LLMClient
-from ..llm.prompts import load_prompt
 from .reasoning import AgentTrace
 
 _DEFAULT_REPORT_PROMPT = """\
@@ -31,16 +30,11 @@ def generate_report(llm: LLMClient, trace: AgentTrace) -> str:
     Returns:
         Formatted clinical report string.
     """
-    try:
-        system_prompt = load_prompt("report_generation.txt")
-    except FileNotFoundError:
-        system_prompt = _DEFAULT_REPORT_PROMPT
-
     # Build trace summary for the LLM
     trace_text = _format_trace_for_report(trace)
 
     messages = [
-        {"role": "system", "content": system_prompt},
+        {"role": "system", "content": _DEFAULT_REPORT_PROMPT},
         {"role": "user", "content": trace_text},
     ]
 

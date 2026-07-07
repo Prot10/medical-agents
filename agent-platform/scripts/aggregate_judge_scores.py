@@ -36,7 +36,7 @@ _DIMS = [
     "uncertainty_calibration",
 ]
 
-# Canonical weights (must match agent-platform/config/system_prompts/llm_judge.md).
+# Canonical weights (must match agent-platform/config/system_prompts/llm_judge.txt).
 # Two formulas: with vs without red_herring_handling (which is null when the case has no RH).
 _WEIGHTS_RH = {
     "diagnostic_accuracy":     0.20,
