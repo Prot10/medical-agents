@@ -11,6 +11,9 @@ The core runtime is `agent-platform`: FastAPI loads NeuroBench cases, the `Agent
 | Path | Purpose | Role |
 |---|---|---|
 | `agent-platform/` | Main Python package: orchestrator, tools, API, review API, rules, memory, evaluation, training, scripts, tests. | Core runtime |
+| `agent-platform/src/neuroagent/training/` | Training code for QLoRA SFT, DPO, GRPO, DAPO, adapter merge, and finetuned evaluation. | Fine-tuning |
+| `agent-platform/docs/finetuning-plan.md` | Current fine-tuning status, LoRA/QLoRA settings, results, bottlenecks, and roadmap. | Fine-tuning docs |
+| `agent-platform/docs/models.md` | Model inventory, vLLM serving flags, Qwen thinking/tool parsing, AWQ Marlin guidance. | Model serving |
 | `packages/neuroagent-schemas/` | Shared Pydantic models for cases, patient profiles, ground truth, evaluation records, and tool outputs. | Contracts |
 | `dataset-generation/` | NeuroBench case-generation pipeline, criteria packs, validation, prompt templates, and authoring guides. | Data factory |
 | `data/` | Versioned NeuroBench datasets, case evaluations, review artifacts, traces, audit reports. | Corpus |
@@ -172,6 +175,68 @@ flowchart LR
 ```
 
 The evaluation stack reuses the same agent runtime, tool registry, schemas, and patient formatting used by the web API. This keeps dashboard demos and benchmark runs aligned.
+
+## Fine-Tuning and Model Serving
+
+```mermaid
+flowchart TD
+  Cases[NeuroBench v4/v5 cases] --> Gold[Gold trajectory generation<br/>multi-style ReAct traces]
+  Gold --> JSONL[training_data/gold_trajectories<br/>trajectories.jsonl]
+  JSONL --> SFT[QLoRA SFT<br/>Qwen3.5-9B]
+  SFT --> Adapter[SFT LoRA adapter<br/>checkpoints/sft_769]
+  Adapter --> DPO[DPO<br/>offline preference pairs]
+  Adapter --> GRPO[GRPO<br/>online composite reward]
+  Adapter --> DAPO[DAPO<br/>token-level RL]
+  DPO --> Compare[Finetuned evaluation]
+  GRPO --> Compare
+  DAPO --> Compare
+  Adapter --> Merge[merge_adapter.py]
+  Merge --> Serve[vLLM serving]
+  Serve --> API[Dashboard/API model selection]
+  Compare --> Reports[results + paper figures]
+```
+
+### Training Techniques
+
+| Technique | How this repo uses it | Key files |
+|---|---|---|
+| LoRA | Adds trainable low-rank adapters to attention and MLP projections. Current default: rank 64, alpha 128, dropout 0.05. | `training/train_grpo.py`, `training/train_dpo.py` |
+| QLoRA | Loads the base model in 4-bit NF4 with bfloat16 compute and double quantization so Qwen3.5-9B can train on a single A100-40GB. | `get_quantization_config()` in `train_grpo.py` |
+| SFT | Supervised fine-tuning on gold ReAct trajectories using prompt/completion formatting and completion-only loss masking. | `scripts/run_sft_training.sh`, `train_grpo.py --stage sft` |
+| DPO | Offline preference optimization from pre-collected scored rollouts; avoids online generation during training. | `training/train_dpo.py`, `scripts/run_dpo_training.sh` |
+| GRPO | Online reward optimization over grouped completions with rewards for correctness, tool precision/recall, cost, format, and safety. | `training/train_grpo.py`, `scripts/run_grpo_training.sh` |
+| DAPO | Token-level policy-gradient RL with asymmetric clipping, intended to behave better on long ReAct traces. | `training/train_dapo.py`, `scripts/run_dapo_training.sh` |
+| vLLM | Serves base, quantized, and tuned models through an OpenAI-compatible endpoint for the dashboard, scripts, and evaluation. | `scripts/serve_model.sh`, `scripts/serve_dual.sh`, `docs/models.md` |
+
+### Current Fine-Tuning State
+
+- Data pipeline: 769 parsed gold trajectories generated from 200 cases with multiple clinical styles.
+- SFT: completed on Qwen3.5-9B with QLoRA; reported validation loss improved from 1.02 to 0.537.
+- Evaluation: SFT improved fold0 validation top-1 accuracy from 52.9% to 55.7%, mainly on diagnostic puzzles.
+- GRPO: implemented and evaluated, but gains were marginal because long ReAct completions are truncated under single-GPU memory limits.
+- DAPO: implemented and queued as the next RL comparison path.
+- Known bottleneck: full ReAct traces need roughly 4000-5000 completion tokens, while single A100-40GB QLoRA RL is constrained around 2048 tokens.
+
+### Model Serving
+
+```mermaid
+flowchart LR
+  Models[Model registry<br/>docs/models.md] --> ServeScript[serve_model.sh]
+  ServeScript --> vLLM[vLLM server<br/>OpenAI-compatible API]
+  vLLM --> Parsers[Qwen reasoning parser<br/>Qwen tool-call parser]
+  Parsers --> Client[LLMClient]
+  Client --> Agent[AgentOrchestrator]
+  UI[Dashboard model picker] --> API[FastAPI model routes]
+  API --> vLLM
+```
+
+Important serving details:
+
+- Qwen3.5 models use `--reasoning-parser qwen3` and `--tool-call-parser qwen3_coder`.
+- AWQ models should use Marlin-compatible kernels for practical throughput.
+- `--language-model-only` disables unused vision components to save VRAM.
+- `--enable-prefix-caching` helps repeated agent-loop prompts.
+- Dual-model mode can serve an orchestrator model and a specialist model on separate ports.
 
 ## Tool Layer
 

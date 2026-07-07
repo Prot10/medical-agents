@@ -6,6 +6,7 @@ import {
   FileJson,
   FlaskConical,
   GitBranch,
+  GraduationCap,
   Layers3,
   Network,
   PanelTop,
@@ -15,6 +16,7 @@ import {
   ShieldCheck,
   Sparkles,
   Stethoscope,
+  TerminalSquare,
   TestTube2,
   Workflow,
 } from "lucide-react"
@@ -31,6 +33,7 @@ const LAYERS = [
   "Frontend",
   "Review",
   "Research",
+  "Fine-tuning",
   "Deployment",
 ] as const
 
@@ -179,7 +182,7 @@ const NODES: ArchitectureNode[] = [
     id: "llm",
     title: "LLM Client",
     path: "agent-platform/src/neuroagent/llm/",
-    purpose: "OpenAI-compatible client wrapper for vLLM, Ollama, GitHub Copilot models, and streaming tool-call responses.",
+    purpose: "OpenAI-compatible client wrapper for vLLM, Ollama, local model servers, and streaming tool-call responses.",
     kind: "Model adapter",
     layers: ["Runtime", "Reasoning"],
     icon: Sparkles,
@@ -246,12 +249,40 @@ const NODES: ArchitectureNode[] = [
     details: ["Uses MockServer per case for deterministic tool outputs.", "Formats patient information exactly as the API does.", "Feeds traces and tools-called lists into metrics and judge workflows."],
   },
   {
+    id: "training",
+    title: "Fine-tuning Pipeline",
+    path: "agent-platform/src/neuroagent/training/",
+    purpose: "Training stack for Qwen tool-use specialization: gold ReAct trajectories, QLoRA SFT, DPO preference learning, GRPO/DAPO reinforcement learning, adapter merging, and finetuned evaluation.",
+    kind: "Model training",
+    layers: ["Fine-tuning", "Evaluation", "Research"],
+    icon: GraduationCap,
+    accent: "violet",
+    x: 18,
+    y: 88,
+    files: ["training/train_grpo.py", "training/train_dpo.py", "training/train_dapo.py", "docs/finetuning-plan.md"],
+    details: ["SFT uses LoRA rank 64 / alpha 128, QLoRA NF4, completion-only loss, cosine LR, weight decay, and NEFTune.", "DPO builds chosen/rejected pairs from pre-collected scored trajectories, avoiding online generation memory pressure.", "GRPO/DAPO use online rewards for correctness, tool precision/recall, cost efficiency, format, and safety."],
+  },
+  {
+    id: "serving",
+    title: "Model Serving",
+    path: "agent-platform/scripts/serve_model.sh",
+    purpose: "vLLM serving layer for Qwen, MedGemma, AWQ, FP8, local endpoints, and dual-model orchestrator/specialist experiments.",
+    kind: "Inference serving",
+    layers: ["Runtime", "Fine-tuning", "Deployment"],
+    icon: TerminalSquare,
+    accent: "amber",
+    x: 43,
+    y: 88,
+    files: ["scripts/serve_model.sh", "scripts/serve_dual.sh", "scripts/vllm_serve.py", "docs/models.md"],
+    details: ["Uses Qwen reasoning parser and tool-call parser for thinking/tool-call separation.", "AWQ models should use Marlin kernels for practical throughput.", "Prefix caching and language-model-only mode improve agent-loop serving efficiency."],
+  },
+  {
     id: "generation",
     title: "Dataset Generation",
     path: "dataset-generation/",
     purpose: "Pipeline and documentation for building, validating, balancing, and reviewing NeuroBench cases and gold trajectories.",
     kind: "Data factory",
-    layers: ["Data", "Research"],
+    layers: ["Data", "Research", "Fine-tuning"],
     icon: FlaskConical,
     accent: "rose",
     x: 65,
@@ -282,7 +313,7 @@ const NODES: ArchitectureNode[] = [
     layers: ["Research", "Reasoning"],
     icon: GitBranch,
     accent: "slate",
-    x: 12,
+    x: 65,
     y: 88,
     files: ["reasoning-frameworks-research.md", "references.bib"],
     details: ["Proposes Diagnostic Hypothesis Graph first.", "Adds deliberate search over diagnostic trajectories as an offline/advanced engine.", "Frames multi-agent clinical panel as a shared graph blackboard."],
@@ -296,7 +327,7 @@ const NODES: ArchitectureNode[] = [
     layers: ["Deployment", "Runtime"],
     icon: Route,
     accent: "emerald",
-    x: 35,
+    x: 88,
     y: 88,
     files: ["deployment/hostinger/", "deployment/raspberry-pi/README.md"],
     details: ["Includes systemd services and timers for the review platform.", "Documents static frontend plus Python backend deployment shape.", "Keeps GPU-serving concerns separate from review deployment."],
@@ -315,6 +346,12 @@ const LINKS: ArchitectureLink[] = [
   { from: "tools", to: "data", label: "mock outputs", layers: ["Tools", "Data", "Evaluation"] },
   { from: "evaluation", to: "orchestrator", label: "batch runs", layers: ["Evaluation", "Runtime"] },
   { from: "evaluation", to: "schemas", label: "case contracts", layers: ["Evaluation", "Data"] },
+  { from: "training", to: "evaluation", label: "model comparison", layers: ["Fine-tuning", "Evaluation"] },
+  { from: "training", to: "generation", label: "gold trajectories", layers: ["Fine-tuning", "Data"] },
+  { from: "training", to: "data", label: "fold splits", layers: ["Fine-tuning", "Data"] },
+  { from: "training", to: "serving", label: "serve adapters/models", layers: ["Fine-tuning", "Runtime"] },
+  { from: "serving", to: "llm", label: "OpenAI API", layers: ["Fine-tuning", "Runtime"] },
+  { from: "serving", to: "api", label: "model loading", layers: ["Fine-tuning", "Runtime"] },
   { from: "generation", to: "data", label: "case JSON", layers: ["Data", "Research"] },
   { from: "generation", to: "schemas", label: "validate", layers: ["Data"] },
   { from: "review", to: "data", label: "annotations", layers: ["Review", "Data"] },
@@ -325,6 +362,10 @@ const LINKS: ArchitectureLink[] = [
 
 const REPO_ROWS = [
   ["agent-platform", "Main Python package: orchestrator, tools, API, rules, memory, evaluation, training.", "Core runtime"],
+  ["agent-platform/src/neuroagent/training", "QLoRA SFT, DPO, GRPO, DAPO, adapter merge, finetuned evaluation scripts.", "Fine-tuning"],
+  ["agent-platform/scripts/run_*training.sh", "Launchers for SFT, DPO, GRPO, DAPO, and comparison/evaluation runs.", "Training ops"],
+  ["agent-platform/docs/finetuning-plan.md", "Current training status, LoRA/QLoRA configuration, known bottlenecks, results, and roadmap.", "Training docs"],
+  ["agent-platform/docs/models.md", "Supported model inventory, vLLM flags, Qwen thinking/tool parsing, AWQ Marlin notes.", "Model serving"],
   ["packages/neuroagent-schemas", "Shared Pydantic schema package for cases, patient profiles, tool outputs, and evaluation.", "Contracts"],
   ["dataset-generation", "Case generation, validation, criteria packs, and gold trajectory authoring docs.", "Data factory"],
   ["data", "Versioned NeuroBench datasets, review artifacts, traces, and generated benchmark outputs.", "Corpus"],
@@ -350,6 +391,23 @@ const REASONING_ROADMAP = [
   ["Panel", "Shared Blackboard", "Specialist agents read/write one graph state: diagnostician, planner, skeptic, protocol officer, cost steward."],
 ]
 
+const FINETUNING_STEPS = [
+  { title: "Gold trajectories", body: "Generate ideal ReAct traces with multiple clinical styles, compressed tool outputs, fold splits, and a trimmed training prompt." },
+  { title: "SFT", body: "QLoRA supervised fine-tuning on Qwen3.5-9B using LoRA r=64, alpha=128, NF4 double quantization, completion-only loss, and 6144-token budget." },
+  { title: "Preference/RL", body: "DPO uses offline chosen/rejected pairs. GRPO and DAPO use online composite rewards for accuracy, tool choice, cost, format, and safety." },
+  { title: "Serve + evaluate", body: "Merge or load adapters, serve through vLLM-compatible endpoints, then compare base, SFT, GRPO, DAPO, and DPO variants on held-out folds." },
+]
+
+const FINETUNING_TECHNIQUES = [
+  ["LoRA", "Low-rank adapters on attention and MLP projections; repo default is rank 64, alpha 128, dropout 0.05."],
+  ["QLoRA", "4-bit NF4 BitsAndBytes loading with bfloat16 compute and double quantization to fit Qwen3.5-9B training on one A100-40GB."],
+  ["SFT", "Learns the gold ReAct style and tool-call format from trajectory JSONL with prompt/completion loss masking."],
+  ["DPO", "Offline preference optimization from scored rollouts, avoiding online generation during training."],
+  ["GRPO", "Group relative policy optimization with online rewards; currently constrained by long completion memory and truncation."],
+  ["DAPO", "Token-level policy-gradient variant with asymmetric clipping, intended to work better on long ReAct traces."],
+  ["vLLM", "Inference server for base and tuned models, with Qwen reasoning parser, tool-call parser, prefix caching, and AWQ Marlin support."],
+]
+
 export function ArchitectureExplorer() {
   const [selectedLayer, setSelectedLayer] = useState<Layer>("All")
   const [selectedNodeId, setSelectedNodeId] = useState("orchestrator")
@@ -367,9 +425,11 @@ export function ArchitectureExplorer() {
   const connectedLinks = LINKS.filter((link) => link.from === selectedNode.id || link.to === selectedNode.id)
 
   return (
-    <div className="flex-1 overflow-y-auto bg-background">
+    <div className="flex-1 overflow-y-auto bg-background noise-bg">
       <div className="mx-auto max-w-7xl p-6 space-y-6">
-        <header className="flex flex-wrap items-start justify-between gap-4">
+        <header className="relative overflow-hidden rounded-lg border border-border bg-card p-5 shadow-sm">
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,transparent,rgba(56,189,248,0.08),transparent),linear-gradient(180deg,rgba(16,185,129,0.08),transparent)]" />
+          <div className="relative flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-3xl">
             <div className="flex items-center gap-2 text-sm font-semibold uppercase text-primary">
               <Network className="h-4 w-4" />
@@ -384,21 +444,22 @@ export function ArchitectureExplorer() {
           <div className="grid grid-cols-3 gap-2 text-center">
             <Metric value="13" label="max tools" />
             <Metric value="5" label="hospitals" />
-            <Metric value="516" label="v5 cases" />
+            <Metric value="769" label="gold traces" />
+          </div>
           </div>
         </header>
 
-        <section className="rounded-lg border border-border bg-card">
-          <div className="flex flex-wrap items-center gap-2 border-b border-border p-3">
+        <section className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
+          <div className="flex flex-wrap items-center gap-2 border-b border-border bg-secondary/40 p-3">
             {LAYERS.map((layer) => (
               <button
                 key={layer}
                 onClick={() => setSelectedLayer(layer)}
                 className={cn(
-                  "rounded-md border px-3 py-1.5 text-sm font-medium transition-colors",
+                  "rounded-md border px-3 py-1.5 text-sm font-medium transition-all duration-200",
                   selectedLayer === layer
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border text-muted-foreground hover:bg-secondary hover:text-foreground",
+                    ? "border-primary bg-primary/15 text-primary shadow-sm shadow-primary/10"
+                    : "border-border bg-background/70 text-muted-foreground hover:-translate-y-0.5 hover:bg-secondary hover:text-foreground",
                 )}
               >
                 {layer}
@@ -407,8 +468,17 @@ export function ArchitectureExplorer() {
           </div>
 
           <div className="grid min-h-[620px] grid-cols-[minmax(0,1fr)_360px]">
-            <div className="relative min-h-[620px] overflow-hidden border-r border-border bg-secondary/30">
+            <div className="arch-grid relative min-h-[620px] overflow-hidden border-r border-border bg-secondary/30">
               <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <defs>
+                  <filter id="archGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="0.9" result="coloredBlur" />
+                    <feMerge>
+                      <feMergeNode in="coloredBlur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
                 {visibleLinks.map((link) => {
                   const from = NODES.find((node) => node.id === link.from)
                   const to = NODES.find((node) => node.id === link.to)
@@ -423,8 +493,19 @@ export function ArchitectureExplorer() {
                         x2={to.x}
                         y2={to.y}
                         stroke={color}
-                        strokeWidth={isFocused ? 0.45 : 0.22}
-                        opacity={isFocused ? 0.75 : 0.25}
+                        strokeWidth={isFocused ? 0.62 : 0.28}
+                        opacity={isFocused ? 0.88 : 0.3}
+                        filter={isFocused ? "url(#archGlow)" : undefined}
+                      />
+                      <line
+                        className="arch-flow-line"
+                        x1={from.x}
+                        y1={from.y}
+                        x2={to.x}
+                        y2={to.y}
+                        stroke={color}
+                        strokeWidth={isFocused ? 0.36 : 0.18}
+                        opacity={isFocused ? 0.9 : 0.28}
                       />
                     </g>
                   )
@@ -440,18 +521,19 @@ export function ArchitectureExplorer() {
                     key={node.id}
                     onClick={() => setSelectedNodeId(node.id)}
                     className={cn(
-                      "absolute flex w-44 -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-lg border bg-card/95 p-2 text-left shadow-sm backdrop-blur transition-all hover:border-primary/60 hover:shadow-md",
-                      isSelected ? cn("ring-2 ring-primary/40", accent.border) : "border-border",
+                      "arch-node group absolute flex w-44 -translate-x-1/2 -translate-y-1/2 items-center gap-2 overflow-hidden rounded-lg border bg-card/90 p-2 text-left shadow-sm backdrop-blur transition-all duration-300 hover:-translate-y-[54%] hover:border-primary/60 hover:shadow-lg hover:shadow-primary/10",
+                      isSelected ? cn("ring-2 ring-primary/40 shadow-lg shadow-primary/15", accent.border) : "border-border",
                     )}
                     style={{ left: `${node.x}%`, top: `${node.y}%` }}
                   >
-                    <span className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-md", accent.bg)}>
+                    <span className={cn("relative flex h-9 w-9 shrink-0 items-center justify-center rounded-md transition-transform duration-300 group-hover:scale-105", accent.bg)}>
                       <Icon className={cn("h-4 w-4", accent.text)} />
                     </span>
                     <span className="min-w-0">
                       <span className="block truncate text-sm font-semibold text-foreground">{node.title}</span>
                       <span className="block truncate text-xs text-muted-foreground">{node.kind}</span>
                     </span>
+                    {isSelected && <span className="absolute inset-x-2 bottom-0 h-[2px] rounded-full bg-primary" />}
                   </button>
                 )
               })}
@@ -464,14 +546,14 @@ export function ArchitectureExplorer() {
         </section>
 
         <section className="grid grid-cols-[minmax(0,1.1fr)_minmax(360px,0.9fr)] gap-4">
-          <div className="rounded-lg border border-border bg-card p-4">
+          <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
             <div className="mb-4 flex items-center gap-2">
               <Workflow className="h-5 w-5 text-primary" />
               <h3 className="text-lg font-semibold">Runtime Flow</h3>
             </div>
             <div className="grid grid-cols-5 gap-2">
               {FLOW_STEPS.map((step) => (
-                <div key={step.title} className="rounded-lg border border-border bg-background p-3">
+                <div key={step.title} className="rounded-lg border border-border bg-background p-3 transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md hover:shadow-primary/5">
                   <div className="text-sm font-semibold">{step.title}</div>
                   <p className="mt-2 text-sm leading-6 text-muted-foreground">{step.body}</p>
                 </div>
@@ -479,14 +561,14 @@ export function ArchitectureExplorer() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-border bg-card p-4">
+          <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
             <div className="mb-4 flex items-center gap-2">
               <Layers3 className="h-5 w-5 text-primary" />
               <h3 className="text-lg font-semibold">Reasoning Framework</h3>
             </div>
             <div className="space-y-2">
               {REASONING_ROADMAP.map(([stage, title, body]) => (
-                <div key={stage} className="grid grid-cols-[88px_minmax(0,1fr)] gap-3 rounded-lg border border-border bg-background p-3">
+                <div key={stage} className="grid grid-cols-[88px_minmax(0,1fr)] gap-3 rounded-lg border border-border bg-background p-3 transition-all duration-200 hover:border-primary/40">
                   <Badge variant={stage === "Current" ? "info" : "success"} className="justify-center rounded-md">
                     {stage}
                   </Badge>
@@ -500,7 +582,51 @@ export function ArchitectureExplorer() {
           </div>
         </section>
 
-        <section className="rounded-lg border border-border bg-card p-4">
+        <section className="rounded-lg border border-border bg-card p-4 shadow-sm">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <GraduationCap className="h-5 w-5 text-primary" />
+              <h3 className="text-lg font-semibold">Fine-tuning and Model Serving</h3>
+            </div>
+            <div className="flex gap-2">
+              <Badge variant="info" className="rounded-md">QLoRA</Badge>
+              <Badge variant="success" className="rounded-md">SFT complete</Badge>
+              <Badge variant="warning" className="rounded-md">RL memory bottleneck</Badge>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] gap-4">
+            <div className="grid grid-cols-2 gap-2">
+              {FINETUNING_STEPS.map((step) => (
+                <div key={step.title} className="rounded-lg border border-border bg-background p-3 transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md hover:shadow-primary/5">
+                  <div className="text-sm font-semibold">{step.title}</div>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{step.body}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="overflow-hidden rounded-lg border border-border">
+              <table className="w-full border-collapse text-left text-sm">
+                <thead className="bg-secondary text-muted-foreground">
+                  <tr>
+                    <th className="w-28 px-3 py-2 font-semibold">Technique</th>
+                    <th className="px-3 py-2 font-semibold">How this repo uses it</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {FINETUNING_TECHNIQUES.map(([technique, body]) => (
+                    <tr key={technique} className="border-t border-border">
+                      <td className="px-3 py-2 font-semibold text-primary">{technique}</td>
+                      <td className="px-3 py-2 text-muted-foreground">{body}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section className="rounded-lg border border-border bg-card p-4 shadow-sm">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <Route className="h-5 w-5 text-primary" />
@@ -540,7 +666,7 @@ export function ArchitectureExplorer() {
 
 function Metric({ value, label }: { value: string; label: string }) {
   return (
-    <div className="rounded-lg border border-border bg-card px-4 py-3">
+    <div className="rounded-lg border border-border bg-background/80 px-4 py-3 shadow-sm backdrop-blur">
       <div className="text-xl font-bold">{value}</div>
       <div className="text-xs font-medium uppercase text-muted-foreground">{label}</div>
     </div>
@@ -553,7 +679,8 @@ function NodeInspector({ node, connectedLinks }: { node: ArchitectureNode; conne
 
   return (
     <div className="flex h-full flex-col">
-      <div className="border-b border-border p-4">
+      <div className="relative overflow-hidden border-b border-border p-4">
+        <div className={cn("absolute inset-x-0 top-0 h-1", accent.bg)} />
         <div className="flex items-start gap-3">
           <span className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-lg", accent.bg)}>
             <Icon className={cn("h-5 w-5", accent.text)} />
@@ -577,7 +704,7 @@ function NodeInspector({ node, connectedLinks }: { node: ArchitectureNode; conne
         <InspectorSection title="Important files">
           <div className="space-y-2">
             {node.files.map((file) => (
-              <div key={file} className="rounded-md bg-secondary px-2 py-1.5 font-mono text-xs text-foreground">
+              <div key={file} className="rounded-md border border-border bg-secondary/70 px-2 py-1.5 font-mono text-xs text-foreground">
                 {file}
               </div>
             ))}
@@ -603,7 +730,10 @@ function NodeInspector({ node, connectedLinks }: { node: ArchitectureNode; conne
               if (!other) return null
               return (
                 <div key={`${link.from}-${link.to}`} className="rounded-md border border-border p-2">
-                  <div className="text-sm font-medium">{other.title}</div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-sm font-medium">{other.title}</div>
+                    <span className="h-1.5 w-8 rounded-full bg-primary/40" />
+                  </div>
                   <div className="mt-1 text-xs text-muted-foreground">{link.label}</div>
                 </div>
               )
