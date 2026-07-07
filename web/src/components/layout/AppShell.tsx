@@ -7,6 +7,7 @@ import { AgentTimeline } from "@/components/agent/AgentTimeline"
 import { OraclePanel } from "@/components/agent/OraclePanel"
 import { DatasetDashboard } from "@/components/dataset/DatasetDashboard"
 import { PathwayEditorPanel } from "@/components/hospital/PathwayEditorPanel"
+import { ArchitectureExplorer } from "@/components/architecture/ArchitectureExplorer"
 import { useAppStore } from "@/stores/appStore"
 import { GripVertical, MoreHorizontal } from "lucide-react"
 
@@ -52,43 +53,47 @@ export function AppShell() {
       {/* Main content */}
       <main className="flex-1 flex flex-col overflow-hidden min-w-0">
         <Header />
-        <Group orientation="horizontal" className="flex-1">
-          {/* Content panel */}
-          <Panel defaultSize={55} minSize={30}>
-            <div className="h-full overflow-hidden">
-              {activeSection === "dataset" ? (
-                <DatasetDashboard />
-              ) : activeSection === "rules" ? (
-                <PathwayEditorPanel />
-              ) : (
-                <PatientViewer />
-              )}
-            </div>
-          </Panel>
-          <HorizontalResizeHandle />
-          {/* Agent panel — optionally split with oracle */}
-          <Panel defaultSize={45} minSize={25}>
-            {oracleOpen ? (
-              <Group orientation="vertical" className="h-full">
-                <Panel defaultSize={50} minSize={20}>
-                  <div className="h-full overflow-hidden">
-                    <AgentTimeline />
-                  </div>
-                </Panel>
-                <VerticalResizeHandle />
-                <Panel defaultSize={50} minSize={20}>
-                  <div className="h-full overflow-hidden">
-                    <OraclePanel />
-                  </div>
-                </Panel>
-              </Group>
-            ) : (
+        {activeSection === "architecture" ? (
+          <ArchitectureExplorer />
+        ) : (
+          <Group orientation="horizontal" className="flex-1">
+            {/* Content panel */}
+            <Panel defaultSize={55} minSize={30}>
               <div className="h-full overflow-hidden">
-                <AgentTimeline />
+                {activeSection === "dataset" ? (
+                  <DatasetDashboard />
+                ) : activeSection === "rules" ? (
+                  <PathwayEditorPanel />
+                ) : (
+                  <PatientViewer />
+                )}
               </div>
-            )}
-          </Panel>
-        </Group>
+            </Panel>
+            <HorizontalResizeHandle />
+            {/* Agent panel — optionally split with oracle */}
+            <Panel defaultSize={45} minSize={25}>
+              {oracleOpen ? (
+                <Group orientation="vertical" className="h-full">
+                  <Panel defaultSize={50} minSize={20}>
+                    <div className="h-full overflow-hidden">
+                      <AgentTimeline />
+                    </div>
+                  </Panel>
+                  <VerticalResizeHandle />
+                  <Panel defaultSize={50} minSize={20}>
+                    <div className="h-full overflow-hidden">
+                      <OraclePanel />
+                    </div>
+                  </Panel>
+                </Group>
+              ) : (
+                <div className="h-full overflow-hidden">
+                  <AgentTimeline />
+                </div>
+              )}
+            </Panel>
+          </Group>
+        )}
       </main>
     </div>
   )

@@ -1,6 +1,6 @@
 import { create } from "zustand"
 
-export type ActiveSection = "cases" | "dataset" | "traces" | "rules" | "settings"
+export type ActiveSection = "cases" | "dataset" | "traces" | "rules" | "architecture" | "settings"
 
 interface DatasetFilters {
   conditions: string[]
