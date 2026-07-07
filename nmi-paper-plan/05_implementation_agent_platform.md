@@ -30,7 +30,7 @@ neuroagent/
     │   └── system_prompts/
     │       ├── orchestrator.txt           # Main agent system prompt
     │       ├── reflection.txt             # Reflection step prompt
-    │       └── report_generation.txt      # Clinical report generation prompt
+    │       └── llm_judge.txt              # LLM-as-judge evaluation prompt
     ├── src/neuroagent/
     │   ├── __init__.py
     │   ├── agent/
@@ -38,8 +38,7 @@ neuroagent/
     │   │   ├── orchestrator.py            # Main agent: ReAct loop with tool dispatch
     │   │   ├── reasoning.py               # Chain-of-thought reasoning module
     │   │   ├── reflection.py              # Post-action reflection module
-    │   │   ├── planner.py                 # Action planning (what tool to call next)
-    │   │   └── report_generator.py        # Clinical report generation
+    │   │   └── planner.py                 # Action planning (what tool to call next)
     │   ├── tools/
     │   │   ├── __init__.py
     │   │   ├── base.py                    # BaseTool abstract class

@@ -4,23 +4,17 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import Any
 
 from neuroagent_schemas import GroundTruth, NeuroBenchCase
 
 from ..agent.reasoning import AgentTrace
 from ..llm.client import LLMClient
-
-# Load the judge system prompt from file
-_PROMPT_DIR = Path(__file__).resolve().parent.parent.parent.parent / "config" / "system_prompts"
+from ..llm.prompts import load_prompt
 
 
 def _load_judge_prompt() -> str:
-    prompt_path = _PROMPT_DIR / "llm_judge.txt"
-    if prompt_path.exists():
-        return prompt_path.read_text()
-    raise FileNotFoundError(f"Judge prompt not found at {prompt_path}")
+    return load_prompt("llm_judge.txt")
 
 
 @dataclass
