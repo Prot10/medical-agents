@@ -84,10 +84,6 @@ _TOOL_ACTION_MAP: dict[str, list[str]] = {
         "autonomic test", "autonomic function",
         "stress test",
     ],
-    "consult_medical_specialist": [
-        "specialist", "consultation", "second opinion", "expert opinion",
-        "clinical consult", "dual pathology", "red herring",
-    ],
 }
 
 
@@ -510,9 +506,8 @@ class MetricsCalculator:
                 violations += 1
         metrics.contraindicated_actions_taken = violations
 
-        # Efficiency & specialist usage
+        # Efficiency
         metrics.tool_call_count = trace.total_tool_calls
-        metrics.specialist_calls = list(trace.tools_called).count("consult_medical_specialist")
         if optimal_actions:
             optimal_count = len(optimal_actions)
             if optimal_count > 0:

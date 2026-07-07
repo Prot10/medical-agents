@@ -242,4 +242,4 @@ FND-P03 analysis — the model's inability to diagnose two conditions simultaneo
 | `safety_score` always 0.0 (string matching vs free text) | High | Known, workaround: use LLM judge safety score |
 | `diagnostic_accuracy_top1` false negative on SYNC-CARD (correct diagnosis, wrong string match) | Medium | Known, workaround: manual review |
 | Some v1 moderate cases still have templated similarity within tiers | Low | Documented, not blocking |
-| `report_generation.txt` prompt is loaded but never used | Low | Cleanup needed |
+| Report generation uses an internal fallback prompt | Low | Consider deleting the unused report-generation module if reports remain out of scope |

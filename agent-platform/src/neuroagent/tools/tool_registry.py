@@ -32,19 +32,14 @@ class ToolRegistry:
     @staticmethod
     def create_default_registry(
         mock_server=None,
-        specialist_client=None,
     ) -> "ToolRegistry":
         """Create a registry with all diagnostic tools.
 
         Args:
             mock_server: MockServer for evaluation mode (pre-generated outputs).
-            specialist_client: LLMClient for the specialist model (dual-model mode).
-                If provided, the ``consult_medical_specialist`` tool is registered
-                as the 13th tool.  If only mock_server is set, the specialist tool
-                delegates to mock_server like every other tool.
 
         Returns:
-            ToolRegistry with 12 tools (single-model) or 13 tools (dual-model).
+            ToolRegistry with the 12 diagnostic tools.
         """
         from .eeg_analyzer import EEGAnalyzerTool
         from .mri_analyzer import MRIAnalyzerTool
@@ -67,13 +62,5 @@ class ToolRegistry:
             CardiacMonitoringTool, AdvancedImagingTool, SpecializedTestTool,
         ]:
             registry.register(tool_cls(mock_server=mock_server))
-
-        # Specialist consultation tool — only when dual-model or mock evaluation
-        if specialist_client is not None or mock_server is not None:
-            from .medical_specialist import MedicalSpecialistTool
-            registry.register(MedicalSpecialistTool(
-                mock_server=mock_server,
-                specialist_client=specialist_client,
-            ))
 
         return registry

@@ -275,36 +275,6 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
         },
         "required": ["drug"],
     },
-    "consult_medical_specialist": {
-        "type": "object",
-        "properties": {
-            "clinical_summary": {
-                "type": "string",
-                "description": (
-                    "Summary of the patient presentation and all diagnostic "
-                    "findings gathered so far."
-                ),
-            },
-            "current_differential": {
-                "type": "array",
-                "items": {"type": "string"},
-                "description": "Your current ranked differential diagnosis list.",
-            },
-            "specific_question": {
-                "type": "string",
-                "description": (
-                    "A specific clinical question for the specialist (e.g., "
-                    "'Could this be FND superimposed on MS rather than an MS "
-                    "relapse?')"
-                ),
-            },
-            "clinical_context": {
-                "type": "string",
-                "description": "Why you are consulting the specialist at this point.",
-            },
-        },
-        "required": ["clinical_summary", "specific_question"],
-    },
 }
 
 

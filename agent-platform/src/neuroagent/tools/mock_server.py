@@ -28,10 +28,6 @@ class MockServer:
                 output=output.model_dump() if isinstance(output, BaseModel) else output,
             )
 
-        # Specialist consultation: synthesize from ground truth (returns ToolResult directly)
-        if tool_name == "consult_medical_specialist":
-            return self._synthesize_specialist_opinion(parameters)
-
         # Check follow-up outputs
         output = self._match_followup_output(tool_name, parameters)
         if output is not None:
@@ -93,57 +89,6 @@ class MockServer:
             return results[0] if results else None
 
         return None
-
-    def _synthesize_specialist_opinion(self, parameters: dict[str, Any]) -> ToolResult:
-        """Synthesize a specialist opinion from the case's ground truth.
-
-        In evaluation mode, the specialist "knows" the correct reasoning and
-        provides hints without directly stating the diagnosis.  This mimics
-        what a real specialist consultation would provide.
-        """
-        gt = self.case.ground_truth
-
-        # Build a helpful (but not answer-giving) specialist response
-        parts = ["### Specialist Opinion"]
-
-        # Use key reasoning points as the basis for the opinion
-        if gt.key_reasoning_points:
-            # Include 2-3 reasoning points as clinical insights
-            insights = gt.key_reasoning_points[:3]
-            parts.append(
-                "Based on the clinical information provided, I would highlight "
-                "the following considerations:\n"
-                + "\n".join(f"- {p}" for p in insights)
-            )
-
-        parts.append("\n### Differential Critique")
-        if gt.differential:
-            for d in gt.differential[:3]:
-                parts.append(f"- **{d.diagnosis}**: {d.key_features}")
-
-        parts.append("\n### Red Flags")
-        if gt.red_herrings:
-            for rh in gt.red_herrings:
-                parts.append(
-                    f"- **{rh.data_point}** (in {rh.location}): "
-                    f"{rh.correct_interpretation}"
-                )
-        else:
-            parts.append("- No specific red flags identified in the provided data.")
-
-        parts.append("\n### Recommendation")
-        if gt.critical_actions:
-            parts.append(
-                "I would ensure the following critical steps are completed:\n"
-                + "\n".join(f"- {a}" for a in gt.critical_actions[:3])
-            )
-
-        # Return directly as a ToolResult (bypass the model_dump path in get_output)
-        return ToolResult(
-            tool_name="consult_medical_specialist",
-            success=True,
-            output={"specialist_opinion": "\n".join(parts), "model": "mock_specialist"},
-        )
 
     def _match_followup_output(self, tool_name: str, parameters: dict[str, Any]) -> BaseModel | None:
         for followup in self.case.followup_outputs:

@@ -22,7 +22,8 @@ logger = logging.getLogger(__name__)
 #
 # `supports_tools` is whether the model emits structured `tool_calls` via vLLM
 # (i.e. usable in the ReAct loop). Verified empirically per model below. Models
-# marked False can only be used in dual-model mode as the text-only specialist.
+# marked False are listed for loading/evaluation experiments but are not suitable
+# for the ReAct tool loop.
 AVAILABLE_MODELS = [
     {
         "key": "qwen3.5-4b",
@@ -55,7 +56,7 @@ AVAILABLE_MODELS = [
         "key": "medgemma-4b",
         "name": "MedGemma 1.5 4B",
         "hf_model_id": "google/medgemma-1.5-4b-it",
-        "description": "Medical specialist, fast. Text-only. (Gated — needs HF token.)",
+        "description": "Medical text model, fast. Text-only. (Gated — needs HF token.)",
         "size_gb": 8.1,
         "expected_load_seconds": 180,
         "supports_tools": False,
@@ -64,7 +65,7 @@ AVAILABLE_MODELS = [
         "key": "medgemma-27b",
         "name": "MedGemma 27B",
         "hf_model_id": "ig1/medgemma-27b-text-it-FP8-Dynamic",
-        "description": "Medical specialist, best quality. FP8. Text-only (Gemma not tool-trained).",
+        "description": "Medical text model, best quality. FP8. Text-only (Gemma not tool-trained).",
         "size_gb": 30.0,
         "expected_load_seconds": 500,
         "supports_tools": False,
