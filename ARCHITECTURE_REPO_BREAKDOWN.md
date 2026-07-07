@@ -10,7 +10,7 @@ The core runtime is `agent-platform`: FastAPI loads NeuroBench cases, the `Agent
 
 | Path | Purpose | Role |
 |---|---|---|
-| `agent-platform/` | Main Python package: orchestrator, tools, API, review API, rules, memory, evaluation, training, scripts, tests. | Core runtime |
+| `agent-platform/` | Main Python package: orchestrator, tools, API, review API, rules, evaluation, training, scripts, tests. | Core runtime |
 | `agent-platform/src/neuroagent/training/` | Training code for QLoRA SFT, DPO, GRPO, DAPO, adapter merge, and finetuned evaluation. | Fine-tuning |
 | `agent-platform/docs/finetuning-plan.md` | Current fine-tuning status, LoRA/QLoRA settings, results, bottlenecks, and roadmap. | Fine-tuning docs |
 | `agent-platform/docs/models.md` | Model inventory, vLLM serving flags, Qwen thinking/tool parsing, AWQ Marlin guidance. | Model serving |
@@ -37,7 +37,6 @@ flowchart LR
   Tools -->|evaluation mode| Mock[MockServer]
   Mock --> Data
   Orch -->|prompt context| Rules[RulesEngine<br/>hospital YAML]
-  Orch -->|retrieve/store| Memory[PatientMemory<br/>ChromaDB]
   Orch --> Trace[AgentTrace<br/>turns, costs, tokens]
   Trace --> API
   API -->|stream events| Web
@@ -54,12 +53,10 @@ sequenceDiagram
   participant T as ToolRegistry
   participant M as MockServer
   participant R as RulesEngine
-  participant Mem as PatientMemory
 
   UI->>API: POST case_id, hospital, model
   API->>O: create orchestrator for case
   O->>R: load hospital protocol context
-  O->>Mem: retrieve prior encounters if enabled
   O->>L: system + patient info + tool definitions
   L-->>O: reasoning text + tool calls
   O-->>UI: SSE thinking/tool_call
@@ -137,7 +134,7 @@ flowchart LR
 
 The dashboard uses `Zustand` for local UI state and `TanStack Query` for API-backed state. Agent runs and trace replays stream as Server-Sent Events so the timeline can render reasoning, tool calls, observations, reflections, and assessment as they arrive.
 
-## Rules and Memory
+## Rules
 
 ```mermaid
 flowchart TD
@@ -145,12 +142,8 @@ flowchart TD
   RulesDir --> Engine[RulesEngine]
   Engine --> Context[Compact protocol context]
   Context --> Prompt[System prompt]
-  PatientID[Patient id] --> Memory[PatientMemory Chroma collection]
-  Memory --> History[Previous encounter summaries]
-  History --> Prompt
   Prompt --> Orchestrator[AgentOrchestrator]
   Orchestrator --> Trace[AgentTrace]
-  Trace --> Memory
   Trace --> Compliance[Compliance checks and metrics]
   Engine --> Compliance
 ```
@@ -171,7 +164,7 @@ flowchart LR
   Metrics --> Reports[analysis scripts + rollups]
   Judge --> Reports
   Results --> Training[SFT / DPO / GRPO / DAPO scripts]
-  Config[reward_weights.yaml<br/>agent_config.yaml] --> Training
+  Config[config/training/reward_weights.yaml<br/>config/tools/costs.yaml] --> Training
 ```
 
 The evaluation stack reuses the same agent runtime, tool registry, schemas, and patient formatting used by the web API. This keeps dashboard demos and benchmark runs aligned.

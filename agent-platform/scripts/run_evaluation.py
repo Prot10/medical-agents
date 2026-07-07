@@ -23,7 +23,6 @@ def evaluate(
     split: str = typer.Option("test", help="Dataset split"),
     output_dir: str = typer.Option("results/", help="Output directory"),
     max_cases: int = typer.Option(None, help="Limit number of cases"),
-    enable_memory: bool = typer.Option(False, help="Enable patient memory"),
     enable_rules: bool = typer.Option(True, help="Enable hospital rules"),
     rules_dir: str = typer.Option("config/hospital_rules", help="Hospital rules directory"),
     hospital: str = typer.Option("us_mayo", help="Hospital rule set: us_mayo, uk_nhs, de_charite, jp_todai, br_hcfmusp"),
@@ -49,12 +48,11 @@ def evaluate(
 
     console.print(f"[bold]Running evaluation on {dataset} ({split} split)[/bold]")
     console.print(f"Model: {model}")
-    console.print(f"Memory: {enable_memory}, Rules: {enable_rules}, Hospital: {hospital}")
+    console.print(f"Rules: {enable_rules}, Hospital: {hospital}")
 
     results = runner.run_evaluation(
         split=split,
         max_cases=max_cases,
-        enable_memory=enable_memory,
         enable_rules=enable_rules,
         rules_dir=rules_dir,
         hospital=hospital,

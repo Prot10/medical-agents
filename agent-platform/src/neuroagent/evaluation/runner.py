@@ -52,7 +52,6 @@ class EvaluationRunner:
         self,
         split: str = "test",
         max_cases: int | None = None,
-        enable_memory: bool = False,
         enable_rules: bool = True,
         rules_dir: str = "config/hospital_rules",
         hospital: str = "us_mayo",
@@ -62,7 +61,6 @@ class EvaluationRunner:
         Args:
             split: Dataset split to evaluate ("train", "val", "test").
             max_cases: Limit number of cases (for debugging).
-            enable_memory: Whether to enable patient memory.
             enable_rules: Whether to enable hospital rules.
             rules_dir: Path to hospital rules YAML directory.
 
@@ -71,12 +69,6 @@ class EvaluationRunner:
         """
         cases = self._load_cases(split, max_cases)
         logger.info("Loaded %d cases from split '%s'", len(cases), split)
-
-        # Set up optional components
-        memory = None
-        if enable_memory:
-            from ..memory.patient_memory import PatientMemory
-            memory = PatientMemory()
 
         rules_engine = None
         if enable_rules:
@@ -90,7 +82,6 @@ class EvaluationRunner:
             config={
                 "model": self.config.model,
                 "split": split,
-                "enable_memory": enable_memory,
                 "enable_rules": enable_rules,
                 "hospital": hospital,
             }
@@ -110,7 +101,6 @@ class EvaluationRunner:
             agent = AgentOrchestrator(
                 config=self.config,
                 tool_registry=tool_registry,
-                memory=memory,
                 rules_engine=rules_engine,
             )
 
@@ -120,7 +110,6 @@ class EvaluationRunner:
             # Run agent
             trace = agent.run(
                 patient_info=patient_info,
-                patient_id=case.patient.patient_id if enable_memory else None,
                 case_id=case.case_id,
             )
 

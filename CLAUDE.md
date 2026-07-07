@@ -2,7 +2,7 @@
 
 ## What is this project
 
-NeuroAgent: tool-augmented LLM agent for neurological clinical decision support. ReAct loop + 12 diagnostic tools + hospital protocols + patient memory + cost tracking. Targeting Nature Machine Intelligence.
+NeuroAgent: tool-augmented LLM agent for neurological clinical decision support. ReAct loop + 12 diagnostic tools + hospital protocols + cost tracking. Targeting Nature Machine Intelligence.
 
 See README.md for full project docs, setup, and architecture.
 
@@ -22,7 +22,7 @@ See README.md for full project docs, setup, and architecture.
 - `data/review/annotations/{version}/{reviewer_code}/{case_id}.json` — per-reviewer annotation runtime data (gitignored)
 - `agent-platform/config/hospital_rules/{hospital}/*.yaml` — clinical pathways
 - `agent-platform/config/review/reviewer_codes.yaml` — review-app reviewer registry (hot-reloads on mtime)
-- `agent-platform/config/tool_costs.yaml` — per-tool cost registry (Medicare reference rates)
+- `agent-platform/config/tools/costs.yaml` — per-tool cost registry (Medicare reference rates)
 
 ## Common commands
 
@@ -53,7 +53,7 @@ uv run python agent-platform/scripts/migrate_v3_to_v4.py     # migrate v3→v4 (
 - Dataset versions: v1 (synthetic, enhanced outputs), v2 (real-seeded, enhanced), v3 (v1+v2 combined, realistic/stripped outputs), v4 (12-tool schema + cost tracking, migrated from v3)
 - Tool output modes: "enhanced" (v1/v2, interpretive fields present) vs "realistic" (v3/v4, stripped to match real clinical reports)
 - 12 tools: analyze_brain_mri, analyze_eeg, analyze_ecg, interpret_labs, analyze_csf, order_ct_scan, order_echocardiogram, order_cardiac_monitoring, order_advanced_imaging, order_specialized_test, search_medical_literature, check_drug_interactions
-- Cost tracking: `CostTracker` in `tools/cost_tracker.py`, config in `config/tool_costs.yaml`, Medicare PFS reference rates
+- Cost tracking: `CostTracker` in `tools/cost_tracker.py`, config in `config/tools/costs.yaml`, Medicare PFS reference rates
 - Evaluation: `format_patient_info()` in `evaluation/runner.py` is the single source of truth for patient presentation formatting
 
 ## Models
@@ -64,7 +64,7 @@ LLM client (`llm/client.py`) strips `<think>` tags from Qwen and parses OpenAI-s
 
 ## Architecture notes
 
-- Agent orchestrator: ReAct loop up to 15 turns, system prompt = base + hospital rules + patient memory
+- Agent orchestrator: ReAct loop up to 15 turns, system prompt = base + hospital rules
 - Web API: FastAPI port 8888, serves REST + SSE streaming + static frontend from `web/dist/`
 - SSE streaming uses `asyncio.Queue` bridge between sync generator and async response
 - Model loading/unloading via `/api/v1/models/{key}/load` (SSE progress) and `/api/v1/models/unload`

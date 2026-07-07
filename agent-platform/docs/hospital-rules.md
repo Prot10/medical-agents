@@ -37,16 +37,6 @@ for h in us_mayo uk_nhs de_charite jp_todai br_hcfmusp; do
 done
 ```
 
-### Configuration file
-
-In `config/agent_config.yaml`:
-
-```yaml
-rules:
-  rules_dir: "config/hospital_rules"
-  hospital: "uk_nhs"  # Change this
-```
-
 ### Programmatic
 
 ```python

@@ -82,14 +82,10 @@ class TestSystemPromptAssembly:
         def get_context(self):
             return ""
 
-    class FakeMemory:
-        def retrieve(self, patient_id):
-            return f"History for {patient_id}"
-
     def test_initial_messages_use_system_then_user(self, config):
         agent = AgentOrchestrator(config=config, tool_registry=ToolRegistry())
 
-        messages = agent._build_initial_messages("Patient presentation", patient_id=None)
+        messages = agent._build_initial_messages("Patient presentation")
 
         assert [m["role"] for m in messages] == ["system", "user"]
         assert "NeuroAgent" in messages[0]["content"]
@@ -102,7 +98,7 @@ class TestSystemPromptAssembly:
             rules_engine=self.FakeRules(),
         )
 
-        prompt = agent._build_system_prompt(patient_id=None)
+        prompt = agent._build_system_prompt()
 
         assert "## Hospital Protocols" in prompt
         assert "Protocol A" in prompt
@@ -115,23 +111,9 @@ class TestSystemPromptAssembly:
             rules_engine=self.EmptyRules(),
         )
 
-        prompt = agent._build_system_prompt(patient_id=None)
+        prompt = agent._build_system_prompt()
 
         assert "## Hospital Protocols" not in prompt
-
-    def test_system_prompt_injects_memory_only_with_patient_id(self, config):
-        agent = AgentOrchestrator(
-            config=config,
-            tool_registry=ToolRegistry(),
-            memory=self.FakeMemory(),
-        )
-
-        without_patient = agent._build_system_prompt(patient_id=None)
-        with_patient = agent._build_system_prompt(patient_id="P001")
-
-        assert "## Patient History" not in without_patient
-        assert "## Patient History (From Previous Encounters)" in with_patient
-        assert "History for P001" in with_patient
 
 
 class TestPlanner:

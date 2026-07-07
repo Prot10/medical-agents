@@ -11,7 +11,6 @@ import {
   Network,
   PanelTop,
   Route,
-  ScrollText,
   Server,
   ShieldCheck,
   Sparkles,
@@ -168,7 +167,7 @@ const NODES: ArchitectureNode[] = [
     id: "orchestrator",
     title: "Agent Orchestrator",
     path: "agent-platform/src/neuroagent/agent/",
-    purpose: "The core ReAct loop: builds prompt context, calls the LLM, dispatches tool calls, injects reflection, records traces, tracks cost, and stores memory.",
+    purpose: "The core ReAct loop: builds prompt context, calls the LLM, dispatches tool calls, injects reflection, records traces, and tracks cost.",
     kind: "Reasoning core",
     layers: ["Runtime", "Reasoning"],
     icon: BrainCircuit,
@@ -219,20 +218,6 @@ const NODES: ArchitectureNode[] = [
     y: 43,
     files: ["rules/rules_engine.py", "rules/pathway_checker.py", "config/hospital_rules/*"],
     details: ["Five hospital profiles: Mayo, NHS, Charite, Todai, HC-FMUSP.", "All pathways are injected so matching does not leak the diagnosis.", "Mandatory and contraindicated actions are exposed to metrics and UI."],
-  },
-  {
-    id: "memory",
-    title: "Patient Memory",
-    path: "agent-platform/src/neuroagent/memory/",
-    purpose: "ChromaDB-backed longitudinal memory that retrieves prior encounters and stores compact post-run summaries.",
-    kind: "Vector memory",
-    layers: ["Runtime", "Reasoning", "Data"],
-    icon: ScrollText,
-    accent: "violet",
-    x: 21,
-    y: 70,
-    files: ["memory/patient_memory.py", "memory/memory_retriever.py", "memory/memory_summarizer.py"],
-    details: ["Injects previous encounters into the system prompt when enabled.", "Stores tools used and final assessment per patient.", "Defaults to ./data/patient_memory."],
   },
   {
     id: "evaluation",
@@ -342,7 +327,6 @@ const LINKS: ArchitectureLink[] = [
   { from: "orchestrator", to: "llm", label: "chat/tool calls", layers: ["Runtime", "Reasoning"] },
   { from: "orchestrator", to: "tools", label: "dispatch", layers: ["Runtime", "Tools", "Reasoning"] },
   { from: "orchestrator", to: "rules", label: "prompt context", layers: ["Runtime", "Reasoning"] },
-  { from: "orchestrator", to: "memory", label: "retrieve/store", layers: ["Runtime", "Reasoning", "Data"] },
   { from: "tools", to: "data", label: "mock outputs", layers: ["Tools", "Data", "Evaluation"] },
   { from: "evaluation", to: "orchestrator", label: "batch runs", layers: ["Evaluation", "Runtime"] },
   { from: "evaluation", to: "schemas", label: "case contracts", layers: ["Evaluation", "Data"] },
@@ -361,7 +345,7 @@ const LINKS: ArchitectureLink[] = [
 ]
 
 const REPO_ROWS = [
-  ["agent-platform", "Main Python package: orchestrator, tools, API, rules, memory, evaluation, training.", "Core runtime"],
+  ["agent-platform", "Main Python package: orchestrator, tools, API, rules, evaluation, training.", "Core runtime"],
   ["agent-platform/src/neuroagent/training", "QLoRA SFT, DPO, GRPO, DAPO, adapter merge, finetuned evaluation scripts.", "Fine-tuning"],
   ["agent-platform/scripts/run_*training.sh", "Launchers for SFT, DPO, GRPO, DAPO, and comparison/evaluation runs.", "Training ops"],
   ["agent-platform/docs/finetuning-plan.md", "Current training status, LoRA/QLoRA configuration, known bottlenecks, results, and roadmap.", "Training docs"],
@@ -378,7 +362,7 @@ const REPO_ROWS = [
 
 const FLOW_STEPS = [
   { title: "1. Case Context", body: "FastAPI loads NeuroBench JSON, validates it through shared schemas, and formats only the clinician-visible patient presentation." },
-  { title: "2. Prompt Assembly", body: "The orchestrator combines the base system prompt, selected hospital protocols, optional patient memory, and the case presentation." },
+  { title: "2. Prompt Assembly", body: "The orchestrator combines the base system prompt, selected hospital protocols, and the case presentation." },
   { title: "3. ReAct Turns", body: "The LLM emits visible reasoning plus tool calls. The registry executes valid tools and returns structured observations." },
   { title: "4. Reflection", body: "After tool results, a reflection prompt asks the model to update its differential before the next action." },
   { title: "5. Trace + Metrics", body: "Assistant turns, tool results, token usage, costs, final assessment, and replay events are saved for review and evaluation." },
