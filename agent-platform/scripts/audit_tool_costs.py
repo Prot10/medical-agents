@@ -56,7 +56,6 @@ RANGE_CHECKS: list[tuple[tuple[str, ...], float, float, str]] = [
     (("tools", "order_echocardiogram", "by_type", "TEE"), 400, 1000, "Echo TEE"),
     (("tools", "order_cardiac_monitoring", "by_type", "holter_24h"), 80, 300, "Holter 24h"),
     (("tools", "order_cardiac_monitoring", "by_type", "event_monitor_30d"), 150, 600, "Event monitor"),
-    (("tools", "consult_medical_specialist", "base"), 50, 200, "Specialist consult"),
 ]
 
 # Specialty lab panel range (broader, just flag absurd values)
@@ -155,7 +154,6 @@ def main() -> int:
         "analyze_brain_mri": lookup(cfg, ("tools", "analyze_brain_mri", "base")),
         "analyze_ecg": lookup(cfg, ("tools", "analyze_ecg", "base")),
         "analyze_csf": lookup(cfg, ("tools", "analyze_csf", "base")),
-        "consult_medical_specialist": lookup(cfg, ("tools", "consult_medical_specialist", "base")),
     }
     for tool, base in base_map.items():
         if base is None:

@@ -15,9 +15,8 @@ from pydantic import BaseModel
 from neuroagent_schemas import NeuroBenchCase
 
 from ...agent.orchestrator import AgentConfig, AgentOrchestrator
-from ...agent.reasoning import AgentTrace, AgentTurn
+from ...agent.reasoning import AgentTrace
 from ...evaluation.metrics import MetricsCalculator
-from ...evaluation.llm_judge import LLMJudge
 from ...evaluation.runner import format_patient_info
 from ...llm.client import LLMClient
 from ...rules.rules_engine import AVAILABLE_HOSPITALS, RulesEngine
@@ -51,8 +50,6 @@ class RunRequest(BaseModel):
     model: str = "qwen3.5-9b"
     base_url: str | None = None   # custom LLM endpoint (e.g. GitHub Models)
     api_key: str | None = None    # API key for custom endpoint
-    dual_model: bool = False      # enable dual-model (orchestrator + specialist)
-    specialist_model: str = "medgemma-4b"  # specialist model key
 
 
 class EvaluateRequest(BaseModel):
@@ -75,9 +72,6 @@ def _sse_event(data: dict) -> str:
 # _format_initial_info removed — use format_patient_info from evaluation.runner
 
 
-SPECIALIST_PORT = 8001
-
-
 async def _stream_agent_events(
     case: NeuroBenchCase,
     hospital: str,
@@ -86,28 +80,11 @@ async def _stream_agent_events(
     rules_dir: str,
     traces_dir: Any,
     api_key: str = "not-needed",
-    dual_model: bool = False,
-    specialist_model_hf_id: str = "",
 ) -> AsyncIterator[str]:
     """Run agent in a thread, push events to an async queue for true SSE streaming."""
 
-    # Create specialist client if dual-model mode is enabled
-    specialist_client = None
-    if dual_model and specialist_model_hf_id:
-        specialist_client = LLMClient(
-            base_url=f"http://localhost:{SPECIALIST_PORT}/v1",
-            api_key="not-needed",
-            model=specialist_model_hf_id,
-            temperature=0.3,
-            max_tokens=4096,
-            presence_penalty=0.0,
-        )
-
     mock_server = MockServer(case)
-    tool_registry = ToolRegistry.create_default_registry(
-        mock_server=mock_server,
-        specialist_client=specialist_client,
-    )
+    tool_registry = ToolRegistry.create_default_registry(mock_server=mock_server)
     rules_engine = RulesEngine(rules_dir, hospital=hospital)
 
     config = AgentConfig(
@@ -125,8 +102,6 @@ async def _stream_agent_events(
         "hospital": hospital,
         "model": model_hf_id,
         "max_turns": config.max_turns,
-        "dual_model": dual_model,
-        "specialist_model": specialist_model_hf_id if dual_model else None,
     })
 
     # Use an async queue so events stream as they're produced
@@ -205,13 +180,6 @@ async def run_agent(body: RunRequest, request: Request):
         model_hf_id = body.model
         base_url = OLLAMA_BASE_URL
 
-    # Resolve specialist model for dual-model mode
-    specialist_hf_id = ""
-    if body.dual_model:
-        specialist_hf_id = MODEL_KEY_TO_HF.get(
-            body.specialist_model, body.specialist_model,
-        )
-
     return StreamingResponse(
         _stream_agent_events(
             case=case,
@@ -221,8 +189,6 @@ async def run_agent(body: RunRequest, request: Request):
             rules_dir=request.app.state.rules_dir,
             traces_dir=request.app.state.traces_dir,
             api_key=body.api_key or "not-needed",
-            dual_model=body.dual_model,
-            specialist_model_hf_id=specialist_hf_id,
         ),
         media_type="text/event-stream",
         headers={
@@ -274,12 +240,12 @@ async def replay_trace(body: ReplayRequest, request: Request):
 
 from pathlib import Path as _Path
 
-_JUDGE_PROMPT_PATH = _Path(__file__).resolve().parents[4] / "config" / "system_prompts" / "llm_judge.md"
+_JUDGE_PROMPT_PATH = _Path(__file__).resolve().parents[4] / "config" / "system_prompts" / "llm_judge.txt"
 _oracle_prompt_cache: str | None = None
 
 
 def _get_oracle_system_prompt() -> str:
-    """Load the oracle evaluation prompt from llm_judge.md (cached)."""
+    """Load the oracle evaluation prompt from llm_judge.txt (cached)."""
     global _oracle_prompt_cache
     if _oracle_prompt_cache is None:
         _oracle_prompt_cache = _JUDGE_PROMPT_PATH.read_text()

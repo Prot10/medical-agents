@@ -24,14 +24,13 @@ def v5_catalog():
 
 
 class TestToolCatalog:
-    def test_thirteen_tools(self, v5_catalog):
-        assert len(v5_catalog.tools) == 13
+    def test_twelve_tools(self, v5_catalog):
+        assert len(v5_catalog.tools) == 12
 
     def test_universal_tools(self, v5_catalog):
         assert set(v5_catalog.universal_tools) == {
             "search_medical_literature",
             "check_drug_interactions",
-            "consult_medical_specialist",
         }
 
     def test_conditions_present(self, v5_catalog):

@@ -36,7 +36,7 @@ from pathlib import Path
 
 CASES_DIR = Path("data/neurobench_v5/cases")
 
-# Canonical 12-tool universe + the specialist consultation tool
+# Canonical 12-tool universe.
 CANONICAL_TOOLS = {
     "analyze_brain_mri",
     "analyze_eeg",
@@ -50,7 +50,6 @@ CANONICAL_TOOLS = {
     "order_specialized_test",
     "search_medical_literature",
     "check_drug_interactions",
-    "consult_medical_specialist",
 }
 
 # Map tool_name → ToolOutputSet field name(s) where its output lives
@@ -67,7 +66,6 @@ TOOL_TO_OUTPUT_FIELD: dict[str, list[str]] = {
     "order_specialized_test": ["specialized_test"],
     "search_medical_literature": ["literature_search"],
     "check_drug_interactions": ["drug_interactions"],
-    "consult_medical_specialist": [],  # no pre-generated output
 }
 
 LIKELIHOOD_ORDER = {
@@ -79,7 +77,7 @@ def _has_output(case: dict, tool_name: str) -> bool:
     """True if the case has a pre-generated output for this tool."""
     fields = TOOL_TO_OUTPUT_FIELD.get(tool_name, [])
     if not fields:
-        return True  # consult_medical_specialist — synthesized at runtime
+        return False
     initial = case.get("initial_tool_outputs", {}) or {}
     followup = case.get("followup_outputs", []) or []
     for f in fields:

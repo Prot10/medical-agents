@@ -39,7 +39,6 @@ class FormatReward:
         "order_cardiac_monitoring",
         "order_advanced_imaging",
         "order_specialized_test",
-        "consult_medical_specialist",
     })
 
     def compute(

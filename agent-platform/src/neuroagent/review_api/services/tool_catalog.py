@@ -116,14 +116,6 @@ _TOOL_META: list[dict[str, str | None]] = [
         "conditions for interactions and contraindications.",
         "modality": None,
     },
-    {
-        "name": "consult_medical_specialist",
-        "label": "Specialist consultation",
-        "description": "Curbside consult with a subspecialist (e.g. behavioral "
-        "neurology, cardiology, neuro-ophthalmology) for syndromic clarification "
-        "or coordinated care.",
-        "modality": None,
-    },
 ]
 
 # Modality tokens used in conditions.yaml -> canonical tool name.
@@ -145,7 +137,6 @@ _MODALITY_TO_TOOL: dict[str, str] = {
 _UNIVERSAL_TOOLS: list[str] = [
     "search_medical_literature",
     "check_drug_interactions",
-    "consult_medical_specialist",
 ]
 
 # Enum value (in cases) -> conditions.yaml top-level key, where they differ.
