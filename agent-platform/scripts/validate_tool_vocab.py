@@ -1,7 +1,7 @@
 """Validate that all tool_parameters in v5 cases come from the closed vocabulary.
 
 Reads `dataset-generation/TOOL_PARAMETER_VOCABULARY.md` (the source of truth)
-and `agent-platform/config/tool_costs.yaml` (the cost-lookup table) and checks
+and `agent-platform/config/tools/costs.yaml` (the cost-lookup table) and checks
 every case file for:
 
 - `optimal_actions[].tool_parameters` values matching the vocab when the
@@ -27,7 +27,7 @@ from pathlib import Path
 import yaml
 
 CASES_DIR = Path("data/neurobench_v5/cases")
-COSTS_YAML = Path("agent-platform/config/tool_costs.yaml")
+COSTS_YAML = Path("agent-platform/config/tools/costs.yaml")
 
 CATCHALL_TOOLS = {"order_specialized_test", "order_advanced_imaging"}
 

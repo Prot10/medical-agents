@@ -27,7 +27,7 @@ class CostTracker:
 
     def __init__(self, config_path: str | Path | None = None):
         if config_path is None:
-            config_path = Path(__file__).resolve().parents[3] / "config" / "tool_costs.yaml"
+            config_path = Path(__file__).resolve().parents[3] / "config" / "tools" / "costs.yaml"
         self.config = self._load_config(Path(config_path))
         self.entries: list[ToolCostEntry] = []
 

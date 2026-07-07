@@ -1,6 +1,6 @@
 """Tests for the CostTracker — parameter-dependent cost computation.
 
-Reference values are in EUR (the CostTracker reads ``tool_costs.yaml`` which is
+Reference values are in EUR (the CostTracker reads ``config/tools/costs.yaml`` which is
 EUR-denominated after the 2026-06 conversion). The attribute name ``cost_usd``
 is historical: renaming it cascades into the training/RL pipeline and is left
 for a dedicated PR. Treat ``cost_usd`` as "cost in the configured reference

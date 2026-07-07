@@ -17,7 +17,7 @@ set -euo pipefail
 #   - agent-platform/src/neuroagent/review_api/ .......... the only runtime code
 #   - agent-platform/pyproject.toml ...................... workspace member manifest
 #   - agent-platform/config/review/ ...................... reviewer-config dir
-#   - agent-platform/config/tool_costs.yaml .............. tool catalog cost summaries
+#   - agent-platform/config/tools/costs.yaml ............. tool catalog cost summaries
 #   - packages/neuroagent-schemas/ ....................... NeuroBenchCase model
 #   - dataset-generation/{pyproject.toml,src/} ........... workspace member shell (uv sync requires it)
 #   - dataset-generation/config/conditions.yaml .......... tool-catalog per-condition rules
@@ -105,7 +105,7 @@ rsync -az --delete \
   "$VPS_HOST:$VPS_PATH/packages/neuroagent-schemas/"
 
 # Config: ONLY the review/ subdir is needed (reviewer codes + future review
-# config). hospital_rules/, system_prompts/, tool_costs.yaml, etc. belong to
+# config). hospital_rules/, system_prompts/, tools/costs.yaml, etc. belong to
 # the main agent and stay local.
 # reviewer_codes.yaml itself is excluded here — gated behind --force-codes.
 rsync -az --delete \
@@ -124,13 +124,14 @@ rsync -az --delete \
   dataset-generation/src \
   "$VPS_HOST:$VPS_PATH/dataset-generation/"
 
-# conditions.yaml + tool_costs.yaml — review_api/services/tool_catalog.py
+# conditions.yaml + tools/costs.yaml — review_api/services/tool_catalog.py
 # reads both to build the per-condition tool-permission map and cost-summary
 # labels. Without them, the tool catalog endpoint is degraded.
 rsync -az dataset-generation/config/conditions.yaml \
   "$VPS_HOST:$VPS_PATH/dataset-generation/config/conditions.yaml"
-rsync -az agent-platform/config/tool_costs.yaml \
-  "$VPS_HOST:$VPS_PATH/agent-platform/config/tool_costs.yaml"
+ssh "$VPS_HOST" "mkdir -p $VPS_PATH/agent-platform/config/tools"
+rsync -az agent-platform/config/tools/costs.yaml \
+  "$VPS_HOST:$VPS_PATH/agent-platform/config/tools/costs.yaml"
 
 if [ "$FORCE_CODES" -eq 1 ]; then
   if [ -f agent-platform/config/review/reviewer_codes.yaml ]; then

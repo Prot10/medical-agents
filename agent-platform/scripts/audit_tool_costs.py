@@ -1,4 +1,4 @@
-"""Sanity-check tool_costs.yaml against reference ranges.
+"""Sanity-check config/tools/costs.yaml against reference ranges.
 
 Flags entries that look suspect (likely typos, missing decimals, outdated
 rates) before the cost metrics are baked into evaluation results. NOT a
@@ -36,7 +36,7 @@ from pathlib import Path
 import yaml
 
 
-COSTS_YAML = Path("agent-platform/config/tool_costs.yaml")
+COSTS_YAML = Path("agent-platform/config/tools/costs.yaml")
 
 
 # (path-in-config, min, max, description)
@@ -176,7 +176,7 @@ def main() -> int:
             print(f"  {i}")
         return 1
 
-    print("OK — no obvious issues in tool_costs.yaml.")
+    print("OK — no obvious issues in config/tools/costs.yaml.")
     return 0
 
 
