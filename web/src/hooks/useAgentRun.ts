@@ -11,7 +11,7 @@ export function useAgentRun() {
       caseId: string,
       hospital: string,
       model: string,
-      options?: { dual_model?: boolean; specialist_model?: string },
+      options?: { base_url?: string; api_key?: string },
     ) => {
       abortRef.current?.abort()
       const controller = new AbortController()

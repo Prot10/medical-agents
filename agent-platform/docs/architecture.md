@@ -97,7 +97,7 @@ medical-agents/               # uv workspace root
 │   │   └── evaluation/       # Runner, metrics, noise, judge, analyzer
 │   ├── config/
 │   │   ├── agent_config.yaml
-│   │   ├── system_prompts/   # orchestrator.txt, reflection.txt, report_generation.txt
+│   │   ├── system_prompts/   # orchestrator.txt, reflection.txt, llm_judge.txt
 │   │   └── hospital_rules/   # Per-hospital YAML directories
 │   ├── scripts/              # CLI entry points
 │   └── tests/
