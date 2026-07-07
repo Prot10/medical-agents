@@ -1,6 +1,6 @@
 # Patient Data & Case Structure
 
-This document describes the complete data model for patient information in NeuroAgent: how patients are represented, what a NeuroBench case contains, how ground truth is structured, and how longitudinal memory works.
+This document describes the complete data model for patient information in NeuroAgent: how patients are represented, what a NeuroBench case contains, and how ground truth is structured.
 
 All models are defined as Pydantic v2 `BaseModel` subclasses in the `neuroagent-schemas` package (`packages/neuroagent-schemas/src/neuroagent_schemas/`).
 
@@ -379,59 +379,7 @@ Intentional distractors embedded in moderate and puzzle-difficulty cases:
 
 ---
 
-## 4. Patient Memory (Longitudinal)
-
-**Schema**: `neuroagent.memory.patient_memory.PatientMemory`
-
-ChromaDB-backed vector store for tracking patients across multiple encounters. This allows the agent to recall prior visits for the same patient.
-
-### 4.1 Storage
-
-After each agent run, `PatientMemory.store_encounter()` saves:
-
-| Field | Storage | Description |
-|---|---|---|
-| `encounter_id` | ChromaDB document ID | `"{patient_id}_{iso_timestamp}"` |
-| `summary` | ChromaDB document text | Condensed encounter summary (tools called + assessment, max 2000 chars). |
-| `patient_id` | metadata | Patient identifier for filtering. |
-| `date` | metadata | ISO timestamp. |
-| `tools_called` | metadata (JSON) | List of tools used in the encounter. |
-| `total_tool_calls` | metadata | Total number of tool invocations. |
-| `has_diagnosis` | metadata | Whether the agent reached a diagnosis. |
-
-### 4.2 Retrieval
-
-`PatientMemory.retrieve()` returns a formatted history string injected into the system prompt:
-
-1. Filters by `patient_id` (exact match).
-2. Sorts by date (most recent first).
-3. Returns up to `max_encounters` (default: 5).
-4. Formats as markdown sections:
-
-```
-Previous encounters for this patient (3 found):
-
-### Encounter 1 (2024-11-15T10:30:00)
-Tests performed: analyze_brain_mri, interpret_labs
-Assessment:
-### Primary Diagnosis
-Early-onset Alzheimer's disease...
-
-### Encounter 2 (2024-10-01T14:20:00)
-...
-```
-
-The memory string is appended to the system prompt under a `## Patient History (From Previous Encounters)` section.
-
-### 4.3 Design choices
-
-- **Cosine similarity** (`hnsw:space: cosine`) for the ChromaDB collection, enabling semantic search for similar past encounters if `current_complaint` is provided (not yet implemented — current retrieval is ID-based only).
-- **Summarization**: Only the tools called and final assessment are stored, not the full trace. This keeps memory compact and avoids injecting verbose reasoning into future prompts.
-- **No patient demographics in memory**: Demographics come from the `PatientProfile` in the case, not from memory. Memory is purely for longitudinal encounter history.
-
----
-
-## 5. Dataset Versions
+## 4. Dataset Versions
 
 NeuroBench cases exist in three versions:
 
@@ -515,11 +463,11 @@ Red herrings are annotated on 16 puzzle cases (all rewritten P02/P03 cases) and 
 ```
 
 1. **Case loading**: `NeuroBenchCase` JSON is deserialized into Pydantic models.
-2. **Prompt formatting**: `PatientProfile` fields are converted to a clinical narrative and sent as the user message. Hospital rules and patient memory (if any) are injected into the system prompt.
+2. **Prompt formatting**: `PatientProfile` fields are converted to a clinical narrative and sent as the user message. Hospital rules are injected into the system prompt.
 3. **Tool dispatch**: The agent calls tools; `MockServer` returns matching outputs from `initial_tool_outputs` or `followup_outputs`.
 4. **Trace recording**: Every turn (reasoning, tool calls, tool results) is captured in `AgentTrace`.
 5. **Evaluation**: `MetricsCalculator` compares the trace against `GroundTruth` — diagnostic accuracy, action recall, safety violations, reasoning quality.
-6. **Memory storage**: If patient memory is enabled, the encounter summary is stored in ChromaDB for future retrieval.
+6. **Evaluation output**: Results include the trace, metrics, cost totals, and optional judge scores for downstream analysis.
 
 ---
 
@@ -532,7 +480,6 @@ Red herrings are annotated on 16 puzzle cases (all rewritten P02/P03 cases) and 
 | `neuroagent-schemas/evaluation.py` | `GroundTruth`, `ActionStep`, `RedHerring` |
 | `neuroagent-schemas/enums.py` | `NeurologicalCondition`, `CaseDifficulty`, `EncounterType`, `ActionCategory`, `Modality` |
 | `neuroagent-schemas/tool_outputs.py` | All tool output models (see [tools.md](tools.md)) |
-| `neuroagent/memory/patient_memory.py` | `PatientMemory` (ChromaDB longitudinal store) |
 | `neuroagent/agent/reasoning.py` | `AgentTrace`, `AgentTurn` |
 | `data/neurobench_v1/cases/*.json` | 100 synthetic cases (v1) |
 | `data/neurobench_v2/cases/*.json` | 100 real-case-seeded cases (v2) |

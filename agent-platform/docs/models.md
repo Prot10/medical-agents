@@ -68,7 +68,7 @@ Qwen3.5 with thinking mode has specific recommended sampling parameters:
 | `presence_penalty` | 1.5 | Reduces repetition in long outputs |
 | `max_tokens` | 8192 | Sufficient for medical reasoning + structured assessment |
 
-These are configured in `config/agent_config.yaml` and `AgentConfig` defaults.
+These are configured through `AgentConfig` defaults and script/API runtime overrides.
 
 ## Using a different model in scripts
 

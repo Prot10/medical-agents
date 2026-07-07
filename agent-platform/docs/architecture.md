@@ -10,7 +10,6 @@ NeuroAgent is a tool-augmented LLM agent for neurological clinical decision supp
 │  Prompt      │────▶│  (vLLM)      │────▶│  Registry    │
 │  + Hospital  │     │              │◀────│  (7 tools)   │
 │    Rules     │     │  ReAct Loop  │     └──────────────┘
-│  + Memory    │     │              │
 └─────────────┘     └──────┬───────┘
                            │
                     ┌──────▼───────┐
@@ -25,7 +24,7 @@ NeuroAgent is a tool-augmented LLM agent for neurological clinical decision supp
 ### Agent Orchestrator (`agent/orchestrator.py`)
 
 The main ReAct loop:
-1. Build system prompt (base + hospital rules + patient memory)
+1. Build system prompt (base + hospital rules)
 2. Send patient info to LLM with tool definitions
 3. Loop: LLM calls tools → observe results → reflect → repeat
 4. LLM responds without tool calls → done
@@ -51,10 +50,6 @@ In evaluation mode, all tools are backed by a `MockServer` that returns pre-gene
 ### Hospital Rules (`rules/`)
 
 Clinical protocols loaded from YAML files, one directory per hospital. Injected into the system prompt — not a tool. See [hospital-rules.md](hospital-rules.md).
-
-### Patient Memory (`memory/`)
-
-ChromaDB-backed vector store for longitudinal patient encounters. Stores and retrieves past encounters for the same patient across cases. See [patient-data.md](patient-data.md) for the complete patient data model, case structure, and memory system.
 
 ### Evaluation (`evaluation/`)
 
@@ -92,13 +87,13 @@ medical-agents/               # uv workspace root
 │   │   ├── api/              # FastAPI web API + SSE streaming
 │   │   ├── llm/              # LLM client, prompts
 │   │   ├── tools/            # 7 diagnostic tools + mock server + registry
-│   │   ├── memory/           # ChromaDB patient memory
 │   │   ├── rules/            # Rules engine, pathway checker
 │   │   └── evaluation/       # Runner, metrics, noise, judge, analyzer
 │   ├── config/
-│   │   ├── agent_config.yaml
 │   │   ├── system_prompts/   # orchestrator.txt, reflection.txt, llm_judge.txt
-│   │   └── hospital_rules/   # Per-hospital YAML directories
+│   │   ├── hospital_rules/   # Per-hospital YAML directories
+│   │   ├── tools/            # Tool cost registry
+│   │   └── training/         # Reward weights
 │   ├── scripts/              # CLI entry points
 │   └── tests/
 ├── web/                      # React frontend dashboard

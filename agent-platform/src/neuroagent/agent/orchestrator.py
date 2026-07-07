@@ -61,7 +61,6 @@ class AgentOrchestrator:
         self,
         config: AgentConfig,
         tool_registry: ToolRegistry,
-        memory: Any | None = None,  # PatientMemory (imported lazily to avoid circular deps)
         rules_engine: Any | None = None,  # RulesEngine
         cost_tracker: CostTracker | None = None,
     ):
@@ -76,21 +75,18 @@ class AgentOrchestrator:
             presence_penalty=config.presence_penalty,
         )
         self.tools = tool_registry
-        self.memory = memory
         self.rules = rules_engine
         self.cost_tracker = cost_tracker or CostTracker()
 
     def run(
         self,
         patient_info: str,
-        patient_id: str | None = None,
         case_id: str | None = None,
     ) -> AgentTrace:
         """Run the agent on a patient case.
 
         Args:
             patient_info: Initial clinical information (chief complaint + history).
-            patient_id: If set, load/store patient memory.
             case_id: Case identifier for tracing.
 
         Returns:
@@ -100,7 +96,7 @@ class AgentOrchestrator:
         trace.start_timer()
         self.cost_tracker.reset()
 
-        messages = self._build_initial_messages(patient_info, patient_id)
+        messages = self._build_initial_messages(patient_info)
         tool_definitions = self._get_tool_definitions()
 
         turn_number = 0
@@ -216,16 +212,11 @@ class AgentOrchestrator:
         trace.total_cost_usd = self.cost_tracker.total_cost_usd
         trace.cost_entries = [e.model_dump() for e in self.cost_tracker.entries]
 
-        # Store encounter in patient memory
-        if self.memory and patient_id:
-            self.memory.store_encounter(patient_id, trace)
-
         return trace
 
     def run_streaming(
         self,
         patient_info: str,
-        patient_id: str | None = None,
         case_id: str | None = None,
     ):
         """Run the agent and yield SSE event dicts with real-time token streaming.
@@ -247,7 +238,7 @@ class AgentOrchestrator:
         trace.start_timer()
         self.cost_tracker.reset()
 
-        messages = self._build_initial_messages(patient_info, patient_id)
+        messages = self._build_initial_messages(patient_info)
         tool_definitions = self._get_tool_definitions()
 
         turn_number = 0
@@ -400,10 +391,6 @@ class AgentOrchestrator:
         trace.total_cost_usd = self.cost_tracker.total_cost_usd
         trace.cost_entries = [e.model_dump() for e in self.cost_tracker.entries]
 
-        # Store encounter in patient memory
-        if self.memory and patient_id:
-            self.memory.store_encounter(patient_id, trace)
-
         yield {
             "type": "run_complete",
             "total_tool_calls": trace.total_tool_calls,
@@ -441,7 +428,7 @@ class AgentOrchestrator:
             "differential diagnosis, and recommendations."
         )
 
-        messages = self._build_initial_messages(combined, patient_id=None)
+        messages = self._build_initial_messages(combined)
 
         response = self.llm.chat(messages=messages, tools=None)
         trace.add_assistant_turn(
@@ -456,15 +443,15 @@ class AgentOrchestrator:
         return trace
 
     def _build_initial_messages(
-        self, patient_info: str, patient_id: str | None,
+        self, patient_info: str,
     ) -> list[dict[str, Any]]:
-        system = self._build_system_prompt(patient_id)
+        system = self._build_system_prompt()
         return [
             {"role": "system", "content": system},
             {"role": "user", "content": patient_info},
         ]
 
-    def _build_system_prompt(self, patient_id: str | None) -> str:
+    def _build_system_prompt(self) -> str:
         base = load_prompt("orchestrator.txt")
 
         # Inject ALL hospital rules — agent must determine which pathway applies
@@ -472,12 +459,6 @@ class AgentOrchestrator:
             context = self.rules.get_context()
             if context:
                 base += f"\n\n## Hospital Protocols\n{context}"
-
-        # Inject patient memory
-        if self.memory and patient_id:
-            history = self.memory.retrieve(patient_id)
-            if history:
-                base += f"\n\n## Patient History (From Previous Encounters)\n{history}"
 
         return base
 

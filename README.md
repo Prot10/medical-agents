@@ -1,6 +1,6 @@
 # NeuroAgent
 
-Tool-augmented LLM agent for neurological clinical decision support. Reasons through patient cases using a ReAct loop with 12 diagnostic tools, follows hospital-specific protocols, and maintains longitudinal patient memory.
+Tool-augmented LLM agent for neurological clinical decision support. Reasons through patient cases using a ReAct loop with 12 diagnostic tools and follows hospital-specific protocols.
 
 Targeting a **Nature Machine Intelligence** publication.
 
@@ -16,12 +16,12 @@ medical-agents/                     # uv workspace root
 │   │   ├── llm/                    # LLM client (OpenAI-compatible), prompts
 │   │   ├── tools/                  # 12 diagnostic tools + MockServer + ToolRegistry
 │   │   ├── rules/                  # Hospital rules engine (YAML pathways)
-│   │   ├── memory/                 # ChromaDB patient memory
 │   │   └── evaluation/             # Runner, metrics, noise injector, LLM judge
 │   ├── config/
-│   │   ├── agent_config.yaml       # Default agent/LLM/rules config
 │   │   ├── system_prompts/         # orchestrator.txt, reflection.txt, llm_judge.txt
 │   │   ├── hospital_rules/         # 5 hospital dirs
+│   │   ├── tools/                  # Tool cost registry
+│   │   ├── training/               # Training reward config
 │   │   └── review/                 # Reviewer-code registry (reviewer_codes.yaml)
 │   ├── scripts/                    # CLI entry points + vLLM serve scripts
 │   └── tests/                      # pytest suite
@@ -123,7 +123,7 @@ For Mac: use Ollama with `qwen3.5:4b` or `qwen3.5:8b`.
 
 ReAct loop (up to 15 turns): THINK → ACT (tool call) → OBSERVE → REFLECT. Two modes: `run()` returns `AgentTrace`, `run_streaming()` yields SSE events.
 
-System prompt = base prompt + hospital protocols + patient memory.
+System prompt = base prompt + hospital protocols.
 
 ### 12 Diagnostic Tools
 
