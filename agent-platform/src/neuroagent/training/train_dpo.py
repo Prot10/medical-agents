@@ -363,8 +363,8 @@ def main() -> None:
         )
 
         reward_fn = CompositeReward.from_config(
-            reward_config_path="agent-platform/config/reward_weights.yaml",
-            tool_costs_path="agent-platform/config/tool_costs.yaml",
+            reward_config_path="agent-platform/config/training/reward_weights.yaml",
+            tool_costs_path="agent-platform/config/tools/costs.yaml",
             rules_dir="agent-platform/config/hospital_rules",
             hospital=args.hospital,
         )

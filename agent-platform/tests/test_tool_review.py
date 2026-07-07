@@ -63,7 +63,7 @@ class TestToolCatalog:
         assert by_name["search_medical_literature"].cost_summary == "free"
         # MRI is base €294 (the floor), never the €116 contrast modifier alone.
         # Costs are EUR, converted from CMS PFS at 1 USD = 0.92 EUR — see
-        # agent-platform/config/tool_costs.yaml.
+        # agent-platform/config/tools/costs.yaml.
         assert by_name["analyze_brain_mri"].cost_summary == "from €294"
 
 

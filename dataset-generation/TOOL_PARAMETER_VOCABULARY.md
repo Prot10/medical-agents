@@ -89,7 +89,7 @@ with slightly different strings (e.g., `EMG/NCS` vs `EMG and NCS` vs
 `nerve conduction studies`) and the metric layer would see them as different
 tools, inflating precision/recall noise. Closed vocabulary also pins cost
 calculation: every entry above maps to a row in
-`agent-platform/config/tool_costs.yaml` so `cost_efficiency` works without
+`agent-platform/config/tools/costs.yaml` so `cost_efficiency` works without
 fallback rates.
 
 If the fleet finds a case that genuinely requires a test outside this list,

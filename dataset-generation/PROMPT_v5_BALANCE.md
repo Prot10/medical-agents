@@ -263,7 +263,7 @@ print(f'{c.case_id}  cond={c.condition.value}  diff={c.difficulty.value}  dx={c.
 #    d. Vital signs in physiological range for age
 #    e. ICD code matches primary_diagnosis at the disease-category level
 #    f. useless_tools and harmful_tools subset of the 12-tool roster (see
-#       CLAUDE.md and config/tool_costs.yaml)
+#       CLAUDE.md and config/tools/costs.yaml)
 #    g. sequence_constraints reference tools that exist
 #    h. tool_parameters in optimal_actions use the closed vocabulary
 #       (TOOL_PARAMETER_VOCABULARY.md)

@@ -41,7 +41,7 @@ The deploy script ships **only** the parts of the repo `review_api` imports at r
 - `agent-platform/src/neuroagent/__init__.py` + `agent-platform/src/neuroagent/review_api/` — the review backend
 - `agent-platform/pyproject.toml` — workspace member manifest
 - `agent-platform/config/review/` — reviewer-config dir (without `reviewer_codes.yaml` unless `--force-codes`)
-- `agent-platform/config/tool_costs.yaml` — read by `services/tool_catalog.py`
+- `agent-platform/config/tools/costs.yaml` — read by `services/tool_catalog.py`
 - `packages/neuroagent-schemas/` — `NeuroBenchCase` Pydantic model
 - `dataset-generation/{pyproject.toml,src/}` + `dataset-generation/config/conditions.yaml` — workspace member shell (required by `uv sync`) plus the tool-catalog config
 - `pyproject.toml`, `uv.lock` — root workspace + lockfile

@@ -658,8 +658,8 @@ def main() -> None:
     parser.add_argument("--bf16", action="store_true", default=True)
 
     # Reward (for online GRPO)
-    parser.add_argument("--reward-config", default="config/reward_weights.yaml")
-    parser.add_argument("--tool-costs", default="config/tool_costs.yaml")
+    parser.add_argument("--reward-config", default="config/training/reward_weights.yaml")
+    parser.add_argument("--tool-costs", default="config/tools/costs.yaml")
     parser.add_argument("--rules-dir", default="config/hospital_rules")
     parser.add_argument("--hospital", default="us_mayo")
 

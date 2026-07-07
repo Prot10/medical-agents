@@ -194,8 +194,8 @@ def main() -> None:
     parser.add_argument("--model", default="Qwen/Qwen3.5-9B", help="Model name")
     parser.add_argument("--base-url", default="http://localhost:8000/v1", help="LLM API base URL")
     parser.add_argument("--hospital", default="us_mayo", help="Hospital for rules")
-    parser.add_argument("--reward-config", default="config/reward_weights.yaml")
-    parser.add_argument("--tool-costs", default="config/tool_costs.yaml")
+    parser.add_argument("--reward-config", default="config/training/reward_weights.yaml")
+    parser.add_argument("--tool-costs", default="config/tools/costs.yaml")
     parser.add_argument("--rules-dir", default="config/hospital_rules")
 
     args = parser.parse_args()

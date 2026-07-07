@@ -5,7 +5,7 @@ The catalog joins three sources:
 * the dataset's actual conditions (``case.condition.value``),
 * the per-condition ``required_modalities`` / ``optional_modalities`` in
   ``dataset-generation/config/conditions.yaml``,
-* the tool list + cost ranges in ``agent-platform/config/tool_costs.yaml``.
+* the tool list + cost ranges in ``agent-platform/config/tools/costs.yaml``.
 
 Condition keys in the cases are the ``NeurologicalCondition`` enum values
 (e.g. ``ftd``); a few differ from the ``conditions.yaml`` top-level keys
@@ -161,13 +161,13 @@ def _modalities_to_tools(tokens: list[str]) -> list[str]:
 
 
 def _cost_summary(tool_name: str, costs: dict[str, Any]) -> str | None:
-    """Produce an honest cost *floor* label from tool_costs.yaml.
+    """Produce an honest cost *floor* label from config/tools/costs.yaml.
 
     Tool specs mix additive forms (``base`` + ``modifiers``) and
     alternative-option maps (``by_type`` / ``by_panel``); a precise range
     is ambiguous, so we report the entry charge (``from €X``) which is never
     misleading. Free tools render as ``free``. Values are in EUR — see
-    ``tool_costs.yaml`` for sourcing notes.
+    ``config/tools/costs.yaml`` for sourcing notes.
     """
     spec = (costs.get("tools") or {}).get(tool_name)
     if spec is None:
@@ -265,7 +265,7 @@ def build_catalog(
     if tool_costs_path.exists():
         tool_costs = yaml.safe_load(tool_costs_path.read_text()) or {}
     else:  # pragma: no cover
-        logger.warning("tool_costs.yaml not found at %s", tool_costs_path)
+        logger.warning("Tool costs config not found at %s", tool_costs_path)
 
     tools = [
         ToolMeta(

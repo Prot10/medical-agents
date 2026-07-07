@@ -22,7 +22,7 @@ REVIEW_CONFIG_DIR = _REPO_ROOT / "agent-platform" / "config" / "review"
 REVIEWER_CODES_PATH = REVIEW_CONFIG_DIR / "reviewer_codes.yaml"
 
 # Sources for the tool catalog (existing 12-tool list + per-condition mapping).
-TOOL_COSTS_PATH = _REPO_ROOT / "agent-platform" / "config" / "tool_costs.yaml"
+TOOL_COSTS_PATH = _REPO_ROOT / "agent-platform" / "config" / "tools" / "costs.yaml"
 CONDITIONS_YAML_PATH = (
     _REPO_ROOT / "dataset-generation" / "config" / "conditions.yaml"
 )
