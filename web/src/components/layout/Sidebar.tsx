@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback, useState } from "react"
-import { Stethoscope, BarChart3, History, PanelLeftClose, PanelLeft, Moon, Sun, ChevronDown, ChevronUp, Hospital, Settings, Shield, Play, Square } from "lucide-react"
+import { Stethoscope, BarChart3, History, PanelLeftClose, PanelLeft, Moon, Sun, ChevronDown, ChevronUp, Hospital, Settings, Shield, Play, Square, Network } from "lucide-react"
 import { useQueryClient } from "@tanstack/react-query"
 import { useAppStore } from "@/stores/appStore"
 import { useModels, useHospitals } from "@/hooks/useCases"
@@ -19,6 +19,7 @@ const NAV_ITEMS = [
   { id: "dataset" as const, label: "Dataset", icon: BarChart3 },
   { id: "traces" as const, label: "Traces", icon: History },
   { id: "rules" as const, label: "Rules", icon: Shield },
+  { id: "architecture" as const, label: "Architecture", icon: Network },
   { id: "settings" as const, label: "Settings", icon: Settings },
 ]
 
