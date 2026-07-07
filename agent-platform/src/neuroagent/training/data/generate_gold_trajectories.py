@@ -29,6 +29,8 @@ from typing import Any
 
 from neuroagent_schemas import NeuroBenchCase
 
+from ...llm.prompts import load_prompt
+
 logger = logging.getLogger(__name__)
 
 # The 5 trajectory styles with instructions
@@ -889,8 +891,7 @@ def main() -> None:
     if args.system_prompt:
         system_prompt = Path(args.system_prompt).read_text()
     else:
-        default_path = Path(__file__).resolve().parents[4] / "config" / "system_prompts" / "orchestrator.txt"
-        system_prompt = default_path.read_text() if default_path.exists() else ""
+        system_prompt = load_prompt("orchestrator.txt")
 
     if args.prepare_prompts:
         prepare_prompts(

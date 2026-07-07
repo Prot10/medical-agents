@@ -19,6 +19,7 @@ from ...agent.reasoning import AgentTrace
 from ...evaluation.metrics import MetricsCalculator
 from ...evaluation.runner import format_patient_info
 from ...llm.client import LLMClient
+from ...llm.prompts import load_prompt
 from ...rules.rules_engine import AVAILABLE_HOSPITALS, RulesEngine
 from ...tools.mock_server import MockServer
 from ...tools.tool_registry import ToolRegistry
@@ -237,10 +238,6 @@ async def replay_trace(body: ReplayRequest, request: Request):
         },
     )
 
-
-from pathlib import Path as _Path
-
-_JUDGE_PROMPT_PATH = _Path(__file__).resolve().parents[4] / "config" / "system_prompts" / "llm_judge.txt"
 _oracle_prompt_cache: str | None = None
 
 
@@ -248,7 +245,7 @@ def _get_oracle_system_prompt() -> str:
     """Load the oracle evaluation prompt from llm_judge.txt (cached)."""
     global _oracle_prompt_cache
     if _oracle_prompt_cache is None:
-        _oracle_prompt_cache = _JUDGE_PROMPT_PATH.read_text()
+        _oracle_prompt_cache = load_prompt("llm_judge.txt")
     return _oracle_prompt_cache
 
 
