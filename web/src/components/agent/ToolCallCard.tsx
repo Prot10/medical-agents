@@ -3,7 +3,6 @@ import {
   ChevronRight, ChevronDown, CheckCircle2, XCircle, Loader2,
   Brain, Activity, Heart, FlaskConical, Droplets, BookOpen, Pill,
   Scan, AudioWaveform, MonitorCheck, Radiation, ClipboardCheck,
-  UserCheck,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ToolResultRenderer } from "@/components/results/ToolResultRenderer"
@@ -21,7 +20,6 @@ const TOOL_META: Record<string, { icon: React.ElementType; label: string; accent
   order_cardiac_monitoring: { icon: MonitorCheck, label: "Cardiac Monitoring", accent: "text-red-500 dark:text-red-400", bgClass: "bg-red-500/15", color: "#ef4444" },
   order_advanced_imaging: { icon: Radiation, label: "Advanced Imaging", accent: "text-indigo-500 dark:text-indigo-400", bgClass: "bg-indigo-500/15", color: "#6366f1" },
   order_specialized_test: { icon: ClipboardCheck, label: "Specialized Test", accent: "text-teal-500 dark:text-teal-400", bgClass: "bg-teal-500/15", color: "#14b8a6" },
-  consult_medical_specialist: { icon: UserCheck, label: "Specialist Consultation", accent: "text-purple-500 dark:text-purple-400", bgClass: "bg-purple-500/15", color: "#a855f7" },
 }
 
 interface ToolCallCardProps {

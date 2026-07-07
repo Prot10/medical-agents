@@ -2,7 +2,7 @@
 
 ## What is this project
 
-NeuroAgent: tool-augmented LLM agent for neurological clinical decision support. ReAct loop + 13 diagnostic tools + hospital protocols + patient memory + cost tracking. Targeting Nature Machine Intelligence.
+NeuroAgent: tool-augmented LLM agent for neurological clinical decision support. ReAct loop + 12 diagnostic tools + hospital protocols + patient memory + cost tracking. Targeting Nature Machine Intelligence.
 
 See README.md for full project docs, setup, and architecture.
 
@@ -52,7 +52,7 @@ uv run python agent-platform/scripts/migrate_v3_to_v4.py     # migrate v3→v4 (
 - Commit style: conventional commits (`feat:`, `fix:`, `docs:`, `chore:`)
 - Dataset versions: v1 (synthetic, enhanced outputs), v2 (real-seeded, enhanced), v3 (v1+v2 combined, realistic/stripped outputs), v4 (12-tool schema + cost tracking, migrated from v3)
 - Tool output modes: "enhanced" (v1/v2, interpretive fields present) vs "realistic" (v3/v4, stripped to match real clinical reports)
-- 13 tools: analyze_brain_mri, analyze_eeg, analyze_ecg, interpret_labs, analyze_csf, order_ct_scan, order_echocardiogram, order_cardiac_monitoring, order_advanced_imaging, order_specialized_test, search_medical_literature, check_drug_interactions, consult_medical_specialist
+- 12 tools: analyze_brain_mri, analyze_eeg, analyze_ecg, interpret_labs, analyze_csf, order_ct_scan, order_echocardiogram, order_cardiac_monitoring, order_advanced_imaging, order_specialized_test, search_medical_literature, check_drug_interactions
 - Cost tracking: `CostTracker` in `tools/cost_tracker.py`, config in `config/tool_costs.yaml`, Medicare PFS reference rates
 - Evaluation: `format_patient_info()` in `evaluation/runner.py` is the single source of truth for patient presentation formatting
 

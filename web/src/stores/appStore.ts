@@ -27,10 +27,6 @@ interface AppState {
   selectedPathwayIndex: number | null
   isCreatingPathway: boolean
 
-  // Dual-model specialist
-  dualModelEnabled: boolean
-  specialistModel: string
-
   // Oracle
   oracleOpen: boolean
   oracleTrigger: number  // increment to trigger evaluation
@@ -40,8 +36,6 @@ interface AppState {
   setHospital: (id: string) => void
   setModel: (key: string) => void
   setEvaluatorModel: (key: string) => void
-  setDualModel: (enabled: boolean) => void
-  setSpecialistModel: (key: string) => void
   toggleDarkMode: () => void
   toggleGroundTruth: () => void
   setOracleOpen: (open: boolean) => void
@@ -60,8 +54,6 @@ export const useAppStore = create<AppState>((set) => ({
   selectedHospital: "us_mayo",
   selectedModel: "qwen3.5-9b",
   selectedEvaluatorModel: "",
-  dualModelEnabled: false,
-  specialistModel: "medgemma-4b",
   darkMode: false,
   showGroundTruth: false,
   rulesHospitalId: "us_mayo",
@@ -78,8 +70,6 @@ export const useAppStore = create<AppState>((set) => ({
   setHospital: (id) => set({ selectedHospital: id }),
   setModel: (key) => set({ selectedModel: key }),
   setEvaluatorModel: (key) => set({ selectedEvaluatorModel: key }),
-  setDualModel: (enabled) => set({ dualModelEnabled: enabled }),
-  setSpecialistModel: (key) => set({ specialistModel: key }),
   toggleDarkMode: () =>
     set((s) => {
       const next = !s.darkMode
