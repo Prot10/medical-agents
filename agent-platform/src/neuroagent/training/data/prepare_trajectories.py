@@ -22,7 +22,7 @@ from typing import Any
 
 from neuroagent_schemas import NeuroBenchCase
 
-from ...agent.orchestrator import AgentConfig, AgentOrchestrator
+from ...agent.orchestrator import AgentOrchestrator, load_agent_config
 from ...agent.reasoning import AgentTrace
 from ...evaluation.runner import format_patient_info
 from ...tools.mock_server import MockServer
@@ -209,10 +209,11 @@ def main() -> None:
         logger.info("Filtered to %d cases from split file %s", len(cases), args.split_file)
     logger.info("Loaded %d cases", len(cases))
 
-    agent_config = AgentConfig(
+    agent_config = load_agent_config(
         base_url=args.base_url,
         model=args.model,
         temperature=1.0,  # high temperature for diverse rollouts
+        hospital=args.hospital,
     )
 
     reward_fn = CompositeReward.from_config(

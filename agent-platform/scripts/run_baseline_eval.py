@@ -184,7 +184,7 @@ def run_one_case(
     """
     # Imports kept local so the script's --help works without the heavy deps.
     from neuroagent_schemas import NeuroBenchCase
-    from neuroagent.agent.orchestrator import AgentConfig, AgentOrchestrator
+    from neuroagent.agent.orchestrator import AgentOrchestrator, load_agent_config
     from neuroagent.evaluation.metrics import MetricsCalculator
     from neuroagent.evaluation.runner import format_patient_info
     from neuroagent.tools.mock_server import MockServer
@@ -192,7 +192,7 @@ def run_one_case(
 
     case = NeuroBenchCase.model_validate(case_data)
 
-    cfg = AgentConfig(
+    cfg = load_agent_config(
         base_url=base_url,
         model=model_id,
         max_tokens=max_tokens,

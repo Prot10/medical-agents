@@ -10,7 +10,8 @@ from typing import Any
 
 from neuroagent_schemas import NeuroBenchCase
 
-from ..agent.orchestrator import AgentConfig, AgentOrchestrator
+from ..agent.config import AgentConfig
+from ..agent.orchestrator import AgentOrchestrator
 from ..agent.reasoning import AgentTrace
 from ..tools.mock_server import MockServer
 from ..tools.tool_registry import ToolRegistry

@@ -78,7 +78,7 @@ def compare(
     )
 
     from neuroagent_schemas import NeuroBenchCase
-    from neuroagent.agent.orchestrator import AgentConfig
+    from neuroagent.agent.orchestrator import load_agent_config
     from neuroagent.evaluation.runner import EvaluationRunner
     from neuroagent.evaluation.metrics import MetricsCalculator
 
@@ -120,10 +120,11 @@ def compare(
         console.print(f"  URL: {endpoint.base_url}, Model: {endpoint.model}")
 
         try:
-            config = AgentConfig(
+            config = load_agent_config(
                 base_url=endpoint.base_url,
                 api_key="not-needed",
                 model=endpoint.model,
+                hospital=hospital,
             )
 
             runner = EvaluationRunner(config=config, dataset_path="")

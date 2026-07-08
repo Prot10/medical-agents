@@ -21,7 +21,7 @@ from typing import Any
 
 from neuroagent_schemas import NeuroBenchCase
 
-from ..agent.orchestrator import AgentConfig
+from ..agent.orchestrator import load_agent_config
 from ..evaluation.metrics import MetricsCalculator
 from ..evaluation.runner import CaseResult, EvaluationRunner
 from .rewards.composite_reward import CompositeReward
@@ -184,10 +184,11 @@ def main() -> None:
     if args.adapter:
         logger.info("Adapter: %s (ensure vLLM is serving with --lora-modules)", args.adapter)
 
-    config = AgentConfig(
+    config = load_agent_config(
         base_url=args.base_url,
         model=model,
         temperature=0.0,  # Deterministic for evaluation
+        hospital=args.hospital,
     )
 
     reward_fn = CompositeReward.from_config(

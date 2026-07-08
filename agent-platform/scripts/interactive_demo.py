@@ -28,11 +28,11 @@ def demo(
         handlers=[RichHandler(console=console)],
     )
 
-    from neuroagent.agent.orchestrator import AgentConfig, AgentOrchestrator
+    from neuroagent.agent.orchestrator import AgentOrchestrator, load_agent_config
     from neuroagent.tools.tool_registry import ToolRegistry
     from neuroagent.rules.rules_engine import RulesEngine
 
-    config = AgentConfig(base_url=base_url, api_key=api_key, model=model)
+    config = load_agent_config(base_url=base_url, api_key=api_key, model=model)
 
     rules_engine = None
     if enable_rules:

@@ -181,14 +181,19 @@ def save_checkpoint(run_dir: Path, completed: set[str], errors: dict[str, str]) 
 def make_agent(model_id: str, max_tokens: int, hospital: str, case_data: dict):
     """Create a fresh agent for one case (fresh mock/tools, shared LLM config)."""
     from neuroagent_schemas import NeuroBenchCase
-    from neuroagent.agent.orchestrator import AgentConfig, AgentOrchestrator
+    from neuroagent.agent.orchestrator import AgentOrchestrator, load_agent_config
     from neuroagent.evaluation.runner import EvaluationRunner
     from neuroagent.rules.rules_engine import RulesEngine
     from neuroagent.tools.mock_server import MockServer
     from neuroagent.tools.tool_registry import ToolRegistry
 
     case = NeuroBenchCase.model_validate(case_data)
-    config = AgentConfig(base_url="http://localhost:8000/v1", model=model_id, max_tokens=max_tokens)
+    config = load_agent_config(
+        base_url="http://localhost:8000/v1",
+        model=model_id,
+        max_tokens=max_tokens,
+        hospital=hospital,
+    )
 
     # Fresh mock server and tool registry per case — no state leakage
     mock = MockServer(case)
