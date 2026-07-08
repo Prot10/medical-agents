@@ -74,6 +74,7 @@ export interface CaseReviewSummary {
   comment_count: number
   severity_counts: Record<Severity, number>
   last_updated_at: string | null
+  time_spent_seconds: number
 }
 
 export interface MyProgress {
@@ -81,6 +82,8 @@ export interface MyProgress {
   dataset_version: string
   total_cases: number
   touched_cases: number
+  total_time_spent_seconds: number
+  avg_time_spent_seconds: number
   by_status: Record<ReviewStatus, number>
   by_condition: Record<string, Record<ReviewStatus, number>>
 }
