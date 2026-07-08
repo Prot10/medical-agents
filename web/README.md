@@ -4,15 +4,15 @@ Interactive web interface for visualizing the NeuroAgent clinical reasoning proc
 
 ## Features
 
-- **Case Browser** — Browse 100 NeuroBench cases across 10 neurological conditions, filter by difficulty
+- **Case Browser** — Browse NeuroBench cases across 20 neurological conditions, filter by difficulty
 - **Patient Viewer** — Full clinical data display: demographics, vitals (abnormal highlighting), HPI, medications, neurological exam
 - **Agent Execution Timeline** — Real-time visualization of the ReAct loop:
   - Thinking/reasoning blocks with markdown rendering
   - Collapsible tool call cards (MRI, EEG, ECG, labs, CSF, literature, drug interactions)
-  - 7 specialized result renderers with clinical formatting
+  - Specialized result renderers with a generic fallback
   - Reflection steps and final structured assessment
 - **Hospital Rules** — Select from 5 hospital protocol sets (Mayo/AAN, NHS/NICE, Charité/DGN, Todai/JSN, HC-FMUSP/ABN)
-- **Model Selection** — Switch between 4 LLM backends with live status indicator
+- **Model Selection** — Switch between registered LLM backends with live status indicator
 - **Ground Truth** — Compare agent output against gold-standard diagnosis and action compliance
 - **Trace Replay** — Save and replay past agent runs without a GPU
 - **Export** — Download agent traces as JSON
@@ -42,7 +42,7 @@ Navigate to `http://localhost:8888` in your browser. The production frontend is 
 Start a vLLM inference server first:
 
 ```bash
-./scripts/serve_model.sh qwen3.5-9b    # or qwen3.5-27b-awq, medgemma-4b, medgemma-27b
+./scripts/runtime/serve_model.sh qwen3.5-9b    # or qwen3.5-27b-awq, medgemma-4b, medgemma-27b
 ```
 
 Then select a case, choose your hospital and model, and click **Run Agent**.
@@ -167,7 +167,7 @@ web/
 │   │   ├── model/                  # ModelPicker (select + status dot)
 │   │   ├── agent/                  # AgentTimeline, ThinkingBlock, ToolCallCard,
 │   │   │                           # ReflectionBlock, AssessmentPanel, TokenCounter
-│   │   ├── results/                # 7 specialized renderers + GenericResult fallback
+│   │   ├── results/                # Specialized renderers + GenericResult fallback
 │   │   └── ground-truth/           # GroundTruthPanel (action compliance checklist)
 │   └── lib/
 │       └── utils.ts                # cn() helper (clsx + tailwind-merge)
