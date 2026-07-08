@@ -6,10 +6,10 @@ NeuroAgent is a tool-augmented LLM agent for neurological clinical decision supp
 
 ```
 ┌─────────────┐     ┌──────────────┐     ┌──────────────┐
-│  System      │     │   LLM        │     │  Tool        │
-│  Prompt      │────▶│  (vLLM)      │────▶│  Registry    │
-│  + Hospital  │     │              │◀────│  (7 tools)   │
-│    Rules     │     │  ReAct Loop  │     └──────────────┘
+│  System     │     │   LLM        │     │  Tool        │
+│  Prompt     │────▶│  (vLLM)      │────▶│  Registry    │
+│  + Hospital │     │              │◀────│  (7 tools)   │
+│    Rules    │     │  ReAct Loop  │     └──────────────┘
 └─────────────┘     └──────┬───────┘
                            │
                     ┌──────▼───────┐
@@ -92,6 +92,7 @@ medical-agents/               # uv workspace root
 │   ├── config/
 │   │   ├── system_prompts/   # orchestrator.txt, reflection.txt, llm_judge.txt
 │   │   ├── hospital_rules/   # Per-hospital YAML directories
+│   │   ├── runtime/          # Agent runtime defaults
 │   │   ├── tools/            # Tool cost registry
 │   │   └── training/         # Reward weights
 │   ├── scripts/              # CLI entry points
