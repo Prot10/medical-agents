@@ -109,3 +109,4 @@ class CaseReviewSummary(BaseModel):
     comment_count: int
     severity_counts: dict[str, int]   # {"note": N, "issue": N, "error": N}
     last_updated_at: datetime | None
+    time_spent_seconds: int = 0
