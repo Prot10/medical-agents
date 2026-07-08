@@ -21,6 +21,7 @@ See README.md for full project docs, setup, and architecture.
 - `data/neurobench_v5/cases/` — 600 benchmark cases across 20 conditions (current default)
 - `data/review/annotations/{version}/{reviewer_code}/{case_id}.json` — per-reviewer annotation runtime data (gitignored)
 - `agent-platform/config/hospital_rules/{hospital}/*.yaml` — clinical pathways
+- `agent-platform/config/runtime/agent.yaml` — agent runtime defaults loaded by `load_agent_config()`
 - `agent-platform/config/review/reviewer_codes.yaml` — review-app reviewer registry (hot-reloads on mtime)
 - `agent-platform/config/tools/costs.yaml` — per-tool cost registry (Medicare reference rates)
 

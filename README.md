@@ -20,6 +20,7 @@ medical-agents/                     # uv workspace root
 │   ├── config/
 │   │   ├── system_prompts/         # orchestrator.txt, reflection.txt, llm_judge.txt
 │   │   ├── hospital_rules/         # 5 hospital dirs
+│   │   ├── runtime/                # Agent runtime defaults
 │   │   ├── tools/                  # Tool cost registry
 │   │   ├── training/               # Training reward config
 │   │   └── review/                 # Reviewer-code registry (reviewer_codes.yaml)
