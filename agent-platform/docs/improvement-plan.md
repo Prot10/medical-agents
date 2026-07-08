@@ -35,10 +35,10 @@ Status: March 2026 — post-v3 audit and initial Qwen3.5-9B benchmark results.
 
 New fields added to `CaseMetrics`: `critical_actions_detail` and `contraindicated_actions_detail` (dict mapping each action text to hit/violated bool) for transparency.
 
-### 1.2 Complete the 4-model benchmark on v3
-**Status**: Qwen3.5-9B complete (90 runs). MedGemma-4B and Qwen3.5-27B pending.
+### 1.2 Complete the model benchmark
+**Status**: Legacy v3/v4 comparison scripts were removed during script cleanup.
 
-**Action**: Run `./agent-platform/scripts/run_v3_full.sh --skip-phase qwen9b`
+**Action**: Use `agent-platform/scripts/benchmark/` for current benchmark runs.
 
 **Effort**: ~8 hours GPU time
 **Impact**: Enables the paper's main results table

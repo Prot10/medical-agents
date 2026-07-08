@@ -8,7 +8,7 @@ NeuroAgent is a tool-augmented LLM agent for neurological clinical decision supp
 ┌─────────────┐     ┌──────────────┐     ┌──────────────┐
 │  System     │     │   LLM        │     │  Tool        │
 │  Prompt     │────▶│  (vLLM)      │────▶│  Registry    │
-│  + Hospital │     │              │◀────│  (7 tools)   │
+│  + Hospital │     │              │◀────│  (12 tools)  │
 │    Rules    │     │  ReAct Loop  │     └──────────────┘
 └─────────────┘     └──────┬───────┘
                            │
@@ -33,7 +33,7 @@ Key config: `AgentConfig` dataclass with model, hospital, max_turns, ablation co
 
 ### Tools (`tools/`)
 
-7 diagnostic tools, all implementing `BaseTool`:
+12 diagnostic tools, all implementing `BaseTool`:
 
 | Tool | Description |
 |---|---|
@@ -42,6 +42,11 @@ Key config: `AgentConfig` dataclass with model, hospital, max_turns, ablation co
 | `analyze_ecg` | Electrocardiogram analysis |
 | `interpret_labs` | Laboratory results interpretation |
 | `analyze_csf` | Cerebrospinal fluid analysis |
+| `order_ct_scan` | CT scan ordering and interpretation |
+| `order_echocardiogram` | Echocardiography results |
+| `order_cardiac_monitoring` | Holter/telemetry monitoring |
+| `order_advanced_imaging` | PET/SPECT/advanced imaging |
+| `order_specialized_test` | Genetic, antibody, biopsy, and other specialized testing |
 | `search_medical_literature` | Literature search |
 | `check_drug_interactions` | Drug interaction checking |
 
@@ -55,9 +60,7 @@ Clinical protocols loaded from YAML files, one directory per hospital. Injected 
 
 - `EvaluationRunner`: Runs agent on NeuroBench cases
 - `MetricsCalculator`: Computes diagnostic accuracy, action recall, safety scores
-- `NoiseInjector`: Ablation tool — injects noise into tool outputs
 - `LLMJudge`: Uses a judge LLM to rate reasoning quality
-- `ResultsAnalyzer`: Generates comparison tables
 
 ### LLM Client (`llm/client.py`)
 
@@ -71,7 +74,7 @@ Wraps the OpenAI SDK. Key features:
 FastAPI server + React frontend for interactive agent visualization. See [web-api.md](web-api.md).
 
 - Real-time SSE streaming of agent execution (thinking, tool calls, results, assessment)
-- 7 specialized diagnostic result renderers (labs, MRI, ECG, EEG, CSF, literature, drugs)
+- 12 specialized diagnostic result renderers
 - Case browser, patient viewer, hospital/model selection, ground truth comparison
 - Trace save/replay for demos without a GPU
 
@@ -86,9 +89,9 @@ medical-agents/               # uv workspace root
 │   │   ├── agent/            # Orchestrator, reasoning, reflection, planner
 │   │   ├── api/              # FastAPI web API + SSE streaming
 │   │   ├── llm/              # LLM client, prompts
-│   │   ├── tools/            # 7 diagnostic tools + mock server + registry
+│   │   ├── tools/            # 12 diagnostic tools + mock server + registry
 │   │   ├── rules/            # Rules engine, pathway checker
-│   │   └── evaluation/       # Runner, metrics, noise, judge, analyzer
+│   │   └── evaluation/       # Runner, metrics, judge
 │   ├── config/
 │   │   ├── system_prompts/   # orchestrator.txt, reflection.txt, llm_judge.txt
 │   │   ├── hospital_rules/   # Per-hospital YAML directories

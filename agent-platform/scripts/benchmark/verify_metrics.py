@@ -26,7 +26,7 @@ import sys
 from dataclasses import asdict
 from pathlib import Path
 
-REPO = Path(__file__).resolve().parent.parent.parent
+REPO = Path(__file__).resolve().parents[3]
 RUN = REPO / "data" / "neurobench_v5"
 RESULTS = Path("/eos/project-d/diagbox/dvc/NeuroAgent/results/baseline_eval_20260616_140245")
 

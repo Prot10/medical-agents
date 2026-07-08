@@ -1,6 +1,6 @@
 #!/bin/bash
 # GRPO Training from SFT checkpoint on gold trajectories
-# Run: bash agent-platform/scripts/run_grpo_training.sh
+# Run: bash agent-platform/scripts/training/run_grpo_training.sh
 set -euo pipefail
 cd /home/aprotani/projects/medical-agents
 

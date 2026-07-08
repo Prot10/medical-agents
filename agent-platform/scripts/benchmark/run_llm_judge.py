@@ -10,10 +10,10 @@ the rule-based metrics from the comparison run.
 
 Usage:
     # Requires a running vLLM server (or OpenAI-compatible endpoint)
-    uv run python agent-platform/scripts/run_llm_judge.py
-    uv run python agent-platform/scripts/run_llm_judge.py --judge-model Qwen/Qwen3.5-9B
-    uv run python agent-platform/scripts/run_llm_judge.py --results-dir results/v4_comparison --run qwen27b-react
-    uv run python agent-platform/scripts/run_llm_judge.py --max-cases 10  # quick test
+    uv run python agent-platform/scripts/benchmark/run_llm_judge.py
+    uv run python agent-platform/scripts/benchmark/run_llm_judge.py --judge-model Qwen/Qwen3.5-9B
+    uv run python agent-platform/scripts/benchmark/run_llm_judge.py --results-dir results/v4_comparison --run qwen27b-react
+    uv run python agent-platform/scripts/benchmark/run_llm_judge.py --max-cases 10  # quick test
 """
 
 from __future__ import annotations
@@ -32,7 +32,7 @@ from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, MofNCompleteColumn
 from rich.table import Table
 
-REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+REPO_ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO_ROOT / "agent-platform" / "src"))
 sys.path.insert(0, str(REPO_ROOT / "packages" / "neuroagent-schemas" / "src"))
 

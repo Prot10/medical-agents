@@ -22,7 +22,7 @@ from pathlib import Path
 import typer
 from rich.console import Console
 
-REPO = Path(__file__).resolve().parent.parent.parent
+REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "agent-platform" / "src"))
 sys.path.insert(0, str(REPO / "packages" / "neuroagent-schemas" / "src"))
 

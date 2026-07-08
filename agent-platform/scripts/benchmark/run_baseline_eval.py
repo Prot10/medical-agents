@@ -27,7 +27,7 @@ Output layout (on EOS):
 
 Run from the repo root:
 
-    uv run python agent-platform/scripts/run_baseline_eval.py \
+    uv run python agent-platform/scripts/benchmark/run_baseline_eval.py \
         --output-base /eos/project-d/diagbox/dvc/NeuroAgent/results \
         --reps 3 --num-cases 50
 
@@ -53,10 +53,10 @@ from rich.console import Console
 from rich.logging import RichHandler
 from rich.table import Table
 
-REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+REPO_ROOT = Path(__file__).resolve().parents[3]
 AGENT_PLATFORM = REPO_ROOT / "agent-platform"
 DATASET_DIR = REPO_ROOT / "data" / "neurobench_v5"
-SERVE_SCRIPT = AGENT_PLATFORM / "scripts" / "serve_model.sh"
+SERVE_SCRIPT = AGENT_PLATFORM / "scripts" / "runtime" / "serve_model.sh"
 
 app = typer.Typer(add_completion=False)
 console = Console()

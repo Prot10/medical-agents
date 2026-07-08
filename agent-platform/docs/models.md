@@ -20,13 +20,13 @@ Qwen3.5 is a **hybrid architecture** — not a standard transformer. It uses Gat
 
 ```bash
 # Default (Qwen3.5-9B)
-./scripts/serve_model.sh
+./scripts/runtime/serve_model.sh
 
 # Specific model
-./scripts/serve_model.sh qwen3.5-27b-awq
+./scripts/runtime/serve_model.sh qwen3.5-27b-awq
 
 # Custom port
-./scripts/serve_model.sh qwen3.5-9b 8001
+./scripts/runtime/serve_model.sh qwen3.5-9b 8001
 ```
 
 The server exposes an OpenAI-compatible API at `http://localhost:{port}/v1`.
@@ -76,14 +76,14 @@ All CLI scripts accept `--model` and `--base-url` flags:
 
 ```bash
 # Run with the default 9B model
-uv run python scripts/run_single_case.py tests/fixtures/sample_case.json
+uv run python scripts/runtime/run_single_case.py tests/fixtures/sample_case.json
 
 # Run with the 27B AWQ model
-uv run python scripts/run_single_case.py tests/fixtures/sample_case.json \
+uv run python scripts/runtime/run_single_case.py tests/fixtures/sample_case.json \
     --model QuantTrio/Qwen3.5-27B-AWQ
 
 # Run against a remote endpoint
-uv run python scripts/run_single_case.py tests/fixtures/sample_case.json \
+uv run python scripts/runtime/run_single_case.py tests/fixtures/sample_case.json \
     --model gpt-4o \
     --base-url https://api.openai.com/v1 \
     --api-key sk-...

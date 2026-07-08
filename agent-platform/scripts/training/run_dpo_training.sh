@@ -2,7 +2,7 @@
 # DPO Training Pipeline: collect → pairs → train
 # Decouples generation (vLLM) from training (QLoRA) to fit A100-40GB
 #
-# Run: bash agent-platform/scripts/run_dpo_training.sh
+# Run: bash agent-platform/scripts/training/run_dpo_training.sh
 set -euo pipefail
 cd /home/aprotani/projects/medical-agents
 
@@ -50,7 +50,7 @@ if [ ! -f "$TRAJECTORIES" ]; then
     sleep 5
 
     echo "Starting vLLM with SFT model..."
-    bash "$SCRIPT_DIR/serve_model.sh" "$SFT_MODEL" "$PORT" &
+    bash "$SCRIPT_DIR/../runtime/serve_model.sh" "$SFT_MODEL" "$PORT" &
     VLLM_PID=$!
 
     echo "Waiting for vLLM..."

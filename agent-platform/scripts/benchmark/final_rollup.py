@@ -5,7 +5,7 @@ Reads each model's summary_with_judge.json and writes:
   - final_summary.md: human-readable Markdown report (paper-style)
 
 Usage:
-  uv run python agent-platform/scripts/final_rollup.py --run-dir /eos/.../baseline_eval_<TS>
+  uv run python agent-platform/scripts/benchmark/final_rollup.py --run-dir /eos/.../baseline_eval_<TS>
 """
 
 from __future__ import annotations

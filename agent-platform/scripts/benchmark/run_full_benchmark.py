@@ -14,19 +14,19 @@ Default: 4 models × 2 modes × 3 hospitals × 3 reps × 100 cases = 7,200 runs
 
 Usage:
     # Full benchmark (all models, hospitals, 3 reps)
-    uv run python agent-platform/scripts/run_full_benchmark.py
+    uv run python agent-platform/scripts/benchmark/run_full_benchmark.py
 
     # Quick test
-    uv run python agent-platform/scripts/run_full_benchmark.py --max-cases 2 --reps 1
+    uv run python agent-platform/scripts/benchmark/run_full_benchmark.py --max-cases 2 --reps 1
 
     # Specific model only
-    uv run python agent-platform/scripts/run_full_benchmark.py --models qwen3.5-9b
+    uv run python agent-platform/scripts/benchmark/run_full_benchmark.py --models qwen3.5-9b
 
     # Specific modes/hospitals
-    uv run python agent-platform/scripts/run_full_benchmark.py --modes react --hospitals de_charite
+    uv run python agent-platform/scripts/benchmark/run_full_benchmark.py --modes react --hospitals de_charite
 
     # Resume after failure — just re-run the same command
-    uv run python agent-platform/scripts/run_full_benchmark.py
+    uv run python agent-platform/scripts/benchmark/run_full_benchmark.py
 """
 
 from __future__ import annotations
@@ -50,11 +50,11 @@ app = typer.Typer()
 console = Console()
 logger = logging.getLogger(__name__)
 
-REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+REPO_ROOT = Path(__file__).resolve().parents[3]
 AGENT_PLATFORM = REPO_ROOT / "agent-platform"
 DATASET_DIR = REPO_ROOT / "data" / "neurobench_v5"
 RESULTS_DIR = REPO_ROOT / "results" / "benchmark"
-SERVE_SCRIPT = AGENT_PLATFORM / "scripts" / "serve_model.sh"
+SERVE_SCRIPT = AGENT_PLATFORM / "scripts" / "runtime" / "serve_model.sh"
 
 # ---------------------------------------------------------------------------
 # Model definitions

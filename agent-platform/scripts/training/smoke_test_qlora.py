@@ -7,7 +7,7 @@ Verifies:
 4. Peak GPU memory < 40GB
 
 Usage:
-    uv run python scripts/smoke_test_qlora.py
+    uv run python scripts/training/smoke_test_qlora.py
 """
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ import time
 from pathlib import Path
 
 # Ensure project is importable
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 
 def main():

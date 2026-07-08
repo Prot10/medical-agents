@@ -8,7 +8,7 @@
 #   4. Compare results
 #
 # Prerequisites: GPU available, vLLM venv at $VLLM_VENV
-# Run: bash agent-platform/scripts/run_sft_eval.sh
+# Run: bash agent-platform/scripts/training/run_sft_eval.sh
 set -euo pipefail
 cd /home/aprotani/projects/medical-agents
 
@@ -64,7 +64,7 @@ if [ ! -f "$RESULTS_DIR/base_results.json" ]; then
 
     # Start base model server
     echo "Starting vLLM for base model..."
-    bash "$SCRIPT_DIR/serve_model.sh" qwen3.5-9b "$PORT" &
+    bash "$SCRIPT_DIR/../runtime/serve_model.sh" qwen3.5-9b "$PORT" &
     VLLM_PID=$!
 
     # Wait for server to be ready
@@ -78,7 +78,7 @@ if [ ! -f "$RESULTS_DIR/base_results.json" ]; then
     done
 
     # Run evaluation
-    uv run python agent-platform/scripts/run_sft_eval_cases.py evaluate \
+    uv run python agent-platform/scripts/training/run_sft_eval_cases.py evaluate \
         --model-id "$BASE_MODEL" \
         --run-name "base-qwen3.5-9b" \
         --hospital "$HOSPITAL" \
@@ -110,7 +110,7 @@ if [ ! -f "$RESULTS_DIR/sft_results.json" ]; then
     # Start SFT model server (merged weights, same flags as base)
     echo "Starting vLLM for SFT model..."
     MERGED_ABS="$(cd /home/aprotani/projects/medical-agents && pwd)/$MERGED_MODEL"
-    bash "$SCRIPT_DIR/serve_model.sh" "$MERGED_ABS" "$PORT" &
+    bash "$SCRIPT_DIR/../runtime/serve_model.sh" "$MERGED_ABS" "$PORT" &
     VLLM_PID=$!
 
     # Wait for server
@@ -124,7 +124,7 @@ if [ ! -f "$RESULTS_DIR/sft_results.json" ]; then
     done
 
     # Run evaluation — model-id must match what vLLM reports (absolute path)
-    uv run python agent-platform/scripts/run_sft_eval_cases.py evaluate \
+    uv run python agent-platform/scripts/training/run_sft_eval_cases.py evaluate \
         --model-id "$MERGED_ABS" \
         --run-name "sft-qwen3.5-9b" \
         --hospital "$HOSPITAL" \
@@ -146,7 +146,7 @@ fi
 # -------------------------------------------------------
 echo ""
 echo "[Step 4/4] Comparing results..."
-uv run python agent-platform/scripts/run_sft_eval_cases.py compare \
+uv run python agent-platform/scripts/training/run_sft_eval_cases.py compare \
     --base-results "$RESULTS_DIR/base_results.json" \
     --sft-results "$RESULTS_DIR/sft_results.json" \
     --output "$RESULTS_DIR/comparison.json"

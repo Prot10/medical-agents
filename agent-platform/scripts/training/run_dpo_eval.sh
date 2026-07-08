@@ -1,29 +1,27 @@
 #!/bin/bash
-# Evaluate GRPO model on fold0 val set (60 cases × 3 repeats)
-# Run: bash agent-platform/scripts/run_grpo_eval.sh
+# Evaluate DPO model on fold0 val set and compare all 4 models
+# Run: bash agent-platform/scripts/training/run_dpo_eval.sh
 set -euo pipefail
 cd /home/aprotani/projects/medical-agents
 
 export CUDA_MODULE_LOADING=LAZY
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MERGED_MODEL="/home/aprotani/projects/medical-agents/models/qwen3.5-9b-grpo"
+DPO_MODEL="/home/aprotani/projects/medical-agents/models/qwen3.5-9b-dpo"
 RESULTS_DIR="results/sft_eval"
 PORT=8000
 
 echo "========================================="
-echo " GRPO Evaluation — fold0 val (60 cases)"
-echo " Model: $MERGED_MODEL"
+echo " DPO Evaluation — fold0 val (60 cases)"
+echo " Model: $DPO_MODEL"
 echo " Start: $(date)"
 echo "========================================="
 
-# Kill any existing vLLM
 pkill -f "vllm_serve.py" || true
 pkill -f "VLLM::EngineCore" || true
 sleep 5
 
-# Start vLLM
 echo "Starting vLLM..."
-bash "$SCRIPT_DIR/serve_model.sh" "$MERGED_MODEL" "$PORT" &
+bash "$SCRIPT_DIR/../runtime/serve_model.sh" "$DPO_MODEL" "$PORT" &
 VLLM_PID=$!
 
 echo "Waiting for vLLM..."
@@ -35,25 +33,22 @@ for i in $(seq 1 120); do
     sleep 5
 done
 
-# Run evaluation
-uv run python agent-platform/scripts/run_sft_eval_cases.py evaluate \
-    --model-id "$MERGED_MODEL" \
-    --run-name "grpo-qwen3.5-9b" \
+uv run python agent-platform/scripts/training/run_sft_eval_cases.py evaluate \
+    --model-id "$DPO_MODEL" \
+    --run-name "dpo-qwen3.5-9b" \
     --hospital "de_charite" \
     --repeats 3 \
-    --output "$RESULTS_DIR/grpo_results.json" \
+    --output "$RESULTS_DIR/dpo_results.json" \
     --port "$PORT"
 
-# Stop server
 kill "$VLLM_PID" 2>/dev/null || true
 pkill -f "vllm_serve.py" || true
 pkill -f "VLLM::EngineCore" || true
 sleep 3
 
-# Compare all three models
 echo ""
 echo "========================================="
-echo " Comparing Base vs SFT vs GRPO"
+echo " Comparing Base vs SFT vs GRPO vs DPO"
 echo "========================================="
 python3 -c "
 import json
@@ -75,7 +70,7 @@ def load(path):
     }
 
 models = {}
-for name, path in [('Base', '$RESULTS_DIR/base_results.json'), ('SFT', '$RESULTS_DIR/sft_results.json'), ('GRPO', '$RESULTS_DIR/grpo_results.json')]:
+for name, path in [('Base', '$RESULTS_DIR/base_results.json'), ('SFT', '$RESULTS_DIR/sft_results.json'), ('GRPO', '$RESULTS_DIR/grpo_results.json'), ('DPO', '$RESULTS_DIR/dpo_results.json')]:
     try:
         models[name] = load(path)
     except: pass
@@ -96,24 +91,20 @@ row = f'{\"runs\":20s}'
 for name, m in models.items(): row += f'{m[\"n\"]:>8d}'
 print(row)
 
-# Per-difficulty breakdown
 print()
-for name, path in [('Base', '$RESULTS_DIR/base_results.json'), ('SFT', '$RESULTS_DIR/sft_results.json'), ('GRPO', '$RESULTS_DIR/grpo_results.json')]:
-    try:
-        r = json.loads(open(path).read())['results']
-        by_diff = defaultdict(list)
-        for x in r: by_diff[x['difficulty']].append(x)
-        accs = []
-        for d in ['straightforward', 'moderate', 'diagnostic_puzzle']:
-            if d in by_diff:
-                rs = by_diff[d]
-                accs.append(f'{d[:6]}={sum(1 for x in rs if x[\"diagnostic_accuracy_top1\"])/len(rs):.0%}')
-        print(f'  {name:6s}: {\"  \".join(accs)}')
-    except: pass
+for diff in ['straightforward', 'moderate', 'diagnostic_puzzle']:
+    row = f'{diff[:16]:16s}'
+    for name, path in [('Base', '$RESULTS_DIR/base_results.json'), ('SFT', '$RESULTS_DIR/sft_results.json'), ('GRPO', '$RESULTS_DIR/grpo_results.json'), ('DPO', '$RESULTS_DIR/dpo_results.json')]:
+        try:
+            r = json.loads(open(path).read())['results']
+            rs = [x for x in r if x['difficulty'] == diff]
+            a = sum(1 for x in rs if x['diagnostic_accuracy_top1'])/len(rs) if rs else 0
+            row += f'{a:>7.0%}'
+        except: row += f'{\"\":>7s}'
+    print(row)
 "
 
 echo ""
 echo "========================================="
 echo " Done! $(date)"
-echo " Results: $RESULTS_DIR/"
 echo "========================================="

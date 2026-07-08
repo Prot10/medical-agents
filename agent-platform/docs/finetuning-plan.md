@@ -10,7 +10,7 @@
 ## TODO Tracker
 
 ### Phase 1: Data Pipeline — COMPLETE
-- [x] **1.1** Create Claude Code subagent definition (`scripts/generate_trajectories_subagent.md`)
+- [x] **1.1** Create Claude Code subagent definition (`scripts/training/generate_trajectories_subagent.md`)
 - [x] **1.2** Build trajectory generation orchestrator (`training/data/generate_gold_trajectories.py`)
 - [x] **1.3** Add QLoRA support to `training/train_grpo.py` (`--qlora` flag, BitsAndBytes NF4)
 - [x] **1.4** Fix SFT formatting: prompt/completion split for proper loss masking (Qwen lacks `{% generation %}`)
@@ -40,7 +40,7 @@
   - Eval: 56.2% top-1 (+3.3% over base, +0.5% over SFT) — marginal, mostly within noise
 - [x] **3.5b** Fixed `generation_batch_size` bug in both `train_grpo.py` and `train_dapo.py`
 - [x] **3.5c** Fixed val contamination: created `train_fold0.jsonl` (140 train-only cases, no val leakage)
-- [ ] **3.6** Run DAPO from SFT checkpoint (5 epochs, 2 gens, max_completion=2048) — script: `scripts/run_dapo_training.sh`
+- [ ] **3.6** Run DAPO from SFT checkpoint (5 epochs, 2 gens, max_completion=2048) — script: `scripts/training/run_dapo_training.sh`
 - [ ] **3.7** Compare Base vs SFT vs GRPO vs DAPO on fold0 val
 
 ### Known limitation: Single A100-40GB RL bottleneck
@@ -69,7 +69,7 @@
 
 **Built a fully automated pipeline** that generates ideal ReAct reasoning traces for training:
 
-- **Subagent prompt** (`scripts/generate_trajectories_subagent.md`): Instructs Claude to generate complete multi-turn traces with `<think>`, `<tool_call>`, and `<tool_response>` blocks
+- **Subagent prompt** (`scripts/training/generate_trajectories_subagent.md`): Instructs Claude to generate complete multi-turn traces with `<think>`, `<tool_call>`, and `<tool_response>` blocks
 - **Orchestrator** (`training/data/generate_gold_trajectories.py`): Prepares prompts for all cases, parses raw subagent output into structured JSONL, validates against ground truth
 - **5 trajectory styles** per case for diversity: minimal_efficient, standard_clinical, thorough_workup, cost_conscious, differential_focused
 - **Tool output compression**: Strips normal/unremarkable values from tool outputs to fit within the 6144-token training budget (labs 76% smaller, imaging 19% smaller)
@@ -132,8 +132,8 @@
 | Prompts | `training_data/gold_trajectories/prompts/` | 1000 prompt files (200 cases × 5 styles) |
 | 5-fold splits | `data/neurobench_v4/splits/` | fold0-4_train.txt, fold0-4_val.txt |
 | Training system prompt | `config/system_prompts/orchestrator.txt` | Runtime prompt used unless a training script is passed a custom prompt |
-| SFT training script | `scripts/run_sft_training.sh` | Ready to run in tmux |
-| Comparison script | `scripts/run_finetuning_comparison.sh` | End-to-end pipeline |
+| SFT training script | `scripts/training/run_sft_training.sh` | Ready to run in tmux |
+| Comparison script | `scripts/training/run_finetuning_comparison.sh` | End-to-end pipeline |
 
 ---
 
@@ -141,7 +141,7 @@
 
 ### Immediate (before paper submission)
 
-1. **SFT Training Run** — Script is ready (`scripts/run_sft_training.sh`), needs to complete successfully. Expected ~4-6 hours for 769 trajectories × 5 epochs on A100-40GB.
+1. **SFT Training Run** — Script is ready (`scripts/training/run_sft_training.sh`), needs to complete successfully. Expected ~4-6 hours for 769 trajectories × 5 epochs on A100-40GB.
 
 2. **GRPO Training Run** — From SFT checkpoint, 15 epochs with integrated curriculum. Needs GRPO-formatted data from `format_for_grpo.py --mode gold`.
 
@@ -227,12 +227,12 @@ Paper Figures & Tables
 ### Created
 | File | Purpose |
 |------|---------|
-| `scripts/generate_trajectories_subagent.md` | Claude Code subagent prompt for trajectory distillation |
-| `scripts/batch_generate_trajectories.py` | Anthropic API batch generation (alternative to subagents) |
-| `scripts/run_sft_training.sh` | SFT training launcher for tmux |
-| `scripts/run_finetuning_comparison.sh` | End-to-end experiment pipeline |
-| `scripts/smoke_test_qlora.py` | GPU memory + training validation |
-| `scripts/test_max_seq_length.py` | Seq length profiling |
+| `scripts/training/generate_trajectories_subagent.md` | Claude Code subagent prompt for trajectory distillation |
+| `scripts/training/batch_generate_trajectories.py` | Anthropic API batch generation (alternative to subagents) |
+| `scripts/training/run_sft_training.sh` | SFT training launcher for tmux |
+| `scripts/training/run_finetuning_comparison.sh` | End-to-end experiment pipeline |
+| `scripts/training/smoke_test_qlora.py` | GPU memory + training validation |
+| `scripts/training/test_max_seq_length.py` | Seq length profiling |
 | `training/data/generate_gold_trajectories.py` | Trajectory orchestrator + parser + validator |
 | `training/data/split_dataset.py` | Stratified k-fold splitting |
 | `training/train_dapo.py` | DAPO trainer (token-level PG, asymmetric clip) |

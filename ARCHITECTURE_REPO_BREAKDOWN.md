@@ -195,11 +195,11 @@ flowchart TD
 |---|---|---|
 | LoRA | Adds trainable low-rank adapters to attention and MLP projections. Current default: rank 64, alpha 128, dropout 0.05. | `training/train_grpo.py`, `training/train_dpo.py` |
 | QLoRA | Loads the base model in 4-bit NF4 with bfloat16 compute and double quantization so Qwen3.5-9B can train on a single A100-40GB. | `get_quantization_config()` in `train_grpo.py` |
-| SFT | Supervised fine-tuning on gold ReAct trajectories using prompt/completion formatting and completion-only loss masking. | `scripts/run_sft_training.sh`, `train_grpo.py --stage sft` |
-| DPO | Offline preference optimization from pre-collected scored rollouts; avoids online generation during training. | `training/train_dpo.py`, `scripts/run_dpo_training.sh` |
-| GRPO | Online reward optimization over grouped completions with rewards for correctness, tool precision/recall, cost, format, and safety. | `training/train_grpo.py`, `scripts/run_grpo_training.sh` |
-| DAPO | Token-level policy-gradient RL with asymmetric clipping, intended to behave better on long ReAct traces. | `training/train_dapo.py`, `scripts/run_dapo_training.sh` |
-| vLLM | Serves base, quantized, and tuned models through an OpenAI-compatible endpoint for the dashboard, scripts, and evaluation. | `scripts/serve_model.sh`, `scripts/serve_dual.sh`, `docs/models.md` |
+| SFT | Supervised fine-tuning on gold ReAct trajectories using prompt/completion formatting and completion-only loss masking. | `scripts/training/run_sft_training.sh`, `train_grpo.py --stage sft` |
+| DPO | Offline preference optimization from pre-collected scored rollouts; avoids online generation during training. | `training/train_dpo.py`, `scripts/training/run_dpo_training.sh` |
+| GRPO | Online reward optimization over grouped completions with rewards for correctness, tool precision/recall, cost, format, and safety. | `training/train_grpo.py`, `scripts/training/run_grpo_training.sh` |
+| DAPO | Token-level policy-gradient RL with asymmetric clipping, intended to behave better on long ReAct traces. | `training/train_dapo.py`, `scripts/training/run_dapo_training.sh` |
+| vLLM | Serves base, quantized, and tuned models through an OpenAI-compatible endpoint for the dashboard, scripts, and evaluation. | `scripts/runtime/serve_model.sh`, `scripts/serve_dual.sh`, `docs/models.md` |
 
 ### Current Fine-Tuning State
 
@@ -296,7 +296,7 @@ Recommended implementation order:
 
 - Run dashboard API: `uv run uvicorn neuroagent.api.app:app --host 0.0.0.0 --port 8888`
 - Run frontend dev server: `cd web && npm run dev`
-- Run single case: `uv run python agent-platform/scripts/run_single_case.py data/neurobench_v5/cases/<case>.json`
+- Run single case: `uv run python agent-platform/scripts/runtime/run_single_case.py data/neurobench_v5/cases/<case>.json`
 - Run evaluation scripts from `agent-platform/scripts/`
 - Review app backend: `uv run uvicorn neuroagent.review_api.app:app --host 0.0.0.0 --port 8889`
 - Review app frontend: `cd web-review && npm run dev`

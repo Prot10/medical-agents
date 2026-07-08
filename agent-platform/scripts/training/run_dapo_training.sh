@@ -1,6 +1,6 @@
 #!/bin/bash
 # DAPO Training from SFT checkpoint
-# Run: bash agent-platform/scripts/run_dapo_training.sh
+# Run: bash agent-platform/scripts/training/run_dapo_training.sh
 set -euo pipefail
 cd /home/aprotani/projects/medical-agents
 

@@ -8,7 +8,7 @@ bundle_files[], output_path) so the dispatcher (Claude) can spawn one
 parallel llm-judge agent per chunk.
 
 Usage:
-    uv run python agent-platform/scripts/prepare_judge_batches.py \
+    uv run python agent-platform/scripts/benchmark/prepare_judge_batches.py \
         --run-dir /eos/.../results/baseline_eval_<TS> \
         --model qwen3.5-4b \
         --batch-size 10
