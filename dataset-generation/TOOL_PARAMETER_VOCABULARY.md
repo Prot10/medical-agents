@@ -9,8 +9,8 @@ and inter-rater agreement work without per-case synonym normalization.
 **Rule:** if a case's optimal_actions, useless_tools, or harmful_tools cite
 `order_specialized_test` or `order_advanced_imaging`, the value of
 `tool_parameters["test_type"]` or `tool_parameters["modality"]` MUST come from
-the lists below. The pre-fleet validator
-(`agent-platform/scripts/validate_tool_vocab.py`) rejects off-list values.
+the lists below. This document is the source of truth for case authoring and
+review.
 
 Non-catchall tools (`analyze_brain_mri`, `analyze_eeg`, `analyze_csf`, etc.)
 have free-form parameters — only the two catchalls are vocabulary-constrained.

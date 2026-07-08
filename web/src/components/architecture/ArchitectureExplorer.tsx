@@ -161,7 +161,7 @@ const NODES: ArchitectureNode[] = [
     x: 80,
     y: 16,
     files: ["data/neurobench_v5/cases/", "data/review/", "data/traces/"],
-    details: ["v5 is the current default: 516 cases across 20 conditions.", "Case JSON includes initial outputs, follow-up outputs, fallback tool outputs, and ground truth.", "Traces are saved after streamed runs for replay."],
+    details: ["v5 is the current default: 600 cases across 20 conditions.", "Case JSON includes initial outputs, follow-up outputs, fallback tool outputs, and ground truth.", "Traces are saved after streamed runs for replay."],
   },
   {
     id: "orchestrator",
@@ -250,7 +250,7 @@ const NODES: ArchitectureNode[] = [
   {
     id: "serving",
     title: "Model Serving",
-    path: "agent-platform/scripts/serve_model.sh",
+    path: "agent-platform/scripts/runtime/serve_model.sh",
     purpose: "vLLM serving layer for Qwen, AWQ, FP8, and local endpoints.",
     kind: "Inference serving",
     layers: ["Runtime", "Fine-tuning", "Deployment"],
@@ -258,7 +258,7 @@ const NODES: ArchitectureNode[] = [
     accent: "amber",
     x: 43,
     y: 88,
-    files: ["scripts/serve_model.sh", "scripts/vllm_serve.py", "docs/models.md"],
+    files: ["scripts/runtime/serve_model.sh", "scripts/runtime/vllm_serve.py", "docs/models.md"],
     details: ["Uses Qwen reasoning parser and tool-call parser for thinking/tool-call separation.", "AWQ models should use Marlin kernels for practical throughput.", "Prefix caching and language-model-only mode improve agent-loop serving efficiency."],
   },
   {
@@ -347,7 +347,7 @@ const LINKS: ArchitectureLink[] = [
 const REPO_ROWS = [
   ["agent-platform", "Main Python package: orchestrator, tools, API, rules, evaluation, training.", "Core runtime"],
   ["agent-platform/src/neuroagent/training", "QLoRA SFT, DPO, GRPO, DAPO, adapter merge, finetuned evaluation scripts.", "Fine-tuning"],
-  ["agent-platform/scripts/run_*training.sh", "Launchers for SFT, DPO, GRPO, DAPO, and comparison/evaluation runs.", "Training ops"],
+  ["agent-platform/scripts/training/run_*training.sh", "Launchers for SFT, DPO, GRPO, DAPO, and comparison/evaluation runs.", "Training ops"],
   ["agent-platform/docs/finetuning-plan.md", "Current training status, LoRA/QLoRA configuration, known bottlenecks, results, and roadmap.", "Training docs"],
   ["agent-platform/docs/models.md", "Supported model inventory, vLLM flags, Qwen thinking/tool parsing, AWQ Marlin notes.", "Model serving"],
   ["packages/neuroagent-schemas", "Shared Pydantic schema package for cases, patient profiles, tool outputs, and evaluation.", "Contracts"],

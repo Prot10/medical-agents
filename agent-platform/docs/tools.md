@@ -1,6 +1,6 @@
 # Tool Reference
 
-NeuroAgent equips the LLM with **7 diagnostic tools** exposed via OpenAI-compatible function calling. The agent decides which tools to invoke and in what order as part of its ReAct reasoning loop. This document is the authoritative reference for every tool: what it does, what it accepts, and what it returns.
+NeuroAgent equips the LLM with **12 diagnostic tools** exposed via OpenAI-compatible function calling. The agent decides which tools to invoke and in what order as part of its ReAct reasoning loop. This document is the authoritative reference for every tool: what it does, what it accepts, and what it returns.
 
 ## Architecture
 
@@ -265,17 +265,6 @@ Check drug interactions, contraindications, formulary status, and alternatives f
 
 ---
 
-## Additional tool: `check_hospital_rules` (not in default registry)
-
-Defined in `tools/hospital_rules_checker.py` but **not registered** in the default 7-tool registry. Hospital rules are instead injected into the system prompt via the `RulesEngine`. This tool exists for potential future use as an on-demand protocol lookup.
-
-| Name | Type | Required | Description |
-|---|---|---|---|
-| `clinical_scenario` | string | yes | Description of the current clinical scenario. |
-| `suspected_condition` | string | no | The suspected or confirmed condition. |
-
----
-
 ## How the MockServer routes tool calls
 
 During evaluation, `MockServer` receives every `ToolCall` and returns pre-generated outputs from the loaded `NeuroBenchCase`:
@@ -324,16 +313,6 @@ This mode tests genuine clinical reasoning: the agent must synthesize raw findin
 
 **For the NMI paper**, the primary benchmark uses v3 (realistic). The v1→v3 accuracy delta is reported as an ablation showing the effect of interpretive tool outputs on agent performance.
 
-### Creating v3 from v1/v2
-
-```bash
-uv run python agent-platform/scripts/create_v3_dataset.py
-```
-
-This script reads both `data/neurobench_v1/cases/` and `data/neurobench_v2/cases/`, applies the stripping transformations, and writes 200 cleaned cases to `data/neurobench_v3/cases/`.
-
----
-
 ## Source files
 
 | File | Description |
@@ -347,6 +326,5 @@ This script reads both `data/neurobench_v1/cases/` and `data/neurobench_v2/cases
 | `tools/csf_analyzer.py` | `CSFAnalyzerTool` |
 | `tools/literature_search.py` | `LiteratureSearchTool` |
 | `tools/drug_interaction.py` | `DrugInteractionTool` |
-| `tools/hospital_rules_checker.py` | `HospitalRulesCheckerTool` (not in default registry) |
 | `tools/mock_server.py` | `MockServer` for evaluation mode |
 | `neuroagent-schemas/tool_outputs.py` | Pydantic output models (`EEGReport`, `MRIReport`, etc.) |

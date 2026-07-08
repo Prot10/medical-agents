@@ -22,27 +22,6 @@ MedCaseReasoning seed → build_prompt_seeded.py → prompt_template_seeded.md �
 
 Key difference: v2 cases separate diagnostic test results from the patient presentation, forcing the AI agent to call tools to discover evidence. Red herrings and disguising information are calibrated by difficulty level.
 
-### Pipeline 3: Realistic Tool Outputs (v3)
-
-v3 is NOT a new generation pipeline — it's a post-processing step that strips interpretive fields from v1 and v2 tool outputs to create realistic clinical reports. The v3 dataset combines all 200 cases (100 v1 + 100 v2) with stripped outputs.
-
-```
-v1/cases/ + v2/cases/ → create_v3_dataset.py → v3/cases/ (200 cases with realistic tool outputs)
-```
-
-**Why v3 exists**: An audit revealed that v1/v2 tool outputs contain interpretive fields that "give away the answer" — MRI impressions naming diseases, lab values explaining their diagnostic significance, EEG reports stating diagnoses. This inflates agent performance by testing reading comprehension instead of clinical reasoning. v3 strips these fields to match what real diagnostic reports provide.
-
-**Stripping script**: `agent-platform/scripts/create_v3_dataset.py`
-
-**Fields stripped or rewritten**:
-- `LabValue.clinical_significance` → `null`
-- `MRIReport.differential_by_imaging` → `[]`
-- `MRI/EEG confidence` → `0.0`
-- `MRI/EEG recommended_actions` → `["Clinical correlation recommended."]`
-- `MRI/EEG impression` → descriptive findings only (disease names removed)
-- `ECGReport.clinical_correlation` → `""`
-- `CSFResults.interpretation` → terse numerical summary
-
 ## Directory Structure
 
 ```
