@@ -17,7 +17,7 @@ import {
 } from "@/hooks/useReview"
 import { useAdminToolReview } from "@/hooks/useToolReview"
 import { conditionShort } from "@/lib/conditions"
-import { cn } from "@/lib/utils"
+import { cn, formatDuration } from "@/lib/utils"
 import { useReviewStore } from "@/stores/reviewStore"
 import { SeverityPill } from "@/components/ui/SeverityPill"
 import { StatusPill } from "@/components/ui/StatusPill"
@@ -299,6 +299,21 @@ function ProgressView() {
                 </span>
               ),
             )}
+          </div>
+          <div className="flex flex-wrap gap-1.5 border-t border-border pt-3 text-[11px] text-muted-foreground">
+            <span>
+              Total time{" "}
+              <span className="font-mono text-foreground">
+                {formatDuration(r.total_time_spent_seconds)}
+              </span>
+            </span>
+            <span>·</span>
+            <span>
+              Avg / case{" "}
+              <span className="font-mono text-foreground">
+                {formatDuration(r.avg_time_spent_seconds)}
+              </span>
+            </span>
           </div>
         </div>
       ))}
