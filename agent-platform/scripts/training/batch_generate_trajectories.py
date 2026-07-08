@@ -7,13 +7,13 @@ and saves raw outputs to raw_v2/.
 Usage:
     # Defaults read $TRAINING_DATA_ROOT/gold_trajectories_v5/{prompts,raw_v2}
     # (TRAINING_DATA_ROOT defaults to /eos/.../NeuroAgent/training_data).
-    uv run python scripts/batch_generate_trajectories.py \
+    uv run python scripts/training/batch_generate_trajectories.py \
         --styles minimal_efficient cost_conscious \
         --max-cases 200
 
     # Local override for fast iteration:
     TRAINING_DATA_ROOT=./training_data \
-        uv run python scripts/batch_generate_trajectories.py ...
+        uv run python scripts/training/batch_generate_trajectories.py ...
 """
 
 from __future__ import annotations

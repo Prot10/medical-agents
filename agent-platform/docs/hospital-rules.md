@@ -22,17 +22,17 @@ All scripts accept `--hospital`:
 
 ```bash
 # Use UK NHS protocols
-uv run python scripts/run_single_case.py tests/fixtures/sample_case.json \
+uv run python scripts/runtime/run_single_case.py tests/fixtures/sample_case.json \
     --hospital uk_nhs
 
 # Use Japanese protocols
-uv run python scripts/run_single_case.py tests/fixtures/sample_case.json \
+uv run python scripts/runtime/run_single_case.py tests/fixtures/sample_case.json \
     --hospital jp_todai
 
 # Compare same case across hospitals
 for h in us_mayo uk_nhs de_charite jp_todai br_hcfmusp; do
     echo "=== $h ==="
-    uv run python scripts/run_single_case.py tests/fixtures/sample_case.json \
+    uv run python scripts/runtime/run_single_case.py tests/fixtures/sample_case.json \
         --hospital "$h"
 done
 ```

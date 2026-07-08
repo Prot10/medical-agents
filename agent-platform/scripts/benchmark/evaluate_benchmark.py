@@ -9,8 +9,8 @@ Reads traces from results/benchmark/ and produces:
 Can run on partial results — evaluates whatever traces exist.
 
 Usage:
-    uv run python agent-platform/scripts/evaluate_benchmark.py
-    uv run python agent-platform/scripts/evaluate_benchmark.py --benchmark-dir results/benchmark
+    uv run python agent-platform/scripts/benchmark/evaluate_benchmark.py
+    uv run python agent-platform/scripts/benchmark/evaluate_benchmark.py --benchmark-dir results/benchmark
 """
 
 from __future__ import annotations
@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 app = typer.Typer()
 console = Console()
 
-REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+REPO_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_BENCHMARK_DIR = REPO_ROOT / "results" / "benchmark"
 
 

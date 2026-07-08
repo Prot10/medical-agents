@@ -1,6 +1,6 @@
 #!/bin/bash
 # SFT Training on gold trajectories with train/val split
-# Run: bash agent-platform/scripts/run_sft_training.sh
+# Run: bash agent-platform/scripts/training/run_sft_training.sh
 set -euo pipefail
 
 # Must run from the repo root so DATASET / split paths resolve.

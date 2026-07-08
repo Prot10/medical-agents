@@ -15,9 +15,6 @@ See README.md for full project docs, setup, and architecture.
 - `dataset-generation/` — NeuroBench case generation
 - `web/src/` — main React dashboard (port 5173)
 - `web-review/src/` — dataset review UI (port 5174, imports primitives via `@web/*` alias)
-- `data/neurobench_v{1,2}/cases/` — 200 benchmark cases (JSON)
-- `data/neurobench_v3/cases/` — 200 benchmark cases with realistic tool outputs (v1+v2 combined, stripped)
-- `data/neurobench_v4/cases/` — 200 benchmark cases with 12-tool schema and cost tracking (v3 migrated)
 - `data/neurobench_v5/cases/` — 600 benchmark cases across 20 conditions (current default)
 - `data/review/annotations/{version}/{reviewer_code}/{case_id}.json` — per-reviewer annotation runtime data (gitignored)
 - `agent-platform/config/hospital_rules/{hospital}/*.yaml` — clinical pathways
@@ -36,10 +33,8 @@ cd web && npm run dev                     # main frontend dev (local)
 cd web && npm run dev:remote              # main frontend dev (remote VM, binds 0.0.0.0)
 cd web-review && npm install && npm run dev:remote   # review frontend dev (port 5174)
 uv run pytest agent-platform/tests/ -v   # tests
-./agent-platform/scripts/run_v3_full.sh                       # full model comparison (v3, 7 tools)
-./agent-platform/scripts/run_v4_full.sh                       # full model comparison (v4, 12 tools + cost)
-uv run python agent-platform/scripts/create_v3_dataset.py     # regenerate v3 from v1+v2
-uv run python agent-platform/scripts/migrate_v3_to_v4.py     # migrate v3→v4 (12-tool schema)
+uv run python agent-platform/scripts/runtime/run_single_case.py data/neurobench_v5/cases/<case>.json
+uv run python agent-platform/scripts/benchmark/run_baseline_eval.py
 ```
 
 ## Conventions

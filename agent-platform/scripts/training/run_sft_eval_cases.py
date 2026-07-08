@@ -2,13 +2,13 @@
 
 Usage:
     # Run evaluation
-    python agent-platform/scripts/run_sft_eval_cases.py \
+    python agent-platform/scripts/training/run_sft_eval_cases.py \
         --model-id Qwen/Qwen3.5-9B \
         --run-name base-qwen3.5-9b \
         --output results/sft_eval/base_results.json
 
     # Compare two runs
-    python agent-platform/scripts/run_sft_eval_cases.py \
+    python agent-platform/scripts/training/run_sft_eval_cases.py \
         --compare \
         --base-results results/sft_eval/base_results.json \
         --sft-results results/sft_eval/sft_results.json \
@@ -31,7 +31,7 @@ from rich.console import Console
 from rich.table import Table
 
 # ---------------------------------------------------------------------------
-REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+REPO_ROOT = Path(__file__).resolve().parents[3]
 AGENT_PLATFORM = REPO_ROOT / "agent-platform"
 sys.path.insert(0, str(AGENT_PLATFORM / "src"))
 sys.path.insert(0, str(REPO_ROOT / "packages" / "neuroagent-schemas" / "src"))

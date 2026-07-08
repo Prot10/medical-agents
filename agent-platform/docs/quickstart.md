@@ -30,8 +30,8 @@ HF_HOME=~/.cache/huggingface .venv-vllm/bin/huggingface-cli download Qwen/Qwen3.
 
 ```bash
 cd agent-platform
-./scripts/serve_model.sh              # default: qwen3.5-9b
-./scripts/serve_model.sh qwen3.5-27b-awq  # larger model
+./scripts/runtime/serve_model.sh              # default: qwen3.5-9b
+./scripts/runtime/serve_model.sh qwen3.5-27b-awq  # larger model
 ```
 
 Wait until you see `Uvicorn running on http://0.0.0.0:8000`.
@@ -39,7 +39,7 @@ Wait until you see `Uvicorn running on http://0.0.0.0:8000`.
 ## 4. Run a case
 
 ```bash
-uv run python agent-platform/scripts/run_single_case.py \
+uv run python agent-platform/scripts/runtime/run_single_case.py \
     agent-platform/tests/fixtures/sample_case.json
 ```
 
