@@ -4,16 +4,16 @@ from __future__ import annotations
 
 import json
 import logging
-from dataclasses import dataclass, field
 from typing import Any
 
 import re
 
-from ..llm.client import LLMClient, LLMResponse
+from ..llm.client import LLMClient, LLMResponse, LLMToolCall
 from ..llm.prompts import load_prompt, format_tool_result
 from ..tools.base import ToolCall, ToolResult
 from ..tools.cost_tracker import CostTracker
 from ..tools.tool_registry import ToolRegistry
+from .config import AgentConfig, AgentConfigError, load_agent_config
 from .planner import restrict_tools
 from .reasoning import AgentTrace
 from .reflection import get_reflection_prompt
@@ -24,34 +24,16 @@ _ASSESSMENT_PATTERN = re.compile(
     r"(###\s*Primary Diagnosis.*)",
     flags=re.DOTALL,
 )
+_NO_CONCLUSION_MESSAGE = "[Agent did not reach a conclusion within turn limit]"
+_STRUCTURED_DIAGNOSIS_REPROMPT = (
+    "You provided reasoning but did not include a structured "
+    "diagnosis. Please provide your final assessment now using "
+    "the required format starting with:\n\n"
+    "### Primary Diagnosis\n[Diagnosis] (Confidence: X.XX)"
+)
+_USE_RESPONSE_TOOL_CALLS = object()
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class AgentConfig:
-    """Configuration for the agent orchestrator."""
-
-    # LLM settings
-    base_url: str = "http://localhost:8000/v1"
-    api_key: str = "not-needed"
-    model: str = "Qwen/Qwen3.5-9B"
-    temperature: float = 1.0
-    max_tokens: int = 8192
-    top_p: float = 0.95
-    presence_penalty: float = 1.5
-
-    # Agent behavior
-    max_turns: int = 15
-    enable_reflection: bool = True
-
-    # Hospital rules
-    hospital: str = "us_mayo"  # Hospital rule set: us_mayo, uk_nhs, de_charite, jp_todai, br_hcfmusp
-
-    # Ablation controls
-    allowed_tools: list[str] | None = None
-    excluded_tools: list[str] | None = None
-    all_info_upfront: bool = False  # If True, give all tool outputs at once
 
 
 class AgentOrchestrator:
@@ -98,43 +80,35 @@ class AgentOrchestrator:
 
         messages = self._build_initial_messages(patient_info)
         tool_definitions = self._get_tool_definitions()
+        tool_request = self._tool_request_kwargs(tool_definitions)
 
         turn_number = 0
         for _ in range(self.config.max_turns):
             # Call LLM with tool definitions
             response = self.llm.chat(
                 messages=messages,
-                tools=tool_definitions if tool_definitions else None,
-                tool_choice="auto" if tool_definitions else None,
+                **tool_request,
             )
 
             turn_number += 1
+            valid_tool_calls = self._valid_tool_calls(response)
 
             # If LLM wants to call tool(s)
-            if response.tool_calls:
+            if valid_tool_calls:
                 # Record assistant turn with tool calls
                 trace.add_assistant_turn(
                     turn_number=turn_number,
                     content=response.content,
-                    tool_calls=[
-                        {"name": tc.name, "arguments": tc.arguments}
-                        for tc in response.tool_calls
-                    ],
+                    tool_calls=self._tool_call_records(valid_tool_calls),
                     token_usage=response.usage,
                 )
 
                 # Add assistant message to conversation
-                messages.append(self._format_assistant_message(response))
+                messages.append(self._format_assistant_message(response, valid_tool_calls))
 
                 # Execute each tool call and add results
-                for tc in response.tool_calls:
-                    tool_call = ToolCall(tool_name=tc.name, parameters=tc.arguments)
-                    result = self.tools.execute(tool_call)
-
-                    # Track cost
-                    cost_entry = self.cost_tracker.compute_cost(tc.name, tc.arguments)
-                    result.cost_usd = cost_entry.cost_usd
-
+                for tc in valid_tool_calls:
+                    result, cost_entry = self._execute_tool_call(tc)
                     turn_number += 1
                     trace.add_tool_turn(
                         turn_number=turn_number,
@@ -175,15 +149,10 @@ class AgentOrchestrator:
                 # re-prompt once to get the required output format.
                 if assessment and not _ASSESSMENT_PATTERN.search(assessment):
                     logger.info("No structured diagnosis found — re-prompting for format.")
-                    messages.append(self._format_assistant_message(response))
+                    messages.append(self._format_assistant_message(response, []))
                     messages.append({
                         "role": "user",
-                        "content": (
-                            "You provided reasoning but did not include a structured "
-                            "diagnosis. Please provide your final assessment now using "
-                            "the required format starting with:\n\n"
-                            "### Primary Diagnosis\n[Diagnosis] (Confidence: X.XX)"
-                        ),
+                        "content": _STRUCTURED_DIAGNOSIS_REPROMPT,
                     })
                     retry = self.llm.chat(messages=messages, tools=None)
                     turn_number += 1
@@ -205,13 +174,10 @@ class AgentOrchestrator:
             last_content = trace.turns[-1].content if trace.turns else ""
             trace.set_final_response(
                 _extract_assessment(last_content or "")
-                or "[Agent did not reach a conclusion within turn limit]"
+                or _NO_CONCLUSION_MESSAGE
             )
 
-        # Finalize cost tracking
-        trace.total_cost_usd = self.cost_tracker.total_cost_usd
-        trace.cost_entries = [e.model_dump() for e in self.cost_tracker.entries]
-
+        self._finalize_trace(trace)
         return trace
 
     def run_streaming(
@@ -240,6 +206,7 @@ class AgentOrchestrator:
 
         messages = self._build_initial_messages(patient_info)
         tool_definitions = self._get_tool_definitions()
+        tool_request = self._tool_request_kwargs(tool_definitions)
 
         turn_number = 0
         for _ in range(self.config.max_turns):
@@ -250,8 +217,7 @@ class AgentOrchestrator:
             think_content = None
             for event in self.llm.chat_stream(
                 messages=messages,
-                tools=tool_definitions if tool_definitions else None,
-                tool_choice="auto" if tool_definitions else None,
+                **tool_request,
             ):
                 if event["type"] == "think_delta":
                     # Internal reasoning tokens (from <think> tags)
@@ -275,20 +241,14 @@ class AgentOrchestrator:
                 break
 
             # Filter out hallucinated tool names (e.g. "Final Assessment")
-            valid_tool_calls = [
-                tc for tc in (response.tool_calls or [])
-                if tc.name in self.tools.tools
-            ]
+            valid_tool_calls = self._valid_tool_calls(response)
 
             if valid_tool_calls:
                 # Record thinking
                 trace.add_assistant_turn(
                     turn_number=turn_number,
                     content=response.content,
-                    tool_calls=[
-                        {"name": tc.name, "arguments": tc.arguments}
-                        for tc in valid_tool_calls
-                    ],
+                    tool_calls=self._tool_call_records(valid_tool_calls),
                     token_usage=response.usage,
                 )
 
@@ -314,7 +274,7 @@ class AgentOrchestrator:
                     "token_usage": response.usage,
                 }
 
-                messages.append(self._format_assistant_message(response))
+                messages.append(self._format_assistant_message(response, valid_tool_calls))
 
                 # Execute each tool call
                 for tc in valid_tool_calls:
@@ -325,13 +285,7 @@ class AgentOrchestrator:
                         "arguments": tc.arguments,
                     }
 
-                    tool_call = ToolCall(tool_name=tc.name, parameters=tc.arguments)
-                    result = self.tools.execute(tool_call)
-
-                    # Track cost
-                    cost_entry = self.cost_tracker.compute_cost(tc.name, tc.arguments)
-                    result.cost_usd = cost_entry.cost_usd
-
+                    result, cost_entry = self._execute_tool_call(tc)
                     turn_number += 1
                     trace.add_tool_turn(
                         turn_number=turn_number,
@@ -384,13 +338,10 @@ class AgentOrchestrator:
             last_content = trace.turns[-1].content if trace.turns else ""
             trace.set_final_response(
                 _extract_assessment(last_content or "")
-                or "[Agent did not reach a conclusion within turn limit]"
+                or _NO_CONCLUSION_MESSAGE
             )
 
-        # Finalize cost tracking
-        trace.total_cost_usd = self.cost_tracker.total_cost_usd
-        trace.cost_entries = [e.model_dump() for e in self.cost_tracker.entries]
-
+        self._finalize_trace(trace)
         yield {
             "type": "run_complete",
             "total_tool_calls": trace.total_tool_calls,
@@ -440,6 +391,7 @@ class AgentOrchestrator:
         trace.set_final_response(
             _extract_assessment(response.content or "")
         )
+        self._finalize_trace(trace)
         return trace
 
     def _build_initial_messages(
@@ -470,12 +422,54 @@ class AgentOrchestrator:
             excluded_tools=self.config.excluded_tools,
         )
 
-    def _format_assistant_message(self, response: LLMResponse) -> dict[str, Any]:
+    def _tool_request_kwargs(self, tool_definitions: list[dict[str, Any]]) -> dict[str, Any]:
+        if not tool_definitions:
+            return {"tools": None, "tool_choice": None}
+        return {"tools": tool_definitions, "tool_choice": "auto"}
+
+    def _valid_tool_calls(self, response: LLMResponse) -> list[LLMToolCall]:
+        valid: list[LLMToolCall] = []
+        for tool_call in response.tool_calls or []:
+            if tool_call.name in self.tools.tools:
+                valid.append(tool_call)
+                continue
+            logger.warning(
+                "Ignoring unknown tool call %s. Available tools: %s",
+                tool_call.name,
+                sorted(self.tools.tools),
+            )
+        return valid
+
+    def _tool_call_records(self, tool_calls: list[LLMToolCall]) -> list[dict[str, Any]]:
+        return [{"name": tc.name, "arguments": tc.arguments} for tc in tool_calls]
+
+    def _execute_tool_call(self, tool_call: LLMToolCall) -> tuple[ToolResult, Any]:
+        result = self.tools.execute(
+            ToolCall(tool_name=tool_call.name, parameters=tool_call.arguments)
+        )
+        cost_entry = self.cost_tracker.compute_cost(tool_call.name, tool_call.arguments)
+        result.cost_usd = cost_entry.cost_usd
+        return result, cost_entry
+
+    def _finalize_trace(self, trace: AgentTrace) -> None:
+        trace.total_cost_usd = self.cost_tracker.total_cost_usd
+        trace.cost_entries = [entry.model_dump() for entry in self.cost_tracker.entries]
+
+    def _format_assistant_message(
+        self,
+        response: LLMResponse,
+        tool_calls: list[LLMToolCall] | object = _USE_RESPONSE_TOOL_CALLS,
+    ) -> dict[str, Any]:
         """Format an assistant response as an OpenAI-style message."""
         msg: dict[str, Any] = {"role": "assistant"}
         if response.content:
             msg["content"] = response.content
-        if response.tool_calls:
+        selected_tool_calls = (
+            response.tool_calls or []
+            if tool_calls is _USE_RESPONSE_TOOL_CALLS
+            else tool_calls
+        )
+        if selected_tool_calls:
             msg["tool_calls"] = [
                 {
                     "id": tc.id,
@@ -485,7 +479,7 @@ class AgentOrchestrator:
                         "arguments": json.dumps(tc.arguments),
                     },
                 }
-                for tc in response.tool_calls
+                for tc in selected_tool_calls
             ]
         return msg
 

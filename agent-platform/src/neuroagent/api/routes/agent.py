@@ -14,7 +14,7 @@ from pydantic import BaseModel
 
 from neuroagent_schemas import NeuroBenchCase
 
-from ...agent.orchestrator import AgentConfig, AgentOrchestrator
+from ...agent.orchestrator import AgentOrchestrator, load_agent_config
 from ...agent.reasoning import AgentTrace
 from ...evaluation.metrics import MetricsCalculator
 from ...evaluation.runner import format_patient_info
@@ -88,8 +88,11 @@ async def _stream_agent_events(
     tool_registry = ToolRegistry.create_default_registry(mock_server=mock_server)
     rules_engine = RulesEngine(rules_dir, hospital=hospital)
 
-    config = AgentConfig(
-        base_url=base_url, model=model_hf_id, api_key=api_key,
+    config = load_agent_config(
+        base_url=base_url,
+        model=model_hf_id,
+        api_key=api_key,
+        hospital=hospital,
     )
     agent = AgentOrchestrator(
         config=config, tool_registry=tool_registry, rules_engine=rules_engine,

@@ -5,7 +5,13 @@ from pathlib import Path
 
 import pytest
 
-from neuroagent.agent.orchestrator import AgentConfig, AgentOrchestrator, _extract_assessment
+from neuroagent.agent.orchestrator import (
+    AgentConfig,
+    AgentConfigError,
+    AgentOrchestrator,
+    _extract_assessment,
+    load_agent_config,
+)
 from neuroagent.agent.reasoning import AgentTrace, AgentTurn
 from neuroagent.agent.reflection import get_reflection_prompt
 from neuroagent.agent.planner import restrict_tools, get_forced_tool_order
@@ -24,20 +30,46 @@ def sample_case() -> NeuroBenchCase:
 
 @pytest.fixture
 def config():
-    return AgentConfig(model="test-model", max_turns=5)
+    return load_agent_config(model="test-model", max_turns=5)
 
 
 class TestAgentConfig:
-    def test_defaults(self):
-        cfg = AgentConfig()
+    def test_requires_explicit_values(self):
+        with pytest.raises(TypeError):
+            AgentConfig()
+
+    def test_loads_runtime_yaml(self):
+        cfg = load_agent_config()
         assert cfg.max_turns == 15
         assert cfg.enable_reflection is True
+        assert cfg.model == "Qwen/Qwen3.5-9B"
 
-    def test_custom(self):
-        cfg = AgentConfig(model="custom-model", max_turns=10, enable_reflection=False)
+    def test_loads_with_overrides(self):
+        cfg = load_agent_config(model="custom-model", max_turns=10, enable_reflection=False)
         assert cfg.model == "custom-model"
         assert cfg.max_turns == 10
         assert cfg.enable_reflection is False
+
+    def test_rejects_missing_yaml_keys(self, tmp_path):
+        config_path = tmp_path / "agent.yaml"
+        config_path.write_text(
+            """
+llm:
+  base_url: "http://localhost:8000/v1"
+  api_key: "not-needed"
+agent:
+  max_turns: 15
+  enable_reflection: true
+  allowed_tools: null
+  excluded_tools: null
+  all_info_upfront: false
+rules:
+  hospital: "us_mayo"
+"""
+        )
+
+        with pytest.raises(AgentConfigError, match="llm.model"):
+            load_agent_config(config_path)
 
 
 class TestAgentTrace:
