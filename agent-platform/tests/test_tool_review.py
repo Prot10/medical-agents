@@ -19,7 +19,7 @@ from neuroagent.review_api.services.tool_review_store import ToolReviewStore
 
 @pytest.fixture(scope="module")
 def v5_catalog():
-    _idx, objs = load_dataset(AVAILABLE_DATASETS["v5"]["path"])
+    _idx, objs = load_dataset(AVAILABLE_DATASETS["v5"].path)
     return build_catalog("v5", objs, CONDITIONS_YAML_PATH, TOOL_COSTS_PATH)
 
 

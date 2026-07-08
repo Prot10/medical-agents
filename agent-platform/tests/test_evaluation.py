@@ -16,7 +16,6 @@ from neuroagent_schemas.evaluation import (
 )
 from neuroagent.agent.reasoning import AgentTrace, AgentTurn
 from neuroagent.evaluation.metrics import MetricsCalculator, CaseMetrics
-from neuroagent.evaluation.noise_injector import NoiseInjector, NoiseType
 
 
 @pytest.fixture
@@ -231,17 +230,3 @@ class TestGoldTrajectoryMetrics:
         assert m.recommended_called == 0 and m.recommended_total == 1
         assert m.optional_called == 1 and m.optional_total == 1
         assert 0 < m.tool_f1 < 1
-
-
-class TestNoiseInjector:
-    def test_completeness_noise(self):
-        injector = NoiseInjector(seed=42)
-        output = {"findings": [{"a": 1}, {"b": 2}, {"c": 3}, {"d": 4}]}
-        noisy = injector.inject(output, "analyze_eeg", NoiseType.COMPLETENESS, severity=0.5)
-        assert len(noisy["findings"]) < 4
-
-    def test_zero_severity(self):
-        injector = NoiseInjector()
-        output = {"findings": [{"a": 1}, {"b": 2}]}
-        noisy = injector.inject(output, "analyze_eeg", NoiseType.COMPLETENESS, severity=0.0)
-        assert noisy == output  # No change

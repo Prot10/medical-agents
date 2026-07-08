@@ -597,7 +597,12 @@ def build_subagent_prompt(
     system_prompt: str,
 ) -> str:
     """Build the full prompt to send to the Claude Code subagent."""
-    template_path = Path(__file__).resolve().parents[4] / "scripts" / "generate_trajectories_subagent.md"
+    template_path = (
+        Path(__file__).resolve().parents[4]
+        / "scripts"
+        / "training"
+        / "generate_trajectories_subagent.md"
+    )
     template = template_path.read_text()
 
     patient_info = format_patient_info(case)

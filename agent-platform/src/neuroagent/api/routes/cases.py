@@ -19,8 +19,8 @@ def list_datasets(request: Request) -> list[dict]:
         idx = all_datasets.get(version, ({},))[0]
         result.append({
             "version": version,
-            "name": info["name"],
-            "description": info["description"],
+            "name": info.name,
+            "description": info.description,
             "case_count": len(idx),
             "active": version == active,
         })
@@ -40,7 +40,7 @@ def activate_dataset(version: str, request: Request) -> dict:
     request.app.state.case_objects = objs
 
     from ..app import DATASETS
-    request.app.state.dataset_path = DATASETS[version]["path"]
+    request.app.state.dataset_path = DATASETS[version].path
 
     return {"status": "ok", "version": version, "case_count": len(idx)}
 

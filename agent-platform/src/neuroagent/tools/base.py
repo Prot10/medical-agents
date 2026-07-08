@@ -1,13 +1,13 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Any
 
 
 class ToolCall(BaseModel):
     """What the agent produces when it wants to call a tool."""
     tool_name: str
-    parameters: dict[str, Any] = {}
+    parameters: dict[str, Any] = Field(default_factory=dict)
 
 
 class ToolResult(BaseModel):
