@@ -36,8 +36,8 @@ def list_datasets(
         out.append(
             {
                 "version": version,
-                "name": info["name"],
-                "description": info["description"],
+                "name": info.name,
+                "description": info.description,
                 "case_count": len(idx),
                 "is_default": version == default_version,
             }

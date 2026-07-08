@@ -8,7 +8,6 @@ import time
 from dataclasses import dataclass, field
 from typing import Any
 
-import httpx
 from openai import OpenAI
 from pydantic import BaseModel
 
@@ -111,124 +110,6 @@ class LLMClient:
         # Ollama's native API with think=true + tools is broken for Qwen3.5
         # (see https://github.com/ollama/ollama/issues/14493).
         yield from self._chat_stream_openai(messages, tools, tool_choice, temperature, max_tokens)
-
-    def _chat_stream_ollama(
-        self,
-        messages: list[dict[str, Any]],
-        tools: list[dict[str, Any]] | None,
-        temperature: float | None,
-        max_tokens: int | None,
-    ):
-        """Stream via Ollama's native API to capture thinking tokens."""
-        # Ollama native API base (strip /v1 from base_url)
-        ollama_base = self.base_url.replace("/v1", "")
-
-        # Convert OpenAI-style messages to Ollama native format:
-        # - assistant tool_calls: arguments must be dict, not JSON string
-        # - tool results: use 'tool' role with 'content' as string
-        ollama_messages = []
-        for msg in messages:
-            if msg.get("role") == "assistant" and msg.get("tool_calls"):
-                converted_tcs = []
-                for tc in msg["tool_calls"]:
-                    func = tc.get("function", {})
-                    args = func.get("arguments", {})
-                    if isinstance(args, str):
-                        try:
-                            args = json.loads(args)
-                        except json.JSONDecodeError:
-                            args = {}
-                    converted_tcs.append({
-                        "id": tc.get("id", ""),
-                        "function": {"name": func.get("name", ""), "arguments": args},
-                    })
-                ollama_messages.append({
-                    "role": "assistant",
-                    "content": msg.get("content", ""),
-                    "tool_calls": converted_tcs,
-                })
-            elif msg.get("role") == "tool":
-                content = msg.get("content", "")
-                if not isinstance(content, str):
-                    content = json.dumps(content)
-                ollama_messages.append({"role": "tool", "content": content})
-            else:
-                ollama_messages.append(msg)
-
-        body: dict[str, Any] = {
-            "model": self.model,
-            "messages": ollama_messages,
-            "stream": True,
-            "think": True,
-            "options": {
-                "temperature": temperature if temperature is not None else self.temperature,
-                "top_p": self.top_p,
-                "num_predict": max_tokens or self.max_tokens,
-                "repeat_penalty": self.presence_penalty,
-            },
-        }
-        if tools:
-            body["tools"] = tools
-
-        content_parts: list[str] = []
-        think_parts: list[str] = []
-        tool_calls_raw: list[dict[str, Any]] = []
-
-        with httpx.Client(timeout=300.0) as client:
-            with client.stream("POST", f"{ollama_base}/api/chat", json=body) as resp:
-                for line in resp.iter_lines():
-                    if not line:
-                        continue
-                    data = json.loads(line)
-                    msg = data.get("message", {})
-
-                    # Thinking tokens
-                    if msg.get("thinking"):
-                        think_parts.append(msg["thinking"])
-                        yield {"type": "think_delta", "delta": msg["thinking"]}
-
-                    # Visible content tokens
-                    if msg.get("content"):
-                        content_parts.append(msg["content"])
-                        yield {"type": "content_delta", "delta": msg["content"]}
-
-                    # Tool calls (arrive in the final message)
-                    if msg.get("tool_calls"):
-                        tool_calls_raw = msg["tool_calls"]
-
-                    # Usage info in final chunk
-                    if data.get("done"):
-                        break
-
-        # Build tool calls
-        parsed_tool_calls = None
-        if tool_calls_raw:
-            parsed_tool_calls = []
-            for i, tc in enumerate(tool_calls_raw):
-                func = tc.get("function", {})
-                args = func.get("arguments", {})
-                if isinstance(args, str):
-                    args = json.loads(args)
-                parsed_tool_calls.append(
-                    LLMToolCall(
-                        id=tc.get("id", f"call_{i}"),
-                        name=func.get("name", ""),
-                        arguments=args,
-                    )
-                )
-
-        content = "".join(content_parts) or None
-        think_content = "".join(think_parts) or None
-
-        yield {
-            "type": "done",
-            "response": LLMResponse(
-                content=content,
-                tool_calls=parsed_tool_calls,
-                usage={},  # Ollama usage comes in different format
-            ),
-            "think_content": think_content,
-        }
 
     def _chat_stream_openai(
         self,

@@ -70,9 +70,7 @@ class RulesEngine:
         hospital: str = "us_mayo",
     ):
         base = Path(rules_dir)
-        # Support both new (per-hospital subdirs) and legacy (flat dir) layouts
-        hospital_dir = base / hospital
-        self.rules_dir = hospital_dir if hospital_dir.is_dir() else base
+        self.rules_dir = base / hospital
         self.hospital = hospital
         self.pathways: list[ClinicalPathway] = []
         if self.rules_dir.exists():

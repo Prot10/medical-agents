@@ -7,21 +7,9 @@ import json
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import Response
 
-router = APIRouter(tags=["traces"])
+from neuroagent.model_registry import HF_TO_KEY
 
-# Reverse mapping: HuggingFace model ID → short key
-_HF_TO_SHORT: dict[str, str] = {
-    "Qwen/Qwen3.5-4B": "qwen3.5-4b",
-    "Qwen/Qwen3.5-9B": "qwen3.5-9b",
-    "QuantTrio/Qwen3.5-27B-AWQ": "qwen3.5-27b-awq",
-    "google/medgemma-1.5-4b-it": "medgemma-4b",
-    "ig1/medgemma-27b-text-it-FP8-Dynamic": "medgemma-27b",
-    "nvidia/NVIDIA-Nemotron-Nano-9B-v2": "nemotron-nano-9b-v2",
-    "nvidia/NVIDIA-Nemotron-3-Nano-4B-BF16": "nemotron-3-nano-4b",
-    "google/gemma-4-E2B-it": "gemma-4-e2b",
-    "google/gemma-4-E4B-it": "gemma-4-e4b",
-    "google/gemma-4-12B-it": "gemma-4-12b",
-}
+router = APIRouter(tags=["traces"])
 
 
 @router.get("/traces")
@@ -41,7 +29,7 @@ def list_traces(request: Request) -> list[dict]:
                 "case_id": case_id,
                 "hospital": data.get("hospital", ""),
                 "model": model_hf,
-                "model_short": _HF_TO_SHORT.get(model_hf, model_hf),
+                "model_short": HF_TO_KEY.get(model_hf, model_hf),
                 "condition": data.get("condition") or case_meta.get("condition", ""),
                 "difficulty": data.get("difficulty") or case_meta.get("difficulty", ""),
                 "total_tool_calls": data.get("total_tool_calls", 0),

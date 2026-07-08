@@ -106,7 +106,7 @@ def create_app() -> FastAPI:
     # Pre-load every registered dataset at startup so per-case GETs are fast.
     all_datasets: dict[str, tuple[dict, dict]] = {}
     for version, info in AVAILABLE_DATASETS.items():
-        idx, objs = load_dataset(info["path"])
+        idx, objs = load_dataset(info.path)
         all_datasets[version] = (idx, objs)
         logger.info("Loaded %d cases from %s", len(idx), version)
 

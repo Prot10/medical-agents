@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import time
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class AgentTurn(BaseModel):
@@ -14,21 +14,21 @@ class AgentTurn(BaseModel):
     content: str | None = None
     tool_calls: list[dict] | None = None  # raw tool call dicts
     tool_results: list[dict] | None = None  # raw tool result dicts
-    token_usage: dict[str, int] = {}
+    token_usage: dict[str, int] = Field(default_factory=dict)
 
 
 class AgentTrace(BaseModel):
     """Complete record of an agent run on a single case."""
 
     case_id: str | None = None
-    turns: list[AgentTurn] = []
+    turns: list[AgentTurn] = Field(default_factory=list)
     final_response: str | None = None
     total_tool_calls: int = 0
-    tools_called: list[str] = []
+    tools_called: list[str] = Field(default_factory=list)
     total_tokens: int = 0
     elapsed_time_seconds: float = 0.0
     total_cost_usd: float = 0.0
-    cost_entries: list[dict] = []  # serialized ToolCostEntry list
+    cost_entries: list[dict] = Field(default_factory=list)  # serialized ToolCostEntry list
     _start_time: float | None = None
 
     model_config = ConfigDict(arbitrary_types_allowed=True)

@@ -6,16 +6,16 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ToolCostEntry(BaseModel):
     """Cost record for a single tool invocation."""
 
     tool_name: str
-    parameters: dict[str, Any] = {}
+    parameters: dict[str, Any] = Field(default_factory=dict)
     cost_usd: float
-    cost_breakdown: dict[str, float] = {}
+    cost_breakdown: dict[str, float] = Field(default_factory=dict)
 
 
 class CostTracker:
