@@ -160,6 +160,7 @@ class AnnotationStore:
                     comment_count=len(review.case_comments),
                     severity_counts=severity_counts,
                     last_updated_at=review.last_updated_at,
+                    time_spent_seconds=review.time_spent_seconds,
                 )
             )
         return summaries

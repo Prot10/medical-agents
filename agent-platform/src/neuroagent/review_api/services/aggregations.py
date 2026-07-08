@@ -139,6 +139,11 @@ def reviewer_progress_summary(
     touched = len(summaries)
     by_status["pending"] = total - touched + by_status.get("pending", 0)
 
+    total_time_spent_seconds = sum(s.time_spent_seconds for s in summaries)
+    avg_time_spent_seconds = (
+        total_time_spent_seconds / touched if touched else 0.0
+    )
+
     # Roll up by condition.
     by_condition: dict[str, dict[ReviewStatus, int]] = defaultdict(_empty_status_counts)
     for case_id, case in case_objects.items():
@@ -153,6 +158,8 @@ def reviewer_progress_summary(
         "dataset_version": version,
         "total_cases": total,
         "touched_cases": touched,
+        "total_time_spent_seconds": total_time_spent_seconds,
+        "avg_time_spent_seconds": round(avg_time_spent_seconds, 1),
         "by_status": by_status,
         "by_condition": {
             condition: dict(counts) for condition, counts in by_condition.items()
