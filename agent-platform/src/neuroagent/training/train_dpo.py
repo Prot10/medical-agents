@@ -347,7 +347,7 @@ def main() -> None:
     if args.command == "collect":
         from .data.prepare_trajectories import collect_trajectories, load_cases
         from .rewards.composite_reward import CompositeReward
-        from ..agent.orchestrator import AgentConfig
+        from ..agent.orchestrator import load_agent_config
 
         cases = load_cases(Path(args.dataset), max_cases=args.max_cases)
         if args.split_file:
@@ -355,7 +355,7 @@ def main() -> None:
             cases = [c for c in cases if c.case_id in split_ids]
             logger.info("Filtered to %d cases from split", len(cases))
 
-        agent_config = AgentConfig(
+        agent_config = load_agent_config(
             base_url=args.base_url,
             model=args.model,
             temperature=1.0,

@@ -33,15 +33,16 @@ def evaluate(
         handlers=[RichHandler(console=console, rich_tracebacks=True)],
     )
 
-    from neuroagent.agent.orchestrator import AgentConfig
+    from neuroagent.agent.orchestrator import load_agent_config
     from neuroagent.evaluation.runner import EvaluationRunner
     from neuroagent.evaluation.metrics import MetricsCalculator
     from neuroagent.evaluation.analyzer import ResultsAnalyzer
 
-    config = AgentConfig(
+    config = load_agent_config(
         base_url=base_url,
         api_key=api_key,
         model=model,
+        hospital=hospital,
     )
 
     runner = EvaluationRunner(config=config, dataset_path=dataset)

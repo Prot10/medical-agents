@@ -32,7 +32,7 @@ def run(
     )
 
     from neuroagent_schemas import NeuroBenchCase
-    from neuroagent.agent.orchestrator import AgentConfig
+    from neuroagent.agent.orchestrator import load_agent_config
     from neuroagent.evaluation.runner import EvaluationRunner
 
     # Load case
@@ -48,7 +48,12 @@ def run(
         title="Case Details",
     ))
 
-    config = AgentConfig(base_url=base_url, api_key=api_key, model=model)
+    config = load_agent_config(
+        base_url=base_url,
+        api_key=api_key,
+        model=model,
+        hospital=hospital,
+    )
     runner = EvaluationRunner(config=config, dataset_path="")
 
     trace = runner.run_single_case(case, enable_rules=enable_rules, rules_dir=rules_dir, hospital=hospital)

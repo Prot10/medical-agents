@@ -36,7 +36,7 @@ sys.path.insert(0, str(REPO_ROOT / "packages" / "neuroagent-schemas" / "src"))
 
 from neuroagent_schemas import GroundTruth, NeuroBenchCase
 
-from neuroagent.agent.orchestrator import AgentConfig, AgentOrchestrator
+from neuroagent.agent.orchestrator import AgentOrchestrator, load_agent_config
 from neuroagent.agent.reasoning import AgentTrace
 from neuroagent.evaluation.metrics import CaseMetrics, MetricsCalculator
 from neuroagent.evaluation.runner import format_patient_info
@@ -135,7 +135,7 @@ def run_single_case(
 ) -> tuple[AgentTrace, CaseMetrics]:
     """Run a single case with the given configuration."""
 
-    config = AgentConfig(
+    config = load_agent_config(
         base_url="http://localhost:8000/v1",
         api_key="not-needed",
         model=run_config.model_id,

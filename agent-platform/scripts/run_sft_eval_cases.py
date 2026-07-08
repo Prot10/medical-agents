@@ -38,7 +38,7 @@ sys.path.insert(0, str(REPO_ROOT / "packages" / "neuroagent-schemas" / "src"))
 
 from neuroagent_schemas import NeuroBenchCase
 
-from neuroagent.agent.orchestrator import AgentConfig, AgentOrchestrator
+from neuroagent.agent.orchestrator import AgentOrchestrator, load_agent_config
 from neuroagent.evaluation.metrics import MetricsCalculator
 from neuroagent.evaluation.runner import format_patient_info
 from neuroagent.rules.rules_engine import RulesEngine
@@ -136,7 +136,7 @@ def evaluate(
     cases = load_fold0_val_cases()
     console.print(f"\n[bold]Evaluating {run_name} on {len(cases)} fold0 val cases × {repeats} repeats[/bold]")
 
-    config = AgentConfig(
+    config = load_agent_config(
         base_url=f"http://localhost:{port}/v1",
         api_key="not-needed",
         model=model_id,
