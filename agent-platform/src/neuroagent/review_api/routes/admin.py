@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from neuroagent.datasets import normalize_dataset_version
 
 from ..dependencies import get_reviewer_registry, require_admin
 from ..schemas.reviewers import ReviewerCode
@@ -20,14 +21,15 @@ from ..services.tool_review_aggregations import tool_review_summary
 router = APIRouter(prefix="/admin", tags=["admin"])
 
 
-def _require_dataset(request: Request, version: str) -> dict:
+def _require_dataset(request: Request, version: str) -> tuple[str, dict]:
+    version = normalize_dataset_version(version)
     all_datasets = request.app.state.all_datasets
     if version not in all_datasets:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Dataset '{version}' not found",
         )
-    return all_datasets[version][1]
+    return version, all_datasets[version][1]
 
 
 @router.get("/datasets/{version}/agreement")
@@ -37,7 +39,7 @@ def get_agreement(
     _admin: ReviewerCode = Depends(require_admin),
     registry: ReviewerCodeRegistry = Depends(get_reviewer_registry),
 ) -> dict[str, Any]:
-    case_objects = _require_dataset(request, version)
+    version, case_objects = _require_dataset(request, version)
     return inter_rater_agreement(
         request.app.state.annotation_store,
         version,
@@ -53,7 +55,7 @@ def get_all_progress(
     _admin: ReviewerCode = Depends(require_admin),
     registry: ReviewerCodeRegistry = Depends(get_reviewer_registry),
 ) -> list[dict[str, Any]]:
-    case_objects = _require_dataset(request, version)
+    version, case_objects = _require_dataset(request, version)
     return all_reviewers_progress(
         request.app.state.annotation_store,
         version,
@@ -69,7 +71,7 @@ def get_field_hotspots(
     _admin: ReviewerCode = Depends(require_admin),
     registry: ReviewerCodeRegistry = Depends(get_reviewer_registry),
 ) -> list[dict[str, Any]]:
-    case_objects = _require_dataset(request, version)
+    version, case_objects = _require_dataset(request, version)
     reviewer_codes = [r.code for r in registry.all() if r.role == "reviewer"]
     return field_hotspots(
         request.app.state.annotation_store,
@@ -87,7 +89,7 @@ def get_case_diff(
     _admin: ReviewerCode = Depends(require_admin),
     registry: ReviewerCodeRegistry = Depends(get_reviewer_registry),
 ) -> dict[str, Any]:
-    case_objects = _require_dataset(request, version)
+    version, case_objects = _require_dataset(request, version)
     if case_id not in case_objects:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -108,7 +110,7 @@ def get_tool_review_summary(
     _admin: ReviewerCode = Depends(require_admin),
     registry: ReviewerCodeRegistry = Depends(get_reviewer_registry),
 ) -> dict[str, Any]:
-    _require_dataset(request, version)
+    version, _case_objects = _require_dataset(request, version)
     return tool_review_summary(
         request.app.state.tool_review_store,
         version,

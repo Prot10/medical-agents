@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException, Request
+from neuroagent.datasets import normalize_dataset_version
 
 router = APIRouter(tags=["cases"])
 
@@ -30,6 +31,7 @@ def list_datasets(request: Request) -> list[dict]:
 @router.post("/datasets/{version}/activate")
 def activate_dataset(version: str, request: Request) -> dict:
     """Switch the active dataset."""
+    version = normalize_dataset_version(version)
     all_datasets = request.app.state.all_datasets
     if version not in all_datasets:
         raise HTTPException(status_code=404, detail=f"Dataset '{version}' not found")

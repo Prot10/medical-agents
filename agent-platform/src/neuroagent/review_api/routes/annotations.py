@@ -11,6 +11,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from neuroagent.datasets import normalize_dataset_version
 
 from ..dependencies import current_reviewer
 from ..schemas.annotations import (
@@ -44,21 +45,24 @@ def _store(request: Request) -> AnnotationStore:
     return request.app.state.annotation_store
 
 
-def _ensure_dataset(request: Request, version: str) -> None:
+def _ensure_dataset(request: Request, version: str) -> str:
+    version = normalize_dataset_version(version)
     if version not in request.app.state.all_datasets:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Dataset '{version}' not found",
         )
+    return version
 
 
-def _ensure_case(request: Request, version: str, case_id: str) -> None:
-    _ensure_dataset(request, version)
+def _ensure_case(request: Request, version: str, case_id: str) -> str:
+    version = _ensure_dataset(request, version)
     if case_id not in request.app.state.all_datasets[version][1]:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Case '{case_id}' not found in {version}",
         )
+    return version
 
 
 # ----------------------------------------------------------------------
@@ -74,7 +78,7 @@ def list_my_reviews(
     request: Request,
     reviewer: ReviewerCode = Depends(current_reviewer),
 ) -> list[CaseReviewSummary]:
-    _ensure_dataset(request, version)
+    version = _ensure_dataset(request, version)
     return _store(request).list_for_reviewer(version, reviewer.code)
 
 
@@ -88,7 +92,7 @@ def get_review(
     request: Request,
     reviewer: ReviewerCode = Depends(current_reviewer),
 ) -> CaseReview:
-    _ensure_case(request, version, case_id)
+    version = _ensure_case(request, version, case_id)
     return _store(request).load_or_init(version, reviewer.code, case_id)
 
 
@@ -107,7 +111,7 @@ def set_status(
     request: Request,
     reviewer: ReviewerCode = Depends(current_reviewer),
 ) -> CaseReview:
-    _ensure_case(request, version, case_id)
+    version = _ensure_case(request, version, case_id)
     store = _store(request)
     review = store.load_or_init(version, reviewer.code, case_id)
     review.status = body.status
@@ -130,7 +134,7 @@ def create_annotation(
     request: Request,
     reviewer: ReviewerCode = Depends(current_reviewer),
 ) -> CaseReview:
-    _ensure_case(request, version, case_id)
+    version = _ensure_case(request, version, case_id)
     store = _store(request)
     review = store.load_or_init(version, reviewer.code, case_id)
     if any(a.id == body.id for a in review.field_annotations):
@@ -164,7 +168,7 @@ def update_annotation(
     request: Request,
     reviewer: ReviewerCode = Depends(current_reviewer),
 ) -> CaseReview:
-    _ensure_case(request, version, case_id)
+    version = _ensure_case(request, version, case_id)
     store = _store(request)
     review = store.load_or_init(version, reviewer.code, case_id)
     for idx, annotation in enumerate(review.field_annotations):
@@ -190,7 +194,7 @@ def delete_annotation(
     request: Request,
     reviewer: ReviewerCode = Depends(current_reviewer),
 ) -> CaseReview:
-    _ensure_case(request, version, case_id)
+    version = _ensure_case(request, version, case_id)
     store = _store(request)
     review = store.load_or_init(version, reviewer.code, case_id)
     before = len(review.field_annotations)
@@ -221,7 +225,7 @@ def create_comment(
     request: Request,
     reviewer: ReviewerCode = Depends(current_reviewer),
 ) -> CaseReview:
-    _ensure_case(request, version, case_id)
+    version = _ensure_case(request, version, case_id)
     store = _store(request)
     review = store.load_or_init(version, reviewer.code, case_id)
     if any(c.id == body.id for c in review.case_comments):
@@ -255,7 +259,7 @@ def update_comment(
     request: Request,
     reviewer: ReviewerCode = Depends(current_reviewer),
 ) -> CaseReview:
-    _ensure_case(request, version, case_id)
+    version = _ensure_case(request, version, case_id)
     store = _store(request)
     review = store.load_or_init(version, reviewer.code, case_id)
     for idx, comment in enumerate(review.case_comments):
@@ -281,7 +285,7 @@ def delete_comment(
     request: Request,
     reviewer: ReviewerCode = Depends(current_reviewer),
 ) -> CaseReview:
-    _ensure_case(request, version, case_id)
+    version = _ensure_case(request, version, case_id)
     store = _store(request)
     review = store.load_or_init(version, reviewer.code, case_id)
     before = len(review.case_comments)
@@ -313,7 +317,7 @@ def heartbeat(
     request: Request,
     reviewer: ReviewerCode = Depends(current_reviewer),
 ) -> dict[str, int]:
-    _ensure_case(request, version, case_id)
+    version = _ensure_case(request, version, case_id)
     store = _store(request)
     review = store.load_or_init(version, reviewer.code, case_id)
     review.time_spent_seconds = min(

@@ -17,12 +17,14 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
+from neuroagent.datasets import DATASET_VERSION_ALIASES, normalize_dataset_version
+
 from ..schemas.annotations import CaseReview, CaseReviewSummary
 
 logger = logging.getLogger(__name__)
 
 # Defensive validators — these strings end up as path segments.
-_VERSION_PATTERN = re.compile(r"^v\d{1,3}$")
+_VERSION_PATTERN = re.compile(r"^[A-Za-z0-9_\-]{1,64}$")
 _CODE_PATTERN = re.compile(r"^[A-Z0-9-]{3,64}$")
 _CASE_ID_PATTERN = re.compile(r"^[A-Za-z0-9_\-]+$")
 
@@ -44,9 +46,27 @@ class AnnotationStore:
     # ------------------------------------------------------------------
     # Path resolution
 
-    def _reviewer_dir(self, version: str, reviewer_code: str) -> Path:
+    def _validate_version(self, version: str) -> str:
         if not _VERSION_PATTERN.fullmatch(version):
             raise ValueError(f"Invalid dataset version: {version!r}")
+        return normalize_dataset_version(version)
+
+    def _version_candidates(self, version: str) -> list[str]:
+        canonical = self._validate_version(version)
+        aliases = [
+            alias
+            for alias, target in DATASET_VERSION_ALIASES.items()
+            if target == canonical and alias != canonical
+        ]
+        return [canonical, *aliases]
+
+    def _reviewer_dir(self, version: str, reviewer_code: str) -> Path:
+        canonical = self._validate_version(version)
+        if not _CODE_PATTERN.fullmatch(reviewer_code):
+            raise ValueError(f"Invalid reviewer code: {reviewer_code!r}")
+        return self._root / canonical / reviewer_code
+
+    def _reviewer_dir_for_key(self, version: str, reviewer_code: str) -> Path:
         if not _CODE_PATTERN.fullmatch(reviewer_code):
             raise ValueError(f"Invalid reviewer code: {reviewer_code!r}")
         return self._root / version / reviewer_code
@@ -55,6 +75,16 @@ class AnnotationStore:
         if not _CASE_ID_PATTERN.fullmatch(case_id):
             raise ValueError(f"Invalid case id: {case_id!r}")
         return self._reviewer_dir(version, reviewer_code) / f"{case_id}.json"
+
+    def _path_candidates(
+        self, version: str, reviewer_code: str, case_id: str
+    ) -> list[Path]:
+        if not _CASE_ID_PATTERN.fullmatch(case_id):
+            raise ValueError(f"Invalid case id: {case_id!r}")
+        return [
+            self._reviewer_dir_for_key(candidate, reviewer_code) / f"{case_id}.json"
+            for candidate in self._version_candidates(version)
+        ]
 
     # ------------------------------------------------------------------
     # CRUD
@@ -66,11 +96,14 @@ class AnnotationStore:
         case_id: str,
     ) -> CaseReview | None:
         """Return the existing review or None if no file exists."""
-        path = self._path_for(version, reviewer_code, case_id)
-        if not path.exists():
+        paths = self._path_candidates(version, reviewer_code, case_id)
+        path = next((candidate for candidate in paths if candidate.exists()), None)
+        if path is None:
             return None
         try:
-            return CaseReview.model_validate_json(path.read_text())
+            review = CaseReview.model_validate_json(path.read_text())
+            review.dataset_version = normalize_dataset_version(review.dataset_version)
+            return review
         except Exception as exc:  # pragma: no cover — corrupted file
             logger.error("Failed to parse review at %s: %s", path, exc)
             return None
@@ -91,9 +124,10 @@ class AnnotationStore:
             return existing
 
         now = _utcnow()
+        canonical = normalize_dataset_version(version)
         review = CaseReview(
             case_id=case_id,
-            dataset_version=version,
+            dataset_version=canonical,
             reviewer_code=reviewer_code,
             first_opened_at=now,
             last_updated_at=now,
@@ -104,6 +138,7 @@ class AnnotationStore:
     def save(self, review: CaseReview) -> CaseReview:
         """Persist the review atomically."""
         review.last_updated_at = _utcnow()
+        review.dataset_version = normalize_dataset_version(review.dataset_version)
         path = self._path_for(
             review.dataset_version, review.reviewer_code, review.case_id
         )
@@ -138,13 +173,16 @@ class AnnotationStore:
         reviewer_code: str,
     ) -> list[CaseReviewSummary]:
         """Cheap per-reviewer summary, suitable for the case-list sidebar."""
-        directory = self._reviewer_dir(version, reviewer_code)
-        if not directory.exists():
-            return []
+        case_ids: set[str] = set()
+        for candidate in self._version_candidates(version):
+            directory = self._reviewer_dir_for_key(candidate, reviewer_code)
+            if not directory.exists():
+                continue
+            case_ids.update(case_file.stem for case_file in directory.glob("*.json"))
 
         summaries: list[CaseReviewSummary] = []
-        for case_file in sorted(directory.glob("*.json")):
-            review = self.load(version, reviewer_code, case_file.stem)
+        for case_id in sorted(case_ids):
+            review = self.load(version, reviewer_code, case_id)
             if review is None:
                 continue
             severity_counts: dict[str, int] = {"note": 0, "issue": 0, "error": 0}
@@ -167,13 +205,14 @@ class AnnotationStore:
 
     def list_all_reviewers(self, version: str) -> list[str]:
         """List every reviewer code that has at least one stored review for ``version``."""
-        if not _VERSION_PATTERN.fullmatch(version):
-            raise ValueError(f"Invalid dataset version: {version!r}")
-        version_dir = self._root / version
-        if not version_dir.exists():
-            return []
-        return sorted(
-            entry.name
-            for entry in version_dir.iterdir()
-            if entry.is_dir() and _CODE_PATTERN.fullmatch(entry.name)
-        )
+        reviewers: set[str] = set()
+        for candidate in self._version_candidates(version):
+            version_dir = self._root / candidate
+            if not version_dir.exists():
+                continue
+            reviewers.update(
+                entry.name
+                for entry in version_dir.iterdir()
+                if entry.is_dir() and _CODE_PATTERN.fullmatch(entry.name)
+            )
+        return sorted(reviewers)

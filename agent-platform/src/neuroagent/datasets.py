@@ -14,7 +14,11 @@ logger = logging.getLogger(__name__)
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 DATA_ROOT = REPO_ROOT / "data"
-DEFAULT_DATASET_VERSION = "v5"
+CANONICAL_DATASET_VERSION = "neurobench"
+DEFAULT_DATASET_VERSION = CANONICAL_DATASET_VERSION
+DATASET_VERSION_ALIASES = {
+    "v5": CANONICAL_DATASET_VERSION,
+}
 
 
 @dataclass(frozen=True, slots=True)
@@ -26,13 +30,23 @@ class DatasetInfo:
 
 
 DATASETS: dict[str, DatasetInfo] = {
-    "v5": DatasetInfo(
-        version="v5",
-        path=DATA_ROOT / "neurobench_v5",
+    CANONICAL_DATASET_VERSION: DatasetInfo(
+        version=CANONICAL_DATASET_VERSION,
+        path=DATA_ROOT / "neurobench",
         name="NeuroBench",
         description="Tool-augmented neurology benchmark across 20 conditions.",
     ),
 }
+
+
+def normalize_dataset_version(version: str) -> str:
+    """Return the canonical dataset key for ``version`` or its legacy aliases."""
+    return DATASET_VERSION_ALIASES.get(version, version)
+
+
+def resolve_dataset_info(version: str) -> DatasetInfo | None:
+    """Resolve a dataset by canonical key or compatibility alias."""
+    return DATASETS.get(normalize_dataset_version(version))
 
 
 def load_dataset(
