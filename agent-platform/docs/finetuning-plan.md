@@ -1,5 +1,11 @@
 # Fine-Tuning Qwen3.5-9B for NeuroAgent Tool Use
 
+> **Partly superseded.** The numbers here (769 trajectories, 200 cases, 10 conditions)
+> describe an earlier run. Current: 1000 trajectories over the 500 train cases, Qwen3.5-9B
+> and -4B, QLoRA with hybrid LoRA targets (the gated-delta-net projections) and Liger fused
+> cross-entropy. `test_max_seq_length.py` was replaced by `probe_max_seq_length.py`.
+> See [`docs/training/distillation.md`](../../docs/training/distillation.md).
+
 > **Status:** Phase 2 in progress — SFT training running on 769 trajectories
 > **Last updated:** 2026-03-26
 > **Hardware:** Single A100-40GB

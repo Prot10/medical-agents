@@ -195,7 +195,7 @@ Examples: `ALZ-EARLY-P01`, `ISCH-STR-S03`, `FEPI-TEMP-RM02`
 
 ### 2.2 Enumerations
 
-#### NeurologicalCondition (32 conditions)
+#### NeurologicalCondition (36 conditions; the active dataset uses 20)
 
 Organized by clinical domain:
 

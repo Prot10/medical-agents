@@ -1,5 +1,10 @@
 # NeuroAgent Improvement Plan
 
+> **Historical record — March 2026.** This plan predates the 600-case / 20-condition dataset
+> and the tool-contract migration. Several items it lists as open are done (semantic action
+> matching, safety scoring). Kept for provenance; do not treat it as current guidance.
+> Current state: [`docs/architecture.md`](../../docs/architecture.md).
+
 Status: March 2026 — post-v3 audit and initial Qwen3.5-9B benchmark results.
 
 ## Current State

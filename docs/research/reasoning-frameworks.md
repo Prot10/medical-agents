@@ -177,7 +177,7 @@ The trajectory of this field is itself the argument: **chain → tree → graph 
 | [KARE](https://arxiv.org/abs/2410.04585) | ICLR 2025 | KG **community-level** retrieval for clinical prediction; +10–15% on MIMIC. Scalable knowledge-retrieval module. | 6 |
 | [MedRAG (KG-elicited)](https://arxiv.org/abs/2502.04413) | WWW 2025 | Four-tier hierarchical diagnostic KG (category → disease → feature → differentiator) drives DDx + follow-up questions. A concrete KG schema. | 6 |
 | [Med-R1](https://arxiv.org/abs/2503.13939) | preprint 2025 | GRPO reinforcement learning for medical vision-language reasoning; a 2B model beats 72B baselines. RL-efficiency evidence for §8. | 6 |
-| [O1 Replication Journey, Part 3](https://arxiv.org/abs/2501.06458) | preprint 2025 | Inference-time scaling helps *most* on the hardest medical cases; **~500 supervised examples suffice**. Implies NeuroBench (516 cases) is enough for reasoning-model SFT. | 6 |
+| [O1 Replication Journey, Part 3](https://arxiv.org/abs/2501.06458) | preprint 2025 | Inference-time scaling helps *most* on the hardest medical cases; **~500 supervised examples suffice**. Implies NeuroBench (600 cases; 500 in the train split) is enough for reasoning-model SFT. | 6 |
 | [MedAgentBench](https://arxiv.org/abs/2501.14654) | NEJM AI 2025 | FHIR-compliant virtual-EHR benchmark; best model 69.7%. Tool-use planning is the bottleneck; benchmark-design template. | 6 |
 | [MedRAG / MIRAGE](https://arxiv.org/abs/2402.13178) | preprint 2024 | RAG benchmark + toolkit for medicine; "lost-in-the-middle" effect. Informs the `search_medical_literature` tool. | 5 |
 | [MedAgentsBench](https://arxiv.org/abs/2503.07459) | preprint 2025 | Hard multi-step medical-reasoning benchmark; search-based agents give the best cost/accuracy ratio. Eval-design reference. | 5 |
@@ -488,7 +488,7 @@ The user's parallel goal — fine-tuning a model — is not separate from the re
 - **NeuroBench is already a verifiable reward source.** `GroundTruth` gives the correct diagnosis, `optimal_actions`, `critical_actions`, `contraindicated_actions` and `red_herrings`. A composite reward — correct primary dx + critical-action recall − contraindicated actions − cost overrun − miscalibration — enables **RLVR / GRPO** exactly as in [HuatuoGPT-o1](https://arxiv.org/abs/2412.18925) and [Med-R1](https://arxiv.org/abs/2503.13939).
 - **Search as a data engine.** Proposal B generates many scored trajectories per case → SFT on the best, preference-optimise on the rest → distil into a fast policy ([rStar-Math](https://arxiv.org/abs/2501.04519), [AlphaLLM](https://arxiv.org/abs/2404.12253)).
 - **Calibration as a first-class loss.** Because posteriors are explicit, a proper scoring rule (Brier) can be part of the objective — training the model to *know what it doesn't know*, which verbalised-confidence ReAct cannot.
-- **Data sufficiency.** [O1 Journey Part 3](https://arxiv.org/abs/2501.06458) found ~500 well-supervised examples already move medical reasoning substantially — NeuroBench's 516 cases are enough to start; the search engine multiplies them.
+- **Data sufficiency.** [O1 Journey Part 3](https://arxiv.org/abs/2501.06458) found ~500 well-supervised examples already move medical reasoning substantially — NeuroBench's 600 cases (500 train) are enough to start; the search engine multiplies them.
 
 In short: **Proposal A makes the model *supervisable*, Proposal B *generates the training data*, Proposal C *provides a teacher to distil*.**
 

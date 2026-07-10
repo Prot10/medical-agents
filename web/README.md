@@ -31,7 +31,7 @@ cd agent-platform
 uvicorn neuroagent.api.app:app --host 0.0.0.0 --port 8888
 ```
 
-The server loads all 100 cases into memory on startup and serves both the API and the frontend.
+The server loads all 600 cases into memory on startup and serves both the API and the frontend.
 
 ### 2. Open the dashboard
 
@@ -131,7 +131,7 @@ The FastAPI app automatically serves `web/dist/` as static files when the direct
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | Vite + React 18 + TypeScript |
+| Frontend | Vite + React 19 + TypeScript |
 | Styling | Tailwind CSS v4 + shadcn/ui primitives |
 | State | Zustand (streaming) + TanStack Query (data fetching) |
 | Markdown | react-markdown + remark-gfm |

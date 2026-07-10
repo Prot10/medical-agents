@@ -1,5 +1,9 @@
 # Models
 
+> The registry now holds 10 models (`agent-platform/src/neuroagent/model_registry.py`),
+> including Qwen3.5-4B, two Nemotron Nano variants and three Gemma-4 sizes. This page
+> documents the main ones; `serve_model.sh` is the authoritative launcher list.
+
 NeuroAgent uses [vLLM](https://docs.vllm.ai/) to serve LLMs locally via an OpenAI-compatible API.
 
 ## Supported models
@@ -10,7 +14,6 @@ NeuroAgent uses [vLLM](https://docs.vllm.ai/) to serve LLMs locally via an OpenA
 | `qwen3.5-27b-awq` | `QuantTrio/Qwen3.5-27B-AWQ` | ~15 GB | ~22 GB | AWQ 4-bit via Marlin kernels (~55 tok/s). Best quality. |
 | `medgemma-27b` | `ig1/medgemma-27b-text-it-FP8-Dynamic` | ~31 GB | ~33 GB | Medical specialist, FP8 quantized. Tight on A100-40GB (8K context limit). |
 | `medgemma-4b` | `google/medgemma-1.5-4b-it` | ~8 GB | ~10 GB | Small medical model. Fast iteration. Gated access. |
-| `openbio-8b` | `aaditya/Llama3-OpenBioLLM-8B` | ~16 GB | ~18 GB | Biomedical baseline. |
 
 ## Qwen3.5 architecture
 
