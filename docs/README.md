@@ -12,6 +12,7 @@ labelled as such — do not follow its commands.
 | --- | --- |
 | [`architecture.md`](architecture.md) | How the whole repo fits together: ReAct loop, tools, mock server, evaluation, web apps |
 | [`benchmark/tool-contract.md`](benchmark/tool-contract.md) | **What a tool is, what a case may say about it, and how that is enforced.** Read before touching a case or a tool |
+| [`benchmark/diagnosis-scoring.md`](benchmark/diagnosis-scoring.md) | What `diagnostic_accuracy_top1`/`top3` actually measure, and why old figures do not compare |
 | [`training/distillation.md`](training/distillation.md) | Gold trajectory generation and SFT of the small student models |
 
 ## Where the authoritative definition of each thing lives

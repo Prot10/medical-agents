@@ -206,6 +206,8 @@ flowchart TD
 - Data pipeline: 1000 parsed gold trajectories generated from the 500 train cases, two clinical styles each.
 - SFT: completed on Qwen3.5-9B with QLoRA; reported validation loss improved from 1.02 to 0.537.
 - Evaluation: SFT improved fold0 validation top-1 accuracy from 52.9% to 55.7%, mainly on diagnostic puzzles.
+  These figures predate the diagnosis-scoring fix and were measured against the whole response;
+  re-run before citing. See [`benchmark/diagnosis-scoring.md`](benchmark/diagnosis-scoring.md).
 - GRPO: implemented and evaluated, but gains were marginal because long ReAct completions are truncated under single-GPU memory limits.
 - DAPO: implemented and queued as the next RL comparison path.
 - Known bottleneck: full ReAct traces need roughly 4000-5000 completion tokens, while single A100-40GB QLoRA RL is constrained around 2048 tokens.
