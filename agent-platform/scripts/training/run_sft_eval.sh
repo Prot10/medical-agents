@@ -32,7 +32,6 @@ if [ ! -d "$SHM_HF/hub/$MODEL_DIR" ]; then
 fi
 export HF_HOME="$SHM_HF"
 export HF_HUB_OFFLINE=1
-MERGED_MODEL="${MERGED_MODEL:-$EOS_ROOT/models/ft/qwen3.5-$(echo "$MODEL_TAG" | grep -oiE '[0-9]+b' | head -1 | tr '[:upper:]' '[:lower:]')-sft}"
 
 RESULTS_DIR="${RESULTS_DIR:-results/sft_eval/${MODEL_TAG}}"
 SPLIT="${SPLIT:-test}"
@@ -46,8 +45,8 @@ mkdir -p "$RESULTS_DIR"
 
 echo "========================================="
 echo " SFT Evaluation — $MODEL_TAG on $SPLIT split"
-echo " Base:    $BASE_MODEL"
-echo " Adapter: $ADAPTER"
+echo " Base:    $BASE_MODEL (from RAM)"
+echo " Adapter: $ADAPTER (LoRA, from EOS — no merge)"
 echo " Repeats: $REPEATS"
 echo " Results: $RESULTS_DIR"
 echo "========================================="
@@ -58,54 +57,43 @@ _kill_vllm() {
   sleep 5
 }
 
-_serve_and_wait() {  # $1 = serve target (key or abs path)
+# One server hosts the base weights AND the LoRA adapter. Base is addressed by its model-id,
+# the adapter by the name "sft" (see serve_model.sh LORA_ADAPTER). So both evals run against
+# a single vLLM start — no merge, no restart between base and SFT.
+if [ ! -f "$RESULTS_DIR/base_results.json" ] || [ ! -f "$RESULTS_DIR/sft_results.json" ]; then
+  echo "[1/3] Starting vLLM ($MODEL_TAG base + LoRA adapter)..."
   _kill_vllm
-  bash "$SCRIPT_DIR/../runtime/serve_model.sh" "$1" "$PORT" &
-  for _ in $(seq 1 120); do
-    curl -s "http://localhost:$PORT/v1/models" | grep -q "model" && { echo "vLLM ready"; return 0; }
+  LORA_ADAPTER="$ADAPTER" bash "$SCRIPT_DIR/../runtime/serve_model.sh" "$SERVE_KEY" "$PORT" &
+  for _ in $(seq 1 180); do
+    curl -s "http://localhost:$PORT/v1/models" | grep -q "\"sft\"" && { echo "vLLM ready (base + sft)"; break; }
     sleep 5
   done
-  echo "ERROR: vLLM did not become ready" >&2
-  return 1
-}
-
-# -------- Step 1: merge adapter --------
-if [ ! -f "$MERGED_MODEL/config.json" ]; then
-  echo "[1/4] Merging adapter into base..."
-  mkdir -p "$(dirname "$MERGED_MODEL")"
-  uv run python -m neuroagent.training.merge_adapter \
-      --base-model "$BASE_MODEL" --adapter "$ADAPTER" --output "$MERGED_MODEL"
-else
-  echo "[1/4] Merged model exists, skipping."
 fi
 
-# -------- Step 2: base model --------
+# -------- base --------
 if [ ! -f "$RESULTS_DIR/base_results.json" ]; then
-  echo "[2/4] Evaluating BASE $MODEL_TAG on $SPLIT..."
-  _serve_and_wait "$SERVE_KEY"
+  echo "[2/3] Evaluating BASE $MODEL_TAG on $SPLIT..."
   uv run python agent-platform/scripts/training/run_sft_eval_cases.py evaluate \
       --model-id "$BASE_MODEL" --run-name "base-$SERVE_KEY" --split "$SPLIT" \
       --hospital "$HOSPITAL" --repeats "$REPEATS" \
       --output "$RESULTS_DIR/base_results.json" --port "$PORT"
-  _kill_vllm
 else
-  echo "[2/4] Base results exist, skipping."
+  echo "[2/3] Base results exist, skipping."
 fi
 
-# -------- Step 3: SFT model --------
+# -------- SFT (LoRA adapter, addressed as "sft") --------
 if [ ! -f "$RESULTS_DIR/sft_results.json" ]; then
-  echo "[3/4] Evaluating SFT $MODEL_TAG on $SPLIT..."
-  _serve_and_wait "$MERGED_MODEL"
+  echo "[3/3] Evaluating SFT $MODEL_TAG (LoRA) on $SPLIT..."
   uv run python agent-platform/scripts/training/run_sft_eval_cases.py evaluate \
-      --model-id "$MERGED_MODEL" --run-name "sft-$SERVE_KEY" --split "$SPLIT" \
+      --model-id "sft" --run-name "sft-$SERVE_KEY" --split "$SPLIT" \
       --hospital "$HOSPITAL" --repeats "$REPEATS" \
       --output "$RESULTS_DIR/sft_results.json" --port "$PORT"
-  _kill_vllm
 else
-  echo "[3/4] SFT results exist, skipping."
+  echo "[3/3] SFT results exist, skipping."
 fi
+_kill_vllm
 
-# -------- Step 4: compare --------
+# -------- compare --------
 echo "[4/4] Comparing..."
 uv run python agent-platform/scripts/training/run_sft_eval_cases.py compare \
     --base-results "$RESULTS_DIR/base_results.json" \

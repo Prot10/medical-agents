@@ -65,6 +65,19 @@ QWEN35_FLAGS=(
   --language-model-only
 )
 
+# Optional LoRA adapter. Set LORA_ADAPTER=/path/to/adapter to serve base + adapter from one
+# process: requests with model="<base>" hit the base weights, model="sft" hit the adapter.
+# Avoids merging a full fine-tuned model (no 18GB write, no slow reload) — the base loads
+# from RAM and only the ~300MB adapter comes off EOS.
+if [ -n "${LORA_ADAPTER:-}" ]; then
+  QWEN35_FLAGS+=(
+    --enable-lora
+    --lora-modules "sft=$LORA_ADAPTER"
+    --max-lora-rank "${MAX_LORA_RANK:-64}"
+  )
+  echo "Serving with LoRA adapter 'sft' = $LORA_ADAPTER"
+fi
+
 echo "Starting vLLM server for model: $MODEL on port $PORT"
 
 case "$MODEL" in
