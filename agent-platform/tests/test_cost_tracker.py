@@ -177,11 +177,11 @@ class TestCostTrackerNewTools:
         assert entry.cost_usd == 276.0
 
     def test_amyloid_pet(self, tracker: CostTracker):
-        entry = tracker.compute_cost("order_advanced_imaging", {"imaging_type": "amyloid_PET"})
+        entry = tracker.compute_cost("order_advanced_imaging", {"modality": "amyloid_PET"})
         assert entry.cost_usd == 3680.0
 
     def test_datscan(self, tracker: CostTracker):
-        entry = tracker.compute_cost("order_advanced_imaging", {"imaging_type": "DaTscan"})
+        entry = tracker.compute_cost("order_advanced_imaging", {"modality": "DaTscan"})
         assert entry.cost_usd == 4600.0
 
     def test_neuropsych(self, tracker: CostTracker):
@@ -245,7 +245,7 @@ class TestCostTrackerRealisticWorkups:
         tracker.compute_cost("interpret_labs", {"panels": ["CBC", "BMP", "thyroid", "B12", "folate", "RPR", "HIV"]})
         tracker.compute_cost("analyze_brain_mri", {"protocol": "dementia", "contrast": False})
         tracker.compute_cost("order_specialized_test", {"test_type": "neuropsych_battery"})
-        tracker.compute_cost("order_advanced_imaging", {"imaging_type": "amyloid_PET"})
+        tracker.compute_cost("order_advanced_imaging", {"modality": "amyloid_PET"})
         # Expected (EUR): 129 + 294 + 1104 + 3680 = 5207
         assert tracker.total_cost_usd == 5207.0
 

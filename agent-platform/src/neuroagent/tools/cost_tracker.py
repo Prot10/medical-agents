@@ -60,7 +60,7 @@ class CostTracker:
         elif tool_name == "order_cardiac_monitoring":
             total, breakdown = self._cost_by_type(tool_cfg, parameters, "monitor_type", "holter_24h")
         elif tool_name == "order_advanced_imaging":
-            total, breakdown = self._cost_by_type(tool_cfg, parameters, "imaging_type", "FDG_PET")
+            total, breakdown = self._cost_by_type(tool_cfg, parameters, "modality", "FDG_PET")
         elif tool_name == "order_specialized_test":
             total, breakdown = self._cost_specialized_test(tool_cfg, parameters)
         else:
