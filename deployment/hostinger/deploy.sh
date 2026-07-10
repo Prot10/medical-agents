@@ -14,6 +14,7 @@ set -euo pipefail
 # evaluation, LLM clients, tools, etc. are deliberately NOT synced to keep
 # the VPS minimal):
 #   - agent-platform/src/neuroagent/__init__.py .......... package marker
+#   - agent-platform/src/neuroagent/datasets.py .......... shared dataset registry (review_api imports it)
 #   - agent-platform/src/neuroagent/review_api/ .......... the only runtime code
 #   - agent-platform/pyproject.toml ...................... workspace member manifest
 #   - agent-platform/config/review/ ...................... reviewer-config dir
@@ -92,6 +93,12 @@ rsync -az --delete \
   "$VPS_HOST:$VPS_PATH/agent-platform/src/neuroagent/review_api/"
 rsync -az agent-platform/src/neuroagent/__init__.py \
   "$VPS_HOST:$VPS_PATH/agent-platform/src/neuroagent/__init__.py"
+
+# Shared dataset registry — review_api's config/routes/services all import
+# from neuroagent.datasets (dataset version resolution + legacy aliases).
+# It lives outside review_api/ so it must be shipped explicitly.
+rsync -az agent-platform/src/neuroagent/datasets.py \
+  "$VPS_HOST:$VPS_PATH/agent-platform/src/neuroagent/datasets.py"
 
 # agent-platform/pyproject.toml is the workspace member manifest — required
 # even if we only use review_api, because `uv sync` resolves the workspace.
