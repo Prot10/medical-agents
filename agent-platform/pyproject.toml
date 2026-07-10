@@ -36,6 +36,12 @@ training = [
     "bitsandbytes>=0.44",
     "datasets>=3.0",
     "accelerate>=1.0",
+    # Qwen3.5 is a hybrid model: its gated-delta-net layers run a slow pure-torch
+    # fallback unless fla supplies the Triton delta-rule kernels. Measured 2.2x faster
+    # SFT step time on an A100 (66s -> 30s/step). Pure Triton, no nvcc needed. The sibling
+    # `causal-conv1d` and `flash-attn` are deliberately NOT here: no cu13/py313 wheels
+    # exist, they need nvcc, and torch SDPA already covers full attention.
+    "flash-linear-attention>=0.5.1",
 ]
 
 [tool.uv.sources]

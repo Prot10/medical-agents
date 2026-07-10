@@ -336,6 +336,7 @@ def run_sft(
     neftune_alpha: float | None = None,
     early_stopping_patience: int = 1,
     seed: int = 42,
+    max_steps: int = -1,
 ) -> None:
     """Run SFT warmup on top trajectories.
 
@@ -464,6 +465,7 @@ def run_sft(
     training_args = SFTConfig(
         output_dir=output_dir,
         num_train_epochs=epochs,
+        max_steps=max_steps,  # -1 = ignore; >0 caps steps for a pipeline smoke test
         per_device_train_batch_size=batch_size,
         gradient_accumulation_steps=grad_accum,
         learning_rate=learning_rate,
@@ -838,6 +840,8 @@ def main() -> None:
     parser.add_argument("--early-stopping-patience", type=int, default=1,
                         help="Stop after N evals without eval_loss improvement. 0 disables")
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--max-steps", type=int, default=-1,
+                        help="Cap training steps for an end-to-end smoke test. -1 runs full epochs")
     parser.add_argument("--val-fraction", type=float, default=0.1,
                         help="Fraction of train cases carved out for validation")
     parser.add_argument("--max-seq-length", type=int, default=8192,
@@ -882,6 +886,7 @@ def main() -> None:
             neftune_alpha=args.neftune_alpha,
             early_stopping_patience=args.early_stopping_patience,
             seed=args.seed,
+            max_steps=args.max_steps,
         )
 
     elif args.stage == "grpo":

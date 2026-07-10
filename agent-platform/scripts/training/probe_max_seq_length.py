@@ -203,7 +203,7 @@ def main() -> None:
     summary = {
         "gpu": torch.cuda.get_device_name(0),
         "gpu_total_gb": round(torch.cuda.get_device_properties(0).total_memory / 1e9, 1),
-        "recipe": f"QLoRA NF4, r=64/alpha=128, grad_ckpt, NEFTune=5.0, bf16, bs=1, liger={args.liger}",
+        "recipe": f"QLoRA NF4, r=64/alpha=128, grad_ckpt, NEFTune=off, paged_adamw_8bit, bf16, bs=1, liger={args.liger}",
         "probes": probes,
         "shared_max_seq_length": shared,
     }

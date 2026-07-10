@@ -67,6 +67,14 @@ EPOCHS="${EPOCHS:-3}"
 BATCH="${BATCH:-1}"
 GRAD_ACCUM="${GRAD_ACCUM:-16}"   # effective batch 16; LoRA tolerates large batches poorly
 
+# flash-linear-attention supplies Qwen3.5's gated-delta-net Triton kernels. Without it the
+# model trains correctly but ~2.2x slower (torch fallback). Warn loudly rather than silently
+# burn hours — it is a project dependency (agent-platform[training]).
+if ! uv run python -c "import fla" 2>/dev/null; then
+  echo "WARNING: flash-linear-attention not importable — Qwen3.5 will run the slow torch"
+  echo "         fallback (~2.2x slower). Install with: uv sync --extra training"
+fi
+
 N_TRAJ="$(wc -l < "$DATA")"
 mkdir -p "$STAGING_DIR" results/sft_probe
 
