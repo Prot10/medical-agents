@@ -38,6 +38,10 @@ class AgentConfig:
     allowed_tools: list[str] | None
     excluded_tools: list[str] | None
     all_info_upfront: bool
+    # Which reasoning-style directive to append to the system prompt. "concise" (the default
+    # and current production behavior) leaves the base prompt untouched; "differential" asks
+    # the agent to make its exclusion reasoning explicit. See llm.prompts.apply_reasoning_style.
+    reasoning_style: str = "concise"
 
     def __post_init__(self) -> None:
         _require_non_empty_string("base_url", self.base_url)
@@ -65,6 +69,13 @@ class AgentConfig:
             raise AgentConfigError("all_info_upfront must be a boolean")
         _require_optional_string_list("allowed_tools", self.allowed_tools)
         _require_optional_string_list("excluded_tools", self.excluded_tools)
+        from ..llm.prompts import REASONING_STYLE_DIRECTIVE
+
+        if self.reasoning_style not in REASONING_STYLE_DIRECTIVE:
+            raise AgentConfigError(
+                f"reasoning_style must be one of {sorted(REASONING_STYLE_DIRECTIVE)}, "
+                f"got {self.reasoning_style!r}"
+            )
 
 
 _SCHEMA: dict[str, tuple[str, ...]] = {

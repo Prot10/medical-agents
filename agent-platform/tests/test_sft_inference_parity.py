@@ -24,6 +24,7 @@ os.environ.setdefault("HF_HOME", "/eos/project-d/diagbox/dvc/NeuroAgent/models/b
 
 from neuroagent.agent.orchestrator import AgentOrchestrator
 from neuroagent.llm.client import LLMResponse, LLMToolCall, extract_think_content
+from neuroagent.llm.prompts import apply_reasoning_style
 from neuroagent.training.chat_template import apply_training_chat_template
 from neuroagent.training.train_grpo import _agent_tool_definitions
 
@@ -153,3 +154,76 @@ class TestTrainingPromptEqualsServingPrompt:
         observation = next(m["content"] for m in trajectory["messages"] if m["role"] == "tool")
         distinctive = observation.strip().splitlines()[3].strip()[:24]
         assert distinctive and distinctive not in in_loss, "loss lands on a tool observation"
+
+
+@pytest.mark.skipif(not TRAJECTORIES.exists(), reason="gold trajectories not present")
+class TestReasoningStyleParity:
+    """The style directive the agent appends must reproduce the trajectory system prompts.
+
+    Every case appears in two styles. efficient_linear = the base prompt (concise, the
+    inference default); differential_reasoned = base + the exclusion-reasoning directive. If
+    the agent's `apply_reasoning_style` does not reproduce the exact stored prompt, the SFT
+    model is served a prompt it was not trained on — the class of bug this whole module exists
+    to prevent, now for the system prompt itself.
+    """
+
+    @pytest.fixture(scope="class")
+    def trajectories(self) -> list[dict]:
+        return [
+            json.loads(line)
+            for line in TRAJECTORIES.read_text().splitlines()
+            if line.strip()
+        ]
+
+    @pytest.fixture(scope="class")
+    def style_pairs(self) -> dict:
+        from collections import defaultdict
+
+        by_case = defaultdict(dict)
+        for line in TRAJECTORIES.read_text().splitlines():
+            if not line.strip():
+                continue
+            t = json.loads(line)
+            by_case[t["case_id"]][t["style"]] = t["messages"][0]["content"]
+        return {c: s for c, s in by_case.items() if len(s) == 2}
+
+    def test_every_case_has_both_styles(self, style_pairs):
+        assert len(style_pairs) == 500
+
+    def test_directive_present_exactly_for_differential(self, trajectories):
+        """The directive marks differential trajectories and only those."""
+        marker = "## Reasoning Approach"
+        for t in trajectories:
+            has = marker in t["messages"][0]["content"]
+            expect = t["style"] == "differential_reasoned"
+            assert has == expect, f"{t['case_id']} {t['style']}: directive present={has}"
+
+    def test_the_agent_appends_the_directive_where_it_is_stored(self, trajectories):
+        """`apply_reasoning_style` reproduces each trajectory's own prompt idempotently.
+
+        Applying the trajectory's own style to its own prompt must be a fixed point — the
+        directive is already where the orchestrator would put it (before hospital protocols),
+        so re-applying changes nothing. This ties the stored prompt to the agent's transform
+        without assuming the two styles of a case share a hospital context (373 do not).
+        """
+        mismatches = []
+        for t in trajectories:
+            prompt = t["messages"][0]["content"]
+            if apply_reasoning_style(prompt, t["style"]) != prompt:
+                mismatches.append((t["case_id"], t["style"]))
+        assert mismatches == [], mismatches[:5]
+
+    def test_directive_sits_immediately_before_hospital_protocols(self, trajectories):
+        """When a differential prompt has hospital rules, the directive precedes them."""
+        for t in trajectories:
+            prompt = t["messages"][0]["content"]
+            if t["style"] != "differential_reasoned" or "## Hospital Protocols" not in prompt:
+                continue
+            before = prompt.split("## Hospital Protocols")[0]
+            assert "## Reasoning Approach" in before, f"{t['case_id']}: directive after protocols"
+
+    def test_no_identical_prompt_conflicts_remain(self, style_pairs):
+        """The 127 same-prompt pairs are gone: the two styles now differ for every case."""
+        collisions = [c for c, p in style_pairs.items()
+                      if p["efficient_linear"] == p["differential_reasoned"]]
+        assert collisions == [], collisions[:5]

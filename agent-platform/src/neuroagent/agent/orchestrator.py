@@ -9,7 +9,7 @@ from typing import Any
 import re
 
 from ..llm.client import LLMClient, LLMResponse, LLMToolCall
-from ..llm.prompts import load_prompt, format_tool_result
+from ..llm.prompts import apply_reasoning_style, load_prompt, format_tool_result
 from ..tools.base import ToolCall, ToolResult
 from ..tools.cost_tracker import CostTracker
 from ..tools.tool_registry import ToolRegistry
@@ -405,6 +405,11 @@ class AgentOrchestrator:
 
     def _build_system_prompt(self) -> str:
         base = load_prompt("orchestrator.txt")
+
+        # Reasoning-style directive (concise = unchanged base; differential = show exclusion
+        # reasoning). Applied before hospital rules so the composed prompt matches the
+        # trajectory system prompts byte-for-byte. See llm.prompts.apply_reasoning_style.
+        base = apply_reasoning_style(base, self.config.reasoning_style)
 
         # Inject ALL hospital rules — agent must determine which pathway applies
         if self.rules:
