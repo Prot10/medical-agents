@@ -34,7 +34,7 @@ This is **offline agent distillation via rejection sampling** (FireAct / Agent D
 - [x] Phase 3 — Assemble + repair + audit → **1000/1000 valid, training-ready**
 - [ ] Phase 4b — SFT both models on full data, evaluate vs base on the 100-case test set
 
-## FINAL DATASET — `training_data/gold_trajectories_v6/trajectories.jsonl`
+## FINAL DATASET — `training_data/gold_trajectories/trajectories.jsonl`
 
 **1000 trajectories over 500 train cases** (2 per case, 100% of attempted).
 
@@ -268,16 +268,16 @@ uv run python -m neuroagent.training.data.make_train_test_split
 
 # 2. prompts for the 500 train cases x 2 styles
 uv run python -m neuroagent.training.data.generate_gold_trajectories \
-    --dataset data/neurobench --output training_data/gold_trajectories_v6 \
+    --dataset data/neurobench --output training_data/gold_trajectories \
     --splits-dir data/neurobench/splits --token-budget <BUDGET> --prepare-prompts
 
 # 3. generate (Workflow tool, Sonnet subagents, chunked & resumable via skip-existing)
 
 # 4. assemble + audit
 uv run python -m neuroagent.training.data.generate_gold_trajectories \
-    --dataset data/neurobench --output training_data/gold_trajectories_v6 --assemble
+    --dataset data/neurobench --output training_data/gold_trajectories --assemble
 HF_HOME=... uv run python agent-platform/scripts/training/audit_trajectories.py \
-    --data training_data/gold_trajectories_v6/trajectories.jsonl
+    --data training_data/gold_trajectories/trajectories.jsonl
 
 # 5. SFT
 bash agent-platform/scripts/training/run_sft_training.sh Qwen/Qwen3.5-9B

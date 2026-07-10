@@ -6,7 +6,7 @@ this is much cheaper than regenerating from scratch and preserves the good reaso
 
 Usage:
     uv run python agent-platform/scripts/training/list_repair_targets.py \
-        --output-dir training_data/gold_trajectories_v6
+        --output-dir training_data/gold_trajectories
 """
 
 from __future__ import annotations

@@ -20,7 +20,7 @@ CHECKPOINTS_ROOT="${CHECKPOINTS_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent/chec
 mkdir -p "$CHECKPOINTS_ROOT"
 
 TRAINING_DATA_ROOT="${TRAINING_DATA_ROOT:-./training_data}"
-DATA="$TRAINING_DATA_ROOT/gold_trajectories_v6/trajectories.jsonl"
+DATA="$TRAINING_DATA_ROOT/gold_trajectories/trajectories.jsonl"
 
 # Longest real trajectory measured on the train split is ~9.3k tokens, so anything above
 # ~10k only wastes the truncation ceiling — cap the probe's answer there.

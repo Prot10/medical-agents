@@ -34,7 +34,7 @@ def main():
         "/eos/project-d/diagbox/dvc/NeuroAgent/training_data",
     )
     model_name = "Qwen/Qwen3.5-9B"
-    data_path = f"{training_data_root}/gold_trajectories_v5/trajectories.jsonl"
+    data_path = f"{training_data_root}/gold_trajectories/trajectories.jsonl"
     output_dir = "/tmp/smoke_test_qlora"
 
     print(f"GPU: {torch.cuda.get_device_name(0)}")
