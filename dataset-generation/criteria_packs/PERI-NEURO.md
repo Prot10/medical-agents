@@ -44,7 +44,7 @@ the rest.
 
 **Optional:**
 - `analyze_csf` — when CIDP suspected (albuminocytologic dissociation supports)
-- `consult_medical_specialist` — neurology/rheumatology
+- Specialist referral *(clinical action — `tool_name: null`, no tool call)* — neurology/rheumatology
 
 ## 3. Tools that are typically USELESS
 

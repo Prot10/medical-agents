@@ -30,7 +30,7 @@ vasospasm risk based on CT blood distribution.
 - `interpret_labs` (CBC, BMP, coagulation, type & screen, troponin, BNP) — pre-op workup, neurogenic stress cardiomyopathy, hyponatremia (cerebral salt wasting / SIADH)
 - `analyze_ecg` — neurogenic stress (broad T-wave inversions, QT prolongation, ST changes); rule out concurrent cardiac event
 - `search_medical_literature` — Hunt-Hess + WFNS + Fisher grading, treatment options (clipping vs coiling)
-- `consult_medical_specialist` — neurosurgery + interventional neuroradiology REQUIRED
+- Specialist referral *(clinical action — `tool_name: null`, no tool call)* — neurosurgery + interventional neuroradiology REQUIRED
 - `check_drug_interactions` — nimodipine (oral, every 4h x 21 days, all patients with aneurysmal SAH), antiseizure prophylaxis (controversial — short course often used), reversal of anticoagulation if applicable
 
 **Recommended:**
@@ -57,7 +57,7 @@ vasospasm risk based on CT blood distribution.
 
 - `order_ct_scan` (non-contrast) → `analyze_csf` (`hard`): CT MUST precede LP — both for diagnosis (CT positive obviates LP) and safety [Edlow_2008]
 - `order_ct_scan` (positive for SAH) → CTA (`hard`): aneurysm characterization before treatment planning
-- `consult_medical_specialist` (neurosurgery) → definitive treatment (`hard`): clipping or coiling within 24-72h to reduce rebleeding risk [Connolly_2012]
+- Specialist referral (neurosurgery) → definitive treatment — *not expressible as a `sequence_constraint`, which must order two callable tools*: clipping or coiling within 24-72h to reduce rebleeding risk [Connolly_2012]
 - `interpret_labs` (coagulation) → invasive procedures (`hard`): correct coagulopathy before LP or surgery
 
 ## 6. Subtype variations

@@ -37,7 +37,7 @@ supported by DaTscan when clinical uncertainty.
 **Optional:**
 - `order_specialized_test` (`test_type: polysomnography`) — REM sleep behavior disorder, very strong PD prodrome marker
 - `order_specialized_test` (`test_type: autonomic_testing`) — for atypical features suggesting MSA
-- `consult_medical_specialist` — movement disorders subspecialist
+- Specialist referral *(clinical action — `tool_name: null`, no tool call)* — movement disorders subspecialist
 
 ## 3. Tools that are typically USELESS
 

@@ -33,7 +33,7 @@ ovarian teratoma (~50% young women, lower in other demographics).
 - `check_drug_interactions` — steroids, IVIG, rituximab, antipsychotics (some worsen movements), benzodiazepines
 
 **Recommended:**
-- `consult_medical_specialist` — neurology + psychiatry + gynecology if teratoma
+- Specialist referral *(clinical action — `tool_name: null`, no tool call)* — neurology + psychiatry + gynecology if teratoma
 
 **Optional:**
 - `order_advanced_imaging` (`modality: FDG_PET`) — research/specialty use, frontotemporal hypermetabolism in early stages, hypometabolism later

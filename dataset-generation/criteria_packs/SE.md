@@ -34,7 +34,7 @@ anesthetic therapy.
 - `interpret_labs` (autoimmune encephalitis panel, paraneoplastic panel, anti-thyroid antibodies) — autoimmune SE
 
 **Recommended:**
-- `consult_medical_specialist` — neurology + critical care; refractory SE benefits from epilepsy subspecialist
+- Specialist referral *(clinical action — `tool_name: null`, no tool call)* — neurology + critical care; refractory SE benefits from epilepsy subspecialist
 - `order_specialized_test` (`test_type: respiratory_function`) — if airway/respiratory concern (rarely a primary investigation here; usually clinical)
 
 **Optional:**

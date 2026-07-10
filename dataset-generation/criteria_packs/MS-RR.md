@@ -39,7 +39,7 @@ scenarios per McDonald 2017).
 - `order_specialized_test` (`test_type: vep`) — subclinical optic pathway involvement supports DIS
 
 **Optional:**
-- `consult_medical_specialist` — MS subspecialist for DMT decisions
+- Specialist referral *(clinical action — `tool_name: null`, no tool call)* — MS subspecialist for DMT decisions
 
 ## 3. Tools that are typically USELESS
 

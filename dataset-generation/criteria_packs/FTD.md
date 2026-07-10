@@ -29,7 +29,7 @@ sentence repetition deficits — usually AD pathology).
 **Recommended:**
 - `order_advanced_imaging` (`modality: FDG_PET`) — frontotemporal hypometabolism; useful when MRI atrophy subtle or when distinguishing from AD [Foster_2007]
 - `order_specialized_test` (`test_type: genetic_panel:FTD`) — family history positive or young onset; C9orf72 most common, then GRN, MAPT [Pottier_2016]
-- `consult_medical_specialist` — behavioral/cognitive neurology
+- Specialist referral *(clinical action — `tool_name: null`, no tool call)* — behavioral/cognitive neurology
 
 **Optional:**
 - `analyze_csf` (`Abeta42, phospho_tau, total_tau`) — distinguishes FTD from AD when amyloid PET unavailable
