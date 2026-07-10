@@ -43,12 +43,19 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export CUDA_MODULE_LOADING=LAZY
 mkdir -p "$RESULTS_DIR"
 
+# MODE selects what to evaluate. The weekend runner scores the base on the test set BEFORE
+# training (base does not need the adapter), then the SFT model after — same split, same
+# sampling, directly comparable.
+#   base : serve base only, evaluate base            (run before training)
+#   sft  : serve base + LoRA, evaluate the adapter   (run after training)
+#   both : serve base + LoRA, evaluate both, compare (default, standalone use)
+MODE="${MODE:-${2:-both}}"
+
 echo "========================================="
-echo " SFT Evaluation — $MODEL_TAG on $SPLIT split"
+echo " SFT Evaluation — $MODEL_TAG on $SPLIT split (mode: $MODE)"
 echo " Base:    $BASE_MODEL (from RAM)"
-echo " Adapter: $ADAPTER (LoRA, from EOS — no merge)"
-echo " Repeats: $REPEATS"
-echo " Results: $RESULTS_DIR"
+[ "$MODE" != "base" ] && echo " Adapter: $ADAPTER (LoRA, from EOS — no merge)"
+echo " Repeats: $REPEATS   Results: $RESULTS_DIR"
 echo "========================================="
 
 _kill_vllm() {
@@ -57,50 +64,64 @@ _kill_vllm() {
   sleep 5
 }
 
-# One server hosts the base weights AND the LoRA adapter. Base is addressed by its model-id,
-# the adapter by the name "sft" (see serve_model.sh LORA_ADAPTER). So both evals run against
-# a single vLLM start — no merge, no restart between base and SFT.
-if [ ! -f "$RESULTS_DIR/base_results.json" ] || [ ! -f "$RESULTS_DIR/sft_results.json" ]; then
-  echo "[1/3] Starting vLLM ($MODEL_TAG base + LoRA adapter)..."
+_serve() {  # $1 = "base" (no adapter) or "lora" (base + adapter)
   _kill_vllm
-  LORA_ADAPTER="$ADAPTER" bash "$SCRIPT_DIR/../runtime/serve_model.sh" "$SERVE_KEY" "$PORT" &
+  local ready_token="model"
+  if [ "$1" = "lora" ]; then
+    [ -f "$ADAPTER/adapter_model.safetensors" ] || { echo "ERROR: no adapter at $ADAPTER" >&2; return 1; }
+    LORA_ADAPTER="$ADAPTER" bash "$SCRIPT_DIR/../runtime/serve_model.sh" "$SERVE_KEY" "$PORT" &
+    ready_token='"sft"'
+  else
+    bash "$SCRIPT_DIR/../runtime/serve_model.sh" "$SERVE_KEY" "$PORT" &
+  fi
   for _ in $(seq 1 180); do
-    curl -s "http://localhost:$PORT/v1/models" | grep -q "\"sft\"" && { echo "vLLM ready (base + sft)"; break; }
+    curl -s "http://localhost:$PORT/v1/models" | grep -q "$ready_token" && { echo "vLLM ready"; return 0; }
     sleep 5
   done
+  echo "ERROR: vLLM did not become ready" >&2
+  return 1
+}
+
+# -------- base (before training) --------
+if [ "$MODE" = "base" ] || [ "$MODE" = "both" ]; then
+  if [ ! -f "$RESULTS_DIR/base_results.json" ]; then
+    echo "Evaluating BASE $MODEL_TAG on $SPLIT..."
+    _serve base
+    uv run python agent-platform/scripts/training/run_sft_eval_cases.py evaluate \
+        --model-id "$BASE_MODEL" --run-name "base-$SERVE_KEY" --split "$SPLIT" \
+        --hospital "$HOSPITAL" --repeats "$REPEATS" \
+        --output "$RESULTS_DIR/base_results.json" --port "$PORT"
+    _kill_vllm
+  else
+    echo "Base results exist, skipping."
+  fi
 fi
 
-# -------- base --------
-if [ ! -f "$RESULTS_DIR/base_results.json" ]; then
-  echo "[2/3] Evaluating BASE $MODEL_TAG on $SPLIT..."
-  uv run python agent-platform/scripts/training/run_sft_eval_cases.py evaluate \
-      --model-id "$BASE_MODEL" --run-name "base-$SERVE_KEY" --split "$SPLIT" \
-      --hospital "$HOSPITAL" --repeats "$REPEATS" \
-      --output "$RESULTS_DIR/base_results.json" --port "$PORT"
-else
-  echo "[2/3] Base results exist, skipping."
+# -------- SFT (after training) --------
+if [ "$MODE" = "sft" ] || [ "$MODE" = "both" ]; then
+  if [ ! -f "$RESULTS_DIR/sft_results.json" ]; then
+    echo "Evaluating SFT $MODEL_TAG (LoRA) on $SPLIT..."
+    _serve lora
+    uv run python agent-platform/scripts/training/run_sft_eval_cases.py evaluate \
+        --model-id "sft" --run-name "sft-$SERVE_KEY" --split "$SPLIT" \
+        --hospital "$HOSPITAL" --repeats "$REPEATS" \
+        --output "$RESULTS_DIR/sft_results.json" --port "$PORT"
+    _kill_vllm
+  else
+    echo "SFT results exist, skipping."
+  fi
 fi
 
-# -------- SFT (LoRA adapter, addressed as "sft") --------
-if [ ! -f "$RESULTS_DIR/sft_results.json" ]; then
-  echo "[3/3] Evaluating SFT $MODEL_TAG (LoRA) on $SPLIT..."
-  uv run python agent-platform/scripts/training/run_sft_eval_cases.py evaluate \
-      --model-id "sft" --run-name "sft-$SERVE_KEY" --split "$SPLIT" \
-      --hospital "$HOSPITAL" --repeats "$REPEATS" \
-      --output "$RESULTS_DIR/sft_results.json" --port "$PORT"
-else
-  echo "[3/3] SFT results exist, skipping."
+# -------- compare (only once both halves exist) --------
+if [ -f "$RESULTS_DIR/base_results.json" ] && [ -f "$RESULTS_DIR/sft_results.json" ]; then
+  echo "Comparing base vs SFT..."
+  uv run python agent-platform/scripts/training/run_sft_eval_cases.py compare \
+      --base-results "$RESULTS_DIR/base_results.json" \
+      --sft-results "$RESULTS_DIR/sft_results.json" \
+      --output "$RESULTS_DIR/comparison.json"
 fi
-_kill_vllm
 
-# -------- compare --------
-echo "[4/4] Comparing..."
-uv run python agent-platform/scripts/training/run_sft_eval_cases.py compare \
-    --base-results "$RESULTS_DIR/base_results.json" \
-    --sft-results "$RESULTS_DIR/sft_results.json" \
-    --output "$RESULTS_DIR/comparison.json"
-
-# Persist to EOS alongside the checkpoint.
+# Persist whatever exists to EOS alongside the checkpoint.
 EOS_RESULTS="$EOS_ROOT/results/sft_eval/${MODEL_TAG}"
 mkdir -p "$EOS_RESULTS"
 cp -r "$RESULTS_DIR/." "$EOS_RESULTS/"

@@ -28,6 +28,15 @@ from typing import Any
 
 import typer
 from rich.console import Console
+from rich.progress import (
+    BarColumn,
+    MofNCompleteColumn,
+    Progress,
+    SpinnerColumn,
+    TextColumn,
+    TimeElapsedColumn,
+    TimeRemainingColumn,
+)
 from rich.table import Table
 
 # ---------------------------------------------------------------------------
@@ -172,68 +181,82 @@ def evaluate(
         console.print(f"[yellow]Resuming: {len(completed)} already done[/yellow]")
 
     total = len(cases) * repeats
-    done = len(completed)
+    correct = sum(1 for r in all_results if r.diagnostic_accuracy_top1)
 
-    for rep in range(1, repeats + 1):
-        console.print(f"\n[bold]── Repeat {rep}/{repeats} ──[/bold]")
-        for i, case in enumerate(cases):
-            run_key = f"{run_name}|{case.case_id}|rep{rep}"
-            if run_key in completed:
-                continue
+    progress = Progress(
+        SpinnerColumn(),
+        TextColumn("[bold blue]{task.description}"),
+        BarColumn(bar_width=None),
+        MofNCompleteColumn(),
+        TextColumn("[green]top1 {task.fields[acc]}"),
+        TextColumn("•"),
+        TimeElapsedColumn(),
+        TextColumn("eta"),
+        TimeRemainingColumn(),
+        console=console,
+    )
 
-            done += 1
-            console.print(
-                f"  [{done}/{total}] {case.case_id} ({case.difficulty.value}) rep{rep}...",
-                end=" ",
-            )
+    def _acc() -> str:
+        n = len(all_results)
+        return f"{correct}/{n} ({100 * correct / n:.0f}%)" if n else "0/0"
 
-            try:
-                t0 = time.time()
-                trace, metrics = run_single_case(case, config, hospital)
-                elapsed = time.time() - t0
+    with progress:
+        task = progress.add_task(
+            f"{run_name}", total=total, completed=len(completed), acc=_acc()
+        )
+        for rep in range(1, repeats + 1):
+            for case in cases:
+                run_key = f"{run_name}|{case.case_id}|rep{rep}"
+                if run_key in completed:
+                    continue
 
-                result = CaseResult(
-                    case_id=case.case_id,
-                    condition=case.condition.value,
-                    difficulty=case.difficulty.value,
-                    run_name=run_name,
-                    repeat=rep,
-                    primary_diagnosis_gt=case.ground_truth.primary_diagnosis,
-                    agent_final_response=trace.final_response or "",
-                    diagnostic_accuracy_top1=metrics.diagnostic_accuracy_top1,
-                    diagnostic_accuracy_top3=metrics.diagnostic_accuracy_top3,
-                    critical_actions_hit=metrics.critical_actions_hit,
-                    safety_score=metrics.safety_score,
-                    tool_call_count=metrics.tool_call_count,
-                    tools_called=trace.tools_called,
-                    protocol_compliance=metrics.protocol_compliance,
-                    missing_required_steps=metrics.missing_required_steps,
-                    protocol_violations=metrics.protocol_violations,
-                    elapsed_seconds=round(elapsed, 1),
-                    total_tokens=trace.total_tokens,
-                    total_cost_usd=round(metrics.total_cost_usd, 2),
-                    cost_efficiency=round(metrics.cost_efficiency, 3),
-                )
-                all_results.append(result)
-                completed.add(run_key)
+                try:
+                    t0 = time.time()
+                    trace, metrics = run_single_case(case, config, hospital)
+                    elapsed = time.time() - t0
 
-                # Checkpoint
-                checkpoint_file.write_text(json.dumps({
-                    "completed": sorted(completed),
-                    "results": [asdict(r) for r in all_results],
-                }, default=str))
+                    result = CaseResult(
+                        case_id=case.case_id,
+                        condition=case.condition.value,
+                        difficulty=case.difficulty.value,
+                        run_name=run_name,
+                        repeat=rep,
+                        primary_diagnosis_gt=case.ground_truth.primary_diagnosis,
+                        agent_final_response=trace.final_response or "",
+                        diagnostic_accuracy_top1=metrics.diagnostic_accuracy_top1,
+                        diagnostic_accuracy_top3=metrics.diagnostic_accuracy_top3,
+                        critical_actions_hit=metrics.critical_actions_hit,
+                        safety_score=metrics.safety_score,
+                        tool_call_count=metrics.tool_call_count,
+                        tools_called=trace.tools_called,
+                        protocol_compliance=metrics.protocol_compliance,
+                        missing_required_steps=metrics.missing_required_steps,
+                        protocol_violations=metrics.protocol_violations,
+                        elapsed_seconds=round(elapsed, 1),
+                        total_tokens=trace.total_tokens,
+                        total_cost_usd=round(metrics.total_cost_usd, 2),
+                        cost_efficiency=round(metrics.cost_efficiency, 3),
+                    )
+                    all_results.append(result)
+                    completed.add(run_key)
+                    correct += int(metrics.diagnostic_accuracy_top1)
 
-                dx = "✓" if metrics.diagnostic_accuracy_top1 else "✗"
-                cost_str = f"${metrics.total_cost_usd:,.0f}"
-                console.print(
-                    f"dx={dx}  tools={metrics.tool_call_count}  "
-                    f"safety={metrics.safety_score:.2f}  cost={cost_str}  "
-                    f"{elapsed:.0f}s  {trace.total_tokens}tok"
-                )
+                    checkpoint_file.write_text(json.dumps({
+                        "completed": sorted(completed),
+                        "results": [asdict(r) for r in all_results],
+                    }, default=str))
 
-            except Exception as e:
-                console.print(f"[red]FAILED: {e}[/red]")
-                logger.exception("Case %s rep%d failed", case.case_id, rep)
+                    dx = "[green]✓[/green]" if metrics.diagnostic_accuracy_top1 else "[red]✗[/red]"
+                    progress.console.print(
+                        f"  {dx} [dim]{case.case_id:<16} rep{rep}[/dim]  "
+                        f"tools={metrics.tool_call_count:<2} safety={metrics.safety_score:.2f} "
+                        f"${metrics.total_cost_usd:,.0f} {elapsed:.0f}s"
+                    )
+                except Exception as e:
+                    progress.console.print(f"  [red]✗ {case.case_id} rep{rep} FAILED: {e}[/red]")
+                    logger.exception("Case %s rep%d failed", case.case_id, rep)
+
+                progress.update(task, advance=1, acc=_acc())
 
     # Save final results
     out_path = Path(output)

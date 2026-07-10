@@ -25,22 +25,31 @@ echo "#########################################################"
 for TAG in "${MODELS[@]}"; do
   echo ""
   echo "==================== $TAG ===================="
+
+  # 1. Base model on the test set FIRST — same split/sampling as the SFT eval, so the two are
+  #    directly comparable, and the RAM-staged base is scored before training touches the GPU.
+  echo "[$TAG] base test-set eval — $(date)"
+  if ! MODE=base bash "$SCRIPT_DIR/run_sft_eval.sh" "$TAG"; then
+    echo "[$TAG] BASE EVAL FAILED — continuing (training can still run)." >&2
+  fi
+
+  # 2. Train the adapter (written to EOS).
   echo "[$TAG] training — $(date)"
   if ! bash "$SCRIPT_DIR/run_sft_training.sh" "Qwen/$TAG"; then
-    echo "[$TAG] TRAINING FAILED — skipping its eval, continuing to next model." >&2
+    echo "[$TAG] TRAINING FAILED — skipping SFT eval, continuing to next model." >&2
     continue
   fi
 
-  # Confirm the adapter actually landed on EOS before evaluating it.
   ADAPTER="$EOS_ROOT/checkpoints/sft_$TAG"
   if [ ! -f "$ADAPTER/adapter_model.safetensors" ]; then
-    echo "[$TAG] no adapter at $ADAPTER after training — skipping eval." >&2
+    echo "[$TAG] no adapter at $ADAPTER after training — skipping SFT eval." >&2
     continue
   fi
 
-  echo "[$TAG] evaluating base vs SFT on the 100-case test split — $(date)"
-  if ! bash "$SCRIPT_DIR/run_sft_eval.sh" "$TAG"; then
-    echo "[$TAG] EVAL FAILED — adapter is safe on EOS; continuing to next model." >&2
+  # 3. SFT model on the same test set, then compare against the base results from step 1.
+  echo "[$TAG] SFT test-set eval + compare — $(date)"
+  if ! MODE=sft bash "$SCRIPT_DIR/run_sft_eval.sh" "$TAG"; then
+    echo "[$TAG] SFT EVAL FAILED — adapter is safe on EOS; continuing to next model." >&2
     continue
   fi
   echo "[$TAG] done — $(date)"
