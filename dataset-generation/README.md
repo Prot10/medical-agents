@@ -43,7 +43,6 @@ dataset-generation/
 │   ├── generate_one.sh              # Single case debug script
 │   └── dataset_statistics.py        # Dataset statistics (conditions, demographics, modalities)
 └── docs/
-    └── external_case_sources.md     # Research on 22+ external medical case datasets
 ```
 
 ## Usage
@@ -93,4 +92,4 @@ uv run --project dataset-generation python dataset-generation/scripts/dataset_st
 
 ## External Data Sources
 
-See `docs/external_case_sources.md` for comprehensive research on 22+ medical case datasets evaluated for NeuroBench expansion, including licensing, access methods, and mapping potential.
+See `docs/archive/dataset-generation/external_case_sources.md` (historical) for the research on 22+ medical case datasets evaluated for NeuroBench expansion, including licensing, access methods, and mapping potential.

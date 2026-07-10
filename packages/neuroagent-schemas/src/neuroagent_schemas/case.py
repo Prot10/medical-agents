@@ -12,7 +12,6 @@ from .patient import PatientProfile
 from .tool_outputs import (
     AdvancedImagingReport,
     CardiacMonitoringReport,
-    ConsultationOutput,
     CSFResults,
     CTReport,
     DrugInteractionResult,
@@ -41,7 +40,6 @@ class ToolOutputSet(BaseModel):
     specialized_test: SpecializedTestReport | None = None
     literature_search: dict[str, LiteratureSearchResult] | None = None
     drug_interactions: dict[str, DrugInteractionResult] | None = None
-    consultation: dict[str, ConsultationOutput] | None = None
 
 
 # Maps a tool name to the output model it must produce. Used to resolve the
@@ -62,7 +60,6 @@ _TOOL_OUTPUT_MODEL: dict[str, type[BaseModel]] = {
     "order_specialized_test": SpecializedTestReport,
     "search_medical_literature": LiteratureSearchResult,
     "check_drug_interactions": DrugInteractionResult,
-    "consult_medical_specialist": ConsultationOutput,
 }
 
 
@@ -71,10 +68,7 @@ class FollowUpToolOutput(BaseModel):
 
     trigger_action: str
     tool_name: str
-    # ConsultationOutput is last in the union: it accepts extras (`extra="allow"`)
-    # so it would match almost any dict in a fallback resolution. The model_validator
-    # below dispatches by tool_name first, so this only matters as a defensive
-    # ordering for unseen legacy data.
+    # The model_validator below dispatches by tool_name; the union is the fallback.
     output: (
         EEGReport
         | MRIReport
@@ -88,7 +82,6 @@ class FollowUpToolOutput(BaseModel):
         | SpecializedTestReport
         | LiteratureSearchResult
         | DrugInteractionResult
-        | ConsultationOutput
     )
 
     @model_validator(mode="before")
