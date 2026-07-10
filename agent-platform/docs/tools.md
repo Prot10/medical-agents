@@ -328,7 +328,7 @@ One tool, nineteen studies plus targeted gene panels, selected by `test_type`.
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |
 | `clinical_context` | string | yes | |
-| `test_type` | enum | **yes** | 19 values — nerve/muscle (`emg_ncs`, `emg_single_fiber`, `repetitive_nerve_stimulation`, `nerve_biopsy`, `muscle_biopsy`, `skin_biopsy_iencf`), evoked potentials (`vep`, `ssep`, `baep`), cognition (`neuropsych_battery`), sleep (`polysomnography`, `mslt`), autonomic/cardiac (`tilt_table`, `autonomic_testing`, `exercise_stress_test`), ophthalmic (`optical_coherence_tomography`, `visual_field_perimetry`), `respiratory_function`, `ice_pack_test` — **plus** `genetic_panel:<panel>` for 11 panels |
+| `test_type` | enum | **yes** | 21 values — nerve/muscle (`emg_ncs`, `emg_single_fiber`, `repetitive_nerve_stimulation`, `nerve_biopsy`, `muscle_biopsy`, `skin_biopsy_iencf`, `minor_salivary_gland_biopsy`), evoked potentials (`vep`, `ssep`, `baep`), cognition (`neuropsych_battery`), sleep (`polysomnography`, `mslt`), autonomic/cardiac (`tilt_table`, `autonomic_testing`, `exercise_stress_test`), ophthalmic (`optical_coherence_tomography`, `visual_field_perimetry`), audiology (`pure_tone_audiometry`), `respiratory_function`, `ice_pack_test` — **plus** `genetic_panel:<panel>` for 15 panels |
 
 Returns `SpecializedTestReport`.
 

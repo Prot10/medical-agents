@@ -51,7 +51,7 @@ uv run python agent-platform/scripts/benchmark/run_baseline_eval.py
 - 12 tools: analyze_brain_mri, analyze_eeg, analyze_ecg, interpret_labs, analyze_csf, order_ct_scan, order_echocardiogram, order_cardiac_monitoring, order_advanced_imaging, order_specialized_test, search_medical_literature, check_drug_interactions
 - Cost tracking: `CostTracker` in `tools/cost_tracker.py`, config in `config/tools/costs.yaml`, Medicare PFS reference rates
 - Tool vocabulary: `costs.yaml` is the single source; `tools/vocabulary.py` generates the catchall enums from it.
-  `order_advanced_imaging` takes `modality` (11 values); `order_specialized_test` takes `test_type` (19 + `genetic_panel:<panel>`)
+  `order_advanced_imaging` takes `modality` (11 values); `order_specialized_test` takes `test_type` (21 + `genetic_panel:<panel>`)
 - Case contract: `agent-platform/scripts/validation/validate_cases.py` must report 0 issues on 600/600.
   Read `docs/benchmark/tool-contract.md` before editing a case or a tool schema
 - `consult_medical_specialist` does not exist; a specialist referral is an action with `tool_name: null`
