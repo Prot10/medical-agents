@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Any
 from .base import BaseTool, ToolResult
 from .mock_server import MockServer
+from .vocabulary import by_type_values
 
 
 class CardiacMonitoringTool(BaseTool):
@@ -22,10 +23,12 @@ class CardiacMonitoringTool(BaseTool):
             },
             "monitor_type": {
                 "type": "string",
-                "enum": ["holter_24h", "holter_48h", "event_monitor_30d", "telemetry"],
+                "enum": by_type_values("order_cardiac_monitoring"),
                 "description": (
                     "Type of monitoring. 'holter_24h'/'holter_48h': continuous recording. "
-                    "'event_monitor_30d': patient-activated, captures infrequent events. "
+                    "'event_monitor_14d'/'event_monitor_30d': patient-activated, captures "
+                    "infrequent events. 'implantable_loop_recorder': months to years of "
+                    "monitoring (cryptogenic stroke, unexplained syncope). "
                     "'telemetry': inpatient continuous monitoring."
                 ),
                 "default": "holter_24h",
