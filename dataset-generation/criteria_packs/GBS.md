@@ -33,7 +33,7 @@ ataxia + areflexia, anti-GQ1b positive), pharyngeal-cervical-brachial.
 - `analyze_ecg` + `order_cardiac_monitoring` — autonomic involvement (arrhythmia, BP lability) common; monitor in moderate-severe cases [Asbury_1990]
 
 **Optional:**
-- `consult_medical_specialist` — neurology/ICU for severe cases
+- Specialist referral *(clinical action — `tool_name: null`, no tool call)* — neurology/ICU for severe cases
 
 ## 3. Tools that are typically USELESS
 

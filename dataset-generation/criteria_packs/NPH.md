@@ -32,7 +32,7 @@ shunt response (sensitivity ~50-80%, specificity >75%).
 - `search_medical_literature` — Relkin 2005, INPH Study, shunt response predictors
 
 **Recommended:**
-- `consult_medical_specialist` — neurosurgery for shunt evaluation
+- Specialist referral *(clinical action — `tool_name: null`, no tool call)* — neurosurgery for shunt evaluation
 - Repeat tap test or lumbar drainage (3-5 day trial) if first tap inconclusive
 
 **Optional:**

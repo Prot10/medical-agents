@@ -38,7 +38,7 @@ predominant, poor RNS response), congenital myasthenic syndromes.
 
 **Optional:**
 - `analyze_ecg` — pre-thymectomy + comorbid cardiac assessment
-- `consult_medical_specialist` — neurology/thymic surgery
+- Specialist referral *(clinical action — `tool_name: null`, no tool call)* — neurology/thymic surgery
 
 ## 3. Tools that are typically USELESS
 

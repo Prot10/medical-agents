@@ -30,7 +30,7 @@ causes. Ammonia level supports diagnosis but isn't required (poor sensitivity
 **Recommended:**
 - `analyze_csf` — only if meningitis/encephalitis suspected; otherwise not indicated
 - `analyze_eeg` — triphasic waves classic but non-specific (metabolic encephalopathy generally); useful if non-convulsive status epilepticus on differential
-- `consult_medical_specialist` — hepatology + critical care for grades III-IV
+- Specialist referral *(clinical action — `tool_name: null`, no tool call)* — hepatology + critical care for grades III-IV
 
 **Optional:**
 - `analyze_ecg` — baseline if elderly or comorbid cardiac disease

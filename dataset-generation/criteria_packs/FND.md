@@ -32,7 +32,7 @@ preserved awareness, prolonged duration with normal post-ictal state.
 - `check_drug_interactions` — review of medications that may worsen symptoms
 
 **Optional:**
-- `consult_medical_specialist` — psychiatry/health psychology for treatment
+- Specialist referral *(clinical action — `tool_name: null`, no tool call)* — psychiatry/health psychology for treatment
 
 ## 3. Tools that are typically USELESS
 

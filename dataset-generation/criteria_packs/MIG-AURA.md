@@ -30,7 +30,7 @@ Diagnosis is **clinical** — no diagnostic test confirms migraine.
 - `analyze_eeg` — only when seizure on differential; otherwise NOT indicated
 
 **Optional:**
-- `consult_medical_specialist` — neurology/headache subspecialist for refractory or atypical cases
+- Specialist referral *(clinical action — `tool_name: null`, no tool call)* — neurology/headache subspecialist for refractory or atypical cases
 
 ## 3. Tools that are typically USELESS
 

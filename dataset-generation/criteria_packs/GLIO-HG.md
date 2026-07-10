@@ -23,7 +23,7 @@ grades 3-4 (IDH-mutant astrocytoma CNS WHO grade 3, glioblastoma; note "anaplast
 - `analyze_brain_mri` (with and without gadolinium contrast; include diffusion, FLAIR) — characterize lesion, edema, mass effect, enhancement pattern [Stupp_2005]
 - `interpret_labs` (CBC, CMP, coagulation; type & screen pre-op) — anticipated surgery, possibly steroids
 - `search_medical_literature` — WHO classification, Stupp protocol, surgical referral criteria
-- `consult_medical_specialist` — neurosurgery + neuro-oncology REQUIRED for tissue diagnosis and treatment planning
+- Specialist referral *(clinical action — `tool_name: null`, no tool call)* — neurosurgery + neuro-oncology REQUIRED for tissue diagnosis and treatment planning
 
 **Recommended:**
 - `order_advanced_imaging` (`modality: perfusion_MRI`) — high rCBV supports high-grade; useful when biopsy planning targeted to highest-grade region [Law_2003]

@@ -33,7 +33,7 @@ known structural heart disease; family history of sudden cardiac death.
 - `order_specialized_test` (`test_type: tilt_table`) — only if neurally-mediated syncope vs cardiac is uncertain; NOT to confirm cardiac syncope
 - `order_specialized_test` (`test_type: exercise_stress_test`) — exercise-induced syncope, suspected exercise-triggered arrhythmia
 - `order_advanced_imaging` (`modality: MR_angiography`) — if vascular (subclavian steal, vertebrobasilar TIA) on differential
-- `consult_medical_specialist` — cardiology / electrophysiology referral
+- Specialist referral *(clinical action — `tool_name: null`, no tool call)* — cardiology / electrophysiology referral
 
 **Optional:**
 - `analyze_brain_mri` — only if seizure or stroke on differential; routine imaging not indicated in typical syncope
