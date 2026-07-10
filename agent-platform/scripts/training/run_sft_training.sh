@@ -28,9 +28,19 @@ CHECKPOINTS_ROOT="${CHECKPOINTS_ROOT:-$EOS_ROOT/checkpoints}"
 SHM_HF="${SHM_HF:-/dev/shm/hf}"
 MODEL_DIR="models--${MODEL/\//--}"   # Qwen/Qwen3.5-9B -> models--Qwen--Qwen3.5-9B
 if [ ! -d "$SHM_HF/hub/$MODEL_DIR" ]; then
-  echo "Staging $MODEL_TAG from EOS to $SHM_HF (RAM, one-time ~5min)..."
+  echo "▶ Staging $MODEL_TAG base weights: EOS → $SHM_HF (RAM, one-time)"
   mkdir -p "$SHM_HF/hub"
-  cp -r "$EOS_HF/hub/$MODEL_DIR" "$SHM_HF/hub/" || { echo "ERROR: base model not on EOS at $EOS_HF/hub/$MODEL_DIR" >&2; exit 1; }
+  # rsync shows a live % / rate progress bar; falls back to cp if rsync is missing.
+  if command -v rsync >/dev/null; then
+    rsync -a --info=progress2 "$EOS_HF/hub/$MODEL_DIR" "$SHM_HF/hub/" \
+      || { echo "ERROR: base model not on EOS at $EOS_HF/hub/$MODEL_DIR" >&2; exit 1; }
+  else
+    cp -r "$EOS_HF/hub/$MODEL_DIR" "$SHM_HF/hub/" \
+      || { echo "ERROR: base model not on EOS at $EOS_HF/hub/$MODEL_DIR" >&2; exit 1; }
+  fi
+  echo "✓ base weights staged"
+else
+  echo "✓ $MODEL_TAG base already staged in RAM"
 fi
 export HF_HOME="$SHM_HF"
 export HF_HUB_OFFLINE=1
@@ -105,6 +115,11 @@ echo " Output:     $EOS_DIR (EOS — only the adapter, written directly)"
 echo "========================================="
 echo "Start: $(date)"
 echo ""
+
+# A prior eval phase serves with vLLM; make sure it fully released the A100 before we load the
+# model for training, or the trainer OOMs on a GPU that still looks occupied.
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/_gpu.sh"
+free_gpu "before training" || true
 
 # Checkpoints and the final adapter are written straight to EOS.
 uv run python -m neuroagent.training.train_grpo \

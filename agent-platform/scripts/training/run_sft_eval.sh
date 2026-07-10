@@ -58,11 +58,8 @@ echo " Base:    $BASE_MODEL (from RAM)"
 echo " Repeats: $REPEATS   Results: $RESULTS_DIR"
 echo "========================================="
 
-_kill_vllm() {
-  pkill -f "vllm_serve.py" 2>/dev/null || true
-  pkill -f "VLLM::EngineCore" 2>/dev/null || true
-  sleep 5
-}
+source "$SCRIPT_DIR/_gpu.sh"
+_kill_vllm() { free_gpu "eval teardown"; }
 
 _serve() {  # $1 = "base" (no adapter) or "lora" (base + adapter)
   _kill_vllm
