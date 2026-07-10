@@ -72,6 +72,8 @@ missing `clinical_context` is expected and fine. An unknown key is not.
 | `visual_field_perimetry` | Humphrey/Goldmann VF | Chiasmal compression, MS |
 | `ice_pack_test` | Bedside ice-pack ptosis test | MG (rapid screen) |
 | `respiratory_function` | FVC, MIP/MEP, NIF | ALS respiratory monitoring, MG crisis risk |
+| `pure_tone_audiometry` | Formal pure-tone audiometry | Sensorineural hearing loss (bacterial meningitis) |
+| `minor_salivary_gland_biopsy` | Lip biopsy, focus score | Sjögren's confirmation |
 | `genetic_panel:<panel>` | Targeted gene panel | See panel list below |
 
 **Allowed genetic panels** (only these `<panel>` suffix values are valid):
@@ -89,6 +91,10 @@ missing `clinical_context` is expected and fine. An unknown key is not.
 | `HSP` | Hereditary spastic paraparesis | SPG4, SPG7, SPG11 |
 | `mitochondrial` | Mitochondrial myopathy | mtDNA + nuclear |
 | `MS_genetic_risk` | MS risk panel (research use only) | HLA-DRB1, etc. |
+| `wilson` | Wilson disease | ATP7B |
+| `porphyria` | Acute intermittent porphyria | HMBS, ALAS1, CPOX, PPOX |
+| `small_fiber_neuropathy` | Hereditary small-fibre neuropathy | SCN9A, SCN10A, SCN11A |
+| `PD` | Young-onset / monogenic Parkinson's | PRKN, PINK1, DJ-1, LRRK2, GBA, SNCA |
 
 ---
 
