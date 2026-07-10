@@ -5,7 +5,7 @@ description: Exhaustively validate NeuroBench benchmark cases field-by-field —
 
 # NeuroBench Case Audit
 
-Exhaustively validate NeuroBench v5 cases (`data/neurobench_v5/cases/{CASE}.json`),
+Exhaustively validate NeuroBench v5 cases (`data/neurobench/cases/{CASE}.json`),
 reading **every field, value, and sentence** of each assigned case. Produce a
 trustworthy audit: fix only objectively-wrong mechanical errors, flag everything
 requiring judgment, and never silently change clinical meaning.
@@ -37,10 +37,8 @@ requiring judgment, and never silently change clinical meaning.
 ## Step 1 — run the mechanical validators for your condition
 
 ```bash
-uv run python agent-platform/scripts/validate_ground_truth_coherence.py --case {CASE}.json   # must be 0
-uv run python agent-platform/scripts/detect_answer_leakage.py --case {CASE}.json              # candidates; judge each
-uv run python agent-platform/scripts/validate_tool_vocab.py            # whole-dataset; note your cases
-uv run python -c "from pathlib import Path; from neuroagent_schemas import NeuroBenchCase; NeuroBenchCase.model_validate_json(Path('data/neurobench_v5/cases/{CASE}.json').read_text())"
+uv run python agent-platform/scripts/validation/validate_cases.py --case {CASE}.json   # must be 0 issues
+uv run python -c "from pathlib import Path; from neuroagent_schemas import NeuroBenchCase; NeuroBenchCase.model_validate_json(Path('data/neurobench/cases/{CASE}.json').read_text())"
 ```
 
 ## Step 2 — read every field against the five dimensions

@@ -6,14 +6,44 @@ diagnostic tools. Strict adherence keeps every `(tool_name, tool_parameters)`
 pair globally comparable across cases and lets cost lookup, metric aggregation,
 and inter-rater agreement work without per-case synonym normalization.
 
+> **This is now machine-enforced.** `agent-platform/config/tools/costs.yaml` is the single
+> source of truth: `tools/vocabulary.py` reads it, the tool schemas generate their `enum`s
+> from it, and `agent-platform/scripts/validation/validate_cases.py` checks every case
+> against it. A term cannot exist in this document without also having a price and a tool
+> that can order it. `agent-platform/tests/test_case_tool_contract.py` fails if the three
+> ever disagree again.
+>
+> They did disagree, for a long time: the tool schemas exposed 6 of the 11 modalities and 9
+> of the 19 test types below, so ground-truth values that were legal here were unorderable by
+> the agent, and `CostTracker` — which read `imaging_type` while every case wrote `modality`
+> — silently priced the wrong workup in 293 of 600 cases.
+>
+> To add a term: add the row to `costs.yaml`, then add it here. Nothing else.
+
 **Rule:** if a case's optimal_actions, useless_tools, or harmful_tools cite
 `order_specialized_test` or `order_advanced_imaging`, the value of
 `tool_parameters["test_type"]` or `tool_parameters["modality"]` MUST come from
 the lists below. This document is the source of truth for case authoring and
 review.
 
-Non-catchall tools (`analyze_brain_mri`, `analyze_eeg`, `analyze_csf`, etc.)
-have free-form parameters — only the two catchalls are vocabulary-constrained.
+Non-catchall tools (`analyze_brain_mri`, `analyze_eeg`, `analyze_csf`, etc.) are not
+vocabulary-constrained in the same way, but their parameters are still checked:
+
+* a key must be either a real parameter of that tool (see `ToolRegistry`) or a **documented
+  descriptive annotation** — the per-tool allowlist lives in `ANNOTATION_KEYS` in
+  `agent-platform/scripts/validation/validate_cases.py`. Annotations record clinical intent
+  the tool does not take as an argument (`sequences`, `region`, `indication`); `CostTracker`
+  ignores them. One canonical spelling each.
+* an enum-typed parameter (`analyze_brain_mri.protocol`, `analyze_eeg.eeg_type`,
+  `order_cardiac_monitoring.monitor_type`, …) must carry a legal value.
+
+`analyze_csf` deserves a note: `costs.yaml` prices the LP procedure together with cell count,
+protein and glucose inside `analyze_csf.base`, and bills each entry of `special_tests`
+separately. Put the always-done panel in the `basic` annotation and only billable assays in
+`special_tests`, or the basics get charged a second time.
+
+`ground_truth.tool_parameters` is an **annotation of intent, not a complete tool call** — a
+missing `clinical_context` is expected and fine. An unknown key is not.
 
 ---
 
