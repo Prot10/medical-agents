@@ -36,6 +36,7 @@ import argparse
 import json
 import logging
 import os
+import random
 from pathlib import Path
 from typing import Any
 
@@ -46,8 +47,30 @@ logger = logging.getLogger(__name__)
 # LoRA configuration
 # ---------------------------------------------------------------------------
 
-def get_lora_config(rank: int = 64, alpha: int = 128):
-    """Build LoRA config targeting attention + MLP layers."""
+# Qwen3.5 is a *hybrid* architecture: `config.layer_types` interleaves 3 `linear_attention`
+# layers (Qwen3_5GatedDeltaNet) for every 1 `full_attention` layer (Qwen3_5Attention).
+# On Qwen3.5-9B that is 24 linear-attention vs 8 full-attention layers.
+#
+# The classic ["q_proj","k_proj","v_proj","o_proj"] list only exists inside the 8 full
+# attention layers, so targeting it alone leaves the token-mixing of 24/32 layers entirely
+# frozen. The gated-delta-net layers project through different module names.
+QWEN35_FULL_ATTENTION_MODULES = ["q_proj", "k_proj", "v_proj", "o_proj"]
+
+# Gated-delta-net (linear attention) projections.
+# `in_proj_a` / `in_proj_b` are deliberately excluded: they are (hidden_size, num_v_heads)
+# = (4096, 32) per-head gating projections, so out_features < the usual LoRA rank. A rank-64
+# adapter there holds more parameters than the weight it adapts and cannot be low-rank at all.
+QWEN35_LINEAR_ATTENTION_MODULES = ["in_proj_qkv", "in_proj_z", "out_proj"]
+
+QWEN35_MLP_MODULES = ["gate_proj", "up_proj", "down_proj"]
+
+QWEN35_TARGET_MODULES = (
+    QWEN35_FULL_ATTENTION_MODULES + QWEN35_LINEAR_ATTENTION_MODULES + QWEN35_MLP_MODULES
+)
+
+
+def get_lora_config(rank: int = 64, alpha: int = 128, target_modules: list[str] | None = None):
+    """Build LoRA config covering BOTH attention families of the hybrid Qwen3.5 stack."""
     from peft import LoraConfig
 
     return LoraConfig(
@@ -56,10 +79,7 @@ def get_lora_config(rank: int = 64, alpha: int = 128):
         lora_dropout=0.05,
         bias="none",
         task_type="CAUSAL_LM",
-        target_modules=[
-            "q_proj", "k_proj", "v_proj", "o_proj",  # attention
-            "gate_proj", "up_proj", "down_proj",       # MLP
-        ],
+        target_modules=target_modules or QWEN35_TARGET_MODULES,
     )
 
 
@@ -141,36 +161,56 @@ def load_grpo_data(data_path: str) -> list[dict]:
 # Stage 1: SFT Warmup
 # ---------------------------------------------------------------------------
 
-def _split_trajectories_by_fold(
+def _split_trajectories(
     examples: list[dict],
     splits_dir: str,
-    fold: int = 0,
+    val_fraction: float = 0.1,
+    seed: int = 42,
 ) -> tuple[list[dict], list[dict]]:
-    """Split trajectories into train/val based on pre-computed fold splits.
+    """Split trajectories into train/val, carving validation out of the TRAIN split.
 
-    Uses the case_id in each trajectory to assign it to train or val.
+    The held-out test set (`test_cases.txt`) is never touched here — no gold trajectory
+    exists for it by construction. Validation is carved from train *by case_id*, so both
+    styles of a case land on the same side and a case cannot be memorised in train and
+    scored in val.
     """
     splits_path = Path(splits_dir)
-    train_file = splits_path / f"fold{fold}_train.txt"
-    val_file = splits_path / f"fold{fold}_val.txt"
+    train_file = splits_path / "train_cases.txt"
+    test_file = splits_path / "test_cases.txt"
 
     if not train_file.exists():
-        logger.warning("Fold split files not found at %s, using all data for training", splits_path)
+        logger.warning("No train_cases.txt at %s, using all data for training", splits_path)
         return examples, []
 
-    train_cases = set(train_file.read_text().strip().split("\n"))
-    val_cases = set(val_file.read_text().strip().split("\n"))
+    train_cases = {c for c in train_file.read_text().split() if c}
+    test_cases = {c for c in test_file.read_text().split() if c} if test_file.exists() else set()
 
-    train = [ex for ex in examples if ex.get("case_id", "") in train_cases]
-    val = [ex for ex in examples if ex.get("case_id", "") in val_cases]
+    leaked = [ex for ex in examples if ex.get("case_id", "") in test_cases]
+    if leaked:
+        raise ValueError(
+            f"{len(leaked)} trajectories belong to held-out test cases "
+            f"(e.g. {leaked[0].get('case_id')}). Regenerate prompts from the train split."
+        )
 
-    # Trajectories whose case_id isn't in either split go to train
-    unmatched = [ex for ex in examples if ex.get("case_id", "") not in train_cases and ex.get("case_id", "") not in val_cases]
-    if unmatched:
-        logger.warning("%d trajectories not in fold %d splits, adding to train", len(unmatched), fold)
-        train.extend(unmatched)
+    unknown = [ex for ex in examples if ex.get("case_id", "") not in train_cases]
+    if unknown:
+        logger.warning("%d trajectories have case_ids outside the train split", len(unknown))
 
-    logger.info("Fold %d split: %d train, %d val trajectories", fold, len(train), len(val))
+    val_case_ids: set[str] = set()
+    if val_fraction > 0:
+        ordered = sorted(train_cases)
+        rng = random.Random(seed)
+        rng.shuffle(ordered)
+        n_val = int(len(ordered) * val_fraction)
+        val_case_ids = set(ordered[:n_val])
+
+    train = [ex for ex in examples if ex.get("case_id", "") not in val_case_ids]
+    val = [ex for ex in examples if ex.get("case_id", "") in val_case_ids]
+
+    logger.info(
+        "Split: %d train / %d val trajectories (%d val cases, val_fraction=%.2f)",
+        len(train), len(val), len(val_case_ids), val_fraction,
+    )
     return train, val
 
 
@@ -188,7 +228,8 @@ def run_sft(
     qlora: bool = False,
     top_fraction: float = 1.0,
     splits_dir: str | None = None,
-    fold: int = 0,
+    val_fraction: float = 0.1,
+    use_liger: bool = True,
 ) -> None:
     """Run SFT warmup on top trajectories.
 
@@ -199,15 +240,17 @@ def run_sft(
 
     Args:
         qlora: If True, load base model in 4-bit NF4 quantization (QLoRA).
-        splits_dir: Path to fold split files (e.g., data/neurobench/splits/).
-            If provided, splits data into train/val by case_id for evaluation.
-        fold: Which fold to use for train/val split (0-4).
+        splits_dir: Path to the split directory (e.g., data/neurobench/splits/) holding
+            train_cases.txt / test_cases.txt. Validation is carved out of the train split.
+        val_fraction: Fraction of TRAIN cases held out for eval_loss / best-model selection.
     """
     import torch
     from datasets import Dataset
     from peft import get_peft_model, prepare_model_for_kbit_training
     from transformers import AutoModelForCausalLM, AutoTokenizer
     from trl import SFTConfig, SFTTrainer
+
+    from .chat_template import apply_training_chat_template
 
     logger.info("Loading model: %s (qlora=%s)", model_name, qlora)
     tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
@@ -239,60 +282,45 @@ def run_sft(
 
     train_examples, val_examples = top_examples, []
     if splits_dir:
-        train_examples, val_examples = _split_trajectories_by_fold(top_examples, splits_dir, fold)
+        train_examples, val_examples = _split_trajectories(top_examples, splits_dir, val_fraction)
     else:
         logger.info("No splits_dir provided, using all %d examples for training (no validation)", len(top_examples))
 
-    # Convert to prompt/completion format for proper loss masking.
-    # The messages format doesn't work with Qwen's chat template (no {% generation %}
-    # markers), so we manually build prompt (system+user+tool turns) and completion
-    # (assistant turns only). This ensures loss is computed only on what the model
-    # should learn to generate.
-    def _to_prompt_completion(examples: list[dict]) -> list[dict]:
-        """Convert message-format examples to prompt/completion for loss masking."""
-        formatted = []
-        for ex in examples:
-            if "messages" in ex:
-                msgs = ex["messages"]
-                prompt_parts = []
-                completion_parts = []
-                in_completion = False
+    # Gold trajectories are conversational (`messages` with structured `tool_calls`).
+    # We hand them to TRL as-is and let Qwen's own chat template render them, so the
+    # training text is byte-identical to what the served model sees at inference.
+    #
+    # Loss masking: the shipped template has no `{% generation %}` markers, so we patch
+    # them in (see training/chat_template.py) and set `assistant_only_loss=True`. Loss
+    # then falls on thoughts + tool calls + final answer only — never on tool
+    # observations, which the model must learn to *read*, not to *invent*.
+    conversational = bool(train_examples) and "messages" in train_examples[0]
 
-                for msg in msgs:
-                    role = msg["role"]
-                    content = msg["content"]
-                    if role == "assistant":
-                        in_completion = True
-                        completion_parts.append(content)
-                    elif role == "tool":
-                        if in_completion:
-                            completion_parts.append(f"<tool_response>\n{content}\n</tool_response>")
-                        else:
-                            prompt_parts.append(f"[Tool output]\n{content}")
-                    else:
-                        if in_completion:
-                            completion_parts.append(f"[{role}]: {content}")
-                        else:
-                            prompt_parts.append(content)
-
-                prompt = "\n\n".join(prompt_parts)
-                completion = "\n\n".join(completion_parts)
-                formatted.append({"prompt": prompt, "completion": completion})
-            else:
+    if conversational:
+        apply_training_chat_template(tokenizer)
+        dataset = Dataset.from_list([{"messages": ex["messages"]} for ex in train_examples])
+        eval_dataset = (
+            Dataset.from_list([{"messages": ex["messages"]} for ex in val_examples])
+            if val_examples
+            else None
+        )
+    else:
+        def _to_prompt_completion(examples: list[dict]) -> list[dict]:
+            """Legacy prompt/completion examples (pre-gold-trajectory format)."""
+            formatted = []
+            for ex in examples:
                 prompt = ex.get("system_prompt", ex.get("prompt", ""))
                 if ex.get("patient_info"):
                     prompt += "\n\n" + ex["patient_info"]
-                completion = ex.get("completion", "")
-                formatted.append({"prompt": prompt, "completion": completion})
-        return formatted
+                formatted.append({"prompt": prompt, "completion": ex.get("completion", "")})
+            return formatted
 
-    train_formatted = _to_prompt_completion(train_examples)
-    dataset = Dataset.from_list(train_formatted)
+        dataset = Dataset.from_list(_to_prompt_completion(train_examples))
+        eval_dataset = (
+            Dataset.from_list(_to_prompt_completion(val_examples)) if val_examples else None
+        )
 
-    eval_dataset = None
-    if val_examples:
-        val_formatted = _to_prompt_completion(val_examples)
-        eval_dataset = Dataset.from_list(val_formatted)
+    if eval_dataset is not None:
         logger.info("Eval dataset: %d examples", len(eval_dataset))
 
     # Training config — following SFT best practices:
@@ -313,6 +341,12 @@ def run_sft(
             "greater_is_better": False,
         }
 
+    # Conversational data masks via assistant_only_loss; legacy prompt/completion data
+    # masks via completion_only_loss. Setting both is contradictory.
+    loss_mask_kwargs = (
+        {"assistant_only_loss": True} if conversational else {"completion_only_loss": True}
+    )
+
     training_args = SFTConfig(
         output_dir=output_dir,
         num_train_epochs=epochs,
@@ -330,7 +364,12 @@ def run_sft(
         lr_scheduler_type="cosine",
         weight_decay=0.01,
         neftune_noise_alpha=5.0,
-        completion_only_loss=True,
+        # Qwen3.5's vocabulary is 248k, so a full logits tensor at seq=8192 is ~4 GB in
+        # bf16 and ~8 GB once cross-entropy upcasts to fp32 — the dominant memory term,
+        # and what OOMs a 40 GB card. Liger's fused linear cross-entropy computes the loss
+        # in chunks without ever materialising full logits.
+        use_liger_kernel=use_liger,
+        **loss_mask_kwargs,
         **eval_kwargs,
     )
 
@@ -653,8 +692,13 @@ def main() -> None:
     parser.add_argument("--top-fraction", type=float, default=1.0,
                         help="Fraction of top trajectories for SFT (1.0 = use all, 0.1 = top 10%%)")
     parser.add_argument("--qlora", action="store_true", help="Use QLoRA (4-bit NF4 quantization)")
-    parser.add_argument("--splits-dir", default=None, help="Path to fold split files for train/val (e.g., data/neurobench/splits/)")
-    parser.add_argument("--fold", type=int, default=0, help="Which fold to use (0-4)")
+    parser.add_argument("--splits-dir", default=None, help="Split dir with train_cases.txt / test_cases.txt (e.g., data/neurobench/splits/)")
+    parser.add_argument("--val-fraction", type=float, default=0.1,
+                        help="Fraction of train cases carved out for validation")
+    parser.add_argument("--max-seq-length", type=int, default=8192,
+                        help="Max sequence length; set from scripts/training/probe_max_seq_length.py")
+    parser.add_argument("--no-liger", dest="use_liger", action="store_false", default=True,
+                        help="Disable Liger fused cross-entropy (needed on 248k-vocab Qwen3.5)")
     parser.add_argument("--bf16", action="store_true", default=True)
 
     # Reward (for online GRPO)
@@ -685,7 +729,9 @@ def main() -> None:
             qlora=args.qlora,
             top_fraction=args.top_fraction,
             splits_dir=args.splits_dir,
-            fold=args.fold,
+            val_fraction=args.val_fraction,
+            max_seq_length=args.max_seq_length,
+            use_liger=args.use_liger,
         )
 
     elif args.stage == "grpo":
