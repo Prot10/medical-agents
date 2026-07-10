@@ -306,14 +306,14 @@ Returns `CardiacMonitoringReport`.
 
 ### 11. `order_advanced_imaging` — Advanced Imaging *(catchall)*
 
-One tool, eleven studies, selected by `modality`. The enum is generated from
+One tool, twelve studies, selected by `modality`. The enum is generated from
 `config/tools/costs.yaml`, so a modality cannot exist without a price.
 
 #### Parameters
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |
 | `clinical_context` | string | yes | |
-| `modality` | enum | **yes** | `amyloid_PET`, `tau_PET`, `FDG_PET`, `DaTscan`, `MIBG_scan`, `perfusion_MRI`, `MR_spectroscopy`, `MR_angiography`, `MR_venography`, `carotid_duplex`, `transcranial_doppler` |
+| `modality` | enum | **yes** | `amyloid_PET`, `tau_PET`, `FDG_PET`, `DaTscan`, `MIBG_scan`, `perfusion_MRI`, `cardiac_MRI`, `MR_spectroscopy`, `MR_angiography`, `MR_venography`, `carotid_duplex`, `transcranial_doppler` |
 
 The parameter was called `imaging_type` until the tool-contract migration. Returns
 `AdvancedImagingReport`.

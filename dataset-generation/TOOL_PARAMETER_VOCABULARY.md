@@ -109,7 +109,8 @@ missing `clinical_context` is expected and fine. An unknown key is not.
 | `FDG_PET` | 18F-FDG PET | AD vs FTD pattern, paraneoplastic, glioma grading |
 | `DaTscan` | Dopamine transporter SPECT | PD vs essential tremor vs MSA-C |
 | `MIBG_scan` | Cardiac 123I-MIBG | PD vs MSA differentiation (autonomic) |
-| `perfusion_MRI` | DSC / ASL perfusion MRI | Tumor grading, ischemia, MELAS |
+| `perfusion_MRI` | DSC / ASL perfusion MRI (brain) | Tumor grading, ischemia, MELAS |
+| `cardiac_MRI` | Cardiac MRI with LGE | Cardiac syncope substrate, ARVC, myocarditis |
 | `MR_spectroscopy` | 1H-MRS | Tumor (NAA/Cho), MELAS, leukodystrophy |
 | `MR_angiography` | MRA (TOF, contrast-enhanced) | Vascular workup without contrast |
 | `MR_venography` | MRV | Cerebral venous sinus thrombosis |
