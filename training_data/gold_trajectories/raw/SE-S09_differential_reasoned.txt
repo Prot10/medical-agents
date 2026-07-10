@@ -1,0 +1,69 @@
+<think>
+52-year-old man with known left temporal epilepsy, 15 minutes of continuous focal-onset seizure with secondary generalization, GCS 8 post-ictally, right Todd's paresis, fever 38.2°C, tachycardia — this is convulsive status epilepticus. Differential for the trigger: breakthrough SE from medication non-adherence (~35%), AED toxicity or drug interaction given the new antibiotic course (~30%), new CNS infection/encephalitis given fever and pneumonia history (~25%), and less likely an acute structural lesion (~10%). First step is to confirm this is electrographic SE and characterize its focus, then get labs including an AED level since he's on a new interacting drug and possibly missed doses — the level will separate under-dosing from toxicity.
+</think>
+<tool_call>
+{"name": "analyze_eeg", "arguments": {"clinical_context": "continuous left-onset focal seizure with secondary generalization, 15 minutes, known left temporal epilepsy", "eeg_type": "continuous_icu", "patient_age": 52}}
+</tool_call>
+<tool_response>
+Abnormal. Left temporal focal ictal activity, 5-7 Hz rhythmic theta-delta with sharp waves, left temporal (T3) maximum evolving to generalized — meets criteria for electrographic status epilepticus. Post-ictal left temporal polymorphic delta slowing.
+</tool_response>
+
+<think>
+EEG confirms focal SE arising from his known left temporal focus, arguing against a new structural lesion and against this being a purely infectious encephalitis picture (no diffuse or multifocal pattern). This still doesn't separate non-adherence from toxicity as the trigger. An AED level plus metabolic/inflammatory panel will discriminate directly — protocol here also mandates labs immediately in this setting.
+</think>
+<tool_call>
+{"name": "interpret_labs", "arguments": {"clinical_context": "status epilepticus, known epilepsy on carbamazepine, new antibiotic course, fever, possible rhabdomyolysis", "panels": ["CBC", "BMP", "AED_levels", "lactate", "CK"], "patient_age": 52, "patient_sex": "male"}}
+</tool_call>
+<tool_response>
+WBC 14.8 (mild leukocytosis — consistent with stress response/seizure, correlates with his ongoing pneumonia). Glucose 176 (stress hyperglycemia). Carbamazepine level 16.8 mcg/mL — TOXIC (reference 4-12 therapeutic). Lactate 6.4 — elevated, expected post-ictal. CK 1860 — rhabdomyolysis from convulsive activity.
+</tool_response>
+
+<think>
+This flips the differential decisively toward toxicity: his CBZ level is toxic despite reported non-adherence concerns, which only makes sense if something is impairing its clearance — the clarithromycin started 4 days ago is a known CYP3A4 inhibitor and carbamazepine is a CYP3A4 substrate. Non-adherence is now unlikely (toxic, not subtherapeutic, level) and infection as the seizure trigger is downgraded to an incidental contributor. Before acting on medications, protocol requires a drug-interaction check, which will also confirm the mechanism and give a safe antibiotic alternative.
+</think>
+<tool_call>
+{"name": "check_drug_interactions", "arguments": {"drug": "carbamazepine", "current_medications": ["clarithromycin", "sertraline", "levothyroxine"], "patient_conditions": ["left temporal focal epilepsy", "status epilepticus", "valproate allergy"]}}
+</tool_call>
+<tool_response>
+MAJOR: Clarithromycin (CYP3A4 inhibitor) + carbamazepine (CYP3A4 substrate) — clarithromycin blocks carbamazepine metabolism, doubling levels. Carbamazepine toxicity (>12 mcg/mL) causes diplopia, ataxia, confusion, and can be pro-convulsant at very high levels. Contraindication: valproate (documented allergy — thrombocytopenia/pancreatitis). Warnings: stop clarithromycin immediately; alternative antibiotic options include azithromycin, doxycycline, or levofloxacin (no significant CYP3A4 interaction); reduce/hold carbamazepine until level normalizes; use IV levetiracetam or lacosamide for SE, not valproate.
+</tool_response>
+
+<think>
+This confirms the mechanism: clarithromycin-induced CYP3A4 inhibition raised his carbamazepine to toxic levels, which — combined with his known focus — precipitated this focal status epilepticus. A non-contrast CT is still warranted before committing to this as the sole explanation, since focal SE with Todd's paresis always merits imaging to exclude a new acute structural cause superimposed on his known epilepsy.
+</think>
+<tool_call>
+{"name": "order_ct_scan", "arguments": {"clinical_context": "focal status epilepticus with post-ictal right-sided Todd's paresis, known left temporal epilepsy, exclude acute structural cause", "contrast": false}}
+</tool_call>
+<tool_response>
+Subtle left mesial temporal changes — likely chronic, consistent with known left TLE/hippocampal sclerosis. No acute intracranial hemorrhage or mass. No new acute lesion.
+</tool_response>
+
+<think>
+CT shows only his known chronic left temporal substrate with no new acute lesion, which removes an acute structural cause from consideration and leaves toxic carbamazepine levels in the setting of a CYP3A4-inhibiting macrolide, acting on his pre-existing left temporal epileptogenic focus, as the explanation for this SE episode. His toxic carbamazepine level is also relevant to his cardiac risk given the tachycardia already present — CBZ toxicity can produce AV conduction delay or arrhythmia, so cardiac monitoring through drug clearance is warranted independent of any seizure-specific indication.
+</think>
+
+### Primary Diagnosis
+Status epilepticus from carbamazepine toxicity due to CYP3A4 inhibition by clarithromycin in left temporal focal epilepsy (Confidence: 0.90)
+
+### Differential Diagnoses
+1. Breakthrough SE from carbamazepine non-adherence — argues against: level is toxic (16.8), not subtherapeutic, which is inconsistent with missed doses being the driver
+2. Autoimmune/infectious encephalitis — argues against: EEG shows a single known focal ictal source with typical post-ictal slowing rather than a diffuse/multifocal encephalopathic pattern, and CT shows only chronic changes
+3. Acute new structural lesion (e.g., hemorrhage, tumor) — argues against: CT shows no acute hemorrhage or mass, only chronic left mesial temporal change
+
+### Key Evidence
+- Toxic carbamazepine level 16.8 mcg/mL from interpret_labs — confirms drug-level abnormality rather than non-adherence
+- Major clarithromycin-carbamazepine interaction from check_drug_interactions — establishes the causal mechanism (CYP3A4 inhibition)
+- EEG showing left temporal ictal activity with secondary generalization from analyze_eeg — localizes SE to his known epileptogenic focus
+- CT showing only chronic left mesial temporal change, no acute lesion — excludes an acute structural alternative
+
+### Recommendations
+1. Administer IV lorazepam 0.1 mg/kg first-line for ongoing SE
+2. Hold carbamazepine and switch the antibiotic from clarithromycin to azithromycin or doxycycline to remove the CYP3A4 interaction and complete pneumonia treatment safely
+3. Load IV levetiracetam as a bridging AED while carbamazepine levels normalize (avoid valproate given documented allergy)
+4. Continuous cardiac monitoring during carbamazepine clearance given toxic level and risk of conduction abnormality/arrhythmia
+
+### Red Flags / Alerts
+- Do not continue clarithromycin with carbamazepine — this interaction is the precipitant of this episode
+- Do not load phenytoin without cardiac monitoring in a patient with carbamazepine-toxicity-related cardiac risk
+- Avoid other CYP3A4 inhibitors (e.g., erythromycin, fluconazole) as antibiotic/antifungal substitutes while on carbamazepine
+- Do not use valproate given documented allergy (thrombocytopenia and pancreatitis)

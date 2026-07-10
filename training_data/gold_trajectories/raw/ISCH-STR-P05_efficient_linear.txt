@@ -1,0 +1,102 @@
+<think>
+A 34-year-old man wakes with a dense right homonymous hemianopia, mild right hemibody sensory loss, and subtle alexia — a cortical/thalamic pattern, not a typical vascular-risk-factor stroke presentation. Differential: occipital (PCA territory) ischemic stroke ~45%, migraine with aura ~20%, occipital seizure/Todd's phenomenon ~15%, complicated/hemiplegic migraine or other structural lesion ~10-15%. Last known well was bedtime, roughly 8 hours ago, so this is a wake-up stroke with an uncertain window; before considering any reperfusion therapy I need to exclude hemorrhage and confirm whether this is truly an infarct rather than a migrainous phenomenon. Plan: emergent non-contrast CT head first (protocol-mandated and required before any thrombolytic decision), pairing it with CTA head/neck in the same acquisition to look for a culprit vessel lesion.
+</think>
+<tool_call>
+{"name": "order_ct_scan", "arguments": {"clinical_context": "Wake-up presentation with right homonymous hemianopia and right hemibody sensory loss, LKW ~8h; excluding hemorrhage before thrombolytic consideration and assessing for vascular occlusion", "contrast": true, "angiography": true}}
+</tool_call>
+<tool_response>
+Non-contrast CT: no intracranial hemorrhage; subtle hypodensity, medial left occipital lobe, favoring early ischemic change (MRI-DWI recommended for confirmation). CTA: distal left PCA (P2-P3) filling defect consistent with thrombus/embolus; proximal P1 patent; anterior circulation and cervical vessels normal, no dissection.
+</tool_response>
+
+<think>
+No hemorrhage, and CTA already shows a distal left PCA filling defect — this argues strongly against migraine/functional visual loss and toward a true embolic infarct, since young age and absent vascular risk factors alone don't rule out stroke. The hospital stroke protocol requires labs and ECG immediately regardless; labs will also screen for a hypercoagulable/thrombotic driver given the calf tenderness noted on exam, and ECG will assess for atrial fibrillation as an alternative embolic source.
+</think>
+<tool_call>
+{"name": "interpret_labs", "arguments": {"clinical_context": "Acute stroke labs plus hypercoagulability workup given young cryptogenic presentation, left calf tenderness, and possible venous thromboembolic source", "panels": ["CBC", "BMP", "coagulation", "D-dimer", "hypercoagulability"], "patient_age": 34, "patient_sex": "male"}}
+</tool_call>
+<tool_response>
+D-dimer markedly elevated at 1820 ng/mL (ref <500); all other coagulation indices, glucose, CBC, and metabolic panel normal.
+</tool_response>
+
+<think>
+Glucose is normal, excluding a metabolic stroke mimic, and the markedly elevated D-dimer paired with the left calf tenderness on exam points toward an occult venous thromboembolic source rather than an isolated arterial event. ECG is protocol-mandated before any treatment decision and needed to exclude atrial fibrillation as a competing embolic mechanism.
+</think>
+<tool_call>
+{"name": "analyze_ecg", "arguments": {"clinical_context": "Acute stroke workup, excluding atrial fibrillation as embolic source prior to treatment decision"}}
+</tool_call>
+<tool_response>
+Normal sinus rhythm at 82 bpm. No atrial fibrillation, flutter, or other arrhythmia. No ischemic changes.
+</tool_response>
+
+<think>
+No AF on a single ECG, but that doesn't exclude paroxysmal atrial fibrillation, so definitive imaging confirmation of the infarct takes priority now. MRI-DWI is needed to confirm the PCA territory infarct with certainty — the CT hypodensity was only "subtle" and I should not anchor on migraine given the young age; DWI positivity would settle that, and DWI-FLAIR mismatch will inform late-window eligibility given the ~8-hour LKW.
+</think>
+<tool_call>
+{"name": "analyze_brain_mri", "arguments": {"clinical_context": "Confirm left PCA territory acute infarction and assess DWI-FLAIR mismatch for late-window thrombolytic eligibility given wake-up presentation", "protocol": "stroke", "contrast": false}}
+</tool_call>
+<tool_response>
+Confluent DWI-hyperintense, ADC-hypointense lesion (~4.8x3.2 cm) in left occipital cortex, occipitotemporal cortex, and left pulvinar thalamus — left PCA territory, involving calcarine (primary visual) cortex. FLAIR less extensive than DWI, consistent with infarct <24h. No hemorrhagic transformation. MRA: diminished left PCA P2-P3 flow consistent with distal occlusion.
+</tool_response>
+
+<think>
+DWI positivity confirms a genuine acute infarct in the territory anatomically explaining the right hemianopia (left PCA supplies left calcarine cortex) — this is not migraine or a functional disturbance. Before any thrombolytic decision the protocol requires checking drug interactions/contraindications, and given the wake-up presentation this call also needs to weigh late-window eligibility.
+</think>
+<tool_call>
+{"name": "check_drug_interactions", "arguments": {"drug": "IV alteplase (tPA)", "current_medications": [], "patient_conditions": ["acute ischemic stroke, left PCA territory", "wake-up stroke, LKW ~8h"]}}
+</tool_call>
+<tool_response>
+No drug-drug interactions (no chronic medications). No absolute contraindications identified from current history/labs. LKW ~8h places patient outside standard 4.5h window; wake-up/unknown-onset requires DWI-FLAIR mismatch or perfusion assessment for late-window eligibility (WAKE-UP/EXTEND criteria). BP and glucose currently acceptable.
+</tool_response>
+
+<think>
+No thrombolytic contraindications identified, but the FLAIR-DWI mismatch just seen supports plausible late-window eligibility, which will be an individualized decision alongside the low NIHSS (4) for isolated hemianopia. With hemorrhage excluded and the infarct confirmed, the residual question is mechanism: a young man with no vascular risk factors, an elevated D-dimer, and left calf tenderness after a 7.5-hour flight raises paradoxical embolism through a right-to-left shunt as the leading explanation, so I need to look at the cardiac source directly with a shunt-focused echocardiogram rather than stopping at "cryptogenic."
+</think>
+<tool_call>
+{"name": "order_echocardiogram", "arguments": {"clinical_context": "Young cryptogenic stroke workup: evaluate for right-to-left shunt (PFO), intracardiac thrombus, and aortic arch atheroma as embolic source", "echo_type": "TEE"}}
+</tool_call>
+<tool_response>
+Agitated-saline bubble study: PFO confirmed with large right-to-left shunt (microbubbles in left atrium within 3 cycles, markedly accentuated with Valsalva release); tunnel ~7mm, no septal aneurysm. No intracardiac thrombus, no aortic arch atheroma, normal EF 63%.
+</tool_response>
+
+<think>
+A large shunting PFO is now demonstrated, but confirming PFO alone doesn't establish it as the stroke mechanism — occult paroxysmal AF must be excluded before attributing causation to paradoxical embolism, and a single normal ECG is insufficient for that. Prolonged monitoring is the necessary next and final step to close this differential rather than anchoring prematurely on the PFO finding.
+</think>
+<tool_call>
+{"name": "order_cardiac_monitoring", "arguments": {"clinical_context": "Exclude paroxysmal atrial fibrillation as alternative embolic source before attributing stroke mechanism to PFO-mediated paradoxical embolism", "monitor_type": "event_monitor_30d"}}
+</tool_call>
+<tool_response>
+30-day event monitor: normal sinus rhythm throughout, 0 seconds AF burden, no atrial fibrillation or flutter detected, no significant ventricular arrhythmia.
+</tool_response>
+
+<think>
+With AF excluded over 30 days, the mechanism converges on paradoxical embolism: a DVT (suggested by the elevated D-dimer and left calf findings, provoked by prolonged flight immobility) crossing a large right-to-left PFO shunt, triggered by a Valsalva-type maneuver, in a young patient whose RoPE score would be high given cortical infarct pattern and absence of conventional vascular risk factors. Formal lower-extremity venous imaging for DVT is outside the available tool set here, so the elevated D-dimer plus exam findings of calf tenderness/swelling serve as the clinical surrogate for the venous source.
+</think>
+
+### Primary Diagnosis
+Acute ischemic stroke, left PCA territory, paradoxical embolism via patent foramen ovale (provoked by prolonged immobility/transatlantic flight and Valsalva, with DVT as venous source and heterozygous Factor V Leiden as thrombophilic amplifier) (Confidence: 0.70)
+
+### Differential Diagnoses
+1. Migraine with aura / functional visual disturbance — no scintillating scotoma, spreading aura, or headache history; DWI-positive lesion confirms a true infarct, not a migrainous phenomenon
+2. Paroxysmal atrial fibrillation-related cardioembolism — 30-day event monitor showed 0 seconds AF burden, excluding this mechanism
+3. Large-artery atherosclerotic or dissection-related stroke — CTA and carotid vasculature findings show no stenosis, plaque, or dissection
+
+### Key Evidence
+- DWI-positive left PCA territory infarct (occipital/occipitotemporal cortex, pulvinar) from MRI — confirms true infarct explaining right hemianopia, alexia, and right hemibody sensory loss
+- Distal left PCA (P2-P3) filling defect on CTA — localizes the embolic occlusion
+- Markedly elevated D-dimer (1820 ng/mL) with left calf tenderness/swelling — surrogate evidence for DVT as the venous embolic source
+- Large right-to-left shunting PFO with Valsalva accentuation on TEE bubble study — the anatomic conduit for paradoxical embolism
+- Normal sinus rhythm with 0% AF burden on 30-day monitoring — excludes atrial fibrillation as the mechanism
+
+### Recommendations
+1. Individualize late-window thrombolytic decision using DWI-FLAIR mismatch and low NIHSS (4), per WAKE-UP/EXTEND-type criteria, given wake-up presentation with LKW ~8h
+2. Obtain formal lower-extremity venous duplex imaging to directly confirm DVT as the source
+3. Initiate anticoagulation (rather than antiplatelet monotherapy) given confirmed venous thromboembolic source and Factor V Leiden, per standard management of PFO-associated paradoxical embolism with a documented DVT
+4. Refer for multidisciplinary discussion of PFO closure given large shunt, high estimated RoPE score, and age <60
+5. Hematology referral for thrombophilia counseling given heterozygous Factor V Leiden
+
+### Red Flags / Alerts
+- Do not administer IV tPA before non-contrast CT excludes hemorrhage (already obtained) or if INR >1.7, platelets <100,000, or other standard contraindications are present
+- Do not dose alteplase at the standard 0.9 mg/kg — local protocol specifies 0.6 mg/kg
+- Do not aggressively lower blood pressure below 140/90 mmHg acutely outside the tPA window — risks worsening penumbral perfusion
+- Do not attribute the mechanism to PFO alone without having excluded paroxysmal AF, and do not stop the workup at PFO confirmation without pursuing the venous source and thrombophilia evaluation
+- Do not discharge without a comprehensive secondary prevention plan (anticoagulation decision, PFO closure discussion, risk-factor counseling) and a referral letter to primary care

@@ -1,0 +1,71 @@
+<think>
+Continuous GTC seizure ×10 min at 28 weeks gestation, now post-ictal (GCS 7), hyperreflexia with ankle clonus, and BP 168/104 — collectively raise concern for eclampsia superimposed on known epilepsy. She has a subtherapeutic lamotrigine trend (4.2 mcg/mL two weeks ago despite dose increase) in a pregnancy known to accelerate lamotrigine clearance. Differential: eclampsia with seizure ~40%, breakthrough epilepsy from subtherapeutic AED ~35%, HELLP-related cerebral event ~15%, other secondary cause (electrolyte, CVST) ~10%. First step is to confirm this was a single ictal event with no ongoing electrographic seizure, then get labs to evaluate for HELLP/preeclampsia physiology alongside the AED level.
+</think>
+<tool_call>
+{"name": "analyze_eeg", "arguments": {"clinical_context": "post-ictal state after generalized tonic-clonic status epilepticus, 28 weeks pregnant, confirm resolution of ictal activity", "eeg_type": "continuous_icu", "patient_age": 35}}
+</tool_call>
+<tool_response>
+Abnormal: diffuse post-ictal 2-3 Hz delta slowing, generalized, no ongoing ictal activity. No electrographic seizures over 6 hours.
+</tool_response>
+
+<think>
+No ongoing electrographic seizure — this was a single convulsive event that has terminated, not refractory SE, so the picture is now about etiology. Given the hypertension and clonus, I need labs that specifically screen for HELLP/preeclampsia (LFTs, platelets, proteinuria) alongside a fresh lamotrigine level, since a subtherapeutic level would support breakthrough epilepsy while HELLP markers would support eclampsia — and both can coexist.
+</think>
+<tool_call>
+{"name": "interpret_labs", "arguments": {"clinical_context": "post-ictal 28-week pregnant patient with hypertension, evaluate for HELLP/preeclampsia and AED level", "panels": ["CBC", "BMP", "Liver", "Urine", "AED_Levels"], "patient_age": 35, "patient_sex": "female"}}
+</tool_call>
+<tool_response>
+Platelets 88 (L), AST 142 (H), ALT 118 (H), LDH 684 (H), Hemoglobin 10.8 (L), urine protein:creatinine 4.2 (markedly elevated), Lamotrigine level 2.8 mcg/mL (subtherapeutic, below prior 4.2).
+</tool_response>
+
+<think>
+Thrombocytopenia, transaminitis, elevated LDH, and heavy proteinuria confirm HELLP-spectrum preeclampsia/eclampsia rather than an isolated epilepsy breakthrough — but the lamotrigine level has actually fallen further (2.8 vs 4.2), so subtherapeutic AED is also contributing; this looks like a combined process rather than either diagnosis alone. Given the neurologic exam and hypertension, I need emergency imaging to exclude hemorrhage before anything else — the protocol requires excluding hemorrhage and can't wait for LP or other workup, and a coagulopathic platelet count of 88 makes LP unsafe regardless.
+</think>
+<tool_call>
+{"name": "order_ct_scan", "arguments": {"clinical_context": "post-ictal eclampsia workup, severe hypertension, exclude intracranial hemorrhage before further management", "contrast": false}}
+</tool_call>
+<tool_response>
+Subtle bilateral parieto-occipital hypodensity consistent with PRES; no intracranial hemorrhage.
+</tool_response>
+
+<think>
+No hemorrhage, and the bilateral parieto-occipital pattern is classic for PRES from eclampsia rather than a structural lesion, which fits the hypertension/proteinuria/HELLP picture better than epilepsy alone. Before treating, protocol requires checking drug interactions — I need to confirm magnesium sulfate (the eclampsia-specific seizure agent, distinct from benzodiazepine/AED therapy) is safe alongside lamotrigine and to confirm safe antihypertensive options in pregnancy.
+</think>
+<tool_call>
+{"name": "check_drug_interactions", "arguments": {"drug": "magnesium sulfate", "current_medications": ["lamotrigine 300mg BID"], "patient_conditions": ["eclampsia", "HELLP syndrome", "28 weeks gestation", "generalized epilepsy"]}}
+</tool_call>
+<tool_response>
+No pharmacokinetic interaction between magnesium sulfate and lamotrigine. Magnesium sulfate is first-line for eclampsia seizure prevention (not benzodiazepine/AED treatment). Lamotrigine dose should target >6 mcg/mL in pregnancy. Valproate relatively contraindicated in pregnancy. Labetalol/hydralazine/nifedipine safe antihypertensives; avoid ACE inhibitors/ARBs. Monitor fetal heart rate continuously.
+</tool_response>
+
+<think>
+The convulsion sits at the intersection of two active processes: eclampsia/HELLP (thrombocytopenia, transaminitis, proteinuria, severe hypertension, PRES on CT) and inadequately dosed lamotrigine in a pregnancy that has markedly increased its clearance. Both need simultaneous, specific treatment rather than treating one and assuming the seizure is explained.
+</think>
+
+### Primary Diagnosis
+Convulsive status epilepticus from concurrent eclampsia with HELLP syndrome and breakthrough epilepsy from subtherapeutic lamotrigine at 28 weeks gestation (Confidence: 0.90)
+
+### Differential Diagnoses
+1. Breakthrough epilepsy alone (subtherapeutic AED) - does not explain thrombocytopenia, transaminitis, proteinuria, or PRES pattern on CT
+2. HELLP/eclampsia alone without AED breakthrough - lamotrigine level fell further despite dose increase, indicating inadequate AED control was also a contributor
+3. Cerebral venous sinus thrombosis - CT shows PRES pattern with no hemorrhage; no focal deficit pattern suggesting venous infarct
+4. Isolated severe preeclampsia without eclamptic seizure - the seizure itself, hyperreflexia, and clonus place her past preeclampsia into eclampsia
+
+### Key Evidence
+- Platelets 88, AST 142, ALT 118, LDH 684, proteinuria 4.2 from interpret_labs — meets HELLP criteria
+- Lamotrigine 2.8 mcg/mL from interpret_labs — subtherapeutic despite recent dose increase, consistent with pregnancy-accelerated clearance
+- Bilateral parieto-occipital hypodensity, no hemorrhage from order_ct_scan — PRES pattern from eclampsia
+- No ongoing ictal activity from analyze_eeg — confirms terminated convulsive SE, not refractory
+
+### Recommendations
+1. IV magnesium sulfate 4-6 g bolus then 2 g/h infusion — first-line for eclampsia, not benzodiazepine alone
+2. Lower BP with IV labetalol or hydralazine (pregnancy-safe); avoid ACE inhibitors/ARBs
+3. Reload/increase lamotrigine toward therapeutic target (>6 mcg/mL), accounting for markedly increased clearance in pregnancy
+4. Urgent obstetric/maternal-fetal medicine consultation for delivery planning given HELLP
+5. IV lorazepam only if seizures recur despite magnesium
+
+### Red Flags / Alerts
+- Do not treat this as isolated epilepsy breakthrough with benzodiazepine/AED alone — eclampsia requires magnesium sulfate specifically
+- Do not perform lumbar puncture — platelet count 88 with HELLP coagulopathy carries spinal hematoma risk
+- Do not use valproate or ACE inhibitors/ARBs in pregnancy
+- Do not delay delivery planning once mother is stabilized — delivery is definitive treatment for HELLP

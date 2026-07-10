@@ -1,0 +1,94 @@
+<think>
+A 19-year-old with recurrent collapse during exertion/emotion, brief 10-15s convulsive jerking, immediate full recovery with no post-ictal confusion, and a longstanding "epilepsy" label on levetiracetam. Differential: exertional/reflex epilepsy ~45%, convulsive syncope of cardiac origin ~30%, vasovagal syncope ~15%, exercise-induced arrhythmia without prior seizure diagnosis ~10%. Given the established diagnosis and antiepileptic treatment, epilepsy remains the leading explanation, though the exertional trigger pattern is atypical for most epilepsies. The general-neurology protocol requires checking drug interactions before any prescribing change, but first I need objective cardiac and metabolic data — starting with a 12-lead ECG on arrival to look for a QT abnormality or arrhythmia that could explain collapse independent of a seizure focus.
+</think>
+<tool_call>
+{"name": "analyze_ecg", "arguments": {"clinical_context": "collapse with brief convulsive movements during exertion, prior epilepsy diagnosis, evaluate for arrhythmic cause"}}
+</tool_call>
+<tool_response>
+Normal sinus rhythm, rate 72. QTc markedly prolonged at 510 ms (Bazett; normal female <440 ms). Broad-based monophasic T waves in V4-V6. Three isolated monomorphic PVCs on the strip. No Brugada pattern, no pre-excitation, no ST changes.
+</tool_response>
+<think>
+A QTc of 510 ms does not fit ongoing epilepsy as the primary process — this is a markedly abnormal, high-risk QT prolongation that reframes the recurrent "seizures" as likely convulsive syncope from a ventricular arrhythmia. This shifts the differential sharply: congenital long QT syndrome ~55%, acquired QT prolongation (electrolyte/drug) ~25%, structural cardiomyopathy ~10%, epilepsy now falls to ~10%. I need potassium, magnesium, and other metabolic drivers next to determine whether this QTc is acquired or intrinsic.
+</think>
+<tool_call>
+{"name": "interpret_labs", "arguments": {"clinical_context": "markedly prolonged QTc on ECG, rule out electrolyte or metabolic cause of QT prolongation", "panels": ["BMP", "magnesium", "troponin", "TSH"], "patient_age": 19, "patient_sex": "female"}}
+</tool_call>
+<tool_response>
+All values within normal limits. Potassium 4.2 mEq/L, magnesium 2.0 mg/dL, troponin undetectable, TSH normal, urine beta-hCG negative.
+</tool_response>
+<think>
+Normal potassium and magnesium exclude acquired QT prolongation, meaning the substrate is intrinsic — congenital long QT syndrome now leads clearly, around 65%, with structural heart disease and channelopathy overlap syndromes remaining on the list. The maternal uncle's unexplained drowning at age 28 in a supervised pool is a recognized high-risk pattern for LQTS-related sudden death, reinforcing a heritable channelopathy over an acquired process. Next I want an echocardiogram to exclude structural disease (HCM, ARVC, valvulopathy) that could independently explain arrhythmia or syncope.
+</think>
+<tool_call>
+{"name": "order_echocardiogram", "arguments": {"clinical_context": "prolonged QTc with exertional syncope, exclude structural heart disease", "echo_type": "TTE"}}
+</tool_call>
+<tool_response>
+Structurally normal heart: LV/RV normal size and function, LVEF 62%, normal valves, no LVOT obstruction, no pericardial effusion, no thrombus or vegetation.
+</tool_response>
+<think>
+A structurally normal heart argues against hypertrophic cardiomyopathy or ARVC and supports a pure electrical channelopathy — congenital LQTS now around 70%. Given the QTc ≥500 ms and exertional trigger, admission with continuous telemetry is warranted to capture QT burden and any spontaneous ventricular arrhythmia rather than relying on a single snapshot ECG.
+</think>
+<tool_call>
+{"name": "order_cardiac_monitoring", "arguments": {"clinical_context": "QTc 510 ms with exertional syncope, capture QT burden and spontaneous arrhythmia on telemetry", "monitor_type": "telemetry"}}
+</tool_call>
+<tool_response>
+48 hours telemetry: persistent QTc prolongation, 498-514 ms (mean 508 ms) throughout. 84 isolated PVCs. A self-terminating 3-beat run of non-sustained polymorphic VT at hour 22 with short-long-short initiation, morphology consistent with Torsades de Pointes. No sustained VT/VF, no AV block, no atrial arrhythmia.
+</tool_response>
+<think>
+Capturing a Torsades-morphology non-sustained run confirms the arrhythmic substrate directly — this is the mechanism underlying her prior "seizure" episodes, not epileptiform cortical activity. The witnessed 10-15 second convulsive jerking with rapid, complete recovery and no post-ictal phase across all four episodes is the classic signature of convulsive syncope from cerebral hypoperfusion during Torsades, not a primary seizure disorder. I want literature confirmation on the epilepsy-misdiagnosis pattern and exertional triggers to support reclassifying her prior diagnosis before addressing her current antiepileptic regimen.
+</think>
+<tool_call>
+{"name": "search_medical_literature", "arguments": {"query": "congenital long QT syndrome exercise-triggered convulsive syncope misdiagnosed as epilepsy", "max_results": 3}}
+</tool_call>
+<tool_response>
+Up to 30% of LQTS patients are initially misdiagnosed with epilepsy due to witnessed convulsive movements during syncope; distinguishing features are exertional/emotional triggers, absent post-ictal confusion, brief duration, and family history of sudden death or unexplained drowning. LQT1 (KCNQ1) is classically exercise-triggered. QTc ≥500 ms confers high arrhythmic risk; beta-blockers are first-line therapy.
+</tool_response>
+<think>
+This confirms the reclassification: her prior epilepsy diagnosis at age 15 was never substantiated by a truly epileptiform EEG, and the exertional/emotional trigger pattern plus absence of post-ictal confusion across all episodes fits convulsive syncope from LQTS far better than epilepsy — that diagnosis should be abandoned as the primary explanation, though I should not simply stop levetiracetam without formally checking its QT-drug profile alongside other agents to avoid. The mandatory drug-interaction check before any prescribing decision is required by protocol here.
+</think>
+<tool_call>
+{"name": "check_drug_interactions", "arguments": {"drug": "levetiracetam", "current_medications": ["levetiracetam 1000 mg twice daily"], "patient_conditions": ["congenital long QT syndrome, suspected", "prior epilepsy diagnosis"]}}
+</tool_call>
+<tool_response>
+Levetiracetam: low to minimal QT-prolonging potential, no definitive evidence of clinically significant QTc effect at standard doses. Class IA/III antiarrhythmics, fluoroquinolones, macrolides, antipsychotics, and ondansetron are QT-prolonging and should be avoided in this setting.
+</tool_response>
+<think>
+Levetiracetam is not driving this QTc prolongation, confirming that continuing it as sole treatment would not address the actual cardiac risk. To directly characterize the exercise-triggered arrhythmic mechanism — paradoxical QT behavior with heart rate — a supervised exercise stress test with defibrillator backup is the discriminating study, distinguishing LQT1's failure to shorten QT with exertion from other LQTS subtypes.
+</think>
+<tool_call>
+{"name": "order_specialized_test", "arguments": {"clinical_context": "congenital LQTS suspected, exertional syncope, assess QT adaptation to exercise with defibrillator standby", "test_type": "exercise_stress_test"}}
+</tool_call>
+<tool_response>
+Resting QTc 512 ms. QTc fails to shorten appropriately with rising heart rate (506→498→492 ms through stages 1-3), consistent with paradoxical adaptation. At HR 140, a 4-beat run of polymorphic VT occurred with brief pre-syncope; test halted, rhythm and QT normalized in recovery. No ischemic ST changes.
+</tool_response>
+<think>
+The paradoxical failure of QT shortening with exercise, culminating in exercise-triggered polymorphic VT, is the functional signature of LQT1 and directly reproduces her collapse mechanism under monitored conditions. Combined with the resting QTc ≥500 ms, structurally normal heart, normal electrolytes, and the family history of unexplained drowning, this establishes congenital long QT syndrome with convulsive syncope as the unifying diagnosis; formal genetic confirmation and cardiology referral are the appropriate next steps rather than further neurologic testing.
+</think>
+
+### Primary Diagnosis
+Cardiac syncope due to congenital long QT syndrome (Confidence: 0.72)
+
+### Differential Diagnoses
+1. Epilepsy (prior diagnosis) - no post-ictal confusion in any episode, exertional/emotional triggers, and a normal EEG do not fit a primary seizure disorder
+2. Acquired QT prolongation (electrolyte/drug) - normal potassium, magnesium, and low-risk QT profile of levetiracetam exclude an acquired cause
+3. Structural cardiomyopathy (HCM/ARVC) - structurally normal echocardiogram with preserved EF and no wall-motion abnormality excludes this
+4. Vasovagal syncope - does not explain the markedly prolonged QTc, captured Torsades-morphology VT, or paradoxical exercise QT behavior
+
+### Key Evidence
+- QTc 510 ms with broad-based T waves from ECG — high-risk, load-bearing finding reframing the case from epilepsy to cardiac syncope
+- Normal potassium/magnesium from labs — excludes acquired long QT
+- Torsades-morphology non-sustained VT on telemetry — direct capture of the arrhythmic mechanism
+- Paradoxical QT failure to shorten with exercise plus exercise-triggered polymorphic VT — functional confirmation of LQT1 pattern
+- Family history of maternal uncle's unexplained drowning at 28 — recognized high-risk LQTS sudden-death flag
+
+### Recommendations
+1. Admit to telemetry with continuous QT monitoring and defibrillator availability
+2. Refer to cardiology/electrophysiology for beta-blocker initiation, Schwartz score risk stratification, and genetic counseling; obtain KCNQ1/KCNH2/SCN5A channelopathy panel
+3. Initiate family cascade screening — ECG and genetic testing for first-degree relatives, including the 16-year-old brother with exertional palpitations
+4. Reclassify prior "epilepsy" as convulsive syncope from Torsades de Pointes; do not treat further episodes as seizures
+
+### Red Flags / Alerts
+- Do not continue levetiracetam as the sole treatment plan under an epilepsy framework — it does not address the underlying arrhythmic risk
+- Do not discharge home without cardiology evaluation and risk stratification
+- Do not prescribe QT-prolonging agents (Class IA/III antiarrhythmics, macrolides, fluoroquinolones, antipsychotics, ondansetron) given the confirmed QTc prolongation
+- Do not clear for unrestricted athletic activity before beta-blocker therapy and EP risk stratification are complete
