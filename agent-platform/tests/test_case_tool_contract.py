@@ -25,6 +25,7 @@ CASES_DIR = REPO_ROOT / "data" / "neurobench" / "cases"
 sys.path.insert(0, str(REPO_ROOT / "agent-platform" / "scripts" / "validation"))
 
 from check_perfect_agent import perfect_trace  # noqa: E402
+from check_trajectories import _as_trace, check_trajectory  # noqa: E402,F401
 from validate_cases import _tool_schemas, validate_case  # noqa: E402
 
 from neuroagent.evaluation.metrics import MetricsCalculator  # noqa: E402
@@ -120,3 +121,45 @@ class TestVocabularyHasOneSource:
                     if value not in tests and not value.startswith("genetic_panel:"):
                         unpriced.append(f"{path.stem}: test_type={value}")
         assert unpriced == [], unpriced
+
+
+class TestGoldTrajectoriesSatisfyTheContract:
+    """The trajectories are training data. If a tool changes shape under them, SFT trains on
+    calls the agent can no longer make — and nothing else in the suite would notice."""
+
+    @pytest.fixture(scope="class")
+    def trajectories(self) -> list[dict]:
+        path = REPO_ROOT / "training_data" / "gold_trajectories" / "trajectories.jsonl"
+        if not path.exists():
+            pytest.skip("gold trajectories not present")
+        return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
+
+    @pytest.fixture(scope="class")
+    def cases_by_id(self) -> dict:
+        from neuroagent_schemas import NeuroBenchCase as _Case
+        return {
+            c.case_id: c
+            for c in (_Case.model_validate(json.loads(p.read_text())) for p in CASE_FILES)
+        }
+
+    def test_every_tool_call_satisfies_the_contract(self, trajectories, cases_by_id, schemas):
+        from check_trajectories import check_trajectory
+
+        failures = []
+        for trajectory in trajectories:
+            issues = check_trajectory(trajectory, cases_by_id[trajectory["case_id"]], schemas)
+            if issues:
+                failures.append((trajectory["case_id"], trajectory.get("style"), issues[:2]))
+        assert failures == [], failures[:5]
+
+    def test_no_trajectory_teaches_a_useless_or_harmful_call(self, trajectories, cases_by_id):
+        from check_trajectories import _as_trace
+
+        calculator = MetricsCalculator()
+        offenders = []
+        for trajectory in trajectories:
+            gt = cases_by_id[trajectory["case_id"]].ground_truth
+            m = calculator.compute_all(_as_trace(trajectory), gt)
+            if m.useless_calls or m.harmful_calls or not m.diagnostic_accuracy_top1:
+                offenders.append((trajectory["case_id"], trajectory.get("style")))
+        assert offenders == [], offenders[:5]
