@@ -21,6 +21,7 @@ uv run python agent-platform/scripts/validation/validate_cases.py
 | `sweeps/CONSISTENCY_SWEEP_REPORT.md` | Cross-condition consistency findings | Written when the dataset had 516 cases; it now has 600 |
 | `sweeps/CLINICIAN_REVIEW_FLAGS.md` | Open questions handed to clinician review | Its section 5 asks for a ruling on `consult_medical_specialist`; that tool was removed in `64d4091`, so the question is resolved by deletion |
 | `sweeps/CASE_CONTRACT_SWEEP_SPEC.md` | The tool-contract sweep that took the cases to 0 validator issues | Uses the current validator, but the work is done |
+| `dataset-generation/external_case_sources.md` | Why cases were seeded from PMC / CC-BY sources | Counts describe the 100-case v1 dataset |
 | `audit/*.md` | Per-condition field-by-field audits of all 600 cases | Findings at audit time; some quote output from the deleted validators |
 
 ## What replaced them
