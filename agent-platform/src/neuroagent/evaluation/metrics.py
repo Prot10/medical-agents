@@ -247,6 +247,23 @@ def _extract_call_signature(call: dict[str, Any]) -> tuple[str, str]:
     return name, _normalize_call_args(args)
 
 
+def _word_tokens(text: str) -> list[str]:
+    """Words, punctuation stripped. `"(mild"` and `"amnestic)"` are not words."""
+    return re.findall(r"[a-z0-9']+", text.lower())
+
+
+def diagnosis_core(diagnosis: str) -> str:
+    """The diagnosis itself, without the trailing clinical commentary.
+
+    107 of the 600 ground-truth diagnoses append clauses after an em dash or semicolon —
+    "Migraine with aphasic aura (ICHD-3 1.2.1) — misdiagnosed as TIA; warfarin overtreatment
+    …". An agent states the diagnosis, not the commentary, so scoring the whole string makes
+    the key-term threshold unreachable and marks a correct answer wrong.
+    """
+    core = re.split(r"\s+[—–]\s+|\s+-\s+|;", diagnosis, maxsplit=1)[0]
+    return core.strip().lower()
+
+
 def _call_arguments(call: dict[str, Any]) -> dict[str, Any]:
     """The argument dict of one tool call, whichever shape the trace stored it in."""
     if "function" in call and isinstance(call["function"], dict):
@@ -609,14 +626,16 @@ class MetricsCalculator:
         if not trace.final_response:
             return False
         response_lower = trace.final_response.lower()
-        diagnosis_lower = gt.primary_diagnosis.lower()
+        diagnosis_lower = diagnosis_core(gt.primary_diagnosis)
 
         # Check for exact substring match
         if diagnosis_lower in response_lower:
             return True
 
-        # Check key terms from the diagnosis (words > 3 chars)
-        key_terms = [t for t in diagnosis_lower.split() if len(t) > 3]
+        # Key terms, punctuation stripped. Splitting on whitespace alone leaves tokens like
+        # "(mild" and "amnestic)", which never match a response that writes the same
+        # diagnosis with commas instead of parentheses.
+        key_terms = [t for t in _word_tokens(diagnosis_lower) if len(t) > 3]
         if key_terms:
             matches = sum(1 for t in key_terms if t in response_lower)
             return matches >= len(key_terms) * 0.7
