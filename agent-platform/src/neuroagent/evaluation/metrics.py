@@ -264,6 +264,112 @@ def diagnosis_core(diagnosis: str) -> str:
     return core.strip().lower()
 
 
+def diagnosis_head(diagnosis: str) -> str:
+    """The naming part of the diagnosis, without abbreviations, subtype, or grading.
+
+    "Amyotrophic lateral sclerosis (ALS), bulbar-onset" → "amyotrophic lateral sclerosis".
+    An agent that lists the disease without the ground truth's qualifiers has still named
+    it, and across the 600 cases no head is shared by two conditions — so a head match
+    identifies the condition unambiguously.
+    """
+    core = re.sub(r"\([^)]*\)", " ", diagnosis_core(diagnosis))
+    return re.split(r",", core, maxsplit=1)[0].strip()
+
+
+# The output format the orchestrator system prompt mandates: a `### Primary Diagnosis`
+# section, then `### Differential Diagnoses`. Bolded and inline `Primary Diagnosis: X`
+# variants are accepted too, so a model is not scored wrong for a cosmetic deviation.
+_LABEL_PREFIX = r"(?:#{1,6}\s*|\*\*\s*)?"
+_PRIMARY_LABEL = r"(?:primary\s+|final\s+|working\s+)?diagnosis"
+_DIFFERENTIAL_LABEL = r"differential(?:\s+diagnos[ei]s)?"
+_SECTION_BREAK = re.compile(r"(?m)^\s{0,3}(?:#{1,6}\s|\*\*[^*\n]+\*\*\s*:?\s*$)")
+_CONFIDENCE = re.compile(r"\(\s*confidence\s*[:=][^)]*\)", re.IGNORECASE)
+_THINK = re.compile(r"<think>.*?</think>", re.DOTALL | re.IGNORECASE)
+
+
+def _section_body(response: str, label: str) -> str | None:
+    """The text under a `### <label>` heading, else the value of an inline `<label>: X`.
+
+    A heading wins over an inline label, and the *last* heading wins over an earlier one:
+    reasoning prose says things like "Diagnosis is confirmed:" long before the agent's
+    conclusion, and matching that instead of the real section reads off the wrong verdict.
+    """
+    text = _THINK.sub(" ", response)
+
+    heading = re.compile(rf"(?im)^\s{{0,3}}{_LABEL_PREFIX}(?:{label})\s*\**\s*:?\s*$")
+    last = None
+    for last in heading.finditer(text):
+        pass
+    if last:
+        rest = text[last.end() :].lstrip("\n")
+        stop = _SECTION_BREAK.search(rest)
+        body = (rest[: stop.start()] if stop else rest).strip()
+        return body or None
+
+    # `**Primary Diagnosis:** Alzheimer's disease` — the colon must follow the label, so
+    # that prose ("Primary diagnosis is confirmed: …") is not mistaken for the section.
+    inline = re.compile(rf"(?im)^\s{{0,3}}{_LABEL_PREFIX}(?:{label})\s*\**\s*:\s*(\S.*)$")
+    match = inline.search(text)
+    return match.group(1).strip() if match else None
+
+
+def stated_primary_diagnosis(response: str) -> str | None:
+    """The diagnosis the agent committed to, not every disease it mentioned.
+
+    Scoring the whole response lets a model that concludes B while discussing A in its
+    differential score a correct top-1 for A: on the gold trajectories, 1653 of 1688
+    cross-condition false accepts came from text below the conclusion. The agent's verdict
+    lives in one section; score that section.
+    """
+    body = _section_body(response, _PRIMARY_LABEL)
+    if not body:
+        return None
+    first_line = next((line for line in body.splitlines() if line.strip()), "")
+    stated = _CONFIDENCE.sub("", first_line)
+    return stated.strip(" \t*-–—•[]").strip() or None
+
+
+def stated_differential(response: str, limit: int = 3) -> list[str]:
+    """The agent's own ranked alternatives, best first."""
+    body = _section_body(response, _DIFFERENTIAL_LABEL)
+    if not body:
+        return []
+
+    entries: list[str] = []
+    for line in body.splitlines():
+        item = re.match(r"\s*(?:\d+[.)]|[-*•])\s+(.*)", line)
+        if not item:
+            continue
+        # `1. Cervical myelopathy — spondylotic changes on MRI` → the diagnosis, not the gloss
+        text = re.split(r"\s+[—–]\s+|\s+-\s+|:", item.group(1), maxsplit=1)[0]
+        text = _CONFIDENCE.sub("", text).strip(" \t*")
+        if text:
+            entries.append(text)
+        if len(entries) == limit:
+            break
+    return entries
+
+
+def _states_diagnosis(text: str, diagnosis: str) -> bool:
+    """Does `text` — a stated diagnosis, not an essay — name `diagnosis`?"""
+    if not text:
+        return False
+    text_lower = text.lower()
+
+    core = diagnosis_core(diagnosis)
+    if core in text_lower:
+        return True
+
+    head = diagnosis_head(diagnosis)
+    if head and head in text_lower:
+        return True
+
+    key_terms = [t for t in _word_tokens(core) if len(t) > 3]
+    if not key_terms:
+        return False
+    return sum(1 for t in key_terms if t in text_lower) >= len(key_terms) * 0.7
+
+
 def _call_arguments(call: dict[str, Any]) -> dict[str, Any]:
     """The argument dict of one tool call, whichever shape the trace stored it in."""
     if "function" in call and isinstance(call["function"], dict):
@@ -622,44 +728,41 @@ class MetricsCalculator:
         return metrics
 
     def _check_diagnosis_top1(self, trace: AgentTrace, gt: GroundTruth) -> bool:
-        """Check if the primary diagnosis matches (fuzzy string match)."""
+        """Did the agent commit to the right primary diagnosis?
+
+        Scored against the `### Primary Diagnosis` section the system prompt mandates, so a
+        diagnosis merely mentioned in the differential or the discussion earns no credit.
+        When a response states no diagnosis in any recognised form we cannot read off its
+        verdict, so we fall back to the whole response — but then demand the diagnosis
+        verbatim, never a bag-of-words near-miss.
+        """
         if not trace.final_response:
             return False
-        response_lower = trace.final_response.lower()
-        diagnosis_lower = diagnosis_core(gt.primary_diagnosis)
 
-        # Check for exact substring match
-        if diagnosis_lower in response_lower:
-            return True
+        stated = stated_primary_diagnosis(trace.final_response)
+        if stated is not None:
+            return _states_diagnosis(stated, gt.primary_diagnosis)
 
-        # Key terms, punctuation stripped. Splitting on whitespace alone leaves tokens like
-        # "(mild" and "amnestic)", which never match a response that writes the same
-        # diagnosis with commas instead of parentheses.
-        key_terms = [t for t in _word_tokens(diagnosis_lower) if len(t) > 3]
-        if key_terms:
-            matches = sum(1 for t in key_terms if t in response_lower)
-            return matches >= len(key_terms) * 0.7
-
-        return False
+        visible = _THINK.sub(" ", trace.final_response).lower()
+        return diagnosis_core(gt.primary_diagnosis) in visible
 
     def _check_diagnosis_top3(self, trace: AgentTrace, gt: GroundTruth) -> bool:
-        """Check if correct diagnosis is in top 3 of the agent's differential."""
+        """Is the correct diagnosis the agent's primary, or in its top-3 differential?
+
+        This used to return True when the response mentioned any of the *ground truth's*
+        alternatives — diagnoses that are, by construction, wrong. It credited an agent for
+        naming the distractors. Rank the agent's own differential instead.
+        """
         if self._check_diagnosis_top1(trace, gt):
             return True
 
         if not trace.final_response:
             return False
 
-        response_lower = trace.final_response.lower()
-        diagnosis_lower = gt.primary_diagnosis.lower()
-
-        # Also check differential diagnoses from ground truth
-        for diff in gt.differential[:3]:
-            diag = diff.diagnosis.lower()
-            if diag and diag in response_lower:
-                return True
-
-        return diagnosis_lower in response_lower
+        return any(
+            _states_diagnosis(entry, gt.primary_diagnosis)
+            for entry in stated_differential(trace.final_response, limit=3)
+        )
 
     @staticmethod
     def _compute_optimal_cost(ground_truth: GroundTruth) -> float:
