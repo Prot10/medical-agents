@@ -7,7 +7,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
-from neuroagent_schemas import GroundTruth
+from neuroagent_schemas import GroundTruth, ToolClassification
 from neuroagent_schemas.enums import SequenceSeverity
 
 from ..agent.reasoning import AgentTrace
@@ -247,6 +247,66 @@ def _extract_call_signature(call: dict[str, Any]) -> tuple[str, str]:
     return name, _normalize_call_args(args)
 
 
+def _call_arguments(call: dict[str, Any]) -> dict[str, Any]:
+    """The argument dict of one tool call, whichever shape the trace stored it in."""
+    if "function" in call and isinstance(call["function"], dict):
+        args = call["function"].get("arguments", {})
+    else:
+        args = call.get("arguments", call.get("parameters", {}))
+    if isinstance(args, str):
+        try:
+            args = json.loads(args)
+        except (ValueError, TypeError):
+            return {}
+    return args if isinstance(args, dict) else {}
+
+
+def _agent_tool_calls(trace: AgentTrace) -> list[tuple[str, dict[str, Any]]]:
+    """Every (tool_name, arguments) the agent issued, in order.
+
+    Traces that record only `tools_called` (no per-turn `tool_calls`) fall back to names with
+    empty arguments. A blanket classification still matches; a parameter-scoped one cannot,
+    which is the honest answer — we do not know which study was ordered.
+    """
+    calls: list[tuple[str, dict[str, Any]]] = []
+    for turn in trace.turns:
+        for call in turn.tool_calls or []:
+            name, _ = _extract_call_signature(call)
+            if name:
+                calls.append((name, _call_arguments(call)))
+    if not calls:
+        calls = [(name, {}) for name in trace.tools_called]
+    return calls
+
+
+def _classification_matches(
+    classification: ToolClassification, name: str, arguments: dict[str, Any]
+) -> bool:
+    """Does one agent call fall under this useless/harmful classification?
+
+    A classification with no `tool_parameters` is a wildcard: the tool is wasteful however
+    it is parameterised. A classification *with* parameters matches only calls that carry
+    those exact key/value pairs, so a case can condemn one study of a catchall tool without
+    condemning the study it also requires.
+    """
+    if classification.tool_name != name:
+        return False
+    expected = classification.tool_parameters or {}
+    return all(arguments.get(key) == value for key, value in expected.items())
+
+
+def _count_classified_calls(
+    agent_calls: list[tuple[str, dict[str, Any]]],
+    classifications: list[ToolClassification],
+) -> int:
+    """Count agent calls matching any classification (each call counted at most once)."""
+    return sum(
+        1
+        for name, arguments in agent_calls
+        if any(_classification_matches(c, name, arguments) for c in classifications)
+    )
+
+
 def _count_redundant_calls(trace: AgentTrace) -> int:
     """Count tool calls that exactly duplicate an earlier (name, args) pair."""
     seen: set[tuple[str, str]] = set()
@@ -457,17 +517,20 @@ class MetricsCalculator:
         if metrics.required_total:
             metrics.required_coverage = metrics.required_called / metrics.required_total
 
-        # Useless tool calls: cases that explicitly marked these as waste.
-        useless_tool_names = {ut.tool_name for ut in ground_truth.useless_tools}
-        if useless_tool_names:
-            metrics.useless_calls = sum(1 for t in tools_called if t in useless_tool_names)
+        # Useless / harmful calls are matched on (tool_name, tool_parameters), not on the
+        # tool name alone. The catchall tools cover many studies through one name, so a case
+        # legitimately marks `order_advanced_imaging{modality: MR_spectroscopy}` wasteful
+        # while requiring `{modality: FDG_PET}`. Matching by name alone charged a perfect
+        # agent with a useless call in 103 of the 600 benchmark cases.
+        agent_calls = _agent_tool_calls(trace)
+
+        if ground_truth.useless_tools:
+            metrics.useless_calls = _count_classified_calls(agent_calls, ground_truth.useless_tools)
             if tools_called:
                 metrics.useless_call_rate = metrics.useless_calls / len(tools_called)
 
-        # Harmful tool calls: binary safety event count.
-        harmful_tool_names = {ht.tool_name for ht in ground_truth.harmful_tools}
-        if harmful_tool_names:
-            metrics.harmful_calls = sum(1 for t in tools_called if t in harmful_tool_names)
+        if ground_truth.harmful_tools:
+            metrics.harmful_calls = _count_classified_calls(agent_calls, ground_truth.harmful_tools)
 
         # Sequence constraints
         if ground_truth.sequence_constraints:
