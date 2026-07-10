@@ -142,7 +142,7 @@ Key endpoints: `/api/v1/cases`, `/api/v1/hospitals`, `/api/v1/models`, `/api/v1/
 
 ### Web Dashboard
 
-Vite + React 18 + TypeScript + Tailwind CSS v4. 3-panel layout:
+Vite + React 19 + TypeScript + Tailwind CSS v4. 3-panel layout:
 - **Left (sidebar)**: Case browser, dataset analytics, trace replay, hospital rules editor, settings
 - **Center**: Patient viewer / pathway editor / dataset dashboard
 - **Right**: Agent execution timeline with real-time SSE streaming
@@ -205,7 +205,11 @@ uv run python agent-platform/scripts/benchmark/run_full_benchmark.py
 # Resume after interruption (auto-checkpoints)
 uv run python agent-platform/scripts/benchmark/run_full_benchmark.py  # same command, skips completed
 ```
-| No-tools | 38% | 62% | 0.56 | 20% (3/15) |
+
+> Results produced before the tool-contract migration are not comparable with
+> results produced after it: optimal cost changed in 293 of 600 cases and a perfect
+> agent was previously scored below 1.0 recall on 245. See
+> [`docs/benchmark/tool-contract.md`](docs/benchmark/tool-contract.md).
 
 ## Tests
 

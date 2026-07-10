@@ -1,5 +1,9 @@
 # External Medical Case Sources for NeuroBench Expansion
 
+> **Historical sourcing memo (March 2026).** Its case counts describe the dataset at the
+> time (v1 = 100 synthetic cases). The dataset now has 600 cases across 20 conditions.
+> Kept for provenance of the PMC/CC-BY seeding decisions.
+
 *Research compiled March 2026 for NeuroBench / NeuroAgent (Nature Machine Intelligence submission)*
 
 ---

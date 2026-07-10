@@ -46,7 +46,7 @@ uv run python agent-platform/scripts/runtime/run_single_case.py \
 ## 5. Run the web dashboard
 
 ```bash
-# Start the API server (loads all 100 cases on startup)
+# Start the API server (loads all 600 cases on startup)
 uv run uvicorn neuroagent.api.app:app --host 0.0.0.0 --port 8888
 ```
 

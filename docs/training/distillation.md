@@ -1,7 +1,11 @@
-# Golden Trajectory Generation → SFT — Progress Tracker
+# Agent distillation: gold trajectories → SFT
 
-Persistent tracker for the multi-session agent-distillation effort.
-Plan source: `~/.claude/plans/i-want-you-ot-ticklish-newell.md`
+How the small local students (Qwen3.5-9B / -4B) are taught to run the ReAct loop, by
+imitating trajectories a teacher wrote for the 500 NeuroBench training cases.
+
+This is **offline agent distillation via rejection sampling** (FireAct / Agent Distillation
+lineage): a teacher writes [Thought → Action → Observation] traces, only traces that pass
+validation become SFT targets, and tool observations are masked from the loss.
 
 ## Goal
 
@@ -284,15 +288,3 @@ bash agent-platform/scripts/training/run_sft_training.sh Qwen/Qwen3.5-9B
 bash agent-platform/scripts/training/run_sft_training.sh Qwen/Qwen3.5-4B
 ```
 
-## Phase 0 probe results
-
-_(populated by `scripts/training/probe_max_seq_length.py`; results → `results/sft_probe/max_seq_probe.json`)_
-
-| model | max stable seq_len (bs=1) | peak GB | chosen |
-| --- | --- | --- | --- |
-| Qwen/Qwen3.5-9B | TBD | | |
-| Qwen/Qwen3.5-4B | TBD | | |
-
-Requirement from measurement: **max_seq ≥ 8192** (p90 ≈ 8.2k, max ≈ 9.3k). If the 9B cannot
-reach 8192 on this GPU, options are (a) shrink tool-output truncation from 2000 chars,
-(b) cap tool calls at 4-5, or (c) train the 9B with a shorter budget than the 4B.

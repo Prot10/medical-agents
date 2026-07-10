@@ -6,7 +6,7 @@ The NeuroAgent Web API is served by FastAPI at `http://localhost:8888`. All endp
 
 ### `GET /api/v1/cases`
 
-Returns a lightweight index of all 100 NeuroBench cases.
+Returns a lightweight index of all 600 NeuroBench cases.
 
 **Response**: `CaseIndexEntry[]`
 

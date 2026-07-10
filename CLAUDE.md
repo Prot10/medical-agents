@@ -4,7 +4,7 @@
 
 NeuroAgent: tool-augmented LLM agent for neurological clinical decision support. ReAct loop + 12 diagnostic tools + hospital protocols + cost tracking. Targeting Nature Machine Intelligence.
 
-See README.md for full project docs, setup, and architecture.
+See README.md for setup, and `docs/README.md` for the documentation index.
 
 ## Key paths
 
@@ -50,11 +50,16 @@ uv run python agent-platform/scripts/benchmark/run_baseline_eval.py
 - Tool output modes: "enhanced" (v1/v2, interpretive fields present) vs "realistic" (v3/v4, stripped to match real clinical reports)
 - 12 tools: analyze_brain_mri, analyze_eeg, analyze_ecg, interpret_labs, analyze_csf, order_ct_scan, order_echocardiogram, order_cardiac_monitoring, order_advanced_imaging, order_specialized_test, search_medical_literature, check_drug_interactions
 - Cost tracking: `CostTracker` in `tools/cost_tracker.py`, config in `config/tools/costs.yaml`, Medicare PFS reference rates
+- Tool vocabulary: `costs.yaml` is the single source; `tools/vocabulary.py` generates the catchall enums from it.
+  `order_advanced_imaging` takes `modality` (11 values); `order_specialized_test` takes `test_type` (19 + `genetic_panel:<panel>`)
+- Case contract: `agent-platform/scripts/validation/validate_cases.py` must report 0 issues on 600/600.
+  Read `docs/benchmark/tool-contract.md` before editing a case or a tool schema
+- `consult_medical_specialist` does not exist; a specialist referral is an action with `tool_name: null`
 - Evaluation: `format_patient_info()` in `evaluation/runner.py` is the single source of truth for patient presentation formatting
 
 ## Models
 
-4 vLLM models on A100-40GB. Qwen3.5 uses `--reasoning-parser qwen3` + `--tool-call-parser qwen3_coder`. MedGemma uses `--tool-call-parser hermes`. On Mac use Ollama.
+10 models in `model_registry.py`, served one at a time on the A100-40GB (`scripts/runtime/serve_model.sh`). Qwen3.5 uses `--reasoning-parser qwen3` + `--tool-call-parser qwen3_coder`. MedGemma uses `--tool-call-parser hermes`. On Mac use Ollama.
 
 LLM client (`llm/client.py`) strips `<think>` tags from Qwen and parses OpenAI-style tool calls. Default sampling: temperature=1.0, top_p=0.95, presence_penalty=1.5, max_tokens=8192.
 

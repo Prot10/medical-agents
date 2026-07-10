@@ -23,7 +23,7 @@ Contains the logo mark, model picker, hospital picker (separated by dividers), a
 ## Left Panel — Case Browser
 
 ### `CaseBrowser`
-Lists 100 cases grouped by neurological condition (10 groups). Features:
+Lists 600 cases grouped by neurological condition (20 groups). Features:
 - **Search** — filters by case ID and chief complaint
 - **Difficulty chips** — S (straightforward), M (moderate), P (diagnostic puzzle) with color coding
 - **Sticky group headers** — condition name stays visible while scrolling

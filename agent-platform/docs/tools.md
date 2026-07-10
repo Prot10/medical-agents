@@ -265,6 +265,82 @@ Check drug interactions, contraindications, formulary status, and alternatives f
 
 ---
 
+### 8. `order_ct_scan` — CT Scanner
+
+Fast structural imaging. Preferred over MRI for emergency hemorrhage exclusion.
+
+#### Parameters
+| Name | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `clinical_context` | string | yes | |
+| `contrast` | boolean | no | |
+| `angiography` | boolean | no | CTA — vessel imaging |
+
+Returns `CTReport`.
+
+---
+
+### 9. `order_echocardiogram` — Echocardiogram
+
+#### Parameters
+| Name | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `clinical_context` | string | yes | |
+| `echo_type` | enum | no | `TTE`, `TEE`, `bubble_study` (right-to-left shunt) |
+
+Returns `EchoReport`.
+
+---
+
+### 10. `order_cardiac_monitoring` — Cardiac Monitoring
+
+#### Parameters
+| Name | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `clinical_context` | string | yes | |
+| `monitor_type` | enum | no | `holter_24h`, `holter_48h`, `event_monitor_14d`, `event_monitor_30d`, `implantable_loop_recorder`, `telemetry` |
+
+Returns `CardiacMonitoringReport`.
+
+---
+
+### 11. `order_advanced_imaging` — Advanced Imaging *(catchall)*
+
+One tool, eleven studies, selected by `modality`. The enum is generated from
+`config/tools/costs.yaml`, so a modality cannot exist without a price.
+
+#### Parameters
+| Name | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `clinical_context` | string | yes | |
+| `modality` | enum | **yes** | `amyloid_PET`, `tau_PET`, `FDG_PET`, `DaTscan`, `MIBG_scan`, `perfusion_MRI`, `MR_spectroscopy`, `MR_angiography`, `MR_venography`, `carotid_duplex`, `transcranial_doppler` |
+
+The parameter was called `imaging_type` until the tool-contract migration. Returns
+`AdvancedImagingReport`.
+
+---
+
+### 12. `order_specialized_test` — Specialized Test *(catchall)*
+
+One tool, nineteen studies plus targeted gene panels, selected by `test_type`.
+
+#### Parameters
+| Name | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `clinical_context` | string | yes | |
+| `test_type` | enum | **yes** | 19 values — nerve/muscle (`emg_ncs`, `emg_single_fiber`, `repetitive_nerve_stimulation`, `nerve_biopsy`, `muscle_biopsy`, `skin_biopsy_iencf`), evoked potentials (`vep`, `ssep`, `baep`), cognition (`neuropsych_battery`), sleep (`polysomnography`, `mslt`), autonomic/cardiac (`tilt_table`, `autonomic_testing`, `exercise_stress_test`), ophthalmic (`optical_coherence_tomography`, `visual_field_perimetry`), `respiratory_function`, `ice_pack_test` — **plus** `genetic_panel:<panel>` for 11 panels |
+
+Returns `SpecializedTestReport`.
+
+---
+
+> **Cost.** Every catchall value maps to a row in `config/tools/costs.yaml`. Both enums and
+> the validator read from that file, so the tool, the price and the benchmark's ground truth
+> cannot drift apart. See [`docs/benchmark/tool-contract.md`](../../docs/benchmark/tool-contract.md).
+
+
+---
+
 ## How the MockServer routes tool calls
 
 During evaluation, `MockServer` receives every `ToolCall` and returns pre-generated outputs from the loaded `NeuroBenchCase`:
@@ -285,7 +361,8 @@ All outputs are serialized via `model.model_dump()` (Pydantic v2) and returned a
 
 ## Tool Output Modes: v1 (Enhanced) vs v3 (Realistic)
 
-The NeuroBench dataset exists in two output modes, both containing the same 200 cases (100 synthetic + 100 real-case-seeded):
+The NeuroBench dataset has 600 cases across 20 conditions (500 train / 100 test). Tool
+outputs exist in two modes; the current cases use the realistic mode:
 
 ### v1 / v2: Enhanced tool outputs (original)
 
@@ -303,7 +380,7 @@ These outputs read like an attending physician's case discussion — the answer 
 
 ### v3: Realistic tool outputs (stripped)
 
-The same 200 cases with interpretive fields removed or rewritten to match real-world clinical reports:
+The same cases with interpretive fields removed or rewritten to match real-world clinical reports:
 - Lab values show numbers, units, reference ranges, and H/L flags only — no clinical interpretation
 - MRI/EEG impressions describe findings without naming diseases or suggesting treatments
 - No imaging differentials, no confidence scores, no recommended actions beyond "Clinical correlation recommended."

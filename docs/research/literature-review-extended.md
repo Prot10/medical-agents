@@ -513,7 +513,7 @@ Each gap below is a position NeuroAgent can defensibly claim, grounded in the ci
 
 1. **No neurology-specific, tool-augmented agent at benchmark scale.** The only
    neurology-specific agentic study, Barrit et al. \[19], used five cases; AgentClinic \[7],
-   MedHELM \[9] and MedAgentBench \[10] are cross-specialty. NeuroBench (516 cases, 20
+   MedHELM \[9] and MedAgentBench \[10] are cross-specialty. NeuroBench (600 cases, 20
    conditions) plus NeuroAgent's 12 neurology tools fill a genuine void.
 
 2. **Cost-aware agentic evaluation is nascent.** Only Sequential Diagnosis \[11] scores

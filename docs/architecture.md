@@ -99,7 +99,7 @@ flowchart TD
   Review --> Annotations[data/review/annotations]
 ```
 
-The current default dataset is NeuroBench v5: 516 cases across 20 neurological conditions. Case files include patient presentation, initial tool outputs, conditional follow-up outputs, fallback outputs for off-pathway tool calls, and ground truth.
+The current default dataset is NeuroBench v5: 600 cases across 20 neurological conditions (500 train / 100 test, split at `data/neurobench/splits/`). Case files include patient presentation, initial tool outputs, conditional follow-up outputs, fallback outputs for off-pathway tool calls, and ground truth.
 
 ## API and UI Flow
 
@@ -176,7 +176,7 @@ flowchart TD
   Cases[NeuroBench v4/v5 cases] --> Gold[Gold trajectory generation<br/>multi-style ReAct traces]
   Gold --> JSONL[training_data/gold_trajectories<br/>trajectories.jsonl]
   JSONL --> SFT[QLoRA SFT<br/>Qwen3.5-9B]
-  SFT --> Adapter[SFT LoRA adapter<br/>checkpoints/sft_769]
+  SFT --> Adapter[SFT LoRA adapter<br/>checkpoints/sft_Qwen3.5-9B]
   Adapter --> DPO[DPO<br/>offline preference pairs]
   Adapter --> GRPO[GRPO<br/>online composite reward]
   Adapter --> DAPO[DAPO<br/>token-level RL]
@@ -203,7 +203,7 @@ flowchart TD
 
 ### Current Fine-Tuning State
 
-- Data pipeline: 769 parsed gold trajectories generated from 200 cases with multiple clinical styles.
+- Data pipeline: 1000 parsed gold trajectories generated from the 500 train cases, two clinical styles each.
 - SFT: completed on Qwen3.5-9B with QLoRA; reported validation loss improved from 1.02 to 0.537.
 - Evaluation: SFT improved fold0 validation top-1 accuracy from 52.9% to 55.7%, mainly on diagnostic puzzles.
 - GRPO: implemented and evaluated, but gains were marginal because long ReAct completions are truncated under single-GPU memory limits.
@@ -248,9 +248,10 @@ The current tool registry supports 12 base tools in single-model mode:
 - `search_medical_literature`
 - `check_drug_interactions`
 
-The specialist consultation tool, `consult_medical_specialist`, is registered when a specialist client is provided or when mock evaluation mode is active. That makes the maximum tool count 13.
-
-Note: `agent-platform/docs/architecture.md` still contains stale references to 7 tools. The root README and current code reflect the expanded 12/13-tool architecture.
+The registry holds exactly these 12 tools. `consult_medical_specialist` was removed in
+`64d4091`; a specialist referral now appears in a case as a clinical action with
+`tool_name: null`. The tool vocabulary and cost registry are generated from
+`agent-platform/config/tools/costs.yaml` — see [`benchmark/tool-contract.md`](benchmark/tool-contract.md).
 
 ## Review Platform
 

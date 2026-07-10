@@ -70,7 +70,7 @@ muscle → neuromuscular junction → peripheral nerve → nerve root/plexus
 
 ## 4. The architecture
 
-This framework is the [Diagnostic Hypothesis Graph (Proposal A of `reasoning-frameworks-research.md`)](./reasoning-frameworks-research.md) **with a localization × tempo spine** — it builds on, and does not discard, that earlier design.
+This framework is the [Diagnostic Hypothesis Graph (Proposal A of `reasoning-frameworks-research.md`)](./reasoning-frameworks.md) **with a localization × tempo spine** — it builds on, and does not discard, that earlier design.
 
 ### 4.1 The reasoning state
 
