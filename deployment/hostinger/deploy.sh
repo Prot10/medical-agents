@@ -22,7 +22,7 @@ set -euo pipefail
 #   - dataset-generation/{pyproject.toml,src/} ........... workspace member shell (uv sync requires it)
 #   - dataset-generation/config/conditions.yaml .......... tool-catalog per-condition rules
 #   - pyproject.toml, uv.lock ............................ root workspace + lockfile
-#   - data/neurobench_v5/ ................................ 600 benchmark cases
+#   - data/neurobench/ .................................. 600 benchmark cases
 #   - web-review/dist/ ................................... built static frontend
 #
 # What this script never touches on the VPS:
@@ -154,8 +154,8 @@ if [ "$CODE_ONLY" -eq 1 ]; then
 else
   echo -e "${YELLOW}[3/5] Rsyncing data + dist...${NC}"
   rsync -az --delete \
-    data/neurobench_v5/ \
-    "$VPS_HOST:$VPS_PATH/data/neurobench_v5/"
+    data/neurobench/ \
+    "$VPS_HOST:$VPS_PATH/data/neurobench/"
 
   rsync -az --delete \
     web-review/dist/ \
@@ -178,7 +178,7 @@ echo -e "${GREEN}  Service restarted.${NC}"
 
 # ── Step 5: Smoke test ──────────────────────────────────
 # uvicorn needs ~2s after systemctl restart returns to finish loading the
-# v5 case fleet. Retry a few times. We accept any non-5xx code: a 401 with
+# case fleet. Retry a few times. We accept any non-5xx code: a 401 with
 # our probe header is evidence the backend processed the request and ran
 # its auth check, which is exactly what we want to verify here.
 echo -e "${YELLOW}[5/5] Smoke-testing...${NC}"

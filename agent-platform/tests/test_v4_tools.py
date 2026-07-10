@@ -1,4 +1,4 @@
-"""Tests for v4 tool system — new tools, v4 dataset routing, and cost integration."""
+"""Tests for the tool system, dataset routing, and cost integration."""
 
 import json
 from pathlib import Path
@@ -16,11 +16,11 @@ from neuroagent.tools.cost_tracker import CostTracker
 from neuroagent.agent.reasoning import AgentTrace
 from neuroagent.evaluation.metrics import MetricsCalculator, CaseMetrics, check_critical_action
 
-V4_CASES_DIR = Path(__file__).resolve().parents[2] / "data" / "neurobench_v4" / "cases"
+NEUROBENCH_CASES_DIR = Path(__file__).resolve().parents[2] / "data" / "neurobench" / "cases"
 
 
 def _load_case(case_id: str) -> NeuroBenchCase:
-    path = V4_CASES_DIR / f"{case_id}.json"
+    path = NEUROBENCH_CASES_DIR / f"{case_id}.json"
     return NeuroBenchCase(**json.loads(path.read_text()))
 
 
@@ -174,16 +174,16 @@ class TestToolDefinitions:
 
 
 # ---------------------------------------------------------------------------
-# V4 dataset & mock server routing tests
+# Dataset & mock server routing tests
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.skipif(not V4_CASES_DIR.exists(), reason="v4 dataset not generated")
-class TestV4MockServerRouting:
-    """Test that v4 cases route new tools to proper outputs via MockServer."""
+@pytest.mark.skipif(not NEUROBENCH_CASES_DIR.exists(), reason="dataset not present")
+class TestMockServerRouting:
+    """Test that cases route tools to proper outputs via MockServer."""
 
     def test_stroke_ct_routing(self):
-        """CT scan should return CTReport from v4 stroke case followup."""
+        """CT scan should return CTReport from stroke case followup."""
         case = _load_case("ISCH-STR-S01")
         mock = MockServer(case)
         result = mock.get_output("order_ct_scan", {"clinical_context": "stroke", "angiography": True})
@@ -192,7 +192,7 @@ class TestV4MockServerRouting:
         assert "impression" in result.output
 
     def test_stroke_echo_routing(self):
-        """Echocardiogram should return EchoReport from v4 stroke case followup."""
+        """Echocardiogram should return EchoReport from stroke case followup."""
         case = _load_case("ISCH-STR-S01")
         mock = MockServer(case)
         result = mock.get_output("order_echocardiogram", {"clinical_context": "stroke", "echo_type": "TTE"})
@@ -200,7 +200,7 @@ class TestV4MockServerRouting:
         assert "impression" in result.output
 
     def test_stroke_holter_routing(self):
-        """Cardiac monitoring should return CardiacMonitoringReport from v4 stroke case."""
+        """Cardiac monitoring should return CardiacMonitoringReport from stroke case."""
         case = _load_case("ISCH-STR-S01")
         mock = MockServer(case)
         result = mock.get_output("order_cardiac_monitoring", {"clinical_context": "afib screening"})
@@ -240,26 +240,27 @@ class TestV4MockServerRouting:
         assert ecg.success
 
     def test_missing_tool_returns_error(self):
-        """Calling a tool with no data should fail gracefully."""
+        """Calling a tool with no direct data should use fallback output."""
         case = _load_case("ALZ-EARLY-S01")
         mock = MockServer(case)
         result = mock.get_output("order_ct_scan", {"clinical_context": "not needed"})
-        assert not result.success
-        assert "No order_ct_scan data available" in result.error_message
+        assert result.success
+        assert result.from_fallback
+        assert "impression" in result.output
 
 
 # ---------------------------------------------------------------------------
-# V4 dataset validation
+# Dataset validation
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.skipif(not V4_CASES_DIR.exists(), reason="v4 dataset not generated")
-class TestV4DatasetIntegrity:
-    """Validate all 200 v4 cases load correctly."""
+@pytest.mark.skipif(not NEUROBENCH_CASES_DIR.exists(), reason="dataset not generated")
+class TestDatasetIntegrity:
+    """Validate all canonical dataset cases load correctly."""
 
     def test_all_cases_load(self):
-        cases = sorted(V4_CASES_DIR.glob("*.json"))
-        assert len(cases) == 200
+        cases = sorted(NEUROBENCH_CASES_DIR.glob("*.json"))
+        assert len(cases) == 600
         for path in cases:
             data = json.loads(path.read_text())
             case = NeuroBenchCase(**data)
@@ -268,7 +269,7 @@ class TestV4DatasetIntegrity:
 
     def test_no_misrouted_echo(self):
         """No echocardiogram followups should still be routed to interpret_labs."""
-        for path in sorted(V4_CASES_DIR.glob("*.json")):
+        for path in sorted(NEUROBENCH_CASES_DIR.glob("*.json")):
             data = json.loads(path.read_text())
             for fu in data.get("followup_outputs", []):
                 if "echocardiogram" in fu["trigger_action"]:
@@ -278,7 +279,7 @@ class TestV4DatasetIntegrity:
 
     def test_no_misrouted_holter(self):
         """No Holter followups should still be routed to analyze_ecg."""
-        for path in sorted(V4_CASES_DIR.glob("*.json")):
+        for path in sorted(NEUROBENCH_CASES_DIR.glob("*.json")):
             data = json.loads(path.read_text())
             for fu in data.get("followup_outputs", []):
                 if "holter" in fu["trigger_action"]:
@@ -288,7 +289,7 @@ class TestV4DatasetIntegrity:
 
     def test_no_misrouted_ct(self):
         """No CT followups should still be routed to analyze_brain_mri."""
-        for path in sorted(V4_CASES_DIR.glob("*.json")):
+        for path in sorted(NEUROBENCH_CASES_DIR.glob("*.json")):
             data = json.loads(path.read_text())
             for fu in data.get("followup_outputs", []):
                 trigger = fu["trigger_action"]
@@ -300,7 +301,7 @@ class TestV4DatasetIntegrity:
     def test_no_misrouted_pet(self):
         """No PET/DaTscan followups should still be routed to analyze_brain_mri."""
         pet_triggers = {"request_amyloid_pet", "request_fdg_pet", "request_datscan", "request_pet_scan"}
-        for path in sorted(V4_CASES_DIR.glob("*.json")):
+        for path in sorted(NEUROBENCH_CASES_DIR.glob("*.json")):
             data = json.loads(path.read_text())
             for fu in data.get("followup_outputs", []):
                 if fu["trigger_action"] in pet_triggers:

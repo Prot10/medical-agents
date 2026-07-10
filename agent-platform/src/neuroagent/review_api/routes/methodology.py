@@ -6,6 +6,7 @@ from collections import Counter
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from neuroagent.datasets import normalize_dataset_version
 
 from ..dependencies import current_reviewer
 from ..schemas.reviewers import ReviewerCode
@@ -16,11 +17,11 @@ router = APIRouter(tags=["methodology"])
 # Hand-written prose, keyed by dataset version. Edit this file to update the
 # methodology copy — no template engine needed.
 _METHODOLOGY_PROSE: dict[str, dict[str, Any]] = {
-    "v5": {
+    "neurobench": {
         "title": "NeuroBench",
         "tagline": "A benchmark across 20 neurological conditions.",
         "overview": (
-            "NeuroBench v5 is a benchmark for tool-augmented LLM agents on "
+            "NeuroBench is a benchmark for tool-augmented LLM agents on "
             "neurological diagnostic reasoning. Each case is a self-contained "
             "clinical encounter — a patient profile, available tool outputs, "
             "and an expert-curated ground truth — designed to test diagnostic "
@@ -99,6 +100,7 @@ def get_methodology(
     request: Request,
     _reviewer: ReviewerCode = Depends(current_reviewer),
 ) -> dict[str, Any]:
+    version = normalize_dataset_version(version)
     all_datasets = request.app.state.all_datasets
     if version not in all_datasets:
         raise HTTPException(

@@ -1,4 +1,4 @@
-// Display labels + colors for the 20 neurological conditions in v5.
+// Display labels + colors for the 20 neurological conditions in NeuroBench.
 // Keep keys in sync with `NeurologicalCondition` enum in
 // packages/neuroagent-schemas/src/neuroagent_schemas/enums.py
 

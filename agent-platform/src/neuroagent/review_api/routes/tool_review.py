@@ -10,6 +10,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from neuroagent.datasets import normalize_dataset_version
 
 from ..dependencies import current_reviewer
 from ..schemas.annotations import (
@@ -43,12 +44,14 @@ def _store(request: Request) -> ToolReviewStore:
     return request.app.state.tool_review_store
 
 
-def _ensure_dataset(request: Request, version: str) -> None:
+def _ensure_dataset(request: Request, version: str) -> str:
+    version = normalize_dataset_version(version)
     if version not in request.app.state.all_datasets:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Dataset '{version}' not found",
         )
+    return version
 
 
 # ----------------------------------------------------------------------
@@ -58,7 +61,7 @@ def _ensure_dataset(request: Request, version: str) -> None:
 @router.get("/datasets/{version}/tool-catalog", response_model=ToolCatalog)
 def get_tool_catalog(version: str, request: Request,
                      _reviewer: ReviewerCode = Depends(current_reviewer)) -> ToolCatalog:
-    _ensure_dataset(request, version)
+    version = _ensure_dataset(request, version)
     catalog = request.app.state.tool_catalogs.get(version)
     if catalog is None:  # pragma: no cover — built at startup for every dataset
         raise HTTPException(
@@ -75,7 +78,7 @@ def get_tool_catalog(version: str, request: Request,
 @router.get("/datasets/{version}/tool-review", response_model=ToolReview)
 def get_tool_review(version: str, request: Request,
                     reviewer: ReviewerCode = Depends(current_reviewer)) -> ToolReview:
-    _ensure_dataset(request, version)
+    version = _ensure_dataset(request, version)
     return _store(request).load_or_init(version, reviewer.code)
 
 
@@ -86,7 +89,7 @@ def get_tool_review(version: str, request: Request,
 @router.patch("/datasets/{version}/tool-review/complete", response_model=ToolReview)
 def set_complete(version: str, body: ToolReviewCompleteUpdate, request: Request,
                  reviewer: ReviewerCode = Depends(current_reviewer)) -> ToolReview:
-    _ensure_dataset(request, version)
+    version = _ensure_dataset(request, version)
     store = _store(request)
     review = store.load_or_init(version, reviewer.code)
     review.completed_at = _utcnow() if body.completed else None
@@ -104,7 +107,7 @@ def set_complete(version: str, body: ToolReviewCompleteUpdate, request: Request,
 )
 def create_annotation(version: str, body: FieldAnnotationCreate, request: Request,
                       reviewer: ReviewerCode = Depends(current_reviewer)) -> ToolReview:
-    _ensure_dataset(request, version)
+    version = _ensure_dataset(request, version)
     store = _store(request)
     review = store.load_or_init(version, reviewer.code)
     if any(a.id == body.id for a in review.field_annotations):
@@ -131,7 +134,7 @@ def create_annotation(version: str, body: FieldAnnotationCreate, request: Reques
 def update_annotation(version: str, annotation_id: str, body: FieldAnnotationUpdate,
                       request: Request,
                       reviewer: ReviewerCode = Depends(current_reviewer)) -> ToolReview:
-    _ensure_dataset(request, version)
+    version = _ensure_dataset(request, version)
     store = _store(request)
     review = store.load_or_init(version, reviewer.code)
     for idx, annotation in enumerate(review.field_annotations):
@@ -152,7 +155,7 @@ def update_annotation(version: str, annotation_id: str, body: FieldAnnotationUpd
 )
 def delete_annotation(version: str, annotation_id: str, request: Request,
                       reviewer: ReviewerCode = Depends(current_reviewer)) -> ToolReview:
-    _ensure_dataset(request, version)
+    version = _ensure_dataset(request, version)
     store = _store(request)
     review = store.load_or_init(version, reviewer.code)
     before = len(review.field_annotations)
@@ -178,7 +181,7 @@ def delete_annotation(version: str, annotation_id: str, request: Request,
 )
 def create_proposal(version: str, body: ProposedToolCreate, request: Request,
                     reviewer: ReviewerCode = Depends(current_reviewer)) -> ToolReview:
-    _ensure_dataset(request, version)
+    version = _ensure_dataset(request, version)
     store = _store(request)
     review = store.load_or_init(version, reviewer.code)
     if any(p.id == body.id for p in review.proposed_tools):
@@ -205,7 +208,7 @@ def create_proposal(version: str, body: ProposedToolCreate, request: Request,
 def update_proposal(version: str, proposal_id: str, body: ProposedToolUpdate,
                     request: Request,
                     reviewer: ReviewerCode = Depends(current_reviewer)) -> ToolReview:
-    _ensure_dataset(request, version)
+    version = _ensure_dataset(request, version)
     store = _store(request)
     review = store.load_or_init(version, reviewer.code)
     for idx, proposal in enumerate(review.proposed_tools):
@@ -226,7 +229,7 @@ def update_proposal(version: str, proposal_id: str, body: ProposedToolUpdate,
 )
 def delete_proposal(version: str, proposal_id: str, request: Request,
                     reviewer: ReviewerCode = Depends(current_reviewer)) -> ToolReview:
-    _ensure_dataset(request, version)
+    version = _ensure_dataset(request, version)
     store = _store(request)
     review = store.load_or_init(version, reviewer.code)
     before = len(review.proposed_tools)

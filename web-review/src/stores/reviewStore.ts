@@ -73,7 +73,7 @@ export const useReviewStore = create<ReviewStore>((set) => ({
   profile: loadProfile(),
   darkMode: loadDarkMode(),
   activeTab: "overview",
-  datasetVersion: "v5",
+  datasetVersion: "neurobench",
   selectedCaseId: null,
   filterStatus: "all",
   filterConditions: [],
