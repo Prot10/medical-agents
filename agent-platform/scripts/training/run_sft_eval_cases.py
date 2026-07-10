@@ -49,15 +49,19 @@ app = typer.Typer()
 console = Console()
 logger = logging.getLogger("sft_eval")
 
-DATASET_PATH = REPO_ROOT / "data" / "neurobench_v4"
+DATASET_PATH = REPO_ROOT / "data" / "neurobench"
 SPLITS_DIR = DATASET_PATH / "splits"
 FOLD0_VAL = SPLITS_DIR / "fold0_val.txt"
 
 
 def load_fold0_val_cases() -> list[NeuroBenchCase]:
-    """Load the 60 fold0 validation cases."""
-    case_ids = FOLD0_VAL.read_text().strip().splitlines()
+    """Load fold0 validation cases, or all canonical cases when no split exists."""
     cases_dir = DATASET_PATH / "cases"
+    if FOLD0_VAL.exists():
+        case_ids = FOLD0_VAL.read_text().strip().splitlines()
+    else:
+        logger.warning("Split file not found at %s; evaluating all cases", FOLD0_VAL)
+        case_ids = sorted(path.stem for path in cases_dir.glob("*.json"))
     cases = []
     for cid in case_ids:
         path = cases_dir / f"{cid}.json"

@@ -199,7 +199,7 @@ def run_sft(
 
     Args:
         qlora: If True, load base model in 4-bit NF4 quantization (QLoRA).
-        splits_dir: Path to fold split files (e.g., data/neurobench_v4/splits/).
+        splits_dir: Path to fold split files (e.g., data/neurobench/splits/).
             If provided, splits data into train/val by case_id for evaluation.
         fold: Which fold to use for train/val split (0-4).
     """
@@ -460,7 +460,7 @@ def run_grpo_trl(
 
     # Build reward function — prefer online scoring if dataset is available
     reward_func = None
-    dataset_path_env = os.environ.get("NEUROAGENT_DATASET", "data/neurobench_v4")
+    dataset_path_env = os.environ.get("NEUROAGENT_DATASET", "data/neurobench")
     dataset_dir = Path(dataset_path_env)
 
     if (dataset_dir / "cases").exists():
@@ -653,7 +653,7 @@ def main() -> None:
     parser.add_argument("--top-fraction", type=float, default=1.0,
                         help="Fraction of top trajectories for SFT (1.0 = use all, 0.1 = top 10%%)")
     parser.add_argument("--qlora", action="store_true", help="Use QLoRA (4-bit NF4 quantization)")
-    parser.add_argument("--splits-dir", default=None, help="Path to fold split files for train/val (e.g., data/neurobench_v4/splits/)")
+    parser.add_argument("--splits-dir", default=None, help="Path to fold split files for train/val (e.g., data/neurobench/splits/)")
     parser.add_argument("--fold", type=int, default=0, help="Which fold to use (0-4)")
     parser.add_argument("--bf16", action="store_true", default=True)
 

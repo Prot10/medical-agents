@@ -7,7 +7,7 @@ Usage:
     uv run python dataset-generation/scripts/filter_medcasereasoning.py \
         --output dataset-generation/seeds \
         --target-per-condition 30 \
-        --exclude-pmcids data/neurobench_v2/cases
+        --exclude-pmcids data/neurobench/cases
 """
 
 from __future__ import annotations
@@ -433,7 +433,7 @@ def main():
     parser = argparse.ArgumentParser(description="Filter MedCaseReasoning for NeuroBench seeds")
     parser.add_argument("--output", default="dataset-generation/seeds", help="Output directory for seed JSONs")
     parser.add_argument("--target-per-condition", type=int, default=30, help="Target seeds per condition")
-    parser.add_argument("--exclude-pmcids", default="data/neurobench_v2/cases", help="Directory of existing cases to exclude PMCIDs from")
+    parser.add_argument("--exclude-pmcids", default="data/neurobench/cases", help="Directory of existing cases to exclude PMCIDs from")
     parser.add_argument("--dry-run", action="store_true", help="Print stats without writing files")
     args = parser.parse_args()
 

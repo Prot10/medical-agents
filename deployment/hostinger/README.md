@@ -45,17 +45,17 @@ The deploy script ships **only** the parts of the repo `review_api` imports at r
 - `packages/neuroagent-schemas/` — `NeuroBenchCase` Pydantic model
 - `dataset-generation/{pyproject.toml,src/}` + `dataset-generation/config/conditions.yaml` — workspace member shell (required by `uv sync`) plus the tool-catalog config
 - `pyproject.toml`, `uv.lock` — root workspace + lockfile
-- `data/neurobench_v5/` — 600 benchmark cases
+- `data/neurobench/` — 600 benchmark cases
 - `web-review/dist/` — built static frontend
 
-VPS footprint after a deploy: ~26 MB total (mostly the v5 dataset). The script **never deletes** `data/review/annotations/` or `data/review/backups/` — reviewer data and snapshots are server-owned.
+VPS footprint after a deploy: ~26 MB total (mostly the NeuroBench dataset). The script **never deletes** `data/review/annotations/` or `data/review/backups/` — reviewer data and snapshots are server-owned.
 
 ### Flags
 
 | Flag | Effect |
 |---|---|
 | `--skip-build` | Reuse the existing `web-review/dist/` (skip Vite rebuild) |
-| `--code-only` | Skip `data/neurobench_v5/` and `web-review/dist/` — fastest path for backend-only changes |
+| `--code-only` | Skip `data/neurobench/` and `web-review/dist/` — fastest path for backend-only changes |
 | `--force-codes` | Also push `agent-platform/config/review/reviewer_codes.yaml` (normally untouched by deploys; that file is gitignored) |
 
 ## One-time provisioning (already done; documented for reproduction)
@@ -71,7 +71,7 @@ ssh hostinger 'sudo -u neuroreview bash -lc "curl -LsSf https://astral.sh/uv/ins
 
 # 4. Create app + data + bin dirs owned by the user.
 ssh hostinger 'sudo -u neuroreview mkdir -p \
-    /home/neuroreview/medical-agents/{agent-platform/src/neuroagent,packages,dataset-generation/config,data/neurobench_v5,data/review/annotations,data/review/backups,web-review/dist} \
+    /home/neuroreview/medical-agents/{agent-platform/src/neuroagent,packages,dataset-generation/config,data/neurobench,data/review/annotations,data/review/backups,web-review/dist} \
     /home/neuroreview/bin'
 
 # 5. First-time sync (push code, data, dist, AND reviewer codes).

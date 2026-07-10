@@ -86,7 +86,7 @@ def _summarize_model(model_dir: Path, model_id: str) -> dict:
 def main(
     run_dir: str = typer.Option(..., help="Baseline run directory."),
     dataset_dir: str = typer.Option(
-        str(REPO / "data" / "neurobench_v5"),
+        str(REPO / "data" / "neurobench"),
         help="NeuroBench dataset directory holding cases/<case_id>.json",
     ),
 ) -> None:

@@ -86,7 +86,7 @@ class TestMetricsCalculator:
 
 
 class TestGoldTrajectoryMetrics:
-    """Tests for the v5 gold-trajectory regen metrics on GroundTruth surface:
+    """Tests for the NeuroBench gold-trajectory regen metrics on GroundTruth surface:
     useless_tools, harmful_tools, sequence_constraints, redundancy, premature closure.
     """
 

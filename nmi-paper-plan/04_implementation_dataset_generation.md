@@ -50,7 +50,7 @@ neuroagent/
 │       ├── test_schemas.py
 │       └── test_validators.py
 ├── data/
-│   └── neurobench_v1/
+│   └── neurobench/
 │       ├── cases/                        # One JSON file per case
 │       ├── failed/                       # Cases that failed validation (for debugging)
 │       └── metadata.json                 # Generation metadata
@@ -74,8 +74,8 @@ neuroagent/
 │     → captures raw JSON output                               │
 │                                                              │
 │  3. validate_case.py loads the JSON into Pydantic models     │
-│     → if valid: save to data/neurobench_v1/cases/            │
-│     → if invalid: save to data/neurobench_v1/failed/ + log   │
+│     → if valid: save to data/neurobench/cases/            │
+│     → if invalid: save to data/neurobench/failed/ + log   │
 │                                                              │
 │  4. On validation failure, optionally re-run with the        │
 │     validation error appended to the prompt (self-correct)   │
@@ -128,8 +128,8 @@ TODO-D0.2: Install core dependencies for dataset-generation
     - polars                  # Overkill for stats, stdlib suffices
 
 TODO-D0.3: Create output directories
-  - data/neurobench_v1/cases/
-  - data/neurobench_v1/failed/
+  - data/neurobench/cases/
+  - data/neurobench/failed/
 ```
 
 ### Phase 1: Shared Schemas (`neuroagent-schemas`)
@@ -258,12 +258,12 @@ TODO-D3.3: Implement generate_batch.sh
   #
   # For each (condition, difficulty, case_number):
   #   1. Compute case_id (e.g., FEPI-TEMP-S01)
-  #   2. Skip if data/neurobench_v1/cases/{case_id}.json exists
+  #   2. Skip if data/neurobench/cases/{case_id}.json exists
   #   3. Run: python build_prompt.py → /tmp/prompt_${case_id}.md
   #   4. Run: claude -p "$(cat /tmp/prompt_${case_id}.md)" --output-format json \
   #           > /tmp/raw_${case_id}.json
   #   5. Run: python validate_case.py /tmp/raw_${case_id}.json
-  #      - If valid → move to data/neurobench_v1/cases/{case_id}.json
+  #      - If valid → move to data/neurobench/cases/{case_id}.json
   #      - If invalid → retry once with error, then move to failed/
   #   6. Print progress
 

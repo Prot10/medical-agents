@@ -10,7 +10,7 @@
 - [x] Generate 316 new NeuroBench cases (10 new conditions + supplements)
 - [x] Validate all 516 cases (Pydantic schema — 516/516 pass)
 - [x] Strip diagnostic leakage from tool outputs (v3-style)
-- [x] Assemble v5 dataset at `data/neurobench_v5/cases/` (516 cases)
+- [x] Assemble v5 dataset at `data/neurobench/cases/` (516 cases)
 - [ ] **Generate gold trajectories for 316 new cases** (1580 trajectories = 316 × 5 styles)
   - [ ] Prepare trajectory prompts (generate_gold_trajectories.py --prepare-prompts)
   - [ ] Generate trajectories via Sonnet subagents (batches of ~50)

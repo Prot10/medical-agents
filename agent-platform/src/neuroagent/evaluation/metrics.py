@@ -348,7 +348,7 @@ class CaseMetrics:
     specialist_calls: int = 0  # number of specialist consultations
 
     # ------------------------------------------------------------------
-    # New (gold-trajectory regen, v5): tool-correctness surface.
+    # New (gold-trajectory regen, NeuroBench): tool-correctness surface.
     # action_precision / action_recall stay as set-based metrics over the
     # entire optimal_actions list (any tier). The fields below give a
     # finer-grained breakdown plus the per-case useless / harmful surface.

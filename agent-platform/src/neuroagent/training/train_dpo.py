@@ -10,8 +10,8 @@ Usage:
     # Step 1: Generate trajectories (requires vLLM serving the SFT model)
     python -m neuroagent.training.train_dpo collect \
         --model Qwen/Qwen3.5-9B \
-        --dataset data/neurobench_v4 \
-        --split-file data/neurobench_v4/splits/fold0_train.txt \
+        --dataset data/neurobench \
+        --split-file data/neurobench/splits/fold0_train.txt \
         --output training_data/dpo_trajectories.json \
         --rollouts 8
 
@@ -38,7 +38,7 @@ logger = logging.getLogger(__name__)
 def build_dpo_pairs(
     trajectories_path: str | Path,
     min_reward_gap: float = 0.05,
-    dataset_path: str | Path = "data/neurobench_v4",
+    dataset_path: str | Path = "data/neurobench",
 ) -> list[dict[str, Any]]:
     """Build DPO preference pairs from scored trajectories.
 

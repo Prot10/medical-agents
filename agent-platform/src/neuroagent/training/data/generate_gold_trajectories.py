@@ -7,13 +7,13 @@ training-ready JSONL.
 Usage:
     # Step 1: Prepare prompts for all cases
     python -m neuroagent.training.data.generate_gold_trajectories \
-        --dataset data/neurobench_v4 \
+        --dataset data/neurobench \
         --output training_data/gold_trajectories \
         --prepare-prompts
 
     # Step 2: After subagent generation, validate and format
     python -m neuroagent.training.data.generate_gold_trajectories \
-        --dataset data/neurobench_v4 \
+        --dataset data/neurobench \
         --output training_data/gold_trajectories \
         --validate
 """

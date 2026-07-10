@@ -26,9 +26,7 @@ Key difference: v2 cases separate diagnostic test results from the patient prese
 
 ```
 data/
-├── neurobench_v1/cases/        # 100 synthetic cases (enhanced tool outputs)
-├── neurobench_v2/cases/        # 100 real-seeded cases (enhanced tool outputs)
-└── neurobench_v3/cases/        # 200 combined cases (realistic tool outputs)
+└── neurobench/cases/        # final benchmark cases
 
 dataset-generation/
 ├── config/
@@ -62,7 +60,7 @@ uv run python -m neurobench_gen.build_prompt_seeded /path/to/seed.json ischemic_
 
 ### Validate a case
 ```bash
-uv run --project dataset-generation python -m neurobench_gen.validate_case data/neurobench_v1/cases/ISCH-STR-S01.json
+uv run --project dataset-generation python -m neurobench_gen.validate_case data/neurobench/cases/ISCH-STR-S01.json
 ```
 
 ### Run dataset statistics

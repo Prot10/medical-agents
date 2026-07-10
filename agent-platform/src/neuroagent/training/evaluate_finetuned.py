@@ -6,7 +6,7 @@ reporting all existing metrics plus new cost-efficiency metrics.
 Usage:
     python -m neuroagent.training.evaluate_finetuned \
         --adapter checkpoints/grpo_final \
-        --dataset data/neurobench_v1 \
+        --dataset data/neurobench \
         --output results/grpo_eval.json
 """
 

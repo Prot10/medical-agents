@@ -37,7 +37,7 @@ Tools are registered in `ToolRegistry` and their definitions are passed to the L
 
 - **Evaluation (MockServer)**: All tools are backed by `MockServer`, which looks up pre-generated outputs from `NeuroBenchCase.initial_tool_outputs` and `followup_outputs`. This is the current default.
 - **Live (future)**: Each tool would connect to a real model endpoint or external API. Currently raises `NotImplementedError`.
-- **v3 Realistic mode**: The v3 dataset (`data/neurobench_v3/`) strips interpretive fields from tool outputs. Fields like `clinical_significance`, `differential_by_imaging`, `recommended_actions`, and diagnostic `impression` text are nulled or rewritten to match what real clinical reports provide. This forces the agent to perform actual clinical reasoning rather than reading pre-digested answers. See "Tool Output Modes" below.
+- **v3 Realistic mode**: The v3 dataset (`data/neurobench/`) strips interpretive fields from tool outputs. Fields like `clinical_significance`, `differential_by_imaging`, `recommended_actions`, and diagnostic `impression` text are nulled or rewritten to match what real clinical reports provide. This forces the agent to perform actual clinical reasoning rather than reading pre-digested answers. See "Tool Output Modes" below.
 
 ### Ablation controls
 

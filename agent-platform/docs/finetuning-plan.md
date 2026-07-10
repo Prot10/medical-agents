@@ -130,7 +130,7 @@
 | Raw trajectories | `training_data/gold_trajectories/raw_v2/` | 769 `.txt` files, 12-16K chars each |
 | Training JSONL | `training_data/gold_trajectories/trajectories.jsonl` | 769 parsed trajectories with messages |
 | Prompts | `training_data/gold_trajectories/prompts/` | 1000 prompt files (200 cases × 5 styles) |
-| 5-fold splits | `data/neurobench_v4/splits/` | fold0-4_train.txt, fold0-4_val.txt |
+| 5-fold splits | `data/neurobench/splits/` | fold0-4_train.txt, fold0-4_val.txt |
 | Training system prompt | `config/system_prompts/orchestrator.txt` | Runtime prompt used unless a training script is passed a custom prompt |
 | SFT training script | `scripts/training/run_sft_training.sh` | Ready to run in tmux |
 | Comparison script | `scripts/training/run_finetuning_comparison.sh` | End-to-end pipeline |

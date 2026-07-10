@@ -15,7 +15,7 @@ See README.md for full project docs, setup, and architecture.
 - `dataset-generation/` — NeuroBench case generation
 - `web/src/` — main React dashboard (port 5173)
 - `web-review/src/` — dataset review UI (port 5174, imports primitives via `@web/*` alias)
-- `data/neurobench_v5/cases/` — 600 benchmark cases across 20 conditions (current default)
+- `data/neurobench/cases/` — 600 benchmark cases across 20 conditions (current default)
 - `data/review/annotations/{version}/{reviewer_code}/{case_id}.json` — per-reviewer annotation runtime data (gitignored)
 - `agent-platform/config/hospital_rules/{hospital}/*.yaml` — clinical pathways
 - `agent-platform/config/runtime/agent.yaml` — agent runtime defaults loaded by `load_agent_config()`
@@ -33,7 +33,7 @@ cd web && npm run dev                     # main frontend dev (local)
 cd web && npm run dev:remote              # main frontend dev (remote VM, binds 0.0.0.0)
 cd web-review && npm install && npm run dev:remote   # review frontend dev (port 5174)
 uv run pytest agent-platform/tests/ -v   # tests
-uv run python agent-platform/scripts/runtime/run_single_case.py data/neurobench_v5/cases/<case>.json
+uv run python agent-platform/scripts/runtime/run_single_case.py data/neurobench/cases/<case>.json
 uv run python agent-platform/scripts/benchmark/run_baseline_eval.py
 ```
 
