@@ -2,10 +2,10 @@
 
 Processes cases sequentially using Claude API via the Anthropic SDK.
 Reads prompts from the prepared prompts directory, generates trajectories,
-and saves raw outputs to raw_v2/.
+and saves raw outputs to raw/.
 
 Usage:
-    # Defaults read $TRAINING_DATA_ROOT/gold_trajectories_v5/{prompts,raw_v2}
+    # Defaults read $TRAINING_DATA_ROOT/gold_trajectories/{prompts,raw}
     # (TRAINING_DATA_ROOT defaults to /eos/.../NeuroAgent/training_data).
     uv run python scripts/training/batch_generate_trajectories.py \
         --styles minimal_efficient cost_conscious \
@@ -80,11 +80,11 @@ def main():
     parser = argparse.ArgumentParser(description="Batch generate gold trajectories")
     parser.add_argument(
         "--prompts-dir",
-        default=f"{TRAINING_DATA_ROOT}/gold_trajectories_v5/prompts",
+        default=f"{TRAINING_DATA_ROOT}/gold_trajectories/prompts",
     )
     parser.add_argument(
         "--output-dir",
-        default=f"{TRAINING_DATA_ROOT}/gold_trajectories_v5/raw_v2",
+        default=f"{TRAINING_DATA_ROOT}/gold_trajectories/raw",
     )
     parser.add_argument("--styles", nargs="+", default=["minimal_efficient", "cost_conscious"])
     parser.add_argument("--max-cases", type=int, default=None)

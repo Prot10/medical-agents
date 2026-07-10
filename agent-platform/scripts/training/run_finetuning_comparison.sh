@@ -9,7 +9,7 @@ MODEL="Qwen/Qwen3.5-9B"
 DATASET="data/neurobench"
 # Where generated training data lives. Defaults to EOS; override for local.
 TRAINING_DATA_ROOT="${TRAINING_DATA_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent/training_data}"
-TRAINING_DATA="$TRAINING_DATA_ROOT/gold_trajectories_v5"
+TRAINING_DATA="$TRAINING_DATA_ROOT/gold_trajectories"
 # Where checkpoint adapters live. Defaults to EOS; override for local NVMe.
 CHECKPOINTS="${CHECKPOINTS_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent/checkpoints}"
 RESULTS="results/finetuning_comparison"

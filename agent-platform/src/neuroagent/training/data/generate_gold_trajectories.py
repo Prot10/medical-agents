@@ -15,7 +15,7 @@ Usage:
     # Step 1: prepare one prompt per (train case x style)
     python -m neuroagent.training.data.generate_gold_trajectories \
         --dataset data/neurobench \
-        --output training_data/gold_trajectories_v6 \
+        --output training_data/gold_trajectories \
         --splits-dir data/neurobench/splits \
         --token-budget 3000 \
         --prepare-prompts
@@ -26,7 +26,7 @@ Usage:
     # Step 3: parse, validate, reject, and emit trajectories.jsonl
     python -m neuroagent.training.data.generate_gold_trajectories \
         --dataset data/neurobench \
-        --output training_data/gold_trajectories_v6 \
+        --output training_data/gold_trajectories \
         --reasoning-budget 2200 \
         --assemble
 """

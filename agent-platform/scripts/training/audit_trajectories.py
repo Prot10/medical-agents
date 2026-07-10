@@ -10,7 +10,7 @@ Checks the things that silently ruin an SFT run:
 Usage:
     HF_HOME=/eos/project-d/diagbox/dvc/NeuroAgent/models/base/huggingface \
         uv run python agent-platform/scripts/training/audit_trajectories.py \
-            --data training_data/gold_trajectories_v6/trajectories.jsonl \
+            --data training_data/gold_trajectories/trajectories.jsonl \
             --model Qwen/Qwen3.5-9B \
             --splits-dir data/neurobench/splits
 """
