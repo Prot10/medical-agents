@@ -92,9 +92,13 @@ RENAMABLE_KEYS: dict[tuple[str, str], str] = {
     ("check_drug_interactions", "current_drugs"): "current_medications",
     ("order_echocardiogram", "study_type"): "echo_type",
     ("analyze_brain_mri", "sequence"): "sequences",
+    # `device` names the monitor; `monitor_type` is the schema's word for the same thing.
+    ("order_cardiac_monitoring", "device"): "monitor_type",
 }
 RENAMABLE_VALUES: dict[tuple[str, str, str], str] = {
     ("analyze_brain_mri", "protocol", "MS_protocol"): "ms",
+    # One device, two spellings; costs.yaml prices it as `event_monitor_30d`'s sibling.
+    ("order_cardiac_monitoring", "monitor_type", "ambulatory_event_monitor"): "event_monitor_30d",
 }
 REMOVED_TOOLS = {"consult_medical_specialist"}
 
