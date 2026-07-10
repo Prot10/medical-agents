@@ -151,17 +151,24 @@ class TestToolDefinitions:
         params = defn["function"]["parameters"]["properties"]
         assert "monitor_type" in params
 
-    def test_advanced_imaging_has_type_param(self, registry):
+    def test_advanced_imaging_has_modality_param(self, registry):
         defn = registry.get_tool("order_advanced_imaging").get_tool_definition()
         params = defn["function"]["parameters"]["properties"]
-        assert "imaging_type" in params
-        assert "DaTscan" in params["imaging_type"]["enum"]
+        assert "modality" in params
+        assert "DaTscan" in params["modality"]["enum"]
+        # Widened from 6 to the full closed vocabulary; these were previously unorderable
+        # even though the benchmark's ground truth and costs.yaml both used them.
+        for modality in ("tau_PET", "MIBG_scan", "MR_angiography", "transcranial_doppler"):
+            assert modality in params["modality"]["enum"]
 
     def test_specialized_test_has_type_param(self, registry):
         defn = registry.get_tool("order_specialized_test").get_tool_definition()
         params = defn["function"]["parameters"]["properties"]
         assert "test_type" in params
         assert "neuropsych_battery" in params["test_type"]["enum"]
+        for test in ("respiratory_function", "repetitive_nerve_stimulation",
+                     "optical_coherence_tomography", "emg_single_fiber"):
+            assert test in params["test_type"]["enum"]
 
     def test_all_tools_require_clinical_context(self, registry):
         """All diagnostic tools (not literature/drug) should require clinical_context."""
@@ -219,7 +226,7 @@ class TestMockServerRouting:
         """Advanced imaging should return AdvancedImagingReport for amyloid PET."""
         case = _load_case("ALZ-EARLY-M01")
         mock = MockServer(case)
-        result = mock.get_output("order_advanced_imaging", {"clinical_context": "AD confirmation", "imaging_type": "amyloid_PET"})
+        result = mock.get_output("order_advanced_imaging", {"clinical_context": "AD confirmation", "modality": "amyloid_PET"})
         assert result.success
         assert "impression" in result.output
 

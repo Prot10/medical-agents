@@ -2,18 +2,18 @@ from __future__ import annotations
 from typing import Any
 from .base import BaseTool, ToolResult
 from .mock_server import MockServer
+from .vocabulary import advanced_imaging_modalities
 
 
 class AdvancedImagingTool(BaseTool):
     name = "order_advanced_imaging"
     description = (
         "Order advanced neuroimaging studies including PET scans, DaTscan, "
-        "MR perfusion/spectroscopy, and carotid duplex ultrasound. "
-        "Types: amyloid_PET (~$4,000, Alzheimer's confirmation), "
-        "FDG_PET (~$2,000, dementia/tumor metabolism), "
-        "DaTscan (~$5,000, parkinsonian syndromes), "
-        "perfusion_MRI (~$500), MR_spectroscopy (~$500), "
-        "carotid_duplex (~$350, stenosis screening)."
+        "MR perfusion/spectroscopy/angiography/venography, cardiac MIBG, "
+        "transcranial doppler, and carotid duplex ultrasound. "
+        "Costs vary widely: DaTscan (~$5,000), amyloid_PET (~$4,000), "
+        "FDG_PET (~$2,000), perfusion_MRI / MR_spectroscopy (~$500), "
+        "carotid_duplex (~$350)."
     )
     parameter_schema = {
         "type": "object",
@@ -22,23 +22,23 @@ class AdvancedImagingTool(BaseTool):
                 "type": "string",
                 "description": "Clinical indication for the advanced imaging study.",
             },
-            "imaging_type": {
+            # The enum is derived from costs.yaml so the tool, the cost registry and the
+            # benchmark's ground truth cannot drift apart. See tools/vocabulary.py.
+            "modality": {
                 "type": "string",
-                "enum": [
-                    "amyloid_PET", "FDG_PET", "DaTscan",
-                    "perfusion_MRI", "MR_spectroscopy", "carotid_duplex",
-                ],
+                "enum": advanced_imaging_modalities(),
                 "description": (
-                    "Type of advanced imaging. 'amyloid_PET': amyloid plaque detection "
-                    "(Alzheimer's). 'FDG_PET': glucose metabolism (dementia, tumor). "
-                    "'DaTscan': dopamine transporter imaging (parkinsonian syndromes). "
-                    "'perfusion_MRI': cerebral blood flow (stroke, tumor grading). "
-                    "'MR_spectroscopy': brain metabolite analysis (tumor, metabolic). "
-                    "'carotid_duplex': carotid artery stenosis screening."
+                    "Imaging modality. 'amyloid_PET'/'tau_PET': Alzheimer biomarkers. "
+                    "'FDG_PET': glucose metabolism (dementia pattern, tumor grading). "
+                    "'DaTscan': dopamine transporter (parkinsonian syndromes). "
+                    "'MIBG_scan': cardiac sympathetic denervation (PD vs MSA). "
+                    "'perfusion_MRI': cerebral blood flow. 'MR_spectroscopy': metabolites. "
+                    "'MR_angiography'/'MR_venography': arterial / venous sinus imaging. "
+                    "'carotid_duplex': carotid stenosis. 'transcranial_doppler': vasospasm."
                 ),
             },
         },
-        "required": ["clinical_context", "imaging_type"],
+        "required": ["clinical_context", "modality"],
     }
 
     def __init__(self, mock_server: MockServer | None = None):

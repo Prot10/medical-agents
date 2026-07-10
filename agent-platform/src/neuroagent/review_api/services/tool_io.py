@@ -196,7 +196,7 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                 "type": "string",
                 "description": "Clinical indication for the advanced imaging study.",
             },
-            "imaging_type": {
+            "modality": {
                 "type": "string",
                 "enum": [
                     "amyloid_PET", "FDG_PET", "DaTscan",
@@ -212,7 +212,7 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                 ),
             },
         },
-        "required": ["clinical_context", "imaging_type"],
+        "required": ["clinical_context", "modality"],
     },
     "order_specialized_test": {
         "type": "object",
