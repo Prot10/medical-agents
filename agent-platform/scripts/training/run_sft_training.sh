@@ -17,16 +17,27 @@ cd /home/aprotani/projects/medical-agents
 MODEL="${1:-Qwen/Qwen3.5-9B}"
 MODEL_TAG="$(basename "$MODEL")"
 
-# Base models live on EOS; local disk has no room for them.
-export HF_HOME="${HF_HOME:-/eos/project-d/diagbox/dvc/NeuroAgent/models/base/huggingface}"
+EOS_ROOT="${EOS_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent}"
+EOS_HF="$EOS_ROOT/models/base/huggingface"
+CHECKPOINTS_ROOT="${CHECKPOINTS_ROOT:-$EOS_ROOT/checkpoints}"
+
+# Storage split (measured): reading a full model off the EOS FUSE mount is scattered small
+# reads — ~1-2h to load one model. Writing is fast (221 MB/s sequential). So: stage the base
+# model into /dev/shm (RAM tmpfs, not the full local disk) once per run and load from there,
+# but write every checkpoint straight to EOS. Nothing large persists on local disk.
+SHM_HF="${SHM_HF:-/dev/shm/hf}"
+MODEL_DIR="models--${MODEL/\//--}"   # Qwen/Qwen3.5-9B -> models--Qwen--Qwen3.5-9B
+if [ ! -d "$SHM_HF/hub/$MODEL_DIR" ]; then
+  echo "Staging $MODEL_TAG from EOS to $SHM_HF (RAM, one-time ~5min)..."
+  mkdir -p "$SHM_HF/hub"
+  cp -r "$EOS_HF/hub/$MODEL_DIR" "$SHM_HF/hub/" || { echo "ERROR: base model not on EOS at $EOS_HF/hub/$MODEL_DIR" >&2; exit 1; }
+fi
+export HF_HOME="$SHM_HF"
+export HF_HUB_OFFLINE=1
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
-EOS_ROOT="${EOS_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent}"
-CHECKPOINTS_ROOT="${CHECKPOINTS_ROOT:-$EOS_ROOT/checkpoints}"
-STAGING_ROOT="${STAGING_ROOT:-./checkpoints_staging}"
-
 RUN_NAME="sft_${MODEL_TAG}"
-STAGING_DIR="$STAGING_ROOT/$RUN_NAME"
+# The finetuned adapter + run_summary go straight to EOS (small, fast to write there).
 EOS_DIR="$CHECKPOINTS_ROOT/$RUN_NAME"
 
 DATA="${DATA:-training_data/gold_trajectories/trajectories.jsonl}"
@@ -76,7 +87,7 @@ if ! uv run python -c "import fla" 2>/dev/null; then
 fi
 
 N_TRAJ="$(wc -l < "$DATA")"
-mkdir -p "$STAGING_DIR" results/sft_probe
+mkdir -p "$EOS_DIR" results/sft_probe
 
 echo "========================================="
 echo " SFT — agent distillation"
@@ -89,17 +100,18 @@ echo " Epochs:     $EPOCHS, batch=$BATCH x accum=$GRAD_ACCUM (effective $((BATCH
 echo " Loss:       assistant-only (observations masked, verified before step 1)"
 echo " NEFTune:    off (degrades tool-argument fidelity)"
 echo " Validation: 10% of TRAIN cases, early stopping on eval_loss"
-echo " Staging:    $STAGING_DIR"
-echo " Final:      $EOS_DIR"
+echo " Base:       $SHM_HF (RAM, staged from EOS)"
+echo " Output:     $EOS_DIR (EOS — only the adapter, written directly)"
 echo "========================================="
 echo "Start: $(date)"
 echo ""
 
+# Checkpoints and the final adapter are written straight to EOS.
 uv run python -m neuroagent.training.train_grpo \
     --stage sft \
     --model "$MODEL" \
     --data "$DATA" \
-    --output "$STAGING_DIR" \
+    --output "$EOS_DIR" \
     --lora-rank 64 \
     --lora-alpha 128 \
     --epochs "$EPOCHS" \
@@ -115,11 +127,7 @@ uv run python -m neuroagent.training.train_grpo \
     --qlora
 
 echo ""
-echo "Copying checkpoint to EOS (staged: FUSE stalls on live trainer writes)..."
-mkdir -p "$EOS_DIR"
-cp -r "$STAGING_DIR/." "$EOS_DIR/"
 echo "Adapter + run_summary.json on EOS: $EOS_DIR"
-
 echo "========================================="
 echo " Done. End: $(date)"
 echo "========================================="

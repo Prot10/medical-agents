@@ -18,9 +18,21 @@ EOS_ROOT="${EOS_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent}"
 CHECKPOINTS_ROOT="${CHECKPOINTS_ROOT:-$EOS_ROOT/checkpoints}"
 ADAPTER="${ADAPTER:-$CHECKPOINTS_ROOT/sft_${MODEL_TAG}}"
 
-# Base weights + merged output live on shm: EOS FUSE is too slow for weight loading.
-export HF_HOME="${HF_HOME:-/dev/shm/hf}"
-MERGED_MODEL="${MERGED_MODEL:-/dev/shm/merged/qwen3.5-$(echo "$MODEL_TAG" | grep -o '[0-9]*b\|[0-9]*B' | head -1 | tr '[:upper:]' '[:lower:]')-sft}"
+# Same storage split as training: stage the base model into /dev/shm (RAM) for a fast load
+# (reading it off EOS FUSE takes ~1-2h), and keep the finetuned merged model on EOS. Nothing
+# large lands on local disk. (Future: skip the merge and serve base+adapter via vLLM's native
+# LoRA support, avoiding the full-model write entirely.)
+EOS_HF="$EOS_ROOT/models/base/huggingface"
+SHM_HF="${SHM_HF:-/dev/shm/hf}"
+MODEL_DIR="models--Qwen--$MODEL_TAG"
+if [ ! -d "$SHM_HF/hub/$MODEL_DIR" ]; then
+  echo "Staging $MODEL_TAG from EOS to $SHM_HF (RAM, one-time)..."
+  mkdir -p "$SHM_HF/hub"
+  cp -r "$EOS_HF/hub/$MODEL_DIR" "$SHM_HF/hub/" || { echo "ERROR: base not on EOS" >&2; exit 1; }
+fi
+export HF_HOME="$SHM_HF"
+export HF_HUB_OFFLINE=1
+MERGED_MODEL="${MERGED_MODEL:-$EOS_ROOT/models/ft/qwen3.5-$(echo "$MODEL_TAG" | grep -oiE '[0-9]+b' | head -1 | tr '[:upper:]' '[:lower:]')-sft}"
 
 RESULTS_DIR="${RESULTS_DIR:-results/sft_eval/${MODEL_TAG}}"
 SPLIT="${SPLIT:-test}"
