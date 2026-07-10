@@ -52,7 +52,12 @@ def genetic_panels(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
 
 def advanced_imaging_modalities(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
     """The closed `order_advanced_imaging.modality` vocabulary."""
-    return sorted(_load_tools(costs_path).get("order_advanced_imaging", {}).get("by_type", {}))
+    return by_type_values("order_advanced_imaging", costs_path)
+
+
+def by_type_values(tool_name: str, costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
+    """Every value priced under a tool's `by_type` block — the tool's legal enum."""
+    return sorted(_load_tools(costs_path).get(tool_name, {}).get("by_type", {}))
 
 
 def is_valid_test_type(value: str, costs_path: Path = DEFAULT_COSTS_PATH) -> bool:
