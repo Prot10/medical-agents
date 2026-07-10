@@ -20,6 +20,12 @@ class LLMResponse:
     tool_calls: list[LLMToolCall] | None = None
     usage: dict[str, int] = field(default_factory=dict)
     raw: Any = None
+    # The model's own reasoning for this turn, with `<think>` tags removed. `content` never
+    # carries it, because everything downstream that reads `content` — the diagnosis matcher,
+    # the trace, the UI — wants the answer, not the deliberation. But the *next* prompt does:
+    # the agent must be able to build on what it just worked out. See
+    # `AgentOrchestrator._format_assistant_message`.
+    reasoning: str | None = None
 
 
 @dataclass
@@ -219,6 +225,7 @@ class LLMClient:
                 content=content,
                 tool_calls=parsed_tool_calls,
                 usage=usage,
+                reasoning=think_content.strip() if think_content else None,
             ),
             "think_content": think_content,
         }
@@ -252,6 +259,12 @@ class LLMClient:
             }
 
         content = message.content
+        # vLLM's `--reasoning-parser qwen3` splits the thinking out for us; without it the
+        # `<think>` block arrives inline. Take whichever we were given, and keep it: the
+        # next prompt replays it so the agent can build on its own reasoning.
+        reasoning = getattr(message, "reasoning_content", None)
+        if not reasoning and content:
+            reasoning = extract_think_content(content)
         if content:
             content = strip_think_tags(content)
 
@@ -260,11 +273,22 @@ class LLMClient:
             tool_calls=tool_calls,
             usage=usage,
             raw=response,
+            reasoning=reasoning,
         )
 
 
 # Pre-compiled regex for stripping <think>...</think> blocks (Qwen3.x thinking mode)
 _THINK_PATTERN = re.compile(r"<think>.*?</think>\s*", flags=re.DOTALL)
+# Same block, but capturing the body — `_THINK_PATTERN` has no group, so `findall` on it
+# would return whole matches including the tags.
+_THINK_CAPTURE = re.compile(r"<think>(.*?)</think>", flags=re.DOTALL)
+
+
+def extract_think_content(text: str) -> str | None:
+    """The text inside `<think>...</think>`, or None when the model emitted none."""
+    blocks = _THINK_CAPTURE.findall(text)
+    joined = "\n".join(b.strip() for b in blocks if b and b.strip())
+    return joined or None
 
 
 def strip_think_tags(text: str) -> str:

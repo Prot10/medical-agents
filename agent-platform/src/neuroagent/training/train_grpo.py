@@ -139,6 +139,100 @@ def load_sft_data(data_path: str, top_fraction: float = 0.1) -> list[dict]:
     return top
 
 
+def _assert_loss_is_assistant_only(trainer, tokenizer) -> None:
+    """Fail loudly if the loss covers tool observations.
+
+    `assistant_only_loss=True` is a request, not a guarantee: it needs `{% generation %}`
+    markers in the chat template, and TRL has shipped releases where enabling Liger threw
+    the masks away (huggingface/trl#3781). Both failures are silent — training proceeds and
+    the model learns to hallucinate tool outputs instead of reading them. Check one real
+    batch before committing a GPU to three epochs.
+    """
+    batch = trainer.data_collator([trainer.train_dataset[0]])
+    labels = batch["labels"][0]
+    supervised = int((labels != -100).sum())
+    total = int(labels.numel())
+
+    if supervised == 0:
+        raise RuntimeError(
+            "assistant_only_loss is on but no token is supervised — the chat template has "
+            "no {% generation %} markers, or TRL dropped the assistant mask."
+        )
+    if supervised == total:
+        raise RuntimeError(
+            "Every token is supervised: the assistant mask was dropped (see trl#3781). "
+            "Loss would fall on tool observations. Set --no-liger or upgrade TRL."
+        )
+    logger.info(
+        "Loss mask verified: %d/%d tokens supervised (%.1f%% — assistant turns only)",
+        supervised, total, 100 * supervised / total,
+    )
+
+
+def _save_run_summary(
+    output_dir: str,
+    trainer,
+    result,
+    args,
+    model_name: str,
+    n_train: int,
+    n_eval: int,
+) -> None:
+    """Persist the hyperparameters and the loss curve beside the adapter.
+
+    A checkpoint whose recipe you cannot reconstruct is not a result.
+    """
+    summary = {
+        "model": model_name,
+        "n_train_trajectories": n_train,
+        "n_eval_trajectories": n_eval,
+        "hyperparameters": {
+            "learning_rate": args.learning_rate,
+            "epochs": args.num_train_epochs,
+            "per_device_train_batch_size": args.per_device_train_batch_size,
+            "gradient_accumulation_steps": args.gradient_accumulation_steps,
+            "effective_batch_size": args.per_device_train_batch_size * args.gradient_accumulation_steps,
+            "max_length": args.max_length,
+            "optim": str(args.optim),
+            "lr_scheduler_type": str(args.lr_scheduler_type),
+            "warmup_ratio": args.warmup_ratio,
+            "weight_decay": args.weight_decay,
+            "max_grad_norm": args.max_grad_norm,
+            "neftune_noise_alpha": args.neftune_noise_alpha,
+            "assistant_only_loss": getattr(args, "assistant_only_loss", None),
+            "use_liger_kernel": args.use_liger_kernel,
+            "seed": args.seed,
+        },
+        "train_runtime_s": result.metrics.get("train_runtime"),
+        "final_train_loss": result.metrics.get("train_loss"),
+        "log_history": trainer.state.log_history,
+        "best_metric": trainer.state.best_metric,
+        "best_checkpoint": trainer.state.best_model_checkpoint,
+    }
+    path = Path(output_dir) / "run_summary.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(summary, indent=2, default=str) + "\n")
+    logger.info("Run summary written to %s", path)
+
+
+def _agent_tool_definitions() -> list[dict]:
+    """Exactly the tool schemas `AgentOrchestrator` sends to the model at inference.
+
+    Derived from the same registry and the same `allowed_tools` / `excluded_tools` config,
+    so the training prompt cannot drift from the serving prompt.
+    """
+    from ..agent.config import load_agent_config
+    from ..agent.planner import restrict_tools
+    from ..tools.tool_registry import ToolRegistry
+
+    config = load_agent_config()
+    return restrict_tools(
+        ToolRegistry.create_default_registry().get_all_definitions(),
+        allowed_tools=config.allowed_tools,
+        excluded_tools=config.excluded_tools,
+    )
+
+
 def load_grpo_data(data_path: str) -> list[dict]:
     """Load GRPO training data (grouped by prompt)."""
     path = Path(data_path)
@@ -220,9 +314,13 @@ def run_sft(
     output_dir: str,
     lora_rank: int = 64,
     lora_alpha: int = 128,
-    epochs: int = 2,
-    batch_size: int = 4,
-    learning_rate: float = 2e-5,
+    epochs: int = 3,
+    batch_size: int = 1,
+    # LoRA adapters are randomly initialised, not pretrained, so they want ~10x the LR of a
+    # full fine-tune. 2e-5 is a full-FT rate and underfits a rank-64 adapter.
+    # Unsloth defaults to 2e-4; Thinking Machines' LoRA scaling work puts the optimum near
+    # 10x full-FT. 1.5e-4 sits in the middle of the 1e-4..2e-4 consensus band.
+    learning_rate: float = 1.5e-4,
     max_seq_length: int = 4096,
     bf16: bool = True,
     qlora: bool = False,
@@ -230,6 +328,14 @@ def run_sft(
     splits_dir: str | None = None,
     val_fraction: float = 0.1,
     use_liger: bool = True,
+    grad_accum: int = 16,
+    optim: str = "paged_adamw_8bit",
+    # NEFTune's embedding noise was tuned for free-form conversational win-rate, not for
+    # exact tool arguments. Off by default: noise on reasoning tokens is reported to make
+    # the reasoning less load-bearing for the action that follows it.
+    neftune_alpha: float | None = None,
+    early_stopping_patience: int = 1,
+    seed: int = 42,
 ) -> None:
     """Run SFT warmup on top trajectories.
 
@@ -298,12 +404,20 @@ def run_sft(
 
     if conversational:
         apply_training_chat_template(tokenizer)
-        dataset = Dataset.from_list([{"messages": ex["messages"]} for ex in train_examples])
-        eval_dataset = (
-            Dataset.from_list([{"messages": ex["messages"]} for ex in val_examples])
-            if val_examples
-            else None
-        )
+
+        # The served agent passes `tools=` to vLLM, which renders a ~3k-token `# Tools`
+        # JSON-schema block into the system message. Training without it would teach the
+        # student to emit tool calls from a prompt that never declares the tools, then hand
+        # it a schema block it has never seen at inference. TRL forwards this column
+        # straight to `apply_chat_template(..., tools=...)`.
+        tool_definitions = _agent_tool_definitions()
+        logger.info("Rendering %d tool definitions into every prompt", len(tool_definitions))
+
+        def _rows(examples: list[dict]) -> list[dict]:
+            return [{"messages": ex["messages"], "tools": tool_definitions} for ex in examples]
+
+        dataset = Dataset.from_list(_rows(train_examples))
+        eval_dataset = Dataset.from_list(_rows(val_examples)) if val_examples else None
     else:
         def _to_prompt_completion(examples: list[dict]) -> list[dict]:
             """Legacy prompt/completion examples (pre-gold-trajectory format)."""
@@ -351,7 +465,7 @@ def run_sft(
         output_dir=output_dir,
         num_train_epochs=epochs,
         per_device_train_batch_size=batch_size,
-        gradient_accumulation_steps=8,
+        gradient_accumulation_steps=grad_accum,
         learning_rate=learning_rate,
         max_length=max_seq_length,
         bf16=bf16,
@@ -360,18 +474,31 @@ def run_sft(
         save_total_limit=2,
         save_only_model=True,
         gradient_checkpointing=True,
-        warmup_ratio=0.1,
+        warmup_ratio=0.05,
         lr_scheduler_type="cosine",
         weight_decay=0.01,
-        neftune_noise_alpha=5.0,
+        max_grad_norm=1.0,
+        optim=optim,
+        seed=seed,
+        neftune_noise_alpha=neftune_alpha,
         # Qwen3.5's vocabulary is 248k, so a full logits tensor at seq=8192 is ~4 GB in
         # bf16 and ~8 GB once cross-entropy upcasts to fp32 — the dominant memory term,
         # and what OOMs a 40 GB card. Liger's fused linear cross-entropy computes the loss
         # in chunks without ever materialising full logits.
+        #
+        # TRL once dropped `assistant_masks` whenever Liger was on (huggingface/trl#3781),
+        # silently training on tool observations. Fixed in this pin, and asserted below —
+        # never take it on trust.
         use_liger_kernel=use_liger,
         **loss_mask_kwargs,
         **eval_kwargs,
     )
+
+    callbacks = []
+    if eval_dataset is not None and early_stopping_patience > 0:
+        from transformers import EarlyStoppingCallback
+
+        callbacks.append(EarlyStoppingCallback(early_stopping_patience=early_stopping_patience))
 
     trainer = SFTTrainer(
         model=model,
@@ -379,12 +506,19 @@ def run_sft(
         train_dataset=dataset,
         eval_dataset=eval_dataset,
         processing_class=tokenizer,
+        callbacks=callbacks or None,
     )
 
+    if conversational:
+        _assert_loss_is_assistant_only(trainer, tokenizer)
+
     logger.info("Starting SFT training for %d epochs on %d examples", epochs, len(dataset))
-    trainer.train()
+    result = trainer.train()
     trainer.save_model(output_dir)
     tokenizer.save_pretrained(output_dir)
+
+    _save_run_summary(output_dir, trainer, result, training_args, model_name, len(dataset),
+                      len(eval_dataset) if eval_dataset else 0)
     logger.info("SFT model saved to %s", output_dir)
 
 
@@ -693,6 +827,17 @@ def main() -> None:
                         help="Fraction of top trajectories for SFT (1.0 = use all, 0.1 = top 10%%)")
     parser.add_argument("--qlora", action="store_true", help="Use QLoRA (4-bit NF4 quantization)")
     parser.add_argument("--splits-dir", default=None, help="Split dir with train_cases.txt / test_cases.txt (e.g., data/neurobench/splits/)")
+    parser.add_argument("--grad-accum", type=int, default=16,
+                        help="Gradient accumulation steps. effective batch = batch-size * this")
+    parser.add_argument("--optim", default="paged_adamw_8bit",
+                        help="paged_adamw_8bit (9B, pages optimizer state on VRAM spikes) "
+                             "or adamw_8bit (4B, has headroom)")
+    parser.add_argument("--neftune-alpha", type=float, default=None,
+                        help="NEFTune embedding noise. Off by default: it degrades tool-argument "
+                             "fidelity. The original paper's value is 5.0")
+    parser.add_argument("--early-stopping-patience", type=int, default=1,
+                        help="Stop after N evals without eval_loss improvement. 0 disables")
+    parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--val-fraction", type=float, default=0.1,
                         help="Fraction of train cases carved out for validation")
     parser.add_argument("--max-seq-length", type=int, default=8192,
@@ -714,8 +859,8 @@ def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
     if args.stage == "sft":
-        epochs = args.epochs or 5
-        lr = args.lr or 2e-5
+        epochs = args.epochs or 3
+        lr = args.lr or 1.5e-4
         run_sft(
             model_name=args.model,
             data_path=args.data,
@@ -732,6 +877,11 @@ def main() -> None:
             val_fraction=args.val_fraction,
             max_seq_length=args.max_seq_length,
             use_liger=args.use_liger,
+            grad_accum=args.grad_accum,
+            optim=args.optim,
+            neftune_alpha=args.neftune_alpha,
+            early_stopping_patience=args.early_stopping_patience,
+            seed=args.seed,
         )
 
     elif args.stage == "grpo":

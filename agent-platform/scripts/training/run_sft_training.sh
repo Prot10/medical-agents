@@ -1,11 +1,15 @@
 #!/bin/bash
-# SFT on gold trajectories (agent distillation).
+# SFT on the 1000 gold trajectories (agent distillation), train split only.
 #
 # Run: bash agent-platform/scripts/training/run_sft_training.sh [model]
 #   model defaults to Qwen/Qwen3.5-9B; pass Qwen/Qwen3.5-4B for the small student.
 #
-# max_seq comes from the probe (results/sft_probe/max_seq_probe.json) so training length
-# is a measured hardware fact, not a guess. Override with MAX_SEQ=N.
+# Trains on the 500 train cases (1000 trajectories, two styles each); 10% of TRAIN cases are
+# carved out for eval_loss / early stopping. The 100 test cases are never seen — evaluate
+# them afterwards with run_sft_eval.sh.
+#
+# Checkpoints are written to LOCAL disk and copied to EOS at the end: EOS is a FUSE mount
+# and stalls on the large, repeated writes a live trainer makes.
 set -euo pipefail
 
 cd /home/aprotani/projects/medical-agents
@@ -15,20 +19,29 @@ MODEL_TAG="$(basename "$MODEL")"
 
 # Base models live on EOS; local disk has no room for them.
 export HF_HOME="${HF_HOME:-/eos/project-d/diagbox/dvc/NeuroAgent/models/base/huggingface}"
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
-CHECKPOINTS_ROOT="${CHECKPOINTS_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent/checkpoints}"
-mkdir -p "$CHECKPOINTS_ROOT"
+EOS_ROOT="${EOS_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent}"
+CHECKPOINTS_ROOT="${CHECKPOINTS_ROOT:-$EOS_ROOT/checkpoints}"
+STAGING_ROOT="${STAGING_ROOT:-./checkpoints_staging}"
 
-TRAINING_DATA_ROOT="${TRAINING_DATA_ROOT:-./training_data}"
-DATA="$TRAINING_DATA_ROOT/gold_trajectories/trajectories.jsonl"
+RUN_NAME="sft_${MODEL_TAG}"
+STAGING_DIR="$STAGING_ROOT/$RUN_NAME"
+EOS_DIR="$CHECKPOINTS_ROOT/$RUN_NAME"
 
-# Longest real trajectory measured on the train split is ~9.3k tokens, so anything above
-# ~10k only wastes the truncation ceiling — cap the probe's answer there.
-SEQ_CAP="${SEQ_CAP:-12288}"
+DATA="${DATA:-training_data/gold_trajectories/trajectories.jsonl}"
+SPLITS="${SPLITS:-data/neurobench/splits}"
+
+# The longest trajectory is 12,956 tokens once the 12 tool schemas are rendered into the
+# prompt. Truncation removes the END of a trajectory — the final diagnosis — so the cap must
+# sit above that. The probe reports what the GPU can actually hold.
+SEQ_CAP="${SEQ_CAP:-13312}"
 PROBE_JSON="results/sft_probe/max_seq_probe.json"
 if [ -z "${MAX_SEQ:-}" ]; then
   if [ ! -f "$PROBE_JSON" ]; then
-    echo "ERROR: $PROBE_JSON missing. Run probe_max_seq_length.py or set MAX_SEQ=N." >&2
+    echo "ERROR: $PROBE_JSON missing. Run:" >&2
+    echo "  uv run python agent-platform/scripts/training/probe_max_seq_length.py --liger" >&2
+    echo "or set MAX_SEQ=N explicitly." >&2
     exit 1
   fi
   MAX_SEQ="$(python3 -c "
@@ -37,20 +50,39 @@ probed = json.load(open('$PROBE_JSON'))['shared_max_seq_length']
 print(min(probed, $SEQ_CAP))")"
 fi
 
-export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+if [ "$MAX_SEQ" -lt 13312 ]; then
+  echo "WARNING: max_seq=$MAX_SEQ truncates the longest trajectories (12,956 tokens)."
+  echo "         Truncation cuts the final diagnosis. Consider a smaller model or shorter prompts."
+fi
+
+# Per-model recipe. LoRA adapters are randomly initialised, so they want ~10x the LR of a
+# full fine-tune; 1e-4..2e-4 is the consensus band for rank-64 QLoRA. The 4B has VRAM
+# headroom, so it skips optimizer paging and takes a slightly higher LR.
+case "$MODEL_TAG" in
+  Qwen3.5-4B) LR="${LR:-2e-4}";   OPTIM="${OPTIM:-adamw_8bit}" ;;
+  *)          LR="${LR:-1.5e-4}"; OPTIM="${OPTIM:-paged_adamw_8bit}" ;;
+esac
+
+EPOCHS="${EPOCHS:-3}"
+BATCH="${BATCH:-1}"
+GRAD_ACCUM="${GRAD_ACCUM:-16}"   # effective batch 16; LoRA tolerates large batches poorly
 
 N_TRAJ="$(wc -l < "$DATA")"
+mkdir -p "$STAGING_DIR" results/sft_probe
 
 echo "========================================="
 echo " SFT — agent distillation"
 echo " Model:      $MODEL (QLoRA NF4)"
-echo " Data:       $DATA ($N_TRAJ trajectories)"
-echo " Max seq:    $MAX_SEQ tokens (from probe)"
-echo " LoRA:       rank=64, alpha=128"
-echo " Epochs:     3, batch=1, grad_accum=8"
-echo " Loss:       assistant-only (observations masked)"
-echo " Scheduler:  cosine, weight_decay=0.01, NEFTune=5.0"
-echo " Validation: 10% of TRAIN cases (test set untouched)"
+echo " Data:       $DATA ($N_TRAJ trajectories, train split only)"
+echo " Max seq:    $MAX_SEQ tokens (probe, capped at $SEQ_CAP)"
+echo " LoRA:       rank=64, alpha=128, all linear layers"
+echo " LR:         $LR ($OPTIM), cosine, warmup 0.05, wd 0.01"
+echo " Epochs:     $EPOCHS, batch=$BATCH x accum=$GRAD_ACCUM (effective $((BATCH*GRAD_ACCUM)))"
+echo " Loss:       assistant-only (observations masked, verified before step 1)"
+echo " NEFTune:    off (degrades tool-argument fidelity)"
+echo " Validation: 10% of TRAIN cases, early stopping on eval_loss"
+echo " Staging:    $STAGING_DIR"
+echo " Final:      $EOS_DIR"
 echo "========================================="
 echo "Start: $(date)"
 echo ""
@@ -59,19 +91,27 @@ uv run python -m neuroagent.training.train_grpo \
     --stage sft \
     --model "$MODEL" \
     --data "$DATA" \
-    --output "$CHECKPOINTS_ROOT/sft_${MODEL_TAG}" \
+    --output "$STAGING_DIR" \
     --lora-rank 64 \
     --lora-alpha 128 \
-    --epochs 3 \
-    --batch-size 1 \
+    --epochs "$EPOCHS" \
+    --batch-size "$BATCH" \
+    --grad-accum "$GRAD_ACCUM" \
+    --lr "$LR" \
+    --optim "$OPTIM" \
     --top-fraction 1.0 \
     --max-seq-length "$MAX_SEQ" \
-    --splits-dir data/neurobench/splits \
+    --splits-dir "$SPLITS" \
     --val-fraction 0.1 \
+    --early-stopping-patience 1 \
     --qlora
 
 echo ""
+echo "Copying checkpoint to EOS (staged: FUSE stalls on live trainer writes)..."
+mkdir -p "$EOS_DIR"
+cp -r "$STAGING_DIR/." "$EOS_DIR/"
+echo "Adapter + run_summary.json on EOS: $EOS_DIR"
+
 echo "========================================="
-echo " Done. Checkpoint: $CHECKPOINTS_ROOT/sft_${MODEL_TAG}"
-echo " End: $(date)"
+echo " Done. End: $(date)"
 echo "========================================="

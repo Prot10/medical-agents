@@ -1,4 +1,4 @@
-"""Evaluate a model on fold0 validation cases (60 cases) and optionally compare two runs.
+"""Evaluate a model on a held-out split (default: the 100-case test set) and compare runs.
 
 Usage:
     # Run evaluation
@@ -51,17 +51,24 @@ logger = logging.getLogger("sft_eval")
 
 DATASET_PATH = REPO_ROOT / "data" / "neurobench"
 SPLITS_DIR = DATASET_PATH / "splits"
-FOLD0_VAL = SPLITS_DIR / "fold0_val.txt"
 
 
-def load_fold0_val_cases() -> list[NeuroBenchCase]:
-    """Load fold0 validation cases, or all canonical cases when no split exists."""
+def load_split_cases(split: str = "test") -> list[NeuroBenchCase]:
+    """Load the held-out cases named in `{split}_cases.txt`.
+
+    The default is the 100-case test split — the cases no trajectory was ever generated for,
+    so evaluating on them measures generalisation rather than memorisation. There is no
+    silent fallback to "all cases": scoring a model on its own training data would look like
+    a huge gain and be meaningless.
+    """
     cases_dir = DATASET_PATH / "cases"
-    if FOLD0_VAL.exists():
-        case_ids = FOLD0_VAL.read_text().strip().splitlines()
-    else:
-        logger.warning("Split file not found at %s; evaluating all cases", FOLD0_VAL)
-        case_ids = sorted(path.stem for path in cases_dir.glob("*.json"))
+    split_file = SPLITS_DIR / f"{split}_cases.txt"
+    if not split_file.exists():
+        raise FileNotFoundError(
+            f"No split file at {split_file}. Available: "
+            f"{[p.name for p in SPLITS_DIR.glob('*_cases.txt')]}"
+        )
+    case_ids = [c for c in split_file.read_text().split() if c]
     cases = []
     for cid in case_ids:
         path = cases_dir / f"{cid}.json"
@@ -69,6 +76,8 @@ def load_fold0_val_cases() -> list[NeuroBenchCase]:
             cases.append(NeuroBenchCase.model_validate(json.loads(path.read_text())))
         else:
             logger.warning("Case not found: %s", cid)
+    if not cases:
+        raise RuntimeError(f"{split_file} named {len(case_ids)} cases but none loaded")
     return cases
 
 
@@ -130,15 +139,16 @@ def evaluate(
     repeats: int = typer.Option(3, help="Repeats per case"),
     output: str = typer.Option(..., help="Output JSON path"),
     port: int = typer.Option(8000, help="vLLM port"),
+    split: str = typer.Option("test", help="Which split_cases.txt to evaluate (default: held-out test)"),
 ):
-    """Run agent evaluation on fold0 validation set."""
+    """Run agent evaluation on a held-out split (default: the 100-case test set)."""
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s [%(name)s] %(levelname)s: %(message)s",
     )
 
-    cases = load_fold0_val_cases()
-    console.print(f"\n[bold]Evaluating {run_name} on {len(cases)} fold0 val cases × {repeats} repeats[/bold]")
+    cases = load_split_cases(split)
+    console.print(f"\n[bold]Evaluating {run_name} on {len(cases)} {split} cases × {repeats} repeats[/bold]")
 
     config = load_agent_config(
         base_url=f"http://localhost:{port}/v1",

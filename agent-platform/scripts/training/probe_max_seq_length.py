@@ -32,7 +32,10 @@ from neuroagent.training.train_grpo import get_lora_config
 logger = logging.getLogger(__name__)
 
 # Sequence lengths to probe, ascending. Stops at the first OOM.
-DEFAULT_SEQ_LENGTHS = [4096, 6144, 8192, 10240, 12288, 16384]
+# The longest real trajectory is 12,956 tokens once the tool schemas are rendered into the
+# prompt, so 13312 is the first length that truncates nothing. Anything below it cuts the
+# tail of a trajectory — which is the final diagnosis, the one thing SFT must learn.
+DEFAULT_SEQ_LENGTHS = [4096, 6144, 8192, 10240, 12288, 13312, 16384]
 
 # Long filler text; truncation at max_length guarantees exactly seq_length tokens.
 _FILLER_SENTENCE = (
@@ -84,7 +87,9 @@ def test_seq_length(
         packing=False,
         bf16=True,
         gradient_checkpointing=True,
-        neftune_noise_alpha=5.0,
+        # Mirror the real recipe in `run_sft`, or the probe measures a run nobody will do.
+        neftune_noise_alpha=None,
+        optim="paged_adamw_8bit",
         use_liger_kernel=liger,
         logging_strategy="no",
         warmup_steps=0,

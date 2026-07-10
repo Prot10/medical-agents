@@ -460,10 +460,21 @@ class AgentOrchestrator:
         response: LLMResponse,
         tool_calls: list[LLMToolCall] | object = _USE_RESPONSE_TOOL_CALLS,
     ) -> dict[str, Any]:
-        """Format an assistant response as an OpenAI-style message."""
+        """Format an assistant response as an OpenAI-style message.
+
+        The reasoning goes back into `content` inside `<think>` tags rather than into a
+        `reasoning_content` field: Qwen's chat template splits `</think>` out of `content`
+        itself, and `content` is the only place the OpenAI schema will carry it through
+        vLLM. Without this the template renders an empty `<think></think>` for every prior
+        turn, and the agent re-reads a blank where its own deliberation should be — while
+        the SFT trajectories it was trained on have the reasoning in full.
+        """
         msg: dict[str, Any] = {"role": "assistant"}
         if response.content:
             msg["content"] = response.content
+        if response.reasoning:
+            body = response.content or ""
+            msg["content"] = f"<think>\n{response.reasoning.strip()}\n</think>\n\n{body}"
         selected_tool_calls = (
             response.tool_calls or []
             if tool_calls is _USE_RESPONSE_TOOL_CALLS
