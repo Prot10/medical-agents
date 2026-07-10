@@ -1,0 +1,75 @@
+<think>
+Positives: witnessed VF arrest with 11 min low-flow before ROSC, now on TTM at 36°C and propofol, with periodic left arm flexion and left facial twitching every 15-20s, GCS 3, bilateral Babinski. Negatives: no prior seizure history, hemodynamically stable, pupils reactive. Differential: post-anoxic myoclonic status epilepticus ~40%, drug-induced (propofol) burst-suppression without true ictal correlate ~25%, non-epileptic post-anoxic (Lance-Adams-type) myoclonus without EEG correlate ~20%, structural lesion from the arrest itself ~15%. Continuous EEG through a propofol weaning trial is the discriminating test — if the burst-suppression and left-sided sharp activity persist as sedation is lightened, that argues for a true ictal/anoxic pattern rather than a pure drug effect.
+</think>
+<tool_call>
+{"name": "analyze_eeg", "arguments": {"clinical_context": "unresponsive post-cardiac arrest patient with periodic left arm/facial jerking, need to distinguish post-anoxic myoclonic status epilepticus from propofol drug effect via weaning trial", "eeg_type": "continuous_icu", "patient_age": 62}}
+</tool_call>
+<tool_response>
+Baseline: generalized burst-suppression (bursts 1-3s, inter-burst 4-8s), mild reactivity, left hemisphere sharp waves embedded in bursts maximal at T3, left arm jerking time-locked to left burst activity. On repeat after propofol reduced to 5 mcg/kg/min: burst-suppression persists, inter-burst interval now >10s, reactivity to stimulation is lost, left T3-F3 sharp waves and electroclinical correlation with left arm jerking unchanged. Impression: post-anoxic pattern with electroclinical correlate, not resolving with reduced sedation — drug-induced contribution excluded.
+</tool_response>
+<think>
+Persistence of the burst-suppression and the electroclinically-correlated left-sided jerking despite halving the propofol dose argues against a pure sedation artifact and favors a true post-anoxic ictal pattern — this is a multi-source signal (hypothermia, propofol, and anoxic injury all contribute), and the weaning step is what separates them. Given that, an antiseizure medication is indicated now; the patient is on amiodarone loading, and the protocol requires checking interactions before prescribing, so I need to clear the choice between levetiracetam and alternatives before loading anything.
+</think>
+<tool_call>
+{"name": "check_drug_interactions", "arguments": {"drug": "levetiracetam", "current_medications": ["amiodarone", "metoprolol", "aspirin", "atorvastatin", "propofol"], "patient_conditions": ["post-cardiac arrest", "hypoxic-ischemic encephalopathy", "coronary artery disease"]}}
+</tool_call>
+<tool_response>
+Amiodarone + lacosamide: MAJOR — additive sodium channel blockade, PR already prolonged to 240 ms on current amiodarone load; risk of complete AV block. Amiodarone + levetiracetam: no interaction — levetiracetam has no sodium/calcium channel effects, safe with amiodarone. Alternatives if LEV fails: valproate (check LFTs), then phenobarbital (respiratory depression risk).
+</tool_response>
+<think>
+Levetiracetam is clear to load; phenytoin/fosphenytoin was never a serious option here given amiodarone's additive QT/PR and conduction effects on an already compromised post-arrest heart. Next I want baseline labs and the trend in neuron-specific enolase, since that will start building the multimodal prognostic picture I'll need at 72-96h rather than acting on the EEG alone.
+</think>
+<tool_call>
+{"name": "interpret_labs", "arguments": {"clinical_context": "post-cardiac arrest, HIE workup and serial neuroprognostic marker trend", "panels": ["CBC", "BMP", "cardiac", "NSE serial"], "patient_age": 62, "patient_sex": "male"}}
+</tool_call>
+<tool_response>
+Troponin I 12.8 (H), BNP 2840 (H) — consistent with the arrest and cardiac injury, not independently localizing. NSE 18 mcg/L at 24h (H, just above <17), rising to 68 mcg/L at 48h and 82 mcg/L at 72h — a rising trend above 60 mcg/L is an unfavorable prognostic marker.
+</tool_response>
+<think>
+The rising NSE trend adds a second, independent line of evidence toward a severe anoxic injury, but per multimodal neuroprognostication convention this alone cannot be used to make outcome decisions — it needs to be combined with imaging and SSEP data, and any such synthesis has to wait until after rewarming and sedation clearance. MRI after TTM rewarming will show whether the injury distribution matches the severity these markers suggest.
+</think>
+<tool_call>
+{"name": "analyze_brain_mri", "arguments": {"clinical_context": "post-cardiac arrest encephalopathy, imaging after targeted temperature management rewarming to characterize hypoxic-ischemic injury", "protocol": "standard", "contrast": false}}
+</tool_call>
+<tool_response>
+Diffuse, near-total bilateral cortical DWI restriction with markedly reduced ADC (extensive cytotoxic edema), plus bilateral basal ganglia and thalamic DWI restriction. FLAIR shows loss of gray-white differentiation. No hemorrhage, no mass effect beyond sulcal effacement. Impression: distribution and severity consistent with severe hypoxic-ischemic encephalopathy.
+</tool_response>
+<think>
+This confirms a severe, diffuse anoxic injury pattern that is anatomically consistent with the EEG and rising NSE. For the fourth prognostic modality I'll add bilateral SSEP rather than a literature search — the treatment approach for post-anoxic MSE is already well established and a search would not change bedside management, whereas SSEP directly tests cortical response and is a recognized specific marker that belongs in the same multimodal bundle as the EEG, MRI, and NSE.
+</think>
+<tool_call>
+{"name": "order_specialized_test", "arguments": {"clinical_context": "post-cardiac arrest, bilateral median nerve SSEP for multimodal neuroprognostication after sedation reduction", "test_type": "ssep"}}
+</tool_call>
+<tool_response>
+Bilateral absent cortical N20 responses to median nerve stimulation at 56h post-arrest, obtained after sedation reduction. Peripheral N9/N13 responses present bilaterally, confirming technical adequacy. Bilateral absent N20 is an established finding in the post-arrest setting.
+</tool_response>
+<think>
+Four independent modalities — non-reactive, electroclinically-correlated burst-suppression that persisted through weaning, a rising NSE trend, diffuse cortical/deep-gray DWI restriction, and bilateral absent cortical SSEP responses — now converge on a severe post-anoxic process with a concurrent seizure correlate, while sedation and hypothermia still complicate the EEG's interpretation in isolation. None of this should be used alone or this early to make a withdrawal decision; that synthesis has to wait for the 72-96h window after rewarming and sedation clearance, and should go through a multidisciplinary discussion rather than a unilateral call.
+</think>
+
+### Primary Diagnosis
+Post-anoxic myoclonic status epilepticus with burst-suppression EEG after out-of-hospital cardiac arrest, with concurrent propofol sedation and hypothermia confounding EEG interpretation (Confidence: 0.70)
+
+### Differential Diagnoses
+1. Propofol-induced burst-suppression without true ictal correlate — argued against by persistence of the pattern and electroclinical correlation after propofol was reduced by half
+2. Post-anoxic myoclonus without EEG correlate (Lance-Adams-type) — argued against by the clear time-locked left hemisphere sharp-wave activity underlying the jerking
+3. Structural lesion from the arrest causing focal signs — argued against by the diffuse, bilateral, symmetric DWI and EEG findings rather than a focal structural process
+
+### Key Evidence
+- Burst-suppression with left T3-F3 sharp waves persisting and losing reactivity despite propofol reduction from analyze_eeg — excludes pure drug effect
+- Rising NSE (18→68→82 mcg/L over 72h) from interpret_labs — independent marker of injury severity
+- Diffuse bilateral cortical and deep gray DWI restriction from analyze_brain_mri — anatomic correlate of severe HIE
+- Bilateral absent cortical N20 from order_specialized_test (SSEP) — additional specific poor-prognosis marker
+- Levetiracetam clear of interaction with amiodarone from check_drug_interactions — safe antiseizure choice given cardiac conduction risk
+
+### Recommendations
+1. Continue continuous EEG monitoring with staged propofol weaning to keep distinguishing residual drug effect from ictal activity
+2. Load IV levetiracetam for antiseizure treatment, avoiding phenytoin/fosphenytoin given amiodarone co-administration
+3. Continue targeted temperature management per local protocol through the standard rewarming schedule
+4. Defer neuroprognostication synthesis until 72-96h after rewarming and sedation clearance, incorporating exam, EEG, NSE trend, MRI, and SSEP together
+5. Convene neurology, critical care, and cardiology for a multidisciplinary discussion before any withdrawal-of-care conversation
+
+### Red Flags / Alerts
+- Do not use phenytoin or fosphenytoin in this patient — amiodarone co-administration risks additive PR prolongation and AV block
+- Do not make neuroprognostic or withdrawal decisions before 72-96h, before rewarming is complete, or while sedation effects may still be present
+- Do not escalate to a deep anesthetic infusion for the generalized pattern alone without further confirming an ictal correlate

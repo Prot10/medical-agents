@@ -1,0 +1,87 @@
+<think>
+Positives: 42F with 3 days of headache and word-finding difficulty, a witnessed convulsion, now >30 min without return to baseline, GCS 11, intermittent left gaze preference, BP 172/108, background SLE on hydroxychloroquine and a prednisone taper. Negatives: no fever, no focal limb weakness, no papilledema noted. Differential: non-convulsive status epilepticus from breakthrough epilepsy given known seizure history and possible non-adherence ~40%, autoimmune/lupus cerebritis flare ~25%, hypertensive encephalopathy/PRES ~20%, CNS infection ~15%. Continuous EEG is the first discriminator — it will tell me whether the ongoing confusion is electrographic seizure versus prolonged postictal state or encephalopathy.
+</think>
+<tool_call>
+{"name": "analyze_eeg", "arguments": {"clinical_context": "persistent altered mental status >30 minutes after a witnessed convulsion, known epilepsy on levetiracetam, rule out non-convulsive status epilepticus", "eeg_type": "continuous_icu", "patient_age": 42}}
+</tool_call>
+<tool_response>
+Abnormal. Continuous left temporal rhythmic 1-2 Hz delta with embedded sharp waves meeting Salzburg criteria for NCSE; lateralized periodic discharges (LPDs) on the ictal-interictal continuum. Impression: non-convulsive status epilepticus, left temporal-occipital.
+</tool_response>
+<think>
+This confirms NCSE rather than simple prolonged postictal confusion. Given her known epilepsy, the leading explanation right now is breakthrough seizures from subtherapeutic AED — I want to check her levetiracetam level and basic/rheumatologic labs together, since her SLE history keeps cerebritis and a nephritis flare on the list.
+</think>
+<tool_call>
+{"name": "interpret_labs", "arguments": {"clinical_context": "NCSE with known epilepsy and SLE, check AED level, metabolic panel, and lupus serologies including urinalysis", "panels": ["Basic Metabolic Panel", "AED Levels", "Rheumatology Panel", "Urinalysis"], "patient_age": 42, "patient_sex": "female"}}
+</tool_call>
+<tool_response>
+Levetiracetam 8 mcg/mL (subtherapeutic, reference 12-46). Lactate 4.2 mmol/L. dsDNA 42 IU/mL (elevated), C3 62 and C4 8 (both low), ESR 68 — active SLE serology. Urinalysis: 2+ protein, RBC casts present, urine protein:creatinine 1.8 — active sediment suggesting nephritis flare. Glucose 162, CO2 21 (mild).
+</tool_response>
+<think>
+The subtherapeutic level fits a straightforward story of breakthrough NCSE from AED non-adherence — that's now my leading hypothesis at ~55%, with the active lupus serology and RBC casts explaining a concurrent nephritis flare that needs its own attention but wouldn't itself cause seizures. Still, her BP of 172/108 and three days of headache with word-finding trouble are not fully explained by low drug levels alone, so I need to exclude hemorrhage and characterize any structural correlate before committing.
+</think>
+<tool_call>
+{"name": "order_ct_scan", "arguments": {"clinical_context": "NCSE with markedly elevated blood pressure, rule out hemorrhage before further workup", "contrast": false}}
+</tool_call>
+<tool_response>
+No acute hemorrhage or mass. Subtle bilateral posterior (occipital/parietal) cortical-subcortical hypodensity, nonspecific — could reflect vasogenic edema in a PRES distribution versus ictal edema; MRI recommended.
+</tool_response>
+<think>
+Bilateral posterior hypodensity does not fit a simple subtherapeutic-AED breakthrough seizure — that finding is not localized to her left temporal ictal focus and instead points toward a diffuse posterior process. Combined with the severe hypertension, this reframes the picture: the low levetiracetam level is a real contributor but doesn't account for the posterior imaging change or the degree of BP elevation. PRES from hypertensive emergency, possibly triggered by the SLE flare, now moves to the top of the differential; MRI with FLAIR/DWI will confirm whether this is vasogenic (PRES) or ischemic.
+</think>
+<tool_call>
+{"name": "analyze_brain_mri", "arguments": {"clinical_context": "bilateral posterior hypodensity on CT with severe hypertension and NCSE, characterize with FLAIR and DWI for PRES versus infarct", "protocol": "stroke", "contrast": false}}
+</tool_call>
+<tool_response>
+Bilateral symmetric parieto-occipital FLAIR hyperintensity with elevated ADC and no DWI restriction — vasogenic edema in a classic PRES distribution. Mild left temporal FLAIR signal without restriction, corresponding to the NCSE focus. No hemorrhage, no midline shift.
+</tool_response>
+<think>
+No DWI restriction confirms vasogenic rather than ischemic edema, cementing PRES as the unifying structural diagnosis rather than bilateral posterior infarcts. Given her active lupus serologies, I still need to exclude an infectious or autoimmune encephalitis process presenting similarly before finalizing management, particularly since fever is absent but her mental status is markedly impaired.
+</think>
+<tool_call>
+{"name": "analyze_csf", "arguments": {"clinical_context": "NCSE with PRES-pattern MRI and active SLE serology, exclude CNS infection and autoimmune encephalitis", "special_tests": ["HSV PCR", "VZV PCR", "Anti-NMDAR CSF IgG", "Anti-LGI1 CSF IgG", "Oligoclonal bands"]}}
+</tool_call>
+<tool_response>
+Mildly elevated opening pressure (22 cmH2O). Mild lymphocytic pleocytosis (8 WBC), protein 52 (mildly elevated), glucose ratio 0.44. HSV/VZV/EBV PCR negative. Anti-NMDAR and anti-LGI1 negative. Oligoclonal bands 2 (nonspecific). No evidence of bacterial infection or viral encephalitis.
+</tool_response>
+<think>
+CSF excludes infectious and autoimmune-antibody encephalitis, leaving PRES from hypertensive emergency — precipitated by her SLE flare and compounded by subtherapeutic AED — as the diagnosis. Before escalating her AED and adding antihypertensives, I need to confirm no adverse interactions with her hydroxychloroquine/prednisone regimen, and given her reproductive age a pregnancy check is mandatory before any AED loading.
+</think>
+<tool_call>
+{"name": "check_drug_interactions", "arguments": {"drug": "levetiracetam", "current_medications": ["hydroxychloroquine", "prednisone", "amlodipine"], "patient_conditions": ["SLE", "hypertension", "epilepsy"]}}
+</tool_call>
+<tool_response>
+No significant pharmacokinetic interactions between levetiracetam escalation and hydroxychloroquine or prednisone. No contraindications. Warning: multiple antihypertensive agents may have additive effects — monitor BP; corticosteroids may worsen hyperglycemia.
+</tool_response>
+<think>
+Levetiracetam escalation is safe alongside her current regimen, and this DGN general-neurology pathway requires this interaction check before any new prescribing. The diagnosis is now converging: NCSE from PRES driven by hypertensive emergency in the context of an active SLE flare, with subtherapeutic AED as a contributing but non-explanatory factor.
+</think>
+
+### Primary Diagnosis
+Non-convulsive status epilepticus secondary to posterior reversible encephalopathy syndrome (PRES) from hypertensive emergency in active SLE (Confidence: 0.78)
+
+### Differential Diagnoses
+1. Breakthrough NCSE from AED non-adherence alone — subtherapeutic levetiracetam is real but does not explain the bilateral posterior vasogenic edema or severe hypertension
+2. Lupus cerebritis / CNS vasculitis — active serology supports a flare, but CSF shows no encephalitic pattern and MRI shows the classic posterior vasogenic-edema PRES pattern rather than diffuse cerebritis changes
+3. Autoimmune (NMDAR/LGI1) encephalitis — plausible given SLE, but CSF antibody panel is negative
+4. Bilateral posterior circulation ischemic stroke — excluded by absence of DWI restriction on MRI
+
+### Key Evidence
+- Left temporal evolving rhythmic delta meeting Salzburg NCSE criteria from EEG — confirms ongoing electrographic seizure explaining the persistent altered mental status
+- Bilateral parieto-occipital FLAIR hyperintensity with elevated ADC, no DWI restriction from MRI — pathognomonic vasogenic PRES pattern, argues against infarct
+- Subtherapeutic levetiracetam (8 mcg/mL) from labs — a contributing precipitant, not the primary explanation
+- dsDNA 42, low C3/C4, ESR 68, and RBC casts on urinalysis — active SLE with likely nephritis flare driving the hypertensive emergency
+- Negative HSV/VZV PCR and negative NMDAR/LGI1 antibodies on CSF — excludes infectious and autoimmune encephalitis mimics
+
+### Recommendations
+1. Administer IV lorazepam 0.1 mg/kg immediately as first-line therapy; do not delay for further diagnostics
+2. Lower blood pressure by 20-25% over the first hour using IV nicardipine or labetalol, avoiding precipitous correction
+3. Load IV levetiracetam (current level subtherapeutic) as second-line per ESETT protocol, avoiding valproate in this woman of reproductive age
+4. Confirm beta-hCG is negative before completing AED loading
+5. Obtain rheumatology consultation for the active SLE flare with probable nephritis, anticipating pulse steroids/immunosuppression once seizures are controlled
+
+### Red Flags / Alerts
+- Do not delay benzodiazepine administration to pursue imaging or labs — NCSE treatment is time-critical
+- Do not lower blood pressure abruptly or over-correct — precipitous drops risk cerebral ischemic injury in PRES
+- Do not load valproate in this patient — teratogen risk in a woman of reproductive age; use levetiracetam
+- Do not use phenytoin/fosphenytoin without cardiac monitoring if instability develops
+- Do not treat the subtherapeutic AED level as the sole explanation — failing to address BP and the SLE flare risks recurrent PRES/NCSE

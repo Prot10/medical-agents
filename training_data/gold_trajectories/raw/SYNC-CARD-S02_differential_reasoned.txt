@@ -1,0 +1,66 @@
+<think>
+Salient positives: sudden, painless syncope during exertion (stairs), no prodrome, pallor/cyanosis during the event, immediate return to baseline mentation with no confusion, plus recurrent exertional near-syncope over weeks and worsening exertional dyspnea in a man with known moderate aortic stenosis and a family history of sudden death/pacemaker. Salient negatives: no tongue biting, no incontinence, no convulsive activity, normal post-event neuro exam. Vitals show marked bradycardia (HR 45) with borderline hypotension. Initial differential: cardiac syncope from high-grade conduction disease or outflow obstruction ~50%, convulsive/epileptic seizure ~15%, orthostatic/vasovagal syncope ~15%, transient ischemic event ~15%. An ECG is the single fastest, highest-yield discriminator here given the resting bradycardia and exertional trigger, so I'll get that first.
+</think>
+<tool_call>
+{"name": "analyze_ecg", "arguments": {"clinical_context": "witnessed exertional syncope with no prodrome, no convulsive activity, resting HR 45, history of aortic stenosis"}}
+</tool_call>
+<tool_response>
+Third-degree (complete) AV block, ventricular escape rate 32 bpm, wide QRS (156 ms, LBBB morphology), atrial rate ~82 with complete AV dissociation, QTc prolonged at 512 ms, right axis deviation, LVH by voltage. No ST elevation.
+</tool_response>
+<think>
+Complete heart block with an unstable escape rhythm now explains the abrupt loss of consciousness far better than seizure or vasovagal syncope — the lack of prodrome, rapid recovery, and absence of ictal features all fit an Adams-Stokes mechanism, moving that candidate to the front (~75%). Seizure and reflex syncope are now unlikely given this objective conduction abnormality, but I still need labs to exclude a reversible metabolic/electrolyte trigger and troponin/BNP to gauge concomitant ischemia or decompensated structural disease before committing to a primary cardiac-conduction diagnosis.
+</think>
+<tool_call>
+{"name": "interpret_labs", "arguments": {"clinical_context": "complete heart block on ECG, evaluate for electrolyte or metabolic contributors and cardiac strain", "panels": ["CBC", "BMP", "cardiac_markers"], "patient_age": 74, "patient_sex": "male"}}
+</tool_call>
+<tool_response>
+Mild normocytic anemia (Hgb 11.5). Sodium 146, potassium 5.3 (mildly elevated, non-critical), BUN 38/creatinine 1.8 (consistent with known CKD). Troponin I 0.06 ng/mL (mildly elevated, non-ischemic pattern). BNP markedly elevated at 614 pg/mL.
+</tool_response>
+<think>
+No dangerous electrolyte derangement (potassium only mildly elevated) or acute ischemic troponin rise to explain the block, so this looks like an intrinsic, structural conduction disease rather than a transient metabolic cause; the elevated BNP suggests a hemodynamically significant underlying cardiac lesion. Given his known aortic stenosis, worsening murmur, and exertional near-syncope episodes, I want to restage the valve and assess LV function directly, since severe AS with annular calcification extending into the conduction system would tie the whole picture together and also determines what I can safely do next (tilt-table is unsafe if AS is severe).
+</think>
+<tool_call>
+{"name": "order_echocardiogram", "arguments": {"clinical_context": "restage known aortic stenosis and assess LV function in setting of new complete heart block", "echo_type": "TTE"}}
+</tool_call>
+<tool_response>
+Severe aortic stenosis: valve area 0.9 cm2, mean gradient 42 mmHg, peak velocity 4.3 m/s. Heavily calcified annulus with extension into the intervalvular fibrosa. LVEF 40% (reduced), concentric LVH, mildly dilated LV and LA, mild-moderate MR, RVSP 48 mmHg.
+</tool_response>
+<think>
+This confirms severe (not just moderate) calcific aortic stenosis with annular calcification extending toward the conduction system — a mechanism that directly accounts for new complete AV block, and it reframes the near-syncope/exertional dyspnea history as low-flow, low-output AS symptoms compounding the arrhythmia. Given this combination, tilt-table testing is now relatively contraindicated (hemodynamic risk in severe AS) and would add no diagnostic value with a documented fixed block already in hand, so I'll instead confirm persistence/stability of the rhythm with continuous monitoring, which also directly informs urgency of pacing.
+</think>
+<tool_call>
+{"name": "order_cardiac_monitoring", "arguments": {"clinical_context": "confirm persistence and stability of complete heart block and screen for malignant ectopy pending pacing", "monitor_type": "holter_24h"}}
+</tool_call>
+<tool_response>
+Persistent complete AV block throughout 24h, average ventricular rate 34 bpm (range 26-40), atrial rate ~80 sinus. Minimum rate 26 bpm with a 5.8-second pause overnight. Three runs of non-sustained VT (3-5 beats, 140-160 bpm). QTc >500 ms during multiple intervals. Frequent PVCs.
+</tool_response>
+<think>
+Persistent, unremitting complete heart block with a prolonged pause and runs of non-sustained VT confirms an unstable escape rhythm at high risk for asystole or malignant ventricular arrhythmia, cementing cardiac syncope from AV block as the mechanism rather than any primary neurologic event — the normal EEG and MRI already argue against seizure and structural brain disease as alternative explanations for this presentation. The combination of severe AS with conduction-system calcification is the unifying lesion, and management now needs urgent pacing coordinated with valve intervention rather than any further diagnostic workup.
+</think>
+
+### Primary Diagnosis
+Cardiac syncope due to complete (third-degree) atrioventricular block secondary to calcific aortic stenosis with conduction-system involvement (Confidence: 0.92)
+
+### Differential Diagnoses
+1. Convulsive seizure — no ictal semiology, no post-ictal confusion, no tongue biting/incontinence, and normal EEG argue against this
+2. Vasovagal/reflex syncope — no prodrome and exertional (not standing/emotional) trigger are atypical, and tilt-table is unsafe to pursue given severe AS
+3. Acute coronary syndrome causing arrhythmic syncope — troponin only mildly elevated with non-ischemic pattern and no ST changes, favoring a structural/degenerative rather than acute ischemic cause of the block
+
+### Key Evidence
+- Third-degree AV block with wide-complex escape rhythm from analyze_ecg — establishes the arrhythmic mechanism of collapse
+- Severe AS (AVA 0.9 cm2, mean gradient 42) with annular calcification extending into the intervalvular fibrosa from order_echocardiogram — identifies the structural cause of the conduction disease
+- Persistent complete block with a 5.8-second pause and non-sustained VT on 24h monitoring — confirms an unstable, high-risk escape rhythm
+- Normal EEG and normal brain MRI — argue against a primary neurologic cause of the collapse
+
+### Recommendations
+1. Admit to telemetry given the combined risk of severe AS and complete AV block
+2. Initiate an urgent pacing plan, including readiness for temporary transvenous pacing if the escape rhythm proves unstable
+3. Coordinate pacing with structural-heart evaluation for aortic valve intervention to avoid a repeat hospitalization
+4. Hold any AV-nodal blocking agents
+5. Counsel on driving restriction until definitive treatment and clearance
+
+### Red Flags / Alerts
+- Do not perform tilt-table testing — moderate-to-severe aortic stenosis makes it hemodynamically hazardous and it adds nothing once complete AV block is documented
+- Do not administer further AV-nodal blocking agents, which could precipitate asystole
+- Do not discharge home before a pacing plan is in place
+- Do not clear the patient to drive until definitive rhythm management is completed

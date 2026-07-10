@@ -1,0 +1,91 @@
+<think>
+Sudden LOC with no prodrome, brief grunt, rapid full recovery without confusion, in a patient with prior inferior MI and reduced LVEF — this pattern plus recent brief palpitation episodes is far more consistent with an arrhythmic cause than a neurologic or reflex one. Differential: cardiac arrhythmic syncope (ventricular tachycardia given her structural substrate) ~55%, cardiogenic syncope from bradyarrhythmia/AV block ~15%, reflex/vasovagal syncope ~15%, seizure ~10% (husband explicitly distinguishes it from known epileptic events, no post-ictal state). Plan: start with a 12-lead ECG to look for a substrate or active conduction abnormality, then labs to check electrolytes and troponin, since hypokalemia/hypomagnesemia and ischemia can both provoke ventricular arrhythmia in this substrate.
+</think>
+<tool_call>
+{"name": "analyze_ecg", "arguments": {"clinical_context": "witnessed sudden loss of consciousness without prodrome in patient with prior inferior MI and reduced LVEF, evaluating for arrhythmic substrate"}}
+</tool_call>
+<tool_response>
+Normal sinus rhythm, rate 92. QRS mildly prolonged (110 ms), QTc mildly prolonged (468 ms). Left axis deviation. Q waves and persistent T-wave inversions in II, III, aVF consistent with old inferior MI. No acute ST changes, no pre-excitation.
+</tool_response>
+
+<think>
+No acute ischemia or pre-excitation, but a chronic inferior infarct scar and a mildly prolonged QTc are present — this scar is a substrate that supports re-entrant ventricular tachycardia over reflex syncope, which now moves lower on the list. Next I need labs to check for electrolyte derangements (she's on furosemide) and troponin, since either could lower the threshold for a ventricular arrhythmia or signal an acute event.
+</think>
+<tool_call>
+{"name": "interpret_labs", "arguments": {"clinical_context": "syncope with prior MI and reduced EF, on loop diuretic, assessing electrolytes and troponin for arrhythmia trigger versus acute ischemia", "panels": ["CBC", "BMP", "Cardiac", "Metabolic"], "patient_age": 56, "patient_sex": "female"}}
+</tool_call>
+<tool_response>
+Potassium 3.2 mEq/L (low), Magnesium 1.6 mg/dL (low), Troponin I (hs) 0.06 ng/mL (mildly elevated), BNP 412 pg/mL (elevated), Hemoglobin 11.9 g/dL (mildly low), Glucose 138 mg/dL, HbA1c 7.4%.
+</tool_response>
+
+<think>
+Hypokalemia and hypomagnesemia are present, likely from her furosemide, and would lower the threshold for ventricular arrhythmia on top of her infarct scar — the mild troponin rise is more consistent with demand-related injury during a hemodynamic event than a new acute coronary syndrome, but this needs confirmation. Reflex syncope and seizure are increasingly unlikely given the abrupt onset, immediate lucid recovery, and now a plausible arrhythmic substrate plus metabolic trigger; I don't need EEG or brain imaging since there is no post-ictal state or focal deficit. The decisive test is continuous telemetry to capture the actual rhythm during a spontaneous event, rather than tilt-table testing, which would add nothing once a structural/arrhythmic cause is this likely.
+</think>
+<tool_call>
+{"name": "order_cardiac_monitoring", "arguments": {"clinical_context": "unexplained syncope with prior MI, reduced LVEF, recent palpitation episodes, and electrolyte abnormalities; capturing spontaneous arrhythmia", "monitor_type": "telemetry"}}
+</tool_call>
+<tool_response>
+48-hour telemetry: sinus rhythm with frequent PVCs (~9% of beats). Two self-terminating episodes of sustained monomorphic VT (LBBB morphology, inferior axis) at 188 bpm (32 sec, with palpitations/near-syncope) and 192 bpm (18 sec, asymptomatic). No AFib/flutter. No significant pauses. PVC morphology matches VT-initiating beat.
+</tool_response>
+
+<think>
+Telemetry has now documented sustained monomorphic VT arising from the same focus as her PVCs, confirming a scar-mediated re-entrant ventricular arrhythmia as the cause of her syncope — this is the arrhythmic substrate consistent with her prior inferior infarct and matches the presentation far better than reflex syncope or seizure, which are now excluded. I still need to confirm the degree of ventricular dysfunction to guide secondary-prevention decision-making and to review her medications for anything that could be aggravating arrhythmia risk or would be unsafe to add.
+</think>
+<tool_call>
+{"name": "order_echocardiogram", "arguments": {"clinical_context": "documented sustained monomorphic VT in prior inferior MI patient, assessing current LV function and structural substrate", "echo_type": "TTE"}}
+</tool_call>
+<tool_response>
+LVEF 32% (reduced from prior 38%), moderately dilated LV. Inferior and inferoposterior basal/mid hypokinesis consistent with prior RCA-territory infarct. No new wall motion abnormality elsewhere. Mild MR, no pericardial effusion, RV function preserved.
+</tool_response>
+
+<think>
+LVEF has dropped to 32% with a wall motion pattern matching her known infarct territory — this confirms a fixed ischemic scar as the arrhythmogenic substrate for the VT already captured on telemetry, well below the threshold that drives secondary-prevention ICD guidelines. Before finalizing management I should confirm the guideline indication for ICD in this exact scenario and check for any drug interactions relevant to her antiarrhythmic and beta-blocker regimen.
+</think>
+<tool_call>
+{"name": "search_medical_literature", "arguments": {"query": "sustained ventricular tachycardia ischemic cardiomyopathy syncope ICD implantation risk stratification", "max_results": 3}}
+</tool_call>
+<tool_response>
+AHA/ACC/HRS 2018 and ESC 2022 guidelines: ICD implantation is a Class I recommendation for secondary prevention in patients with prior MI and sustained VT/VF causing hemodynamic instability, expected survival >1 year. LVEF <35% with sustained VT and syncope markedly elevates sudden cardiac death risk.
+</tool_response>
+
+<think>
+This confirms secondary-prevention ICD is the guideline-directed next step given her documented sustained VT, prior MI, and LVEF 32%. One remaining gap is medication safety — she is on two beta-blockers and diuretic-driven electrolyte depletion, so I should check for interactions before any antiarrhythmic adjustment is considered.
+</think>
+<tool_call>
+{"name": "check_drug_interactions", "arguments": {"drug": "amiodarone", "current_medications": ["carvedilol", "metoprolol succinate", "furosemide", "lisinopril", "spironolactone", "atorvastatin", "aspirin", "metformin"], "patient_conditions": ["ischemic cardiomyopathy", "reduced LVEF 32%", "prolonged QTc", "recent sustained VT"]}}
+</tool_call>
+<tool_response>
+Furosemide-driven hypokalemia/hypomagnesemia lowers the arrhythmia threshold and potentiates QT prolongation — correct electrolytes before any QT-active agent. Carvedilol + metoprolol succinate: redundant dual beta-blockade increases bradycardia/AV block risk — reconcile to a single agent. Sotalol is relatively contraindicated (LVEF 32%, QTc 468 ms). Class Ic agents (flecainide, propafenone) are contraindicated in structural heart disease with prior MI.
+</tool_response>
+
+<think>
+The evidence converges: a documented scar-related sustained monomorphic VT in a patient with prior inferior MI and LVEF 32%, on a background of diuretic-induced hypokalemia/hypomagnesemia that likely lowered her arrhythmic threshold, together with a guideline-level Class I indication for secondary-prevention ICD. The mildly elevated troponin is best explained as demand injury from the hemodynamic strain of VT rather than a new coronary event, but this should still be followed serially.
+</think>
+
+### Primary Diagnosis
+Cardiac syncope due to sustained monomorphic ventricular tachycardia in ischemic cardiomyopathy (Confidence: 0.92)
+
+### Differential Diagnoses
+1. Reflex/vasovagal syncope - no prodrome, abrupt LOC with rapid full recovery, and telemetry-documented VT better explains the event
+2. Bradyarrhythmia/high-grade AV block - baseline ECG and telemetry show sinus rhythm with only first-degree AV block, no significant pauses
+3. Seizure - no post-ictal confusion, husband distinguishes it clearly from prior witnessed seizures, no tongue laceration or incontinence
+
+### Key Evidence
+- Two sustained monomorphic VT episodes (188-192 bpm) on telemetry — Cardiac Monitoring — establishes the arrhythmic mechanism directly
+- LVEF 32% with inferior/inferoposterior scar matching prior infarct territory — Echocardiogram — confirms the structural re-entrant substrate
+- Potassium 3.2 mEq/L, Magnesium 1.6 mg/dL — Labs — aggravating, correctable triggers layered on the fixed scar
+- Class I secondary-prevention ICD indication for sustained VT with prior MI and LVEF <35% — Literature search — guideline-directed next step
+
+### Recommendations
+1. Admit to continuous cardiac telemetry immediately
+2. Correct hypokalemia (target K >4.0 mEq/L) and hypomagnesemia urgently
+3. Obtain serial troponin measurements to exclude new ACS
+4. Electrophysiology consult for secondary prevention ICD evaluation
+5. Discontinue or reconcile the dual beta-blocker regimen (carvedilol + metoprolol)
+6. Counsel patient on driving restriction pending ICD implantation and arrhythmia stabilization
+
+### Red Flags / Alerts
+- Do not prescribe Class Ic antiarrhythmics (flecainide, propafenone) — contraindicated in structural heart disease with prior MI
+- Do not prescribe sotalol given reduced LVEF (32%) and QTc 468 ms — high risk of QT prolongation and torsades de pointes
+- Do not discharge without a defined ICD plan
+- Do not perform tilt-table testing — not informative once arrhythmic VT is documented on telemetry in a patient with known structural heart disease

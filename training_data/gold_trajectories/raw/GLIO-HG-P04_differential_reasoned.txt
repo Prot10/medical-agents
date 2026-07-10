@@ -1,0 +1,69 @@
+<think>
+A 55-year-old man has 3 weeks of progressive right headache worse in the morning/with bending, left arm weakness with pronator drift, and new word-finding/calculation trouble, plus a low-grade fever (37.9°C) and a ring-enhancing lesion on CT after a dental crown procedure with peri-apical inflammation 3 weeks ago. Differential: brain abscess ~45% (dental source, fever, elevated inflammatory markers), high-grade glioma ~35%, metastasis ~10%, demyelinating tumefactive lesion ~5%. The morning headache, focal deficits, and mass effect need urgent characterization — I'll start with a dedicated contrast MRI with DWI to look at the diffusion pattern, which is the single best imaging discriminator between abscess and tumor.
+</think>
+<tool_call>
+{"name": "analyze_brain_mri", "arguments": {"clinical_context": "ring-enhancing right temporal-parietal lesion on CT, evaluate for abscess vs neoplasm, characterize DWI pattern and mass effect", "protocol": "tumor", "contrast": true}}
+</tool_call>
+<tool_response>
+Ring-enhancing mass, right temporal-parietal region, 3.4 x 3.1 x 3.0 cm. DWI shows restricted diffusion at the PERIPHERAL RIM only; the central necrotic core shows facilitated diffusion (no central restriction). Rim enhancement is irregular and nodular, thicker along the inferior/lateral walls, with focal nodular projection into the core medially — not a smooth thin-walled ring. 5 mm leftward midline shift, effacement of right lateral ventricle trigone. Extensive surrounding FLAIR edema (~48 mL).
+</tool_response>
+<think>
+Given the dental source, prophylactic antibiotics, and fever, I'm still inclined toward abscess as the leading explanation — the peripheral DWI pattern is a point against it, but a partially treated abscess could plausibly look atypical. I want labs to check whether there's a systemic infectious/inflammatory signature (CRP, ESR, procalcitonin, cultures) that would support abscess, alongside pre-operative and glycemic status given his diabetes.
+</think>
+<tool_call>
+{"name": "interpret_labs", "arguments": {"clinical_context": "evaluate for systemic infection versus inflammatory response in ring-enhancing brain lesion, pre-operative and glycemic assessment", "panels": ["CBC", "BMP", "inflammatory markers", "coagulation", "HbA1c"], "patient_age": 55, "patient_sex": "male"}}
+</tool_call>
+<tool_response>
+CRP 2.2 mg/dL (H), ESR 31 mm/hr (H), glucose 148 mg/dL (H), HbA1c 7.8% (H). Procalcitonin 0.06 ng/mL — normal. Blood cultures no growth at 48 hours. CBC and coagulation within reference ranges.
+</tool_response>
+<think>
+The normal procalcitonin and negative blood cultures do not fit an active bacterial process; mild CRP/ESR elevation is nonspecific and doesn't confirm bacteremia or a maturing abscess. Combined with the peripheral (not central) DWI restriction from the MRI, the abscess hypothesis is weakening — I'm shifting toward high-grade glioma as the leading candidate, with abscess now lower and metastasis still on the list. I want the literature-supported perfusion/spectroscopy discriminators confirmed before committing.
+</think>
+<tool_call>
+{"name": "search_medical_literature", "arguments": {"query": "ring-enhancing brain lesion differential diagnosis DWI perfusion MRI discriminators brain abscess versus high-grade glioma", "max_results": 5}}
+</tool_call>
+<tool_response>
+rCBV >1.75 in the enhancing rim has high sensitivity/specificity for high-grade glioma; abscess rims show low rCBV (<1.0) due to lack of neovascularization. On MRS, markedly elevated Cho/NAA with reduced NAA favors high-grade glioma; abscess instead shows amino acid peaks (succinate, acetate, alanine) from bacterial fermentation, which are absent in tumor.
+</tool_response>
+<think>
+This confirms the discriminators I need directly: rCBV and spectroscopy amino acid peaks. Ordering MR perfusion together with spectroscopy will settle whether the rim is angiogenic tumor tissue or reactive inflammatory tissue around pus.
+</think>
+<tool_call>
+{"name": "order_advanced_imaging", "arguments": {"clinical_context": "characterize rCBV/Ktrans and, in the same study, the metabolite profile (choline/NAA ratio, amino acid peaks) of the enhancing rim to differentiate high-grade glioma from abscess", "imaging_type": "perfusion_MRI"}}
+</tool_call>
+<tool_response>
+rCBV in enhancing rim markedly elevated at 3.1 (contralateral-normalized), with elevated Ktrans consistent with angiogenic, blood-brain-barrier-disrupted tissue. Central necrotic core rCBV low (0.3, avascular necrosis). Perilesional white matter mildly elevated rCBV (1.5), suggesting infiltration beyond the enhancing rim. Spectroscopy of the same rim shows markedly elevated choline (Cho/Cr 3.4, Cho/NAA 4.8) with markedly reduced NAA; prominent lipid/lactate. No amino acid peaks (no acetate 1.92 ppm, no succinate 2.4 ppm, no alanine 1.47 ppm). Necrotic core dominated by lipid-lactate. Mildly elevated Cho/NAA (1.9) in perilesional tissue, suggesting infiltration.
+</tool_response>
+<think>
+rCBV of 3.1 in the rim is well above the abscess range and squarely in the high-grade glioma range, and the markedly elevated Cho/NAA with absent amino acid peaks reinforces this — together these essentially exclude abscess as the driver of the rim enhancement. The low-grade fever and CRP/ESR elevation are better explained as a peritumoral/paraneoplastic inflammatory response than as evidence of bacteremia.
+</think>
+<think>
+Given the peripheral (not central) DWI restriction, markedly elevated rCBV (3.1), elevated Cho/NAA without amino acid peaks, irregular nodular rim, negative blood cultures, and normal procalcitonin, this constellation now converges firmly on a high-grade glial neoplasm rather than abscess. Definitive confirmation still requires tissue, so urgent neurosurgical referral for stereotactic biopsy with dual pathology/microbiology submission is the necessary next step rather than empirical antibiotics or LP (contraindicated given the midline shift).
+</think>
+
+### Primary Diagnosis
+Glioblastoma, IDH-wildtype, WHO grade 4 (right temporal-parietal lobe) (Confidence: 0.68)
+
+### Differential Diagnoses
+1. Brain abscess — peripheral (not central) DWI restriction, rCBV 3.1, and absent amino acid peaks on MRS all argue against it; procalcitonin normal and cultures negative
+2. Solitary brain metastasis — no primary malignancy history and imaging pattern (irregular nodular rim with infiltrative perilesional spectroscopic changes) is more typical of primary glioma, though tissue diagnosis is still required to exclude this definitively
+3. Tumefactive demyelinating lesion — the markedly elevated rCBV and Cho/NAA with necrosis are atypical for demyelination, which usually shows lower perfusion and an open-ring enhancement pattern
+
+### Key Evidence
+- Peripheral DWI rim restriction with facilitated diffusion in the necrotic core from analyze_brain_mri — inconsistent with the central restriction expected in pyogenic abscess
+- rCBV 3.1 in the enhancing rim from MR perfusion — well above the abscess threshold and consistent with angiogenic high-grade tumor tissue
+- Cho/NAA 4.8 with no amino acid peaks from MR spectroscopy — favors neoplasm over bacterial abscess
+- Normal procalcitonin and negative blood cultures from interpret_labs — do not support an active bacterial process despite the dental history and mild CRP/ESR elevation
+
+### Recommendations
+1. Urgent neurosurgical consultation for stereotactic biopsy with dual submission to neuropathology and microbiology to confirm histology and simultaneously exclude infection
+2. Initiate dexamethasone for peritumoral edema with close glucose monitoring given HbA1c 7.8%
+3. Initiate levetiracetam for seizure prophylaxis given mass effect and cortical involvement
+4. Obtain pre-operative labs (CBC, CMP, coagulation, type and screen) and optimize glycemic control before biopsy/craniotomy
+5. Neuro-oncology consultation for molecular profiling (IDH, MGMT, TERT, EGFR) and adjuvant treatment planning once tissue diagnosis is confirmed
+
+### Red Flags / Alerts
+- Do not perform lumbar puncture — 5 mm midline shift carries herniation risk
+- Do not initiate empirical antibiotics or commit to an abscess diagnosis without the DWI/perfusion/MRS findings already reviewed — this would delay tissue diagnosis of a likely fatal tumor
+- Do not aspirate the lesion as a presumed abscess without intraoperative frozen-section confirmation
+- Do not start radiation or temozolomide before tissue diagnosis is established
