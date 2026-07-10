@@ -385,9 +385,9 @@ NeuroBench cases exist in three versions:
 
 | Version | Location | Cases | Tool Outputs | Purpose |
 |---------|----------|-------|-------------|---------|
-| **v1** | `data/neurobench_v1/cases/` | 100 synthetic | Enhanced (interpretive) | Original dataset; includes diversified demographics, fixed ICD codes, and 17 rewritten puzzle cases |
-| **v2** | `data/neurobench_v2/cases/` | 100 real-case-seeded | Enhanced (interpretive) | Seeded from PMC case reports (CC-BY 4.0); richer clinical detail |
-| **v3** | `data/neurobench_v3/cases/` | 200 (v1 + v2 combined) | **Realistic (stripped)** | Primary benchmark dataset for NMI paper; interpretive fields removed |
+| **v1** | `data/neurobench/cases/` | 100 synthetic | Enhanced (interpretive) | Original dataset; includes diversified demographics, fixed ICD codes, and 17 rewritten puzzle cases |
+| **v2** | `data/neurobench/cases/` | 100 real-case-seeded | Enhanced (interpretive) | Seeded from PMC case reports (CC-BY 4.0); richer clinical detail |
+| **v3** | `data/neurobench/cases/` | 200 (v1 + v2 combined) | **Realistic (stripped)** | Primary benchmark dataset for NMI paper; interpretive fields removed |
 
 ### v3 Realistic Output Stripping
 
@@ -481,5 +481,5 @@ Red herrings are annotated on 16 puzzle cases (all rewritten P02/P03 cases) and 
 | `neuroagent-schemas/enums.py` | `NeurologicalCondition`, `CaseDifficulty`, `EncounterType`, `ActionCategory`, `Modality` |
 | `neuroagent-schemas/tool_outputs.py` | All tool output models (see [tools.md](tools.md)) |
 | `neuroagent/agent/reasoning.py` | `AgentTrace`, `AgentTurn` |
-| `data/neurobench_v1/cases/*.json` | 100 synthetic cases (v1) |
-| `data/neurobench_v2/cases/*.json` | 100 real-case-seeded cases (v2) |
+| `data/neurobench/cases/*.json` | 100 synthetic cases (v1) |
+| `data/neurobench/cases/*.json` | 100 real-case-seeded cases (v2) |

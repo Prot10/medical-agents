@@ -1,7 +1,7 @@
 """Generate figures + summary statistics for the NeuroBench v5 slide deck.
 
 Run from repo root:
-    uv run python presentations/neurobench_v5/make_figures.py
+    uv run python presentations/neurobench/make_figures.py
 """
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ import numpy as np
 from matplotlib.patches import FancyBboxPatch
 
 REPO = Path(__file__).resolve().parents[2]
-CASES_DIR = REPO / "data" / "neurobench_v5" / "cases"
+CASES_DIR = REPO / "data" / "neurobench" / "cases"
 OUT_DIR = Path(__file__).resolve().parent / "figures"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 

@@ -211,7 +211,7 @@ class CostReward:
     ) -> CostBreakdown:
         """Get detailed cost breakdown using flat costs.
 
-        When ``useless_tools`` / ``harmful_tools`` are provided (from the v5
+        When ``useless_tools`` / ``harmful_tools`` are provided (from the NeuroBench
         gold-trajectory regen schema), the breakdown additionally splits the
         "unnecessary" bucket into ``useless_*`` and ``harmful_*`` fields.
         These do not change the legacy fields — they only annotate.

@@ -9,7 +9,7 @@ uvicorn neuroagent.api.app:app --host 0.0.0.0 --port 8888
 ```
 
 On startup, the server:
-1. Loads all NeuroBench cases from `data/neurobench_v1/cases/` into memory
+1. Loads all NeuroBench cases from `data/neurobench/cases/` into memory
 2. Builds a lightweight search index (case_id, condition, difficulty, patient summary)
 3. Creates the `data/traces/` directory for saved agent runs
 4. Mounts the frontend static files from `web/dist/` (if the build exists)

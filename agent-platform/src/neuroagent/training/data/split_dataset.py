@@ -5,8 +5,8 @@ ensuring balanced representation in each fold.
 
 Usage:
     python -m neuroagent.training.data.split_dataset \
-        --dataset data/neurobench_v4 \
-        --output data/neurobench_v4/splits \
+        --dataset data/neurobench \
+        --output data/neurobench/splits \
         --k 5
 """
 

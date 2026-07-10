@@ -259,7 +259,7 @@ flowchart LR
   Reviewer[Reviewer browser] --> ReviewUI[web-review]
   ReviewUI -->|X-Reviewer-Code| ReviewAPI[review_api FastAPI]
   ReviewAPI --> Registry[reviewer_codes.yaml]
-  ReviewAPI --> Cases[data/neurobench_v5/cases]
+  ReviewAPI --> Cases[data/neurobench/cases]
   ReviewAPI --> Annotations[data/review/annotations/version/reviewer/case.json]
   Admin[Admin role] --> ReviewUI
   ReviewUI --> Aggregates[agreement, hotspots, progress, diffs]
@@ -296,7 +296,7 @@ Recommended implementation order:
 
 - Run dashboard API: `uv run uvicorn neuroagent.api.app:app --host 0.0.0.0 --port 8888`
 - Run frontend dev server: `cd web && npm run dev`
-- Run single case: `uv run python agent-platform/scripts/runtime/run_single_case.py data/neurobench_v5/cases/<case>.json`
+- Run single case: `uv run python agent-platform/scripts/runtime/run_single_case.py data/neurobench/cases/<case>.json`
 - Run evaluation scripts from `agent-platform/scripts/`
 - Review app backend: `uv run uvicorn neuroagent.review_api.app:app --host 0.0.0.0 --port 8889`
 - Review app frontend: `cd web-review && npm run dev`

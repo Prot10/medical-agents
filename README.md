@@ -31,7 +31,7 @@ medical-agents/                     # uv workspace root
 ├── web/                            # Main React dashboard (port 5173)
 ├── web-review/                     # Dataset review UI (port 5174, shares tokens with web/)
 └── data/
-    ├── neurobench_v5/cases/        # 600 cases across 20 conditions
+    ├── neurobench/cases/        # 600 cases across 20 conditions
     ├── review/annotations/         # Per-reviewer annotation files (runtime, gitignored)
     └── traces/                     # Saved agent execution traces
 ```
@@ -83,7 +83,7 @@ ollama pull qwen3.5:4b
 
 # Run a single case via CLI
 uv run python agent-platform/scripts/runtime/run_single_case.py \
-  data/neurobench_v5/cases/<case>.json \
+  data/neurobench/cases/<case>.json \
   --model qwen3.5:4b \
   --base-url http://localhost:11434/v1
 ```
@@ -197,7 +197,7 @@ The frontend can be served by anything that hosts static files (Nginx, Vercel, N
 
 ```bash
 # Single case
-uv run python agent-platform/scripts/runtime/run_single_case.py data/neurobench_v5/cases/<case>.json
+uv run python agent-platform/scripts/runtime/run_single_case.py data/neurobench/cases/<case>.json
 
 # Full benchmark (4 models × 2 modes × 3 hospitals × 3 reps)
 uv run python agent-platform/scripts/benchmark/run_full_benchmark.py

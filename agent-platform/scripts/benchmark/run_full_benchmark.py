@@ -52,7 +52,7 @@ logger = logging.getLogger(__name__)
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 AGENT_PLATFORM = REPO_ROOT / "agent-platform"
-DATASET_DIR = REPO_ROOT / "data" / "neurobench_v5"
+DATASET_DIR = REPO_ROOT / "data" / "neurobench"
 RESULTS_DIR = REPO_ROOT / "results" / "benchmark"
 SERVE_SCRIPT = AGENT_PLATFORM / "scripts" / "runtime" / "serve_model.sh"
 

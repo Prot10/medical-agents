@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Batch LLM-judge evaluation on saved v4 comparison results.
+"""Batch LLM-judge evaluation on saved NeuroBench comparison results.
 
 Loads the comparison traces and runs each through the LLM judge rubric (8
 dimensions + composite) using a vLLM or OpenAI-compatible endpoint.
@@ -12,7 +12,7 @@ Usage:
     # Requires a running vLLM server (or OpenAI-compatible endpoint)
     uv run python agent-platform/scripts/benchmark/run_llm_judge.py
     uv run python agent-platform/scripts/benchmark/run_llm_judge.py --judge-model Qwen/Qwen3.5-9B
-    uv run python agent-platform/scripts/benchmark/run_llm_judge.py --results-dir results/v4_comparison --run qwen27b-react
+    uv run python agent-platform/scripts/benchmark/run_llm_judge.py --results-dir results/neurobench_comparison --run qwen27b-react
     uv run python agent-platform/scripts/benchmark/run_llm_judge.py --max-cases 10  # quick test
 """
 
@@ -45,11 +45,11 @@ app = typer.Typer()
 console = Console()
 logger = logging.getLogger("llm_judge")
 
-V4_CASES_DIR = REPO_ROOT / "data" / "neurobench_v4" / "cases"
+NEUROBENCH_CASES_DIR = REPO_ROOT / "data" / "neurobench" / "cases"
 
 
 def load_case(case_id: str) -> NeuroBenchCase:
-    path = V4_CASES_DIR / f"{case_id}.json"
+    path = NEUROBENCH_CASES_DIR / f"{case_id}.json"
     return NeuroBenchCase(**json.loads(path.read_text()))
 
 
@@ -79,7 +79,7 @@ def reconstruct_trace(trace_data: dict, result_data: dict) -> AgentTrace:
 
 @app.command()
 def main(
-    results_dir: str = typer.Option("results/v4_comparison", help="Results directory"),
+    results_dir: str = typer.Option("results/neurobench_comparison", help="Results directory"),
     judge_base_url: str = typer.Option("http://localhost:8000/v1", help="Judge LLM endpoint"),
     judge_model: str = typer.Option("", help="Judge model ID (auto-detect if empty)"),
     judge_api_key: str = typer.Option("not-needed", help="API key for judge endpoint"),
@@ -88,7 +88,7 @@ def main(
     repeat: int = typer.Option(1, help="Which repeat to evaluate (1-3, default 1)"),
     output_name: str = typer.Option("llm_judge_scores", help="Output filename prefix"),
 ):
-    """Run LLM-judge evaluation on saved v4 comparison traces."""
+    """Run LLM-judge evaluation on saved NeuroBench comparison traces."""
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(message)s")
 

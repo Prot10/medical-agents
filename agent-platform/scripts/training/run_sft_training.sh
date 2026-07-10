@@ -44,7 +44,7 @@ uv run python -m neuroagent.training.train_grpo \
     --epochs 5 \
     --batch-size 1 \
     --top-fraction 1.0 \
-    --splits-dir data/neurobench_v4/splits \
+    --splits-dir data/neurobench/splits \
     --fold 0 \
     --qlora
 

@@ -795,7 +795,7 @@ case = NeuroBenchCase(
 )
 
 # Write to file
-with open(f"data/neurobench_v1/cases/{case.case_id}.json", "w") as f:
+with open(f"data/neurobench/cases/{case.case_id}.json", "w") as f:
     f.write(case.model_dump_json(indent=2))
 ```
 
@@ -803,10 +803,10 @@ with open(f"data/neurobench_v1/cases/{case.case_id}.json", "w") as f:
 
 ```bash
 # Pydantic schema validation + clinical plausibility checks
-uv run --project dataset-generation python -m neurobench_gen.validate_case data/neurobench_v1/cases/NEW-CASE.json
+uv run --project dataset-generation python -m neurobench_gen.validate_case data/neurobench/cases/NEW-CASE.json
 
 # Batch validation
-for f in data/neurobench_v1/cases/*.json; do
+for f in data/neurobench/cases/*.json; do
     uv run --project dataset-generation python -m neurobench_gen.validate_case "$f"
 done
 ```

@@ -228,7 +228,7 @@ def run_dapo(
 
     # Build reward function — prefer online scoring
     reward_func = None
-    dataset_path_env = os.environ.get("NEUROAGENT_DATASET", "data/neurobench_v4")
+    dataset_path_env = os.environ.get("NEUROAGENT_DATASET", "data/neurobench")
     dataset_dir = Path(dataset_path_env)
 
     if (dataset_dir / "cases").exists():

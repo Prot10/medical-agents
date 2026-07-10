@@ -2,7 +2,7 @@
 
 End-to-end runbook for deploying the NeuroBench dataset review platform
 (`review_api` on :8889 + the `web-review` static build) on a Raspberry Pi 5,
-exposed publicly so external clinicians can review the v5 dataset.
+exposed publicly so external clinicians can review the NeuroBench dataset.
 
 **Why a Pi:** the review app does no LLM inference, so no GPU is needed. The Pi
 gives a free always-on host with a real persistent filesystem, which solves
@@ -272,7 +272,7 @@ Skip this step if you'd rather keep `sudo` requiring a password.
 
 ## Phase 6 — Copy the project + build the frontend (15 min)
 
-The Pi gets the **code** + the **prebuilt frontend** + the **v5 dataset**. The
+The Pi gets the **code** + the **prebuilt frontend** + the **NeuroBench dataset**. The
 frontend build runs on your Mac (faster, has Node toolchain), then we rsync
 the result to the Pi.
 
@@ -297,10 +297,6 @@ rsync -avz --progress \
   --exclude='node_modules/' \
   --exclude='.git/' \
   --exclude='data/traces/' \
-  --exclude='data/neurobench_v1/' \
-  --exclude='data/neurobench_v2/' \
-  --exclude='data/neurobench_v3/' \
-  --exclude='data/neurobench_v4/' \
   --exclude='__pycache__/' \
   --exclude='.pytest_cache/' \
   --exclude='*.pyc' \
@@ -310,7 +306,7 @@ rsync -avz --progress \
 ```
 
 - [ ] First run prompts for SSH password; subsequent runs (after Phase 9 SSH key setup) will be passwordless
-- [ ] Expect ~5–15 minutes depending on Wi-Fi speed (v5 cases + dist)
+- [ ] Expect ~5–15 minutes depending on Wi-Fi speed (dataset cases + dist)
 
 ### 6.3 — Install Python dependencies on the Pi
 
@@ -686,8 +682,6 @@ When you change something on the Mac and want to push it to the Pi:
 rsync -avz --progress \
   --exclude='.venv/' --exclude='node_modules/' --exclude='.git/' \
   --exclude='data/traces/' \
-  --exclude='data/neurobench_v1/' --exclude='data/neurobench_v2/' \
-  --exclude='data/neurobench_v3/' --exclude='data/neurobench_v4/' \
   --exclude='__pycache__/' --exclude='*.pyc' --exclude='.DS_Store' \
   /Users/andrea/Documents/medical-agents/ \
   andrea@neurobench-review.local:~/medical-agents/
@@ -750,7 +744,7 @@ The backend hot-reloads on mtime change — no restart needed.
 | Backend code | `agent-platform/src/neuroagent/review_api/` |
 | Frontend build | `web-review/dist/` |
 | Annotations | `data/review/annotations/{version}/{reviewer}/{case_id}.json` |
-| v5 dataset | `data/neurobench_v5/cases/` |
+| NeuroBench dataset | `data/neurobench/cases/` |
 | Reviewer codes | `agent-platform/config/review/reviewer_codes.yaml` |
 | Review API systemd unit | `/etc/systemd/system/neurobench-review.service` |
 | Cloudflared (Quick Tunnel) systemd unit | `/etc/systemd/system/cloudflared-quick.service` |

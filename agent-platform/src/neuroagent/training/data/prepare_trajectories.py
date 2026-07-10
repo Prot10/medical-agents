@@ -5,7 +5,7 @@ trajectories, then scores each with the composite reward function.
 
 Usage:
     python -m neuroagent.training.data.prepare_trajectories \
-        --dataset data/neurobench_v1 \
+        --dataset data/neurobench \
         --output training_data/trajectories.json \
         --rollouts-per-case 8
 """

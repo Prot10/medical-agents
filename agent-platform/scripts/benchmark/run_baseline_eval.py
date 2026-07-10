@@ -55,7 +55,7 @@ from rich.table import Table
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 AGENT_PLATFORM = REPO_ROOT / "agent-platform"
-DATASET_DIR = REPO_ROOT / "data" / "neurobench_v5"
+DATASET_DIR = REPO_ROOT / "data" / "neurobench"
 SERVE_SCRIPT = AGENT_PLATFORM / "scripts" / "runtime" / "serve_model.sh"
 
 app = typer.Typer(add_completion=False)

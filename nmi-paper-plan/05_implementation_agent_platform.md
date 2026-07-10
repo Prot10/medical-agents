@@ -675,7 +675,7 @@ TODO-A6.1: Implement run_evaluation.py (main entry point)
   @app.command()
   def evaluate(
       model: str = "qwen3-32b",        # Orchestrator model
-      dataset: str = "data/neurobench_v1",
+      dataset: str = "data/neurobench",
       split: str = "test",
       output_dir: str = "results/",
       max_cases: int | None = None,
@@ -703,7 +703,7 @@ TODO-A6.3: Implement run_robustness_eval.py
   Grid: 5 noise types × 4 severity levels (0.1, 0.25, 0.5, 0.75) = 20 runs
 
 TODO-A6.4: Implement run_longitudinal_eval.py
-  - Load multi-encounter cases from data/neurobench_v1/longitudinal/
+  - Load multi-encounter cases from data/neurobench/longitudinal/
   - Run agent on encounter 1, store memory
   - Run agent on encounter 2 WITH memory from encounter 1
   - Compare: agent with memory vs. agent without memory

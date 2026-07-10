@@ -6,7 +6,7 @@ roadmap (vanilla → tools → SFT → GRPO → graph-structured reasoning).
 
 ## Files
 
-- `neurobench_v5.tex`     — the Beamer source
+- `neurobench.tex`     — the Beamer source
 - `beamerthemeCERN.sty`   — CERN beamer theme (self-contained copy)
 - `logos/`                — CERN + CAFEIN logos used by the theme
 - `make_figures.py`       — generates all PDFs in `figures/` and a JSON stats dump
@@ -18,11 +18,11 @@ roadmap (vanilla → tools → SFT → GRPO → graph-structured reasoning).
 
 ```bash
 # 1. regenerate the figures (uses uv-managed Python env)
-uv run python presentations/neurobench_v5/make_figures.py
+uv run python presentations/neurobench/make_figures.py
 
 # 2. compile the deck (xelatex/lualatex preferred; pdflatex falls back to helvet)
-cd presentations/neurobench_v5
-latexmk -pdf neurobench_v5.tex
+cd presentations/neurobench
+latexmk -pdf neurobench.tex
 ```
 
 If you don't have a TeX install, the easiest path is Overleaf — upload the
@@ -35,4 +35,4 @@ bundled `beamerthemeCERN.sty`.
 - The case study is `ALS-M01` (bulbar-onset ALS with a cervical-spondylosis red
   herring) — fully self-contained, no extra data required.
 - Regenerate stats anytime a case is added/removed: the script re-scans
-  `data/neurobench_v5/cases/`.
+  `data/neurobench/cases/`.

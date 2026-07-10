@@ -160,7 +160,7 @@ const NODES: ArchitectureNode[] = [
     accent: "emerald",
     x: 80,
     y: 16,
-    files: ["data/neurobench_v5/cases/", "data/review/", "data/traces/"],
+    files: ["data/neurobench/cases/", "data/review/", "data/traces/"],
     details: ["v5 is the current default: 600 cases across 20 conditions.", "Case JSON includes initial outputs, follow-up outputs, fallback tool outputs, and ground truth.", "Traces are saved after streamed runs for replay."],
   },
   {
