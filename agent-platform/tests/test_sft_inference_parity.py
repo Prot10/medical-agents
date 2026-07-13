@@ -39,16 +39,11 @@ TRAIN_SPLIT = REPO_ROOT / "data/neurobench/splits/train_cases.txt"
 # styles, and hospitals at negligible cost.
 SAMPLE_STRIDE = 50
 
-# KNOWN DATA DEFECT (found the moment this test stopped checking only
-# trajectories[0]): 7/1000 gold trajectories contain an assistant turn with TWO
-# <think> blocks. The serving stack merges all think blocks into one
-# (`extract_think_content` joins them; the orchestrator re-embeds a single
-# block), so those turns can never round-trip byte-identically — the student is
-# trained on 7 histories the served model cannot reproduce. Fix is regenerating
-# those teacher traces, which is dataset work, not test work. The round-trip
-# test exempts exactly the trajectories exhibiting this mechanism, and
-# `test_multi_think_defect_does_not_grow` pins the count so it can only shrink.
-KNOWN_MULTI_THINK_TRAJECTORIES = 7
+# A turn with more than one <think> block cannot round-trip byte-identically:
+# the serving stack merges all think blocks into one (`extract_think_content`
+# joins them; the orchestrator re-embeds a single block). 7 such teacher traces
+# existed and were normalized in-place to the merged serving form; this guard
+# keeps new ones out.
 
 
 def _has_multi_think_turn(trajectory: dict) -> bool:
@@ -169,23 +164,18 @@ class TestTrainingPromptEqualsServingPrompt:
             assert "<think>\n\n</think>" not in serving_text, (
                 f"{trajectory['case_id']}: reasoning was dropped from history"
             )
-            if _has_multi_think_turn(trajectory):
-                # Known data defect (see KNOWN_MULTI_THINK_TRAJECTORIES): a turn
-                # with two <think> blocks is merged into one at serving, so byte
-                # parity is impossible until those traces are regenerated.
-                continue
             assert serving_text == training_text, trajectory["case_id"]
 
-    def test_multi_think_defect_does_not_grow(self):
-        """The multi-<think> data defect is pinned: it may shrink (regenerated
-        traces), never grow — a new multi-think trajectory is a new parity bug."""
+    def test_no_multi_think_turns(self):
+        """Every assistant turn carries at most one <think> block. Serving merges
+        multiple blocks into one, so a multi-think trajectory is a parity bug."""
         lines = [l for l in TRAJECTORIES.read_text().splitlines() if l.strip()]
         offenders = [
             (t["case_id"], t["style"])
             for t in map(json.loads, lines)
             if _has_multi_think_turn(t)
         ]
-        assert len(offenders) <= KNOWN_MULTI_THINK_TRAJECTORIES, offenders
+        assert not offenders, offenders
 
     def test_assistant_only_mask_covers_reasoning_and_excludes_observations(
         self, trajectories_sample
