@@ -221,7 +221,13 @@ data-quality cause: the data is good (35% hard cases, 85% unique reasoning openi
 2. **Rejection-sampling fine-tuning (RFT/STaR)** — the best-evidenced single change: sample N
    trajectories from your *own* model, keep only the diagnostically-correct ones (gold labels =
    verifier), SFT on those. Beat vanilla SFT 35.9→49.3 on GSM8K (Yuan et al., 2023); helps most
-   when the base is near-ceiling on imitation. What DeepSeek-R1 and Llama-3 do.
+   when the base is near-ceiling on imitation. What DeepSeek-R1 and Llama-3 do. **Implemented:**
+   `run_rft.sh` (serve base or base+SFT-LoRA → roll out N× on the train split at temp 0.7 →
+   `build_rft_dataset.py` filters to correct + dedupes + caps per case) → then `run_sft_training.sh`
+   on the resulting dataset. The rollout reuses the eval runner (`--rollout-jsonl`) and the
+   `AgentTrace.messages` capture, so a correct rollout becomes a training example directly. Watch
+   the coverage number it prints: cases with **no** correct rollout can't be taught by RFT without
+   harder sampling or a stronger teacher.
 3. **Add ~5–10% error-recovery / abstention negatives** (Agent-FLAN) and a **general-data replay
    mix** (~1:1) to prevent forgetting.
 4. **Recipe deltas (done / cheap):** bf16 LoRA over QLoRA (§3); all linear layers ✓; LR
