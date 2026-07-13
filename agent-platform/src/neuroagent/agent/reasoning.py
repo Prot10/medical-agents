@@ -22,6 +22,10 @@ class AgentTrace(BaseModel):
 
     case_id: str | None = None
     turns: list[AgentTurn] = Field(default_factory=list)
+    # The full OpenAI-style conversation the agent actually had (system + user + assistant/tool
+    # turns), in the same shape as the gold trajectories. Populated by the orchestrator so an
+    # RFT rollout can be turned into a training example without reconstruction. Empty unless set.
+    messages: list[dict] = Field(default_factory=list)
     final_response: str | None = None
     total_tool_calls: int = 0
     tools_called: list[str] = Field(default_factory=list)

@@ -202,8 +202,15 @@ def evaluate(
     temperature: float = typer.Option(1.0, help="Sampling temperature (0 = greedy/deterministic)"),
     presence_penalty: float = typer.Option(1.5, help="Presence penalty (set 0 for greedy)"),
     save_bundles: bool = typer.Option(True, help="Write per-case judge bundles (full trace) for the composite score"),
+    rollout_jsonl: str = typer.Option(None, help="RFT: append every rollout's training-format messages + correctness here"),
 ):
-    """Run agent evaluation on a held-out split (default: the 100-case test set)."""
+    """Run agent evaluation on a held-out split (default: the 100-case test set).
+
+    Doubles as the RFT rollout generator: point --split at the TRAIN split, use --repeats N
+    and --temperature 0.7, and pass --rollout-jsonl to dump each sampled trajectory (the exact
+    conversation) with its correctness label. build_rft_dataset.py then filters to the correct
+    ones and formats them for SFT.
+    """
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s [%(name)s] %(levelname)s: %(message)s",
@@ -303,6 +310,18 @@ def evaluate(
 
                     if bundle_dir is not None:
                         write_judge_bundle(bundle_dir, case, trace, run_name, rep, model_id)
+
+                    if rollout_jsonl and trace.messages:
+                        with open(rollout_jsonl, "a") as fh:
+                            fh.write(json.dumps({
+                                "case_id": case.case_id,
+                                "condition": case.condition.value,
+                                "difficulty": case.difficulty.value,
+                                "repeat": rep,
+                                "correct": bool(metrics.diagnostic_accuracy_top1),
+                                "num_tool_calls": metrics.tool_call_count,
+                                "messages": trace.messages,
+                            }, default=str) + "\n")
 
                     checkpoint_file.write_text(json.dumps({
                         "completed": sorted(completed),

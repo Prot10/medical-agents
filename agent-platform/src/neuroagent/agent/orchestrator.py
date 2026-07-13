@@ -177,6 +177,7 @@ class AgentOrchestrator:
                 or _NO_CONCLUSION_MESSAGE
             )
 
+        trace.messages = messages  # the exact conversation, for RFT rollout capture
         self._finalize_trace(trace)
         return trace
 
@@ -341,6 +342,7 @@ class AgentOrchestrator:
                 or _NO_CONCLUSION_MESSAGE
             )
 
+        trace.messages = messages  # the exact conversation, for RFT rollout capture
         self._finalize_trace(trace)
         yield {
             "type": "run_complete",
@@ -391,6 +393,7 @@ class AgentOrchestrator:
         trace.set_final_response(
             _extract_assessment(response.content or "")
         )
+        trace.messages = messages  # the exact conversation, for RFT rollout capture
         self._finalize_trace(trace)
         return trace
 
