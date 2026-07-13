@@ -1,10 +1,11 @@
-"""DAPO (Decoupled Alignment via Policy Optimization) trainer for NeuroAgent.
+"""DAPO trainer for NeuroAgent.
 
-Implements DAPO modifications over GRPO for better multi-turn ReAct training:
+DAPO modifications over GRPO, all delivered through TRL's native support
+(``GRPOConfig(loss_type="dapo", epsilon=…, epsilon_high=…)``):
 1. Token-level policy gradient loss (better credit assignment for long traces)
 2. Clip-higher: asymmetric PPO clipping (prevents premature convergence)
-3. Dynamic sampling: focuses on prompts with learning signal
-4. No KL penalty
+3. Dynamic sampling: focuses on prompts with learning signal (offline filter below)
+4. No KL penalty (GRPOConfig's ``beta`` defaults to 0.0)
 
 Reference: arXiv:2503.14476
 
@@ -21,84 +22,29 @@ from __future__ import annotations
 import argparse
 import json
 import logging
-import math
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 logger = logging.getLogger(__name__)
 
+# Reward values format_for_grpo's gold mode assigns by trajectory-style keyword.
+# They carry no clinical signal; variance filtering on them is meaningless.
+_PLACEHOLDER_REWARD_VALUES = {0.5, 0.6, 0.8}
+
 
 @dataclass
 class DAPOConfig:
-    """DAPO-specific hyperparameters."""
+    """DAPO-specific hyperparameters (only knobs the TRL path actually uses)."""
 
-    # Asymmetric clipping bounds
+    # Asymmetric clipping bounds → GRPOConfig epsilon / epsilon_high
     clip_higher: float = 0.28
     clip_lower: float = 0.18
 
-    # Dynamic sampling
+    # Dynamic sampling (offline pre-filter over pre-computed reward groups)
     dynamic_sampling: bool = True
     min_reward_variance: float = 0.01  # skip prompts below this variance
-
-    # Token-level loss
-    token_level_loss: bool = True
-
-    # No KL penalty in DAPO
-    kl_coeff: float = 0.0
-
-    # Oversampling factor for dynamic sampling
-    oversample_factor: float = 1.5
-
-
-def compute_dapo_loss(
-    log_probs: "torch.Tensor",  # (B, T)
-    old_log_probs: "torch.Tensor",  # (B, T)
-    advantages: "torch.Tensor",  # (B,) or (B, T)
-    attention_mask: "torch.Tensor",  # (B, T)
-    clip_lower: float = 0.18,
-    clip_higher: float = 0.28,
-    token_level: bool = True,
-) -> "torch.Tensor":
-    """Compute DAPO policy gradient loss with asymmetric clipping.
-
-    Key differences from standard PPO/GRPO:
-    - Asymmetric clipping: ratio clipped to [1 - clip_lower, 1 + clip_higher]
-    - Token-level: advantages broadcast to each token, loss computed per-token
-    """
-    import torch
-
-    # Log ratio for importance sampling
-    log_ratio = log_probs - old_log_probs  # (B, T)
-    ratio = torch.exp(log_ratio)
-
-    # Expand advantages to token level if needed
-    if token_level and advantages.dim() == 1:
-        advantages = advantages.unsqueeze(1).expand_as(ratio)  # (B, T)
-
-    # Asymmetric clipping
-    clipped_ratio = torch.clamp(
-        ratio,
-        min=1.0 - clip_lower,
-        max=1.0 + clip_higher,
-    )
-
-    # Surrogate loss (take minimum as in PPO)
-    surr1 = ratio * advantages
-    surr2 = clipped_ratio * advantages
-    loss = -torch.min(surr1, surr2)
-
-    # Mask padding tokens
-    loss = loss * attention_mask
-
-    if token_level:
-        # Average over valid tokens, then over batch
-        token_counts = attention_mask.sum(dim=1).clamp(min=1)
-        per_sample_loss = loss.sum(dim=1) / token_counts
-        return per_sample_loss.mean()
-    else:
-        return loss.sum() / attention_mask.sum().clamp(min=1)
 
 
 def filter_by_reward_variance(
@@ -109,7 +55,26 @@ def filter_by_reward_variance(
 
     Dynamic sampling: skip prompts where the model has already converged
     (all completions get similar rewards), focusing compute on harder cases.
+
+    Refuses to run on style-keyword PLACEHOLDER rewards (format_for_grpo gold
+    mode): their variance reflects which trajectory styles a case happened to
+    get, not any learning signal, so "dynamic sampling" over them silently
+    drops arbitrary cases from training.
     """
+    marked_placeholder = any(
+        group.get("reward_source") == "style_placeholder" for group in grouped_data
+    )
+    all_rewards = [r for group in grouped_data for r in group.get("rewards", [])]
+    looks_placeholder = bool(all_rewards) and set(all_rewards) <= _PLACEHOLDER_REWARD_VALUES
+    if marked_placeholder or looks_placeholder:
+        raise ValueError(
+            "filter_by_reward_variance called on style-keyword placeholder rewards "
+            f"({'reward_source=style_placeholder' if marked_placeholder else 'all rewards in ' + str(sorted(_PLACEHOLDER_REWARD_VALUES))}). "
+            "These are schema fillers, not scores — variance filtering over them "
+            "drops arbitrary cases. Rescore the trajectories with CompositeReward "
+            "(prepare_trajectories.py) or disable dynamic sampling."
+        )
+
     filtered = []
     skipped = 0
     for group in grouped_data:
@@ -144,16 +109,21 @@ def run_dapo(
     learning_rate: float = 5e-6,
     num_generations: int = 4,
     max_completion_length: int = 4096,
-    max_prompt_length: int = 2048,
     temperature: float = 1.0,
     bf16: bool = True,
     qlora: bool = False,
     dapo_config: DAPOConfig | None = None,
+    seed: int = 42,
+    reward_config: str = "config/training/reward_weights.yaml",
+    tool_costs_config: str = "config/tools/costs.yaml",
+    rules_dir: str = "config/hospital_rules",
+    hospital: str = "us_mayo",
+    allow_placeholder_rewards: bool = False,
 ) -> None:
-    """Run DAPO training.
+    """Run DAPO training via TRL's GRPOTrainer with ``loss_type="dapo"``.
 
-    Builds on TRL's GRPOTrainer but overrides the loss computation with
-    DAPO's token-level asymmetric clipping.
+    Note: TRL 0.29's GRPOConfig has no `max_prompt_length` (the trainer does not
+    truncate prompts), so this function does not accept one.
     """
     import torch
     from datasets import Dataset
@@ -162,6 +132,10 @@ def run_dapo(
     from trl import GRPOConfig, GRPOTrainer
 
     from .train_grpo import (
+        _build_offline_reward_fn,
+        _build_online_reward_fn,
+        _require_case_ids,
+        _save_rl_run_summary,
         get_lora_config,
         get_quantization_config,
         load_grpo_data,
@@ -211,56 +185,44 @@ def run_dapo(
 
     # Load data
     raw_data = load_grpo_data(data_path)
+    _require_case_ids(raw_data)
 
-    # Dynamic sampling: filter low-variance groups
+    # Dynamic sampling: filter low-variance groups. Raises on style-keyword
+    # placeholder rewards — pass --no-dynamic-sampling if the data carries them.
     if dapo_config.dynamic_sampling and isinstance(raw_data, list):
         raw_data = filter_by_reward_variance(
             raw_data, min_variance=dapo_config.min_reward_variance,
         )
 
-    # Format for GRPOTrainer
+    # Format for GRPOTrainer. `case_id` is kept as an extra dataset column —
+    # GRPOConfig.remove_unused_columns defaults to False, so TRL forwards it to
+    # the reward function as a kwarg for explicit, collision-free case lookup.
     formatted = []
     for ex in raw_data:
         prompt_messages = [{"role": "user", "content": ex.get("prompt", "")}]
-        formatted.append({"prompt": prompt_messages})
+        formatted.append({"prompt": prompt_messages, "case_id": ex["case_id"]})
 
     dataset = Dataset.from_list(formatted)
 
-    # Build reward function — prefer online scoring
-    reward_func = None
+    # Build reward function — same shared builders as GRPO (CompositeReward online,
+    # explicit-keyed offline behind --allow-placeholder-rewards).
     dataset_path_env = os.environ.get("NEUROAGENT_DATASET", "data/neurobench")
     dataset_dir = Path(dataset_path_env)
 
     if (dataset_dir / "cases").exists():
-        logger.info("Using ONLINE reward (case ground truth scoring)")
-        from .rewards.online_reward import OnlineRewardFunction, build_prompt_to_case_mapping
-        from ..tools.cost_tracker import CostTracker
-
-        case_mapping = build_prompt_to_case_mapping(dataset_dir)
-        cost_tracker = CostTracker()
-        reward_func = OnlineRewardFunction(cases=case_mapping, cost_tracker=cost_tracker)
+        logger.info("Using ONLINE reward (CompositeReward, weights from %s)", reward_config)
+        reward_func = _build_online_reward_fn(
+            raw_data, dataset_dir, reward_config, tool_costs_config, rules_dir, hospital
+        )
     else:
-        logger.info("Using OFFLINE pre-computed rewards")
-        reward_data = {}
-        for ex in raw_data:
-            if "completions" in ex and "rewards" in ex:
-                for comp, rew in zip(ex["completions"], ex["rewards"]):
-                    if isinstance(comp, str):
-                        reward_data[comp[:200]] = rew
-
-        def reward_func(prompts, completions, **kwargs) -> list[float]:
-            rewards = []
-            for comp in completions:
-                if isinstance(comp, str):
-                    rewards.append(reward_data.get(comp[:200], 0.0))
-                else:
-                    rewards.append(0.0)
-            return rewards
+        reward_func = _build_offline_reward_fn(raw_data, allow_placeholder_rewards)
+        logger.info("Using OFFLINE pre-computed rewards (dataset not found at %s)", dataset_dir)
 
     # DAPO config via TRL's native loss_type="dapo" support
     # - loss_type="dapo": token-level policy gradient with per-token advantage
     # - epsilon: lower clip bound (1 - epsilon)
     # - epsilon_high: upper clip bound (1 + epsilon_high) for asymmetric clipping
+    # - beta stays at its 0.0 default: DAPO uses no KL penalty
     # - generation_batch_size must be >= num_generations
     gen_batch = max(batch_size, num_generations)
     training_args = GRPOConfig(
@@ -272,6 +234,7 @@ def run_dapo(
         num_generations=num_generations,
         generation_batch_size=gen_batch,
         max_completion_length=max_completion_length,
+        seed=seed,
         bf16=bf16,
         logging_steps=10,
         save_steps=50,
@@ -294,13 +257,30 @@ def run_dapo(
     )
 
     logger.info(
-        "Starting DAPO training: %d epochs, clip=[%.2f, %.2f], token_level=%s",
-        epochs, dapo_config.clip_lower, dapo_config.clip_higher,
-        dapo_config.token_level_loss,
+        "Starting DAPO training: %d epochs, clip=[%.2f, %.2f], seed=%d",
+        epochs, dapo_config.clip_lower, dapo_config.clip_higher, seed,
     )
-    trainer.train()
+    result = trainer.train()
     trainer.save_model(output_dir)
     tokenizer.save_pretrained(output_dir)
+    _save_rl_run_summary(
+        output_dir, trainer, result, training_args, model_name,
+        n_train=len(dataset), algorithm="dapo", data_path=data_path, seed=seed,
+        extra_hyperparameters={
+            "loss_type": "dapo",
+            "epsilon_clip_lower": dapo_config.clip_lower,
+            "epsilon_high_clip_higher": dapo_config.clip_higher,
+            "dynamic_sampling": dapo_config.dynamic_sampling,
+            "min_reward_variance": dapo_config.min_reward_variance,
+            "num_generations": num_generations,
+            "max_completion_length": max_completion_length,
+            "generation_temperature": temperature,
+            "lora_rank": lora_rank,
+            "lora_alpha": lora_alpha,
+            "qlora": qlora,
+            "adapter_init": adapter_path,
+        },
+    )
     logger.info("DAPO model saved to %s", output_dir)
 
 
@@ -324,12 +304,24 @@ def main() -> None:
     parser.add_argument("--temperature", type=float, default=1.0)
     parser.add_argument("--qlora", action="store_true")
     parser.add_argument("--bf16", action="store_true", default=True)
+    parser.add_argument("--seed", type=int, default=42)
+
+    # Reward (for online scoring)
+    parser.add_argument("--reward-config", default="config/training/reward_weights.yaml")
+    parser.add_argument("--tool-costs", default="config/tools/costs.yaml")
+    parser.add_argument("--rules-dir", default="config/hospital_rules")
+    parser.add_argument("--hospital", default="us_mayo")
+    parser.add_argument(
+        "--allow-placeholder-rewards", action="store_true",
+        help="Permit offline pre-computed rewards when the cases dir is absent. "
+             "Those rewards may be style-keyword placeholders with no clinical "
+             "signal — debugging only, never for reportable runs.",
+    )
 
     # DAPO-specific
     parser.add_argument("--clip-higher", type=float, default=0.28)
     parser.add_argument("--clip-lower", type=float, default=0.18)
     parser.add_argument("--no-dynamic-sampling", action="store_true")
-    parser.add_argument("--no-token-level", action="store_true")
 
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -338,7 +330,6 @@ def main() -> None:
         clip_higher=args.clip_higher,
         clip_lower=args.clip_lower,
         dynamic_sampling=not args.no_dynamic_sampling,
-        token_level_loss=not args.no_token_level,
     )
 
     run_dapo(
@@ -357,6 +348,12 @@ def main() -> None:
         bf16=args.bf16,
         qlora=args.qlora,
         dapo_config=dapo_config,
+        seed=args.seed,
+        reward_config=args.reward_config,
+        tool_costs_config=args.tool_costs,
+        rules_dir=args.rules_dir,
+        hospital=args.hospital,
+        allow_placeholder_rewards=args.allow_placeholder_rewards,
     )
 
 

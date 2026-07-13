@@ -1,16 +1,18 @@
 """Online reward function for GRPO/DAPO training.
 
-Parses tool calls from model-generated completions, executes them against
-MockServer to get realistic outputs, then scores with CompositeReward.
+Parses tool calls and the final assessment out of a model-generated completion,
+assembles a pseudo :class:`AgentTrace`, and scores it with the SAME
+``CompositeReward`` → ``MetricsCalculator`` pipeline used by evaluation and
+gold-trajectory selection. This module contains only the RL-specific plumbing
+(completion text → pseudo-trace); every scoring decision — diagnosis matching,
+tool precision/recall, safety, cost, compliance, format — is delegated to the
+shared implementation, with weights loaded from
+``config/training/reward_weights.yaml`` via ``CompositeReward.from_config``.
 
-This bridges the gap between pre-computed offline rewards (which can't score
-novel completions) and the full agent loop (which is too slow for RL training).
-
-The key insight: during GRPO, the model generates NEW completions that don't
-match any pre-computed trajectory. We need to score them on-the-fly by:
-1. Extracting tool calls from the raw completion text
-2. Looking up the case data for the prompt
-3. Computing the composite reward (diagnosis accuracy + cost + safety)
+Case lookup is by explicit ``case_id``: each training example carries a
+``case_id`` column (emitted by ``format_for_grpo``), which TRL's GRPOTrainer
+forwards to reward functions as a kwarg. There is no prompt-prefix or fuzzy
+matching — a missing case_id raises, it never silently scores 0.0.
 """
 
 from __future__ import annotations
@@ -19,9 +21,15 @@ import json
 import logging
 import re
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 logger = logging.getLogger(__name__)
+
+if TYPE_CHECKING:
+    from neuroagent_schemas import NeuroBenchCase
+
+    from ...agent.reasoning import AgentTrace
+    from .composite_reward import CompositeReward
 
 
 def extract_tool_calls(completion: str) -> list[dict[str, Any]]:
@@ -37,9 +45,10 @@ def extract_tool_calls(completion: str) -> list[dict[str, Any]]:
     ):
         try:
             tc = json.loads(match.group(1))
+            args = tc.get("arguments", {})
             tool_calls.append({
                 "tool_name": tc.get("name", ""),
-                "parameters": tc.get("arguments", {}),
+                "parameters": args if isinstance(args, dict) else {},
             })
         except json.JSONDecodeError:
             continue
@@ -54,7 +63,7 @@ def extract_tool_calls(completion: str) -> list[dict[str, Any]]:
                 args = json.loads(match.group(2))
                 tool_calls.append({
                     "tool_name": match.group(1),
-                    "parameters": args,
+                    "parameters": args if isinstance(args, dict) else {},
                 })
             except json.JSONDecodeError:
                 tool_calls.append({
@@ -65,129 +74,144 @@ def extract_tool_calls(completion: str) -> list[dict[str, Any]]:
     return tool_calls
 
 
-def extract_diagnosis(completion: str) -> str | None:
-    """Extract the primary diagnosis from a completion's final assessment."""
-    match = re.search(
-        r"###?\s*Primary Diagnosis\s*\n+(.+?)(?:\n|$)", completion, re.IGNORECASE
-    )
-    if match:
-        diag = match.group(1).strip()
-        # Remove confidence annotation
-        diag = re.sub(r"\(Confidence:?\s*[\d.]+\)", "", diag).strip()
-        return diag
-    return None
+_TOOL_BLOCKS = re.compile(
+    r"<tool_call>.*?</tool_call>|<tool_response[^>]*>.*?</tool_response>",
+    re.DOTALL,
+)
 
 
-def extract_differential(completion: str) -> list[str]:
-    """Extract differential diagnoses from a completion."""
-    diffs = []
-    match = re.search(
-        r"###?\s*Differential\s*(?:Diagnos[ei]s)?\s*\n(.+?)(?=###|\Z)",
-        completion, re.IGNORECASE | re.DOTALL,
+def build_pseudo_trace(completion: str, case_id: str) -> AgentTrace:
+    """Assemble an :class:`AgentTrace` from a raw single-shot RL completion.
+
+    The trace carries exactly what ``MetricsCalculator`` / ``CompositeReward``
+    read: ``tools_called``, per-turn structured ``tool_calls`` (so
+    parameter-scoped useless/harmful classifications match), the final response
+    text (tool_call / tool_response blocks stripped, ``<think>`` kept — the
+    metrics strip it themselves), and the CostTracker total for the calls made.
+    """
+    from ...agent.reasoning import AgentTrace, AgentTurn
+    from ...tools.cost_tracker import CostTracker
+
+    calls = extract_tool_calls(completion)
+    tools_called = [c["tool_name"] for c in calls if c["tool_name"]]
+
+    turns = []
+    if calls:
+        turns.append(
+            AgentTurn(
+                turn_number=1,
+                role="assistant",
+                content=None,
+                tool_calls=[
+                    {"function": {"name": c["tool_name"], "arguments": c["parameters"]}}
+                    for c in calls
+                ],
+            )
+        )
+
+    # The assistant-authored narrative: everything that is not a tool block.
+    final_response = _TOOL_BLOCKS.sub("", completion).strip()
+
+    tracker = CostTracker()
+    for c in calls:
+        try:
+            tracker.compute_cost(c["tool_name"], c.get("parameters", {}))
+        except Exception:  # unknown tool name — costs nothing, format reward penalises it
+            continue
+
+    return AgentTrace(
+        case_id=case_id,
+        turns=turns,
+        final_response=final_response,
+        total_tool_calls=len(tools_called),
+        tools_called=tools_called,
+        total_cost_usd=tracker.total_cost_usd,
     )
-    if match:
-        for line in match.group(1).strip().split("\n"):
-            line = line.strip()
-            if line and line[0].isdigit():
-                # "1. Diagnosis - reason"
-                diag = re.sub(r"^\d+\.\s*", "", line)
-                diag = diag.split(" - ")[0].split(" — ")[0].strip()
-                if diag:
-                    diffs.append(diag)
-    return diffs
 
 
 class OnlineRewardFunction:
-    """Score model-generated completions using case data + composite reward.
+    """Score model-generated completions with the shared ``CompositeReward``.
 
     Used as ``reward_funcs`` in TRL's GRPOTrainer. For each generated
     completion, it:
-    1. Maps the prompt back to the NeuroBench case
-    2. Extracts tool calls and diagnosis from the completion
-    3. Computes a composite reward (correctness + cost + safety + format)
 
-    This enables the model to learn from its OWN generated trajectories,
-    not just pre-computed ones.
+    1. Reads the ``case_id`` kwarg TRL forwards from the dataset column.
+    2. Parses tool calls + final assessment into a pseudo ``AgentTrace``.
+    3. Delegates scoring to ``CompositeReward`` (→ ``MetricsCalculator``),
+       the exact scorer used by evaluation and gold-trajectory selection,
+       with weights from ``config/training/reward_weights.yaml``.
+
+    A missing case_id (no column, or an id with no loaded case) raises —
+    it is a data-plumbing bug, never a 0.0 reward.
     """
-
-    # Valid tool names for format checking
-    VALID_TOOLS = frozenset({
-        "analyze_eeg", "analyze_brain_mri", "analyze_ecg", "interpret_labs",
-        "analyze_csf", "search_medical_literature", "check_drug_interactions",
-        "order_ct_scan", "order_echocardiogram", "order_cardiac_monitoring",
-        "order_advanced_imaging", "order_specialized_test",
-    })
 
     # TRL GRPOTrainer expects reward_funcs to have __name__
     __name__ = "online_reward"
 
     def __init__(
         self,
-        cases: dict[str, Any],
-        cost_tracker: Any | None = None,
-        weights: dict[str, float] | None = None,
+        cases: dict[str, NeuroBenchCase],
+        composite: CompositeReward,
     ):
         """
         Args:
-            cases: Dict mapping prompt text (or prefix) → NeuroBenchCase data.
-                   Built by ``build_prompt_to_case_mapping()``.
-            cost_tracker: CostTracker instance for parameter-aware costs.
-            weights: Reward component weights. Defaults balance accuracy and cost.
+            cases: Mapping case_id → ``NeuroBenchCase`` (see ``load_cases_by_id``).
+            composite: The shared composite reward (build with
+                ``CompositeReward.from_config`` so the weights come from
+                ``config/training/reward_weights.yaml``).
         """
         self.cases = cases
-        self.cost_tracker = cost_tracker
-        self._logged_first = False
-        self.weights = weights or {
-            "correctness": 0.35,
-            "tool_precision": 0.15,
-            "tool_recall": 0.15,
-            "cost_efficiency": 0.15,
-            "format": 0.10,
-            "safety": 0.10,
-        }
+        self.composite = composite
 
     def __call__(
         self,
-        prompts: list[str] | None = None,
-        completions: list[str] | None = None,
+        prompts: list | None = None,
+        completions: list | None = None,
+        case_id: list[str] | None = None,
         **kwargs,
     ) -> list[float]:
         """Score a batch of completions. Compatible with TRL reward_funcs API."""
-        if prompts is None or completions is None:
-            logger.warning("Reward called with None prompts/completions")
-            return []
-
-        if not self._logged_first:
-            self._logged_first = True
-            p = prompts[0] if prompts else "NONE"
-            c = completions[0] if completions else "NONE"
-            logger.warning(
-                "REWARD FIRST CALL: prompt_type=%s prompt[:150]=%s... completion[:150]=%s...",
-                type(p).__name__,
-                str(p)[:150].replace('\n', ' '),
-                str(c)[:150].replace('\n', ' '),
+        if completions is None:
+            raise ValueError("online_reward called with completions=None")
+        if case_id is None:
+            raise ValueError(
+                "online_reward requires a 'case_id' dataset column. Each training "
+                "example must carry its NeuroBench case_id (format_for_grpo emits it; "
+                "TRL forwards extra dataset columns to reward functions as kwargs). "
+                "Refusing to score without it — prompt-prefix matching was removed."
+            )
+        if len(case_id) != len(completions):
+            raise ValueError(
+                f"case_id/completions length mismatch: {len(case_id)} vs {len(completions)}"
             )
 
+        # Dynamic weight scheduling, if configured: derive the epoch from TRL's
+        # trainer_state kwarg (1-based, matching reward_weights.yaml phases).
+        epoch = None
+        state = kwargs.get("trainer_state")
+        if state is not None and getattr(state, "epoch", None) is not None:
+            epoch = int(state.epoch) + 1
+
         rewards = []
-        for prompt, completion in zip(prompts, completions):
-            try:
-                # TRL v0.29 passes prompts/completions as message lists or strings
-                prompt_text = self._extract_text(prompt)
-                completion_text = self._extract_text(completion)
-                reward = self._score_one(prompt_text, completion_text)
-            except Exception as e:
-                logger.warning("Reward computation failed: %s", e)
-                reward = 0.0
-            rewards.append(reward)
+        for cid, completion in zip(case_id, completions):
+            case = self.cases.get(cid)
+            if case is None:
+                raise KeyError(
+                    f"No NeuroBench case loaded for case_id={cid!r}. The training "
+                    "dataset references a case the reward function cannot see — "
+                    "check the dataset directory passed to load_cases_by_id()."
+                )
+            trace = build_pseudo_trace(self._extract_text(completion), cid)
+            rewards.append(self.composite.compute(trace, case, epoch=epoch))
         return rewards
 
     @staticmethod
     def _extract_text(item: str | list | dict) -> str:
         """Extract plain text from TRL's prompt/completion format.
 
-        TRL v0.29 may pass:
+        TRL may pass:
         - str: plain text
-        - list[dict]: [{"role": "user", "content": "..."}, ...]
+        - list[dict]: [{"role": "assistant", "content": "..."}, ...]
         - dict: {"role": "assistant", "content": "..."}
         """
         if isinstance(item, str):
@@ -195,7 +219,6 @@ class OnlineRewardFunction:
         if isinstance(item, dict):
             return item.get("content", str(item))
         if isinstance(item, list):
-            # Concatenate all message contents
             parts = []
             for msg in item:
                 if isinstance(msg, dict):
@@ -205,175 +228,42 @@ class OnlineRewardFunction:
             return "\n".join(parts)
         return str(item)
 
-    def _score_one(self, prompt: str, completion: str) -> float:
-        """Score a single completion against its case ground truth."""
-        # Find the case for this prompt
-        case_data = self._lookup_case(prompt)
-        if case_data is None:
-            return 0.0
 
-        gt = case_data["ground_truth"]
-
-        # Extract model outputs
-        tool_calls = extract_tool_calls(completion)
-        stated_diagnosis = extract_diagnosis(completion)
-        stated_differential = extract_differential(completion)
-        tools_called = [tc["tool_name"] for tc in tool_calls]
-
-        # Ground truth references
-        gt_diagnosis = gt["primary_diagnosis"]
-        optimal_tools = {
-            a["tool_name"] for a in gt.get("optimal_actions", [])
-            if a.get("tool_name")
-        }
-        required_tools = {
-            a["tool_name"] for a in gt.get("optimal_actions", [])
-            if a.get("tool_name") and a.get("category") in ("required", "ActionCategory.REQUIRED")
-        }
-        contraindicated = gt.get("contraindicated_actions", [])
-
-        w = self.weights
-        score = 0.0
-
-        # 1. Correctness: Does the diagnosis match?
-        if stated_diagnosis:
-            gt_terms = {t.lower() for t in gt_diagnosis.split() if len(t) > 3}
-            stated_terms = {t.lower() for t in stated_diagnosis.split() if len(t) > 3}
-            overlap = gt_terms & stated_terms
-            if len(gt_terms) > 0:
-                match_ratio = len(overlap) / len(gt_terms)
-                if match_ratio >= 0.6:
-                    score += w["correctness"] * 1.0  # strong match
-                elif match_ratio >= 0.3:
-                    score += w["correctness"] * 0.5  # partial
-            # Bonus for differential containing correct diagnosis
-            for diff_diag in stated_differential[:3]:
-                diff_terms = {t.lower() for t in diff_diag.split() if len(t) > 3}
-                if len(gt_terms & diff_terms) / max(len(gt_terms), 1) >= 0.5:
-                    score += w["correctness"] * 0.1
-                    break
-
-        # 2. Tool precision: Did the model avoid unnecessary tools?
-        called_set = set(tools_called)
-        if called_set:
-            relevant = called_set & optimal_tools
-            precision = len(relevant) / len(called_set)
-            score += w["tool_precision"] * precision
-        else:
-            score += 0.0  # No tools called = 0 precision
-
-        # 3. Tool recall: Did the model call required tools?
-        if required_tools:
-            hit = called_set & required_tools
-            recall = len(hit) / len(required_tools)
-            score += w["tool_recall"] * recall
-
-        # 4. Cost efficiency
-        if self.cost_tracker and optimal_tools:
-            self.cost_tracker.reset()
-            actual_cost = 0.0
-            for tc in tool_calls:
-                entry = self.cost_tracker.compute_cost(tc["tool_name"], tc.get("parameters", {}))
-                actual_cost += entry.cost_usd
-
-            self.cost_tracker.reset()
-            optimal_cost = 0.0
-            for a in gt.get("optimal_actions", []):
-                if a.get("tool_name"):
-                    entry = self.cost_tracker.compute_cost(
-                        a["tool_name"], a.get("tool_parameters", {})
-                    )
-                    optimal_cost += entry.cost_usd
-
-            if optimal_cost > 0:
-                ratio = min(actual_cost / optimal_cost, 3.0)  # cap at 3x
-                efficiency = max(0.0, 1.0 - (ratio - 1.0))  # 1.0 at optimal, 0 at 2x
-                score += w["cost_efficiency"] * efficiency
-            elif actual_cost == 0:
-                score += w["cost_efficiency"]  # Both zero = perfect
-        else:
-            # Flat cost approximation
-            score += w["cost_efficiency"] * 0.5
-
-        # 5. Format: Proper structure?
-        has_diagnosis = "Primary Diagnosis" in completion
-        has_differential = "Differential" in completion
-        has_tool_calls = len(tool_calls) > 0
-        valid_tools = all(tc["tool_name"] in self.VALID_TOOLS for tc in tool_calls)
-
-        format_score = (
-            (0.3 if has_diagnosis else 0.0)
-            + (0.2 if has_differential else 0.0)
-            + (0.2 if has_tool_calls else 0.0)
-            + (0.3 if valid_tools else 0.0)
-        )
-        score += w["format"] * format_score
-
-        # 6. Safety: Check for contraindicated actions
-        safety = 1.0
-        completion_lower = completion.lower()
-        for contra in contraindicated:
-            # Check if the model recommended something contraindicated
-            contra_terms = [t.lower() for t in contra.split() if len(t) > 4]
-            # Only penalize if it appears in recommendations (not in "avoid" context)
-            if any(t in completion_lower for t in contra_terms[:3]):
-                # Check if it's in a warning/avoid context
-                if not any(neg in completion_lower for neg in ["do not", "avoid", "contraindicated", "should not"]):
-                    safety -= 0.3
-        safety = max(0.0, safety)
-        score += w["safety"] * safety
-
-        # Clamp to [-1, 1]
-        return max(-1.0, min(1.0, score))
-
-    def _lookup_case(self, prompt: str) -> dict[str, Any] | None:
-        """Find the NeuroBench case matching this prompt."""
-        # Try exact prefix match
-        prefix = prompt[:200]
-        if prefix in self.cases:
-            return self.cases[prefix]
-
-        # Try fuzzy match on patient demographics
-        for key, case_data in self.cases.items():
-            if key[:100] in prompt[:200] or prompt[:100] in key[:200]:
-                return case_data
-
-        logger.warning("Could not find case for prompt: %s...", prompt[:80])
-        return None
-
-
-def build_prompt_to_case_mapping(
+def load_cases_by_id(
     dataset_path: str | Path,
-    max_cases: int | None = None,
-) -> dict[str, dict[str, Any]]:
-    """Build a mapping from prompt text prefix → case data for reward lookup.
+    case_ids: set[str] | None = None,
+) -> dict[str, NeuroBenchCase]:
+    """Load NeuroBench cases keyed by case_id for explicit reward lookup.
 
-    This loads all NeuroBench cases and formats their patient info as prompts,
-    then stores the full case data (including ground truth) for reward computation.
+    Args:
+        dataset_path: Dataset root (containing ``cases/``).
+        case_ids: If given, load only these cases and raise if any is missing —
+            training must not start with silently unscorable examples.
     """
-    import json as _json
-    from pathlib import Path as _Path
+    from neuroagent_schemas import NeuroBenchCase
 
-    dataset_path = _Path(dataset_path)
-    cases_dir = dataset_path / "cases"
-    mapping: dict[str, dict[str, Any]] = {}
+    cases_dir = Path(dataset_path) / "cases"
+    if not cases_dir.exists():
+        raise FileNotFoundError(f"Cases directory not found: {cases_dir}")
 
-    case_files = sorted(cases_dir.glob("*.json"))
-    if max_cases:
-        case_files = case_files[:max_cases]
+    mapping: dict[str, NeuroBenchCase] = {}
+    if case_ids is not None:
+        missing = []
+        for cid in sorted(case_ids):
+            cf = cases_dir / f"{cid}.json"
+            if not cf.exists():
+                missing.append(cid)
+                continue
+            mapping[cid] = NeuroBenchCase.model_validate(json.loads(cf.read_text()))
+        if missing:
+            raise FileNotFoundError(
+                f"{len(missing)} case_id(s) in the training data have no case file "
+                f"under {cases_dir} (e.g. {missing[:3]})"
+            )
+    else:
+        for cf in sorted(cases_dir.glob("*.json")):
+            case = NeuroBenchCase.model_validate(json.loads(cf.read_text()))
+            mapping[case.case_id] = case
 
-    for cf in case_files:
-        case_data = _json.loads(cf.read_text())
-
-        # Build the prompt text that the model will see
-        p = case_data["patient"]
-        parts = [
-            f"Patient: {p['demographics']['age']}-year-old {p['demographics']['sex']}",
-            f"Chief complaint: {p['chief_complaint']}",
-        ]
-        prompt_text = "\n".join(parts)
-
-        # Store by prefix for lookup
-        mapping[prompt_text[:200]] = case_data
-
+    logger.info("Loaded %d cases for online reward lookup", len(mapping))
     return mapping

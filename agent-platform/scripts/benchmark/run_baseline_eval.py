@@ -286,7 +286,7 @@ def write_judge_bundle(
         ],
     }
     bundle_path.parent.mkdir(parents=True, exist_ok=True)
-    bundle_path.write_text(json.dumps(bundle, indent=2, default=str))
+    _atomic_write_text(bundle_path, json.dumps(bundle, indent=2, default=str))
 
 
 # ---------------------------------------------------------------------------
@@ -333,6 +333,15 @@ def summarize_model_run(model_dir: Path) -> dict:
 # Checkpointing
 # ---------------------------------------------------------------------------
 
+def _atomic_write_text(path: Path, text: str) -> None:
+    """Write via a same-directory temp file + os.replace, so a crash mid-write
+    (these runs take days, and EOS writes can stall) never leaves a truncated
+    or corrupt JSON behind."""
+    tmp = path.with_name(path.name + ".tmp")
+    tmp.write_text(text)
+    os.replace(tmp, path)
+
+
 def ckpt_key(case_id: str, rep: int) -> str:
     return f"{case_id}|rep{rep}"
 
@@ -345,7 +354,7 @@ def load_checkpoint(path: Path) -> tuple[set[str], dict[str, str]]:
 
 
 def save_checkpoint(path: Path, completed: set[str], errors: dict[str, str]) -> None:
-    path.write_text(json.dumps({
+    _atomic_write_text(path, json.dumps({
         "completed": sorted(completed),
         "errors": errors,
         "last_updated": time.strftime("%Y-%m-%dT%H:%M:%S"),
@@ -421,6 +430,25 @@ def main(
     else:
         models = list(MODELS)
 
+    # Sampling provenance: record what run_one_case will ACTUALLY use. run_one_case
+    # loads sampling params from config/runtime/agent.yaml via load_agent_config
+    # (overriding only base_url/model/max_tokens/hospital), so build the same
+    # config object here and read the values off it — never restate them as
+    # literals that drift from the YAML.
+    from neuroagent.agent.config import load_agent_config
+    sampling_probe = load_agent_config(
+        base_url=f"http://localhost:{port}/v1",
+        model="provenance-probe",
+        hospital=hospital,
+    )
+    sampling = {
+        "temperature": sampling_probe.temperature,
+        "top_p": sampling_probe.top_p,
+        "presence_penalty": sampling_probe.presence_penalty,
+        "sampling_seed": sampling_probe.seed,
+        "source": "config/runtime/agent.yaml (loaded, not hardcoded)",
+    }
+
     # Run-wide config — written once.
     cfg = {
         "started_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
@@ -433,15 +461,11 @@ def main(
         "mode": "react",
         "models": [m["serve_name"] for m in models],
         "model_ids": {m["serve_name"]: m["model_id"] for m in models},
-        "sampling": {
-            "temperature": 1.0,
-            "top_p": 0.95,
-            "presence_penalty": 1.5,
-        },
+        "sampling": sampling,
         "dataset": str(DATASET_DIR),
         "vllm_port": port,
     }
-    (out / "config.json").write_text(json.dumps(cfg, indent=2))
+    _atomic_write_text(out / "config.json", json.dumps(cfg, indent=2))
 
     total = len(models) * len(case_ids) * reps
     if max_cases_per_model:
@@ -480,16 +504,16 @@ def main(
                 summary_rows.append({"model": mkey, **summarize_model_run(mdir)})
                 continue
 
-            # Write per-model config
-            (mdir / "run_config.json").write_text(json.dumps({
+            # Write per-model config (sampling values from the loaded agent.yaml,
+            # identical to what run_one_case will use — see `sampling` above).
+            _atomic_write_text(mdir / "run_config.json", json.dumps({
                 "model_key": mkey,
                 "model_id": mdef["model_id"],
                 "max_tokens": mdef["max_tokens"],
                 "hospital": hospital,
                 "reps": reps,
-                "temperature": 1.0,
-                "top_p": 0.95,
-                "presence_penalty": 1.5,
+                **{k: v for k, v in sampling.items() if k != "source"},
+                "sampling_source": sampling["source"],
                 "started_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
             }, indent=2))
 
@@ -548,8 +572,8 @@ def main(
 
                     # Write trace + metrics together to keep one source of truth.
                     full = {**trace_dict, "metrics": metrics_dict}
-                    trace_path.write_text(json.dumps(full, indent=2, default=str))
-                    metric_path.write_text(json.dumps(metrics_dict, indent=2, default=str))
+                    _atomic_write_text(trace_path, json.dumps(full, indent=2, default=str))
+                    _atomic_write_text(metric_path, json.dumps(metrics_dict, indent=2, default=str))
                     write_judge_bundle(bundle_path, cases[cid], trace_dict, mkey, rep)
 
                     completed.add(key)
@@ -568,7 +592,7 @@ def main(
             summary["model"] = mkey
             summary["model_id"] = mdef["model_id"]
             summary["errors_count"] = len(errors)
-            (mdir / "summary.json").write_text(json.dumps(summary, indent=2))
+            _atomic_write_text(mdir / "summary.json", json.dumps(summary, indent=2))
             done_flag.write_text(time.strftime("%Y-%m-%dT%H:%M:%S") + "\n")
             console.print(f"[bold green]{mkey} done — wrote model_done.flag[/bold green]")
             summary_rows.append({"model": mkey, **summary})
@@ -582,7 +606,7 @@ def main(
         "completed_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
         "rows": summary_rows,
     }
-    (out / "summary.json").write_text(json.dumps(rollup, indent=2))
+    _atomic_write_text(out / "summary.json", json.dumps(rollup, indent=2))
 
     # Print table.
     table = Table(title="Baseline summary")

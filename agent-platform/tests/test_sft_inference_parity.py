@@ -15,6 +15,7 @@ tests render both with the real tokenizer and require them to agree.
 from __future__ import annotations
 
 import json
+import logging
 import os
 from pathlib import Path
 
@@ -26,10 +27,35 @@ from neuroagent.agent.orchestrator import AgentOrchestrator
 from neuroagent.llm.client import LLMResponse, LLMToolCall, extract_think_content
 from neuroagent.llm.prompts import apply_reasoning_style
 from neuroagent.training.chat_template import apply_training_chat_template
-from neuroagent.training.train_grpo import _agent_tool_definitions
+from neuroagent.training.train_grpo import _agent_tool_definitions, _log_sequence_stats
 
 MODEL = "Qwen/Qwen3.5-9B"
-TRAJECTORIES = Path(__file__).resolve().parents[2] / "training_data/gold_trajectories/trajectories.jsonl"
+REPO_ROOT = Path(__file__).resolve().parents[2]
+TRAJECTORIES = REPO_ROOT / "training_data/gold_trajectories/trajectories.jsonl"
+TRAIN_SPLIT = REPO_ROOT / "data/neurobench/splits/train_cases.txt"
+
+# Deterministic sample stride: checking only trajectories[0] once let a format bug
+# in trajectory 2..N ship; every 50th trajectory spreads the check across cases,
+# styles, and hospitals at negligible cost.
+SAMPLE_STRIDE = 50
+
+# KNOWN DATA DEFECT (found the moment this test stopped checking only
+# trajectories[0]): 7/1000 gold trajectories contain an assistant turn with TWO
+# <think> blocks. The serving stack merges all think blocks into one
+# (`extract_think_content` joins them; the orchestrator re-embeds a single
+# block), so those turns can never round-trip byte-identically — the student is
+# trained on 7 histories the served model cannot reproduce. Fix is regenerating
+# those teacher traces, which is dataset work, not test work. The round-trip
+# test exempts exactly the trajectories exhibiting this mechanism, and
+# `test_multi_think_defect_does_not_grow` pins the count so it can only shrink.
+KNOWN_MULTI_THINK_TRAJECTORIES = 7
+
+
+def _has_multi_think_turn(trajectory: dict) -> bool:
+    return any(
+        m["role"] == "assistant" and (m["content"] or "").count("<think>") > 1
+        for m in trajectory["messages"]
+    )
 
 
 def _tokenizer():
@@ -89,71 +115,154 @@ class TestReasoningSurvivesTheRoundTrip:
 @pytest.mark.skipif(not TRAJECTORIES.exists(), reason="gold trajectories not present")
 class TestTrainingPromptEqualsServingPrompt:
     @pytest.fixture(scope="class")
-    def trajectory(self) -> dict:
-        return json.loads(TRAJECTORIES.read_text().splitlines()[0])
+    def trajectories_sample(self) -> list[dict]:
+        """Every SAMPLE_STRIDE-th trajectory — a deterministic spread, not just [0]."""
+        lines = [l for l in TRAJECTORIES.read_text().splitlines() if l.strip()]
+        sample = [json.loads(lines[i]) for i in range(0, len(lines), SAMPLE_STRIDE)]
+        assert sample, "trajectories.jsonl is empty"
+        return sample
 
-    def test_training_renders_the_tool_schemas(self, trajectory):
+    def test_training_renders_the_tool_schemas(self, trajectories_sample):
         """Without the tools column the student never sees the functions it must call."""
         tok = _tokenizer()
         tools = _agent_tool_definitions()
 
-        without = tok.apply_chat_template(trajectory["messages"], tokenize=False)
-        with_tools = tok.apply_chat_template(trajectory["messages"], tokenize=False, tools=tools)
+        for trajectory in trajectories_sample:
+            without = tok.apply_chat_template(trajectory["messages"], tokenize=False)
+            with_tools = tok.apply_chat_template(
+                trajectory["messages"], tokenize=False, tools=tools
+            )
 
-        assert "# Tools" not in without
-        assert "# Tools" in with_tools
-        for name in ("analyze_brain_mri", "order_specialized_test", "check_drug_interactions"):
-            assert name in with_tools
+            assert "# Tools" not in without
+            assert "# Tools" in with_tools, trajectory["case_id"]
+            for name in ("analyze_brain_mri", "order_specialized_test", "check_drug_interactions"):
+                assert name in with_tools, trajectory["case_id"]
 
-    def test_serving_history_reproduces_the_training_text(self, trajectory):
-        """Replay the trajectory as the orchestrator would build it, and compare renderings."""
+    def test_serving_history_reproduces_the_training_text(self, trajectories_sample):
+        """Replay each trajectory as the orchestrator would build it, and compare renderings."""
         tok = _tokenizer()
         tools = _agent_tool_definitions()
 
-        served: list[dict] = []
-        for message in trajectory["messages"]:
-            if message["role"] != "assistant":
-                served.append(message)
+        for trajectory in trajectories_sample:
+            served: list[dict] = []
+            for message in trajectory["messages"]:
+                if message["role"] != "assistant":
+                    served.append(message)
+                    continue
+                # The client splits reasoning out of content; the orchestrator puts it back.
+                reasoning = extract_think_content(message["content"] or "")
+                response = LLMResponse(
+                    content=(message["content"] or "").split("</think>")[-1].lstrip(),
+                    reasoning=reasoning,
+                    tool_calls=[
+                        LLMToolCall(id=f"c{i}", name=c["function"]["name"], arguments=c["function"]["arguments"])
+                        for i, c in enumerate(message.get("tool_calls") or [])
+                    ],
+                )
+                served.append(
+                    AgentOrchestrator._format_assistant_message(None, response, response.tool_calls)
+                )
+
+            training_text = tok.apply_chat_template(trajectory["messages"], tokenize=False, tools=tools)
+            serving_text = tok.apply_chat_template(_vllm_normalize(served), tokenize=False, tools=tools)
+
+            assert "<think>\n\n</think>" not in serving_text, (
+                f"{trajectory['case_id']}: reasoning was dropped from history"
+            )
+            if _has_multi_think_turn(trajectory):
+                # Known data defect (see KNOWN_MULTI_THINK_TRAJECTORIES): a turn
+                # with two <think> blocks is merged into one at serving, so byte
+                # parity is impossible until those traces are regenerated.
                 continue
-            # The client splits reasoning out of content; the orchestrator puts it back.
-            reasoning = extract_think_content(message["content"] or "")
-            response = LLMResponse(
-                content=(message["content"] or "").split("</think>")[-1].lstrip(),
-                reasoning=reasoning,
-                tool_calls=[
-                    LLMToolCall(id=f"c{i}", name=c["function"]["name"], arguments=c["function"]["arguments"])
-                    for i, c in enumerate(message.get("tool_calls") or [])
-                ],
-            )
-            served.append(
-                AgentOrchestrator._format_assistant_message(None, response, response.tool_calls)
-            )
+            assert serving_text == training_text, trajectory["case_id"]
 
-        training_text = tok.apply_chat_template(trajectory["messages"], tokenize=False, tools=tools)
-        serving_text = tok.apply_chat_template(_vllm_normalize(served), tokenize=False, tools=tools)
+    def test_multi_think_defect_does_not_grow(self):
+        """The multi-<think> data defect is pinned: it may shrink (regenerated
+        traces), never grow — a new multi-think trajectory is a new parity bug."""
+        lines = [l for l in TRAJECTORIES.read_text().splitlines() if l.strip()]
+        offenders = [
+            (t["case_id"], t["style"])
+            for t in map(json.loads, lines)
+            if _has_multi_think_turn(t)
+        ]
+        assert len(offenders) <= KNOWN_MULTI_THINK_TRAJECTORIES, offenders
 
-        assert "<think>\n\n</think>" not in serving_text, "reasoning was dropped from history"
-        assert serving_text == training_text
-
-    def test_assistant_only_mask_covers_reasoning_and_excludes_observations(self, trajectory):
+    def test_assistant_only_mask_covers_reasoning_and_excludes_observations(
+        self, trajectories_sample
+    ):
         tok = _tokenizer()
         apply_training_chat_template(tok)
-        encoded = tok.apply_chat_template(
-            trajectory["messages"],
-            tools=_agent_tool_definitions(),
-            tokenize=True,
-            return_dict=True,
-            return_assistant_tokens_mask=True,
-        )
-        mask, ids = encoded["assistant_masks"], encoded["input_ids"]
-        assert sum(mask) > 0, "assistant_only_loss would train on nothing"
+        tools = _agent_tool_definitions()
 
-        in_loss = tok.decode([t for t, m in zip(ids, mask) if m])
-        assert "<think>" in in_loss, "the student is not trained on its own reasoning"
+        for trajectory in trajectories_sample:
+            encoded = tok.apply_chat_template(
+                trajectory["messages"],
+                tools=tools,
+                tokenize=True,
+                return_dict=True,
+                return_assistant_tokens_mask=True,
+            )
+            mask, ids = encoded["assistant_masks"], encoded["input_ids"]
+            assert sum(mask) > 0, (
+                f"{trajectory['case_id']}: assistant_only_loss would train on nothing"
+            )
 
-        observation = next(m["content"] for m in trajectory["messages"] if m["role"] == "tool")
-        distinctive = observation.strip().splitlines()[3].strip()[:24]
-        assert distinctive and distinctive not in in_loss, "loss lands on a tool observation"
+            in_loss = tok.decode([t for t, m in zip(ids, mask) if m])
+            assert "<think>" in in_loss, (
+                f"{trajectory['case_id']}: the student is not trained on its own reasoning"
+            )
+
+            observation = next(
+                m["content"] for m in trajectory["messages"] if m["role"] == "tool"
+            )
+            obs_lines = [l.strip() for l in observation.strip().splitlines() if l.strip()]
+            distinctive = obs_lines[min(3, len(obs_lines) - 1)][:24]
+            assert distinctive and distinctive not in in_loss, (
+                f"{trajectory['case_id']}: loss lands on a tool observation"
+            )
+
+    def test_truncation_boundary_cuts_the_final_assistant_segment_loudly(
+        self, trajectories_sample, caplog
+    ):
+        """A sequence over max_seq_length loses its TAIL — the final diagnosis.
+
+        Verifies both halves of the contract: (a) the tokens beyond the boundary
+        really are the final assistant segment (so silent truncation would cut
+        the answer, not padding), and (b) `_log_sequence_stats` reports the cut
+        loudly before training, and stays quiet when everything fits.
+        """
+        tok = _tokenizer()
+        tools = _agent_tool_definitions()
+        trajectory = trajectories_sample[0]
+
+        text = tok.apply_chat_template(trajectory["messages"], tokenize=False, tools=tools)
+        ids = tok(text, add_special_tokens=False).input_ids
+        n_tokens = len(ids)
+
+        # (a) The tail of the token stream is final-assistant content: truncating
+        # just below the full length must eat into the last assistant message.
+        tail_text = tok.decode(ids[-40:])
+        final_assistant = trajectory["messages"][-1]["content"]
+        assert any(
+            chunk and chunk in final_assistant
+            for chunk in (tail_text[i:i + 12] for i in range(0, len(tail_text) - 12, 6))
+        ), "the sequence tail is not the final assistant segment"
+
+        rows = [{"messages": trajectory["messages"], "tools": tools}]
+        logger_name = "neuroagent.training.train_grpo"
+
+        # (b) One token short of the full length → the cut is reported loudly.
+        with caplog.at_level(logging.INFO, logger=logger_name):
+            _log_sequence_stats(rows, tok, max_seq_length=n_tokens - 1, tools=tools)
+        assert any(
+            "WILL BE TRUNCATED" in r.getMessage() for r in caplog.records
+        ), "an over-length trajectory was not reported"
+
+        caplog.clear()
+        with caplog.at_level(logging.INFO, logger=logger_name):
+            _log_sequence_stats(rows, tok, max_seq_length=n_tokens, tools=tools)
+        assert not any("WILL BE TRUNCATED" in r.getMessage() for r in caplog.records)
+        assert any("No truncation" in r.getMessage() for r in caplog.records)
 
 
 @pytest.mark.skipif(not TRAJECTORIES.exists(), reason="gold trajectories not present")
@@ -187,8 +296,13 @@ class TestReasoningStyleParity:
             by_case[t["case_id"]][t["style"]] = t["messages"][0]["content"]
         return {c: s for c, s in by_case.items() if len(s) == 2}
 
+    @pytest.mark.skipif(not TRAIN_SPLIT.exists(), reason="train split file not present")
     def test_every_case_has_both_styles(self, style_pairs):
-        assert len(style_pairs) == 500
+        """Both styles exist for every TRAIN-split case — size derived from the
+        split file, not hardcoded, so a regenerated/expanded split keeps this honest."""
+        train_ids = {c for c in TRAIN_SPLIT.read_text().split() if c}
+        assert len(style_pairs) == len(train_ids)
+        assert set(style_pairs) == train_ids
 
     def test_directive_present_exactly_for_differential(self, trajectories):
         """The directive marks differential trajectories and only those."""

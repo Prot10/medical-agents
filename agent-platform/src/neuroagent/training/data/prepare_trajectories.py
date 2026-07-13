@@ -18,7 +18,7 @@ import logging
 import sys
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from neuroagent_schemas import NeuroBenchCase
 
@@ -28,6 +28,9 @@ from ...evaluation.runner import format_patient_info
 from ...tools.mock_server import MockServer
 from ...tools.tool_registry import ToolRegistry
 from ..rewards.composite_reward import CompositeReward, RewardBreakdown
+
+if TYPE_CHECKING:
+    from ...agent.config import AgentConfig
 
 logger = logging.getLogger(__name__)
 

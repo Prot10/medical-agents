@@ -117,18 +117,26 @@ def build_dpo_pairs(
     return pairs
 
 
-def _trace_to_messages(trace: dict[str, Any], compact: bool = True) -> str:
-    """Convert an AgentTrace dict to a completion string for DPO.
+def _trace_to_messages(trace: dict[str, Any]) -> str:
+    """Convert an AgentTrace dict into the ASSISTANT-AUTHORED completion for DPO.
 
-    The completion concatenates the model's reasoning, tool call decisions,
-    and final assessment. Tool responses (from MockServer, not model-generated)
-    are aggressively truncated in compact mode to maximize the token budget
-    for the model's own output (reasoning + diagnosis).
+    Format of the emitted completion (concatenated with blank lines, in trace
+    order):
 
-    Args:
-        trace: AgentTrace.model_dump() dict.
-        compact: If True, truncate tool responses to save tokens for
-            model-generated content (reasoning, tool choices, assessment).
+        <think>…reasoning…</think> / prose        (assistant turn content)
+        <tool_call>{"name": …, "arguments": …}</tool_call>   (per tool decision)
+        …
+        final assessment text                     (last assistant turn)
+
+    Tool OBSERVATIONS (MockServer outputs) are deliberately EXCLUDED. DPO's
+    loss covers every completion token of both `chosen` and `rejected`, so any
+    observation text placed in the completion trains the policy to *generate*
+    environment output instead of reading it. They also cannot be moved into
+    the shared prompt: the chosen and rejected trajectories diverge after their
+    first differing action, so their observations differ, while a DPO pair must
+    condition both completions on the same prompt (the patient presentation).
+    The preference signal therefore lives entirely in what the model itself
+    authored — reasoning, tool-call decisions, and the final assessment.
     """
     turns = trace.get("turns", [])
     if not turns:
@@ -140,36 +148,26 @@ def _trace_to_messages(trace: dict[str, Any], compact: bool = True) -> str:
         role = turn.get("role", "")
         content = turn.get("content", "") or ""
         tool_calls = turn.get("tool_calls", []) or []
-        tool_results = turn.get("tool_results", []) or []
 
         if role == "assistant":
             if content:
                 completion_parts.append(content)
             for tc in tool_calls:
-                name = tc.get("name", "unknown")
-                args = json.dumps(tc.get("arguments", {}))
+                func = tc.get("function", tc)
+                name = func.get("name", "unknown")
+                args = func.get("arguments", {})
+                if isinstance(args, str):
+                    try:
+                        args = json.loads(args) if args.strip() else {}
+                    except json.JSONDecodeError:
+                        args = {}
                 completion_parts.append(
-                    f"<tool_call>\n{{\"name\": \"{name}\", \"arguments\": {args}}}\n</tool_call>"
+                    "<tool_call>\n"
+                    + json.dumps({"name": name, "arguments": args})
+                    + "\n</tool_call>"
                 )
-        elif role == "tool":
-            for tr in tool_results:
-                tool_name = tr.get("tool_name", "")
-                output = tr.get("output", "")
-                if isinstance(output, dict):
-                    output = json.dumps(output)
-                if output:
-                    # In compact mode, heavily truncate tool responses.
-                    # These are MockServer outputs, not model-generated.
-                    # The model's DECISIONS (which tool, what params) are
-                    # what DPO needs to learn from; the full response content
-                    # is less important for preference learning.
-                    max_chars = 200 if compact else 2000
-                    truncated = str(output)[:max_chars]
-                    if len(str(output)) > max_chars:
-                        truncated += "... [truncated]"
-                    completion_parts.append(
-                        f"<tool_response name=\"{tool_name}\">\n{truncated}\n</tool_response>"
-                    )
+        # role == "tool": environment-generated observation — never part of the
+        # trained completion (see docstring).
 
     return "\n\n".join(completion_parts) if completion_parts else ""
 
@@ -189,6 +187,7 @@ def run_dpo_training(
     bf16: bool = True,
     qlora: bool = False,
     use_rslora: bool = True,
+    seed: int = 42,
 ) -> None:
     """Train with DPO on preference pairs.
 
@@ -275,6 +274,7 @@ def run_dpo_training(
         learning_rate=learning_rate,
         beta=beta,
         max_length=max_length,
+        seed=seed,
         bf16=bf16,
         logging_steps=10,
         save_steps=50,
@@ -296,10 +296,25 @@ def run_dpo_training(
         peft_config=peft_config,
     )
 
-    logger.info("Starting DPO training for %d epochs (beta=%.2f)", epochs, beta)
-    trainer.train()
+    logger.info("Starting DPO training for %d epochs (beta=%.2f, seed=%d)", epochs, beta, seed)
+    result = trainer.train()
     trainer.save_model(output_dir)
     tokenizer.save_pretrained(output_dir)
+
+    from .train_grpo import _save_rl_run_summary
+    _save_rl_run_summary(
+        output_dir, trainer, result, training_args, model_name,
+        n_train=len(dataset), algorithm="dpo", data_path=pairs_path, seed=seed,
+        extra_hyperparameters={
+            "beta": beta,
+            "max_length": max_length,
+            "lora_rank": lora_rank,
+            "lora_alpha": lora_alpha,
+            "use_rslora": use_rslora,
+            "qlora": qlora,
+            "precompute_ref_log_probs": True,
+        },
+    )
     logger.info("DPO model saved to %s", output_dir)
 
 
@@ -340,6 +355,7 @@ def main() -> None:
     train_parser.add_argument("--qlora", action="store_true")
     train_parser.add_argument("--bf16", action="store_true", default=True)
     train_parser.add_argument("--no-rslora", action="store_true", help="Disable rsLoRA (use standard alpha/r scaling)")
+    train_parser.add_argument("--seed", type=int, default=42)
 
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -402,6 +418,7 @@ def main() -> None:
             bf16=args.bf16,
             qlora=args.qlora,
             use_rslora=not args.no_rslora,
+            seed=args.seed,
         )
 
 

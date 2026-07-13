@@ -17,7 +17,7 @@ import json
 import logging
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from neuroagent_schemas import NeuroBenchCase
 
@@ -26,6 +26,9 @@ from ..evaluation.metrics import MetricsCalculator
 from ..evaluation.runner import CaseResult, EvaluationRunner
 from .rewards.composite_reward import CompositeReward
 from .rewards.cost_reward import CostReward
+
+if TYPE_CHECKING:
+    from ..agent.config import AgentConfig
 
 logger = logging.getLogger(__name__)
 

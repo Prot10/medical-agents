@@ -20,12 +20,13 @@ from __future__ import annotations
 import json
 import logging
 import math
+import os
 import sys
 import time
 from collections import defaultdict
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import typer
 from rich.console import Console
@@ -55,9 +56,20 @@ from neuroagent.rules.rules_engine import RulesEngine
 from neuroagent.tools.mock_server import MockServer
 from neuroagent.tools.tool_registry import ToolRegistry
 
+if TYPE_CHECKING:
+    from neuroagent.agent.config import AgentConfig
+
 app = typer.Typer()
 console = Console()
 logger = logging.getLogger("sft_eval")
+
+
+def _atomic_write_text(path: Path, text: str) -> None:
+    """Write via a same-directory temp file + os.replace, so a crash mid-write
+    (these runs take hours) never leaves a truncated/corrupt JSON behind."""
+    tmp = path.with_name(path.name + ".tmp")
+    tmp.write_text(text)
+    os.replace(tmp, path)
 
 DATASET_PATH = REPO_ROOT / "data" / "neurobench"
 SPLITS_DIR = DATASET_PATH / "splits"
@@ -323,7 +335,7 @@ def evaluate(
                                 "messages": trace.messages,
                             }, default=str) + "\n")
 
-                    checkpoint_file.write_text(json.dumps({
+                    _atomic_write_text(checkpoint_file, json.dumps({
                         "completed": sorted(completed),
                         "results": [asdict(r) for r in all_results],
                     }, default=str))
@@ -343,7 +355,7 @@ def evaluate(
     # Save final results
     out_path = Path(output)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(json.dumps({
+    _atomic_write_text(out_path, json.dumps({
         "run_name": run_name,
         "model_id": model_id,
         "hospital": hospital,
@@ -443,7 +455,14 @@ def compare(
                 f"({'[green]SFT more consistent[/]' if r['sft_sd'] < r['base_sd'] else 'base more consistent'})"
             )
 
-    # Per-difficulty breakdown
+    # Per-difficulty breakdown — DESCRIPTIVE ONLY. These subgroup deltas carry no
+    # significance test (the paired stats above cover the overall top-1 delta only)
+    # and the per-group n is far too small to support a claim. Never cite them as
+    # findings.
+    console.print(
+        "\n[bold]Per-difficulty Top-1 Accuracy[/bold] "
+        "[dim](descriptive, no significance test — do not cite as findings)[/dim]"
+    )
     for diff in ["straightforward", "moderate", "diagnostic_puzzle"]:
         base_diff = [r for r in base_data if r["difficulty"] == diff]
         sft_diff = [r for r in sft_data if r["difficulty"] == diff]
@@ -452,13 +471,23 @@ def compare(
             sa = sum(1 for r in sft_diff if r["diagnostic_accuracy_top1"]) / len(sft_diff)
             delta = sa - ba
             color = "green" if delta > 0 else ("red" if delta < 0 else "white")
-            console.print(f"  {diff:20s}  base={ba:.0%}  sft={sa:.0%}  [{color}]Δ={delta:+.0%}[/]")
+            console.print(
+                f"  {diff:20s}  base={ba:.0%}  sft={sa:.0%}  [{color}]Δ={delta:+.0%}[/]  "
+                f"[dim](descriptive, no significance test; n={len(base_diff)} results/arm)[/dim]"
+            )
 
-    # Per-condition breakdown
-    console.print("\n[bold]Per-condition Top-1 Accuracy:[/bold]")
+    # Per-condition breakdown — DESCRIPTIVE ONLY, same caveat as above.
+    console.print(
+        "\n[bold]Per-condition Top-1 Accuracy[/bold] "
+        "[dim](descriptive, no significance test; small n per condition — do not cite as findings)[/dim]"
+    )
     conditions = sorted(set(r["condition"] for r in base_data))
-    table2 = Table(show_lines=True)
+    table2 = Table(
+        show_lines=True,
+        caption="Descriptive only — no per-condition significance test; do not cite as findings.",
+    )
     table2.add_column("Condition", style="bold")
+    table2.add_column("n/arm", justify="right")
     table2.add_column("Base", justify="right")
     table2.add_column("SFT", justify="right")
     table2.add_column("Δ", justify="right")
@@ -471,7 +500,8 @@ def compare(
             sa = sum(1 for r in sc if r["diagnostic_accuracy_top1"]) / len(sc)
             delta = sa - ba
             color = "green" if delta > 0 else ("red" if delta < 0 else "")
-            table2.add_row(cond, f"{ba:.0%}", f"{sa:.0%}", f"[{color}]{delta:+.0%}[/]" if color else f"{delta:+.0%}")
+            table2.add_row(cond, str(len(bc)), f"{ba:.0%}", f"{sa:.0%}",
+                           f"[{color}]{delta:+.0%}[/]" if color else f"{delta:+.0%}")
 
     console.print(table2)
 

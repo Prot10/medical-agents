@@ -193,6 +193,9 @@ def format_full_trajectory(
             "prompt": system_prompt,  # System prompt — patient info is in trace
             "completions": completions,
             "rewards": rewards,
+            # Provenance marker: these rewards came from CompositeReward scoring
+            # (prepare_trajectories.py), so they are safe to train on offline.
+            "reward_source": "composite",
         })
 
     logger.info(
@@ -227,6 +230,7 @@ def format_per_step(
                 "prompt": step["prompt"],
                 "completion": step["completion"],
                 "reward": trajectory_reward,
+                "reward_source": "composite",
             })
 
     logger.info("Formatted %d per-step examples from %d trajectories",
@@ -277,7 +281,11 @@ def format_from_gold_trajectories(
                     parts.append(f"<tool_response>\n{m['content']}\n</tool_response>")
             completions.append("\n\n".join(parts))
 
-        # Assign rewards based on trajectory style (will be overridden by online reward)
+        # Style-keyword PLACEHOLDER rewards. These carry no clinical signal — they
+        # exist only so the file schema is complete before the online reward
+        # (CompositeReward via case_id lookup) rescoring replaces them at train
+        # time. `reward_source` marks them so the trainers refuse to optimise
+        # against them unless --allow-placeholder-rewards is passed explicitly.
         rewards = []
         for traj in trajs:
             style = traj.get("trajectory_style", "")
@@ -295,6 +303,7 @@ def format_from_gold_trajectories(
             "prompt": user_msg,
             "completions": completions,
             "rewards": rewards,
+            "reward_source": "style_placeholder",
         })
 
     logger.info("Formatted %d GRPO prompt groups from %d gold trajectories", len(dataset), len(trajectories))
@@ -322,16 +331,20 @@ def save_dataset(dataset: list[dict[str, Any]], output_dir: str | Path) -> None:
         import pyarrow as pa
         import pyarrow.parquet as pq
 
-        # For parquet, flatten completions/rewards lists into separate rows
+        # For parquet, flatten completions/rewards lists into separate rows.
+        # `completion_index` keeps the (case_id, index) key stable so offline
+        # reward lookup never has to match on completion-text prefixes.
         flat = []
         for item in dataset:
             if "completions" in item:
-                for comp, rew in zip(item["completions"], item["rewards"]):
+                for idx, (comp, rew) in enumerate(zip(item["completions"], item["rewards"])):
                     flat.append({
                         "case_id": item["case_id"],
+                        "completion_index": idx,
                         "prompt": item["prompt"],
                         "completion": comp,
                         "reward": rew,
+                        "reward_source": item.get("reward_source", "unknown"),
                     })
             else:
                 flat.append(item)

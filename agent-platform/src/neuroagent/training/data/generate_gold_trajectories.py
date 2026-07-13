@@ -231,12 +231,55 @@ def get_available_tool_outputs(case: NeuroBenchCase) -> tuple[list[str], list[st
     return initial, followup
 
 
+def _match_keyed_output(
+    stored: dict[str, Any],
+    argument: str,
+    tool_name: str,
+    case_id: str,
+) -> dict[str, Any]:
+    """Pick the stored result whose key matches the call's argument.
+
+    `search_medical_literature` results are keyed by query and
+    `check_drug_interactions` by drug. With a single stored result there is
+    nothing to disambiguate. With several, match the argument against the keys
+    (exact case-insensitive, then substring either way); if nothing matches,
+    fall back to the first stored result — the historical behaviour — with a
+    debug log so mismatched observations are traceable.
+    """
+    def _dump(value: Any) -> dict[str, Any]:
+        return value.model_dump() if hasattr(value, "model_dump") else value
+
+    keys = list(stored)
+    if len(keys) == 1 or not argument:
+        return _dump(stored[keys[0]])
+
+    arg_norm = argument.strip().lower()
+    for key in keys:
+        if key.strip().lower() == arg_norm:
+            return _dump(stored[key])
+    for key in keys:
+        key_norm = key.strip().lower()
+        if key_norm and (key_norm in arg_norm or arg_norm in key_norm):
+            return _dump(stored[key])
+
+    logger.debug(
+        "%s: %s argument %r matches none of the stored keys %s — falling back to first",
+        case_id, tool_name, argument, keys,
+    )
+    return _dump(stored[keys[0]])
+
+
 def get_tool_output_for_call(
     case: NeuroBenchCase,
     tool_name: str,
     parameters: dict[str, Any],
 ) -> dict[str, Any] | None:
-    """Look up the pre-generated tool output for a given tool call."""
+    """Look up the pre-generated tool output for a given tool call.
+
+    For the dict-keyed tools (`search_medical_literature`, keyed by query;
+    `check_drug_interactions`, keyed by drug), the call's argument selects
+    among multiple stored results; see `_match_keyed_output`.
+    """
     ito = case.initial_tool_outputs
     tool_to_field = {
         "analyze_eeg": "eeg",
@@ -260,21 +303,19 @@ def get_tool_output_for_call(
                 return val.model_dump()
             return val
 
-    # Check literature_search and drug_interactions (dict-based)
+    # Check literature_search and drug_interactions (dict-based, keyed by the
+    # query/drug the case stored). When a case stores multiple results, match the
+    # call's argument to the right key; fall back to the first stored result (the
+    # historical behaviour) with a debug log when nothing matches.
     if tool_name == "search_medical_literature" and ito.literature_search:
-        query = parameters.get("query", "")
-        # Return first match or first available
-        for key, result in ito.literature_search.items():
-            if hasattr(result, "model_dump"):
-                return result.model_dump()
-            return result
+        return _match_keyed_output(
+            ito.literature_search, parameters.get("query", ""), tool_name, case.case_id
+        )
 
     if tool_name == "check_drug_interactions" and ito.drug_interactions:
-        drug = parameters.get("drug", "")
-        for key, result in ito.drug_interactions.items():
-            if hasattr(result, "model_dump"):
-                return result.model_dump()
-            return result
+        return _match_keyed_output(
+            ito.drug_interactions, parameters.get("drug", ""), tool_name, case.case_id
+        )
 
     # Check followup outputs
     for fo in case.followup_outputs:
@@ -693,9 +734,11 @@ def build_subagent_prompt(
     return prompt
 
 
-def _tool_output_text(case: NeuroBenchCase, tool_name: str) -> str | None:
+def _tool_output_text(
+    case: NeuroBenchCase, tool_name: str, parameters: dict[str, Any] | None = None
+) -> str | None:
     """The compressed case output for a tool, as the MockServer would return it."""
-    actual = get_tool_output_for_call(case, tool_name, {})
+    actual = get_tool_output_for_call(case, tool_name, parameters or {})
     if actual is None:
         return None
     compressed = compress_tool_output(actual, tool_name)
@@ -747,6 +790,7 @@ def parse_trajectory_from_response(
     ]
 
     tools_called: list[str] = []
+    call_arguments: list[dict[str, Any]] = []  # parallel to tools_called
     pending_text: list[str] = []
     pending_tool_calls: list[dict[str, Any]] = []
 
@@ -776,7 +820,7 @@ def parse_trajectory_from_response(
                 continue
             flush_assistant()
             last_tool = tools_called[-1]
-            output = _tool_output_text(case, last_tool)
+            output = _tool_output_text(case, last_tool, call_arguments[-1])
             if output is None:
                 logger.warning("%s: no case output for tool %s", case.case_id, last_tool)
                 output = resp_match.group(1).strip()
@@ -797,6 +841,7 @@ def parse_trajectory_from_response(
                 logger.warning("%s: tool call arguments not an object", case.case_id)
                 return None
             tools_called.append(name)
+            call_arguments.append(arguments)
             pending_tool_calls.append(
                 {"type": "function", "function": {"name": name, "arguments": arguments}}
             )

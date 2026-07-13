@@ -566,25 +566,152 @@ def run_sft(
 # Stage 2: GRPO with TRL
 # ---------------------------------------------------------------------------
 
-def _build_reward_fn(
+def _require_case_ids(raw_data: list[dict]) -> None:
+    """Every training example must carry an explicit case_id (no prompt matching)."""
+    missing = [i for i, ex in enumerate(raw_data) if not ex.get("case_id")]
+    if missing:
+        raise ValueError(
+            f"{len(missing)} training example(s) have no 'case_id' (first at index "
+            f"{missing[0]}). Rewards are looked up by explicit case_id — regenerate "
+            "the dataset with format_for_grpo, which emits a case_id column."
+        )
+
+
+def _build_online_reward_fn(
+    raw_data: list[dict],
+    dataset_dir: Path,
     reward_config: str,
     tool_costs_config: str,
     rules_dir: str,
     hospital: str,
 ):
-    """Build the reward function for GRPO training.
+    """Online reward: score generated completions with the shared CompositeReward.
 
-    Returns a callable compatible with TRL GRPOTrainer.reward_funcs.
+    Same scorer (CompositeReward → MetricsCalculator) and same weights file
+    (config/training/reward_weights.yaml) that evaluation and gold-trajectory
+    selection use. Case lookup is by the case_id dataset column, which TRL
+    forwards to the reward function as a kwarg.
     """
     from .rewards.composite_reward import CompositeReward
+    from .rewards.online_reward import OnlineRewardFunction, load_cases_by_id
 
-    reward = CompositeReward.from_config(
+    composite = CompositeReward.from_config(
         reward_config_path=reward_config,
         tool_costs_path=tool_costs_config,
         rules_dir=rules_dir,
         hospital=hospital,
     )
-    return reward
+    cases = load_cases_by_id(
+        dataset_dir, case_ids={ex["case_id"] for ex in raw_data}
+    )
+    return OnlineRewardFunction(cases=cases, composite=composite)
+
+
+def _build_offline_reward_fn(raw_data: list[dict], allow_placeholder_rewards: bool):
+    """Offline pre-computed rewards, keyed by (case_id, completion text) — never by prefix.
+
+    This path exists only for replay-style debugging: pre-computed rewards cannot
+    score the NEW completions an on-policy trainer generates. Worse, gold-mode
+    datasets carry style-keyword PLACEHOLDER rewards (reward_source ==
+    "style_placeholder") that encode no clinical signal at all. So this is a hard
+    error unless --allow-placeholder-rewards is passed explicitly.
+    """
+    if not allow_placeholder_rewards:
+        raise RuntimeError(
+            "NeuroBench cases directory not found, so the online CompositeReward "
+            "cannot run — and the dataset's pre-computed rewards may be style-keyword "
+            "placeholders (format_for_grpo gold mode) that must never be optimised "
+            "against. Point NEUROAGENT_DATASET at the dataset, or pass "
+            "--allow-placeholder-rewards to proceed anyway (debugging only)."
+        )
+
+    sources = {ex.get("reward_source", "unknown") for ex in raw_data}
+    if "style_placeholder" in sources:
+        logger.warning(
+            "Training on STYLE-PLACEHOLDER rewards (--allow-placeholder-rewards). "
+            "These encode no clinical signal — do not report results from this run."
+        )
+
+    reward_data: dict[tuple[str, str], float] = {}
+    for ex in raw_data:
+        cid = ex["case_id"]
+        if "completions" in ex and "rewards" in ex:
+            for comp, rew in zip(ex["completions"], ex["rewards"]):
+                if isinstance(comp, str):
+                    reward_data[(cid, comp)] = rew
+        elif "completion" in ex and "reward" in ex:
+            reward_data[(cid, ex["completion"])] = ex["reward"]
+
+    def offline_reward(prompts=None, completions=None, case_id=None, **kwargs) -> list[float]:
+        if case_id is None:
+            raise ValueError(
+                "offline reward requires the 'case_id' dataset column (TRL forwards "
+                "extra dataset columns to reward functions as kwargs)."
+            )
+        rewards = []
+        for cid, comp in zip(case_id, completions):
+            if not isinstance(comp, str):
+                comp = "\n".join(
+                    m.get("content", "") for m in comp if isinstance(m, dict)
+                )
+            key = (cid, comp)
+            if key not in reward_data:
+                raise KeyError(
+                    f"No pre-computed reward for case {cid!r} and this completion — "
+                    "offline rewards cannot score newly generated completions. Use "
+                    "the online reward (NEUROAGENT_DATASET pointing at the cases dir)."
+                )
+            rewards.append(reward_data[key])
+        return rewards
+
+    offline_reward.__name__ = "offline_precomputed_reward"
+    return offline_reward
+
+
+def _save_rl_run_summary(
+    output_dir: str,
+    trainer,
+    result,
+    args,
+    model_name: str,
+    n_train: int,
+    algorithm: str,
+    data_path: str,
+    seed: int,
+    extra_hyperparameters: dict[str, Any] | None = None,
+) -> None:
+    """RL twin of `_save_run_summary`: persist the recipe beside the checkpoint.
+
+    A checkpoint whose recipe you cannot reconstruct is not a result. Records the
+    shared TrainingArguments plus the algorithm-specific knobs (beta/clip/etc.)
+    and the full loss curve.
+    """
+    summary = {
+        "algorithm": algorithm,
+        "model": model_name,
+        "dataset_path": str(data_path),
+        "n_train_examples": n_train,
+        "hyperparameters": {
+            "learning_rate": args.learning_rate,
+            "epochs": args.num_train_epochs,
+            "per_device_train_batch_size": args.per_device_train_batch_size,
+            "gradient_accumulation_steps": args.gradient_accumulation_steps,
+            "effective_batch_size": (
+                args.per_device_train_batch_size * args.gradient_accumulation_steps
+            ),
+            "seed": seed,
+            "bf16": getattr(args, "bf16", None),
+            "gradient_checkpointing": getattr(args, "gradient_checkpointing", None),
+            **(extra_hyperparameters or {}),
+        },
+        "train_runtime_s": result.metrics.get("train_runtime") if result is not None else None,
+        "final_train_loss": result.metrics.get("train_loss") if result is not None else None,
+        "log_history": trainer.state.log_history,
+    }
+    path = Path(output_dir) / "run_summary.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(summary, indent=2, default=str) + "\n")
+    logger.info("Run summary written to %s", path)
 
 
 def run_grpo_trl(
@@ -599,19 +726,30 @@ def run_grpo_trl(
     learning_rate: float = 3e-6,
     num_generations: int = 8,
     max_completion_length: int = 4096,
-    max_prompt_length: int = 2048,
     temperature: float = 1.0,
     kl_coeff: float = 0.001,
     bf16: bool = True,
     use_vllm: bool = False,
     qlora: bool = False,
+    seed: int = 42,
+    reward_config: str = "config/training/reward_weights.yaml",
+    tool_costs_config: str = "config/tools/costs.yaml",
+    rules_dir: str = "config/hospital_rules",
+    hospital: str = "us_mayo",
+    allow_placeholder_rewards: bool = False,
 ) -> None:
     """Run GRPO training using TRL GRPOTrainer.
+
+    Note on prompt length: TRL 0.29 removed `max_prompt_length` from GRPOConfig
+    (prompts are no longer truncated by the trainer), so this function no longer
+    accepts one. With vLLM generation, size the context via `vllm_max_model_length`.
 
     Args:
         model_name: Model name or PEFT adapter checkpoint path.
         base_model: If model_name is an adapter, this is the base model name.
             Auto-detected from adapter_config.json if not specified.
+        kl_coeff: KL coefficient, forwarded to GRPOConfig's `beta` field.
+        seed: Random seed forwarded to GRPOConfig (mirrors the SFT stage).
     """
     import torch
     from datasets import Dataset
@@ -661,46 +799,31 @@ def run_grpo_trl(
 
     # Load data — format as prompts for GRPO
     raw_data = load_grpo_data(data_path)
+    _require_case_ids(raw_data)
 
-    # GRPO expects: each example has a "prompt" field
-    # The trainer generates completions and scores them with reward_funcs
+    # GRPO expects a "prompt" field; the trainer generates completions and scores
+    # them with reward_funcs. `case_id` is kept as an extra dataset column —
+    # GRPOConfig.remove_unused_columns defaults to False, so TRL forwards it to
+    # the reward function as a kwarg for explicit, collision-free case lookup.
     formatted = []
     for ex in raw_data:
         prompt_messages = [{"role": "user", "content": ex.get("prompt", "")}]
-        formatted.append({"prompt": prompt_messages})
+        formatted.append({"prompt": prompt_messages, "case_id": ex["case_id"]})
 
     dataset = Dataset.from_list(formatted)
 
-    # Build reward function — prefer online scoring if dataset is available
-    reward_func = None
+    # Build reward function — online CompositeReward scoring if the cases exist.
     dataset_path_env = os.environ.get("NEUROAGENT_DATASET", "data/neurobench")
     dataset_dir = Path(dataset_path_env)
 
     if (dataset_dir / "cases").exists():
-        logger.info("Using ONLINE reward (MockServer + CompositeReward)")
-        from .rewards.online_reward import OnlineRewardFunction, build_prompt_to_case_mapping
-        from ..tools.cost_tracker import CostTracker
-
-        case_mapping = build_prompt_to_case_mapping(dataset_dir)
-        cost_tracker = CostTracker()
-        reward_func = OnlineRewardFunction(cases=case_mapping, cost_tracker=cost_tracker)
+        logger.info("Using ONLINE reward (CompositeReward, weights from %s)", reward_config)
+        reward_func = _build_online_reward_fn(
+            raw_data, dataset_dir, reward_config, tool_costs_config, rules_dir, hospital
+        )
     else:
+        reward_func = _build_offline_reward_fn(raw_data, allow_placeholder_rewards)
         logger.info("Using OFFLINE pre-computed rewards (dataset not found at %s)", dataset_dir)
-        reward_data = {}
-        for ex in raw_data:
-            if "completions" in ex and "rewards" in ex:
-                for comp, rew in zip(ex["completions"], ex["rewards"]):
-                    if isinstance(comp, str):
-                        reward_data[comp[:200]] = rew
-
-        def reward_func(prompts, completions, **kwargs) -> list[float]:
-            rewards = []
-            for comp in completions:
-                if isinstance(comp, str):
-                    rewards.append(reward_data.get(comp[:200], 0.0))
-                else:
-                    rewards.append(0.0)
-            return rewards
 
     # GRPO config — TRL v0.29+ API
     # generation_batch_size must be >= num_generations
@@ -714,6 +837,8 @@ def run_grpo_trl(
         num_generations=num_generations,
         generation_batch_size=gen_batch,
         max_completion_length=max_completion_length,
+        beta=kl_coeff,  # TRL 0.29 name for the KL coefficient
+        seed=seed,
         bf16=bf16,
         logging_steps=10,
         save_steps=50,
@@ -730,10 +855,24 @@ def run_grpo_trl(
         reward_funcs=reward_func,
     )
 
-    logger.info("Starting GRPO training for %d epochs", epochs)
-    trainer.train()
+    logger.info("Starting GRPO training for %d epochs (seed=%d, beta=%g)", epochs, seed, kl_coeff)
+    result = trainer.train()
     trainer.save_model(output_dir)
     tokenizer.save_pretrained(output_dir)
+    _save_rl_run_summary(
+        output_dir, trainer, result, training_args, model_name,
+        n_train=len(dataset), algorithm="grpo", data_path=data_path, seed=seed,
+        extra_hyperparameters={
+            "beta_kl_coeff": kl_coeff,
+            "num_generations": num_generations,
+            "max_completion_length": max_completion_length,
+            "generation_temperature": temperature,
+            "lora_rank": lora_rank,
+            "lora_alpha": lora_alpha,
+            "qlora": qlora,
+            "adapter_init": adapter_path,
+        },
+    )
     logger.info("GRPO model saved to %s", output_dir)
 
 
@@ -893,6 +1032,12 @@ def main() -> None:
     parser.add_argument("--tool-costs", default="config/tools/costs.yaml")
     parser.add_argument("--rules-dir", default="config/hospital_rules")
     parser.add_argument("--hospital", default="us_mayo")
+    parser.add_argument(
+        "--allow-placeholder-rewards", action="store_true",
+        help="Permit offline pre-computed rewards when the cases dir is absent. "
+             "Those rewards may be style-keyword placeholders with no clinical "
+             "signal — debugging only, never for reportable runs.",
+    )
 
     # veRL-specific
     parser.add_argument("--n-gpus", type=int, default=4)
@@ -962,6 +1107,12 @@ def main() -> None:
                 bf16=args.bf16,
                 use_vllm=args.use_vllm,
                 qlora=args.qlora,
+                seed=args.seed,
+                reward_config=args.reward_config,
+                tool_costs_config=args.tool_costs,
+                rules_dir=args.rules_dir,
+                hospital=args.hospital,
+                allow_placeholder_rewards=args.allow_placeholder_rewards,
             )
 
 
