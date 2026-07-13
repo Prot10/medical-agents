@@ -11,8 +11,8 @@ set -euo pipefail
 if [[ $# -ne 3 ]]; then
     echo "Usage: $0 <condition_key> <difficulty> <case_id>"
     echo ""
-    echo "Conditions: focal_epilepsy_temporal, ischemic_stroke,"
-    echo "            autoimmune_encephalitis_nmdar, alzheimers_early, syncope_cardiac"
+    echo "Conditions: the 20 keys in dataset-generation/config/conditions.yaml"
+    echo "            (e.g. focal_epilepsy_temporal, ischemic_stroke, ...)"
     echo "Difficulties: straightforward, moderate, diagnostic_puzzle"
     echo ""
     echo "Example: $0 focal_epilepsy_temporal straightforward FEPI-TEMP-S01"

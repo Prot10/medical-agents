@@ -2,16 +2,25 @@
 #
 # generate_batch.sh — Generate NeuroBench cases using claude CLI
 #
+# Conditions are read from config/conditions.yaml (20 conditions), so the
+# script stays in sync with the dataset automatically. For each selected
+# condition it generates a batch of synthetic cases per difficulty
+# (default 4 straightforward + 3 moderate + 3 puzzle), skipping case IDs
+# that already exist in data/neurobench/cases/.
+#
 # IMPORTANT: This script must be run OUTSIDE of a Claude Code session.
 # It calls `claude -p` which cannot be nested inside another claude session.
 #
 # Usage:
-#   ./generate_batch.sh                    # Generate all 50 pilot cases
-#   ./generate_batch.sh --dry-run          # Show what would be generated
-#   ./generate_batch.sh --condition focal_epilepsy_temporal  # Only one condition
+#   ./generate_batch.sh                          # all conditions from conditions.yaml
+#   ./generate_batch.sh --dry-run                # show what would be generated
+#   ./generate_batch.sh --condition ischemic_stroke        # one condition only
+#   ./generate_batch.sh --counts 6,4,4           # S,M,P cases per condition
+#   ./generate_batch.sh --start 11               # number cases from 11 (extend a batch)
+#   ./generate_batch.sh --max-retries 3          # validation retries per case
 #
-# Alternative: Cases can also be generated directly within a Claude Code
-# conversation using subagents (see the implementation plan doc).
+# For a single case (same underlying pipeline), use:
+#   ./generate_one.sh <condition_key> <difficulty> <case_id>
 #
 set -euo pipefail
 
@@ -29,6 +38,7 @@ REPO_ROOT="$(cd "$PROJECT_DIR/.." && pwd)"
 DATA_DIR="$REPO_ROOT/data/neurobench"
 CASES_DIR="$DATA_DIR/cases"
 FAILED_DIR="$DATA_DIR/failed"
+CONDITIONS_YAML="$PROJECT_DIR/config/conditions.yaml"
 
 mkdir -p "$CASES_DIR" "$FAILED_DIR"
 
@@ -36,30 +46,45 @@ mkdir -p "$CASES_DIR" "$FAILED_DIR"
 DRY_RUN=false
 FILTER_CONDITION=""
 MAX_RETRIES=2
+COUNTS="4,3,3"   # straightforward,moderate,diagnostic_puzzle per condition
+START=1
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --dry-run) DRY_RUN=true; shift ;;
         --condition) FILTER_CONDITION="$2"; shift 2 ;;
+        --counts) COUNTS="$2"; shift 2 ;;
+        --start) START="$2"; shift 2 ;;
         --max-retries) MAX_RETRIES="$2"; shift 2 ;;
         *) echo "Unknown option: $1"; exit 1 ;;
     esac
 done
 
-# Distribution: 5 conditions × (4 straightforward + 3 moderate + 3 puzzle) = 50
-declare -A CONDITIONS=(
-    ["focal_epilepsy_temporal"]="FEPI-TEMP"
-    ["ischemic_stroke"]="ISCH-STR"
-    ["autoimmune_encephalitis_nmdar"]="NMDAR-ENC"
-    ["alzheimers_early"]="ALZ-EARLY"
-    ["syncope_cardiac"]="SYNC-CARD"
-)
+IFS=',' read -r COUNT_S COUNT_M COUNT_P <<< "$COUNTS"
+if [[ -z "${COUNT_S:-}" || -z "${COUNT_M:-}" || -z "${COUNT_P:-}" ]]; then
+    echo "ERROR: --counts must be S,M,P (e.g. 4,3,3)"; exit 1
+fi
 
-declare -A DIFFICULTY_COUNTS=(
-    ["straightforward"]=4
-    ["moderate"]=3
-    ["diagnostic_puzzle"]=3
-)
+# Load condition_key<TAB>abbreviation pairs from conditions.yaml
+mapfile -t CONDITION_ROWS < <(cd "$REPO_ROOT" && uv run --project dataset-generation python -c "
+import yaml
+with open('$CONDITIONS_YAML') as f:
+    conditions = yaml.safe_load(f)
+for key, spec in conditions.items():
+    print(f\"{key}\t{spec['abbreviation']}\")
+")
+
+if [[ ${#CONDITION_ROWS[@]} -eq 0 ]]; then
+    echo "ERROR: no conditions loaded from $CONDITIONS_YAML"; exit 1
+fi
+
+if [[ -n "$FILTER_CONDITION" ]]; then
+    if ! printf '%s\n' "${CONDITION_ROWS[@]}" | cut -f1 | grep -qx "$FILTER_CONDITION"; then
+        echo "ERROR: unknown condition '$FILTER_CONDITION'. Available:"
+        printf '%s\n' "${CONDITION_ROWS[@]}" | cut -f1 | sed 's/^/  /'
+        exit 1
+    fi
+fi
 
 # Counters
 total=0
@@ -67,24 +92,23 @@ generated=0
 skipped=0
 failed=0
 
-for condition in "${!CONDITIONS[@]}"; do
+for row in "${CONDITION_ROWS[@]}"; do
+    condition="${row%%$'\t'*}"
+    abbrev="${row##*$'\t'}"
+
     if [[ -n "$FILTER_CONDITION" && "$condition" != "$FILTER_CONDITION" ]]; then
         continue
     fi
 
-    abbrev="${CONDITIONS[$condition]}"
-
     for difficulty in straightforward moderate diagnostic_puzzle; do
-        count="${DIFFICULTY_COUNTS[$difficulty]}"
-
         case "$difficulty" in
-            straightforward) dletter="S" ;;
-            moderate) dletter="M" ;;
-            diagnostic_puzzle) dletter="P" ;;
+            straightforward) dletter="S"; count="$COUNT_S" ;;
+            moderate) dletter="M"; count="$COUNT_M" ;;
+            diagnostic_puzzle) dletter="P"; count="$COUNT_P" ;;
         esac
 
-        for i in $(seq -w 1 "$count"); do
-            case_id="${abbrev}-${dletter}${i}"
+        for ((n = START; n < START + count; n++)); do
+            case_id="$(printf '%s-%s%02d' "$abbrev" "$dletter" "$n")"
             total=$((total + 1))
 
             if [[ -f "$CASES_DIR/${case_id}.json" ]]; then
