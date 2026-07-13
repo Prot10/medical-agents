@@ -14,7 +14,7 @@ See README.md for setup, and `docs/README.md` for the documentation index.
 - `packages/neuroagent-schemas/` — shared Pydantic models
 - `dataset-generation/` — NeuroBench case generation
 - `web/src/` — main React dashboard (port 5173)
-- `web-review/src/` — dataset review UI (port 5174, imports primitives via `@web/*` alias)
+- `web-review/src/` — dataset review UI (port 5174, self-contained fork of the main app's primitives)
 - `data/neurobench/cases/` — 600 benchmark cases across 20 conditions (current default)
 - `data/review/annotations/{version}/{reviewer_code}/{case_id}.json` — per-reviewer annotation runtime data (gitignored)
 - `agent-platform/config/hospital_rules/{hospital}/*.yaml` — clinical pathways
@@ -46,7 +46,7 @@ uv run python agent-platform/scripts/benchmark/run_baseline_eval.py
 - Frontend: `@/` path alias for `src/`, named exports only, no default exports for components
 - State: Zustand for UI/streaming state, TanStack Query for server data
 - Commit style: conventional commits (`feat:`, `fix:`, `docs:`, `chore:`)
-- Dataset versions: v1 (synthetic, enhanced outputs), v2 (real-seeded, enhanced), v3 (v1+v2 combined, realistic/stripped outputs), v4 (12-tool schema + cost tracking, migrated from v3)
+- Dataset versions: v1 (synthetic, enhanced outputs), v2 (real-seeded, enhanced), v3 (v1+v2 combined, realistic/stripped outputs), v4 (12-tool schema + cost tracking, migrated from v3), v5 (current: 600 cases across 20 conditions, 500 train / 100 test)
 - Tool output modes: "enhanced" (v1/v2, interpretive fields present) vs "realistic" (v3/v4, stripped to match real clinical reports)
 - 12 tools: analyze_brain_mri, analyze_eeg, analyze_ecg, interpret_labs, analyze_csf, order_ct_scan, order_echocardiogram, order_cardiac_monitoring, order_advanced_imaging, order_specialized_test, search_medical_literature, check_drug_interactions
 - Cost tracking: `CostTracker` in `tools/cost_tracker.py`, config in `config/tools/costs.yaml`, Medicare PFS reference rates
@@ -78,7 +78,7 @@ LLM client (`llm/client.py`) strips `<think>` tags from Qwen and parses OpenAI-s
 Separate FastAPI + Vite app for blind triple-review of the NeuroBench dataset. Independent from the main agent — its own startup command, port, and Vite project, but reuses the `NeuroBenchCase` Pydantic schema.
 
 - Backend: `agent-platform/src/neuroagent/review_api/app.py` on port 8889. File-based persistence under `data/review/annotations/`. Gated by `X-Reviewer-Code` header; admin role unlocks aggregate endpoints under `/api/v1/admin/...`.
-- Frontend: `web-review/` (Vite + React 19 + Tailwind v4 + framer-motion). Vite alias `@web/*` → `../web/src/*` so it can import primitives from the main app without a refactor. Vite proxies `/api` → `http://127.0.0.1:8889`. Light theme is the default.
+- Frontend: `web-review/` (Vite + React 19 + Tailwind v4 + framer-motion). Carries its own copies of the UI primitives (forked from `web/src` and intentionally diverged — light theme, borders); it does not import from the main app. Vite proxies `/api` → `http://127.0.0.1:8889`. Light theme is the default.
 - Reviewer registry: `agent-platform/config/review/reviewer_codes.yaml` — hand-edited; backend reloads on YAML mtime change inside the `current_reviewer` FastAPI dependency.
 - Annotation storage: `data/review/annotations/{version}/{reviewer_code}/{case_id}.json` — one file per (reviewer, version, case) triple. Filesystem-level isolation: a reviewer endpoint cannot return another reviewer's data.
 - Tabs: Overview (per-reviewer progress) / Cases (600 v5 cases) / Methodology (showcase) / Admin (4 aggregate views: inter-rater agreement, reviewer progress, field hotspots, side-by-side diff).
