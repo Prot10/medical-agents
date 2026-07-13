@@ -9,15 +9,22 @@
 ## 1. Install dependencies
 
 ```bash
-# From the repo root
+# From the repo root — app + eval
 uv sync --all-packages
+
+# For SFT / RFT fine-tuning, also install the optional training extra
+# (torch, transformers, trl, peft, bitsandbytes, flash-linear-attention, liger-kernel):
+uv sync --all-packages --extra training
 ```
+
+`flash-linear-attention` (in the training extra) is required for Qwen3.5 — without it the
+gated-delta-net layers run a ~2.2×-slower torch fallback. It is pure Triton, no `nvcc` needed.
 
 For the vLLM inference server (separate venv to avoid dependency conflicts):
 
 ```bash
 uv venv .venv-vllm --python 3.11
-.venv-vllm/bin/pip install vllm==0.17.1
+.venv-vllm/bin/pip install vllm==0.23.0
 ```
 
 ## 2. Download a model

@@ -25,7 +25,8 @@ See README.md for setup, and `docs/README.md` for the documentation index.
 ## Common commands
 
 ```bash
-uv sync --all-packages                    # install everything
+uv sync --all-packages                    # app + eval (agent, dataset tools)
+uv sync --all-packages --extra training   # + training deps (torch/trl/peft/bitsandbytes/flash-linear-attention/liger); required for SFT/RFT
 cd web && npm run build                   # build main frontend
 uv run uvicorn neuroagent.api.app:app --host 0.0.0.0 --port 8888         # main API
 uv run uvicorn neuroagent.review_api.app:app --host 0.0.0.0 --port 8889  # review API
@@ -35,7 +36,15 @@ cd web-review && npm install && npm run dev:remote   # review frontend dev (port
 uv run pytest agent-platform/tests/ -v   # tests
 uv run python agent-platform/scripts/runtime/run_single_case.py data/neurobench/cases/<case>.json
 uv run python agent-platform/scripts/benchmark/run_baseline_eval.py
+
+# Fine-tuning (needs --extra training). Base models load from EOS→/dev/shm; adapters write to EOS.
+PRECISION=bf16 bash agent-platform/scripts/training/run_sft_training.sh Qwen/Qwen3.5-9B   # SFT (PRECISION=qlora default)
+bash agent-platform/scripts/training/run_definitive_eval.sh Qwen3.5-9B                    # greedy+reliability eval + judge bundles
+bash agent-platform/scripts/training/run_rft.sh Qwen3.5-9B                                # rejection-sampling FT: rollouts → filtered dataset
 ```
+
+See `docs/training/sft-recipe-hardware-and-evaluation.md` for the recipe, bf16-vs-QLoRA, memory,
+and the literature-aligned evaluation; `docs/training/distillation.md` for trajectory generation.
 
 ## Conventions
 

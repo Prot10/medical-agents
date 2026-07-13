@@ -47,9 +47,21 @@ medical-agents/                     # uv workspace root
 ### Install
 
 ```bash
-uv sync --all-packages
+uv sync --all-packages            # app, schemas, dataset tools (agent + eval)
 cd web && npm install
 ```
+
+For **training / fine-tuning** (SFT, RFT) also install the training extra — it is optional and
+NOT pulled by `--all-packages`:
+
+```bash
+uv sync --all-packages --extra training   # torch, transformers, trl, peft, bitsandbytes, flash-linear-attention, liger-kernel
+```
+
+`flash-linear-attention` is required for Qwen3.5: its gated-delta-net layers run a ~2.2×-slower
+torch fallback without it. It is pure Triton (no `nvcc`, no CUDA build) and installs on the
+project's torch 2.11 / CUDA 13 / Python 3.13 stack. See
+[`docs/training/sft-recipe-hardware-and-evaluation.md`](docs/training/sft-recipe-hardware-and-evaluation.md).
 
 ### Run on GPU server (CERN VM / any Linux with CUDA)
 
