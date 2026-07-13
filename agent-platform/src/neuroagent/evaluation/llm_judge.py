@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -13,13 +14,21 @@ from ..llm.client import LLMClient
 from ..llm.prompts import load_prompt
 
 
+logger = logging.getLogger(__name__)
+
+
 def _load_judge_prompt() -> str:
     return load_prompt("llm_judge.txt")
 
 
 @dataclass
 class ReasoningScore:
-    """Rubric-based reasoning quality scores (8 dimensions)."""
+    """Rubric-based reasoning quality scores (8 dimensions).
+
+    Consumers MUST check ``valid`` before aggregating: when the judge response
+    could not be parsed, ``valid`` is False and every dimension is 0 — treating
+    such a score as a genuine 0.0 would silently drag down the mean.
+    """
 
     diagnostic_accuracy: int = 0  # 0-5
     evidence_identification: int = 0  # 0-5
@@ -34,6 +43,13 @@ class ReasoningScore:
     weaknesses: list[str] = field(default_factory=list)
     critical_errors: list[str] = field(default_factory=list)
     justification: str = ""
+    # False when the judge response could not be parsed — the dimension scores
+    # are then meaningless placeholders and must be excluded from aggregation.
+    valid: bool = True
+    # The composite the judge itself reported, kept for auditing only.
+    # `composite_score` is always recomputed locally from the dimension scores
+    # with the rubric weights, never trusted from the judge.
+    judge_reported_composite: float | None = None
 
     # Keep backward-compatible alias
     @property
@@ -268,14 +284,24 @@ class LLMJudge:
                 justification=data.get("justification", ""),
             )
 
-            # Use the judge's composite if provided, otherwise compute
-            if "composite_score" in data and data["composite_score"] is not None:
-                score.composite_score = float(data["composite_score"])
-            else:
-                score.compute_composite()
+            # Always recompute the composite locally from the dimension scores
+            # with the rubric weights — the judge's self-reported value mixes
+            # scales/weights unpredictably. Keep it only for auditing.
+            if data.get("composite_score") is not None:
+                try:
+                    score.judge_reported_composite = float(data["composite_score"])
+                except (TypeError, ValueError):
+                    score.judge_reported_composite = None
+            score.compute_composite()
 
             return score
-        except (json.JSONDecodeError, ValueError, KeyError):
+        except (json.JSONDecodeError, ValueError, KeyError) as exc:
+            logger.error(
+                "JUDGE PARSE FAILURE (%s: %s) — returning invalid score that MUST "
+                "be excluded from aggregation. Response head: %r",
+                type(exc).__name__, exc, response[:300],
+            )
             return ReasoningScore(
-                justification=f"Failed to parse judge response: {response[:300]}"
+                valid=False,
+                justification=f"Failed to parse judge response: {response[:300]}",
             )

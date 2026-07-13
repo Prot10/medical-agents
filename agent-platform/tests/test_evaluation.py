@@ -15,7 +15,10 @@ from neuroagent_schemas.evaluation import (
     ToolClassification,
 )
 from neuroagent.agent.reasoning import AgentTrace, AgentTurn
+from neuroagent.evaluation.llm_judge import LLMJudge, ReasoningScore
 from neuroagent.evaluation.metrics import MetricsCalculator, CaseMetrics
+from neuroagent.evaluation.runner import EvaluationRunner
+from neuroagent.datasets import load_dataset
 
 
 @pytest.fixture
@@ -230,3 +233,163 @@ class TestGoldTrajectoryMetrics:
         assert m.recommended_called == 0 and m.recommended_total == 1
         assert m.optional_called == 1 and m.optional_total == 1
         assert 0 < m.tool_f1 < 1
+
+
+# ---------------------------------------------------------------------------
+# EvaluationRunner: per-case fault isolation, checkpointing, strict splits
+# ---------------------------------------------------------------------------
+
+FIXTURE_CASE = Path(__file__).parent / "fixtures" / "sample_case.json"
+
+
+def _make_dataset(tmp_path: Path, case_ids: list[str], split_ids: list[str] | None = None) -> Path:
+    """Build a minimal dataset dir from copies of the sample fixture."""
+    dataset = tmp_path / "dataset"
+    cases_dir = dataset / "cases"
+    cases_dir.mkdir(parents=True)
+    base = json.loads(FIXTURE_CASE.read_text())
+    for cid in case_ids:
+        data = dict(base)
+        data["case_id"] = cid
+        (cases_dir / f"{cid}.json").write_text(json.dumps(data))
+    if split_ids is not None:
+        splits = dataset / "splits"
+        splits.mkdir()
+        (splits / "test.txt").write_text("\n".join(split_ids))
+    return dataset
+
+
+class TestEvaluationRunnerFaultTolerance:
+    @pytest.fixture
+    def config(self):
+        from neuroagent.agent.config import load_agent_config
+        return load_agent_config(model="test-model", max_turns=3)
+
+    def _patch_orchestrator(self, monkeypatch, fail_case_ids: set[str]):
+        class FakeOrchestrator:
+            def __init__(self, config=None, tool_registry=None, rules_engine=None):
+                pass
+
+            def run(self, patient_info: str, case_id: str) -> AgentTrace:
+                if case_id in fail_case_ids:
+                    raise RuntimeError(f"boom on {case_id}")
+                trace = AgentTrace(case_id=case_id)
+                trace.set_final_response("### Primary Diagnosis\nX")
+                return trace
+
+        monkeypatch.setattr(
+            "neuroagent.evaluation.runner.AgentOrchestrator", FakeOrchestrator
+        )
+
+    def test_failed_case_is_recorded_and_run_continues(self, tmp_path, monkeypatch, config):
+        dataset = _make_dataset(tmp_path, ["CASE-S1", "CASE-S2", "CASE-S3"])
+        self._patch_orchestrator(monkeypatch, fail_case_ids={"CASE-S2"})
+
+        runner = EvaluationRunner(config, str(dataset))
+        results = runner.run_evaluation(split="test", enable_rules=False)
+
+        assert results.num_cases == 2
+        assert results.num_failures == 1
+        failure = results.failures[0]
+        assert failure["case_id"] == "CASE-S2"
+        assert "boom on CASE-S2" in failure["error"]
+        assert "traceback" in failure
+
+    def test_checkpoint_written_incrementally_and_atomically(self, tmp_path, monkeypatch, config):
+        dataset = _make_dataset(tmp_path, ["CASE-S1", "CASE-S2"])
+        self._patch_orchestrator(monkeypatch, fail_case_ids={"CASE-S2"})
+        out_dir = tmp_path / "out"
+
+        runner = EvaluationRunner(config, str(dataset))
+        results = runner.run_evaluation(
+            split="test", enable_rules=False, output_dir=out_dir
+        )
+
+        ckpt = out_dir / "eval_checkpoint.json"
+        assert ckpt.exists()
+        payload = json.loads(ckpt.read_text())
+        assert payload["num_completed"] == 1
+        assert payload["num_failures"] == 1
+        assert payload["results"][0]["case_id"] == "CASE-S1"
+        assert payload["failures"][0]["case_id"] == "CASE-S2"
+        # No leftover temp files from the atomic write
+        assert list(out_dir.glob("*.tmp")) == []
+        assert results.num_cases == 1
+
+    def test_missing_split_case_file_raises(self, tmp_path, config):
+        dataset = _make_dataset(
+            tmp_path, ["CASE-S1"], split_ids=["CASE-S1", "CASE-MISSING"]
+        )
+        runner = EvaluationRunner(config, str(dataset))
+        with pytest.raises(FileNotFoundError, match="CASE-MISSING"):
+            runner.run_evaluation(split="test", enable_rules=False)
+
+
+# ---------------------------------------------------------------------------
+# datasets.load_dataset: strict by default
+# ---------------------------------------------------------------------------
+
+class TestLoadDatasetStrict:
+    def test_valid_dataset_loads(self, tmp_path):
+        dataset = _make_dataset(tmp_path, ["CASE-S1"])
+        idx, objs = load_dataset(dataset)
+        assert set(objs) == {"CASE-S1"}
+
+    def test_invalid_case_raises_by_default(self, tmp_path):
+        dataset = _make_dataset(tmp_path, ["CASE-S1"])
+        (dataset / "cases" / "BROKEN-S1.json").write_text("{not valid json")
+        with pytest.raises(ValueError, match="BROKEN-S1"):
+            load_dataset(dataset)
+
+    def test_skip_invalid_exposes_skipped_count(self, tmp_path):
+        dataset = _make_dataset(tmp_path, ["CASE-S1"])
+        (dataset / "cases" / "BROKEN-S1.json").write_text("{not valid json")
+        skipped: list[str] = []
+        idx, objs = load_dataset(dataset, skip_invalid=True, skipped=skipped)
+        assert set(objs) == {"CASE-S1"}
+        assert skipped == ["BROKEN-S1.json"]
+
+
+# ---------------------------------------------------------------------------
+# LLMJudge response parsing
+# ---------------------------------------------------------------------------
+
+class TestJudgeParsing:
+    def _parse(self, response: str) -> ReasoningScore:
+        judge = LLMJudge.__new__(LLMJudge)  # skip __init__ (needs an LLM client)
+        return judge._parse_response(response)
+
+    def test_parse_failure_is_flagged_invalid(self):
+        score = self._parse("The agent did well overall, no JSON here.")
+        assert score.valid is False
+        assert score.composite_score == 0.0
+        assert "Failed to parse" in score.justification
+
+    def test_composite_recomputed_not_trusted(self):
+        payload = {
+            "diagnostic_accuracy": 5,
+            "evidence_identification": 4,
+            "evidence_integration": 4,
+            "differential_reasoning": 4,
+            "tool_efficiency": 3,
+            "clinical_safety": 5,
+            "red_herring_handling": None,
+            "uncertainty_calibration": 4,
+            "composite_score": 99.0,  # judge-reported, wrong scale
+        }
+        score = self._parse(json.dumps(payload))
+        assert score.valid is True
+        assert score.judge_reported_composite == 99.0
+        # Locally recomputed on the 0-1 scale from dimensions + rubric weights
+        expected = ReasoningScore(
+            diagnostic_accuracy=5,
+            evidence_identification=4,
+            evidence_integration=4,
+            differential_reasoning=4,
+            tool_efficiency=3,
+            clinical_safety=5,
+            red_herring_handling=None,
+            uncertainty_calibration=4,
+        ).compute_composite()
+        assert score.composite_score == expected
+        assert 0.0 <= score.composite_score <= 1.0

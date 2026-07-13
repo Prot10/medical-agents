@@ -37,6 +37,86 @@ class LLMToolCall:
     arguments: dict[str, Any]
 
 
+class ThinkTagStreamParser:
+    """Incremental parser splitting a streamed response into content vs. think text.
+
+    Qwen3.x thinking mode wraps chain-of-thought in ``<think>...</think>``. When
+    streaming, a tag can be split across delta chunks (``"<thi"`` + ``"nk>"``) or a
+    single chunk can contain both tags plus surrounding text. This buffers just
+    enough text to resolve tags deterministically:
+
+    - ``feed(text)`` returns ``[(kind, piece), ...]`` events, where ``kind`` is
+      ``"content"`` or ``"think"``. Tag text itself is never emitted.
+    - ``flush()`` returns events for whatever remains buffered at end-of-stream
+      (e.g. a trailing partial tag that never completed).
+
+    An orphaned ``</think>`` without a preceding ``<think>`` (a known Qwen quirk,
+    see ``strip_think_tags``) is stripped and treated as a no-op boundary.
+    """
+
+    _OPEN = "<think>"
+    _CLOSE = "</think>"
+
+    def __init__(self) -> None:
+        self._buffer = ""
+        self.in_think = False
+
+    def feed(self, text: str) -> list[tuple[str, str]]:
+        self._buffer += text
+        events: list[tuple[str, str]] = []
+
+        while True:
+            if self.in_think:
+                idx = self._buffer.find(self._CLOSE)
+                if idx != -1:
+                    if idx:
+                        events.append(("think", self._buffer[:idx]))
+                    self._buffer = self._buffer[idx + len(self._CLOSE):]
+                    self.in_think = False
+                    continue
+                kind, tags = "think", (self._CLOSE,)
+            else:
+                # Outside a think block, watch for an opening tag and also strip
+                # orphaned closing tags (model sometimes omits the opening one).
+                found = [
+                    (i, t)
+                    for t in (self._OPEN, self._CLOSE)
+                    if (i := self._buffer.find(t)) != -1
+                ]
+                if found:
+                    idx, tag = min(found)
+                    if idx:
+                        events.append(("content", self._buffer[:idx]))
+                    self._buffer = self._buffer[idx + len(tag):]
+                    self.in_think = tag == self._OPEN
+                    continue
+                kind, tags = "content", (self._OPEN, self._CLOSE)
+
+            # No complete tag in the buffer: emit everything except a trailing
+            # fragment that could still turn into one of the awaited tags.
+            hold = max(self._partial_tag_suffix(tag) for tag in tags)
+            emit_len = len(self._buffer) - hold
+            if emit_len > 0:
+                events.append((kind, self._buffer[:emit_len]))
+                self._buffer = self._buffer[emit_len:]
+            return events
+
+    def flush(self) -> list[tuple[str, str]]:
+        """End-of-stream: return any buffered text under the current state."""
+        if not self._buffer:
+            return []
+        events = [("think" if self.in_think else "content", self._buffer)]
+        self._buffer = ""
+        return events
+
+    def _partial_tag_suffix(self, tag: str) -> int:
+        """Length of the longest buffer suffix that is a proper prefix of ``tag``."""
+        for k in range(min(len(tag) - 1, len(self._buffer)), 0, -1):
+            if self._buffer.endswith(tag[:k]):
+                return k
+        return 0
+
+
 class LLMClient:
     """Unified LLM client wrapping OpenAI-compatible APIs."""
 
@@ -49,6 +129,9 @@ class LLMClient:
         max_tokens: int = 8192,
         top_p: float = 0.95,
         presence_penalty: float = 1.5,
+        seed: int | None = None,
+        timeout: float = 120.0,
+        max_retries: int = 2,
         extra_body: dict[str, Any] | None = None,
     ):
         # Copilot API requires specific headers to authenticate
@@ -62,6 +145,8 @@ class LLMClient:
             base_url=base_url,
             api_key=api_key,
             default_headers=default_headers or None,
+            timeout=timeout,
+            max_retries=max_retries,
         )
         self.base_url = base_url
         self.model = model
@@ -69,6 +154,11 @@ class LLMClient:
         self.max_tokens = max_tokens
         self.top_p = top_p
         self.presence_penalty = presence_penalty
+        # Forwarded as `seed=` on every request so sampling is reproducible even
+        # at temperature > 0 (supported by vLLM and the OpenAI API).
+        self.seed = seed
+        self.timeout = timeout
+        self.max_retries = max_retries
         self.extra_body = extra_body or {}
 
     def chat(
@@ -88,6 +178,8 @@ class LLMClient:
             "top_p": self.top_p,
             "presence_penalty": self.presence_penalty,
         }
+        if self.seed is not None:
+            kwargs["seed"] = self.seed
         if self.extra_body:
             kwargs["extra_body"] = self.extra_body
         if tools:
@@ -136,6 +228,8 @@ class LLMClient:
             "stream": True,
             "stream_options": {"include_usage": True},
         }
+        if self.seed is not None:
+            kwargs["seed"] = self.seed
         if self.extra_body:
             kwargs["extra_body"] = self.extra_body
         if tools:
@@ -148,7 +242,14 @@ class LLMClient:
         think_parts: list[str] = []
         tool_calls_acc: dict[int, dict[str, Any]] = {}
         usage: dict[str, int] = {}
-        in_think = False
+        think_parser = ThinkTagStreamParser()
+
+        def _emit(kind: str, piece: str):
+            if kind == "think":
+                think_parts.append(piece)
+                return {"type": "think_delta", "delta": piece}
+            content_parts.append(piece)
+            return {"type": "content_delta", "delta": piece}
 
         for chunk in stream:
             if chunk.usage:
@@ -164,29 +265,8 @@ class LLMClient:
             delta = chunk.choices[0].delta
 
             if delta.content:
-                text = delta.content
-
-                if "<think>" in text:
-                    in_think = True
-                    before = text.split("<think>")[0]
-                    if before:
-                        content_parts.append(before)
-                        yield {"type": "content_delta", "delta": before}
-                    continue
-                if "</think>" in text:
-                    in_think = False
-                    after = text.split("</think>", 1)[1]
-                    if after:
-                        content_parts.append(after)
-                        yield {"type": "content_delta", "delta": after}
-                    continue
-                if in_think:
-                    think_parts.append(text)
-                    yield {"type": "think_delta", "delta": text}
-                    continue
-
-                content_parts.append(text)
-                yield {"type": "content_delta", "delta": text}
+                for kind, piece in think_parser.feed(delta.content):
+                    yield _emit(kind, piece)
 
             if delta.tool_calls:
                 for tc_delta in delta.tool_calls:
@@ -203,6 +283,10 @@ class LLMClient:
                         tool_calls_acc[idx]["id"] = tc_delta.id
                     if tc_delta.function and tc_delta.function.name:
                         tool_calls_acc[idx]["name"] = tc_delta.function.name
+
+        # Flush any text still buffered in the parser (e.g. a trailing partial tag).
+        for kind, piece in think_parser.flush():
+            yield _emit(kind, piece)
 
         think_content = "".join(think_parts) or None
         content = "".join(content_parts) or None
@@ -241,7 +325,12 @@ class LLMClient:
             for tc in message.tool_calls:
                 args = tc.function.arguments
                 if isinstance(args, str):
-                    args = json.loads(args)
+                    # Same fallback as the streaming path: a malformed argument
+                    # payload becomes an empty dict instead of crashing the turn.
+                    try:
+                        args = json.loads(args)
+                    except json.JSONDecodeError:
+                        args = {}
                 tool_calls.append(
                     LLMToolCall(
                         id=tc.id,

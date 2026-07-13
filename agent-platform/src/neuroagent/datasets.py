@@ -51,10 +51,29 @@ def resolve_dataset_info(version: str) -> DatasetInfo | None:
 
 def load_dataset(
     dataset_path: Path,
+    *,
+    skip_invalid: bool = False,
+    skipped: list[str] | None = None,
 ) -> tuple[dict[str, dict[str, Any]], dict[str, NeuroBenchCase]]:
-    """Load every case JSON under ``dataset_path / "cases"``."""
+    """Load every case JSON under ``dataset_path / "cases"``.
+
+    Strict by default: a case file that fails to parse or validate raises,
+    because silently dropping cases shrinks the benchmark denominator.
+
+    Args:
+        dataset_path: Dataset root containing a ``cases/`` directory.
+        skip_invalid: If True, restore the old lenient behavior — invalid cases
+            are skipped with a prominent warning instead of raising.
+        skipped: Optional list that, when provided with ``skip_invalid=True``,
+            is extended with the filenames of every skipped case so callers can
+            report the exact count.
+
+    Raises:
+        ValueError: A case file is malformed and ``skip_invalid`` is False.
+    """
     case_index: dict[str, dict[str, Any]] = {}
     case_objects: dict[str, NeuroBenchCase] = {}
+    skipped_files: list[str] = []
 
     cases_dir = dataset_path / "cases"
     if not cases_dir.exists():
@@ -66,7 +85,12 @@ def load_dataset(
             data = json.loads(case_file.read_text())
             case = NeuroBenchCase.model_validate(data)
         except Exception as exc:
-            logger.error("Failed to load case %s: %s", case_file.name, exc)
+            if not skip_invalid:
+                raise ValueError(
+                    f"Invalid NeuroBench case file {case_file}: {exc}"
+                ) from exc
+            logger.error("Skipping invalid case %s: %s", case_file.name, exc)
+            skipped_files.append(case_file.name)
             continue
 
         case_objects[case.case_id] = case
@@ -79,5 +103,14 @@ def load_dataset(
             "sex": case.patient.demographics.sex,
             "chief_complaint": case.patient.chief_complaint,
         }
+
+    if skipped_files:
+        logger.warning(
+            "load_dataset SKIPPED %d invalid case file(s) — loaded %d cases; "
+            "the dataset denominator is reduced: %s",
+            len(skipped_files), len(case_objects), skipped_files,
+        )
+        if skipped is not None:
+            skipped.extend(skipped_files)
 
     return case_index, case_objects

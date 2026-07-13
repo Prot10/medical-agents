@@ -32,6 +32,13 @@ class AgentConfig:
     max_tokens: int
     top_p: float
     presence_penalty: float
+    # Sampling seed forwarded to the inference server (vLLM/OpenAI `seed=`) on every
+    # request. Required for reproducible runs at temperature > 0; null disables it.
+    seed: int | None
+    # HTTP client robustness: per-request timeout (seconds) and automatic retries
+    # applied when constructing the OpenAI client.
+    request_timeout: float
+    max_retries: int
     max_turns: int
     enable_reflection: bool
     hospital: str
@@ -51,6 +58,19 @@ class AgentConfig:
         _require_number("temperature", self.temperature, minimum=0)
         _require_number("top_p", self.top_p, minimum=0, maximum=1)
         _require_number("presence_penalty", self.presence_penalty)
+        if self.seed is not None and (
+            not isinstance(self.seed, int) or isinstance(self.seed, bool)
+        ):
+            raise AgentConfigError("seed must be null or an integer")
+        _require_number("request_timeout", self.request_timeout)
+        if self.request_timeout <= 0:
+            raise AgentConfigError("request_timeout must be > 0")
+        if (
+            not isinstance(self.max_retries, int)
+            or isinstance(self.max_retries, bool)
+            or self.max_retries < 0
+        ):
+            raise AgentConfigError("max_retries must be a non-negative integer")
         if (
             not isinstance(self.max_tokens, int)
             or isinstance(self.max_tokens, bool)
@@ -87,6 +107,9 @@ _SCHEMA: dict[str, tuple[str, ...]] = {
         "max_tokens",
         "top_p",
         "presence_penalty",
+        "seed",
+        "request_timeout",
+        "max_retries",
     ),
     "agent": (
         "max_turns",
