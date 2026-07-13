@@ -1,19 +1,23 @@
 #!/usr/bin/env python3
-"""Batch LLM-judge evaluation on saved NeuroBench comparison results.
+"""Batch LLM-judge evaluation on saved model-comparison results (legacy layout).
 
 Loads the comparison traces and runs each through the LLM judge rubric (8
 dimensions + composite) using a vLLM or OpenAI-compatible endpoint.
 
-The judge evaluates reasoning quality, evidence integration, tool efficiency,
-clinical safety, and diagnostic accuracy — providing scores that complement
-the rule-based metrics from the comparison run.
+Expects a results directory in the run_model_comparison.py layout:
+    <results-dir>/merged_results.json          # all runs, rule-based metrics
+    <results-dir>/<model>/traces.json          # per-model saved traces
+Scores are written to <results-dir>/analysis/.
+
+NOTE: for current benchmark runs (results/baseline_eval_<TS>/<model>/ with
+judge_bundles/), use the batch pipeline instead:
+    prepare_judge_batches.py -> llm-judge agents -> aggregate_judge_scores.py
 
 Usage:
     # Requires a running vLLM server (or OpenAI-compatible endpoint)
-    uv run python agent-platform/scripts/benchmark/run_llm_judge.py
-    uv run python agent-platform/scripts/benchmark/run_llm_judge.py --judge-model Qwen/Qwen3.5-9B
-    uv run python agent-platform/scripts/benchmark/run_llm_judge.py --results-dir results/neurobench_comparison --run qwen27b-react
-    uv run python agent-platform/scripts/benchmark/run_llm_judge.py --max-cases 10  # quick test
+    uv run python agent-platform/scripts/benchmark/run_llm_judge.py --results-dir <dir>
+    uv run python agent-platform/scripts/benchmark/run_llm_judge.py --results-dir <dir> --run <run_name>
+    uv run python agent-platform/scripts/benchmark/run_llm_judge.py --results-dir <dir> --max-cases 10  # quick test
 """
 
 from __future__ import annotations
@@ -79,11 +83,15 @@ def reconstruct_trace(trace_data: dict, result_data: dict) -> AgentTrace:
 
 @app.command()
 def main(
-    results_dir: str = typer.Option("results/neurobench_comparison", help="Results directory"),
+    results_dir: str = typer.Option(
+        ...,
+        help="Saved comparison results dir containing merged_results.json and "
+        "<model>/traces.json (run_model_comparison.py layout).",
+    ),
     judge_base_url: str = typer.Option("http://localhost:8000/v1", help="Judge LLM endpoint"),
     judge_model: str = typer.Option("", help="Judge model ID (auto-detect if empty)"),
     judge_api_key: str = typer.Option("not-needed", help="API key for judge endpoint"),
-    run: str = typer.Option("", help="Specific run to evaluate (e.g. qwen27b-react). Empty = all react runs."),
+    run: str = typer.Option("", help="Specific run_name from merged_results.json. Empty = all react runs."),
     max_cases: int = typer.Option(0, help="Max cases to evaluate per run (0 = all)"),
     repeat: int = typer.Option(1, help="Which repeat to evaluate (1-3, default 1)"),
     output_name: str = typer.Option("llm_judge_scores", help="Output filename prefix"),
@@ -108,7 +116,16 @@ def main(
             raise typer.Exit(1)
 
     # Load merged results
-    merged = json.loads((results_path / "merged_results.json").read_text())
+    merged_path = results_path / "merged_results.json"
+    if not merged_path.exists():
+        console.print(f"[red]No merged_results.json in {results_path}.[/red]")
+        console.print(
+            "This script scores legacy run_model_comparison.py outputs. For "
+            "results/baseline_eval_<TS>/ runs, use prepare_judge_batches.py -> "
+            "llm-judge agents -> aggregate_judge_scores.py instead."
+        )
+        raise typer.Exit(1)
+    merged = json.loads(merged_path.read_text())
     all_results = merged["results"]
 
     # Select runs to evaluate
@@ -126,24 +143,17 @@ def main(
     if max_cases:
         console.print(f"  Max cases per run: {max_cases}")
 
-    # Load trace files
+    # Load trace files — one traces.json per model subdirectory (auto-discover
+    # rather than hardcoding model names).
     trace_files = {}
-    for subdir in ["qwen3.5-9b", "qwen3.5-27b-awq", "medgemma-4b"]:
-        tf = results_path / subdir / "traces.json"
-        if tf.exists():
-            trace_files[subdir] = json.loads(tf.read_text())
+    for tf in sorted(results_path.glob("*/traces.json")):
+        trace_files[tf.parent.name] = json.loads(tf.read_text())
 
-    # Map run_name to trace file subdir
+    # Map run_name to trace file subdir (subdirs are named after the model).
     run_to_subdir = {}
     for r in all_results:
-        model = r["model"]
-        run_name = r["run_name"]
-        if model == "qwen3.5-9b":
-            run_to_subdir[run_name] = "qwen3.5-9b"
-        elif model == "qwen3.5-27b-awq":
-            run_to_subdir[run_name] = "qwen3.5-27b-awq"
-        elif model == "medgemma-4b":
-            run_to_subdir[run_name] = "medgemma-4b"
+        if r["model"] in trace_files:
+            run_to_subdir[r["run_name"]] = r["model"]
 
     # Initialize judge
     llm = LLMClient(

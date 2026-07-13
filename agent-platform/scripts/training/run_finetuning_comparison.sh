@@ -1,167 +1,66 @@
 #!/bin/bash
-# End-to-end fine-tuning comparison pipeline for NeuroAgent
-# Runs: SFT → GRPO → DAPO on Qwen3.5-9B with QLoRA
-# Hardware: Single A100-40GB
+# End-to-end fine-tuning comparison for NeuroAgent: SFT a model on the gold
+# trajectories (v5 train split), then evaluate base vs SFT on the held-out test split.
+#
+# Run: bash agent-platform/scripts/training/run_finetuning_comparison.sh [model_tag]
+#   model_tag defaults to Qwen3.5-9B; pass Qwen3.5-4B for the small student.
+#
+# This is a thin orchestrator over the maintained launchers (each is idempotent, so
+# re-running after an interruption is safe):
+#   run_sft_training.sh     — QLoRA/bf16-LoRA SFT on the train split, adapter to EOS
+#   run_definitive_eval.sh  — greedy + sampled base-vs-SFT eval with paired stats
+# For preference/RL stages see run_dpo_training.sh and run_rft.sh.
 set -euo pipefail
+cd /home/aprotani/projects/medical-agents
 
-# === Configuration ===
-MODEL="Qwen/Qwen3.5-9B"
-DATASET="data/neurobench"
-# Where generated training data lives. Defaults to EOS; override for local.
-TRAINING_DATA_ROOT="${TRAINING_DATA_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent/training_data}"
-TRAINING_DATA="$TRAINING_DATA_ROOT/gold_trajectories"
-# Where checkpoint adapters live. Defaults to EOS; override for local NVMe.
-CHECKPOINTS="${CHECKPOINTS_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent/checkpoints}"
-RESULTS="results/finetuning_comparison"
+MODEL_TAG="${1:-Qwen3.5-9B}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SPLITS="data/neurobench/splits"
+DATA="${DATA:-training_data/gold_trajectories/trajectories.jsonl}"
 
-LORA_RANK=64
-LORA_ALPHA=128
-SFT_EPOCHS=3
-GRPO_EPOCHS=15
-DAPO_EPOCHS=10
-BATCH_SIZE=2
-NUM_GENERATIONS=4
-
-# === Setup ===
-mkdir -p "$CHECKPOINTS" "$RESULTS" "$TRAINING_DATA"
-
-echo "========================================="
-echo " NeuroAgent Fine-Tuning Pipeline"
-echo " Model: $MODEL"
-echo " Dataset: $DATASET"
-echo " Hardware: QLoRA on single A100-40GB"
-echo "========================================="
-
-# === Phase 1: Data Preparation ===
-echo ""
-echo "[Phase 1] Preparing data..."
-
-# 1.1 Generate prompts for gold trajectory generation
-echo "  [1.1] Preparing trajectory prompts..."
-uv run python -m neuroagent.training.data.generate_gold_trajectories \
-    --dataset "$DATASET" \
-    --output "$TRAINING_DATA" \
-    --prepare-prompts
-
-# 1.2 Generate k-fold splits
-echo "  [1.2] Generating 5-fold splits..."
-uv run python -m neuroagent.training.data.split_dataset \
-    --dataset "$DATASET" \
-    --k 5
-
-echo "  [1.3] Gold trajectories must be generated via Claude Code subagent."
-echo "  Check $TRAINING_DATA/manifest.json for prompts."
-echo "  After generation, run: --validate to check them."
-
-# Check if trajectories exist
-if [ ! -f "$TRAINING_DATA/trajectories.jsonl" ]; then
-    echo ""
-    echo "  ⚠ No trajectories.jsonl found!"
-    echo "  Generate gold trajectories first, then re-run this script."
-    echo "  Skipping to evaluation of base model..."
-    echo ""
-fi
-
-# === Phase 2: SFT ===
-if [ -f "$TRAINING_DATA/trajectories.jsonl" ]; then
-    echo ""
-    echo "[Phase 2] SFT Training..."
-    echo "  Config: QLoRA, rank=$LORA_RANK, alpha=$LORA_ALPHA, epochs=$SFT_EPOCHS"
-
-    uv run python -m neuroagent.training.train_grpo \
-        --stage sft \
-        --model "$MODEL" \
-        --data "$TRAINING_DATA/trajectories.jsonl" \
-        --output "$CHECKPOINTS/sft_warmup" \
-        --lora-rank "$LORA_RANK" \
-        --lora-alpha "$LORA_ALPHA" \
-        --epochs "$SFT_EPOCHS" \
-        --batch-size "$BATCH_SIZE" \
-        --qlora
-
-    echo "  SFT checkpoint: $CHECKPOINTS/sft_warmup"
-fi
-
-# === Phase 3a: GRPO ===
-if [ -d "$CHECKPOINTS/sft_warmup" ]; then
-    echo ""
-    echo "[Phase 3a] Collecting trajectories from SFT model..."
-    uv run python -m neuroagent.training.data.prepare_trajectories \
-        --dataset "$DATASET" \
-        --output "$TRAINING_DATA/sft_trajectories.json" \
-        --model-checkpoint "$CHECKPOINTS/sft_warmup" \
-        --rollouts-per-case 8
-
-    echo ""
-    echo "[Phase 3a] Formatting for GRPO..."
-    uv run python -m neuroagent.training.data.format_for_grpo \
-        --input "$TRAINING_DATA/sft_trajectories.json" \
-        --output "$TRAINING_DATA/grpo_dataset" \
-        --mode full
-
-    echo ""
-    echo "[Phase 3a] GRPO Training (15 epochs with integrated curriculum)..."
-    uv run python -m neuroagent.training.train_grpo \
-        --stage grpo \
-        --model "$CHECKPOINTS/sft_warmup" \
-        --data "$TRAINING_DATA/grpo_dataset/train.jsonl" \
-        --output "$CHECKPOINTS/grpo_final" \
-        --lora-rank "$LORA_RANK" \
-        --lora-alpha "$LORA_ALPHA" \
-        --epochs "$GRPO_EPOCHS" \
-        --batch-size 1 \
-        --num-generations "$NUM_GENERATIONS" \
-        --qlora
-
-    echo "  GRPO checkpoint: $CHECKPOINTS/grpo_final"
-fi
-
-# === Phase 3b: DAPO ===
-if [ -d "$CHECKPOINTS/sft_warmup" ] && [ -f "$TRAINING_DATA/grpo_dataset/train.jsonl" ]; then
-    echo ""
-    echo "[Phase 3b] DAPO Training (10 epochs, token-level loss)..."
-    uv run python -m neuroagent.training.train_dapo \
-        --model "$CHECKPOINTS/sft_warmup" \
-        --data "$TRAINING_DATA/grpo_dataset/train.jsonl" \
-        --output "$CHECKPOINTS/dapo_final" \
-        --lora-rank "$LORA_RANK" \
-        --lora-alpha "$LORA_ALPHA" \
-        --epochs "$DAPO_EPOCHS" \
-        --batch-size 1 \
-        --num-generations "$NUM_GENERATIONS" \
-        --qlora
-
-    echo "  DAPO checkpoint: $CHECKPOINTS/dapo_final"
-fi
-
-# === Phase 4: Evaluation ===
-echo ""
-echo "[Phase 4] Evaluation..."
-
-# Evaluate all model variants
-for VARIANT in base sft grpo dapo; do
-    case $VARIANT in
-        base)   ADAPTER="" ;;
-        sft)    ADAPTER="$CHECKPOINTS/sft_warmup" ;;
-        grpo)   ADAPTER="$CHECKPOINTS/grpo_final" ;;
-        dapo)   ADAPTER="$CHECKPOINTS/dapo_final" ;;
-    esac
-
-    if [ "$VARIANT" = "base" ] || [ -d "$ADAPTER" ]; then
-        echo "  Evaluating: $VARIANT"
-        ADAPTER_FLAG=""
-        [ -n "$ADAPTER" ] && ADAPTER_FLAG="--adapter $ADAPTER"
-
-        uv run python -m neuroagent.training.evaluate_finetuned \
-            --base-model "$MODEL" \
-            $ADAPTER_FLAG \
-            --dataset "$DATASET" \
-            --output "$RESULTS/${VARIANT}_eval.json" || true
+# === Preconditions =======================================================
+# v5 train/test split (500/100 cases, checked into git). Regenerate only
+# deliberately — it would invalidate every existing run:
+#   uv run python -m neuroagent.training.data.make_train_test_split
+for f in train_cases.txt test_cases.txt split_manifest.json; do
+    if [ ! -f "$SPLITS/$f" ]; then
+        echo "ERROR: missing $SPLITS/$f — regenerate with:" >&2
+        echo "  uv run python -m neuroagent.training.data.make_train_test_split" >&2
+        exit 1
     fi
 done
 
+# Gold trajectories (generated by Claude subagents; see
+# generate_gold_trajectories.py --prepare-prompts and batch_generate_trajectories.py).
+if [ ! -f "$DATA" ]; then
+    echo "ERROR: no gold trajectories at $DATA" >&2
+    echo "Generate them first (prepare prompts, then run the trajectory subagents):" >&2
+    echo "  uv run python -m neuroagent.training.data.generate_gold_trajectories \\" >&2
+    echo "      --dataset data/neurobench --output training_data/gold_trajectories --prepare-prompts" >&2
+    exit 1
+fi
+
+echo "========================================="
+echo " NeuroAgent Fine-Tuning Comparison"
+echo " Model:  Qwen/$MODEL_TAG"
+echo " Data:   $DATA ($(wc -l < "$DATA") trajectories)"
+echo " Splits: $SPLITS ($(wc -l < "$SPLITS/train_cases.txt") train / $(wc -l < "$SPLITS/test_cases.txt") test)"
+echo "========================================="
+
+# === Phase 1: SFT (train split only; 10% val carve-out; adapter lands on EOS) ===
+echo ""
+echo "[Phase 1] SFT training..."
+DATA="$DATA" SPLITS="$SPLITS" bash "$SCRIPT_DIR/run_sft_training.sh" "Qwen/$MODEL_TAG"
+
+# === Phase 2: base-vs-SFT evaluation on the held-out test split ===
+# Greedy pass@1 + sampled reliability + judge bundles + paired significance.
+echo ""
+echo "[Phase 2] Base-vs-SFT evaluation..."
+bash "$SCRIPT_DIR/run_definitive_eval.sh" "$MODEL_TAG"
+
 echo ""
 echo "========================================="
-echo " Pipeline complete!"
-echo " Results: $RESULTS/"
+echo " Pipeline complete."
+echo " Results: results/definitive_eval/$MODEL_TAG/"
+echo " Judge bundles there feed prepare_judge_batches.py -> llm-judge -> aggregate_judge_scores.py"
 echo "========================================="

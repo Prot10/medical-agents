@@ -18,21 +18,35 @@ export CUDA_MODULE_LOADING=LAZY
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SFT_MODEL="/home/aprotani/projects/medical-agents/models/qwen3.5-9b-sft769"
-SFT_ADAPTER="$CHECKPOINTS_ROOT/sft_769/checkpoint-272"
-SFT_MERGED="/home/aprotani/projects/medical-agents/models/qwen3.5-9b-sft769"
+MODEL_TAG="${MODEL_TAG:-Qwen3.5-9B}"
+BASE_MODEL="Qwen/$MODEL_TAG"
+SERVE_KEY="$(echo "$MODEL_TAG" | tr '[:upper:]' '[:lower:]')"
+# SFT adapter written by run_sft_training.sh; served as LoRA for rollout collection.
+SFT_ADAPTER="${SFT_ADAPTER:-$CHECKPOINTS_ROOT/sft_${MODEL_TAG}}"
+# Merged SFT model (base + adapter) — DPO needs full weights: policy init + frozen reference.
+SFT_MERGED="${SFT_MERGED:-models/${SERVE_KEY}-sft-merged}"
 DATASET="data/neurobench"
-SPLIT_FILE="$DATASET/splits/fold0_train.txt"
+SPLIT_FILE="$DATASET/splits/train_cases.txt"   # v5 train split; test stays held out
 TRAJECTORIES="$TRAINING_DATA_ROOT/dpo_trajectories.json"
 PAIRS="$TRAINING_DATA_ROOT/dpo_pairs.json"
-OUTPUT="$CHECKPOINTS_ROOT/dpo_from_sft"
+OUTPUT="$CHECKPOINTS_ROOT/dpo_from_sft_${MODEL_TAG}"
 ROLLOUTS=8
 HOSPITAL="de_charite"
 PORT=8000
 
+# Stage base weights into /dev/shm (RAM) — EOS FUSE reads are too slow for a full model.
+source "$SCRIPT_DIR/_stage.sh"
+source "$SCRIPT_DIR/_gpu.sh"
+stage_base "$BASE_MODEL" || exit 1
+
+if [ ! -f "$SFT_ADAPTER/adapter_model.safetensors" ]; then
+    echo "ERROR: no SFT adapter at $SFT_ADAPTER — run run_sft_training.sh first" >&2
+    exit 1
+fi
+
 echo "========================================="
-echo " DPO Training Pipeline"
-echo " Step 1: Collect $ROLLOUTS rollouts × 140 cases via vLLM"
+echo " DPO Training Pipeline — $MODEL_TAG"
+echo " Step 1: Collect $ROLLOUTS rollouts × $(wc -l < "$SPLIT_FILE") train cases via vLLM"
 echo " Step 2: Build preference pairs"
 echo " Step 3: Train DPO (3 epochs, max_length=3584)"
 echo " Start: $(date)"
@@ -45,17 +59,14 @@ if [ ! -f "$TRAJECTORIES" ]; then
     echo ""
     echo "[Step 1/3] Collecting trajectories..."
 
-    pkill -f "vllm_serve.py" || true
-    pkill -f "VLLM::EngineCore" || true
-    sleep 5
+    free_gpu "before serving" || true
 
-    echo "Starting vLLM with SFT model..."
-    bash "$SCRIPT_DIR/../runtime/serve_model.sh" "$SFT_MODEL" "$PORT" &
-    VLLM_PID=$!
+    echo "Starting vLLM (base + SFT LoRA served as 'sft')..."
+    LORA_ADAPTER="$SFT_ADAPTER" bash "$SCRIPT_DIR/../runtime/serve_model.sh" "$SERVE_KEY" "$PORT" &
 
     echo "Waiting for vLLM..."
-    for i in $(seq 1 120); do
-        if curl -s "http://localhost:$PORT/v1/models" 2>/dev/null | grep -q "model"; then
+    for i in $(seq 1 180); do
+        if curl -s "http://localhost:$PORT/v1/models" 2>/dev/null | grep -q '"sft"'; then
             echo "vLLM ready after $((i*5))s"
             break
         fi
@@ -63,7 +74,7 @@ if [ ! -f "$TRAJECTORIES" ]; then
     done
 
     uv run python -m neuroagent.training.train_dpo collect \
-        --model "$SFT_MODEL" \
+        --model sft \
         --dataset "$DATASET" \
         --split-file "$SPLIT_FILE" \
         --output "$TRAJECTORIES" \
@@ -71,10 +82,7 @@ if [ ! -f "$TRAJECTORIES" ]; then
         --hospital "$HOSPITAL" \
         --base-url "http://localhost:$PORT/v1"
 
-    kill "$VLLM_PID" 2>/dev/null || true
-    pkill -f "vllm_serve.py" || true
-    pkill -f "VLLM::EngineCore" || true
-    sleep 5
+    free_gpu "rollouts done" || true
     echo "Trajectories saved to $TRAJECTORIES"
 else
     echo "[Step 1/3] Trajectories already exist at $TRAJECTORIES, skipping."
@@ -100,6 +108,14 @@ fi
 # -------------------------------------------------------
 echo ""
 echo "[Step 3/3] DPO Training..."
+# Merge the SFT adapter into the base once — DPO trains from full SFT weights.
+if [ ! -d "$SFT_MERGED" ]; then
+    echo "Merging SFT adapter into base -> $SFT_MERGED ..."
+    uv run python -m neuroagent.training.merge_adapter \
+        --base-model "$BASE_MODEL" \
+        --adapter "$SFT_ADAPTER" \
+        --output "$SFT_MERGED"
+fi
 # Use merged SFT model as base so that:
 # - Reference model = frozen SFT weights (correct for preference learning)
 # - Policy model = SFT + fresh rsLoRA adapter

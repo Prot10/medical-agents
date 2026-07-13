@@ -8,6 +8,11 @@ Keep:
 - `recompute_metrics.py`, `verify_metrics.py`, `evaluate_benchmark.py` — saved-trace scoring and diagnostics.
 - `run_model_comparison.py` — quick local model comparison.
 
+Legacy:
+- `run_llm_judge.py` — vLLM-based judge for saved `run_model_comparison.py` outputs
+  (`merged_results.json` + per-model `traces.json`); `--results-dir` is required, no
+  stale defaults. For `results/baseline_eval_*` runs use the batch pipeline above
+  (`prepare_judge_batches.py` → llm-judge agents → `aggregate_judge_scores.py`).
+
 Needs update:
-- `run_llm_judge.py` still documents/defaults to old v4 comparison paths. Update it to the current benchmark output layout or remove it if the batch judge pipeline is the only supported path.
 - `run_baseline_eval.py` and `run_full_benchmark.py` overlap. Keep both only if they serve distinct experiment workflows.
