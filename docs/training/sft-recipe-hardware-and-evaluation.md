@@ -16,7 +16,7 @@ Scripts referenced:
 
 | Knob | Value | Why |
 | --- | --- | --- |
-| Method | **bf16 LoRA** (was QLoRA/4-bit) | Unsloth recommends against 4-bit for Qwen3.5; and bf16 measured *lower* peak memory here (§3) |
+| Method | QLoRA (default) or **bf16 LoRA** (`PRECISION=bf16`, opt-in) | bf16 avoids 4-bit quantization error on the base (Unsloth's Qwen3.5 guidance); costs ~2 GB more, fits fine (§3) |
 | LoRA rank / alpha | 64 / 128 (α = 2r) | breadth (which modules) matters more than rank (QLoRA ablation) |
 | Target modules | **all linear**: `q,k,v,o` + `gate,up,down` + gated-delta-net `in_proj_qkv,in_proj_z,out_proj` | Qwen3.5 is hybrid — 24/32 layers are gated-delta-net; attention-only would freeze most token-mixing |
 | lora_dropout | 0.05 | mild regularisation on ~1000 examples |
@@ -73,27 +73,37 @@ Sequence length does **not** change the parameter count or optimizer state.
 
 ---
 
-## 3. bf16 LoRA vs QLoRA — measured, and why bf16 won
+## 3. bf16 LoRA vs QLoRA — measured (controlled)
 
-QLoRA stores the frozen base in 4-bit (~5 GB for the 9B); bf16 stores it in 16-bit (~18.5 GB
-resident). The LoRA adapter, its gradients, and optimizer state are identical either way. The
-naive expectation is that bf16's +13 GB of weights would push the 9B over 40 GB. It does not:
+QLoRA stores the frozen base in 4-bit; bf16 stores it in 16-bit. The LoRA adapter, its
+gradients, and optimizer state are identical either way. **Controlled** head-to-head on the 9B
+at seq 13312 — same optimizer (`paged_adamw_8bit`), same gradient checkpointing, same Liger,
+`expandable_segments:True`, peak read via `torch.cuda.max_memory_allocated()`:
 
-| seq_len | **bf16 LoRA** 9B peak | headroom (42 GB) |
-| --- | --- | --- |
-| 8192 | 25.2 GB | 17.2 |
-| 10240 | 26.5 GB | 15.9 |
-| 12288 | 27.8 GB | 14.6 |
-| **13312 (ours)** | **28.5 GB** | **13.9** ✓ |
-| 16384 | 30.4 GB | 12.0 |
+| @ seq 13312, identical settings | resident weights | **peak** | headroom (42 GB) |
+| --- | --- | --- | --- |
+| **QLoRA (4-bit)** | 12.4 GB | **25.2 GB** | 17.2 |
+| **bf16 LoRA** | 18.5 GB | **27.2 GB** | 15.2 |
 
-**bf16 peak (28.5 GB) is *lower* than QLoRA's peak at the same length (~30.9 GB).** QLoRA saves
-resident weight memory but must **dequantize each 4-bit weight back to bf16 on the fly** every
-forward/backward pass, and those temporary bf16 copies cost more than the 4-bit storage saved
-at this scale. So for the 9B here bf16 LoRA is **both higher quality** (no quantization error on
-the base) **and lower peak memory**. No reason to keep QLoRA for either model. Growth is only
-~1.3 GB per 2048 tokens because Liger keeps the logits flat (§4) and checkpointing bounds
-activations.
+**QLoRA is lower (~2 GB), the expected ordering** — saving memory is the whole point of QLoRA.
+
+> A caution, learned the hard way: an earlier *uncontrolled* comparison made it look like bf16
+> used *less* than QLoRA (28.5 vs 30.9 GB). That was an artifact — the QLoRA figure came from a
+> probe with a paged 8-bit optimizer measured via `nvidia-smi`, and **paged optimizers map
+> unified memory that inflates the NVML/reserved figure far above the true allocated tensors**
+> (bitsandbytes; PyTorch allocator fragmentation). Always compare with identical optimizer and
+> `max_memory_allocated()`, not `nvidia-smi`. bf16 is not cheaper than QLoRA; QLoRA is designed
+> to save ~the resident-weight delta.
+
+Two real facts survive: (1) at long context the gap is **much smaller than the 6 GB
+resident-weight difference** (down to ~2 GB) because the shared activation memory dominates —
+so the weight saving matters less at 13k tokens than at short context; and (2) **both fit
+comfortably** (25–27 GB, ~15 GB headroom). So the choice is not about memory.
+
+**Why we still switch the retrain to bf16 LoRA:** quality, not memory. Unsloth recommends
+against 4-bit for Qwen3.5 — quantizing the base adds error the LoRA has to work around. bf16
+keeps the base exact and costs only ~2 GB more, which fits. It is an **opt-in flag**
+(`PRECISION=bf16` in `run_sft_training.sh`); QLoRA remains the default.
 
 ---
 

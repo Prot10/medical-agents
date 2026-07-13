@@ -206,6 +206,7 @@ def _save_run_summary(
     model_name: str,
     n_train: int,
     n_eval: int,
+    precision: str = "unknown",
 ) -> None:
     """Persist the hyperparameters and the loss curve beside the adapter.
 
@@ -213,6 +214,7 @@ def _save_run_summary(
     """
     summary = {
         "model": model_name,
+        "precision": precision,  # "qlora" (4-bit NF4) or "bf16"
         "n_train_trajectories": n_train,
         "n_eval_trajectories": n_eval,
         "hyperparameters": {
@@ -555,7 +557,8 @@ def run_sft(
     tokenizer.save_pretrained(output_dir)
 
     _save_run_summary(output_dir, trainer, result, training_args, model_name, len(dataset),
-                      len(eval_dataset) if eval_dataset else 0)
+                      len(eval_dataset) if eval_dataset else 0,
+                      precision="qlora" if qlora else "bf16")
     logger.info("SFT model saved to %s", output_dir)
 
 

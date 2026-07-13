@@ -8,8 +8,8 @@
 # carved out for eval_loss / early stopping. The 100 test cases are never seen — evaluate
 # them afterwards with run_sft_eval.sh.
 #
-# Checkpoints are written to LOCAL disk and copied to EOS at the end: EOS is a FUSE mount
-# and stalls on the large, repeated writes a live trainer makes.
+# Base weights stage to /dev/shm (RAM); the adapter is written straight to EOS. Precision is
+# QLoRA (default) or bf16 LoRA via PRECISION=bf16.
 set -euo pipefail
 
 cd /home/aprotani/projects/medical-agents
@@ -43,10 +43,10 @@ fi
 DATA="${DATA:-training_data/gold_trajectories/trajectories.jsonl}"
 SPLITS="${SPLITS:-data/neurobench/splits}"
 
-# The longest trajectory is 12,956 tokens once the 12 tool schemas are rendered into the
+# The longest trajectory is ~15,809 tokens once the 12 tool schemas are rendered into the
 # prompt. Truncation removes the END of a trajectory — the final diagnosis — so the cap must
 # sit above that. The probe reports what the GPU can actually hold.
-SEQ_CAP="${SEQ_CAP:-13312}"
+SEQ_CAP="${SEQ_CAP:-16384}"
 PROBE_JSON="results/sft_probe/max_seq_probe.json"
 if [ -z "${MAX_SEQ:-}" ]; then
   if [ ! -f "$PROBE_JSON" ]; then
@@ -61,8 +61,8 @@ probed = json.load(open('$PROBE_JSON'))['shared_max_seq_length']
 print(min(probed, $SEQ_CAP))")"
 fi
 
-if [ "$MAX_SEQ" -lt 13312 ]; then
-  echo "WARNING: max_seq=$MAX_SEQ truncates the longest trajectories (12,956 tokens)."
+if [ "$MAX_SEQ" -lt 16384 ]; then
+  echo "WARNING: max_seq=$MAX_SEQ truncates the longest trajectories (up to 15,809 tokens)."
   echo "         Truncation cuts the final diagnosis. Consider a smaller model or shorter prompts."
 fi
 
@@ -72,6 +72,16 @@ fi
 case "$MODEL_TAG" in
   Qwen3.5-4B) LR="${LR:-2e-4}";   OPTIM="${OPTIM:-adamw_8bit}" ;;
   *)          LR="${LR:-1.5e-4}"; OPTIM="${OPTIM:-paged_adamw_8bit}" ;;
+esac
+
+# Precision: qlora (4-bit NF4, default) or bf16 (16-bit base LoRA). bf16 avoids quantization
+# error on the base — Unsloth's Qwen3.5 guidance — at ~2 GB more memory (measured: 27.2 GB vs
+# 25.2 GB at seq 13312 on the 9B; both fit 40 GB with margin). Opt in with PRECISION=bf16.
+PRECISION="${PRECISION:-qlora}"
+case "$PRECISION" in
+  qlora) QLORA_FLAG="--qlora" ;;
+  bf16)  QLORA_FLAG="" ;;
+  *) echo "ERROR: PRECISION must be 'qlora' or 'bf16', got '$PRECISION'" >&2; exit 1 ;;
 esac
 
 EPOCHS="${EPOCHS:-3}"
@@ -91,7 +101,7 @@ mkdir -p "$EOS_DIR" results/sft_probe
 
 echo "========================================="
 echo " SFT — agent distillation"
-echo " Model:      $MODEL (QLoRA NF4)"
+echo " Model:      $MODEL ($PRECISION)"
 echo " Data:       $DATA ($N_TRAJ trajectories, train split only)"
 echo " Max seq:    $MAX_SEQ tokens (probe, capped at $SEQ_CAP)"
 echo " LoRA:       rank=64, alpha=128, all linear layers"
@@ -129,7 +139,8 @@ uv run python -m neuroagent.training.train_grpo \
     --splits-dir "$SPLITS" \
     --val-fraction 0.1 \
     --early-stopping-patience 1 \
-    --qlora
+    --max-steps "${MAX_STEPS:--1}" \
+    $QLORA_FLAG
 
 echo ""
 echo "Adapter + run_summary.json on EOS: $EOS_DIR"
