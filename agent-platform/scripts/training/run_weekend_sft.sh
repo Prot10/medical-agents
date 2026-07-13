@@ -11,7 +11,7 @@
 # Idempotent: each stage skips if its output already exists, so it is safe to re-run after an
 # interruption.
 set -uo pipefail
-cd /home/aprotani/projects/medical-agents
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"  # repo root
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MODELS=("Qwen3.5-4B" "Qwen3.5-9B")

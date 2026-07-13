@@ -8,7 +8,7 @@
 # measures generalisation, not recall of training data. Base and SFT are each served in
 # turn, evaluated with REPEATS samples per case, then compared.
 set -euo pipefail
-cd /home/aprotani/projects/medical-agents
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"  # repo root
 
 MODEL_TAG="${1:-Qwen3.5-9B}"
 SERVE_KEY="$(echo "$MODEL_TAG" | tr '[:upper:]' '[:lower:]')"   # qwen3.5-9b / qwen3.5-4b

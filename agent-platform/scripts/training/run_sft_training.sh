@@ -12,7 +12,7 @@
 # QLoRA (default) or bf16 LoRA via PRECISION=bf16.
 set -euo pipefail
 
-cd /home/aprotani/projects/medical-agents
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"  # repo root
 
 MODEL="${1:-Qwen/Qwen3.5-9B}"
 MODEL_TAG="$(basename "$MODEL")"

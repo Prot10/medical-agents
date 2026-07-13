@@ -9,7 +9,7 @@
 # SFT'd model (ADAPTER=...) reinforces reasoning the student can already produce — the point
 # of RFT. Run: bash run_rft.sh Qwen3.5-9B
 set -uo pipefail
-cd /home/aprotani/projects/medical-agents
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"  # repo root
 
 MODEL_TAG="${1:-Qwen3.5-9B}"
 SERVE_KEY="$(echo "$MODEL_TAG" | tr '[:upper:]' '[:lower:]')"

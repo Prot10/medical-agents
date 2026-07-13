@@ -4,7 +4,7 @@
 #
 # Run: bash agent-platform/scripts/training/run_dpo_training.sh
 set -euo pipefail
-cd /home/aprotani/projects/medical-agents
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"  # repo root
 
 # Where checkpoint adapters live. Defaults to EOS; override for local NVMe.
 CHECKPOINTS_ROOT="${CHECKPOINTS_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent/checkpoints}"

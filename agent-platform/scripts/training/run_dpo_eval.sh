@@ -2,11 +2,11 @@
 # Evaluate DPO model on fold0 val set and compare all 4 models
 # Run: bash agent-platform/scripts/training/run_dpo_eval.sh
 set -euo pipefail
-cd /home/aprotani/projects/medical-agents
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"  # repo root
 
 export CUDA_MODULE_LOADING=LAZY
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DPO_MODEL="/home/aprotani/projects/medical-agents/models/qwen3.5-9b-dpo"
+DPO_MODEL="${DPO_MODEL:-${MODELS_ROOT:-models}/qwen3.5-9b-dpo}"
 RESULTS_DIR="results/sft_eval"
 PORT=8000
 

@@ -11,7 +11,7 @@
 #   run_definitive_eval.sh  — greedy + sampled base-vs-SFT eval with paired stats
 # For preference/RL stages see run_dpo_training.sh and run_rft.sh.
 set -euo pipefail
-cd /home/aprotani/projects/medical-agents
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"  # repo root
 
 MODEL_TAG="${1:-Qwen3.5-9B}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
