@@ -139,6 +139,35 @@ def load_sft_data(data_path: str, top_fraction: float = 0.1) -> list[dict]:
     return top
 
 
+def _log_sequence_stats(dataset, tokenizer, max_seq_length: int, tools: list[dict]) -> None:
+    """Log the token-length distribution and truncation count before training starts."""
+    import statistics
+
+    lengths = []
+    for row in dataset:
+        text = tokenizer.apply_chat_template(
+            row["messages"], tools=row.get("tools") or tools, tokenize=False
+        )
+        lengths.append(len(tokenizer(text, add_special_tokens=False).input_ids))
+    lengths.sort()
+    n = len(lengths)
+    p = lambda q: lengths[min(n - 1, int(n * q))]
+    truncated = sum(1 for x in lengths if x > max_seq_length)
+
+    logger.info(
+        "Sequence lengths (tokens, with tools rendered): median=%d p95=%d max=%d  | max_seq_length=%d",
+        int(statistics.median(lengths)), p(0.95), lengths[-1], max_seq_length,
+    )
+    if truncated:
+        logger.warning(
+            "%d/%d trajectories (%.1f%%) exceed max_seq_length=%d and WILL BE TRUNCATED at the "
+            "tail — the final diagnosis is what gets cut. Raise --max-seq-length or shorten prompts.",
+            truncated, n, 100 * truncated / n, max_seq_length,
+        )
+    else:
+        logger.info("No truncation: every trajectory fits in %d tokens ✓", max_seq_length)
+
+
 def _assert_loss_is_assistant_only(trainer, tokenizer) -> None:
     """Fail loudly if the loss covers tool observations.
 
@@ -438,6 +467,12 @@ def run_sft(
     if eval_dataset is not None:
         logger.info("Eval dataset: %d examples", len(eval_dataset))
 
+    # Pre-flight: report the token-length distribution and how much (if anything) truncates at
+    # max_seq_length, so a silently-cut trajectory tail (the final diagnosis) is visible in the
+    # log before a multi-hour run rather than discovered after.
+    if conversational:
+        _log_sequence_stats(dataset, tokenizer, max_seq_length, _agent_tool_definitions())
+
     # Training config — following SFT best practices:
     # - completion_only_loss=True: only compute loss on completion tokens (not prompt)
     # - cosine scheduler for smoother convergence
@@ -471,7 +506,7 @@ def run_sft(
         learning_rate=learning_rate,
         max_length=max_seq_length,
         bf16=bf16,
-        logging_steps=10,
+        logging_steps=5,  # finer granularity for tmux monitoring (~11 logs/epoch)
         save_strategy="epoch",
         save_total_limit=2,
         save_only_model=True,
