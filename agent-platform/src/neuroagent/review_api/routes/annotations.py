@@ -113,9 +113,10 @@ def set_status(
 ) -> CaseReview:
     version = _ensure_case(request, version, case_id)
     store = _store(request)
-    review = store.load_or_init(version, reviewer.code, case_id)
-    review.status = body.status
-    return store.save(review)
+    with store.lock_for(version, reviewer.code, case_id):
+        review = store.load_or_init(version, reviewer.code, case_id)
+        review.status = body.status
+        return store.save(review)
 
 
 # ----------------------------------------------------------------------
@@ -136,24 +137,25 @@ def create_annotation(
 ) -> CaseReview:
     version = _ensure_case(request, version, case_id)
     store = _store(request)
-    review = store.load_or_init(version, reviewer.code, case_id)
-    if any(a.id == body.id for a in review.field_annotations):
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"Annotation '{body.id}' already exists",
+    with store.lock_for(version, reviewer.code, case_id):
+        review = store.load_or_init(version, reviewer.code, case_id)
+        if any(a.id == body.id for a in review.field_annotations):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Annotation '{body.id}' already exists",
+            )
+        if len(review.field_annotations) >= MAX_ANNOTATIONS_PER_CASE:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Annotation limit reached for this case",
+            )
+        now = _utcnow()
+        review.field_annotations.append(
+            FieldAnnotation(**body.model_dump(), created_at=now, updated_at=now)
         )
-    if len(review.field_annotations) >= MAX_ANNOTATIONS_PER_CASE:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Annotation limit reached for this case",
-        )
-    now = _utcnow()
-    review.field_annotations.append(
-        FieldAnnotation(**body.model_dump(), created_at=now, updated_at=now)
-    )
-    if review.status == "pending":
-        review.status = "in_progress"
-    return store.save(review)
+        if review.status == "pending":
+            review.status = "in_progress"
+        return store.save(review)
 
 
 @router.put(
@@ -170,13 +172,14 @@ def update_annotation(
 ) -> CaseReview:
     version = _ensure_case(request, version, case_id)
     store = _store(request)
-    review = store.load_or_init(version, reviewer.code, case_id)
-    for idx, annotation in enumerate(review.field_annotations):
-        if annotation.id == annotation_id:
-            updates = body.model_dump(exclude_unset=True)
-            updates["updated_at"] = _utcnow()
-            review.field_annotations[idx] = annotation.model_copy(update=updates)
-            return store.save(review)
+    with store.lock_for(version, reviewer.code, case_id):
+        review = store.load_or_init(version, reviewer.code, case_id)
+        for idx, annotation in enumerate(review.field_annotations):
+            if annotation.id == annotation_id:
+                updates = body.model_dump(exclude_unset=True)
+                updates["updated_at"] = _utcnow()
+                review.field_annotations[idx] = annotation.model_copy(update=updates)
+                return store.save(review)
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"Annotation '{annotation_id}' not found",
@@ -196,17 +199,18 @@ def delete_annotation(
 ) -> CaseReview:
     version = _ensure_case(request, version, case_id)
     store = _store(request)
-    review = store.load_or_init(version, reviewer.code, case_id)
-    before = len(review.field_annotations)
-    review.field_annotations = [
-        a for a in review.field_annotations if a.id != annotation_id
-    ]
-    if len(review.field_annotations) == before:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Annotation '{annotation_id}' not found",
-        )
-    return store.save(review)
+    with store.lock_for(version, reviewer.code, case_id):
+        review = store.load_or_init(version, reviewer.code, case_id)
+        before = len(review.field_annotations)
+        review.field_annotations = [
+            a for a in review.field_annotations if a.id != annotation_id
+        ]
+        if len(review.field_annotations) == before:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Annotation '{annotation_id}' not found",
+            )
+        return store.save(review)
 
 
 # ----------------------------------------------------------------------
@@ -227,24 +231,25 @@ def create_comment(
 ) -> CaseReview:
     version = _ensure_case(request, version, case_id)
     store = _store(request)
-    review = store.load_or_init(version, reviewer.code, case_id)
-    if any(c.id == body.id for c in review.case_comments):
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"Comment '{body.id}' already exists",
+    with store.lock_for(version, reviewer.code, case_id):
+        review = store.load_or_init(version, reviewer.code, case_id)
+        if any(c.id == body.id for c in review.case_comments):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Comment '{body.id}' already exists",
+            )
+        if len(review.case_comments) >= MAX_COMMENTS_PER_CASE:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Comment limit reached for this case",
+            )
+        now = _utcnow()
+        review.case_comments.append(
+            CaseComment(**body.model_dump(), created_at=now, updated_at=now)
         )
-    if len(review.case_comments) >= MAX_COMMENTS_PER_CASE:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Comment limit reached for this case",
-        )
-    now = _utcnow()
-    review.case_comments.append(
-        CaseComment(**body.model_dump(), created_at=now, updated_at=now)
-    )
-    if review.status == "pending":
-        review.status = "in_progress"
-    return store.save(review)
+        if review.status == "pending":
+            review.status = "in_progress"
+        return store.save(review)
 
 
 @router.put(
@@ -261,13 +266,14 @@ def update_comment(
 ) -> CaseReview:
     version = _ensure_case(request, version, case_id)
     store = _store(request)
-    review = store.load_or_init(version, reviewer.code, case_id)
-    for idx, comment in enumerate(review.case_comments):
-        if comment.id == comment_id:
-            updates = body.model_dump(exclude_unset=True)
-            updates["updated_at"] = _utcnow()
-            review.case_comments[idx] = comment.model_copy(update=updates)
-            return store.save(review)
+    with store.lock_for(version, reviewer.code, case_id):
+        review = store.load_or_init(version, reviewer.code, case_id)
+        for idx, comment in enumerate(review.case_comments):
+            if comment.id == comment_id:
+                updates = body.model_dump(exclude_unset=True)
+                updates["updated_at"] = _utcnow()
+                review.case_comments[idx] = comment.model_copy(update=updates)
+                return store.save(review)
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"Comment '{comment_id}' not found",
@@ -287,15 +293,16 @@ def delete_comment(
 ) -> CaseReview:
     version = _ensure_case(request, version, case_id)
     store = _store(request)
-    review = store.load_or_init(version, reviewer.code, case_id)
-    before = len(review.case_comments)
-    review.case_comments = [c for c in review.case_comments if c.id != comment_id]
-    if len(review.case_comments) == before:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Comment '{comment_id}' not found",
-        )
-    return store.save(review)
+    with store.lock_for(version, reviewer.code, case_id):
+        review = store.load_or_init(version, reviewer.code, case_id)
+        before = len(review.case_comments)
+        review.case_comments = [c for c in review.case_comments if c.id != comment_id]
+        if len(review.case_comments) == before:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Comment '{comment_id}' not found",
+            )
+        return store.save(review)
 
 
 # ----------------------------------------------------------------------
@@ -319,10 +326,11 @@ def heartbeat(
 ) -> dict[str, int]:
     version = _ensure_case(request, version, case_id)
     store = _store(request)
-    review = store.load_or_init(version, reviewer.code, case_id)
-    review.time_spent_seconds = min(
-        review.time_spent_seconds + body.seconds, MAX_CASE_TIME_SECONDS
-    )
-    review.last_active_at = _utcnow()
-    store.save(review)
+    with store.lock_for(version, reviewer.code, case_id):
+        review = store.load_or_init(version, reviewer.code, case_id)
+        review.time_spent_seconds = min(
+            review.time_spent_seconds + body.seconds, MAX_CASE_TIME_SECONDS
+        )
+        review.last_active_at = _utcnow()
+        store.save(review)
     return {"time_spent_seconds": review.time_spent_seconds}

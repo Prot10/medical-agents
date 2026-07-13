@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import Response
@@ -10,6 +11,17 @@ from fastapi.responses import Response
 from neuroagent.model_registry import HF_TO_KEY
 
 router = APIRouter(tags=["traces"])
+
+# Trace ids are `{case_id}_{time_ns}` — allowlist keeps path separators,
+# `..`, and anything else path-traversal-shaped out of filesystem lookups.
+_TRACE_ID_PATTERN = re.compile(r"^[A-Za-z0-9_\-]+$")
+
+
+def validate_trace_id(trace_id: str) -> str:
+    """Reject trace ids that could escape the traces directory."""
+    if not trace_id or not _TRACE_ID_PATTERN.fullmatch(trace_id):
+        raise HTTPException(status_code=400, detail="Invalid trace ID")
+    return trace_id
 
 
 @router.get("/traces")
@@ -46,6 +58,7 @@ def list_traces(request: Request) -> list[dict]:
 @router.get("/traces/{trace_id}")
 def get_trace(trace_id: str, request: Request) -> dict:
     """Download a full trace JSON."""
+    validate_trace_id(trace_id)
     trace_file = request.app.state.traces_dir / f"{trace_id}.json"
     if not trace_file.exists():
         raise HTTPException(status_code=404, detail=f"Trace '{trace_id}' not found")
@@ -55,8 +68,7 @@ def get_trace(trace_id: str, request: Request) -> dict:
 @router.delete("/traces/{trace_id}", status_code=204)
 def delete_trace(trace_id: str, request: Request) -> Response:
     """Delete a saved trace file."""
-    if "/" in trace_id or ".." in trace_id:
-        raise HTTPException(status_code=400, detail="Invalid trace ID")
+    validate_trace_id(trace_id)
     trace_file = request.app.state.traces_dir / f"{trace_id}.json"
     if not trace_file.exists():
         raise HTTPException(status_code=404, detail=f"Trace '{trace_id}' not found")

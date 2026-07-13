@@ -10,10 +10,10 @@ see each other's annotations because they live in separate directories.
 
 from __future__ import annotations
 
-import json
 import logging
 import re
 import tempfile
+import threading
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -31,6 +31,22 @@ _CASE_ID_PATTERN = re.compile(r"^[A-Za-z0-9_\-]+$")
 
 def _utcnow() -> datetime:
     return datetime.now(timezone.utc)
+
+
+# Per-(canonical version, reviewer, case) write locks. Module-level so every
+# AnnotationStore instance serializes on the same lock for the same file.
+# Reentrant so load_or_init can call save() while already holding the lock.
+_REVIEW_LOCKS: dict[tuple[str, str, str], threading.RLock] = {}
+_REVIEW_LOCKS_GUARD = threading.Lock()
+
+
+def _review_lock(version: str, reviewer_code: str, case_id: str) -> threading.RLock:
+    key = (version, reviewer_code, case_id)
+    with _REVIEW_LOCKS_GUARD:
+        lock = _REVIEW_LOCKS.get(key)
+        if lock is None:
+            lock = _REVIEW_LOCKS[key] = threading.RLock()
+        return lock
 
 
 class AnnotationStore:
@@ -86,6 +102,22 @@ class AnnotationStore:
             for candidate in self._version_candidates(version)
         ]
 
+    def lock_for(
+        self, version: str, reviewer_code: str, case_id: str
+    ) -> threading.RLock:
+        """Reentrant lock guarding one (version, reviewer, case) review file.
+
+        ``save``/``load_or_init``/``delete`` acquire it internally; callers
+        that do a load → mutate → save sequence can hold it across the whole
+        sequence to make the read-modify-write atomic.
+        """
+        canonical = self._validate_version(version)
+        if not _CODE_PATTERN.fullmatch(reviewer_code):
+            raise ValueError(f"Invalid reviewer code: {reviewer_code!r}")
+        if not _CASE_ID_PATTERN.fullmatch(case_id):
+            raise ValueError(f"Invalid case id: {case_id!r}")
+        return _review_lock(canonical, reviewer_code, case_id)
+
     # ------------------------------------------------------------------
     # CRUD
 
@@ -119,50 +151,55 @@ class AnnotationStore:
         Side effect: on first load, ``first_opened_at`` is set and the
         review is persisted so the timestamp survives restarts.
         """
-        existing = self.load(version, reviewer_code, case_id)
-        if existing is not None:
-            return existing
+        with self.lock_for(version, reviewer_code, case_id):
+            existing = self.load(version, reviewer_code, case_id)
+            if existing is not None:
+                return existing
 
-        now = _utcnow()
-        canonical = normalize_dataset_version(version)
-        review = CaseReview(
-            case_id=case_id,
-            dataset_version=canonical,
-            reviewer_code=reviewer_code,
-            first_opened_at=now,
-            last_updated_at=now,
-        )
-        self.save(review)
-        return review
+            now = _utcnow()
+            canonical = normalize_dataset_version(version)
+            review = CaseReview(
+                case_id=case_id,
+                dataset_version=canonical,
+                reviewer_code=reviewer_code,
+                first_opened_at=now,
+                last_updated_at=now,
+            )
+            self.save(review)
+            return review
 
     def save(self, review: CaseReview) -> CaseReview:
         """Persist the review atomically."""
-        review.last_updated_at = _utcnow()
         review.dataset_version = normalize_dataset_version(review.dataset_version)
-        path = self._path_for(
+        with self.lock_for(
             review.dataset_version, review.reviewer_code, review.case_id
-        )
-        path.parent.mkdir(parents=True, exist_ok=True)
-        # Atomic write: tempfile + rename.
-        with tempfile.NamedTemporaryFile(
-            "w",
-            dir=str(path.parent),
-            prefix=f".{path.name}.",
-            suffix=".tmp",
-            delete=False,
-            encoding="utf-8",
-        ) as fh:
-            fh.write(review.model_dump_json(indent=2))
-            tmp_path = Path(fh.name)
-        tmp_path.replace(path)
+        ):
+            review.last_updated_at = _utcnow()
+            path = self._path_for(
+                review.dataset_version, review.reviewer_code, review.case_id
+            )
+            path.parent.mkdir(parents=True, exist_ok=True)
+            # Atomic write: tempfile + rename.
+            with tempfile.NamedTemporaryFile(
+                "w",
+                dir=str(path.parent),
+                prefix=f".{path.name}.",
+                suffix=".tmp",
+                delete=False,
+                encoding="utf-8",
+            ) as fh:
+                fh.write(review.model_dump_json(indent=2))
+                tmp_path = Path(fh.name)
+            tmp_path.replace(path)
         return review
 
     def delete(self, version: str, reviewer_code: str, case_id: str) -> bool:
-        path = self._path_for(version, reviewer_code, case_id)
-        if not path.exists():
-            return False
-        path.unlink()
-        return True
+        with self.lock_for(version, reviewer_code, case_id):
+            path = self._path_for(version, reviewer_code, case_id)
+            if not path.exists():
+                return False
+            path.unlink()
+            return True
 
     # ------------------------------------------------------------------
     # Listing

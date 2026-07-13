@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 from typing import AsyncIterator
 
 from neuroagent_schemas import NeuroBenchCase
@@ -12,6 +13,10 @@ from neuroagent.agent.reasoning import AgentTrace
 from neuroagent.evaluation.metrics import MetricsCalculator
 from neuroagent.llm.client import LLMClient
 from neuroagent.llm.prompts import load_prompt
+
+from .sse_bridge import SSEBridge
+
+logger = logging.getLogger(__name__)
 
 _oracle_prompt_cache: str | None = None
 
@@ -34,7 +39,9 @@ async def stream_evaluation_events(
     evaluator_api_key: str,
 ) -> AsyncIterator[dict]:
     """Run rule-based metrics plus LLM judge and yield API event dicts."""
-    queue: asyncio.Queue[dict | None] = asyncio.Queue()
+    # Thread-safe bridge: the evaluator runs in a worker thread, and
+    # asyncio.Queue must only be touched from the event loop thread.
+    bridge = SSEBridge()
 
     def _run_sync() -> None:
         try:
@@ -47,7 +54,7 @@ async def stream_evaluation_events(
             )
             metrics = MetricsCalculator().compute_all(trace, case.ground_truth)
 
-            queue.put_nowait({
+            bridge.put_from_thread({
                 "type": "metrics",
                 "diagnostic_accuracy_top1": metrics.diagnostic_accuracy_top1,
                 "diagnostic_accuracy_top3": metrics.diagnostic_accuracy_top3,
@@ -59,7 +66,7 @@ async def stream_evaluation_events(
                 "safety_score": round(metrics.safety_score, 3),
             })
 
-            queue.put_nowait({"type": "judge_started"})
+            bridge.put_from_thread({"type": "judge_started"})
 
             llm = LLMClient(
                 base_url=evaluator_base_url,
@@ -79,27 +86,48 @@ async def stream_evaluation_events(
 
             full_content: list[str] = []
             for ev in llm.chat_stream(messages=messages, tools=None):
+                if bridge.client_disconnected:
+                    # Nothing to persist here — stop paying for judge tokens.
+                    logger.info("Evaluation client disconnected; stopping judge stream")
+                    return
                 if ev["type"] == "content_delta":
                     full_content.append(ev["delta"])
-                    queue.put_nowait({"type": "judge_delta", "delta": ev["delta"]})
+                    bridge.put_from_thread({"type": "judge_delta", "delta": ev["delta"]})
 
-            queue.put_nowait({
+            bridge.put_from_thread({
                 "type": "judge_complete",
                 **_parse_oracle_response("".join(full_content)),
             })
         except Exception as exc:
-            queue.put_nowait({"type": "eval_error", "message": str(exc)})
+            bridge.put_from_thread({"type": "eval_error", "message": str(exc)})
         finally:
-            queue.put_nowait(None)
+            bridge.put_from_thread(None)
 
-    loop = asyncio.get_event_loop()
-    loop.run_in_executor(None, _run_sync)
+    loop = asyncio.get_running_loop()
+    run_future = loop.run_in_executor(None, _run_sync)
+    run_future.add_done_callback(_log_worker_failure)
 
-    while True:
-        event = await queue.get()
-        if event is None:
-            break
-        yield event
+    completed = False
+    try:
+        async for event in bridge.events():
+            yield event
+        completed = True
+    finally:
+        if not completed:
+            # Client disconnected — stop buffering judge output.
+            bridge.mark_disconnected()
+            logger.info(
+                "SSE client disconnected during evaluation of case %s", case.case_id
+            )
+
+
+def _log_worker_failure(future: asyncio.Future) -> None:
+    """Surface unexpected executor-task failures instead of losing them."""
+    if future.cancelled():
+        return
+    exc = future.exception()
+    if exc is not None:
+        logger.error("Evaluation worker thread failed", exc_info=exc)
 
 
 def _build_oracle_user_prompt(

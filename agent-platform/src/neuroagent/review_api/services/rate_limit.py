@@ -4,10 +4,13 @@ The reviewer code is a bearer secret reachable over a public tunnel, so we
 slow down brute-force guessing: after too many failed attempts from one client
 within a window, that client is locked out for a cooldown period and gets 429s.
 
-Keyed on the real client IP — behind Cloudflare we honour ``CF-Connecting-IP``
-/ ``X-Forwarded-For`` (the direct ``request.client`` is just the tunnel).
+Keyed on ``X-Real-IP``, which the deployment nginx sets from ``$remote_addr``
+and therefore cannot be forged by the client. ``CF-Connecting-IP`` and
+``X-Forwarded-For`` are deliberately NOT trusted: nginx only *appends* to
+X-Forwarded-For (``proxy_add_x_forwarded_for``), so the first element is
+attacker-controlled and would let a brute-forcer rotate keys freely.
 State is per-process and in-memory, which is sufficient for the single-uvicorn
-Raspberry-Pi deployment; pair with a Cloudflare WAF rule for defence in depth.
+deployment; pair with an upstream WAF rule for defence in depth.
 """
 
 from __future__ import annotations
@@ -35,13 +38,16 @@ class AuthRateLimiter:
 
     @staticmethod
     def client_key(request: Request) -> str:
-        """Best-effort real client identity, Cloudflare-aware."""
-        cf = request.headers.get("cf-connecting-ip")
-        if cf:
-            return cf.strip()
-        xff = request.headers.get("x-forwarded-for")
-        if xff:
-            return xff.split(",")[0].strip()
+        """Client identity for throttling.
+
+        Only ``X-Real-IP`` is honoured — the deployment nginx overwrites it
+        with ``$remote_addr``, so a client cannot spoof it through the proxy.
+        Client-controllable headers (``CF-Connecting-IP``, ``X-Forwarded-For``)
+        are ignored. Without the proxy, fall back to the socket peer address.
+        """
+        real_ip = request.headers.get("x-real-ip")
+        if real_ip:
+            return real_ip.strip()
         return request.client.host if request.client else "unknown"
 
     def retry_after(self, key: str) -> int | None:

@@ -18,6 +18,8 @@ from neuroagent_schemas import NeuroBenchCase
 from ...agent.orchestrator import AgentOrchestrator, load_agent_config
 from ...evaluation.runner import format_patient_info
 from ..services.agent_evaluation import stream_evaluation_events
+from ..services.sse_bridge import SSEBridge
+from .traces import validate_trace_id
 from ...rules.rules_engine import AVAILABLE_HOSPITALS, RulesEngine
 from ...tools.mock_server import MockServer
 from ...tools.tool_registry import ToolRegistry
@@ -88,37 +90,20 @@ async def _stream_agent_events(
         "max_turns": config.max_turns,
     })
 
-    # Use an async queue so events stream as they're produced
-    queue: asyncio.Queue[dict | None] = asyncio.Queue()
+    # Thread-safe bridge so events stream as they're produced (the sync agent
+    # runs in a worker thread; asyncio.Queue is not thread-safe on its own).
+    bridge = SSEBridge()
     all_events: list[dict] = []
 
-    def _run_sync():
-        """Run in thread pool — puts each event onto the queue."""
-        try:
-            for event in agent.run_streaming(
-                patient_info=patient_info,
-                case_id=case.case_id,
-            ):
-                all_events.append(event)
-                queue.put_nowait(event)
-        except Exception as e:
-            queue.put_nowait({"type": "error", "message": str(e)})
-        finally:
-            queue.put_nowait(None)  # sentinel
-
-    loop = asyncio.get_event_loop()
-    loop.run_in_executor(None, _run_sync)
-
-    # Consume events from queue and yield as SSE
-    while True:
-        event = await queue.get()
-        if event is None:
-            break
-        yield _sse_event(event)
-
-    # Save trace for replay
-    run_complete = next((e for e in all_events if e.get("type") == "run_complete"), None)
-    if run_complete and traces_dir:
+    def _save_trace() -> None:
+        """Persist the trace for replay. Runs in the worker thread, so the
+        potentially large JSON write never blocks the event loop, and it runs
+        even if the SSE client disconnected before the run finished."""
+        run_complete = next(
+            (e for e in all_events if e.get("type") == "run_complete"), None
+        )
+        if not (run_complete and traces_dir):
+            return
         trace_data = {
             "case_id": case.case_id,
             "hospital": hospital,
@@ -130,6 +115,54 @@ async def _stream_agent_events(
         }
         trace_file = traces_dir / f"{case.case_id}_{time.time_ns()}.json"
         trace_file.write_text(json.dumps(trace_data, indent=2, default=str))
+
+    def _run_sync():
+        """Run in thread pool — hands each event to the bridge."""
+        try:
+            for event in agent.run_streaming(
+                patient_info=patient_info,
+                case_id=case.case_id,
+            ):
+                all_events.append(event)
+                bridge.put_from_thread(event)
+        except Exception as e:
+            bridge.put_from_thread({"type": "error", "message": str(e)})
+        finally:
+            try:
+                _save_trace()
+            except Exception:
+                logger.exception("Failed to save trace for case %s", case.case_id)
+            bridge.put_from_thread(None)  # sentinel
+
+    loop = asyncio.get_running_loop()
+    run_future = loop.run_in_executor(None, _run_sync)
+    run_future.add_done_callback(_log_worker_failure)
+
+    # Consume events from the bridge and yield as SSE
+    completed = False
+    try:
+        async for event in bridge.events():
+            yield _sse_event(event)
+        completed = True
+    finally:
+        if not completed:
+            # Client disconnected (GeneratorExit/CancelledError). Stop
+            # buffering; the worker keeps running and still saves the trace.
+            bridge.mark_disconnected()
+            logger.info(
+                "SSE client disconnected during run for case %s; "
+                "the agent run continues and the trace will still be saved",
+                case.case_id,
+            )
+
+
+def _log_worker_failure(future: Any) -> None:
+    """Surface unexpected executor-task failures instead of losing them."""
+    if future.cancelled():
+        return
+    exc = future.exception()
+    if exc is not None:
+        logger.error("Agent worker thread failed", exc_info=exc)
 
 
 @router.post("/agent/run")
@@ -172,7 +205,9 @@ async def run_agent(body: RunRequest, request: Request):
             base_url=base_url,
             rules_dir=request.app.state.rules_dir,
             traces_dir=request.app.state.traces_dir,
-            api_key=body.api_key or "not-needed",
+            # Pass the resolved key — for copilot models this is the exchanged
+            # Copilot token, which `body.api_key or ...` used to drop.
+            api_key=api_key,
         ),
         media_type="text/event-stream",
         headers={
@@ -186,7 +221,8 @@ async def run_agent(body: RunRequest, request: Request):
 @router.post("/agent/replay")
 async def replay_trace(body: ReplayRequest, request: Request):
     """Replay a saved trace as SSE events with small delays."""
-    trace_file = request.app.state.traces_dir / f"{body.trace_id}.json"
+    trace_id = validate_trace_id(body.trace_id)
+    trace_file = request.app.state.traces_dir / f"{trace_id}.json"
     if not trace_file.exists():
         raise HTTPException(status_code=404, detail=f"Trace '{body.trace_id}' not found")
 

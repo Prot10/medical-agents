@@ -23,7 +23,10 @@ _LLM_BACKENDS = [
     ("http://localhost:11434", "ollama"),
 ]
 
-# Module-level state
+# Module-level state. All mutation of these globals (kill/spawn/assign) must
+# happen while holding _models_lock, otherwise two concurrent load requests can
+# each spawn a vLLM server and orphan one of the processes on the GPU.
+_models_lock = asyncio.Lock()
 _loading_model: str | None = None
 _vllm_process: asyncio.subprocess.Process | None = None
 
@@ -147,40 +150,47 @@ async def load_model(model_key: str) -> StreamingResponse:
             return f"data: {json.dumps(data)}\n\n"
 
         try:
-            # Step 1: Kill existing vLLM if running
-            active = await _get_active_models()
-            vllm_active = [m for m in active if m["backend"] == "vllm"]
+            # Steps 1-2 mutate the module globals (kill old server, spawn new
+            # one) — serialize them so concurrent load/unload requests can't
+            # orphan a vLLM process.
+            async with _models_lock:
+                # Step 1: Kill existing vLLM if running
+                active = await _get_active_models()
+                vllm_active = [m for m in active if m["backend"] == "vllm"]
 
-            if vllm_active:
+                if vllm_active:
+                    yield sse({
+                        "phase": "unloading",
+                        "message": f"Stopping {vllm_active[0]['key']}...",
+                        "progress": 0,
+                    })
+                    await _kill_vllm()
+                    await asyncio.sleep(3)
+
+                # Step 2: Start loading
+                _loading_model = model_key
+                logger.info("Loading model %s via %s", model_key, _SERVE_SCRIPT)
+
                 yield sse({
-                    "phase": "unloading",
-                    "message": f"Stopping {vllm_active[0]['key']}...",
+                    "phase": "starting",
+                    "model": model_key,
+                    "model_name": model_name,
+                    "size_gb": size_gb,
+                    "expected_seconds": expected_seconds,
+                    "message": f"Starting vLLM for {model_name} ({size_gb:.1f} GB)...",
                     "progress": 0,
                 })
-                await _kill_vllm()
-                await asyncio.sleep(3)
 
-            # Step 2: Start loading
-            _loading_model = model_key
-            logger.info("Loading model %s via %s", model_key, _SERVE_SCRIPT)
-
-            yield sse({
-                "phase": "starting",
-                "model": model_key,
-                "model_name": model_name,
-                "size_gb": size_gb,
-                "expected_seconds": expected_seconds,
-                "message": f"Starting vLLM for {model_name} ({size_gb:.1f} GB)...",
-                "progress": 0,
-            })
-
-            # Launch serve_model.sh
-            _vllm_process = await asyncio.create_subprocess_exec(
-                "bash", str(_SERVE_SCRIPT), model_key,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.STDOUT,
-                start_new_session=True,
-            )
+                # Launch serve_model.sh
+                _vllm_process = await asyncio.create_subprocess_exec(
+                    "bash", str(_SERVE_SCRIPT), model_key,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.STDOUT,
+                    start_new_session=True,
+                )
+                # Local handle: the polling below must track the process this
+                # request spawned even if another request later replaces the global.
+                proc = _vllm_process
 
             # Step 3: Poll and stream progress
             elapsed = 0
@@ -194,10 +204,10 @@ async def load_model(model_key: str) -> StreamingResponse:
                     elapsed += poll_interval
 
                     # Read any available stdout from vLLM (non-blocking)
-                    if _vllm_process.stdout:
+                    if proc.stdout:
                         try:
                             chunk = await asyncio.wait_for(
-                                _vllm_process.stdout.read(4096), timeout=0.1
+                                proc.stdout.read(4096), timeout=0.1
                             )
                             if chunk:
                                 lines = chunk.decode(errors="replace").strip().split("\n")
@@ -217,16 +227,16 @@ async def load_model(model_key: str) -> StreamingResponse:
                             pass
 
                     # Check if process died
-                    if _vllm_process.returncode is not None:
+                    if proc.returncode is not None:
                         _loading_model = None
                         # Read remaining output for error message
                         err_msg = ""
-                        if _vllm_process.stdout:
-                            remaining = await _vllm_process.stdout.read()
+                        if proc.stdout:
+                            remaining = await proc.stdout.read()
                             err_msg = remaining.decode(errors="replace")[-500:]
                         yield sse({
                             "phase": "error",
-                            "message": f"vLLM exited with code {_vllm_process.returncode}",
+                            "message": f"vLLM exited with code {proc.returncode}",
                             "detail": err_msg,
                             "progress": 0,
                         })
@@ -297,6 +307,7 @@ async def load_model(model_key: str) -> StreamingResponse:
 async def unload_model() -> dict:
     """Stop any running vLLM model server."""
     global _loading_model
-    _loading_model = None
-    await _kill_vllm()
+    async with _models_lock:
+        _loading_model = None
+        await _kill_vllm()
     return {"status": "ok", "message": "Model server stopped"}

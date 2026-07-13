@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os
 from pathlib import Path
 from typing import Any
 
@@ -23,14 +24,31 @@ RULES_DIR = Path(__file__).resolve().parents[3] / "config" / "hospital_rules"
 TRACES_DIR = DATA_ROOT / "traces"
 WEB_DIST = Path(__file__).resolve().parents[4] / "web" / "dist"
 
+# CORS: explicit allowlist instead of `*` (which, combined with credentials,
+# would let any origin drive the API from a browser). Extra origins (e.g. a
+# LAN-dev Vite server on another host) via NEUROAGENT_CORS_ORIGINS, comma-separated.
+_DEFAULT_CORS_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:8888",
+    "http://127.0.0.1:8888",
+]
+
+
+def _cors_origins() -> list[str]:
+    extra = os.environ.get("NEUROAGENT_CORS_ORIGINS", "")
+    origins = list(_DEFAULT_CORS_ORIGINS)
+    origins.extend(o.strip() for o in extra.split(",") if o.strip())
+    return origins
+
 
 def create_app() -> FastAPI:
     app = FastAPI(title="NeuroAgent Dashboard API", version="1.0.0")
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
+        allow_origins=_cors_origins(),
+        allow_credentials=False,
         allow_methods=["*"],
         allow_headers=["*"],
     )

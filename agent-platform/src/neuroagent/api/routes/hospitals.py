@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import re
 from pathlib import Path
 
@@ -12,6 +13,11 @@ from pydantic import BaseModel
 from ...rules.rules_engine import AVAILABLE_HOSPITALS, RulesEngine
 
 router = APIRouter(tags=["hospitals"])
+
+# Serializes all rule mutations: PUT/DELETE address pathways by index into the
+# sorted file listing, so a concurrent create/delete could shift the ordering
+# between the list and the mutation and hit the wrong file.
+_rules_write_lock = asyncio.Lock()
 
 
 class PathwayUpdate(BaseModel):
@@ -102,50 +108,55 @@ def _slugify(name: str) -> str:
 
 
 @router.put("/hospitals/{hospital_id}/rules/{pathway_index}")
-def update_pathway(
+async def update_pathway(
     hospital_id: str, pathway_index: int, body: PathwayUpdate, request: Request
 ) -> dict:
     """Update an existing pathway by index."""
     hospital_dir = _get_hospital_dir(request, hospital_id)
-    yaml_files = _sorted_yaml_files(hospital_dir)
 
-    if pathway_index < 0 or pathway_index >= len(yaml_files):
-        raise HTTPException(status_code=404, detail=f"Pathway index {pathway_index} out of range")
+    async with _rules_write_lock:
+        yaml_files = _sorted_yaml_files(hospital_dir)
 
-    target_file = yaml_files[pathway_index]
-    data = _pathway_dict_from_body(body)
-    target_file.write_text(yaml.dump(data, default_flow_style=False, sort_keys=False))
+        if pathway_index < 0 or pathway_index >= len(yaml_files):
+            raise HTTPException(status_code=404, detail=f"Pathway index {pathway_index} out of range")
+
+        target_file = yaml_files[pathway_index]
+        data = _pathway_dict_from_body(body)
+        target_file.write_text(yaml.dump(data, default_flow_style=False, sort_keys=False))
 
     return data
 
 
 @router.post("/hospitals/{hospital_id}/rules", status_code=201)
-def create_pathway(hospital_id: str, body: PathwayUpdate, request: Request) -> dict:
+async def create_pathway(hospital_id: str, body: PathwayUpdate, request: Request) -> dict:
     """Create a new pathway."""
     hospital_dir = _get_hospital_dir(request, hospital_id)
     slug = _slugify(body.name)
     target_file = hospital_dir / f"{slug}.yaml"
 
-    if target_file.exists():
-        raise HTTPException(status_code=409, detail=f"Pathway file '{target_file.name}' already exists")
+    async with _rules_write_lock:
+        if target_file.exists():
+            raise HTTPException(status_code=409, detail=f"Pathway file '{target_file.name}' already exists")
 
-    data = _pathway_dict_from_body(body)
-    target_file.write_text(yaml.dump(data, default_flow_style=False, sort_keys=False))
+        data = _pathway_dict_from_body(body)
+        target_file.write_text(yaml.dump(data, default_flow_style=False, sort_keys=False))
 
     return data
 
 
 @router.delete("/hospitals/{hospital_id}/rules/{pathway_index}")
-def delete_pathway(
+async def delete_pathway(
     hospital_id: str, pathway_index: int, request: Request
 ) -> dict:
     """Delete a pathway by index."""
     hospital_dir = _get_hospital_dir(request, hospital_id)
-    yaml_files = _sorted_yaml_files(hospital_dir)
 
-    if pathway_index < 0 or pathway_index >= len(yaml_files):
-        raise HTTPException(status_code=404, detail=f"Pathway index {pathway_index} out of range")
+    async with _rules_write_lock:
+        yaml_files = _sorted_yaml_files(hospital_dir)
 
-    yaml_files[pathway_index].unlink()
+        if pathway_index < 0 or pathway_index >= len(yaml_files):
+            raise HTTPException(status_code=404, detail=f"Pathway index {pathway_index} out of range")
+
+        yaml_files[pathway_index].unlink()
 
     return {"status": "ok"}

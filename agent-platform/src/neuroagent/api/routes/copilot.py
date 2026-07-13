@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import time
 from pathlib import Path
 
 import httpx
 from fastapi import APIRouter
+from fastapi.responses import JSONResponse
 
 router = APIRouter(tags=["copilot"])
 logger = logging.getLogger(__name__)
@@ -42,10 +44,15 @@ COPILOT_MODELS = [
 
 
 def _save_token(token: str) -> None:
-    """Persist GitHub token to disk."""
+    """Persist GitHub token to disk, readable by the owner only (0600)."""
     try:
         _TOKEN_FILE.parent.mkdir(parents=True, exist_ok=True)
-        _TOKEN_FILE.write_text(json.dumps({"github_token": token}))
+        # O_CREAT mode only applies to newly created files; chmod afterwards
+        # tightens a pre-existing file that may have been world-readable.
+        fd = os.open(_TOKEN_FILE, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            fh.write(json.dumps({"github_token": token}))
+        os.chmod(_TOKEN_FILE, 0o600)
     except Exception as e:
         logger.warning(f"Failed to save token: {e}")
 
@@ -78,7 +85,7 @@ def _ensure_loaded() -> None:
 
 
 @router.post("/copilot/device-code")
-async def start_device_flow() -> dict:
+async def start_device_flow():
     """Start GitHub OAuth device flow. Returns user_code and verification_uri."""
     async with httpx.AsyncClient(timeout=10.0) as client:
         resp = await client.post(
@@ -87,10 +94,17 @@ async def start_device_flow() -> dict:
             data={"client_id": GITHUB_CLIENT_ID, "scope": "read:user"},
         )
         if resp.status_code != 200:
-            return {"error": f"GitHub returned {resp.status_code}"}
+            # Upstream (GitHub) failure — surface as 502, keep the body shape.
+            return JSONResponse(
+                status_code=502,
+                content={"error": f"GitHub returned {resp.status_code}"},
+            )
         data = resp.json()
         if "error" in data:
-            return {"error": data.get("error_description", data["error"])}
+            return JSONResponse(
+                status_code=502,
+                content={"error": data.get("error_description", data["error"])},
+            )
         return {
             "device_code": data["device_code"],
             "user_code": data["user_code"],
@@ -101,13 +115,17 @@ async def start_device_flow() -> dict:
 
 
 @router.post("/copilot/poll-token")
-async def poll_token(body: dict) -> dict:
+async def poll_token(body: dict):
     """Poll GitHub for OAuth token after user enters the code."""
     global _github_token
 
     device_code = body.get("device_code")
     if not device_code:
-        return {"status": "error", "error": "device_code required"}
+        # Client error — 400, body shape unchanged.
+        return JSONResponse(
+            status_code=400,
+            content={"status": "error", "error": "device_code required"},
+        )
 
     async with httpx.AsyncClient(timeout=10.0) as client:
         resp = await client.post(
@@ -131,14 +149,24 @@ async def poll_token(body: dict) -> dict:
                 return {"status": "expired"}
             if error == "access_denied":
                 return {"status": "denied"}
-            return {"status": "error", "error": data.get("error_description", error)}
+            # Unrecognized upstream OAuth error — 502, body shape unchanged.
+            return JSONResponse(
+                status_code=502,
+                content={
+                    "status": "error",
+                    "error": data.get("error_description", error),
+                },
+            )
 
         if "access_token" in data:
             _github_token = data["access_token"]
             _save_token(_github_token)
             return {"status": "complete"}
 
-        return {"status": "error", "error": "Unexpected response"}
+        return JSONResponse(
+            status_code=502,
+            content={"status": "error", "error": "Unexpected response"},
+        )
 
 
 @router.get("/copilot/status")
