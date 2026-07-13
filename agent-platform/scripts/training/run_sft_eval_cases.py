@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import json
 import logging
+import math
 import sys
 import time
 from collections import defaultdict
@@ -116,6 +117,55 @@ def run_single_case(case: NeuroBenchCase, config: AgentConfig, hospital: str):
     return trace, metrics
 
 
+def write_judge_bundle(
+    bundle_dir: Path, case: NeuroBenchCase, trace, run_name: str, rep: int, model_id: str
+) -> None:
+    """One bundle per (case, rep) with the FULL reasoning trace, for the llm-judge composite.
+
+    Schema matches run_baseline_eval.py / the llm-judge agent contract so the same
+    prepare_judge_batches → llm-judge → aggregate_judge_scores pipeline consumes it.
+    """
+    raw = json.loads(case.model_dump_json())
+    bundle = {
+        "case_id": case.case_id,
+        "condition": case.condition.value,
+        "difficulty": case.difficulty.value,
+        "case_presentation": {
+            "patient": raw["patient"],
+            "encounter_type": raw.get("encounter_type"),
+        },
+        "ground_truth": raw["ground_truth"],
+        "runs": [
+            {
+                "run_name": f"{run_name}-rep{rep}",
+                "model_id": model_id,
+                "mode": "react",
+                "final_response": trace.final_response,
+                "tools_called": list(trace.tools_called),
+                "total_tool_calls": trace.total_tool_calls,
+                "elapsed_time_seconds": round(trace.elapsed_time_seconds, 2),
+                "trace": {
+                    "num_turns": len(trace.turns),
+                    "turns": [
+                        {
+                            "turn_number": t.turn_number,
+                            "role": t.role,
+                            "content": t.content,
+                            "tool_calls": t.tool_calls,
+                            "tool_results": t.tool_results,
+                        }
+                        for t in trace.turns
+                    ],
+                },
+            }
+        ],
+    }
+    bundle_dir.mkdir(parents=True, exist_ok=True)
+    (bundle_dir / f"{case.case_id}_rep{rep}.json").write_text(
+        json.dumps(bundle, indent=2, default=str)
+    )
+
+
 @dataclass
 class CaseResult:
     case_id: str
@@ -149,6 +199,9 @@ def evaluate(
     output: str = typer.Option(..., help="Output JSON path"),
     port: int = typer.Option(8000, help="vLLM port"),
     split: str = typer.Option("test", help="Which split_cases.txt to evaluate (default: held-out test)"),
+    temperature: float = typer.Option(1.0, help="Sampling temperature (0 = greedy/deterministic)"),
+    presence_penalty: float = typer.Option(1.5, help="Presence penalty (set 0 for greedy)"),
+    save_bundles: bool = typer.Option(True, help="Write per-case judge bundles (full trace) for the composite score"),
 ):
     """Run agent evaluation on a held-out split (default: the 100-case test set)."""
     logging.basicConfig(
@@ -157,18 +210,25 @@ def evaluate(
     )
 
     cases = load_split_cases(split)
-    console.print(f"\n[bold]Evaluating {run_name} on {len(cases)} {split} cases × {repeats} repeats[/bold]")
+    greedy = temperature == 0.0
+    console.print(
+        f"\n[bold]Evaluating {run_name} on {len(cases)} {split} cases × {repeats} repeats "
+        f"(temp={temperature}{' greedy' if greedy else ''})[/bold]"
+    )
 
     config = load_agent_config(
         base_url=f"http://localhost:{port}/v1",
         api_key="not-needed",
         model=model_id,
         max_tokens=8192,
-        temperature=1.0,
-        top_p=0.95,
-        presence_penalty=1.5,
+        temperature=temperature,
+        # top_p must be 1.0 for true greedy; presence_penalty off so decoding is deterministic.
+        top_p=1.0 if greedy else 0.95,
+        presence_penalty=0.0 if greedy else presence_penalty,
         hospital=hospital,
     )
+
+    bundle_dir = Path(output).parent / "judge_bundles" / run_name if save_bundles else None
 
     all_results: list[CaseResult] = []
     checkpoint_file = Path(output).with_suffix(".checkpoint.json")
@@ -240,6 +300,9 @@ def evaluate(
                     all_results.append(result)
                     completed.add(run_key)
                     correct += int(metrics.diagnostic_accuracy_top1)
+
+                    if bundle_dir is not None:
+                        write_judge_bundle(bundle_dir, case, trace, run_name, rep, model_id)
 
                     checkpoint_file.write_text(json.dumps({
                         "completed": sorted(completed),
@@ -340,6 +403,27 @@ def compare(
 
     console.print(table)
 
+    # Statistical significance — base and SFT see the SAME cases, so the comparison is PAIRED.
+    stats = _paired_significance(base_data, sft_data)
+    if stats:
+        console.print("\n[bold]Significance (paired, top-1):[/bold]")
+        console.print(
+            f"  Δ top1 = {stats['delta']:+.1%}   "
+            f"95% bootstrap CI [{stats['ci_low']:+.1%}, {stats['ci_high']:+.1%}]   "
+            f"{'[green]significant[/]' if stats['significant'] else '[yellow]not significant (CI spans 0)[/]'}"
+        )
+        console.print(
+            f"  McNemar: base-only-correct={stats['base_only']}  sft-only-correct={stats['sft_only']}  "
+            f"exact p={stats['mcnemar_p']:.3f}"
+        )
+        if stats.get("reliability") is not None:
+            r = stats["reliability"]
+            console.print(
+                f"  Reliability (per-case pass-rate SD across repeats): "
+                f"base={r['base_sd']:.3f}  sft={r['sft_sd']:.3f}  "
+                f"({'[green]SFT more consistent[/]' if r['sft_sd'] < r['base_sd'] else 'base more consistent'})"
+            )
+
     # Per-difficulty breakdown
     for diff in ["straightforward", "moderate", "diagnostic_puzzle"]:
         base_diff = [r for r in base_data if r["difficulty"] == diff]
@@ -378,8 +462,78 @@ def compare(
     out_path.write_text(json.dumps({
         "base": {"run_name": base["run_name"], "metrics": base_metrics},
         "sft": {"run_name": sft["run_name"], "metrics": sft_metrics},
+        "significance": stats,
     }, indent=2, default=str))
     console.print(f"\n[green]Comparison saved to {output}[/green]")
+
+
+def _paired_significance(base_data: list[dict], sft_data: list[dict], n_boot: int = 10000) -> dict:
+    """Paired top-1 comparison: bootstrap CI over cases, McNemar, and repeat-reliability.
+
+    base and SFT are evaluated on the SAME cases, so pairing by case_id controls for case
+    difficulty and is far more powerful than treating the two as independent samples.
+    """
+    import random
+    import statistics as st
+    from collections import defaultdict
+
+    def by_case(data):
+        d = defaultdict(list)
+        for r in data:
+            d[r["case_id"]].append(int(bool(r["diagnostic_accuracy_top1"])))
+        return d
+
+    b, s = by_case(base_data), by_case(sft_data)
+    cases = sorted(set(b) & set(s))
+    if not cases:
+        return {}
+
+    # Per-case pass rate (mean over repeats), paired.
+    b_rate = {c: st.mean(b[c]) for c in cases}
+    s_rate = {c: st.mean(s[c]) for c in cases}
+    diffs = [s_rate[c] - b_rate[c] for c in cases]
+    delta = st.mean(diffs)
+
+    # Paired bootstrap over cases (resample cases, not rows — preserves pairing).
+    rng = random.Random(0)
+    n = len(cases)
+    boot = []
+    for _ in range(n_boot):
+        sample = [diffs[rng.randrange(n)] for _ in range(n)]
+        boot.append(sum(sample) / n)
+    boot.sort()
+    ci_low = boot[int(0.025 * n_boot)]
+    ci_high = boot[int(0.975 * n_boot)]
+
+    # McNemar on the per-case majority vote; exact two-sided binomial on the discordant pairs.
+    b_maj = {c: (1 if b_rate[c] >= 0.5 else 0) for c in cases}
+    s_maj = {c: (1 if s_rate[c] >= 0.5 else 0) for c in cases}
+    base_only = sum(1 for c in cases if b_maj[c] and not s_maj[c])
+    sft_only = sum(1 for c in cases if s_maj[c] and not b_maj[c])
+    nd = base_only + sft_only
+    k = min(base_only, sft_only)
+    # exact two-sided binomial p at rate 0.5
+    p = min(1.0, 2 * sum(math.comb(nd, i) for i in range(0, k + 1)) / (2 ** nd)) if nd else 1.0
+
+    reliability = None
+    reps = max(len(b[c]) for c in cases)
+    if reps > 1:
+        reliability = {
+            "base_sd": st.mean([st.pstdev(b[c]) for c in cases if len(b[c]) > 1]),
+            "sft_sd": st.mean([st.pstdev(s[c]) for c in cases if len(s[c]) > 1]),
+        }
+
+    return {
+        "n_cases": n,
+        "delta": delta,
+        "ci_low": ci_low,
+        "ci_high": ci_high,
+        "significant": ci_low > 0 or ci_high < 0,
+        "base_only": base_only,
+        "sft_only": sft_only,
+        "mcnemar_p": p,
+        "reliability": reliability,
+    }
 
 
 def _compute_aggregate(results: list[dict]) -> dict:
