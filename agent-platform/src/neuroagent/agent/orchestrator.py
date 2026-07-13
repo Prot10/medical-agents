@@ -55,6 +55,9 @@ class AgentOrchestrator:
             max_tokens=config.max_tokens,
             top_p=config.top_p,
             presence_penalty=config.presence_penalty,
+            seed=config.seed,
+            timeout=config.request_timeout,
+            max_retries=config.max_retries,
         )
         self.tools = tool_registry
         self.rules = rules_engine
@@ -136,37 +139,7 @@ class AgentOrchestrator:
 
             else:
                 # LLM responded with text (no tool call) → it's done
-                trace.add_assistant_turn(
-                    turn_number=turn_number,
-                    content=response.content,
-                    tool_calls=None,
-                    token_usage=response.usage,
-                )
-
-                assessment = _extract_assessment(response.content or "")
-
-                # If the model produced reasoning but no structured diagnosis,
-                # re-prompt once to get the required output format.
-                if assessment and not _ASSESSMENT_PATTERN.search(assessment):
-                    logger.info("No structured diagnosis found — re-prompting for format.")
-                    messages.append(self._format_assistant_message(response, []))
-                    messages.append({
-                        "role": "user",
-                        "content": _STRUCTURED_DIAGNOSIS_REPROMPT,
-                    })
-                    retry = self.llm.chat(messages=messages, tools=None)
-                    turn_number += 1
-                    trace.add_assistant_turn(
-                        turn_number=turn_number,
-                        content=retry.content,
-                        tool_calls=None,
-                        token_usage=retry.usage,
-                    )
-                    retry_assessment = _extract_assessment(retry.content or "")
-                    if retry_assessment:
-                        assessment = retry_assessment
-
-                trace.set_final_response(assessment)
+                self._finalize_assessment(trace, messages, response, turn_number)
                 break
         else:
             # Hit max_turns without finishing
@@ -318,21 +291,18 @@ class AgentOrchestrator:
 
             else:
                 # Final assessment — deltas were already streamed as thinking_delta,
-                # now re-emit them as assessment type for the complete record
-                trace.add_assistant_turn(
-                    turn_number=turn_number,
-                    content=response.content,
-                    tool_calls=None,
-                    token_usage=response.usage,
+                # now re-emit them as assessment type for the complete record.
+                # Shared finalization (incl. the one-shot structured-diagnosis
+                # re-prompt) so run() and run_streaming() produce identical
+                # final_response/trace for identical model output.
+                final_content, final_usage, turn_number = self._finalize_assessment(
+                    trace, messages, response, turn_number
                 )
-                final = _extract_assessment(response.content or "")
-                trace.set_final_response(final)
-
                 yield {
                     "type": "assessment",
                     "turn_number": turn_number,
-                    "content": response.content or "",
-                    "token_usage": response.usage,
+                    "content": final_content,
+                    "token_usage": final_usage,
                 }
                 break
         else:
@@ -458,6 +428,65 @@ class AgentOrchestrator:
         cost_entry = self.cost_tracker.compute_cost(tool_call.name, tool_call.arguments)
         result.cost_usd = cost_entry.cost_usd
         return result, cost_entry
+
+    def _finalize_assessment(
+        self,
+        trace: AgentTrace,
+        messages: list[dict[str, Any]],
+        response: LLMResponse,
+        turn_number: int,
+    ) -> tuple[str, dict[str, Any] | None, int]:
+        """Shared finalization for run() and run_streaming().
+
+        Records the concluding assistant turn, extracts the structured
+        assessment, and — if the model produced reasoning without the required
+        ``### Primary Diagnosis`` section — re-prompts once (non-streaming)
+        for the structured format. Sets ``trace.final_response`` so identical
+        model output yields an identical final_response/trace in both entry
+        points.
+
+        Returns:
+            (final_content, final_usage, turn_number): the assistant text the
+            final_response was extracted from, its token usage, and the
+            (possibly incremented) turn number — used by the streaming path
+            to emit the ``assessment`` event.
+        """
+        trace.add_assistant_turn(
+            turn_number=turn_number,
+            content=response.content,
+            tool_calls=None,
+            token_usage=response.usage,
+        )
+
+        final_content = response.content or ""
+        final_usage = response.usage
+        assessment = _extract_assessment(final_content)
+
+        # If the model produced reasoning but no structured diagnosis,
+        # re-prompt once to get the required output format.
+        if assessment and not _ASSESSMENT_PATTERN.search(assessment):
+            logger.info("No structured diagnosis found — re-prompting for format.")
+            messages.append(self._format_assistant_message(response, []))
+            messages.append({
+                "role": "user",
+                "content": _STRUCTURED_DIAGNOSIS_REPROMPT,
+            })
+            retry = self.llm.chat(messages=messages, tools=None)
+            turn_number += 1
+            trace.add_assistant_turn(
+                turn_number=turn_number,
+                content=retry.content,
+                tool_calls=None,
+                token_usage=retry.usage,
+            )
+            retry_assessment = _extract_assessment(retry.content or "")
+            if retry_assessment:
+                assessment = retry_assessment
+                final_content = retry.content or ""
+                final_usage = retry.usage
+
+        trace.set_final_response(assessment)
+        return final_content, final_usage, turn_number
 
     def _finalize_trace(self, trace: AgentTrace) -> None:
         trace.total_cost_usd = self.cost_tracker.total_cost_usd

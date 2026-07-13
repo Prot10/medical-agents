@@ -1,12 +1,32 @@
-"""Cost tracking for diagnostic tool calls using Medicare reference rates."""
+"""Cost tracking for diagnostic tool calls using Medicare reference rates.
+
+Costs feed a reported metric (cost-efficiency in the paper), so a term missing
+from ``config/tools/costs.yaml`` fails loudly (:class:`CostConfigError`) rather
+than silently substituting a hardcoded literal.  Two kinds of lookup miss are
+deliberately NOT errors, because they depend on model behavior at run time and
+must not crash or alter an evaluation run:
+
+* an *out-of-vocabulary parameter value* (unknown panel / modality / test type)
+  falls back to the tool's **configured** default rate, exactly as before — the
+  catchall tools log a warning at execute time (see tools/vocabulary.py);
+* an *unknown tool name* costs 0 with a warning (training rewards replay raw
+  rollouts that may contain hallucinated tool names).
+"""
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 from typing import Any
 
 import yaml
 from pydantic import BaseModel, Field
+
+logger = logging.getLogger(__name__)
+
+
+class CostConfigError(KeyError):
+    """A required cost entry is missing from costs.yaml."""
 
 
 class ToolCostEntry(BaseModel):
@@ -28,27 +48,48 @@ class CostTracker:
     def __init__(self, config_path: str | Path | None = None):
         if config_path is None:
             config_path = Path(__file__).resolve().parents[3] / "config" / "tools" / "costs.yaml"
-        self.config = self._load_config(Path(config_path))
+        self.config_path = Path(config_path)
+        self.config = self._load_config(self.config_path)
         self.entries: list[ToolCostEntry] = []
 
     @staticmethod
     def _load_config(path: Path) -> dict[str, Any]:
         if not path.exists():
-            return {}
+            raise FileNotFoundError(
+                f"Cost config not found: {path}. Costs feed a reported metric, "
+                "so running without a cost registry is not allowed."
+            )
         with open(path) as f:
             data = yaml.safe_load(f) or {}
         return data.get("tools", {})
 
+    def _require(self, cfg: dict[str, Any], key: str, tool_name: str) -> Any:
+        """Fetch a required cost entry; missing keys fail loudly."""
+        if key not in cfg:
+            raise CostConfigError(
+                f"Cost entry '{key}' for tool '{tool_name}' is missing from "
+                f"{self.config_path}. Add the entry to costs.yaml — silent "
+                "fallback rates are not allowed because costs feed a reported metric."
+            )
+        return cfg[key]
+
     def compute_cost(self, tool_name: str, parameters: dict[str, Any]) -> ToolCostEntry:
         """Compute cost for a single tool call and record it."""
-        tool_cfg = self.config.get(tool_name, {})
+        tool_cfg = self.config.get(tool_name)
         breakdown: dict[str, float] = {}
         total = 0.0
 
-        if tool_name == "analyze_brain_mri":
+        if tool_cfg is None:
+            # Unknown tool (e.g. hallucinated name in a raw training rollout):
+            # cost 0, but never silently.
+            logger.warning(
+                "No cost entry for unknown tool '%s' in %s — recording 0 cost.",
+                tool_name, self.config_path,
+            )
+        elif tool_name == "analyze_brain_mri":
             total, breakdown = self._cost_mri(tool_cfg, parameters)
         elif tool_name == "analyze_eeg":
-            total, breakdown = self._cost_by_type(tool_cfg, parameters, "eeg_type", "routine")
+            total, breakdown = self._cost_by_type(tool_cfg, parameters, "eeg_type", "routine", tool_name)
         elif tool_name == "interpret_labs":
             total, breakdown = self._cost_labs(tool_cfg, parameters)
         elif tool_name == "analyze_csf":
@@ -56,16 +97,16 @@ class CostTracker:
         elif tool_name == "order_ct_scan":
             total, breakdown = self._cost_ct(tool_cfg, parameters)
         elif tool_name == "order_echocardiogram":
-            total, breakdown = self._cost_by_type(tool_cfg, parameters, "echo_type", "TTE")
+            total, breakdown = self._cost_by_type(tool_cfg, parameters, "echo_type", "TTE", tool_name)
         elif tool_name == "order_cardiac_monitoring":
-            total, breakdown = self._cost_by_type(tool_cfg, parameters, "monitor_type", "holter_24h")
+            total, breakdown = self._cost_by_type(tool_cfg, parameters, "monitor_type", "holter_24h", tool_name)
         elif tool_name == "order_advanced_imaging":
-            total, breakdown = self._cost_by_type(tool_cfg, parameters, "modality", "FDG_PET")
+            total, breakdown = self._cost_by_type(tool_cfg, parameters, "modality", "FDG_PET", tool_name)
         elif tool_name == "order_specialized_test":
             total, breakdown = self._cost_specialized_test(tool_cfg, parameters)
         else:
             # Flat base cost (ECG, literature, drug interactions)
-            total = float(tool_cfg.get("base", 0))
+            total = float(self._require(tool_cfg, "base", tool_name))
             if total:
                 breakdown["base"] = total
 
@@ -102,30 +143,38 @@ class CostTracker:
     # Per-tool cost computation
     # ------------------------------------------------------------------
 
-    @staticmethod
-    def _cost_mri(cfg: dict, params: dict) -> tuple[float, dict[str, float]]:
+    def _cost_mri(self, cfg: dict, params: dict) -> tuple[float, dict[str, float]]:
         breakdown: dict[str, float] = {}
-        base = float(cfg.get("base", 320))
+        base = float(self._require(cfg, "base", "analyze_brain_mri"))
         breakdown["base"] = base
         total = base
         if params.get("contrast"):
-            modifier = float(cfg.get("modifiers", {}).get("contrast", 126))
+            modifiers = self._require(cfg, "modifiers", "analyze_brain_mri")
+            modifier = float(self._require(modifiers, "contrast", "analyze_brain_mri"))
             breakdown["contrast"] = modifier
             total += modifier
         return total, breakdown
 
-    @staticmethod
     def _cost_by_type(
-        cfg: dict, params: dict, type_key: str, default: str,
+        self, cfg: dict, params: dict, type_key: str, default: str, tool_name: str,
     ) -> tuple[float, dict[str, float]]:
-        by_type = cfg.get("by_type", {})
+        by_type = self._require(cfg, "by_type", tool_name)
+        # The default type must always be priced — its absence is a config error.
+        default_cost = float(self._require(by_type, default, tool_name))
         selected = params.get(type_key, default)
-        cost = float(by_type.get(selected, by_type.get(default, 0)))
+        if selected not in by_type:
+            # Out-of-vocabulary parameter value: keep the pre-existing fallback
+            # to the default type's rate (never crash mid-run on model output).
+            logger.warning(
+                "Unpriced %s=%r for tool '%s' in %s — falling back to the "
+                "'%s' rate (%.0f).",
+                type_key, selected, tool_name, self.config_path, default, default_cost,
+            )
+        cost = float(by_type.get(selected, default_cost))
         return cost, {selected: cost}
 
-    @staticmethod
     def _cost_specialized_test(
-        cfg: dict, params: dict,
+        self, cfg: dict, params: dict,
     ) -> tuple[float, dict[str, float]]:
         """Cost lookup for `order_specialized_test`.
 
@@ -133,20 +182,26 @@ class CostTracker:
         the `genetic_panel:<panel>` syntax, where `<panel>` is looked up in
         the `genetic_panels` block. See dataset-generation/TOOL_PARAMETER_VOCABULARY.md.
         """
-        by_type = cfg.get("by_type", {})
-        genetic_panels = cfg.get("genetic_panels", {})
+        tool_name = "order_specialized_test"
         selected = params.get("test_type", "neuropsych_battery")
         if isinstance(selected, str) and selected.startswith("genetic_panel:"):
+            genetic_panels = self._require(cfg, "genetic_panels", tool_name)
+            default_panel_cost = float(self._require(cfg, "default_genetic_panel", tool_name))
             panel = selected.split(":", 1)[1]
-            cost = float(genetic_panels.get(panel, 1500))  # default ~mid-size panel
+            if panel not in genetic_panels:
+                logger.warning(
+                    "Unpriced genetic panel %r for tool '%s' in %s — falling "
+                    "back to the configured default_genetic_panel rate (%.0f).",
+                    panel, tool_name, self.config_path, default_panel_cost,
+                )
+            cost = float(genetic_panels.get(panel, default_panel_cost))
             return cost, {selected: cost}
-        cost = float(by_type.get(selected, by_type.get("neuropsych_battery", 0)))
-        return cost, {selected: cost}
+        return self._cost_by_type(cfg, params, "test_type", "neuropsych_battery", tool_name)
 
-    @staticmethod
-    def _cost_labs(cfg: dict, params: dict) -> tuple[float, dict[str, float]]:
-        by_panel = cfg.get("by_panel", {})
-        default_cost = float(cfg.get("default_panel", 25))
+    def _cost_labs(self, cfg: dict, params: dict) -> tuple[float, dict[str, float]]:
+        tool_name = "interpret_labs"
+        by_panel = self._require(cfg, "by_panel", tool_name)
+        default_cost = float(self._require(cfg, "default_panel", tool_name))
         panels = params.get("panels", [])
         breakdown: dict[str, float] = {}
         total = 0.0
@@ -157,36 +212,49 @@ class CostTracker:
             total = cost
         else:
             for panel in panels:
+                if panel not in by_panel:
+                    logger.warning(
+                        "Unpriced lab panel %r for tool '%s' in %s — falling "
+                        "back to the configured default_panel rate (%.0f).",
+                        panel, tool_name, self.config_path, default_cost,
+                    )
                 cost = float(by_panel.get(panel, default_cost))
                 breakdown[panel] = cost
                 total += cost
         return total, breakdown
 
-    @staticmethod
-    def _cost_csf(cfg: dict, params: dict) -> tuple[float, dict[str, float]]:
-        base = float(cfg.get("base", 250))
+    def _cost_csf(self, cfg: dict, params: dict) -> tuple[float, dict[str, float]]:
+        tool_name = "analyze_csf"
+        base = float(self._require(cfg, "base", tool_name))
         breakdown: dict[str, float] = {"base": base}
         total = base
-        by_test = cfg.get("by_special_test", {})
-        default_cost = float(cfg.get("default_test", 50))
+        by_test = self._require(cfg, "by_special_test", tool_name)
+        default_cost = float(self._require(cfg, "default_test", tool_name))
         for test in params.get("special_tests", []):
+            if test not in by_test:
+                logger.warning(
+                    "Unpriced CSF special test %r for tool '%s' in %s — falling "
+                    "back to the configured default_test rate (%.0f).",
+                    test, tool_name, self.config_path, default_cost,
+                )
             cost = float(by_test.get(test, default_cost))
             breakdown[test] = cost
             total += cost
         return total, breakdown
 
-    @staticmethod
-    def _cost_ct(cfg: dict, params: dict) -> tuple[float, dict[str, float]]:
-        base = float(cfg.get("base", 200))
+    def _cost_ct(self, cfg: dict, params: dict) -> tuple[float, dict[str, float]]:
+        tool_name = "order_ct_scan"
+        base = float(self._require(cfg, "base", tool_name))
         breakdown: dict[str, float] = {"base": base}
         total = base
-        modifiers = cfg.get("modifiers", {})
         if params.get("contrast"):
-            mod = float(modifiers.get("contrast", 100))
+            modifiers = self._require(cfg, "modifiers", tool_name)
+            mod = float(self._require(modifiers, "contrast", tool_name))
             breakdown["contrast"] = mod
             total += mod
         if params.get("angiography"):
-            mod = float(modifiers.get("angiography", 200))
+            modifiers = self._require(cfg, "modifiers", tool_name)
+            mod = float(self._require(modifiers, "angiography", tool_name))
             breakdown["angiography"] = mod
             total += mod
         return total, breakdown

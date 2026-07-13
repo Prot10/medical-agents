@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -147,13 +148,48 @@ class RulesEngine:
                 lines.append(f"  CONTRAINDICATED: {'; '.join(p.contraindicated)}")
         return "\n".join(lines)
 
+    @staticmethod
+    def _tokens(text: str) -> frozenset[str]:
+        """Normalize a trigger/condition string to a set of lowercase tokens."""
+        return frozenset(re.split(r"[^a-z0-9]+", text.lower())) - {""}
+
     def get_pathway(self, trigger: str) -> ClinicalPathway | None:
-        """Find a matching clinical pathway for a trigger condition."""
-        trigger_lower = trigger.lower()
+        """Find the clinical pathway matching a trigger/condition string.
+
+        Matching rule (deterministic, most-specific-first):
+
+        1. **Exact match** — the query, normalized to lowercase tokens
+           (split on non-alphanumerics, so ``"first_seizure"`` ==
+           ``"first seizure"``), equals one of a pathway's triggers.
+        2. **Longest token overlap** — otherwise, the pathway whose trigger
+           shares the most tokens with the query wins; at least one shared
+           token is required. Ties keep the earliest-loaded pathway.
+
+        This replaces the old bidirectional-substring first-match rule, which
+        was order-dependent and matched accidental substrings (e.g. ``"tia"``
+        inside ``"dementia"``).
+        """
+        query_tokens = self._tokens(trigger)
+        if not query_tokens:
+            return None
+
+        # 1. Exact match on any trigger.
         for pathway in self.pathways:
-            if any(t.lower() in trigger_lower or trigger_lower in t.lower() for t in pathway.triggers):
+            if any(self._tokens(t) == query_tokens for t in pathway.triggers):
                 return pathway
-        return None
+
+        # 2. Longest token overlap (strictly-greater keeps the first best,
+        #    making ties deterministic in pathway load order).
+        best: ClinicalPathway | None = None
+        best_overlap = 0
+        for pathway in self.pathways:
+            overlap = max(
+                (len(query_tokens & self._tokens(t)) for t in pathway.triggers),
+                default=0,
+            )
+            if overlap > best_overlap:
+                best, best_overlap = pathway, overlap
+        return best
 
     def check_compliance(self, tools_called: list[str], pathway: ClinicalPathway) -> ComplianceResult:
         """Check if the agent's actions comply with a pathway.
@@ -164,22 +200,26 @@ class RulesEngine:
 
         Returns:
             ComplianceResult with details of compliance/violations.
+
+        Note on ``violations``: contraindicated items are free-text clinical
+        descriptions ("Anticoagulation in acute hemorrhagic stroke"), not tool
+        names, so this is deliberately a minimal name-based heuristic — a
+        contraindication counts as violated only if a called tool's exact name
+        appears verbatim in its text (case-insensitive). With the current rule
+        YAMLs this effectively never fires; detailed contraindication
+        assessment is delegated to the LLM judge.
         """
         required = pathway.get_required_actions()
         completed = [a for a in required if a in tools_called]
         missing = [a for a in required if a not in tools_called]
 
-        # Check for contraindicated actions
-        violations = []
-        for action_desc in pathway.contraindicated:
-            # Contraindicated items are free-text descriptions, not tool names
-            # This is a simplified check; the LLM judge does detailed assessment
-            violations_found = False
-            for tool_name in tools_called:
-                if tool_name.lower() in action_desc.lower():
-                    violations.append(action_desc)
-                    violations_found = True
-                    break
+        # Name-based contraindication heuristic (see docstring). Each
+        # contraindication is reported at most once.
+        violations = [
+            action_desc
+            for action_desc in pathway.contraindicated
+            if any(tool_name.lower() in action_desc.lower() for tool_name in tools_called)
+        ]
 
         return ComplianceResult(
             pathway_name=pathway.name,

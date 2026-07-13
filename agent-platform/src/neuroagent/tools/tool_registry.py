@@ -24,7 +24,7 @@ class ToolRegistry:
                 tool_name=tool_call.tool_name,
                 success=False,
                 output=None,
-                error=f"Tool '{tool_call.tool_name}' not found. Available: {list(self.tools.keys())}",
+                error_message=f"Tool '{tool_call.tool_name}' not found. Available: {list(self.tools.keys())}",
             )
         tool = self.get_tool(tool_call.tool_name)
         return tool.execute(tool_call.parameters)
