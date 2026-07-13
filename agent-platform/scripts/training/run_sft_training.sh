@@ -18,37 +18,27 @@ MODEL="${1:-Qwen/Qwen3.5-9B}"
 MODEL_TAG="$(basename "$MODEL")"
 
 EOS_ROOT="${EOS_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent}"
-EOS_HF="$EOS_ROOT/models/base/huggingface"
 CHECKPOINTS_ROOT="${CHECKPOINTS_ROOT:-$EOS_ROOT/checkpoints}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Storage split (measured): reading a full model off the EOS FUSE mount is scattered small
-# reads — ~1-2h to load one model. Writing is fast (221 MB/s sequential). So: stage the base
-# model into /dev/shm (RAM tmpfs, not the full local disk) once per run and load from there,
-# but write every checkpoint straight to EOS. Nothing large persists on local disk.
-SHM_HF="${SHM_HF:-/dev/shm/hf}"
-MODEL_DIR="models--${MODEL/\//--}"   # Qwen/Qwen3.5-9B -> models--Qwen--Qwen3.5-9B
-if [ ! -d "$SHM_HF/hub/$MODEL_DIR" ]; then
-  echo "▶ Staging $MODEL_TAG base weights: EOS → $SHM_HF (RAM, one-time)"
-  mkdir -p "$SHM_HF/hub"
-  # rsync shows a live % / rate progress bar; falls back to cp if rsync is missing.
-  if command -v rsync >/dev/null; then
-    rsync -a --info=progress2 "$EOS_HF/hub/$MODEL_DIR" "$SHM_HF/hub/" \
-      || { echo "ERROR: base model not on EOS at $EOS_HF/hub/$MODEL_DIR" >&2; exit 1; }
-  else
-    cp -r "$EOS_HF/hub/$MODEL_DIR" "$SHM_HF/hub/" \
-      || { echo "ERROR: base model not on EOS at $EOS_HF/hub/$MODEL_DIR" >&2; exit 1; }
-  fi
-  echo "✓ base weights staged"
-else
-  echo "✓ $MODEL_TAG base already staged in RAM"
-fi
-export HF_HOME="$SHM_HF"
-export HF_HUB_OFFLINE=1
+# Storage split (measured): reading a full model off the EOS FUSE mount is ~1-2h of scattered
+# small reads. Writing is fast (221 MB/s). So stage the base into /dev/shm (RAM, not the full
+# local disk) once, load from there, and write every checkpoint straight to EOS. stage_base
+# is idempotent and validates the copy before returning, and sets HF_HOME/HF_HUB_OFFLINE.
+source "$SCRIPT_DIR/_stage.sh"
+stage_base "$MODEL" || exit 1
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
 RUN_NAME="sft_${MODEL_TAG}"
 # The finetuned adapter + run_summary go straight to EOS (small, fast to write there).
 EOS_DIR="$CHECKPOINTS_ROOT/$RUN_NAME"
+
+# Idempotent: if the adapter is already on EOS, don't retrain (makes the weekend runner safe to
+# re-run after an interruption). Override with FORCE_RETRAIN=1.
+if [ -f "$EOS_DIR/adapter_model.safetensors" ] && [ "${FORCE_RETRAIN:-0}" != 1 ]; then
+  echo "✓ $MODEL_TAG adapter already trained at $EOS_DIR — skipping (FORCE_RETRAIN=1 to redo)"
+  exit 0
+fi
 
 DATA="${DATA:-training_data/gold_trajectories/trajectories.jsonl}"
 SPLITS="${SPLITS:-data/neurobench/splits}"

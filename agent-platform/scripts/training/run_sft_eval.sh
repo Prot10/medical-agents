@@ -18,27 +18,19 @@ EOS_ROOT="${EOS_ROOT:-/eos/project-d/diagbox/dvc/NeuroAgent}"
 CHECKPOINTS_ROOT="${CHECKPOINTS_ROOT:-$EOS_ROOT/checkpoints}"
 ADAPTER="${ADAPTER:-$CHECKPOINTS_ROOT/sft_${MODEL_TAG}}"
 
-# Same storage split as training: stage the base model into /dev/shm (RAM) for a fast load
-# (reading it off EOS FUSE takes ~1-2h), and keep the finetuned merged model on EOS. Nothing
-# large lands on local disk. (Future: skip the merge and serve base+adapter via vLLM's native
-# LoRA support, avoiding the full-model write entirely.)
-EOS_HF="$EOS_ROOT/models/base/huggingface"
-SHM_HF="${SHM_HF:-/dev/shm/hf}"
-MODEL_DIR="models--Qwen--$MODEL_TAG"
-if [ ! -d "$SHM_HF/hub/$MODEL_DIR" ]; then
-  echo "Staging $MODEL_TAG from EOS to $SHM_HF (RAM, one-time)..."
-  mkdir -p "$SHM_HF/hub"
-  cp -r "$EOS_HF/hub/$MODEL_DIR" "$SHM_HF/hub/" || { echo "ERROR: base not on EOS" >&2; exit 1; }
-fi
-export HF_HOME="$SHM_HF"
-export HF_HUB_OFFLINE=1
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Same storage split as training: stage the base into /dev/shm (RAM) for a fast load (reading
+# it off EOS FUSE takes ~1-2h). stage_base is idempotent + validated and sets HF_HOME. The
+# finetuned adapter is served as a LoRA from EOS — nothing large lands on local disk.
+source "$SCRIPT_DIR/_stage.sh"
+stage_base "$BASE_MODEL" || exit 1
 
 RESULTS_DIR="${RESULTS_DIR:-results/sft_eval/${MODEL_TAG}}"
 SPLIT="${SPLIT:-test}"
 HOSPITAL="${HOSPITAL:-de_charite}"
 REPEATS="${REPEATS:-3}"
 PORT="${PORT:-8000}"
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 export CUDA_MODULE_LOADING=LAZY
 mkdir -p "$RESULTS_DIR"
