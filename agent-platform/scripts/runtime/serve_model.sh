@@ -33,7 +33,8 @@ export CUDA_MODULE_LOADING=LAZY
 # a local cache. See benchmark in commit history for cold/warm load times.
 export HF_HOME="${HF_HOME:-/eos/project-d/diagbox/dvc/NeuroAgent/models/base/huggingface}"
 
-VLLM_VENV="${VLLM_VENV:-/home/aprotani/projects/medical-agents/.venv-vllm}"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+VLLM_VENV="${VLLM_VENV:-$REPO_ROOT/.venv-vllm}"
 MODEL="${1:-qwen3.5-9b}"
 PORT="${2:-8000}"
 
