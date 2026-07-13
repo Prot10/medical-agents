@@ -1,5 +1,9 @@
 # Architecture
 
+> Scope: the `agent-platform` runtime (agent loop, tools, APIs). For the
+> repo-wide breakdown covering datasets, frontends, and training, see
+> [`docs/architecture.md`](../../docs/architecture.md).
+
 ## Overview
 
 NeuroAgent is a tool-augmented LLM agent for neurological clinical decision support. It follows a ReAct (Reasoning + Acting) loop to investigate patient cases through sequential tool use.

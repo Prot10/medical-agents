@@ -37,7 +37,7 @@ Tools are registered in `ToolRegistry` and their definitions are passed to the L
 
 - **Evaluation (MockServer)**: All tools are backed by `MockServer`, which looks up pre-generated outputs from `NeuroBenchCase.initial_tool_outputs` and `followup_outputs`. This is the current default.
 - **Live (future)**: Each tool would connect to a real model endpoint or external API. Currently raises `NotImplementedError`.
-- **v3 Realistic mode**: The v3 dataset (`data/neurobench/`) strips interpretive fields from tool outputs. Fields like `clinical_significance`, `differential_by_imaging`, `recommended_actions`, and diagnostic `impression` text are nulled or rewritten to match what real clinical reports provide. This forces the agent to perform actual clinical reasoning rather than reading pre-digested answers. See "Tool Output Modes" below.
+- **Realistic mode**: The current dataset (v5, 600 cases in `data/neurobench/cases/`) uses stripped tool outputs. Fields like `clinical_significance`, `differential_by_imaging`, `recommended_actions`, and diagnostic `impression` text are nulled or rewritten to match what real clinical reports provide. This forces the agent to perform actual clinical reasoning rather than reading pre-digested answers. See "Tool Output Modes" below.
 
 ### Ablation controls
 
@@ -86,7 +86,7 @@ Analyze an electroencephalography recording for neurological abnormalities.
 
 **`EEGFinding` fields**: `type` (e.g., sharp_wave, slowing, periodic_discharge), `location` (e.g., "F8/T4, right anterior temporal"), `frequency`, `morphology`, `state` (awake/sleep), `clinical_correlation`.
 
-> **v3 realistic mode**: In the v3 dataset, `confidence` is set to 0.0 (not provided), `impression` is stripped of disease names (descriptive findings only + "Clinical correlation recommended."), `recommended_actions` is replaced with `["Clinical correlation recommended."]`, and all `EEGFinding.clinical_correlation` fields are set to `""`.
+> **Realistic mode**: In the current dataset, `confidence` is set to 0.0 (not provided), `impression` is stripped of disease names (descriptive findings only + "Clinical correlation recommended."), `recommended_actions` is replaced with `["Clinical correlation recommended."]`, and all `EEGFinding.clinical_correlation` fields are set to `""`.
 
 ---
 
@@ -119,7 +119,7 @@ Analyze a brain MRI scan for structural abnormalities, volumetric changes, and d
 
 **`MRIFinding` fields**: `type` (e.g., mass_lesion, atrophy, white_matter_lesion), `location`, `size`, `signal_characteristics` (dict with T1/T2/FLAIR/DWI/contrast signals), `mass_effect`, `borders`.
 
-> **v3 realistic mode**: `differential_by_imaging` is `[]` (empty), `confidence` is 0.0, `recommended_actions` is `["Clinical correlation recommended."]`, `impression` is stripped of diagnosis names and treatment recommendations, and `additional_observations` entries containing diagnostic conclusions are removed.
+> **Realistic mode**: `differential_by_imaging` is `[]` (empty), `confidence` is 0.0, `recommended_actions` is `["Clinical correlation recommended."]`, `impression` is stripped of diagnosis names and treatment recommendations, and `additional_observations` entries containing diagnostic conclusions are removed.
 
 ---
 
@@ -148,7 +148,7 @@ Analyze a 12-lead electrocardiogram for cardiac abnormalities relevant to neurol
 | `interpretation` | string | Summary interpretation. |
 | `clinical_correlation` | string | How ECG findings relate to the neurological presentation. |
 
-> **v3 realistic mode**: `clinical_correlation` is `""` (empty). `interpretation` is stripped of disease-etiology commentary, keeping only rhythm/rate/interval descriptions.
+> **Realistic mode**: `clinical_correlation` is `""` (empty). `interpretation` is stripped of disease-etiology commentary, keeping only rhythm/rate/interval descriptions.
 
 ---
 
@@ -177,7 +177,7 @@ Interpret laboratory results across multiple panels with reference ranges, abnor
 
 **`LabValue` fields**: `test` (name), `value` (float or string), `unit`, `reference_range`, `is_abnormal` (bool), `clinical_significance` (optional explanation).
 
-> **v3 realistic mode**: All `LabValue.clinical_significance` fields are `null`. `interpretation` is replaced with a terse list of abnormal values only (e.g., "Abnormal values: Sodium 126 mEq/L (L), Glucose 186 mg/dL (H)."). `abnormal_values_summary` entries are stripped of prose explanations, keeping only "Test: value unit (H/L)".
+> **Realistic mode**: All `LabValue.clinical_significance` fields are `null`. `interpretation` is replaced with a terse list of abnormal values only (e.g., "Abnormal values: Sodium 126 mEq/L (L), Glucose 186 mg/dL (H)."). `abnormal_values_summary` entries are stripped of prose explanations, keeping only "Test: value unit (H/L)".
 
 ---
 
@@ -207,7 +207,7 @@ Analyze cerebrospinal fluid results including cell counts, chemistry, and specia
 | `special_tests` | dict[str, str] | Results of special tests: Gram stain, culture, HSV PCR, crypto antigen, oligoclonal bands, antibody panels, cytology, etc. |
 | `interpretation` | string | Clinical interpretation of the CSF profile. |
 
-> **v3 realistic mode**: `interpretation` is replaced with a terse numerical summary (e.g., "Opening pressure: 31 cmH2O. WBC: 392 (72% PMN/24% lymph). Protein: 153.2 mg/dL. Glucose: 30.7 mg/dL (ratio 0.24)."). No diagnostic commentary.
+> **Realistic mode**: `interpretation` is replaced with a terse numerical summary (e.g., "Opening pressure: 31 cmH2O. WBC: 392 (72% PMN/24% lymph). Protein: 153.2 mg/dL. Glucose: 30.7 mg/dL (ratio 0.24)."). No diagnostic commentary.
 
 ---
 
@@ -359,10 +359,11 @@ All outputs are serialized via `model.model_dump()` (Pydantic v2) and returned a
 
 ---
 
-## Tool Output Modes: v1 (Enhanced) vs v3 (Realistic)
+## Tool Output Modes: Enhanced (v1/v2) vs Realistic (v3 onward)
 
-The NeuroBench dataset has 600 cases across 20 conditions (500 train / 100 test). Tool
-outputs exist in two modes; the current cases use the realistic mode:
+The current NeuroBench dataset (v5) has 600 cases across 20 conditions (500 train /
+100 test) with the 12-tool schema and cost tracking. Tool outputs exist in two modes;
+the current cases use the realistic mode:
 
 ### v1 / v2: Enhanced tool outputs (original)
 
@@ -378,9 +379,11 @@ These outputs read like an attending physician's case discussion — the answer 
 - Establishing an upper bound on diagnostic accuracy
 - Comparing tool-augmented vs. no-tool performance where tool outputs are maximally informative
 
-### v3: Realistic tool outputs (stripped)
+### v3 onward: Realistic tool outputs (stripped)
 
-The same cases with interpretive fields removed or rewritten to match real-world clinical reports:
+Introduced in v3, carried through v4 (12-tool schema + cost tracking) into the current
+v5 dataset: the same cases with interpretive fields removed or rewritten to match
+real-world clinical reports:
 - Lab values show numbers, units, reference ranges, and H/L flags only — no clinical interpretation
 - MRI/EEG impressions describe findings without naming diseases or suggesting treatments
 - No imaging differentials, no confidence scores, no recommended actions beyond "Clinical correlation recommended."
@@ -388,7 +391,7 @@ The same cases with interpretive fields removed or rewritten to match real-world
 
 This mode tests genuine clinical reasoning: the agent must synthesize raw findings across modalities to reach a diagnosis, just as a real clinician would interpret reports from radiology, pathology, and the lab.
 
-**For the NMI paper**, the primary benchmark uses v3 (realistic). The v1→v3 accuracy delta is reported as an ablation showing the effect of interpretive tool outputs on agent performance.
+**For the NMI paper**, the primary benchmark uses the realistic mode. The enhanced→realistic accuracy delta is reported as an ablation showing the effect of interpretive tool outputs on agent performance.
 
 ## Source files
 

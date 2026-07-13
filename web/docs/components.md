@@ -5,131 +5,106 @@ The frontend is organized into feature-based directories under `src/components/`
 ## Layout
 
 ```
-┌──────────────────────────────────────────────────────────┐
-│  Header: Logo │ ModelPicker │ HospitalPicker │ ThemeToggle│
-├──────────┬───────────────────────┬───────────────────────┤
-│ Case     │ Patient Viewer        │ Agent Timeline        │
-│ Browser  │                       │                       │
-│ (250px)  │ (flex)                │ (480px)               │
-└──────────┴───────────────────────┴───────────────────────┘
+┌───────────┬──────────────────────────────────────────────┐
+│           │  Header: Breadcrumb │ Metrics │ Evaluate │ Run │
+│  Sidebar  ├───────────────────────┬──────────────────────┤
+│  (nav +   │ Content panel         │ Agent Timeline       │
+│  section  │ (Patient / Dataset /  │ ──────────────────── │
+│  browser) │  Pathway Editor)      │ Oracle (optional)    │
+└───────────┴───────────────────────┴──────────────────────┘
 ```
 
-### `AppShell`
-3-panel layout with fixed-width sidebars and a flexible center. All panels scroll independently.
+A collapsible, resizable sidebar (200–400px, or 64px collapsed) plus a main area split by `react-resizable-panels`. The sidebar's nav selects the active section (`cases` / `dataset` / `traces` / `rules` / `architecture` / `settings`); the content panel swaps accordingly, and the Architecture section takes over the full main area.
 
-### `Header`
-Contains the logo mark, model picker, hospital picker (separated by dividers), and a dark/light theme toggle.
+### Layout (`layout/`)
 
-## Left Panel — Case Browser
+- **`AppShell`** — top-level layout: sidebar + header + resizable content/agent panels; optionally splits the agent panel vertically with the `OraclePanel`.
+- **`Sidebar`** — nav items, per-section browser content, and a collapsible footer with agent-model / evaluator-model / hospital pickers, model load/stop controls (consumes the `/models/{key}/load` SSE stream), and the dark-mode toggle.
+- **`Header`** — section breadcrumb + selected case ID, `TokenCounter` metrics, export-trace button, Evaluate button (triggers the Oracle), and Run/Stop controls.
+- **`SidebarResizeHandle`** — drag handle that clamps sidebar width between 200 and 400px.
 
-### `CaseBrowser`
-Lists 600 cases grouped by neurological condition (20 groups). Features:
-- **Search** — filters by case ID and chief complaint
-- **Difficulty chips** — S (straightforward), M (moderate), P (diagnostic puzzle) with color coding
-- **Sticky group headers** — condition name stays visible while scrolling
-- **Selection state** — connected to `appStore.selectedCaseId`; selecting a case resets the agent timeline
+## Sidebar Section Panels
 
-## Center Panel — Patient Viewer
+Rendered inside the sidebar based on the active nav section:
 
-### `PatientViewer`
-Full clinical data display for the selected case. Contains inline sub-components:
+- **`CaseBrowser`** (`cases/`) — 600 cases grouped by condition, with text search (case ID / chief complaint), difficulty filter, and selection wired to `appStore.selectedCaseId`.
+- **`DatasetOverview`** (`dataset/`) — compact dataset summary (total, avg age, difficulty and condition bars) whose rows toggle `appStore.datasetFilters`.
+- **`TraceBrowser`** (`traces/`) — saved traces with search and difficulty filter; replay (streamed or instant), delete, and per-trace metadata (model, hospital, cost).
+- **`HospitalRulesBrowser`** (`hospital/`) — hospital picker + searchable pathway list; selects a pathway for the editor or starts creation of a new one.
+- **`SettingsPanel`** (`settings/`) — GitHub Copilot connection via OAuth device flow (pairing code, polling, logout).
 
-- **Demographics bar** — age, sex, handedness, ethnicity, BMI, encounter type, difficulty badges
-- **VitalsRow** — 6 metric cards (BP, HR, Temp, RR, SpO2) with icons and abnormal-value highlighting (red border when outside reference range)
-- **Chief Complaint** — prominent text
-- **HPI** — full narrative
-- **Tabbed sections**:
-  - *History* — PMH list, medications table, allergy badges, family history, social history
-  - *Neurological Exam* — collapsible sections for each of 8 exam domains
-- **Ground Truth toggle** — expands `GroundTruthPanel` below
+## Content Panel
 
-### `GroundTruthPanel`
-Collapsible panel showing:
-- Primary diagnosis + ICD code
-- Differential diagnoses with likelihood
-- **Action compliance checklist** — cross-references `ground_truth.optimal_actions` against the agent's actual tool calls (green check / gray X)
-- Critical actions and key reasoning points
+- **`PatientViewer`** (`patient/`) — full clinical data for the selected case in tabs: Overview (demographics, vitals, chief complaint, HPI), History, Neuro Exam, Diagnostics (pre-generated tool outputs), and Ground Truth.
+- **`GroundTruthPanel`** (`ground-truth/`) — primary diagnosis + ICD code, differentials, and an action-compliance checklist cross-referencing `ground_truth.optimal_actions` against the agent's actual tool calls.
+- **`DatasetDashboard`** (`dataset/`) — dataset analytics: stat cards (cases, avg age, sex split, conditions), dataset switcher (`/datasets/{v}/activate`), and four charts.
+  - **`charts/ConditionChart`** — case counts per condition (bar).
+  - **`charts/DifficultyDonut`** — difficulty breakdown (donut).
+  - **`charts/AgeHistogram`** — age distribution in 10-year bins.
+  - **`charts/CaseHeatmap`** — condition × difficulty matrix.
+- **`PathwayEditorPanel`** (`hospital/`) — full CRUD editor for hospital pathways: name/description/triggers, step list (action, timing, mandatory, condition), contraindicated actions; saves via the hospitals rules POST/PUT/DELETE endpoints.
+- **`ArchitectureExplorer`** (`architecture/`) — interactive system map of the whole project (nodes with paths, files, and links) filterable by layer (Runtime, Reasoning, Tools, Data, Evaluation, Frontend, Review, Research, Fine-tuning, Deployment). Replaces the whole main area.
 
-## Right Panel — Agent Timeline
+## Agent Panel (`agent/`)
 
-The core feature. A vertical scrollable timeline that auto-scrolls during streaming.
-
-### `AgentTimeline`
-Container component managing:
-- **Run controls** — Run Agent / Stop buttons, replay dropdown, export button
-- **Event rendering** — converts raw `AgentEvent[]` from the store into render items by pairing `tool_call` + `tool_result` events
-- **Live indicators** — pulsing dot with "Agent is thinking..." during runs
-
-### `ThinkingBlock`
-Indigo-accented card for agent reasoning. Left gradient accent bar. Content rendered with react-markdown + remark-gfm. Shows turn number.
-
-### `ToolCallCard`
-VSCode/Cursor-inspired collapsible card:
-- **Collapsed** — chevron + tool icon (color-coded per tool) + tool name + args preview + status icon (spinning/check/X)
-- **Expanded** — arguments JSON + specialized result renderer
-
-7 tool-to-icon mappings:
-
-| Tool | Icon | Color |
-|------|------|-------|
-| `analyze_brain_mri` | Brain | Violet |
-| `analyze_eeg` | Activity | Blue |
-| `analyze_ecg` | Heart | Rose |
-| `interpret_labs` | FlaskConical | Emerald |
-| `analyze_csf` | Droplets | Cyan |
-| `search_medical_literature` | BookOpen | Amber |
-| `check_drug_interactions` | Pill | Orange |
-
-### `ReflectionBlock`
-Minimal divider with gradient lines and a "Reflect" label in the reflection accent color.
-
-### `AssessmentPanel`
-Green-accented card for the final structured assessment. Gradient header with shield icon. Full markdown rendering of the agent's diagnosis, differentials, evidence, recommendations, and red flags.
-
-### `TokenCounter`
-Compact metrics display: token count (in thousands) and elapsed time. Monospace font.
+- **`AgentTimeline`** — vertical auto-scrolling timeline; pairs `tool_call` + `tool_result` events into render items, groups turns, and renders live streaming deltas via `StreamingContent`.
+- **`StreamingContent`** — collapsible reasoning block that renders token deltas with Streamdown while streaming and react-markdown once complete.
+- **`ThinkingBlock`** — card for a completed reasoning turn (markdown via react-markdown + remark-gfm).
+- **`ToolCallCard`** — collapsible card per tool call: icon + args preview + status while collapsed, arguments JSON + specialized result renderer when expanded. Icon/color mappings for all 12 tools.
+- **`ReflectionBlock`** — minimal divider marking an injected reflection prompt.
+- **`AssessmentPanel`** — green-accented card for the final structured assessment, fully markdown-rendered.
+- **`OraclePanel`** — evaluation view, opened by the header's Evaluate button (`appStore.oracleTrigger`). Streams `/agent/evaluate`: rule-based metrics grid (accuracy, precision/recall, safety, efficiency) then the LLM judge's streaming output and scores.
+- **`TokenCounter`** — compact token count + elapsed time, monospace.
 
 ## Tool Result Renderers (`results/`)
 
-Each renderer is designed for a specific diagnostic tool output format:
+- **`ToolResultRenderer`** — router that picks the specialized renderer by `toolName`, falling back to `GenericResult`.
 
 | Component | Tool | Key Features |
 |-----------|------|-------------|
-| `LabResultsTable` | `interpret_labs` | Grouped by panel (CBC, BMP, etc.), auto-expands panels with abnormal values, red highlighting for out-of-range results |
-| `MRIFindings` | `analyze_brain_mri` | Finding cards with signal characteristics grid (T1/T2/FLAIR/DWI), imaging differential badges |
-| `ECGReport` | `analyze_ecg` | Top-line metric badges (rhythm, rate, axis), intervals grid, severity-colored findings |
-| `EEGReport` | `analyze_eeg` | Classification header, background description, finding cards (type, location, frequency, morphology) |
-| `CSFResults` | `analyze_csf` | Key-value grid (appearance, pressure, protein, glucose), cell count breakdown, special tests |
-| `LiteratureResults` | `search_medical_literature` | Paper cards with title, source, summary; query echo; overall summary |
-| `DrugInteractions` | `check_drug_interactions` | Severity-colored interaction cards (major/moderate/minor), contraindication list, green alternative badges |
-| `GenericResult` | (fallback) | Auto-renders key metrics, findings list, impression text; raw JSON toggle |
+| `LabResultsTable` | `interpret_labs` | Grouped by panel, auto-expands abnormal panels, out-of-range highlighting |
+| `MRIFindings` | `analyze_brain_mri` | Finding cards with signal characteristics grid (T1/T2/FLAIR/DWI) |
+| `ECGReport` | `analyze_ecg` | Rhythm/rate/axis badges, intervals grid, severity-colored findings |
+| `EEGReport` | `analyze_eeg` | Classification header, background description, finding cards |
+| `CSFResults` | `analyze_csf` | Key-value grid, cell count breakdown, special tests |
+| `LiteratureResults` | `search_medical_literature` | Paper cards, query echo, overall summary |
+| `DrugInteractions` | `check_drug_interactions` | Severity-colored interaction cards, alternatives |
+| `GenericResult` | (fallback) | Key metrics, findings, impression, raw JSON toggle — covers the `order_*` tools |
 
-### `ToolResultRenderer`
-Router component that selects the appropriate specialized renderer based on `toolName`, falling back to `GenericResult`.
+## Model (`model/`)
+
+- **`ModelLoadingToast`** — floating toast for model loads: phase label, smoothly interpolated progress bar and elapsed clock, auto-dismiss on ready; driven by `modelLoadingStore`.
+
+## UI Primitives (`ui/`)
+
+- **`Badge`** — pill label with variants (default/outline/success/warning/destructive/info).
+- **`Card`** — rounded bordered container with optional left accent and hover state.
+- **`DifficultyStars`** — 1–3 colored stars for straightforward/moderate/diagnostic_puzzle.
+- **`SectionLabel`** — small uppercase section heading with optional icon.
 
 ## State Management
 
 ### `appStore` (Zustand)
-UI-level state persisted across component re-renders:
-- `selectedCaseId` — which case is active
-- `selectedHospital` — hospital rule set (`us_mayo` default)
-- `selectedModel` — LLM backend (`qwen3.5-9b` default)
-- `darkMode` — theme toggle (default: true)
-- `showGroundTruth` — ground truth panel visibility
+UI-level state: `selectedCaseId`, `selectedHospital`, `selectedModel`, `selectedEvaluatorModel`, `darkMode`, `showGroundTruth`, sidebar state (`sidebarCollapsed`, `sidebarWidth`, `activeSection`), `datasetFilters`, rules-editor state (`rulesHospitalId`, `selectedPathwayIndex`, `isCreatingPathway`), and Oracle state (`oracleOpen`, `oracleTrigger`).
 
 ### `agentStore` (Zustand)
 Agent execution state, updated at high frequency during SSE streaming:
 - `status` — `idle` | `running` | `complete` | `error`
 - `events` — append-only array of `AgentEvent` objects
-- `totalTokens` / `elapsedTime` — accumulated metrics
+- `streamingContent` / `streamingThinkContent` / `streamingTurnNumber` — buffers accumulated from `content_delta` / `think_delta` events
+- `totalTokens` / `elapsedTime` / `totalCost` — accumulated metrics
 - `errorMessage` — last error
 
-### TanStack Query
-Used for static data that doesn't change during a session:
-- Cases list (`staleTime: Infinity`)
-- Case detail (`staleTime: Infinity`, enabled only when a case is selected)
-- Hospitals (`staleTime: Infinity`)
-- Models (`staleTime: 10s` — re-fetches to detect vLLM status changes)
+### `modelLoadingStore` (Zustand)
+Model-load progress from the `/models/{key}/load` SSE stream: `phase`, `progress`, `elapsed`, `expectedSeconds`, `sizeGb`, `message`.
+
+### TanStack Query (`hooks/`)
+Server data via `useCases.ts` and `useReplay.ts`:
+- Cases list / case detail (`staleTime: Infinity`)
+- Hospitals (`staleTime: Infinity`), hospital rules (`staleTime: 30s`)
+- Datasets (`staleTime: 30s`) + `useActivateDataset` mutation
+- Models (`staleTime: 10s` — merges local models with Copilot models when authenticated)
+- Copilot status (`staleTime: 5s`)
 - Traces (`staleTime: 5s`)
 
 ## Data Flow
@@ -143,9 +118,13 @@ User clicks "Run Agent"
       → async queue passes events to SSE response
     → consumeSSEStream() parses "data: {...}\n\n" lines
       → agentStore.appendEvent(event) for each
-        → AgentTimeline re-renders with new events
-        → buildRenderItems() pairs tool_call + tool_result
+        → think_delta / content_delta accumulate into streaming buffers
+        → AgentTimeline re-renders; buildRenderItems() pairs tool_call + tool_result
         → auto-scroll to bottom
     → on run_complete: status → "complete"
     → trace auto-saved to data/traces/ on backend
+User clicks "Evaluate"
+  → appStore.triggerOracle() opens OraclePanel
+    → streamEvaluation() POSTs the run's events to /api/v1/agent/evaluate
+    → metrics event renders the score grid; judge_delta streams the LLM judge
 ```

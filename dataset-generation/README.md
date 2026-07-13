@@ -30,20 +30,27 @@ data/
 
 dataset-generation/
 ├── config/
-│   ├── conditions.yaml              # 10 neurological conditions with clinical specs
-│   ├── prompt_template.md           # Template for synthetic case generation (v1)
-│   └── prompt_template_seeded.md    # Template for real-case-seeded generation (v2)
+│   ├── conditions.yaml              # 20 neurological conditions with clinical specs
+│   ├── prompt_template.md           # Template for synthetic case generation
+│   └── prompt_template_seeded.md    # Template for real-case-seeded generation
+├── criteria_packs/                  # Per-condition clinical criteria packs (one .md per condition)
+├── seeds/                           # Real-case seeds (per-condition subdirs, tracked in git)
+├── prompts/                         # Assembled prompts (NOT tracked in git — see note below)
 ├── src/neurobench_gen/
-│   ├── build_prompt.py              # Assembles v1 prompts from YAML + schema
-│   ├── build_prompt_seeded.py       # Assembles v2 prompts from seed case + YAML + schema
+│   ├── build_prompt.py              # Assembles synthetic prompts from YAML + schema
+│   ├── build_prompt_seeded.py       # Assembles seeded prompts from seed case + YAML + schema
 │   ├── validate_case.py             # Pydantic validation + clinical plausibility checks
 │   └── __init__.py
-├── scripts/
-│   ├── generate_batch.sh            # Batch generation via `claude -p` (outside Claude Code)
-│   ├── generate_one.sh              # Single case debug script
-│   └── dataset_statistics.py        # Dataset statistics (conditions, demographics, modalities)
-└── docs/
+└── scripts/
+    ├── generate_batch.sh            # Batch generation via `claude -p` (outside Claude Code)
+    ├── generate_one.sh              # Single case debug script
+    ├── filter_medcasereasoning.py   # Seed extraction from MedCaseReasoning
+    └── dataset_statistics.py        # Dataset statistics (conditions, demographics, modalities)
 ```
+
+> **Note on `prompts/`:** the assembled prompt files are no longer tracked in git.
+> They are regenerated deterministically by `build_prompt.py` / `build_prompt_seeded.py`
+> from `config/conditions.yaml` + `seeds/`, so there is nothing to version.
 
 ## Usage
 
@@ -69,26 +76,44 @@ uv run --project dataset-generation python dataset-generation/scripts/dataset_st
 
 ## Conditions
 
+20 conditions, defined in `config/conditions.yaml` (one criteria pack per condition in `criteria_packs/`):
+
 | Abbreviation | Condition | ICD Code |
 |-------------|-----------|----------|
 | `ISCH-STR` | Acute ischemic stroke | I63.9 |
 | `FEPI-TEMP` | Focal epilepsy (temporal) | G40.209 |
 | `MS-RR` | Multiple sclerosis (relapsing-remitting) | G35.A |
 | `ALZ-EARLY` | Alzheimer's disease | G30.9 |
-| `PD` | Parkinson's disease | G20 |
+| `PD` | Parkinson's disease | G20.A1 |
 | `GLIO-HG` | High-grade glioma (glioblastoma) | C71.9 |
 | `BACT-MEN` | Bacterial meningitis | G00.9 |
 | `NMDAR-ENC` | Anti-NMDAR encephalitis | G04.81 |
 | `FND` | Functional neurological disorder | F44.4 |
 | `SYNC-CARD` | Cardiac syncope | R55 |
+| `GBS` | Guillain-Barré syndrome | G61.0 |
+| `MG` | Myasthenia gravis | G70.0 |
+| `SAH` | Subarachnoid hemorrhage | I60.9 |
+| `MIG-AURA` | Migraine with aura | G43.1 |
+| `FTD` | Frontotemporal dementia | G31.09 |
+| `SE` | Status epilepticus | G41.9 |
+| `PERI-NEURO` | Peripheral neuropathy (diabetic/CIDP/toxic) | G62.9 |
+| `NPH` | Normal pressure hydrocephalus | G91.2 |
+| `HEP-ENC` | Hepatic encephalopathy | K72.9 |
+| `ALS` | Amyotrophic lateral sclerosis | G12.21 |
 
 ## Case ID Convention
 
-- **v1**: `{ABBREV}-{S|M|P}{NUMBER}` — e.g., `ISCH-STR-S01`, `MS-RR-P03`
-- **v2**: `{ABBREV}-R{S|M|P}{NUMBER}` — e.g., `ISCH-STR-RS01`, `MS-RR-RP03` (R = real-seeded)
-- **v3**: Contains both v1 and v2 cases with their original IDs, stripped tool outputs
+- Synthetic cases: `{ABBREV}-{S|M|P}{NUMBER}` — e.g., `ISCH-STR-S01`, `MS-RR-P03`
+- Real-seeded cases: `{ABBREV}-R{S|M|P}{NUMBER}` — e.g., `ISCH-STR-RS01`, `MS-RR-RP03` (R = real-seeded)
 - Difficulty: S = straightforward, M = moderate, P = diagnostic puzzle
-- Distribution per condition: 4S + 3M + 3P = 10 cases
+
+## Dataset Versions
+
+- **v1** — fully synthetic (Pipeline 1), enhanced tool outputs. 10 conditions × 10 cases (4S + 3M + 3P).
+- **v2** — real-case-seeded (Pipeline 2), enhanced tool outputs. Same 10 conditions and per-condition distribution.
+- **v3** — v1 + v2 combined with their original IDs; tool outputs stripped to "realistic" mode (interpretive fields removed to match real clinical reports).
+- **v4** — migrated from v3 to the 12-tool schema + cost tracking (`order_advanced_imaging`, `order_specialized_test`, etc.; see `docs/benchmark/tool-contract.md`).
+- **v5** — **current default**: 600 cases across 20 conditions (30 per condition, mixed synthetic + real-seeded), in `data/neurobench/cases/`. Generated via per-condition criteria packs (`criteria_packs/`) + real-case seeds (`seeds/`). Split into 500 train / 100 test (`data/neurobench/splits/`; the test set includes 2 held-out conditions).
 
 ## External Data Sources
 

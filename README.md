@@ -101,14 +101,20 @@ cd web && npm run dev:remote   # remote VM (binds 0.0.0.0)
 
 ## Models
 
-4 models supported via vLLM on a single A100-40GB:
+10 models registered in `agent-platform/src/neuroagent/model_registry.py`, served one at a time on the A100-40GB via vLLM (`agent-platform/scripts/runtime/serve_model.sh`):
 
-| Key | HF Model ID | VRAM | Load time |
-|-----|-------------|------|-----------|
-| `qwen3.5-9b` | `Qwen/Qwen3.5-9B` | ~18 GB | ~40s |
-| `qwen3.5-27b-awq` | `QuantTrio/Qwen3.5-27B-AWQ` | ~16 GB | ~65s |
-| `medgemma-4b` | `google/medgemma-1.5-4b-it` | ~9 GB | ~70s |
-| `medgemma-27b` | `ig1/medgemma-27b-text-it-FP8-Dynamic` | ~27 GB | ~50s |
+| Key | HF Model ID | Size | Tool calling |
+|-----|-------------|------|--------------|
+| `qwen3.5-4b` | `Qwen/Qwen3.5-4B` | 8.8 GB | yes |
+| `qwen3.5-9b` | `Qwen/Qwen3.5-9B` | 19.0 GB | yes |
+| `qwen3.5-27b-awq` | `QuantTrio/Qwen3.5-27B-AWQ` | 21.0 GB | yes |
+| `medgemma-4b` | `google/medgemma-1.5-4b-it` | 8.1 GB | no (text-only) |
+| `medgemma-27b` | `ig1/medgemma-27b-text-it-FP8-Dynamic` | 30.0 GB | no (text-only) |
+| `nemotron-nano-9b-v2` | `nvidia/NVIDIA-Nemotron-Nano-9B-v2` | 17.0 GB | yes |
+| `nemotron-3-nano-4b` | `nvidia/NVIDIA-Nemotron-3-Nano-4B-BF16` | 7.5 GB | yes |
+| `gemma-4-e2b` | `google/gemma-4-E2B-it` | 9.6 GB | yes |
+| `gemma-4-e4b` | `google/gemma-4-E4B-it` | 15.0 GB | yes |
+| `gemma-4-12b` | `google/gemma-4-12B-it` | 22.3 GB | yes |
 
 Models can be loaded/switched from the web UI (sidebar → model selector → Load button). Only one model runs at a time; switching unloads the previous one automatically.
 
@@ -182,7 +188,7 @@ Open `http://<vm-host>:5174` and enter a reviewer code from `reviewer_codes.yaml
 
 - **Code entry gate** on first visit; code stored in `localStorage` and sent on every request as `X-Reviewer-Code`
 - **Overview tab**: progress strip (approved / needs-changes / in-progress / pending), recent cases, milestones, Random-Pending CTA
-- **Cases tab**: 516-row hybrid list with status-colored left border, condition pill, severity dot cluster, multi-select condition filter, search, and a Random-Pending button
+- **Cases tab**: 600-row hybrid list with status-colored left border, condition pill, severity dot cluster, multi-select condition filter, search, and a Random-Pending button
 - **Case detail**: header + chief complaint pull-quote + patient/vitals + HPI (Source Serif Pro) + neuro exam + initial workup (collapsible) + diagnostic pathway timeline + ground truth showcase (differential cards, optimal actions, critical / contraindicated, red herrings, teaching pearls) + metadata
 - **Field-level annotation gesture**: hover any field → primary-color "Comment" pill appears in the margin → popover with severity (note / issue / error) + free-text + `⌘↵` to save. Already-annotated fields get a persistent left border colored by highest severity + count badge
 - **Annotation sidebar**: 4-state status switcher (pending / in-progress / needs-changes / approved), case-wide thread, severity-filterable field annotations, Approve case + Next-Pending CTAs

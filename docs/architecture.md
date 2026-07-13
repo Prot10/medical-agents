@@ -1,5 +1,9 @@
 # NeuroAgent Architecture and Repository Breakdown
 
+> Scope: the whole repository. For a runtime-focused deep dive into the
+> agent loop and tools, see
+> [`agent-platform/docs/architecture.md`](../agent-platform/docs/architecture.md).
+
 ## Executive Summary
 
 NeuroAgent is a tool-augmented clinical reasoning platform for neurological decision support. The repository combines a Python agent runtime, shared Pydantic schemas, versioned NeuroBench datasets, dataset-generation workflows, two React frontends, clinical review tooling, evaluation scripts, and publication/research material.
@@ -12,16 +16,16 @@ The core runtime is `agent-platform`: FastAPI loads NeuroBench cases, the `Agent
 |---|---|---|
 | `agent-platform/` | Main Python package: orchestrator, tools, API, review API, rules, evaluation, training, scripts, tests. | Core runtime |
 | `agent-platform/src/neuroagent/training/` | Training code for QLoRA SFT, DPO, GRPO, DAPO, adapter merge, and finetuned evaluation. | Fine-tuning |
-| `agent-platform/docs/finetuning-plan.md` | Current fine-tuning status, LoRA/QLoRA settings, results, bottlenecks, and roadmap. | Fine-tuning docs |
+| `docs/training/` | Distillation pipeline and the SFT recipe: hardware, memory, and evaluation learnings. | Fine-tuning docs |
 | `agent-platform/docs/models.md` | Model inventory, vLLM serving flags, Qwen thinking/tool parsing, AWQ Marlin guidance. | Model serving |
 | `packages/neuroagent-schemas/` | Shared Pydantic models for cases, patient profiles, ground truth, evaluation records, and tool outputs. | Contracts |
 | `dataset-generation/` | NeuroBench case-generation pipeline, criteria packs, validation, prompt templates, and authoring guides. | Data factory |
 | `data/` | Versioned NeuroBench datasets, case evaluations, review artifacts, traces, audit reports. | Corpus |
 | `web/` | Main Vite/React dashboard for cases, model loading, agent streaming, trace replay, rules, and architecture exploration. | Frontend |
 | `web-review/` | Separate doctor-led review UI for blinded annotations and admin aggregation. | Review frontend |
-| `research/reasoning-frameworks/` | Survey and roadmap for replacing linear ReAct with graph/search/panel reasoning. | Research |
+| `docs/research/` | Literature reviews, bibliographies, and the reasoning-frameworks survey/roadmap. | Research |
 | `deployment/` | Hostinger and Raspberry Pi deployment notes, service files, Nginx config, backup scripts. | Operations |
-| `papers/`, `presentations/`, `nmi-paper-plan/` | Explainers, publication assets, presentation source, and paper planning. | Publication |
+| `papers/`, `presentations/` | Reference papers and presentation sources/assets. | Publication |
 
 ## Runtime Architecture
 

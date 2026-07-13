@@ -55,11 +55,15 @@ Colocated with the code they describe, under `agent-platform/docs/`:
 ## Research
 
 [`research/literature-review.md`](research/literature-review.md) ·
+[`research/literature-review-extended.md`](research/literature-review-extended.md) ·
 [`research/bibliography.md`](research/bibliography.md) ·
+[`research/references.bib`](research/references.bib) ·
 [`research/reasoning-frameworks.md`](research/reasoning-frameworks.md) ·
+[`research/reasoning-frameworks-references.bib`](research/reasoning-frameworks-references.bib) ·
 [`research/proposal-localization-first-reasoning.md`](research/proposal-localization-first-reasoning.md)
 
 ## Archive
 
-[`archive/`](archive/) — completed sweeps and per-condition audits. Records of why cases
-changed. Several reference scripts that were deleted; they are kept for provenance, not use.
+[`archive/`](archive/) — completed sweeps, per-condition audits, and superseded plans
+(e.g. the original fine-tuning and improvement plans). Records of why cases changed.
+Several reference scripts that were deleted; they are kept for provenance, not use.

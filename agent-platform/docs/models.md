@@ -1,19 +1,28 @@
 # Models
 
-> The registry now holds 10 models (`agent-platform/src/neuroagent/model_registry.py`),
-> including Qwen3.5-4B, two Nemotron Nano variants and three Gemma-4 sizes. This page
-> documents the main ones; `serve_model.sh` is the authoritative launcher list.
+> The registry holds 10 models (`agent-platform/src/neuroagent/model_registry.py`):
+> three Qwen3.5 sizes, two MedGemma sizes, two Nemotron Nano variants and three Gemma-4
+> sizes. The table below mirrors the registry; `serve_model.sh` is the authoritative
+> launcher (per-model vLLM flags live there).
 
-NeuroAgent uses [vLLM](https://docs.vllm.ai/) to serve LLMs locally via an OpenAI-compatible API.
+NeuroAgent uses [vLLM](https://docs.vllm.ai/) to serve LLMs locally via an OpenAI-compatible API, one model at a time on the A100-40GB.
 
 ## Supported models
 
-| Shortname | HuggingFace ID | Size | VRAM | Notes |
+| Shortname | HuggingFace ID | Weights | Parsers (tool / reasoning) | Notes |
 |---|---|---|---|---|
-| `qwen3.5-9b` | `Qwen/Qwen3.5-9B` | ~18 GB | ~20 GB | **Default.** Fast (~70 tok/s on A100), good tool calling. Best for development. |
-| `qwen3.5-27b-awq` | `QuantTrio/Qwen3.5-27B-AWQ` | ~15 GB | ~22 GB | AWQ 4-bit via Marlin kernels (~55 tok/s). Best quality. |
-| `medgemma-27b` | `ig1/medgemma-27b-text-it-FP8-Dynamic` | ~31 GB | ~33 GB | Medical specialist, FP8 quantized. Tight on A100-40GB (8K context limit). |
-| `medgemma-4b` | `google/medgemma-1.5-4b-it` | ~8 GB | ~10 GB | Small medical model. Fast iteration. Gated access. |
+| `qwen3.5-4b` | `Qwen/Qwen3.5-4B` | ~9 GB | `qwen3_coder` / `qwen3` | Smallest Qwen3.5. Native tool calling, fast iteration. |
+| `qwen3.5-9b` | `Qwen/Qwen3.5-9B` | ~19 GB | `qwen3_coder` / `qwen3` | **Default.** Fast (~70 tok/s on A100), good tool calling. Best for development. |
+| `qwen3.5-27b-awq` | `QuantTrio/Qwen3.5-27B-AWQ` | ~21 GB | `qwen3_coder` / `qwen3` | AWQ 4-bit via Marlin kernels (~55 tok/s). Best Qwen quality. |
+| `medgemma-4b` | `google/medgemma-1.5-4b-it` | ~8 GB | `hermes` / — | Small medical model. No native tool calling. Gated access. |
+| `medgemma-27b` | `ig1/medgemma-27b-text-it-FP8-Dynamic` | ~30 GB | `hermes` / — | Medical specialist, FP8 quantized. Tight on A100-40GB (8K context limit). No native tool calling. |
+| `nemotron-nano-9b-v2` | `nvidia/NVIDIA-Nemotron-Nano-9B-v2` | ~17 GB | `nemotron_json` (vendored plugin) / — | Hybrid Mamba/Transformer. Tool calls in `<TOOLCALL>` JSON format. |
+| `nemotron-3-nano-4b` | `nvidia/NVIDIA-Nemotron-3-Nano-4B-BF16` | ~8 GB | `qwen3_coder` / `nano_v3` (vendored plugin) | Latest Nemotron gen, smallest variant. |
+| `gemma-4-e2b` | `google/gemma-4-E2B-it` | ~10 GB | `gemma4` / `gemma4` | 5B total / 2B effective via Per-Layer Embeddings (PLE). |
+| `gemma-4-e4b` | `google/gemma-4-E4B-it` | ~15 GB | `gemma4` / `gemma4` | 8B total / 4B effective (PLE). |
+| `gemma-4-12b` | `google/gemma-4-12B-it` | ~22 GB | `gemma4` / `gemma4` | Encoder-free dense multimodal 12B. |
+
+The two vendored parser plugins (`nemotron_toolcall_parser.py`, `nano_v3_reasoning_parser.py`) live next to `serve_model.sh` in `scripts/runtime/`.
 
 ## Qwen3.5 architecture
 
