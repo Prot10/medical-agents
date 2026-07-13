@@ -2,12 +2,13 @@ import { FileText, Plus, Clock, AlertTriangle, ChevronDown, Search } from "lucid
 import { useState } from "react"
 import { useAppStore } from "@/stores/appStore"
 import { useHospitals, useHospitalRules } from "@/hooks/useCases"
+import { QueryError } from "@/components/ui/QueryError"
 import { cn } from "@/lib/utils"
 
 export function HospitalRulesBrowser() {
   const { rulesHospitalId, setRulesHospitalId, selectedPathwayIndex, selectPathway, setIsCreatingPathway } = useAppStore()
   const { data: hospitals } = useHospitals()
-  const { data: rulesData, isLoading } = useHospitalRules(rulesHospitalId)
+  const { data: rulesData, isLoading, isError, error, refetch } = useHospitalRules(rulesHospitalId)
   const [search, setSearch] = useState("")
 
   const pathways = rulesData?.pathways ?? []
@@ -20,6 +21,10 @@ export function HospitalRulesBrowser() {
 
   if (isLoading) {
     return <div className="p-4 text-base text-muted-foreground">Loading rules...</div>
+  }
+
+  if (isError) {
+    return <QueryError message="Could not load hospital rules." error={error} onRetry={() => refetch()} />
   }
 
   return (

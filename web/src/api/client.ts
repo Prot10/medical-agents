@@ -48,16 +48,16 @@ export const api = {
       if (!res.ok) throw new Error(`${res.status}: ${res.statusText}`)
     }),
   getTrace: (id: string) => fetchJSON<{ case_id: string; events: AgentEvent[]; [key: string]: unknown }>(`${BASE}/traces/${id}`),
-  loadModel: (modelKey: string) =>
-    fetch(`${BASE}/models/${modelKey}/load`, { method: "POST" }),
+  loadModel: (modelKey: string, signal?: AbortSignal) =>
+    fetch(`${BASE}/models/${modelKey}/load`, { method: "POST", signal }),
   unloadModel: () =>
     fetchJSON<{ status: string; message: string }>(`${BASE}/models/unload`, { method: "POST" }),
 }
 
 /** Parse SSE events from a ReadableStream, calling onEvent for each. */
-async function consumeSSEStream(
+export async function consumeSSEStream<T = AgentEvent>(
   response: Response,
-  onEvent: (event: AgentEvent) => void,
+  onEvent: (event: T) => void,
 ): Promise<void> {
   const reader = response.body!.getReader()
   const decoder = new TextDecoder()
@@ -82,11 +82,11 @@ async function consumeSSEStream(
   }
 }
 
-function parseSSELine(raw: string, onEvent: (event: AgentEvent) => void): void {
+function parseSSELine<T>(raw: string, onEvent: (event: T) => void): void {
   const line = raw.trim()
   if (line.startsWith("data: ")) {
     try {
-      onEvent(JSON.parse(line.slice(6)) as AgentEvent)
+      onEvent(JSON.parse(line.slice(6)) as T)
     } catch {
       // skip malformed events
     }
@@ -156,7 +156,7 @@ export async function streamEvaluation(
     return
   }
 
-  await consumeSSEStream(response, onEvent as unknown as (event: AgentEvent) => void)
+  await consumeSSEStream<Record<string, unknown>>(response, onEvent)
 }
 
 export async function replayTrace(

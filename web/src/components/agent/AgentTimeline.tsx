@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import { Zap, Loader2, GitFork } from "lucide-react"
 import { useAgentStore } from "@/stores/agentStore"
 import { useAppStore } from "@/stores/appStore"
@@ -18,23 +18,70 @@ function Connector() {
   )
 }
 
+// ─── Live streaming block ─────────────────────────────────────────────────────
+// Isolated so that per-token delta updates only re-render this component, not
+// the whole timeline.
+
+function LiveStreamingBlock({ scrollRef, showConnector }: {
+  scrollRef: React.RefObject<HTMLDivElement | null>
+  showConnector: boolean
+}) {
+  const streamingContent = useAgentStore((s) => s.streamingContent)
+  const streamingThinkContent = useAgentStore((s) => s.streamingThinkContent)
+  const streamingTurnNumber = useAgentStore((s) => s.streamingTurnNumber)
+
+  // Follow the stream: keep the container scrolled to the bottom per token
+  useEffect(() => {
+    if ((streamingContent || streamingThinkContent) && scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+    }
+  }, [streamingContent, streamingThinkContent, scrollRef])
+
+  if (!streamingContent && !streamingThinkContent) return null
+
+  return (
+    <div>
+      {showConnector && <Connector />}
+      <div className="space-y-2 animate-fade-in">
+        {streamingContent && (
+          <StreamingContent
+            content={streamingContent}
+            turnNumber={streamingTurnNumber}
+            streaming
+          />
+        )}
+        {streamingThinkContent && (
+          <ThinkingBlock
+            content={streamingThinkContent}
+            turnNumber={streamingTurnNumber}
+            streaming
+          />
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export function AgentTimeline() {
-  const { selectedCaseId } = useAppStore()
-  const { events, status, errorMessage, streamingContent, streamingThinkContent, streamingTurnNumber } = useAgentStore()
+  const selectedCaseId = useAppStore((s) => s.selectedCaseId)
+  const events = useAgentStore((s) => s.events)
+  const status = useAgentStore((s) => s.status)
+  const errorMessage = useAgentStore((s) => s.errorMessage)
+  // Boolean selector: only re-renders the timeline on streaming start/stop,
+  // not on every delta (LiveStreamingBlock subscribes to the buffers itself).
+  const isStreaming = useAgentStore((s) => !!(s.streamingContent || s.streamingThinkContent))
   const scrollRef = useRef<HTMLDivElement>(null)
-
-  const isStreaming = !!(streamingContent || streamingThinkContent)
 
   useEffect(() => {
     if (status === "running" && scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
-  }, [events.length, status, streamingContent, streamingThinkContent])
+  }, [events.length, status])
 
-  const groupedItems = groupItems(buildRenderItems(events))
-  const hasContent = groupedItems.length > 0 || isStreaming || (status === "running" && !isStreaming)
+  const groupedItems = useMemo(() => groupItems(buildRenderItems(events)), [events])
+  const hasContent = groupedItems.length > 0 || isStreaming || status === "running"
 
   return (
     <div className="flex flex-col h-full noise-bg relative bg-card">
@@ -54,7 +101,7 @@ export function AgentTimeline() {
 
       {/* Timeline content */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto relative z-[1]">
-        {events.length === 0 && status === "idle" && !isStreaming && (
+        {events.length === 0 && (status === "idle" || status === "cancelled") && !isStreaming && (
           <div className="flex flex-col items-center justify-center h-full text-muted-foreground/30">
             <div className="h-16 w-16 rounded-2xl bg-primary/5 flex items-center justify-center mb-4">
               <Zap className="h-8 w-8 text-primary/20" />
@@ -167,27 +214,9 @@ export function AgentTimeline() {
               }
             })}
 
-            {/* Live streaming blocks */}
+            {/* Live streaming blocks (isolated per-token subscriber) */}
             {isStreaming && (
-              <div>
-                {groupedItems.length > 0 && <Connector />}
-                <div className="space-y-2 animate-fade-in">
-                  {streamingContent && (
-                    <StreamingContent
-                      content={streamingContent}
-                      turnNumber={streamingTurnNumber}
-                      streaming
-                    />
-                  )}
-                  {streamingThinkContent && (
-                    <ThinkingBlock
-                      content={streamingThinkContent}
-                      turnNumber={streamingTurnNumber}
-                      streaming
-                    />
-                  )}
-                </div>
-              </div>
+              <LiveStreamingBlock scrollRef={scrollRef} showConnector={groupedItems.length > 0} />
             )}
 
             {/* Thinking spinner */}

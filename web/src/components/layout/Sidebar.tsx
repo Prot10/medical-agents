@@ -3,6 +3,7 @@ import { Stethoscope, BarChart3, History, PanelLeftClose, PanelLeft, Moon, Sun, 
 import { useQueryClient } from "@tanstack/react-query"
 import { useAppStore } from "@/stores/appStore"
 import { useModels, useHospitals } from "@/hooks/useCases"
+import { api, consumeSSEStream } from "@/api/client"
 import { useModelLoadingStore } from "@/stores/modelLoadingStore"
 import type { LoadEvent } from "@/stores/modelLoadingStore"
 import { cn } from "@/lib/utils"
@@ -11,8 +12,6 @@ import { DatasetOverview } from "@/components/dataset/DatasetOverview"
 import { TraceBrowser } from "@/components/traces/TraceBrowser"
 import { SettingsPanel } from "@/components/settings/SettingsPanel"
 import { HospitalRulesBrowser } from "@/components/hospital/HospitalRulesBrowser"
-
-const MODEL_LOAD_BASE = "/api/v1"
 
 const NAV_ITEMS = [
   { id: "cases" as const, label: "Cases", icon: Stethoscope },
@@ -59,57 +58,37 @@ export function Sidebar() {
     startLoading(key, model.name)
 
     try {
-      const response = await fetch(`${MODEL_LOAD_BASE}/models/${key}/load`, {
-        method: "POST",
-        signal: controller.signal,
-      })
+      const response = await api.loadModel(key, controller.signal)
       if (!response.ok) {
         handleEvent({ phase: "error", message: `Server error: ${response.status}` })
         return
       }
-      const reader = response.body?.getReader()
-      if (!reader) { handleEvent({ phase: "error", message: "No stream" }); return }
 
-      const decoder = new TextDecoder()
-      let buffer = ""
-      // eslint-disable-next-line no-constant-condition
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        buffer += decoder.decode(value, { stream: true })
-        const parts = buffer.split("\n\n")
-        buffer = parts.pop()!
-        for (const part of parts) {
-          const line = part.trim()
-          if (!line.startsWith("data: ")) continue
-          try {
-            const event = JSON.parse(line.slice(6)) as LoadEvent
-            handleEvent(event)
-            if (event.phase === "ready" || event.phase === "error") {
-              queryClient.invalidateQueries({ queryKey: ["models"] })
-              abortRef.current = null
-            }
-          } catch { /* skip */ }
+      await consumeSSEStream<LoadEvent>(response, (event) => {
+        handleEvent(event)
+        if (event.phase === "ready" || event.phase === "error") {
+          queryClient.invalidateQueries({ queryKey: ["models"] })
+          abortRef.current = null
         }
-      }
-      if (buffer.trim().startsWith("data: ")) {
-        try {
-          const event = JSON.parse(buffer.trim().slice(6)) as LoadEvent
-          handleEvent(event)
-          if (event.phase === "ready" || event.phase === "error")
-            queryClient.invalidateQueries({ queryKey: ["models"] })
-        } catch { /* skip */ }
-      }
+      })
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") return
       handleEvent({ phase: "error", message: err instanceof Error ? err.message : "Connection failed" })
     }
   }, [models, startLoading, handleEvent, queryClient])
 
+  // Abort any in-flight model-load stream when the sidebar unmounts
+  useEffect(() => {
+    return () => {
+      abortRef.current?.abort()
+      abortRef.current = null
+    }
+  }, [])
+
   const handleStopLoad = useCallback(() => {
     if (abortRef.current) { abortRef.current.abort(); abortRef.current = null }
     resetLoading()
-    fetch(`${MODEL_LOAD_BASE}/models/unload`, { method: "POST" }).catch(() => {})
+    api.unloadModel().catch(() => {})
     queryClient.invalidateQueries({ queryKey: ["models"] })
   }, [resetLoading, queryClient])
 

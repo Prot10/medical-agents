@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react"
+import { useCallback } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { api, replayTrace } from "@/api/client"
 import { useAgentStore } from "@/stores/agentStore"
@@ -13,16 +13,15 @@ export function useTraces() {
 }
 
 export function useReplay() {
-  const { startRun, appendEvent, setError } = useAgentStore()
-  const abortRef = useRef<AbortController | null>(null)
+  const { startRun, setAbortController, appendEvent, setError } = useAgentStore()
 
   const replay = useCallback(
     async (traceId: string) => {
-      abortRef.current?.abort()
+      useAgentStore.getState().abortController?.abort()
       const controller = new AbortController()
-      abortRef.current = controller
 
       startRun()
+      setAbortController(controller)
 
       try {
         await replayTrace(
@@ -41,9 +40,13 @@ export function useReplay() {
         if ((err as Error).name !== "AbortError") {
           setError((err as Error).message)
         }
+      } finally {
+        if (useAgentStore.getState().abortController === controller) {
+          setAbortController(null)
+        }
       }
     },
-    [startRun, appendEvent, setError],
+    [startRun, setAbortController, appendEvent, setError],
   )
 
   const replayInstant = useCallback(
@@ -72,8 +75,7 @@ export function useReplay() {
   )
 
   const stop = useCallback(() => {
-    abortRef.current?.abort()
-    abortRef.current = null
+    useAgentStore.getState().cancel()
   }, [])
 
   return { replay, replayInstant, stop }

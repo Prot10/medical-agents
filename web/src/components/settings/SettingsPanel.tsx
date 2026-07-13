@@ -82,7 +82,14 @@ export function SettingsPanel() {
         // Still pending — poll again
         const nextInterval = result.interval || interval
         pollRef.current = setTimeout(poll, nextInterval * 1000)
-      } catch {
+      } catch (err) {
+        // fetchJSON throws "<status>: <statusText>" on HTTP errors — those are
+        // terminal (e.g. 502 when GitHub rejects the flow); only network blips retry.
+        const message = err instanceof Error ? err.message : ""
+        if (/^[45]\d\d:/.test(message)) {
+          setFlow({ step: "error", message: `GitHub authentication failed (${message})` })
+          return
+        }
         pollRef.current = setTimeout(poll, interval * 1000)
       }
     }

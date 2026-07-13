@@ -19,6 +19,7 @@ export function Header() {
   const events = useAgentStore((s) => s.events)
   const totalTokens = useAgentStore((s) => s.totalTokens)
   const elapsedTime = useAgentStore((s) => s.elapsedTime)
+  const startedAt = useAgentStore((s) => s.startedAt)
   const { run, stop } = useAgentRun()
 
   const canEvaluate = status === "complete" && !!selectedCaseId && !!selectedEvaluatorModel
@@ -59,7 +60,7 @@ export function Header() {
 
       {/* Metrics */}
       {events.length > 0 && (
-        <TokenCounter tokens={totalTokens} time={elapsedTime} status={status} />
+        <TokenCounter tokens={totalTokens} time={elapsedTime} status={status} startedAt={startedAt} />
       )}
 
       {/* Export button */}

@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/Badge"
 import { Card } from "@/components/ui/Card"
 import { SectionLabel } from "@/components/ui/SectionLabel"
 import { DifficultyStars } from "@/components/ui/DifficultyStars"
+import { QueryError } from "@/components/ui/QueryError"
 import type { Vitals } from "@/api/types"
 
 function VitalCard({ label, value, unit, icon: Icon, abnormal }: {
@@ -268,7 +269,7 @@ type TabId = "overview" | "history" | "neuro" | "diagnostics" | "ground_truth"
 
 export function PatientViewer() {
   const { selectedCaseId } = useAppStore()
-  const { data: caseDetail, isLoading } = useCaseDetail(selectedCaseId)
+  const { data: caseDetail, isLoading, isError, error, refetch } = useCaseDetail(selectedCaseId)
   const [activeTab, setActiveTab] = useState<TabId>("overview")
 
   if (!selectedCaseId) {
@@ -283,6 +284,10 @@ export function PatientViewer() {
         </div>
       </div>
     )
+  }
+
+  if (isError) {
+    return <QueryError message="Could not load case." error={error} onRetry={() => refetch()} centered />
   }
 
   if (isLoading || !caseDetail) {

@@ -1,7 +1,7 @@
 import { create } from "zustand"
 import type { AgentEvent } from "@/api/types"
 
-export type RunStatus = "idle" | "running" | "complete" | "error"
+export type RunStatus = "idle" | "running" | "complete" | "cancelled" | "error"
 
 interface AgentState {
   status: RunStatus
@@ -15,17 +15,25 @@ interface AgentState {
 
   // Accumulated metrics
   totalTokens: number
+  /** Wall-clock start of the current run (ms epoch); used to derive live elapsed time. */
+  startedAt: number | null
   elapsedTime: number
   totalCost: number
 
+  // In-flight stream controller — lives in the store so any component
+  // (Header stop button, CaseBrowser case switch, ...) can abort the run.
+  abortController: AbortController | null
+
   // Actions
   startRun: () => void
+  setAbortController: (controller: AbortController | null) => void
   appendEvent: (event: AgentEvent) => void
   setError: (msg: string) => void
+  cancel: () => void
   reset: () => void
 }
 
-export const useAgentStore = create<AgentState>((set) => ({
+export const useAgentStore = create<AgentState>((set, get) => ({
   status: "idle",
   events: [],
   errorMessage: null,
@@ -33,11 +41,15 @@ export const useAgentStore = create<AgentState>((set) => ({
   streamingThinkContent: "",
   streamingTurnNumber: 0,
   totalTokens: 0,
+  startedAt: null,
   elapsedTime: 0,
   totalCost: 0,
+  abortController: null,
 
   startRun: () =>
-    set({ status: "running", events: [], errorMessage: null, streamingContent: "", streamingThinkContent: "", streamingTurnNumber: 0, totalTokens: 0, elapsedTime: 0, totalCost: 0 }),
+    set({ status: "running", events: [], errorMessage: null, streamingContent: "", streamingThinkContent: "", streamingTurnNumber: 0, totalTokens: 0, startedAt: Date.now(), elapsedTime: 0, totalCost: 0 }),
+
+  setAbortController: (controller) => set({ abortController: controller }),
 
   appendEvent: (event) =>
     set((state) => {
@@ -71,7 +83,7 @@ export const useAgentStore = create<AgentState>((set) => ({
 
       if (event.type === "thinking" || event.type === "assessment") {
         // Complete block arrived — clear streaming buffers
-        const base = {
+        return {
           events: newEvents,
           totalTokens,
           elapsedTime,
@@ -80,8 +92,6 @@ export const useAgentStore = create<AgentState>((set) => ({
           streamingThinkContent: "",
           streamingTurnNumber: 0,
         }
-        if (event.type === "assessment") return base
-        return base
       }
 
       if (event.type === "run_complete") {
@@ -113,6 +123,27 @@ export const useAgentStore = create<AgentState>((set) => ({
 
   setError: (msg) => set({ status: "error", errorMessage: msg }),
 
-  reset: () =>
-    set({ status: "idle", events: [], errorMessage: null, streamingContent: "", streamingThinkContent: "", streamingTurnNumber: 0, totalTokens: 0, elapsedTime: 0, totalCost: 0 }),
+  cancel: () => {
+    const { abortController, status, startedAt } = get()
+    abortController?.abort()
+    set({
+      abortController: null,
+      // Keep events collected so far; freeze the run in a terminal state
+      ...(status === "running"
+        ? {
+            status: "cancelled" as const,
+            elapsedTime: startedAt ? (Date.now() - startedAt) / 1000 : 0,
+            streamingContent: "",
+            streamingThinkContent: "",
+            streamingTurnNumber: 0,
+          }
+        : {}),
+    })
+  },
+
+  reset: () => {
+    // Abort any in-flight run so a stale stream can't append into the reset store
+    get().abortController?.abort()
+    set({ status: "idle", events: [], errorMessage: null, streamingContent: "", streamingThinkContent: "", streamingTurnNumber: 0, totalTokens: 0, startedAt: null, elapsedTime: 0, totalCost: 0, abortController: null })
+  },
 }))

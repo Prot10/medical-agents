@@ -1,10 +1,9 @@
-import { useCallback, useRef } from "react"
+import { useCallback } from "react"
 import { streamAgentRun } from "@/api/client"
 import { useAgentStore } from "@/stores/agentStore"
 
 export function useAgentRun() {
-  const { startRun, appendEvent, setError, status } = useAgentStore()
-  const abortRef = useRef<AbortController | null>(null)
+  const { startRun, setAbortController, appendEvent, setError, status } = useAgentStore()
 
   const run = useCallback(
     async (
@@ -13,11 +12,12 @@ export function useAgentRun() {
       model: string,
       options?: { base_url?: string; api_key?: string },
     ) => {
-      abortRef.current?.abort()
+      // Abort any previous in-flight run (its AbortError is swallowed below)
+      useAgentStore.getState().abortController?.abort()
       const controller = new AbortController()
-      abortRef.current = controller
 
       startRun()
+      setAbortController(controller)
 
       try {
         await streamAgentRun(
@@ -33,14 +33,19 @@ export function useAgentRun() {
         if ((err as Error).name !== "AbortError") {
           setError((err as Error).message)
         }
+      } finally {
+        // Clear only if this run's controller is still the active one
+        if (useAgentStore.getState().abortController === controller) {
+          setAbortController(null)
+        }
       }
     },
-    [startRun, appendEvent, setError],
+    [startRun, setAbortController, appendEvent, setError],
   )
 
   const stop = useCallback(() => {
-    abortRef.current?.abort()
-    abortRef.current = null
+    // Aborts the in-flight stream and moves the run to a terminal "cancelled" state
+    useAgentStore.getState().cancel()
   }, [])
 
   return { run, stop, status }

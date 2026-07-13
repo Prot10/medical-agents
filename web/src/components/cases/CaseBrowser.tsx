@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react"
 import { Search, Brain, Heart, Zap, Activity, FlaskConical, Pill, AlertCircle, Microscope, Stethoscope, HeartPulse, Database } from "lucide-react"
 import { DifficultyStars } from "@/components/ui/DifficultyStars"
+import { QueryError } from "@/components/ui/QueryError"
 import { useCases, useDatasets, useActivateDataset } from "@/hooks/useCases"
 import { useAppStore } from "@/stores/appStore"
 import { useAgentStore } from "@/stores/agentStore"
@@ -35,7 +36,7 @@ const CONDITION_ICONS: Record<string, React.ElementType> = {
 
 
 export function CaseBrowser() {
-  const { data: cases, isLoading } = useCases()
+  const { data: cases, isLoading, isError, error, refetch } = useCases()
   const { data: datasets } = useDatasets()
   const activateDataset = useActivateDataset()
   const { selectedCaseId, selectCase } = useAppStore()
@@ -72,6 +73,10 @@ export function CaseBrowser() {
     return (
       <div className="p-4 text-base text-muted-foreground">Loading cases...</div>
     )
+  }
+
+  if (isError) {
+    return <QueryError message="Could not load cases." error={error} onRetry={() => refetch()} />
   }
 
   return (

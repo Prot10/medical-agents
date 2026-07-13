@@ -2,6 +2,7 @@ import { useMemo, useState } from "react"
 import { History, Clock, Zap, Wrench, Play, SkipForward, Search, Trash2 } from "lucide-react"
 import { useQueryClient } from "@tanstack/react-query"
 import { DifficultyStars } from "@/components/ui/DifficultyStars"
+import { QueryError } from "@/components/ui/QueryError"
 import { useTraces, useReplay } from "@/hooks/useReplay"
 import { useAppStore } from "@/stores/appStore"
 import { api } from "@/api/client"
@@ -16,7 +17,7 @@ const HOSPITAL_LABELS: Record<string, string> = {
 }
 
 export function TraceBrowser() {
-  const { data: traces, isLoading } = useTraces()
+  const { data: traces, isLoading, isError, error, refetch } = useTraces()
   const { replay, replayInstant } = useReplay()
   const { selectCase, setOracleOpen } = useAppStore()
   const queryClient = useQueryClient()
@@ -70,6 +71,10 @@ export function TraceBrowser() {
 
   if (isLoading) {
     return <div className="p-4 text-base text-muted-foreground">Loading traces...</div>
+  }
+
+  if (isError) {
+    return <QueryError message="Could not load traces." error={error} onRetry={() => refetch()} />
   }
 
   if (!traces || traces.length === 0) {

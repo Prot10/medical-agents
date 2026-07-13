@@ -2,6 +2,7 @@ import { useMemo } from "react"
 import { BarChart3, Users, Activity, Brain, Database } from "lucide-react"
 import { useCases, useDatasets, useActivateDataset } from "@/hooks/useCases"
 import { Card, CardTitle } from "@/components/ui/Card"
+import { QueryError } from "@/components/ui/QueryError"
 import { ConditionChart } from "./charts/ConditionChart"
 import { DifficultyDonut } from "./charts/DifficultyDonut"
 import { AgeHistogram } from "./charts/AgeHistogram"
@@ -27,7 +28,7 @@ function StatCard({ icon: Icon, label, value, sub }: {
 }
 
 export function DatasetDashboard() {
-  const { data: cases, isLoading } = useCases()
+  const { data: cases, isLoading, isError, error, refetch } = useCases()
   const { data: datasets } = useDatasets()
   const activateDataset = useActivateDataset()
 
@@ -37,6 +38,10 @@ export function DatasetDashboard() {
     if (!cases) return null
     return computeStats(cases)
   }, [cases])
+
+  if (isError) {
+    return <QueryError message="Could not load dataset." error={error} onRetry={() => refetch()} centered />
+  }
 
   if (isLoading || !stats) {
     return (

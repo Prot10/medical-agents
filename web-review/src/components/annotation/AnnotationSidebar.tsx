@@ -74,9 +74,11 @@ export function AnnotationSidebar({
     return null
   }, [cases, currentCaseId, reviews])
 
-  function severityCount(severity: Severity): number {
-    return annotations.filter((a) => a.severity === severity).length
-  }
+  const severityCounts = useMemo(() => {
+    const counts: Record<Severity, number> = { note: 0, issue: 0, error: 0 }
+    for (const a of annotations) counts[a.severity] += 1
+    return counts
+  }, [annotations])
 
   return (
     <aside className="space-y-4">
@@ -138,7 +140,7 @@ export function AnnotationSidebar({
             onClick={() => setFilter("all")}
           />
           {SEVERITIES.map((sev) => {
-            const count = severityCount(sev)
+            const count = severityCounts[sev]
             if (count === 0) return null
             return (
               <FilterChip

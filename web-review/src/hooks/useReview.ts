@@ -123,15 +123,17 @@ export function useReview(version: string, caseId: string | null) {
   })
 }
 
-function invalidateAfterMutation(
+function applyMutationResult(
   queryClient: ReturnType<typeof useQueryClient>,
   version: string,
   caseId: string,
   code: string,
+  data: CaseReview,
 ) {
-  queryClient.invalidateQueries({
-    queryKey: QK.review(version, caseId, code),
-  })
+  // The server returns the full updated CaseReview — write it straight into
+  // the cache instead of refetching. List/progress queries still invalidate
+  // so aggregate counts stay correct.
+  queryClient.setQueryData(QK.review(version, caseId, code), data)
   queryClient.invalidateQueries({ queryKey: QK.myReviews(version, code) })
   queryClient.invalidateQueries({ queryKey: QK.progress(version, code) })
 }
@@ -151,7 +153,7 @@ export function useSetStatus(version: string) {
         `/datasets/${version}/reviews/${caseId}/status`,
         { status },
       ),
-    onSuccess: (_data, vars) => invalidateAfterMutation(queryClient, version, vars.caseId, code),
+    onSuccess: (data, vars) => applyMutationResult(queryClient, version, vars.caseId, code, data),
   })
 }
 
@@ -174,7 +176,7 @@ export function useCreateAnnotation(version: string) {
         `/datasets/${version}/reviews/${caseId}/annotations`,
         body,
       ),
-    onSuccess: (_data, vars) => invalidateAfterMutation(queryClient, version, vars.caseId, code),
+    onSuccess: (data, vars) => applyMutationResult(queryClient, version, vars.caseId, code, data),
   })
 }
 
@@ -197,7 +199,7 @@ export function useUpdateAnnotation(version: string) {
         `/datasets/${version}/reviews/${caseId}/annotations/${annotationId}`,
         body,
       ),
-    onSuccess: (_data, vars) => invalidateAfterMutation(queryClient, version, vars.caseId, code),
+    onSuccess: (data, vars) => applyMutationResult(queryClient, version, vars.caseId, code, data),
   })
 }
 
@@ -215,7 +217,7 @@ export function useDeleteAnnotation(version: string) {
       deleteJSON<CaseReview>(
         `/datasets/${version}/reviews/${caseId}/annotations/${annotationId}`,
       ),
-    onSuccess: (_data, vars) => invalidateAfterMutation(queryClient, version, vars.caseId, code),
+    onSuccess: (data, vars) => applyMutationResult(queryClient, version, vars.caseId, code, data),
   })
 }
 
@@ -236,7 +238,7 @@ export function useCreateComment(version: string) {
         `/datasets/${version}/reviews/${caseId}/comments`,
         body,
       ),
-    onSuccess: (_data, vars) => invalidateAfterMutation(queryClient, version, vars.caseId, code),
+    onSuccess: (data, vars) => applyMutationResult(queryClient, version, vars.caseId, code, data),
   })
 }
 
@@ -258,7 +260,7 @@ export function useUpdateComment(version: string) {
         `/datasets/${version}/reviews/${caseId}/comments/${commentId}`,
         body,
       ),
-    onSuccess: (_data, vars) => invalidateAfterMutation(queryClient, version, vars.caseId, code),
+    onSuccess: (data, vars) => applyMutationResult(queryClient, version, vars.caseId, code, data),
   })
 }
 
@@ -276,7 +278,7 @@ export function useDeleteComment(version: string) {
       deleteJSON<CaseReview>(
         `/datasets/${version}/reviews/${caseId}/comments/${commentId}`,
       ),
-    onSuccess: (_data, vars) => invalidateAfterMutation(queryClient, version, vars.caseId, code),
+    onSuccess: (data, vars) => applyMutationResult(queryClient, version, vars.caseId, code, data),
   })
 }
 

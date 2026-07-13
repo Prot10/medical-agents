@@ -71,7 +71,7 @@ export function CaseList({
           entry={entry}
           review={reviewByCase.get(entry.case_id)}
           selected={entry.case_id === selectedCaseId}
-          onSelect={() => onSelectCase(entry.case_id)}
+          onSelect={onSelectCase}
         />
       ))}
     </div>

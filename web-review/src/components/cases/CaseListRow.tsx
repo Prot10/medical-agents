@@ -1,4 +1,5 @@
 import { ChevronRight } from "lucide-react"
+import { memo } from "react"
 
 import type {
   CaseIndexEntry,
@@ -16,7 +17,10 @@ const SEVERITY_DOT: Record<Severity, string> = {
   error: "bg-rose-500",
 }
 
-export function CaseListRow({
+// Memoized: the 600-row list re-renders on every filter/search keystroke, but
+// individual rows only change when their own props do. All props are stable —
+// `onSelect` receives the case_id so callers can pass a stable store setter.
+export const CaseListRow = memo(function CaseListRow({
   entry,
   review,
   selected,
@@ -25,13 +29,13 @@ export function CaseListRow({
   entry: CaseIndexEntry
   review: CaseReviewSummary | undefined
   selected: boolean
-  onSelect: () => void
+  onSelect: (caseId: string) => void
 }) {
   const status = review?.status ?? "pending"
   return (
     <button
       type="button"
-      onClick={onSelect}
+      onClick={() => onSelect(entry.case_id)}
       className={cn(
         "group relative w-full text-left bg-card border border-border rounded-lg pl-4 pr-3 py-3 transition-all",
         "hover:border-primary/40 hover:shadow-sm",
@@ -101,4 +105,4 @@ export function CaseListRow({
       </div>
     </button>
   )
-}
+})
