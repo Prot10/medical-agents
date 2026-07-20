@@ -1221,6 +1221,7 @@ def run_grpo_trl(
     eval_data: str | None = None,
     eval_subset: int = 20,
     eval_steps: int = 40,
+    num_generations_eval: int | None = None,
     importance_sampling_level: str = "sequence",
     scale_rewards: str = "none",
     loss_type: str = "dapo",
@@ -1480,6 +1481,16 @@ def run_grpo_trl(
         gradient_accumulation_steps=grad_accum,
         learning_rate=learning_rate,
         num_generations=num_generations,
+        # Held-out eval generates too, and TRL defaults this to num_generations — so an eval
+        # costs (eval prompts x num_generations) full rollouts. Measured on the 4B: 18 prompts
+        # x 4 = 72 rollouts, ~22 min, and that was with one-turn trajectories; a policy that
+        # actually runs the ReAct loop multiplies it by the turn count. Over a full run that is
+        # hours spent on a number used only to rank checkpoints.
+        #
+        # Left at TRL's default (None -> num_generations) because the eval reward IS the
+        # checkpoint-selection metric and averaging G samples per prompt is what keeps it stable
+        # enough to rank on. Lower it when eval time dominates, accepting a noisier ranking.
+        num_generations_eval=num_generations_eval,
         generation_batch_size=generation_batch_size,
         max_completion_length=max_completion_length,
         beta=kl_coeff,  # TRL 0.29 name for the KL coefficient (0 = no KL, the recommended default)
@@ -1820,6 +1831,12 @@ def main() -> None:
                              "it costs the same per prompt as training — 20 keeps it to a few minutes")
     parser.add_argument("--eval-steps", type=int, default=40,
                         help="Evaluate (and checkpoint) every N optimiser steps")
+    parser.add_argument("--num-generations-eval", type=int, default=None,
+                        help="Completions per prompt during held-out eval (default: same as "
+                             "--num-generations). An eval costs eval_prompts x this many full "
+                             "rollouts — measured 72 rollouts / ~22 min on the 4B at 4, before "
+                             "multiplying by the ReAct turn count. Lower it when eval time "
+                             "dominates, at the cost of a noisier checkpoint ranking.")
     parser.add_argument("--importance-sampling-level", choices=["token", "sequence"],
                         default="sequence",
                         help="GSPO: 'sequence' matches our one-reward-per-rollout objective")
@@ -1932,6 +1949,7 @@ def main() -> None:
                 eval_data=args.eval_data,
                 eval_subset=args.eval_subset,
                 eval_steps=args.eval_steps,
+                num_generations_eval=args.num_generations_eval,
                 importance_sampling_level=args.importance_sampling_level,
                 scale_rewards=args.scale_rewards,
                 loss_type=args.loss_type,
