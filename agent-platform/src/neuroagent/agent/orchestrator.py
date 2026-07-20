@@ -86,6 +86,11 @@ class AgentOrchestrator:
         tool_request = self._tool_request_kwargs(tool_definitions)
 
         turn_number = 0
+        # Structured assessment the model embedded alongside tool calls, if any.
+        # Only used as the salvage value when the loop hits max_turns without
+        # finalizing normally — never finalizes early (the agent may still be
+        # mid-workup, and _finalize_assessment on the normal path always wins).
+        pending_assessment: str | None = None
         for _ in range(self.config.max_turns):
             # Call LLM with tool definitions
             response = self.llm.chat(
@@ -105,6 +110,8 @@ class AgentOrchestrator:
                     tool_calls=self._tool_call_records(valid_tool_calls),
                     token_usage=response.usage,
                 )
+                if response.content and _ASSESSMENT_PATTERN.search(response.content):
+                    pending_assessment = _extract_assessment(response.content)
 
                 # Add assistant message to conversation
                 messages.append(self._format_assistant_message(response, valid_tool_calls))
@@ -144,11 +151,7 @@ class AgentOrchestrator:
         else:
             # Hit max_turns without finishing
             logger.warning("Agent hit max turns (%d) without concluding.", self.config.max_turns)
-            last_content = trace.turns[-1].content if trace.turns else ""
-            trace.set_final_response(
-                _extract_assessment(last_content or "")
-                or _NO_CONCLUSION_MESSAGE
-            )
+            trace.set_final_response(_salvage_assessment(trace, pending_assessment))
 
         trace.messages = messages  # the exact conversation, for RFT rollout capture
         self._finalize_trace(trace)
@@ -183,6 +186,8 @@ class AgentOrchestrator:
         tool_request = self._tool_request_kwargs(tool_definitions)
 
         turn_number = 0
+        # Mirrors run(): salvage-only, never finalizes early. Keep in sync.
+        pending_assessment: str | None = None
         for _ in range(self.config.max_turns):
             turn_number += 1
 
@@ -225,6 +230,8 @@ class AgentOrchestrator:
                     tool_calls=self._tool_call_records(valid_tool_calls),
                     token_usage=response.usage,
                 )
+                if response.content and _ASSESSMENT_PATTERN.search(response.content):
+                    pending_assessment = _extract_assessment(response.content)
 
                 # If the model didn't produce visible reasoning text (common with
                 # Ollama/Qwen3.5 which hides reasoning in <think> tags), extract
@@ -306,11 +313,8 @@ class AgentOrchestrator:
                 }
                 break
         else:
-            last_content = trace.turns[-1].content if trace.turns else ""
-            trace.set_final_response(
-                _extract_assessment(last_content or "")
-                or _NO_CONCLUSION_MESSAGE
-            )
+            logger.warning("Agent hit max turns (%d) without concluding.", self.config.max_turns)
+            trace.set_final_response(_salvage_assessment(trace, pending_assessment))
 
         trace.messages = messages  # the exact conversation, for RFT rollout capture
         self._finalize_trace(trace)
@@ -530,6 +534,31 @@ class AgentOrchestrator:
                 for tc in selected_tool_calls
             ]
         return msg
+
+
+def _salvage_assessment(trace: AgentTrace, pending_assessment: str | None) -> str:
+    """Best final_response when the loop hits max_turns without finalizing.
+
+    Shared by ``run()`` and ``run_streaming()`` so both entry points salvage
+    identically. Preference order:
+
+    1. ``pending_assessment`` — a structured assessment the model embedded in
+       a tool-calling turn (a real concluded diagnosis).
+    2. The most recent assistant turn with non-empty content, run through
+       ``_extract_assessment``. Tool turns carry ``content=None`` (see
+       ``AgentTrace.add_tool_turn``), so scanning only the last turn — which
+       is always a tool turn when max_turns is exhausted — would discard the
+       model's actual reasoning.
+    3. ``_NO_CONCLUSION_MESSAGE`` if the trace has no usable assistant text.
+    """
+    if pending_assessment:
+        return pending_assessment
+    for turn in reversed(trace.turns):
+        if turn.role == "assistant" and turn.content:
+            extracted = _extract_assessment(turn.content)
+            if extracted:
+                return extracted
+    return _NO_CONCLUSION_MESSAGE
 
 
 def _extract_assessment(text: str) -> str:
