@@ -1229,6 +1229,7 @@ def run_grpo_trl(
     val_from_train: bool = True,
     val_per_condition: int = 1,
     multi_turn: bool = False,
+    per_turn_max_tokens: int = 512,
 ) -> None:
     """Run GRPO training using TRL GRPOTrainer.
 
@@ -1428,11 +1429,16 @@ def run_grpo_trl(
             )
         logger.info("Using MULTI-TURN rollout (real ReAct loop, trajectory reward from %s)",
                     reward_config)
-        # per-turn cap is the SINGLE assistant turn budget (measured ~300-400 tok), not the
-        # whole multi-turn completion budget — see MultiTurnRolloutFunc._make_generate_batch_fn.
+        # The per-turn cap is the SINGLE assistant turn budget (measured ~300-400 tok for the
+        # SFT policy), not the whole multi-turn completion budget — see
+        # MultiTurnRolloutFunc._make_generate_batch_fn. Configurable because setting it too low
+        # fails quietly: a turn cut mid-<think> carries no parseable tool call, so the rollout
+        # reads it as the agent concluding, and the trajectory is scored as if it chose to stop
+        # without ordering tests. The rollout counts such turns and warns.
         rollout_func, reward_func = _build_multiturn_rollout(
             raw_data + eval_raw, dataset_dir, reward_config, tool_costs_config, rules_dir,
-            hospital, tokenizer, max_completion_length, per_turn_max_tokens=512,
+            hospital, tokenizer, max_completion_length,
+            per_turn_max_tokens=per_turn_max_tokens,
         )
     elif (dataset_dir / "cases").exists():
         logger.info("Using ONLINE reward (CompositeReward, weights from %s)", reward_config)
@@ -1830,7 +1836,13 @@ def main() -> None:
                              "a trajectory needs ~6.2k prompt + the completion budget.")
     parser.add_argument("--multi-turn", action="store_true",
                         help="Multi-turn ('grouped') GRPO: drive the real ReAct loop against "
-                             "the MockServer and score the genuine trajectory (reflection off).")
+                             "the MockServer and score the genuine trajectory.")
+    parser.add_argument("--per-turn-max-tokens", type=int, default=512,
+                        help="Token cap for ONE assistant turn during a multi-turn rollout "
+                             "(default 512; the SFT policy measures ~300-400). Too low fails "
+                             "quietly: a turn cut mid-reasoning carries no parseable tool call, "
+                             "so it is read as the agent concluding. The rollout counts clipped "
+                             "turns and warns.")
 
     parser.add_argument("--log-file", default=None,
                         help="Verbose logs + captured warnings go HERE; the terminal keeps the "
@@ -1924,6 +1936,7 @@ def main() -> None:
                 scale_rewards=args.scale_rewards,
                 loss_type=args.loss_type,
                 multi_turn=args.multi_turn,
+                per_turn_max_tokens=args.per_turn_max_tokens,
             )
 
 

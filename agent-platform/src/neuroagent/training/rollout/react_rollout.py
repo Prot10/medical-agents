@@ -20,6 +20,7 @@ real tokenizer and a canned policy — only the actual model forward needs a GPU
 
 from __future__ import annotations
 
+import contextlib
 import logging
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Callable, Protocol
@@ -59,6 +60,11 @@ class RolloutResult:
     num_turns: int
     num_tool_calls: int
     truncated: bool
+    # Assistant turns cut off by the PER-TURN generation cap (no EOS emitted). Distinct from
+    # `truncated`, which is the whole-completion budget. A clipped turn that carries no tool
+    # call is indistinguishable from a deliberate conclusion further down, so it is counted
+    # here and surfaced by the caller rather than left silent.
+    clipped_turns: int
     trace: AgentTrace
 
     def __post_init__(self) -> None:
@@ -93,6 +99,7 @@ class _TrajState:
     num_tool_calls: int = 0
     turn_number: int = 0
     truncated: bool = False
+    clipped_turns: int = 0
     done: bool = False
     must_conclude: bool = False
 
@@ -152,6 +159,20 @@ class ReactRollout:
     chat_template: str | None = None
     # Cache the dummy prefix ids (depends only on tokenizer+tools) across trajectories.
     _dummy_prefix_ids: list[int] | None = field(default=None, repr=False)
+
+    @property
+    def _eos_ids(self) -> frozenset[int]:
+        """Ids that legitimately END an assistant turn.
+
+        Both matter for Qwen3.5: `eos_token_id` is `<|im_end|>`, but generation may also stop
+        on `<|endoftext|>`, and the tokenizer's `eos_token_id` alone would misread that as a
+        clipped turn. Anything else at the tail means the per-turn cap cut the turn short.
+        """
+        ids = {getattr(self.tokenizer, "eos_token_id", None)}
+        for tok in ("<|im_end|>", "<|endoftext|>"):
+            with contextlib.suppress(Exception):
+                ids.add(self.tokenizer.convert_tokens_to_ids(tok))
+        return frozenset(i for i in ids if isinstance(i, int) and i >= 0)
 
     # -- token helpers ------------------------------------------------------
 
@@ -268,6 +289,15 @@ class ReactRollout:
         else:
             st.logprobs.extend([0.0] * len(gen_ids))
         st.turn_number += 1
+
+        # A turn that stops without EOS was cut by the per-turn `max_new_tokens` cap, not by
+        # the model deciding it was finished. That distinction is invisible downstream: a
+        # clipped turn usually carries no parseable tool call, so the branch below reads it as
+        # a deliberate conclusion and the trajectory is scored as if the agent chose to stop
+        # without ordering any tests. Count it so a cap that is too tight shows up as a number
+        # instead of as inexplicably bad rewards.
+        if gen_ids[-1] not in self._eos_ids:
+            st.clipped_turns += 1
 
         text = self.tokenizer.decode(gen_ids, skip_special_tokens=True)
         calls = extract_tool_calls(text)
@@ -393,6 +423,7 @@ class ReactRollout:
             num_turns=st.turn_number,
             num_tool_calls=st.num_tool_calls,
             truncated=st.truncated,
+            clipped_turns=st.clipped_turns,
             trace=st.trace_or(trace),
         )
 

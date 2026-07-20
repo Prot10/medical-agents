@@ -80,7 +80,13 @@ if [ "$MULTI_TURN" = 1 ]; then
   # tool calls, vs 4.5/3.5 at 4096 and the ~3.9 it actually uses at eval. Too small a budget
   # silently truncates real agent behaviour rather than just clipping tokens.
   MAX_COMPLETION="${MAX_COMPLETION:-4096}"
-  MULTI_TURN_FLAG="--multi-turn"
+  # Cap for ONE assistant turn, distinct from the whole-trajectory MAX_COMPLETION above. The
+  # SFT policy measures ~300-400 tokens per turn, so 512 leaves headroom — but raise it if the
+  # rollout starts reporting clipped turns. Setting it too low fails QUIETLY: a turn cut
+  # mid-reasoning carries no parseable tool call, so the rollout reads it as the agent
+  # concluding and the trajectory is scored as if it chose to stop without ordering tests.
+  PER_TURN="${PER_TURN:-512}"
+  MULTI_TURN_FLAG="--multi-turn --per-turn-max-tokens $PER_TURN"
   # vLLM-accelerated rollouts (colocate — the only single-GPU vLLM mode). Generation is
   # essentially all of a multi-turn step, and HF generate re-prefills the shared ~6.2k prompt
   # once per generation per turn; vLLM prefix-caches it. VLLM_GPU_FRAC is the engine's share of

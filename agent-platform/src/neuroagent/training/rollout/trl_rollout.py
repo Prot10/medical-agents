@@ -166,16 +166,31 @@ class MultiTurnRolloutFunc:
         ]
         n = max(len(results), 1)
         n_trunc = sum(1 for r in results if r.truncated)
+        n_clipped = sum(1 for r in results if r.clipped_turns)
         logger.info(
             "rollout: %d trajectories, mean turns %.1f, mean tool calls %.1f, "
-            "mean reward %.3f, truncated %d/%d (%.0f%%), mean completion tokens %.0f",
+            "mean reward %.3f, truncated %d/%d (%.0f%%), clipped-turn %d/%d (%.0f%%), "
+            "mean completion tokens %.0f",
             len(results),
             sum(r.num_turns for r in results) / n,
             sum(r.num_tool_calls for r in results) / n,
             sum(rewards_out) / max(len(rewards_out), 1),
             n_trunc, len(results), 100.0 * n_trunc / n,
+            n_clipped, len(results), 100.0 * n_clipped / n,
             sum(len(r.completion_ids) for r in results) / n,
         )
+        if n_clipped:
+            # Distinct from the budget warning below and more insidious. A turn cut by the
+            # per-turn cap carries no parseable tool call, so the rollout reads it as the agent
+            # deciding to stop; the trajectory is then scored as if it chose to conclude
+            # without ordering any tests. The reward looks bad for a reason that has nothing to
+            # do with the policy's judgement, so this must never be silent.
+            logger.warning(
+                "%d/%d trajectories had an assistant turn cut off at the %d-token per-turn cap "
+                "(no EOS). Those turns are scored as deliberate conclusions — raise "
+                "per_turn_max_tokens if this is more than an occasional outlier.",
+                n_clipped, len(results), self.per_turn_max_tokens,
+            )
         if n_trunc:
             # A high truncation rate means the completion budget is clipping real agent
             # behaviour, not just tokens — the reward still scores the whole trace, but the
