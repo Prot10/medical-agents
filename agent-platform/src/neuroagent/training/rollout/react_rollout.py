@@ -71,6 +71,8 @@ class RolloutResult:
     # rollout reports "truncated 0%" while curtailing half the workups (measured: MAX_COMPLETION
     # 4096 fits only 50.9% of the SFT policy's real workups end to end).
     forced_conclusion: bool
+    # Tokens generated per assistant turn — the distribution `per_turn_max_tokens` must cover.
+    turn_lengths: list[int]
     trace: AgentTrace
 
     def __post_init__(self) -> None:
@@ -101,6 +103,11 @@ class _TrajState:
     logprobs: list[float] = field(default_factory=list)
     turns: list = field(default_factory=list)
     tools_called: list[str] = field(default_factory=list)
+    # Tokens generated per assistant turn. This is the distribution `per_turn_max_tokens` has to
+    # cover, and the MEAN is not the number that matters: Qwen3.5 writes a long <think> before
+    # its first tool call, so one over-long turn silently ends the whole trajectory while the
+    # average still looks comfortable.
+    turn_lengths: list[int] = field(default_factory=list)
     final_response: str = ""
     num_tool_calls: int = 0
     turn_number: int = 0
@@ -304,6 +311,7 @@ class ReactRollout:
         # instead of as inexplicably bad rewards.
         if gen_ids[-1] not in self._eos_ids:
             st.clipped_turns += 1
+        st.turn_lengths.append(len(gen_ids))
 
         text = self.tokenizer.decode(gen_ids, skip_special_tokens=True)
         calls = extract_tool_calls(text)
@@ -431,6 +439,7 @@ class ReactRollout:
             truncated=st.truncated,
             clipped_turns=st.clipped_turns,
             forced_conclusion=st.must_conclude,
+            turn_lengths=list(st.turn_lengths),
             trace=st.trace_or(trace),
         )
 

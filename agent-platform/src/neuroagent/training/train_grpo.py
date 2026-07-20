@@ -1230,7 +1230,7 @@ def run_grpo_trl(
     val_from_train: bool = True,
     val_per_condition: int = 1,
     multi_turn: bool = False,
-    per_turn_max_tokens: int = 512,
+    per_turn_max_tokens: int = 2048,
 ) -> None:
     """Run GRPO training using TRL GRPOTrainer.
 
@@ -1854,12 +1854,14 @@ def main() -> None:
     parser.add_argument("--multi-turn", action="store_true",
                         help="Multi-turn ('grouped') GRPO: drive the real ReAct loop against "
                              "the MockServer and score the genuine trajectory.")
-    parser.add_argument("--per-turn-max-tokens", type=int, default=512,
-                        help="Token cap for ONE assistant turn during a multi-turn rollout "
-                             "(default 512; the SFT policy measures ~300-400). Too low fails "
-                             "quietly: a turn cut mid-reasoning carries no parseable tool call, "
-                             "so it is read as the agent concluding. The rollout counts clipped "
-                             "turns and warns.")
+    parser.add_argument("--per-turn-max-tokens", type=int, default=2048,
+                        help="Token cap for ONE assistant turn during a multi-turn rollout. Was "
+                             "512, chosen from a ~300-400 token AVERAGE, which produced ZERO "
+                             "tool calls on every rollout: Qwen3.5 writes a long <think> before "
+                             "its first call, and a turn cut mid-reasoning carries no parseable "
+                             "tool call, so the rollout reads it as the agent concluding. "
+                             "Measured at 4096: 3.0-6.2 turns and 1.0-3.8 tool calls on the same "
+                             "model that produced 1.0/0.0 at 512.")
 
     parser.add_argument("--log-file", default=None,
                         help="Verbose logs + captured warnings go HERE; the terminal keeps the "

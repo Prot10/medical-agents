@@ -160,3 +160,44 @@ def test_clipped_is_independent_of_the_budget_truncation_flag(ctx):
     res = _run(ctx, [CLIPPED_TURN], [False])
     assert res.clipped_turns == 1
     assert not res.truncated
+
+
+def test_a_cap_below_the_first_turn_destroys_the_whole_trajectory(ctx):
+    """The regression that made every rollout degenerate, pinned.
+
+    `per_turn_max_tokens` defaulted to 512, justified by a "~300-400 tokens per turn" average.
+    Measured on the same model and config, changing only that value:
+
+        512  -> mean 1.0 turns, 0.0 tool calls, reward_std 0.02-0.03
+        4096 -> mean 3.0-6.2 turns, 1.0-3.8 tool calls, reward_std 0.20
+
+    The average was the wrong statistic. Qwen3.5 writes a long <think> before its first tool
+    call, so THAT turn runs far past the mean; cut mid-reasoning it carries no parseable tool
+    call, the rollout reads it as a conclusion, and the trajectory ends after one turn having
+    ordered nothing. A GRPO run would have trained entirely on such rollouts while loss, reward
+    and truncation rate all looked healthy.
+
+    Simulated here with a turn whose tool call sits past the cut point.
+    """
+    long_think = "Weighing the differential carefully. " * 40
+    turn_with_late_call = long_think + TOOL_TURN
+
+    res = _run(ctx, [turn_with_late_call, FINAL_TURN], [True, True])
+    assert res.num_tool_calls == 1, "sanity: the tool call must be reachable when not cut"
+
+    # Now cut the same turn before its tool call, exactly as a tight cap would.
+    tok = ctx["tok"]
+    cut = tok.decode(tok(turn_with_late_call, add_special_tokens=False)["input_ids"][:120])
+    cut_res = _run(ctx, [cut], [False])
+    assert cut_res.num_tool_calls == 0, "cut turn should lose its tool call"
+    assert cut_res.clipped_turns == 1, "and it must be REPORTED, not silently read as a conclusion"
+
+
+def test_turn_lengths_are_recorded_for_sizing_the_cap(ctx):
+    """The cap has to be set from the observed tail, so the tail must be observable."""
+    res = _run(ctx, [TOOL_TURN, TOOL_TURN, FINAL_TURN], [True, True, True])
+    assert len(res.turn_lengths) == 3
+    assert all(n > 0 for n in res.turn_lengths)
+    # Per-turn lengths must describe the assistant turns only, never the tool results, or the
+    # number used to size the cap would be inflated by environment tokens.
+    assert max(res.turn_lengths) < len(res.completion_ids)

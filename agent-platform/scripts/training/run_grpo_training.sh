@@ -80,12 +80,19 @@ if [ "$MULTI_TURN" = 1 ]; then
   # tool calls, vs 4.5/3.5 at 4096 and the ~3.9 it actually uses at eval. Too small a budget
   # silently truncates real agent behaviour rather than just clipping tokens.
   MAX_COMPLETION="${MAX_COMPLETION:-4096}"
-  # Cap for ONE assistant turn, distinct from the whole-trajectory MAX_COMPLETION above. The
-  # SFT policy measures ~300-400 tokens per turn, so 512 leaves headroom — but raise it if the
-  # rollout starts reporting clipped turns. Setting it too low fails QUIETLY: a turn cut
-  # mid-reasoning carries no parseable tool call, so the rollout reads it as the agent
-  # concluding and the trajectory is scored as if it chose to stop without ordering tests.
-  PER_TURN="${PER_TURN:-512}"
+  # Cap for ONE assistant turn, distinct from the whole-trajectory MAX_COMPLETION above.
+  #
+  # This was 512, justified by a "~300-400 tokens per turn" AVERAGE. Measured on the same model,
+  # same config, changing only this value:
+  #     512  -> mean 1.0 turns, 0.0 tool calls, reward_std 0.02-0.03
+  #     4096 -> mean 3.0-6.2 turns, 1.0-3.8 tool calls, reward_std 0.20
+  # The average was not the number that mattered. Qwen3.5 writes a long <think> before its first
+  # tool call, so that turn runs far past the mean; a turn cut mid-reasoning carries no parseable
+  # tool call, the rollout reads it as the agent concluding, and the ENTIRE trajectory ends after
+  # one turn with no tools. At 512 a GRPO run would train on nothing but degenerate one-turn
+  # rollouts while every visible signal — loss, reward, truncation rate — looked healthy.
+  # The rollout now logs the per-turn p50/p90/p99/max so this is set from the tail, not a mean.
+  PER_TURN="${PER_TURN:-2048}"
   MULTI_TURN_FLAG="--multi-turn --per-turn-max-tokens $PER_TURN"
   # vLLM-accelerated rollouts (colocate — the only single-GPU vLLM mode). Generation is
   # essentially all of a multi-turn step, and HF generate re-prefills the shared ~6.2k prompt

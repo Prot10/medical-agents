@@ -196,6 +196,20 @@ class MultiTurnRolloutFunc:
                 n_forced, len(results), 100.0 * n_forced / n,
                 self.rollout.max_completion_tokens,
             )
+        # The per-turn length DISTRIBUTION, not its mean. A cap of 512 was chosen from a
+        # "~300-400 token" average and produced zero tool calls across every rollout, because
+        # Qwen3.5's first turn carries a long <think> that runs far past the mean. The tail is
+        # the number that decides whether the trajectory survives, so log the tail.
+        all_turns = sorted(t for r in results for t in r.turn_lengths)
+        if all_turns:
+            def _pc(p: float) -> int:
+                return all_turns[min(int(p * (len(all_turns) - 1)), len(all_turns) - 1)]
+            logger.info(
+                "per-turn generated tokens: p50 %d, p90 %d, p99 %d, max %d (n=%d turns, cap %d)",
+                _pc(0.50), _pc(0.90), _pc(0.99), all_turns[-1], len(all_turns),
+                self.per_turn_max_tokens,
+            )
+
         if n_clipped:
             # Distinct from the budget warning below and more insidious. A turn cut by the
             # per-turn cap carries no parseable tool call, so the rollout reads it as the agent
