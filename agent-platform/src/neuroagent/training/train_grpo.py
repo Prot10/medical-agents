@@ -1231,6 +1231,7 @@ def run_grpo_trl(
     val_per_condition: int = 1,
     multi_turn: bool = False,
     per_turn_max_tokens: int = 2048,
+    logit_chunks: int = 8,
 ) -> None:
     """Run GRPO training using TRL GRPOTrainer.
 
@@ -1597,6 +1598,14 @@ def run_grpo_trl(
         # Multi-turn: our rollout drives the real ReAct loop and returns a masked, token-exact
         # trajectory + the trajectory reward. None → TRL's built-in single-shot generation.
         rollout_func=rollout_func,
+        # How finely the chunked logprob kernel splits the flattened (batch*seq) dimension.
+        # This is the lever on the training-side memory peak, and it is a big one: the peak
+        # allocation is ONE chunk of fp32 logits, i.e. (batch*completion/chunks) x 248320 x 4B.
+        # Measured — G=4 at max_completion 8192 OOM'd in loss.backward() trying to allocate
+        # 2.95 GiB with only 552 MiB free, and 2.95 GiB is exactly one chunk at the default 8.
+        # Doubling the chunk count halves that allocation, so a deeper completion budget is
+        # bought here rather than by shrinking the reward group.
+        logit_chunks=logit_chunks,
     )
     # With disable_tqdm=True, transformers installs a PrinterCallback that print()s the full
     # 50-key metric dict straight to the terminal (bypassing logging). Remove it — our Rich
@@ -1831,6 +1840,13 @@ def main() -> None:
                              "it costs the same per prompt as training — 20 keeps it to a few minutes")
     parser.add_argument("--eval-steps", type=int, default=40,
                         help="Evaluate (and checkpoint) every N optimiser steps")
+    parser.add_argument("--logit-chunks", type=int, default=8,
+                        help="Pieces the chunked logprob kernel splits (batch*seq) into. The "
+                             "training-side memory peak is ONE chunk of fp32 logits: "
+                             "(batch*completion/chunks) x vocab x 4B. At the default 8 with G=4 "
+                             "and completion 8192 that is ~2.9 GiB and OOMs; 32 brings it to "
+                             "~0.7 GiB. Raise this to afford a deeper completion budget instead "
+                             "of shrinking the reward group.")
     parser.add_argument("--num-generations-eval", type=int, default=None,
                         help="Completions per prompt during held-out eval (default: same as "
                              "--num-generations). An eval costs eval_prompts x this many full "
@@ -1957,6 +1973,7 @@ def main() -> None:
                 loss_type=args.loss_type,
                 multi_turn=args.multi_turn,
                 per_turn_max_tokens=args.per_turn_max_tokens,
+                logit_chunks=args.logit_chunks,
             )
 
 
