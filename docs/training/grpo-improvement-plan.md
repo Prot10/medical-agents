@@ -62,10 +62,19 @@ Recipe: clip-higher `epsilon_high=0.28`, KL=0, `mask_truncated_completions=True`
 5. ⏳ Full 4B multi-turn run, then GRPO-vs-SFT on the same corrected benchmark.
 
 ### Reward design decisions (measured)
-- **`correctness` 0.30** — it is the reported objective, and it is the only component that
-  reliably splits a reward group. Tool-selection/safety/cost are highly correlated within a
-  group (`reward_std` ~0.02-0.06), so without correctness there is little advantage signal.
-  With it zeroed, a right and a wrong diagnosis scored identically (0.3529 on ALS-M01).
+- **`correctness` 0.30 — because it is the reported objective, and for no other reason.**
+  With it zeroed (the single-turn config) a right and a wrong diagnosis score identically
+  (0.3529 on ALS-M01), which is the train/eval objective mismatch that made the first runs move
+  the reward but not the eval.
+  A previous claim that correctness also supplies the within-group variance GRPO needs was
+  **measured and refuted**. On the 100x3 sampled definitive-eval runs (temp 0.7 — the shape of a
+  G=3 group), correctness is *constant* across a case's repeats in **78%** of groups, and
+  weighting it slightly NARROWS the mean within-group std (base 0.106→0.098, SFT 0.102→0.092).
+  What actually splits a group is safety (constant in only 10-15%), actions (15-17%) and cost
+  (47%) — hence their weights. Only 3-6% of groups are flat enough to yield no gradient.
+  `compliance` is near-dead (constant in 94-96%); kept small because it is the only signal
+  tying the policy to hospital pathways. Caveats: those runs predate the reward fixes, and
+  training samples at temp 1.0, so training groups should be more diverse. Re-measure.
 - **Safety-gate cap 0.0 → 0.25.** The contraindication detector has 89.1% recall and 97.2%
   per-action precision, but ~4.6 contraindicated actions per case make the per-case false-fire
   rate ~9.5% — and it is biased against good agents: a diagnosis-only answer trips it 0% of the

@@ -10,16 +10,33 @@
 # on ALS-M01) while top-1 diagnostic accuracy is the headline metric we report — the same
 # train/eval objective mismatch that made the first runs move the reward but not the eval.
 #
-# correctness is the largest single weight because it IS the reported objective. It also
-# supplies the reward VARIANCE that GRPO needs: within a group of G rollouts on one case,
-# tool-selection/safety/cost are highly correlated (measured reward_std ~0.02-0.06), whereas
-# getting the diagnosis right or wrong splits the group and produces a real advantage signal.
+# correctness is the largest single weight because it IS the reported objective — train and
+# eval should optimise the same thing. That is the whole justification.
+#
+# An earlier version of this comment also claimed correctness supplies the within-group VARIANCE
+# that GRPO needs. That was measured and is FALSE. On the 100x3 sampled definitive-eval runs
+# (temp 0.7, the same shape as a G=3 group), correctness is CONSTANT across the repeats of a
+# case in 78% of groups — the policy is consistently right or consistently wrong on a given
+# case. Weighting it actually NARROWS the mean within-group std slightly (base 0.106 -> 0.098,
+# SFT 0.102 -> 0.092), because it is the most self-consistent component.
+#
+# What actually splits a group is safety (constant in only 10-15% of groups), actions (15-17%)
+# and cost (47%) — which is why they keep substantial weight rather than being minimised in
+# favour of correctness. Only 3-6% of groups are flat enough to contribute no gradient at all,
+# so the reward is not degenerate.
+#
+# Two caveats on those numbers: they come from eval runs that predate the reward/MockServer
+# fixes, and training samples at temperature 1.0 rather than 0.7, so training groups should be
+# more diverse than measured here. Re-measure on the corrected benchmark.
 
 default_weights:
   correctness: 0.30   # stated diagnosis vs ground truth — the reported objective
   actions:     0.25   # tool selection precision + recall vs the optimal workup
   safety:      0.25   # gated below; the dominant clinical axis
   cost:        0.10   # gated on workup completeness below
+  # Near-dead weight in practice: constant across the repeats of a case in 94-96% of groups, so
+  # it almost never contributes advantage. Kept small rather than removed because it is the only
+  # signal tying the policy to hospital pathways, which the paper claims as a contribution.
   compliance:  0.05   # hospital-pathway adherence (reward-neutral where no pathway exists)
   format:      0.05   # the assessment section must exist for a diagnosis to be extractable
 
