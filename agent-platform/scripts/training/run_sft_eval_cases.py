@@ -24,6 +24,7 @@ import os
 import sys
 import time
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -62,6 +63,34 @@ if TYPE_CHECKING:
 app = typer.Typer()
 console = Console()
 logger = logging.getLogger("sft_eval")
+
+
+def configure_split_logging(log_file: str | None) -> None:
+    """Send verbose logging to a FILE and keep the terminal for the UI only.
+
+    The terminal should show what the user asked for — the live progress bar and the per-case
+    result lines (both printed through the Rich console on stdout). Everything else — INFO
+    chatter ("Loaded pathway…", "GRPO data: 500 examples"), library warnings, framework noise —
+    is routed to `log_file` so the run is analysable afterwards without scrolling past it live.
+    Only ERROR-level records still reach the terminal (via stderr), so a real failure is never
+    hidden in a file the user isn't watching.
+    """
+    root = logging.getLogger()
+    root.setLevel(logging.INFO)
+    for h in list(root.handlers):
+        root.removeHandler(h)
+
+    if log_file:
+        Path(log_file).parent.mkdir(parents=True, exist_ok=True)
+        fh = logging.FileHandler(log_file)
+        fh.setLevel(logging.INFO)
+        fh.setFormatter(logging.Formatter("%(asctime)s [%(name)s] %(levelname)s: %(message)s"))
+        root.addHandler(fh)
+
+    err = logging.StreamHandler(sys.stderr)
+    err.setLevel(logging.ERROR)
+    err.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
+    root.addHandler(err)
 
 
 def _atomic_write_text(path: Path, text: str) -> None:
@@ -200,6 +229,10 @@ class CaseResult:
     total_tokens: int
     total_cost_usd: float = 0.0
     cost_efficiency: float = 0.0
+    # Non-None iff the case crashed instead of completing. The row is still a full, scorable
+    # result (top1/top3 False, worst-defined scores) so every arm keeps the same denominator;
+    # dropping crashes would silently flatter whichever arm crashed more.
+    error: str | None = None
 
 
 @app.command()
@@ -215,6 +248,10 @@ def evaluate(
     presence_penalty: float = typer.Option(1.5, help="Presence penalty (set 0 for greedy)"),
     save_bundles: bool = typer.Option(True, help="Write per-case judge bundles (full trace) for the composite score"),
     rollout_jsonl: str = typer.Option(None, help="RFT: append every rollout's training-format messages + correctness here"),
+    concurrency: int = typer.Option(8, help="Cases run in parallel against vLLM (1 = serial)"),
+    max_turns: int = typer.Option(None, help="Cap the agent's ReAct turns (default: agent.yaml value)"),
+    max_tokens: int = typer.Option(8192, help="Max tokens per model call"),
+    log_file: str = typer.Option(None, help="Verbose logs go HERE; the terminal shows only the progress UI"),
 ):
     """Run agent evaluation on a held-out split (default: the 100-case test set).
 
@@ -223,10 +260,7 @@ def evaluate(
     conversation) with its correctness label. build_rft_dataset.py then filters to the correct
     ones and formats them for SFT.
     """
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(name)s] %(levelname)s: %(message)s",
-    )
+    configure_split_logging(log_file)
 
     cases = load_split_cases(split)
     greedy = temperature == 0.0
@@ -235,17 +269,20 @@ def evaluate(
         f"(temp={temperature}{' greedy' if greedy else ''})[/bold]"
     )
 
-    config = load_agent_config(
+    overrides: dict[str, Any] = dict(
         base_url=f"http://localhost:{port}/v1",
         api_key="not-needed",
         model=model_id,
-        max_tokens=8192,
+        max_tokens=max_tokens,
         temperature=temperature,
         # top_p must be 1.0 for true greedy; presence_penalty off so decoding is deterministic.
         top_p=1.0 if greedy else 0.95,
         presence_penalty=0.0 if greedy else presence_penalty,
         hospital=hospital,
     )
+    if max_turns is not None:
+        overrides["max_turns"] = max_turns
+    config = load_agent_config(**overrides)
 
     bundle_dir = Path(output).parent / "judge_bundles" / run_name if save_bundles else None
 
@@ -260,97 +297,176 @@ def evaluate(
         console.print(f"[yellow]Resuming: {len(completed)} already done[/yellow]")
 
     total = len(cases) * repeats
-    correct = sum(1 for r in all_results if r.diagnostic_accuracy_top1)
 
+    # Live tallies, seeded from any resumed results so the bar is correct after a restart.
+    # `errors` cannot be reconstructed from a checkpoint (failed rows are excluded from it so
+    # a resume retries them), so it counts only failures seen in this process. The final
+    # results JSON reports `num_errors` from the rows themselves.
+    correct = sum(1 for r in all_results if r.diagnostic_accuracy_top1)
+    correct3 = sum(1 for r in all_results if r.diagnostic_accuracy_top3)
+    errors = 0
+    cost_sum = sum(r.total_cost_usd for r in all_results)
+    secs_sum = sum(r.elapsed_seconds for r in all_results)
+
+    def _fmt_dur(s: float) -> str:
+        s = int(s)
+        return f"{s // 60}m{s % 60:02d}s" if s >= 60 else f"{s}s"
+
+    def _fields() -> dict[str, str]:
+        """The live metrics rendered in the pinned bar (top-1/top-3 accuracy, error count,
+        mean cost, mean wall-time per case)."""
+        n = len(all_results)
+        if not n:
+            return {"t1": "  --", "t3": "  --", "err": str(errors), "cost": "--", "avg": "--"}
+        return {
+            "t1": f"{100 * correct / n:4.0f}%",
+            "t3": f"{100 * correct3 / n:4.0f}%",
+            "err": str(errors),
+            "cost": f"${cost_sum / n:,.0f}",
+            "avg": _fmt_dur(secs_sum / n),
+        }
+
+    # Modern, always-visible progress: Rich pins this bar to the bottom of the terminal and
+    # routes every progress.console.print(...) ABOVE it, so per-case log lines scroll on top
+    # while the live tallies stay fixed below. Columns mirror the suite-runner style:
+    #   <run>  ━━━━  N/M  T1 xx%  T3 xx%  !errs  c$avg  avg <t>  ETA <t>
     progress = Progress(
         SpinnerColumn(),
-        TextColumn("[bold blue]{task.description}"),
+        TextColumn("[bold blue]{task.description:<22}"),
         BarColumn(bar_width=None),
         MofNCompleteColumn(),
-        TextColumn("[green]top1 {task.fields[acc]}"),
-        TextColumn("•"),
-        TimeElapsedColumn(),
-        TextColumn("eta"),
+        TextColumn("[green]T1 {task.fields[t1]}"),
+        TextColumn("[cyan]T3 {task.fields[t3]}"),
+        TextColumn("[red]!{task.fields[err]}"),
+        TextColumn("[yellow]c{task.fields[cost]}"),
+        TextColumn("[dim]avg {task.fields[avg]}"),
+        TextColumn("[dim]ETA"),
         TimeRemainingColumn(),
         console=console,
+        transient=False,
     )
 
-    def _acc() -> str:
-        n = len(all_results)
-        return f"{correct}/{n} ({100 * correct / n:.0f}%)" if n else "0/0"
+    # Each work item builds its own MockServer/registry/orchestrator (and therefore its own LLM
+    # client), so the cases are independent and safe to run on threads. vLLM batches the
+    # concurrent requests server-side; the agent loop is I/O-bound, so this is a near-linear
+    # speedup. Every mutation of shared state stays on the main thread, in as_completed order.
+    pending = [
+        (rep, case)
+        for rep in range(1, repeats + 1)
+        for case in cases
+        if f"{run_name}|{case.case_id}|rep{rep}" not in completed
+    ]
 
-    with progress:
+    def _run_one(rep: int, case: NeuroBenchCase):
+        t0 = time.time()
+        trace, metrics = run_single_case(case, config, hospital)
+        return rep, case, trace, metrics, time.time() - t0
+
+    with progress, ThreadPoolExecutor(max_workers=max(1, concurrency)) as pool:
         task = progress.add_task(
-            f"{run_name}", total=total, completed=len(completed), acc=_acc()
+            f"{run_name}", total=total, completed=len(completed), **_fields()
         )
-        for rep in range(1, repeats + 1):
-            for case in cases:
-                run_key = f"{run_name}|{case.case_id}|rep{rep}"
-                if run_key in completed:
-                    continue
+        futures = {pool.submit(_run_one, rep, case): (rep, case) for rep, case in pending}
 
-                try:
-                    t0 = time.time()
-                    trace, metrics = run_single_case(case, config, hospital)
-                    elapsed = time.time() - t0
+        for future in as_completed(futures):
+            rep, case = futures[future]
+            try:
+                rep, case, trace, metrics, elapsed = future.result()
 
-                    result = CaseResult(
-                        case_id=case.case_id,
-                        condition=case.condition.value,
-                        difficulty=case.difficulty.value,
-                        run_name=run_name,
-                        repeat=rep,
-                        primary_diagnosis_gt=case.ground_truth.primary_diagnosis,
-                        agent_final_response=trace.final_response or "",
-                        diagnostic_accuracy_top1=metrics.diagnostic_accuracy_top1,
-                        diagnostic_accuracy_top3=metrics.diagnostic_accuracy_top3,
-                        critical_actions_hit=metrics.critical_actions_hit,
-                        safety_score=metrics.safety_score,
-                        tool_call_count=metrics.tool_call_count,
-                        tools_called=trace.tools_called,
-                        protocol_compliance=metrics.protocol_compliance,
-                        missing_required_steps=metrics.missing_required_steps,
-                        protocol_violations=metrics.protocol_violations,
-                        elapsed_seconds=round(elapsed, 1),
-                        total_tokens=trace.total_tokens,
-                        total_cost_usd=round(metrics.total_cost_usd, 2),
-                        cost_efficiency=round(metrics.cost_efficiency, 3),
-                    )
-                    all_results.append(result)
-                    completed.add(run_key)
-                    correct += int(metrics.diagnostic_accuracy_top1)
+                result = CaseResult(
+                    case_id=case.case_id,
+                    condition=case.condition.value,
+                    difficulty=case.difficulty.value,
+                    run_name=run_name,
+                    repeat=rep,
+                    primary_diagnosis_gt=case.ground_truth.primary_diagnosis,
+                    agent_final_response=trace.final_response or "",
+                    diagnostic_accuracy_top1=metrics.diagnostic_accuracy_top1,
+                    diagnostic_accuracy_top3=metrics.diagnostic_accuracy_top3,
+                    critical_actions_hit=metrics.critical_actions_hit,
+                    safety_score=metrics.safety_score,
+                    tool_call_count=metrics.tool_call_count,
+                    tools_called=trace.tools_called,
+                    protocol_compliance=metrics.protocol_compliance,
+                    missing_required_steps=metrics.missing_required_steps,
+                    protocol_violations=metrics.protocol_violations,
+                    elapsed_seconds=round(elapsed, 1),
+                    total_tokens=trace.total_tokens,
+                    total_cost_usd=round(metrics.total_cost_usd, 2),
+                    cost_efficiency=round(metrics.cost_efficiency, 3),
+                )
+                all_results.append(result)
+                completed.add(f"{run_name}|{case.case_id}|rep{rep}")
+                correct += int(metrics.diagnostic_accuracy_top1)
+                correct3 += int(metrics.diagnostic_accuracy_top3)
+                cost_sum += result.total_cost_usd
+                secs_sum += result.elapsed_seconds
 
-                    if bundle_dir is not None:
-                        write_judge_bundle(bundle_dir, case, trace, run_name, rep, model_id)
+                if bundle_dir is not None:
+                    write_judge_bundle(bundle_dir, case, trace, run_name, rep, model_id)
 
-                    if rollout_jsonl and trace.messages:
-                        with open(rollout_jsonl, "a") as fh:
-                            fh.write(json.dumps({
-                                "case_id": case.case_id,
-                                "condition": case.condition.value,
-                                "difficulty": case.difficulty.value,
-                                "repeat": rep,
-                                "correct": bool(metrics.diagnostic_accuracy_top1),
-                                "num_tool_calls": metrics.tool_call_count,
-                                "messages": trace.messages,
-                            }, default=str) + "\n")
+                if rollout_jsonl and trace.messages:
+                    with open(rollout_jsonl, "a") as fh:
+                        fh.write(json.dumps({
+                            "case_id": case.case_id,
+                            "condition": case.condition.value,
+                            "difficulty": case.difficulty.value,
+                            "repeat": rep,
+                            "correct": bool(metrics.diagnostic_accuracy_top1),
+                            "num_tool_calls": metrics.tool_call_count,
+                            "messages": trace.messages,
+                        }, default=str) + "\n")
 
-                    _atomic_write_text(checkpoint_file, json.dumps({
-                        "completed": sorted(completed),
-                        "results": [asdict(r) for r in all_results],
-                    }, default=str))
+                # Failed rows are excluded from the checkpoint on purpose: crashed (case, rep)
+                # pairs are not in `completed`, so a resumed run retries them — checkpointing
+                # their failed row too would duplicate them if the retry succeeds.
+                _atomic_write_text(checkpoint_file, json.dumps({
+                    "completed": sorted(completed),
+                    "results": [asdict(r) for r in all_results if r.error is None],
+                }, default=str))
 
-                    dx = "[green]✓[/green]" if metrics.diagnostic_accuracy_top1 else "[red]✗[/red]"
-                    progress.console.print(
-                        f"  {dx} [dim]{case.case_id:<16} rep{rep}[/dim]  "
-                        f"tools={metrics.tool_call_count:<2} safety={metrics.safety_score:.2f} "
-                        f"${metrics.total_cost_usd:,.0f} {elapsed:.0f}s"
-                    )
-                except Exception as e:
-                    progress.console.print(f"  [red]✗ {case.case_id} rep{rep} FAILED: {e}[/red]")
-                    logger.exception("Case %s rep%d failed", case.case_id, rep)
+                dx = "[green]✓[/green]" if metrics.diagnostic_accuracy_top1 else "[red]✗[/red]"
+                progress.console.print(
+                    f"  {dx} [dim]{case.case_id:<16} rep{rep}[/dim]  "
+                    f"tools={metrics.tool_call_count:<2} safety={metrics.safety_score:.2f} "
+                    f"${metrics.total_cost_usd:,.0f} {elapsed:.0f}s"
+                )
+            except Exception as e:
+                errors += 1
+                # A crash IS a failure to produce a scorable answer — score it as wrong, don't
+                # drop it. Otherwise this arm's results file has fewer rows than were attempted,
+                # its aggregate is computed over a smaller denominator than the other arm's, and
+                # the comparison is biased toward whichever arm crashed more. Mirror the success
+                # path's schema exactly, at the worst-defined value of every score. The pathway
+                # checker never ran, so protocol_compliance stays None ("no verdict"), the same
+                # value a completed case gets when no pathway applies.
+                all_results.append(CaseResult(
+                    case_id=case.case_id,
+                    condition=case.condition.value,
+                    difficulty=case.difficulty.value,
+                    run_name=run_name,
+                    repeat=rep,
+                    primary_diagnosis_gt=case.ground_truth.primary_diagnosis,
+                    agent_final_response="",
+                    diagnostic_accuracy_top1=False,
+                    diagnostic_accuracy_top3=False,
+                    critical_actions_hit=0.0,
+                    safety_score=0.0,
+                    tool_call_count=0,
+                    tools_called=[],
+                    protocol_compliance=None,
+                    missing_required_steps=[],
+                    protocol_violations=[],
+                    elapsed_seconds=0.0,
+                    total_tokens=0,
+                    total_cost_usd=0.0,
+                    cost_efficiency=0.0,
+                    error=f"{type(e).__name__}: {e}",
+                ))
+                progress.console.print(f"  [red]✗ {case.case_id} rep{rep} FAILED: {e}[/red]")
+                logger.exception("Case %s rep%d failed", case.case_id, rep)
 
-                progress.update(task, advance=1, acc=_acc())
+            progress.update(task, advance=1, **_fields())
 
     # Save final results
     out_path = Path(output)
@@ -362,6 +478,9 @@ def evaluate(
         "repeats": repeats,
         "num_cases": len(cases),
         "num_results": len(all_results),
+        # Crashed rows are scored as failures and kept in `results`; this counts them so the
+        # run's crash rate is auditable without scanning every row.
+        "num_errors": sum(1 for r in all_results if r.error is not None),
         "results": [asdict(r) for r in all_results],
     }, indent=2, default=str))
 
@@ -393,6 +512,32 @@ def compare(
     console.print(f"\n[bold]Comparing {base['run_name']} vs {sft['run_name']}[/bold]")
     console.print(f"  Base: {len(base_data)} results")
     console.print(f"  SFT:  {len(sft_data)} results")
+
+    # Guard: both arms must cover the SAME cases, or every aggregate below is computed over
+    # different denominators and the headline delta is biased toward whichever arm is missing
+    # more (dropped) cases. evaluate() now records crashes as failed rows, so the sets should
+    # always match; if they still differ (e.g. results produced by an older version of this
+    # script), warn loudly and restrict BOTH arms to the paired intersection.
+    base_ids = {r["case_id"] for r in base_data}
+    sft_ids = {r["case_id"] for r in sft_data}
+    if base_ids != sft_ids:
+        only_base = sorted(base_ids - sft_ids)
+        only_sft = sorted(sft_ids - base_ids)
+        console.print(
+            "[yellow bold]WARNING: base and SFT cover different case sets — comparing only the "
+            f"{len(base_ids & sft_ids)} shared cases.[/yellow bold]"
+        )
+        if only_base:
+            console.print(f"[yellow]  only in base ({len(only_base)}): {', '.join(only_base)}[/yellow]")
+        if only_sft:
+            console.print(f"[yellow]  only in sft  ({len(only_sft)}): {', '.join(only_sft)}[/yellow]")
+        logger.warning(
+            "Case sets differ: %d only in base, %d only in sft; intersecting to %d shared cases",
+            len(only_base), len(only_sft), len(base_ids & sft_ids),
+        )
+        common = base_ids & sft_ids
+        base_data = [r for r in base_data if r["case_id"] in common]
+        sft_data = [r for r in sft_data if r["case_id"] in common]
 
     base_metrics = _compute_aggregate(base_data)
     sft_metrics = _compute_aggregate(sft_data)
