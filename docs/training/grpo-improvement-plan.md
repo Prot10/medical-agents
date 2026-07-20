@@ -84,6 +84,13 @@ Recipe: clip-higher `epsilon_high=0.28`, KL=0, `mask_truncated_completions=True`
   0.55-0.66, so at 0.25 a genuine violation still ranks below every safe one.
 - **Diagnosis matcher audited clean**: 0/600 false negatives, 0/600 false positives on
   cross-condition answers.
+- **The training objective is directionally aligned with the reported metric.** Scoring the
+  existing definitive-eval runs with the multi-turn weights, the composite's base-vs-SFT delta
+  has the same sign as the top-1 delta in all four model x sampling combinations (4B greedy
+  +0.053/+0.107, 4B sampled -0.010/-0.017, 9B greedy -0.002/-0.020, 9B sampled +0.005/+0.017).
+  The composite delta is consistently smaller in magnitude, as expected when correctness is
+  30% of the objective. This is the check that matters for GRPO: pushing the composite up
+  should not push top-1 down.
 
 ### Two failure modes that only appear mid-run
 - **fla TileLang backward.** Qwen3.5's gated-delta-rule layers go through
