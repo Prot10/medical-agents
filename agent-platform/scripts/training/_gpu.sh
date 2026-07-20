@@ -1,4 +1,13 @@
-# Shared GPU teardown, sourced by the training and eval scripts.
+# Shared GPU environment + teardown, sourced by the training and eval scripts.
+#
+# Qwen3.5's gated-delta-rule layers run through flash-linear-attention, whose TileLang backend
+# shells out to the pip-installed CUDA 13 nvcc; that nvcc rejects its own bundled headers here
+# ("CUDA compiler and CUDA toolkit headers are incompatible"). It fails only in the BACKWARD
+# kernel, so a run loads the model, generates, completes a rollout, and then dies in
+# loss.backward(). Pin fla to Triton, its reference backend: measured finite forward+backward,
+# forward within 4.8e-3 of fla's independent recurrent implementation, gradient within 3.5e-2
+# of a finite-difference check of its own forward. Not overridden if already set.
+export FLA_TILELANG="${FLA_TILELANG:-0}"
 #
 # The eval serves with vLLM and training loads with HuggingFace; only one can hold the A100 at
 # a time. vLLM spawns an EngineCore child that does not always die with its launcher, so a

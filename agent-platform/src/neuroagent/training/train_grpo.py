@@ -40,6 +40,19 @@ import random
 from pathlib import Path
 from typing import Any
 
+# Qwen3.5's gated-delta-rule layers run through flash-linear-attention, which prefers a TileLang
+# backend that shells out to the pip-installed CUDA 13 nvcc. On this box that nvcc rejects its
+# own bundled headers ("CUDA compiler and CUDA toolkit headers are incompatible"), and only in
+# the BACKWARD kernel — the forward compiles, so a run gets through generation and the first
+# rollout before dying in loss.backward(). Pin fla to its Triton backend instead.
+#
+# Verified rather than assumed: with the default backend the gated_delta_rule backward raises
+# that compile error; with FLA_TILELANG=0 forward and backward both produce finite gradients,
+# the forward agrees with fla's independent recurrent implementation to 4.8e-3 relative, and the
+# gradient agrees with a finite-difference directional derivative of its own forward to 3.5e-2
+# (the bf16 floor). setdefault, so this can be flipped back once the packaging is fixed.
+os.environ.setdefault("FLA_TILELANG", "0")
+
 logger = logging.getLogger(__name__)
 
 
