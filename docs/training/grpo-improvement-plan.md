@@ -113,29 +113,38 @@ Recipe: clip-higher `epsilon_high=0.28`, KL=0, `mask_truncated_completions=True`
   without ordering tests. Now counted (`clipped_turns`), warned about, and configurable
   (`PER_TURN`). Set it from the measured per-turn distribution of the SFT policy, not by guess.
 
-### OPEN: MAX_COMPLETION=4096 covers only half the real workups
-The completion holds the assistant turns AND the (masked) tool results, so the budget caps
-workup depth. Measured — 595 real MockServer outputs through the real tokenizer, tool-call
-counts from the SFT 4B's own eval runs, sampled jointly:
+### RESOLVED: G=4 / 8192 / per-turn 3072 / 32 chunks fits, with no truncation of any kind
+This looked like a forced trade — deeper budget OR full group — and it was neither. The
+apparent "4096 is the memory ceiling at G=4" was true only at the hardcoded `logit_chunks=8`.
 
-| MAX_COMPLETION | workups fitting fully | median tool calls affordable |
-|---:|---:|---:|
-| 4096 (current) | **50.9%** | 3 |
-| 6144 | 80.3% | 4 |
-| 8192 | 93.0% | 6 |
+The bug that framed it: `per_turn_max_tokens=512` produced **zero tool calls on every
+rollout**. Qwen3.5 writes a long `<think>` before its first tool call; a turn cut mid-reasoning
+carries no parseable call, so the rollout reads it as a conclusion and the trajectory ends after
+one turn. A full GRPO run would have trained on degenerate one-turn rollouts (`reward_std` ~0.02)
+while loss, reward, and truncation rate all looked healthy — the exact flat-eval failure this
+whole effort exists to fix. Same base model, same config, changing only the cap:
 
-Both inputs are heavy-tailed (tool result p50 633 / p90 1612 / max 3050 tokens; tool calls
-p50 3 / p90 6 / max 15), which is why point estimates mislead here.
+| per_turn | mean turns | tool calls | reward_std |
+|---:|---:|---:|---:|
+| 512 | 1.0 | 0.0 | 0.02-0.03 |
+| 4096 | 3.0-6.2 | 1.0-3.8 | 0.17-0.20 |
 
-The SFT 4B performs a median of 3 tool calls and a p90 of 6. At 4096 roughly **half** of
-trajectories hit the reserve and are forced to conclude early. That is safe — the reserve
-guarantees a diagnosis — but it means GRPO trains a policy on shallower workups than the one
-we evaluate, silently shaping the exact behaviour it is meant to optimise.
+With that fixed, the real per-turn distribution became visible (uncensored): **p50 1161, p90
+1986, p99 1986, max 2106** — so even 2048 clipped ~25% of turns. Default is now 3072.
 
-The tension: 4096 is the measured memory ceiling at G=4 on the 40GB card (37.3 GB peak, 6144
-OOM'd). Generation KV scales roughly with G x length, so G=2 @ 8192 is the same order of
-memory — but G=2 makes the group advantage a bare paired comparison. **Needs a memory probe
-before choosing**, not a guess. vLLM would dissolve the trade entirely, but needs a 2nd GPU.
+The completion budget then resolved cleanly. The training-side memory peak is ONE fp32 logit
+chunk from the chunked kernel = (batch*completion/chunks) x 248320 x 4B. At 8 chunks that is
+2.65 GiB and G=4 @ 8192 OOM'd in `loss.backward()` (tried 2.95 GiB, 552 MiB free); at 32 chunks
+it is 0.66 GiB and **fits** — measured through generation AND backward at 39.5/41 GB (96%),
+step ~840s, reward_std 0.17. Both kinds of truncation vanish at once:
+
+| config | clipped-turn | budget-capped | group | fit |
+|---|---:|---:|---:|---:|
+| G=4 / 4096 / 8ch | 25% | 25-75% | 4 | yes (94%) |
+| **G=4 / 8192 / per-turn 3072 / 32ch** | **0%** | **0%** | **4** | **yes (96%)** |
+
+`logit_chunks` is the lever for this — it is bit-exact against fp32 regardless of chunk count,
+so it buys memory for a little speed with no numerical cost. This is now the default recipe.
 
 ## Framework decision (branch `feat/agentic-rl-vllm-rollouts`)
 
@@ -204,17 +213,23 @@ computes `old_per_token_logps`; `test_grpo_importance_sampling_level.py` is the 
 ## Commands
 
 ```bash
-# Multi-turn smoke — generation + masking + backward + held-out eval + promotion (~160 s/step)
-MULTI_TURN=1 MAX_STEPS=6 EVAL_STEPS=3 NUM_GENERATIONS=4 PRECISION=qlora \
-  bash agent-platform/scripts/training/run_grpo_training.sh Qwen3.5-4B
-
 # Re-baseline base vs SFT on the corrected benchmark — run this BEFORE any GRPO comparison
 bash agent-platform/scripts/training/run_definitive_eval.sh Qwen3.5-4B
 
-# Full multi-turn run
+# Full multi-turn run — defaults are the validated recipe (G=4 / 8192 / per-turn 3072 / 32ch)
 MULTI_TURN=1 PRECISION=qlora \
   bash agent-platform/scripts/training/run_grpo_training.sh Qwen3.5-4B
 ```
 
+Runtime: **~840 s/step**, ~482 steps/epoch => **~37 h/epoch** at G=4 with real ~5-6 turn
+rollouts. (The earlier "~160 s/step" was measured on degenerate one-turn rollouts under the
+512-token cap and is not representative.) Eval generates too — `num_generations_eval x eval
+prompts` rollouts, ~22 min at 18x4 — so keep `EVAL_STEPS` sparse or lower `--num-generations-eval`.
+
 Everything on EOS needs a live Kerberos ticket (`kinit`); an expired one shows up as
 `Permission denied` on the adapter path, not as an auth error.
+
+The pipeline is validated on the BASE model (no EOS needed): generation, masking, tool
+execution, backward, optimiser step, held-out eval, best-step callback, checkpoint save — all
+run, and `reward_std` is 0.17 (the reward discriminates). What still needs EOS is the
+comparison, not the correctness: the re-baseline and the SFT->GRPO delta.
