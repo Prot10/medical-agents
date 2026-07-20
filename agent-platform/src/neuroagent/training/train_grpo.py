@@ -785,6 +785,43 @@ def _require_case_ids(raw_data: list[dict]) -> None:
         )
 
 
+def load_training_chat_template() -> str | None:
+    """TRL's think-preserving Qwen3.5 TRAINING chat template, or None if unavailable.
+
+    Qwen3.5's shipped template is an INFERENCE template: it strips `<think>` from any assistant
+    turn that a user message follows. In a multi-turn rollout that (a) silently deletes the
+    policy's own reasoning from its context and (b) makes the render non-append-only, which
+    breaks token concatenation. TRL's training variant keeps the reasoning and stays
+    append-only through tool and reflection turns.
+    """
+    try:
+        from trl.chat_template_utils import qwen3_5_think_training_chat_template
+
+        return qwen3_5_think_training_chat_template
+    except Exception as exc:  # older TRL without Qwen3.5 coverage
+        logger.warning("No Qwen3.5 training chat template in this TRL (%s)", exc)
+        return None
+
+
+def export_training_chat_template(path: str | Path) -> Path | None:
+    """Write the training chat template to disk for the eval server to load.
+
+    Training and serving MUST render with the same template. If the policy is trained with
+    reasoning preserved in history but evaluated with the shipped template that strips it, the
+    agent sees a different context at eval than it ever saw while learning — the same class of
+    train/serve mismatch that made the first GRPO runs look flat. vLLM takes this file via
+    `--chat-template`.
+    """
+    template = load_training_chat_template()
+    if template is None:
+        return None
+    out = Path(path)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(template)
+    logger.info("Wrote training chat template for serving: %s", out)
+    return out
+
+
 def _stratified_holdout(
     raw_data: list[dict], per_condition: int, seed: int
 ) -> tuple[list[dict], list[dict]]:
@@ -953,14 +990,34 @@ def _build_multiturn_rollout(
         reward_config, tool_costs_config, rules_dir, hospital
     )
 
+    # The think-preserving TRAINING chat template. Qwen3.5's shipped (inference) template drops
+    # reasoning from any assistant turn a user message follows, which breaks append-only token
+    # concatenation and previously forced reflection off; TRL's training template keeps it and
+    # stays append-only through tool + reflection turns (both verified empirically). The eval
+    # server MUST be given this same template — see export_training_chat_template().
+    chat_template = load_training_chat_template()
+    reflection_msg = None
+    enable_reflection = False
+    if chat_template is not None:
+        from ..agent.reflection import get_reflection_prompt
+
+        reflection_msg = get_reflection_prompt()
+        enable_reflection = bool(load_agent_config(hospital=hospital).enable_reflection)
+    else:
+        logger.warning(
+            "No think-preserving training chat template available — running multi-turn "
+            "rollouts with reflection DISABLED, since the shipped template strips <think> "
+            "after a user turn and would break token alignment."
+        )
+
     rollout = ReactRollout(
         tokenizer=tokenizer,
         tools=tools,
         system_prompt=system_prompt,
         max_completion_tokens=max_completion_length,
-        # Reflection is OFF: it is a user message and Qwen3.5 strips <think> after one,
-        # breaking the append-only token concatenation. See ReactRollout.
-        enable_reflection=False,
+        chat_template=chat_template,
+        enable_reflection=enable_reflection,
+        reflection_message=reflection_msg,
     )
     rollout_func = MultiTurnRolloutFunc(
         rollout=rollout,
@@ -1134,6 +1191,8 @@ def run_grpo_trl(
     kl_coeff: float = 0.001,
     bf16: bool = True,
     use_vllm: bool = False,
+    vllm_gpu_memory_utilization: float = 0.30,
+    vllm_max_model_length: int = 16384,
     qlora: bool = False,
     seed: int = 42,
     reward_config: str = "config/training/reward_weights.yaml",
@@ -1335,6 +1394,15 @@ def run_grpo_trl(
     dataset_path_env = os.environ.get("NEUROAGENT_DATASET", "data/neurobench")
     dataset_dir = Path(dataset_path_env)
 
+    if use_vllm:
+        # vLLM instantiates Qwen3.5 as the MULTIMODAL Qwen3_5ForConditionalGeneration, whose
+        # parameters are language_model.model.* plus a visual.* tower, while we train the
+        # text-only Qwen3_5ForCausalLM (model.*). Without this, TRL's weight sync raises
+        # "no module or parameter named 'model'" the first time it pushes weights.
+        from .vllm_qwen35_patch import patch_vllm_language_model_only
+
+        patch_vllm_language_model_only()
+
     rollout_func = None
     if multi_turn:
         # Multi-turn ("grouped") GRPO: TRL calls our rollout_func, which drives the REAL
@@ -1460,6 +1528,25 @@ def run_grpo_trl(
         # at the budget. Masking those would throw away most of the batch, since long multi-turn
         # trajectories routinely exceed the budget. This is truncated-BPTT, not off-policy noise.
         mask_truncated_completions=(mask_truncated_completions and not multi_turn),
+        # vLLM-accelerated rollouts. Colocate is the ONLY single-GPU mode — server mode refuses
+        # to share a device — so the engine and the trainer split this card:
+        # vllm_gpu_memory_utilization is the engine's share, the rest is left for training.
+        # The win is prefix caching: HF generate re-prefills the shared ~6.2k prompt for every
+        # generation of every turn (~20x per group); vLLM caches it.
+        **(
+            {
+                "use_vllm": True,
+                "vllm_mode": "colocate",
+                "vllm_gpu_memory_utilization": vllm_gpu_memory_utilization,
+                # Qwen3.5 advertises a 262144-token context, and vLLM sizes its KV cache for
+                # the model's max length by default — 8.06 GiB, more than the engine's whole
+                # share of the card, so the engine refuses to start. A multi-turn trajectory
+                # needs prompt (~6.2k) + completion, nothing like 262k, so cap it there.
+                "vllm_max_model_length": vllm_max_model_length,
+            }
+            if use_vllm
+            else {}
+        ),
         # Multi-turn rollouts are fully on-policy (the custom rollout_func generates with the
         # live model): one optimiser update per generation, so the importance ratio is 1 and
         # no stored sampling logprobs are needed.
@@ -1721,6 +1808,13 @@ def main() -> None:
                         help="'none' = do not divide the advantage by the group reward std (Dr. GRPO)")
     parser.add_argument("--loss-type", default="dapo",
                         help="GRPO loss normalisation (dapo = token-level, no length bias)")
+    parser.add_argument("--vllm-gpu-memory-utilization", type=float, default=0.30,
+                        help="Share of the GPU reserved for the colocated vLLM engine; the "
+                             "remainder is left for training. Only used with --use-vllm.")
+    parser.add_argument("--vllm-max-model-length", type=int, default=16384,
+                        help="Context the colocated vLLM engine sizes its KV cache for. Qwen3.5 "
+                             "advertises 262144, which alone exceeds the engine's memory share; "
+                             "a trajectory needs ~6.2k prompt + the completion budget.")
     parser.add_argument("--multi-turn", action="store_true",
                         help="Multi-turn ('grouped') GRPO: drive the real ReAct loop against "
                              "the MockServer and score the genuine trajectory (reflection off).")
@@ -1796,6 +1890,8 @@ def main() -> None:
                 kl_coeff=args.kl_coeff,
                 bf16=args.bf16,
                 use_vllm=args.use_vllm,
+                vllm_gpu_memory_utilization=args.vllm_gpu_memory_utilization,
+                vllm_max_model_length=args.vllm_max_model_length,
                 qlora=args.qlora,
                 seed=args.seed,
                 reward_config=args.reward_config,

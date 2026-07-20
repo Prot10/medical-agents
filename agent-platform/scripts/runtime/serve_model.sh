@@ -60,6 +60,18 @@ COMMON_FLAGS=(
   --max-num-seqs "${MAX_NUM_SEQS:-4}"
 )
 
+# Train/serve parity for multi-turn GRPO. Qwen3.5's shipped template is an INFERENCE template:
+# it strips <think> from any assistant turn a user message follows, so with reflection enabled
+# the agent loses its own reasoning from context. Multi-turn training renders with TRL's
+# think-preserving TRAINING template, and evaluating a policy under a different template than
+# it was trained on reintroduces exactly the train/serve mismatch that made the first GRPO runs
+# look flat. Export it with `python -m neuroagent.training.export_chat_template` and point
+# CHAT_TEMPLATE at the file.
+if [ -n "${CHAT_TEMPLATE:-}" ]; then
+  [ -f "$CHAT_TEMPLATE" ] || { echo "CHAT_TEMPLATE set but not found: $CHAT_TEMPLATE" >&2; exit 1; }
+  COMMON_FLAGS+=(--chat-template "$CHAT_TEMPLATE")
+fi
+
 # Qwen3.5-specific flags: reasoning parser + tool calling + text-only
 QWEN35_FLAGS=(
   --reasoning-parser qwen3

@@ -75,7 +75,41 @@ class MultiTurnRolloutFunc:
         EOS, so leaving it uncapped lets one runaway sequence stall the entire group. A turn
         measures ~300-400 tokens.
         """
+        use_vllm = bool(getattr(trainer, "use_vllm", False)) and getattr(
+            trainer, "vllm_generation", None
+        ) is not None
+
         def generate_batch_fn(batch_ids: list[list[int]]) -> list[list[int]]:
+            if use_vllm:
+                # vLLM path. This is the reason multi-turn is affordable at all: HF generate
+                # re-prefills the shared ~6.2k-token prompt for every generation of every turn
+                # (~20 times per group), whereas vLLM prefix-caches it and pages the KV cache.
+                # TRL has already synced the policy weights into the engine before calling the
+                # rollout (GRPOTrainer._generate, rollout_func branch), so this is on-policy.
+                # num_generations=1: the group's G trajectories are already separate rows here,
+                # each with its own diverging tool history, so vLLM must not fan them out again.
+                _prompts, completion_ids, logprobs, *_ = trainer.vllm_generation.generate(
+                    prompts=batch_ids,
+                    images=None,
+                    num_generations=1,
+                )
+                # Keep the sampling logprobs. TRL's vLLM importance-sampling correction needs
+                # them: the engine's sampling distribution is not identical to the training
+                # model's, and without them TRL computes `old_logps - None` and dies. vLLM
+                # returns per-token top-k logprobs; take the top-1 (the sampled token), which
+                # is what TRL itself does on its own vLLM path.
+                out = []
+                for c, lp in zip(completion_ids, logprobs or []):
+                    flat = [x[0] if isinstance(x, (list, tuple)) else x for x in (lp or [])]
+                    out.append((list(c), [float(v) for v in flat]))
+                if not out:
+                    out = [(list(c), None) for c in completion_ids]
+                return out
+
+            # HF generate fallback. Cap max_new_tokens to ONE assistant turn: the trainer's
+            # generation_config carries the whole-completion budget (thousands of tokens for
+            # multi-turn) and HF generate runs until EVERY sequence in the batch hits EOS, so
+            # leaving it uncapped lets one runaway sequence stall the group. A turn is ~350 tok.
             gen_cfg = trainer.generation_config
             previous = getattr(gen_cfg, "max_new_tokens", None)
             try:
@@ -85,6 +119,8 @@ class MultiTurnRolloutFunc:
                 )
             finally:
                 gen_cfg.max_new_tokens = previous
+            # HF generate supplies no logprobs; the rollout fills 0.0 and TRL skips the
+            # importance-sampling correction (which is exact anyway when fully on-policy).
             return [list(c) for c in completion_ids]
 
         return generate_batch_fn
@@ -118,6 +154,10 @@ class MultiTurnRolloutFunc:
         prompt_ids_out = [r.prompt_ids for r in results]
         completion_ids_out = [r.completion_ids for r in results]
         env_mask_out = [r.env_mask for r in results]
+        # None unless the backend actually produced logprobs (vLLM does, HF generate does not);
+        # TRL treats None as "no importance-sampling correction", which is correct on-policy.
+        any_logprobs = any(any(v != 0.0 for v in r.logprobs) for r in results)
+        logprobs_out = [r.logprobs for r in results] if any_logprobs else None
         rewards_out = [
             float(self.reward_fn(r.trace, self.cases[r.case_id])) for r in results
         ]
@@ -149,7 +189,7 @@ class MultiTurnRolloutFunc:
             # On-policy, single inner iteration: the sampling logprobs equal the policy's, so
             # the importance ratio is 1 and TRL recomputes what it needs from the model. None
             # (key present) selects that path; see GRPOTrainer._generate.
-            "logprobs": None,
+            "logprobs": logprobs_out,
             # Consumed by TRL as the loss mask: 1 on the policy's own tokens, 0 on tool tokens.
             "env_mask": env_mask_out,
             # Forwarded to the reward function below.
