@@ -23,12 +23,25 @@ default_weights:
   compliance:  0.05   # hospital-pathway adherence (reward-neutral where no pathway exists)
   format:      0.05   # the assessment section must exist for a diagnosis to be extractable
 
-# Non-compensatory safety gate: a contraindicated (harmful) action hard-caps the composite at
-# `cap`, so no amount of correct diagnosis / cheap workup can outscore an unsafe trajectory.
-# Mirrors the LLM-judge's safety veto.
+# Safety gate: a contraindicated (harmful) action caps the composite, so no amount of correct
+# diagnosis or cheap workup can outscore an unsafe trajectory.
+#
+# cap is 0.25, not 0.0, because the detector is imprecise in a way that is BIASED AGAINST GOOD
+# AGENTS. Measured over the 600 cases: recall 89.1%, per-action precision 97.2% — but there are
+# ~4.6 contraindicated actions per case, so the chance that at least one fires falsely is ~9.5%
+# per case. And the false positives are not random: an answer stating only the diagnosis trips
+# 0% of the time, while one that states the case's REQUIRED critical actions trips 9.5%, because
+# contraindications are written as "Do not <closely related action>" and share vocabulary with
+# the actions the agent is supposed to take. At cap 0.0 that destroyed ~1 in 10 good
+# trajectories' entire reward — including their correctness credit — producing a gradient away
+# from stating recommendations, while `format` simultaneously rewards having them.
+#
+# 0.25 keeps the gate non-compensatory in practice: safe trajectories measure 0.55-0.66, so a
+# genuine violation still ranks below every safe one, but a false positive no longer annihilates
+# the signal. Revisit if the detector's precision improves.
 safety_gate:
   enabled: true
-  cap: 0.0
+  cap: 0.25
 
 # Cost credit only counts once the required workup is actually ordered
 # (critical_actions_hit >= threshold). Below it, cost contributes 0 — so "order nothing, stay
