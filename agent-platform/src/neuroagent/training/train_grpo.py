@@ -43,6 +43,212 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 
+def _configure_split_logging(log_file: str | None) -> None:
+    """Verbose logs + Python warnings to a FILE; keep the terminal for the progress UI.
+
+    Training prints a lot — transformers/TRL INFO, deprecation warnings, per-step metric dicts.
+    Routed to `log_file`, the terminal is left with the tqdm step bar and the concise reward
+    line from _TerminalProgressCallback. Only ERROR records still surface on the terminal so a
+    crash is never buried in a file. `captureWarnings` folds warnings.warn (e.g. the torch_dtype
+    and generation_config notices) into the same file instead of the terminal.
+    """
+    import os
+    import sys
+
+    # 1. Env flags that must be set before the libraries configure themselves, to kill the
+    #    progress bars / banners that write straight to the terminal, bypassing `logging`:
+    #      HF_HUB_DISABLE_PROGRESS_BARS  -> the "Loading weights" / download bars
+    #      BITSANDBYTES_NOWELCOME        -> the bnb ASCII welcome banner (QLoRA path)
+    #      TOKENIZERS_PARALLELISM        -> the "The current process just got forked" warning
+    #      TRANSFORMERS_NO_ADVISORY_WARNINGS -> transformers advisory notices
+    os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
+    os.environ.setdefault("BITSANDBYTES_NOWELCOME", "1")
+    os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+    os.environ.setdefault("TRANSFORMERS_NO_ADVISORY_WARNINGS", "1")
+    # torch's C++ (glog) logging — the "I0716 … FakeTensor cache stats" dumps — bypasses Python
+    # logging entirely. These must be set before torch is first imported; main() calls this
+    # before run_grpo_trl does the (lazy) `import torch`, so they take effect.
+    os.environ.setdefault("TORCH_CPP_LOG_LEVEL", "ERROR")
+    os.environ.setdefault("GLOG_minloglevel", "2")
+
+    logging.captureWarnings(True)  # warnings.warn (torch_dtype, generation_config) -> logging -> file
+    root = logging.getLogger()
+    root.setLevel(logging.INFO)
+    for h in list(root.handlers):
+        root.removeHandler(h)
+    if log_file:
+        from pathlib import Path as _Path
+        _Path(log_file).parent.mkdir(parents=True, exist_ok=True)
+        fh = logging.FileHandler(log_file)
+        fh.setLevel(logging.INFO)
+        fh.setFormatter(logging.Formatter("%(asctime)s [%(name)s] %(levelname)s: %(message)s"))
+        root.addHandler(fh)
+    err = logging.StreamHandler(sys.stderr)
+    err.setLevel(logging.ERROR)
+    err.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
+    root.addHandler(err)
+
+    # 2. transformers/peft/etc. install their OWN stderr handler and never propagate, so their
+    #    INFO/WARNING (the fla "fast path" note, the tokenizer/PAD message, TRL logs) hit the
+    #    terminal regardless of the root config. Point them at the root's file handler instead
+    #    and turn off their progress bars.
+    try:
+        from transformers.utils import logging as hf_logging
+
+        hf_logging.disable_default_handler()
+        hf_logging.enable_propagation()
+        hf_logging.disable_progress_bar()
+    except Exception:  # transformers layout changed — fall back to level bumping below
+        pass
+    try:
+        import datasets
+
+        datasets.disable_progress_bars()  # the .map() tokenisation bars
+        datasets.utils.logging.disable_default_handler()
+        datasets.utils.logging.enable_propagation()
+    except Exception:
+        pass
+    for name in ("transformers", "datasets", "peft", "trl", "accelerate", "bitsandbytes",
+                 "huggingface_hub", "torch"):
+        lg = logging.getLogger(name)
+        lg.setLevel(logging.INFO)
+        lg.propagate = True
+        # drop any private stderr handler the library attached to its own logger
+        for h in list(lg.handlers):
+            lg.removeHandler(h)
+
+    # 3. Uncaught exceptions (a CUDA OOM during generation, a dtype mismatch) print their
+    #    traceback via the default sys.excepthook straight to stderr — which under this split
+    #    setup means the terminal, NOT the log file. So a crash leaves the log ending mid-step
+    #    with no error, undiagnosable after the terminal is gone (exactly how the 4B GRPO run
+    #    died at step 232). Route the traceback through logging so it lands in the file too;
+    #    keep Ctrl-C on the default path so an intentional interrupt is not logged as a crash.
+    _prev_excepthook = sys.excepthook
+
+    def _log_uncaught(exc_type, exc, tb):
+        if issubclass(exc_type, KeyboardInterrupt):
+            _prev_excepthook(exc_type, exc, tb)
+            return
+        logging.getLogger("__main__").critical(
+            "Uncaught exception — training aborted", exc_info=(exc_type, exc, tb)
+        )
+        _prev_excepthook(exc_type, exc, tb)
+
+    sys.excepthook = _log_uncaught
+
+
+def _quiet_torch_loggers() -> None:
+    """Raise torch's own Python loggers above INFO — call right AFTER `import torch`.
+
+    torch installs its logging handlers at import time, so this cannot live in
+    _configure_split_logging (which runs before torch is imported). Without it, torch dumps
+    like the fake_tensor "cache stats" (an atexit hook) and dynamo/inductor INFO leak to the
+    terminal past every other guard.
+    """
+    for name in ("torch._subclasses.fake_tensor", "torch._dynamo", "torch._inductor",
+                 "torch._logging", "torch.distributed"):
+        logging.getLogger(name).setLevel(logging.WARNING)
+
+
+def _make_terminal_progress_callback(model_tag: str = "GRPO"):
+    """A modern, always-visible Rich training bar with semantic colours.
+
+    TRL's own tqdm bar is disabled (disable_tqdm=True) and its 50-key metric dict goes to the
+    log file; this renders the signal worth watching, live, on the terminal:
+
+        ⠹ GRPO Qwen3.5-4B ━━━━╸  40/250  reward 0.312 ↑0.021  eval 0.334  best 0.334  loss +0.001  ETA 2:41:03
+
+    Colours carry meaning: reward green, its step-over-step delta green up / red down, held-out
+    eval magenta, best-so-far bold-green, loss dim. The spinner animates on Rich's refresh thread
+    even during the ~2-minute generation phase between steps, so "0/250" never looks frozen —
+    it's the model rolling out completions, not a hang.
+    """
+    from rich.console import Console
+    from rich.progress import (
+        BarColumn,
+        MofNCompleteColumn,
+        Progress,
+        SpinnerColumn,
+        TextColumn,
+        TimeElapsedColumn,
+        TimeRemainingColumn,
+    )
+    from transformers import TrainerCallback
+
+    console = Console()
+
+    class _TerminalProgressCallback(TrainerCallback):
+        def __init__(self) -> None:
+            self.progress: Progress | None = None
+            self.task = None
+            self.prev_reward: float | None = None
+            self.best: float | None = None
+
+        def _fields(self) -> dict:
+            return {"reward": "[dim]--", "delta": "", "eval": "[dim]--",
+                    "best": "[dim]--", "loss": "[dim]--"}
+
+        def on_train_begin(self, args, state, control, **kwargs):
+            self.progress = Progress(
+                SpinnerColumn(style="cyan"),
+                TextColumn(f"[bold blue]{model_tag}"),
+                BarColumn(bar_width=None, complete_style="green", finished_style="bold green"),
+                MofNCompleteColumn(),
+                TextColumn("[green]reward {task.fields[reward]}"),
+                TextColumn("{task.fields[delta]}"),
+                TextColumn("[magenta]eval {task.fields[eval]}"),
+                TextColumn("[bold green]best {task.fields[best]}"),
+                TextColumn("[dim]loss {task.fields[loss]}"),
+                TextColumn("[dim]ETA"),
+                TimeRemainingColumn(),
+                TimeElapsedColumn(),
+                console=console,
+            )
+            self.progress.start()
+            self.task = self.progress.add_task(
+                "train", total=state.max_steps or None, **self._fields()
+            )
+
+        def on_log(self, args, state, control, logs=None, **kwargs):
+            if not self.progress or self.task is None or not logs:
+                return
+            # The full metric dict no longer prints to the terminal (PrinterCallback removed);
+            # keep it in the log file so every step is analysable later.
+            if "reward" in logs or "eval_reward" in logs:
+                logger.info("step %d metrics: %s", int(state.global_step), logs)
+            upd: dict = {}
+            if "reward" in logs:
+                r = float(logs["reward"])
+                if self.prev_reward is not None:
+                    diff = r - self.prev_reward
+                    arrow, col = (("↑", "green") if diff > 0
+                                  else ("↓", "red") if diff < 0 else ("→", "dim"))
+                    upd["delta"] = f"[{col}]{arrow}{abs(diff):.3f}[/{col}]"
+                self.prev_reward = r
+                upd["reward"] = f"[green]{r:.3f}"
+                if isinstance(logs.get("loss"), (int, float)):
+                    upd["loss"] = f"{float(logs['loss']):+.4f}"
+            if "eval_reward" in logs:
+                e = float(logs["eval_reward"])
+                upd["eval"] = f"[magenta]{e:.3f}"
+                if self.best is None or e > self.best:
+                    self.best = e
+                    upd["best"] = f"[bold green]{e:.3f}"
+            self.progress.update(self.task, completed=int(state.global_step), **upd)
+
+        def on_train_end(self, args, state, control, **kwargs):
+            if self.progress:
+                self.progress.update(self.task, completed=state.max_steps or state.global_step)
+                self.progress.stop()
+            console.print(
+                f"[bold green]✓ GRPO training complete[/bold green] — "
+                f"{int(state.global_step)} steps, best held-out reward "
+                f"[bold]{self.best if self.best is not None else float('nan'):.3f}[/bold]"
+            )
+
+    return _TerminalProgressCallback()
+
+
 # ---------------------------------------------------------------------------
 # LoRA configuration
 # ---------------------------------------------------------------------------
@@ -383,6 +589,7 @@ def run_sft(
         val_fraction: Fraction of TRAIN cases held out for eval_loss / best-model selection.
     """
     import torch
+    _quiet_torch_loggers()
     from datasets import Dataset
     from peft import get_peft_model, prepare_model_for_kbit_training
     from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -402,7 +609,7 @@ def run_sft(
     if qlora:
         load_kwargs["quantization_config"] = get_quantization_config()
     else:
-        load_kwargs["torch_dtype"] = torch.bfloat16 if bf16 else torch.float16
+        load_kwargs["dtype"] = torch.bfloat16 if bf16 else torch.float16
 
     model = AutoModelForCausalLM.from_pretrained(model_name, **load_kwargs)
 
@@ -413,7 +620,8 @@ def run_sft(
     # Apply LoRA
     lora_config = get_lora_config(rank=lora_rank, alpha=lora_alpha)
     model = get_peft_model(model, lora_config)
-    model.print_trainable_parameters()
+    _tr, _all = model.get_nb_trainable_parameters()
+    logger.info("Trainable params: %d / %d (%.2f%%)", _tr, _all, 100 * _tr / _all)
 
     # Load data and optionally split into train/val
     top_examples = load_sft_data(data_path, top_fraction=top_fraction)
@@ -577,6 +785,35 @@ def _require_case_ids(raw_data: list[dict]) -> None:
         )
 
 
+def _stratified_holdout(
+    raw_data: list[dict], per_condition: int, seed: int
+) -> tuple[list[dict], list[dict]]:
+    """Split a per-condition-stratified validation set out of the training data.
+
+    Returns (train_remaining, validation). Deterministic given ``seed``: within each
+    condition the cases are sorted by id then shuffled, and the first ``per_condition``
+    become validation. Every condition is represented, so the held-out reward is a
+    balanced generalisation signal rather than an alphabetical slice.
+    """
+    import random
+
+    by_cond: dict[str, list[dict]] = {}
+    for ex in raw_data:
+        by_cond.setdefault(ex.get("condition", "_unknown"), []).append(ex)
+
+    rng = random.Random(seed)
+    val_ids: set[str] = set()
+    val: list[dict] = []
+    for cond in sorted(by_cond):
+        items = sorted(by_cond[cond], key=lambda e: e["case_id"])
+        rng.shuffle(items)
+        for ex in items[:per_condition]:
+            val.append(ex)
+            val_ids.add(ex["case_id"])
+    train = [ex for ex in raw_data if ex["case_id"] not in val_ids]
+    return train, val
+
+
 def _build_online_reward_fn(
     raw_data: list[dict],
     dataset_dir: Path,
@@ -668,6 +905,76 @@ def _build_offline_reward_fn(raw_data: list[dict], allow_placeholder_rewards: bo
     return offline_reward
 
 
+def _build_multiturn_rollout(
+    raw_data: list[dict],
+    dataset_dir: Path,
+    reward_config: str,
+    tool_costs_config: str,
+    rules_dir: str,
+    hospital: str,
+    tokenizer,
+    max_completion_length: int,
+    per_turn_max_tokens: int,
+):
+    """Assemble the multi-turn rollout_func and its pass-through reward function.
+
+    Returns ``(rollout_func, reward_func)``. The rollout drives the real ReAct loop against a
+    per-case ``MockServer`` and scores the resulting ``AgentTrace`` with the shared
+    ``CompositeReward``; the reward is threaded to TRL through the ``trajectory_reward`` field.
+    """
+    from ..agent.config import load_agent_config
+    from ..agent.orchestrator import AgentOrchestrator
+    from ..evaluation.runner import format_patient_info
+    from ..rules.rules_engine import RulesEngine
+    from ..tools.cost_tracker import CostTracker
+    from ..tools.mock_server import MockServer
+    from ..tools.tool_registry import ToolRegistry
+    from .rewards.composite_reward import CompositeReward
+    from .rewards.online_reward import load_cases_by_id
+    from .rollout.react_rollout import ReactRollout
+    from .rollout.trl_rollout import MultiTurnRolloutFunc, precomputed_trajectory_reward
+
+    # System prompt is composed exactly as at serving (base + reasoning style + hospital rules).
+    rules = RulesEngine(rules_dir, hospital=hospital)
+    orchestrator = AgentOrchestrator(
+        config=load_agent_config(hospital=hospital),
+        tool_registry=ToolRegistry.create_default_registry(),
+        rules_engine=rules,
+    )
+    system_prompt = orchestrator._build_system_prompt()
+    tools = _agent_tool_definitions()
+
+    case_ids = {ex["case_id"] for ex in raw_data}
+    cases = load_cases_by_id(dataset_dir, case_ids)
+    patient_info = {cid: format_patient_info(case) for cid, case in cases.items()}
+    prompt_to_case = {ex["prompt"]: ex["case_id"] for ex in raw_data}
+
+    composite = CompositeReward.from_config(
+        reward_config, tool_costs_config, rules_dir, hospital
+    )
+
+    rollout = ReactRollout(
+        tokenizer=tokenizer,
+        tools=tools,
+        system_prompt=system_prompt,
+        max_completion_tokens=max_completion_length,
+        # Reflection is OFF: it is a user message and Qwen3.5 strips <think> after one,
+        # breaking the append-only token concatenation. See ReactRollout.
+        enable_reflection=False,
+    )
+    rollout_func = MultiTurnRolloutFunc(
+        rollout=rollout,
+        prompt_to_case=prompt_to_case,
+        cases=cases,
+        patient_info=patient_info,
+        reward_fn=lambda trace, case: composite.compute(trace, case),
+        mock_server_factory=lambda case: MockServer(case),
+        cost_tracker_factory=CostTracker,
+        per_turn_max_tokens=per_turn_max_tokens,
+    )
+    return rollout_func, precomputed_trajectory_reward()
+
+
 def _save_rl_run_summary(
     output_dir: str,
     trainer,
@@ -714,6 +1021,103 @@ def _save_rl_run_summary(
     logger.info("Run summary written to %s", path)
 
 
+def _make_best_reward_callback():
+    """Track the best held-out REWARD and which checkpoint produced it.
+
+    HF's `load_best_model_at_end` cannot be used here: TRL *logs* `eval_reward` but does not
+    return it in the metrics dict, so `metric_for_best_model="eval_reward"` raises KeyError,
+    and the only metric on offer is `eval_loss` — which for GRPO is a policy-gradient
+    surrogate, not a measure of quality (it drifts toward 0 as the policy stops changing).
+    Selecting on it would be worse than selecting on nothing.
+
+    So we watch the logs, remember the step with the highest held-out reward, and the caller
+    promotes that checkpoint to the output root — the same "root adapter == best checkpoint"
+    contract the SFT stage has.
+    """
+    from transformers import TrainerCallback
+
+    class _BestRewardCallback(TrainerCallback):
+        best_reward: float | None = None
+        best_step: int | None = None
+
+        def on_log(self, args, state, control, logs=None, **kwargs):
+            if not logs or "eval_reward" not in logs:
+                return
+            reward = float(logs["eval_reward"])
+            if self.best_reward is None or reward > self.best_reward:
+                self.best_reward, self.best_step = reward, int(state.global_step)
+                logger.info(
+                    "New best held-out reward %.4f at step %d", reward, self.best_step
+                )
+
+    return _BestRewardCallback()
+
+
+def _promote_best_checkpoint(output_dir: str, best_step: int | None) -> None:
+    """Copy the best-reward checkpoint's adapter into the output root.
+
+    Downstream (serving, eval) reads `<output>/adapter_model.safetensors`, so the root must
+    hold the checkpoint we actually want — otherwise the run silently ships its LAST step,
+    which for RL is often past the point where held-out reward peaked.
+    """
+    import shutil
+
+    # These two failures ship a post-peak adapter while looking like success, so they must
+    # surface on the terminal (ERROR), not only in the log file (the split-logging setup
+    # routes WARNING to the file alone).
+    if best_step is None:
+        logger.error("No held-out eval ran — the root adapter is the LAST step, not the best.")
+        return
+    ckpt = Path(output_dir) / f"checkpoint-{best_step}"
+    adapter = ckpt / "adapter_model.safetensors"
+    if not adapter.exists():
+        logger.error("Best step %d has no checkpoint at %s — keeping the last step.", best_step, ckpt)
+        return
+    for name in ("adapter_model.safetensors", "adapter_config.json"):
+        src = ckpt / name
+        if src.exists():
+            shutil.copy2(src, Path(output_dir) / name)
+    logger.info("Promoted checkpoint-%d (best held-out reward) to the output root", best_step)
+
+
+def _make_generation_cache_callback(model):
+    """Callback that keeps the KV cache enabled for GRPO's generation phase.
+
+    HF's Trainer sets `model.config.use_cache = False` whenever gradient checkpointing is
+    on. That is right for the training forward — but GRPO *generates* with the same model,
+    and without a cache `generate()` cannot take the `logits_to_keep=1` shortcut: it
+    materialises logits for EVERY prompt position. At a 6.2k-token prompt and Qwen3.5's
+    248k vocab that is 4 x 6.2k x 248k = 12.2 GB (bf16) of logits per generation batch —
+    for a tensor whose last row is the only one generate() reads.
+
+    Flipping use_cache back on after Trainer's setup gives generation its cache; the
+    checkpointed training forward still disables the cache locally (transformers does that
+    per-forward, without mutating the config), so gradient checkpointing keeps working.
+
+    Defined here rather than at module scope because transformers is imported lazily — the
+    module must stay importable without torch installed.
+    """
+    from transformers import TrainerCallback
+
+    class _GenerationCacheCallback(TrainerCallback):
+        def _enable(self):
+            cfg = getattr(model, "config", None)
+            if cfg is not None:
+                cfg.use_cache = True
+            # PeftModel wraps the base; its inner config is the one generate() reads.
+            inner = getattr(getattr(model, "base_model", None), "model", None)
+            if inner is not None and getattr(inner, "config", None) is not None:
+                inner.config.use_cache = True
+
+        def on_train_begin(self, args, state, control, **kwargs):
+            self._enable()
+
+        def on_step_begin(self, args, state, control, **kwargs):
+            self._enable()
+
+    return _GenerationCacheCallback()
+
+
 def run_grpo_trl(
     model_name: str,
     data_path: str,
@@ -735,8 +1139,24 @@ def run_grpo_trl(
     reward_config: str = "config/training/reward_weights.yaml",
     tool_costs_config: str = "config/tools/costs.yaml",
     rules_dir: str = "config/hospital_rules",
-    hospital: str = "us_mayo",
+    hospital: str = "de_charite",
     allow_placeholder_rewards: bool = False,
+    grad_accum: int = 4,
+    generation_batch_size: int | None = None,
+    max_steps: int = -1,
+    logging_steps: int = 1,
+    save_steps: int = 50,
+    eval_data: str | None = None,
+    eval_subset: int = 20,
+    eval_steps: int = 40,
+    importance_sampling_level: str = "sequence",
+    scale_rewards: str = "none",
+    loss_type: str = "dapo",
+    epsilon_high: float = 0.28,
+    mask_truncated_completions: bool = True,
+    val_from_train: bool = True,
+    val_per_condition: int = 1,
+    multi_turn: bool = False,
 ) -> None:
     """Run GRPO training using TRL GRPOTrainer.
 
@@ -752,10 +1172,19 @@ def run_grpo_trl(
         seed: Random seed forwarded to GRPOConfig (mirrors the SFT stage).
     """
     import torch
+    _quiet_torch_loggers()
     from datasets import Dataset
     from peft import PeftModel, get_peft_model, prepare_model_for_kbit_training
     from transformers import AutoModelForCausalLM, AutoTokenizer
-    from trl import GRPOConfig, GRPOTrainer
+    from trl import GRPOConfig
+
+    # Qwen3.5's 248,320-token vocabulary makes TRL's full logits tensor
+    # (batch x seq x vocab) the largest allocation in the run — it is what OOM'd the
+    # backward pass. This subclass swaps ONLY the logprob computation for Unsloth's chunked
+    # kernel; everything else (generation, advantages, loss, our rollout_func) is stock TRL.
+    # Validated on the real model: bit-exact vs an fp32 reference (TRL's own bf16 path is off
+    # by 6e-2), at 2.5-4.4x less memory. See training/chunked_logps.py.
+    from .chunked_grpo_trainer import ChunkedLogpsGRPOTrainer
 
     # Detect if model_name is a PEFT adapter checkpoint
     adapter_path = None
@@ -781,12 +1210,29 @@ def run_grpo_trl(
     if qlora:
         load_kwargs["quantization_config"] = get_quantization_config()
     else:
-        load_kwargs["torch_dtype"] = torch.bfloat16 if bf16 else torch.float16
+        load_kwargs["dtype"] = torch.bfloat16 if bf16 else torch.float16
 
     model = AutoModelForCausalLM.from_pretrained(model_name, **load_kwargs)
 
     if qlora:
         model = prepare_model_for_kbit_training(model)
+        # prepare_model_for_kbit_training upcasts EVERY non-quantized parameter to fp32 for
+        # numerical stability — a habit from fp16, where the narrow exponent range made fp32
+        # norms necessary. On Qwen3.5 it is ruinous: the 248k-vocab embedding and lm_head are
+        # ~1B params each, so the upcast costs ~3.8 GB of frozen weights and doubles every
+        # logits tensor computed from that fp32 head. bf16 has fp32's exponent range, so the
+        # stability argument does not apply here. Put everything back to bf16 — and it must be
+        # everything, not just the head, or the fp32 norms feed a bf16 head and the forward
+        # dies with "expected scalar type BFloat16 but found Float".
+        compute_dtype = torch.bfloat16 if bf16 else torch.float16
+        upcast = [n for n, p in model.named_parameters() if p.dtype == torch.float32]
+        for _, p in model.named_parameters():
+            if p.dtype == torch.float32:
+                p.data = p.data.to(compute_dtype)
+        logger.info(
+            "Cast %d fp32 params (incl. the 248k-vocab embed/lm_head) back to %s",
+            len(upcast), compute_dtype,
+        )
 
     # Load existing adapter (SFT checkpoint) or create fresh LoRA
     if adapter_path:
@@ -795,70 +1241,279 @@ def run_grpo_trl(
     else:
         lora_config = get_lora_config(rank=lora_rank, alpha=lora_alpha)
         model = get_peft_model(model, lora_config)
-    model.print_trainable_parameters()
+    # peft's print_trainable_parameters() writes to stdout and would litter the terminal; log
+    # the same numbers to the file instead.
+    _trainable, _all = model.get_nb_trainable_parameters()
+    logger.info("Trainable params: %d / %d (%.2f%%)", _trainable, _all, 100 * _trainable / _all)
+    # The bf16 cast above touches only FROZEN base weights. The trainable LoRA params must
+    # stay fp32 (peft's autocast_adapter_dtype default) — optimising bf16 master weights at
+    # a 3e-6 LR would lose most updates to rounding.
+    trainable_dtypes = {p.dtype for p in model.parameters() if p.requires_grad}
+    logger.info("Trainable param dtypes: %s", trainable_dtypes)
+    if trainable_dtypes and trainable_dtypes != {torch.float32}:
+        logger.warning(
+            "Trainable params are %s, not fp32 — at lr=%g updates will round away.",
+            trainable_dtypes, learning_rate,
+        )
 
     # Load data — format as prompts for GRPO
     raw_data = load_grpo_data(data_path)
     _require_case_ids(raw_data)
 
+    # Held-out validation is carved from the TRAIN split, stratified by condition. The old
+    # path validated on the first `eval_subset` cases of the reported TEST split — that both
+    # leaks the report set into model selection and (being an alphabetical head) covers only
+    # ~9 of 20 conditions. Carving from train fixes both; the test split is touched only by
+    # the final eval, never during training.
+    held_out_val: list[dict] = []
+    if val_from_train and val_per_condition > 0:
+        raw_data, held_out_val = _stratified_holdout(raw_data, val_per_condition, seed)
+        logger.info(
+            "Held-out val carved from train: %d cases across %d conditions; %d cases remain for training",
+            len(held_out_val),
+            len({e.get("condition") for e in held_out_val}),
+            len(raw_data),
+        )
+
     # GRPO expects a "prompt" field; the trainer generates completions and scores
     # them with reward_funcs. `case_id` is kept as an extra dataset column —
     # GRPOConfig.remove_unused_columns defaults to False, so TRL forwards it to
     # the reward function as a kwarg for explicit, collision-free case lookup.
+    #
+    # build_grpo_dataset.py already renders the prompt to TEXT through the tokenizer's
+    # chat template, with the system prompt and the serving tool schemas baked in. TRL
+    # leaves a string prompt alone (a "standard" dataset), so it reaches the model exactly
+    # as written. Wrapping it back into [{"role": "user", ...}] would make the dataset
+    # conversational, TRL would apply the chat template a SECOND time, and the system
+    # prompt + tools block would be lost — the policy would train without ever being told
+    # which tools exist.
     formatted = []
     for ex in raw_data:
-        prompt_messages = [{"role": "user", "content": ex.get("prompt", "")}]
-        formatted.append({"prompt": prompt_messages, "case_id": ex["case_id"]})
+        prompt = ex.get("prompt", "")
+        if not isinstance(prompt, str) or not prompt:
+            raise ValueError(
+                f"case {ex.get('case_id')!r}: 'prompt' must be the pre-rendered prompt "
+                "string from build_grpo_dataset.py (got "
+                f"{type(prompt).__name__}). Rebuild the dataset with "
+                "`python -m neuroagent.training.data.build_grpo_dataset`."
+            )
+        formatted.append({"prompt": prompt, "case_id": ex["case_id"]})
 
     dataset = Dataset.from_list(formatted)
+
+    # Held-out validation, mirroring the SFT stage. GRPO has no eval_loss to track — the
+    # honest analogue is the mean reward on cases the policy never trains on, so a rising
+    # train reward that does not generalise is visible instead of silently accepted.
+    # Evaluation GENERATES (num_generations completions per prompt), so it is as expensive
+    # per prompt as training: eval_subset caps how many of the held-out prompts are used.
+    eval_dataset = None
+    eval_raw: list[dict] = []
+    if held_out_val:
+        eval_raw = held_out_val
+        eval_dataset = Dataset.from_list(
+            [{"prompt": ex["prompt"], "case_id": ex["case_id"]} for ex in eval_raw]
+        )
+        logger.info(
+            "Held-out validation: %d train-carved prompts, every %d steps",
+            len(eval_dataset), eval_steps,
+        )
+    elif eval_data:
+        # Legacy path: validate on an explicit file. Kept for compatibility, but it risks
+        # test-set leakage into checkpoint selection — prefer val_from_train (the default).
+        logger.warning(
+            "Validating on explicit --eval-data (%s); this can leak the report set into "
+            "model selection. Prefer --val-from-train.", eval_data,
+        )
+        eval_raw = load_grpo_data(eval_data)
+        _require_case_ids(eval_raw)
+        eval_raw = eval_raw[:eval_subset]
+        eval_dataset = Dataset.from_list(
+            [{"prompt": ex["prompt"], "case_id": ex["case_id"]} for ex in eval_raw]
+        )
 
     # Build reward function — online CompositeReward scoring if the cases exist.
     dataset_path_env = os.environ.get("NEUROAGENT_DATASET", "data/neurobench")
     dataset_dir = Path(dataset_path_env)
 
-    if (dataset_dir / "cases").exists():
+    rollout_func = None
+    if multi_turn:
+        # Multi-turn ("grouped") GRPO: TRL calls our rollout_func, which drives the REAL
+        # ReAct loop against the deterministic MockServer and scores the genuine AgentTrace.
+        # The reward is computed inside the rollout and read back by a pass-through reward fn.
+        if not (dataset_dir / "cases").exists():
+            raise FileNotFoundError(
+                f"Multi-turn GRPO needs the NeuroBench cases at {dataset_dir}/cases to serve "
+                "tool outputs and score trajectories."
+            )
+        logger.info("Using MULTI-TURN rollout (real ReAct loop, trajectory reward from %s)",
+                    reward_config)
+        # per-turn cap is the SINGLE assistant turn budget (measured ~300-400 tok), not the
+        # whole multi-turn completion budget — see MultiTurnRolloutFunc._make_generate_batch_fn.
+        rollout_func, reward_func = _build_multiturn_rollout(
+            raw_data + eval_raw, dataset_dir, reward_config, tool_costs_config, rules_dir,
+            hospital, tokenizer, max_completion_length, per_turn_max_tokens=512,
+        )
+    elif (dataset_dir / "cases").exists():
         logger.info("Using ONLINE reward (CompositeReward, weights from %s)", reward_config)
+        # The reward function must be able to look up EVERY case it will be asked to score —
+        # train and held-out alike, or validation raises KeyError on the first eval step.
         reward_func = _build_online_reward_fn(
-            raw_data, dataset_dir, reward_config, tool_costs_config, rules_dir, hospital
+            raw_data + eval_raw, dataset_dir, reward_config, tool_costs_config, rules_dir, hospital
         )
     else:
         reward_func = _build_offline_reward_fn(raw_data, allow_placeholder_rewards)
         logger.info("Using OFFLINE pre-computed rewards (dataset not found at %s)", dataset_dir)
 
-    # GRPO config — TRL v0.29+ API
-    # generation_batch_size must be >= num_generations
-    gen_batch = max(batch_size, num_generations)
+    # GRPO config — TRL v0.29+ API.
+    #
+    # TRL requires generation_batch_size to be divisible by num_generations: a prompt's
+    # G completions form one reward group, and the advantage is that group's mean-centred
+    # reward, so a group may never be split across generation batches. We generate exactly
+    # `grad_accum` prompts' worth of groups per optimiser step.
+    if generation_batch_size is None:
+        generation_batch_size = batch_size * grad_accum
+    if generation_batch_size % num_generations != 0:
+        raise ValueError(
+            f"generation_batch_size ({generation_batch_size}) must be divisible by "
+            f"num_generations ({num_generations}) — a reward group cannot be split "
+            "across generation batches."
+        )
+    # Saving must land on the eval cadence, so every evaluated step has a checkpoint to
+    # promote. Keep them all: with a rotation limit the best one can be deleted before the
+    # run ends.
+    save_total_limit = 3
+    if eval_dataset is not None:
+        save_steps = eval_steps
+        save_total_limit = None
+
     training_args = GRPOConfig(
         output_dir=output_dir,
         num_train_epochs=epochs,
         per_device_train_batch_size=batch_size,
-        gradient_accumulation_steps=2,
+        gradient_accumulation_steps=grad_accum,
         learning_rate=learning_rate,
         num_generations=num_generations,
-        generation_batch_size=gen_batch,
+        generation_batch_size=generation_batch_size,
         max_completion_length=max_completion_length,
-        beta=kl_coeff,  # TRL 0.29 name for the KL coefficient
+        beta=kl_coeff,  # TRL 0.29 name for the KL coefficient (0 = no KL, the recommended default)
+        # GSPO: score the importance ratio at the SEQUENCE level, not per token. Our reward is
+        # one scalar per rollout, so a sequence-level ratio is the matched, lower-variance
+        # objective — Qwen3 itself was trained this way (arXiv 2507.18071).
+        importance_sampling_level=importance_sampling_level,
+        # Do NOT divide the advantage by the group's reward std. With a small group (G=8) that
+        # std is a noisy per-case-difficulty estimate that injects bias (Dr. GRPO); centring on
+        # the group mean without rescaling is more stable here.
+        scale_rewards=scale_rewards,
+        # "dapo": token-level loss normalised over active tokens in the batch — avoids the
+        # length bias of the old "grpo" loss.
+        loss_type=loss_type,
         seed=seed,
         bf16=bf16,
-        logging_steps=10,
-        save_steps=50,
-        save_total_limit=3,
+        logging_steps=logging_steps,
+        save_steps=save_steps,
+        save_total_limit=save_total_limit,
+        max_steps=max_steps,
+        # Track the held-out reward and keep the checkpoint that maximises it. GRPO can
+        # over-optimise the reward on the training prompts (reward hacking) while the
+        # held-out reward flattens or falls; without this the run would just save the last
+        # step. greater_is_better=True because this is a reward, not a loss.
+        **(
+            {
+                "eval_strategy": "steps",
+                "eval_steps": eval_steps,
+                "per_device_eval_batch_size": num_generations,
+                # Best-checkpoint selection is done by _BestRewardCallback on eval_reward,
+                # not by load_best_model_at_end on eval_loss — see the callback's docstring.
+                "save_strategy": "steps",
+            }
+            if eval_dataset is not None
+            else {}
+        ),
         gradient_checkpointing=True,
-        generation_kwargs={"temperature": temperature},
+        # (save_steps is set above; with eval on it is forced to eval_steps so that
+        # load_best_model_at_end has a checkpoint at every evaluated step.)
+        # use_reentrant=False is the supported checkpointing path: the reentrant one silently
+        # drops grads for inputs that do not require grad, which is exactly the LoRA case.
+        gradient_checkpointing_kwargs={"use_reentrant": False},
+        # Generation is the memory peak: G completions are decoded with a KV cache before
+        # any backward pass. See _GenerationCacheCallback — the config flag alone is not
+        # enough, because Trainer turns it back off for gradient checkpointing.
+        use_cache=True,
+        # Only the LoRA params are trained, but AdamW still keeps fp32 moments for each:
+        # 8-bit states cut that ~4x for free.
+        optim="adamw_8bit",
+        # Frees the generation KV cache before the training forward allocates its logits,
+        # so the two peaks do not stack.
+        torch_empty_cache_steps=1,
+        # ONE temperature for both sampling and the importance-sampling logprobs. Setting only
+        # generation_kwargs samples at `temperature` but scores the ratio at args.temperature
+        # (default 1.0), a silent gradient bug for any temperature != 1.0. GRPOConfig.temperature
+        # drives both, so leave generation_kwargs without a temperature override.
+        temperature=temperature,
+        # Clip-higher (DAPO): an asymmetric upper clip lets low-probability-but-good tokens gain
+        # probability without the symmetric bound collapsing entropy. epsilon stays 0.2.
+        epsilon_high=epsilon_high,
+        # Single-turn: do not learn from completions truncated at max_completion_length (no
+        # EOS) — their reward is computed on an unfinished trajectory, so the gradient is noise.
+        # Multi-turn is the opposite case and must NOT mask: the trajectory is complete (every
+        # tool ran, the trace is whole, the reward is valid) — only the token stream is clipped
+        # at the budget. Masking those would throw away most of the batch, since long multi-turn
+        # trajectories routinely exceed the budget. This is truncated-BPTT, not off-policy noise.
+        mask_truncated_completions=(mask_truncated_completions and not multi_turn),
+        # Multi-turn rollouts are fully on-policy (the custom rollout_func generates with the
+        # live model): one optimiser update per generation, so the importance ratio is 1 and
+        # no stored sampling logprobs are needed.
+        **({"num_iterations": 1} if multi_turn else {}),
+        report_to=[],
+        # Our Rich callback (_make_terminal_progress_callback) is the training UI; TRL's own
+        # tqdm bar would fight it for the terminal.
+        disable_tqdm=True,
     )
 
-    trainer = GRPOTrainer(
+    trainer = ChunkedLogpsGRPOTrainer(
         model=model,
         args=training_args,
         train_dataset=dataset,
+        eval_dataset=eval_dataset,
         processing_class=tokenizer,
         reward_funcs=reward_func,
+        # Multi-turn: our rollout drives the real ReAct loop and returns a masked, token-exact
+        # trajectory + the trajectory reward. None → TRL's built-in single-shot generation.
+        rollout_func=rollout_func,
     )
+    # With disable_tqdm=True, transformers installs a PrinterCallback that print()s the full
+    # 50-key metric dict straight to the terminal (bypassing logging). Remove it — our Rich
+    # callback renders the concise line and logs the full dict to the file instead.
+    try:
+        from transformers.trainer_callback import PrinterCallback, ProgressCallback
+
+        trainer.remove_callback(PrinterCallback)
+        trainer.remove_callback(ProgressCallback)
+    except Exception:  # class names/layout changed — the Rich bar still renders regardless
+        pass
+    trainer.add_callback(_make_generation_cache_callback(model))
+    trainer.add_callback(_make_terminal_progress_callback(Path(output_dir).name or "GRPO"))
+    best_reward_cb = _make_best_reward_callback()
+    if eval_dataset is not None:
+        trainer.add_callback(best_reward_cb)
 
     logger.info("Starting GRPO training for %d epochs (seed=%d, beta=%g)", epochs, seed, kl_coeff)
+    torch.cuda.reset_peak_memory_stats()
     result = trainer.train()
+
+    # Peak ALLOCATED bytes, not nvidia-smi / reserved: a paged optimizer inflates the
+    # reserved figure well above what the run actually needs, which is what made the
+    # earlier bf16-vs-QLoRA comparison come out backwards.
+    peak_gb = torch.cuda.max_memory_allocated() / 1024**3
+    total_gb = torch.cuda.get_device_properties(0).total_memory / 1024**3
+    logger.info("PEAK GPU MEMORY: %.1f GB allocated of %.1f GB (%.0f%%)",
+                peak_gb, total_gb, 100 * peak_gb / total_gb)
+
     trainer.save_model(output_dir)
     tokenizer.save_pretrained(output_dir)
+    # Ship the checkpoint with the best HELD-OUT reward, not the last step.
+    if eval_dataset is not None:
+        _promote_best_checkpoint(output_dir, best_reward_cb.best_step)
     _save_rl_run_summary(
         output_dir, trainer, result, training_args, model_name,
         n_train=len(dataset), algorithm="grpo", data_path=data_path, seed=seed,
@@ -870,7 +1525,12 @@ def run_grpo_trl(
             "lora_rank": lora_rank,
             "lora_alpha": lora_alpha,
             "qlora": qlora,
+            "precision": "qlora" if qlora else ("bf16" if bf16 else "fp16"),
             "adapter_init": adapter_path,
+            "peak_gpu_memory_gb": round(peak_gb, 2),
+            "best_eval_reward": best_reward_cb.best_reward,
+            "best_eval_step": best_reward_cb.best_step,
+            "eval_data": eval_data,
         },
     )
     logger.info("GRPO model saved to %s", output_dir)
@@ -1039,11 +1699,41 @@ def main() -> None:
              "signal — debugging only, never for reportable runs.",
     )
 
+    # GRPO batching / logging
+    parser.add_argument("--generation-batch-size", type=int, default=None,
+                        help="Completions generated per optimiser step. Must be divisible by "
+                             "--num-generations. Defaults to batch-size * grad-accum")
+    parser.add_argument("--logging-steps", type=int, default=1,
+                        help="GRPO steps are slow and few — log every one by default")
+    parser.add_argument("--save-steps", type=int, default=50)
+    parser.add_argument("--eval-data", default=None,
+                        help="Held-out prompts (test split) for validation reward + best-checkpoint "
+                             "selection. GRPO has no eval_loss; the metric is mean held-out reward")
+    parser.add_argument("--eval-subset", type=int, default=20,
+                        help="How many held-out prompts to score per eval. Evaluation generates, so "
+                             "it costs the same per prompt as training — 20 keeps it to a few minutes")
+    parser.add_argument("--eval-steps", type=int, default=40,
+                        help="Evaluate (and checkpoint) every N optimiser steps")
+    parser.add_argument("--importance-sampling-level", choices=["token", "sequence"],
+                        default="sequence",
+                        help="GSPO: 'sequence' matches our one-reward-per-rollout objective")
+    parser.add_argument("--scale-rewards", choices=["none", "group", "batch"], default="none",
+                        help="'none' = do not divide the advantage by the group reward std (Dr. GRPO)")
+    parser.add_argument("--loss-type", default="dapo",
+                        help="GRPO loss normalisation (dapo = token-level, no length bias)")
+    parser.add_argument("--multi-turn", action="store_true",
+                        help="Multi-turn ('grouped') GRPO: drive the real ReAct loop against "
+                             "the MockServer and score the genuine trajectory (reflection off).")
+
+    parser.add_argument("--log-file", default=None,
+                        help="Verbose logs + captured warnings go HERE; the terminal keeps the "
+                             "progress bar and a concise per-step reward line")
+
     # veRL-specific
     parser.add_argument("--n-gpus", type=int, default=4)
 
     args = parser.parse_args()
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    _configure_split_logging(args.log_file)
 
     if args.stage == "sft":
         epochs = args.epochs or 3
@@ -1113,6 +1803,18 @@ def main() -> None:
                 rules_dir=args.rules_dir,
                 hospital=args.hospital,
                 allow_placeholder_rewards=args.allow_placeholder_rewards,
+                grad_accum=args.grad_accum,
+                generation_batch_size=args.generation_batch_size,
+                max_steps=args.max_steps,
+                logging_steps=args.logging_steps,
+                save_steps=args.save_steps,
+                eval_data=args.eval_data,
+                eval_subset=args.eval_subset,
+                eval_steps=args.eval_steps,
+                importance_sampling_level=args.importance_sampling_level,
+                scale_rewards=args.scale_rewards,
+                loss_type=args.loss_type,
+                multi_turn=args.multi_turn,
             )
 
 

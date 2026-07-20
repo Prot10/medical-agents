@@ -1,0 +1,36 @@
+# Reward weights for MULTI-TURN ("grouped") GRPO
+# (agent-platform/scripts/training/run_grpo_training.sh with MULTI_TURN=1).
+#
+# Why this is separate from reward_weights_grpo.yaml:
+# The single-turn config zeroes `correctness` and `format` because a one-shot rollout stops
+# after ordering the workup and never states a diagnosis — weighting them there wasted half the
+# reward on structurally-dead components. In a MULTI-TURN rollout the agent runs the real ReAct
+# loop and DOES commit to a diagnosis, so those components are live again. Keeping them at 0
+# here would mean a correct diagnosis and a wrong one score identically (measured: both 0.3529
+# on ALS-M01) while top-1 diagnostic accuracy is the headline metric we report — the same
+# train/eval objective mismatch that made the first runs move the reward but not the eval.
+#
+# correctness is the largest single weight because it IS the reported objective. It also
+# supplies the reward VARIANCE that GRPO needs: within a group of G rollouts on one case,
+# tool-selection/safety/cost are highly correlated (measured reward_std ~0.02-0.06), whereas
+# getting the diagnosis right or wrong splits the group and produces a real advantage signal.
+
+default_weights:
+  correctness: 0.30   # stated diagnosis vs ground truth — the reported objective
+  actions:     0.25   # tool selection precision + recall vs the optimal workup
+  safety:      0.25   # gated below; the dominant clinical axis
+  cost:        0.10   # gated on workup completeness below
+  compliance:  0.05   # hospital-pathway adherence (reward-neutral where no pathway exists)
+  format:      0.05   # the assessment section must exist for a diagnosis to be extractable
+
+# Non-compensatory safety gate: a contraindicated (harmful) action hard-caps the composite at
+# `cap`, so no amount of correct diagnosis / cheap workup can outscore an unsafe trajectory.
+# Mirrors the LLM-judge's safety veto.
+safety_gate:
+  enabled: true
+  cap: 0.0
+
+# Cost credit only counts once the required workup is actually ordered
+# (critical_actions_hit >= threshold). Below it, cost contributes 0 — so "order nothing, stay
+# cheap" earns no cost bonus.
+cost_requires_workup: 0.5
