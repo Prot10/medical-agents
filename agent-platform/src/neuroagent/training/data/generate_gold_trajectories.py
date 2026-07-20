@@ -45,6 +45,7 @@ from neuroagent_schemas import NeuroBenchCase
 
 from ...llm.prompts import load_prompt
 from ...rules.rules_engine import RulesEngine
+from ...tools.followup_matcher import resolve_followup
 
 logger = logging.getLogger(__name__)
 
@@ -269,63 +270,77 @@ def _match_keyed_output(
     return _dump(stored[keys[0]])
 
 
-def get_tool_output_for_call(
-    case: NeuroBenchCase,
-    tool_name: str,
-    parameters: dict[str, Any],
-) -> dict[str, Any] | None:
-    """Look up the pre-generated tool output for a given tool call.
+_TOOL_TO_FIELD = {
+    "analyze_eeg": "eeg",
+    "analyze_brain_mri": "mri",
+    "analyze_ecg": "ecg",
+    "interpret_labs": "labs",
+    "analyze_csf": "csf",
+    "order_ct_scan": "ct",
+    "order_echocardiogram": "echo",
+    "order_cardiac_monitoring": "cardiac_monitoring",
+    "order_advanced_imaging": "advanced_imaging",
+    "order_specialized_test": "specialized_test",
+}
 
-    For the dict-keyed tools (`search_medical_literature`, keyed by query;
-    `check_drug_interactions`, keyed by drug), the call's argument selects
-    among multiple stored results; see `_match_keyed_output`.
-    """
+
+def _initial_output_for(case: NeuroBenchCase, tool_name: str, parameters: dict[str, Any]):
+    """The case's initial output for a tool, or None. Mirrors the MockServer tiers
+    for the direct-mapped and dict-keyed (literature/drug) tools."""
     ito = case.initial_tool_outputs
-    tool_to_field = {
-        "analyze_eeg": "eeg",
-        "analyze_brain_mri": "mri",
-        "analyze_ecg": "ecg",
-        "interpret_labs": "labs",
-        "analyze_csf": "csf",
-        "order_ct_scan": "ct",
-        "order_echocardiogram": "echo",
-        "order_cardiac_monitoring": "cardiac_monitoring",
-        "order_advanced_imaging": "advanced_imaging",
-        "order_specialized_test": "specialized_test",
-    }
-
-    # Check initial outputs first
-    field = tool_to_field.get(tool_name)
+    field = _TOOL_TO_FIELD.get(tool_name)
     if field:
-        val = getattr(ito, field, None)
-        if val is not None:
-            if hasattr(val, "model_dump"):
-                return val.model_dump()
-            return val
-
-    # Check literature_search and drug_interactions (dict-based, keyed by the
-    # query/drug the case stored). When a case stores multiple results, match the
-    # call's argument to the right key; fall back to the first stored result (the
-    # historical behaviour) with a debug log when nothing matches.
+        return getattr(ito, field, None)
     if tool_name == "search_medical_literature" and ito.literature_search:
         return _match_keyed_output(
             ito.literature_search, parameters.get("query", ""), tool_name, case.case_id
         )
-
     if tool_name == "check_drug_interactions" and ito.drug_interactions:
         return _match_keyed_output(
             ito.drug_interactions, parameters.get("drug", ""), tool_name, case.case_id
         )
-
-    # Check followup outputs
-    for fo in case.followup_outputs:
-        if fo.tool_name == tool_name:
-            output = fo.output
-            if hasattr(output, "model_dump"):
-                return output.model_dump()
-            return output
-
     return None
+
+
+def get_tool_output_for_call(
+    case: NeuroBenchCase,
+    tool_name: str,
+    parameters: dict[str, Any],
+    served_triggers: set[str] | None = None,
+    is_repeat_call: bool = False,
+) -> dict[str, Any] | None:
+    """Look up the pre-generated tool output for a given tool call.
+
+    Resolution is identical to the eval MockServer (shared via
+    `neuroagent.tools.followup_matcher.resolve_followup`): a matching follow-up for
+    a specific re-order OVERRIDES the stale initial output; a bare first call to a
+    tool returns its INITIAL output. Pass `served_triggers` (mutated in place) and
+    `is_repeat_call` when replaying a trajectory so distinct re-orders escalate
+    through distinct follow-ups; the stateless default (fresh call, empty served set)
+    resolves a single call in isolation — used by the existence checks.
+
+    For the dict-keyed tools (`search_medical_literature`, keyed by query;
+    `check_drug_interactions`, keyed by drug), the call's argument selects among
+    multiple stored initial results; see `_match_keyed_output`.
+    """
+    def _dump(val):
+        if val is None:
+            return None
+        return val.model_dump() if hasattr(val, "model_dump") else val
+
+    served = served_triggers if served_triggers is not None else set()
+    initial = _initial_output_for(case, tool_name, parameters)
+
+    followup = resolve_followup(
+        tool_name, parameters, case.followup_outputs, served,
+        has_initial_output=initial is not None,
+        is_repeat_call=is_repeat_call,
+    )
+    if followup is not None:
+        served.add(followup.trigger_action)
+        return _dump(followup.output)
+
+    return _dump(initial)
 
 
 def compress_tool_output(output: dict[str, Any], tool_name: str) -> dict[str, Any]:
@@ -735,10 +750,17 @@ def build_subagent_prompt(
 
 
 def _tool_output_text(
-    case: NeuroBenchCase, tool_name: str, parameters: dict[str, Any] | None = None
+    case: NeuroBenchCase,
+    tool_name: str,
+    parameters: dict[str, Any] | None = None,
+    served_triggers: set[str] | None = None,
+    is_repeat_call: bool = False,
 ) -> str | None:
     """The compressed case output for a tool, as the MockServer would return it."""
-    actual = get_tool_output_for_call(case, tool_name, parameters or {})
+    actual = get_tool_output_for_call(
+        case, tool_name, parameters or {},
+        served_triggers=served_triggers, is_repeat_call=is_repeat_call,
+    )
     if actual is None:
         return None
     compressed = compress_tool_output(actual, tool_name)
@@ -793,6 +815,10 @@ def parse_trajectory_from_response(
     call_arguments: list[dict[str, Any]] = []  # parallel to tools_called
     pending_text: list[str] = []
     pending_tool_calls: list[dict[str, Any]] = []
+    # Session state so re-orders resolve exactly as the MockServer would: which
+    # follow-up triggers have been served, and how many times each tool was called.
+    served_triggers: set[str] = set()
+    tool_call_counts: dict[str, int] = {}
 
     def flush_assistant() -> None:
         content = "\n\n".join(t for t in pending_text if t).strip()
@@ -820,7 +846,12 @@ def parse_trajectory_from_response(
                 continue
             flush_assistant()
             last_tool = tools_called[-1]
-            output = _tool_output_text(case, last_tool, call_arguments[-1])
+            is_repeat = tool_call_counts.get(last_tool, 0) > 0
+            tool_call_counts[last_tool] = tool_call_counts.get(last_tool, 0) + 1
+            output = _tool_output_text(
+                case, last_tool, call_arguments[-1],
+                served_triggers=served_triggers, is_repeat_call=is_repeat,
+            )
             if output is None:
                 logger.warning("%s: no case output for tool %s", case.case_id, last_tool)
                 output = resp_match.group(1).strip()

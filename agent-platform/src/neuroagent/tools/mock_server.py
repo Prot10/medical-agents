@@ -6,6 +6,7 @@ from neuroagent_schemas import (
     AdvancedImagingReport, SpecializedTestReport,
 )
 from .base import ToolCall, ToolResult
+from .followup_matcher import resolve_followup
 from typing import Any
 from pydantic import BaseModel
 
@@ -16,24 +17,39 @@ class MockServer:
     def __init__(self, case: NeuroBenchCase):
         self.case = case
         self.call_log: list[ToolCall] = []
+        # Trigger slugs of follow-ups already served this session. Lets distinct
+        # re-orders of the same tool escalate through distinct follow-ups.
+        self._served_triggers: set[str] = set()
 
     def get_output(self, tool_name: str, parameters: dict[str, Any]) -> ToolResult:
+        # Whether this tool was already called BEFORE this call (a re-order).
+        is_repeat_call = any(c.tool_name == tool_name for c in self.call_log)
         self.call_log.append(ToolCall(tool_name=tool_name, parameters=parameters))
 
-        # Check initial tool outputs
-        output = self._match_initial_output(tool_name, parameters)
-        if output is not None:
+        initial = self._match_initial_output(tool_name, parameters)
+
+        # Precedence: a matching follow-up for this specific re-order OVERRIDES the
+        # (stale) initial output; a bare first call to a tool still returns its
+        # initial output. See followup_matcher.resolve_followup for the full rule.
+        followup = resolve_followup(
+            tool_name, parameters, self.case.followup_outputs,
+            self._served_triggers,
+            has_initial_output=initial is not None,
+            is_repeat_call=is_repeat_call,
+        )
+        if followup is not None:
+            self._served_triggers.add(followup.trigger_action)
+            output = followup.output
             return ToolResult(
                 tool_name=tool_name, success=True,
                 output=output.model_dump() if isinstance(output, BaseModel) else output,
             )
 
-        # Check follow-up outputs
-        output = self._match_followup_output(tool_name, parameters)
-        if output is not None:
+        # Initial tool output (first, parameter-light order on the pathway).
+        if initial is not None:
             return ToolResult(
                 tool_name=tool_name, success=True,
-                output=output.model_dump() if isinstance(output, BaseModel) else output,
+                output=initial.model_dump() if isinstance(initial, BaseModel) else initial,
             )
 
         # Off-pathway fallback: a clinically coherent normal / non-contributory
@@ -88,12 +104,6 @@ class MockServer:
             results = list(self.case.initial_tool_outputs.drug_interactions.values())
             return results[0] if results else None
 
-        return None
-
-    def _match_followup_output(self, tool_name: str, parameters: dict[str, Any]) -> BaseModel | None:
-        for followup in self.case.followup_outputs:
-            if followup.tool_name == tool_name:
-                return followup.output
         return None
 
     def _match_fallback_output(self, tool_name: str, parameters: dict[str, Any]) -> BaseModel | None:
