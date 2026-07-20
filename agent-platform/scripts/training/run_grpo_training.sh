@@ -72,28 +72,37 @@ esac
 # budget than the one-shot plan, and the bigger sequences want a smaller reward group.
 MULTI_TURN="${MULTI_TURN:-0}"
 if [ "$MULTI_TURN" = 1 ]; then
-  NUM_GENERATIONS="${NUM_GENERATIONS:-4}"    # longer multi-turn sequences → smaller group
-  # 4096 is the MEASURED ceiling on the 40GB A100 at G=4: it completed 2 steps at a 37.3 GB
-  # peak (94%), and the peak is GENERATION (G sequences x ~10k tokens of KV cache), not the
-  # training forward. Do not raise this without lowering G — 6144 OOMs.
-  # It also has to be this large for behavioural reasons: at 2048 the agent managed only 2.5
-  # tool calls, vs 4.5/3.5 at 4096 and the ~3.9 it actually uses at eval. Too small a budget
-  # silently truncates real agent behaviour rather than just clipping tokens.
-  MAX_COMPLETION="${MAX_COMPLETION:-4096}"
+  NUM_GENERATIONS="${NUM_GENERATIONS:-4}"    # completions per prompt = the reward group
+  # 8192, not the old 4096. The story that 4096 was the "measured ceiling" was true only at the
+  # default 8 logit chunks: the training-side peak is ONE fp32 logit chunk, and 8192 OOM'd in
+  # loss.backward() trying to allocate the 2.95 GiB that one chunk needs. LOGIT_CHUNKS=32 (below)
+  # cuts that to ~0.66 GiB, and G=4 @ 8192 then fits — measured, generation AND backward, at
+  # 39.5/41 GB (96%), step_time ~840s, reward_std 0.17.
+  # 8192 is needed for behaviour, not just headroom: at 4096, 25-75% of trajectories hit the
+  # budget reserve and had their workup CUT SHORT (measured "budget-capped" per rollout); at 8192
+  # that is 0%. The agent runs its full ~5-6 turn workup instead of a truncated one, so GRPO
+  # shapes the policy we actually evaluate. Lower it (and raise LOGIT_CHUNKS or drop G) only if
+  # memory forces it.
+  MAX_COMPLETION="${MAX_COMPLETION:-8192}"
   # Cap for ONE assistant turn, distinct from the whole-trajectory MAX_COMPLETION above.
   #
-  # This was 512, justified by a "~300-400 tokens per turn" AVERAGE. Measured on the same model,
-  # same config, changing only this value:
-  #     512  -> mean 1.0 turns, 0.0 tool calls, reward_std 0.02-0.03
-  #     4096 -> mean 3.0-6.2 turns, 1.0-3.8 tool calls, reward_std 0.20
-  # The average was not the number that mattered. Qwen3.5 writes a long <think> before its first
-  # tool call, so that turn runs far past the mean; a turn cut mid-reasoning carries no parseable
-  # tool call, the rollout reads it as the agent concluding, and the ENTIRE trajectory ends after
-  # one turn with no tools. At 512 a GRPO run would train on nothing but degenerate one-turn
-  # rollouts while every visible signal — loss, reward, truncation rate — looked healthy.
-  # The rollout now logs the per-turn p50/p90/p99/max so this is set from the tail, not a mean.
-  PER_TURN="${PER_TURN:-2048}"
-  MULTI_TURN_FLAG="--multi-turn --per-turn-max-tokens $PER_TURN"
+  # This was 512, justified by a "~300-400 tokens per turn" AVERAGE — and it produced ZERO tool
+  # calls on every rollout. Qwen3.5 writes a long <think> before its first tool call, so that
+  # turn runs far past the mean; cut mid-reasoning it carries no parseable tool call, the rollout
+  # reads it as the agent concluding, and the ENTIRE trajectory ends after one turn with no tools.
+  # A GRPO run at 512 would have trained on nothing but degenerate one-turn rollouts while every
+  # visible signal — loss, reward, truncation rate — looked healthy.
+  # The UNCENSORED per-turn distribution (measured once the cap stopped clipping it): p50 1161,
+  # p90 1986, p99 1986, max 2106. So 2048 still clips ~25% of turns and even it was too small;
+  # 3072 clears the observed max with margin without inviting a runaway turn to burn the budget.
+  # The rollout logs per-turn p50/p90/p99/max every step — resize from that tail, never a mean.
+  PER_TURN="${PER_TURN:-3072}"
+  # How finely the chunked logprob kernel splits (batch*seq). The training-memory lever: peak is
+  # one fp32 logit chunk = (batch*completion/chunks) x 248320 x 4B. 8 -> 2.65 GiB (OOMs at 8192),
+  # 32 -> 0.66 GiB (fits). Bit-exact vs fp32 regardless of chunk count; more chunks = slightly
+  # slower, so this is the smallest that fits the budget above.
+  LOGIT_CHUNKS="${LOGIT_CHUNKS:-32}"
+  MULTI_TURN_FLAG="--multi-turn --per-turn-max-tokens $PER_TURN --logit-chunks $LOGIT_CHUNKS"
   # vLLM-accelerated rollouts (colocate — the only single-GPU vLLM mode). Generation is
   # essentially all of a multi-turn step, and HF generate re-prefills the shared ~6.2k prompt
   # once per generation per turn; vLLM prefix-caches it. VLLM_GPU_FRAC is the engine's share of
@@ -177,6 +186,7 @@ ui_panel "GRPO · $MODEL_TAG  ${C_GREY}(from the SFT adapter)${C_RESET}" \
   "reward|online CompositeReward (6 components)" \
   "group|$NUM_GENERATIONS completions × $GRAD_ACCUM prompts = $GEN_BATCH / step" \
   "completion|≤ $MAX_COMPLETION tok   ${C_GREY}LR${C_RESET} $LR   ${C_GREY}KL β${C_RESET} $KL_COEFF" \
+  ${MULTI_TURN:+"turn|≤ ${PER_TURN:-} tok/turn   ${C_GREY}logit-chunks${C_RESET} ${LOGIT_CHUNKS:-}"} \
   "log|$LOG_FILE ${C_GREY}(verbose → file)${C_RESET}"
 
 uv run python -m neuroagent.training.train_grpo \
