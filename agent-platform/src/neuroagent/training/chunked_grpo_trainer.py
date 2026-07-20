@@ -74,27 +74,54 @@ class ChunkedLogpsGRPOTrainer(GRPOTrainer):
         image_sizes=None,
         token_type_ids=None,
         mm_token_type_ids=None,
+        **kwargs,
     ):
+        # **kwargs, and forwarding it verbatim, is deliberate: TRL evolves this signature
+        # (1.8 added num_tiles, compute_aux_loss, image_position_ids, spatial_shapes). An
+        # override pinned to today's parameters turns any upstream addition into a crash
+        # mid-run; accepting and forwarding turns it into a correct call instead.
+        #
+        # Only genuinely MULTIMODAL inputs force the fallback. An earlier version treated any
+        # non-None extra as multimodal, which sent `compute_aux_loss=False` — an ordinary
+        # scalar — down the fallback path on every step.
         multimodal = any(
             x is not None
             for x in (pixel_values, image_grid_thw, num_images, pixel_attention_mask,
-                      image_sizes, token_type_ids, mm_token_type_ids)
+                      image_sizes, token_type_ids, mm_token_type_ids,
+                      kwargs.get("image_position_ids"), kwargs.get("spatial_shapes"),
+                      kwargs.get("num_tiles"))
         )
+
+        def _super_call():
+            # Keyword-only: TRL reorders positional parameters between versions, and passing
+            # positionally both mis-binds them and collides with the same name in **kwargs
+            # ("got multiple values for argument 'compute_aux_loss'").
+            return super(ChunkedLogpsGRPOTrainer, self)._get_per_token_logps_and_entropies(
+                model,
+                input_ids,
+                attention_mask,
+                logits_to_keep,
+                batch_size=batch_size,
+                compute_entropy=compute_entropy,
+                pixel_values=pixel_values,
+                image_grid_thw=image_grid_thw,
+                num_images=num_images,
+                pixel_attention_mask=pixel_attention_mask,
+                image_sizes=image_sizes,
+                token_type_ids=token_type_ids,
+                mm_token_type_ids=mm_token_type_ids,
+                **kwargs,
+            )
+
         if self._chunked_kernel is None or multimodal:
             if multimodal:
-                self._fallback_once("multimodal inputs")
-            return super()._get_per_token_logps_and_entropies(
-                model, input_ids, attention_mask, logits_to_keep, batch_size, compute_entropy,
-                pixel_values, image_grid_thw, num_images, pixel_attention_mask, image_sizes,
-                token_type_ids, mm_token_type_ids,
-            )
+                self._fallback_once("multimodal or unrecognised extra inputs")
+            return _super_call()
 
         resolved = resolve_lm_head_and_body(model)
         if resolved is None:
             self._fallback_once("could not resolve lm_head/body, or head is quantised")
-            return super()._get_per_token_logps_and_entropies(
-                model, input_ids, attention_mask, logits_to_keep, batch_size, compute_entropy,
-            )
+            return _super_call()
         body, lm_head_weight = resolved
 
         try:
@@ -111,9 +138,7 @@ class ChunkedLogpsGRPOTrainer(GRPOTrainer):
                 "Chunked logprobs failed (%s: %s) — falling back to TRL's full-logits path "
                 "for the REST of this run. Training continues.", type(exc).__name__, exc,
             )
-            return super()._get_per_token_logps_and_entropies(
-                model, input_ids, attention_mask, logits_to_keep, batch_size, compute_entropy,
-            )
+            return _super_call()
 
     def _chunked_logps(
         self, body, lm_head_weight, input_ids, attention_mask, logits_to_keep,
@@ -161,4 +186,8 @@ class ChunkedLogpsGRPOTrainer(GRPOTrainer):
 
         logps = torch.cat(all_logps, dim=0)
         entropies = torch.cat(all_entropies, dim=0) if compute_entropy else None
-        return logps, entropies
+        # TRL 1.8 returns (logps, entropies, aux_loss); 0.29 returned two values. aux_loss is
+        # an MoE load-balancing term — None for a dense model like Qwen3.5, and the chunked
+        # path does not compute one. Returning the wrong arity fails at the CALLER, several
+        # frames away ("not enough values to unpack"), so it is pinned by a test.
+        return logps, entropies, None

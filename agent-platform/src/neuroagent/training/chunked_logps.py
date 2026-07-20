@@ -38,6 +38,12 @@ import torch
 logger = logging.getLogger(__name__)
 
 
+def _torch_sync() -> None:
+    """Device synchronize, standing in for unsloth_zoo.device_type.device_synchronize."""
+    if torch.cuda.is_available():
+        torch.cuda.synchronize()
+
+
 def load_unsloth_chunked_kernel():
     """Import Unsloth's chunked log-softmax kernel, or return None if unavailable.
 
@@ -48,19 +54,74 @@ def load_unsloth_chunked_kernel():
       * it CLEARS ``PYTORCH_CUDA_ALLOC_CONF``, dropping our ``expandable_segments:True``
         anti-fragmentation setting. We save and restore it.
     """
-    import contextlib
-    import io
+    import importlib.util
+    import sys
+    import types
+    from pathlib import Path
 
     saved_alloc_conf = os.environ.get("PYTORCH_CUDA_ALLOC_CONF")
-    os.environ.setdefault("UNSLOTH_IS_PRESENT", "1")
+    # Load rl_replacements.py DIRECTLY from disk, bypassing unsloth_zoo/__init__.py.
+    # Importing the package normally is not survivable here, in three separate ways:
+    #   * its GPU-init block requires the `unsloth` package (which pins trl<=0.24 against
+    #     our >=1.8) and rewrites PYTORCH_CUDA_ALLOC_CONF, dropping expandable_segments;
+    #   * setting UNSLOTH_ZOO_DISABLE_GPU_INIT to skip that block instead installs MLX
+    #     aliases that STUB OUT bitsandbytes — which then raises "called on Apple Silicon"
+    #     the moment the 8-bit optimiser touches it (this failed a real run);
+    #   * `rl_replacements` imports `.temporary_patches.common` for one config dict, and
+    #     that package drags in unsloth's model-patching machinery, which dies in
+    #     transformers' triton integration and would patch transformers/TRL if it didn't.
+    # Executing the module against stubbed relative imports runs THEIR kernel source
+    # verbatim with none of the package's side effects.
     try:
-        # unsloth_zoo prints a banner ("🦥 Unsloth: Will patch your computer...") with a bare
-        # print() at import, which bypasses logging and lands on the terminal that the training
-        # UI owns. Swallow it — the import itself is what we want, not the advertisement.
-        with contextlib.redirect_stdout(io.StringIO()):
-            from unsloth_zoo.rl_replacements import (
-                chunked_hidden_states_selective_log_softmax,
-            )
+        spec_pkg = importlib.util.find_spec("unsloth_zoo")
+        if spec_pkg is None or not spec_pkg.submodule_search_locations:
+            raise ImportError("unsloth_zoo is not installed")
+        pkg_dir = Path(list(spec_pkg.submodule_search_locations)[0])
+        source = pkg_dir / "rl_replacements.py"
+        if not source.exists():
+            raise ImportError(f"no rl_replacements.py at {source}")
+
+        # Stub the package and the two modules rl_replacements imports, so its relative
+        # imports resolve without executing unsloth_zoo/__init__.py.
+        if "unsloth_zoo" not in sys.modules:
+            pkg = types.ModuleType("unsloth_zoo")
+            pkg.__path__ = [str(pkg_dir)]
+            sys.modules["unsloth_zoo"] = pkg
+        common = types.ModuleType("unsloth_zoo.temporary_patches.common")
+        # Empty options: the kernel is run EAGER (see below), so these are unused; leaving them
+        # empty also avoids unsloth's autotuning profile, which targets their patched models.
+        common.torch_compile_options = {}
+        sys.modules.setdefault("unsloth_zoo.temporary_patches", types.ModuleType("unsloth_zoo.temporary_patches"))
+        sys.modules["unsloth_zoo.temporary_patches.common"] = common
+        dev = types.ModuleType("unsloth_zoo.device_type")
+        dev.DEVICE_TYPE = "cuda"
+        dev.device_synchronize = _torch_sync
+        sys.modules["unsloth_zoo.device_type"] = dev
+
+        spec = importlib.util.spec_from_file_location(
+            "unsloth_zoo.rl_replacements", source, submodule_search_locations=None
+        )
+        module = importlib.util.module_from_spec(spec)
+        module.__package__ = "unsloth_zoo"
+        sys.modules["unsloth_zoo.rl_replacements"] = module
+        spec.loader.exec_module(module)
+        chunked_hidden_states_selective_log_softmax = (
+            module.chunked_hidden_states_selective_log_softmax
+        )
+        # Unsloth ships the kernel wrapped in @torch.compile(fullgraph=True, dynamic=True).
+        # We run the EAGER function instead, for two measured reasons:
+        #   * it fails outright on this stack (torch 2.11 + triton 3.6) — dynamo raises inside
+        #     the compiled region, so the compiled wrapper is unusable here;
+        #   * even where it compiled, it recompiled against the varying sequence lengths that
+        #     multi-turn rollouts inevitably produce, and cost more than it saved: the same
+        #     2-step smoke went from 363-401 s/step to 705-957 s/step.
+        # The memory win comes from the CHUNKING, which is algorithmic and independent of
+        # torch.compile — the eager function is the identical computation.
+        eager = getattr(
+            chunked_hidden_states_selective_log_softmax, "_torchdynamo_orig_callable", None
+        )
+        if eager is not None:
+            chunked_hidden_states_selective_log_softmax = eager
     except Exception as exc:  # not installed / incompatible — caller falls back to TRL
         logger.warning("Unsloth chunked kernel unavailable (%s); using TRL's full-logits path", exc)
         return None
