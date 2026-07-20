@@ -28,9 +28,20 @@ dev = ["pytest>=7.0", "pytest-asyncio"]
 figures = ["matplotlib"]
 training = [
     "torch>=2.2",
-    "transformers>=4.45",
+    # TRL >=1.8 is required, not merely preferred, for multi-turn agentic GRPO on Qwen3.5:
+    #   * `qwen3_5_schema` gives the tokenizer a response_schema. Without it Qwen3.5's tool
+    #     calls are never parsed and TRL's tool loop silently never fires (0.29 only knows
+    #     the Qwen3 template and gates on exact string equality, so Qwen3.5 never matched).
+    #   * `qwen3_5_think_training_chat_template` PRESERVES <think> in history. The shipped
+    #     Qwen3.5 template strips reasoning from any assistant turn a user turn follows,
+    #     which breaks append-only token concatenation and forced multi-turn training to run
+    #     with reflection disabled — a train/serve mismatch. Verified: shipped template drops
+    #     the reasoning, TRL's training template keeps it.
+    #   * `vllm_mode="colocate"` is the only single-GPU vLLM path (server mode refuses to
+    #     share a device), which is what makes vLLM-accelerated rollouts possible at all here.
+    "transformers>=5.14",
     "peft>=0.13",
-    "trl>=0.15",
+    "trl>=1.8",
     "bitsandbytes>=0.44",
     "datasets>=3.0",
     "accelerate>=1.0",
@@ -41,6 +52,13 @@ training = [
     # exist, they need nvcc, and torch SDPA already covers full attention.
     "flash-linear-attention>=0.5.1",
     "liger-kernel>=0.8.0",
+    # Chunked log-softmax kernel: computes hidden @ lm_head.T in chunks so the
+    # batch x seq x 248320-vocab logits tensor is never materialised (measured 2.5-4.4x lower
+    # peak, and bit-exact vs an fp32 reference where TRL's own bf16 path is off by 6e-2).
+    # The `unsloth` package itself is deliberately NOT a dependency: it pins trl<=0.24 and is
+    # only needed to satisfy unsloth-zoo's import guard, which UNSLOTH_ZOO_DISABLE_GPU_INIT
+    # skips (see chunked_logps.load_unsloth_chunked_kernel).
+    "unsloth-zoo>=2026.7",
 ]
 
 [tool.uv.sources]

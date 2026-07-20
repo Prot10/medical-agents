@@ -7,3 +7,12 @@ dependencies = []
 
 [tool.uv.workspace]
 members = ["packages/*", "dataset-generation", "agent-platform"]
+
+# unsloth-zoo supplies the chunked log-softmax kernel used by the GRPO trainer
+# (agent-platform/src/neuroagent/training/chunked_logps.py). It declares `trl<=0.24`, but we
+# require trl>=1.8 for Qwen3.5 response-schema and think-preserving template support, and the
+# kernel itself is pure torch and does not touch TRL. Override the constraint rather than
+# installing out-of-band, so a plain `uv sync` reproduces the environment.
+# Only the kernel is imported; unsloth's TRL/transformers patching is never activated.
+[tool.uv]
+override-dependencies = ["trl>=1.8", "transformers>=5.14", "datasets>=4.7"]
