@@ -5,10 +5,13 @@
 # plain `pkill` can leave ~10GB pinned and OOM the next phase. free_gpu() kills the vLLM
 # processes and then WAITS until the GPU memory is actually released — a verify, not a hope.
 
+# ui_* come from _ui.sh when the caller sourced it; plain fallbacks otherwise.
+type ui_step >/dev/null 2>&1 || { ui_step(){ echo "▶ $*"; }; ui_ok(){ echo "✓ $*"; }; ui_warn(){ echo "⚠ $*" >&2; }; ui_err(){ echo "✗ $*" >&2; }; ui_info(){ echo "  $*"; }; }
+
 # Kill this project's vLLM processes and block until the GPU is (almost) empty.
 free_gpu() {
   local reason="${1:-switching phase}"
-  echo "▶ Freeing GPU ($reason)..."
+  ui_step "Freeing GPU ($reason)…"
 
   # SIGTERM first (clean shutdown), then SIGKILL the stragglers. "EngineCore" is vLLM-specific,
   # so this never touches another user's job.
@@ -24,14 +27,14 @@ free_gpu() {
     used="$(nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits 2>/dev/null | head -1)"
     used="${used//[!0-9]/}"
     if [ -n "$used" ] && [ "$used" -lt 1500 ]; then
-      echo "✓ GPU free (${used} MiB used)"
+      ui_ok "GPU free (${used} MiB used)"
       return 0
     fi
     sleep 3
   done
 
   # Still occupied — report exactly what, so a stuck run is diagnosable rather than a silent OOM.
-  echo "WARNING: GPU still shows ${used:-?} MiB after teardown. Holding processes:" >&2
+  ui_warn "GPU still shows ${used:-?} MiB after teardown. Holding processes:"
   nvidia-smi --query-compute-apps=pid,process_name,used_memory --format=csv,noheader 2>/dev/null >&2 || true
   return 1
 }

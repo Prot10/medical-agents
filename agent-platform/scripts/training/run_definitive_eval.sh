@@ -23,7 +23,12 @@ SPLIT="${SPLIT:-test}"
 HOSPITAL="${HOSPITAL:-de_charite}"
 PORT="${PORT:-8000}"
 ROOT="${ROOT:-results/definitive_eval/${MODEL_TAG}}"
+# Cases run concurrently against vLLM (each is an independent agent session). The agent loop is
+# I/O-bound and vLLM batches server-side, so this is what makes the full 800-rollout eval finish
+# in hours instead of a day.
+CONCURRENCY="${CONCURRENCY:-8}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/_ui.sh"
 EVAL=agent-platform/scripts/training/run_sft_eval_cases.py
 
 source "$SCRIPT_DIR/_stage.sh"
@@ -32,36 +37,40 @@ stage_base "$BASE_MODEL" || exit 1
 export CUDA_MODULE_LOADING=LAZY
 mkdir -p "$ROOT"
 
-echo "#########################################################"
-echo "# Definitive eval — $MODEL_TAG on $SPLIT (base vs SFT/LoRA)"
-echo "# greedy (temp0, 1x) + sampled (temp0.7, 3x), traces saved"
-echo "# Start: $(date)"
-echo "#########################################################"
+ui_panel "Definitive eval · $MODEL_TAG on $SPLIT" \
+  "compare|base vs SFT/LoRA" \
+  "sampling|greedy (temp0 ×1) + sampled (temp0.7 ×3), traces saved" \
+  "start|$(date)"
 
 # One server hosts base + the LoRA adapter for the whole run.
 free_gpu "before serving"
-[ -f "$ADAPTER/adapter_model.safetensors" ] || { echo "ERROR: no adapter at $ADAPTER" >&2; exit 1; }
-echo "▶ Starting vLLM ($MODEL_TAG base + LoRA)..."
-LORA_ADAPTER="$ADAPTER" bash "$SCRIPT_DIR/../runtime/serve_model.sh" "$SERVE_KEY" "$PORT" &
+[ -f "$ADAPTER/adapter_model.safetensors" ] || { ui_err "no adapter at $ADAPTER"; exit 1; }
+ui_step "Starting vLLM ($MODEL_TAG base + LoRA, max_num_seqs=$CONCURRENCY)…"
+LORA_ADAPTER="$ADAPTER" MAX_NUM_SEQS="$CONCURRENCY" \
+  bash "$SCRIPT_DIR/../runtime/serve_model.sh" "$SERVE_KEY" "$PORT" &
 for _ in $(seq 1 180); do
-  curl -s "http://localhost:$PORT/v1/models" | grep -q "\"sft\"" && { echo "✓ vLLM ready (base + sft)"; break; }
+  curl -s "http://localhost:$PORT/v1/models" | grep -q "\"sft\"" && { ui_ok "vLLM ready (base + sft)"; break; }
   sleep 5
 done
+
+# Verbose eval logs go to a file; the terminal keeps the live progress bar.
+LOG_FILE="${LOG_FILE:-results/logs/eval_${MODEL_TAG}_$(date +%Y%m%d_%H%M%S).log}"
+mkdir -p "$(dirname "$LOG_FILE")"
 
 # _eval <sampling_name> <temperature> <repeats> <model-id> <run-name>
 _eval() {
   local samp="$1" temp="$2" reps="$3" mid="$4" rn="$5"
   local out="$ROOT/$samp/${rn}_results.json"
-  if [ -f "$out" ]; then echo "  $samp/$rn exists, skipping"; return 0; fi
+  if [ -f "$out" ]; then ui_info "$samp/$rn exists, skipping"; return 0; fi
   uv run python "$EVAL" evaluate \
     --model-id "$mid" --run-name "$rn" --split "$SPLIT" --hospital "$HOSPITAL" \
-    --temperature "$temp" --repeats "$reps" --output "$out" --port "$PORT"
+    --temperature "$temp" --repeats "$reps" --output "$out" --port "$PORT" \
+    --concurrency "$CONCURRENCY" --log-file "$LOG_FILE"
 }
 
 for samp in "greedy:0:1" "sampled:0.7:3"; do
   name="${samp%%:*}"; rest="${samp#*:}"; temp="${rest%%:*}"; reps="${rest##*:}"
-  echo ""
-  echo "==================== $name (temp=$temp x$reps) ===================="
+  ui_section "$name (temp=$temp ×$reps)"
   _eval "$name" "$temp" "$reps" "$BASE_MODEL" "base-$SERVE_KEY"
   _eval "$name" "$temp" "$reps" "sft"         "sft-$SERVE_KEY"
   uv run python "$EVAL" compare \
@@ -77,9 +86,7 @@ EOS_OUT="$EOS_ROOT/results/definitive_eval/${MODEL_TAG}"
 mkdir -p "$EOS_OUT"
 cp -r "$ROOT/." "$EOS_OUT/"
 
-echo ""
-echo "#########################################################"
-echo "# Done: $(date)"
-echo "# Results:  $ROOT  (copied to $EOS_OUT)"
-echo "# Judge bundles: $ROOT/*/judge_bundles/  -> run the llm-judge next"
-echo "#########################################################"
+ui_panel "Definitive eval complete · $MODEL_TAG" \
+  "finished|$(date)" \
+  "results|$ROOT ${C_GREY}(copied to $EOS_OUT)${C_RESET}" \
+  "judge|$ROOT/*/judge_bundles/ ${C_GREY}→ run the llm-judge next${C_RESET}"

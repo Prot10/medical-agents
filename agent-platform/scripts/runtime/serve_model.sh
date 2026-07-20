@@ -50,12 +50,14 @@ VLLM="$VLLM_VENV/bin/python $SCRIPT_DIR/vllm_serve.py"
 # Common optimized flags for single-GPU A100-40GB
 # GPU_MEMORY_UTILIZATION env var allows manual GPU memory partitioning
 GPU_MEM="${GPU_MEMORY_UTILIZATION:-0.95}"
+# Concurrent sequences the engine will batch. 4 suits the interactive dashboard (one agent at a
+# time, lowest latency); batch evaluation raises it via MAX_NUM_SEQS so many cases run at once.
 COMMON_FLAGS=(
   --port "$PORT"
   --gpu-memory-utilization "$GPU_MEM"
   --enable-prefix-caching
   --dtype auto
-  --max-num-seqs 4
+  --max-num-seqs "${MAX_NUM_SEQS:-4}"
 )
 
 # Qwen3.5-specific flags: reasoning parser + tool calling + text-only

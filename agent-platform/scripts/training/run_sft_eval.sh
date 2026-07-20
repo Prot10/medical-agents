@@ -87,6 +87,15 @@ if [ "$MODE" = "base" ] || [ "$MODE" = "both" ]; then
 fi
 
 # -------- SFT (after training) --------
+# The skip-if-exists guard is only safe while the results are NEWER than the adapter they claim
+# to describe. Retraining (e.g. QLoRA -> bf16) leaves an older sft_results.json in place, and
+# without this check the run would silently "skip" and then compare the new adapter against the
+# old adapter's rollouts. If the adapter is newer, the results are stale — re-run them.
+if [ -f "$RESULTS_DIR/sft_results.json" ] && [ "$ADAPTER/adapter_model.safetensors" -nt "$RESULTS_DIR/sft_results.json" ]; then
+  echo "! sft_results.json is OLDER than the adapter — stale. Re-evaluating."
+  mv "$RESULTS_DIR/sft_results.json" "$RESULTS_DIR/sft_results.stale.json"
+fi
+
 if [ "$MODE" = "sft" ] || [ "$MODE" = "both" ]; then
   if [ ! -f "$RESULTS_DIR/sft_results.json" ]; then
     echo "Evaluating SFT $MODEL_TAG (LoRA) on $SPLIT..."

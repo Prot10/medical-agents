@@ -1,4 +1,5 @@
 # Shared base-model staging, sourced by the training and eval scripts.
+type ui_step >/dev/null 2>&1 || { ui_step(){ echo "▶ $*"; }; ui_ok(){ echo "✓ $*"; }; ui_warn(){ echo "⚠ $*" >&2; }; ui_err(){ echo "✗ $*" >&2; }; }
 #
 # Reading a full model off the EOS FUSE mount is ~1-2h of scattered small reads, so we copy it
 # into /dev/shm (RAM) once and load from there. The copy must be idempotent and VALIDATED: a
@@ -35,24 +36,24 @@ stage_base() {
   local dst="$SHM_HF/hub/$model_dir"
   local name; name="$(basename "$repo")"
 
-  [ -d "$src" ] || { echo "ERROR: base model not on EOS: $src" >&2; return 1; }
+  [ -d "$src" ] || { ui_err "base model not on EOS: $src"; return 1; }
 
   if _base_is_complete "$dst"; then
-    echo "✓ $name base already staged in RAM"
+    ui_ok "$name base already staged in RAM"
     export HF_HOME="$SHM_HF"; export HF_HUB_OFFLINE=1
     return 0
   fi
 
-  echo "▶ Staging $name base weights: EOS → $SHM_HF (RAM)"
+  ui_step "Staging $name base weights: EOS → $SHM_HF (RAM)"
   mkdir -p "$SHM_HF/hub"
   # -a preserves the blob/symlink layout; rsync resumes/completes a partial dir.
   if command -v rsync >/dev/null; then
-    rsync -a --info=progress2 "$src/" "$dst/" || { echo "ERROR: staging rsync failed" >&2; return 1; }
+    rsync -a --info=progress2 "$src/" "$dst/" || { ui_err "staging rsync failed"; return 1; }
   else
-    cp -a "$src/." "$dst/" || { echo "ERROR: staging cp failed" >&2; return 1; }
+    cp -a "$src/." "$dst/" || { ui_err "staging cp failed"; return 1; }
   fi
 
-  _base_is_complete "$dst" || { echo "ERROR: staged copy incomplete after sync: $dst" >&2; return 1; }
-  echo "✓ $name base staged"
+  _base_is_complete "$dst" || { ui_err "staged copy incomplete after sync: $dst"; return 1; }
+  ui_ok "$name base staged"
   export HF_HOME="$SHM_HF"; export HF_HUB_OFFLINE=1
 }
