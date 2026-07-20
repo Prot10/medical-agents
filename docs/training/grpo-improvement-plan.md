@@ -39,12 +39,12 @@ parser + `MockServer` + real `AgentTrace` scoring), returns `env_mask` (0 on too
 and the per-trajectory reward. Token concatenation is template-exact (validated with the real
 tokenizer down to the `<|im_end|>\n<|im_start|>` seam).
 
-Key constraint discovered: **Qwen3.5 strips `<think>` from any assistant turn a `user` message
-follows**, and reflection is a user message — so it breaks append-only concatenation and clean
-credit assignment. Multi-turn GRPO therefore runs with **reflection OFF**; tool results are
-`role="tool"`, after which the template preserves prior `<think>`. **The paired eval must also set
-`agent.enable_reflection=false`** for train/serve parity — recommend disabling reflection across the
-whole re-baseline (base/SFT/GRPO) for consistency.
+Key constraint discovered, then **resolved**: Qwen3.5's *shipped* template strips `<think>` from
+any assistant turn a `user` message follows, and reflection is a user message — which broke
+append-only concatenation. This forced reflection OFF on TRL 0.29. On TRL 1.8 the
+think-preserving *training* template fixes it (measured: append-only True, reasoning kept), so
+**reflection is back ON** and matches serving. The re-baseline should therefore run with
+reflection ON across all arms; serving must be given the same template (see Known config traps).
 
 Files: `training/rollout/react_rollout.py` (token-exact masked rollout, CPU-testable via injected
 policy), `training/rollout/trl_rollout.py` (TRL adapter + pass-through reward),
@@ -53,11 +53,49 @@ Recipe: clip-higher `epsilon_high=0.28`, KL=0, `mask_truncated_completions=True`
 (fully on-policy), val carved from train, 4B G=6/QLoRA for single-turn / G=4 for multi-turn.
 
 ## Status
-1. ✅ All reward/eval/orchestrator/serving fixes + unit tests, full pytest **1521 passing**.
-2. ✅ Multi-turn rollout_func + trainer, wired, unit-tested on CPU with the real tokenizer + a
-   canned policy. Only the live-model generation (`_generate_single_turn`) is unvalidated on CPU.
-3. ⏳ GPU (user launches): (a) 2-step multi-turn smoke to validate generation/logprobs/memory,
-   (b) full run, (c) re-baseline eval on the corrected benchmark (reflection off).
+1. ✅ All reward/eval/orchestrator/serving fixes + unit tests, full pytest **1548 passing**.
+2. ✅ Multi-turn rollout_func + trainer, wired and unit-tested with the real tokenizer.
+3. ✅ Live-model multi-turn validated on the A100: generation, masking, tool execution,
+   backward, optimiser step, and held-out eval all run. ~160 s/step at G=4, QLoRA, 7.9 GB.
+4. ⏳ Re-baseline base + SFT on the corrected benchmark — **the gate**. No GRPO number is
+   comparable until it exists. Needs EOS (the SFT adapters live there).
+5. ⏳ Full 4B multi-turn run, then GRPO-vs-SFT on the same corrected benchmark.
+
+### Reward design decisions (measured)
+- **`correctness` 0.30** — it is the reported objective, and it is the only component that
+  reliably splits a reward group. Tool-selection/safety/cost are highly correlated within a
+  group (`reward_std` ~0.02-0.06), so without correctness there is little advantage signal.
+  With it zeroed, a right and a wrong diagnosis scored identically (0.3529 on ALS-M01).
+- **Safety-gate cap 0.0 → 0.25.** The contraindication detector has 89.1% recall and 97.2%
+  per-action precision, but ~4.6 contraindicated actions per case make the per-case false-fire
+  rate ~9.5% — and it is biased against good agents: a diagnosis-only answer trips it 0% of the
+  time, one stating the case's *required* critical actions trips it 9.5%, because
+  contraindications read "Do not \<closely related action\>". At cap 0.0 that erased the whole
+  reward, correctness included, for ~1 in 10 good trajectories. Safe trajectories measure
+  0.55-0.66, so at 0.25 a genuine violation still ranks below every safe one.
+- **Diagnosis matcher audited clean**: 0/600 false negatives, 0/600 false positives on
+  cross-condition answers.
+
+### Two failure modes that only appear mid-run
+- **fla TileLang backward.** Qwen3.5's gated-delta-rule layers go through
+  flash-linear-attention, whose TileLang backend shells out to the pip CUDA-13 nvcc and hits
+  "CUDA compiler and CUDA toolkit headers are incompatible". Only the BACKWARD kernel fails, so
+  a run loads, generates, completes a rollout, then dies in `loss.backward()`. Pinned to Triton
+  via `FLA_TILELANG=0`. Verified: forward within 4.8e-3 of fla's independent recurrent
+  implementation, gradient within 3.5e-2 of a finite-difference check of its own forward.
+- **TRL `_generate_single_turn` arity.** 0.29 returned 3 values, 1.8 returns 2. Bind
+  `completion_ids` positionally; contract tests pin this and the chunked-logprob override.
+
+### Truncation, at two levels
+- **Whole-completion budget** — `final_answer_reserve` (640 tok) is held back and checked
+  *before* a tool result is appended, so the agent always reaches a diagnosis. A single report
+  can exceed the entire reserve, which is why the check cannot come after. Measured 0%
+  truncation across budgets 1000-16384, diagnosis every time; a tighter budget now costs tool
+  calls, not the assessment.
+- **Per-turn cap** — a turn cut by `per_turn_max_tokens` carries no parseable tool call, so the
+  rollout reads it as the agent concluding and scores the trajectory as if it chose to stop
+  without ordering tests. Now counted (`clipped_turns`), warned about, and configurable
+  (`PER_TURN`). Set it from the measured per-turn distribution of the SFT policy, not by guess.
 
 ## Framework decision (branch `feat/agentic-rl-vllm-rollouts`)
 
@@ -114,10 +152,29 @@ trl/transformers are untouched.
   (`python -m neuroagent.training.export_chat_template`, then `CHAT_TEMPLATE=... serve_model.sh`),
   or the policy is evaluated on contexts it never trained on.
 
-## GPU smoke command (user launches)
+### Ignore TRL's importance-sampling warning
+Every multi-turn run logs that `importance_sampling_level='sequence'` with `loss_type='dapo'`
+length-weights sequences, advising `loss_type='grpo'`. Do not take it: TRL's own docs call
+'grpo' "not recommended due to length bias", and multi-turn completion lengths vary several-fold.
+The warning is also inapplicable — on-policy, TRL substitutes `per_token_logps.detach()` so
+`log_ratio` is identically zero and both levels give **bitwise identical** gradients (measured on
+ragged lengths spanning 8x). It becomes a real question only under vLLM rollouts, where TRL always
+computes `old_per_token_logps`; `test_grpo_importance_sampling_level.py` is the tripwire.
+
+## Commands
+
 ```bash
-# 2-step multi-turn smoke on the 4B (validates generation + masking + memory end-to-end)
-tmux new -s grpo_smoke
-MULTI_TURN=1 MAX_STEPS=2 EVAL_STEPS=2 NUM_GENERATIONS=4 PRECISION=qlora \
+# Multi-turn smoke — generation + masking + backward + held-out eval + promotion (~160 s/step)
+MULTI_TURN=1 MAX_STEPS=6 EVAL_STEPS=3 NUM_GENERATIONS=4 PRECISION=qlora \
+  bash agent-platform/scripts/training/run_grpo_training.sh Qwen3.5-4B
+
+# Re-baseline base vs SFT on the corrected benchmark — run this BEFORE any GRPO comparison
+bash agent-platform/scripts/training/run_definitive_eval.sh Qwen3.5-4B
+
+# Full multi-turn run
+MULTI_TURN=1 PRECISION=qlora \
   bash agent-platform/scripts/training/run_grpo_training.sh Qwen3.5-4B
 ```
+
+Everything on EOS needs a live Kerberos ticket (`kinit`); an expired one shows up as
+`Permission denied` on the adapter path, not as an auth error.
