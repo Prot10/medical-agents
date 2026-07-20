@@ -38,6 +38,37 @@ class ToolCostEntry(BaseModel):
     cost_breakdown: dict[str, float] = Field(default_factory=dict)
 
 
+def _as_item_names(value: Any) -> list[str]:
+    """Normalise a free-text list parameter into hashable, priceable item names.
+
+    A generating policy is not bound by the schema: it emits `panels` as a bare string, a list
+    of strings, a nested list, or a dict, and the tool-call parser coerces whatever it finds.
+    Pricing then does `name in by_panel`, which raises `TypeError: unhashable type: 'list'` on
+    a nested entry and killed a real training run mid-rollout. Flatten one level, stringify
+    anything exotic, and drop empties, so an odd generation costs money rather than the run.
+    """
+    if value is None:
+        return []
+    if isinstance(value, str):
+        return [value] if value.strip() else []
+    if isinstance(value, dict):
+        value = list(value.keys())
+    if not isinstance(value, (list, tuple, set)):
+        return [str(value)]
+    names: list[str] = []
+    for item in value:
+        if isinstance(item, str):
+            if item.strip():
+                names.append(item)
+        elif isinstance(item, (list, tuple, set)):
+            names.extend(_as_item_names(item))  # one nesting level is common; recurse safely
+        elif isinstance(item, dict):
+            names.extend(_as_item_names(list(item.keys())))
+        elif item is not None:
+            names.append(str(item))
+    return names
+
+
 class CostTracker:
     """Compute and track costs for diagnostic tool calls.
 
@@ -202,7 +233,7 @@ class CostTracker:
         tool_name = "interpret_labs"
         by_panel = self._require(cfg, "by_panel", tool_name)
         default_cost = float(self._require(cfg, "default_panel", tool_name))
-        panels = params.get("panels", [])
+        panels = _as_item_names(params.get("panels", []))
         breakdown: dict[str, float] = {}
         total = 0.0
         if not panels:
@@ -230,7 +261,7 @@ class CostTracker:
         total = base
         by_test = self._require(cfg, "by_special_test", tool_name)
         default_cost = float(self._require(cfg, "default_test", tool_name))
-        for test in params.get("special_tests", []):
+        for test in _as_item_names(params.get("special_tests", [])):
             if test not in by_test:
                 logger.warning(
                     "Unpriced CSF special test %r for tool '%s' in %s — falling "
