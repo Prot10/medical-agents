@@ -1,0 +1,36 @@
+# Reward weights for SINGLE-TURN GRPO (agent-platform/scripts/training/run_grpo_training.sh).
+#
+# Why this is separate from reward_weights.yaml:
+# The single-turn rollout stops after the model orders its workup, BEFORE it states a
+# diagnosis. So two components are structurally constant-zero every rollout and contribute
+# no advantage signal:
+#   * correctness — needs a stated diagnosis the one-shot completion never reaches
+#   * format      — needs an assessment section the one-shot completion never writes
+# Leaving them weighted (as the eval config and its epoch-1 dynamic schedule did) wasted half
+# the reward weight on dead components — the measured reason the first GRPO run's reward barely
+# moved. Here the weight is on exactly what one shot CAN affect: which tests get ordered, how
+# safely, how compliantly, at what cost. correctness/format stay at 0 by omission.
+#
+# There is deliberately NO dynamic_schedule: it only advances across epochs, so a short RL run
+# is pinned to phase 1 regardless, and phase 1 was the format-heavy one that caused the damage.
+
+default_weights:
+  correctness: 0.0    # unreachable in one shot — see above
+  actions:     0.45   # tool selection precision + recall vs the optimal workup — the core signal
+  safety:      0.30   # gated below; the dominant clinical axis
+  cost:        0.10   # gated on workup completeness below
+  compliance:  0.15   # hospital-pathway adherence
+  format:      0.0    # no assessment written in one shot — see above
+
+# Non-compensatory safety gate: a contraindicated (harmful) action hard-caps the composite at
+# `cap`, so no combination of good tool-selection / low cost / compliance can outscore a safe
+# trajectory. Mirrors the LLM-judge's safety veto.
+safety_gate:
+  enabled: true
+  cap: 0.0
+
+# Cost credit only counts once the required workup is actually ordered
+# (critical_actions_hit >= threshold). Below it, cost contributes 0 — so "order little, stay
+# cheap" earns no cost bonus. This is the single-turn stand-in for "cost conditional on
+# correctness" (correctness needs a diagnosis; critical_actions_hit is the signal we have).
+cost_requires_workup: 0.5

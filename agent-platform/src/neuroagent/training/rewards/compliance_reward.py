@@ -23,20 +23,25 @@ class ComplianceReward:
         self,
         tools_called: list[str],
         condition: str,
-    ) -> float:
-        """Compute compliance reward in {0, 1}.
+    ) -> float | None:
+        """Compute compliance reward in {0, 1}, or ``None`` when there is nothing to measure.
 
         Args:
             tools_called: Tools the agent called.
             condition: Clinical condition string (used to find matching pathway).
 
         Returns:
-            1.0 if compliant with relevant pathway, 0.0 otherwise.
-            Returns 1.0 if no matching pathway found (no rules to violate).
+            1.0 if compliant with the relevant pathway, 0.0 otherwise, or ``None``
+            if no pathway covers this condition. ``None`` means "no measurement" —
+            only 5 of the ~23 conditions have a pathway, so returning a constant
+            1.0 for the other ~18 injected a fixed +weight that is invisible to a
+            group-relative advantage (dead gradient) yet real when comparing across
+            conditions. The composite renormalises around a ``None`` so the live
+            components carry the full weight instead. See ``CompositeReward``.
         """
         pathway = self.engine.get_pathway(condition)
         if pathway is None:
-            return 1.0
+            return None
 
         result = self.engine.check_compliance(tools_called, pathway)
         return 1.0 if result.compliant else 0.0

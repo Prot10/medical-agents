@@ -33,6 +33,18 @@ _CONFIDENT_DX_PATTERNS = [
 # Semantic matching helpers
 # ---------------------------------------------------------------------------
 
+# The model's reasoning scratchpad. Matched anywhere (incl. an unclosed block from a
+# prompt that pre-opens `<think>`), so scoring never reads deliberation as the answer.
+_THINK_BLOCK = re.compile(r"<think>.*?</think>|<think>.*\Z", re.DOTALL | re.IGNORECASE)
+
+
+def _strip_think(text: str | None) -> str:
+    """Remove `<think>…</think>` (and any trailing unclosed think) from a response."""
+    if not text:
+        return ""
+    return _THINK_BLOCK.sub(" ", text)
+
+
 # Common clinical action keywords grouped by category.
 # Used to fuzzy-match free-text critical/contraindicated actions against
 # the agent's tool calls and final response.
@@ -144,8 +156,12 @@ def check_critical_action(
         if _action_text_matches_tool(action_text, tool):
             return True
 
-    # Check 2: Did the agent address this action in their final response?
-    if _action_text_in_response(action_text, final_response):
+    # Check 2: Did the agent address this action in their COMMITTED response?
+    # Strip <think> first: the scratchpad is not the agent's answer, and the serving
+    # path (orchestrator) already keeps it out of final_response. Scoring think text
+    # let a completion that ordered nothing earn full critical-action credit just by
+    # narrating the plan in its reasoning — reward that vanished at eval.
+    if _action_text_in_response(action_text, _strip_think(final_response)):
         return True
 
     return False
@@ -161,7 +177,15 @@ def check_contraindicated_action(
     More conservative than critical action checking — only flags a violation
     if the agent EXPLICITLY and POSITIVELY recommends the contraindicated action.
     Negations like "defer", "avoid", "do not", "withhold" are NOT violations.
+
+    Only the COMMITTED response counts — ``<think>`` is stripped first. A model
+    that reasons about a contraindication in its scratchpad ("should we start
+    immunosuppression?") is not recommending it, yet the positive-verb heuristic
+    would fire and the safety gate would then zero an otherwise-good trajectory.
+    The serving path keeps ``<think>`` out of final_response; this makes scoring
+    match.
     """
+    final_response = _strip_think(final_response)
     if not final_response:
         return False
 
@@ -402,6 +426,41 @@ def _agent_tool_calls(trace: AgentTrace) -> list[tuple[str, dict[str, Any]]]:
     return calls
 
 
+# The two catchall tools cover many distinct studies under one name, discriminated by a
+# single parameter. Crediting an optimal action for them on the tool name alone let a model
+# call the right tool with a wrong (or garbage) discriminator and score a perfect workup —
+# so for these, an optimal action counts as satisfied only when the discriminating value
+# matches. Every other tool is one study, so the name is the whole signal.
+_CATCHALL_DISCRIMINATOR: dict[str, str] = {
+    "order_advanced_imaging": "modality",
+    "order_specialized_test": "test_type",
+}
+
+
+def _optimal_action_satisfied(
+    tool_name: str,
+    tool_parameters: dict[str, Any] | None,
+    agent_calls: list[tuple[str, dict[str, Any]]],
+) -> bool:
+    """Did the agent issue a call that satisfies this optimal action?
+
+    Name match for ordinary tools; for the catchall tools, the discriminating parameter
+    (``modality`` / ``test_type``) must also match the ground-truth value — when the ground
+    truth specifies one. If the optimal action leaves the discriminator unspecified, any call
+    to that tool satisfies it (the case did not pin a specific study).
+    """
+    discriminator = _CATCHALL_DISCRIMINATOR.get(tool_name)
+    want = (tool_parameters or {}).get(discriminator) if discriminator else None
+    for name, args in agent_calls:
+        if name != tool_name:
+            continue
+        if want is None:
+            return True
+        if args.get(discriminator) == want:
+            return True
+    return False
+
+
 def _classification_matches(
     classification: ToolClassification, name: str, arguments: dict[str, Any]
 ) -> bool:
@@ -604,7 +663,11 @@ class MetricsCalculator:
         metrics.diagnostic_accuracy_top1 = self._check_diagnosis_top1(trace, ground_truth)
         metrics.diagnostic_accuracy_top3 = self._check_diagnosis_top3(trace, ground_truth)
 
-        # Action metrics (tool-name-based, for optimal_actions which use tool names)
+        # Action metrics. Matching is param-aware for the catchall tools (see
+        # _optimal_action_satisfied): calling order_advanced_imaging / order_specialized_test
+        # with the wrong study no longer counts as covering the required one. `matched_names`
+        # is the set of optimal tool names the agent actually satisfied.
+        agent_calls = _agent_tool_calls(trace)
         agent_actions = set(tools_called)
         optimal_actions = {s.tool_name for s in ground_truth.optimal_actions if s.tool_name}
         required_actions = {
@@ -619,24 +682,30 @@ class MetricsCalculator:
             s.tool_name for s in ground_truth.optimal_actions
             if s.tool_name and s.category.value == "optional"
         }
+        matched_names = {
+            s.tool_name
+            for s in ground_truth.optimal_actions
+            if s.tool_name
+            and _optimal_action_satisfied(s.tool_name, s.tool_parameters, agent_calls)
+        }
 
         if agent_actions:
-            metrics.action_precision = len(agent_actions & optimal_actions) / len(agent_actions)
+            metrics.action_precision = len(matched_names) / len(agent_actions)
         if optimal_actions:
-            metrics.action_recall = len(agent_actions & optimal_actions) / len(optimal_actions)
+            metrics.action_recall = len(matched_names) / len(optimal_actions)
         if metrics.action_precision + metrics.action_recall > 0:
             metrics.tool_f1 = (
                 2 * metrics.action_precision * metrics.action_recall
                 / (metrics.action_precision + metrics.action_recall)
             )
 
-        # Per-tier coverage breakdown
+        # Per-tier coverage breakdown (param-aware via matched_names)
         metrics.required_total = len(required_actions)
-        metrics.required_called = len(agent_actions & required_actions)
+        metrics.required_called = len(matched_names & required_actions)
         metrics.recommended_total = len(recommended_actions)
-        metrics.recommended_called = len(agent_actions & recommended_actions)
+        metrics.recommended_called = len(matched_names & recommended_actions)
         metrics.optional_total = len(optional_actions)
-        metrics.optional_called = len(agent_actions & optional_actions)
+        metrics.optional_called = len(matched_names & optional_actions)
         if metrics.required_total:
             metrics.required_coverage = metrics.required_called / metrics.required_total
 
@@ -645,7 +714,7 @@ class MetricsCalculator:
         # legitimately marks `order_advanced_imaging{modality: MR_spectroscopy}` wasteful
         # while requiring `{modality: FDG_PET}`. Matching by name alone charged a perfect
         # agent with a useless call in 103 of the 600 benchmark cases.
-        agent_calls = _agent_tool_calls(trace)
+        # (agent_calls computed above with the action metrics.)
 
         if ground_truth.useless_tools:
             metrics.useless_calls = _count_classified_calls(agent_calls, ground_truth.useless_tools)

@@ -17,6 +17,7 @@ matching — a missing case_id raises, it never silently scores 0.0.
 
 from __future__ import annotations
 
+import ast
 import json
 import logging
 import re
@@ -32,14 +33,68 @@ if TYPE_CHECKING:
     from .composite_reward import CompositeReward
 
 
+_XML_FUNCTION = re.compile(
+    r"<function=([a-zA-Z_][\w]*)>(.*?)</function>", re.DOTALL
+)
+_XML_PARAMETER = re.compile(
+    r"<parameter=([a-zA-Z_][\w]*)>(.*?)</parameter>", re.DOTALL
+)
+
+
+def _coerce(value: str) -> Any:
+    """Type an XML parameter body the way the tool schema expects it.
+
+    qwen3_coder emits Python literals, not JSON — `True`, not `true` — so a plain
+    json.loads leaves booleans as the strings "True"/"False". That matters: `contrast` is a
+    boolean in the tool schema and it changes what an MRI costs, so a string would be priced
+    wrong. Try JSON first (numbers, lists, objects), then Python literals, then give up and
+    keep the raw string (which is right for free-text fields like clinical_context).
+    """
+    v = value.strip()
+    try:
+        return json.loads(v)
+    except (json.JSONDecodeError, ValueError):
+        pass
+    try:
+        return ast.literal_eval(v)
+    except (ValueError, SyntaxError, MemoryError, RecursionError):
+        return v
+
+
 def extract_tool_calls(completion: str) -> list[dict[str, Any]]:
     """Extract tool calls from a model-generated completion.
 
-    Handles both Qwen <tool_call> format and raw JSON tool calls.
-    """
-    tool_calls = []
+    Qwen3.5 is served with `--tool-call-parser qwen3_coder`, and that is the syntax it
+    actually generates — an XML function block, NOT a JSON object:
 
-    # Pattern 1: <tool_call>{"name": ..., "arguments": ...}</tool_call>
+        <tool_call>
+        <function=analyze_brain_mri>
+        <parameter=clinical_context>progressive bulbar weakness</parameter>
+        <parameter=contrast>True</parameter>
+        </function>
+        </tool_call>
+
+    Parsing only the JSON form silently returns [] for every real Qwen3.5 completion, which
+    hands the online reward an empty `tools_called` — so actions, cost, safety and
+    compliance all score zero and GRPO optimises a reward that gives no credit for ordering
+    the right test. The XML form is therefore tried first; the JSON forms are kept for other
+    models and for hand-written fixtures.
+    """
+    tool_calls: list[dict[str, Any]] = []
+
+    # Pattern 1: qwen3_coder XML — what Qwen3.5 emits.
+    for fn in _XML_FUNCTION.finditer(completion):
+        tool_calls.append({
+            "tool_name": fn.group(1),
+            "parameters": {
+                p.group(1): _coerce(p.group(2))
+                for p in _XML_PARAMETER.finditer(fn.group(2))
+            },
+        })
+    if tool_calls:
+        return tool_calls
+
+    # Pattern 2: <tool_call>{"name": ..., "arguments": {...}}</tool_call>
     for match in re.finditer(
         r"<tool_call>\s*(\{.*?\})\s*</tool_call>", completion, re.DOTALL
     ):
@@ -53,7 +108,7 @@ def extract_tool_calls(completion: str) -> list[dict[str, Any]]:
         except json.JSONDecodeError:
             continue
 
-    # Pattern 2: OpenAI-style function calls in JSON
+    # Pattern 3: OpenAI-style function calls in raw JSON
     if not tool_calls:
         for match in re.finditer(
             r'"name"\s*:\s*"([a-z_]+)".*?"arguments"\s*:\s*(\{[^}]*\})',
@@ -78,6 +133,7 @@ _TOOL_BLOCKS = re.compile(
     r"<tool_call>.*?</tool_call>|<tool_response[^>]*>.*?</tool_response>",
     re.DOTALL,
 )
+_THINK_BLOCKS = re.compile(r"<think>.*?</think>", re.DOTALL | re.IGNORECASE)
 
 
 def build_pseudo_trace(completion: str, case_id: str) -> AgentTrace:
@@ -85,10 +141,20 @@ def build_pseudo_trace(completion: str, case_id: str) -> AgentTrace:
 
     The trace carries exactly what ``MetricsCalculator`` / ``CompositeReward``
     read: ``tools_called``, per-turn structured ``tool_calls`` (so
-    parameter-scoped useless/harmful classifications match), the final response
-    text (tool_call / tool_response blocks stripped, ``<think>`` kept — the
-    metrics strip it themselves), and the CostTracker total for the calls made.
+    parameter-scoped useless/harmful classifications match), the CostTracker
+    total, and a ``final_response`` built to MATCH the serving path — the
+    committed assessment, with the reasoning scratchpad removed.
+
+    The scratchpad removal is the load-bearing detail. The GRPO prompt pre-opens
+    ``<think>``, so a completion begins mid-thought and the committed text is
+    everything after the first ``</think>``; ``_extract_assessment`` then pulls
+    the ``### Primary Diagnosis`` section, exactly as the orchestrator does at
+    inference. Keeping ``<think>`` here (the old behaviour) let the safety and
+    critical-action matchers read plan text out of the scratchpad and hand full
+    credit to a completion that ordered nothing — reward that then scored zero at
+    eval, which is why the training reward rose while the eval stayed flat.
     """
+    from ...agent.orchestrator import _extract_assessment
     from ...agent.reasoning import AgentTrace, AgentTurn
     from ...tools.cost_tracker import CostTracker
 
@@ -109,8 +175,12 @@ def build_pseudo_trace(completion: str, case_id: str) -> AgentTrace:
             )
         )
 
-    # The assistant-authored narrative: everything that is not a tool block.
-    final_response = _TOOL_BLOCKS.sub("", completion).strip()
+    # The committed answer: drop the leading (prompt-opened) think, then any closed
+    # think blocks, then tool blocks, then extract the assessment section — the same
+    # text the orchestrator stores as final_response at inference.
+    body = completion.split("</think>", 1)[1] if "</think>" in completion else completion
+    body = _THINK_BLOCKS.sub(" ", body)
+    final_response = _extract_assessment(_TOOL_BLOCKS.sub("", body).strip())
 
     tracker = CostTracker()
     for c in calls:

@@ -17,6 +17,12 @@ class ClinicalScores:
     correctness: float  # 0-1
     actions: float  # 0-1
     safety: float  # -1 to 1
+    # Raw sub-metrics the composite reward gates on (non-compensatory safety,
+    # cost-conditional-on-workup). Exposed so the gate logic reads the real signal
+    # rather than trying to reverse-engineer it from the collapsed scores above.
+    action_recall: float = 0.0            # fraction of optimal tools that were ordered
+    critical_actions_hit: float = 0.0     # fraction of REQUIRED workup that was ordered
+    contraindicated_actions_taken: int = 0  # >0 means a harmful action was taken
 
 
 class ClinicalReward:
@@ -60,4 +66,7 @@ class ClinicalReward:
             correctness=correctness,
             actions=actions,
             safety=max(-1.0, min(1.0, safety)),
+            action_recall=metrics.action_recall,
+            critical_actions_hit=metrics.critical_actions_hit,
+            contraindicated_actions_taken=metrics.contraindicated_actions_taken,
         )

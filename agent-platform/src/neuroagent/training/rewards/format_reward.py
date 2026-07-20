@@ -5,11 +5,16 @@ from __future__ import annotations
 import re
 
 
-# Expected structured assessment sections
+# Expected structured assessment sections. These match the way the model and the gold
+# trajectories ACTUALLY write the assessment ("Primary diagnosis: ...", not a markdown
+# "### Primary Diagnosis" header), with the header form still accepted. The old
+# markdown-only patterns scored every real completion 0.0 — a dead reward component that,
+# under the epoch-1 dynamic schedule (format weight 0.30), silently killed a third of the
+# GRPO signal. `re.IGNORECASE` + optional leading markdown make both styles pass.
 _ASSESSMENT_SECTIONS = [
-    r"###?\s*Primary Diagnosis",
-    r"###?\s*Differential Diagnos[ei]s",
-    r"###?\s*Recommended",
+    r"(###?\s*)?Primary\s+[Dd]iagnos[ei]s",
+    r"(###?\s*)?Differential(\s+[Dd]iagnos[ei]s)?",
+    r"(###?\s*)?(Recommend|Plan|Next\s+step)",
 ]
 
 # Tool call must be valid JSON with name + arguments
