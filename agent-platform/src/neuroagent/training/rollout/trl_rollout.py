@@ -167,18 +167,35 @@ class MultiTurnRolloutFunc:
         n = max(len(results), 1)
         n_trunc = sum(1 for r in results if r.truncated)
         n_clipped = sum(1 for r in results if r.clipped_turns)
+        n_forced = sum(1 for r in results if r.forced_conclusion)
         logger.info(
             "rollout: %d trajectories, mean turns %.1f, mean tool calls %.1f, "
             "mean reward %.3f, truncated %d/%d (%.0f%%), clipped-turn %d/%d (%.0f%%), "
-            "mean completion tokens %.0f",
+            "budget-capped %d/%d (%.0f%%), mean completion tokens %.0f",
             len(results),
             sum(r.num_turns for r in results) / n,
             sum(r.num_tool_calls for r in results) / n,
             sum(rewards_out) / max(len(rewards_out), 1),
             n_trunc, len(results), 100.0 * n_trunc / n,
             n_clipped, len(results), 100.0 * n_clipped / n,
+            n_forced, len(results), 100.0 * n_forced / n,
             sum(len(r.completion_ids) for r in results) / n,
         )
+        if n_forced > n * 0.25:
+            # These trajectories are NOT truncated — the reserve did its job and they end with a
+            # diagnosis — so the truncation rate stays 0% and everything looks healthy while the
+            # completion budget is quietly deciding how deep the workup goes. Measured offline:
+            # MAX_COMPLETION=4096 fits only 50.9% of the SFT policy's real workups end to end.
+            # If most trajectories are capped, GRPO is shaping a shallower policy than the one
+            # being evaluated.
+            logger.warning(
+                "%d/%d trajectories (%.0f%%) hit the %d-token budget reserve and were told to "
+                "conclude early. They still diagnose, so this does NOT show up as truncation — "
+                "but their workup is capped by the budget rather than chosen by the policy. "
+                "Raise max_completion_length (memory permitting) or lower num_generations.",
+                n_forced, len(results), 100.0 * n_forced / n,
+                self.rollout.max_completion_tokens,
+            )
         if n_clipped:
             # Distinct from the budget warning below and more insidious. A turn cut by the
             # per-turn cap carries no parseable tool call, so the rollout reads it as the agent

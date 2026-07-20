@@ -167,3 +167,22 @@ def test_oversized_tool_result_cannot_truncate(ctx):
         _case, res = _run(ctx, budget)
         assert not res.truncated, f"budget {budget} truncated despite the reserve"
         assert res.trace.final_response, f"budget {budget} lost the assessment"
+
+
+def test_budget_capped_workups_are_reported_not_silent(ctx):
+    """A budget-capped workup must be distinguishable from a freely-chosen one.
+
+    The reserve deliberately makes these trajectories end properly with a diagnosis, so
+    `truncated` stays False and the rollout log reads "truncated 0%". That is honest about
+    truncation and misleading about everything else: the completion budget, not the policy, is
+    deciding how deep the workup goes. Measured offline, MAX_COMPLETION=4096 fits only 50.9% of
+    the SFT policy's real workups end to end, so this is the common case rather than an edge.
+    """
+    _case, tight = _run(ctx, 1000)
+    assert tight.forced_conclusion, "a 1000-token budget must report itself as capping the workup"
+    assert not tight.truncated, "a capped workup is not a truncated one"
+    assert tight.trace.final_response, "the reserve must still yield an assessment"
+
+    _case, roomy = _run(ctx, 16384)
+    assert not roomy.forced_conclusion, "a 16k budget should not cap this workup"
+    assert roomy.num_tool_calls >= tight.num_tool_calls

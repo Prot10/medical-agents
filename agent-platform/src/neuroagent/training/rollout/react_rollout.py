@@ -65,6 +65,12 @@ class RolloutResult:
     # call is indistinguishable from a deliberate conclusion further down, so it is counted
     # here and surfaced by the caller rather than left silent.
     clipped_turns: int
+    # True when the budget reserve cut the workup short and the agent was told to conclude.
+    # NOT truncation — the trajectory ends properly with a diagnosis, which is the point of the
+    # reserve — but the workup is shallower than the policy would have chosen. Without this the
+    # rollout reports "truncated 0%" while curtailing half the workups (measured: MAX_COMPLETION
+    # 4096 fits only 50.9% of the SFT policy's real workups end to end).
+    forced_conclusion: bool
     trace: AgentTrace
 
     def __post_init__(self) -> None:
@@ -424,6 +430,7 @@ class ReactRollout:
             num_tool_calls=st.num_tool_calls,
             truncated=st.truncated,
             clipped_turns=st.clipped_turns,
+            forced_conclusion=st.must_conclude,
             trace=st.trace_or(trace),
         )
 
