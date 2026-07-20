@@ -114,13 +114,16 @@ class MultiTurnRolloutFunc:
             previous = getattr(gen_cfg, "max_new_tokens", None)
             try:
                 gen_cfg.max_new_tokens = self.per_turn_max_tokens
-                completion_ids, _logprobs, _extra = trainer._generate_single_turn(
-                    batch_ids, None, {}
-                )
+                # Unpack only the first element. TRL's arity here is NOT stable across versions
+                # — 0.29 returned 3 values, 1.8 returns (completion_ids, logprobs) — and a fixed
+                # 3-way unpack crashed the first multi-turn step after the upgrade. What IS
+                # stable is that completion_ids comes first, so bind that and ignore the rest.
+                completion_ids, *_rest = trainer._generate_single_turn(batch_ids, None, {})
             finally:
                 gen_cfg.max_new_tokens = previous
-            # HF generate supplies no logprobs; the rollout fills 0.0 and TRL skips the
-            # importance-sampling correction (which is exact anyway when fully on-policy).
+            # This path yields no logprobs to keep: TRL sets `logprobs = None` on the plain
+            # HF-generate branch (grpo_trainer.py, "not used in this case"). The rollout fills
+            # 0.0 and TRL skips the importance-sampling correction — exact when on-policy.
             return [list(c) for c in completion_ids]
 
         return generate_batch_fn
