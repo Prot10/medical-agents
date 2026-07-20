@@ -81,6 +81,18 @@ if [ "$MULTI_TURN" = 1 ]; then
   # silently truncates real agent behaviour rather than just clipping tokens.
   MAX_COMPLETION="${MAX_COMPLETION:-4096}"
   MULTI_TURN_FLAG="--multi-turn"
+  # vLLM-accelerated rollouts (colocate — the only single-GPU vLLM mode). Generation is
+  # essentially all of a multi-turn step, and HF generate re-prefills the shared ~6.2k prompt
+  # once per generation per turn; vLLM prefix-caches it. VLLM_GPU_FRAC is the engine's share of
+  # the card, the rest is left for training.
+  # MEASURED: colocate does NOT fit at 4B on a 40GB card. The engine's share (~12GB at 0.30)
+  # plus training OOMs at 38.9GB in use. This matches HF's own guidance that colocate is
+  # practical "up to ~3B on a 24GB GPU". Server mode is not an option either — TRL refuses to
+  # share a device with it. So vLLM rollouts need a second GPU; default OFF.
+  # Everything is wired and working up to this point (engine init, weight sync, generation,
+  # tool execution, sampling logprobs) — only the memory does not fit.
+  USE_VLLM="${USE_VLLM:-0}"
+  VLLM_GPU_FRAC="${VLLM_GPU_FRAC:-0.30}"
   # Multi-turn reaches a diagnosis, so correctness/format are live components again. The
   # single-turn config zeroes both, which makes a right and a wrong diagnosis score identically.
   REWARD_CONFIG_DEFAULT="agent-platform/config/training/reward_weights_grpo_multiturn.yaml"
@@ -111,6 +123,11 @@ BATCH_SIZE="${BATCH_SIZE:-$NUM_GENERATIONS}"
 # It tracks NUM_GENERATIONS, not BATCH_SIZE: a reward group may never be split across generation
 # batches (TRL enforces divisibility), whereas the training-forward batch is free to be smaller.
 GEN_BATCH="${GEN_BATCH:-$NUM_GENERATIONS}"
+
+VLLM_FLAGS=""
+if [ "${USE_VLLM:-0}" = 1 ]; then
+  VLLM_FLAGS="--use-vllm --vllm-gpu-memory-utilization ${VLLM_GPU_FRAC:-0.30}"
+fi
 
 [ -f "$SFT_ADAPTER/adapter_model.safetensors" ] || {
   ui_err "no SFT adapter at $SFT_ADAPTER — run run_sft_training.sh first."; exit 1; }
@@ -172,7 +189,7 @@ uv run python -m neuroagent.training.train_grpo \
     --eval-subset "$EVAL_SUBSET" \
     --eval-steps "$EVAL_STEPS" \
     --log-file "$LOG_FILE" \
-    $MULTI_TURN_FLAG \
+    $MULTI_TURN_FLAG $VLLM_FLAGS \
     $QLORA_FLAG
 STATUS=$?
 
