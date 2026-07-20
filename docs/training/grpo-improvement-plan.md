@@ -113,6 +113,30 @@ Recipe: clip-higher `epsilon_high=0.28`, KL=0, `mask_truncated_completions=True`
   without ordering tests. Now counted (`clipped_turns`), warned about, and configurable
   (`PER_TURN`). Set it from the measured per-turn distribution of the SFT policy, not by guess.
 
+### OPEN: MAX_COMPLETION=4096 covers only half the real workups
+The completion holds the assistant turns AND the (masked) tool results, so the budget caps
+workup depth. Measured — 595 real MockServer outputs through the real tokenizer, tool-call
+counts from the SFT 4B's own eval runs, sampled jointly:
+
+| MAX_COMPLETION | workups fitting fully | median tool calls affordable |
+|---:|---:|---:|
+| 4096 (current) | **50.9%** | 3 |
+| 6144 | 80.3% | 4 |
+| 8192 | 93.0% | 6 |
+
+Both inputs are heavy-tailed (tool result p50 633 / p90 1612 / max 3050 tokens; tool calls
+p50 3 / p90 6 / max 15), which is why point estimates mislead here.
+
+The SFT 4B performs a median of 3 tool calls and a p90 of 6. At 4096 roughly **half** of
+trajectories hit the reserve and are forced to conclude early. That is safe — the reserve
+guarantees a diagnosis — but it means GRPO trains a policy on shallower workups than the one
+we evaluate, silently shaping the exact behaviour it is meant to optimise.
+
+The tension: 4096 is the measured memory ceiling at G=4 on the 40GB card (37.3 GB peak, 6144
+OOM'd). Generation KV scales roughly with G x length, so G=2 @ 8192 is the same order of
+memory — but G=2 makes the group advantage a bare paired comparison. **Needs a memory probe
+before choosing**, not a guess. vLLM would dissolve the trade entirely, but needs a 2nd GPU.
+
 ## Framework decision (branch `feat/agentic-rl-vllm-rollouts`)
 
 Researched switching away from TRL for multi-turn agentic RL. **Conclusion: stay on TRL, but
