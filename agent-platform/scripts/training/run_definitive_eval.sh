@@ -104,10 +104,15 @@ _eval() {
   # the in-flight requests, so an 8192-token turn at 8-way needs ~128 s and the interactive 120 s
   # default would time it out — and a timeout is scored as a FAILED case, biasing accuracy down
   # for whichever model rambles longer (typically base). 300 s gives margin at 8-way.
+  # presence_penalty applies only to the sampled (non-greedy) arm. The default (1.5) is
+  # aggressive: on the 9B it suppressed re-stating the diagnosis in the final turn and left 75%
+  # of trajectories with an EMPTY assessment (the 4B, with shorter turns, was unaffected at 1%).
+  # Lower it via PRESENCE_PENALTY when a model front-loads a verbose first turn.
   uv run python "$EVAL" evaluate \
     --model-id "$mid" --run-name "$rn" --split "$SPLIT" --hospital "$HOSPITAL" \
     --temperature "$temp" --repeats "$reps" --output "$out" --port "$PORT" \
     --concurrency "$CONCURRENCY" --request-timeout "${REQUEST_TIMEOUT:-300}" \
+    --presence-penalty "${PRESENCE_PENALTY:-1.5}" \
     --log-file "$LOG_FILE"
 }
 
