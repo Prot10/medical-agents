@@ -256,7 +256,10 @@ PRECISION=bf16 bash agent-platform/scripts/training/run_sft_training.sh Qwen/Qwe
 # 2. RE-BASELINE base vs SFT on the corrected benchmark — the mandatory gate.
 #    No GRPO number is comparable until this exists (the benchmark changed: MockServer
 #    follow-ups fixed, crashed cases scored, think-leak removed).
-bash agent-platform/scripts/training/run_definitive_eval.sh Qwen3.5-4B
+#    FRESH=1 is REQUIRED after a benchmark change — without it the harness silently reuses the
+#    old result JSONs and only recomputes comparison.json (it keys skip on file existence).
+#    The think-preserving chat template is now applied automatically (train/serve parity).
+FRESH=1 bash agent-platform/scripts/training/run_definitive_eval.sh Qwen3.5-4B
 
 # 3. GRPO — defaults ARE the validated recipe (G=4 / 8192 / per-turn 3072 / 32 chunks).
 #    ~62 h/epoch on the 4B SFT policy (465 s/prompt-rollout x 482 prompts).
