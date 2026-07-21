@@ -95,16 +95,30 @@ Measured on the 40GB A100 (base model, then confirmed from the SFT adapter):
 | `num_iterations` | 1 | fully on-policy |
 | precision | QLoRA | 4-bit NF4, rank 64 |
 
-Measured behaviour at this recipe:
+Measured behaviour at this recipe, on **both** the base model and the actual SFT policy (the
+one that gets trained). They differ sharply, and the recipe was sized for the harder base case:
 
-```
-clipped-turn   0%      per-turn cap never cuts a turn mid-reasoning
-budget-capped  0%      workups run to completion
-mean turns     ~5-6    tool calls ~3
-fit            96%     39.5/41 GB, no OOM through generation AND backward
-step_time      ~840 s  => ~37 h/epoch (482 train examples, G=4)
-reward_std     0.17    the reward discriminates between trajectories
-```
+| | base (fresh LoRA) | **SFT adapter** |
+|---|---:|---:|
+| per-turn tokens (p50 / max) | 1161 / 2106 | **289 / 879** |
+| turns | ~5-6 | **8.5** |
+| tool calls | ~3.0 | **3.8** |
+| clipped-turn / budget-capped | 0% / 0% | **0% / 0%** |
+| peak memory | 39.5 GB (96%) | **31.4 GB (77%)** |
+| step_time (per prompt-rollout) | 840 s | **465 s** |
+| reward mean / std | 0.45 / 0.17 | **0.56 / —** |
+
+The SFT policy writes **short, focused turns and more of them** — the opposite of base — so it is
+memory-cheaper and faster, and the recipe has comfortable margin (77%, 0% truncation of any
+kind). `PER_TURN=3072` gives ~3.5× headroom over the SFT max of 879, absorbing drift as the
+policy changes during training; the rollout logs the per-turn tail every step so drift is
+visible.
+
+**Runtime: ~62 h/epoch on the 4B SFT policy** (482 train prompts × 465 s per prompt-rollout;
+each prompt must be rolled out once per epoch, so this is invariant to how batch/grad-accum split
+it). Generation dominates completely — the parked vLLM path (§9) would cut this by prefix-caching
+the shared ~6 k prompt, but needs a 2nd GPU. *(An earlier "~37 h" figure in these notes was an
+arithmetic error and is corrected here.)*
 
 ### 3.3 Reflection is ON
 
@@ -245,7 +259,7 @@ PRECISION=bf16 bash agent-platform/scripts/training/run_sft_training.sh Qwen/Qwe
 bash agent-platform/scripts/training/run_definitive_eval.sh Qwen3.5-4B
 
 # 3. GRPO — defaults ARE the validated recipe (G=4 / 8192 / per-turn 3072 / 32 chunks).
-#    ~37 h/epoch on the 4B.
+#    ~62 h/epoch on the 4B SFT policy (465 s/prompt-rollout x 482 prompts).
 MULTI_TURN=1 PRECISION=qlora \
   bash agent-platform/scripts/training/run_grpo_training.sh Qwen3.5-4B
 

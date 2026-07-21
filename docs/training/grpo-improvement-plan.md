@@ -221,9 +221,11 @@ MULTI_TURN=1 PRECISION=qlora \
   bash agent-platform/scripts/training/run_grpo_training.sh Qwen3.5-4B
 ```
 
-Runtime: **~840 s/step**, ~482 steps/epoch => **~37 h/epoch** at G=4 with real ~5-6 turn
-rollouts. (The earlier "~160 s/step" was measured on degenerate one-turn rollouts under the
-512-token cap and is not representative.) Eval generates too — `num_generations_eval x eval
+Runtime: **~62 h/epoch on the 4B SFT policy** — 482 train prompts × ~465 s per prompt-rollout
+(measured from the SFT adapter; each prompt is rolled out once per epoch, so this is invariant
+to batch/grad-accum). Base is slower (~840 s/prompt, ~112 h) but is not what gets trained. The
+earlier "~160 s/step" was measured on degenerate one-turn rollouts under the 512-token cap and
+is not representative; an "~37 h/epoch" figure was an arithmetic error. Eval generates too — `num_generations_eval x eval
 prompts` rollouts, ~22 min at 18x4 — so keep `EVAL_STEPS` sparse or lower `--num-generations-eval`.
 
 Everything on EOS needs a live Kerberos ticket (`kinit`); an expired one shows up as
