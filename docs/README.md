@@ -14,6 +14,7 @@ labelled as such — do not follow its commands.
 | [`architecture-diagram.html`](architecture-diagram.html) | Visual system map (open in a browser): runtime topology, ReAct loop, dataset/training pipeline |
 | [`benchmark/tool-contract.md`](benchmark/tool-contract.md) | **What a tool is, what a case may say about it, and how that is enforced.** Read before touching a case or a tool |
 | [`benchmark/diagnosis-scoring.md`](benchmark/diagnosis-scoring.md) | What `diagnostic_accuracy_top1`/`top3` actually measure, and why old figures do not compare |
+| [`training/fine-tuning-overview.md`](training/fine-tuning-overview.md) | **Start here for fine-tuning.** The whole SFT → GRPO pipeline: validated recipe, reward, chunked-logprob memory, the bugs found and fixed, and how to run each stage |
 | [`training/distillation.md`](training/distillation.md) | Gold trajectory generation and SFT of the small student models |
 | [`training/sft-recipe-hardware-and-evaluation.md`](training/sft-recipe-hardware-and-evaluation.md) | The SFT recipe, bf16-vs-QLoRA + sequence-length/softmax memory, fla, EOS/RAM staging, and the literature-aligned eval — with measured numbers |
 
