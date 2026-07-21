@@ -100,10 +100,15 @@ _eval() {
   local samp="$1" temp="$2" reps="$3" mid="$4" rn="$5"
   local out="$ROOT/$samp/${rn}_results.json"
   if [ -f "$out" ]; then ui_info "$samp/$rn exists, skipping"; return 0; fi
+  # request_timeout scales with concurrency: the server's generation throughput is split across
+  # the in-flight requests, so an 8192-token turn at 8-way needs ~128 s and the interactive 120 s
+  # default would time it out — and a timeout is scored as a FAILED case, biasing accuracy down
+  # for whichever model rambles longer (typically base). 300 s gives margin at 8-way.
   uv run python "$EVAL" evaluate \
     --model-id "$mid" --run-name "$rn" --split "$SPLIT" --hospital "$HOSPITAL" \
     --temperature "$temp" --repeats "$reps" --output "$out" --port "$PORT" \
-    --concurrency "$CONCURRENCY" --log-file "$LOG_FILE"
+    --concurrency "$CONCURRENCY" --request-timeout "${REQUEST_TIMEOUT:-300}" \
+    --log-file "$LOG_FILE"
 }
 
 for samp in "greedy:0:1" "sampled:0.7:3"; do

@@ -251,6 +251,13 @@ def evaluate(
     concurrency: int = typer.Option(8, help="Cases run in parallel against vLLM (1 = serial)"),
     max_turns: int = typer.Option(None, help="Cap the agent's ReAct turns (default: agent.yaml value)"),
     max_tokens: int = typer.Option(8192, help="Max tokens per model call"),
+    request_timeout: float = typer.Option(
+        300.0,
+        help="Per-request HTTP timeout (s). Higher than the interactive default (120) because "
+        "under concurrency the server's throughput is split across requests: at 8-way, ~64 tok/s "
+        "each, so an 8192-token turn needs ~128 s and 120 s would time it out. A timeout is "
+        "scored as a failed case, biasing accuracy down for whichever model rambles longer.",
+    ),
     log_file: str = typer.Option(None, help="Verbose logs go HERE; the terminal shows only the progress UI"),
 ):
     """Run agent evaluation on a held-out split (default: the 100-case test set).
@@ -279,6 +286,7 @@ def evaluate(
         top_p=1.0 if greedy else 0.95,
         presence_penalty=0.0 if greedy else presence_penalty,
         hospital=hospital,
+        request_timeout=request_timeout,
     )
     if max_turns is not None:
         overrides["max_turns"] = max_turns
