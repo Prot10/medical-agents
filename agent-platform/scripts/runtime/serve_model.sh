@@ -55,10 +55,17 @@ GPU_MEM="${GPU_MEMORY_UTILIZATION:-0.95}"
 COMMON_FLAGS=(
   --port "$PORT"
   --gpu-memory-utilization "$GPU_MEM"
-  --enable-prefix-caching
   --dtype auto
   --max-num-seqs "${MAX_NUM_SEQS:-4}"
 )
+# Prefix caching is a big speed win (the ~6k prompt is shared across an agent's turns), but vLLM
+# flags it as EXPERIMENTAL for Qwen3.5's GDN/Mamba linear-attention layers. On by default;
+# NO_PREFIX_CACHING=1 disables it when a reported benchmark must not depend on that path.
+if [ "${NO_PREFIX_CACHING:-0}" = 1 ]; then
+  echo "Prefix caching DISABLED (NO_PREFIX_CACHING=1)"
+else
+  COMMON_FLAGS+=(--enable-prefix-caching)
+fi
 
 # Train/serve parity for multi-turn GRPO. Qwen3.5's shipped template is an INFERENCE template:
 # it strips <think> from any assistant turn a user message follows, so with reflection enabled
