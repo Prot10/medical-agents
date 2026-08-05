@@ -61,7 +61,6 @@ missing `clinical_context` is expected and fine. An unknown key is not.
 | `skin_biopsy_iencf` | Intraepidermal nerve fiber density | Small-fiber neuropathy |
 | `neuropsych_battery` | Comprehensive cognitive testing | AD, FTD, NPH, MCI, FND |
 | `polysomnography` | Overnight sleep study | RBD, OSA, narcolepsy |
-| `mslt` | Multiple sleep latency test | Narcolepsy diagnosis (post-PSG) |
 | `tilt_table` | Head-up tilt table test | Syncope (vasovagal vs cardiac vs POTS) |
 | `exercise_stress_test` | Graded exercise ECG stress test | Exertional syncope, ischemia, catecholaminergic arrhythmia |
 | `vep` | Visual evoked potentials | MS optic pathway, demyelinating disease |
@@ -72,7 +71,6 @@ missing `clinical_context` is expected and fine. An unknown key is not.
 | `visual_field_perimetry` | Humphrey/Goldmann VF | Chiasmal compression, MS |
 | `ice_pack_test` | Bedside ice-pack ptosis test | MG (rapid screen) |
 | `respiratory_function` | FVC, MIP/MEP, NIF | ALS respiratory monitoring, MG crisis risk |
-| `pure_tone_audiometry` | Formal pure-tone audiometry | Sensorineural hearing loss (bacterial meningitis) |
 | `minor_salivary_gland_biopsy` | Lip biopsy, focus score | Sjögren's confirmation |
 | `genetic_panel:<panel>` | Targeted gene panel | See panel list below |
 

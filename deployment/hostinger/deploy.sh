@@ -111,9 +111,11 @@ rsync -az --delete \
   packages/neuroagent-schemas/ \
   "$VPS_HOST:$VPS_PATH/packages/neuroagent-schemas/"
 
-# Config: ONLY the review/ subdir is needed (reviewer codes + future review
-# config). hospital_rules/, system_prompts/, tools/costs.yaml, etc. belong to
-# the main agent and stay local.
+# Config: of config/, only review/ is synced here. hospital_rules/ and
+# system_prompts/ belong to the main agent and stay local. config/tools/costs.yaml
+# IS shipped, further down with conditions.yaml — the tool catalog reads both, and
+# the enum vocabularies the review app serves are derived from costs.yaml, so a
+# stale copy silently misrepresents the action space to reviewers.
 # reviewer_codes.yaml itself is excluded here — gated behind --force-codes.
 rsync -az --delete \
   --exclude 'reviewer_codes.yaml' \

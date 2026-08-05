@@ -13,10 +13,14 @@ class SpecializedTestTool(BaseTool):
         "Order specialized neurological tests: nerve/muscle studies (emg_ncs, "
         "emg_single_fiber, repetitive_nerve_stimulation, nerve_biopsy, muscle_biopsy, "
         "skin_biopsy_iencf), evoked potentials (vep, ssep, baep), cognitive testing "
-        "(neuropsych_battery), sleep studies (polysomnography, mslt), autonomic and "
+        "(neuropsych_battery), sleep studies (polysomnography), autonomic and "
         "cardiac workup (tilt_table, autonomic_testing, exercise_stress_test), "
         "ophthalmic tests (optical_coherence_tomography, visual_field_perimetry), "
         "respiratory_function (FVC/MIP/MEP, for ALS and MG), ice_pack_test, "
+        # `mslt` and `pure_tone_audiometry` were retired 2026-08-05: priced and orderable
+        # but referenced by zero cases and never requested in the clinical tool review, so
+        # they were unreviewed action-space surface. Reinstate with a case that needs them
+        # (pure-tone audiometry has a WHO 2025 indication for post-meningitis hearing loss).
         "and targeted gene panels via 'genetic_panel:<panel>'."
     )
     parameter_schema = {

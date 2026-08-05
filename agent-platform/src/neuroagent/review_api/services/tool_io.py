@@ -5,10 +5,21 @@ the deploy script only rsyncs ``review_api/`` and the workspace ``__init__.py``.
 So the agent-facing ``parameter_schema`` dicts that live next to each tool's
 ``execute()`` method aren't importable here. We mirror them verbatim below.
 
-**KEEP IN SYNC** with ``agent-platform/src/neuroagent/tools/*.py``. The truth
-is the tool class's ``parameter_schema`` attribute; the test
-``test_tool_io_schemas_match`` (when added) should diff this mirror against the
-real classes to catch drift in CI.
+**KEEP IN SYNC** with ``agent-platform/src/neuroagent/tools/*.py``. The truth is
+the tool class's ``parameter_schema`` attribute, and
+``tests/test_tool_io_schemas.py::test_tool_io_schemas_match`` diffs this mirror
+against the real classes so drift fails CI.
+
+That test exists because the mirror *did* drift, silently, and it mattered. The
+catchall tools' vocabularies are generated from ``costs.yaml`` in the real tools
+(see ``tools/vocabulary.py``); commit 9a0636c moved them onto that single source
+but only renamed ``imaging_type`` -> ``modality`` here, leaving the stale enum
+lists behind. Between 2026-07-19 and 2026-07-27 the clinical reviewers therefore
+assessed the tool catalog against 9 of 21 specialized tests, 6 of 12 imaging
+modalities and 4 of 6 cardiac monitors, and reported as "missing" six studies the
+agent could already order. The vocabulary-bearing parameters are consequently no
+longer written out here at all: they are injected from ``costs.yaml``, which the
+review_api already loads, so this file cannot go stale on them again.
 
 Return shapes are derived from the Pydantic models in
 ``neuroagent_schemas.tool_outputs`` — those ARE shipped, so no mirror is needed
@@ -17,14 +28,55 @@ for outputs.
 
 from __future__ import annotations
 
+import copy
+import logging
+from functools import lru_cache
+from pathlib import Path
 from typing import Any, get_args, get_origin
 
+import yaml
 from neuroagent_schemas.case import _TOOL_OUTPUT_MODEL
 from pydantic import BaseModel
 from pydantic.fields import FieldInfo
 
+from ..config import TOOL_COSTS_PATH
+
+logger = logging.getLogger(__name__)
+
+# --- Vocabularies derived from costs.yaml -----------------------------
+#
+# `(tool, parameter) -> costs.yaml block` for every parameter whose enum is a
+# closed vocabulary priced in costs.yaml. Mirrors tools/vocabulary.py, which the
+# real tool classes use; kept separate only because tools/ is not shipped to the
+# review VPS. Sorted, so enum order matches the real schema exactly.
+_COSTS_DERIVED_ENUMS: dict[tuple[str, str], tuple[str, str]] = {
+    ("order_advanced_imaging", "modality"): ("order_advanced_imaging", "by_type"),
+    ("order_specialized_test", "test_type"): ("order_specialized_test", "by_type"),
+    ("order_cardiac_monitoring", "monitor_type"): ("order_cardiac_monitoring", "by_type"),
+}
+
+@lru_cache(maxsize=4)
+def _load_tool_costs(costs_path: Path = TOOL_COSTS_PATH) -> dict[str, Any]:
+    if not costs_path.exists():  # pragma: no cover — misconfiguration
+        logger.warning("Tool costs config not found at %s", costs_path)
+        return {}
+    with open(costs_path) as f:
+        return (yaml.safe_load(f) or {}).get("tools", {})
+
+
+def _vocabulary(tool_name: str, parameter: str) -> list[str] | None:
+    """The closed enum for a costs-derived parameter, or None if not one."""
+    block = _COSTS_DERIVED_ENUMS.get((tool_name, parameter))
+    if block is None:
+        return None
+    tool_block, key = block
+    return sorted(_load_tool_costs().get(tool_block, {}).get(key, {}))
+
 
 # --- Parameter schemas (verbatim mirror of tools/*.py) ----------------
+#
+# Parameters listed in `_COSTS_DERIVED_ENUMS` intentionally carry no `enum` key
+# here — `parameters_for()` injects it from costs.yaml.
 
 _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
     "analyze_brain_mri": {
@@ -178,10 +230,11 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
             },
             "monitor_type": {
                 "type": "string",
-                "enum": ["holter_24h", "holter_48h", "event_monitor_30d", "telemetry"],
                 "description": (
                     "Type of monitoring. 'holter_24h'/'holter_48h': continuous recording. "
-                    "'event_monitor_30d': patient-activated, captures infrequent events. "
+                    "'event_monitor_14d'/'event_monitor_30d': patient-activated, captures "
+                    "infrequent events. 'implantable_loop_recorder': months to years of "
+                    "monitoring (cryptogenic stroke, unexplained syncope). "
                     "'telemetry': inpatient continuous monitoring."
                 ),
                 "default": "holter_24h",
@@ -198,17 +251,14 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
             },
             "modality": {
                 "type": "string",
-                "enum": [
-                    "amyloid_PET", "FDG_PET", "DaTscan",
-                    "perfusion_MRI", "MR_spectroscopy", "carotid_duplex",
-                ],
                 "description": (
-                    "Type of advanced imaging. 'amyloid_PET': amyloid plaque detection "
-                    "(Alzheimer's). 'FDG_PET': glucose metabolism (dementia, tumor). "
-                    "'DaTscan': dopamine transporter imaging (parkinsonian syndromes). "
-                    "'perfusion_MRI': cerebral blood flow (stroke, tumor grading). "
-                    "'MR_spectroscopy': brain metabolite analysis (tumor, metabolic). "
-                    "'carotid_duplex': carotid artery stenosis screening."
+                    "Imaging modality. 'amyloid_PET'/'tau_PET': Alzheimer biomarkers. "
+                    "'FDG_PET': glucose metabolism (dementia pattern, tumor grading). "
+                    "'DaTscan': dopamine transporter (parkinsonian syndromes). "
+                    "'MIBG_scan': cardiac sympathetic denervation (PD vs MSA). "
+                    "'perfusion_MRI': cerebral blood flow. 'MR_spectroscopy': metabolites. "
+                    "'MR_angiography'/'MR_venography': arterial / venous sinus imaging. "
+                    "'carotid_duplex': carotid stenosis. 'transcranial_doppler': vasospasm."
                 ),
             },
         },
@@ -221,20 +271,21 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                 "type": "string",
                 "description": "Clinical indication for the specialized test.",
             },
+            # `{genetic_panels}` is filled from costs.yaml by parameters_for() —
+            # JSON Schema `enum` cannot express the `genetic_panel:<panel>` family,
+            # so the real tool documents it in prose and we must reproduce that
+            # prose exactly, panel list included.
             "test_type": {
                 "type": "string",
-                "enum": [
-                    "neuropsych_battery", "emg_ncs", "vep", "ssep", "baep",
-                    "tilt_table", "polysomnography", "autonomic_testing",
-                    "exercise_stress_test",
-                ],
                 "description": (
-                    "Type of specialized test. 'neuropsych_battery': comprehensive "
-                    "cognitive testing (MMSE, MoCA, RAVLT, etc.). 'emg_ncs': "
-                    "electromyography and nerve conduction studies. 'vep'/'ssep'/'baep': "
-                    "evoked potentials. 'tilt_table': orthostatic syncope evaluation. "
-                    "'polysomnography': overnight sleep study. 'autonomic_testing': "
-                    "autonomic reflex screen. 'exercise_stress_test': cardiac stress test."
+                    "Type of specialized test. Also accepts 'genetic_panel:<panel>' where "
+                    "<panel> is one of: {genetic_panels}. "
+                    "'emg_ncs': nerve conduction + needle EMG. 'emg_single_fiber' and "
+                    "'repetitive_nerve_stimulation': neuromuscular junction (myasthenia). "
+                    "'respiratory_function': FVC, MIP/MEP, NIF (ALS monitoring, MG crisis "
+                    "risk). 'neuropsych_battery': comprehensive cognitive testing. "
+                    "'vep'/'ssep'/'baep': evoked potentials. 'tilt_table': syncope. "
+                    "'optical_coherence_tomography': retinal RNFL (MS, optic neuritis)."
                 ),
             },
         },
@@ -339,7 +390,24 @@ def output_fields_for(tool_name: str) -> list[dict[str, Any]] | None:
 def parameters_for(tool_name: str) -> dict[str, Any] | None:
     """Return the agent-facing JSON schema for the tool's parameters.
 
-    None if the tool isn't in the mirror — call site should treat missing
-    metadata as "unknown" rather than rendering an empty form.
+    Closed vocabularies (`_COSTS_DERIVED_ENUMS`) and the `{genetic_panels}`
+    placeholder are filled from costs.yaml, so what a reviewer sees is what the
+    agent can actually order. None if the tool isn't in the mirror — call site
+    should treat missing metadata as "unknown" rather than rendering an empty
+    form.
     """
-    return _TOOL_PARAMETERS.get(tool_name)
+    schema = _TOOL_PARAMETERS.get(tool_name)
+    if schema is None:
+        return None
+    schema = copy.deepcopy(schema)
+    panels = ", ".join(
+        sorted(_load_tool_costs().get("order_specialized_test", {}).get("genetic_panels", {}))
+    )
+    for parameter, spec in schema.get("properties", {}).items():
+        vocabulary = _vocabulary(tool_name, parameter)
+        if vocabulary:
+            spec["enum"] = vocabulary
+        description = spec.get("description")
+        if isinstance(description, str) and "{genetic_panels}" in description:
+            spec["description"] = description.format(genetic_panels=panels)
+    return schema
