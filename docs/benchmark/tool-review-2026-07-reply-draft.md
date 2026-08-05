@@ -75,9 +75,9 @@ Ci scusiamo: parte del vostro lavoro è stata spesa su un quadro incompleto per 
 
 Accolte. In sintesi:
 
-- **18 cambi di tier** (required ↔ optional) e **13 rimozioni** di tool non pertinenti
-  (EEG ed ECG da SM, emicrania, AD e Parkinson; echo e monitoraggio cardiaco dall'epilessia
-  temporale; imaging avanzato dalla NPH).
+- **18 cambi di tier** (required ↔ optional) e **6 rimozioni** applicate integralmente
+  (EEG ed ECG da SM e Parkinson, ECG da emicrania, AD e meningite batterica). Le altre 7
+  richieste di rimozione le abbiamo declassate a opzionali: vedi il punto 5.
 - **Quattro nuovi tool**, per colmare i vuoti reali che restano dopo la correzione del
   catalogo. Il problema di fondo che avete individuato è che l'agente può guardare solo
   l'encefalo e non può prelevare campioni:
