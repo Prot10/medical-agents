@@ -1,4 +1,5 @@
-// Display labels + colors for the 20 neurological conditions in NeuroBench.
+// Display labels + colors for the neurological conditions in NeuroBench (23 in the
+// benchmark since 2026-08-05; this map also covers keys reserved but not yet populated).
 // Keep keys in sync with `NeurologicalCondition` enum in
 // packages/neuroagent-schemas/src/neuroagent_schemas/enums.py
 
@@ -17,7 +18,7 @@ export const CONDITION_META: Record<string, ConditionMeta> = {
   generalized_epilepsy: { label: "Generalized Epilepsy", short: "GE", color: "#0e7490", category: "epilepsy" },
   status_epilepticus: { label: "Status Epilepticus", short: "SE", color: "#155e75", category: "epilepsy" },
   ischemic_stroke: { label: "Ischemic Stroke", short: "STK", color: "#f43f5e", category: "cerebrovascular" },
-  hemorrhagic_stroke: { label: "Hemorrhagic Stroke", short: "HEM", color: "#e11d48", category: "cerebrovascular" },
+  hemorrhagic_stroke: { label: "Spontaneous Intracerebral Hemorrhage", short: "ICH", color: "#e11d48", category: "cerebrovascular" },
   subarachnoid_hemorrhage: { label: "Subarachnoid Hemorrhage", short: "SAH", color: "#be123c", category: "cerebrovascular" },
   tia: { label: "Transient Ischemic Attack", short: "TIA", color: "#fb7185", category: "cerebrovascular" },
   cadasil: { label: "CADASIL", short: "CDS", color: "#fda4af", category: "cerebrovascular" },
@@ -36,7 +37,7 @@ export const CONDITION_META: Record<string, ConditionMeta> = {
   guillain_barre: { label: "Guillain-Barré", short: "GBS", color: "#5b21b6", category: "neuromuscular" },
   peripheral_neuropathy: { label: "Peripheral Neuropathy", short: "PN", color: "#a855f7", category: "neuromuscular" },
   bacterial_meningitis: { label: "Bacterial Meningitis", short: "BACT", color: "#dc2626", category: "infectious" },
-  viral_encephalitis: { label: "Viral Encephalitis", short: "VENC", color: "#b91c1c", category: "infectious" },
+  viral_encephalitis: { label: "Herpes Simplex Encephalitis", short: "HSV", color: "#b91c1c", category: "infectious" },
   brain_tumor_glioma: { label: "Glioma", short: "GLI", color: "#1e40af", category: "tumor" },
   brain_tumor_meningioma: { label: "Meningioma", short: "MEN", color: "#1d4ed8", category: "tumor" },
   brain_tumor_metastasis: { label: "Brain Metastasis", short: "MET", color: "#2563eb", category: "tumor" },
@@ -46,6 +47,8 @@ export const CONDITION_META: Record<string, ConditionMeta> = {
   syncope_cardiac: { label: "Cardiac Syncope", short: "SYNC", color: "#f97316", category: "other" },
   syncope_vasovagal: { label: "Vasovagal Syncope", short: "VVS", color: "#fb923c", category: "other" },
   functional_neurological_disorder: { label: "FND", short: "FND", color: "#64748b", category: "functional" },
+  vascular_dementia: { label: "Vascular Dementia", short: "VaD", color: "#c084fc", category: "neurodegenerative" },
+  dementia_with_lewy_bodies: { label: "Dementia with Lewy Bodies", short: "DLB", color: "#8b5cf6", category: "neurodegenerative" },
 }
 
 export function conditionLabel(condition: string): string {

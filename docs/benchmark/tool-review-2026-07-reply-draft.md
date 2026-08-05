@@ -112,9 +112,9 @@ Per le quattro nuove patologie prepariamo noi una prima versione dei pannelli
 piattaforma insieme ai casi: così la conferma è parte della review dei casi e non un compito
 aggiuntivo.
 
-Stiamo inoltre chiudendo un arretrato di difetti tecnici già noti su una parte dei casi
-(riferimenti a un tool non più esistente, parametri fuori vocabolario): non avrebbe senso
-farvi trovare bug che abbiamo già in lista.
+I 600 casi attuali passano tutti i controlli automatici di contratto (600/600, zero
+problemi), quindi non vi troverete davanti difetti tecnici che conosciamo già: quello che
+segnalerete sarà sostanza clinica.
 
 Vi scriviamo appena i casi sono pronti per la review. Grazie ancora — il livello di
 dettaglio dei vostri commenti sta cambiando il progetto in meglio.

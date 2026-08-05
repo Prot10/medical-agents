@@ -11,13 +11,17 @@ focal_epilepsy_temporal:
     age_range: [18, 60]
     sex_bias: null
   encounter_type: "inpatient"
-  required_modalities: [EEG, MRI, LABS]
+  # Clinical tool review, July 2026: LABS required->optional (only to exclude acute symptomatic
+  # seizures); CT optional where MRI is unavailable. R1 asked to REMOVE echo and
+  # cardiac_monitoring; kept optional because FEPI-TEMP-P05 and -RP02 are puzzles first attributed
+  # to syncope and need the branch
+  required_modalities: [EEG, MRI]
   # Echo + cardiac_monitoring are used only in atypical presentations where
   # syncope-mimic ruleout is on the differential (e.g. FEPI-TEMP-P05 was
   # initially attributed to vasovagal/cardiac syncope before EEG localised
   # focal temporal onset). Low overall usage; the option must remain so the
   # clinical pathway can branch.
-  optional_modalities: [ECG, echo, cardiac_monitoring]
+  optional_modalities: [LABS, ECG, CT, echo, cardiac_monitoring]
   key_findings:
     eeg:
       straightforward:
@@ -93,8 +97,12 @@ ischemic_stroke:
     age_range: [18, 85]
     sex_bias: "slight_male"
   encounter_type: "emergency"
-  required_modalities: [MRI, LABS, ECG]
-  optional_modalities: [CT, EEG, echo, cardiac_monitoring]
+  # Clinical tool review, July 2026: CT optional->REQUIRED (non-contrast CT is the initial
+  # emergent study); MRI required->optional (an alternative, never a delay to thrombolysis);
+  # advanced_imaging optional for tissue-based selection outside the standard window (AHA/ASA
+  # 2026)
+  required_modalities: [CT, LABS, ECG]
+  optional_modalities: [MRI, EEG, echo, cardiac_monitoring, advanced_imaging]
   key_findings:
     mri:
       straightforward:
@@ -171,7 +179,10 @@ autoimmune_encephalitis_nmdar:
     age_range: [18, 40]
     sex_bias: "female_predominant"
   encounter_type: "emergency"
-  required_modalities: [EEG, MRI, LABS, CSF]
+  # Clinical tool review, July 2026: occult-tumour screening imaging added as REQUIRED
+  # (body_imaging): a missed ovarian teratoma is a missed treatable cause and no existing item
+  # covered it (Graus 2016)
+  required_modalities: [EEG, MRI, LABS, CSF, body_imaging]
   optional_modalities: [ECG]
   key_findings:
     eeg:
@@ -265,8 +276,13 @@ alzheimers_early:
     age_range: [60, 85]
     sex_bias: "slight_female"
   encounter_type: "outpatient"
-  required_modalities: [MRI, LABS]
-  optional_modalities: [EEG, ECG, CSF]
+  # Clinical tool review, July 2026: structured cognitive assessment added as REQUIRED and
+  # sequenced first; CT optional where MRI is contraindicated; advanced_imaging optional for
+  # FDG-PET/amyloid PET; specialized_test optional for genetics in young onset. ECG removed. R1
+  # asked to REMOVE EEG; kept optional because ALZ-EARLY-RP04 uses it on a CJD/encephalopathy
+  # differential
+  required_modalities: [clinical_assessment, MRI, LABS]
+  optional_modalities: [CSF, advanced_imaging, CT, specialized_test, EEG]
   key_findings:
     mri:
       straightforward:
@@ -361,8 +377,12 @@ syncope_cardiac:
   encounter_type: "emergency"
   # EEG is used only to rule out seizure as the syncope mimic, not as first-line
   # workup for cardiac syncope (3 cases legitimately skip EEG).
-  required_modalities: [ECG, LABS, echo]
-  optional_modalities: [EEG, MRI, cardiac_monitoring]
+  # Clinical tool review, July 2026: cardiac_monitoring optional->REQUIRED (the only test
+  # producing symptom-rhythm correlation; ESC 2018 Class I in high-risk patients); LABS
+  # required->optional (low yield unless clinically suggested); advanced cardiac imaging added as
+  # optional
+  required_modalities: [ECG, echo, cardiac_monitoring]
+  optional_modalities: [LABS, EEG, MRI, advanced_imaging]
   key_findings:
     ecg:
       straightforward:
@@ -440,8 +460,11 @@ multiple_sclerosis:
     age_range: [20, 45]
     sex_bias: "female_predominant"
   encounter_type: "inpatient"
-  required_modalities: [MRI, LABS, CSF]
-  optional_modalities: [EEG, ECG, specialized_test]
+  # Clinical tool review, July 2026: CSF required->optional (2024 McDonald: LP not universally
+  # required if criteria are otherwise met); EEG and ECG removed (no diagnostic role);
+  # specialized_test narrowed to optic-nerve testing (OCT, VEP)
+  required_modalities: [MRI, LABS]
+  optional_modalities: [CSF, specialized_test]
   key_findings:
     mri:
       straightforward:
@@ -534,8 +557,11 @@ bacterial_meningitis:
   # complications: abscess, ventriculitis, empyema, cerebritis, venous sinus
   # thrombosis) but is not first-line — CT-then-LP-then-empirics is. Practice
   # supports demoting MRI to optional rather than treating it as mandatory.
-  required_modalities: [LABS, CSF]
-  optional_modalities: [MRI, CT, EEG, ECG]
+  # Clinical tool review, July 2026: non-CSF microbiology added as REQUIRED (blood cultures,
+  # whole-blood PCR, throat swab; WHO 2025); ECG removed — neither source assigns it a role in
+  # this condition
+  required_modalities: [LABS, CSF, microbiology]
+  optional_modalities: [MRI, CT, EEG]
   key_findings:
     csf:
       straightforward:
@@ -626,8 +652,11 @@ parkinsons:
     age_range: [55, 80]
     sex_bias: "slight_male"
   encounter_type: "outpatient"
-  required_modalities: [MRI, LABS]
-  optional_modalities: [EEG, ECG, specialized_test]
+  # Clinical tool review, July 2026: LABS required->optional (MDS criteria: no fixed routine
+  # panel); EEG and ECG removed; specialized_test optional and limited to neuropsychological
+  # testing; CT optional as the MRI alternative
+  required_modalities: [MRI]
+  optional_modalities: [LABS, specialized_test, CT]
   key_findings:
     mri:
       straightforward:
@@ -699,8 +728,12 @@ brain_tumor_glioma:
   encounter_type: "inpatient"
   # EEG is required only when the patient presents with seizures; otherwise it
   # is not first-line for glioma diagnosis (3 cases legitimately skip EEG).
-  required_modalities: [MRI, LABS]
-  optional_modalities: [EEG, ECG]
+  # Clinical tool review, July 2026: tissue acquisition + integrated histomolecular diagnosis
+  # added as REQUIRED — without it the pathway can only reach a suspicion, which WHO CNS5 labels
+  # NOS; advanced_imaging optional for perfusion MRI and amino-acid PET, which separate
+  # pseudoprogression from progression
+  required_modalities: [MRI, LABS, tissue_diagnosis]
+  optional_modalities: [EEG, ECG, advanced_imaging]
   key_findings:
     mri:
       straightforward:
@@ -784,8 +817,16 @@ functional_neurological_disorder:
     age_range: [20, 50]
     sex_bias: "female_predominant"
   encounter_type: "inpatient"
-  required_modalities: [EEG, MRI, LABS]
-  optional_modalities: [ECG, EMG_NCS]
+  # Clinical tool review, July 2026: Retained as the benchmark's diagnostic-restraint probe
+  # against the reviewers' first preference: it is the only condition where correct behaviour is
+  # to withhold testing, and cost tracking needs a case class with teeth. Their objection (a
+  # purely clinical diagnosis has no diagnostic tool) is answered by
+  # perform_clinical_assessment{functional_neuro_signs} -- FND is a positive clinical diagnosis,
+  # so the examination is the required act and every instrumental study is optional. NOT an empty
+  # required set: that would leave required_coverage with a zero denominator. What separates a
+  # good agent here is ground_truth.useless_tools and cost, not coverage
+  required_modalities: [clinical_assessment]
+  optional_modalities: [EEG, MRI, LABS, ECG, EMG_NCS]
   key_findings:
     eeg:
       all_difficulties:
@@ -852,8 +893,12 @@ guillain_barre:
     age_range: [15, 85]
     sex_bias: "slight_male"
   encounter_type: "emergency"
-  required_modalities: [LABS, CSF, specialized_test]
-  optional_modalities: [MRI, ECG, cardiac_monitoring]
+  # Clinical tool review, July 2026: cardiac_monitoring optional->REQUIRED (autonomic instability
+  # triggers ICU escalation alongside FVC); respiratory monitoring is already
+  # specialized_test{respiratory_function}, which stays REQUIRED; spinal and nerve imaging added
+  # as optional to exclude cord compression
+  required_modalities: [LABS, CSF, specialized_test, cardiac_monitoring]
+  optional_modalities: [MRI, ECG, body_imaging]
   key_findings:
     labs:
       all_difficulties:
@@ -955,11 +1000,14 @@ myasthenia_gravis:
     age_range: [15, 85]
     sex_bias: "female_predominant"
   encounter_type: "inpatient"
-  required_modalities: [LABS, specialized_test, CT]
+  # Clinical tool review, July 2026: mediastinal (thymic) imaging added as REQUIRED in every newly
+  # diagnosed patient irrespective of serostatus (Jacob 2025); a chest radiograph does not satisfy
+  # it. CT demoted to optional rather than dropped, since existing cases use it for the thymus
+  required_modalities: [LABS, specialized_test, body_imaging]
   # CSF appears in 1 puzzle case (MG-RS14, MuSK+ bulbar-predominant) to rule
   # out brainstem demyelination — the MS-mimic differential is the only
   # legitimate clinical scenario in which CSF is ordered for an NMJ disorder.
-  optional_modalities: [MRI, ECG, CSF]
+  optional_modalities: [MRI, ECG, CSF, advanced_imaging, CT]
   key_findings:
     labs:
       straightforward:
@@ -1056,8 +1104,11 @@ subarachnoid_hemorrhage:
   # CSF is only mandatory when the index CT is non-diagnostic; CT-positive
   # SAH (9 straightforward cases) legitimately skip LP. Keep CSF as optional
   # to reflect the conditional-required clinical reality.
-  required_modalities: [CT, LABS, advanced_imaging]
-  optional_modalities: [CSF, ECG, echo]
+  # Clinical tool review, July 2026: CSF optional->REQUIRED (conditional on a negative or
+  # non-diagnostic CT with persisting suspicion; AHA/ASA 2023 Class I); advanced_imaging
+  # required->optional and reduced to transcranial Doppler, which carries COR 2a not COR 1
+  required_modalities: [CT, LABS, CSF]
+  optional_modalities: [advanced_imaging, ECG, echo]
   key_findings:
     ct:
       straightforward:
@@ -1162,8 +1213,14 @@ migraine_with_aura:
     age_range: [18, 50]
     sex_bias: "female_predominant"
   encounter_type: "outpatient"
-  required_modalities: [MRI, LABS]
-  optional_modalities: [EEG, ECG, echo, CSF]
+  # Clinical tool review, July 2026: MRI and LABS required->optional (ICHD-3 clinical diagnosis;
+  # imaging reserved for red flags); the structured ICHD-3 history is the actual required act. ECG
+  # removed. R1 asked to REMOVE echo, EEG and CSF; kept optional because MIG-AURA-P03/P07/P08 use
+  # a bubble study for PFO and -RM11 uses EEG and CSF on a secondary-headache differential — but
+  # see the report: those three cases have echo at the REQUIRED tier, which R1's comment implies
+  # is wrong and is a case-level fix, not a catalog one
+  required_modalities: [clinical_assessment]
+  optional_modalities: [MRI, LABS, echo, EEG, CSF]
   key_findings:
     mri:
       straightforward:
@@ -1251,12 +1308,15 @@ frontotemporal_dementia:
     age_range: [50, 70]
     sex_bias: null
   encounter_type: "outpatient"
-  required_modalities: [MRI, LABS, advanced_imaging]
+  # Clinical tool review, July 2026: validated neuropsychological testing REQUIRED
+  # (specialized_test) and cognitive assessment REQUIRED; advanced_imaging required->optional and
+  # narrowed to FDG-PET or perfusion SPECT; CT optional as the MRI alternative
+  required_modalities: [clinical_assessment, MRI, LABS, specialized_test]
   # CT appears in 2 cases that present acutely via ED (e.g. FTD-M09 brought
   # by police after shoplifting arrest) — any acute behavioural change in
   # the ED legitimately gets head CT to exclude haemorrhage/mass/hydrocephalus
   # before further workup. Not appropriate for outpatient FTD evaluation.
-  optional_modalities: [specialized_test, CT]
+  optional_modalities: [advanced_imaging, CT]
   key_findings:
     mri:
       straightforward:
@@ -1354,6 +1414,9 @@ status_epilepticus:
     age_range: [18, 75]
     sex_bias: null
   encounter_type: "emergency"
+  # Clinical tool review, July 2026: tiers confirmed unchanged; all five annotations are
+  # description-level (cEEG duration and review frequency, ASM levels, CT timing after
+  # stabilisation, venous-phase imaging)
   required_modalities: [EEG, LABS, CT]
   optional_modalities: [MRI, CSF]
   key_findings:
@@ -1562,8 +1625,13 @@ normal_pressure_hydrocephalus:
     age_range: [60, 80]
     sex_bias: "slight_male"
   encounter_type: "inpatient"
-  required_modalities: [MRI, LABS, CSF, specialized_test]
-  optional_modalities: [advanced_imaging]
+  # Clinical tool review, July 2026: specialized_test replaced by clinical_assessment: the
+  # required act is objective gait and cognition before and after the tap test, not the generic
+  # test bucket. LABS required->optional. R1 asked to REMOVE advanced_imaging; kept optional
+  # because all 30 NPH cases use amyloid or FDG PET to address the Alzheimer differential, not as
+  # an NPH test
+  required_modalities: [MRI, CSF, clinical_assessment]
+  optional_modalities: [LABS, advanced_imaging]
   key_findings:
     mri:
       straightforward:
@@ -1670,8 +1738,12 @@ hepatic_encephalopathy:
     age_range: [40, 70]
     sex_bias: "slight_male"
   encounter_type: "emergency"
-  required_modalities: [LABS, EEG, CT]
-  optional_modalities: [MRI, ECG]
+  # Clinical tool review, July 2026: infection screen with diagnostic paracentesis added as
+  # REQUIRED (microbiology; EASL 2022); EEG required->optional (no recommendation makes it
+  # routine) and CT required->optional (ACG 2026 suggests AGAINST routine imaging without focal
+  # deficits); abdominal shunt imaging added as optional
+  required_modalities: [LABS, microbiology]
+  optional_modalities: [EEG, CT, MRI, ECG, body_imaging]
   key_findings:
     labs:
       straightforward:
@@ -1777,8 +1849,11 @@ amyotrophic_lateral_sclerosis:
     age_range: [45, 75]
     sex_bias: "slight_male"
   encounter_type: "outpatient"
+  # Clinical tool review, July 2026: specialized_test stays REQUIRED as EMG/NCS specifically;
+  # spinal imaging added as optional (body_imaging) to exclude cervical myelopathy and other
+  # mimics
   required_modalities: [specialized_test, MRI, LABS]
-  optional_modalities: [CSF]
+  optional_modalities: [CSF, body_imaging]
   key_findings:
     specialized_test:
       straightforward:
