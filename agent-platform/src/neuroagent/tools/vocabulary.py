@@ -55,6 +55,51 @@ def advanced_imaging_modalities(costs_path: Path = DEFAULT_COSTS_PATH) -> list[s
     return by_type_values("order_advanced_imaging", costs_path)
 
 
+def normalize_analyte(value: str) -> str:
+    """Canonical form of a lab panel / CSF assay name, for comparison only.
+
+    `costs.yaml` carries spelling aliases of the same assay at the same price
+    (`D-dimer`/`D_dimer`, `Free T4`/`free_T4`, `protein C`/`protein_C`, ...) because the
+    600 cases were authored with free text. Scoring compares normalised names so a model
+    writing `Protein C` is not marked as having missed `protein_C`.
+    """
+    return value.strip().lower().replace(" ", "_").replace("-", "_")
+
+
+def _canonical_analytes(names: list[str]) -> list[str]:
+    """Deduplicate spelling aliases, preferring the snake_case spelling.
+
+    Used for the *advertised* enum: the aliases stay priced so existing cases keep working,
+    but the agent is shown one name per assay.
+    """
+    best: dict[str, str] = {}
+    for name in names:
+        key = normalize_analyte(name)
+        current = best.get(key)
+        if current is None or (" " in current and " " not in name):
+            best[key] = name
+    return sorted(best.values())
+
+
+def lab_panels(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
+    """The priced `interpret_labs.panels` vocabulary, aliases collapsed.
+
+    Not closed in the same sense as the catchall enums: an out-of-vocabulary analyte still
+    executes and is charged `default_panel`. The list exists so the agent can *name* the
+    assay it wants, because the score and the bill are both per-analyte.
+    """
+    return _canonical_analytes(
+        list(_load_tools(costs_path).get("interpret_labs", {}).get("by_panel", {}))
+    )
+
+
+def csf_special_tests(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
+    """The priced `analyze_csf.special_tests` vocabulary."""
+    return _canonical_analytes(
+        list(_load_tools(costs_path).get("analyze_csf", {}).get("by_special_test", {}))
+    )
+
+
 def by_type_values(tool_name: str, costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
     """Every value priced under a tool's `by_type` block — the tool's legal enum."""
     return sorted(_load_tools(costs_path).get(tool_name, {}).get("by_type", {}))

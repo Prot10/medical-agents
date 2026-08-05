@@ -53,7 +53,31 @@ _COSTS_DERIVED_ENUMS: dict[tuple[str, str], tuple[str, str]] = {
     ("order_advanced_imaging", "modality"): ("order_advanced_imaging", "by_type"),
     ("order_specialized_test", "test_type"): ("order_specialized_test", "by_type"),
     ("order_cardiac_monitoring", "monitor_type"): ("order_cardiac_monitoring", "by_type"),
+    # Array-valued: the enum belongs on `items`, and spelling aliases priced in costs.yaml
+    # are collapsed so one assay is advertised once (see tools/vocabulary.py).
+    ("interpret_labs", "panels"): ("interpret_labs", "by_panel"),
+    ("analyze_csf", "special_tests"): ("analyze_csf", "by_special_test"),
 }
+
+# Array-valued parameters: the enum sits on `items`, and their vocabularies carry spelling
+# aliases at identical prices (the 600 cases were authored with free text), so one assay is
+# advertised once. Mirrors tools/vocabulary.py::normalize_analyte / _canonical_analytes,
+# duplicated here only because tools/ is not shipped to the review VPS.
+_ARRAY_VALUED: frozenset[tuple[str, str]] = frozenset(
+    {("interpret_labs", "panels"), ("analyze_csf", "special_tests")}
+)
+
+
+def _canonical_analytes(names: list[str]) -> list[str]:
+    """Collapse spelling aliases, preferring the snake_case form."""
+    best: dict[str, str] = {}
+    for name in names:
+        key = name.strip().lower().replace(" ", "_").replace("-", "_")
+        current = best.get(key)
+        if current is None or (" " in current and " " not in name):
+            best[key] = name
+    return sorted(best.values())
+
 
 @lru_cache(maxsize=4)
 def _load_tool_costs(costs_path: Path = TOOL_COSTS_PATH) -> dict[str, Any]:
@@ -65,12 +89,15 @@ def _load_tool_costs(costs_path: Path = TOOL_COSTS_PATH) -> dict[str, Any]:
 
 
 def _vocabulary(tool_name: str, parameter: str) -> list[str] | None:
-    """The closed enum for a costs-derived parameter, or None if not one."""
+    """The enum for a costs-derived parameter, or None if not one."""
     block = _COSTS_DERIVED_ENUMS.get((tool_name, parameter))
     if block is None:
         return None
     tool_block, key = block
-    return sorted(_load_tool_costs().get(tool_block, {}).get(key, {}))
+    values = list(_load_tool_costs().get(tool_block, {}).get(key, {}))
+    if (tool_name, parameter) in _ARRAY_VALUED:
+        return _canonical_analytes(values)
+    return sorted(values)
 
 
 # --- Parameter schemas (verbatim mirror of tools/*.py) ----------------
@@ -152,8 +179,11 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
             },
             "panels": {
                 "type": "array",
-                "items": {"type": "string"},
-                "description": "Which lab panels to interpret (e.g., CBC, BMP, LFT, thyroid).",
+                "description": (
+                    "Individual assays or named panels to interpret. Each entry is billed "
+                    "separately, from EUR 5 (glucose, sodium) to EUR 2300 "
+                    "(paraneoplastic). Prefer the specific assay the question needs."
+                ),
             },
             "patient_age": {
                 "type": "integer",
@@ -175,8 +205,12 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
             },
             "special_tests": {
                 "type": "array",
-                "items": {"type": "string"},
-                "description": "Special CSF tests to interpret (e.g., HSV PCR, oligoclonal bands).",
+                "description": (
+                    "Additional CSF assays to run, billed separately from the EUR 230 "
+                    "lumbar puncture: from EUR 18 (IgG index) to EUR 1840 (autoimmune "
+                    "panel). Order the assay the differential calls for — 14-3-3 and "
+                    "RT_QuIC answer a prion question, HSV_PCR an encephalitis question."
+                ),
             },
         },
         "required": ["clinical_context"],
@@ -406,7 +440,10 @@ def parameters_for(tool_name: str) -> dict[str, Any] | None:
     for parameter, spec in schema.get("properties", {}).items():
         vocabulary = _vocabulary(tool_name, parameter)
         if vocabulary:
-            spec["enum"] = vocabulary
+            if (tool_name, parameter) in _ARRAY_VALUED:
+                spec.setdefault("items", {"type": "string"})["enum"] = vocabulary
+            else:
+                spec["enum"] = vocabulary
         description = spec.get("description")
         if isinstance(description, str) and "{genetic_panels}" in description:
             spec["description"] = description.format(genetic_panels=panels)

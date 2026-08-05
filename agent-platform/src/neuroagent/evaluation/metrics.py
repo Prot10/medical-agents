@@ -11,6 +11,7 @@ from neuroagent_schemas import GroundTruth, ToolClassification
 from neuroagent_schemas.enums import SequenceSeverity
 
 from ..agent.reasoning import AgentTrace
+from ..tools.vocabulary import normalize_analyte
 
 
 # Heuristics for the "premature closure" metric: phrases that indicate the
@@ -426,15 +427,70 @@ def _agent_tool_calls(trace: AgentTrace) -> list[tuple[str, dict[str, Any]]]:
     return calls
 
 
-# The two catchall tools cover many distinct studies under one name, discriminated by a
-# single parameter. Crediting an optimal action for them on the tool name alone let a model
-# call the right tool with a wrong (or garbage) discriminator and score a perfect workup —
-# so for these, an optimal action counts as satisfied only when the discriminating value
-# matches. Every other tool is one study, so the name is the whole signal.
-_CATCHALL_DISCRIMINATOR: dict[str, str] = {
-    "order_advanced_imaging": "modality",
-    "order_specialized_test": "test_type",
+# --- Which study did the agent actually order? -------------------------------------------
+#
+# Most tools cover many distinct studies under one name, selected by a parameter. Crediting
+# an optimal action on the tool name alone lets a model call the right tool with the wrong
+# study and score a perfect workup. Every parameter below is cost-bearing in
+# config/tools/costs.yaml, and that is the test applied: a distinction that changes the bill
+# has to change the score. Without `panels` here, an `interpret_labs` call ordering a EUR 2300
+# paraneoplastic panel satisfied a ground truth asking for EUR 18 of ammonia — which is the
+# hepatic-encephalopathy case exactly, and it is why the clinical reviewers read the shared
+# lab bucket as unscoreable.
+#
+# Scalar discriminators: one study per call, compared by equality against the value the
+# ground truth pins. The second element is the tool schema's `default`, so a ground truth
+# that pins the default is still satisfied by a call that omits the parameter.
+_SCALAR_DISCRIMINATORS: dict[str, tuple[tuple[str, Any], ...]] = {
+    "order_advanced_imaging": (("modality", None),),
+    "order_specialized_test": (("test_type", None),),
+    "order_cardiac_monitoring": (("monitor_type", "holter_24h"),),
+    "order_echocardiogram": (("echo_type", "TTE"),),
+    "analyze_eeg": (("eeg_type", "routine"),),
+    "analyze_brain_mri": (("protocol", None),),
+    "order_ct_scan": (("contrast", False), ("angiography", False)),
 }
+
+# Set-valued discriminators: the ground truth names individual analytes, and the agent may
+# legitimately order them across several calls, so containment is checked against the union
+# of every call to that tool. Ordering labs in two batches is one workup, not a miss.
+_SET_DISCRIMINATORS: dict[str, str] = {
+    "interpret_labs": "panels",
+    "analyze_csf": "special_tests",
+}
+
+
+def _as_set(value: Any) -> frozenset[str]:
+    """Normalise a set-valued parameter to a frozenset of canonical analyte names.
+
+    Ground truth and agent calls both use free text, so names are compared through
+    `normalize_analyte`: `Protein C`, `protein C` and `protein_C` are one assay, priced
+    identically in costs.yaml, and a model must not lose the point for the spelling. A bare
+    string is tolerated because a model may pass one instead of a single-element list.
+    """
+    if value is None:
+        return frozenset()
+    if isinstance(value, str):
+        return frozenset({normalize_analyte(value)})
+    if isinstance(value, (list, tuple, set, frozenset)):
+        return frozenset(normalize_analyte(str(v)) for v in value)
+    return frozenset()
+
+
+def _pinned_scalars(
+    tool_name: str, tool_parameters: dict[str, Any] | None
+) -> tuple[tuple[str, Any, Any], ...]:
+    """`(parameter, wanted, default)` for each scalar discriminator the ground truth pins.
+
+    A discriminator the optimal action leaves unspecified is a wildcard: the case did not
+    care which variant was ordered, so any call to the tool satisfies it.
+    """
+    params = tool_parameters or {}
+    return tuple(
+        (parameter, params[parameter], default)
+        for parameter, default in _SCALAR_DISCRIMINATORS.get(tool_name, ())
+        if parameter in params
+    )
 
 
 def _optimal_action_satisfied(
@@ -442,21 +498,84 @@ def _optimal_action_satisfied(
     tool_parameters: dict[str, Any] | None,
     agent_calls: list[tuple[str, dict[str, Any]]],
 ) -> bool:
-    """Did the agent issue a call that satisfies this optimal action?
+    """Did the agent issue call(s) that satisfy this optimal action?
 
-    Name match for ordinary tools; for the catchall tools, the discriminating parameter
-    (``modality`` / ``test_type``) must also match the ground-truth value — when the ground
-    truth specifies one. If the optimal action leaves the discriminator unspecified, any call
-    to that tool satisfies it (the case did not pin a specific study).
+    Set-valued tools are satisfied when the ground truth's analytes are contained in the
+    union of the agent's calls to that tool. Scalar tools are satisfied by a single call
+    whose pinned discriminators all match. A tool with no discriminator, or an action that
+    pins none, is satisfied by any call to that tool.
     """
-    discriminator = _CATCHALL_DISCRIMINATOR.get(tool_name)
-    want = (tool_parameters or {}).get(discriminator) if discriminator else None
+    parameter = _SET_DISCRIMINATORS.get(tool_name)
+    if parameter is not None:
+        want = _as_set((tool_parameters or {}).get(parameter))
+        if not want:
+            return any(name == tool_name for name, _ in agent_calls)
+        ordered: set[str] = set()
+        for name, args in agent_calls:
+            if name == tool_name:
+                ordered |= _as_set(args.get(parameter))
+        return want <= ordered
+
+    pinned = _pinned_scalars(tool_name, tool_parameters)
     for name, args in agent_calls:
         if name != tool_name:
             continue
-        if want is None:
+        if all(args.get(p, default) == wanted for p, wanted, default in pinned):
             return True
-        if args.get(discriminator) == want:
+    return False
+
+
+def _action_key(tool_name: str, tool_parameters: dict[str, Any] | None) -> tuple:
+    """Identity of one optimal action: the tool *plus* which study it asks for.
+
+    The action metrics used to be sets of tool names, which silently collapsed distinct
+    studies: 61% of the 600 cases name one tool in more than one optimal action, and
+    `order_specialized_test` does so in 197. A case requiring both EMG/NCS and an ALS gene
+    panel therefore counted as one required action, and an agent that ordered only the first
+    scored full required coverage.
+    """
+    parameter = _SET_DISCRIMINATORS.get(tool_name)
+    if parameter is not None:
+        return (tool_name, tuple(sorted(_as_set((tool_parameters or {}).get(parameter)))))
+    return (tool_name,) + tuple(
+        (p, wanted) for p, wanted, _ in _pinned_scalars(tool_name, tool_parameters)
+    )
+
+
+def _call_key(tool_name: str, args: dict[str, Any]) -> tuple:
+    """Identity of one agent call, in the same shape as `_action_key`."""
+    parameter = _SET_DISCRIMINATORS.get(tool_name)
+    if parameter is not None:
+        return (tool_name, tuple(sorted(_as_set(args.get(parameter)))))
+    return (tool_name,) + tuple(
+        (p, args.get(p, default))
+        for p, default in _SCALAR_DISCRIMINATORS.get(tool_name, ())
+        if p in args
+    )
+
+
+def _call_serves_an_optimal_action(
+    tool_name: str, args: dict[str, Any], optimal_actions: list[Any]
+) -> bool:
+    """Does this call contribute to any optimal action? (the precision numerator)
+
+    Set-valued calls need only *intersect* an action's analytes: a single `interpret_labs`
+    covering four of five wanted panels is a contribution, not waste. Whether the extra
+    analytes are wasteful is a separate judgement, already carried by `useless_tools` and
+    priced by `CostTracker`.
+    """
+    for action in optimal_actions:
+        if action.tool_name != tool_name:
+            continue
+        parameter = _SET_DISCRIMINATORS.get(tool_name)
+        if parameter is not None:
+            want = _as_set((action.tool_parameters or {}).get(parameter))
+            got = _as_set(args.get(parameter))
+            if not want or not got or (want & got):
+                return True
+            continue
+        pinned = _pinned_scalars(tool_name, action.tool_parameters)
+        if all(args.get(p, default) == wanted for p, wanted, default in pinned):
             return True
     return False
 
@@ -663,49 +782,52 @@ class MetricsCalculator:
         metrics.diagnostic_accuracy_top1 = self._check_diagnosis_top1(trace, ground_truth)
         metrics.diagnostic_accuracy_top3 = self._check_diagnosis_top3(trace, ground_truth)
 
-        # Action metrics. Matching is param-aware for the catchall tools (see
-        # _optimal_action_satisfied): calling order_advanced_imaging / order_specialized_test
-        # with the wrong study no longer counts as covering the required one. `matched_names`
-        # is the set of optimal tool names the agent actually satisfied.
+        # Action metrics, keyed by *study* rather than by tool name (see `_action_key`).
+        # Both sides are deduplicated, so a case asking for the same study twice counts once
+        # and an agent repeating a call is not rewarded for it. Recall is over the studies
+        # the ground truth asks for; precision is the share of the agent's distinct calls
+        # that contribute to any of them.
         agent_calls = _agent_tool_calls(trace)
-        agent_actions = set(tools_called)
-        optimal_actions = {s.tool_name for s in ground_truth.optimal_actions if s.tool_name}
-        required_actions = {
-            s.tool_name for s in ground_truth.optimal_actions
-            if s.tool_name and s.category.value == "required"
+        steps = [s for s in ground_truth.optimal_actions if s.tool_name]
+
+        agent_keys = {_call_key(name, args) for name, args in agent_calls}
+        optimal_keys = {_action_key(s.tool_name, s.tool_parameters) for s in steps}
+        keys_by_tier: dict[str, set[tuple]] = {
+            tier: {
+                _action_key(s.tool_name, s.tool_parameters)
+                for s in steps
+                if s.category.value == tier
+            }
+            for tier in ("required", "recommended", "optional")
         }
-        recommended_actions = {
-            s.tool_name for s in ground_truth.optimal_actions
-            if s.tool_name and s.category.value == "recommended"
+        matched_keys = {
+            _action_key(s.tool_name, s.tool_parameters)
+            for s in steps
+            if _optimal_action_satisfied(s.tool_name, s.tool_parameters, agent_calls)
         }
-        optional_actions = {
-            s.tool_name for s in ground_truth.optimal_actions
-            if s.tool_name and s.category.value == "optional"
-        }
-        matched_names = {
-            s.tool_name
-            for s in ground_truth.optimal_actions
-            if s.tool_name
-            and _optimal_action_satisfied(s.tool_name, s.tool_parameters, agent_calls)
+        justified_keys = {
+            _call_key(name, args)
+            for name, args in agent_calls
+            if _call_serves_an_optimal_action(name, args, steps)
         }
 
-        if agent_actions:
-            metrics.action_precision = len(matched_names) / len(agent_actions)
-        if optimal_actions:
-            metrics.action_recall = len(matched_names) / len(optimal_actions)
+        if agent_keys:
+            metrics.action_precision = len(justified_keys) / len(agent_keys)
+        if optimal_keys:
+            metrics.action_recall = len(matched_keys) / len(optimal_keys)
         if metrics.action_precision + metrics.action_recall > 0:
             metrics.tool_f1 = (
                 2 * metrics.action_precision * metrics.action_recall
                 / (metrics.action_precision + metrics.action_recall)
             )
 
-        # Per-tier coverage breakdown (param-aware via matched_names)
-        metrics.required_total = len(required_actions)
-        metrics.required_called = len(matched_names & required_actions)
-        metrics.recommended_total = len(recommended_actions)
-        metrics.recommended_called = len(matched_names & recommended_actions)
-        metrics.optional_total = len(optional_actions)
-        metrics.optional_called = len(matched_names & optional_actions)
+        # Per-tier coverage breakdown (study-level via matched_keys)
+        metrics.required_total = len(keys_by_tier["required"])
+        metrics.required_called = len(matched_keys & keys_by_tier["required"])
+        metrics.recommended_total = len(keys_by_tier["recommended"])
+        metrics.recommended_called = len(matched_keys & keys_by_tier["recommended"])
+        metrics.optional_total = len(keys_by_tier["optional"])
+        metrics.optional_called = len(matched_keys & keys_by_tier["optional"])
         if metrics.required_total:
             metrics.required_coverage = metrics.required_called / metrics.required_total
 
@@ -763,10 +885,13 @@ class MetricsCalculator:
 
         # Efficiency
         metrics.tool_call_count = trace.total_tool_calls
-        if optimal_actions:
-            optimal_count = len(optimal_actions)
-            if optimal_count > 0:
-                metrics.efficiency_score = min(1.0, optimal_count / max(trace.total_tool_calls, 1))
+        # Ceiling is the number of distinct *studies* the ground truth wants, not the number
+        # of distinct tool names — the latter under-counted the work a case actually requires
+        # and so scored a thorough agent as inefficient.
+        if optimal_keys:
+            metrics.efficiency_score = min(
+                1.0, len(optimal_keys) / max(trace.total_tool_calls, 1)
+            )
 
         # Cost tracking
         metrics.total_cost_usd = trace.total_cost_usd

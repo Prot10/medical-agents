@@ -22,6 +22,8 @@ from typing import Any
 import yaml
 from pydantic import BaseModel, Field
 
+from .vocabulary import normalize_analyte
+
 logger = logging.getLogger(__name__)
 
 
@@ -229,9 +231,20 @@ class CostTracker:
             return cost, {selected: cost}
         return self._cost_by_type(cfg, params, "test_type", "neuropsych_battery", tool_name)
 
+    @staticmethod
+    def _priced_lookup(rates: dict) -> dict[str, float]:
+        """Rate table indexed by normalised assay name.
+
+        The score normalises assay names (`evaluation/metrics.py::_as_set`) so a model is
+        not penalised for writing `Protein C` instead of `protein_C`. Pricing has to agree,
+        or the same call would be credited as correct and billed at the fallback rate — the
+        bill and the score must read one workup the same way.
+        """
+        return {normalize_analyte(str(name)): float(rate) for name, rate in rates.items()}
+
     def _cost_labs(self, cfg: dict, params: dict) -> tuple[float, dict[str, float]]:
         tool_name = "interpret_labs"
-        by_panel = self._require(cfg, "by_panel", tool_name)
+        by_panel = self._priced_lookup(self._require(cfg, "by_panel", tool_name))
         default_cost = float(self._require(cfg, "default_panel", tool_name))
         panels = _as_item_names(params.get("panels", []))
         breakdown: dict[str, float] = {}
@@ -243,13 +256,14 @@ class CostTracker:
             total = cost
         else:
             for panel in panels:
-                if panel not in by_panel:
+                key = normalize_analyte(panel)
+                if key not in by_panel:
                     logger.warning(
                         "Unpriced lab panel %r for tool '%s' in %s — falling "
                         "back to the configured default_panel rate (%.0f).",
                         panel, tool_name, self.config_path, default_cost,
                     )
-                cost = float(by_panel.get(panel, default_cost))
+                cost = by_panel.get(key, default_cost)
                 breakdown[panel] = cost
                 total += cost
         return total, breakdown
@@ -259,16 +273,17 @@ class CostTracker:
         base = float(self._require(cfg, "base", tool_name))
         breakdown: dict[str, float] = {"base": base}
         total = base
-        by_test = self._require(cfg, "by_special_test", tool_name)
+        by_test = self._priced_lookup(self._require(cfg, "by_special_test", tool_name))
         default_cost = float(self._require(cfg, "default_test", tool_name))
         for test in _as_item_names(params.get("special_tests", [])):
-            if test not in by_test:
+            key = normalize_analyte(test)
+            if key not in by_test:
                 logger.warning(
                     "Unpriced CSF special test %r for tool '%s' in %s — falling "
                     "back to the configured default_test rate (%.0f).",
                     test, tool_name, self.config_path, default_cost,
                 )
-            cost = float(by_test.get(test, default_cost))
+            cost = by_test.get(key, default_cost)
             breakdown[test] = cost
             total += cost
         return total, breakdown
