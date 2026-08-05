@@ -196,3 +196,90 @@ for code, name in [('NB-KSC3-TWUA-QDTM', 'REVIEWER 1'), ('NB-87MF-FBTV-TPWE', 'R
         print(f'## [{a["severity"].upper()}] {a["field_path"]}\n_{a["field_snippet"]}_\n{a["comment"]}\n')
 PY
 ```
+
+---
+
+## Implementation status (2026-08-05)
+
+Done, in four commits:
+
+| Commit | What |
+|---|---|
+| `84af853` | Killed the stale mirror. `tool_io.py` now injects enums from `costs.yaml`; `tests/test_tool_io_schemas.py` fails CI on drift, covering both a reintroduced literal enum and description drift. Retired `mslt` and `pure_tone_audiometry`. |
+| `22c1d4a` | Per-study scoring. `interpret_labs`/`analyze_csf` were credited on tool name alone; the action metrics were sets of tool *names*, collapsing 61% of cases. Measured on a parameter-blind agent: required coverage 0.885 → 0.544, cases at full coverage 336 → 78. |
+| `61dbcce` | The four tools: `order_body_imaging`, `order_microbiology`, `obtain_tissue_diagnosis`, `perform_clinical_assessment`, plus `CT_perfusion`. 12 → 16 tools. |
+| `827c1d4` | 18 tier changes + removals in `conditions.yaml`; VaD and DLB in the enum; FND kept as the restraint probe. |
+
+Gates after all four: `validate_cases.py` 600/600 clean, perfect agent 1.0 on 600/600,
+1567 tests pass (5 skipped need `--extra training`).
+
+### Remaining work
+
+**1. Redeploy the review app** — pair with sending the reply, since it changes what the
+reviewers see. `bash deployment/hostinger/deploy.sh`. The VPS is running a 2026-07-10
+snapshot.
+
+**2. Author four `conditions.yaml` entries** — vascular dementia, DLB, spontaneous ICH,
+HSV encephalitis. Each needs `name`, `abbreviation`, `icd_code`, `description`,
+`typical_demographics`, `encounter_type`, `required_modalities`, `optional_modalities`,
+`key_findings` per difficulty, `differential_diagnoses`, `difficulty_variants`,
+`common_followups` — ~90 lines, modelled on `functional_neurological_disorder`. Source
+from the guidelines the reviewers cited. DLB needs `MIBG_scan` and `DaTscan`, both already
+priced.
+
+**3. Generate 120 cases** (4 × 30) and retire the 30 `PERI-NEURO-*`:
+
+```bash
+for c in vascular_dementia dementia_with_lewy_bodies hemorrhagic_stroke viral_encephalitis; do
+  bash dataset-generation/scripts/generate_batch.sh "$c"   # calls `claude -p` per case
+done
+git rm data/neurobench/cases/PERI-NEURO-*.json
+```
+
+**4. Author the new required steps into 327 existing cases.** The tier changes opened this
+gap by design — `conditions.yaml` now marks a step REQUIRED that no case's ground truth
+contains yet:
+
+| Missing tool | Cases | Conditions |
+|---|---|---|
+| `perform_clinical_assessment` | 150 | FTD, migraine, Alzheimer's, NPH, FND |
+| `order_microbiology` | 60 | bacterial meningitis, hepatic encephalopathy |
+| `order_body_imaging` | 60 | NMDAR encephalitis, myasthenia gravis |
+| `obtain_tissue_diagnosis` | 30 | high-grade glioma |
+| `analyze_csf` | 29 | subarachnoid haemorrhage (conditional REQUIRED) |
+
+Each needs an `optimal_actions` step with `tool_parameters`, `expected_finding`, `citation`
+and `guideline_source`, plus the matching pre-generated output in `initial_tool_outputs` or
+`followup_outputs` and a `metadata.fallback_tool_kinds` entry. Reviewer 2's annotations
+contain most of the clinical text needed, verbatim.
+
+Re-derive the gap after any batch with:
+
+```bash
+uv run python - <<'EOF'
+import json, glob, yaml, collections
+from neuroagent.review_api.services.tool_catalog import _MODALITY_TO_TOOL, _CONDITION_ALIAS
+spec = yaml.safe_load(open('dataset-generation/config/conditions.yaml'))
+gap = collections.Counter()
+for f in glob.glob('data/neurobench/cases/*.json'):
+    d = json.load(open(f)); cond = d['condition']
+    e = spec.get(_CONDITION_ALIAS.get(cond, cond))
+    if not e: continue
+    req = {_MODALITY_TO_TOOL[t] for t in e['required_modalities']}
+    have = {a.get('tool_name') for a in d['ground_truth']['optimal_actions']}
+    for m in req - have: gap[m] += 1
+print(gap.most_common())
+EOF
+```
+
+**5. Regenerate the GRPO prompts** — they bake the tool schemas in and are stale:
+
+```bash
+uv run python -m neuroagent.training.data.build_grpo_dataset --split train \
+  --output data/neurobench/grpo/train_prompts.jsonl
+uv run python -m neuroagent.training.data.build_grpo_dataset --split test \
+  --output data/neurobench/grpo/test_prompts.jsonl
+```
+
+**6. Re-baseline.** `clinical_reward.py` feeds `(action_precision + action_recall)/2` into
+GRPO, so every published number and trained adapter predates the scoring fix.

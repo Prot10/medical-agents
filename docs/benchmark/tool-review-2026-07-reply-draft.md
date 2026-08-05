@@ -97,7 +97,30 @@ Accolte. In sintesi:
   truth* e nella griglia di valutazione: è la sede corretta, ed è anche più utile, perché
   rende misurabile la scelta del singolo esame invece di lasciarla al giudizio.
 
-## 5. Miastenia gravis
+## 5. Sette rimozioni che abbiamo declassato invece di eliminare — vi chiediamo conferma
+
+Su 13 richieste di rimozione, 7 riguardano tool che un caso già esistente usa **in diagnosi
+differenziale**. In questi casi li abbiamo resi opzionali anziché eliminarli:
+
+| Patologia | Tool | Perché lo abbiamo tenuto opzionale |
+|---|---|---|
+| NPH | Imaging avanzato | Tutti e 30 i casi usano PET amiloide/FDG per il differenziale con l'Alzheimer, non come test per la NPH |
+| Epilessia temporale | Echo + monitoraggio cardiaco | FEPI-TEMP-P05 e -RP02 sono casi inizialmente attribuiti a sincope |
+| Emicrania con aura | Echo | MIG-AURA-P03/P07/P08 usano il bubble study per il PFO |
+| Emicrania con aura | EEG + liquor | MIG-AURA-RM11 li usa su un sospetto di cefalea secondaria |
+| Alzheimer | EEG | ALZ-EARLY-RP04 lo usa su un differenziale con CJD/encefalopatia |
+
+Il criterio che abbiamo applicato è quello formulato dal Revisore 2 a proposito di EEG e RM
+nella sincope: *"l'item va mantenuto perché l'etichetta del pannello è l'ipotesi sotto esame:
+un agente che sospetti correttamente una causa diversa deve comunque poter agire."* Ci è
+sembrato coerente estenderlo anche alle patologie croniche. **Se non siete d'accordo, li
+eliminiamo e correggiamo i casi.**
+
+Un punto separato: nei tre casi di emicrania l'ecocardiogramma è al tier **required**. Il
+vostro commento implica che sia sbagliato, e siamo d'accordo — è un difetto del caso, non del
+catalogo, e lo correggiamo.
+
+## 6. Miastenia gravis
 
 Le cinque annotazioni che avete inserito sotto "Peripheral neuropathy" riguardano in realtà
 la miastenia gravis (anti-AChR/anti-MuSK, SFEMG, imaging del mediastino, Evoli 2019 e
@@ -105,7 +128,7 @@ Jacob 2025). Le abbiamo spostate sotto **Myasthenia gravis**, che altrimenti sar
 l'unica condizione senza review. Se non era intenzionale, fatecelo sapere e le rimettiamo
 dove erano.
 
-## 6. Prossimi passi
+## 7. Prossimi passi
 
 Per le quattro nuove patologie prepariamo noi una prima versione dei pannelli
 (tier + descrizioni) a partire dalle linee guida che avete citato, e la troverete nella
