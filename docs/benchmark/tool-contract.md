@@ -19,7 +19,7 @@ costs.yaml  ──►  tools/vocabulary.py  ──►  tool schemas (enum)
 
 `agent-platform/tests/test_case_tool_contract.py` fails if these ever disagree again.
 
-## The 12 tools
+## The 16 tools
 
 The registry is `agent-platform/src/neuroagent/tools/tool_registry.py`. There are exactly 12.
 `consult_medical_specialist` was removed in `64d4091` — a specialist referral is a real

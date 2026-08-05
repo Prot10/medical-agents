@@ -449,6 +449,11 @@ _SCALAR_DISCRIMINATORS: dict[str, tuple[tuple[str, Any], ...]] = {
     "analyze_eeg": (("eeg_type", "routine"),),
     "analyze_brain_mri": (("protocol", None),),
     "order_ct_scan": (("contrast", False), ("angiography", False)),
+    # Tools added after the July 2026 review; same one-discriminator shape.
+    "order_body_imaging": (("study", None), ("contrast", False)),
+    "order_microbiology": (("specimen", None),),
+    "obtain_tissue_diagnosis": (("procedure", None),),
+    "perform_clinical_assessment": (("assessment_type", None), ("timing", None)),
 }
 
 # Set-valued discriminators: the ground truth names individual analytes, and the agent may
@@ -457,6 +462,14 @@ _SCALAR_DISCRIMINATORS: dict[str, tuple[tuple[str, Any], ...]] = {
 _SET_DISCRIMINATORS: dict[str, str] = {
     "interpret_labs": "panels",
     "analyze_csf": "special_tests",
+}
+
+# A tool may discriminate on a scalar *and* accumulate a set: `obtain_tissue_diagnosis` is
+# credited for the procedure by equality and for each molecular assay by containment, since
+# an integrated diagnosis is the biopsy plus the assays run on it. Kept separate from
+# `_SET_DISCRIMINATORS`, whose tools have no scalar part.
+_ALSO_SET_DISCRIMINATORS: dict[str, str] = {
+    "obtain_tissue_diagnosis": "molecular_assays",
 }
 
 
@@ -493,6 +506,17 @@ def _pinned_scalars(
     )
 
 
+def _accumulated(
+    agent_calls: list[tuple[str, dict[str, Any]]], tool_name: str, parameter: str
+) -> frozenset[str]:
+    """Union of a set-valued parameter across every agent call to one tool."""
+    ordered: set[str] = set()
+    for name, args in agent_calls:
+        if name == tool_name:
+            ordered |= _as_set(args.get(parameter))
+    return frozenset(ordered)
+
+
 def _optimal_action_satisfied(
     tool_name: str,
     tool_parameters: dict[str, Any] | None,
@@ -502,27 +526,31 @@ def _optimal_action_satisfied(
 
     Set-valued tools are satisfied when the ground truth's analytes are contained in the
     union of the agent's calls to that tool. Scalar tools are satisfied by a single call
-    whose pinned discriminators all match. A tool with no discriminator, or an action that
-    pins none, is satisfied by any call to that tool.
+    whose pinned discriminators all match. `obtain_tissue_diagnosis` needs both: the right
+    procedure *and* the assays run on the specimen. A tool with no discriminator, or an
+    action that pins none, is satisfied by any call to that tool.
     """
     parameter = _SET_DISCRIMINATORS.get(tool_name)
     if parameter is not None:
         want = _as_set((tool_parameters or {}).get(parameter))
         if not want:
             return any(name == tool_name for name, _ in agent_calls)
-        ordered: set[str] = set()
-        for name, args in agent_calls:
-            if name == tool_name:
-                ordered |= _as_set(args.get(parameter))
-        return want <= ordered
+        return want <= _accumulated(agent_calls, tool_name, parameter)
 
     pinned = _pinned_scalars(tool_name, tool_parameters)
-    for name, args in agent_calls:
-        if name != tool_name:
-            continue
-        if all(args.get(p, default) == wanted for p, wanted, default in pinned):
-            return True
-    return False
+    scalar_ok = any(
+        name == tool_name
+        and all(args.get(p, default) == wanted for p, wanted, default in pinned)
+        for name, args in agent_calls
+    )
+    if not scalar_ok:
+        return False
+
+    also = _ALSO_SET_DISCRIMINATORS.get(tool_name)
+    if also is None:
+        return True
+    want = _as_set((tool_parameters or {}).get(also))
+    return not want or want <= _accumulated(agent_calls, tool_name, also)
 
 
 def _action_key(tool_name: str, tool_parameters: dict[str, Any] | None) -> tuple:
@@ -537,9 +565,13 @@ def _action_key(tool_name: str, tool_parameters: dict[str, Any] | None) -> tuple
     parameter = _SET_DISCRIMINATORS.get(tool_name)
     if parameter is not None:
         return (tool_name, tuple(sorted(_as_set((tool_parameters or {}).get(parameter)))))
-    return (tool_name,) + tuple(
+    key: tuple = (tool_name,) + tuple(
         (p, wanted) for p, wanted, _ in _pinned_scalars(tool_name, tool_parameters)
     )
+    also = _ALSO_SET_DISCRIMINATORS.get(tool_name)
+    if also is not None:
+        key += (tuple(sorted(_as_set((tool_parameters or {}).get(also)))),)
+    return key
 
 
 def _call_key(tool_name: str, args: dict[str, Any]) -> tuple:
@@ -547,11 +579,15 @@ def _call_key(tool_name: str, args: dict[str, Any]) -> tuple:
     parameter = _SET_DISCRIMINATORS.get(tool_name)
     if parameter is not None:
         return (tool_name, tuple(sorted(_as_set(args.get(parameter)))))
-    return (tool_name,) + tuple(
+    key: tuple = (tool_name,) + tuple(
         (p, args.get(p, default))
         for p, default in _SCALAR_DISCRIMINATORS.get(tool_name, ())
         if p in args
     )
+    also = _ALSO_SET_DISCRIMINATORS.get(tool_name)
+    if also is not None:
+        key += (tuple(sorted(_as_set(args.get(also)))),)
+    return key
 
 
 def _call_serves_an_optimal_action(

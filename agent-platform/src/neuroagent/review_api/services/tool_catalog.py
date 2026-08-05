@@ -31,7 +31,7 @@ from .tool_io import output_fields_for, parameters_for
 
 logger = logging.getLogger(__name__)
 
-# The 12 diagnostic tools, with clinician-facing descriptions. Order is the
+# The 16 diagnostic tools, with clinician-facing descriptions. Order is the
 # canonical tool order used across the project.
 _TOOL_META: list[dict[str, str | None]] = [
     {
@@ -103,6 +103,37 @@ _TOOL_META: list[dict[str, str | None]] = [
         "neuropsych battery, evoked potentials, autonomic/tilt testing, genetics.",
         "modality": "specialized_test",
     },
+    # Added after the July 2026 clinical tool review, which found the action space could
+    # only image the brain and could not obtain a specimen.
+    {
+        "name": "order_body_imaging",
+        "label": "Body imaging",
+        "description": "Cross-sectional imaging outside the CNS: pelvis/abdomen "
+        "(occult tumour, portosystemic shunts), mediastinum (thymoma), spine "
+        "(cord compression), peripheral nerve.",
+        "modality": "body_imaging",
+    },
+    {
+        "name": "order_microbiology",
+        "label": "Microbiology (non-CSF)",
+        "description": "Blood cultures, whole-blood PCR, throat swab, urine, and "
+        "diagnostic paracentesis with ascitic fluid studies.",
+        "modality": "microbiology",
+    },
+    {
+        "name": "obtain_tissue_diagnosis",
+        "label": "Tissue diagnosis",
+        "description": "Resection or stereotactic biopsy, with the integrated "
+        "histomolecular diagnosis (IDH, 1p/19q, CDKN2A/B, MGMT, ATRX, TERT, H3K27).",
+        "modality": "tissue_diagnosis",
+    },
+    {
+        "name": "perform_clinical_assessment",
+        "label": "Clinical assessment",
+        "description": "Structured bedside assessment: cognitive screen, ICHD-3 "
+        "headache/aura history, timed gait and balance, positive functional signs.",
+        "modality": "clinical_assessment",
+    },
     {
         "name": "search_medical_literature",
         "label": "Literature search",
@@ -131,6 +162,10 @@ _MODALITY_TO_TOOL: dict[str, str] = {
     "advanced_imaging": "order_advanced_imaging",
     "specialized_test": "order_specialized_test",
     "EMG_NCS": "order_specialized_test",
+    "body_imaging": "order_body_imaging",
+    "microbiology": "order_microbiology",
+    "tissue_diagnosis": "obtain_tissue_diagnosis",
+    "clinical_assessment": "perform_clinical_assessment",
 }
 
 # Tools available for every condition regardless of modality.

@@ -11,7 +11,9 @@ from .evaluation import GroundTruth
 from .patient import PatientProfile
 from .tool_outputs import (
     AdvancedImagingReport,
+    BodyImagingReport,
     CardiacMonitoringReport,
+    ClinicalAssessmentReport,
     CSFResults,
     CTReport,
     DrugInteractionResult,
@@ -20,8 +22,10 @@ from .tool_outputs import (
     EEGReport,
     LabResults,
     LiteratureSearchResult,
+    MicrobiologyReport,
     MRIReport,
     SpecializedTestReport,
+    TissueDiagnosisReport,
 )
 
 
@@ -38,6 +42,11 @@ class ToolOutputSet(BaseModel):
     cardiac_monitoring: CardiacMonitoringReport | None = None
     advanced_imaging: AdvancedImagingReport | None = None
     specialized_test: SpecializedTestReport | None = None
+    # Added with the four post-review tools (see tool_outputs.py).
+    body_imaging: BodyImagingReport | None = None
+    microbiology: MicrobiologyReport | None = None
+    tissue_diagnosis: TissueDiagnosisReport | None = None
+    clinical_assessment: ClinicalAssessmentReport | None = None
     literature_search: dict[str, LiteratureSearchResult] | None = None
     drug_interactions: dict[str, DrugInteractionResult] | None = None
 
@@ -58,6 +67,10 @@ _TOOL_OUTPUT_MODEL: dict[str, type[BaseModel]] = {
     "order_cardiac_monitoring": CardiacMonitoringReport,
     "order_advanced_imaging": AdvancedImagingReport,
     "order_specialized_test": SpecializedTestReport,
+    "order_body_imaging": BodyImagingReport,
+    "order_microbiology": MicrobiologyReport,
+    "obtain_tissue_diagnosis": TissueDiagnosisReport,
+    "perform_clinical_assessment": ClinicalAssessmentReport,
     "search_medical_literature": LiteratureSearchResult,
     "check_drug_interactions": DrugInteractionResult,
 }

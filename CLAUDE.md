@@ -2,7 +2,7 @@
 
 ## What is this project
 
-NeuroAgent: tool-augmented LLM agent for neurological clinical decision support. ReAct loop + 12 diagnostic tools + hospital protocols + cost tracking. Targeting Nature Machine Intelligence.
+NeuroAgent: tool-augmented LLM agent for neurological clinical decision support. ReAct loop + 16 diagnostic tools + hospital protocols + cost tracking. Targeting Nature Machine Intelligence.
 
 See README.md for setup, and `docs/README.md` for the documentation index.
 
@@ -57,10 +57,22 @@ and the literature-aligned evaluation; `docs/training/distillation.md` for traje
 - Commit style: conventional commits (`feat:`, `fix:`, `docs:`, `chore:`)
 - Dataset versions: v1 (synthetic, enhanced outputs), v2 (real-seeded, enhanced), v3 (v1+v2 combined, realistic/stripped outputs), v4 (12-tool schema + cost tracking, migrated from v3), v5 (current: 600 cases across 20 conditions, 500 train / 100 test)
 - Tool output modes: "enhanced" (v1/v2, interpretive fields present) vs "realistic" (v3/v4, stripped to match real clinical reports)
-- 12 tools: analyze_brain_mri, analyze_eeg, analyze_ecg, interpret_labs, analyze_csf, order_ct_scan, order_echocardiogram, order_cardiac_monitoring, order_advanced_imaging, order_specialized_test, search_medical_literature, check_drug_interactions
+- 16 tools: analyze_brain_mri, analyze_eeg, analyze_ecg, interpret_labs, analyze_csf, order_ct_scan, order_echocardiogram, order_cardiac_monitoring, order_advanced_imaging, order_specialized_test, search_medical_literature, check_drug_interactions,
+  and (added after the July 2026 clinical tool review) order_body_imaging, order_microbiology, obtain_tissue_diagnosis, perform_clinical_assessment
 - Cost tracking: `CostTracker` in `tools/cost_tracker.py`, config in `config/tools/costs.yaml`, Medicare PFS reference rates
-- Tool vocabulary: `costs.yaml` is the single source; `tools/vocabulary.py` generates the catchall enums from it.
-  `order_advanced_imaging` takes `modality` (12 values); `order_specialized_test` takes `test_type` (21 + `genetic_panel:<panel>`)
+- Tool vocabulary: `costs.yaml` is the single source; `tools/vocabulary.py` generates every enum from it,
+  so a term cannot exist without a price. `order_advanced_imaging` takes `modality` (13 values);
+  `order_specialized_test` takes `test_type` (19 + `genetic_panel:<panel>`); `order_body_imaging` takes
+  `study` (9, `<region>_<modality>`); `order_microbiology` takes `specimen` (5); `obtain_tissue_diagnosis`
+  takes `procedure` (2) + `molecular_assays` (11); `perform_clinical_assessment` takes `assessment_type` (4).
+  `interpret_labs.panels` (153) and `analyze_csf.special_tests` (22) are advisory, not closed — an unlisted
+  assay runs at the default rate.
+  The review app mirrors these schemas in `review_api/services/tool_io.py` because `tools/` is not deployed
+  to the review VPS; `tests/test_tool_io_schemas.py` fails CI if the mirror drifts. It did, silently, and the
+  clinical reviewers assessed a stale catalog — see `docs/benchmark/tool-review-2026-07.md`.
+- Scoring is per-study, not per-tool: `evaluation/metrics.py::_SCALAR_DISCRIMINATORS` /
+  `_SET_DISCRIMINATORS` decide which parameter identifies the study, and every one of them is
+  cost-bearing in `costs.yaml`. Adding a discriminating parameter to a tool means adding it there too
 - Case contract: `agent-platform/scripts/validation/validate_cases.py` must report 0 issues on 600/600.
   Read `docs/benchmark/tool-contract.md` before editing a case or a tool schema
 - `consult_medical_specialist` does not exist; a specialist referral is an action with `tool_name: null`

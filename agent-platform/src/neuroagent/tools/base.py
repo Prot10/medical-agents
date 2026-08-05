@@ -31,7 +31,7 @@ class ToolResult(BaseModel):
 
 
 class BaseTool(ABC):
-    """Base class for the 12 diagnostic tools.
+    """Base class for the 16 diagnostic tools.
 
     ``execute()`` is a template method shared by every tool: validate the
     parameters (warn-only hook), then dispatch to the MockServer in evaluation

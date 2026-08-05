@@ -163,3 +163,87 @@ class SpecializedTestReport(BaseModel):
     recommended_actions: list[str] = []
 
 
+
+# --- Tools added after the July 2026 clinical tool review ---------------------------------
+#
+# The reviewers' finding, in one sentence: the action space could only look at the brain and
+# could not obtain a specimen. Four reports close that, each shaped like the reports above
+# (every field optional, `findings` as loose key/value rows) so case authors and the
+# MockServer treat them no differently.
+
+
+class BodyImagingReport(BaseModel):
+    """Cross-sectional imaging outside the CNS.
+
+    Pelvic/abdominal for the ovarian teratoma of anti-NMDAR encephalitis, mediastinal for
+    thymoma in myasthenia gravis, spinal for the cord-compression mimic of GBS, abdominal
+    portal-venous for the portosystemic shunts of refractory hepatic encephalopathy.
+    """
+
+    region: str = ""  # pelvis_abdomen, mediastinum, spine, peripheral_nerve
+    modality: str = ""  # CT, MRI, ultrasound
+    contrast: bool = False
+    findings: list[dict[str, str]] = []
+    measurements: dict[str, str] | None = None  # lesion size, shunt diameter, ...
+    impression: str = ""
+    recommended_actions: list[str] = []
+
+
+class MicrobiologyReport(BaseModel):
+    """Microbiology on specimens other than CSF.
+
+    `collected_before_antimicrobials` is explicit because yield collapses once treatment has
+    started, and both the WHO 2025 meningitis guideline and the reviewers require the report
+    to state it rather than leave it inferred.
+    """
+
+    specimen: str = ""  # blood_culture, whole_blood_pcr, throat_swab, urine, ascitic_fluid
+    tests: list[str] = []
+    collected_before_antimicrobials: bool | None = None
+    organism: str | None = None
+    gram_stain: str | None = None
+    susceptibility: dict[str, str] | None = None
+    cell_counts: dict[str, str] | None = None  # e.g. ascitic PMN count
+    findings: list[dict[str, str]] = []
+    impression: str = ""
+    recommended_actions: list[str] = []
+
+
+class TissueDiagnosisReport(BaseModel):
+    """Histopathology integrated with molecular testing.
+
+    Layered as WHO CNS5 requires: integrated diagnosis, histology, grade, molecular findings.
+    `diagnosis_suffix` carries NOS (molecular work-up not done) or NEC (done but not fitting
+    a WHO type), which is how the classification names an incomplete diagnosis — the state
+    the benchmark was previously stuck in for every glioma case.
+    """
+
+    procedure: str = ""  # resection, stereotactic_biopsy
+    site: str = ""
+    specimen_adequate: bool | None = None
+    integrated_diagnosis: str = ""
+    histological_diagnosis: str = ""
+    who_grade: str | None = None
+    molecular_findings: dict[str, str] | None = None  # IDH1, 1p/19q, MGMT, ATRX, TERT, ...
+    diagnosis_suffix: str | None = None  # "NOS" | "NEC" | None
+    findings: list[dict[str, str]] = []
+    impression: str = ""
+    recommended_actions: list[str] = []
+
+
+class ClinicalAssessmentReport(BaseModel):
+    """A structured bedside assessment performed by the clinician.
+
+    The reviewers named three required steps with no tool behind them: validated cognitive
+    testing for the dementias, an ICHD-3 history for migraine, and objective gait and
+    cognition before/after a CSF tap test in NPH. Positive functional signs belong here too,
+    which is what lets FND be diagnosed without imaging.
+    """
+
+    assessment_type: str = ""
+    scores: dict[str, str] | None = None  # MoCA 24/30, TUG 18.2 s, FVC 1.9 L, ...
+    criteria_met: dict[str, bool] | None = None  # e.g. ICHD-3 aura criteria, per item
+    pre_post_comparison: dict[str, str] | None = None  # NPH tap test: before vs after
+    findings: list[dict[str, str]] = []
+    impression: str = ""
+    recommended_actions: list[str] = []

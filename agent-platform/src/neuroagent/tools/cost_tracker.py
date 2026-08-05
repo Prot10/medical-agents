@@ -137,6 +137,18 @@ class CostTracker:
             total, breakdown = self._cost_by_type(tool_cfg, parameters, "modality", "FDG_PET", tool_name)
         elif tool_name == "order_specialized_test":
             total, breakdown = self._cost_specialized_test(tool_cfg, parameters)
+        elif tool_name == "order_body_imaging":
+            total, breakdown = self._cost_body_imaging(tool_cfg, parameters)
+        elif tool_name == "order_microbiology":
+            total, breakdown = self._cost_by_type(
+                tool_cfg, parameters, "specimen", "blood_culture", tool_name
+            )
+        elif tool_name == "obtain_tissue_diagnosis":
+            total, breakdown = self._cost_tissue_diagnosis(tool_cfg, parameters)
+        elif tool_name == "perform_clinical_assessment":
+            total, breakdown = self._cost_by_type(
+                tool_cfg, parameters, "assessment_type", "cognitive_screen", tool_name
+            )
         else:
             # Flat base cost (ECG, literature, drug interactions)
             total = float(self._require(tool_cfg, "base", tool_name))
@@ -266,6 +278,49 @@ class CostTracker:
                 cost = by_panel.get(key, default_cost)
                 breakdown[panel] = cost
                 total += cost
+        return total, breakdown
+
+    def _cost_body_imaging(self, cfg: dict, params: dict) -> tuple[float, dict[str, float]]:
+        """`order_body_imaging`: the study, plus contrast if requested.
+
+        `study` fuses region and modality so each is priced individually; contrast is a
+        modifier as it is for brain MRI and CT.
+        """
+        tool_name = "order_body_imaging"
+        total, breakdown = self._cost_by_type(
+            cfg, params, "study", "pelvis_abdomen_CT", tool_name
+        )
+        if params.get("contrast"):
+            modifiers = self._require(cfg, "modifiers", tool_name)
+            mod = float(self._require(modifiers, "contrast", tool_name))
+            breakdown["contrast"] = mod
+            total += mod
+        return total, breakdown
+
+    def _cost_tissue_diagnosis(self, cfg: dict, params: dict) -> tuple[float, dict[str, float]]:
+        """`obtain_tissue_diagnosis`: the procedure, plus each molecular assay run on it.
+
+        Two-part like `_cost_csf`. A resection at EUR 9200 dominates the bill, which is the
+        honest economics — and the reason the reference standards place the burden of
+        justification on the decision *not* to obtain tissue rather than on obtaining it.
+        """
+        tool_name = "obtain_tissue_diagnosis"
+        total, breakdown = self._cost_by_type(
+            cfg, params, "procedure", "stereotactic_biopsy", tool_name
+        )
+        by_assay = self._priced_lookup(self._require(cfg, "by_molecular_assay", tool_name))
+        default_cost = float(self._require(cfg, "default_molecular_assay", tool_name))
+        for assay in _as_item_names(params.get("molecular_assays", [])):
+            key = normalize_analyte(assay)
+            if key not in by_assay:
+                logger.warning(
+                    "Unpriced molecular assay %r for tool '%s' in %s — falling back to the "
+                    "configured default_molecular_assay rate (%.0f).",
+                    assay, tool_name, self.config_path, default_cost,
+                )
+            cost = by_assay.get(key, default_cost)
+            breakdown[assay] = cost
+            total += cost
         return total, breakdown
 
     def _cost_csf(self, cfg: dict, params: dict) -> tuple[float, dict[str, float]]:

@@ -93,7 +93,7 @@ class TestMockServer:
 
 class TestToolRegistry:
     def test_default_registry(self, registry: ToolRegistry):
-        assert len(registry.tools) == 12
+        assert len(registry.tools) == 16
 
     def test_get_tool(self, registry: ToolRegistry):
         tool = registry.get_tool("analyze_eeg")
@@ -110,7 +110,7 @@ class TestToolRegistry:
 
     def test_get_all_definitions(self, registry: ToolRegistry):
         defs = registry.get_all_definitions()
-        assert len(defs) == 12
+        assert len(defs) == 16
         for d in defs:
             assert d["type"] == "function"
             assert "name" in d["function"]

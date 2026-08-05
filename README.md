@@ -1,6 +1,6 @@
 # NeuroAgent
 
-Tool-augmented LLM agent for neurological clinical decision support. Reasons through patient cases using a ReAct loop with 12 diagnostic tools and follows hospital-specific protocols.
+Tool-augmented LLM agent for neurological clinical decision support. Reasons through patient cases using a ReAct loop with 16 diagnostic tools and follows hospital-specific protocols.
 
 Targeting a **Nature Machine Intelligence** publication.
 
@@ -14,7 +14,7 @@ medical-agents/                     # uv workspace root
 │   │   ├── api/                    # Main FastAPI app (port 8888) — agent runs, traces, models
 │   │   ├── review_api/             # Separate FastAPI app (port 8889) — dataset review
 │   │   ├── llm/                    # LLM client (OpenAI-compatible), prompts
-│   │   ├── tools/                  # 12 diagnostic tools + MockServer + ToolRegistry
+│   │   ├── tools/                  # 16 diagnostic tools + MockServer + ToolRegistry
 │   │   ├── rules/                  # Hospital rules engine (YAML pathways)
 │   │   └── evaluation/             # Runner, metrics, noise injector, LLM judge
 │   ├── config/

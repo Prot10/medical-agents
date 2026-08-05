@@ -44,7 +44,17 @@ from neuroagent.tools.vocabulary import is_valid_modality, is_valid_test_type
 
 CASES_DIR = Path("data/neurobench/cases")
 
-CATCHALL_PARAM = {"order_advanced_imaging": "modality", "order_specialized_test": "test_type"}
+# Tools whose single parameter selects which study was ordered. Kept in step with
+# evaluation/metrics.py::_SCALAR_DISCRIMINATORS — a value the validator lets through but the
+# metric cannot match is a silent scoring loss.
+CATCHALL_PARAM = {
+    "order_advanced_imaging": "modality",
+    "order_specialized_test": "test_type",
+    "order_body_imaging": "study",
+    "order_microbiology": "specimen",
+    "obtain_tissue_diagnosis": "procedure",
+    "perform_clinical_assessment": "assessment_type",
+}
 
 # Where each tool's pre-generated output lives inside the case.
 TOOL_TO_OUTPUT_FIELD: dict[str, str] = {
@@ -58,6 +68,10 @@ TOOL_TO_OUTPUT_FIELD: dict[str, str] = {
     "order_cardiac_monitoring": "cardiac_monitoring",
     "order_advanced_imaging": "advanced_imaging",
     "order_specialized_test": "specialized_test",
+    "order_body_imaging": "body_imaging",
+    "order_microbiology": "microbiology",
+    "obtain_tissue_diagnosis": "tissue_diagnosis",
+    "perform_clinical_assessment": "clinical_assessment",
     "search_medical_literature": "literature_search",
     "check_drug_interactions": "drug_interactions",
 }

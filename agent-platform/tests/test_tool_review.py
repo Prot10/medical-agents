@@ -26,8 +26,8 @@ def neurobench_catalog():
 
 
 class TestToolCatalog:
-    def test_twelve_tools(self, neurobench_catalog):
-        assert len(neurobench_catalog.tools) == 12
+    def test_sixteen_tools(self, neurobench_catalog):
+        assert len(neurobench_catalog.tools) == 16
 
     def test_universal_tools(self, neurobench_catalog):
         assert set(neurobench_catalog.universal_tools) == {

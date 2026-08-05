@@ -50,7 +50,7 @@ _METHODOLOGY_PROSE: dict[str, dict[str, Any]] = {
                 "label": "Tool outputs",
                 "icon": "Activity",
                 "description": (
-                    "Initial and follow-up outputs are generated for the 12 supported "
+                    "Initial and follow-up outputs are generated for the 16 supported "
                     "modalities (MRI, EEG, ECG, labs, CSF, etc.). Reports are written "
                     "to mirror real clinical documentation in style and content."
                 ),

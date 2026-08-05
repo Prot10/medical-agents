@@ -81,6 +81,11 @@ class MockServer:
             "order_cardiac_monitoring": self.case.initial_tool_outputs.cardiac_monitoring,
             "order_advanced_imaging": self.case.initial_tool_outputs.advanced_imaging,
             "order_specialized_test": self.case.initial_tool_outputs.specialized_test,
+            # Added with the four post-review tools.
+            "order_body_imaging": self.case.initial_tool_outputs.body_imaging,
+            "order_microbiology": self.case.initial_tool_outputs.microbiology,
+            "obtain_tissue_diagnosis": self.case.initial_tool_outputs.tissue_diagnosis,
+            "perform_clinical_assessment": self.case.initial_tool_outputs.clinical_assessment,
         }
 
         # Direct mapping for diagnostic tools
@@ -123,6 +128,10 @@ class MockServer:
             "order_cardiac_monitoring": fb.cardiac_monitoring,
             "order_advanced_imaging": fb.advanced_imaging,
             "order_specialized_test": fb.specialized_test,
+            "order_body_imaging": fb.body_imaging,
+            "order_microbiology": fb.microbiology,
+            "obtain_tissue_diagnosis": fb.tissue_diagnosis,
+            "perform_clinical_assessment": fb.clinical_assessment,
         }
         if tool_name in mapping:
             return mapping[tool_name]

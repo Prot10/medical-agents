@@ -105,6 +105,63 @@ def by_type_values(tool_name: str, costs_path: Path = DEFAULT_COSTS_PATH) -> lis
     return sorted(_load_tools(costs_path).get(tool_name, {}).get("by_type", {}))
 
 
+# --- Tools added after the July 2026 clinical tool review ----------------------------------
+#
+# Each has a single discriminator backed by a `by_type` block, so these are thin wrappers
+# over `by_type_values` and exist only to give the tool schemas a named accessor — the same
+# shape as `advanced_imaging_modalities`. Adding a term means adding a priced row; nothing
+# can be orderable without a price.
+
+
+def body_imaging_studies(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
+    """The closed `order_body_imaging.study` vocabulary (`<region>_<modality>`)."""
+    return by_type_values("order_body_imaging", costs_path)
+
+
+def microbiology_specimens(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
+    """The closed `order_microbiology.specimen` vocabulary."""
+    return by_type_values("order_microbiology", costs_path)
+
+
+def tissue_procedures(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
+    """The closed `obtain_tissue_diagnosis.procedure` vocabulary."""
+    return by_type_values("obtain_tissue_diagnosis", costs_path)
+
+
+def molecular_assays(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
+    """The priced `obtain_tissue_diagnosis.molecular_assays` vocabulary."""
+    return sorted(
+        _load_tools(costs_path).get("obtain_tissue_diagnosis", {}).get("by_molecular_assay", {})
+    )
+
+
+def assessment_types(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
+    """The closed `perform_clinical_assessment.assessment_type` vocabulary."""
+    return by_type_values("perform_clinical_assessment", costs_path)
+
+
+def is_valid_body_imaging_study(value: str, costs_path: Path = DEFAULT_COSTS_PATH) -> bool:
+    return value in body_imaging_studies(costs_path)
+
+
+def is_valid_specimen(value: str, costs_path: Path = DEFAULT_COSTS_PATH) -> bool:
+    return value in microbiology_specimens(costs_path)
+
+
+def is_valid_tissue_procedure(value: str, costs_path: Path = DEFAULT_COSTS_PATH) -> bool:
+    return value in tissue_procedures(costs_path)
+
+
+def is_valid_molecular_assay(value: str, costs_path: Path = DEFAULT_COSTS_PATH) -> bool:
+    return normalize_analyte(value) in {
+        normalize_analyte(a) for a in molecular_assays(costs_path)
+    }
+
+
+def is_valid_assessment_type(value: str, costs_path: Path = DEFAULT_COSTS_PATH) -> bool:
+    return value in assessment_types(costs_path)
+
+
 def is_valid_test_type(value: str, costs_path: Path = DEFAULT_COSTS_PATH) -> bool:
     """True for a fixed test type or a `genetic_panel:<panel>` with a known panel."""
     if value.startswith(GENETIC_PANEL_PREFIX):

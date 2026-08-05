@@ -1,6 +1,6 @@
 # Tool Reference
 
-NeuroAgent equips the LLM with **12 diagnostic tools** exposed via OpenAI-compatible function calling. The agent decides which tools to invoke and in what order as part of its ReAct reasoning loop. This document is the authoritative reference for every tool: what it does, what it accepts, and what it returns.
+NeuroAgent equips the LLM with **16 diagnostic tools** exposed via OpenAI-compatible function calling. The agent decides which tools to invoke and in what order as part of its ReAct reasoning loop. This document is the authoritative reference for every tool: what it does, what it accepts, and what it returns.
 
 ## Architecture
 

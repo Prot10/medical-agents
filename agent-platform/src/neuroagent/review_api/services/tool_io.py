@@ -57,6 +57,18 @@ _COSTS_DERIVED_ENUMS: dict[tuple[str, str], tuple[str, str]] = {
     # are collapsed so one assay is advertised once (see tools/vocabulary.py).
     ("interpret_labs", "panels"): ("interpret_labs", "by_panel"),
     ("analyze_csf", "special_tests"): ("analyze_csf", "by_special_test"),
+    # Tools added after the July 2026 clinical tool review.
+    ("order_body_imaging", "study"): ("order_body_imaging", "by_type"),
+    ("order_microbiology", "specimen"): ("order_microbiology", "by_type"),
+    ("obtain_tissue_diagnosis", "procedure"): ("obtain_tissue_diagnosis", "by_type"),
+    ("obtain_tissue_diagnosis", "molecular_assays"): (
+        "obtain_tissue_diagnosis",
+        "by_molecular_assay",
+    ),
+    ("perform_clinical_assessment", "assessment_type"): (
+        "perform_clinical_assessment",
+        "by_type",
+    ),
 }
 
 # Array-valued parameters: the enum sits on `items`, and their vocabularies carry spelling
@@ -64,7 +76,11 @@ _COSTS_DERIVED_ENUMS: dict[tuple[str, str], tuple[str, str]] = {
 # advertised once. Mirrors tools/vocabulary.py::normalize_analyte / _canonical_analytes,
 # duplicated here only because tools/ is not shipped to the review VPS.
 _ARRAY_VALUED: frozenset[tuple[str, str]] = frozenset(
-    {("interpret_labs", "panels"), ("analyze_csf", "special_tests")}
+    {
+        ("interpret_labs", "panels"),
+        ("analyze_csf", "special_tests"),
+        ("obtain_tissue_diagnosis", "molecular_assays"),
+    }
 )
 
 
@@ -324,6 +340,146 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
             },
         },
         "required": ["clinical_context", "test_type"],
+    },
+    # --- Tools added after the July 2026 clinical tool review -----------------------------
+    # Generated from the tool classes rather than hand-written; kept in sync by
+    # tests/test_tool_io_schemas.py.
+    "order_body_imaging": {
+        "type": "object",
+        "properties": {
+            "clinical_context": {
+                "type": "string",
+                "description": "Clinical indication for the study.",
+            },
+            "study": {
+                "type": "string",
+                "description": (
+                    "Region and modality. 'pelvis_abdomen_CT'/'_MRI'/'_ultrasound': "
+                    "occult neoplasm search (ovarian teratoma in anti-NMDAR "
+                    "encephalitis), portosystemic shunts in refractory hepatic "
+                    "encephalopathy. 'mediastinum_CT'/'_MRI': thymic hyperplasia or "
+                    "thymoma in myasthenia gravis. 'spine_MRI'/'_CT': cord compression, "
+                    "transverse myelitis, spinal tumour — the mimics of an ascending "
+                    "flaccid weakness. 'peripheral_nerve_MRI'/'_ultrasound': nerve root "
+                    "enhancement, nerve enlargement."
+                ),
+            },
+            "contrast": {
+                "type": "boolean",
+                "description": "Whether IV contrast is needed.",
+                "default": False,
+            },
+        },
+        "required": ["clinical_context", "study"],
+    },
+    "order_microbiology": {
+        "type": "object",
+        "properties": {
+            "clinical_context": {
+                "type": "string",
+                "description": "Clinical indication for the specimen.",
+            },
+            "specimen": {
+                "type": "string",
+                "description": (
+                    "What to sample. 'blood_culture': two sets, with susceptibility "
+                    "testing. 'whole_blood_pcr': meningococcus / pneumococcus and other "
+                    "principal meningeal pathogens. 'throat_swab': meningococcal culture. "
+                    "'urine': urinalysis and culture. 'ascitic_fluid': diagnostic "
+                    "paracentesis with PMN count, protein and culture — indicated in "
+                    "every patient with ascites and altered mental status."
+                ),
+            },
+            "tests": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": (
+                    "Assays to run on the specimen (e.g. culture, gram_stain, "
+                    "susceptibility, pcr, cell_count, protein)."
+                ),
+            },
+            "before_antimicrobials": {
+                "type": "boolean",
+                "description": (
+                    "Whether the specimen is being taken before the first antimicrobial "
+                    "dose. Yield of culture, stain and PCR falls sharply once treatment "
+                    "has started, so the report states this either way."
+                ),
+                "default": True,
+            },
+        },
+        "required": ["clinical_context", "specimen"],
+    },
+    "obtain_tissue_diagnosis": {
+        "type": "object",
+        "properties": {
+            "clinical_context": {
+                "type": "string",
+                "description": "Clinical indication, and the lesion's site and appearance.",
+            },
+            "procedure": {
+                "type": "string",
+                "description": (
+                    "How tissue is obtained. 'resection': maximal safe resection where "
+                    "feasible given site and clinical condition; also therapeutic. "
+                    "'stereotactic_biopsy': where microsurgical resection is not safely "
+                    "feasible; serial samples along the trajectory avoid sampling bias."
+                ),
+            },
+            "site": {
+                "type": "string",
+                "description": "Anatomical target of the procedure.",
+            },
+            "molecular_assays": {
+                "type": "array",
+                "description": (
+                    "Assays to run on the specimen. 'IDH1_IHC' and 'ATRX_IHC' routinely; "
+                    "'IDH1_IDH2_sequencing' where IHC is negative, in grade 2-3 diffuse "
+                    "gliomas and in glioblastoma under 55 years; '1p_19q_codeletion' in "
+                    "IDH-mutant gliomas with retained ATRX; 'CDKN2A_B_deletion' in "
+                    "IDH-mutant astrocytomas; 'TERT_promoter', 'EGFR_amplification', "
+                    "'chr7_gain_chr10_loss' in IDH-wildtype astrocytic gliomas lacking "
+                    "microvascular proliferation and necrosis; 'H3K27_status' for midline "
+                    "tumours; 'MGMT_methylation' in glioblastoma (by PCR, pyrosequencing "
+                    "or array — NOT immunocytochemistry); 'BRAF_V600' in IDH-wildtype "
+                    "tumours."
+                ),
+            },
+        },
+        "required": ["clinical_context", "procedure"],
+    },
+    "perform_clinical_assessment": {
+        "type": "object",
+        "properties": {
+            "clinical_context": {
+                "type": "string",
+                "description": "What the assessment is meant to establish or exclude.",
+            },
+            "assessment_type": {
+                "type": "string",
+                "description": (
+                    "'cognitive_screen': MoCA / MMSE at the bedside, with informant "
+                    "history — the first step in suspected cognitive decline, before "
+                    "imaging (a full battery is "
+                    "order_specialized_test{neuropsych_battery}). "
+                    "'structured_headache_history_ichd3': headache and aura features "
+                    "against ICHD-3 criteria — reversibility, gradual spread, succession, "
+                    "duration, red flags. 'gait_and_balance_timed': Timed Up and Go and "
+                    "timed walk; run before and after a CSF tap test in suspected NPH. "
+                    "'functional_neuro_signs': Hoover's sign, entrainment and the other "
+                    "positive signs of a functional disorder."
+                ),
+            },
+            "timing": {
+                "type": "string",
+                "description": (
+                    "Optional label for when the assessment was performed, e.g. "
+                    "'baseline' or 'post_tap_test' — the NPH tap test is interpreted as a "
+                    "pair."
+                ),
+            },
+        },
+        "required": ["clinical_context", "assessment_type"],
     },
     "search_medical_literature": {
         "type": "object",

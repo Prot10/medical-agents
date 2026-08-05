@@ -114,6 +114,65 @@ missing `clinical_context` is expected and fine. An unknown key is not.
 | `MR_venography` | MRV | Cerebral venous sinus thrombosis |
 | `carotid_duplex` | Carotid Doppler ultrasound | Carotid stenosis, ischemic stroke workup |
 | `transcranial_doppler` | TCD | Vasospasm in SAH, sickle-cell risk |
+| `CT_perfusion` | CTP, automated core/penumbra | Extended-window thrombolysis, thrombectomy 6-24 h |
+
+---
+
+## Tools added after the July 2026 clinical tool review
+
+The reviewers' structural finding: the action space could only image the brain and could not
+obtain a specimen, so several conditions had a mandatory diagnostic step with no callable
+act. Each new tool has one discriminating parameter backed by a `by_type` block, exactly like
+`order_advanced_imaging`.
+
+### `order_body_imaging.study`
+
+Region and modality are one term, because a CT and an MRI of the same region are different
+studies at different prices.
+
+| Value | Study | When |
+|---|---|---|
+| `pelvis_abdomen_CT` / `_MRI` / `_ultrasound` | Pelvic + abdominal imaging | Ovarian teratoma in anti-NMDAR encephalitis; portosystemic shunts in refractory hepatic encephalopathy |
+| `mediastinum_CT` / `_MRI` | Anterior mediastinum | Thymoma / thymic hyperplasia in myasthenia gravis — chest radiograph does not substitute |
+| `spine_MRI` / `_CT` | Spinal cord and column | Cord compression, transverse myelitis, spinal tumour — the mimics of ascending flaccid weakness |
+| `peripheral_nerve_MRI` / `_ultrasound` | Nerve / nerve root | Root enhancement, nerve enlargement (GBS vs acute-onset CIDP) |
+
+`contrast` is a boolean modifier, as for brain MRI and CT.
+
+### `order_microbiology.specimen`
+
+| Value | Specimen | When |
+|---|---|---|
+| `blood_culture` | Two sets, with susceptibility | Suspected bacterial meningitis, sepsis, SBP |
+| `whole_blood_pcr` | Meningococcus / pneumococcus PCR | Meningitis where culture may be negative |
+| `throat_swab` | Meningococcal culture | Suspected meningococcal disease |
+| `urine` | Urinalysis + culture | Infection screen as an HE precipitant |
+| `ascitic_fluid` | Diagnostic paracentesis: PMN count, protein, culture | Every patient with ascites and altered mental status |
+
+`before_antimicrobials` is a boolean: yield collapses once treatment has started, and the
+report must state it rather than leave it inferred.
+
+### `obtain_tissue_diagnosis`
+
+`procedure` is `resection` or `stereotactic_biopsy`. `molecular_assays` is a list drawn from
+`IDH1_IHC`, `IDH1_IDH2_sequencing`, `ATRX_IHC`, `1p_19q_codeletion`, `CDKN2A_B_deletion`,
+`TERT_promoter`, `EGFR_amplification`, `chr7_gain_chr10_loss`, `H3K27_status`,
+`MGMT_methylation`, `BRAF_V600`. Each assay is in the list because it changes management, not
+to complete a taxonomy. MGMT must not be assessed by immunocytochemistry.
+
+### `perform_clinical_assessment.assessment_type`
+
+Deliberately small and non-overlapping with `order_specialized_test`: a full battery is
+`neuropsych_battery`, bedside spirometry is `respiratory_function`, formal autonomic testing
+is `autonomic_testing`. Duplicating a study under two tools would let either satisfy the
+ground truth.
+
+| Value | Assessment | When |
+|---|---|---|
+| `cognitive_screen` | MoCA / MMSE with informant history | First step in suspected cognitive decline, before imaging |
+| `structured_headache_history_ichd3` | Headache and aura features against ICHD-3 | Migraine with aura — the actual confirmatory step |
+| `gait_and_balance_timed` | Timed Up and Go, timed walk | NPH, before *and* after the CSF tap test (two assessments) |
+| `functional_neuro_signs` | Hoover's sign, entrainment | Functional neurological disorder — a positive clinical diagnosis |
 
 ---
 

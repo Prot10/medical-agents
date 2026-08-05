@@ -281,6 +281,10 @@ tools:
       DaTscan: 4600
       MIBG_scan: 1656
       perfusion_MRI: 460
+      # CT perfusion — tissue-based selection for extended-window thrombolysis and for
+      # thrombectomy 6-24 h from last known well (AHA/ASA 2026). Only perfusion_MRI existed,
+      # so the CT arm of that pathway was unreachable.
+      CT_perfusion: 460
       cardiac_MRI: 552
       MR_spectroscopy: 460
       MR_angiography: 552
@@ -333,6 +337,75 @@ tools:
       porphyria: 1656           # HMBS, ALAS1, CPOX, PPOX
       small_fiber_neuropathy: 1380  # SCN9A, SCN10A, SCN11A
       PD: 1840                  # PRKN, PINK1, DJ-1, LRRK2, GBA, SNCA
+
+  # --- Tools added after the July 2026 clinical tool review -------------------------------
+  # The reviewers' structural finding: the action space could only image the brain and could
+  # not obtain a specimen, so several conditions had a mandatory step with no callable act.
+  # Rates are EUR reference estimates in the same band as the studies already listed above
+  # (technical + professional component), pending coding sign-off — same caveat as the rest
+  # of this file, not fee-schedule lookups.
+  # One discriminator + one `by_type` block each, exactly like order_advanced_imaging, so
+  # vocabulary.by_type_values, CostTracker._cost_by_type and the metric layer's scalar
+  # discriminator all apply unchanged. Region and modality are fused into one `study` term
+  # rather than split across two parameters, because a CT and an MRI of the same region are
+  # different studies at different prices, and one term keeps them individually priceable.
+  order_body_imaging:
+    by_type:
+      pelvis_abdomen_CT: 368
+      pelvis_abdomen_MRI: 552
+      pelvis_abdomen_ultrasound: 184
+      mediastinum_CT: 322
+      mediastinum_MRI: 506
+      spine_MRI: 552
+      spine_CT: 322
+      peripheral_nerve_MRI: 460
+      peripheral_nerve_ultrasound: 184
+    modifiers:
+      contrast: 116
+
+  order_microbiology:
+    by_type:
+      blood_culture: 37
+      whole_blood_pcr: 184
+      throat_swab: 28
+      urine: 28
+      # Diagnostic paracentesis: the procedure plus its fluid studies (PMN count, protein,
+      # culture into blood-culture bottles at the bedside), per EASL 2022.
+      ascitic_fluid: 276
+
+  obtain_tissue_diagnosis:
+    # Two-part, like analyze_csf: the procedure, then the assays run on the specimen.
+    # Resection is priced as the diagnostic act only — it is also therapeutic, which the
+    # benchmark does not bill for.
+    by_type:
+      stereotactic_biopsy: 2760
+      resection: 9200
+    by_molecular_assay:
+      IDH1_IHC: 138
+      IDH1_IDH2_sequencing: 552
+      ATRX_IHC: 138
+      1p_19q_codeletion: 460
+      CDKN2A_B_deletion: 460
+      TERT_promoter: 368
+      EGFR_amplification: 368
+      chr7_gain_chr10_loss: 460
+      H3K27_status: 276
+      MGMT_methylation: 460
+      BRAF_V600: 276
+    # Rate for an assay with no row above (warned at execute time and here).
+    default_molecular_assay: 368
+
+  perform_clinical_assessment:
+    # The reviewers named these as required steps with no callable act behind them. Kept
+    # deliberately small and non-overlapping: a full battery is already
+    # order_specialized_test{neuropsych_battery}, bedside spirometry is already
+    # {respiratory_function}, and formal autonomic testing is already {autonomic_testing}.
+    # Duplicating a study under a second tool would let either satisfy the ground truth.
+    by_type:
+      cognitive_screen: 92                 # MoCA / MMSE at the bedside, not a full battery
+      structured_headache_history_ichd3: 138
+      gait_and_balance_timed: 92           # TUG / timed walk; the NPH tap test is two of these
+      functional_neuro_signs: 138          # Hoover, entrainment — the positive signs of FND
 
   search_medical_literature:
     base: 0

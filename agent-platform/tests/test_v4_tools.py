@@ -88,14 +88,14 @@ class TestNewOutputSchemas:
 
 
 class TestToolDefinitions:
-    """Verify all 12 tools have correct schemas."""
+    """Verify all 16 tools have correct schemas."""
 
     @pytest.fixture
     def registry(self) -> ToolRegistry:
         return ToolRegistry.create_default_registry()
 
-    def test_twelve_tools_registered(self, registry):
-        assert len(registry.tools) == 12
+    def test_sixteen_tools_registered(self, registry):
+        assert len(registry.tools) == 16
 
     def test_all_tool_names(self, registry):
         expected = {
@@ -105,6 +105,9 @@ class TestToolDefinitions:
             "order_ct_scan", "order_echocardiogram",
             "order_cardiac_monitoring", "order_advanced_imaging",
             "order_specialized_test",
+            # Added after the July 2026 clinical tool review.
+            "order_body_imaging", "order_microbiology",
+            "obtain_tissue_diagnosis", "perform_clinical_assessment",
         }
         assert set(registry.tools.keys()) == expected
 
@@ -323,7 +326,7 @@ class TestDatasetIntegrity:
 
 
 class TestMetricsWithNewTools:
-    """Test that evaluation metrics work with 12-tool set."""
+    """Test that evaluation metrics work with the full tool set."""
 
     def test_critical_action_matches_ct(self):
         assert check_critical_action("Order CT scan to rule out hemorrhage", ["order_ct_scan"], "")
