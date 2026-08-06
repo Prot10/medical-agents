@@ -61,11 +61,15 @@ and the literature-aligned evaluation; `docs/training/distillation.md` for traje
   and (added after the July 2026 clinical tool review) order_body_imaging, order_microbiology, obtain_tissue_diagnosis, perform_clinical_assessment
 - Cost tracking: `CostTracker` in `tools/cost_tracker.py`, config in `config/tools/costs.yaml`, Medicare PFS reference rates
 - Tool vocabulary: `costs.yaml` is the single source; `tools/vocabulary.py` generates every enum from it,
-  so a term cannot exist without a price. `order_advanced_imaging` takes `modality` (14 values);
+  so a term cannot exist without a price. `order_advanced_imaging` takes `modality` (17 values,
+  including the second-line cardiac studies);
   `order_specialized_test` takes `test_type` (19 + `genetic_panel:<panel>`); `order_body_imaging` takes
-  `study` (9, `<region>_<modality>`); `order_microbiology` takes `specimen` (5); `obtain_tissue_diagnosis`
-  takes `procedure` (2) + `molecular_assays` (11); `perform_clinical_assessment` takes `assessment_type` (4).
-  `interpret_labs.panels` (153) and `analyze_csf.special_tests` (22) are advisory, not closed — an unlisted
+  `study` (11, `<region>_<modality>`); `order_microbiology` takes `specimen` (5); `obtain_tissue_diagnosis`
+  takes `procedure` (3) + `molecular_assays` (11); `perform_clinical_assessment` takes `assessment_type` (4).
+  `order_echocardiogram`, `analyze_eeg` and `analyze_brain_mri` were the last three enums written by
+  hand in their tool class; they now derive from `costs.yaml` too. `order_ct_scan` images the head and
+  neck only — a thoracic, abdominal or spinal CT is `order_body_imaging`.
+  `interpret_labs.panels` (154) and `analyze_csf.special_tests` (22) are advisory, not closed — an unlisted
   assay runs at the default rate.
   The review app mirrors these schemas in `review_api/services/tool_io.py` because `tools/` is not deployed
   to the review VPS; `tests/test_tool_io_schemas.py` fails CI if the mirror drifts. It did, silently, and the

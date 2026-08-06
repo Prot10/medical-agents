@@ -39,7 +39,7 @@ un buon agente qui è il non ordinare esami inutili e il costo, non la copertura
 |---|---|---|
 | Cambi di tier (required ↔ optional) | 18 | ✅ tutti applicati |
 | Rimozioni di tool da una patologia | 13 | ✅ 6 applicate · ⚠️ 7 declassate a opzionale (§4) |
-| Nuovi item diagnostici | 12 | ✅ 6 già esistevano (§3) · ✅ 4 nuovi tool · 🟡 2 parziali (§5) |
+| Nuovi item diagnostici | 12 | ✅ 6 già esistevano (§3) · ✅ 4 nuovi tool · ✅ 2 completati (glioma, sincope: §5, §5.1) · ⚪ 2 da valutare |
 | Riscritture delle descrizioni | 37 | ⚪ accolte, non ancora inserite — vanno nel *ground truth* e nella griglia di valutazione, non nella descrizione del tool (§6) |
 | Note di conferma senza modifica | 11 | ✅ nulla da fare |
 
@@ -113,9 +113,62 @@ costruzione.
 |---|---|
 | PET con aminoacidi (¹¹C-metionina, ¹⁸F-FET) per il glioma | ✅ **aggiunta** (EUR 2300). Avete ragione anche sul fatto che il FDG non è adeguato per i tumori primitivi: era l'unica strada disponibile, cioè proprio l'esame che la linea guida esclude. Ora la descrizione del tool lo dice esplicitamente all'agente |
 | RM funzionale e trattografia DTI | ❌ **non aggiunte come modalità** — le collocate nella pianificazione prechirurgica presso aree eloquenti: è una domanda operatoria, non diagnostica. Restano come annotazione di sequenza della RM encefalo, che è la sede corretta |
-| TC cardiaca e coronarografia (sincope) | ⚪ da valutare — al momento c'è solo `cardiac_MRI` |
+| Imaging cardiaco di seconda linea (RM cardiaca, TC cardiaca, coronarografia) | ✅ **completato** — vedi §5.1 |
 | SPECT di perfusione (alternativa alla FDG-PET, AD/FTD) | ⚪ da valutare |
 | RM encefalo **e midollo** con protocollo SM | ⚪ da collegare — l'imaging spinale esiste, non è ancora agganciato alla SM |
+
+### 5.1 Imaging cardiaco di seconda linea — la sincope cardiaca, chiusa per intero ✅
+
+La metà della vostra richiesta era già soddisfatta: `cardiac_MRI` esisteva e **18 dei 30 casi
+la ordinano già** con il parametro esplicito. Era il catalogo obsoleto a nascondervela.
+L'altra metà è stata aggiunta, con la vostra stessa gerarchia di evidenza — l'escalation
+TC/RM su testo consultivo, la coronarografia con la sua raccomandazione di Classe IIa:
+
+| Aggiunto | Tool | € | Nota |
+|---|---|---|---|
+| `coronary_CTA` | imaging avanzato | 460 | via non invasiva all'ischemia |
+| `coronary_angiography` | imaging avanzato | 2760 | il pezzo Classe IIa |
+| `cardiac_FDG_PET` | imaging avanzato | 2300 | studio distinto dalla PET cerebrale: preparazione dietetica, acquisizione gated |
+| `chest_CT` / `chest_CTA` | imaging corporeo | 276 / 368 | la «cardiac or thoracic CT angiography» che chiedevate |
+| `exercise_echo` | ecocardiogramma | 460 | il vostro item di Classe I nella cardiomiopatia ipertrofica |
+| `lymph_node_biopsy` | diagnosi tissutale | 1840 | conferma istologica per via extracardiaca |
+
+**Tre casi modellavano un esame con il tool sbagliato, e i vostri commenti li hanno fatti
+emergere:**
+
+- **SYNC-CARD-RM04** (embolia polmonare) chiedeva un'angio-TC polmonare attraverso il tool
+  della **TC cranio**, che non ha un parametro di regione. I suoi discriminanti erano identici
+  a un'angio-TC cranio-cervicale: un agente che in quel paziente avesse studiato il cervello
+  prendeva comunque il punto. È esattamente «the arrangement most likely to produce the wrong
+  imaging choice» che avevate previsto.
+- **SYNC-CARD-RP05** (sarcoidosi cardiaca) usava `FDG_PET`, la PET cerebrale, per una PET/TC
+  cardiaca con preparazione dietetica; e metteva la conferma istologica come referral senza
+  tool — lo stesso schema a cui obiettavate nel glioma. Ora è una biopsia linfonodale
+  chiamabile e valutabile.
+- **SYNC-CARD-P02** (cardiomiopatia ipertrofica) modellava l'**eco da sforzo** come test
+  ergometrico. Un tapis roulant prendeva il punto di un esame il cui intero contenuto è un
+  gradiente provocato *per immagine*.
+
+**La vostra direttiva sui laboratori, applicata a tutti e 30 i casi.** Il TSH era nel pannello
+obbligatorio di 29 casi su 30 e il BNP di 27 — contro un vostro commento che dice
+letteralmente che i pannelli non mirati (tiroide, infiammazione, autoimmunità, paraneoplastica)
+non hanno ruolo stabilito qui e che i peptidi natriuretici non stabiliscono la causa della
+sincope. Ora:
+
+- il TSH resta nei **4** casi in cui un meccanismo tiroideo è davvero in diagnosi differenziale
+  (tachicardia sopraventricolare, flutter atriale, disfunzione del nodo del seno, QT lungo);
+- il BNP nei **3** in cui una linea guida lo usa per stratificare il rischio del meccanismo
+  già accertato (ESC 2019 per l'embolia polmonare) o in cui una decisione sul device dipende
+  dalla gravità dello scompenso;
+- il passo dei laboratori è `required` in **11** casi e `recommended` in **19**;
+- la spesa di laboratorio imposta sui 30 casi scende da EUR 6108 a EUR 4686 (circa 47 € per
+  caso), e le azioni obbligatorie da 204 a 185.
+
+Il vostro commento ha fatto emergere anche **un vincolo di sequenza che contraddiceva la
+vostra stessa direttiva**: 28 casi imponevano i laboratori *prima* del monitoraggio cardiaco a
+severità `hard`. Con i laboratori non più obbligatori, un agente che correttamente salta un
+pannello non mirato per andare al monitoraggio subiva una violazione. Rimosso nei 18 casi in
+cui il passo non è più obbligatorio, mantenuto dove un esame nominato apre la decisione.
 
 ---
 
@@ -147,6 +200,10 @@ Per trasparenza.
 | Decisione | Motivo |
 |---|---|
 | Punteggio per singolo esame (§6) | Conseguenza diretta del vostro rilievo sui pannelli generici. Sposta le metriche pubblicate |
+| Descrizioni del catalogo riscritte dove la modifica riguarda l'esame e non la patologia | Le stringhe che avete citato come *«current description (to be removed)»* sono quelle del catalogo, e due erano proprio quelle che avevate riconosciuto come ereditate da un pannello neuroimmunologico: laboratori e liquor. Sono corrette. Al prossimo accesso il testo che vedete è cambiato — non è un errore |
+| `ASO` e `AED_levels` prezzati e ordinabili | Due casi affermavano nel *ground truth* un risultato (titolo antistreptolisinico, livello dell'antiepilettico) che l'agente non poteva chiedere perché l'esame non aveva prezzo |
+| Un esame condannato dentro un prelievo multiplo ora conta | «Questo singolo dosaggio non è indicato qui» era inesprimibile: il confronto era per uguaglianza esatta, quindi non scattava mai su una richiesta reale che raggruppa più analiti. Sette classificazioni del dataset erano morte, cinque su un parametro inesistente |
+| Il tool della TC dichiara di essere solo cranio-cervicale | Non ha un parametro di regione, quindi una TC del torace chiesta lì è indistinguibile da un'angio-TC del collo per il punteggio |
 | Normalizzazione dei nomi degli esami, nel punteggio e nel costo | `Protein C` / `protein_C` sono lo stesso esame: nessuno deve perdere punti per l'ortografia |
 | Vocabolario dei 153 esami di laboratorio e 22 su liquor esposto all'agente | Senza l'elenco il punteggio per esame sarebbe un indovinello |
 | Ritirati `mslt` e `pure_tone_audiometry` | Prezzati e ordinabili ma usati da zero casi e mai richiesti: superficie non revisionata. L'audiometria ha un'indicazione OMS 2025 post-meningite, la reintroduciamo se serve |

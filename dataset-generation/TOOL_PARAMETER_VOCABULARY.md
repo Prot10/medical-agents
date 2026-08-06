@@ -104,7 +104,7 @@ missing `clinical_context` is expected and fine. An unknown key is not.
 | --- | --- | --- |
 | `amyloid_PET` | Amyloid-β PET (florbetapir, florbetaben, flutemetamol) | AD biomarker confirmation |
 | `tau_PET` | Tau PET (flortaucipir) | AD tau staging, FTD tauopathy |
-| `FDG_PET` | 18F-FDG PET | AD vs FTD pattern, paraneoplastic, glioma grading |
+| `FDG_PET` | 18F-FDG PET, brain | AD vs FTD pattern, paraneoplastic. NOT adequate for grading a primary brain tumour |
 | `DaTscan` | Dopamine transporter SPECT | PD vs essential tremor vs MSA-C |
 | `MIBG_scan` | Cardiac 123I-MIBG | PD vs MSA differentiation (autonomic) |
 | `perfusion_MRI` | DSC / ASL perfusion MRI (brain) | Tumor grading, ischemia, MELAS |
@@ -116,6 +116,9 @@ missing `clinical_context` is expected and fine. An unknown key is not.
 | `transcranial_doppler` | TCD | Vasospasm in SAH, sickle-cell risk |
 | `CT_perfusion` | CTP, automated core/penumbra | Extended-window thrombolysis, thrombectomy 6-24 h |
 | `amino_acid_PET` | 11C-methionine or 18F-FET PET | High-grade glioma: active tumour vs necrosis/treatment effect, biopsy targeting. FDG is NOT adequate for primary brain tumours |
+| `cardiac_FDG_PET` | 18F-FDG PET/CT, cardiac, with dietary suppression of myocardial glucose uptake | Active myocardial inflammation — cardiac sarcoidosis, myocarditis. A different study from `FDG_PET`, not the same scan read differently |
+| `coronary_CTA` | Coronary CT angiography | Non-invasive coronary anatomy when ischaemia is suspected |
+| `coronary_angiography` | Invasive catheter coronary angiography | Suspected myocardial ischaemia or infarction (ESC 2018 Class IIa in syncope). An angiographic finding alone does not establish the cause of a symptom |
 
 ---
 
@@ -134,6 +137,8 @@ studies at different prices.
 | Value | Study | When |
 |---|---|---|
 | `pelvis_abdomen_CT` / `_MRI` / `_ultrasound` | Pelvic + abdominal imaging | Ovarian teratoma in anti-NMDAR encephalitis; portosystemic shunts in refractory hepatic encephalopathy |
+| `chest_CT` | Thoracic CT | Lung parenchyma, an intrathoracic mass |
+| `chest_CTA` | Thoracic CT angiography | Pulmonary embolism, aortic dissection, when either must be confirmed or excluded rapidly. `order_ct_scan` images the head and neck only and cannot answer this |
 | `mediastinum_CT` / `_MRI` | Anterior mediastinum | Thymoma / thymic hyperplasia in myasthenia gravis — chest radiograph does not substitute |
 | `spine_MRI` / `_CT` | Spinal cord and column | Cord compression, transverse myelitis, spinal tumour — the mimics of ascending flaccid weakness |
 | `peripheral_nerve_MRI` / `_ultrasound` | Nerve / nerve root | Root enhancement, nerve enlargement (GBS vs acute-onset CIDP) |
@@ -155,7 +160,11 @@ report must state it rather than leave it inferred.
 
 ### `obtain_tissue_diagnosis`
 
-`procedure` is `resection` or `stereotactic_biopsy`. `molecular_assays` is a list drawn from
+`procedure` is `resection`, `stereotactic_biopsy` or `lymph_node_biopsy` (endobronchial needle
+aspiration or surgical nodal sampling — the low-risk route to histological confirmation of a
+systemic disease when the accessible node is not the symptomatic organ, e.g. hilar nodes in
+cardiac sarcoidosis rather than an endomyocardial biopsy). A purely histological pattern needs
+no molecular assay. `molecular_assays` is a list drawn from
 `IDH1_IHC`, `IDH1_IDH2_sequencing`, `ATRX_IHC`, `1p_19q_codeletion`, `CDKN2A_B_deletion`,
 `TERT_promoter`, `EGFR_amplification`, `chr7_gain_chr10_loss`, `H3K27_status`,
 `MGMT_methylation`, `BRAF_V600`. Each assay is in the list because it changes management, not

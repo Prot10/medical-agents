@@ -90,6 +90,16 @@ Accolte. In sintesi:
     glioma era corretto: senza tessuto il percorso non può che fermarsi al sospetto);
   - valutazione clinica strutturata (anamnesi secondo ICHD-3 per l'emicrania, valutazione
     obiettiva di marcia e cognizione prima/dopo tap test nella NPH, segni clinici nella FND).
+- **Sincope cardiaca: le vostre cinque annotazioni sono applicate tutte.** Metà della richiesta
+  di imaging cardiaco di seconda linea era già soddisfatta (la RM cardiaca esisteva e 18 dei 30
+  casi la ordinano); abbiamo aggiunto TC coronarica, coronarografia, PET cardiaca con FDG,
+  angio-TC del torace ed eco da sforzo. Il vostro commento sui laboratori ha fatto emergere un
+  difetto che ci ha sorpresi: il TSH era obbligatorio in 29 casi su 30 e il BNP in 27. Ora il
+  TSH resta solo dove un meccanismo tiroideo è in diagnosi differenziale e il BNP solo dove una
+  linea guida lo usa per stratificare il rischio. E tre casi chiedevano un esame attraverso il
+  tool sbagliato — fra questi un'angio-TC polmonare chiesta con il tool della TC cranio, cioè
+  precisamente l'errore che avevate previsto quando avete scritto che offrire la RM encefalo e
+  non l'imaging cardiaco è «the arrangement most likely to produce the wrong imaging choice».
 - Le vostre **descrizioni condizione-specifiche** vengono recepite, ma con un accorgimento:
   non possono comparire nella descrizione del tool che l'agente legge, perché rivelerebbero
   la diagnosi che deve invece inferire (se il tool dice "per la SM, RM encefalo e midollo con

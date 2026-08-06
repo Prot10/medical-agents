@@ -26,12 +26,23 @@ The registry is `agent-platform/src/neuroagent/tools/tool_registry.py`. There ar
 clinical step, but no tool performs it, so it appears in a case as an action with
 `tool_name: null`.
 
-The two catchall tools stand in for many studies, selected by one parameter:
+Six tools stand in for many studies each, selected by one discriminating parameter. Every
+value is a priced row in `costs.yaml`, and `validate_cases.py` checks each parameter against
+**its own** vocabulary — it previously checked four of the six against the specialized-test
+list, which reported legal values as illegal:
 
 | Tool | Parameter | Values |
 | --- | --- | --- |
-| `order_advanced_imaging` | `modality` | 14 (`amyloid_PET`, `tau_PET`, `FDG_PET`, `amino_acid_PET`, `DaTscan`, `MIBG_scan`, `perfusion_MRI`, `CT_perfusion`, `cardiac_MRI`, `MR_spectroscopy`, `MR_angiography`, `MR_venography`, `carotid_duplex`, `transcranial_doppler`) |
+| `order_advanced_imaging` | `modality` | 17 (`amyloid_PET`, `tau_PET`, `FDG_PET`, `amino_acid_PET`, `cardiac_FDG_PET`, `DaTscan`, `MIBG_scan`, `perfusion_MRI`, `CT_perfusion`, `cardiac_MRI`, `coronary_CTA`, `coronary_angiography`, `MR_spectroscopy`, `MR_angiography`, `MR_venography`, `carotid_duplex`, `transcranial_doppler`) |
 | `order_specialized_test` | `test_type` | 21, plus `genetic_panel:<panel>` for 15 panels |
+| `order_body_imaging` | `study` | 11 (`<region>_<modality>` over pelvis/abdomen, chest, mediastinum, spine, peripheral nerve) |
+| `order_microbiology` | `specimen` | 5 |
+| `obtain_tissue_diagnosis` | `procedure` | 3 (`resection`, `stereotactic_biopsy`, `lymph_node_biopsy`), plus 11 molecular assays |
+| `perform_clinical_assessment` | `assessment_type` | 4 |
+
+`order_ct_scan` images the **head and neck only** and has no region parameter, so its
+discriminators (`contrast`, `angiography`) cannot distinguish a head-and-neck CTA from a
+thoracic one. Thoracic, abdominal and spinal CT belongs to `order_body_imaging`.
 
 ## What a case may write in `tool_parameters`
 

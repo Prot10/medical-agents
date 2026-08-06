@@ -209,9 +209,76 @@ Done, in four commits:
 | `22c1d4a` | Per-study scoring. `interpret_labs`/`analyze_csf` were credited on tool name alone; the action metrics were sets of tool *names*, collapsing 61% of cases. Measured on a parameter-blind agent: required coverage 0.885 → 0.544, cases at full coverage 336 → 78. |
 | `61dbcce` | The four tools: `order_body_imaging`, `order_microbiology`, `obtain_tissue_diagnosis`, `perform_clinical_assessment`, plus `CT_perfusion`. 12 → 16 tools. |
 | `827c1d4` | 18 tier changes + removals in `conditions.yaml`; VaD and DLB in the enum; FND kept as the restraint probe. |
+| `ee33f83` | Item 1 of the per-condition passes: `amino_acid_PET` for high-grade glioma, the tracer EANO names, and `obtain_tissue_diagnosis` replacing the `tool_name: null` referral in `GLIO-HG.md`. |
 
-Gates after all four: `validate_cases.py` 600/600 clean, perfect agent 1.0 on 600/600,
+Gates after all five: `validate_cases.py` 600/600 clean, perfect agent 1.0 on 600/600,
 1567 tests pass (5 skipped need `--extra training`).
+
+### Item 2: cardiac syncope, end to end
+
+Reviewer 2 left five annotations on this panel. Half of the "advanced cardiac imaging" ask
+was already satisfied — `cardiac_MRI` existed and 18 of the 30 cases pin it — so the work was
+the other half plus the four defects the audit turned up.
+
+**Vocabulary added** (`costs.yaml`, and therefore the enums, the catalog and the cost tracker):
+`chest_CT` 276 / `chest_CTA` 368 on `order_body_imaging`; `coronary_CTA` 460,
+`coronary_angiography` 2760 and `cardiac_FDG_PET` 2300 on `order_advanced_imaging`;
+`exercise_echo` 460 on `order_echocardiogram`; `lymph_node_biopsy` 1840 on
+`obtain_tissue_diagnosis`; `ASO` 18 on `interpret_labs`. All EUR.
+
+**Three cases were modelling a study with the wrong tool:**
+
+| Case | Was | Now | Why it mattered |
+|---|---|---|---|
+| RM04 | CT pulmonary angiogram via `order_ct_scan{contrast, angiography}` plus a phantom `region: chest` the schema ignores | `order_body_imaging{study: chest_CTA, contrast: true}` | The head tool's discriminators are identical for a head-and-neck CTA, so imaging the brain of a patient with a pulmonary embolism scored the required action — the misdirected escalation the reviewer predicted |
+| RP05 | `FDG_PET` for a cardiac PET/CT with dietary preparation; histology as a `tool_name: null` referral | `cardiac_FDG_PET`; `obtain_tissue_diagnosis{lymph_node_biopsy}` | One token meant two studies at different prices; and the mandatory histological step had no callable act — the glioma pattern again |
+| P02 | Exercise echocardiography as `order_specialized_test{exercise_stress_test}` | `order_echocardiogram{echo_type: exercise_echo}` | A treadmill test scored a study whose whole answer is an imaged, provoked outflow gradient (ESC 2018 Class I) |
+
+**The laboratory directive, applied to all 30.** TSH was in the required panel of 29 cases
+and BNP of 27, against a reviewer annotation stating in terms that untargeted thyroid,
+inflammatory, autoimmune and paraneoplastic panels have no established role here and that
+natriuretic peptides do not establish the cause of syncope. Thyroid survives in the 4 cases
+where a thyroid mechanism is on the differential (SVT, atrial flutter, sinus node
+dysfunction, QT prolongation), BNP in the 3 where a guideline risk-stratifies with it. The
+step is `required` in 11 cases and `recommended` in 19. Mandated laboratory spend over the 30
+cases: EUR 6108 → 4686, about EUR 47 per case; required actions 204 → 185.
+
+Two case-level inconsistencies surfaced while doing it: RP04's ground truth asserted a
+therapeutic antiepileptic level without ordering `AED_levels`, and RM02's asserted rheumatic
+activity from an ASO titre that its lab report contains but `costs.yaml` did not price — so
+the agent could not name it and no optimal action could ask for it.
+
+**A hard sequence constraint contradicted the directive.** 28 cases required
+`interpret_labs` *before* `order_cardiac_monitoring` at `hard` severity. With the labs no
+longer mandatory, an agent that correctly skipped an untargeted panel and went to monitoring
+took a hard sequence violation. Removed from the 18 cases where the labs step is no longer
+`required`; kept where a named assay gates the decision. No gate would have caught this: the
+perfect agent orders every optimal action regardless of tier, so it never triggers the
+violation.
+
+**Four defects found in the machinery, each latent because nothing exercised it:**
+
+1. `FollowUpToolOutput.output` — the union never gained the four post-review models, so a case
+   authoring a follow-up for one of them failed validation outright.
+2. `validate_cases.py` — checked `study`, `specimen`, `procedure` and `assessment_type` against
+   the *specialized-test* vocabulary. RM04 and RP05 are the first two cases in the dataset to
+   use those parameters and both were reported as out of vocabulary while being legal.
+   `test_every_case_value_is_priced` had the mirror-image blind spot.
+3. `_classification_matches` compared parameters by equality, so a `useless`/`harmful` entry
+   carrying a list could never match a real call. Seven were dead, five of them on
+   `analyze_csf.basic` — a parameter that does not exist. Set-valued parameters now match by
+   intersection, which is what makes "this one assay is untargeted here" scoreable at all.
+4. `order_echocardiogram`, `analyze_eeg` and `analyze_brain_mri` still wrote their enums out by
+   hand — in the tool class *and* in the review-app mirror, so each could drift from
+   `costs.yaml` independently. All three now derive.
+
+**Measurement worth recording: the panel lists are a generation input, not a per-case
+contract.** Comparing `conditions.yaml` against the 600 cases, 360 case actions are absent
+though the panel marks the tool required, and 588 are `required` in a case though the panel
+marks the tool optional. Both numbers pre-date the review (157 / 278 before the tier changes)
+and `validate_cases.py` does not check either, by design. The syncope labs entry was the one
+place where the gap produced the behaviour a reviewer had explicitly objected to, which is why
+it was closed there and nowhere else.
 
 ### Remaining work
 

@@ -267,7 +267,11 @@ Check drug interactions, contraindications, formulary status, and alternatives f
 
 ### 8. `order_ct_scan` — CT Scanner
 
-Fast structural imaging. Preferred over MRI for emergency hemorrhage exclusion.
+Fast structural imaging of the **head and neck only**. Preferred over MRI for emergency
+hemorrhage exclusion. A thoracic, abdominal or spinal CT — including a CT pulmonary
+angiogram — is `order_body_imaging`; a coronary study is `order_advanced_imaging`. The tool
+has no region parameter, so a chest study requested here is indistinguishable from a
+head-and-neck CTA to the scoring layer.
 
 #### Parameters
 | Name | Type | Required | Notes |
@@ -286,7 +290,7 @@ Returns `CTReport`.
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |
 | `clinical_context` | string | yes | |
-| `echo_type` | enum | no | `TTE`, `TEE`, `bubble_study` (right-to-left shunt) |
+| `echo_type` | enum | no | 4 values — `TTE`, `TEE`, `bubble_study` (right-to-left shunt), `exercise_echo` (provoked outflow gradient, ESC 2018 Class I in HCM with syncope). Generated from `costs.yaml`. |
 
 Returns `EchoReport`.
 
@@ -306,14 +310,16 @@ Returns `CardiacMonitoringReport`.
 
 ### 11. `order_advanced_imaging` — Advanced Imaging *(catchall)*
 
-One tool, twelve studies, selected by `modality`. The enum is generated from
-`config/tools/costs.yaml`, so a modality cannot exist without a price.
+One tool, seventeen studies, selected by `modality`. The enum is generated from
+`config/tools/costs.yaml`, so a modality cannot exist without a price. Covers cerebral
+molecular imaging, perfusion and vascular studies, and second-line cardiac imaging beyond the
+echocardiogram.
 
 #### Parameters
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |
 | `clinical_context` | string | yes | |
-| `modality` | enum | **yes** | 14 values — `amyloid_PET`, `tau_PET`, `FDG_PET`, `amino_acid_PET`, `DaTscan`, `MIBG_scan`, `perfusion_MRI`, `CT_perfusion`, `cardiac_MRI`, `MR_spectroscopy`, `MR_angiography`, `MR_venography`, `carotid_duplex`, `transcranial_doppler` |
+| `modality` | enum | **yes** | 17 values — `amyloid_PET`, `tau_PET`, `FDG_PET`, `amino_acid_PET`, `cardiac_FDG_PET`, `DaTscan`, `MIBG_scan`, `perfusion_MRI`, `CT_perfusion`, `cardiac_MRI`, `coronary_CTA`, `coronary_angiography`, `MR_spectroscopy`, `MR_angiography`, `MR_venography`, `carotid_duplex`, `transcranial_doppler` |
 
 The parameter was called `imaging_type` until the tool-contract migration. Returns
 `AdvancedImagingReport`.
