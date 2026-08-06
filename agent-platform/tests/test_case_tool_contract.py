@@ -26,7 +26,7 @@ sys.path.insert(0, str(REPO_ROOT / "agent-platform" / "scripts" / "validation"))
 
 from check_perfect_agent import perfect_trace  # noqa: E402
 from check_trajectories import _as_trace, check_trajectory  # noqa: E402,F401
-from validate_cases import _tool_schemas, validate_case  # noqa: E402
+from validate_cases import CATCHALL_PARAM, _tool_schemas, validate_case  # noqa: E402
 
 from neuroagent.evaluation.metrics import MetricsCalculator  # noqa: E402
 from neuroagent.tools.tool_registry import ToolRegistry  # noqa: E402
@@ -104,23 +104,45 @@ class TestVocabularyHasOneSource:
         )
 
     def test_every_case_value_is_priced(self, schemas):
-        """No ground-truth value may fall back to a default cost rate."""
-        modalities, tests = set(advanced_imaging_modalities()), set(specialized_test_types())
+        """No ground-truth value may fall back to a default cost rate.
+
+        Covers all six discriminating parameters, not just the two original catchall tools.
+        Checking only those two left the four post-review tools unguarded, and the validator
+        had the mirror-image bug: it checked *their* values against the specialized-test
+        vocabulary, so `study=chest_CTA` was reported as illegal while `study=emg_ncs` would
+        have passed. Both blind spots were invisible while no case used the parameters.
+        """
         unpriced: list[str] = []
         for path in CASE_FILES:
             gt = json.loads(path.read_text())["ground_truth"]
             entries = gt["optimal_actions"] + gt["useless_tools"] + gt["harmful_tools"]
             for entry in entries:
                 params = entry.get("tool_parameters") or {}
-                tool = entry.get("tool_name")
-                if tool == "order_advanced_imaging" and "modality" in params:
-                    if params["modality"] not in modalities:
-                        unpriced.append(f"{path.stem}: modality={params['modality']}")
-                if tool == "order_specialized_test" and "test_type" in params:
-                    value = params["test_type"]
-                    if value not in tests and not value.startswith("genetic_panel:"):
-                        unpriced.append(f"{path.stem}: test_type={value}")
+                key_and_predicate = CATCHALL_PARAM.get(entry.get("tool_name"))
+                if key_and_predicate is None:
+                    continue
+                key, is_valid = key_and_predicate
+                if key in params and not is_valid(str(params[key])):
+                    unpriced.append(f"{path.stem}: {key}={params[key]}")
         assert unpriced == [], unpriced
+
+    @pytest.mark.parametrize("tool_name", sorted(CATCHALL_PARAM))
+    def test_each_tool_is_validated_against_its_own_vocabulary(self, tool_name, registry):
+        """The validator's predicate must accept exactly that tool's enum, and no other's."""
+        key, is_valid = CATCHALL_PARAM[tool_name]
+        own = self._enum(registry, tool_name, key)
+        assert own, f"{tool_name}.{key} has no enum to validate against"
+        assert all(is_valid(value) for value in own), (
+            f"{tool_name}: the validator rejects legal values of its own vocabulary"
+        )
+        foreign = {
+            value
+            for other, (other_key, _) in CATCHALL_PARAM.items()
+            if other != tool_name
+            for value in self._enum(registry, other, other_key)
+        } - set(own)
+        leaked = sorted(value for value in foreign if is_valid(value))
+        assert not leaked, f"{tool_name}: validator also accepts another tool's terms: {leaked}"
 
 
 class TestGoldTrajectoriesSatisfyTheContract:

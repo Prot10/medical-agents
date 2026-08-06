@@ -82,6 +82,10 @@ class FollowUpToolOutput(BaseModel):
     trigger_action: str
     tool_name: str
     # The model_validator below dispatches by tool_name; the union is the fallback.
+    # Every member of `_TOOL_OUTPUT_MODEL` must appear here. The four post-review tools were
+    # added to that map but not to this union, so a case authoring a *follow-up* for one of
+    # them failed validation outright — latent until the cardiac-syncope pass moved a CT
+    # pulmonary angiogram onto order_body_imaging.
     output: (
         EEGReport
         | MRIReport
@@ -93,6 +97,10 @@ class FollowUpToolOutput(BaseModel):
         | CardiacMonitoringReport
         | AdvancedImagingReport
         | SpecializedTestReport
+        | BodyImagingReport
+        | MicrobiologyReport
+        | TissueDiagnosisReport
+        | ClinicalAssessmentReport
         | LiteratureSearchResult
         | DrugInteractionResult
     )

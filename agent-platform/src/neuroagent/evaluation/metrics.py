@@ -623,13 +623,27 @@ def _classification_matches(
 
     A classification with no `tool_parameters` is a wildcard: the tool is wasteful however
     it is parameterised. A classification *with* parameters matches only calls that carry
-    those exact key/value pairs, so a case can condemn one study of a catchall tool without
+    those key/value pairs, so a case can condemn one study of a catchall tool without
     condemning the study it also requires.
+
+    Set-valued parameters are compared by intersection, not equality. Equality made such a
+    classification unreachable: an agent bundles analytes into one call, so
+    `panels == ["thyroid"]` matched nothing unless thyroid was the *only* thing ordered.
+    Condemning one assay inside a bundle is exactly what the clinical reviewers asked for when
+    they wrote that untargeted thyroid, inflammatory and paraneoplastic panels have no
+    established role in a condition whose other analytes are required.
     """
     if classification.tool_name != name:
         return False
     expected = classification.tool_parameters or {}
-    return all(arguments.get(key) == value for key, value in expected.items())
+    set_parameter = _SET_DISCRIMINATORS.get(name) or _ALSO_SET_DISCRIMINATORS.get(name)
+    for key, value in expected.items():
+        if key == set_parameter or isinstance(value, (list, tuple, set, frozenset)):
+            if not (_as_set(value) & _as_set(arguments.get(key))):
+                return False
+        elif arguments.get(key) != value:
+            return False
+    return True
 
 
 def _count_classified_calls(

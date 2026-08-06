@@ -40,20 +40,34 @@ from pathlib import Path
 from typing import Any
 
 from neuroagent.tools.tool_registry import ToolRegistry
-from neuroagent.tools.vocabulary import is_valid_modality, is_valid_test_type
+from neuroagent.tools.vocabulary import (
+    is_valid_assessment_type,
+    is_valid_body_imaging_study,
+    is_valid_modality,
+    is_valid_specimen,
+    is_valid_test_type,
+    is_valid_tissue_procedure,
+)
 
 CASES_DIR = Path("data/neurobench/cases")
 
-# Tools whose single parameter selects which study was ordered. Kept in step with
+# Tools whose single parameter selects which study was ordered, with the predicate that knows
+# that tool's closed vocabulary. Kept in step with
 # evaluation/metrics.py::_SCALAR_DISCRIMINATORS — a value the validator lets through but the
 # metric cannot match is a silent scoring loss.
-CATCHALL_PARAM = {
-    "order_advanced_imaging": "modality",
-    "order_specialized_test": "test_type",
-    "order_body_imaging": "study",
-    "order_microbiology": "specimen",
-    "obtain_tissue_diagnosis": "procedure",
-    "perform_clinical_assessment": "assessment_type",
+#
+# Each predicate used to be inferred from the tool name, with everything that was not
+# `order_advanced_imaging` checked against the *specialized test* vocabulary. That was wrong
+# for the four tools added after the July 2026 review and invisible, because no case used
+# their discriminating parameter yet: the first two that did — a chest CT angiogram and a
+# lymph-node biopsy — were both reported as out of vocabulary while being perfectly legal.
+CATCHALL_PARAM: dict[str, tuple[str, Any]] = {
+    "order_advanced_imaging": ("modality", is_valid_modality),
+    "order_specialized_test": ("test_type", is_valid_test_type),
+    "order_body_imaging": ("study", is_valid_body_imaging_study),
+    "order_microbiology": ("specimen", is_valid_specimen),
+    "obtain_tissue_diagnosis": ("procedure", is_valid_tissue_procedure),
+    "perform_clinical_assessment": ("assessment_type", is_valid_assessment_type),
 }
 
 # Where each tool's pre-generated output lives inside the case.
@@ -188,9 +202,9 @@ def _check_parameters(
             })
             continue
 
-        if key in CATCHALL_PARAM.get(tool, ""):
-            valid = is_valid_modality(value) if tool == "order_advanced_imaging" else is_valid_test_type(value)
-            if not valid:
+        catchall_key, is_valid = CATCHALL_PARAM.get(tool, (None, None))
+        if key == catchall_key:
+            if not is_valid(str(value)):
                 issues.append({
                     "code": "VOCAB_BAD_VALUE", "section": section, "index": index, "tool": tool,
                     "detail": f"{key}=`{value}` is not in the closed vocabulary",

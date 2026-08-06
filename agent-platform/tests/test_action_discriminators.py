@@ -29,6 +29,7 @@ from neuroagent.agent.reasoning import AgentTrace, AgentTurn
 from neuroagent.evaluation.metrics import (
     MetricsCalculator,
     _action_key,
+    _classification_matches,
     _optimal_action_satisfied,
 )
 
@@ -294,3 +295,65 @@ class TestRestraintCases:
         )
         metrics = MetricsCalculator().compute_all(_trace(), ground_truth)
         assert metrics.useless_calls == 0
+
+
+class TestClassificationMatching:
+    """A useless/harmful classification must be reachable by a realistic agent call.
+
+    Every one of these started as a dataset defect. `_classification_matches` compared
+    parameters by equality, so a classification carrying a list matched only an agent whose
+    call carried that exact list — which no agent produces, because analytes are bundled. Seven
+    classifications in the 600 cases were therefore dead: five of them on `analyze_csf.basic`,
+    a parameter that does not exist in the tool's schema at all. Nothing failed; they simply
+    never fired.
+    """
+
+    def test_wildcard_condemns_the_tool_however_parameterised(self):
+        classification = ToolClassification(
+            tool_name="analyze_csf", tool_parameters={}, rationale="LP contraindicated"
+        )
+        assert _classification_matches(classification, "analyze_csf", {"special_tests": ["HSV_PCR"]})
+        assert _classification_matches(classification, "analyze_csf", {})
+
+    def test_scalar_parameter_still_needs_an_exact_match(self):
+        classification = ToolClassification(
+            tool_name="order_specialized_test",
+            tool_parameters={"test_type": "tilt_table"},
+            rationale="relative contraindication in severe aortic stenosis",
+        )
+        assert _classification_matches(
+            classification, "order_specialized_test", {"test_type": "tilt_table"}
+        )
+        assert not _classification_matches(
+            classification, "order_specialized_test", {"test_type": "exercise_stress_test"}
+        )
+
+    def test_set_parameter_matches_inside_a_bundle(self):
+        """The reviewers' case: one untargeted assay condemned among required ones."""
+        classification = ToolClassification(
+            tool_name="interpret_labs",
+            tool_parameters={"panels": ["TSH"]},
+            rationale="untargeted thyroid testing has no established role here",
+        )
+        assert _classification_matches(
+            classification, "interpret_labs", {"panels": ["CBC", "BMP", "troponin", "TSH"]}
+        )
+        assert not _classification_matches(
+            classification, "interpret_labs", {"panels": ["CBC", "BMP", "troponin"]}
+        )
+
+    def test_set_parameter_tolerates_spelling(self):
+        classification = ToolClassification(
+            tool_name="interpret_labs",
+            tool_parameters={"panels": ["D_dimer"]},
+            rationale="no suspicion of pulmonary embolism",
+        )
+        assert _classification_matches(
+            classification, "interpret_labs", {"panels": ["CBC", "D-dimer"]}
+        )
+
+    def test_a_different_tool_never_matches(self):
+        classification = ToolClassification(
+            tool_name="analyze_csf", tool_parameters={}, rationale="no role"
+        )
+        assert not _classification_matches(classification, "analyze_brain_mri", {})
