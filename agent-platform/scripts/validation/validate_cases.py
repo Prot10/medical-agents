@@ -156,6 +156,25 @@ def _signature(tool_name: str | None, params: dict | None) -> tuple[str, str]:
     return (tool_name or "", json.dumps(params, sort_keys=True, default=str))
 
 
+def _resolver(case: dict):
+    """`(tool, params) -> None | "ok" | "fallback"`, or None if the case cannot be modelled."""
+    try:
+        from neuroagent.tools.mock_server import MockServer
+        from neuroagent_schemas import NeuroBenchCase
+
+        model = NeuroBenchCase.model_validate(case)
+    except Exception:  # a case mid-migration; the other checks still apply
+        return None
+
+    def resolve(tool: str, params: dict) -> str | None:
+        result = MockServer(model).get_output(tool, params)
+        if not result.success:
+            return None
+        return "fallback" if result.from_fallback else "ok"
+
+    return resolve
+
+
 def _has_output(case: dict, tool_name: str) -> bool:
     field = TOOL_TO_OUTPUT_FIELD.get(tool_name)
     if not field:
@@ -253,6 +272,7 @@ def _check_parameters(
 def validate_case(case: dict, schemas: dict[str, dict[str, Any]]) -> list[dict]:
     issues: list[dict] = []
     gt = case.get("ground_truth", {}) or {}
+    server = _resolver(case)
 
     sections = {
         "optimal_actions": gt.get("optimal_actions") or [],
@@ -296,13 +316,45 @@ def validate_case(case: dict, schemas: dict[str, dict[str, Any]]) -> list[dict]:
                 "fix_class": "judgment",
             })
 
-    # A required action the mock server cannot answer is a trap for the agent.
+    # An action the mock server cannot answer is a trap for the agent — so resolve every one of them
+    # through the server itself rather than asking the weaker question "does this tool have any
+    # stored output at all?". That proxy passed while 15 required actions returned nothing and 96
+    # more were answered by *another study's* report: the case stored an advanced-imaging report, so
+    # the proxy was satisfied, but it was a carotid duplex and the action asked for a transcranial
+    # Doppler. Being answered by the off-pathway fallback is also wrong for a step the gold workup
+    # includes — that tier means "not on the pathway, did not contribute". The two zero-cost
+    # universal tools are exempt from the fallback rule: a literature search and an interaction
+    # check carry no diagnostic finding, so their generic answer is a fair simulation.
     for i, action in enumerate(sections["optimal_actions"]):
         tool = action.get("tool_name")
-        if tool and tool in schemas and action.get("category") == "required" and not _has_output(case, tool):
+        if not tool or tool not in schemas or server is None:
+            continue
+        params = dict(action.get("tool_parameters") or {})
+        params.setdefault("clinical_context", str(action.get("action", ""))[:80])
+        if tool == "search_medical_literature":
+            params.setdefault("query", str(action.get("action", ""))[:80])
+        result = server(tool, params)
+        if result is None:
             issues.append({
-                "code": "REQUIRED_NO_OUTPUT", "section": "optimal_actions", "index": i, "tool": tool,
-                "detail": f"required `{tool}` has no stored output; the agent obeying the gold gets an error",
+                "code": "ACTION_NO_RESULT", "section": "optimal_actions", "index": i, "tool": tool,
+                "detail": (
+                    f"{action.get('category')} `{tool}`"
+                    + (f" ({params.get('modality') or params.get('test_type') or ''})"
+                       if params.get("modality") or params.get("test_type") else "")
+                    + " returns no result; the agent obeying the gold gets an error"
+                ),
+                "fix_class": "judgment",
+            })
+        elif result == "fallback" and tool not in ("search_medical_literature",
+                                                  "check_drug_interactions"):
+            issues.append({
+                "code": "ACTION_ONLY_FALLBACK", "section": "optimal_actions", "index": i,
+                "tool": tool,
+                "detail": (
+                    f"{action.get('category')} `{tool}` is answered only by the off-pathway "
+                    "fallback, which says the study did not contribute — but this action carries "
+                    "its own expected finding"
+                ),
                 "fix_class": "judgment",
             })
 

@@ -270,6 +270,22 @@ mancante in miastenia e NMDAR (60) **c'erano già, sul tool sbagliato**.
 in archivio: una PET cardiaca a chi ordinava una PET cerebrale, un'emocoltura a chi chiedeva il
 liquido ascitico, un tilt-table a chi chiedeva un test ergometrico. Ora controlla il discriminante.
 
+**E quel controllo ha fatto emergere la cosa più grossa del giro.** Una volta che il simulatore
+verifica *quale* esame è stato chiesto, si può fare la domanda giusta: ogni passo del percorso di
+riferimento riceve davvero una risposta? **No: 194 azioni su 600 casi no.** 98 non ricevevano
+nulla — 12 obbligatorie — e 96 ricevevano il referto generico «esame fuori percorso, non
+contributivo» pur avendo un reperto atteso dichiarato. Prima del controllo ricevevano tutte **il
+referto di un altro esame**: chi ordinava un Doppler transcranico riceveva un eco-Doppler carotideo,
+chi ordinava un ice-pack test riceveva una stimolazione ripetitiva. Il validatore era soddisfatto,
+perché chiedeva soltanto se quel tool avesse *un qualsiasi* referto in archivio.
+
+Tutte e 194 ora hanno il proprio referto, scritto a partire da ciò che ogni azione già dichiarava
+nel proprio reperto atteso. Nulla è inventato: il caso si era già impegnato sul risultato.
+
+Nel farlo sono emersi anche **20 referti di RM cardiaca etichettati `perfusion_MRI`**, cioè lo studio
+cerebrale — il contenuto era cardiaco (enhancement tardivo in territorio coronarico), l'etichetta no,
+ed era quella che il ground truth confrontava.
+
 ---
 
 ## 8. Da confermare

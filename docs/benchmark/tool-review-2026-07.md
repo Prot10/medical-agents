@@ -359,6 +359,54 @@ retired.
 
 Both panels now say what the cases do: cord MRI is REQUIRED for MS and for ALS, not optional.
 
+### A further pass: the gold workup was asking for studies the cases could not report
+
+With the discriminator guard in place, the question worth asking became: does every action in every
+gold workup actually get an answer? It did not.
+
+**194 optimal actions across the 600 cases could not be answered as ordered.** 98 returned nothing
+at all — 12 of them at `required` tier — and 96 more were answered by the off-pathway *fallback*
+tier, which by construction says "this study was not on the pathway and did not contribute" while
+the action carried its own expected finding. Before the guard, all of them were served **another
+study's report**: an agent ordering a transcranial Doppler received a carotid duplex, one ordering an
+MR angiogram received a duplex, one ordering an ice-pack test received a repetitive-stimulation
+study. `validate_cases.py` was satisfied throughout, because its check asked only whether the tool
+had *any* stored output.
+
+All 194 now have their own report, authored from what each action already declares in its
+`expected_finding` — "intramural haematoma and luminal narrowing confirm cervical arterial
+dissection", "improvement of ptosis after two minutes of cooling supports MG" — put into the report's
+shape, with the study named in the field both the scoring layer and the MockServer read. Nothing was
+invented: the case had already committed to the result.
+
+Three further findings on the way:
+
+* **20 cardiac-MRI reports were labelled `perfusion_MRI`**, the cerebral study. The content was a
+  cardiac MRI — late gadolinium enhancement in a coronary territory — so the label was wrong, and it
+  was what the ground truth's `cardiac_MRI` was being compared against. 8 gold trajectories had
+  inherited the mislabel and ordered the cerebral study for a cardiac question.
+* **The discriminator comparison was word-order sensitive.** A report saying `"Single-fiber EMG"` did
+  not match a call for `emg_single_fiber`, so the case's own SFEMG report was refused and its
+  repetitive-stimulation report offered instead. Comparison is now on token sets, which is safe: no
+  two terms in any of the ten vocabularies share one.
+* **Ten cases have a gold workup that costs nothing** — the migraine cases whose only required steps
+  are the two free tools, because the reviewers correctly demoted imaging and labs and the required
+  `perform_clinical_assessment` step is still in the 150-case authoring block. `cost_efficiency`
+  handles a zero-cost optimum without dividing by zero (1.0 if the agent also spent nothing, else
+  0.0), so this is a pending gap, not a live defect.
+
+`validate_cases.py` now resolves every optimal action through the MockServer instead of asking
+whether the tool has any output at all: `ACTION_NO_RESULT` and `ACTION_ONLY_FALLBACK`, both verified
+against a stripped report. Only `search_medical_literature` and `check_drug_interactions` may still
+answer from the fallback tier — they carry no diagnostic finding, so a generic answer is a fair
+simulation of one.
+
+One judgement recorded rather than changed: in 15 cases a tool the case condemns outright still
+returns an abnormal report — an LP in a subarachnoid haemorrhage with hydrocephalus shows the raised
+pressure it was condemned for risking. That is clinically true, and the safety metric is what
+penalises the act, so the content stands. Six were already declared red herrings; NPH-S10's
+paroxysmal atrial fibrillation was a deliberate distractor that had never been declared, and now is.
+
 ### Remaining work
 
 **1. Redeploy the review app** — pair with sending the reply, since it changes what the

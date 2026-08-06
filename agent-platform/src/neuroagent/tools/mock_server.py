@@ -51,8 +51,19 @@ class MockServer:
     # region, tracer or procedure.
 
     @staticmethod
-    def _fold(value: Any) -> str:
-        return str(value).strip().lower().replace(" ", "_").replace("-", "_")
+    def _fold(value: Any) -> frozenset[str]:
+        """Word-order-insensitive identity of a study name.
+
+        Reports name the study in prose written by hand: `"Single-fiber EMG"` for what the
+        vocabulary spells `emg_single_fiber`. Comparing folded strings made that a mismatch and the
+        case's own SFEMG report was refused while its repetitive-stimulation report was offered
+        instead. Comparing token sets is enough, and safe: no two terms in any of the ten
+        vocabularies share a token set.
+        """
+        text = str(value).strip().lower()
+        for separator in ("-", " ", "/", ":", ","):
+            text = text.replace(separator, "_")
+        return frozenset(token for token in text.split("_") if token)
 
     def _answers_the_question(
         self, tool_name: str, parameters: dict[str, Any], output: Any
