@@ -39,11 +39,13 @@ logger = logging.getLogger(__name__)
 class TissueDiagnosisTool(BaseTool):
     name = "obtain_tissue_diagnosis"
     description = (
-        "Obtain tissue and issue an integrated histomolecular diagnosis. This is the only "
-        "route to a definitive diagnosis, grade and treatment branch for a brain tumour — "
-        "imaging alone yields a suspicion, reported as NOS. Request the molecular assays "
-        "that change management; each is billed separately. Molecular work-up must not delay "
-        "radiotherapy or tumour-specific pharmacotherapy."
+        "Obtain tissue and issue an integrated histopathological diagnosis. For a brain "
+        "tumour this is the only route to a definitive diagnosis, grade and treatment branch — "
+        "imaging alone yields a suspicion, reported as NOS. It also covers nodal sampling when "
+        "a systemic disease has to be confirmed histologically outside the organ that is "
+        "symptomatic. Request the molecular assays that change management; each is billed "
+        "separately, and a purely histological pattern needs none. Molecular work-up must not "
+        "delay radiotherapy or tumour-specific pharmacotherapy."
     )
     parameter_schema = {
         "type": "object",
@@ -60,7 +62,10 @@ class TissueDiagnosisTool(BaseTool):
                     "How tissue is obtained. 'resection': maximal safe resection where "
                     "feasible given site and clinical condition; also therapeutic. "
                     "'stereotactic_biopsy': where microsurgical resection is not safely "
-                    "feasible; serial samples along the trajectory avoid sampling bias."
+                    "feasible; serial samples along the trajectory avoid sampling bias. "
+                    "'lymph_node_biopsy': endobronchial needle aspiration or surgical nodal "
+                    "sampling — the low-risk route to histological confirmation of a systemic "
+                    "disease when the accessible node is not the symptomatic organ."
                 ),
             },
             "site": {

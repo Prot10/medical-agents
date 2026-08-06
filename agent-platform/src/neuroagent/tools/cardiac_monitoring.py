@@ -6,11 +6,13 @@ from .vocabulary import by_type_values
 class CardiacMonitoringTool(BaseTool):
     name = "order_cardiac_monitoring"
     description = (
-        "Order prolonged cardiac rhythm monitoring for arrhythmia detection. "
-        "Used in syncope workup and cryptogenic stroke (paroxysmal AFib). "
-        "Types: holter_24h (~$150), holter_48h (~$200), event_monitor_30d "
-        "(~$300), telemetry (~$100/day). For a single 12-lead ECG, use "
-        "analyze_ecg instead."
+        "Order prolonged cardiac rhythm monitoring — the only study that can correlate a "
+        "symptom with the rhythm at the moment it happens. Match the modality to how often "
+        "events occur: inpatient telemetry (EUR 92/day) while the patient is at risk, "
+        "holter_24h/holter_48h (EUR 138/184) for events at least weekly, an event monitor "
+        "(EUR 230/276) when they are weeks apart, an implantable loop recorder (EUR 4600) when "
+        "they are months apart. An unselected 24-hour recording in a patient with rare events "
+        "is diagnostic in a very small minority. For a single 12-lead ECG, use analyze_ecg."
     )
     parameter_schema = {
         "type": "object",

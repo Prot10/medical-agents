@@ -13,6 +13,7 @@ from neuroagent.tools.base import ToolCall, ToolResult
 from neuroagent.tools.mock_server import MockServer
 from neuroagent.tools.tool_registry import ToolRegistry
 from neuroagent.tools.cost_tracker import CostTracker
+from neuroagent.tools.vocabulary import by_type_values
 from neuroagent.agent.reasoning import AgentTrace
 from neuroagent.evaluation.metrics import MetricsCalculator, CaseMetrics, check_critical_action
 
@@ -147,7 +148,12 @@ class TestToolDefinitions:
         defn = registry.get_tool("order_echocardiogram").get_tool_definition()
         params = defn["function"]["parameters"]["properties"]
         assert "echo_type" in params
-        assert set(params["echo_type"]["enum"]) == {"TTE", "TEE", "bubble_study"}
+        # Derived from costs.yaml, not written out here: the enum was one of the last three
+        # still hardcoded in its tool class, and `exercise_echo` — the study ESC 2018 places
+        # at Class I for exertional syncope with a non-diagnostic resting gradient — became
+        # orderable the moment it was priced.
+        assert set(params["echo_type"]["enum"]) == set(by_type_values("order_echocardiogram"))
+        assert "exercise_echo" in params["echo_type"]["enum"]
 
     def test_cardiac_monitoring_has_type_param(self, registry):
         defn = registry.get_tool("order_cardiac_monitoring").get_tool_definition()

@@ -5,9 +5,11 @@ from .base import BaseTool
 class ECGAnalyzerTool(BaseTool):
     name = "analyze_ecg"
     description = (
-        "Analyze a 12-lead ECG (~$20). Returns rhythm analysis, intervals, "
-        "axis, findings, and clinical correlation. For prolonged cardiac "
-        "rhythm monitoring (Holter, event monitor), use order_cardiac_monitoring."
+        "Analyze a 12-lead ECG (EUR 18). Returns rhythm, rate, PR/QRS/QT-QTc intervals, "
+        "axis, conduction and repolarization, and clinical correlation. Cheap enough to be "
+        "part of the initial evaluation of any transient loss of consciousness; a normal "
+        "tracing does not exclude a paroxysmal arrhythmia. For prolonged rhythm monitoring "
+        "(telemetry, Holter, event monitor, loop recorder), use order_cardiac_monitoring."
     )
     parameter_schema = {
         "type": "object",

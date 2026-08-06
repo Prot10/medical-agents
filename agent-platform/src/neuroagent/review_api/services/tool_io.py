@@ -53,6 +53,14 @@ _COSTS_DERIVED_ENUMS: dict[tuple[str, str], tuple[str, str]] = {
     ("order_advanced_imaging", "modality"): ("order_advanced_imaging", "by_type"),
     ("order_specialized_test", "test_type"): ("order_specialized_test", "by_type"),
     ("order_cardiac_monitoring", "monitor_type"): ("order_cardiac_monitoring", "by_type"),
+    # These three were still written out by hand in their tool class as well, so both copies
+    # could drift from costs.yaml independently. Now neither does: `exercise_echo` became
+    # orderable, catalogued and scoreable the moment it was priced.
+    ("order_echocardiogram", "echo_type"): ("order_echocardiogram", "by_type"),
+    ("analyze_eeg", "eeg_type"): ("analyze_eeg", "by_type"),
+    # `protocols`, not `by_type`: protocol selection does not change what is billed, so every
+    # row is priced at 0 — but the block is still the source of the enum.
+    ("analyze_brain_mri", "protocol"): ("analyze_brain_mri", "protocols"),
     # Array-valued: the enum belongs on `items`, and spelling aliases priced in costs.yaml
     # are collapsed so one assay is advertised once (see tools/vocabulary.py).
     ("interpret_labs", "panels"): ("interpret_labs", "by_panel"),
@@ -131,7 +139,6 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
             },
             "protocol": {
                 "type": "string",
-                "enum": ["standard", "epilepsy", "stroke", "tumor", "ms", "dementia"],
                 "description": (
                     "MRI protocol to use. 'epilepsy': thin coronal hippocampal cuts (ILAE HARNESS-MRI). "
                     "'stroke': DWI emphasis + MRA. 'tumor': includes perfusion-weighted sequences. "
@@ -155,7 +162,6 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
             },
             "eeg_type": {
                 "type": "string",
-                "enum": ["routine", "ambulatory", "video", "continuous_icu"],
                 "description": (
                     "Type of EEG study. 'routine': 20-40 min outpatient. "
                     "'ambulatory': 24-72 hr home monitoring. "
@@ -260,11 +266,15 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
             },
             "echo_type": {
                 "type": "string",
-                "enum": ["TTE", "TEE", "bubble_study"],
                 "description": (
-                    "Type of echocardiogram. 'TTE': transthoracic (standard, non-invasive). "
-                    "'TEE': transesophageal (better for PFO, thrombus, endocarditis). "
-                    "'bubble_study': contrast echo for PFO/shunt detection."
+                    "Type of echocardiogram. 'TTE': transthoracic — the standard study, "
+                    "non-invasive. 'TEE': transesophageal — when the transthoracic window is "
+                    "non-diagnostic, or for a prosthetic valve, an intracardiac mass, "
+                    "endocarditis or aortic dissection. 'bubble_study': agitated-saline "
+                    "contrast for a right-to-left shunt. 'exercise_echo': imaging during or "
+                    "immediately after graded exercise, standing, sitting or semi-supine — "
+                    "the answer is a provoked outflow-tract gradient or an exercise-induced "
+                    "wall-motion or rhythm change that the resting study cannot show."
                 ),
                 "default": "TTE",
             },
@@ -303,19 +313,25 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                 "type": "string",
                 "description": (
                     "Imaging modality. 'amyloid_PET'/'tau_PET': Alzheimer biomarkers. "
-                    "'FDG_PET': glucose metabolism (dementia pattern); NOT an adequate "
-                    "tracer for a primary brain tumour. 'amino_acid_PET': 11C-methionine or "
-                    "18F-FET — separates active tumour from necrosis or treatment effect and "
-                    "targets biopsy at the most aggressive area. 'DaTscan': dopamine "
-                    "transporter (parkinsonian syndromes). 'MIBG_scan': cardiac sympathetic "
-                    "denervation (PD vs MSA, Lewy body disease). 'perfusion_MRI': cerebral "
-                    "blood flow and rCBV. 'CT_perfusion': core-to-penumbra quantification "
-                    "for tissue-based stroke selection outside the standard time window. "
-                    "'MR_spectroscopy': metabolites, including 2-hydroxyglutarate. "
-                    "'MR_angiography'/'MR_venography': arterial / venous sinus imaging. "
-                    "'cardiac_MRI': myocardial tissue characterisation with late gadolinium "
-                    "enhancement. 'carotid_duplex': carotid stenosis. "
-                    "'transcranial_doppler': vasospasm."
+                    "'FDG_PET': cerebral glucose metabolism (dementia pattern); NOT an "
+                    "adequate tracer for a primary brain tumour. 'amino_acid_PET': "
+                    "11C-methionine or 18F-FET — separates active tumour from necrosis or "
+                    "treatment effect and targets biopsy at the most aggressive area. "
+                    "'cardiac_FDG_PET': myocardial inflammation after dietary suppression of "
+                    "myocardial glucose uptake — a different study from the brain scan, not "
+                    "the same scan read differently. 'DaTscan': dopamine transporter "
+                    "(parkinsonian syndromes). 'MIBG_scan': cardiac sympathetic denervation "
+                    "(PD vs MSA, Lewy body disease). 'perfusion_MRI': cerebral blood flow and "
+                    "rCBV. 'CT_perfusion': core-to-penumbra quantification for tissue-based "
+                    "stroke selection outside the standard time window. 'MR_spectroscopy': "
+                    "metabolites, including 2-hydroxyglutarate. 'MR_angiography'/"
+                    "'MR_venography': arterial / venous sinus imaging. 'cardiac_MRI': "
+                    "myocardial tissue characterisation with late gadolinium enhancement — "
+                    "infiltrative or arrhythmogenic substrate, myocarditis, fibrosis. "
+                    "'coronary_CTA': non-invasive coronary anatomy. 'coronary_angiography': "
+                    "invasive catheter study, indicated by suspected myocardial ischaemia; "
+                    "an angiographic finding alone does not establish the cause of a symptom. "
+                    "'carotid_duplex': carotid stenosis. 'transcranial_doppler': vasospasm."
                 ),
             },
         },
@@ -364,7 +380,11 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                     "Region and modality. 'pelvis_abdomen_CT'/'_MRI'/'_ultrasound': "
                     "occult neoplasm search (ovarian teratoma in anti-NMDAR "
                     "encephalitis), portosystemic shunts in refractory hepatic "
-                    "encephalopathy. 'mediastinum_CT'/'_MRI': thymic hyperplasia or "
+                    "encephalopathy. 'chest_CT': lung parenchyma, mediastinum, an "
+                    "intrathoracic mass. 'chest_CTA': CT angiography of the thorax — "
+                    "pulmonary embolism, aortic dissection, when either has to be "
+                    "confirmed or excluded rapidly. "
+                    "'mediastinum_CT'/'_MRI': thymic hyperplasia or "
                     "thymoma in myasthenia gravis. 'spine_MRI'/'_CT': cord compression, "
                     "transverse myelitis, spinal tumour — the mimics of an ascending "
                     "flaccid weakness. 'peripheral_nerve_MRI'/'_ultrasound': nerve root "
@@ -430,7 +450,11 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                     "How tissue is obtained. 'resection': maximal safe resection where "
                     "feasible given site and clinical condition; also therapeutic. "
                     "'stereotactic_biopsy': where microsurgical resection is not safely "
-                    "feasible; serial samples along the trajectory avoid sampling bias."
+                    "feasible; serial samples along the trajectory avoid sampling bias. "
+                    "'lymph_node_biopsy': endobronchial needle aspiration or surgical "
+                    "nodal sampling — the low-risk route to histological confirmation of "
+                    "a systemic disease when the accessible node is not the symptomatic "
+                    "organ."
                 ),
             },
             "site": {

@@ -5,10 +5,12 @@ from .base import BaseTool
 class CTScanTool(BaseTool):
     name = "order_ct_scan"
     description = (
-        "Order a CT scan of the head. CT is faster and cheaper than MRI — "
-        "use for emergency neuroimaging (hemorrhage exclusion, acute trauma), "
-        "or CT angiography (CTA) for vascular assessment in acute stroke. "
-        "Cost: ~$200 base, +$100 contrast, +$200 CTA."
+        "Order a CT scan of the head and neck — this tool images nothing else. CT is faster "
+        "and cheaper than MRI: use it for emergency neuroimaging (hemorrhage exclusion, acute "
+        "trauma), or CT angiography (CTA) for cervical and intracranial vascular assessment. "
+        "Cost: EUR 184 base, +EUR 92 contrast, +EUR 184 CTA. For a CT of the chest, abdomen, "
+        "pelvis or spine — including a CT pulmonary angiogram — use order_body_imaging; "
+        "for a coronary study use order_advanced_imaging."
     )
     parameter_schema = {
         "type": "object",

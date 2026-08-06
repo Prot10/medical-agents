@@ -33,6 +33,16 @@ logger = logging.getLogger(__name__)
 
 # The 16 diagnostic tools, with clinician-facing descriptions. Order is the
 # canonical tool order used across the project.
+#
+# These are the strings the clinical reviewers quoted back as "current description (to be
+# removed)" — the catalog text, not the agent-facing `parameter_schema`. Where their rewrite
+# is a property of the study itself it is applied here. Where it is a property of the
+# *condition* ("mandatory if the head CT is negative", "not indicated in syncope") it cannot
+# be: the catalog shows one description per tool across all conditions, and a
+# condition-specific indication in the agent-facing text would hand the agent the diagnosis it
+# is meant to infer. Those go to the criteria packs and the per-case ground truth instead.
+# The two the reviewers named as carried over from a neuroimmunological panel — the labs and
+# CSF entries — were the clearest instances and are corrected below.
 _TOOL_META: list[dict[str, str | None]] = [
     {
         "name": "analyze_brain_mri",
@@ -51,49 +61,66 @@ _TOOL_META: list[dict[str, str | None]] = [
     {
         "name": "analyze_ecg",
         "label": "ECG",
-        "description": "12-lead electrocardiogram: rhythm, rate, intervals, axis.",
+        "description": "12-lead electrocardiogram: rhythm, rate, PR/QRS/QT-QTc "
+        "intervals, axis, conduction and repolarization. A normal tracing does not "
+        "exclude a paroxysmal arrhythmia.",
         "modality": "ECG",
     },
     {
         "name": "interpret_labs",
         "label": "Laboratory studies",
-        "description": "Blood/serum panels — CBC, metabolic, coagulation, "
-        "thyroid, inflammatory, autoimmune/paraneoplastic, genetic.",
+        "description": "Named blood and serum assays, ordered individually rather "
+        "than as a routine battery: 154 priced analytes and panels, each scored and "
+        "billed separately, from EUR 5 (glucose) to EUR 2300 (paraneoplastic "
+        "antibodies).",
         "modality": "LABS",
     },
     {
         "name": "analyze_csf",
         "label": "CSF analysis (lumbar puncture)",
-        "description": "Cerebrospinal fluid studies: cell count, protein, glucose, "
-        "and special tests (oligoclonal bands, PCR, antibodies, 14-3-3/RT-QuIC).",
+        "description": "Cerebrospinal fluid studies. Opening pressure, cell count "
+        "with first-to-last tube comparison, protein and glucose are always "
+        "reported; 22 further assays are named and priced individually, from the "
+        "IgG index to spectrophotometry for xanthochromia, PCR, autoimmune and "
+        "prion panels.",
         "modality": "CSF",
     },
     {
         "name": "order_ct_scan",
-        "label": "CT scan",
-        "description": "CT head with/without contrast, or CT angiography (CTA) "
-        "for acute hemorrhage and vascular assessment.",
+        "label": "CT scan (head and neck)",
+        "description": "CT of the head and neck only, with or without contrast, or "
+        "CT angiography for cervical and intracranial vessels. Thoracic, abdominal "
+        "and spinal CT — including CT pulmonary angiography — is body imaging; a "
+        "coronary study is advanced imaging.",
         "modality": "CT",
     },
     {
         "name": "order_echocardiogram",
         "label": "Echocardiogram",
-        "description": "Cardiac echo (TTE, TEE, bubble study) for cardioembolic "
-        "source and structural heart disease.",
+        "description": "Ventricular size and systolic function, wall thickness, "
+        "valve morphology and gradients, atrial size, pulmonary pressures, "
+        "pericardium, intracardiac masses. Transthoracic, transoesophageal, "
+        "agitated-saline shunt study, or imaging during graded exercise for a "
+        "provoked outflow gradient.",
         "modality": "echo",
     },
     {
         "name": "order_cardiac_monitoring",
         "label": "Cardiac monitoring",
-        "description": "Holter, extended event monitoring, or inpatient telemetry "
-        "for paroxysmal arrhythmia.",
+        "description": "Non-invasive rhythm monitoring for symptom–rhythm "
+        "correlation, with the modality chosen from event frequency: inpatient "
+        "telemetry, 24–48 h Holter, external event monitor, implantable loop "
+        "recorder.",
         "modality": "cardiac_monitoring",
     },
     {
         "name": "order_advanced_imaging",
         "label": "Advanced imaging",
-        "description": "PET (amyloid/tau/FDG), DaTscan, MIBG, perfusion/spectroscopy "
-        "MRI, MR/CT angiography, carotid duplex, transcranial Doppler.",
+        "description": "PET (amyloid, tau, cerebral and cardiac FDG, amino-acid "
+        "tracers), DaTscan, MIBG, MR and CT perfusion, MR spectroscopy, MR "
+        "angiography and venography, carotid duplex, transcranial Doppler, and "
+        "second-line cardiac imaging (cardiac MRI, coronary CTA, coronary "
+        "angiography).",
         "modality": "advanced_imaging",
     },
     {
@@ -109,8 +136,9 @@ _TOOL_META: list[dict[str, str | None]] = [
         "name": "order_body_imaging",
         "label": "Body imaging",
         "description": "Cross-sectional imaging outside the CNS: pelvis/abdomen "
-        "(occult tumour, portosystemic shunts), mediastinum (thymoma), spine "
-        "(cord compression), peripheral nerve.",
+        "(occult tumour, portosystemic shunts), chest and thoracic CT angiography "
+        "(pulmonary embolism, aortic dissection, intrathoracic mass), mediastinum "
+        "(thymoma), spine (cord compression), peripheral nerve.",
         "modality": "body_imaging",
     },
     {
@@ -123,8 +151,9 @@ _TOOL_META: list[dict[str, str | None]] = [
     {
         "name": "obtain_tissue_diagnosis",
         "label": "Tissue diagnosis",
-        "description": "Resection or stereotactic biopsy, with the integrated "
-        "histomolecular diagnosis (IDH, 1p/19q, CDKN2A/B, MGMT, ATRX, TERT, H3K27).",
+        "description": "Resection, stereotactic biopsy or nodal sampling, with the "
+        "integrated histopathological report — and, where the entity requires it, the "
+        "molecular layer (IDH, 1p/19q, CDKN2A/B, MGMT, ATRX, TERT, H3K27).",
         "modality": "tissue_diagnosis",
     },
     {

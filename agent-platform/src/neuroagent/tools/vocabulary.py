@@ -105,6 +105,32 @@ def by_type_values(tool_name: str, costs_path: Path = DEFAULT_COSTS_PATH) -> lis
     return sorted(_load_tools(costs_path).get(tool_name, {}).get("by_type", {}))
 
 
+# The three enums that were still written out by hand in their tool class, and so could drift
+# from costs.yaml exactly as the review app's catalog did. Derived here instead, which is what
+# made `exercise_echo` orderable the moment it was priced.
+
+
+def echocardiogram_types(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
+    """The closed `order_echocardiogram.echo_type` vocabulary."""
+    return by_type_values("order_echocardiogram", costs_path)
+
+
+def eeg_types(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
+    """The closed `analyze_eeg.eeg_type` vocabulary."""
+    return by_type_values("analyze_eeg", costs_path)
+
+
+def mri_protocols(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
+    """The closed `analyze_brain_mri.protocol` vocabulary.
+
+    Read from the `protocols` block rather than `by_type`: protocol selection does not change
+    what is billed (the radiologist chooses the sequences), so every row is priced at 0 and
+    the MRI's cost comes from `base` + `contrast`. The block is still the source of the enum,
+    so a protocol cannot be orderable without being declared.
+    """
+    return sorted(_load_tools(costs_path).get("analyze_brain_mri", {}).get("protocols", {}))
+
+
 # --- Tools added after the July 2026 clinical tool review ----------------------------------
 #
 # Each has a single discriminator backed by a `by_type` block, so these are thin wrappers
@@ -171,3 +197,15 @@ def is_valid_test_type(value: str, costs_path: Path = DEFAULT_COSTS_PATH) -> boo
 
 def is_valid_modality(value: str, costs_path: Path = DEFAULT_COSTS_PATH) -> bool:
     return value in advanced_imaging_modalities(costs_path)
+
+
+def is_valid_echo_type(value: str, costs_path: Path = DEFAULT_COSTS_PATH) -> bool:
+    return value in echocardiogram_types(costs_path)
+
+
+def is_valid_eeg_type(value: str, costs_path: Path = DEFAULT_COSTS_PATH) -> bool:
+    return value in eeg_types(costs_path)
+
+
+def is_valid_mri_protocol(value: str, costs_path: Path = DEFAULT_COSTS_PATH) -> bool:
+    return value in mri_protocols(costs_path)

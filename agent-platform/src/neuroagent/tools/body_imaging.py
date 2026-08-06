@@ -31,10 +31,11 @@ class BodyImagingTool(BaseTool):
     name = "order_body_imaging"
     description = (
         "Image a region OUTSIDE the brain and skull: pelvis/abdomen (occult tumour search, "
-        "portosystemic shunts), mediastinum (thymoma), spine (cord compression, myelitis), "
-        "or peripheral nerve (nerve root enlargement). Use this when the question is about "
-        "an organ the brain imaging tools cannot see. `study` fuses region and modality "
-        "because a CT and an MRI of the same region are different studies."
+        "portosystemic shunts), chest (pulmonary embolism, aortic dissection, an intrathoracic "
+        "mass), mediastinum (thymoma), spine (cord compression, myelitis), or peripheral nerve "
+        "(nerve root enlargement). Use this when the question is about an organ the brain "
+        "imaging tools cannot see — order_ct_scan images the head and neck only. `study` fuses "
+        "region and modality because a CT and an MRI of the same region are different studies."
     )
     parameter_schema = {
         "type": "object",
@@ -51,6 +52,9 @@ class BodyImagingTool(BaseTool):
                     "Region and modality. 'pelvis_abdomen_CT'/'_MRI'/'_ultrasound': occult "
                     "neoplasm search (ovarian teratoma in anti-NMDAR encephalitis), "
                     "portosystemic shunts in refractory hepatic encephalopathy. "
+                    "'chest_CT': lung parenchyma, mediastinum, an intrathoracic mass. "
+                    "'chest_CTA': CT angiography of the thorax — pulmonary embolism, aortic "
+                    "dissection, when either has to be confirmed or excluded rapidly. "
                     "'mediastinum_CT'/'_MRI': thymic hyperplasia or thymoma in myasthenia "
                     "gravis. 'spine_MRI'/'_CT': cord compression, transverse myelitis, "
                     "spinal tumour — the mimics of an ascending flaccid weakness. "

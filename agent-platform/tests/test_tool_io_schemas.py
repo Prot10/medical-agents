@@ -36,6 +36,7 @@ from neuroagent.tools.vocabulary import (  # noqa: E402
     advanced_imaging_modalities,
     by_type_values,
     genetic_panels,
+    mri_protocols,
     specialized_test_types,
 )
 
@@ -82,6 +83,15 @@ class TestCostsDerivedVocabularies:
                 "monitor_type",
                 lambda: by_type_values("order_cardiac_monitoring"),
             ),
+            # The three that were hardcoded in *both* copies until the cardiac-syncope pass,
+            # so each could drift from costs.yaml on its own.
+            (
+                "order_echocardiogram",
+                "echo_type",
+                lambda: by_type_values("order_echocardiogram"),
+            ),
+            ("analyze_eeg", "eeg_type", lambda: by_type_values("analyze_eeg")),
+            ("analyze_brain_mri", "protocol", mri_protocols),
         ],
     )
     def test_enum_matches_priced_vocabulary(self, tool_name, parameter, expected):
