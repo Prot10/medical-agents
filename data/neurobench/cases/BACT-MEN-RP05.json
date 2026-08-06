@@ -423,91 +423,59 @@
     },
     {
       "trigger_action": "request_blood_cultures_result",
-      "tool_name": "interpret_labs",
+      "tool_name": "order_microbiology",
       "output": {
-        "panels": {
-          "Blood_cultures_final": [
-            {
-              "test": "Blood culture set 1 (aerobic)",
-              "value": "Klebsiella pneumoniae isolated at 19 hours",
-              "unit": "qualitative",
-              "reference_range": "No growth expected",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Blood culture set 2 (aerobic)",
-              "value": "Klebsiella pneumoniae isolated at 22 hours",
-              "unit": "qualitative",
-              "reference_range": "No growth expected",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Blood culture set 1 (anaerobic)",
-              "value": "No growth at 5 days",
-              "unit": "qualitative",
-              "reference_range": "No growth expected",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Blood culture set 2 (anaerobic)",
-              "value": "No growth at 5 days",
-              "unit": "qualitative",
-              "reference_range": "No growth expected",
-              "is_abnormal": false,
-              "clinical_significance": null
-            }
-          ],
-          "Susceptibilities": [
-            {
-              "test": "Ampicillin",
-              "value": "Resistant (MIC >32 ug/mL)",
-              "unit": "ug/mL",
-              "reference_range": "Susceptible <=8",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Ceftriaxone",
-              "value": "Susceptible (MIC <=1 ug/mL)",
-              "unit": "ug/mL",
-              "reference_range": "Susceptible <=1",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Meropenem",
-              "value": "Susceptible (MIC <=0.25 ug/mL)",
-              "unit": "ug/mL",
-              "reference_range": "Susceptible <=1",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Gentamicin",
-              "value": "Susceptible (MIC <=1 ug/mL)",
-              "unit": "ug/mL",
-              "reference_range": "Susceptible <=4",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Trimethoprim-sulfamethoxazole",
-              "value": "Susceptible",
-              "unit": "qualitative",
-              "reference_range": "Susceptible",
-              "is_abnormal": false,
-              "clinical_significance": null
-            }
-          ]
-        },
-        "interpretation": "Klebsiella pneumoniae isolated from two of two aerobic blood culture sets (at 19 and 22 hours). Organism is resistant to ampicillin; susceptible to ceftriaxone, meropenem, gentamicin, and trimethoprim-sulfamethoxazole.",
-        "abnormal_values_summary": [
-          "Blood cultures positive: Klebsiella pneumoniae (2/2 aerobic sets, 19-22 hours)",
-          "Ampicillin resistant (MIC >32 ug/mL)"
-        ]
+        "specimen": "blood_culture",
+        "tests": [
+          "culture",
+          "gram_stain",
+          "susceptibility"
+        ],
+        "collected_before_antimicrobials": true,
+        "organism": "Klebsiella pneumoniae",
+        "gram_stain": null,
+        "susceptibility": null,
+        "cell_counts": null,
+        "findings": [
+          {
+            "test": "Blood culture set 1 (aerobic)",
+            "result": "Klebsiella pneumoniae isolated at 19 hours"
+          },
+          {
+            "test": "Blood culture set 2 (aerobic)",
+            "result": "Klebsiella pneumoniae isolated at 22 hours"
+          },
+          {
+            "test": "Blood culture set 1 (anaerobic)",
+            "result": "No growth at 5 days"
+          },
+          {
+            "test": "Blood culture set 2 (anaerobic)",
+            "result": "No growth at 5 days"
+          },
+          {
+            "test": "Ampicillin",
+            "result": "Resistant (MIC >32 ug/mL)"
+          },
+          {
+            "test": "Ceftriaxone",
+            "result": "Susceptible (MIC <=1 ug/mL)"
+          },
+          {
+            "test": "Meropenem",
+            "result": "Susceptible (MIC <=0.25 ug/mL)"
+          },
+          {
+            "test": "Gentamicin",
+            "result": "Susceptible (MIC <=1 ug/mL)"
+          },
+          {
+            "test": "Trimethoprim-sulfamethoxazole",
+            "result": "Susceptible"
+          }
+        ],
+        "impression": "Klebsiella pneumoniae isolated. Specimen taken before the first antimicrobial dose.",
+        "recommended_actions": []
       }
     },
     {
@@ -799,16 +767,16 @@
       },
       {
         "step": 2,
-        "action": "Draw two sets of peripheral blood cultures BEFORE first antibiotic dose; send CBC with differential, CMP, procalcitonin, CRP, and lactate.",
+        "action": "Send targeted laboratory studies: CBC, BMP, CRP, procalcitonin, HbA1c",
         "tool_name": "interpret_labs",
-        "expected_finding": "Marked leukocytosis with left shift, elevated procalcitonin (>2 ng/mL strongly suggests bacterial etiology), markedly elevated CRP, elevated lactate; eventual blood culture growth of the pathogen; HbA1c reflecting poorly controlled diabetes.",
+        "expected_finding": "Marked leukocytosis with left shift, elevated procalcitonin (>2 ng/mL strongly suggests bacterial etiology), markedly elevated CRP, elevated lactate; HbA1c reflecting poorly controlled diabetes.",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
-            "blood_cultures",
-            "inflammatory_markers",
+            "CRP",
+            "procalcitonin",
             "HbA1c"
           ]
         },
@@ -860,6 +828,24 @@
         },
         "citation": "[Brouwer_2012]",
         "guideline_source": "Brouwer 2012"
+      },
+      {
+        "step": 7,
+        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started. eventual blood culture growth of the pathogen;",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "blood_culture",
+          "tests": [
+            "culture",
+            "gram_stain",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §VI"
       }
     ],
     "useless_tools": [

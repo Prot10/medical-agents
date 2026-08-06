@@ -252,6 +252,27 @@
       "additional_observations": [],
       "impression": "No acute intracranial abnormality. No mass, haemorrhage, or midline shift",
       "recommended_actions": []
+    },
+    "microbiology": {
+      "specimen": "blood_culture",
+      "tests": [
+        "culture",
+        "gram_stain",
+        "susceptibility"
+      ],
+      "collected_before_antimicrobials": true,
+      "organism": null,
+      "gram_stain": null,
+      "susceptibility": null,
+      "cell_counts": null,
+      "findings": [
+        {
+          "test": "culture",
+          "result": "No growth reported at the time of this encounter"
+        }
+      ],
+      "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
+      "recommended_actions": []
     }
   },
   "followup_outputs": [
@@ -541,11 +562,24 @@
       },
       {
         "step": 2,
-        "action": "Labs: CBC, CMP, glucose, Ca/Mg, AED level (LEV), ammonia, ABG, lactate, CK, troponin, blood cultures, beta-hCG (n/a, male)",
+        "action": "Send targeted laboratory studies: CBC, CMP, ammonia, magnesium, AED_levels, lactate, ABG, troponin, CK, beta-hCG",
         "tool_name": "interpret_labs",
         "expected_finding": "LEV undetectable (<2 mcg/mL); lactate 8.2 (post-convulsive); CK 1840 (rhabdo); troponin 0.06 (post-convulsive)",
         "category": "required",
-        "tool_parameters": {},
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "ammonia",
+            "magnesium",
+            "AED_levels",
+            "lactate",
+            "ABG",
+            "troponin",
+            "CK",
+            "beta-hCG"
+          ]
+        },
         "citation": "[Brophy_2012]",
         "guideline_source": ""
       },
@@ -591,11 +625,33 @@
       },
       {
         "step": 7,
-        "action": "Repeat troponin — exclude cardiac event if persistently elevated",
+        "action": "Send targeted laboratory studies: troponin — exclude cardiac event if persistently elevated",
         "tool_name": "interpret_labs",
         "expected_finding": "Mild post-convulsive troponin elevation typically trends down without intervention",
         "category": "optional",
-        "tool_parameters": {},
+        "tool_parameters": {
+          "panels": [
+            "troponin"
+          ]
+        },
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 8,
+        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "blood_culture",
+          "tests": [
+            "culture",
+            "gram_stain",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
         "citation": "[Brophy_2012]",
         "guideline_source": ""
       }

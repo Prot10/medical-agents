@@ -442,24 +442,27 @@
     },
     {
       "trigger_action": "request_urine_culture",
-      "tool_name": "interpret_labs",
+      "tool_name": "order_microbiology",
       "output": {
-        "panels": {
-          "Urine Culture": [
-            {
-              "test": "Urine culture",
-              "value": "Escherichia coli >100,000 CFU/mL — sensitive to nitrofurantoin, ceftriaxone, TMP-SMX (note: TMP raises creatinine artifactually), ciprofloxacin",
-              "unit": "CFU/mL",
-              "reference_range": "<10,000 (no growth)",
-              "is_abnormal": true,
-              "clinical_significance": null
-            }
-          ]
-        },
-        "interpretation": "Abnormal values: Urine culture Escherichia coli >100,000 CFU/mL.",
-        "abnormal_values_summary": [
-          "Urine culture: Escherichia coli >100,000 CFU/mL; sensitive to nitrofurantoin, ceftriaxone, ciprofloxacin, TMP-SMX (H)"
-        ]
+        "specimen": "urine",
+        "tests": [
+          "culture",
+          "microscopy",
+          "susceptibility"
+        ],
+        "collected_before_antimicrobials": true,
+        "organism": null,
+        "gram_stain": null,
+        "susceptibility": null,
+        "cell_counts": null,
+        "findings": [
+          {
+            "test": "Urine culture",
+            "result": "Escherichia coli >100,000 CFU/mL — sensitive to nitrofurantoin, ceftriaxone, TMP-SMX (note: TMP raises creatinine artifactually), ciprofloxacin"
+          }
+        ],
+        "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
+        "recommended_actions": []
       }
     },
     {
@@ -614,11 +617,24 @@
       },
       {
         "step": 2,
-        "action": "Labs: CBC, CMP, glucose, Ca/Mg, AED level, lactate, ABG, INR/PT/aPTT, ammonia, blood and urine cultures, urinalysis, tox screen",
+        "action": "Send targeted laboratory studies: CBC, CMP, ammonia, magnesium, AED_levels, lactate, ABG, tox_screen, coagulation, urinalysis",
         "tool_name": "interpret_labs",
         "expected_finding": "WBC 14.6 (UTI source), Na 130, BUN 32 / Cr 1.4, INR 4.8 (CRITICAL — supratherapeutic warfarin)",
         "category": "required",
-        "tool_parameters": {},
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "ammonia",
+            "magnesium",
+            "AED_levels",
+            "lactate",
+            "ABG",
+            "tox_screen",
+            "coagulation",
+            "urinalysis"
+          ]
+        },
         "citation": "[Brophy_2012]",
         "guideline_source": ""
       },
@@ -654,11 +670,15 @@
       },
       {
         "step": 6,
-        "action": "Anticoagulant reversal labs (PT/INR after PCC + vitamin K)",
+        "action": "Send targeted laboratory studies: coagulation",
         "tool_name": "interpret_labs",
         "expected_finding": "INR target <1.5 prior to any neurosurgical procedure",
         "category": "required",
-        "tool_parameters": {},
+        "tool_parameters": {
+          "panels": [
+            "coagulation"
+          ]
+        },
         "citation": "[Brophy_2012]",
         "guideline_source": ""
       },
@@ -689,6 +709,24 @@
         "expected_finding": "Empiric gram-negative coverage pending culture",
         "category": "recommended",
         "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 10,
+        "action": "Send urine for microscopy and culture as part of the infection screen",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Pyuria and bacteriuria identify a urinary source; a negative result removes it from the list of precipitants",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "urine",
+          "tests": [
+            "culture",
+            "microscopy",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
         "citation": "[Brophy_2012]",
         "guideline_source": ""
       }

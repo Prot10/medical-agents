@@ -95,6 +95,11 @@ tools:
       D_dimer: 14
       "D-dimer": 14
       ACE: 28
+      # Named by the ground truth of 100+ status-epilepticus and hepatic-encephalopathy actions
+      # and reported in their stored lab panels, but never priced — so the agent could not ask
+      # for either and no optimal action could pin them.
+      lactate: 14
+      ABG: 28   # arterial blood gas: pH, pCO2, pO2, bicarbonate, base excess
       # Aliases of panels already priced above
       LFTs: 23
       UA: 9
@@ -105,7 +110,6 @@ tools:
       toxicology: 28
       tox_screen: 28
       valproate_level: 28
-      "blood cultures x3": 37
       ESR_CRP: 23
       serum_copper: 18
       # Vitamins / metabolic
@@ -194,8 +198,11 @@ tools:
       endocrine_panel: 40
       anti_intrinsic_factor: 23
       anti_parietal_cell: 23
-      # Infectious serologies / cultures
-      blood_cultures: 37
+      # Infectious serologies. Blood cultures are NOT here: they are
+      # `order_microbiology{specimen: blood_culture}`. They were priced under both tools, so the
+      # same study was reachable two ways and either satisfied the ground truth — exactly what
+      # the one-study-one-tool rule below `perform_clinical_assessment` exists to prevent. 62
+      # cases were ordering them through the laboratory tool and have been moved.
       VZV_IgG: 23
       Lyme_serology: 28
       hepatitis_B_surface_antigen: 18

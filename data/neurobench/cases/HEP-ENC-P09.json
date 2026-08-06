@@ -312,6 +312,27 @@
       "additional_observations": [],
       "impression": "1. Chronic left-convexity subdural hematoma, 9 mm in maximal thickness, with mild sulcal effacement and approximately 3 mm rightward midline shift. No herniation. 2. No acute intracranial hemorrhage, no acute ischemic change, no intracranial mass. 3. Mild diffuse cortical volume loss",
       "recommended_actions": []
+    },
+    "microbiology": {
+      "specimen": "blood_culture",
+      "tests": [
+        "culture",
+        "gram_stain",
+        "susceptibility"
+      ],
+      "collected_before_antimicrobials": true,
+      "organism": null,
+      "gram_stain": null,
+      "susceptibility": null,
+      "cell_counts": null,
+      "findings": [
+        {
+          "test": "culture",
+          "result": "No growth reported at the time of this encounter"
+        }
+      ],
+      "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
+      "recommended_actions": []
     }
   },
   "followup_outputs": [
@@ -431,6 +452,31 @@
           "Acetaminophen 500 mg q6h (max 2 g/day in liver disease) for headache analgesia — safer than opioids or NSAIDs"
         ],
         "formulary_status": "Lactulose, rifaximin, spironolactone, furosemide on formulary. Trimethoprim-sulfamethoxazole on formulary. Nitrofurantoin on formulary."
+      }
+    },
+    {
+      "trigger_action": "request_urine_specimen",
+      "tool_name": "order_microbiology",
+      "output": {
+        "specimen": "urine",
+        "tests": [
+          "culture",
+          "microscopy",
+          "susceptibility"
+        ],
+        "collected_before_antimicrobials": true,
+        "organism": null,
+        "gram_stain": null,
+        "susceptibility": null,
+        "cell_counts": null,
+        "findings": [
+          {
+            "test": "culture",
+            "result": "No growth reported at the time of this encounter"
+          }
+        ],
+        "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
+        "recommended_actions": []
       }
     }
   ],
@@ -584,11 +630,20 @@
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Comprehensive labs: CMP including AST/ALT/bilirubin/INR/albumin, ammonia, CBC, glucose, electrolytes (Na, K, Mg), BUN/Cr, PT/aPTT/fibrinogen (coagulation panel — critical given coagulopathy and SDH risk), blood cultures, urinalysis and urine culture. Confirms liver dysfunction, quantifies coagulopathy, and identifies infection precipitant.",
+        "action": "Send targeted laboratory studies: CBC, CMP, ammonia, magnesium, coagulation, urinalysis. Confirms liver dysfunction, quantifies coagulopathy, and identifies infection precipitant.",
         "tool_name": "interpret_labs",
         "expected_finding": "Ammonia 74 µmol/L; INR 1.8, PT elevated, fibrinogen low (coagulopathy); platelets 98; pyuria with nitrites positive (UTI precipitant); hypokalemia 3.3 — all relevant to SDH risk and HE management.",
         "category": "required",
-        "tool_parameters": {},
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "ammonia",
+            "magnesium",
+            "coagulation",
+            "urinalysis"
+          ]
+        },
         "citation": "[AASLD_2014]",
         "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
@@ -639,6 +694,42 @@
         "expected_finding": "Hepatology guidance: escalate lactulose, continue rifaximin, treat UTI, correct electrolytes; MELD 14 stable — not imminently transplant-listed.",
         "category": "recommended",
         "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      },
+      {
+        "step": 7,
+        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "blood_culture",
+          "tests": [
+            "culture",
+            "gram_stain",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      },
+      {
+        "step": 8,
+        "action": "Send urine for microscopy and culture as part of the infection screen",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Pyuria and bacteriuria identify a urinary source; a negative result removes it from the list of precipitants",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "urine",
+          "tests": [
+            "culture",
+            "microscopy",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
         "citation": "[AASLD_2014]",
         "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       }

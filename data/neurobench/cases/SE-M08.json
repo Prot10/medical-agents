@@ -269,6 +269,27 @@
       "recommended_actions": [
         "MRI brain with gadolinium recommended for characterization of ring-enhancing lesion."
       ]
+    },
+    "microbiology": {
+      "specimen": "blood_culture",
+      "tests": [
+        "culture",
+        "gram_stain",
+        "susceptibility"
+      ],
+      "collected_before_antimicrobials": true,
+      "organism": null,
+      "gram_stain": null,
+      "susceptibility": null,
+      "cell_counts": null,
+      "findings": [
+        {
+          "test": "culture",
+          "result": "No growth reported at the time of this encounter"
+        }
+      ],
+      "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
+      "recommended_actions": []
     }
   },
   "followup_outputs": [
@@ -606,11 +627,22 @@
       },
       {
         "step": 2,
-        "action": "Labs: CBC, CMP, glucose, Ca/Mg, AED level, lactate, ABG, CD4, HIV viral load, toxoplasma IgG/IgM, blood cultures, tox screen",
+        "action": "Send targeted laboratory studies: CBC, CMP, magnesium, AED_levels, lactate, ABG, tox_screen, HIV",
         "tool_name": "interpret_labs",
         "expected_finding": "CD4 382 (lower limit of protective range), expected toxoplasma IgG positive",
         "category": "required",
-        "tool_parameters": {},
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "magnesium",
+            "AED_levels",
+            "lactate",
+            "ABG",
+            "tox_screen",
+            "HIV"
+          ]
+        },
         "citation": "[Brophy_2012]",
         "guideline_source": ""
       },
@@ -636,11 +668,15 @@
       },
       {
         "step": 5,
-        "action": "Toxoplasma serology + repeat HIV labs",
+        "action": "Send targeted laboratory studies: HIV",
         "tool_name": "interpret_labs",
         "expected_finding": "Toxoplasma IgG positive supports reactivation toxoplasmosis",
         "category": "required",
-        "tool_parameters": {},
+        "tool_parameters": {
+          "panels": [
+            "HIV"
+          ]
+        },
         "citation": "[Brophy_2012]",
         "guideline_source": ""
       },
@@ -650,7 +686,11 @@
         "tool_name": "analyze_csf",
         "expected_finding": "Mild lymphocytic pleocytosis; toxo PCR may be negative (low sensitivity); cryptococcal antigen + India ink negative",
         "category": "required",
-        "tool_parameters": {},
+        "tool_parameters": {
+          "special_tests": [
+            "cryptococcal_antigen"
+          ]
+        },
         "citation": "[Brophy_2012]",
         "guideline_source": ""
       },
@@ -681,6 +721,24 @@
         "expected_finding": "Co-management of HIV opportunistic infection",
         "category": "recommended",
         "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 10,
+        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "blood_culture",
+          "tests": [
+            "culture",
+            "gram_stain",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
         "citation": "[Brophy_2012]",
         "guideline_source": ""
       }

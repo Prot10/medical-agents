@@ -333,6 +333,27 @@
       "additional_observations": [],
       "impression": "No acute intracranial abnormality. No hemorrhage, infarct, or mass. Mild chronic cortical atrophy. Bilateral globus pallidi hypodensity",
       "recommended_actions": []
+    },
+    "microbiology": {
+      "specimen": "blood_culture",
+      "tests": [
+        "culture",
+        "gram_stain",
+        "susceptibility"
+      ],
+      "collected_before_antimicrobials": true,
+      "organism": null,
+      "gram_stain": null,
+      "susceptibility": null,
+      "cell_counts": null,
+      "findings": [
+        {
+          "test": "culture",
+          "result": "No growth reported at the time of this encounter"
+        }
+      ],
+      "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
+      "recommended_actions": []
     }
   },
   "followup_outputs": [
@@ -510,6 +531,31 @@
           "Prior overt HE episodes: 2 (H)"
         ]
       }
+    },
+    {
+      "trigger_action": "request_urine_specimen",
+      "tool_name": "order_microbiology",
+      "output": {
+        "specimen": "urine",
+        "tests": [
+          "culture",
+          "microscopy",
+          "susceptibility"
+        ],
+        "collected_before_antimicrobials": true,
+        "organism": null,
+        "gram_stain": null,
+        "susceptibility": null,
+        "cell_counts": null,
+        "findings": [
+          {
+            "test": "culture",
+            "result": "No growth reported at the time of this encounter"
+          }
+        ],
+        "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
+        "recommended_actions": []
+      }
     }
   ],
   "fallback_tool_outputs": {
@@ -643,11 +689,20 @@
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Comprehensive labs: CMP including AST/ALT/bilirubin/INR/albumin, ammonia, CBC, glucose, electrolytes (Na, K, Mg), BUN/Cr, lactate, blood cultures and urine cultures; toxicology if substance use plausible. Confirms liver dysfunction and screens for precipitants.",
+        "action": "Send targeted laboratory studies: CBC, CMP, ammonia, magnesium, lactate, coagulation. Confirms liver dysfunction and screens for precipitants.",
         "tool_name": "interpret_labs",
         "expected_finding": "Ammonia 164; tox positive for codeine; cirrhosis features.",
         "category": "required",
-        "tool_parameters": {},
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "ammonia",
+            "magnesium",
+            "lactate",
+            "coagulation"
+          ]
+        },
         "citation": "[AASLD_2014]",
         "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
@@ -698,6 +753,42 @@
         "expected_finding": "Hepatology / critical-care guidance integrated into management.",
         "category": "recommended",
         "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      },
+      {
+        "step": 7,
+        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "blood_culture",
+          "tests": [
+            "culture",
+            "gram_stain",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      },
+      {
+        "step": 8,
+        "action": "Send urine for microscopy and culture as part of the infection screen",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Pyuria and bacteriuria identify a urinary source; a negative result removes it from the list of precipitants",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "urine",
+          "tests": [
+            "culture",
+            "microscopy",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
         "citation": "[AASLD_2014]",
         "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       }

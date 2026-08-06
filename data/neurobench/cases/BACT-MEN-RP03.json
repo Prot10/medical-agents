@@ -446,48 +446,39 @@
     },
     {
       "trigger_action": "request_blood_cultures",
-      "tool_name": "interpret_labs",
+      "tool_name": "order_microbiology",
       "output": {
-        "panels": {
-          "Blood_cultures": [
-            {
-              "test": "Aerobic blood culture (set 1)",
-              "value": "Streptococcus pneumoniae isolated at 18 hours",
-              "unit": "qualitative",
-              "reference_range": "No growth expected",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Aerobic blood culture (set 2)",
-              "value": "Streptococcus pneumoniae isolated at 22 hours",
-              "unit": "qualitative",
-              "reference_range": "No growth expected",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Anaerobic blood culture (set 1)",
-              "value": "No growth at 5 days",
-              "unit": "qualitative",
-              "reference_range": "No growth expected",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Antibiotic susceptibilities",
-              "value": "Penicillin MIC 0.06 (S), Ceftriaxone MIC <0.06 (S), Vancomycin MIC 0.5 (S), Meropenem MIC <0.06 (S)",
-              "unit": "ug/mL",
-              "reference_range": "N/A",
-              "is_abnormal": false,
-              "clinical_significance": null
-            }
-          ]
-        },
-        "interpretation": "Abnormal values: Aerobic blood culture (set 1) Streptococcus pneumoniae isolated at 18 hours qualitative (H), Aerobic blood culture (set 2) Streptococcus pneumoniae isolated at 22 hours qualitative (H).",
-        "abnormal_values_summary": [
-          "Blood cultures positive for Streptococcus pneumoniae (2/2 sets)"
-        ]
+        "specimen": "blood_culture",
+        "tests": [
+          "culture",
+          "gram_stain",
+          "susceptibility"
+        ],
+        "collected_before_antimicrobials": true,
+        "organism": "Streptococcus pneumoniae",
+        "gram_stain": null,
+        "susceptibility": null,
+        "cell_counts": null,
+        "findings": [
+          {
+            "test": "Aerobic blood culture (set 1)",
+            "result": "Streptococcus pneumoniae isolated at 18 hours"
+          },
+          {
+            "test": "Aerobic blood culture (set 2)",
+            "result": "Streptococcus pneumoniae isolated at 22 hours"
+          },
+          {
+            "test": "Anaerobic blood culture (set 1)",
+            "result": "No growth at 5 days"
+          },
+          {
+            "test": "Antibiotic susceptibilities",
+            "result": "Penicillin MIC 0.06 (S), Ceftriaxone MIC <0.06 (S), Vancomycin MIC 0.5 (S), Meropenem MIC <0.06 (S)"
+          }
+        ],
+        "impression": "Streptococcus pneumoniae isolated. Specimen taken before the first antimicrobial dose.",
+        "recommended_actions": []
       }
     },
     {
@@ -896,7 +887,7 @@
       },
       {
         "step": 2,
-        "action": "Draw two sets of peripheral blood cultures BEFORE the first antibiotic dose and send CBC with differential, CMP, procalcitonin, CRP, and lactate.",
+        "action": "Send targeted laboratory studies: CBC, BMP, CRP, procalcitonin",
         "tool_name": "interpret_labs",
         "expected_finding": "Peripheral leukocytosis with left shift, elevated procalcitonin/CRP, eventual blood-culture growth of the pathogen.",
         "category": "required",
@@ -904,8 +895,8 @@
           "panels": [
             "CBC",
             "BMP",
-            "blood_cultures",
-            "inflammatory_markers"
+            "CRP",
+            "procalcitonin"
           ]
         },
         "citation": "[IDSA_2004]",
@@ -956,6 +947,24 @@
         },
         "citation": "[Brouwer_2012]",
         "guideline_source": "Brouwer 2012"
+      },
+      {
+        "step": 7,
+        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "blood_culture",
+          "tests": [
+            "culture",
+            "gram_stain",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §VI"
       }
     ],
     "useless_tools": [

@@ -417,67 +417,45 @@
     },
     {
       "trigger_action": "request_blood_cultures",
-      "tool_name": "interpret_labs",
+      "tool_name": "order_microbiology",
       "output": {
-        "panels": {
-          "Blood cultures": [
-            {
-              "test": "Aerobic bottle (Set 1)",
-              "value": "Positive at 14 hours — Gram-positive diplococci",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Anaerobic bottle (Set 1)",
-              "value": "No growth at 48 hours",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Aerobic bottle (Set 2)",
-              "value": "Positive at 16 hours — Gram-positive diplococci",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Anaerobic bottle (Set 2)",
-              "value": "No growth at 48 hours",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Final identification",
-              "value": "Streptococcus pneumoniae",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Susceptibilities",
-              "value": "Penicillin MIC 0.12 ug/mL (intermediate for meningitis); Ceftriaxone MIC <0.5 ug/mL (susceptible); Vancomycin MIC 0.5 ug/mL (susceptible); Meropenem MIC <0.25 ug/mL (susceptible)",
-              "unit": "",
-              "reference_range": "N/A",
-              "is_abnormal": true,
-              "clinical_significance": null
-            }
-          ]
+        "specimen": "blood_culture",
+        "tests": [
+          "culture",
+          "gram_stain",
+          "susceptibility"
+        ],
+        "collected_before_antimicrobials": true,
+        "organism": null,
+        "gram_stain": null,
+        "susceptibility": {
+          "Susceptibilities": "Penicillin MIC 0.12 ug/mL (intermediate for meningitis); Ceftriaxone MIC <0.5 ug/mL (susceptible); Vancomycin MIC 0.5 ug/mL (susceptible); Meropenem MIC <0.25 ug/mL (susceptible)"
         },
-        "interpretation": "Abnormal values: Aerobic bottle (Set 1) Positive at 14 hours — Gram-positive diplococci (H), Aerobic bottle (Set 2) Positive at 16 hours — Gram-positive diplococci (H), Final identification Streptococcus pneumoniae (H), Susceptibilities Penicillin MIC 0.12 ug/mL (intermediate for meningitis); Ceftriaxone MIC <0.5 ug/mL (susceptible); Vancomycin MIC 0.5 ug/mL (susceptible); Meropenem MIC <0.25 ug/mL (susceptible) (H).",
-        "abnormal_values_summary": [
-          "Aerobic bottle (Set 1): Positive at 14 hours — Gram-positive diplococci (H)",
-          "Aerobic bottle (Set 2): Positive at 16 hours — Gram-positive diplococci (H)",
-          "Final identification: Streptococcus pneumoniae (H)",
-          "Susceptibilities: Penicillin MIC 0.12 ug/mL (intermediate for meningitis) (H)"
-        ]
+        "cell_counts": null,
+        "findings": [
+          {
+            "test": "Aerobic bottle (Set 1)",
+            "result": "Positive at 14 hours — Gram-positive diplococci"
+          },
+          {
+            "test": "Anaerobic bottle (Set 1)",
+            "result": "No growth at 48 hours"
+          },
+          {
+            "test": "Aerobic bottle (Set 2)",
+            "result": "Positive at 16 hours — Gram-positive diplococci"
+          },
+          {
+            "test": "Anaerobic bottle (Set 2)",
+            "result": "No growth at 48 hours"
+          },
+          {
+            "test": "Final identification",
+            "result": "Streptococcus pneumoniae"
+          }
+        ],
+        "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
+        "recommended_actions": []
       }
     },
     {
@@ -819,7 +797,7 @@
       },
       {
         "step": 2,
-        "action": "Draw two sets of peripheral blood cultures BEFORE the first antibiotic dose and send CBC with differential, CMP, procalcitonin, CRP, and lactate.",
+        "action": "Send targeted laboratory studies: CBC, BMP, CRP, procalcitonin",
         "tool_name": "interpret_labs",
         "expected_finding": "Peripheral leukocytosis with left shift, elevated procalcitonin/CRP, eventual blood-culture growth of the pathogen.",
         "category": "required",
@@ -827,8 +805,8 @@
           "panels": [
             "CBC",
             "BMP",
-            "blood_cultures",
-            "inflammatory_markers"
+            "CRP",
+            "procalcitonin"
           ]
         },
         "citation": "[IDSA_2004]",
@@ -879,6 +857,24 @@
         },
         "citation": "[Brouwer_2012]",
         "guideline_source": "Brouwer 2012"
+      },
+      {
+        "step": 7,
+        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "blood_culture",
+          "tests": [
+            "culture",
+            "gram_stain",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §VI"
       }
     ],
     "useless_tools": [

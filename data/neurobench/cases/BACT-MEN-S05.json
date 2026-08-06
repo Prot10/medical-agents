@@ -404,57 +404,35 @@
     },
     {
       "trigger_action": "request_blood_culture_results",
-      "tool_name": "interpret_labs",
+      "tool_name": "order_microbiology",
       "output": {
-        "panels": {
-          "Blood Cultures — Final": [
-            {
-              "test": "Blood Culture (Aerobic) — Set 1",
-              "value": "Positive at 10 hours: Gram-negative diplococci; identified as Neisseria meningitidis serogroup B",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Blood Culture (Aerobic) — Set 2",
-              "value": "Positive at 11 hours: Gram-negative diplococci; Neisseria meningitidis serogroup B",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Susceptibility — Penicillin MIC",
-              "value": "0.03 mcg/mL (Susceptible)",
-              "unit": "mcg/mL",
-              "reference_range": "Susceptible: <=0.06",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Susceptibility — Ceftriaxone MIC",
-              "value": "<=0.01 mcg/mL (Susceptible)",
-              "unit": "mcg/mL",
-              "reference_range": "Susceptible: <=0.5",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Susceptibility — Vancomycin MIC",
-              "value": "Not applicable (intrinsically resistant; vancomycin has no role in confirmed meningococcal disease)",
-              "unit": "",
-              "reference_range": "N/A for Neisseria meningitidis",
-              "is_abnormal": false,
-              "clinical_significance": null
-            }
-          ]
+        "specimen": "blood_culture",
+        "tests": [
+          "culture",
+          "gram_stain",
+          "susceptibility"
+        ],
+        "collected_before_antimicrobials": true,
+        "organism": null,
+        "gram_stain": null,
+        "susceptibility": {
+          "Susceptibility — Penicillin MIC": "0.03 mcg/mL (Susceptible)",
+          "Susceptibility — Ceftriaxone MIC": "<=0.01 mcg/mL (Susceptible)",
+          "Susceptibility — Vancomycin MIC": "Not applicable (intrinsically resistant; vancomycin has no role in confirmed meningococcal disease)"
         },
-        "interpretation": "Neisseria meningitidis serogroup B isolated from both blood culture sets at 10-11 hours. Organism is penicillin-susceptible (MIC 0.03 mcg/mL) and highly ceftriaxone-susceptible (MIC ≤0.01 mcg/mL).",
-        "abnormal_values_summary": [
-          "Blood Culture (Aerobic) — Set 1: Neisseria meningitidis serogroup B (H)",
-          "Blood Culture (Aerobic) — Set 2: Neisseria meningitidis serogroup B (H)"
-        ]
+        "cell_counts": null,
+        "findings": [
+          {
+            "test": "Blood Culture (Aerobic) — Set 1",
+            "result": "Positive at 10 hours: Gram-negative diplococci; identified as Neisseria meningitidis serogroup B"
+          },
+          {
+            "test": "Blood Culture (Aerobic) — Set 2",
+            "result": "Positive at 11 hours: Gram-negative diplococci; Neisseria meningitidis serogroup B"
+          }
+        ],
+        "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
+        "recommended_actions": []
       }
     }
   ],
@@ -633,16 +611,16 @@
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Draw two sets of peripheral blood cultures BEFORE the first antibiotic dose and send CBC with differential, CMP, procalcitonin, lactate, and coagulation panel.",
+        "action": "Send targeted laboratory studies: CBC, BMP, CRP, procalcitonin, coagulation",
         "tool_name": "interpret_labs",
-        "expected_finding": "Leukocytosis with neutrophilia and bandemia; thrombocytopenia; elevated procalcitonin, CRP, and lactate; coagulopathy pattern consistent with DIC; blood cultures will yield Gram-negative diplococci.",
+        "expected_finding": "Leukocytosis with neutrophilia and bandemia; thrombocytopenia; elevated procalcitonin, CRP, and lactate; coagulopathy pattern consistent with DIC.",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
-            "blood_cultures",
-            "inflammatory_markers",
+            "CRP",
+            "procalcitonin",
             "coagulation"
           ]
         },
@@ -682,6 +660,24 @@
         "tool_parameters": {},
         "citation": "[De_Gans_2002]",
         "guideline_source": "De Gans 2002"
+      },
+      {
+        "step": 5,
+        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started. blood cultures will yield Gram-negative diplococci.",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "blood_culture",
+          "tests": [
+            "culture",
+            "gram_stain",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §VI"
       }
     ],
     "useless_tools": [

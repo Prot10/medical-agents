@@ -420,67 +420,39 @@
     },
     {
       "trigger_action": "request_blood_culture_final",
-      "tool_name": "interpret_labs",
+      "tool_name": "order_microbiology",
       "output": {
-        "panels": {
-          "Blood cultures final": [
-            {
-              "test": "Blood culture (aerobic) — Set 1",
-              "value": "No growth at 5 days",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Blood culture (aerobic) — Set 2",
-              "value": "No growth at 5 days",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": false,
-              "clinical_significance": null
-            }
-          ],
-          "CSF culture final": [
-            {
-              "test": "CSF culture (from EVD) — organism identification",
-              "value": "Staphylococcus aureus (methicillin-susceptible, MSSA)",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Susceptibility — Oxacillin MIC",
-              "value": "≤0.25 mcg/mL (susceptible)",
-              "unit": "mcg/mL",
-              "reference_range": "Susceptible: ≤2",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Susceptibility — Vancomycin MIC",
-              "value": "1.0 mcg/mL (susceptible)",
-              "unit": "mcg/mL",
-              "reference_range": "Susceptible: ≤2",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Susceptibility — Cefazolin MIC",
-              "value": "≤8 mcg/mL (susceptible)",
-              "unit": "mcg/mL",
-              "reference_range": "Susceptible: ≤8",
-              "is_abnormal": false,
-              "clinical_significance": null
-            }
-          ]
+        "specimen": "blood_culture",
+        "tests": [
+          "culture",
+          "gram_stain",
+          "susceptibility"
+        ],
+        "collected_before_antimicrobials": true,
+        "organism": null,
+        "gram_stain": null,
+        "susceptibility": {
+          "Susceptibility — Oxacillin MIC": "≤0.25 mcg/mL (susceptible)",
+          "Susceptibility — Vancomycin MIC": "1.0 mcg/mL (susceptible)",
+          "Susceptibility — Cefazolin MIC": "≤8 mcg/mL (susceptible)"
         },
-        "interpretation": "Abnormal values: CSF culture (from EVD) — organism identification Staphylococcus aureus (methicillin-susceptible, MSSA) (H).",
-        "abnormal_values_summary": [
-          "CSF culture: Staphylococcus aureus (MSSA) isolated from EVD fluid — susceptible to oxacillin, vancomycin, and cefazolin",
-          "Blood cultures 2/2: No growth at 5 days"
-        ]
+        "cell_counts": null,
+        "findings": [
+          {
+            "test": "Blood culture (aerobic) — Set 1",
+            "result": "No growth at 5 days"
+          },
+          {
+            "test": "Blood culture (aerobic) — Set 2",
+            "result": "No growth at 5 days"
+          },
+          {
+            "test": "CSF culture (from EVD) — organism identification",
+            "result": "Staphylococcus aureus (methicillin-susceptible, MSSA)"
+          }
+        ],
+        "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
+        "recommended_actions": []
       }
     },
     {
@@ -694,16 +666,16 @@
       },
       {
         "step": 2,
-        "action": "Draw two sets of peripheral blood cultures and send CBC with differential, CMP, procalcitonin, and lactate BEFORE any antibiotic dose.",
+        "action": "Send targeted laboratory studies: CBC, BMP, CRP, procalcitonin",
         "tool_name": "interpret_labs",
-        "expected_finding": "Peripheral leukocytosis with neutrophilia, elevated CRP and procalcitonin; blood cultures may be negative in isolated device-associated ventriculitis but should be obtained to detect concurrent bacteremia.",
+        "expected_finding": "Peripheral leukocytosis with neutrophilia, elevated CRP and procalcitonin.",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
-            "blood_cultures",
-            "inflammatory_markers"
+            "CRP",
+            "procalcitonin"
           ]
         },
         "citation": "[IDSA_2004]",
@@ -754,6 +726,24 @@
         },
         "citation": "[Brouwer_2012]",
         "guideline_source": "Brouwer 2012"
+      },
+      {
+        "step": 7,
+        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started. blood cultures may be negative in isolated device-associated ventriculitis but should be obtained to detect concurrent bacteremia.",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "blood_culture",
+          "tests": [
+            "culture",
+            "gram_stain",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §VI"
       }
     ],
     "useless_tools": [

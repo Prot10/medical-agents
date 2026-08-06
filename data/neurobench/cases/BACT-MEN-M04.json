@@ -450,65 +450,39 @@
     },
     {
       "trigger_action": "request_blood_cultures_result",
-      "tool_name": "interpret_labs",
+      "tool_name": "order_microbiology",
       "output": {
-        "panels": {
-          "Blood Culture Results (Final)": [
-            {
-              "test": "Aerobic bottle 1 — organism",
-              "value": "Listeria monocytogenes, isolated at 36 hours",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Aerobic bottle 2 — organism",
-              "value": "Listeria monocytogenes, isolated at 40 hours",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Anaerobic bottles",
-              "value": "No growth at 5 days",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Susceptibility — Ampicillin MIC",
-              "value": "<=0.5 mcg/mL (Susceptible)",
-              "unit": "mcg/mL",
-              "reference_range": "Susceptible <=2.0",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Susceptibility — Penicillin G MIC",
-              "value": "0.5 mcg/mL (Susceptible)",
-              "unit": "mcg/mL",
-              "reference_range": "Susceptible <=2.0",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Susceptibility — Trimethoprim-sulfamethoxazole",
-              "value": "Susceptible",
-              "unit": "",
-              "reference_range": "Susceptible",
-              "is_abnormal": false,
-              "clinical_significance": null
-            }
-          ]
+        "specimen": "blood_culture",
+        "tests": [
+          "culture",
+          "gram_stain",
+          "susceptibility"
+        ],
+        "collected_before_antimicrobials": true,
+        "organism": null,
+        "gram_stain": null,
+        "susceptibility": {
+          "Susceptibility — Ampicillin MIC": "<=0.5 mcg/mL (Susceptible)",
+          "Susceptibility — Penicillin G MIC": "0.5 mcg/mL (Susceptible)",
+          "Susceptibility — Trimethoprim-sulfamethoxazole": "Susceptible"
         },
-        "interpretation": "Abnormal values: Aerobic bottle 1 Listeria monocytogenes, isolated at 36 hours (H), Aerobic bottle 2 Listeria monocytogenes, isolated at 40 hours (H).",
-        "abnormal_values_summary": [
-          "Aerobic bottle 1: Listeria monocytogenes isolated at 36 hours (H)",
-          "Aerobic bottle 2: Listeria monocytogenes isolated at 40 hours (H)"
-        ]
+        "cell_counts": null,
+        "findings": [
+          {
+            "test": "Aerobic bottle 1 — organism",
+            "result": "Listeria monocytogenes, isolated at 36 hours"
+          },
+          {
+            "test": "Aerobic bottle 2 — organism",
+            "result": "Listeria monocytogenes, isolated at 40 hours"
+          },
+          {
+            "test": "Anaerobic bottles",
+            "result": "No growth at 5 days"
+          }
+        ],
+        "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
+        "recommended_actions": []
       }
     },
     {
@@ -743,15 +717,14 @@
       },
       {
         "step": 2,
-        "action": "Draw two sets of peripheral blood cultures BEFORE the first antibiotic dose; send CBC with differential, CMP, procalcitonin, CRP, lactate, and coagulation panel.",
+        "action": "Send targeted laboratory studies: CBC, BMP, inflammatory_markers",
         "tool_name": "interpret_labs",
-        "expected_finding": "Leukocytosis with left shift; elevated inflammatory markers; eventual blood culture growth of Listeria monocytogenes.",
+        "expected_finding": "Leukocytosis with left shift; elevated inflammatory markers.",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
-            "blood_cultures",
             "inflammatory_markers"
           ]
         },
@@ -803,6 +776,24 @@
         },
         "citation": "[Brouwer_2012]",
         "guideline_source": "Brouwer 2012"
+      },
+      {
+        "step": 7,
+        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started. eventual blood culture growth of Listeria monocytogenes.",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "blood_culture",
+          "tests": [
+            "culture",
+            "gram_stain",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §VI"
       }
     ],
     "useless_tools": [

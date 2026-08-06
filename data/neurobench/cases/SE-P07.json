@@ -239,16 +239,6 @@
             "is_abnormal": true,
             "clinical_significance": null
           }
-        ],
-        "Ascitic Fluid": [
-          {
-            "test": "Ascitic fluid WBC",
-            "value": 680,
-            "unit": "cells/mm3 (82% neutrophils)",
-            "reference_range": "<250 polymorphonuclear",
-            "is_abnormal": true,
-            "clinical_significance": null
-          }
         ]
       },
       "interpretation": "Abnormal values: WBC 12.4 x10^9/L (H), Hemoglobin 9.8 g/dL (L), Platelets 82 x10^9/L (L), Sodium 128 mEq/L (L), Potassium 3.2 mEq/L (L), BUN 42 mg/dL (H), Creatinine 1.6 mg/dL (H), Glucose 62 mg/dL (L), AST 128 U/L (H), ALT 62 U/L (H), Total Bilirubin 8.6 mg/dL (H), Albumin 2.2 g/dL (L), PT/INR 3.2 / 3.2 ratio (H), Serum ammonia 186 µmol/L (H), Ascitic fluid WBC 680 cells/mm3 (82% neutrophils) (H).",
@@ -285,6 +275,27 @@
       "angiography_findings": null,
       "additional_observations": [],
       "impression": "No acute intracranial abnormality. No mass, haemorrhage, or midline shift. Mild generalised volume loss",
+      "recommended_actions": []
+    },
+    "microbiology": {
+      "specimen": "blood_culture",
+      "tests": [
+        "culture",
+        "gram_stain",
+        "susceptibility"
+      ],
+      "collected_before_antimicrobials": true,
+      "organism": null,
+      "gram_stain": null,
+      "susceptibility": null,
+      "cell_counts": null,
+      "findings": [
+        {
+          "test": "culture",
+          "result": "No growth reported at the time of this encounter"
+        }
+      ],
+      "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
       "recommended_actions": []
     }
   },
@@ -444,6 +455,32 @@
         },
         "interpretation": "Opening pressure: 16 cmH2O. WBC: 4 cells/mm3 (N/A PMN/N/A lymph). Protein: 44 mg/dL. Glucose: 44 mg/dL (ratio 0.71). Anti-NMDAR IgG: Negative. HSV PCR: Negative. Bacterial culture: No growth."
       }
+    },
+    {
+      "trigger_action": "request_ascitic_fluid_paracentesis",
+      "tool_name": "order_microbiology",
+      "output": {
+        "specimen": "ascitic_fluid",
+        "tests": [
+          "cell_count",
+          "protein",
+          "culture",
+          "gram_stain"
+        ],
+        "collected_before_antimicrobials": true,
+        "organism": null,
+        "gram_stain": null,
+        "susceptibility": null,
+        "cell_counts": null,
+        "findings": [
+          {
+            "test": "Ascitic fluid WBC",
+            "result": "680"
+          }
+        ],
+        "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
+        "recommended_actions": []
+      }
     }
   ],
   "fallback_tool_outputs": {
@@ -576,11 +613,22 @@
       },
       {
         "step": 2,
-        "action": "Labs: CBC, CMP, glucose, Ca/Mg, AED level, ammonia (key — extremely elevated 186), ABG, lactate, LFTs, PT/INR, albumin, blood cultures, ascitic fluid (cell count, culture, gram stain)",
+        "action": "Send targeted laboratory studies: CBC, CMP, ammonia, magnesium, AED_levels, lactate, ABG, coagulation",
         "tool_name": "interpret_labs",
         "expected_finding": "Ammonia 186 (CRITICAL high), bilirubin 8.6, PT/INR 3.2, albumin 2.2, ascitic WBC 680 = SBP",
         "category": "required",
-        "tool_parameters": {},
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "ammonia",
+            "magnesium",
+            "AED_levels",
+            "lactate",
+            "ABG",
+            "coagulation"
+          ]
+        },
         "citation": "[Brophy_2012]",
         "guideline_source": ""
       },
@@ -616,11 +664,15 @@
       },
       {
         "step": 6,
-        "action": "Serial ammonia + EEG response — confirms metabolic vs ictal origin",
+        "action": "Send targeted laboratory studies: ammonia — confirms metabolic vs ictal origin",
         "tool_name": "interpret_labs",
         "expected_finding": "Triphasic waves resolve with ammonia normalization — confirms metabolic encephalopathy, NOT NCSE",
         "category": "required",
-        "tool_parameters": {},
+        "tool_parameters": {
+          "panels": [
+            "ammonia"
+          ]
+        },
         "citation": "[Brophy_2012]",
         "guideline_source": ""
       },
@@ -651,6 +703,43 @@
         "expected_finding": "Transplant candidacy assessment; SBP prophylaxis post-treatment",
         "category": "required",
         "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 10,
+        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "blood_culture",
+          "tests": [
+            "culture",
+            "gram_stain",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 11,
+        "action": "Perform a diagnostic paracentesis and send ascitic fluid for cell count with differential, protein and culture, inoculating blood-culture bottles at the bedside",
+        "tool_name": "order_microbiology",
+        "expected_finding": "A polymorphonuclear count at or above 250 cells/mm3 establishes spontaneous bacterial peritonitis, which is a precipitant that must be treated whether or not fever or leucocytosis is present",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "ascitic_fluid",
+          "tests": [
+            "cell_count",
+            "protein",
+            "culture",
+            "gram_stain"
+          ],
+          "before_antimicrobials": true
+        },
         "citation": "[Brophy_2012]",
         "guideline_source": ""
       }

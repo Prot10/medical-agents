@@ -459,81 +459,55 @@
     },
     {
       "trigger_action": "request_blood_cultures",
-      "tool_name": "interpret_labs",
+      "tool_name": "order_microbiology",
       "output": {
-        "panels": {
-          "Blood_culture_final": [
-            {
-              "test": "Blood culture set 1 (aerobic)",
-              "value": "Streptococcus pneumoniae isolated at 42 hours",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Blood culture set 1 (anaerobic)",
-              "value": "No growth at 5 days",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": false
-            },
-            {
-              "test": "Blood culture set 2 (aerobic)",
-              "value": "Streptococcus pneumoniae isolated at 44 hours",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Blood culture set 2 (anaerobic)",
-              "value": "No growth at 5 days",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": false
-            }
-          ],
-          "Susceptibility": [
-            {
-              "test": "Penicillin MIC",
-              "value": "0.06 mcg/mL",
-              "unit": "mcg/mL",
-              "reference_range": "Susceptible <=0.06 for meningitis",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Ceftriaxone MIC",
-              "value": "<=0.5",
-              "unit": "mcg/mL",
-              "reference_range": "Susceptible <=0.5 for meningitis",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Vancomycin MIC",
-              "value": "0.5",
-              "unit": "mcg/mL",
-              "reference_range": "Susceptible <=1.0",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Meropenem MIC",
-              "value": "<=0.25",
-              "unit": "mcg/mL",
-              "reference_range": "Susceptible <=0.25",
-              "is_abnormal": false,
-              "clinical_significance": null
-            }
-          ]
-        },
-        "interpretation": "Abnormal values: Blood culture set 1 (aerobic) Streptococcus pneumoniae isolated at 42 hours (H), Blood culture set 2 (aerobic) Streptococcus pneumoniae isolated at 44 hours (H).",
-        "abnormal_values_summary": [
-          "Blood culture set 1 (aerobic): Streptococcus pneumoniae isolated at 42 hours (H)",
-          "Blood culture set 2 (aerobic): Streptococcus pneumoniae isolated at 44 hours (H)"
-        ]
+        "specimen": "blood_culture",
+        "tests": [
+          "culture",
+          "gram_stain",
+          "susceptibility"
+        ],
+        "collected_before_antimicrobials": true,
+        "organism": "Streptococcus pneumoniae",
+        "gram_stain": null,
+        "susceptibility": null,
+        "cell_counts": null,
+        "findings": [
+          {
+            "test": "Blood culture set 1 (aerobic)",
+            "result": "Streptococcus pneumoniae isolated at 42 hours"
+          },
+          {
+            "test": "Blood culture set 1 (anaerobic)",
+            "result": "No growth at 5 days"
+          },
+          {
+            "test": "Blood culture set 2 (aerobic)",
+            "result": "Streptococcus pneumoniae isolated at 44 hours"
+          },
+          {
+            "test": "Blood culture set 2 (anaerobic)",
+            "result": "No growth at 5 days"
+          },
+          {
+            "test": "Penicillin MIC",
+            "result": "0.06 mcg/mL"
+          },
+          {
+            "test": "Ceftriaxone MIC",
+            "result": "<=0.5"
+          },
+          {
+            "test": "Vancomycin MIC",
+            "result": "0.5"
+          },
+          {
+            "test": "Meropenem MIC",
+            "result": "<=0.25"
+          }
+        ],
+        "impression": "Streptococcus pneumoniae isolated. Specimen taken before the first antimicrobial dose.",
+        "recommended_actions": []
       }
     },
     {
@@ -989,7 +963,7 @@
       },
       {
         "step": 2,
-        "action": "Draw two sets of peripheral blood cultures BEFORE the first antibiotic dose and send CBC with differential, CMP, procalcitonin, CRP, and lactate.",
+        "action": "Send targeted laboratory studies: CBC, BMP, CRP, procalcitonin",
         "tool_name": "interpret_labs",
         "expected_finding": "Peripheral leukocytosis with left shift, elevated procalcitonin/CRP, eventual blood-culture growth of the pathogen.",
         "category": "required",
@@ -997,8 +971,8 @@
           "panels": [
             "CBC",
             "BMP",
-            "blood_cultures",
-            "inflammatory_markers"
+            "CRP",
+            "procalcitonin"
           ]
         },
         "citation": "[IDSA_2004]",
@@ -1049,6 +1023,24 @@
         },
         "citation": "[Brouwer_2012]",
         "guideline_source": "Brouwer 2012"
+      },
+      {
+        "step": 7,
+        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "blood_culture",
+          "tests": [
+            "culture",
+            "gram_stain",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §VI"
       }
     ],
     "useless_tools": [

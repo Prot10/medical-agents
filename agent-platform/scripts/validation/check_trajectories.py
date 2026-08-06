@@ -31,17 +31,19 @@ from collections import Counter
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from validate_cases import CASES_DIR, _tool_schemas  # noqa: E402
+from validate_cases import CASES_DIR, CATCHALL_PARAM, _tool_schemas  # noqa: E402
 
 from neuroagent.agent.reasoning import AgentTrace, AgentTurn  # noqa: E402
 from neuroagent.evaluation.metrics import MetricsCalculator  # noqa: E402
 from neuroagent.tools.mock_server import MockServer  # noqa: E402
-from neuroagent.tools.vocabulary import is_valid_modality, is_valid_test_type  # noqa: E402
 from neuroagent_schemas import NeuroBenchCase  # noqa: E402
 
 DEFAULT_TRAJECTORIES = Path("training_data/gold_trajectories/trajectories.jsonl")
 
-CATCHALL = {"order_advanced_imaging": "modality", "order_specialized_test": "test_type"}
+# Shared with validate_cases so each discriminating parameter is checked against ITS OWN
+# closed vocabulary. This file had the same dispatch bug: everything that was not
+# order_advanced_imaging was validated against the specialized-test list.
+CATCHALL = {tool: key for tool, (key, _) in CATCHALL_PARAM.items()}
 
 
 def _load_cases(cases_dir: Path) -> dict[str, NeuroBenchCase]:
@@ -89,12 +91,7 @@ def check_trajectory(
             if key not in params:
                 continue
             if tool in CATCHALL and key == CATCHALL[tool]:
-                valid = (
-                    is_valid_modality(value)
-                    if tool == "order_advanced_imaging"
-                    else is_valid_test_type(value)
-                )
-                if not valid:
+                if not CATCHALL_PARAM[tool][1](str(value)):
                     issues.append(f"{tool}.{key}=`{value}` is not in the closed vocabulary")
             elif (enum := params[key].get("enum")) and value not in enum:
                 issues.append(f"{tool}.{key}=`{value}` not in {enum}")

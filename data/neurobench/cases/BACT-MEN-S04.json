@@ -470,75 +470,51 @@
     },
     {
       "trigger_action": "request_blood_cultures",
-      "tool_name": "interpret_labs",
+      "tool_name": "order_microbiology",
       "output": {
-        "panels": {
-          "Blood cultures (final)": [
-            {
-              "test": "Aerobic blood culture bottle 1",
-              "value": "Streptococcus pneumoniae, serotype 19A",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Aerobic blood culture bottle 2",
-              "value": "Streptococcus pneumoniae, serotype 19A",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Anaerobic blood culture",
-              "value": "No growth at 5 days",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": false,
-              "clinical_significance": null
-            }
-          ],
-          "Susceptibilities": [
-            {
-              "test": "Penicillin MIC",
-              "value": "0.06 ug/mL (Susceptible; meningeal breakpoint <=0.06)",
-              "unit": "ug/mL",
-              "reference_range": "<=0.06 susceptible for meningitis",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Ceftriaxone MIC",
-              "value": "<=0.5 ug/mL (Susceptible)",
-              "unit": "ug/mL",
-              "reference_range": "<=0.5 susceptible for meningitis",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Vancomycin MIC",
-              "value": "0.5 ug/mL (Susceptible)",
-              "unit": "ug/mL",
-              "reference_range": "<=1.0 susceptible",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Meropenem MIC",
-              "value": "<=0.25 ug/mL (Susceptible)",
-              "unit": "ug/mL",
-              "reference_range": "<=0.25 susceptible",
-              "is_abnormal": false,
-              "clinical_significance": null
-            }
-          ]
-        },
-        "interpretation": "Abnormal values: Aerobic blood culture bottle 1 Streptococcus pneumoniae, serotype 19A (H), Aerobic blood culture bottle 2 Streptococcus pneumoniae, serotype 19A (H).",
-        "abnormal_values_summary": [
-          "Aerobic blood culture bottle 1: Streptococcus pneumoniae, serotype 19A (H)",
-          "Aerobic blood culture bottle 2: Streptococcus pneumoniae, serotype 19A (H)"
-        ]
+        "specimen": "blood_culture",
+        "tests": [
+          "culture",
+          "gram_stain",
+          "susceptibility"
+        ],
+        "collected_before_antimicrobials": true,
+        "organism": null,
+        "gram_stain": null,
+        "susceptibility": null,
+        "cell_counts": null,
+        "findings": [
+          {
+            "test": "Aerobic blood culture bottle 1",
+            "result": "Streptococcus pneumoniae, serotype 19A"
+          },
+          {
+            "test": "Aerobic blood culture bottle 2",
+            "result": "Streptococcus pneumoniae, serotype 19A"
+          },
+          {
+            "test": "Anaerobic blood culture",
+            "result": "No growth at 5 days"
+          },
+          {
+            "test": "Penicillin MIC",
+            "result": "0.06 ug/mL (Susceptible; meningeal breakpoint <=0.06)"
+          },
+          {
+            "test": "Ceftriaxone MIC",
+            "result": "<=0.5 ug/mL (Susceptible)"
+          },
+          {
+            "test": "Vancomycin MIC",
+            "result": "0.5 ug/mL (Susceptible)"
+          },
+          {
+            "test": "Meropenem MIC",
+            "result": "<=0.25 ug/mL (Susceptible)"
+          }
+        ],
+        "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
+        "recommended_actions": []
       }
     },
     {
@@ -948,7 +924,7 @@
       },
       {
         "step": 2,
-        "action": "Draw two sets of peripheral blood cultures BEFORE the first antibiotic dose and send CBC with differential, CMP, procalcitonin, CRP, and lactate.",
+        "action": "Send targeted laboratory studies: CBC, BMP, CRP, procalcitonin",
         "tool_name": "interpret_labs",
         "expected_finding": "Peripheral leukocytosis with left shift, elevated procalcitonin/CRP, eventual blood-culture growth of the pathogen.",
         "category": "required",
@@ -956,8 +932,8 @@
           "panels": [
             "CBC",
             "BMP",
-            "blood_cultures",
-            "inflammatory_markers"
+            "CRP",
+            "procalcitonin"
           ]
         },
         "citation": "[IDSA_2004]",
@@ -1008,6 +984,24 @@
         },
         "citation": "[Brouwer_2012]",
         "guideline_source": "Brouwer 2012"
+      },
+      {
+        "step": 7,
+        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "blood_culture",
+          "tests": [
+            "culture",
+            "gram_stain",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §VI"
       }
     ],
     "useless_tools": [

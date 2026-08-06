@@ -410,72 +410,51 @@
   "followup_outputs": [
     {
       "trigger_action": "request_blood_culture_results",
-      "tool_name": "interpret_labs",
+      "tool_name": "order_microbiology",
       "output": {
-        "panels": {
-          "Blood Cultures": [
-            {
-              "test": "Aerobic bottle set 1 (right antecubital)",
-              "value": "Positive at 14 hours: Streptococcus mutans (viridans group streptococci)",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Anaerobic bottle set 1 (right antecubital)",
-              "value": "Positive at 16 hours: Streptococcus mutans",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Aerobic bottle set 2 (left antecubital)",
-              "value": "Positive at 15 hours: Streptococcus mutans",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Anaerobic bottle set 2 (left antecubital)",
-              "value": "Positive at 18 hours: Streptococcus mutans",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "MIC Penicillin",
-              "value": 0.06,
-              "unit": "mcg/mL",
-              "reference_range": "Susceptible <0.12",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "MIC Gentamicin",
-              "value": 4,
-              "unit": "mcg/mL",
-              "reference_range": "Susceptible <500 (for synergy)",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "MIC Vancomycin",
-              "value": 0.5,
-              "unit": "mcg/mL",
-              "reference_range": "Susceptible <1",
-              "is_abnormal": false,
-              "clinical_significance": null
-            }
-          ]
-        },
-        "interpretation": "Abnormal values: Aerobic bottle set 1 (right antecubital) Positive at 14 hours: Streptococcus mutans (viridans group streptococci) (H), Anaerobic bottle set 1 (right antecubital) Positive at 16 hours: Streptococcus mutans (H), Aerobic bottle set 2 (left antecubital) Positive at 15 hours: Streptococcus mutans (H), Anaerobic bottle set 2 (left antecubital) Positive at 18 hours: Streptococcus mutans (H).",
-        "abnormal_values_summary": [
-          "4/4 blood culture bottles positive for Streptococcus mutans (viridans group streptococci)"
-        ]
+        "specimen": "blood_culture",
+        "tests": [
+          "culture",
+          "gram_stain",
+          "susceptibility"
+        ],
+        "collected_before_antimicrobials": true,
+        "organism": null,
+        "gram_stain": null,
+        "susceptibility": null,
+        "cell_counts": null,
+        "findings": [
+          {
+            "test": "Aerobic bottle set 1 (right antecubital)",
+            "result": "Positive at 14 hours: Streptococcus mutans (viridans group streptococci)"
+          },
+          {
+            "test": "Anaerobic bottle set 1 (right antecubital)",
+            "result": "Positive at 16 hours: Streptococcus mutans"
+          },
+          {
+            "test": "Aerobic bottle set 2 (left antecubital)",
+            "result": "Positive at 15 hours: Streptococcus mutans"
+          },
+          {
+            "test": "Anaerobic bottle set 2 (left antecubital)",
+            "result": "Positive at 18 hours: Streptococcus mutans"
+          },
+          {
+            "test": "MIC Penicillin",
+            "result": "0.06"
+          },
+          {
+            "test": "MIC Gentamicin",
+            "result": "4"
+          },
+          {
+            "test": "MIC Vancomycin",
+            "result": "0.5"
+          }
+        ],
+        "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
+        "recommended_actions": []
       }
     },
     {
@@ -874,7 +853,7 @@
       },
       {
         "step": 3,
-        "action": "Order stat labs: CBC, BMP (including glucose), coagulation panel (INR/PTT), troponin",
+        "action": "Send targeted laboratory studies: CBC, BMP, coagulation, troponin",
         "tool_name": "interpret_labs",
         "expected_finding": "CBC with differential (leukocytosis), ESR/CRP elevated, blood cultures × 3 BEFORE antibiotics, BMP, coagulation, troponin",
         "category": "required",
@@ -882,7 +861,6 @@
           "panels": [
             "CBC",
             "BMP",
-            "glucose",
             "coagulation",
             "troponin"
           ]
@@ -926,13 +904,12 @@
       },
       {
         "step": 7,
-        "action": "Draw at least three sets of blood cultures from separate venipuncture sites BEFORE antibiotics; add procalcitonin if available",
+        "action": "Send targeted laboratory studies: ESR, CRP, procalcitonin — inflammatory markers to support an infective endocarditis source",
         "tool_name": "interpret_labs",
         "expected_finding": "Identification of streptococcal or staphylococcal bacteremia supports endocarditis (Duke criteria major)",
         "category": "required",
         "tool_parameters": {
           "panels": [
-            "blood cultures x3",
             "ESR",
             "CRP",
             "procalcitonin"
@@ -1021,6 +998,24 @@
         },
         "citation": "[AHA_ASA_2014]",
         "guideline_source": "[AHA_ASA_2014]"
+      },
+      {
+        "step": 14,
+        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "blood_culture",
+          "tests": [
+            "culture",
+            "gram_stain",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
+        "citation": "[AHA_ASA_2019]",
+        "guideline_source": "[AHA_ASA_2019]"
       }
     ],
     "useless_tools": [

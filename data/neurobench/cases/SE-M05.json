@@ -280,6 +280,27 @@
       "recommended_actions": [
         "MRI brain with gadolinium recommended."
       ]
+    },
+    "microbiology": {
+      "specimen": "blood_culture",
+      "tests": [
+        "culture",
+        "gram_stain",
+        "susceptibility"
+      ],
+      "collected_before_antimicrobials": true,
+      "organism": null,
+      "gram_stain": null,
+      "susceptibility": null,
+      "cell_counts": null,
+      "findings": [
+        {
+          "test": "culture",
+          "result": "No growth reported at the time of this encounter"
+        }
+      ],
+      "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
+      "recommended_actions": []
     }
   },
   "followup_outputs": [
@@ -605,11 +626,22 @@
       },
       {
         "step": 2,
-        "action": "Labs: CBC, CMP, lactate, ABG, AED level, blood cultures, tox screen, beta-hCG (essential for pelvic imaging and AED selection)",
+        "action": "Send targeted laboratory studies: CBC, CMP, AED_levels, lactate, ABG, tox_screen, inflammatory_markers, beta-hCG",
         "tool_name": "interpret_labs",
         "expected_finding": "Inflammatory markers elevated; beta-hCG negative; non-specific labs",
         "category": "required",
-        "tool_parameters": {},
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "AED_levels",
+            "lactate",
+            "ABG",
+            "tox_screen",
+            "inflammatory_markers",
+            "beta-hCG"
+          ]
+        },
         "citation": "[Brophy_2012]",
         "guideline_source": ""
       },
@@ -639,17 +671,26 @@
         "tool_name": "analyze_csf",
         "expected_finding": "Lymphocytic pleocytosis with oligoclonal bands; CSF NMDAR IgG positive (definitive)",
         "category": "required",
-        "tool_parameters": {},
+        "tool_parameters": {
+          "special_tests": [
+            "HSV_PCR",
+            "oligoclonal_bands"
+          ]
+        },
         "citation": "[Brophy_2012]",
         "guideline_source": ""
       },
       {
         "step": 6,
-        "action": "Serum autoimmune / paraneoplastic panel (NMDAR, LGI1, GABA-B-R, AMPA, GAD65)",
+        "action": "Send targeted laboratory studies: paraneoplastic_panel",
         "tool_name": "interpret_labs",
         "expected_finding": "Serum NMDAR positive — confirms anti-NMDAR encephalitis",
         "category": "required",
-        "tool_parameters": {},
+        "tool_parameters": {
+          "panels": [
+            "paraneoplastic_panel"
+          ]
+        },
         "citation": "[Brophy_2012]",
         "guideline_source": ""
       },
@@ -694,6 +735,24 @@
         "expected_finding": "Neuro-immunology lead; gynecology for teratoma removal",
         "category": "recommended",
         "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 11,
+        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "blood_culture",
+          "tests": [
+            "culture",
+            "gram_stain",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
         "citation": "[Brophy_2012]",
         "guideline_source": ""
       }

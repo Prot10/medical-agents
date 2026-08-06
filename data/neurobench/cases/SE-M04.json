@@ -419,43 +419,39 @@
     },
     {
       "trigger_action": "request_urine_culture_workup",
-      "tool_name": "interpret_labs",
+      "tool_name": "order_microbiology",
       "output": {
-        "panels": {
-          "Infectious Workup": [
-            {
-              "test": "Blood culture x2",
-              "value": "No growth at 48 hours",
-              "unit": "qualitative",
-              "reference_range": "No growth",
-              "is_abnormal": false
-            },
-            {
-              "test": "Urine culture",
-              "value": "No growth",
-              "unit": "qualitative",
-              "reference_range": "No growth",
-              "is_abnormal": false
-            },
-            {
-              "test": "Urinalysis WBC",
-              "value": 3,
-              "unit": "cells/hpf",
-              "reference_range": "<5",
-              "is_abnormal": false
-            },
-            {
-              "test": "Procalcitonin",
-              "value": 0.18,
-              "unit": "ng/mL",
-              "reference_range": "<0.25",
-              "is_abnormal": false,
-              "clinical_significance": null
-            }
-          ]
-        },
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": []
+        "specimen": "urine",
+        "tests": [
+          "culture",
+          "microscopy",
+          "susceptibility"
+        ],
+        "collected_before_antimicrobials": true,
+        "organism": null,
+        "gram_stain": null,
+        "susceptibility": null,
+        "cell_counts": null,
+        "findings": [
+          {
+            "test": "Blood culture x2",
+            "result": "No growth at 48 hours"
+          },
+          {
+            "test": "Urine culture",
+            "result": "No growth"
+          },
+          {
+            "test": "Urinalysis WBC",
+            "result": "3"
+          },
+          {
+            "test": "Procalcitonin",
+            "result": "0.18"
+          }
+        ],
+        "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
+        "recommended_actions": []
       }
     },
     {
@@ -669,11 +665,22 @@
       },
       {
         "step": 2,
-        "action": "Labs: CBC, CMP, glucose, Ca/Mg, AED level, ammonia, lactate, ABG, urine osm + urine Na, blood and urine cultures, tox screen",
+        "action": "Send targeted laboratory studies: CBC, CMP, ammonia, magnesium, AED_levels, lactate, ABG, tox_screen",
         "tool_name": "interpret_labs",
         "expected_finding": "Sodium 132 with urine Na 62 and urine osm 480 = SIADH; carbamazepine 14.2; UTI labs",
         "category": "required",
-        "tool_parameters": {},
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "ammonia",
+            "magnesium",
+            "AED_levels",
+            "lactate",
+            "ABG",
+            "tox_screen"
+          ]
+        },
         "citation": "[Brophy_2012]",
         "guideline_source": ""
       },
@@ -734,6 +741,24 @@
         "expected_finding": "Correct sodium ≤8 mEq/L per 24h to avoid osmotic demyelination; switch from CBZ to non-SIADH AED",
         "category": "recommended",
         "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 9,
+        "action": "Send urine for microscopy and culture as part of the infection screen",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Pyuria and bacteriuria identify a urinary source; a negative result removes it from the list of precipitants",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "urine",
+          "tests": [
+            "culture",
+            "microscopy",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
         "citation": "[Brophy_2012]",
         "guideline_source": ""
       }

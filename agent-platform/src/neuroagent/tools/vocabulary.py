@@ -55,30 +55,78 @@ def advanced_imaging_modalities(costs_path: Path = DEFAULT_COSTS_PATH) -> list[s
     return by_type_values("order_advanced_imaging", costs_path)
 
 
-def normalize_analyte(value: str) -> str:
-    """Canonical form of a lab panel / CSF assay name, for comparison only.
+# Different *names* for one assay, as opposed to different spellings of one name. Punctuation
+# folding cannot reconcile these, so before this map the benchmark held two priced rows for the
+# same test that did not compare equal: ground truth asked `syphilis` in 30 case actions and
+# `RPR` in 118, and an agent naming either failed the other. Same for the paraneoplastic panel
+# (37 actions vs 1), liver function (33 vs 2) and the inflammatory bundle (31 vs 1).
+#
+# Key: the punctuation-folded alias. Value: the canonical *display* spelling, which is the one
+# advertised to the agent — a named assay wherever there is one, since naming the assay rather
+# than the question is the whole point of the per-study vocabulary.
+_ANALYTE_SYNONYMS: dict[str, str] = {
+    "syphilis": "RPR",
+    "lft": "LFTs",
+    "lipid": "lipid_panel",
+    "lipids": "lipid_panel",
+    "ua": "urinalysis",
+    "paraneoplastic": "paraneoplastic_panel",
+    "paraneoplastic_antibodies": "paraneoplastic_panel",
+    "autoimmune_encephalitis": "autoimmune_encephalitis_panel",
+    "inflammatory": "inflammatory_markers",
+    "esr_crp": "inflammatory_markers",
+    "toxicology": "tox_screen",
+    "drug_screen": "tox_screen",
+    "adamts13_activity": "ADAMTS13",
+    "complement_c3/c4": "complement",
+    "smear": "peripheral smear",
+    "blood_cultures_x3": "blood_cultures",
+}
 
-    `costs.yaml` carries spelling aliases of the same assay at the same price
-    (`D-dimer`/`D_dimer`, `Free T4`/`free_T4`, `protein C`/`protein_C`, ...) because the
-    600 cases were authored with free text. Scoring compares normalised names so a model
-    writing `Protein C` is not marked as having missed `protein_C`.
-    """
+
+def _fold(value: str) -> str:
+    """Punctuation- and case-folded form: `Protein C`, `protein-C` and `protein_C` agree."""
     return value.strip().lower().replace(" ", "_").replace("-", "_")
 
 
-def _canonical_analytes(names: list[str]) -> list[str]:
-    """Deduplicate spelling aliases, preferring the snake_case spelling.
+def normalize_analyte(value: str) -> str:
+    """Comparison key for a lab panel / CSF assay name.
 
-    Used for the *advertised* enum: the aliases stay priced so existing cases keep working,
-    but the agent is shown one name per assay.
+    Two levels. `costs.yaml` carries spelling aliases of the same name at the same price
+    (`D-dimer`/`D_dimer`, `Free T4`/`free_T4`, `protein C`/`protein_C`, ...) because the 600
+    cases were authored with free text, so scoring folds punctuation and case: a model writing
+    `Protein C` has not missed `protein_C`. It also carries distinct *names* for one assay,
+    which folding cannot reconcile — see `_ANALYTE_SYNONYMS`.
+
+    Used by the metric layer (`evaluation/metrics.py::_as_set`) and by `CostTracker`, so the
+    bill and the score read one workup the same way.
     """
-    best: dict[str, str] = {}
+    folded = _fold(value)
+    canonical = _ANALYTE_SYNONYMS.get(folded)
+    return _fold(canonical) if canonical else folded
+
+
+def canonical_analyte(value: str) -> str:
+    """The display spelling to advertise for an assay, resolving synonyms."""
+    return _ANALYTE_SYNONYMS.get(_fold(value), value)
+
+
+def _canonical_analytes(names: list[str]) -> list[str]:
+    """Deduplicate aliases to one advertised name per assay.
+
+    Used for the *advertised* enum: every alias stays priced so existing cases keep working,
+    but the agent is shown one name. A synonym's canonical target wins outright; otherwise the
+    snake_case spelling is preferred over the spaced one.
+    """
+    candidates: dict[str, set[str]] = {}
     for name in names:
-        key = normalize_analyte(name)
-        current = best.get(key)
-        if current is None or (" " in current and " " not in name):
-            best[key] = name
-    return sorted(best.values())
+        # A synonym resolves to its canonical target, so every alias of one assay contributes
+        # the same string here and the only remaining choice is between spellings of one name.
+        candidates.setdefault(normalize_analyte(name), set()).add(canonical_analyte(name))
+    # Prefer the project's snake_case house style: no space, then underscore over hyphen.
+    return sorted(
+        min(group, key=lambda d: (" " in d, "-" in d, d)) for group in candidates.values()
+    )
 
 
 def lab_panels(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:

@@ -501,50 +501,39 @@
     },
     {
       "trigger_action": "request_blood_cultures",
-      "tool_name": "interpret_labs",
+      "tool_name": "order_microbiology",
       "output": {
-        "panels": {
-          "Blood cultures": [
-            {
-              "test": "Blood culture set 1 (aerobic)",
-              "value": "Proteus mirabilis isolated at 14 hours",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Blood culture set 1 (anaerobic)",
-              "value": "No growth at 5 days",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Blood culture set 2 (aerobic)",
-              "value": "Proteus mirabilis isolated at 16 hours",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Antibiotic susceptibility",
-              "value": "Sensitive to meropenem, ceftriaxone, ciprofloxacin, gentamicin. Resistant to ampicillin, trimethoprim-sulfamethoxazole.",
-              "unit": "",
-              "reference_range": "N/A",
-              "is_abnormal": true,
-              "clinical_significance": null
-            }
-          ]
-        },
-        "interpretation": "Abnormal values: Blood culture set 1 (aerobic) Proteus mirabilis isolated at 14 hours (H), Blood culture set 2 (aerobic) Proteus mirabilis isolated at 16 hours (H), Antibiotic susceptibility Sensitive to meropenem, ceftriaxone, ciprofloxacin, gentamicin. Resistant to ampicillin, trimethoprim-sulfamethoxazole. (H).",
-        "abnormal_values_summary": [
-          "Blood cultures 2/2 positive for Proteus mirabilis",
-          "Resistant to ampicillin and trimethoprim-sulfamethoxazole",
-          "Sensitive to meropenem, ceftriaxone, ciprofloxacin, gentamicin"
-        ]
+        "specimen": "blood_culture",
+        "tests": [
+          "culture",
+          "gram_stain",
+          "susceptibility"
+        ],
+        "collected_before_antimicrobials": true,
+        "organism": "Proteus mirabilis",
+        "gram_stain": null,
+        "susceptibility": null,
+        "cell_counts": null,
+        "findings": [
+          {
+            "test": "Blood culture set 1 (aerobic)",
+            "result": "Proteus mirabilis isolated at 14 hours"
+          },
+          {
+            "test": "Blood culture set 1 (anaerobic)",
+            "result": "No growth at 5 days"
+          },
+          {
+            "test": "Blood culture set 2 (aerobic)",
+            "result": "Proteus mirabilis isolated at 16 hours"
+          },
+          {
+            "test": "Antibiotic susceptibility",
+            "result": "Sensitive to meropenem, ceftriaxone, ciprofloxacin, gentamicin. Resistant to ampicillin, trimethoprim-sulfamethoxazole."
+          }
+        ],
+        "impression": "Proteus mirabilis isolated. Specimen taken before the first antimicrobial dose.",
+        "recommended_actions": []
       }
     },
     {
@@ -852,7 +841,7 @@
       },
       {
         "step": 2,
-        "action": "Draw two sets of peripheral blood cultures BEFORE the first antibiotic dose and send CBC with differential, CMP, procalcitonin, CRP, and lactate.",
+        "action": "Send targeted laboratory studies: CBC, BMP, CRP, procalcitonin",
         "tool_name": "interpret_labs",
         "expected_finding": "Peripheral leukocytosis with left shift, elevated procalcitonin/CRP, eventual blood-culture growth of the pathogen.",
         "category": "required",
@@ -860,8 +849,8 @@
           "panels": [
             "CBC",
             "BMP",
-            "blood_cultures",
-            "inflammatory_markers"
+            "CRP",
+            "procalcitonin"
           ]
         },
         "citation": "[IDSA_2004]",
@@ -912,6 +901,24 @@
         },
         "citation": "[Brouwer_2012]",
         "guideline_source": "Brouwer 2012"
+      },
+      {
+        "step": 7,
+        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "blood_culture",
+          "tests": [
+            "culture",
+            "gram_stain",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §VI"
       }
     ],
     "useless_tools": [

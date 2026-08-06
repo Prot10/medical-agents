@@ -546,65 +546,47 @@
     },
     {
       "trigger_action": "request_blood_culture_final",
-      "tool_name": "interpret_labs",
+      "tool_name": "order_microbiology",
       "output": {
-        "panels": {
-          "Blood_Culture_Final": [
-            {
-              "test": "Blood culture (aerobic bottle 1) - Final identification",
-              "value": "Listeria monocytogenes",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Blood culture (aerobic bottle 2) - Final identification",
-              "value": "Listeria monocytogenes",
-              "unit": "",
-              "reference_range": "No growth",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Penicillin MIC",
-              "value": "0.06 mcg/mL (susceptible)",
-              "unit": "mcg/mL",
-              "reference_range": "Susceptible: <=2",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Ampicillin MIC",
-              "value": "0.12 mcg/mL (susceptible)",
-              "unit": "mcg/mL",
-              "reference_range": "Susceptible: <=2",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "TMP-SMX MIC",
-              "value": "0.5/9.5 mcg/mL (susceptible)",
-              "unit": "mcg/mL",
-              "reference_range": "Susceptible: <=0.5/9.5",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Ceftriaxone",
-              "value": "Intrinsically resistant — Listeria monocytogenes (innate cephalosporin resistance)",
-              "unit": "",
-              "reference_range": "N/A",
-              "is_abnormal": true,
-              "clinical_significance": null
-            }
-          ]
-        },
-        "interpretation": "Listeria monocytogenes identified in 2/2 aerobic blood culture bottles. Ampicillin and penicillin susceptible. TMP-SMX susceptible. Ceftriaxone: innate resistance confirmed (Listeria is not reliably tested against cephalosporins due to intrinsic resistance).",
-        "abnormal_values_summary": [
-          "Listeria monocytogenes: isolated from 2/2 blood culture bottles (H)",
-          "Ceftriaxone: intrinsically resistant (H)"
-        ]
+        "specimen": "blood_culture",
+        "tests": [
+          "culture",
+          "gram_stain",
+          "susceptibility"
+        ],
+        "collected_before_antimicrobials": true,
+        "organism": null,
+        "gram_stain": null,
+        "susceptibility": null,
+        "cell_counts": null,
+        "findings": [
+          {
+            "test": "Blood culture (aerobic bottle 1) - Final identification",
+            "result": "Listeria monocytogenes"
+          },
+          {
+            "test": "Blood culture (aerobic bottle 2) - Final identification",
+            "result": "Listeria monocytogenes"
+          },
+          {
+            "test": "Penicillin MIC",
+            "result": "0.06 mcg/mL (susceptible)"
+          },
+          {
+            "test": "Ampicillin MIC",
+            "result": "0.12 mcg/mL (susceptible)"
+          },
+          {
+            "test": "TMP-SMX MIC",
+            "result": "0.5/9.5 mcg/mL (susceptible)"
+          },
+          {
+            "test": "Ceftriaxone",
+            "result": "Intrinsically resistant — Listeria monocytogenes (innate cephalosporin resistance)"
+          }
+        ],
+        "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
+        "recommended_actions": []
       }
     },
     {
@@ -785,17 +767,17 @@
       },
       {
         "step": 2,
-        "action": "Draw two sets of peripheral blood cultures before the first antibiotic dose and send CBC with differential, CMP, procalcitonin, CRP, lactate, and LFTs (baseline methotrexate hepatotoxicity screen).",
+        "action": "Send targeted laboratory studies: CBC, BMP, CRP, procalcitonin, LFTs",
         "tool_name": "interpret_labs",
-        "expected_finding": "Peripheral leukocytosis with left shift, markedly elevated procalcitonin/CRP and lactate, mildly elevated creatinine reflecting baseline CKD; blood cultures positive for Gram-positive rods.",
+        "expected_finding": "Peripheral leukocytosis with left shift, markedly elevated procalcitonin/CRP and lactate, mildly elevated creatinine reflecting baseline CKD.",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
-            "blood_cultures",
-            "inflammatory_markers",
-            "LFT"
+            "CRP",
+            "procalcitonin",
+            "LFTs"
           ]
         },
         "citation": "[IDSA_2004]",
@@ -846,6 +828,24 @@
         },
         "citation": "[Brouwer_2012]",
         "guideline_source": "Brouwer 2012"
+      },
+      {
+        "step": 7,
+        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started. blood cultures positive for Gram-positive rods.",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "blood_culture",
+          "tests": [
+            "culture",
+            "gram_stain",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §VI"
       }
     ],
     "useless_tools": [

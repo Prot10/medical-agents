@@ -92,15 +92,41 @@ _ARRAY_VALUED: frozenset[tuple[str, str]] = frozenset(
 )
 
 
+# Mirror of tools/vocabulary.py::_ANALYTE_SYNONYMS — distinct *names* for one assay, which
+# punctuation folding cannot reconcile. Duplicated here only because tools/ is not shipped to
+# the review VPS; tests/test_tool_io_schemas.py fails if the two lists disagree.
+_ANALYTE_SYNONYMS: dict[str, str] = {
+    "syphilis": "RPR",
+    "lft": "LFTs",
+    "lipid": "lipid_panel",
+    "lipids": "lipid_panel",
+    "ua": "urinalysis",
+    "paraneoplastic": "paraneoplastic_panel",
+    "paraneoplastic_antibodies": "paraneoplastic_panel",
+    "autoimmune_encephalitis": "autoimmune_encephalitis_panel",
+    "inflammatory": "inflammatory_markers",
+    "esr_crp": "inflammatory_markers",
+    "toxicology": "tox_screen",
+    "drug_screen": "tox_screen",
+    "adamts13_activity": "ADAMTS13",
+    "complement_c3/c4": "complement",
+    "smear": "peripheral smear",
+    "blood_cultures_x3": "blood_cultures",
+}
+
+
 def _canonical_analytes(names: list[str]) -> list[str]:
-    """Collapse spelling aliases, preferring the snake_case form."""
-    best: dict[str, str] = {}
+    """Collapse aliases to one advertised name per assay, snake_case preferred."""
+    def fold(value: str) -> str:
+        return value.strip().lower().replace(" ", "_").replace("-", "_")
+
+    candidates: dict[str, set[str]] = {}
     for name in names:
-        key = name.strip().lower().replace(" ", "_").replace("-", "_")
-        current = best.get(key)
-        if current is None or (" " in current and " " not in name):
-            best[key] = name
-    return sorted(best.values())
+        display = _ANALYTE_SYNONYMS.get(fold(name), name)
+        candidates.setdefault(fold(display), set()).add(display)
+    return sorted(
+        min(group, key=lambda d: (" " in d, "-" in d, d)) for group in candidates.values()
+    )
 
 
 @lru_cache(maxsize=4)

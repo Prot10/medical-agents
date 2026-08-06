@@ -272,40 +272,6 @@
             "reference_range": "25-35",
             "is_abnormal": false
           }
-        ],
-        "Blood_cultures": [
-          {
-            "test": "Blood culture set 1 (aerobic)",
-            "value": "No growth at 5 days",
-            "unit": "",
-            "reference_range": "No growth",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Blood culture set 1 (anaerobic)",
-            "value": "No growth at 5 days",
-            "unit": "",
-            "reference_range": "No growth",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Blood culture set 2 (aerobic)",
-            "value": "No growth at 5 days",
-            "unit": "",
-            "reference_range": "No growth",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Blood culture set 2 (anaerobic)",
-            "value": "No growth at 5 days",
-            "unit": "",
-            "reference_range": "No growth",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
         ]
       },
       "interpretation": "Abnormal values: WBC 12.8 x10^9/L (H), Neutrophils 72% (H), Lymphocytes 18% (L), Sodium 133 mEq/L (L), CO2 22 mEq/L (L), CRP 54 mg/L (H), Procalcitonin 1.8 ng/mL (H), ESR 44 mm/hr (H), Serum_lactate 2.2 mmol/L (H). Blood cultures: no growth at 5 days (both sets, all bottles).",
@@ -346,7 +312,40 @@
       "interpretation": "Opening pressure elevated at 28 cmH2O. Pleocytosis of 310 cells/microL with mixed differential (54% PMN, 39% lymphocytes, 7% monocytes). Protein markedly elevated at 148 mg/dL. Glucose low at 38 mg/dL (CSF:serum ratio 0.42). No organisms on Gram stain. No growth on bacterial culture at 5 days. CSF lactate markedly elevated at 4.6 mmol/L. Multiplex PCR meningitis panel: Streptococcus pneumoniae detected; all other targets not detected. Pneumococcal urinary antigen positive. India ink and cryptococcal antigen negative. Discordance between negative Gram stain/culture and positive molecular and antigen detection, with mixed pleocytosis, low glucose, and elevated lactate"
     },
     "literature_search": null,
-    "drug_interactions": null
+    "drug_interactions": null,
+    "microbiology": {
+      "specimen": "blood_culture",
+      "tests": [
+        "culture",
+        "gram_stain",
+        "susceptibility"
+      ],
+      "collected_before_antimicrobials": true,
+      "organism": null,
+      "gram_stain": null,
+      "susceptibility": null,
+      "cell_counts": null,
+      "findings": [
+        {
+          "test": "Blood culture set 1 (aerobic)",
+          "result": "No growth at 5 days"
+        },
+        {
+          "test": "Blood culture set 1 (anaerobic)",
+          "result": "No growth at 5 days"
+        },
+        {
+          "test": "Blood culture set 2 (aerobic)",
+          "result": "No growth at 5 days"
+        },
+        {
+          "test": "Blood culture set 2 (anaerobic)",
+          "result": "No growth at 5 days"
+        }
+      ],
+      "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
+      "recommended_actions": []
+    }
   },
   "followup_outputs": [
     {
@@ -637,16 +636,16 @@
       },
       {
         "step": 2,
-        "action": "Draw two sets of peripheral blood cultures before any further antibiotic dose and send CBC with differential, BMP, CRP, procalcitonin, and serum lactate.",
+        "action": "Send targeted laboratory studies: CBC, BMP, CRP, procalcitonin",
         "tool_name": "interpret_labs",
-        "expected_finding": "Moderate leukocytosis, elevated CRP and procalcitonin; blood cultures likely negative due to prior amoxicillin exposure — negative blood cultures do not exclude bacterial meningitis in this context.",
+        "expected_finding": "Moderate leukocytosis, elevated CRP and procalcitonin.",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
-            "blood_cultures",
-            "inflammatory_markers"
+            "CRP",
+            "procalcitonin"
           ]
         },
         "citation": "[IDSA_2004]",
@@ -697,6 +696,24 @@
         },
         "citation": "[Brouwer_2012]",
         "guideline_source": "Brouwer 2012"
+      },
+      {
+        "step": 7,
+        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started. blood cultures likely negative due to prior amoxicillin exposure — negative blood cultures do not exclude bacterial meningitis in this context.",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "blood_culture",
+          "tests": [
+            "culture",
+            "gram_stain",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §VI"
       }
     ],
     "useless_tools": [

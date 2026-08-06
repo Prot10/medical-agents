@@ -373,71 +373,74 @@
     "advanced_imaging": null,
     "specialized_test": null,
     "literature_search": null,
-    "drug_interactions": null
+    "drug_interactions": null,
+    "microbiology": {
+      "specimen": "blood_culture",
+      "tests": [
+        "culture",
+        "gram_stain",
+        "susceptibility"
+      ],
+      "collected_before_antimicrobials": true,
+      "organism": null,
+      "gram_stain": null,
+      "susceptibility": null,
+      "cell_counts": null,
+      "findings": [
+        {
+          "test": "culture",
+          "result": "No growth reported at the time of this encounter"
+        }
+      ],
+      "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
+      "recommended_actions": []
+    }
   },
   "followup_outputs": [
     {
       "trigger_action": "request_sbp_paracentesis",
-      "tool_name": "interpret_labs",
+      "tool_name": "order_microbiology",
       "output": {
-        "panels": {
-          "Ascitic Fluid Analysis": [
-            {
-              "test": "PMN Count",
-              "value": 380,
-              "unit": "cells/mm3",
-              "reference_range": "<250 for SBP exclusion",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Total cell count",
-              "value": 720,
-              "unit": "cells/mm3",
-              "reference_range": "<500",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Protein",
-              "value": 1.1,
-              "unit": "g/dL",
-              "reference_range": "variable",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "SAAG",
-              "value": 1.9,
-              "unit": "g/dL",
-              "reference_range": ">1.1 = portal hypertension",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Gram Stain",
-              "value": "Gram-negative rods",
-              "unit": "qualitative",
-              "reference_range": "None",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Culture",
-              "value": "Pending 48h",
-              "unit": "qualitative",
-              "reference_range": "No growth",
-              "is_abnormal": true,
-              "clinical_significance": null
-            }
-          ]
-        },
-        "interpretation": "Abnormal values: PMN Count 380 cells/mm3 (H), Total cell count 720 cells/mm3 (H), Gram Stain Gram-negative rods qualitative (H), Culture Pending 48h qualitative (H).",
-        "abnormal_values_summary": [
-          "PMN Count 380 cells/mm3 (H — above 250 threshold)",
-          "Gram stain: gram-negative rods present",
-          "Culture: pending at time of report"
-        ]
+        "specimen": "ascitic_fluid",
+        "tests": [
+          "cell_count",
+          "protein",
+          "culture",
+          "gram_stain"
+        ],
+        "collected_before_antimicrobials": true,
+        "organism": null,
+        "gram_stain": null,
+        "susceptibility": null,
+        "cell_counts": null,
+        "findings": [
+          {
+            "test": "PMN Count",
+            "result": "380"
+          },
+          {
+            "test": "Total cell count",
+            "result": "720"
+          },
+          {
+            "test": "Protein",
+            "result": "1.1"
+          },
+          {
+            "test": "SAAG",
+            "result": "1.9"
+          },
+          {
+            "test": "Gram Stain",
+            "result": "Gram-negative rods"
+          },
+          {
+            "test": "Culture",
+            "result": "Pending 48h"
+          }
+        ],
+        "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
+        "recommended_actions": []
       }
     },
     {
@@ -601,6 +604,31 @@
           "Culture result: Escherichia coli, pansensitive"
         ]
       }
+    },
+    {
+      "trigger_action": "request_urine_specimen",
+      "tool_name": "order_microbiology",
+      "output": {
+        "specimen": "urine",
+        "tests": [
+          "culture",
+          "microscopy",
+          "susceptibility"
+        ],
+        "collected_before_antimicrobials": true,
+        "organism": null,
+        "gram_stain": null,
+        "susceptibility": null,
+        "cell_counts": null,
+        "findings": [
+          {
+            "test": "culture",
+            "result": "No growth reported at the time of this encounter"
+          }
+        ],
+        "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
+        "recommended_actions": []
+      }
     }
   ],
   "fallback_tool_outputs": {
@@ -735,11 +763,20 @@
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Comprehensive labs: CMP including AST/ALT/bilirubin/INR/albumin, ammonia, CBC, glucose, electrolytes (Na, K, Mg), BUN/Cr, lactate, blood cultures and urine cultures; toxicology if substance use plausible. Confirms liver dysfunction and screens for precipitants.",
+        "action": "Send targeted laboratory studies: CBC, CMP, ammonia, magnesium, lactate, coagulation. Confirms liver dysfunction and screens for precipitants.",
         "tool_name": "interpret_labs",
         "expected_finding": "Ammonia elevated; cultures; cirrhosis features.",
         "category": "required",
-        "tool_parameters": {},
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "ammonia",
+            "magnesium",
+            "lactate",
+            "coagulation"
+          ]
+        },
         "citation": "[AASLD_2014]",
         "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       },
@@ -800,6 +837,61 @@
         "expected_finding": "Hepatology / critical-care guidance integrated into management.",
         "category": "recommended",
         "tool_parameters": {},
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      },
+      {
+        "step": 8,
+        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "blood_culture",
+          "tests": [
+            "culture",
+            "gram_stain",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      },
+      {
+        "step": 9,
+        "action": "Perform a diagnostic paracentesis and send ascitic fluid for cell count with differential, protein and culture, inoculating blood-culture bottles at the bedside",
+        "tool_name": "order_microbiology",
+        "expected_finding": "A polymorphonuclear count at or above 250 cells/mm3 establishes spontaneous bacterial peritonitis, which is a precipitant that must be treated whether or not fever or leucocytosis is present",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "ascitic_fluid",
+          "tests": [
+            "cell_count",
+            "protein",
+            "culture",
+            "gram_stain"
+          ],
+          "before_antimicrobials": true
+        },
+        "citation": "[AASLD_2014]",
+        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+      },
+      {
+        "step": 10,
+        "action": "Send urine for microscopy and culture as part of the infection screen",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Pyuria and bacteriuria identify a urinary source; a negative result removes it from the list of precipitants",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "urine",
+          "tests": [
+            "culture",
+            "microscopy",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
         "citation": "[AASLD_2014]",
         "guideline_source": "AASLD/EASL 2014 HE practice guideline"
       }

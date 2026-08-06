@@ -227,6 +227,27 @@
       ],
       "impression": "No acute intracranial abnormality. No mass, hemorrhage, midline shift, or edema. No structural cause identified",
       "recommended_actions": []
+    },
+    "microbiology": {
+      "specimen": "urine",
+      "tests": [
+        "culture",
+        "microscopy",
+        "susceptibility"
+      ],
+      "collected_before_antimicrobials": true,
+      "organism": null,
+      "gram_stain": null,
+      "susceptibility": null,
+      "cell_counts": null,
+      "findings": [
+        {
+          "test": "culture",
+          "result": "No growth reported at the time of this encounter"
+        }
+      ],
+      "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
+      "recommended_actions": []
     }
   },
   "followup_outputs": [
@@ -555,11 +576,24 @@
       },
       {
         "step": 2,
-        "action": "Labs: CBC, CMP, glucose, Ca/Mg, AED level (valproate), ammonia, ABG, lactate, CK, blood and urine cultures, beta-hCG, tox screen, BAL",
+        "action": "Send targeted laboratory studies: CBC, CMP, ammonia, magnesium, AED_levels, lactate, ABG, tox_screen, CK, beta-hCG",
         "tool_name": "interpret_labs",
         "expected_finding": "Subtherapeutic valproate 28, BAL 0.18, lactate 8.4 (post-convulsive), CK 2840 (rhabdomyolysis), Mg 1.4",
         "category": "required",
-        "tool_parameters": {},
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "ammonia",
+            "magnesium",
+            "AED_levels",
+            "lactate",
+            "ABG",
+            "tox_screen",
+            "CK",
+            "beta-hCG"
+          ]
+        },
         "citation": "[Brophy_2012]",
         "guideline_source": ""
       },
@@ -605,11 +639,16 @@
       },
       {
         "step": 7,
-        "action": "Magnesium replacement and rhabdomyolysis management",
+        "action": "Send targeted laboratory studies: magnesium, CK",
         "tool_name": "interpret_labs",
         "expected_finding": "IV magnesium repletion; aggressive IV fluids for CK 2840",
         "category": "required",
-        "tool_parameters": {},
+        "tool_parameters": {
+          "panels": [
+            "magnesium",
+            "CK"
+          ]
+        },
         "citation": "[Brophy_2012]",
         "guideline_source": ""
       },
@@ -620,6 +659,24 @@
         "expected_finding": "JME requires lifelong AED; address non-adherence factors",
         "category": "recommended",
         "tool_parameters": {},
+        "citation": "[Brophy_2012]",
+        "guideline_source": ""
+      },
+      {
+        "step": 9,
+        "action": "Send urine for microscopy and culture as part of the infection screen",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Pyuria and bacteriuria identify a urinary source; a negative result removes it from the list of precipitants",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "urine",
+          "tests": [
+            "culture",
+            "microscopy",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
         "citation": "[Brophy_2012]",
         "guideline_source": ""
       }
