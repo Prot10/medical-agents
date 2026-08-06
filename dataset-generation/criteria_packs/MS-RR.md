@@ -28,7 +28,7 @@ scenarios per McDonald 2017).
 
 **Required:**
 - `analyze_brain_mri` (with gadolinium contrast, MS protocol including FLAIR, T2, DWI, post-contrast T1) — DIS, DIT (if enhancing + non-enhancing simultaneously), lesion characterization [McDonald_2017]
-- `analyze_brain_mri` extending to cervical/thoracic spine — typical MS regions include cord; ~80% of MS patients have cord lesions [McDonald_2017]
+- `order_body_imaging` (`study: spine_MRI`, with contrast) — cervical and thoracic cord. ~80% of MS patients have cord lesions and cord involvement counts toward dissemination in space; short-segment peripheral lesions favour MS over the longitudinally extensive myelitis of NMOSD [McDonald_2017]. **Not** a second `analyze_brain_mri`: that tool images the brain, and pinning the same `protocol: ms` on both gave the two studies one identity, so the cord was unscoreable and imaging only the brain scored full coverage
 - `analyze_csf` (`oligoclonal_bands, IgG_index, total protein, glucose, cells`) — OCBs supportive (sensitivity ~95% MS); can substitute for DIT per McDonald 2017 [McDonald_2017]
 - `interpret_labs` (CBC, CMP, TSH, B12, ANA, NMO-IgG/aquaporin-4, MOG-IgG, HIV, RPR, vitamin D) — exclude mimics (NMOSD, neurosarcoidosis, B12 deficiency, syphilis); MOG/AQP4 critical to distinguish [Wingerchuk_2015]
 - `search_medical_literature` — McDonald 2017, DMT options, NEDA-3 outcome

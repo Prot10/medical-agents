@@ -100,6 +100,14 @@ Accolte. In sintesi:
   tool sbagliato — fra questi un'angio-TC polmonare chiesta con il tool della TC cranio, cioè
   precisamente l'errore che avevate previsto quando avete scritto che offrire la RM encefalo e
   non l'imaging cardiaco è «the arrangement most likely to produce the wrong imaging choice».
+- **SM: la RM del midollo c'era già, ma non era valutabile.** Avevate chiesto encefalo *e*
+  midollo. Tutti e 30 i casi avevano già le due azioni, ma entrambe sul tool dell'encefalo e con lo
+  stesso parametro: per il punteggio erano **un solo esame**, quindi studiare solo l'encefalo dava
+  copertura piena e lo studio del midollo era invisibile. Cercando la stessa forma su tutti i 600
+  casi l'abbiamo ritrovata nella **SLA**, dove l'esclusione della mielopatia cervicale — il mimico
+  che va escluso prima di una diagnosi di malattia del motoneurone — era nascosta dentro il referto
+  della RM encefalo, in tutti e 30 i casi. Ora sono studi separati, ordinabili e valutabili, e la
+  RM del midollo è obbligatoria in entrambe le patologie.
 - Le vostre **descrizioni condizione-specifiche** vengono recepite, ma con un accorgimento:
   non possono comparire nella descrizione del tool che l'agente legge, perché rivelerebbero
   la diagnosi che deve invece inferire (se il tool dice "per la SM, RM encefalo e midollo con

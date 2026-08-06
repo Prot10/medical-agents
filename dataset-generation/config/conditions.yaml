@@ -479,8 +479,13 @@ multiple_sclerosis:
   encounter_type: "inpatient"
   # Clinical tool review, July 2026: CSF required->optional (2024 McDonald: LP not universally
   # required if criteria are otherwise met); EEG and ECG removed (no diagnostic role);
-  # specialized_test narrowed to optic-nerve testing (OCT, VEP)
-  required_modalities: [MRI, LABS]
+  # specialized_test narrowed to optic-nerve testing (OCT, VEP).
+  # body_imaging is required because the reviewers asked for brain *and* cord imaging by name and
+  # the cord counts toward dissemination in space. All 30 cases already required it — as a second
+  # `analyze_brain_mri` carrying a `region: cervical_thoracic_spine` annotation the brain tool
+  # drops, which gave it the same action identity as the brain study, so the two collapsed into one
+  # and imaging only the brain scored full required coverage.
+  required_modalities: [MRI, body_imaging, LABS]
   optional_modalities: [CSF, specialized_test]
   key_findings:
     mri:
@@ -498,6 +503,10 @@ multiple_sclerosis:
       diagnostic_puzzle:
         - "Few scattered white matter lesions that could be vascular"
         - "No enhancement (monophasic presentation)"
+    body_imaging:
+      all_difficulties:
+        - "spine_MRI: short-segment (<2 vertebral bodies) peripheral cord lesions — favour MS over the longitudinally extensive lesion of NMOSD"
+        - "Cord involvement counts toward dissemination in space even when the brain study is equivocal"
         - "Findings overlap with migraine-related white matter changes"
         - "Lesion distribution atypical (mostly subcortical)"
     labs:
@@ -1867,10 +1876,13 @@ amyotrophic_lateral_sclerosis:
     sex_bias: "slight_male"
   encounter_type: "outpatient"
   # Clinical tool review, July 2026: specialized_test stays REQUIRED as EMG/NCS specifically;
-  # spinal imaging added as optional (body_imaging) to exclude cervical myelopathy and other
-  # mimics
-  required_modalities: [specialized_test, MRI, LABS]
-  optional_modalities: [CSF, body_imaging]
+  # spinal imaging added for cervical myelopathy and other mimics — as REQUIRED, not optional,
+  # because all 30 cases already required it: the cord was imaged as part of the brain MRI, marked
+  # by an `include_cervical_spine` annotation the brain tool has no parameter for and drops. So the
+  # exclusion of compressive myelopathy — the mimic that must be ruled out before a motor neuron
+  # disease diagnosis — was neither separately orderable nor scoreable.
+  required_modalities: [specialized_test, MRI, body_imaging, LABS]
+  optional_modalities: [CSF]
   key_findings:
     specialized_test:
       straightforward:

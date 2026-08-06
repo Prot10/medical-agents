@@ -21,14 +21,15 @@ electrodiagnostic equivalents of fibrillations under Awaji.
 
 **Required:**
 - `order_specialized_test` (`test_type: emg_ncs`) — bulbar + ≥2 spinal regions; documents LMN signs (fibs/PSWs, complex fasciculation potentials, reduced motor unit recruitment) [Awaji_2008]
-- `analyze_brain_mri` — exclude structural mimics (CSM, MS, brainstem tumor) [AAN_2009]
+- `analyze_brain_mri` — exclude an *intracranial* structural mimic (MS, brainstem tumour, multi-infarct disease) [AAN_2009]
+- `order_body_imaging` (`study: spine_MRI`) — cervical and thoracic cord, to exclude compressive myelopathy and radiculopathy. This is the mimic that must be excluded before a motor neuron disease diagnosis, and it is a **separate study**: it used to be carried as an `include_cervical_spine` annotation on the brain MRI, which the brain tool has no parameter for and drops, so the exclusion was neither orderable nor scoreable [AAN_2009]
 - `interpret_labs` (CK, B12, TSH, HbA1c, +/- HIV, RPR) — exclude reversible mimics; CK often elevated 2–5×ULN in ALS, >10× suggests myopathy [AAN_2009]
 - `search_medical_literature` — confirm diagnostic thresholds; document AAN practice parameter [AAN_2009]
 
 **Recommended:**
 - `order_specialized_test` (`test_type: respiratory_function`) — FVC + MIP/MEP at baseline (informs prognosis and riluzole timing) [AAN_2009]
 - `order_specialized_test` (`test_type: genetic_panel:ALS`) — when family history positive or young onset (<45) [Brown_2017]
-- MRI of cervical/lumbar spine within the brain MRI workflow — exclude radiculopathy mimicking LMN signs
+- `order_body_imaging` (`study: spine_MRI`, lumbar) — where the LMN signs are lumbosacral and a radiculopathy is the competing explanation. Never as a region annotation on the brain MRI
 
 **Optional:**
 - `check_drug_interactions` — if considering riluzole or edaravone

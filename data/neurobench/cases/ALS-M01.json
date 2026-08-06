@@ -98,17 +98,6 @@
           },
           "mass_effect": null,
           "borders": "Ill-defined"
-        },
-        {
-          "type": "Degenerative disc disease",
-          "location": "Cervical spine C3-C4 through C6-C7",
-          "size": "Multilevel",
-          "signal_characteristics": {
-            "T2": "Disc desiccation at C5-C6 and C6-C7",
-            "cord_signal": "No intrinsic cord T2 signal change"
-          },
-          "mass_effect": "Moderate foraminal narrowing C5-C6 bilaterally; mild-moderate central canal stenosis at C5-C6 (cord-CSF interface preserved)",
-          "borders": null
         }
       ],
       "volumetrics": null,
@@ -117,10 +106,9 @@
         "No white matter lesions to suggest demyelinating disease",
         "No enhancing lesions on post-gadolinium sequences",
         "Brainstem: no focal signal abnormality, normal size",
-        "Cerebellum: normal",
-        "MRI cervical spine: moderate multilevel spondylotic changes; central canal stenosis at C5-C6 does not cause cord signal change on current study"
+        "Cerebellum: normal"
       ],
-      "impression": "1. Subtle bilateral T2/FLAIR hyperintensity along the corticospinal tracts in the posterior limb of the internal capsule — differential includes wallerian degeneration, demyelination, or other primary white matter process. 2. Multilevel cervical spondylosis with moderate C5-C6 central canal stenosis; cord signal is preserved on current study. 3. No acute infarct, hemorrhage, mass, or enhancing lesion",
+      "impression": "1. Subtle bilateral T2/FLAIR hyperintensity along the corticospinal tracts in the posterior limb of the internal capsule — differential includes wallerian degeneration, demyelination, or other primary white matter process. 3. No acute infarct, hemorrhage, mass, or enhancing lesion",
       "recommended_actions": []
     },
     "labs": {
@@ -393,6 +381,26 @@
       "recommended_actions": [
         "Pulmonary function testing recommended."
       ]
+    },
+    "body_imaging": {
+      "region": "cervical and thoracic spine",
+      "modality": "MRI",
+      "contrast": false,
+      "findings": [
+        {
+          "type": "Degenerative disc disease",
+          "location": "Cervical spine C3-C4 through C6-C7",
+          "description": "{\"size\": \"Multilevel\", \"signal_characteristics\": {\"T2\": \"Disc desiccation at C5-C6 and C6-C7\", \"cord_signal\": \"No intrinsic cord T2 signal change\"}, \"mass_effect\": \"Moderate foraminal narrowing C5-C6 bilaterally; mild-moderate central canal stenosis at C5-C6 (cord-CSF interface preserved)\"}"
+        },
+        {
+          "type": "additional_observation",
+          "location": "spine",
+          "description": "MRI cervical spine: moderate multilevel spondylotic changes; central canal stenosis at C5-C6 does not cause cord signal change on current study"
+        }
+      ],
+      "measurements": null,
+      "impression": "2. Multilevel cervical spondylosis with moderate C5-C6 central canal stenosis; cord signal is preserved on current study.",
+      "recommended_actions": []
     }
   },
   "followup_outputs": [
@@ -799,7 +807,7 @@
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain brain MRI (with cervical spine sequences) to exclude structural mimics — cervical myelopathy, demyelination, brainstem tumor",
+        "action": "Obtain brain MRI to exclude an intracranial structural mimic — demyelination, brainstem tumour, multi-infarct disease",
         "tool_name": "analyze_brain_mri",
         "expected_finding": "No structural lesion explaining the motor/bulbar findings; corticospinal-tract signal change or non-specific findings may be seen but are not by themselves diagnostic",
         "category": "required",
@@ -810,8 +818,7 @@
             "FLAIR",
             "DWI",
             "T1+Gd"
-          ],
-          "include_cervical_spine": true
+          ]
         },
         "citation": "[AAN_2009]",
         "guideline_source": "AAN_2009"
@@ -922,6 +929,19 @@
         },
         "citation": "[AAN_2009]",
         "guideline_source": "AAN_2009"
+      },
+      {
+        "step": 9,
+        "action": "Obtain cervical and thoracic spine MRI to exclude compressive myelopathy and radiculopathy — the mimic that must be excluded before a motor neuron disease diagnosis",
+        "tool_name": "order_body_imaging",
+        "expected_finding": "Spondylotic change may be present but without cord signal change or a compressive lesion explaining the distribution of weakness, and never explaining upper- and lower-motor-neuron signs in three or more regions",
+        "category": "required",
+        "tool_parameters": {
+          "study": "spine_MRI",
+          "contrast": false
+        },
+        "citation": "[AAN_2009]",
+        "guideline_source": "AAN_2009"
       }
     ],
     "useless_tools": [
@@ -1012,8 +1032,8 @@
     "red_herrings": [
       {
         "data_point": "Moderate cervical spondylosis with C5-C6 central stenosis on brain/cervical MRI",
-        "location": "Initial MRI report",
-        "field_path": "initial_tool_outputs.mri.findings[1]",
+        "location": "Cervical spine MRI",
+        "field_path": "initial_tool_outputs.body_imaging.findings[0]",
         "intended_effect": "Anchors the agent on cervical myelopathy as the primary explanation, potentially deferring ALS workup or generating an inappropriate neurosurgical referral",
         "correct_interpretation": "Spondylosis is common in this age group, cord signal is preserved, and bulbar findings (tongue fasciculations, dysarthria) arise above the cervical cord — they cannot be explained by cervical disease"
       },

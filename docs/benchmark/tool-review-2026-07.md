@@ -316,6 +316,49 @@ in FND and receiving the EMG report.
 `report_panel_case_tiers.py` now prints the panel-versus-case gap on demand, so a tier change that
 drifts from the cases is visible instead of merely true.
 
+### Item 4: the spine hiding inside the brain, in 63 actions
+
+Reviewer 1 asked for brain **and spinal cord** MRI with an MS protocol. The note in this file said
+the spinal imaging existed and was simply not attached to MS. It was worse than that, and the same
+shape as the cardiac-syncope CT.
+
+All 30 MS cases already had two required MRI actions: the brain, and the cervico-thoracic cord. Both
+were `analyze_brain_mri{protocol: ms, contrast: true}`, the cord one marked by a
+`region: cervical_thoracic_spine` annotation the brain schema has no parameter for and drops. So the
+two actions had the **same action identity and collapsed into one**: imaging only the brain scored
+full required coverage for MS, and the cord study — which counts toward dissemination in space, and
+whose short-segment lesions are what separate MS from NMOSD — was unscoreable.
+
+Searching the whole dataset for that shape found it twice more:
+
+* **All 30 ALS cases** carried `include_cervical_spine: true` on the brain MRI, with the cervical
+  findings written into the brain report. So the exclusion of compressive myelopathy — the mimic
+  that must be ruled out before a motor neuron disease diagnosis — was neither separately orderable
+  nor scoreable. Split into a brain MRI and `order_body_imaging{spine_MRI}`, with the report's
+  cervical findings, observations and numbered impression clauses moved to the spine study.
+* **3 more**: a paraneoplastic chest-abdomen-pelvis CT on the head-CT tool in SE-P01 (missed by the
+  region-based sweep because it pinned no region at all), and a cord and a lumbosacral-plexus MRI on
+  the brain tool in two peripheral-neuropathy cases.
+
+Two other collision shapes came out of the same search, and were real:
+
+* **Nine ischaemic-stroke cases** ordered `MR_angiography` and then "considered" the same study
+  again. One study, two actions; the duplicate is gone.
+* **Six actions were attached to a tool that does not perform them** and so collapsed onto a real
+  study's identity: a benzodiazepine trial read on the ongoing EEG, continuing acyclovir filed as a
+  drug-interaction check, an extended lumbar drainage trial as a second CSF analysis, a bone-marrow
+  evaluation and a haematology consultation as literature searches. All are clinical actions with
+  `tool_name: null`, which is what that field is for.
+
+Guards added, both verified against a reintroduced defect: `ACTION_KEY_COLLISION` (scoped to tools
+that name a study — `search_medical_literature` and `check_drug_interactions` are excluded, since
+they cost nothing, have no discriminator, and "consulted the evidence" is fairly one act), and
+`REGION_NOT_INTRACRANIAL`, which keeps `region` usable for a real intracranial sub-region while
+refusing the values that smuggled a body study into a head order. `include_cervical_spine` is
+retired.
+
+Both panels now say what the cases do: cord MRI is REQUIRED for MS and for ALS, not optional.
+
 ### Remaining work
 
 **1. Redeploy the review app** — pair with sending the reply, since it changes what the

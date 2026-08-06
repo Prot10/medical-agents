@@ -115,7 +115,7 @@ costruzione.
 | RM funzionale e trattografia DTI | ❌ **non aggiunte come modalità** — le collocate nella pianificazione prechirurgica presso aree eloquenti: è una domanda operatoria, non diagnostica. Restano come annotazione di sequenza della RM encefalo, che è la sede corretta |
 | Imaging cardiaco di seconda linea (RM cardiaca, TC cardiaca, coronarografia) | ✅ **completato** — vedi §5.1 |
 | SPECT di perfusione (alternativa alla FDG-PET, AD/FTD) | ⚪ da valutare |
-| RM encefalo **e midollo** con protocollo SM | ⚪ da collegare — l'imaging spinale esiste, non è ancora agganciato alla SM |
+| RM encefalo **e midollo** con protocollo SM | ✅ **fatto** — e non era un collegamento: vedi §5.2 |
 
 ### 5.1 Imaging cardiaco di seconda linea — la sincope cardiaca, chiusa per intero ✅
 
@@ -169,6 +169,39 @@ vostra stessa direttiva**: 28 casi imponevano i laboratori *prima* del monitorag
 severità `hard`. Con i laboratori non più obbligatori, un agente che correttamente salta un
 pannello non mirato per andare al monitoraggio subiva una violazione. Rimosso nei 18 casi in
 cui il passo non è più obbligatorio, mantenuto dove un esame nominato apre la decisione.
+
+### 5.2 RM encefalo **e midollo** nella SM — e il midollo nascosto in 63 azioni ✅
+
+Avevate chiesto la RM dell'encefalo **e del midollo** con protocollo SM. Vi rispondiamo che c'era
+già, ma non nel senso che pensavamo: **tutti e 30 i casi di SM avevano già due azioni obbligatorie
+di RM**, encefalo e midollo cervico-dorsale — solo che entrambe erano `analyze_brain_mri` con lo
+stesso `protocol: ms`, e quella del midollo era marcata da un'annotazione `region` che lo schema
+del tool encefalo non ha e scarta.
+
+Conseguenza: **le due azioni avevano la stessa identità e collassavano in una**. Un agente che
+studiava solo l'encefalo prendeva la copertura piena dei required per la SM, e lo studio del
+midollo — che conta per la disseminazione nello spazio, e le cui lesioni corte sono ciò che separa
+la SM dalla NMOSD — era invalutabile.
+
+Cercando questa forma su tutti i 600 casi l'abbiamo trovata altre due volte:
+
+- **Tutti e 30 i casi di SLA** portavano `include_cervical_spine: true` sulla RM encefalo, con i
+  reperti cervicali scritti dentro il referto cerebrale. Quindi l'**esclusione della mielopatia
+  compressiva** — il mimico che va escluso prima di una diagnosi di malattia del motoneurone — non
+  era né ordinabile separatamente né valutabile. Ora sono due studi, con i reperti spinali spostati
+  nel referto del rachide.
+- **Altri 3 casi**: una TC torace-addome-pelvi paraneoplastica sul tool della TC cranio, e una RM
+  del midollo e una del plesso lombosacrale sul tool dell'encefalo.
+
+Nella stessa ricerca sono emerse due altre forme di collasso, entrambe reali: **9 casi di ictus**
+ordinavano l'angio-RM e poi «consideravano» lo stesso esame una seconda volta (un esame, due
+azioni), e **6 azioni erano attaccate a un tool che non le esegue** — un trial con benzodiazepina
+letto sull'EEG in corso, la prosecuzione dell'aciclovir come controllo di interazioni, un drenaggio
+lombare prolungato come seconda analisi del liquor, una biopsia osteomidollare e una consulenza
+ematologica come ricerche bibliografiche. Ora sono azioni cliniche senza tool.
+
+Due controlli automatici nuovi impediscono il ritorno di questa classe, ed entrambi i pannelli
+adesso dicono quello che i casi fanno: la RM del midollo è **obbligatoria** nella SM e nella SLA.
 
 ---
 

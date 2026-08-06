@@ -39,6 +39,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from neuroagent.evaluation.metrics import _action_key
 from neuroagent.tools.tool_registry import ToolRegistry
 from neuroagent.tools.vocabulary import (
     is_valid_assessment_type,
@@ -94,7 +95,7 @@ TOOL_TO_OUTPUT_FIELD: dict[str, str] = {
 # intent (which MRI sequences, which body region) that the tool does not take as an argument;
 # `CostTracker` ignores them. One canonical spelling each — that is the point of the list.
 ANNOTATION_KEYS: dict[str, set[str]] = {
-    "analyze_brain_mri": {"sequences", "region", "include_cervical_spine"},
+    "analyze_brain_mri": {"sequences", "region"},
     "analyze_eeg": {"duration", "indication", "video_eeg"},
     "analyze_csf": {"basic", "paired_serum", "opening_pressure", "xanthochromia",
                     "rbc_count", "spectrophotometry"},
@@ -103,6 +104,18 @@ ANNOTATION_KEYS: dict[str, set[str]] = {
     "order_echocardiogram": {"bubble_study"},
     "order_cardiac_monitoring": {"duration_days"},
     "interpret_labs": {"lab_type"},
+}
+
+# `region` stays allowed on the two head tools, because naming an intracranial sub-region is real
+# clinical intent — but only intracranial values. That annotation is how a spine or body study hid
+# inside a brain or head order: the schema has no region parameter, so it was silently dropped, the
+# action kept the brain study's identity, and 63 actions were in that state — all 30 MS cases (the
+# cord MRI the reviewers asked for by name), all 30 ALS cases (the cervical cord, whose compressive
+# myelopathy is the mimic that must be excluded before a motor neuron diagnosis), and 3 others. All
+# are `order_body_imaging` now, and `include_cervical_spine` is retired.
+INTRACRANIAL_REGIONS = {
+    "head", "head_neck", "brain", "brain_with_contrast", "skull_base", "posterior_fossa",
+    "cerebrum", "temporal_lobes", "pituitary", "orbits", "neck", "cervical_arteries",
 }
 
 LIKELIHOOD_ORDER = {"very_high": 0, "high": 1, "moderate": 2, "low": 3, "very_low": 4}
@@ -202,6 +215,19 @@ def _check_parameters(
             })
             continue
 
+        if key == "region" and tool in ("analyze_brain_mri", "order_ct_scan"):
+            if str(value) not in INTRACRANIAL_REGIONS:
+                issues.append({
+                    "code": "REGION_NOT_INTRACRANIAL", "section": section, "index": index,
+                    "tool": tool,
+                    "detail": (
+                        f"region=`{value}` is outside the head and neck, which this tool cannot "
+                        "image; the study belongs to order_body_imaging"
+                    ),
+                    "fix_class": "judgment",
+                })
+            continue
+
         catchall_key, is_valid = CATCHALL_PARAM.get(tool, (None, None))
         if key == catchall_key:
             if not is_valid(str(value)):
@@ -288,6 +314,41 @@ def validate_case(case: dict, schemas: dict[str, dict[str, Any]]) -> list[dict]:
                 "detail": f"useless `{tool}` has no fallback output; calling it errors instead of returning a normal result",
                 "fix_class": "judgment",
             })
+
+    # Two optimal actions with the same action key are ONE action to the metric layer: identical
+    # tool, identical discriminator. The case's author counted two required steps and the benchmark
+    # counts one, so the second study is unscoreable and an agent that skips it loses nothing.
+    #
+    # All 30 multiple-sclerosis cases were in this state: a brain MRI and a cervico-thoracic cord
+    # MRI, both `analyze_brain_mri{protocol: ms}`, the cord one carrying a `region` annotation the
+    # brain tool drops. The reviewers had asked for brain *and* cord imaging by name, and imaging
+    # only the brain scored full required coverage.
+    #
+    # `search_medical_literature` and `check_drug_interactions` are out of scope: they cost nothing,
+    # have no discriminator, and "consulted the evidence" is fairly one act however many queries it
+    # took. Everything that names a study is in scope.
+    _NOT_A_STUDY = {"search_medical_literature", "check_drug_interactions"}
+    by_key: dict[tuple, list[dict]] = {}
+    for action in gt.get("optimal_actions") or []:
+        tool = action.get("tool_name")
+        if not tool or tool in _NOT_A_STUDY or tool not in schemas:
+            continue
+        by_key.setdefault(
+            _action_key(tool, action.get("tool_parameters")), []
+        ).append(action)
+    for key, group in by_key.items():
+        if len(group) < 2:
+            continue
+        issues.append({
+            "code": "ACTION_KEY_COLLISION",
+            "section": "optimal_actions", "index": gt["optimal_actions"].index(group[1]),
+            "tool": key[0],
+            "detail": (
+                f"{len(group)} actions share one identity {key} — the metric counts them as one "
+                f"study: {[a['action'][:60] for a in group]}"
+            ),
+            "fix_class": "judgment",
+        })
 
     for i, constraint in enumerate(gt.get("sequence_constraints") or []):
         for key in ("before", "after"):
