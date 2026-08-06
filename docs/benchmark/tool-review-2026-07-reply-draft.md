@@ -60,6 +60,44 @@ clinica strutturata** (vedi punto 4), che copre i segni clinici positivi della F
 diagnosi diventa raggiungibile per via clinica, senza imaging — che è esattamente il
 percorso corretto.
 
+**E qui vi dobbiamo una precisazione, perché la vostra obiezione era più fondata di quanto la
+nostra risposta iniziale ammettesse.** Quando siamo andati a verificare i 30 casi abbiamo
+trovato che la scelta che vi stavamo comunicando era vera solo nella configurazione, non nei
+casi: **tutti e 30 richiedevano una RM encefalo con gadolinio e una batteria di laboratorio**,
+nessuno eseguiva l'esame dei segni funzionali, e nessuna azione in tutta la condizione era
+opzionale. Il percorso obbligatorio costava 1 303 EUR di media — più della meningite batterica
+(1 204) e della Guillain-Barré (1 223), due condizioni in cui indagare a fondo è doveroso. La
+condizione che doveva misurare l'astensione premiava l'opposto. E, cosa che ci preme più della
+metrica, quei tier scrivevano nel ground truth il modello «diagnosi per esclusione» che la
+letteratura sulla FND ha abbandonato.
+
+L'abbiamo corretto su tutti e 30 i casi:
+
+- **l'esame dei segni funzionali è l'atto obbligatorio** — con i segni che l'esame obiettivo di
+  ciascun caso già documentava: Hoover in 22 casi, entrainment del tremore in 9, dissociazione
+  sensitiva sulla linea mediana in 19, andatura trascinata in 12;
+- **la RM è opzionale** in 23 casi e raccomandata *una volta e senza contrasto* nei 7 in cui c'è
+  una domanda alternativa precisa (esordio focale acuto trattato come mimico di ictus, nuovo
+  deficit su SM o su malattia di Parkinson, paraplegia acuta, diplopia prima di accettare lo
+  spasmo di convergenza). Il gadolinio senza indicazione è esso stesso l'*overuse* che vogliamo
+  misurare;
+- **i laboratori sono opzionali** in 27 casi e ristretti agli analiti nominati nei 3 con un
+  mimico preciso (glicemia dopo una dose di insulina; elettroliti, magnesio e tiamina in un
+  vomito protratto con perdita di peso);
+- **EMG/NCS e potenziali evocati sono conteggiati come chiamate inutili** in tutti e 30: prima
+  erano vietati solo a parole, e ciò che non è misurato non è testato — è la stessa lezione del
+  punto 3;
+- risultato: negli 8 casi senza eventi paroxistici il percorso obbligatorio costa **138 EUR**,
+  il più economico dell'intero benchmark.
+
+**Una sola deroga alla vostra formulazione, e vi chiediamo se siete d'accordo.** Avete scritto
+«tutti i tool diagnostici opzionali»: abbiamo reso opzionale tutto tranne la **video-EEG nei 22
+casi con eventi**. Non ci sembra un esame di esclusione ma l'atto diagnostico positivo delle
+crisi non epilettiche psicogene — un evento abituale registrato senza correlato EEG è ciò che dà
+la certezza «documentata» secondo la Task Force ILAE 2013, e nessun segno da letto lo
+sostituisce; tutti e 30 i casi sono ricoveri fatti esattamente per quello. Se preferite che sia
+opzionale anche lì, la declassiamo.
+
 ## 3. Un errore nostro sul catalogo dei tool, di cui dovete sapere
 
 La piattaforma vi ha mostrato una versione **obsoleta** del catalogo. Per un bug nostro,

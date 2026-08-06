@@ -851,8 +851,28 @@ functional_neurological_disorder:
   # so the examination is the required act and every instrumental study is optional. NOT an empty
   # required set: that would leave required_coverage with a zero denominator. What separates a
   # good agent here is ground_truth.useless_tools and cost, not coverage
+  #
+  # Made true in the cases on 2026-08-06, because until then it was only true here. All 30 cases
+  # required a brain MRI *with gadolinium* and a laboratory battery, none called
+  # perform_clinical_assessment, and nothing anywhere in the condition was tiered optional -- so
+  # the gold workup cost 1303 EUR on average, more than bacterial meningitis, and the tiers
+  # encoded the discredited diagnosis-of-exclusion model. Now: the functional-signs examination
+  # is REQUIRED in all 30; MRI is OPTIONAL (RECOMMENDED, once and without contrast, in the 7
+  # cases with a specific alternative question); laboratories are OPTIONAL (RECOMMENDED and
+  # narrowed to named assays in the 3 with a targeted mimic). The required set costs 138 EUR in
+  # the 8 non-paroxysmal cases -- the cheapest correct workup in the benchmark.
+  #
+  # One deliberate departure from the reviewers' wording, flagged for their confirmation: video-EEG
+  # is REQUIRED, not optional, in the 22 cases with paroxysmal events. Capturing a habitual event
+  # without EEG correlate is the positive diagnostic act for psychogenic non-epileptic seizures
+  # (ILAE 2013 'documented' certainty), not an exclusion test, and no bedside sign substitutes for
+  # it. It stays in optional_modalities because it is conditional on the phenotype, not universal
+  # -- the same treatment as the conditionally required CSF in subarachnoid haemorrhage.
+  #
+  # EMG_NCS was removed from the optional list: the cases now score it as a useless call, and a
+  # panel that offers it as defensible while every case penalises it contradicts itself.
   required_modalities: [clinical_assessment]
-  optional_modalities: [EEG, MRI, LABS, ECG, EMG_NCS]
+  optional_modalities: [EEG, MRI, LABS, ECG]
   key_findings:
     eeg:
       all_difficulties:

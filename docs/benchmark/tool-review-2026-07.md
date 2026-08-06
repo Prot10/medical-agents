@@ -456,6 +456,66 @@ coverage guard sharp for every other case. The corpus was already due for regene
 required coverage of the existing traces fell to 0.566 when the required set became
 study-specific — and these cases are covered by that run.
 
+### FND: their option 2 was recorded, not implemented — now it is
+
+The register accepted their option 2 (keep FND, every diagnostic tool optional, scored on
+restraint) and `conditions.yaml` said so. The cases said the opposite, and the gap is worth
+recording because it is the same failure mode as the stale catalog: a decision that lives only in
+the place nobody scores.
+
+| | before | after |
+|---|---|---|
+| Cases requiring brain MRI **with gadolinium** | 30/30 | 0 — OPTIONAL in 23, RECOMMENDED once and without contrast in the 7 with a specific alternative question |
+| Cases requiring a laboratory battery | 30/30 | 0 — OPTIONAL in 27, RECOMMENDED and narrowed to named assays in 3 |
+| `perform_clinical_assessment` actions | 0 | 30/30, REQUIRED |
+| Actions tiered `optional` anywhere in the condition | 0 | present in every case |
+| EMG/NCS and evoked potentials | prohibited in prose only | scored `useless_tools` entries in all 30 |
+| Required-workup cost | 1 303 EUR mean, above bacterial meningitis (1 204) and Guillain-Barré (1 223) | **138 EUR** in the 8 non-paroxysmal cases and 1 242 in the 22 with events — against 2 426 EUR for the whole defensible path, which is the overuse gap the metric can now see |
+
+The examination report is built from each case's own examination text, so nothing is invented:
+Hoover sign was already documented in 22 cases, tremor entrainment in 9, midline-splitting
+sensory loss in 19, a dragging monoplegic gait in 12. Two cases had no limb sign to quote
+(FND-M04, FND-M06, both paroxysmal phenotypes); their assessment reports carry the event
+semiology instead and say explicitly that the positive diagnostic act for that phenotype is the
+recorded event, not a bedside sign.
+
+Beyond the metric, the old tiers wrote the discredited diagnosis-of-exclusion model into the
+ground truth: requiring imaging in every case is precisely what the FND literature argues against.
+Fixing the tiers removed a clinical error, not just a scoring one.
+
+Scoring EMG/NCS surfaced the same defect one layer down, in the trajectory corpus. Eighteen of the
+25 `order_specialized_test` calls across the FND gold trajectories carry a clinical context that
+asks for *functional signs* — "characterize atypical upward arm drift", "assess for positive
+non-organic examination signs" — while the parameter says `neuropsych_battery` or, in one case,
+`emg_ncs`. The teacher was reaching for the bedside examination and routing it through whichever
+tool existed, because none performed it. That is the reviewers' structural finding again, this time
+in the training data.
+
+One of the eighteen was scored as a useless call and is repaired here (FND-P08,
+`differential_reasoned`): the call becomes `perform_clinical_assessment{functional_neuro_signs}`,
+and the observation becomes the case's own report — the teacher's version had asserted a positive
+Hoover sign and distraction-induced improvement that FND-P08's examination does not document, so
+the following turn's reasoning is re-anchored on the two signs the case does record. The other
+seventeen are not scored as errors, because the battery is a legitimate optional study, but they
+teach the student to reach for a 1 104 EUR battery when the answer is an examination. That is a
+regeneration item, not a patch: **the corpus rewrite must route the functional-signs examination
+through `perform_clinical_assessment` in FND, and the cognitive screen likewise in the dementias,
+migraine and NPH.**
+
+The battery itself is now an explicit OPTIONAL action in all 30 cases with a report derived from
+each case's own history, which is also what un-bans `order_specialized_test` for the trajectory
+gate: that gate bans a tool by name unless the case's own `optimal_actions` name it, so condemning
+two of its studies had banned all of them.
+
+**One deliberate departure from their wording, flagged for confirmation** (§8.5 of the register):
+video-EEG is REQUIRED, not optional, in the 22 cases with paroxysmal events. A recorded habitual
+event without ictal EEG correlate is the positive diagnostic act for psychogenic non-epileptic
+seizures at the ILAE 2013 *documented* level of certainty; no bedside sign substitutes for it, and
+all 30 cases are inpatient admissions made for exactly that purpose. That keeps the required set
+at 1 242 EUR in those 22 cases, which is honest rather than tidy: restraint is not diagnostic
+nihilism. `EMG_NCS` was also removed from the panel's optional list, since a panel cannot offer as
+defensible what every case now scores as waste.
+
 ### Remaining work
 
 **1. Redeploy the review app** — pair with sending the reply, since it changes what the

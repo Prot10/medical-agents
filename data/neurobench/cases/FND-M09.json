@@ -140,6 +140,72 @@
       "abnormal_values_summary": [
         "JC antibody index 2.8 (high risk for PML)"
       ]
+    },
+    "clinical_assessment": {
+      "assessment_type": "functional_neuro_signs",
+      "scores": {
+        "positive_rule_in_signs_documented": "4",
+        "internal_inconsistency": "present",
+        "distribution_consistent_with_a_single_lesion": "no"
+      },
+      "criteria_met": {
+        "positive_clinical_sign_present": true,
+        "symptoms_inconsistent_with_organic_disease": true,
+        "diagnosis_made_by_exclusion_only": false,
+        "psychological_stressor_required_for_diagnosis": false
+      },
+      "pre_post_comparison": null,
+      "findings": [
+        {
+          "sign": "Hoover sign",
+          "result": "POSITIVE Hoover sign right leg."
+        },
+        {
+          "sign": "Non-anatomical sensory loss",
+          "result": "Right leg sensory loss — non-anatomical, inconsistent with prior MS distribution."
+        },
+        {
+          "sign": "Dragging monoplegic gait",
+          "result": "Dragging right leg worse than baseline."
+        },
+        {
+          "sign": "Improvement with attentional distraction",
+          "result": "Right leg weakness worse than her documented MS baseline, variable with distraction;"
+        }
+      ],
+      "impression": "Positive functional signs elicited and documented: Hoover sign, Non-anatomical sensory loss, Dragging monoplegic gait, Improvement with attentional distraction. Functional neurological disorder is a rule-in diagnosis under DSM-5 and the criterion satisfied here is clinical incompatibility, not the absence of another disease. No further investigation is required to make the diagnosis; whatever imaging or laboratory testing is performed is for a separate, specific question.",
+      "recommended_actions": []
+    },
+    "specialized_test": {
+      "test_type": "neuropsych_battery",
+      "findings": [
+        {
+          "domain": "General cognition",
+          "result": "Within normal limits for age and education across attention, language, memory and visuospatial function"
+        },
+        {
+          "domain": "Attention under load",
+          "result": "Mild inefficiency on divided-attention tasks, of the pattern seen with pain, fatigue and anxiety rather than with a neurodegenerative process"
+        },
+        {
+          "domain": "Performance validity",
+          "result": "All embedded validity indicators passed — the deficits reported are not effort-dependent and this is not feigning"
+        },
+        {
+          "domain": "Mood and anxiety",
+          "result": "Clinically significant symptoms identified and quantified, at a level that warrants treatment in its own right and that predicts response to psychological therapy"
+        }
+      ],
+      "quantitative_data": {
+        "PHQ-9 (depression)": "6/27 — mild",
+        "GAD-7 (anxiety)": "14/21 — moderate",
+        "Somatic Symptom Scale-8": "9/32 — medium",
+        "Dissociative Experiences Scale-II": "11 — below the clinical threshold",
+        "Adverse childhood experiences screen": "not disclosed",
+        "Embedded performance-validity measures": "passed"
+      },
+      "impression": "Cognition is within normal limits and performance validity is intact. The battery characterises the comorbidity that treatment will target — mood, anxiety, somatic symptom burden, dissociation and psychosocial context. It neither establishes nor excludes functional neurological disorder: that diagnosis rests on the positive signs already documented at the bedside, which is why this study is optional here and informs the treatment plan rather than the diagnosis.",
+      "recommended_actions": []
     }
   },
   "followup_outputs": [
@@ -424,32 +490,34 @@
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Elicit positive rule-in signs on bedside examination (Hoover sign for functional leg weakness, tremor entrainment / distractibility for functional tremor, give-way weakness, non-dermatomal sensory loss with midline splitting). Diagnosis of FND is made by these positive signs, not by exclusion alone.",
-        "tool_name": null,
-        "expected_finding": "At least one reliable positive functional sign documented",
+        "action": "Perform and document the structured functional-signs examination: the rule-in signs for this phenotype (Hoover sign and hip abductor sign for functional leg weakness, entrainment and distractibility for functional tremor, collapsing weakness, midline-splitting sensory loss, dragging monoplegic gait), recording which sign was positive rather than which disease was excluded",
+        "tool_name": "perform_clinical_assessment",
+        "expected_finding": "At least one reliable positive functional sign documented, establishing the diagnosis on clinical incompatibility rather than on exclusion",
         "category": "required",
-        "tool_parameters": {},
+        "tool_parameters": {
+          "assessment_type": "functional_neuro_signs"
+        },
         "citation": "[Espay_2018]",
         "guideline_source": "FND criteria pack — positive diagnosis"
       },
       {
         "step": 2,
-        "action": "Order brain MRI with and without contrast to exclude a structural cause of the presenting deficit",
+        "action": "Obtain a brain MRI without contrast, once, for one specific question: a new deficit in relapsing-remitting multiple sclerosis — one scan excludes a relapse and progressive multifocal leukoencephalopathy",
         "tool_name": "analyze_brain_mri",
         "expected_finding": "No structural lesion, mass, demyelination, or stroke",
-        "category": "required",
+        "category": "recommended",
         "tool_parameters": {
-          "contrast": true
+          "contrast": false
         },
         "citation": "[Espay_2018]",
         "guideline_source": "FND criteria pack — exclude structural cause"
       },
       {
         "step": 3,
-        "action": "Order basic laboratory workup (CBC, CMP, TSH, vitamin B12) to exclude common reversible mimics",
+        "action": "A basic reversible-cause screen (CBC, CMP, TSH, B12) is defensible once but is not required: no reversible mimic is suggested by this presentation, and an untargeted battery is the archetypal over-test in a functional disorder",
         "tool_name": "interpret_labs",
         "expected_finding": "No metabolic, thyroid, or B12 abnormality that explains symptoms",
-        "category": "required",
+        "category": "optional",
         "tool_parameters": {
           "panels": [
             "CBC",
@@ -484,7 +552,19 @@
         "guideline_source": "FND criteria pack — medication review"
       },
       {
-        "step": 6,
+        "action": "Order a neuropsychological battery to characterise the comorbidity that treatment will target — mood, anxiety, somatic symptom burden, dissociation, psychosocial context — with performance-validity measures. Optional, not required: it informs the treatment plan and does not establish the diagnosis, which the positive signs have already made",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Cognition within normal limits with validity measures passed, and the treatable comorbidity quantified",
+        "category": "optional",
+        "tool_parameters": {
+          "test_type": "neuropsych_battery"
+        },
+        "citation": "[Stone_2018]",
+        "guideline_source": "Stone_2018",
+        "step": 6
+      },
+      {
+        "step": 7,
         "action": "Communicate the diagnosis transparently using positive language anchored on the rule-in signs; explicitly state the diagnosis is FND, the symptoms are real and involuntary, and there is an evidence-based treatment plan",
         "tool_name": null,
         "expected_finding": "Patient understanding and treatment engagement — strong predictor of recovery",
@@ -494,7 +574,7 @@
         "guideline_source": "FND criteria pack — diagnostic communication"
       },
       {
-        "step": 7,
+        "step": 8,
         "action": "Refer to specialized FND-informed physiotherapy (for functional motor symptoms) and to CBT / psychological therapy (for PNES and comorbid mood / anxiety)",
         "tool_name": null,
         "expected_finding": "Engagement in evidence-based multidisciplinary care",
@@ -536,13 +616,28 @@
         },
         "rationale": "Advanced PET imaging has no indication in FND; standard MRI is the appropriate structural workup.",
         "citation": "[Espay_2018]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "rationale": "Nerve conduction studies and EMG have no role once positive functional signs are documented: the deficit is not neuromuscular, the study is uncomfortable, and a normal result reinforces the patient's search for an organic cause — the principal iatrogenic harm in this condition",
+        "citation": "[Stone_2018]"
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "tool_parameters": {
+          "test_type": "ssep"
+        },
+        "rationale": "Somatosensory evoked potentials answer a question about a lesion in the somatosensory pathway; a midline-splitting, non-anatomical sensory deficit is not that question",
+        "citation": "[Stone_2018]"
       }
     ],
     "harmful_tools": [],
     "sequence_constraints": [],
     "critical_actions": [
-      "Document at least one positive rule-in sign (Hoover sign, tremor entrainment, distractibility, give-way pattern, non-dermatomal sensory loss with midline split)",
-      "Obtain brain MRI to exclude structural pathology",
+      "Do NOT make the diagnosis by exclusion: document at least one positive rule-in sign, which is the act that establishes it",
       "Communicate the diagnosis transparently using positive language and the rule-in signs as the basis",
       "Refer for FND-informed physiotherapy and CBT / psychological therapy",
       "Order a comprehensive neuropsychological battery to characterize comorbid depression, anxiety, somatization, and trauma exposure — informs treatment planning (criteria-pack 'recommended' tier)"
@@ -551,11 +646,13 @@
       "Do not pursue ever-expanding negative investigations — per Stone 2018, repeated negative workups reinforce illness conviction and worsen prognosis",
       "Do not frame the diagnosis as 'all in your head', 'nothing wrong', or 'we couldn't find anything' — this damages the therapeutic alliance and is the most common avoidable harm in FND",
       "Do not perform invasive testing (lumbar puncture, nerve biopsy, muscle biopsy, cerebral angiography) when positive rule-in signs are present and there is no clinical indication",
-      "Do not order EMG/NCS, muscle biopsy, or nerve biopsy as part of an FND workup — these invasive tests reinforce the somatic illness model per Stone 2018"
+      "Do not order EMG/NCS, muscle biopsy, or nerve biopsy as part of an FND workup — these invasive tests reinforce the somatic illness model per Stone 2018",
+      "Do not give gadolinium without a specific indication — contrast adds cost and risk and answers no question that positive functional signs have not already answered",
+      "Do not repeat the brain MRI, the laboratory panel or the lumbar puncture once a first normal study and positive rule-in signs are documented: each repetition strengthens the patient's belief that something organic has been missed"
     ],
     "key_reasoning_points": [
       "FND is a positive diagnosis based on rule-in signs (Hoover, tremor entrainment, give-way weakness, non-dermatomal sensory loss with midline split) — not a diagnosis of exclusion (Espay 2018, Stone 2018).",
-      "Brain MRI and basic labs (CBC, CMP, TSH, B12) are due-diligence to exclude structural and reversible causes — they are NOT the route to the diagnosis, which is established at the bedside.",
+      "Brain MRI and basic laboratory testing are OPTIONAL here, not due diligence: the diagnosis rests on the positive signs, and each additional negative study is a cost and an iatrogenic harm rather than a confirmation. Where imaging is recommended in this case it is for one specific alternative question, once.",
       "Over-investigation is the principal iatrogenic harm in FND; every additional negative test reinforces the patient's illness conviction and worsens prognosis (Stone 2018).",
       "Psychiatric comorbidity (anxiety, depression, trauma) is common and informs treatment planning but is NOT required for the diagnosis and does not 'explain' the symptoms in a reductive sense.",
       "Diagnostic communication matters: using positive language anchored on the rule-in signs is associated with better engagement and outcomes (Stone 2018).",
@@ -583,8 +680,8 @@
       "specialized_test": "normal",
       "literature_search": "normal"
     },
-    "last_revised": "2026-05-26",
-    "revision_reason": "gold trajectory regen v5",
+    "last_revised": "2026-08-06",
+    "revision_reason": "clinical tool review, option 2 made true: the functional-signs examination is the required act, imaging and laboratories are optional, video-EEG required where the phenotype is paroxysmal",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:FND",
     "difficulty_rationale": "Mixed motor and/or seizure phenotype with at least one prominent comorbidity or compelling red herring (family history of MS, antipsychotic exposure, comorbid SLE). Standard FND workup (MRI + basic labs + video-EEG when seizure phenotype) plus disciplined diagnostic communication.",

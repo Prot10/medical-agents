@@ -21,15 +21,35 @@ non ancora implementata · ⚠️ modificata rispetto alla richiesta, serve conf
 | 1.4 | Aggiungere *Emorragia intracerebrale spontanea* | 🟡 accolta | Percorso terapeutico distinto (pressione, reversal, indicazione neurochirurgica): valuta decisioni diverse da ictus ischemico ed ESA |
 | 1.5 | Aggiungere *Encefalite erpetica* | 🟡 accolta | Completa il capitolo infezioni SNC e mette alla prova la tempestività della terapia empirica con aciclovir |
 | 1.6 | Rimuovere la *FND* (vostra prima opzione) | ❌ **non accolta** | Vedi 1.7. È l'unica decisione in cui andiamo contro la vostra preferenza dichiarata |
-| 1.7 | Tenere la FND con tutti i tool opzionali (vostra seconda opzione) | ✅ accolta | Il *diagnostic overuse* è un obiettivo del progetto: il tracciamento dei costi su tariffe di riferimento è una delle nostre metriche principali. La FND è la sola condizione in cui il comportamento corretto è astenersi; senza di lei non possiamo rispondere alla domanda "l'agente sa quando *non* indagare?". La vostra obiezione (diagnosi puramente clinica, nessun tool diagnostico) è risolta dal nuovo tool di valutazione clinica: i segni positivi — Hoover, entrainment — rendono la diagnosi raggiungibile senza imaging, che è il percorso corretto |
+| 1.7 | Tenere la FND con tutti i tool opzionali (vostra seconda opzione) | ✅ **completata nei casi** | Il *diagnostic overuse* è un obiettivo del progetto: il tracciamento dei costi su tariffe di riferimento è una delle nostre metriche principali. La FND è la sola condizione in cui il comportamento corretto è astenersi; senza di lei non possiamo rispondere alla domanda "l'agente sa quando *non* indagare?". La vostra obiezione (diagnosi puramente clinica, nessun tool diagnostico) è risolta dal nuovo tool di valutazione clinica: i segni positivi — Hoover, entrainment — rendono la diagnosi raggiungibile senza imaging, che è il percorso corretto |
 
 **Esito:** 23 patologie invece di 20. Aggiungiamo la DLB *e* teniamo la FND, quindi non
 perdiamo nulla di quanto avete proposto.
 
-Nota tecnica su 1.7: i tool diagnostici sono tutti opzionali, ma la valutazione clinica
-resta **required**. Un insieme di richiesti vuoto lascerebbe la metrica di copertura con
-denominatore zero e assegnerebbe lo stesso punteggio a qualunque agente. Ciò che distingue
-un buon agente qui è il non ordinare esami inutili e il costo, non la copertura.
+### 1.7bis — La scelta era registrata ma non implementata: ora lo è (2026-08-06)
+
+Vale la pena dirlo per come lo abbiamo trovato, perché la vostra obiezione era più fondata di
+quanto la nostra prima risposta ammettesse. Il pannello diceva già «esame clinico obbligatorio,
+strumentale tutto opzionale». I 30 casi dicevano il contrario:
+
+| | prima | ora |
+|---|---|---|
+| Casi che richiedevano la RM encefalo **con gadolinio** | 30 / 30 | 0 — opzionale in 23, raccomandata *una volta e senza contrasto* nei 7 con una domanda alternativa precisa |
+| Casi che richiedevano una batteria di laboratorio | 30 / 30 | 0 — opzionale in 27, raccomandata e ristretta ad analiti nominati nei 3 con un mimico preciso |
+| Azioni `perform_clinical_assessment` | 0 | **30 / 30, obbligatoria** — con i segni positivi che l'esame di ciascun caso già documentava (Hoover in 22, entrainment in 9, dissociazione sensitiva sulla linea mediana in 19, andatura trascinata in 12) |
+| Azioni al tier `optional` in tutta la condizione | 0 | presenti in tutti i casi |
+| EMG/NCS e potenziali evocati | vietati solo a parole | **conteggiati come chiamate inutili** in tutti e 30 |
+| Costo del percorso obbligatorio | 1 303 EUR di media, più della meningite batterica (1 204) | **138 EUR** negli 8 casi senza eventi — il percorso corretto più economico di tutto il benchmark |
+
+Al di là della metrica, i tier di prima scrivevano nel ground truth il modello «diagnosi per
+esclusione», che la letteratura ha abbandonato: la FND si diagnostica per segni positivi.
+Correggendoli non abbiamo piegato la clinica alla metrica: abbiamo tolto un errore clinico.
+
+Nota tecnica: la valutazione clinica resta **required** e un insieme di richiesti vuoto
+lascerebbe la copertura con denominatore zero, assegnando lo stesso punteggio a qualunque
+agente. Ciò che distingue un buon agente qui è il non ordinare esami inutili e il costo, non la
+copertura. **Una sola deroga alla vostra formulazione**, con la motivazione clinica, al punto 5
+del §8: la video-EEG resta obbligatoria dove ci sono eventi da registrare.
 
 ---
 
@@ -301,3 +321,12 @@ ed era quella che il ground truth confrontava.
    nell'encefalopatia epatica, ma 27 e 30 casi rispettivamente la richiedono — nella meningite
    come esclusione di massa prima della rachicentesi. Se siete d'accordo la portiamo a
    obbligatoria condizionale in entrambe.
+5. **Una deroga alla vostra formulazione sulla FND, e la ragione.** Avete scritto «tutti i tool
+   diagnostici opzionali». Abbiamo reso opzionale tutto lo strumentale tranne uno: la
+   **video-EEG resta obbligatoria nei 22 casi su 30 con eventi paroxistici**. Non la
+   consideriamo un esame di esclusione ma *l'atto diagnostico positivo* delle crisi non
+   epilettiche psicogene: registrare un evento abituale senza correlato EEG è ciò che dà la
+   certezza «documentata» secondo la Task Force ILAE 2013, e nessun segno clinico da letto lo
+   sostituisce. Nei 30 casi si tratta di ricoveri fatti esattamente per quello. Negli altri 8
+   casi, dove non ci sono eventi da registrare, la video-EEG non compare. Se preferite che sia
+   opzionale anche lì, la declassiamo: è una riga di configurazione e 22 casi.
