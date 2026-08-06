@@ -131,9 +131,17 @@ Ci scusiamo: parte del vostro lavoro è stata spesa su un quadro incompleto per 
 
 Accolte. In sintesi:
 
-- **18 cambi di tier** (required ↔ optional) e **6 rimozioni** applicate integralmente
-  (EEG ed ECG da SM e Parkinson, ECG da emicrania, AD e meningite batterica). Le altre 7
-  richieste di rimozione le abbiamo declassate a opzionali: vedi il punto 5.
+- **I 18 cambi di tier e le 6 rimozioni: applicati al pannello di generazione, e su questo
+  dobbiamo essere precisi con voi.** Il tier che il benchmark misura sta nel singolo caso, non
+  nel pannello, e la propagazione ai 600 casi è ancora parziale: al momento sono arrivate ai casi
+  la sincope (tutti e 30, vedi il punto 5) e la TC nell'ictus ischemico. Le altre restano nel
+  pannello — la rachicentesi nella SM è ancora obbligatoria in 29 casi, i laboratori sono ancora
+  obbligatori in 30 casi di Parkinson, 30 di NPH e 30 di epilessia temporale, la RM encefalo in
+  30 casi di ictus, la TC in 30 di encefalopatia epatica; e il monitoraggio cardiaco nella GBS,
+  che ci avete chiesto di rendere obbligatorio, nei casi è raccomandato. Le stiamo propagando
+  condizione per condizione con la stessa procedura usata per la sincope, che è l'unica in cui
+  la propagazione è completa e verificata. Le 6 rimozioni sono applicate; le altre 7 richieste di
+  rimozione le abbiamo declassate a opzionali: vedi il punto 5.
 - **Quattro nuovi tool**, per colmare i vuoti reali che restano dopo la correzione del
   catalogo. Il problema di fondo che avete individuato è che l'agente può guardare solo
   l'encefalo e non può prelevare campioni:

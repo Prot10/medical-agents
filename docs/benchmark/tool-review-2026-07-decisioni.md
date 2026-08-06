@@ -63,6 +63,45 @@ del §8: la video-EEG resta obbligatoria dove ci sono eventi da registrare.
 | Riscritture delle descrizioni | 37 | ⚪ accolte, non ancora inserite — vanno nel *ground truth* e nella griglia di valutazione, non nella descrizione del tool (§6) |
 | Note di conferma senza modifica | 11 | ✅ nulla da fare |
 
+### 2bis. ⚠️ Stato reale della propagazione dei tier ai 600 casi (verificato 2026-08-06)
+
+Il tier che la metrica legge è `ground_truth.optimal_actions[].category` **nel caso**.
+`conditions.yaml` è l'input di generazione e alimenta il catalogo che vedete voi. Aver cambiato
+solo il secondo significa aver cambiato ciò che si legge, non ciò che si misura.
+
+| Richiesta | Nei casi oggi | Propagata |
+|---|---|---|
+| SM: liquor → opzionale | obbligatorio in 29 | ❌ |
+| Emicrania: RM → opzionale | obbligatoria in 15, raccomandata in 5 | ⚠️ metà |
+| Emicrania: laboratori → opzionale | obbligatori in 4 | ❌ |
+| Parkinson: laboratori → opzionale | obbligatori in 30 | ❌ |
+| NPH: laboratori → opzionale | obbligatori in 30 | ❌ |
+| Epilessia temporale: laboratori → opzionale | obbligatori in 30 | ❌ |
+| Sincope: laboratori → opzionale | raccomandati in 19, obbligatori in 11 | ⚠️ in corso |
+| FTD: imaging avanzato → opzionale | misto | ⚠️ |
+| Ictus: RM → opzionale | obbligatoria in 30 | ❌ |
+| Encefalopatia epatica: EEG → opzionale | raccomandato in 23 | ⚠️ |
+| Encefalopatia epatica: TC → opzionale | obbligatoria in 30 | ❌ |
+| ESA: liquor → obbligatorio condizionale | presente in 3 casi su 30 | ❌ |
+| Ictus: TC → obbligatoria | obbligatoria | ✅ |
+| GBS: monitoraggio cardiaco → obbligatorio | raccomandato in 30 | ❌ |
+| Sincope: monitoraggio cardiaco → obbligatorio | obbligatorio in 30 | ✅ |
+
+**La conseguenza peggiore, e la ragione per cui l'abbiamo trovato:** nell'emicrania il
+declassamento è stato applicato a metà dei casi e l'atto che doveva sostituirlo — l'anamnesi
+strutturata ICHD-3, che il Revisore 1 indica come *l'unico* esame davvero obbligatorio per questa
+condizione — non è presente in nessuno dei 30. In quei 15 casi l'insieme obbligatorio contiene
+soltanto i due tool a costo zero (ricerca in letteratura e controllo interazioni): un agente
+ottiene **copertura dei required 1.0 senza compiere un solo atto diagnostico**.
+
+Perché i gate di rilascio non lo vedevano: `validate_cases.py` e `check_perfect_agent.py`
+verificano ogni caso *al proprio interno* — che le sue azioni siano rispondibili e che un agente
+perfetto arrivi a 1.0. Nessuno dei due confronta un caso con il pannello della sua condizione.
+L'unico strumento che lo fa, `report_panel_case_tiers.py`, è un report e non un gate: 211 azioni
+obbligatorie da pannello sono assenti dai casi (120 valutazioni cliniche fra Alzheimer, FTD,
+emicrania e NPH; 30 diagnosi istologiche nel glioma; 30 monitoraggi cardiaci nella GBS; 29
+rachicentesi fra ESA e meningite).
+
 ---
 
 ## 3. Sei richieste già soddisfatte: era un bug nostro
