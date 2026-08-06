@@ -238,35 +238,7 @@
         "Anti-AChR negative"
       ]
     },
-    "ct": {
-      "findings": [
-        {
-          "type": "No recurrent NSCLC",
-          "location": "Right lung, prior surgical site",
-          "size": null,
-          "density": null,
-          "description": "Post-surgical changes right upper lobe from prior lobectomy. No new pulmonary mass or nodule. No hilar adenopathy."
-        },
-        {
-          "type": "No mediastinal mass",
-          "location": "Mediastinum",
-          "size": null,
-          "density": null,
-          "description": "No thymoma, no mediastinal adenopathy."
-        }
-      ],
-      "contrast_used": true,
-      "angiography_findings": null,
-      "additional_observations": [
-        "No new lung parenchymal lesion",
-        "COPD emphysema present",
-        "No pleural effusion"
-      ],
-      "impression": "CT chest: No evidence of NSCLC recurrence at prior surgical site. Post-surgical changes right upper lobe. No new pulmonary mass or hilar adenopathy. No mediastinal mass. Standard CT has limited sensitivity for small lung primary tumors. Recommend PET-CT if clinical concern for occult malignancy persists",
-      "recommended_actions": [
-        "PET-CT if clinical concern for occult malignancy persists"
-      ]
-    },
+    "ct": null,
     "eeg": null,
     "mri": null,
     "ecg": null,
@@ -274,7 +246,44 @@
     "cardiac_monitoring": null,
     "advanced_imaging": null,
     "literature_search": null,
-    "drug_interactions": null
+    "drug_interactions": null,
+    "body_imaging": {
+      "region": "mediastinum",
+      "modality": "CT",
+      "contrast": true,
+      "findings": [
+        {
+          "type": "No recurrent NSCLC",
+          "location": "Right lung, prior surgical site",
+          "description": "Post-surgical changes right upper lobe from prior lobectomy. No new pulmonary mass or nodule. No hilar adenopathy."
+        },
+        {
+          "type": "No mediastinal mass",
+          "location": "Mediastinum",
+          "description": "No thymoma, no mediastinal adenopathy."
+        },
+        {
+          "type": "additional_observation",
+          "location": "mediastinum",
+          "description": "No new lung parenchymal lesion"
+        },
+        {
+          "type": "additional_observation",
+          "location": "mediastinum",
+          "description": "COPD emphysema present"
+        },
+        {
+          "type": "additional_observation",
+          "location": "mediastinum",
+          "description": "No pleural effusion"
+        }
+      ],
+      "measurements": null,
+      "impression": "CT chest: No evidence of NSCLC recurrence at prior surgical site. Post-surgical changes right upper lobe. No new pulmonary mass or hilar adenopathy. No mediastinal mass. Standard CT has limited sensitivity for small lung primary tumors. Recommend PET-CT if clinical concern for occult malignancy persists",
+      "recommended_actions": [
+        "PET-CT if clinical concern for occult malignancy persists"
+      ]
+    }
   },
   "followup_outputs": [
     {
@@ -476,7 +485,18 @@
       "special_tests": {},
       "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
     },
-    "ct": null,
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [
+        "No acute intracranial haemorrhage",
+        "No mass, midline shift or hydrocephalus",
+        "Grey-white differentiation preserved"
+      ],
+      "impression": "No acute intracranial abnormality. Normal study, and it does not address the question this patient's workup turns on.",
+      "recommended_actions": []
+    },
     "echo": {
       "chambers": {
         "LV": "normal size and systolic function",
@@ -588,13 +608,12 @@
       {
         "step": 3,
         "action": "CT chest with contrast for occult SCLC (most common LEMS-associated malignancy)",
-        "tool_name": "order_ct_scan",
+        "tool_name": "order_body_imaging",
         "expected_finding": "May be negative initially — SCLC can be small; PET-CT recommended if standard CT non-diagnostic",
         "category": "required",
         "tool_parameters": {
-          "region": "chest",
-          "contrast": true,
-          "indication": "occult_SCLC_screening"
+          "study": "mediastinum_CT",
+          "contrast": true
         },
         "citation": "[Gilhus_2016]",
         "guideline_source": "Gilhus_2016"
@@ -719,7 +738,7 @@
       {
         "data_point": "CT chest negative for NSCLC recurrence at prior surgical site; no new mass",
         "location": "CT chest",
-        "field_path": "initial_tool_outputs.ct.impression",
+        "field_path": "initial_tool_outputs.body_imaging.impression",
         "intended_effect": "Rule out malignancy and miss occult new SCLC.",
         "correct_interpretation": "Standard CT has limited sensitivity for small lung primaries; LEMS often precedes radiographic SCLC by months — PET-CT is required and surveillance continues for up to 2 years."
       },

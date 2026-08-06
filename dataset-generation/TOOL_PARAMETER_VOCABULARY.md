@@ -37,6 +37,17 @@ vocabulary-constrained in the same way, but their parameters are still checked:
 * an enum-typed parameter (`analyze_brain_mri.protocol`, `analyze_eeg.eeg_type`,
   `order_cardiac_monitoring.monitor_type`, …) must carry a legal value.
 
+Two rules the whole laboratory vocabulary rests on:
+
+* **One assay, one name.** `costs.yaml` may price several spellings of a name (`D-dimer` /
+  `D_dimer`) and several *names* for one assay (`syphilis` / `RPR`, `paraneoplastic` /
+  `paraneoplastic_panel`). `normalize_analyte()` folds both, so the score and the bill read them as
+  one; `_ANALYTE_SYNONYMS` holds the second kind. Ground truth should use the canonical name — the
+  one `lab_panels()` advertises.
+* **One study, one tool.** Blood, urine and ascitic-fluid microbiology is
+  `order_microbiology`, never an `interpret_labs` panel. Pricing the same study under two tools let
+  either satisfy the ground truth.
+
 `analyze_csf` deserves a note: `costs.yaml` prices the LP procedure together with cell count,
 protein and glucose inside `analyze_csf.base`, and bills each entry of `special_tests`
 separately. Put the always-done panel in the `basic` annotation and only billable assays in
@@ -139,6 +150,7 @@ studies at different prices.
 | `pelvis_abdomen_CT` / `_MRI` / `_ultrasound` | Pelvic + abdominal imaging | Ovarian teratoma in anti-NMDAR encephalitis; portosystemic shunts in refractory hepatic encephalopathy |
 | `chest_CT` | Thoracic CT | Lung parenchyma, an intrathoracic mass |
 | `chest_CTA` | Thoracic CT angiography | Pulmonary embolism, aortic dissection, when either must be confirmed or excluded rapidly. `order_ct_scan` images the head and neck only and cannot answer this |
+| `chest_abdomen_pelvis_CT` | Staging / occult-primary CT, one acquisition | Paraneoplastic tumour search (anti-NMDAR, anti-Hu); excluding an extracranial primary before calling a lesion a primary brain tumour |
 | `mediastinum_CT` / `_MRI` | Anterior mediastinum | Thymoma / thymic hyperplasia in myasthenia gravis — chest radiograph does not substitute |
 | `spine_MRI` / `_CT` | Spinal cord and column | Cord compression, transverse myelitis, spinal tumour — the mimics of ascending flaccid weakness |
 | `peripheral_nerve_MRI` / `_ultrasound` | Nerve / nerve root | Root enhancement, nerve enlargement (GBS vs acute-onset CIDP) |

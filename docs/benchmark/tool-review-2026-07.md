@@ -280,6 +280,42 @@ and `validate_cases.py` does not check either, by design. The syncope labs entry
 place where the gap produced the behaviour a reviewer had explicitly objected to, which is why
 it was closed there and nowhere else.
 
+### The same defect classes, swept across all 600 cases
+
+Cardiac syncope is one condition of twenty, and it was the only one audited at close range.
+Running its four defect classes over the whole dataset found each of them again, in numbers. All
+are now closed. None of them broke a gate: `validate_cases.py` checks that ground truth is legal
+and reachable, not that it names the study it means.
+
+| Defect | Scale | Resolution |
+|---|---|---|
+| A study priced under two tools | blood cultures under `interpret_labs` *and* `order_microbiology`; 123 laboratory actions in 108 cases ordering blood, urine or ascitic-fluid microbiology through the laboratory tool | All on `order_microbiology`. 43 reports already existed as `interpret_labs` follow-ups — organism, bottles, susceptibility — and were transplanted, not reinvented |
+| The head-CT tool asked to image a body region | 89 actions: myasthenia 30 (mediastinum), anti-NMDAR 30 (teratoma search), glioma 27 (staging), status epilepticus 2. `order_ct_scan` has no region parameter, so its discriminators were identical to a head-and-neck study | All on `order_body_imaging`, with `chest_abdomen_pelvis_CT` added as the single study it actually is. Reports moved with the actions; 6 were authored from the cases' own stated findings; 33 gold-trajectory calls retargeted with their tool responses |
+| Required labs / CSF actions naming no assay | 246, so any call satisfied them and the per-study scoring was inert exactly where the reviewers aimed | 153 pinned from the assays their own text names. 95 left as wildcards on purpose — an `analyze_csf` answered by the always-reported cell count and protein has no sub-selection to make |
+| Two priced names for one assay that did not compare equal | `syphilis` in 30 actions vs `RPR` in 118; paraneoplastic 37 vs 1; liver function 33 vs 2; inflammatory bundle 31 vs 1 | `normalize_analyte` resolves synonyms as well as spellings, and 69 case terms were rewritten to the canonical name. `lactate` and `ABG` are priced — 100+ actions named them and no agent could order either |
+| An aggregate label required while the finding names its components | 31 actions requiring `inflammatory_markers` while the expected finding names procalcitonin and CRP, so an agent ordering precisely the right assay failed | Replaced by the components. Where the case names no component (GBS and 3 others) the bundle label is what it means and stays |
+| A `hard` sequence constraint on a prerequisite the case does not require | 8: five gating a lumbar puncture on imaging the case only recommended, three gating drug selection on an ECG — one case never ordering it at all | Prerequisites raised to required; the four hepatic MRIs promoted from their fallback (a normal scan is the case truth and is what the gate needs), and three status-epilepticus ECGs authored, since the generic normal fallback contradicted a patient on amiodarone and one at potassium 6.8. New `SEQ_PREREQ_NOT_REQUIRED` check |
+
+Two closed a gap that was on the handover list as case-authoring work: the missing
+`order_microbiology` step in bacterial meningitis and hepatic encephalopathy (60 cases) and the
+missing `order_body_imaging` step in myasthenia and anti-NMDAR (60) **already existed, on the
+wrong tool**. Required steps still absent from cases: 240, down from 360 —
+`perform_clinical_assessment` 150, `obtain_tissue_diagnosis` 30, `analyze_csf` 29 in SAH,
+`order_cardiac_monitoring` 30 in GBS, and one echo.
+
+**And the MockServer was answering one question with another study's report.** A tool that stands
+in for several studies served whatever it had stored: a cardiac PET for a brain FDG order, a blood
+culture for an ascitic-fluid order, a tilt-table report for an ergometry request. It now checks the
+discriminator, and prefers the follow-up that *is* the study asked for — the token matcher scored
+trigger slugs, and family tokens like `pet` are not discriminating. The guard applies only where
+the stored report itself speaks the closed vocabulary, and only where variants answer different
+questions; `order_cardiac_monitoring` is exempt, because a 48-hour and a 24-hour recording report
+the same rhythm. It immediately found two gold trajectories ordering a neuropsychological battery
+in FND and receiving the EMG report.
+
+`report_panel_case_tiers.py` now prints the panel-versus-case gap on demand, so a tier change that
+drifts from the cases is visible instead of merely true.
+
 ### Remaining work
 
 **1. Redeploy the review app** — pair with sending the reply, since it changes what the

@@ -307,6 +307,32 @@ def validate_case(case: dict, schemas: dict[str, dict[str, Any]]) -> list[dict]:
                 "fix_class": "deterministic" if removed else "judgment",
             })
 
+        # A `hard` constraint is a safety gate: the metric counts a violation whenever the
+        # dependent step is taken and the prerequisite was not. If the prerequisite is not itself
+        # `required` in this case, the gold workup contradicts itself, and an agent that correctly
+        # skips an optional study is penalised for it. Found in 8 cases — 5 gating a lumbar
+        # puncture on imaging the case only recommended, and 3 gating drug selection on an ECG one
+        # case never ordered at all. It is also how 28 cardiac-syncope cases would have penalised
+        # an agent for skipping the untargeted laboratory panel the reviewers told us to demote.
+        if constraint.get("severity") == "hard":
+            prerequisite = constraint.get("before")
+            tiers = {
+                action.get("category")
+                for action in gt.get("optimal_actions") or []
+                if action.get("tool_name") == prerequisite
+            }
+            if prerequisite in schemas and "required" not in tiers:
+                issues.append({
+                    "code": "SEQ_PREREQ_NOT_REQUIRED",
+                    "section": "sequence_constraints", "index": i, "tool": prerequisite,
+                    "detail": (
+                        f"hard constraint gates `{constraint.get('after')}` on `{prerequisite}`, "
+                        f"which this case marks {sorted(tiers) or ['absent']} — raise it to "
+                        "required or soften the constraint"
+                    ),
+                    "fix_class": "judgment",
+                })
+
     # A stored output keyed to a tool nobody can call is unreachable. Removing it can drop a
     # case below the followup-count floor, so a human decides: re-key it or drop it.
     for i, followup in enumerate(case.get("followup_outputs") or []):

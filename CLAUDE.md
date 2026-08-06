@@ -64,13 +64,15 @@ and the literature-aligned evaluation; `docs/training/distillation.md` for traje
   so a term cannot exist without a price. `order_advanced_imaging` takes `modality` (17 values,
   including the second-line cardiac studies);
   `order_specialized_test` takes `test_type` (19 + `genetic_panel:<panel>`); `order_body_imaging` takes
-  `study` (11, `<region>_<modality>`); `order_microbiology` takes `specimen` (5); `obtain_tissue_diagnosis`
+  `study` (12, `<region>_<modality>`); `order_microbiology` takes `specimen` (5); `obtain_tissue_diagnosis`
   takes `procedure` (3) + `molecular_assays` (11); `perform_clinical_assessment` takes `assessment_type` (4).
   `order_echocardiogram`, `analyze_eeg` and `analyze_brain_mri` were the last three enums written by
   hand in their tool class; they now derive from `costs.yaml` too. `order_ct_scan` images the head and
   neck only — a thoracic, abdominal or spinal CT is `order_body_imaging`.
-  `interpret_labs.panels` (154) and `analyze_csf.special_tests` (22) are advisory, not closed — an unlisted
-  assay runs at the default rate.
+  `interpret_labs.panels` (139 advertised, aliases collapsed) and `analyze_csf.special_tests` (22) are advisory, not closed — an unlisted
+  assay runs at the default rate. `normalize_analyte()` resolves synonyms as well as spellings, so
+  `syphilis` and `RPR` are one assay to the score and to the bill; blood cultures live only under
+  `order_microbiology`, never under `interpret_labs`.
   The review app mirrors these schemas in `review_api/services/tool_io.py` because `tools/` is not deployed
   to the review VPS; `tests/test_tool_io_schemas.py` fails CI if the mirror drifts. It did, silently, and the
   clinical reviewers assessed a stale catalog — see `docs/benchmark/tool-review-2026-07.md`.

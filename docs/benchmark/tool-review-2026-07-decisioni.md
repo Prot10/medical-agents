@@ -213,6 +213,32 @@ Per trasparenza.
 
 ---
 
+## 7bis. Quello che la sincope ha fatto emergere su tutto il dataset
+
+La sincope era una patologia su venti, ed è l'unica che avevamo esaminato da vicino. Abbiamo
+passato le sue classi di difetto su tutti i 600 casi e le abbiamo ritrovate tutte. Sono chiuse.
+Nessuna faceva cadere un controllo automatico: i controlli verificano che il *ground truth* sia
+legale e raggiungibile, non che nomini l'esame che intende.
+
+| Difetto | Quanto | Cosa abbiamo fatto |
+|---|---|---|
+| Le emocolture erano prezzate sotto **due** tool | 123 azioni in 108 casi ordinavano emocolture, urinocoltura o paracentesi attraverso il tool dei laboratori | Tutte su `order_microbiology`. 43 referti colturali esistevano già come follow-up dei laboratori — germe, flaconi, antibiogramma — e sono stati trasferiti, non reinventati |
+| Il tool della TC cranio usato per torace/addome/pelvi | 89 azioni: miastenia 30 (mediastino), NMDAR 30 (ricerca del teratoma), glioma 27 (stadiazione), stato epilettico 2 | Tutte su `order_body_imaging`. Come per la sincope: quel tool non ha un parametro di regione, quindi quelle azioni erano indistinguibili da uno studio cranio-cervicale |
+| Azioni di laboratorio/liquor obbligatorie che **non nominavano alcun esame** | 246 — qualunque chiamata al tool le soddisfaceva, quindi il punteggio per singolo esame era inerte proprio dove il vostro rilievo mirava | 153 vincolate agli esami che il loro stesso testo nomina. 95 restano volutamente generiche: un liquor la cui risposta è nella conta cellulare e nelle proteine, sempre refertate, non ha una sotto-scelta da fare |
+| Due nomi prezzati per lo stesso esame che non si confrontavano uguali | `syphilis` in 30 azioni contro `RPR` in 118; pannello paraneoplastico 37 contro 1 | Risolti a un nome canonico: 69 termini riscritti. `lactate` e `ABG` ora sono prezzati — oltre 100 azioni li nominavano e nessun agente poteva chiederli |
+| L'etichetta aggregata obbligatoria mentre il referto atteso nomina i componenti | 31 azioni chiedevano «indici di infiammazione» mentre l'atteso nomina procalcitonina e PCR: **un agente che ordinava esattamente l'esame giusto sbagliava** | Sostituita dai componenti. Dove il caso non nomina componenti (GBS) l'etichetta aggregata è ciò che intende e resta |
+| Un vincolo `hard` su un prerequisito che il caso non richiede | 8 casi — cinque subordinavano la rachicentesi a un imaging solo raccomandato, tre la scelta del farmaco a un ECG che un caso non ordinava mai | Prerequisiti portati a obbligatori, con i referti mancanti scritti. Nuovo controllo automatico che impedisce il ripetersi |
+
+Due di queste chiudono un pezzo di lavoro che avevamo in lista come «casi da scrivere»: il passo
+di microbiologia mancante in meningite ed encefalopatia epatica (60 casi) e l'imaging corporeo
+mancante in miastenia e NMDAR (60) **c'erano già, sul tool sbagliato**.
+
+**Un ultimo difetto, sul simulatore.** Un tool che sta per più studi restituiva quello che aveva
+in archivio: una PET cardiaca a chi ordinava una PET cerebrale, un'emocoltura a chi chiedeva il
+liquido ascitico, un tilt-table a chi chiedeva un test ergometrico. Ora controlla il discriminante.
+
+---
+
 ## 8. Da confermare
 
 1. Le sette rimozioni declassate a opzionale (§4).
@@ -221,3 +247,8 @@ Per trasparenza.
    senza review.
 3. I pannelli delle quattro nuove patologie: li prepariamo noi dalle linee guida che avete
    citato e li trovate in piattaforma insieme ai casi.
+4. Due tier di pannello che i casi contraddicono in modo sistematico, e che secondo noi sono i
+   pannelli a sbagliare: la **TC cranio** è opzionale nella meningite batterica e
+   nell'encefalopatia epatica, ma 27 e 30 casi rispettivamente la richiedono — nella meningite
+   come esclusione di massa prima della rachicentesi. Se siete d'accordo la portiamo a
+   obbligatoria condizionale in entrambe.

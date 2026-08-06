@@ -35,7 +35,7 @@ list, which reported legal values as illegal:
 | --- | --- | --- |
 | `order_advanced_imaging` | `modality` | 17 (`amyloid_PET`, `tau_PET`, `FDG_PET`, `amino_acid_PET`, `cardiac_FDG_PET`, `DaTscan`, `MIBG_scan`, `perfusion_MRI`, `CT_perfusion`, `cardiac_MRI`, `coronary_CTA`, `coronary_angiography`, `MR_spectroscopy`, `MR_angiography`, `MR_venography`, `carotid_duplex`, `transcranial_doppler`) |
 | `order_specialized_test` | `test_type` | 21, plus `genetic_panel:<panel>` for 15 panels |
-| `order_body_imaging` | `study` | 11 (`<region>_<modality>` over pelvis/abdomen, chest, mediastinum, spine, peripheral nerve) |
+| `order_body_imaging` | `study` | 12 (`<region>_<modality>` over pelvis/abdomen, chest, chest-abdomen-pelvis, mediastinum, spine, peripheral nerve) |
 | `order_microbiology` | `specimen` | 5 |
 | `obtain_tissue_diagnosis` | `procedure` | 3 (`resection`, `stereotactic_biopsy`, `lymph_node_biopsy`), plus 11 molecular assays |
 | `perform_clinical_assessment` | `assessment_type` | 4 |
