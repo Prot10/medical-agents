@@ -39,7 +39,7 @@ strumentale tutto opzionale». I 30 casi dicevano il contrario:
 | Azioni `perform_clinical_assessment` | 0 | **30 / 30, obbligatoria** — con i segni positivi che l'esame di ciascun caso già documentava: Hoover in 23, miglioramento con distrazione in 20, cedimento in 17, andatura trascinata in 16, incoerenza al riesame in 15, dissociazione non anatomica in 14, sulla linea mediana in 10, entrainment in 9. Nei 3 casi puramente parossistici il referto porta la semeiologia dell'evento |
 | Azioni al tier `optional` in tutta la condizione | 0 | presenti in tutti i casi |
 | EMG/NCS e potenziali evocati | vietati solo a parole | **conteggiati come chiamate inutili** in tutti e 30 |
-| Costo del percorso obbligatorio | 1 303 EUR di media, più della meningite batterica (1 204) | **138 EUR** negli 8 casi senza eventi — il percorso corretto più economico di tutto il benchmark |
+| Costo del percorso obbligatorio | 1 303 EUR di media, più della meningite batterica (1 204) | **138 EUR** negli 8 casi senza eventi e 1 242 nei 22 con eventi, contro 2 426 EUR del percorso difendibile completo: è quel divario che la metrica di *overuse* ora vede |
 
 Al di là della metrica, i tier di prima scrivevano nel ground truth il modello «diagnosi per
 esclusione», che la letteratura ha abbandonato: la FND si diagnostica per segni positivi.

@@ -33,7 +33,11 @@ preserved awareness, prolonged duration with normal post-ictal state.
 > none performed a structured functional-signs examination, and nothing was tiered optional.
 > Beyond the metric, that encoded the discredited diagnosis-of-exclusion model. **The required
 > act is now the examination.** In the 8 non-paroxysmal cases the whole required workup costs
-> 138 EUR, the cheapest correct workup in the benchmark.
+> 138 EUR — the cheapest *fully specified* pathway in the benchmark. It is not the numerically
+> lowest: 15 migraine-with-aura cases require nothing that costs anything, because their only
+> required acts are the two zero-cost tools and the ICHD-3 structured history the reviewers named
+> as that condition's one true required test is still absent from the cases. That is a hole to fix
+> in migraine, not a virtue to claim here.
 
 **Required:**
 - `perform_clinical_assessment` (`assessment_type: functional_neuro_signs`) — the diagnostic act.

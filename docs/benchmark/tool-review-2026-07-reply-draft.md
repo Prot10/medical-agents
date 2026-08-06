@@ -91,8 +91,9 @@ L'abbiamo corretto su tutti e 30 i casi:
 - **EMG/NCS e potenziali evocati sono conteggiati come chiamate inutili** in tutti e 30: prima
   erano vietati solo a parole, e ciò che non è misurato non è testato — è la stessa lezione del
   punto 3;
-- risultato: negli 8 casi senza eventi paroxistici il percorso obbligatorio costa **138 EUR**,
-  il più economico dell'intero benchmark.
+- risultato: negli 8 casi senza eventi parossistici il percorso obbligatorio costa **138 EUR** e
+  nei 22 con eventi 1 242 EUR, contro **2 426 EUR** del percorso difendibile completo: è quel
+  divario che rende misurabile l'*overuse*, non il costo assoluto.
 
 **Una sola deroga alla vostra formulazione, e vi chiediamo se siete d'accordo.** Avete scritto
 «tutti i tool diagnostici opzionali»: abbiamo reso opzionale tutto tranne la **video-EEG nei 22

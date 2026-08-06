@@ -602,5 +602,27 @@ uv run python -m neuroagent.training.data.build_grpo_dataset --split test \
   --output data/neurobench/grpo/test_prompts.jsonl
 ```
 
+**7. Migraine's required set is vacuous, and the FND pass is what exposed it.** Measuring the FND
+required pathway made the comparison possible: **15 of the 30 migraine-with-aura cases have a
+required workup that costs nothing**, because their only required tool calls are the two zero-cost
+universal tools (`search_medical_literature`, `check_drug_interactions`). An agent scores 1.0
+required coverage in those cases without performing a single diagnostic act. This is the same defect
+FND had, one step worse, and it is Reviewer 1's own annotation: the ICHD-3 structured history is the
+*only* true required test for this condition, `perform_clinical_assessment
+{structured_headache_history_ichd3}` exists and is priced at 138 EUR, and no case calls it. Fixing it
+is the migraine slice of item 4 above and should be done in the same shape as the FND pass.
+
+**8. The GRPO prompt datasets were broken, not merely stale, and are now renamed.** The 2026-08-05
+build referenced 30 deleted `PERI-NEURO` cases (28 train, 2 test) and lacked the 30 new vascular
+dementia ones. They are preserved as `*.stale-2026-08-05.jsonl` so the training script fails to find
+its input rather than silently using a broken one, `data/neurobench/grpo/README.md` records why, and
+`agent-platform/tests/test_grpo_prompt_dataset.py` now fails if a present artifact disagrees with the
+split. Regeneration needs the training extra and a tokenizer.
+
+**9. One reviewer annotation is now orphaned, by design.** Reviewer 1's `SOSTITUIRE PATOLOGIA` on
+`condition_tool:peripheral_neuropathy:interpret_labs` points at a condition that no longer exists in
+the catalog, because we did what it asked. The annotation file is untouched — it is their record, not
+ours to rewrite — and the catalog simply no longer has a row to render it against.
+
 **6. Re-baseline.** `clinical_reward.py` feeds `(action_precision + action_recall)/2` into
 GRPO, so every published number and trained adapter predates the scoring fix.
