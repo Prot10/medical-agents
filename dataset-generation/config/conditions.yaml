@@ -380,9 +380,16 @@ syncope_cardiac:
   # Clinical tool review, July 2026: cardiac_monitoring optional->REQUIRED (the only test
   # producing symptom-rhythm correlation; ESC 2018 Class I in high-risk patients); LABS
   # required->optional (low yield unless clinically suggested); advanced cardiac imaging added as
-  # optional
+  # optional. Applied to the 30 cases in a second pass: the untargeted thyroid and natriuretic
+  # peptide assays left the required panel (TSH 29 cases -> 4, BNP 27 -> 3) and the labs step
+  # is `required` only in the 11 cases where a named assay drives a decision.
+  # body_imaging and tissue_diagnosis are optional at panel level because they belong to
+  # specific mechanisms, not to the condition: thoracic CT angiography when a pulmonary
+  # embolism presents as syncope (SYNC-CARD-RM04, where it was previously requested through the
+  # head-CT tool), nodal biopsy when a granulomatous infiltration must be confirmed
+  # histologically (SYNC-CARD-RP05, previously a referral with no callable act).
   required_modalities: [ECG, echo, cardiac_monitoring]
-  optional_modalities: [LABS, EEG, MRI, advanced_imaging]
+  optional_modalities: [LABS, EEG, MRI, advanced_imaging, body_imaging, tissue_diagnosis]
   key_findings:
     ecg:
       straightforward:
@@ -398,12 +405,15 @@ syncope_cardiac:
         - "Intermittent PVCs only"
         - "Arrhythmia not captured (paroxysmal)"
     labs:
+      # Order on a specific suspicion, not as a routine battery (ESC 2018 section 4.1.1).
+      # A natriuretic peptide may support the identification of structural heart disease but
+      # does not establish the cause of the syncope, and untargeted thyroid, inflammatory,
+      # autoimmune and paraneoplastic panels have no established role here.
       all_difficulties:
-        - "CBC: normal"
-        - "BMP: electrolytes normal (rules out metabolic cause)"
-        - "Glucose: normal"
+        - "CBC: normal — haemoglobin excludes haemorrhage"
+        - "BMP: electrolytes and glucose normal (rules out metabolic cause)"
         - "Troponin: normal or mildly elevated"
-        - "BNP: may be elevated if underlying heart failure"
+        - "Magnesium: low where a diuretic or a QT mechanism is in play"
     eeg:
       all_difficulties:
         - "Normal EEG — no epileptiform abnormalities"
@@ -413,6 +423,13 @@ syncope_cardiac:
       all_difficulties:
         - "Normal brain MRI (if performed)"
         - "No acute intracranial pathology"
+    body_imaging:
+      all_difficulties:
+        - "chest_CTA: normal pulmonary arteries, no dissection (when a thoracic cause is excluded)"
+        - "OR: intraluminal filling defects with an RV:LV ratio above 1.0 when a pulmonary embolism is the mechanism"
+    tissue_diagnosis:
+      all_difficulties:
+        - "lymph_node_biopsy: non-necrotising granulomas with negative mycobacterial and fungal stains, when a granulomatous infiltration is the substrate"
   differential_diagnoses:
     - diagnosis: "Epileptic seizure"
       key_distinguishing: "Epileptiform EEG, post-ictal confusion >5min, tongue bite, urinary incontinence"

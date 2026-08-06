@@ -409,7 +409,7 @@
       "trigger_action": "request_fdg_pet_cardiac",
       "tool_name": "order_advanced_imaging",
       "output": {
-        "modality": "FDG_PET",
+        "modality": "cardiac_FDG_PET",
         "tracer_or_protocol": "18F-FDG cardiac PET/CT with high-fat/low-carbohydrate dietary preparation to suppress physiological myocardial glucose uptake",
         "findings": [
           {
@@ -495,6 +495,44 @@
           "Inhaled corticosteroid (e.g., budesonide/formoterol) for asthma may be preferred over frequent albuterol use given ventricular arrhythmia risk; reassess respiratory management",
           "Methotrexate as steroid-sparing agent for long-term sarcoidosis management (per cardiology/rheumatology guidance)"
         ]
+      }
+    },
+    {
+      "trigger_action": "request_lymph_node_biopsy",
+      "tool_name": "obtain_tissue_diagnosis",
+      "output": {
+        "procedure": "lymph_node_biopsy",
+        "site": "Right hilar (station 10R) and right paratracheal (station 4R) lymph nodes, sampled by endobronchial ultrasound-guided transbronchial needle aspiration",
+        "specimen_adequate": true,
+        "integrated_diagnosis": "Non-necrotising granulomatous lymphadenitis, consistent with sarcoidosis in this clinical and imaging context",
+        "histological_diagnosis": "Multiple well-formed non-necrotising (non-caseating) epithelioid granulomas with Langhans-type multinucleated giant cells and a peripheral lymphocytic cuff; no necrosis",
+        "who_grade": null,
+        "molecular_findings": null,
+        "diagnosis_suffix": null,
+        "findings": [
+          {
+            "stain": "Ziehl-Neelsen (AFB)",
+            "result": "Negative"
+          },
+          {
+            "stain": "Grocott methenamine silver / PAS (fungi)",
+            "result": "Negative"
+          },
+          {
+            "stain": "Mycobacterial and fungal culture",
+            "result": "No growth at 6 weeks"
+          },
+          {
+            "stain": "Flow cytometry and cytology",
+            "result": "No lymphoproliferative disorder; no malignant cells"
+          },
+          {
+            "stain": "Polarised light",
+            "result": "No foreign material or berylliosis-type inclusions"
+          }
+        ],
+        "impression": "Non-necrotising granulomatous inflammation of the hilar and paratracheal lymph nodes with negative mycobacterial and fungal stains and cultures and no evidence of malignancy. Together with the myocardial FDG uptake and the high-grade AV block, this satisfies histological confirmation of extracardiac sarcoidosis in a patient with cardiac involvement, without requiring endomyocardial biopsy.",
+        "recommended_actions": []
       }
     }
   ],
@@ -649,17 +687,15 @@
       },
       {
         "step": 2,
-        "action": "Labs: CBC, BMP, glucose, troponin, BNP, beta-hCG, TSH, ACE, calcium, CRP, ESR, ANA, RF",
+        "action": "Targeted laboratory studies: CBC, BMP (electrolytes and glucose), troponin, beta-hCG, ACE, calcium, CRP, ESR, ANA, rheumatoid factor",
         "tool_name": "interpret_labs",
-        "expected_finding": "Normal ACE (key trap — does NOT exclude sarcoidosis), borderline low TSH (distractor), normal troponin/BNP; ACE within normal range in up to 50% of cardiac sarcoidosis",
+        "expected_finding": "Normal ACE (the key trap — a normal value does NOT exclude sarcoidosis, being within range in up to half of cardiac sarcoidosis); calcium and inflammatory markers documented; troponin normal",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
             "troponin",
-            "BNP",
-            "TSH",
             "beta-hCG",
             "ACE",
             "calcium",
@@ -703,7 +739,7 @@
         "expected_finding": "Focal patchy myocardial FDG uptake in basal anteroseptal and mid-inferior segments plus bilateral hilar and mediastinal lymph node hypermetabolism — characteristic pattern for active cardiac sarcoidosis",
         "category": "required",
         "tool_parameters": {
-          "modality": "FDG_PET"
+          "modality": "cardiac_FDG_PET"
         },
         "citation": "[EGSYS_2008]",
         "guideline_source": "HRS 2017 Expert Consensus (cardiac sarcoidosis) — cited via EGSYS_2008 as closest available pack citation; see metadata.citation_gap"
@@ -740,11 +776,14 @@
       },
       {
         "step": 9,
-        "action": "Arrange tissue diagnosis (bronchoscopy with lymph node biopsy for histopathologic confirmation)",
-        "tool_name": null,
-        "expected_finding": "Non-caseating granulomas confirm sarcoidosis histologically; extracardiac biopsy preferred over endomyocardial biopsy given patchy distribution",
+        "action": "Obtain histological confirmation by EBUS-transbronchial needle aspiration of the FDG-avid hilar and paratracheal lymph nodes — the low-risk extracardiac route, preferred over endomyocardial biopsy",
+        "tool_name": "obtain_tissue_diagnosis",
+        "expected_finding": "Non-necrotising (non-caseating) granulomatous inflammation with negative stains and cultures for mycobacteria and fungi, establishing extracardiac sarcoidosis",
         "category": "required",
-        "tool_parameters": {},
+        "tool_parameters": {
+          "procedure": "lymph_node_biopsy",
+          "site": "right hilar and paratracheal lymph nodes (EBUS-TBNA)"
+        },
         "citation": "[ACC_AHA_HRS_2017]",
         "guideline_source": "ACC/AHA/HRS 2017 §5"
       }

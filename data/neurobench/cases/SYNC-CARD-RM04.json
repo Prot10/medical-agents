@@ -407,8 +407,11 @@
     },
     {
       "trigger_action": "request_ct_pulmonary_angiogram",
-      "tool_name": "order_ct_scan",
+      "tool_name": "order_body_imaging",
       "output": {
+        "region": "chest",
+        "modality": "CT angiography",
+        "contrast": true,
         "findings": [
           {
             "type": "pulmonary_embolism",
@@ -429,25 +432,62 @@
             "type": "pleural_finding",
             "location": "bilateral",
             "description": "Small bilateral pleural effusions, right greater than left."
+          },
+          {
+            "type": "vascular_detail",
+            "location": "right main pulmonary artery",
+            "description": "Intraluminal filling defect, near-occlusive"
+          },
+          {
+            "type": "vascular_detail",
+            "location": "left main pulmonary artery",
+            "description": "Intraluminal filling defect, partially occlusive"
+          },
+          {
+            "type": "vascular_detail",
+            "location": "lobar and segmental branches bilateral",
+            "description": "Filling defects extending to at least 6 segmental branches"
+          },
+          {
+            "type": "vascular_detail",
+            "location": "interventricular septum",
+            "description": "Bowing leftward consistent with RV pressure overload"
+          },
+          {
+            "type": "vascular_detail",
+            "location": "IVC and hepatic veins",
+            "description": "Contrast reflux indicating elevated right-sided pressures"
+          },
+          {
+            "type": "additional_observation",
+            "location": "thorax",
+            "description": "No pneumothorax"
+          },
+          {
+            "type": "additional_observation",
+            "location": "thorax",
+            "description": "No mediastinal mass or lymphadenopathy"
+          },
+          {
+            "type": "additional_observation",
+            "location": "thorax",
+            "description": "No acute aortic pathology"
+          },
+          {
+            "type": "additional_observation",
+            "location": "thorax",
+            "description": "Trace bilateral pleural effusions"
+          },
+          {
+            "type": "additional_observation",
+            "location": "thorax",
+            "description": "Right lower lobe peripheral opacity: pulmonary infarct cannot be excluded"
           }
         ],
-        "contrast_used": true,
-        "angiography_findings": {
-          "right_main_pulmonary_artery": "Intraluminal filling defect, near-occlusive",
-          "left_main_pulmonary_artery": "Intraluminal filling defect, partially occlusive",
-          "lobar_and_segmental_branches_bilateral": "Filling defects extending to at least 6 segmental branches",
-          "RV_LV_diameter_ratio": "1.3 (enlarged RV, axial images)",
-          "interventricular_septum": "Bowing leftward consistent with RV pressure overload",
-          "IVC_and_hepatic_veins": "Contrast reflux indicating elevated right-sided pressures",
-          "estimated_obstruction_index": "45-50%"
+        "measurements": {
+          "RV:LV diameter ratio (axial)": "1.3 (enlarged RV, axial images)",
+          "Estimated pulmonary artery obstruction index": "45-50%"
         },
-        "additional_observations": [
-          "No pneumothorax",
-          "No mediastinal mass or lymphadenopathy",
-          "No acute aortic pathology",
-          "Trace bilateral pleural effusions",
-          "Right lower lobe peripheral opacity: pulmonary infarct cannot be excluded"
-        ],
         "impression": "1. Acute bilateral pulmonary embolism involving the right and left main pulmonary arteries with extension to lobar and segmental branches. Estimated pulmonary artery obstruction index 45-50%. 2. CT signs of right ventricular strain: RV:LV diameter ratio 1.3, leftward interventricular septal bowing, IVC contrast reflux. 3. Right lower lobe peripheral wedge opacity — pulmonary infarct or atelectasis cannot be distinguished on imaging alone. 4. Small bilateral pleural effusions.",
         "recommended_actions": []
       }
@@ -593,7 +633,19 @@
       "special_tests": {},
       "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
     },
-    "ct": null,
+    "ct": {
+      "findings": [],
+      "contrast_used": false,
+      "angiography_findings": null,
+      "additional_observations": [
+        "No acute intracranial haemorrhage",
+        "No skull fracture; no scalp haematoma",
+        "No mass, midline shift, or hydrocephalus",
+        "Grey-white differentiation preserved; no large-territory infarct"
+      ],
+      "impression": "No acute intracranial abnormality and no traumatic finding. Normal study; it does not address the cause of the syncopal episode.",
+      "recommended_actions": []
+    },
     "echo": null,
     "cardiac_monitoring": null,
     "advanced_imaging": null,
@@ -702,9 +754,9 @@
       },
       {
         "step": 2,
-        "action": "Labs: CBC, BMP, glucose, troponin, BNP, D-dimer, beta-hCG, coagulation",
+        "action": "Targeted laboratory studies: CBC, BMP (electrolytes and glucose), troponin, BNP, D-dimer, coagulation, beta-hCG",
         "tool_name": "interpret_labs",
-        "expected_finding": "Markedly elevated D-dimer (8.4 mg/L FEU), elevated troponin I (0.18 ng/mL) and BNP (412 pg/mL) indicating PE with myocardial strain; beta-hCG negative",
+        "expected_finding": "Markedly elevated D-dimer (8.4 mg/L FEU), with elevated troponin I (0.18 ng/mL) and BNP (412 pg/mL) placing this at intermediate-high risk by ESC 2019 criteria; beta-hCG negative",
         "category": "required",
         "tool_parameters": {
           "panels": [
@@ -712,7 +764,7 @@
             "BMP",
             "troponin",
             "BNP",
-            "D-dimer",
+            "D_dimer",
             "coagulation",
             "beta-hCG"
           ]
@@ -735,14 +787,12 @@
       {
         "step": 4,
         "action": "CT pulmonary angiogram (CTPA) to confirm PE and assess clot burden",
-        "tool_name": "order_ct_scan",
+        "tool_name": "order_body_imaging",
         "expected_finding": "Bilateral intraluminal filling defects in main, lobar, and segmental pulmonary arteries; CT RV strain signs (RV:LV ratio 1.3, septal bowing, IVC reflux)",
         "category": "required",
         "tool_parameters": {
-          "contrast": true,
-          "indication": "Suspected pulmonary embolism",
-          "angiography": true,
-          "region": "chest"
+          "study": "chest_CTA",
+          "contrast": true
         },
         "citation": "[ESC_2018]",
         "guideline_source": "ESC 2018 §5.1"
@@ -822,8 +872,8 @@
     "sequence_constraints": [
       {
         "before": "analyze_ecg",
-        "after": "order_ct_scan",
-        "reason": "S1Q3T3 pattern on ECG is a key signal triggering PE workup and CTPA ordering; ECG must precede confirmatory imaging in the diagnostic chain.",
+        "after": "order_body_imaging",
+        "reason": "S1Q3T3 pattern on ECG is a key signal triggering PE workup and CT pulmonary angiography; ECG must precede confirmatory imaging in the diagnostic chain.",
         "citation": "[ESC_2018]",
         "severity": "hard"
       },
