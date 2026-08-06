@@ -30,7 +30,7 @@ The two catchall tools stand in for many studies, selected by one parameter:
 
 | Tool | Parameter | Values |
 | --- | --- | --- |
-| `order_advanced_imaging` | `modality` | 12 (`amyloid_PET`, `tau_PET`, `FDG_PET`, `DaTscan`, `MIBG_scan`, `perfusion_MRI`, `cardiac_MRI`, `MR_spectroscopy`, `MR_angiography`, `MR_venography`, `carotid_duplex`, `transcranial_doppler`) |
+| `order_advanced_imaging` | `modality` | 14 (`amyloid_PET`, `tau_PET`, `FDG_PET`, `amino_acid_PET`, `DaTscan`, `MIBG_scan`, `perfusion_MRI`, `CT_perfusion`, `cardiac_MRI`, `MR_spectroscopy`, `MR_angiography`, `MR_venography`, `carotid_duplex`, `transcranial_doppler`) |
 | `order_specialized_test` | `test_type` | 21, plus `genetic_panel:<panel>` for 15 panels |
 
 ## What a case may write in `tool_parameters`

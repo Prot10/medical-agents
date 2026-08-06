@@ -303,12 +303,19 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                 "type": "string",
                 "description": (
                     "Imaging modality. 'amyloid_PET'/'tau_PET': Alzheimer biomarkers. "
-                    "'FDG_PET': glucose metabolism (dementia pattern, tumor grading). "
-                    "'DaTscan': dopamine transporter (parkinsonian syndromes). "
-                    "'MIBG_scan': cardiac sympathetic denervation (PD vs MSA). "
-                    "'perfusion_MRI': cerebral blood flow. 'MR_spectroscopy': metabolites. "
+                    "'FDG_PET': glucose metabolism (dementia pattern); NOT an adequate "
+                    "tracer for a primary brain tumour. 'amino_acid_PET': 11C-methionine or "
+                    "18F-FET — separates active tumour from necrosis or treatment effect and "
+                    "targets biopsy at the most aggressive area. 'DaTscan': dopamine "
+                    "transporter (parkinsonian syndromes). 'MIBG_scan': cardiac sympathetic "
+                    "denervation (PD vs MSA, Lewy body disease). 'perfusion_MRI': cerebral "
+                    "blood flow and rCBV. 'CT_perfusion': core-to-penumbra quantification "
+                    "for tissue-based stroke selection outside the standard time window. "
+                    "'MR_spectroscopy': metabolites, including 2-hydroxyglutarate. "
                     "'MR_angiography'/'MR_venography': arterial / venous sinus imaging. "
-                    "'carotid_duplex': carotid stenosis. 'transcranial_doppler': vasospasm."
+                    "'cardiac_MRI': myocardial tissue characterisation with late gadolinium "
+                    "enhancement. 'carotid_duplex': carotid stenosis. "
+                    "'transcranial_doppler': vasospasm."
                 ),
             },
         },

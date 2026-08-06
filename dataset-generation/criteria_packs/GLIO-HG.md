@@ -23,12 +23,14 @@ grades 3-4 (IDH-mutant astrocytoma CNS WHO grade 3, glioblastoma; note "anaplast
 - `analyze_brain_mri` (with and without gadolinium contrast; include diffusion, FLAIR) — characterize lesion, edema, mass effect, enhancement pattern [Stupp_2005]
 - `interpret_labs` (CBC, CMP, coagulation; type & screen pre-op) — anticipated surgery, possibly steroids
 - `search_medical_literature` — WHO classification, Stupp protocol, surgical referral criteria
-- Specialist referral *(clinical action — `tool_name: null`, no tool call)* — neurosurgery + neuro-oncology REQUIRED for tissue diagnosis and treatment planning
+- `obtain_tissue_diagnosis` (`procedure: resection` where maximal safe resection is feasible given site and clinical condition, else `stereotactic_biopsy`; with the molecular assays that change management) — REQUIRED. Entity, CNS WHO grade and treatment branch all follow from tissue; with imaging and labs alone the pathway can only reach a suspicion, which WHO CNS5 labels NOS. Management without tissue is reserved for very exceptional situations (prohibitive operative risk, or a large lesion of typical appearance with rapid deterioration and very unfavourable prognosis) [WHO_2021]
+- Specialist referral *(clinical action — `tool_name: null`, no tool call)* — neurosurgery + neuro-oncology for treatment planning
 
 **Recommended:**
 - `order_advanced_imaging` (`modality: perfusion_MRI`) — high rCBV supports high-grade; useful when biopsy planning targeted to highest-grade region [Law_2003]
 - `order_advanced_imaging` (`modality: MR_spectroscopy`) — elevated Cho/NAA + lipid-lactate peaks support malignancy; differentiates from radiation necrosis post-treatment [Bulik_2013]
-- `analyze_brain_mri` (functional/DTI sequences for tractography) — if eloquent cortex involvement, surgical planning
+- `order_advanced_imaging` (`modality: amino_acid_PET`) — 11C-methionine or 18F-FET. Separates active tumour from necrosis or treatment effect, and identifies the most biologically aggressive area for targeted biopsy. Indicated where enhancement increases in the first months after chemoradiotherapy, which is the point the pathway most often gets wrong: with structural MRI alone pseudoprogression and true progression are the same image, and biopsy does not resolve it either since viable tumour cells are regularly found without excluding pseudoprogression. Follow RANO recommendations; not standard practice for radiotherapy target delineation [EANO_2021]
+- `analyze_brain_mri` (functional/DTI sequences for tractography) — if eloquent cortex involvement, surgical planning. NOTE: fMRI and DTI stay MRI annotations rather than `order_advanced_imaging` modalities, because they answer a surgical-planning question, not a diagnostic one
 
 **Optional:**
 - `order_ct_scan` — only as emergency or pre-op planning (acute hemorrhage, intra-op navigation)
@@ -41,7 +43,8 @@ grades 3-4 (IDH-mutant astrocytoma CNS WHO grade 3, glioblastoma; note "anaplast
 - `analyze_ecg` — unrelated to diagnosis
 - `order_echocardiogram` — unrelated unless paraneoplastic suspected
 - `order_cardiac_monitoring` — unrelated
-- `order_advanced_imaging` (`modality: amyloid_PET / DaTscan / FDG_PET routine`) — not first-line; FDG-PET sometimes useful for grading but limited by physiologic cortical uptake
+- `order_advanced_imaging` (`modality: amyloid_PET / DaTscan`) — dementia and parkinsonian biomarkers; no role here
+- `order_advanced_imaging` (`modality: FDG_PET`) — NOT an adequate tracer for a primary brain tumour: physiologic cortical uptake limits it, and the amino-acid tracers are the ones with an established role. Ordering FDG here is a characteristic error, not a cheaper substitute for `amino_acid_PET` [EANO_2021]
 - `order_advanced_imaging` (`modality: carotid_duplex / transcranial_doppler`) — irrelevant
 
 ## 4. Tools that are HARMFUL / contraindicated
@@ -76,3 +79,4 @@ grades 3-4 (IDH-mutant astrocytoma CNS WHO grade 3, glioblastoma; note "anaplast
 - `[Bulik_2013]` — Bulik M et al. Potential of MR spectroscopy for assessment of glioma grading. Clin Neurol Neurosurg 2013;115:146-153
 - `[Hasbun_2001]` — Hasbun R et al. Computed tomography of the head before lumbar puncture in adults with suspected meningitis. NEJM 2001;345:1727-1733
 - `[NCCN_CNS]` — NCCN Clinical Practice Guidelines in Oncology: Central Nervous System Cancers (current version)
+- `[EANO_2021]` — Weller M et al. EANO guidelines on the diagnosis and treatment of diffuse gliomas of adulthood. Nat Rev Clin Oncol 2021;18:170-186 (added 2026-08-06: the source the clinical reviewers cite for the standardised tumour MRI protocol, amino-acid PET and the pseudoprogression problem)

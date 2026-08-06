@@ -147,7 +147,7 @@ class CardiacMonitoringReport(BaseModel):
 
 
 class AdvancedImagingReport(BaseModel):
-    modality: str = ""  # amyloid_PET, FDG_PET, DaTscan, perfusion_MRI, MR_spectroscopy, carotid_duplex
+    modality: str = ""  # see tools/vocabulary.py::advanced_imaging_modalities (14 values)
     tracer_or_protocol: str | None = None
     findings: list[dict[str, str]] = []  # region, uptake/signal, interpretation
     quantitative_data: dict[str, str] | None = None  # SUV, ratios, etc.

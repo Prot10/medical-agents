@@ -115,6 +115,7 @@ missing `clinical_context` is expected and fine. An unknown key is not.
 | `carotid_duplex` | Carotid Doppler ultrasound | Carotid stenosis, ischemic stroke workup |
 | `transcranial_doppler` | TCD | Vasospasm in SAH, sickle-cell risk |
 | `CT_perfusion` | CTP, automated core/penumbra | Extended-window thrombolysis, thrombectomy 6-24 h |
+| `amino_acid_PET` | 11C-methionine or 18F-FET PET | High-grade glioma: active tumour vs necrosis/treatment effect, biopsy targeting. FDG is NOT adequate for primary brain tumours |
 
 ---
 

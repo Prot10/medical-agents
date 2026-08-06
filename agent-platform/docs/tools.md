@@ -313,7 +313,7 @@ One tool, twelve studies, selected by `modality`. The enum is generated from
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |
 | `clinical_context` | string | yes | |
-| `modality` | enum | **yes** | `amyloid_PET`, `tau_PET`, `FDG_PET`, `DaTscan`, `MIBG_scan`, `perfusion_MRI`, `cardiac_MRI`, `MR_spectroscopy`, `MR_angiography`, `MR_venography`, `carotid_duplex`, `transcranial_doppler` |
+| `modality` | enum | **yes** | 14 values — `amyloid_PET`, `tau_PET`, `FDG_PET`, `amino_acid_PET`, `DaTscan`, `MIBG_scan`, `perfusion_MRI`, `CT_perfusion`, `cardiac_MRI`, `MR_spectroscopy`, `MR_angiography`, `MR_venography`, `carotid_duplex`, `transcranial_doppler` |
 
 The parameter was called `imaging_type` until the tool-contract migration. Returns
 `AdvancedImagingReport`.
