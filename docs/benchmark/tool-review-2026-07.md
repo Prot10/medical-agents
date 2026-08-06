@@ -473,11 +473,23 @@ the place nobody scores.
 | Required-workup cost | 1 303 EUR mean, above bacterial meningitis (1 204) and Guillain-Barré (1 223) | **138 EUR** in the 8 non-paroxysmal cases and 1 242 in the 22 with events — against 2 426 EUR for the whole defensible path, which is the overuse gap the metric can now see |
 
 The examination report is built from each case's own examination text, so nothing is invented:
-Hoover sign was already documented in 22 cases, tremor entrainment in 9, midline-splitting
-sensory loss in 19, a dragging monoplegic gait in 12. Two cases had no limb sign to quote
-(FND-M04, FND-M06, both paroxysmal phenotypes); their assessment reports carry the event
-semiology instead and say explicitly that the positive diagnostic act for that phenotype is the
-recorded event, not a bedside sign.
+Hoover sign was already documented in 23 cases, improvement with attentional distraction in 20,
+collapsing (give-way) weakness in 17, a dragging monoplegic gait in 16, internal inconsistency on
+repeat testing in 15, non-anatomical sensory loss in 14, midline splitting in 10 and tremor
+entrainment in 9. Three cases have no limb sign to quote (FND-M04, FND-M06, FND-RP01, all
+paroxysmal phenotypes); their reports carry the event semiology instead and say explicitly that
+the positive diagnostic act for that phenotype is the recorded event, not a bedside sign.
+
+Extraction is guarded, because a keyword is not a sign and the first pass proved it: `"CN XII:
+Tongue midline, no fasciculations"` had been quoted as midline-splitting sensory loss, `"CN XI:
+Sternocleidomastoid and trapezius strength 5/5 bilaterally"` as the sternocleidomastoid sign
+(which requires weakness), `"No give-way weakness at this time"` as collapsing weakness, and
+`"Reflexes are symmetric and normal, inconsistent with upper or lower motor neuron lesion"` as
+internal inconsistency — the last of these being exclusion reasoning, the very model this pass
+removes. Every sign now carries a required pattern plus a guard, negations and descriptions of the
+patient's *other* condition are refused, an equivocal sign is labelled equivocal and excluded from
+the positive tally, and a tripwire re-reads every quoted sentence for normality markers so the
+next false positive is visible rather than silent.
 
 Beyond the metric, the old tiers wrote the discredited diagnosis-of-exclusion model into the
 ground truth: requiring imaging in every case is precisely what the FND literature argues against.

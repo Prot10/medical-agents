@@ -74,8 +74,12 @@ letteratura sulla FND ha abbandonato.
 L'abbiamo corretto su tutti e 30 i casi:
 
 - **l'esame dei segni funzionali è l'atto obbligatorio** — con i segni che l'esame obiettivo di
-  ciascun caso già documentava: Hoover in 22 casi, entrainment del tremore in 9, dissociazione
-  sensitiva sulla linea mediana in 19, andatura trascinata in 12;
+  ciascun caso già documentava: Hoover in 23 casi, miglioramento con distrazione in 20, cedimento
+  (give-way) in 17, andatura trascinata in 16, incoerenza al riesame in 15, dissociazione
+  sensitiva non anatomica in 14, sulla linea mediana in 10, entrainment del tremore in 9. Nei 3
+  casi puramente parossistici, dove i segni sugli arti non si applicano, il referto porta la
+  semeiologia dell'evento e dice esplicitamente che l'atto diagnostico positivo è la
+  registrazione video-EEG;
 - **la RM è opzionale** in 23 casi e raccomandata *una volta e senza contrasto* nei 7 in cui c'è
   una domanda alternativa precisa (esordio focale acuto trattato come mimico di ictus, nuovo
   deficit su SM o su malattia di Parkinson, paraplegia acuta, diplopia prima di accettare lo

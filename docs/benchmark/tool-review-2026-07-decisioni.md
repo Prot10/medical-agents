@@ -36,7 +36,7 @@ strumentale tutto opzionale». I 30 casi dicevano il contrario:
 |---|---|---|
 | Casi che richiedevano la RM encefalo **con gadolinio** | 30 / 30 | 0 — opzionale in 23, raccomandata *una volta e senza contrasto* nei 7 con una domanda alternativa precisa |
 | Casi che richiedevano una batteria di laboratorio | 30 / 30 | 0 — opzionale in 27, raccomandata e ristretta ad analiti nominati nei 3 con un mimico preciso |
-| Azioni `perform_clinical_assessment` | 0 | **30 / 30, obbligatoria** — con i segni positivi che l'esame di ciascun caso già documentava (Hoover in 22, entrainment in 9, dissociazione sensitiva sulla linea mediana in 19, andatura trascinata in 12) |
+| Azioni `perform_clinical_assessment` | 0 | **30 / 30, obbligatoria** — con i segni positivi che l'esame di ciascun caso già documentava: Hoover in 23, miglioramento con distrazione in 20, cedimento in 17, andatura trascinata in 16, incoerenza al riesame in 15, dissociazione non anatomica in 14, sulla linea mediana in 10, entrainment in 9. Nei 3 casi puramente parossistici il referto porta la semeiologia dell'evento |
 | Azioni al tier `optional` in tutta la condizione | 0 | presenti in tutti i casi |
 | EMG/NCS e potenziali evocati | vietati solo a parole | **conteggiati come chiamate inutili** in tutti e 30 |
 | Costo del percorso obbligatorio | 1 303 EUR di media, più della meningite batterica (1 204) | **138 EUR** negli 8 casi senza eventi — il percorso corretto più economico di tutto il benchmark |
