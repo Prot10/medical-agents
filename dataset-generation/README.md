@@ -96,7 +96,7 @@ uv run --project dataset-generation python dataset-generation/scripts/dataset_st
 | `MIG-AURA` | Migraine with aura | G43.1 |
 | `FTD` | Frontotemporal dementia | G31.09 |
 | `SE` | Status epilepticus | G41.9 |
-| `PERI-NEURO` | Peripheral neuropathy (diabetic/CIDP/toxic) | G62.9 |
+| `VASC-DEM` | Vascular dementia (major vascular cognitive disorder) | F01.50 |
 | `NPH` | Normal pressure hydrocephalus | G91.2 |
 | `HEP-ENC` | Hepatic encephalopathy | K72.9 |
 | `ALS` | Amyotrophic lateral sclerosis | G12.21 |
@@ -114,6 +114,15 @@ uv run --project dataset-generation python dataset-generation/scripts/dataset_st
 - **v3** — v1 + v2 combined with their original IDs; tool outputs stripped to "realistic" mode (interpretive fields removed to match real clinical reports).
 - **v4** — migrated from v3 to the 12-tool schema + cost tracking (`order_advanced_imaging`, `order_specialized_test`, etc.; see `docs/benchmark/tool-contract.md`).
 - **v5** — **current default**: 600 cases across 20 conditions (30 per condition, mixed synthetic + real-seeded), in `data/neurobench/cases/`. Generated via per-condition criteria packs (`criteria_packs/`) + real-case seeds (`seeds/`). Split into 500 train / 100 test (`data/neurobench/splits/`; the test set includes 2 held-out conditions).
+  - **Composition change, August 2026 (clinical tool review).** `peripheral_neuropathy` was
+    retired — both reviewers judged it too broad a category to score — and **vascular dementia**
+    (`VASC-DEM`, 30 synthetic cases) took its place, completing the four major dementias so the
+    differential among them becomes scoreable. The split was rebuilt with
+    `make_train_test_split --preserve <previous manifest>`, which keeps every surviving case on
+    the side it was already on: only the 30 new cases were placed (28 train, 2 test), so
+    published numbers stay comparable and existing gold trajectories stay valid. The 28 new
+    train cases have no gold trajectory yet and are listed in
+    `tests/test_sft_inference_parity.py::AWAITING_DISTILLATION` until the corpus is regenerated.
 
 ## External Data Sources
 

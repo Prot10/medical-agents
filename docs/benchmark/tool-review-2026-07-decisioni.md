@@ -15,8 +15,8 @@ non ancora implementata · ⚠️ modificata rispetto alla richiesta, serve conf
 
 | # | Proposta | Decisione | Motivo |
 |---|---|---|---|
-| 1.1 | Rimuovere *Peripheral neuropathy* | ⚪ accolta | Categoria troppo ampia, siamo d'accordo. Enum e cases ancora da rimuovere |
-| 1.2 | Sostituirla con *Demenza vascolare* | 🟡 accolta | Enum e label fatti; pannello e 30 casi da generare |
+| 1.1 | Rimuovere *Peripheral neuropathy* | ✅ **completata** | Categoria troppo ampia, siamo d'accordo. Rimossi i 30 casi, i 7 seed reali, il criteria pack, la voce del filtro MedCaseReasoning, il valore dell'enum e la label dell'app di review |
+| 1.2 | Sostituirla con *Demenza vascolare* | ✅ **completata** | Pannello in `conditions.yaml`, criteria pack `VASC-DEM.md` (VASCOG 2014 / NINDS-AIREN / STRIVE-2 / Boston v2.0 / AHA-ASA 2021), **30 casi generati** (11 S / 10 M / 9 P) su sette meccanismi vascolari, split rigenerato preservando le assegnazioni precedenti. Tutti i gate verdi: 600/600 casi puliti, agente perfetto 1.0 su 600/600 |
 | 1.3 | Aggiungere *Demenza a corpi di Lewy* | 🟡 accolta | Completa le quattro demenze principali (AD, FTD, DLB, VaD) e apre l'asse della diagnosi differenziale fra loro, che ci mancava. `MIBG_scan` e `DaTscan` erano già disponibili e prezzati |
 | 1.4 | Aggiungere *Emorragia intracerebrale spontanea* | 🟡 accolta | Percorso terapeutico distinto (pressione, reversal, indicazione neurochirurgica): valuta decisioni diverse da ictus ischemico ed ESA |
 | 1.5 | Aggiungere *Encefalite erpetica* | 🟡 accolta | Completa il capitolo infezioni SNC e mette alla prova la tempestività della terapia empirica con aciclovir |

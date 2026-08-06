@@ -55,7 +55,7 @@ and the literature-aligned evaluation; `docs/training/distillation.md` for traje
 - Frontend: `@/` path alias for `src/`, named exports only, no default exports for components
 - State: Zustand for UI/streaming state, TanStack Query for server data
 - Commit style: conventional commits (`feat:`, `fix:`, `docs:`, `chore:`)
-- Dataset versions: v1 (synthetic, enhanced outputs), v2 (real-seeded, enhanced), v3 (v1+v2 combined, realistic/stripped outputs), v4 (12-tool schema + cost tracking, migrated from v3), v5 (current: 600 cases across 20 conditions, 500 train / 100 test)
+- Dataset versions: v1 (synthetic, enhanced outputs), v2 (real-seeded, enhanced), v3 (v1+v2 combined, realistic/stripped outputs), v4 (12-tool schema + cost tracking, migrated from v3), v5 (current: 600 cases across 20 conditions, 500 train / 100 test; the July 2026 clinical review swapped `peripheral_neuropathy` out for `vascular_dementia` — regenerate the split with `make_train_test_split --preserve <previous manifest>` so a composition change does not reshuffle cases that were already assigned)
 - Tool output modes: "enhanced" (v1/v2, interpretive fields present) vs "realistic" (v3/v4, stripped to match real clinical reports)
 - 16 tools: analyze_brain_mri, analyze_eeg, analyze_ecg, interpret_labs, analyze_csf, order_ct_scan, order_echocardiogram, order_cardiac_monitoring, order_advanced_imaging, order_specialized_test, search_medical_literature, check_drug_interactions,
   and (added after the July 2026 clinical tool review) order_body_imaging, order_microbiology, obtain_tissue_diagnosis, perform_clinical_assessment

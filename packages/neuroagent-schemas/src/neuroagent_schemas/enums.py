@@ -26,7 +26,10 @@ class NeurologicalCondition(str, Enum):
     FTD = "ftd"
     NPH = "nph"
     MYASTHENIA_GRAVIS = "myasthenia_gravis"
-    PERIPHERAL_NEUROPATHY = "peripheral_neuropathy"
+    # PERIPHERAL_NEUROPATHY was retired on the July 2026 clinical tool review: both reviewers
+    # judged it too broad a category to score, and vascular dementia took its place (see
+    # VASCULAR_DEMENTIA below and dataset-generation/criteria_packs/VASC-DEM.md). Its 30 cases
+    # and 7 seeds were removed with it.
     SYNCOPE_CARDIAC = "syncope_cardiac"
     SYNCOPE_VASOVAGAL = "syncope_vasovagal"
     CJD = "cjd"

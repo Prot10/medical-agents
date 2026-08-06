@@ -39,6 +39,18 @@ TRAIN_SPLIT = REPO_ROOT / "data/neurobench/splits/train_cases.txt"
 # styles, and hospitals at negligible cost.
 SAMPLE_STRIDE = 50
 
+# Train-split cases that have no gold trajectory yet, with the reason. Vascular dementia was
+# added to the benchmark on the July 2026 clinical tool review (replacing peripheral
+# neuropathy, which both reviewers judged too broad to score), so its 28 train cases exist
+# before the teacher has written traces for them. The corpus is due for regeneration in any
+# case — required-coverage of the existing traces fell to 0.566 when the required set became
+# study-specific — and these cases are covered by that run. Empty this set afterwards.
+AWAITING_DISTILLATION = {
+    case_id
+    for case_id in (TRAIN_SPLIT.read_text().split() if TRAIN_SPLIT.exists() else [])
+    if case_id.startswith("VASC-DEM-")
+}
+
 # A turn with more than one <think> block cannot round-trip byte-identically:
 # the serving stack merges all think blocks into one (`extract_think_content`
 # joins them; the orchestrator re-embeds a single block). 7 such teacher traces
@@ -289,10 +301,18 @@ class TestReasoningStyleParity:
     @pytest.mark.skipif(not TRAIN_SPLIT.exists(), reason="train split file not present")
     def test_every_case_has_both_styles(self, style_pairs):
         """Both styles exist for every TRAIN-split case — size derived from the
-        split file, not hardcoded, so a regenerated/expanded split keeps this honest."""
+        split file, not hardcoded, so a regenerated/expanded split keeps this honest.
+
+        `AWAITING_DISTILLATION` is the one documented exception: a condition added to the
+        benchmark has cases in the train split before the teacher has written trajectories for
+        them. Naming them here keeps the guard sharp — any *other* missing case still fails —
+        while making the known gap visible instead of turning the test off.
+        """
         train_ids = {c for c in TRAIN_SPLIT.read_text().split() if c}
-        assert len(style_pairs) == len(train_ids)
-        assert set(style_pairs) == train_ids
+        expected = train_ids - AWAITING_DISTILLATION
+        missing = expected - set(style_pairs)
+        assert not missing, f"train cases without both styles: {sorted(missing)}"
+        assert not (set(style_pairs) - train_ids), "trajectories for non-train cases"
 
     def test_directive_present_exactly_for_differential(self, trajectories):
         """The directive marks differential trajectories and only those."""

@@ -286,19 +286,25 @@ CONDITION_FILTERS: dict[str, dict] = {
             r"\bseizure.*>\s*5\s+min\b", r"\bunresponsive.*seizure\b",
         ],
     },
-    "peripheral_neuropathy": {
-        "abbreviation": "PERI-NEURO",
+    # `peripheral_neuropathy` was retired on the July 2026 clinical tool review — both
+    # reviewers judged it too broad a category to score — and vascular dementia replaced it.
+    "vascular_dementia": {
+        "abbreviation": "VASC-DEM",
         "diagnosis_keywords": [
-            r"\bperipheral\s+neuropathy\b", r"\bdiabetic\s+neuropathy\b",
-            r"\bCIDP\b", r"\bchronic\s+inflammatory\s+demyelinating\b",
-            r"\bCharcot.?Marie.?Tooth\b", r"\bhereditary\s+neuropathy\b",
-            r"\bvasculitic\s+neuropathy\b", r"\btoxic\s+neuropathy\b",
-            r"\balcoholic\s+neuropathy\b", r"\bsmall\s+fiber\s+neuropathy\b",
+            r"\bvascular\s+dementia\b", r"\bvascular\s+cognitive\s+impairment\b",
+            r"\bvascular\s+cognitive\s+disorder\b", r"\bmulti.?infarct\s+dementia\b",
+            r"\bsubcortical\s+ischemic\s+vascular\s+dementia\b", r"\bBinswanger\b",
+            r"\bpost.?stroke\s+dementia\b", r"\bstrategic\s+infarct\s+dementia\b",
+            r"\bmixed\s+(alzheimer|dementia).*vascular\b", r"\bvascular.*mixed\s+dementia\b",
+            r"\bcerebral\s+amyloid\s+angiopathy\b", r"\bCADASIL\b",
+            r"\bcerebral\s+small\s+vessel\s+disease\b",
         ],
         "presentation_keywords": [
-            r"\bnumbness.*feet\b", r"\btingling.*stocking\b",
-            r"\bdistal\s+weakness\b", r"\bnerve\s+conduction\b",
-            r"\bEMG.*neuropathy\b", r"\bareflexia.*distal\b",
+            r"\bstepwise\s+(cognitive\s+)?decline\b", r"\bexecutive\s+dysfunction\b",
+            r"\bwhite\s+matter\s+(hyperintensit|lesion|change)", r"\blacunar\s+infarct",
+            r"\bFazekas\b", r"\bleukoaraiosis\b", r"\bcerebral\s+microbleed",
+            r"\bcortical\s+superficial\s+siderosis\b", r"\bMoCA\b",
+            r"\bgait\s+apraxia\b", r"\bpsychomotor\s+slowing\b",
         ],
     },
     "normal_pressure_hydrocephalus": {

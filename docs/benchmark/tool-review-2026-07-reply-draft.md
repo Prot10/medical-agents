@@ -14,7 +14,20 @@ Abbiamo letto tutti i 91 commenti. Di seguito le decisioni, così potete partire
 ## 1. Elenco delle patologie: accettiamo tutte le vostre proposte
 
 - **Peripheral neuropathy** → sostituita con **demenza vascolare**. D'accordo: era una
-  categoria troppo ampia.
+  categoria troppo ampia. **Questa sostituzione è già completa**: la neuropatia periferica è
+  stata rimossa (30 casi, 7 seed reali, criteria pack, enum, label) e la demenza vascolare è
+  in piattaforma con il suo pannello e **30 casi nuovi** — 11 semplici, 10 moderati, 9 puzzle —
+  costruiti sui meccanismi vascolari distinti anziché su un'etichetta unica: malattia dei
+  piccoli vasi sottocorticale, demenza multi-infartuale, infarto strategico singolo, demenza
+  post-ictus (ischemica ed emorragica), forma mista Alzheimer-vascolare, angiopatia amiloide
+  cerebrale, CADASIL e ipoperfusione globale. I criteri seguiti sono VASCOG 2014, NINDS-AIREN,
+  STRIVE-2 per la refertazione delle immagini, i criteri di Boston v2.0 per l'angiopatia
+  amiloide e le linee guida AHA/ASA 2021 per la prevenzione secondaria. Due casi sono
+  volutamente "scomodi" e lo segnaliamo perché non li leggiate come errori: in uno la risposta
+  corretta è **compromissione cognitiva vascolare lieve** e non demenza, perché l'autonomia
+  strumentale è conservata; in un altro la RM è controindicata (pacemaker non compatibile) e la
+  diagnosi va raggiunta con TC, ecodoppler e interrogazione del dispositivo, dichiarando che la
+  TC non può escludere l'angiopatia amiloide.
 - Aggiungiamo la **demenza a corpi di Lewy**, così le quattro principali forme di demenza
   sono coperte (AD, FTD, DLB, VaD). L'argomento della diagnosi differenziale tra le quattro
   ci convince, ed è un asse di valutazione che al momento ci manca.

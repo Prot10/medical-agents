@@ -35,7 +35,6 @@ export const CONDITION_META: Record<string, ConditionMeta> = {
   als: { label: "ALS", short: "ALS", color: "#7c3aed", category: "neuromuscular" },
   myasthenia_gravis: { label: "Myasthenia Gravis", short: "MG", color: "#6d28d9", category: "neuromuscular" },
   guillain_barre: { label: "Guillain-Barré", short: "GBS", color: "#5b21b6", category: "neuromuscular" },
-  peripheral_neuropathy: { label: "Peripheral Neuropathy", short: "PN", color: "#a855f7", category: "neuromuscular" },
   bacterial_meningitis: { label: "Bacterial Meningitis", short: "BACT", color: "#dc2626", category: "infectious" },
   viral_encephalitis: { label: "Herpes Simplex Encephalitis", short: "HSV", color: "#b91c1c", category: "infectious" },
   brain_tumor_glioma: { label: "Glioma", short: "GLI", color: "#1e40af", category: "tumor" },

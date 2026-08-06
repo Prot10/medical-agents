@@ -27,6 +27,7 @@ import logging
 import random
 from collections import Counter, defaultdict
 from pathlib import Path
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -160,6 +161,80 @@ def build_split(
     return train, heldout, stratified
 
 
+def build_split_preserving(
+    meta: list[dict[str, str]],
+    prior: dict[str, Any],
+    heldout_conditions: list[str],
+    test_size: int,
+    seed: int,
+) -> tuple[list[dict[str, str]], list[dict[str, str]], list[dict[str, str]]]:
+    """Rebuild the split without reshuffling cases that were already assigned.
+
+    A change in dataset composition — a condition retired, a condition added — otherwise
+    reshuffles the whole split, because the stratified pick is seeded over the case set. That
+    has two costs that are easy to miss: every published number stops being comparable, and the
+    gold trajectory corpus (generated for the train split only) is invalidated for cases that
+    merely moved sides. Preserving prior membership confines both costs to the cases that
+    actually changed.
+
+    Cases the prior manifest never saw are placed here: enough of them go to the stratified
+    test set to restore `test_size`, chosen with the same stratified selector, and the rest go
+    to train. Held-out conditions are recomputed from the argument, so changing that list still
+    works.
+    """
+    prior_train = set(prior.get("train_case_ids") or [])
+    prior_test = set(prior.get("test_stratified_case_ids") or []) | set(
+        prior.get("test_heldout_condition_case_ids") or []
+    )
+
+    known = {c["condition"] for c in meta}
+    unknown = set(heldout_conditions) - known
+    if unknown:
+        raise ValueError(f"Unknown held-out conditions: {sorted(unknown)}")
+
+    heldout = [c for c in meta if c["condition"] in heldout_conditions]
+    pool = [c for c in meta if c["condition"] not in heldout_conditions]
+
+    n_stratified = test_size - len(heldout)
+    if n_stratified < 0:
+        raise ValueError(
+            f"Held-out conditions contribute {len(heldout)} cases, exceeding test_size={test_size}"
+        )
+
+    carried_test = [c for c in pool if c["case_id"] in prior_test]
+    carried_train = [c for c in pool if c["case_id"] in prior_train]
+    fresh = [
+        c for c in pool if c["case_id"] not in prior_test and c["case_id"] not in prior_train
+    ]
+
+    need = n_stratified - len(carried_test)
+    if need > 0:
+        promoted = select_stratified(fresh, min(need, len(fresh)), seed)
+        promoted_ids = {c["case_id"] for c in promoted}
+        stratified = carried_test + promoted
+        train = carried_train + [c for c in fresh if c["case_id"] not in promoted_ids]
+        logger.info(
+            "preserved %d prior assignments; placed %d new cases (%d to test, %d to train)",
+            len(carried_test) + len(carried_train), len(fresh), len(promoted),
+            len(fresh) - len(promoted),
+        )
+    elif need < 0:
+        demoted = select_stratified(carried_test, -need, seed)
+        demoted_ids = {c["case_id"] for c in demoted}
+        stratified = [c for c in carried_test if c["case_id"] not in demoted_ids]
+        train = carried_train + demoted + fresh
+        logger.warning(
+            "prior test set exceeds test_size by %d after the composition change; "
+            "moved %s to train", -need, sorted(demoted_ids),
+        )
+    else:
+        stratified = carried_test
+        train = carried_train + fresh
+        logger.info("preserved all prior assignments; %d new cases to train", len(fresh))
+
+    return train, heldout, stratified
+
+
 def _distribution_report(name: str, cases: list[dict[str, str]]) -> str:
     diff = Counter(c["difficulty"] for c in cases)
     enc = Counter(c["encounter_type"] for c in cases)
@@ -177,14 +252,30 @@ def main() -> None:
     parser.add_argument("--test-size", type=int, default=100)
     parser.add_argument("--heldout-conditions", nargs="+", default=DEFAULT_HELDOUT_CONDITIONS)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument(
+        "--preserve",
+        default=None,
+        metavar="MANIFEST",
+        help=(
+            "Path to a previous split_manifest.json. Cases it already assigned keep their side; "
+            "only cases it never saw are placed. Use this whenever dataset composition changes, "
+            "so published numbers stay comparable and existing gold trajectories stay valid."
+        ),
+    )
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 
     meta = load_case_metadata(Path(args.dataset))
-    train, heldout, stratified = build_split(
-        meta, args.heldout_conditions, args.test_size, args.seed
-    )
+    if args.preserve:
+        prior = json.loads(Path(args.preserve).read_text())
+        train, heldout, stratified = build_split_preserving(
+            meta, prior, args.heldout_conditions, args.test_size, args.seed
+        )
+    else:
+        train, heldout, stratified = build_split(
+            meta, args.heldout_conditions, args.test_size, args.seed
+        )
     test = heldout + stratified
 
     out = Path(args.output)

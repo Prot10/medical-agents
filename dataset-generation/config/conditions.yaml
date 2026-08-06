@@ -1544,103 +1544,161 @@ status_epilepticus:
       tool_name: "analyze_csf"
       description: "Lumbar puncture for CSF autoimmune antibody panel and infectious workup"
 
-peripheral_neuropathy:
-  name: "Peripheral neuropathy (diabetic/CIDP/toxic)"
-  abbreviation: "PERI-NEURO"
-  icd_code: "G62.9"
-  description: "Peripheral nervous system disorder causing distal sensorimotor symptoms; etiologies include diabetic, CIDP, toxic, inflammatory, and hereditary"
+vascular_dementia:
+  name: "Vascular dementia (major vascular cognitive disorder)"
+  abbreviation: "VASC-DEM"
+  icd_code: "F01.50"
+  description: "Major vascular cognitive disorder: cognitive decline attributable to cerebrovascular disease — subcortical small-vessel ischaemia, multiple cortical infarcts, a single strategic infarct, cerebral amyloid angiopathy, or mixed with Alzheimer pathology"
   typical_demographics:
-    age_range: [40, 75]
-    sex_bias: null
+    age_range: [55, 88]
+    sex_bias: "slight_male"
   encounter_type: "outpatient"
-  required_modalities: [LABS, specialized_test]
-  optional_modalities: [MRI, CSF, advanced_imaging]
+  # Clinical tool review, July 2026. Replaces `peripheral_neuropathy`, which both reviewers
+  # judged too broad a category to score ("SOSTITUIRE PATOLOGIA", Reviewer 1, severity error),
+  # and completes the four major dementias — AD, FTD, DLB, VaD — so the benchmark can score the
+  # differential among them, which was the reviewers' stated reason for asking.
+  #
+  # Tiers follow the rule the reviewers applied everywhere else: REQUIRED only where the
+  # governing guideline makes the step mandatory for the diagnosis itself.
+  #   clinical_assessment (cognitive_screen) — VASCOG 2014 and DSM-5 both require impairment
+  #     documented on a validated instrument; the executive/processing-speed-predominant profile
+  #     with relatively spared recognition memory is the discriminator against AD
+  #   MRI — the vascular attribution IS the imaging: STRIVE-2 markers (confluent WMH, lacunes,
+  #     microbleeds, cortical superficial siderosis, atrophy pattern). CT only where MRI is
+  #     contraindicated, and then it cannot see microbleeds — that limitation is scored
+  #   LABS — reversible mimics (TSH, B12, folate, RPR, HIV) plus the vascular risk factors that
+  #     change management (HbA1c, lipid panel)
+  # ECG, cardiac monitoring and echocardiography stay OPTIONAL at panel level and are required
+  # per case only where the infarct pattern is embolic, because that is where an occult source
+  # changes treatment from risk-factor control to anticoagulation. Same for carotid duplex/MRA:
+  # required only where a large-artery source is in play.
+  required_modalities: [clinical_assessment, MRI, LABS]
+  optional_modalities: [CT, ECG, advanced_imaging, specialized_test, cardiac_monitoring, echo, CSF]
   key_findings:
-    labs:
+    clinical_assessment:
       straightforward:
-        - "HbA1c: elevated (>6.5%) — diabetic neuropathy etiology"
-        - "Fasting glucose: elevated"
-        - "Vitamin B12: low (<200 pg/mL) with elevated MMA/homocysteine"
-        - "CBC: macrocytic anemia (B12 deficiency)"
-        - "TSH: hypothyroidism as neuropathy cause"
-        - "SPEP (serum protein electrophoresis): monoclonal protein (M-spike) — MGUS/myeloma neuropathy"
-        - "Anti-MAG antibodies: positive in anti-MAG neuropathy (IgM MGUS)"
-        - "RPR/VDRL: positive (neurosyphilis)"
-        - "ESR/CRP: elevated in vasculitic neuropathy"
-        - "ANA, ANCA: positive in connective tissue disease-associated neuropathy"
-        - "Heavy metals (lead, arsenic, thallium): elevated in toxic neuropathy"
+        - "MoCA 19/30 with the loss concentrated in trail-making, digit span backwards and verbal fluency; delayed recall improves with cueing"
+        - "Executive/processing-speed profile out of proportion to the memory deficit (opposite of the AD profile)"
+        - "Stepwise history corroborated by an informant; abrupt worsening dated to a documented event"
+        - "Timed-up-and-go prolonged with short-stepped, wide-based gait and preserved arm swing (vascular gait apraxia)"
       moderate:
-        - "HbA1c: borderline elevated (5.7-6.4%) — prediabetic neuropathy"
-        - "B12 low-normal (200-300 pg/mL) with equivocal MMA"
-        - "SPEP: no M-spike but total protein elevated"
-        - "Anti-sulfatide antibodies: weakly positive"
+        - "MoCA 24/30 — borderline, executive items disproportionately affected"
+        - "Mixed profile: both amnestic and executive deficits, attribution unclear on testing alone"
+        - "Gradual rather than stepwise decline reported, which does not exclude small-vessel disease"
       diagnostic_puzzle:
-        - "All standard labs negative — cryptogenic sensorimotor neuropathy"
-        - "Borderline glucose tolerance, no clear etiology"
-        - "Anti-NF155 or anti-CNTN1 antibodies (nodopathy) — may require specialized testing"
-    specialized_test:
-      straightforward:
-        - "Motor NCS: reduced CMAP amplitudes in distal nerves (axonal) or markedly slowed velocity (demyelinating)"
-        - "Sensory NCS: absent or severely reduced SNAPs bilaterally (length-dependent)"
-        - "F-waves: prolonged or absent"
-        - "EMG: chronic denervation with fibrillations and positive sharp waves in distal muscles"
-        - "Diabetic pattern: length-dependent axonal sensorimotor neuropathy"
-        - "CIDP pattern: demyelinating (velocity <75% LLN), temporal dispersion, conduction block, prolonged DML"
-      moderate:
-        - "Mild distal sensory NCS abnormalities — borderline axonal vs within normal limits"
-        - "Asymmetric nerve involvement (mononeuritis multiplex pattern — consider vasculitis)"
-        - "Mixed axonal and demyelinating features — superimposed CIDP on diabetic neuropathy"
-      diagnostic_puzzle:
-        - "Near-normal NCS — small fiber neuropathy (large fibers spared); requires skin punch biopsy for IENFD"
-        - "Focal conduction block without typical CIDP pattern — MMN vs early CIDP"
-        - "NCS consistent with both hereditary (CMT) and acquired neuropathy"
+        - "MoCA 26/30 with severe functional complaint — testing underestimates the deficit"
+        - "Prominent apathy and slowed processing mistaken by the family for depression"
+        - "Fluctuating attention on repeat testing (raises DLB) without visual hallucinations or parkinsonism"
     mri:
       straightforward:
-        - "MRI spine: normal cord signal, excludes myelopathy as contributing factor"
-        - "MRI lumbar plexus: T2 signal in nerve roots (CIDP, diabetic lumbosacral radiculoplexus neuropathy)"
+        - "Confluent periventricular and deep white matter hyperintensity, Fazekas 3"
+        - "Multiple lacunes in basal ganglia, thalamus and pons (>3 cavitated lesions)"
+        - "Enlarged basal-ganglia perivascular spaces; no restricted diffusion (all lesions chronic)"
+        - "Multiple chronic cortical and cortico-subcortical infarcts in more than one arterial territory"
+        - "Strategic infarct: left anterior thalamus / genu of the internal capsule / angular gyrus"
+        - "Deep cerebral microbleeds on SWI in a hypertensive distribution (thalamus, basal ganglia, pons)"
+        - "Medial temporal lobes relatively preserved for age (Scheltens 0-1)"
       moderate:
-        - "MRI cervical spine: multilevel degenerative disease with mild compression — radiculopathy vs neuropathy"
-        - "MRI lumbar spine: moderate stenosis — confounding radiculopathy"
+        - "Moderate white matter hyperintensity, Fazekas 2 — greater than expected for age but not confluent"
+        - "One or two lacunes plus mild global atrophy; both vascular and degenerative contributions plausible"
+        - "Hippocampal atrophy Scheltens 2 alongside Fazekas 2 — mixed pathology on imaging"
       diagnostic_puzzle:
-        - "MRI spine: significant cervical or lumbar cord compression — myelopathy component cannot be excluded"
-        - "MRI brachial plexus: patchy enhancement (Parsonage-Turner vs vasculitic neuropathy)"
+        - "Strictly lobar microbleeds with cortical superficial siderosis and posterior WMH — probable cerebral amyloid angiopathy (Boston criteria v2.0)"
+        - "Severe confluent WMH with anterior temporal pole and external capsule involvement in a patient under 60 — hereditary small-vessel disease (CADASIL) must be excluded"
+        - "Fazekas 3 burden with a near-normal cognitive profile — imaging severity dissociated from the clinical picture"
+        - "Bilateral watershed infarcts after a documented hypotensive episode rather than embolic disease"
+    labs:
+      all_difficulties:
+        - "CBC: normal (excludes anaemia and polycythaemia as contributors)"
+        - "CMP: normal renal and hepatic function"
+        - "TSH: normal (excludes hypothyroid cognitive impairment)"
+        - "Vitamin B12: normal or low-normal; folate normal"
+        - "RPR: non-reactive (excludes neurosyphilis)"
+        - "HIV: negative"
+        - "HbA1c: elevated (7-9%) — long-standing diabetes as the vascular driver"
+        - "Lipid panel: elevated LDL, low HDL"
+      moderate:
+        - "HbA1c borderline (5.9-6.4%); LDL at target on a statin already prescribed"
+        - "B12 low (180-250 pg/mL) with normal homocysteine — a contributor, not the explanation"
+      diagnostic_puzzle:
+        - "Every reversible-cause lab normal, with an untreated blood pressure of 178/98 at the visit"
+        - "ESR/CRP mildly elevated — vasculitis considered and not supported"
+    advanced_imaging:
+      straightforward:
+        - "Carotid duplex: >50% stenosis of the internal carotid artery ipsilateral to the cortical infarcts"
+        - "MR angiography: intracranial large-artery stenosis; no dissection"
+      moderate:
+        - "Carotid duplex: 30-49% plaque, not flow-limiting — vascular disease confirmed, mechanism not established"
+        - "FDG-PET: patchy multifocal hypometabolism following the white matter lesions rather than a temporoparietal pattern"
+      diagnostic_puzzle:
+        - "Amyloid PET positive alongside a heavy vascular burden — mixed Alzheimer and vascular pathology, not either alone"
+        - "FDG-PET temporoparietal hypometabolism with a vascular burden — mixed disease; treating one and ignoring the other is the error"
+    csf:
+      moderate:
+        - "Abeta42 borderline, phospho-tau normal — Alzheimer biology not supported"
+      diagnostic_puzzle:
+        - "Abeta42 reduced with elevated phospho-tau on top of the vascular burden — mixed AD/vascular"
+        - "Normal cell count and protein; no inflammatory picture (excludes CNS vasculitis)"
+    ecg:
+      straightforward:
+        - "Atrial fibrillation, previously undocumented — an embolic source for the multi-territory infarcts"
+        - "Left ventricular hypertrophy with a strain pattern (chronic hypertension)"
+      moderate:
+        - "Sinus rhythm with frequent atrial ectopy — paroxysmal atrial fibrillation not excluded, prompting longer monitoring"
+      diagnostic_puzzle:
+        - "Sinus rhythm throughout; the mechanism remains small-vessel rather than embolic"
   differential_diagnoses:
-    - diagnosis: "Radiculopathy (cervical or lumbar)"
-      key_distinguishing: "Dermatomal sensory loss, proximal pain radiation, MRI disc herniation or stenosis, NCS shows focal root level abnormality"
-    - diagnosis: "Myelopathy (cervical spondylotic)"
-      key_distinguishing: "Upper motor neuron signs, hyperreflexia below level, cord signal on MRI, gait spasticity"
-    - diagnosis: "GBS/AIDP"
-      key_distinguishing: "Acute onset over days-weeks, ascending paralysis, areflexia, albumino-cytologic dissociation"
-    - diagnosis: "Vasculitic neuropathy"
-      key_distinguishing: "Asymmetric/stepwise progression, multifocal, mononeuritis multiplex, nerve biopsy epineurial vasculitis"
-    - diagnosis: "Hereditary neuropathy (CMT)"
-      key_distinguishing: "Family history, pes cavus, hammer toes, very slow velocities, PMP22 or GJB1 mutation"
+    - diagnosis: "Alzheimer's disease"
+      key_distinguishing: "Insidious amnestic-predominant decline, recall not helped by cueing, medial temporal atrophy out of proportion to vascular burden, amyloid biomarkers positive"
+    - diagnosis: "Mixed Alzheimer and vascular dementia"
+      key_distinguishing: "Both hippocampal atrophy and a significant vascular burden, or positive amyloid biomarkers with confluent white matter disease — a distinct diagnosis, not a tie-break"
+    - diagnosis: "Dementia with Lewy bodies"
+      key_distinguishing: "Fluctuating cognition, well-formed visual hallucinations, spontaneous parkinsonism, REM sleep behaviour disorder, reduced DaTscan uptake"
+    - diagnosis: "Frontotemporal dementia (behavioural variant)"
+      key_distinguishing: "Early disinhibition and loss of empathy with frontotemporal atrophy and no vascular burden"
+    - diagnosis: "Normal pressure hydrocephalus"
+      key_distinguishing: "Ventriculomegaly with Evans index >0.3 and a disproportionately enlarged subarachnoid space, gait-first triad, objective improvement after a tap test"
+    - diagnosis: "Cerebral amyloid angiopathy"
+      key_distinguishing: "Strictly lobar microbleeds and cortical superficial siderosis on SWI, lobar haemorrhage history — a vascular cause, but one that contraindicates anticoagulation"
+    - diagnosis: "CADASIL"
+      key_distinguishing: "Onset under 60, migraine with aura, family history of stroke or dementia, anterior temporal pole and external capsule white matter involvement, NOTCH3 variant"
+    - diagnosis: "Depression (pseudodementia)"
+      key_distinguishing: "Prominent low mood and effort-dependent performance, deficits improving with treatment, imaging burden not explaining the severity"
   difficulty_variants:
     straightforward:
-      presentation: "62-year-old with poorly controlled type 2 diabetes (HbA1c 10.2%), 3-year progressive bilateral foot numbness and burning pain. NCS shows length-dependent axonal sensorimotor neuropathy."
-      expected_agent_confidence: 0.88
+      presentation: "74-year-old with 30 years of hypertension and type 2 diabetes, brought by his daughter after a stepwise decline over 3 years dated to two episodes of transient weakness. Short-stepped gait, brisk reflexes. MoCA 19/30 with executive predominance."
+      expected_agent_confidence: 0.82
     moderate:
-      presentation: "55-year-old with 1-year progressive proximal and distal weakness and sensory loss, mildly elevated CSF protein. NCS shows demyelinating features. Query CIDP vs diabetic neuropathy."
-      expected_agent_confidence: 0.62
+      presentation: "69-year-old with 2 years of gradual slowing, apathy and word-finding difficulty. Treated hypertension. MoCA 24/30 with both amnestic and executive items affected. Imaging shows Fazekas 2 white matter change and Scheltens 2 hippocampal atrophy."
+      expected_agent_confidence: 0.55
     diagnostic_puzzle:
-      presentation: "48-year-old with 2-year progressive bilateral foot numbness, normal NCS (large fibers intact). Symptoms worse at night. Normal HbA1c. Small fiber neuropathy suspected — awaiting skin biopsy."
-      expected_agent_confidence: 0.38
+      presentation: "58-year-old with 18 months of executive decline, a long history of migraine with aura and a mother who developed dementia at 62. Blood pressure normal, no diabetes. Imaging shows severe confluent white matter change with anterior temporal pole involvement."
+      expected_agent_confidence: 0.35
   common_followups:
-    - trigger_action: "request_skin_punch_biopsy"
-      tool_name: "order_specialized_test"
-      description: "Skin punch biopsy for intraepidermal nerve fiber density (IENFD) — small fiber neuropathy diagnosis"
-    - trigger_action: "request_nerve_biopsy"
-      tool_name: "order_specialized_test"
-      description: "Sural nerve biopsy for vasculitic neuropathy, amyloid, or hereditary neuropathy confirmation"
-    - trigger_action: "request_genetic_neuropathy_panel"
-      tool_name: "interpret_labs"
-      description: "PMP22 duplication/deletion, GJB1, MPZ, GDAP1 genetic panel (CMT workup)"
-    - trigger_action: "request_autonomic_testing"
-      tool_name: "order_specialized_test"
-      description: "Autonomic testing (QSART, TST, HRV) for autonomic neuropathy characterization"
-    - trigger_action: "request_csf_analysis_cidp"
+    - trigger_action: "request_carotid_duplex"
+      tool_name: "order_advanced_imaging"
+      description: "Carotid duplex ultrasound for extracranial large-artery stenosis as the infarct mechanism"
+    - trigger_action: "request_mr_angiography"
+      tool_name: "order_advanced_imaging"
+      description: "MR angiography of the head and neck for intracranial stenosis or dissection"
+    - trigger_action: "request_fdg_pet"
+      tool_name: "order_advanced_imaging"
+      description: "FDG-PET to separate a temporoparietal Alzheimer pattern from patchy vascular hypometabolism"
+    - trigger_action: "request_amyloid_pet"
+      tool_name: "order_advanced_imaging"
+      description: "Amyloid PET where mixed Alzheimer and vascular pathology is the question"
+    - trigger_action: "request_csf_biomarkers"
       tool_name: "analyze_csf"
-      description: "LP for CSF protein and cell count (elevated protein supports CIDP)"
+      description: "CSF Abeta42, Abeta42/40 ratio and phospho-tau for coexisting Alzheimer biology"
+    - trigger_action: "request_prolonged_cardiac_monitoring"
+      tool_name: "order_cardiac_monitoring"
+      description: "Extended ambulatory monitoring for paroxysmal atrial fibrillation after multi-territory infarcts"
+    - trigger_action: "request_neuropsych_battery"
+      tool_name: "order_specialized_test"
+      description: "Formal neuropsychological battery to document the domain profile and track it"
+    - trigger_action: "request_notch3_panel"
+      tool_name: "order_specialized_test"
+      description: "NOTCH3 sequencing where hereditary small-vessel disease is suspected"
 
 normal_pressure_hydrocephalus:
   name: "Normal pressure hydrocephalus"

@@ -202,7 +202,7 @@ Organized by clinical domain:
 | Domain | Conditions |
 |---|---|
 | **Epilepsy** | `focal_epilepsy_temporal`, `focal_epilepsy_frontal`, `generalized_epilepsy`, `status_epilepticus` |
-| **Dementia** | `alzheimers_early`, `alzheimers_moderate`, `ftd`, `nph`, `cjd` |
+| **Dementia** | `alzheimers_early`, `alzheimers_moderate`, `ftd`, `nph`, `cjd`, `vascular_dementia`, `dementia_with_lewy_bodies` |
 | **Cerebrovascular** | `ischemic_stroke`, `hemorrhagic_stroke`, `tia`, `cadasil` |
 | **Movement Disorders** | `parkinsons`, `atypical_parkinsonism_msa`, `atypical_parkinsonism_psp` |
 | **Neuroimmunology** | `multiple_sclerosis`, `autoimmune_encephalitis_nmdar`, `autoimmune_encephalitis_lgi1`, `myasthenia_gravis`, `neurosarcoidosis` |
@@ -210,7 +210,6 @@ Organized by clinical domain:
 | **Neuro-oncology** | `brain_tumor_glioma`, `brain_tumor_meningioma`, `brain_tumor_metastasis` |
 | **Headache** | `migraine_with_aura`, `migraine_without_aura` |
 | **Syncope** | `syncope_cardiac`, `syncope_vasovagal` |
-| **Peripheral** | `peripheral_neuropathy` |
 | **Functional** | `functional_neurological_disorder` |
 
 #### CaseDifficulty

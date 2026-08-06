@@ -35,7 +35,7 @@ CONDITION_LABELS = {
     "autoimmune_encephalitis_nmdar": "NMDAR encephalitis",
     "nph":                          "NPH",
     "parkinsons":                   "Parkinson's disease",
-    "peripheral_neuropathy":        "Peripheral neuropathy",
+    "vascular_dementia":            "Vascular dementia",
     "subarachnoid_hemorrhage":      "SAH",
     "status_epilepticus":           "Status epilepticus",
     "syncope_cardiac":              "Cardiac syncope",

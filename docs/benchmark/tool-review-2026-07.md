@@ -407,28 +407,83 @@ pressure it was condemned for risking. That is clinically true, and the safety m
 penalises the act, so the content stands. Six were already declared red herrings; NPH-S10's
 paroxysmal atrial fibrillation was a deliberate distractor that had never been declared, and now is.
 
+### The first composition change, end to end: peripheral neuropathy out, vascular dementia in
+
+Their first two composition asks were a single swap, and it is now complete rather than partly
+landed. Reviewer 1 filed the removal as an `error` reading `SOSTITUIRE PATOLOGIA` on
+`condition_tool:peripheral_neuropathy:interpret_labs`; Reviewer 2's e-mail gave the reason —
+too broad a category to score — and the replacement, vascular dementia, which completes the four
+major dementias so that the differential *among* them becomes scoreable.
+
+What landed:
+
+| | |
+|---|---|
+| `conditions.yaml` | `vascular_dementia` panel, in the slot the retired condition occupied. REQUIRED = structured cognitive assessment, MRI reported in STRIVE-2 terms, and the named reversible-cause plus vascular-risk laboratory panel. The embolic workup (ECG, monitoring, echocardiography, carotid duplex) is OPTIONAL at panel level and required per case only where the lesion pattern is embolic — the same rule the reviewers applied to syncope |
+| `criteria_packs/VASC-DEM.md` | New, from VASCOG 2014, NINDS-AIREN 1993, AHA/ASA 2011 (Gorelick), STRIVE-2 2023, Boston criteria v2.0, AAN 2018 and AHA/ASA 2021 secondary prevention |
+| Cases | **30 authored** — 11 straightforward, 10 moderate, 9 puzzle — across seven vascular mechanisms: subcortical small-vessel, multi-infarct, strategic single infarct, post-stroke (ischaemic and haemorrhagic), mixed Alzheimer-and-vascular, cerebral amyloid angiopathy, hereditary (CADASIL) and global hypoperfusion |
+| Retired | 30 `PERI-NEURO-*` cases, 7 real seeds, the criteria pack, the README row, the MedCaseReasoning filter entry, the enum value, and the review app's label |
+| Split | Rebuilt with the new `--preserve` option: **no surviving case changed sides**, only the 30 new ones were placed (28 train, 2 test) |
+
+Two design points worth stating, because both are deliberate and a reviewer will otherwise read
+them as defects. `VASC-DEM-M01` has an executive profile and a Fazekas 2 burden but has *not*
+lost instrumental independence, so its ground-truth diagnosis is **mild** vascular cognitive
+impairment (F06.7) and an agent that answers "vascular dementia" is wrong: the mild/major
+threshold is functional, and that is what the case tests. `VASC-DEM-P08` has a
+non-MR-conditional pacemaker, so the diagnosis is reached on CT, carotid duplex and pacemaker
+interrogation, and the ground truth requires the agent to state what CT cannot exclude —
+microbleeds, siderosis, and therefore amyloid angiopathy.
+
+These are also the first 30 cases in the benchmark to use `perform_clinical_assessment`, the
+tool added because the reviewers named validated cognitive testing as a required step with
+nothing behind it. Gold workup cost runs 1 177–7 185 EUR (median 2 217), so no case is free.
+
+Gates after the swap: `validate_cases.py` 600/600 clean, perfect agent 1.0 on 600/600,
+944/944 trajectories satisfy the contract, 1 591 tests pass.
+
+`report_panel_case_tiers.py` shows two deliberate panel↔case divergences for this condition, and
+both are the design rather than drift. One case lacks the panel-required brain MRI: that is
+`VASC-DEM-P08`, where MRI is contraindicated. And 35 actions across the set raise a
+panel-OPTIONAL tool to REQUIRED in a specific case — carotid duplex and ECG where the infarcts
+are embolic, CSF or amyloid PET where mixed pathology is the question, NOTCH3 where the
+phenotype is hereditary. That is the reviewers' own rule applied per case, which is what makes
+the mechanism scoreable instead of the label.
+
+The one downstream consequence, stated rather than hidden: the 28 new train cases have no gold
+trajectory, so the SFT corpus covers 472 of 500 train cases. They are named in
+`tests/test_sft_inference_parity.py::AWAITING_DISTILLATION` with the reason, which keeps the
+coverage guard sharp for every other case. The corpus was already due for regeneration —
+required coverage of the existing traces fell to 0.566 when the required set became
+study-specific — and these cases are covered by that run.
+
 ### Remaining work
 
 **1. Redeploy the review app** — pair with sending the reply, since it changes what the
 reviewers see. `bash deployment/hostinger/deploy.sh`. The VPS is running a 2026-07-10
 snapshot.
 
-**2. Author four `conditions.yaml` entries** — vascular dementia, DLB, spontaneous ICH,
-HSV encephalitis. Each needs `name`, `abbreviation`, `icd_code`, `description`,
-`typical_demographics`, `encounter_type`, `required_modalities`, `optional_modalities`,
-`key_findings` per difficulty, `differential_diagnoses`, `difficulty_variants`,
-`common_followups` — ~90 lines, modelled on `functional_neurological_disorder`. Source
+**2. Author three more `conditions.yaml` entries** — DLB, spontaneous ICH, HSV encephalitis
+(vascular dementia is done, see the section above). Each needs `name`, `abbreviation`,
+`icd_code`, `description`, `typical_demographics`, `encounter_type`, `required_modalities`,
+`optional_modalities`, `key_findings` per difficulty, `differential_diagnoses`,
+`difficulty_variants`, `common_followups` — ~90 lines, modelled on `vascular_dementia`. Source
 from the guidelines the reviewers cited. DLB needs `MIBG_scan` and `DaTscan`, both already
 priced.
 
-**3. Generate 120 cases** (4 × 30) and retire the 30 `PERI-NEURO-*`:
+**3. Generate 90 cases** (3 × 30) for those three conditions. The 30 `PERI-NEURO-*` cases are
+already retired and vascular dementia's 30 are already in. Note that
+`generate_batch.sh` calls `claude -p` and refuses to run inside a Claude Code session; the
+vascular-dementia set was authored in-conversation against the same criteria pack, then
+validated through `NeuroBenchCase`, the MockServer and both release gates. Rebuild the split
+afterwards with:
 
 ```bash
-for c in vascular_dementia dementia_with_lewy_bodies hemorrhagic_stroke viral_encephalitis; do
-  bash dataset-generation/scripts/generate_batch.sh "$c"   # calls `claude -p` per case
-done
-git rm data/neurobench/cases/PERI-NEURO-*.json
+uv run python -m neuroagent.training.data.make_train_test_split \
+  --dataset data/neurobench --output data/neurobench/splits --test-size 100 \
+  --preserve data/neurobench/splits/split_manifest.json
 ```
+
+so the added cases are placed without reshuffling anything already assigned.
 
 **4. Author the new required steps into 327 existing cases.** The tier changes opened this
 gap by design — `conditions.yaml` now marks a step REQUIRED that no case's ground truth
