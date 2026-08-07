@@ -234,29 +234,29 @@
     },
     {
       "trigger_action": "request_pulmonary_function_als",
-      "tool_name": "interpret_labs",
+      "tool_name": "order_specialized_test",
       "output": {
-        "panels": {
-          "PFT": [
-            {
-              "test": "FVC",
-              "value": 92,
-              "unit": "% predicted",
-              "reference_range": ">80%",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "SNIP",
-              "value": 88,
-              "unit": "cmH2O",
-              "reference_range": ">70 cmH2O men",
-              "is_abnormal": false
-            }
-          ]
+        "test_type": "respiratory_function",
+        "findings": [
+          {
+            "panel": "PFT",
+            "test": "FVC",
+            "result": "92",
+            "reference_range": ">80%"
+          },
+          {
+            "panel": "PFT",
+            "test": "SNIP",
+            "result": "88",
+            "reference_range": ">70 cmH2O men"
+          }
+        ],
+        "quantitative_data": {
+          "FVC": "92",
+          "SNIP": "88"
         },
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": []
+        "impression": "All values within normal limits.",
+        "recommended_actions": []
       }
     },
     {
@@ -691,18 +691,12 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
     },
-    "last_revised": "2026-05-26",
-    "revision_reason": "gold trajectory regen v5",
+    "last_revised": "2026-08-07",
+    "revision_reason": "per-case audit: request_pulmonary_function_als -> order_specialized_test{respiratory_function} — the required action could not reach a report filed under the laboratory tool",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:ALS",
     "difficulty_rationale": "Family history of early ALS death; genetic panel essential and shapes prognosis + treatment (tofersen eligibility); 5+ required tools",
-    "case_body_concerns": [
-      {
-        "field_path": "followup_outputs",
-        "concern": "ALS genetic panel is wired to `interpret_labs` rather than `order_specialized_test` with `test_type: genetic_panel:ALS`. Per the criteria pack and TOOL_PARAMETER_VOCABULARY, genetic testing should resolve via order_specialized_test. The gold trajectory routes the action via order_specialized_test; the case body fix is a tool-name swap in followup_outputs without changing the report payload.",
-        "suggested_fix": "Change followup tool_name from interpret_labs to order_specialized_test for the ALS_Genetic_Panel followup; payload structure can stay."
-      }
-    ],
+    "case_body_concerns": [],
     "citation_gap": [],
     "vocab_gap": []
   }

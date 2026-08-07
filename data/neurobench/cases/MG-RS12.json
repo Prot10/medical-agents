@@ -337,8 +337,8 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
     },
-    "last_revised": "2026-05-26",
-    "revision_reason": "gold trajectory regen v5",
+    "last_revised": "2026-08-07",
+    "revision_reason": "per-case audit: the electrophysiology studies named themselves in prose, so the discriminator could not tell them apart and the required repetitive-stimulation call was answered with whichever study occupied the slot",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:MG",
     "difficulty_rationale": "5 required tools, 0 red herrings, typical AChR+ generalized MG",
@@ -392,7 +392,7 @@
     "cardiac_monitoring": null,
     "advanced_imaging": null,
     "specialized_test": {
-      "test_type": "Repetitive nerve stimulation",
+      "test_type": "repetitive_nerve_stimulation",
       "findings": [
         {
           "description": "REPETITIVE NERVE STIMULATION STUDY\n\nIndication: Fatigable ptosis, bulbar dysfunction; RNS for NMJ assessment\n\nTECHNIQUE: 3 Hz RNS performed at anconeus (radial nerve), trapezius (accessory nerve), and orbicularis oculi (facial nerve)\n\nRESULTS:\n  Anconeus: Decrement 14% from 1st to 4th stimulus [>10% abnormal] ABNORMAL\n  Trapezius: Decrement 16% ABNORMAL\n  Orbicularis oculi: Decrement 12% ABNORMAL\n\nMOTOR NERVE CONDUCTION: Normal distal latencies and amplitudes; no evidence of peripheral neuropathy.\n\nSENSORY NERVE CONDUCTION: Normal.\n\nNEEDLE EMG (distal and proximal muscles): Normal insertional activity; no fibrillations, no fasciculations; no myopathic or neuropathic motor unit morphology changes.\n\nHIGH-RATE RNS (50 Hz): No pathological facilitating response.\n\nIMPRESSION: Abnormal decremental responses at 3 Hz in three muscle groups (anconeus 14%, trapezius 16%, orbicularis 12%). Normal needle EMG and nerve conduction. No 50 Hz increment. Findings are consistent with a disorder of neuromuscular transmission. Clinical correlation recommended."
@@ -441,10 +441,10 @@
       }
     },
     {
-      "trigger_action": "request_sfemg",
+      "trigger_action": "request_emg_single_fiber",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "Single-fiber EMG",
+        "test_type": "emg_single_fiber",
         "findings": [
           {
             "description": "SINGLE-FIBER EMG — ORBICULARIS OCULI\n\nMCD: 58 µs [normal <35 µs] MARKEDLY ABNORMAL\nBlocking: 20% of potential pairs\n\nIMPRESSION: Markedly increased mean consecutive difference with 20% blocking, consistent with a disorder of neuromuscular transmission. Clinical correlation recommended."
@@ -456,29 +456,30 @@
       }
     },
     {
-      "trigger_action": "request_pulmonary_function",
-      "tool_name": "interpret_labs",
+      "trigger_action": "request_respiratory_function",
+      "tool_name": "order_specialized_test",
       "output": {
-        "panels": {
-          "Pulmonary_function": [
-            {
-              "test": "NIF (Negative Inspiratory Force)",
-              "value": "-70 cm H2O",
-              "reference_range": "< -60 cm H2O",
-              "is_abnormal": false,
-              "unit": "cm H2O"
-            },
-            {
-              "test": "FVC % predicted",
-              "value": "86%",
-              "reference_range": "> 80%",
-              "is_abnormal": false,
-              "unit": "%"
-            }
-          ]
+        "test_type": "respiratory_function",
+        "findings": [
+          {
+            "panel": "Pulmonary_function",
+            "test": "NIF (Negative Inspiratory Force)",
+            "result": "-70 cm H2O",
+            "reference_range": "< -60 cm H2O"
+          },
+          {
+            "panel": "Pulmonary_function",
+            "test": "FVC % predicted",
+            "result": "86%",
+            "reference_range": "> 80%"
+          }
+        ],
+        "quantitative_data": {
+          "NIF (Negative Inspiratory Force)": "-70 cm H2O",
+          "FVC % predicted": "86%"
         },
-        "interpretation": "Pulmonary function adequate. NIF -70 cm H2O (reference < -60 cm H2O — meets threshold for adequate respiratory reserve). FVC 86% predicted. No immediate respiratory compromise.",
-        "abnormal_values_summary": []
+        "impression": "Pulmonary function adequate. NIF -70 cm H2O (reference < -60 cm H2O — meets threshold for adequate respiratory reserve). FVC 86% predicted. No immediate respiratory compromise.",
+        "recommended_actions": []
       }
     },
     {

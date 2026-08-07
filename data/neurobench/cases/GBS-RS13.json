@@ -286,31 +286,29 @@
     },
     {
       "trigger_action": "request_respiratory_monitoring",
-      "tool_name": "interpret_labs",
+      "tool_name": "order_specialized_test",
       "output": {
-        "panels": {
-          "Respiratory": [
-            {
-              "test": "SpO2 on room air",
-              "value": "93%",
-              "unit": "%",
-              "reference_range": ">95%",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "FVC (estimated pre-intubation)",
-              "value": "Not measurable — patient intubated on day 2",
-              "unit": "",
-              "reference_range": "N/A",
-              "is_abnormal": true
-            }
-          ]
+        "test_type": "respiratory_function",
+        "findings": [
+          {
+            "panel": "Respiratory",
+            "test": "SpO2 on room air",
+            "result": "93%",
+            "reference_range": ">95%"
+          },
+          {
+            "panel": "Respiratory",
+            "test": "FVC (estimated pre-intubation)",
+            "result": "Not measurable — patient intubated on day 2",
+            "reference_range": "N/A"
+          }
+        ],
+        "quantitative_data": {
+          "SpO2 on room air": "93%",
+          "FVC (estimated pre-intubation)": "Not measurable — patient intubated on day 2"
         },
-        "interpretation": "Abnormal values: SpO2 on room air 93% (H), FVC (estimated pre-intubation) Not measurable — patient intubated on day 2 (H).",
-        "abnormal_values_summary": [
-          "Respiratory failure — intubated day 2"
-        ]
+        "impression": "Abnormal values: SpO2 on room air 93% (H), FVC (estimated pre-intubation) Not measurable — patient intubated on day 2 (H).",
+        "recommended_actions": []
       }
     },
     {
@@ -729,12 +727,11 @@
       "drug_interactions": "normal"
     },
     "last_revised": "2026-08-07",
-    "revision_reason": "clinical tool review: cardiac monitoring promoted to required in the case, with the telemetry report it needed in order to be answerable",
+    "revision_reason": "per-case audit: request_respiratory_monitoring -> order_specialized_test{respiratory_function} — the required action could not reach a report filed under the laboratory tool",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:GBS",
     "difficulty_rationale": "6 required tools, 1 red herring(s); classic or near-classic GBS workup with one or more plausible mimics that need active exclusion.",
     "case_body_concerns": [
-      "Bedside respiratory function (FVC/MIP/MEP/NIF) is delivered via an `interpret_labs` followup panel rather than `order_specialized_test{test_type=respiratory_function}` as the criteria pack mandates. Agents calling order_specialized_test{respiratory_function} will hit the EMG/NCS output instead. Recommend adding a respiratory_function followup keyed to order_specialized_test in a follow-up case-body pass.",
       "Mirrored fallback_tool_outputs into followup_outputs for required tools that previously only existed in the fallback bucket: ['search_medical_literature', 'check_drug_interactions']. Content is unchanged; the move makes the coherence validator see an explicit primary output for criteria-pack-required tools."
     ],
     "citation_gap": [],

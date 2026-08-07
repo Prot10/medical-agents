@@ -382,38 +382,36 @@
     },
     {
       "trigger_action": "request_genetic_panel_young_onset",
-      "tool_name": "interpret_labs",
+      "tool_name": "order_specialized_test",
       "output": {
-        "panels": {
-          "Young_Onset_Dementia_Genetic_Panel": [
-            {
-              "test": "C9orf72 repeat expansion",
-              "value": "No expansion — 2/3 repeats (normal)",
-              "unit": "repeat count",
-              "reference_range": "Normal <30",
-              "is_abnormal": false
-            },
-            {
-              "test": "GRN sequencing",
-              "value": "HETEROZYGOUS PATHOGENIC VARIANT identified: GRN c.1477C>T (p.Arg493*) — STOP CODON — loss-of-function mutation",
-              "unit": "sequencing",
-              "reference_range": "No pathogenic variant",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "MAPT sequencing",
-              "value": "No pathogenic variant",
-              "unit": "sequencing",
-              "reference_range": "No pathogenic variant",
-              "is_abnormal": false
-            }
-          ]
+        "test_type": "genetic_panel:FTD",
+        "findings": [
+          {
+            "panel": "Young_Onset_Dementia_Genetic_Panel",
+            "test": "C9orf72 repeat expansion",
+            "result": "No expansion — 2/3 repeats (normal)",
+            "reference_range": "Normal <30"
+          },
+          {
+            "panel": "Young_Onset_Dementia_Genetic_Panel",
+            "test": "GRN sequencing",
+            "result": "HETEROZYGOUS PATHOGENIC VARIANT identified: GRN c.1477C>T (p.Arg493*) — STOP CODON — loss-of-function mutation",
+            "reference_range": "No pathogenic variant"
+          },
+          {
+            "panel": "Young_Onset_Dementia_Genetic_Panel",
+            "test": "MAPT sequencing",
+            "result": "No pathogenic variant",
+            "reference_range": "No pathogenic variant"
+          }
+        ],
+        "quantitative_data": {
+          "C9orf72 repeat expansion": "No expansion — 2/3 repeats (normal)",
+          "GRN sequencing": "HETEROZYGOUS PATHOGENIC VARIANT identified: GRN c.1477C>T (p.Arg493*) — STOP CODON — loss-of-function mutation",
+          "MAPT sequencing": "No pathogenic variant"
         },
-        "interpretation": "Abnormal values: GRN sequencing HETEROZYGOUS PATHOGENIC VARIANT identified: GRN c.1477C>T (p.Arg493*) — STOP CODON — loss-of-function mutation sequencing (H).",
-        "abnormal_values_summary": [
-          "GRN c.1477C>T PATHOGENIC NONSENSE VARIANT"
-        ]
+        "impression": "Abnormal values: GRN sequencing HETEROZYGOUS PATHOGENIC VARIANT identified: GRN c.1477C>T (p.Arg493*) — STOP CODON — loss-of-function mutation sequencing (H).",
+        "recommended_actions": []
       }
     },
     {
@@ -901,7 +899,7 @@
       "specialized_test": "normal"
     },
     "last_revised": "2026-08-07",
-    "revision_reason": "clinical tool review: order_advanced_imaging demoted to optional in the case, which is where the tier is scored — the panel had been changed alone",
+    "revision_reason": "per-case audit: request_genetic_panel_young_onset -> order_specialized_test{genetic_panel:FTD} — the required action could not reach a report filed under the laboratory tool",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:FTD",
     "difficulty_rationale": "≥5 required tools, multi-axis confounders (psychiatric comorbidity, normal/subtle MRI, parkinsonism overlap, or APOE-driven AD anchoring), and 2+ grounded red herrings — requires sophisticated biomarker / genetic reasoning to overcome anchoring on a comorbidity.",
@@ -910,8 +908,7 @@
       "required tool `order_specialized_test` (step 7, params={'test_type': 'genetic_panel:FTD'}) has no initial_tool_outputs or followup_outputs entry — case body should add a order_specialized_test output to support this required step",
       "validator flags `order_advanced_imaging` in both optimal_actions (FDG_PET / amyloid_PET) and useless_tools (MR_spectroscopy / DaTscan / perfusion_MRI / carotid_duplex) — these are distinct modalities of the same catchall tool. Known systemic validator limitation: the coherence script ignores `tool_parameters.modality`. No fix at case level.",
       "required tool `order_specialized_test` has no matching `initial_tool_outputs` or `followup_outputs` entry — case body should add a corresponding output so the agent gets a meaningful result when calling this required step.",
-      "fallback output for `order_advanced_imaging` is missing in `fallback_tool_outputs` — calling the useless tool will return empty; case body needs an off-pathway fallback entry.",
-      "RESOLVED (coherence sweep): both required order_specialized_test calls (neuropsych_battery + genetic_panel:FTD) are now satisfied. The mock server resolves order_specialized_test to the single initial_tool_outputs.specialized_test slot regardless of test_type; the diagnostically primary neuropsych_battery report occupies that slot, and the genetic result is delivered via the existing interpret_labs genetic-panel followup consistent with this case's genotype."
+      "fallback output for `order_advanced_imaging` is missing in `fallback_tool_outputs` — calling the useless tool will return empty; case body needs an off-pathway fallback entry."
     ],
     "citation_gap": [],
     "vocab_gap": []

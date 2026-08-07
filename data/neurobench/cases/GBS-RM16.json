@@ -278,10 +278,11 @@
     },
     {
       "trigger_action": "request_spine_mri",
-      "tool_name": "order_advanced_imaging",
+      "tool_name": "order_body_imaging",
       "output": {
-        "modality": "MRI cervical and thoracic spine with gadolinium",
-        "tracer_or_protocol": "1.5T gadolinium",
+        "region": "spine",
+        "modality": "MRI",
+        "contrast": false,
         "findings": [
           {
             "region": "Cervical spinal cord",
@@ -300,7 +301,7 @@
             "finding": "Mild C5-C6 degenerative changes — incidental, no cord compression"
           }
         ],
-        "quantitative_data": {
+        "measurements": {
           "enhancement_pattern": "Diffuse mild nerve root enhancement"
         },
         "impression": "1. No T2 signal abnormality in the cervical or thoracic spinal cord. No cord lesion identified at the T4 level or elsewhere. 2. Mild diffuse nerve root enhancement throughout the imaged spine. 3. Mild C5-C6 degenerative changes without cord compression",
@@ -346,32 +347,29 @@
     },
     {
       "trigger_action": "request_respiratory_monitoring",
-      "tool_name": "interpret_labs",
+      "tool_name": "order_specialized_test",
       "output": {
-        "panels": {
-          "Respiratory": [
-            {
-              "test": "FVC",
-              "value": "2.2 L",
-              "unit": "L",
-              "reference_range": "55% predicted",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "NIF",
-              "value": "-26 cmH2O",
-              "unit": "cmH2O",
-              "reference_range": "Marginally above -25 threshold",
-              "is_abnormal": false
-            }
-          ]
+        "test_type": "respiratory_function",
+        "findings": [
+          {
+            "panel": "Respiratory",
+            "test": "FVC",
+            "result": "2.2 L",
+            "reference_range": "55% predicted"
+          },
+          {
+            "panel": "Respiratory",
+            "test": "NIF",
+            "result": "-26 cmH2O",
+            "reference_range": "Marginally above -25 threshold"
+          }
+        ],
+        "quantitative_data": {
+          "FVC": "2.2 L",
+          "NIF": "-26 cmH2O"
         },
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": [
-          "FVC declining trend 2.4 → 2.2 L",
-          "NIF marginal -26 cmH2O"
-        ]
+        "impression": "All values within normal limits.",
+        "recommended_actions": []
       }
     },
     {
@@ -707,12 +705,11 @@
       "literature_search": "normal"
     },
     "last_revised": "2026-08-07",
-    "revision_reason": "clinical tool review: cardiac monitoring promoted to required in the case, with the telemetry report it needed in order to be answerable",
+    "revision_reason": "per-case audit: request_respiratory_monitoring -> order_specialized_test{respiratory_function} — the required action could not reach a report filed under the laboratory tool",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:GBS",
     "difficulty_rationale": "6 required tools, 0 red herring(s); classic or near-classic GBS workup with one or more plausible mimics that need active exclusion.",
     "case_body_concerns": [
-      "Bedside respiratory function (FVC/MIP/MEP/NIF) is delivered via an `interpret_labs` followup panel rather than `order_specialized_test{test_type=respiratory_function}` as the criteria pack mandates. Agents calling order_specialized_test{respiratory_function} will hit the EMG/NCS output instead. Recommend adding a respiratory_function followup keyed to order_specialized_test in a follow-up case-body pass.",
       "Mirrored fallback_tool_outputs into followup_outputs for required tools that previously only existed in the fallback bucket: ['search_medical_literature']. Content is unchanged; the move makes the coherence validator see an explicit primary output for criteria-pack-required tools."
     ],
     "citation_gap": [],

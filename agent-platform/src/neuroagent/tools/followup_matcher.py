@@ -104,6 +104,23 @@ def _trigger_tokens(trigger_action: str) -> set[str]:
 
 
 def _call_tokens(tool_name: str, parameters: dict[str, Any] | None) -> set[str]:
+    """Tokens identifying the study a call asks for.
+
+    Parameter *values* carry that identity for every tool but one. `order_ct_scan` names its study
+    with flags — `{"contrast": True, "angiography": True}` IS the CT angiogram — and a flag's value
+    stringifies to `"true"`, which identifies nothing. So a call for a CTA produced the token set
+    `{"true", "ct", "order", "scan"}` while the follow-up authored to answer it carried the trigger
+    `request_ct_angiography` (`{"ct", "angiography"}`), they shared no meaningful token, and the
+    stored CTA report was unreachable by the only call that names it: 54 required CT-angiography
+    actions across ischaemic stroke and subarachnoid haemorrhage were answered with the
+    non-contrast CT, whose own `angiography_findings` is null. Both the scorer and the cost model
+    treat angiography as a distinct study (`_SCALAR_DISCRIMINATORS`, +184 EUR); only the simulator
+    did not.
+
+    For a boolean flag the study identity is the parameter *key*, so a true flag contributes its
+    name. A false flag contributes nothing on purpose: `angiography=False` asserts this is NOT the
+    angiogram, and letting it match would hand the CTA report to a plain-CT order.
+    """
     values: list[str] = []
 
     def walk(v: Any) -> None:
@@ -117,7 +134,8 @@ def _call_tokens(tool_name: str, parameters: dict[str, Any] | None) -> set[str]:
             values.append(str(v))
 
     walk(parameters or {})
-    return _tokenize(" ".join([*values, tool_name]))
+    flags = [key for key, value in (parameters or {}).items() if value is True]
+    return _tokenize(" ".join([*values, *flags, tool_name]))
 
 
 def _tok_match(a: str, b: str) -> bool:

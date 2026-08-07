@@ -251,25 +251,20 @@
       }
     },
     {
-      "trigger_action": "request_digital_subtraction_angiography",
-      "tool_name": "order_advanced_imaging",
+      "trigger_action": "request_ct_angiography",
+      "tool_name": "order_ct_scan",
       "output": {
-        "modality": "CT Angiography head with renal precautions",
-        "tracer_or_protocol": "IV contrast CTA - minimum contrast volume, IV hydration pre and post",
-        "findings": [
-          {
-            "location": "Left posterior communicating artery",
-            "finding": "Saccular aneurysm 4.8 x 4.2 mm - irregular bleb, ruptured appearance"
-          },
-          {
-            "location": "Other vessels",
-            "finding": "No additional aneurysms"
-          }
-        ],
-        "quantitative_data": {
-          "size": "4.8 x 4.2 mm",
-          "location": "Left PComA"
+        "findings": [],
+        "contrast_used": true,
+        "angiography_findings": {
+          "Left posterior communicating artery": "Saccular aneurysm 4.8 x 4.2 mm - irregular bleb, ruptured appearance",
+          "Other vessels": "No additional aneurysms"
         },
+        "additional_observations": [
+          "size: 4.8 x 4.2 mm",
+          "location: Left PComA",
+          "IV contrast CTA - minimum contrast volume, IV hydration pre and post"
+        ],
         "impression": "1. Saccular aneurysm of the left posterior communicating artery, measuring 4.8 x 4.2 mm, with irregular bleb morphology consistent with a ruptured aneurysm. 2. No additional intracranial aneurysms identified. Findings are consistent with the source of subarachnoid hemorrhage. Conventional DSA recommended for treatment planning",
         "recommended_actions": [
           "Conventional DSA recommended for treatment planning"
@@ -278,9 +273,10 @@
     },
     {
       "trigger_action": "request_transcranial_doppler",
-      "tool_name": "order_specialized_test",
+      "tool_name": "order_advanced_imaging",
       "output": {
-        "test_type": "TCD Day 6",
+        "modality": "transcranial_doppler",
+        "tracer_or_protocol": "Bilateral transtemporal insonation of the middle cerebral arteries",
         "findings": [
           {
             "vessel": "Left MCA",
@@ -612,18 +608,6 @@
         },
         "citation": "[Hoh_2023]",
         "guideline_source": "Hoh_2023"
-      },
-      {
-        "step": 11,
-        "action": "Consider MR angiography as alternative vascular imaging given renal impairment and contrast considerations",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Vascular tree visualization without iodinated contrast; sensitivity slightly less than CTA for aneurysms <3 mm",
-        "category": "optional",
-        "tool_parameters": {
-          "modality": "MR_angiography"
-        },
-        "citation": "[Hoh_2023]",
-        "guideline_source": "Hoh_2023"
       }
     ],
     "useless_tools": [
@@ -743,8 +727,8 @@
       "eeg": "normal",
       "cardiac_monitoring": "incidental"
     },
-    "last_revised": "2026-05-26",
-    "revision_reason": "gold trajectory regen v5",
+    "last_revised": "2026-08-07",
+    "revision_reason": "per-case audit: withdrew order_advanced_imaging MR_angiography",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:SAH",
     "difficulty_rationale": "Classic SAH presentation but one comorbidity (anticoagulant, CKD, PKD, lithium, cocaine, or hydrocephalus) introduces an additional management thread; 7-8 required tools plus medication / pre-procedure complexity.",
@@ -755,6 +739,15 @@
     "vocab_gap": [],
     "panel_required_exemptions": {
       "analyze_csf": "The panel marks CSF required conditionally: mandatory only when the index CT is non-diagnostic. This case's CT is diagnostic for subarachnoid haemorrhage, so a lumbar puncture adds risk without adding information — the three cases with a negative CT (SAH-P01, P03, P06) do require it."
-    }
+    },
+    "actions_withdrawn": [
+      {
+        "tool_name": "order_advanced_imaging",
+        "study": "MR_angiography",
+        "category": "optional",
+        "action": "Consider MR angiography as alternative vascular imaging given renal impairment and contrast considerations",
+        "reason": "The case stores no result for this study, so an agent following the gold standard received an error or an off-pathway placeholder. Withdrawn during the per-case audit of 2026-08-07; reinstate it with an authored report."
+      }
+    ]
   }
 }

@@ -304,10 +304,10 @@
   },
   "followup_outputs": [
     {
-      "trigger_action": "request_sfemg",
+      "trigger_action": "request_emg_single_fiber",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "SFEMG — Extensor Digitorum Communis",
+        "test_type": "emg_single_fiber",
         "findings": [
           {
             "measurement": "Mean MCD",
@@ -413,42 +413,37 @@
       }
     },
     {
-      "trigger_action": "request_pulmonary_function",
-      "tool_name": "interpret_labs",
+      "trigger_action": "request_respiratory_function",
+      "tool_name": "order_specialized_test",
       "output": {
-        "panels": {
-          "Respiratory Monitoring": [
-            {
-              "test": "NIF",
-              "value": -48,
-              "unit": "cmH2O",
-              "reference_range": ">-60",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "FVC",
-              "value": 2.8,
-              "unit": "L",
-              "reference_range": ">3.0L predicted",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "ABG",
-              "value": "pH 7.41, pCO2 41, pO2 86",
-              "unit": "qualitative",
-              "reference_range": "Normal",
-              "is_abnormal": false,
-              "clinical_significance": null
-            }
-          ]
+        "test_type": "respiratory_function",
+        "findings": [
+          {
+            "panel": "Respiratory Monitoring",
+            "test": "NIF",
+            "result": "-48",
+            "reference_range": ">-60"
+          },
+          {
+            "panel": "Respiratory Monitoring",
+            "test": "FVC",
+            "result": "2.8",
+            "reference_range": ">3.0L predicted"
+          },
+          {
+            "panel": "Respiratory Monitoring",
+            "test": "ABG",
+            "result": "pH 7.41, pCO2 41, pO2 86",
+            "reference_range": "Normal"
+          }
+        ],
+        "quantitative_data": {
+          "NIF": "-48",
+          "FVC": "2.8",
+          "ABG": "pH 7.41, pCO2 41, pO2 86"
         },
-        "interpretation": "Abnormal values: NIF -48 cmH2O (L), FVC 2.8 L (L).",
-        "abnormal_values_summary": [
-          "NIF -48 (borderline)",
-          "FVC mildly reduced"
-        ]
+        "impression": "Abnormal values: NIF -48 cmH2O (L), FVC 2.8 L (L).",
+        "recommended_actions": []
       }
     },
     {
@@ -651,22 +646,10 @@
       },
       {
         "step": 2,
-        "action": "Order repetitive nerve stimulation (RNS) at 2-3 Hz across proximal and facial muscles",
+        "action": "Perform single-fibre electromyography of a clinically weak muscle: the most sensitive electrodiagnostic test of neuromuscular-junction transmission, and the appropriate electrodiagnostic step when repetitive stimulation is normal or not available",
         "tool_name": "order_specialized_test",
         "expected_finding": "Decrement >10% in symptomatic muscles supports postsynaptic NMJ disorder",
         "category": "required",
-        "tool_parameters": {
-          "test_type": "repetitive_nerve_stimulation"
-        },
-        "citation": "[Wolfe_2016]",
-        "guideline_source": "Wolfe_2016"
-      },
-      {
-        "step": 3,
-        "action": "Order single-fiber EMG (gold standard >95% sensitivity)",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Increased jitter and blocking on extensor digitorum communis or orbicularis oculi confirms NMJ transmission failure",
-        "category": "recommended",
         "tool_parameters": {
           "test_type": "emg_single_fiber"
         },
@@ -674,7 +657,7 @@
         "guideline_source": "Wolfe_2016"
       },
       {
-        "step": 4,
+        "step": 3,
         "action": "Order CT chest with contrast for thymoma screening",
         "tool_name": "order_body_imaging",
         "expected_finding": "No thymoma; thymic involution appropriate for age",
@@ -687,7 +670,7 @@
         "guideline_source": "Wolfe_2016"
       },
       {
-        "step": 5,
+        "step": 4,
         "action": "Review MGFA classification and current treatment guidance (pyridostigmine, prednisone, steroid-sparing, IVIG/PLEX, thymectomy)",
         "tool_name": "search_medical_literature",
         "expected_finding": "MGFA classification stages disease severity; thymectomy benefits AChR+ generalized MG (MGTX); IVIG/PLEX for crisis",
@@ -699,7 +682,7 @@
         "guideline_source": "Sanders_2016"
       },
       {
-        "step": 6,
+        "step": 5,
         "action": "Check drug interactions for MG-exacerbating agents (aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, neuromuscular blockers, procainamide)",
         "tool_name": "check_drug_interactions",
         "expected_finding": "Flag aminoglycosides, fluoroquinolones, IV magnesium, telithromycin, NMBs as contraindicated or use-with-caution in MG",
@@ -718,7 +701,7 @@
         "guideline_source": "Wolfe_2016"
       },
       {
-        "step": 7,
+        "step": 6,
         "action": "Bedside respiratory function testing (FVC, MIP/MEP, NIF) — repeat q4h in crisis",
         "tool_name": "order_specialized_test",
         "expected_finding": "Baseline FVC/NIF to assess crisis risk in patients with bulbar or limb involvement",
@@ -728,18 +711,6 @@
         },
         "citation": "[Sanders_2016]",
         "guideline_source": "Sanders_2016"
-      },
-      {
-        "step": 8,
-        "action": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Improvement of ptosis after 2 minutes of cooling supports MG",
-        "category": "recommended",
-        "tool_parameters": {
-          "test_type": "ice_pack_test"
-        },
-        "citation": "[Wolfe_2016]",
-        "guideline_source": "Wolfe_2016"
       }
     ],
     "useless_tools": [
@@ -847,8 +818,8 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
     },
-    "last_revised": "2026-05-26",
-    "revision_reason": "gold trajectory regen v5",
+    "last_revised": "2026-08-07",
+    "revision_reason": "per-case audit: repetitive_nerve_stimulation -> emg_single_fiber: the case holds a single-fibre EMG and no repetitive-stimulation study; SFEMG is the more sensitive electrodiagnostic test of the neuromuscular junction and an accepted alternative, so the required electrodiagnostic step names the study performed; withdrew order_specialized_test ice_pack_test",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:MG",
     "difficulty_rationale": "5 required tools, 2 red herrings, typical AChR+ generalized MG",
@@ -856,6 +827,15 @@
     "citation_gap": [],
     "vocab_gap": [
       "emg_ncs_useless_via_param_conflation: pack lists order_specialized_test:emg_ncs as USELESS, but coherence validator treats tool_name overlap as a contradiction regardless of tool_parameters; cannot encode without removing required RNS/SFEMG entries. Suggest extending validator to compare tool_name + tool_parameters or fleet-wide pattern."
+    ],
+    "actions_withdrawn": [
+      {
+        "tool_name": "order_specialized_test",
+        "study": "ice_pack_test",
+        "category": "recommended",
+        "action": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)",
+        "reason": "The bedside ice-pack test is recommended here but its result is not stored in this case, or in any case in the condition — the only mention of it anywhere is this recommendation. Its outcome does not follow from the documented ptosis, and at roughly 80% sensitivity it is not definitional of the diagnosis, so authoring a result would be inventing one. Withdrawn from the gold standard during the per-case audit of 2026-08-07; reinstate it with a clinician-authored report."
+      }
     ]
   }
 }

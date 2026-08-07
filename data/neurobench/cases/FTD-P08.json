@@ -506,56 +506,50 @@
     },
     {
       "trigger_action": "request_genetic_panel_c9orf72",
-      "tool_name": "interpret_labs",
+      "tool_name": "order_specialized_test",
       "output": {
-        "panels": {
-          "Neurodegenerative_Genetic_Panel": [
-            {
-              "test": "C9orf72 GGGGCC hexanucleotide repeat expansion (Southern blot + repeat-primed PCR)",
-              "value": "PATHOGENIC EXPANSION DETECTED — estimated >600 GGGGCC repeats on one allele",
-              "unit": "repeat count",
-              "reference_range": "Normal: <30 repeats; Pathogenic: >30 (typically >200 in disease-associated expansion)",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "GRN (progranulin) sequencing",
-              "value": "No pathogenic variant detected",
-              "unit": "genetic sequencing",
-              "reference_range": "No pathogenic variant",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "MAPT sequencing",
-              "value": "No pathogenic variant detected",
-              "unit": "genetic sequencing",
-              "reference_range": "No pathogenic variant",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "SOD1 sequencing",
-              "value": "No pathogenic variant detected",
-              "unit": "genetic sequencing",
-              "reference_range": "No pathogenic variant",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "TARDBP sequencing",
-              "value": "No pathogenic variant detected",
-              "unit": "genetic sequencing",
-              "reference_range": "No pathogenic variant",
-              "is_abnormal": false,
-              "clinical_significance": null
-            }
-          ]
+        "test_type": "genetic_panel:ALS",
+        "findings": [
+          {
+            "panel": "Neurodegenerative_Genetic_Panel",
+            "test": "C9orf72 GGGGCC hexanucleotide repeat expansion (Southern blot + repeat-primed PCR)",
+            "result": "PATHOGENIC EXPANSION DETECTED — estimated >600 GGGGCC repeats on one allele",
+            "reference_range": "Normal: <30 repeats; Pathogenic: >30 (typically >200 in disease-associated expansion)"
+          },
+          {
+            "panel": "Neurodegenerative_Genetic_Panel",
+            "test": "GRN (progranulin) sequencing",
+            "result": "No pathogenic variant detected",
+            "reference_range": "No pathogenic variant"
+          },
+          {
+            "panel": "Neurodegenerative_Genetic_Panel",
+            "test": "MAPT sequencing",
+            "result": "No pathogenic variant detected",
+            "reference_range": "No pathogenic variant"
+          },
+          {
+            "panel": "Neurodegenerative_Genetic_Panel",
+            "test": "SOD1 sequencing",
+            "result": "No pathogenic variant detected",
+            "reference_range": "No pathogenic variant"
+          },
+          {
+            "panel": "Neurodegenerative_Genetic_Panel",
+            "test": "TARDBP sequencing",
+            "result": "No pathogenic variant detected",
+            "reference_range": "No pathogenic variant"
+          }
+        ],
+        "quantitative_data": {
+          "C9orf72 GGGGCC hexanucleotide repeat expansion (Southern blot + repeat-primed PCR)": "PATHOGENIC EXPANSION DETECTED — estimated >600 GGGGCC repeats on one allele",
+          "GRN (progranulin) sequencing": "No pathogenic variant detected",
+          "MAPT sequencing": "No pathogenic variant detected",
+          "SOD1 sequencing": "No pathogenic variant detected",
+          "TARDBP sequencing": "No pathogenic variant detected"
         },
-        "interpretation": "Abnormal values: C9orf72 GGGGCC hexanucleotide repeat expansion: PATHOGENIC EXPANSION DETECTED — estimated >600 repeats on one allele. GRN, MAPT, SOD1, TARDBP: no pathogenic variant detected.",
-        "abnormal_values_summary": [
-          "C9orf72 PATHOGENIC EXPANSION — >600 GGGGCC repeats (normal <30)"
-        ]
+        "impression": "Abnormal values: C9orf72 GGGGCC hexanucleotide repeat expansion: PATHOGENIC EXPANSION DETECTED — estimated >600 repeats on one allele. GRN, MAPT, SOD1, TARDBP: no pathogenic variant detected.",
+        "recommended_actions": []
       }
     },
     {
@@ -1007,13 +1001,12 @@
   },
   "metadata": {
     "version": "v5",
-    "last_revised": "2026-08-06",
-    "revision_reason": "clinical tool review: the panel's required clinical assessment, absent from the cases, added as a scored act",
+    "last_revised": "2026-08-07",
+    "revision_reason": "per-case audit: request_genetic_panel_c9orf72 -> order_specialized_test{genetic_panel:ALS} — the required action could not reach a report filed under the laboratory tool",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:FTD",
     "difficulty_rationale": "diagnostic_puzzle: ≥5 required tools (MRI, labs, EMG/NCS, neuropsych, respiratory function, literature search, genetics — 7 total required), multi-domain cognitive+neuromuscular synthesis required, motor signs masked as anxiety across 14 months with documented prior misattribution, mildly elevated CK as myopathy red herring, requires recognizing FTD-MND as unified diagnosis rather than treating behavioral and motor syndromes as independent",
     "case_body_concerns": [
-      "Mock-server limitation (CLINICIAN_REVIEW_FLAGS section 9): order_specialized_test resolves to one output slot regardless of test_type. This case requires EMG/NCS (puzzle-cracking, placed in initial_tool_outputs.specialized_test), neuropsych_battery (followup), respiratory_function (followup), and genetic_panel:ALS (delivered via interpret_labs in followup). This is consistent with how FTD-P02/P04 handled multi-specialized-test cases. Genetics is delivered via interpret_labs followup (identical to FTD-M02 pattern). The initial specialized_test slot is occupied by EMG/NCS as the primary diagnostic pivot.",
       "validator flags order_advanced_imaging in both optimal_actions (FDG_PET) and useless_tools (DaTscan, MR_spectroscopy, carotid_duplex) — these are distinct modalities of the same catchall tool. Known systemic validator limitation: the coherence script ignores tool_parameters.modality. No fix at case level."
     ],
     "citation_gap": [

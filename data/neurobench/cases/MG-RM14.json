@@ -173,7 +173,7 @@
       ]
     },
     "specialized_test": {
-      "test_type": "Point-of-care respiratory assessment — formal EMG deferred due to crisis",
+      "test_type": "respiratory_function",
       "findings": [
         {
           "test": "Bedside respiratory assessment",
@@ -573,30 +573,6 @@
       },
       {
         "step": 2,
-        "action": "Order repetitive nerve stimulation (RNS) at 2-3 Hz across proximal and facial muscles",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Decrement >10% in symptomatic muscles supports postsynaptic NMJ disorder",
-        "category": "required",
-        "tool_parameters": {
-          "test_type": "repetitive_nerve_stimulation"
-        },
-        "citation": "[Wolfe_2016]",
-        "guideline_source": "Wolfe_2016"
-      },
-      {
-        "step": 3,
-        "action": "Order single-fiber EMG (gold standard >95% sensitivity)",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Increased jitter and blocking on extensor digitorum communis or orbicularis oculi confirms NMJ transmission failure",
-        "category": "recommended",
-        "tool_parameters": {
-          "test_type": "emg_single_fiber"
-        },
-        "citation": "[Wolfe_2016]",
-        "guideline_source": "Wolfe_2016"
-      },
-      {
-        "step": 4,
         "action": "Order CT chest with contrast for thymoma screening",
         "tool_name": "order_body_imaging",
         "expected_finding": "No thymoma; thymic involution appropriate for age",
@@ -609,7 +585,7 @@
         "guideline_source": "Wolfe_2016"
       },
       {
-        "step": 5,
+        "step": 3,
         "action": "Review MGFA classification and current treatment guidance (pyridostigmine, prednisone, steroid-sparing, IVIG/PLEX, thymectomy)",
         "tool_name": "search_medical_literature",
         "expected_finding": "MGFA classification stages disease severity; thymectomy benefits AChR+ generalized MG (MGTX); IVIG/PLEX for crisis",
@@ -621,7 +597,7 @@
         "guideline_source": "Sanders_2016"
       },
       {
-        "step": 6,
+        "step": 4,
         "action": "Check drug interactions for MG-exacerbating agents (aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, neuromuscular blockers, procainamide)",
         "tool_name": "check_drug_interactions",
         "expected_finding": "Flag aminoglycosides, fluoroquinolones, IV magnesium, telithromycin, NMBs as contraindicated or use-with-caution in MG",
@@ -640,7 +616,7 @@
         "guideline_source": "Wolfe_2016"
       },
       {
-        "step": 7,
+        "step": 5,
         "action": "Bedside respiratory function testing (FVC, MIP/MEP, NIF) — repeat q4h in crisis",
         "tool_name": "order_specialized_test",
         "expected_finding": "FVC <20 mL/kg or NIF less negative than -30 cmH2O = intubation criteria",
@@ -652,19 +628,7 @@
         "guideline_source": "Sanders_2016"
       },
       {
-        "step": 8,
-        "action": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Improvement of ptosis after 2 minutes of cooling supports MG",
-        "category": "recommended",
-        "tool_parameters": {
-          "test_type": "ice_pack_test"
-        },
-        "citation": "[Wolfe_2016]",
-        "guideline_source": "Wolfe_2016"
-      },
-      {
-        "step": 9,
+        "step": 6,
         "action": "Plasma exchange (PLEX) or IVIG initiation for myasthenic crisis",
         "tool_name": null,
         "expected_finding": "PLEX 5 cycles or IVIG 0.4 g/kg/day for 5 days; expect clinical improvement within days",
@@ -674,7 +638,7 @@
         "guideline_source": "Sanders_2016"
       },
       {
-        "step": 10,
+        "step": 7,
         "action": "Discontinue ciprofloxacin immediately; substitute non-fluoroquinolone if antibiotic still needed",
         "tool_name": null,
         "expected_finding": "Removal of precipitant; clinical improvement over days",
@@ -794,8 +758,8 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
     },
-    "last_revised": "2026-05-26",
-    "revision_reason": "gold trajectory regen v5",
+    "last_revised": "2026-08-07",
+    "revision_reason": "per-case audit: withdrew order_specialized_test repetitive_nerve_stimulation; withdrew order_specialized_test emg_single_fiber; withdrew order_specialized_test ice_pack_test",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:MG",
     "difficulty_rationale": "8 required tools, 1 red herrings, myasthenic crisis management",
@@ -803,6 +767,29 @@
     "citation_gap": [],
     "vocab_gap": [
       "emg_ncs_useless_via_param_conflation: pack lists order_specialized_test:emg_ncs as USELESS, but coherence validator treats tool_name overlap as a contradiction regardless of tool_parameters; cannot encode without removing required RNS/SFEMG entries. Suggest extending validator to compare tool_name + tool_parameters or fleet-wide pattern."
+    ],
+    "actions_withdrawn": [
+      {
+        "tool_name": "order_specialized_test",
+        "study": "repetitive_nerve_stimulation",
+        "category": "required",
+        "action": "Order repetitive nerve stimulation (RNS) at 2-3 Hz across proximal and facial muscles",
+        "reason": "The case stores no result for this study, so an agent following the gold standard received an error or an off-pathway placeholder. Withdrawn during the per-case audit of 2026-08-07; reinstate it with an authored report."
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "study": "emg_single_fiber",
+        "category": "recommended",
+        "action": "Order single-fiber EMG (gold standard >95% sensitivity)",
+        "reason": "The case stores no result for this study, so an agent following the gold standard received an error or an off-pathway placeholder. Withdrawn during the per-case audit of 2026-08-07; reinstate it with an authored report."
+      },
+      {
+        "tool_name": "order_specialized_test",
+        "study": "ice_pack_test",
+        "category": "recommended",
+        "action": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)",
+        "reason": "The bedside ice-pack test is recommended here but its result is not stored in this case, or in any case in the condition — the only mention of it anywhere is this recommendation. Its outcome does not follow from the documented ptosis, and at roughly 80% sensitivity it is not definitional of the diagnosis, so authoring a result would be inventing one. Withdrawn from the gold standard during the per-case audit of 2026-08-07; reinstate it with a clinician-authored report."
+      }
     ]
   }
 }

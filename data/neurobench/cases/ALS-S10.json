@@ -239,71 +239,70 @@
   "followup_outputs": [
     {
       "trigger_action": "request_genetic_als_panel",
-      "tool_name": "interpret_labs",
+      "tool_name": "order_specialized_test",
       "output": {
-        "panels": {
-          "Neurodegenerative_Genetic_Panel": [
-            {
-              "test": "C9orf72 repeat expansion",
-              "value": "PATHOGENIC — 600+ repeats (G4C2 hexanucleotide expansion)",
-              "unit": "qualitative",
-              "reference_range": "<30 repeats",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "SOD1",
-              "value": "No pathogenic variant",
-              "unit": "sequencing",
-              "reference_range": "No pathogenic variant",
-              "is_abnormal": false
-            },
-            {
-              "test": "TARDBP",
-              "value": "No pathogenic variant",
-              "unit": "sequencing",
-              "reference_range": "No pathogenic variant",
-              "is_abnormal": false
-            },
-            {
-              "test": "FUS",
-              "value": "No pathogenic variant",
-              "unit": "sequencing",
-              "reference_range": "No pathogenic variant",
-              "is_abnormal": false
-            }
-          ]
+        "test_type": "genetic_panel:ALS",
+        "findings": [
+          {
+            "panel": "Neurodegenerative_Genetic_Panel",
+            "test": "C9orf72 repeat expansion",
+            "result": "PATHOGENIC — 600+ repeats (G4C2 hexanucleotide expansion)",
+            "reference_range": "<30 repeats"
+          },
+          {
+            "panel": "Neurodegenerative_Genetic_Panel",
+            "test": "SOD1",
+            "result": "No pathogenic variant",
+            "reference_range": "No pathogenic variant"
+          },
+          {
+            "panel": "Neurodegenerative_Genetic_Panel",
+            "test": "TARDBP",
+            "result": "No pathogenic variant",
+            "reference_range": "No pathogenic variant"
+          },
+          {
+            "panel": "Neurodegenerative_Genetic_Panel",
+            "test": "FUS",
+            "result": "No pathogenic variant",
+            "reference_range": "No pathogenic variant"
+          }
+        ],
+        "quantitative_data": {
+          "C9orf72 repeat expansion": "PATHOGENIC — 600+ repeats (G4C2 hexanucleotide expansion)",
+          "SOD1": "No pathogenic variant",
+          "TARDBP": "No pathogenic variant",
+          "FUS": "No pathogenic variant"
         },
-        "interpretation": "Abnormal values: C9orf72 repeat expansion PATHOGENIC — 600+ repeats (G4C2 hexanucleotide expansion) qualitative (H).",
-        "abnormal_values_summary": [
-          "C9orf72 PATHOGENIC expansion"
-        ]
+        "impression": "Abnormal values: C9orf72 repeat expansion PATHOGENIC — 600+ repeats (G4C2 hexanucleotide expansion) qualitative (H).",
+        "recommended_actions": []
       }
     },
     {
       "trigger_action": "request_pulmonary_function_als",
-      "tool_name": "interpret_labs",
+      "tool_name": "order_specialized_test",
       "output": {
-        "panels": {
-          "PFT": [
-            {
-              "test": "FVC",
-              "value": 91,
-              "unit": "% predicted",
-              "reference_range": ">80%",
-              "is_abnormal": false
-            },
-            {
-              "test": "SNIP",
-              "value": 86,
-              "unit": "cmH2O",
-              "reference_range": ">70 cmH2O men",
-              "is_abnormal": false
-            }
-          ]
+        "test_type": "respiratory_function",
+        "findings": [
+          {
+            "panel": "PFT",
+            "test": "FVC",
+            "result": "91",
+            "reference_range": ">80%"
+          },
+          {
+            "panel": "PFT",
+            "test": "SNIP",
+            "result": "86",
+            "reference_range": ">70 cmH2O men"
+          }
+        ],
+        "quantitative_data": {
+          "FVC": "91",
+          "SNIP": "86"
         },
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": []
+        "impression": "All values within normal limits.",
+        "recommended_actions": []
       }
     },
     {
@@ -759,18 +758,12 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
     },
-    "last_revised": "2026-05-26",
-    "revision_reason": "gold trajectory regen v5",
+    "last_revised": "2026-08-07",
+    "revision_reason": "per-case audit: request_genetic_als_panel -> order_specialized_test{genetic_panel:ALS}; request_pulmonary_function_als -> order_specialized_test{respiratory_function} — the required action could not reach a report filed under the laboratory tool",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:ALS",
     "difficulty_rationale": "Known paternal ALS — genetic panel essential and central to counseling; otherwise classic limb-onset",
-    "case_body_concerns": [
-      {
-        "field_path": "followup_outputs",
-        "concern": "ALS genetic panel is wired to `interpret_labs` rather than `order_specialized_test` with `test_type: genetic_panel:ALS`. Per the criteria pack and TOOL_PARAMETER_VOCABULARY, genetic testing should resolve via order_specialized_test. The gold trajectory routes the action via order_specialized_test; the case body fix is a tool-name swap in followup_outputs without changing the report payload.",
-        "suggested_fix": "Change followup tool_name from interpret_labs to order_specialized_test for the ALS_Genetic_Panel followup; payload structure can stay."
-      }
-    ],
+    "case_body_concerns": [],
     "citation_gap": [],
     "vocab_gap": []
   }

@@ -359,49 +359,43 @@
     },
     {
       "trigger_action": "request_respiratory_monitoring",
-      "tool_name": "interpret_labs",
+      "tool_name": "order_specialized_test",
       "output": {
-        "panels": {
-          "Respiratory": [
-            {
-              "test": "Intubation status",
-              "value": "Orotracheally intubated day 3",
-              "unit": "",
-              "reference_range": "Intubated",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "FVC (pre-intubation day 2)",
-              "value": "0.9 L (14 mL/kg estimated)",
-              "unit": "L",
-              "reference_range": ">20 mL/kg",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "NIF (pre-intubation day 2)",
-              "value": "-18 cmH2O",
-              "unit": "cmH2O",
-              "reference_range": "Worse than -25 cmH2O triggers intubation",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Current ventilator settings",
-              "value": "AC mode, FiO2 0.35, PEEP 5, TV 420 mL",
-              "unit": "",
-              "reference_range": "Ventilated",
-              "is_abnormal": true
-            }
-          ]
+        "test_type": "respiratory_function",
+        "findings": [
+          {
+            "panel": "Respiratory",
+            "test": "Intubation status",
+            "result": "Orotracheally intubated day 3",
+            "reference_range": "Intubated"
+          },
+          {
+            "panel": "Respiratory",
+            "test": "FVC (pre-intubation day 2)",
+            "result": "0.9 L (14 mL/kg estimated)",
+            "reference_range": ">20 mL/kg"
+          },
+          {
+            "panel": "Respiratory",
+            "test": "NIF (pre-intubation day 2)",
+            "result": "-18 cmH2O",
+            "reference_range": "Worse than -25 cmH2O triggers intubation"
+          },
+          {
+            "panel": "Respiratory",
+            "test": "Current ventilator settings",
+            "result": "AC mode, FiO2 0.35, PEEP 5, TV 420 mL",
+            "reference_range": "Ventilated"
+          }
+        ],
+        "quantitative_data": {
+          "Intubation status": "Orotracheally intubated day 3",
+          "FVC (pre-intubation day 2)": "0.9 L (14 mL/kg estimated)",
+          "NIF (pre-intubation day 2)": "-18 cmH2O",
+          "Current ventilator settings": "AC mode, FiO2 0.35, PEEP 5, TV 420 mL"
         },
-        "interpretation": "Abnormal values: Intubation status Orotracheally intubated day 3 (H), FVC (pre-intubation day 2) 0.9 L (14 mL/kg estimated) L (H), NIF (pre-intubation day 2) -18 cmH2O (H), Current ventilator settings AC mode, FiO2 0.35, PEEP 5, TV 420 mL (H).",
-        "abnormal_values_summary": [
-          "FVC 14 mL/kg — intubation threshold crossed",
-          "NIF -18 cmH2O — below safe threshold",
-          "Intubated on day 3"
-        ]
+        "impression": "Abnormal values: Intubation status Orotracheally intubated day 3 (H), FVC (pre-intubation day 2) 0.9 L (14 mL/kg estimated) L (H), NIF (pre-intubation day 2) -18 cmH2O (H), Current ventilator settings AC mode, FiO2 0.35, PEEP 5, TV 420 mL (H).",
+        "recommended_actions": []
       }
     },
     {
@@ -781,12 +775,11 @@
       "drug_interactions": "normal"
     },
     "last_revised": "2026-08-07",
-    "revision_reason": "clinical tool review: cardiac monitoring promoted to required in the case, with the telemetry report it needed in order to be answerable",
+    "revision_reason": "per-case audit: request_respiratory_monitoring -> order_specialized_test{respiratory_function} — the required action could not reach a report filed under the laboratory tool",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:GBS",
     "difficulty_rationale": "6 required tools, 1 red herring(s); atypical or multi-comorbidity presentation requires substantial cross-modality synthesis and active rule-out of strong mimics.",
     "case_body_concerns": [
-      "Bedside respiratory function (FVC/MIP/MEP/NIF) is delivered via an `interpret_labs` followup panel rather than `order_specialized_test{test_type=respiratory_function}` as the criteria pack mandates. Agents calling order_specialized_test{respiratory_function} will hit the EMG/NCS output instead. Recommend adding a respiratory_function followup keyed to order_specialized_test in a follow-up case-body pass.",
       "Mirrored fallback_tool_outputs into followup_outputs for required tools that previously only existed in the fallback bucket: ['check_drug_interactions']. Content is unchanged; the move makes the coherence validator see an explicit primary output for criteria-pack-required tools."
     ],
     "citation_gap": [],

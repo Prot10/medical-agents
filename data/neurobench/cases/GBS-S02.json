@@ -210,33 +210,29 @@
     },
     {
       "trigger_action": "request_respiratory_monitoring",
-      "tool_name": "interpret_labs",
+      "tool_name": "order_specialized_test",
       "output": {
-        "panels": {
-          "Respiratory": [
-            {
-              "test": "FVC",
-              "value": "1.4 L",
-              "unit": "L",
-              "reference_range": "predicted 3.1 L (45%)",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "NIF",
-              "value": "-24 cmH2O",
-              "unit": "cmH2O",
-              "reference_range": "threshold -25",
-              "is_abnormal": true,
-              "clinical_significance": null
-            }
-          ]
+        "test_type": "respiratory_function",
+        "findings": [
+          {
+            "panel": "Respiratory",
+            "test": "FVC",
+            "result": "1.4 L",
+            "reference_range": "predicted 3.1 L (45%)"
+          },
+          {
+            "panel": "Respiratory",
+            "test": "NIF",
+            "result": "-24 cmH2O",
+            "reference_range": "threshold -25"
+          }
+        ],
+        "quantitative_data": {
+          "FVC": "1.4 L",
+          "NIF": "-24 cmH2O"
         },
-        "interpretation": "Abnormal values: FVC 1.4 L (H), NIF -24 cmH2O (H).",
-        "abnormal_values_summary": [
-          "NIF -24 — threshold",
-          "FVC declining 45%"
-        ]
+        "impression": "Abnormal values: FVC 1.4 L (H), NIF -24 cmH2O (H).",
+        "recommended_actions": []
       }
     },
     {
@@ -651,12 +647,11 @@
       "drug_interactions": "normal"
     },
     "last_revised": "2026-08-07",
-    "revision_reason": "clinical tool review: cardiac monitoring promoted to required in the case, with the telemetry report it needed in order to be answerable",
+    "revision_reason": "per-case audit: request_respiratory_monitoring -> order_specialized_test{respiratory_function} — the required action could not reach a report filed under the laboratory tool",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:GBS",
     "difficulty_rationale": "6 required tools, 0 red herring(s); textbook GBS / variant presentation reachable with the standard required workup chain.",
     "case_body_concerns": [
-      "Bedside respiratory function (FVC/MIP/MEP/NIF) is delivered via an `interpret_labs` followup panel rather than `order_specialized_test{test_type=respiratory_function}` as the criteria pack mandates. Agents calling order_specialized_test{respiratory_function} will hit the EMG/NCS output instead. Recommend adding a respiratory_function followup keyed to order_specialized_test in a follow-up case-body pass.",
       "Mirrored fallback_tool_outputs into followup_outputs for required tools that previously only existed in the fallback bucket: ['search_medical_literature', 'check_drug_interactions']. Content is unchanged; the move makes the coherence validator see an explicit primary output for criteria-pack-required tools."
     ],
     "citation_gap": [],

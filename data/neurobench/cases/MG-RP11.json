@@ -325,8 +325,8 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
     },
-    "last_revised": "2026-05-26",
-    "revision_reason": "gold trajectory regen v5",
+    "last_revised": "2026-08-07",
+    "revision_reason": "per-case audit: the electrophysiology studies named themselves in prose, so the discriminator could not tell them apart and the required repetitive-stimulation call was answered with whichever study occupied the slot",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:MG",
     "difficulty_rationale": "5 required tools, 0 red herrings, thymoma-associated generalized MG",
@@ -424,10 +424,10 @@
       }
     },
     {
-      "trigger_action": "request_sfemg",
+      "trigger_action": "request_emg_single_fiber",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "Single-fiber EMG",
+        "test_type": "emg_single_fiber",
         "findings": [
           {
             "description": "SINGLE-FIBER EMG — ORBICULARIS OCULI\n\nIndication: Bilateral ptosis; neuromuscular junction assessment\n\nRESULTS:\n  Mean consecutive difference (MCD): 62 µs [normal <35 µs] MARKEDLY ABNORMAL\n  Blocking: 22% of potential pairs showed intermittent blocking\n  Fiber density: 1.9 (normal ≤2.0)\n\nINTERPRETATION: Markedly increased jitter (MCD 62 µs; reference <35 µs) with 22% blocking rate. Findings are consistent with a disorder of neuromuscular junction transmission. Clinical correlation recommended.\n\nCONCLUSION: Abnormal SFEMG. Clinical correlation recommended."
@@ -439,10 +439,10 @@
       }
     },
     {
-      "trigger_action": "request_repetitive_stimulation",
+      "trigger_action": "request_repetitive_nerve_stimulation",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "Repetitive nerve stimulation",
+        "test_type": "repetitive_nerve_stimulation",
         "findings": [
           {
             "description": "REPETITIVE NERVE STIMULATION STUDY\n\nIndication: Confirm NMJ dysfunction; pre-operative assessment for thymectomy\n\nTECHNIQUE: 3 Hz RNS at orbicularis oculi, nasalis, trapezius\n\nRESULTS:\n  Orbicularis oculi: Decrement 20% (1st to 4th stimulus) [>10% abnormal] ABNORMAL\n  Nasalis: Decrement 17% ABNORMAL\n  Trapezius: Decrement 12% ABNORMAL\n\nCONCLUSION: Significant abnormal decremental response in multiple muscle groups. Findings indicate a generalized disorder of neuromuscular junction transmission. Clinical correlation recommended."
@@ -454,32 +454,30 @@
       }
     },
     {
-      "trigger_action": "request_pulmonary_function",
-      "tool_name": "interpret_labs",
+      "trigger_action": "request_respiratory_function",
+      "tool_name": "order_specialized_test",
       "output": {
-        "panels": {
-          "Pulmonary_function": [
-            {
-              "test": "NIF (Negative Inspiratory Force)",
-              "value": "-38 cm H2O",
-              "reference_range": "< -60 cm H2O",
-              "is_abnormal": true,
-              "unit": "cm H2O"
-            },
-            {
-              "test": "FVC % predicted",
-              "value": "78%",
-              "reference_range": "> 80%",
-              "is_abnormal": true,
-              "unit": "%"
-            }
-          ]
+        "test_type": "respiratory_function",
+        "findings": [
+          {
+            "panel": "Pulmonary_function",
+            "test": "NIF (Negative Inspiratory Force)",
+            "result": "-38 cm H2O",
+            "reference_range": "< -60 cm H2O"
+          },
+          {
+            "panel": "Pulmonary_function",
+            "test": "FVC % predicted",
+            "result": "78%",
+            "reference_range": "> 80%"
+          }
+        ],
+        "quantitative_data": {
+          "NIF (Negative Inspiratory Force)": "-38 cm H2O",
+          "FVC % predicted": "78%"
         },
-        "interpretation": "Pulmonary function adequate. NIF -38 cm H2O (reference < -60 cm H2O — meets threshold for adequate respiratory reserve). FVC 78% predicted. FVC 78% below 80% predicted — monitor respiratory status; no immediate compromise at this level.",
-        "abnormal_values_summary": [
-          "NIF -38 cm H2O — borderline; respiratory function at risk; monitor closely",
-          "FVC 78% — below 80% threshold"
-        ]
+        "impression": "Pulmonary function adequate. NIF -38 cm H2O (reference < -60 cm H2O — meets threshold for adequate respiratory reserve). FVC 78% predicted. FVC 78% below 80% predicted — monitor respiratory status; no immediate compromise at this level.",
+        "recommended_actions": []
       }
     },
     {

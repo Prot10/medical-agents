@@ -89,7 +89,7 @@
   },
   "initial_tool_outputs": {
     "specialized_test": {
-      "test_type": "Repetitive Nerve Stimulation and Electromyography",
+      "test_type": "repetitive_nerve_stimulation",
       "findings": [
         {
           "test": "RNS deltoid 3Hz",
@@ -300,10 +300,10 @@
   },
   "followup_outputs": [
     {
-      "trigger_action": "request_sfemg",
+      "trigger_action": "request_emg_single_fiber",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "Single-Fiber EMG — Orbicularis Oculi",
+        "test_type": "emg_single_fiber",
         "findings": [
           {
             "measurement": "Mean MCD",
@@ -327,51 +327,44 @@
       }
     },
     {
-      "trigger_action": "request_pulmonary_function",
-      "tool_name": "interpret_labs",
+      "trigger_action": "request_respiratory_function",
+      "tool_name": "order_specialized_test",
       "output": {
-        "panels": {
-          "Respiratory Evaluation": [
-            {
-              "test": "NIF",
-              "value": -40,
-              "unit": "cmH2O",
-              "reference_range": ">-60",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "FVC",
-              "value": 1.9,
-              "unit": "L",
-              "reference_range": ">2.5L predicted",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "FEV1/FVC ratio",
-              "value": 0.58,
-              "unit": "ratio",
-              "reference_range": ">0.70",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "ABG",
-              "value": "pH 7.40, pCO2 44, pO2 74",
-              "unit": "qualitative",
-              "reference_range": "Normal",
-              "is_abnormal": false,
-              "clinical_significance": null
-            }
-          ]
+        "test_type": "respiratory_function",
+        "findings": [
+          {
+            "panel": "Respiratory Evaluation",
+            "test": "NIF",
+            "result": "-40",
+            "reference_range": ">-60"
+          },
+          {
+            "panel": "Respiratory Evaluation",
+            "test": "FVC",
+            "result": "1.9",
+            "reference_range": ">2.5L predicted"
+          },
+          {
+            "panel": "Respiratory Evaluation",
+            "test": "FEV1/FVC ratio",
+            "result": "0.58",
+            "reference_range": ">0.70"
+          },
+          {
+            "panel": "Respiratory Evaluation",
+            "test": "ABG",
+            "result": "pH 7.40, pCO2 44, pO2 74",
+            "reference_range": "Normal"
+          }
+        ],
+        "quantitative_data": {
+          "NIF": "-40",
+          "FVC": "1.9",
+          "FEV1/FVC ratio": "0.58",
+          "ABG": "pH 7.40, pCO2 44, pO2 74"
         },
-        "interpretation": "Abnormal values: NIF -40 cmH2O (L), FVC 1.9 L (L), FEV1/FVC ratio 0.58 ratio (L).",
-        "abnormal_values_summary": [
-          "FVC 68% predicted (COPD + MG contribution)",
-          "NIF -40 cmH2O (borderline)",
-          "FEV1/FVC 0.58 (obstructive — COPD)"
-        ]
+        "impression": "Abnormal values: NIF -40 cmH2O (L), FVC 1.9 L (L), FEV1/FVC ratio 0.58 ratio (L).",
+        "recommended_actions": []
       }
     },
     {
@@ -747,18 +740,6 @@
       },
       {
         "step": 8,
-        "action": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Improvement of ptosis after 2 minutes of cooling supports MG",
-        "category": "recommended",
-        "tool_parameters": {
-          "test_type": "ice_pack_test"
-        },
-        "citation": "[Wolfe_2016]",
-        "guideline_source": "Wolfe_2016"
-      },
-      {
-        "step": 9,
         "action": "Pre-thymectomy ECG and cardiac risk assessment given age and comorbidities",
         "tool_name": "analyze_ecg",
         "expected_finding": "Baseline ECG to screen for ischemia / arrhythmia prior to surgical referral",
@@ -866,8 +847,8 @@
       "advanced_imaging": "normal",
       "literature_search": "normal"
     },
-    "last_revised": "2026-05-26",
-    "revision_reason": "gold trajectory regen v5",
+    "last_revised": "2026-08-07",
+    "revision_reason": "per-case audit: withdrew order_specialized_test ice_pack_test",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:MG",
     "difficulty_rationale": "4 required tools, 2 red herrings, thymoma-associated generalized MG",
@@ -875,6 +856,15 @@
     "citation_gap": [],
     "vocab_gap": [
       "emg_ncs_useless_via_param_conflation: pack lists order_specialized_test:emg_ncs as USELESS, but coherence validator treats tool_name overlap as a contradiction regardless of tool_parameters; cannot encode without removing required RNS/SFEMG entries. Suggest extending validator to compare tool_name + tool_parameters or fleet-wide pattern."
+    ],
+    "actions_withdrawn": [
+      {
+        "tool_name": "order_specialized_test",
+        "study": "ice_pack_test",
+        "category": "recommended",
+        "action": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)",
+        "reason": "The bedside ice-pack test is recommended here but its result is not stored in this case, or in any case in the condition — the only mention of it anywhere is this recommendation. Its outcome does not follow from the documented ptosis, and at roughly 80% sensitivity it is not definitional of the diagnosis, so authoring a result would be inventing one. Withdrawn from the gold standard during the per-case audit of 2026-08-07; reinstate it with a clinician-authored report."
+      }
     ]
   }
 }

@@ -236,42 +236,36 @@
     },
     {
       "trigger_action": "request_respiratory_monitoring",
-      "tool_name": "interpret_labs",
+      "tool_name": "order_specialized_test",
       "output": {
-        "panels": {
-          "Respiratory": [
-            {
-              "test": "FVC",
-              "value": "1.4 L",
-              "unit": "L",
-              "reference_range": "predicted 4.2 L (33%)",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "NIF",
-              "value": "-22 cmH2O",
-              "unit": "cmH2O",
-              "reference_range": "Threshold -25",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "ABG PaCO2",
-              "value": 48,
-              "unit": "mmHg",
-              "reference_range": "35-45",
-              "is_abnormal": true,
-              "clinical_significance": null
-            }
-          ]
+        "test_type": "respiratory_function",
+        "findings": [
+          {
+            "panel": "Respiratory",
+            "test": "FVC",
+            "result": "1.4 L",
+            "reference_range": "predicted 4.2 L (33%)"
+          },
+          {
+            "panel": "Respiratory",
+            "test": "NIF",
+            "result": "-22 cmH2O",
+            "reference_range": "Threshold -25"
+          },
+          {
+            "panel": "Respiratory",
+            "test": "ABG PaCO2",
+            "result": "48",
+            "reference_range": "35-45"
+          }
+        ],
+        "quantitative_data": {
+          "FVC": "1.4 L",
+          "NIF": "-22 cmH2O",
+          "ABG PaCO2": "48"
         },
-        "interpretation": "Abnormal values: FVC 1.4 L (H), NIF -22 cmH2O (H), ABG PaCO2 48 mmHg (H).",
-        "abnormal_values_summary": [
-          "FVC 1.4 L (33% predicted) — below threshold",
-          "NIF -22 cmH2O — below threshold",
-          "PaCO2 48 mmHg (H)"
-        ]
+        "impression": "Abnormal values: FVC 1.4 L (H), NIF -22 cmH2O (H), ABG PaCO2 48 mmHg (H).",
+        "recommended_actions": []
       }
     },
     {
@@ -694,12 +688,11 @@
       "drug_interactions": "normal"
     },
     "last_revised": "2026-08-07",
-    "revision_reason": "clinical tool review: cardiac monitoring promoted to required in the case, with the telemetry report it needed in order to be answerable",
+    "revision_reason": "per-case audit: request_respiratory_monitoring -> order_specialized_test{respiratory_function} — the required action could not reach a report filed under the laboratory tool",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:GBS",
     "difficulty_rationale": "6 required tools, 0 red herring(s); textbook GBS / variant presentation reachable with the standard required workup chain.",
     "case_body_concerns": [
-      "Bedside respiratory function (FVC/MIP/MEP/NIF) is delivered via an `interpret_labs` followup panel rather than `order_specialized_test{test_type=respiratory_function}` as the criteria pack mandates. Agents calling order_specialized_test{respiratory_function} will hit the EMG/NCS output instead. Recommend adding a respiratory_function followup keyed to order_specialized_test in a follow-up case-body pass.",
       "Mirrored fallback_tool_outputs into followup_outputs for required tools that previously only existed in the fallback bucket: ['search_medical_literature', 'check_drug_interactions']. Content is unchanged; the move makes the coherence validator see an explicit primary output for criteria-pack-required tools."
     ],
     "citation_gap": [],

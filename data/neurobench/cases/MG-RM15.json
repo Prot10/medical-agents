@@ -221,18 +221,6 @@
       },
       {
         "step": 8,
-        "action": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Improvement of ptosis after 2 minutes of cooling supports MG",
-        "category": "recommended",
-        "tool_parameters": {
-          "test_type": "ice_pack_test"
-        },
-        "citation": "[Wolfe_2016]",
-        "guideline_source": "Wolfe_2016"
-      },
-      {
-        "step": 9,
         "action": "ICU admission with mechanical ventilation as patient is already intubated",
         "tool_name": null,
         "expected_finding": "Continued ventilatory support; lung-protective ventilation",
@@ -242,7 +230,7 @@
         "guideline_source": "Sanders_2016"
       },
       {
-        "step": 10,
+        "step": 9,
         "action": "Initiate PLEX or IVIG within 24 hours",
         "tool_name": null,
         "expected_finding": "PLEX 5 sessions or IVIG 0.4 g/kg/day x 5 days",
@@ -252,7 +240,7 @@
         "guideline_source": "Sanders_2016"
       },
       {
-        "step": 11,
+        "step": 10,
         "action": "Treat aspiration pneumonia empirically with broad-spectrum non-NMJ-blocking antibiotics",
         "tool_name": null,
         "expected_finding": "Avoid aminoglycosides and fluoroquinolones; use piperacillin/tazobactam or ceftriaxone + metronidazole as initial regimen",
@@ -379,8 +367,8 @@
       "cardiac_monitoring": "normal",
       "advanced_imaging": "normal"
     },
-    "last_revised": "2026-05-26",
-    "revision_reason": "gold trajectory regen v5",
+    "last_revised": "2026-08-07",
+    "revision_reason": "per-case audit: withdrew order_specialized_test ice_pack_test",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:MG",
     "difficulty_rationale": "9 required tools, 1 red herrings, myasthenic crisis management",
@@ -388,6 +376,15 @@
     "citation_gap": [],
     "vocab_gap": [
       "emg_ncs_useless_via_param_conflation: pack lists order_specialized_test:emg_ncs as USELESS, but coherence validator treats tool_name overlap as a contradiction regardless of tool_parameters; cannot encode without removing required RNS/SFEMG entries. Suggest extending validator to compare tool_name + tool_parameters or fleet-wide pattern."
+    ],
+    "actions_withdrawn": [
+      {
+        "tool_name": "order_specialized_test",
+        "study": "ice_pack_test",
+        "category": "recommended",
+        "action": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)",
+        "reason": "The bedside ice-pack test is recommended here but its result is not stored in this case, or in any case in the condition — the only mention of it anywhere is this recommendation. Its outcome does not follow from the documented ptosis, and at roughly 80% sensitivity it is not definitional of the diagnosis, so authoring a result would be inventing one. Withdrawn from the gold standard during the per-case audit of 2026-08-07; reinstate it with a clinician-authored report."
+      }
     ]
   },
   "initial_tool_outputs": {
@@ -437,19 +434,21 @@
   },
   "followup_outputs": [
     {
-      "trigger_action": "request_pulmonary_function",
-      "tool_name": "interpret_labs",
+      "trigger_action": "request_respiratory_function",
+      "tool_name": "order_specialized_test",
       "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": []
+        "test_type": "respiratory_function",
+        "findings": [],
+        "quantitative_data": null,
+        "impression": "All values within normal limits.",
+        "recommended_actions": []
       }
     },
     {
-      "trigger_action": "request_repetitive_stimulation",
+      "trigger_action": "request_repetitive_nerve_stimulation",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "Electrophysiology",
+        "test_type": "repetitive_nerve_stimulation",
         "findings": [
           {
             "description": "REPETITIVE NERVE STIMULATION STUDY — POST-EXTUBATION\n\nIndication: Suspected myasthenic crisis; assess NMJ function post-acute event\n\nTECHNIQUE: Low-rate (3 Hz) RNS performed at orbicularis oculi, nasalis, and abductor digiti minimi 72 hours post-extubation\n\nRESULTS:\n  Orbicularis oculi (facial nerve): Decrement 18% from 1st to 4th stimulus [>10% = abnormal] ABNORMAL\n  Nasalis: Decrement 15% ABNORMAL\n  Abductor digiti minimi (ulnar nerve): Decrement 6% BORDERLINE NORMAL\n\nFINDINGS: Significant abnormal decremental response in cranial nerve–innervated muscles (18%, 15%). Proximal and cranial NMJ dysfunction more pronounced than distal.\n\nCONCLUSION: Electrophysiological findings indicate a disorder of neuromuscular junction transmission with cranial-predominant pattern. Clinical correlation recommended."
@@ -461,10 +460,10 @@
       }
     },
     {
-      "trigger_action": "request_sfemg",
+      "trigger_action": "request_emg_single_fiber",
       "tool_name": "order_specialized_test",
       "output": {
-        "test_type": "Electrophysiology",
+        "test_type": "emg_single_fiber",
         "findings": [
           {
             "description": "SINGLE-FIBER EMG REPORT — POST-EXTUBATION\n\nIndication: Known AChR+ MG; confirm NMJ dysfunction severity post-crisis\n\nTECHNIQUE: SFEMG of the extensor digitorum communis performed with voluntary activation\n\nRESULTS:\n  Mean consecutive difference (MCD): 68 µs [normal <35 µs] MARKEDLY ABNORMAL\n  Blocking: 28% of potential pairs showed intermittent blocking\n  Fiber density: 2.1 (normal ≤2.0) MILDLY INCREASED\n\nINTERPRETATION: Markedly increased jitter (MCD 68 µs; reference <35 µs) with 28% blocking rate. Findings are consistent with a disorder of neuromuscular junction transmission. Clinical correlation recommended.\n\nCONCLUSION: SFEMG confirms significant neuromuscular junction transmission failure. Clinical correlation recommended."
