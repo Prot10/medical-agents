@@ -381,7 +381,47 @@
     "advanced_imaging": null,
     "specialized_test": null,
     "literature_search": null,
-    "drug_interactions": null
+    "drug_interactions": null,
+    "tissue_diagnosis": {
+      "procedure": "stereotactic_biopsy",
+      "site": "left parietal",
+      "specimen_adequate": true,
+      "integrated_diagnosis": "Glioblastoma, IDH-wildtype, WHO grade 4 (left parietal)",
+      "histological_diagnosis": "High-grade astrocytic neoplasm with microvascular proliferation and palisading necrosis",
+      "who_grade": "4",
+      "molecular_findings": {
+        "IDH1/2 sequencing": "No mutation detected (IDH-wildtype)",
+        "MGMT promoter methylation": "Tested; status reported to the tumour board as it guides prognosis and temozolomide benefit",
+        "TERT promoter": "Mutated",
+        "EGFR": "Amplified",
+        "Chromosome 7 gain / chromosome 10 loss": "Present"
+      },
+      "diagnosis_suffix": null,
+      "findings": [
+        {
+          "assay": "IDH1/2 sequencing",
+          "result": "No mutation detected (IDH-wildtype)"
+        },
+        {
+          "assay": "MGMT promoter methylation",
+          "result": "Tested; status reported to the tumour board as it guides prognosis and temozolomide benefit"
+        },
+        {
+          "assay": "TERT promoter",
+          "result": "Mutated"
+        },
+        {
+          "assay": "EGFR",
+          "result": "Amplified"
+        },
+        {
+          "assay": "Chromosome 7 gain / chromosome 10 loss",
+          "result": "Present"
+        }
+      ],
+      "impression": "Integrated diagnosis: Glioblastoma, IDH-wildtype, WHO grade 4 (left parietal). The layered report is what the WHO CNS5 classification requires — histology, grade and molecular findings combined — and it is what converts a radiological suspicion into a diagnosis that determines treatment. Imaging cannot substitute for it, and the molecular result changes the protocol, not merely the label.",
+      "recommended_actions": []
+    }
   },
   "followup_outputs": [
     {
@@ -791,6 +831,25 @@
         "tool_parameters": {},
         "citation": "[NCCN_CNS]",
         "guideline_source": "NCCN_CNS"
+      },
+      {
+        "action": "Obtain tissue (stereotactic biopsy) and request an integrated histomolecular diagnosis: histology and grade with the molecular panel the classification requires — IDH status, MGMT promoter methylation, 1p/19q, ATRX, TERT and the copy-number markers. Imaging establishes a suspicion; only tissue establishes the diagnosis, and the molecular result selects the treatment",
+        "tool_name": "obtain_tissue_diagnosis",
+        "expected_finding": "Integrated diagnosis established as Glioblastoma, IDH-wildtype, WHO grade 4 (left parietal), with the molecular findings that determine the protocol",
+        "category": "required",
+        "tool_parameters": {
+          "procedure": "stereotactic_biopsy",
+          "molecular_assays": [
+            "IDH1_IDH2_sequencing",
+            "MGMT_methylation",
+            "TERT_promoter",
+            "EGFR_amplification",
+            "chr7_gain_chr10_loss"
+          ]
+        },
+        "citation": "[EANO_2021]",
+        "guideline_source": "WHO_CNS5",
+        "step": 10
       }
     ],
     "useless_tools": [
@@ -838,6 +897,13 @@
         "reason": "MRI must precede lumbar puncture in any suspected mass lesion to identify mass effect and herniation risk; LP is then recognised as contraindicated",
         "citation": "[Hasbun_2001]",
         "severity": "hard"
+      },
+      {
+        "before": "analyze_brain_mri",
+        "after": "obtain_tissue_diagnosis",
+        "reason": "Imaging plans the approach and identifies the enhancing target to sample; biopsying before it risks a non-diagnostic specimen from a necrotic centre",
+        "citation": "[EANO_2021]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
@@ -872,8 +938,8 @@
     ]
   },
   "metadata": {
-    "last_revised": "2026-06-17",
-    "revision_reason": "v5 balance-to-30 generation",
+    "last_revised": "2026-08-06",
+    "revision_reason": "clinical tool review: the biopsy was filed as an interpret_labs follow-up and no action required tissue; it is now obtain_tissue_diagnosis, required, with the laboratory route removed",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:GLIO-HG",
     "difficulty_rationale": "5 required tools (MRI, labs, literature, neurosurgery consult, neuro-oncology consult), single diagnostic chain, classic ring-enhancing necrotic right parietal mass with high rCBV — unambiguous high-grade imaging pattern; one embedded red herring (provisional TIA) that resolves immediately on MRI",

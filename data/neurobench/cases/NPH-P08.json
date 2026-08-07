@@ -306,6 +306,37 @@
       },
       "impression": "Neuropsychological profile demonstrates a frontal-subcortical pattern of cognitive dysfunction with predominant deficits in executive function (16th percentile) and processing speed (18th percentile). Episodic memory is mildly impaired with a retrieval-greater-than-encoding pattern and intact recognition (28th percentile). Language and attention are relatively preserved. Profile is consistent with subcortical-predominant cognitive impairment; amnestic-predominant Alzheimer-type pattern is not the primary picture",
       "recommended_actions": []
+    },
+    "clinical_assessment": {
+      "assessment_type": "gait_and_balance_timed",
+      "scores": {
+        "MoCA (from the bedside examination)": "21/30",
+        "assessment timing": "immediately before the large-volume tap, then repeated after it",
+        "positive-response threshold": ">=20% improvement in timed-up-and-go or 10-metre walk"
+      },
+      "criteria_met": {
+        "objective_gait_measured_before_the_tap": true,
+        "same_measures_repeated_after_the_tap": true,
+        "cognition_reassessed_after_the_tap": true,
+        "response_meets_the_threshold": false
+      },
+      "pre_post_comparison": {
+        "before the tap": "Classic magnetic gait: severely reduced foot clearance, short shuffling steps, wide base, en bloc turning requiring 12-14 steps, gait freezing at doorway.; Pull test: 3 steps backward, does not fall.",
+        "after the tap": "Timed gait unchanged at 2 and 4 hours — a negative single tap. Sensitivity of a single tap is 50-80%, so a negative result does not exclude shunt-responsive disease and external lumbar drainage is the next step",
+        "interpretation": "negative single tap test"
+      },
+      "findings": [
+        {
+          "observation": "Gait pattern",
+          "result": "Classic magnetic gait: severely reduced foot clearance, short shuffling steps, wide base, en bloc turning requiring 12-14 steps, gait freezing at doorway."
+        },
+        {
+          "observation": "Gait pattern",
+          "result": "Pull test: 3 steps backward, does not fall."
+        }
+      ],
+      "impression": "Objective gait and balance measured before the large-volume tap and repeated after it, with the cognitive screen repeated alongside. The response did not reach the threshold: this is a negative single tap, which has a false-negative rate of 20-50% and does not exclude shunt-responsive hydrocephalus — prolonged external lumbar drainage is the next test, not a conclusion of no disease. Without a measured baseline the post-tap change cannot be interpreted, which is why this assessment precedes the puncture.",
+      "recommended_actions": []
     }
   },
   "followup_outputs": [
@@ -539,7 +570,7 @@
         "action": "Reversible-cause labs (TSH, B12, RPR, HIV) to exclude metabolic and infectious dementia mimics",
         "tool_name": "interpret_labs",
         "expected_finding": "TSH 1.9 (normal), B12 387 (normal), RPR non-reactive, HIV non-reactive — all reversible mimics excluded",
-        "category": "required",
+        "category": "optional",
         "tool_parameters": {
           "panels": [
             "TSH",
@@ -604,6 +635,18 @@
         },
         "citation": "[Williams_2016]",
         "guideline_source": "NPH_pack"
+      },
+      {
+        "action": "Measure gait and balance objectively before the large-volume tap — timed-up-and-go, 10-metre walk, step length, falls risk — and repeat the same measures and the cognitive screen after it. The baseline must be recorded before the puncture or the post-tap change cannot be interpreted",
+        "tool_name": "perform_clinical_assessment",
+        "expected_finding": "Baseline timed gait recorded before the tap and repeated after it, with the response read against the >=20% threshold and the cognitive screen repeated alongside",
+        "category": "required",
+        "tool_parameters": {
+          "assessment_type": "gait_and_balance_timed"
+        },
+        "citation": "[Relkin_2005]",
+        "guideline_source": "Relkin_2005",
+        "step": 9
       }
     ],
     "useless_tools": [
@@ -653,6 +696,13 @@
         "reason": "Baseline neuropsychological and gait assessment must precede the tap test so that objective pre/post-tap change can be measured",
         "citation": "[Tisell_2011]",
         "severity": "soft"
+      },
+      {
+        "before": "perform_clinical_assessment",
+        "after": "analyze_csf",
+        "reason": "The baseline gait and cognition must be measured before the large-volume tap, or the post-tap change cannot be interpreted and the tap test yields nothing",
+        "citation": "[Relkin_2005]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
@@ -675,7 +725,8 @@
       "When the initial tap is negative or equivocal in a patient with diagnostic imaging and complete clinical triad, the recommended next step is an extended lumbar drainage trial (3-5 days, ~10-15 mL/hour); this increases sensitivity for shunt-response prediction above that of a single tap",
       "The progressive gait improvement during extended drainage (TUG 31s baseline to 19s at 72 hours, 39% improvement) is the critical resolver: it confirms shunt-responsiveness and supports VP shunt referral",
       "Reversible mimics (hypothyroidism, B12 deficiency, neurosyphilis, HIV dementia) must be excluded via labs before attributing the syndrome to iNPH",
-      "The frontal-subcortical neuropsychological pattern (executive dysfunction + processing speed impairment + retrieval-greater-than-encoding memory deficit + intact recognition) supports iNPH and argues against a primary amnestic-Alzheimer pattern"
+      "The frontal-subcortical neuropsychological pattern (executive dysfunction + processing speed impairment + retrieval-greater-than-encoding memory deficit + intact recognition) supports iNPH and argues against a primary amnestic-Alzheimer pattern",
+      "Tier per the July 2026 clinical review: The reversible-cause screen is good practice but does not establish or exclude hydrocephalus; the tap test does."
     ],
     "red_herrings": [
       {
@@ -698,8 +749,8 @@
       "cardiac_monitoring": "normal",
       "literature_search": "normal"
     },
-    "last_revised": "2026-06-17",
-    "revision_reason": "v5 balance-to-30 generation",
+    "last_revised": "2026-08-07",
+    "revision_reason": "clinical tool review: interpret_labs demoted to optional in the case, which is where the tier is scored — the panel had been changed alone",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:NPH",
     "difficulty_rationale": "diagnostic_puzzle: false-negative tap requires knowledge of limited tap sensitivity (~50-80%) and the drainage-trial pathway; agent must resist premature diagnostic closure on a single negative tap when imaging is firmly diagnostic; >=6 required tools; 1 grounded red herring (negative tap anchoring); requires cross-modality synthesis of imaging + drainage-trial results",

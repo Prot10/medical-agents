@@ -392,7 +392,51 @@
     "advanced_imaging": null,
     "specialized_test": null,
     "literature_search": null,
-    "drug_interactions": null
+    "drug_interactions": null,
+    "tissue_diagnosis": {
+      "procedure": "stereotactic_biopsy",
+      "site": "left occipital",
+      "specimen_adequate": true,
+      "integrated_diagnosis": "Glioblastoma, IDH-wildtype, WHO grade 4 (left occipital)",
+      "histological_diagnosis": "High-grade astrocytic neoplasm with marked nuclear atypia and pleomorphism, brisk mitotic activity (10 mitoses per 10 HPF), pseudopalisading necrosis, and microvascular proliferation with glomeruloid tufts",
+      "who_grade": "4",
+      "molecular_findings": {
+        "IDH1/2 Mutation": "Wildtype (negative by IHC R132H and sequencing)",
+        "MGMT Promoter Methylation": "Unmethylated",
+        "1p/19q Codeletion": "Absent",
+        "EGFR Amplification": "Present",
+        "TERT Promoter Mutation": "Present (C228T)"
+      },
+      "diagnosis_suffix": null,
+      "findings": [
+        {
+          "assay": "Ki-67 Proliferation Index",
+          "result": "38%"
+        },
+        {
+          "assay": "IDH1/2 Mutation",
+          "result": "Wildtype (negative by IHC R132H and sequencing)"
+        },
+        {
+          "assay": "MGMT Promoter Methylation",
+          "result": "Unmethylated"
+        },
+        {
+          "assay": "1p/19q Codeletion",
+          "result": "Absent"
+        },
+        {
+          "assay": "EGFR Amplification",
+          "result": "Present"
+        },
+        {
+          "assay": "TERT Promoter Mutation",
+          "result": "Present (C228T)"
+        }
+      ],
+      "impression": "Integrated diagnosis: Glioblastoma, IDH-wildtype, WHO grade 4 (left occipital). The layered report is what the WHO CNS5 classification requires — histology, grade and molecular findings combined — and it is what converts a radiological suspicion into a diagnosis that determines treatment. Imaging cannot substitute for it, and the molecular result changes the protocol, not merely the label.",
+      "recommended_actions": []
+    }
   },
   "followup_outputs": [
     {
@@ -481,83 +525,6 @@
         "measurements": null,
         "impression": "No evidence of extracranial primary malignancy or metastatic disease. No lymphadenopathy or visceral masses. Age-appropriate pelvic involution. No suspicious osseous lesions.",
         "recommended_actions": []
-      }
-    },
-    {
-      "trigger_action": "request_neurosurgery_consult_biopsy",
-      "tool_name": "interpret_labs",
-      "output": {
-        "panels": {
-          "Histopathology": [
-            {
-              "test": "H&E Morphology",
-              "value": "High-grade astrocytic neoplasm with marked nuclear atypia and pleomorphism, brisk mitotic activity (10 mitoses per 10 HPF), pseudopalisading necrosis, and microvascular proliferation with glomeruloid tufts",
-              "unit": "",
-              "reference_range": "Normal brain tissue",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Ki-67 Proliferation Index",
-              "value": "38%",
-              "unit": "",
-              "reference_range": "<3%",
-              "is_abnormal": true,
-              "clinical_significance": null
-            }
-          ],
-          "Molecular_Markers": [
-            {
-              "test": "IDH1/2 Mutation",
-              "value": "Wildtype (negative by IHC R132H and sequencing)",
-              "unit": "",
-              "reference_range": "N/A",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "MGMT Promoter Methylation",
-              "value": "Unmethylated",
-              "unit": "",
-              "reference_range": "N/A",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "1p/19q Codeletion",
-              "value": "Absent",
-              "unit": "",
-              "reference_range": "N/A",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "EGFR Amplification",
-              "value": "Present",
-              "unit": "",
-              "reference_range": "N/A",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "TERT Promoter Mutation",
-              "value": "Present (C228T)",
-              "unit": "",
-              "reference_range": "N/A",
-              "is_abnormal": true,
-              "clinical_significance": null
-            }
-          ]
-        },
-        "interpretation": "Abnormal values: H&E Morphology high-grade astrocytic neoplasm with pseudopalisading necrosis and microvascular proliferation (H), Ki-67 38% (H), IDH1/2 wildtype (H), MGMT unmethylated (H), EGFR amplified (H), TERT C228T mutation (H).",
-        "abnormal_values_summary": [
-          "H&E Morphology: High-grade astrocytic neoplasm with pseudopalisading necrosis and microvascular proliferation (H)",
-          "Ki-67 Proliferation Index: 38% (H)",
-          "IDH1/2 Mutation: Wildtype (H)",
-          "MGMT Promoter Methylation: Unmethylated (H)",
-          "EGFR Amplification: Present (H)",
-          "TERT Promoter Mutation: Present C228T (H)"
-        ]
       }
     },
     {
@@ -863,6 +830,24 @@
         "tool_parameters": {},
         "citation": "[NCCN_CNS]",
         "guideline_source": "NCCN_CNS"
+      },
+      {
+        "action": "Obtain tissue (stereotactic biopsy) and request an integrated histomolecular diagnosis: histology and grade with the molecular panel the classification requires — IDH status, MGMT promoter methylation, 1p/19q, ATRX, TERT and the copy-number markers. Imaging establishes a suspicion; only tissue establishes the diagnosis, and the molecular result selects the treatment",
+        "tool_name": "obtain_tissue_diagnosis",
+        "expected_finding": "Integrated diagnosis established as Glioblastoma, IDH-wildtype, WHO grade 4 (left occipital), with the molecular findings that determine the protocol",
+        "category": "required",
+        "tool_parameters": {
+          "procedure": "stereotactic_biopsy",
+          "molecular_assays": [
+            "MGMT_methylation",
+            "1p_19q_codeletion",
+            "TERT_promoter",
+            "EGFR_amplification"
+          ]
+        },
+        "citation": "[EANO_2021]",
+        "guideline_source": "WHO_CNS5",
+        "step": 10
       }
     ],
     "useless_tools": [
@@ -904,6 +889,13 @@
         "reason": "MRI must precede any lumbar puncture when a mass lesion is suspected, to identify mass effect and herniation risk; LP is contraindicated here given imaging findings",
         "citation": "[Hasbun_2001]",
         "severity": "hard"
+      },
+      {
+        "before": "analyze_brain_mri",
+        "after": "obtain_tissue_diagnosis",
+        "reason": "Imaging plans the approach and identifies the enhancing target to sample; biopsying before it risks a non-diagnostic specimen from a necrotic centre",
+        "citation": "[EANO_2021]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
@@ -941,8 +933,8 @@
     "version": "1.0",
     "generated_date": "2026-06-17",
     "clinical_domain": "neuro-oncology",
-    "last_revised": "2026-06-17",
-    "revision_reason": "v5 balance-to-30 generation",
+    "last_revised": "2026-08-06",
+    "revision_reason": "clinical tool review: the biopsy was filed as an interpret_labs follow-up and no action required tissue; it is now obtain_tissue_diagnosis, required, with the laboratory route removed",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:GLIO-HG",
     "difficulty_rationale": "5 required tools, 1 embedded red herring (cataract surgery misattribution of homonymous hemianopia); however the imaging pattern is classic for GBM with unambiguous ring enhancement and necrosis, and the laterality logic (left occipital mass — right homonymous hemianopia) is deterministic once the field defect is correctly localized — meets straightforward criteria",

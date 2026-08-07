@@ -416,7 +416,51 @@
     },
     "csf": null,
     "literature_search": null,
-    "drug_interactions": null
+    "drug_interactions": null,
+    "tissue_diagnosis": {
+      "procedure": "stereotactic_biopsy",
+      "site": "as targeted on the contrast-enhancing rim",
+      "specimen_adequate": true,
+      "integrated_diagnosis": "Glioblastoma, IDH-wildtype, WHO grade 4",
+      "histological_diagnosis": "Highly cellular glial neoplasm with marked nuclear atypia, brisk mitotic activity (>10 mitoses per 10 HPF), microvascular proliferation, and large areas of pseudopalisading necrosis",
+      "who_grade": "4",
+      "molecular_findings": {
+        "IDH1/2 mutation": "Negative (IDH-wildtype)",
+        "MGMT promoter methylation": "Methylated (42% methylation by pyrosequencing)",
+        "1p/19q codeletion": "Absent",
+        "TERT promoter mutation": "Present (C228T)",
+        "EGFR amplification": "Present"
+      },
+      "diagnosis_suffix": null,
+      "findings": [
+        {
+          "assay": "Ki-67 proliferation index",
+          "result": "35%"
+        },
+        {
+          "assay": "IDH1/2 mutation",
+          "result": "Negative (IDH-wildtype)"
+        },
+        {
+          "assay": "MGMT promoter methylation",
+          "result": "Methylated (42% methylation by pyrosequencing)"
+        },
+        {
+          "assay": "1p/19q codeletion",
+          "result": "Absent"
+        },
+        {
+          "assay": "TERT promoter mutation",
+          "result": "Present (C228T)"
+        },
+        {
+          "assay": "EGFR amplification",
+          "result": "Present"
+        }
+      ],
+      "impression": "Integrated diagnosis: Glioblastoma, IDH-wildtype, WHO grade 4. The layered report is what the WHO CNS5 classification requires — histology, grade and molecular findings combined — and it is what converts a radiological suspicion into a diagnosis that determines treatment. Imaging cannot substitute for it, and the molecular result changes the protocol, not merely the label.",
+      "recommended_actions": []
+    }
   },
   "followup_outputs": [
     {
@@ -487,80 +531,6 @@
         "measurements": null,
         "impression": "No evidence of extracranial primary malignancy or metastatic disease. No lymphadenopathy or visceral masses. Age-appropriate mild prostatic enlargement is incidental.",
         "recommended_actions": []
-      }
-    },
-    {
-      "trigger_action": "request_stereotactic_biopsy",
-      "tool_name": "interpret_labs",
-      "output": {
-        "panels": {
-          "Neuropathology": [
-            {
-              "test": "Histology",
-              "value": "Highly cellular glial neoplasm with marked nuclear atypia, brisk mitotic activity (>10 mitoses per 10 HPF), microvascular proliferation, and large areas of pseudopalisading necrosis",
-              "unit": "narrative",
-              "reference_range": "Normal brain parenchyma",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "IDH1/2 mutation",
-              "value": "Negative (IDH-wildtype)",
-              "unit": "molecular",
-              "reference_range": "Negative",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "MGMT promoter methylation",
-              "value": "Methylated (42% methylation by pyrosequencing)",
-              "unit": "molecular",
-              "reference_range": "Unmethylated",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "1p/19q codeletion",
-              "value": "Absent",
-              "unit": "molecular",
-              "reference_range": "Absent in GBM",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "TERT promoter mutation",
-              "value": "Present (C228T)",
-              "unit": "molecular",
-              "reference_range": "Absent",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "EGFR amplification",
-              "value": "Present",
-              "unit": "FISH",
-              "reference_range": "Absent",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Ki-67 proliferation index",
-              "value": "35%",
-              "unit": "%",
-              "reference_range": "< 3% in normal brain",
-              "is_abnormal": true,
-              "clinical_significance": null
-            }
-          ]
-        },
-        "interpretation": "Abnormal values: Histology Highly cellular glial neoplasm with marked nuclear atypia, brisk mitotic activity (>10 mitoses per 10 HPF), microvascular proliferation, and large areas of pseudopalisading necrosis narrative (H), MGMT promoter methylation Methylated (42% methylation by pyrosequencing) molecular (H), TERT promoter mutation Present (C228T) molecular (H), EGFR amplification Present FISH (H), Ki-67 proliferation index 35% (H).",
-        "abnormal_values_summary": [
-          "Histology: Glioblastoma features (H)",
-          "MGMT promoter: Methylated (42%) (H)",
-          "TERT promoter: Mutated (C228T) (H)",
-          "EGFR: Amplified (H)",
-          "Ki-67: 35% (H)"
-        ]
       }
     },
     {
@@ -872,6 +842,24 @@
         "tool_parameters": {},
         "citation": "[NCCN_CNS]",
         "guideline_source": "NCCN_CNS"
+      },
+      {
+        "action": "Obtain tissue (stereotactic biopsy) and request an integrated histomolecular diagnosis: histology and grade with the molecular panel the classification requires — IDH status, MGMT promoter methylation, 1p/19q, ATRX, TERT and the copy-number markers. Imaging establishes a suspicion; only tissue establishes the diagnosis, and the molecular result selects the treatment",
+        "tool_name": "obtain_tissue_diagnosis",
+        "expected_finding": "Integrated diagnosis established as Glioblastoma, IDH-wildtype, WHO grade 4, with the molecular findings that determine the protocol",
+        "category": "required",
+        "tool_parameters": {
+          "procedure": "stereotactic_biopsy",
+          "molecular_assays": [
+            "MGMT_methylation",
+            "1p_19q_codeletion",
+            "TERT_promoter",
+            "EGFR_amplification"
+          ]
+        },
+        "citation": "[EANO_2021]",
+        "guideline_source": "WHO_CNS5",
+        "step": 10
       }
     ],
     "useless_tools": [
@@ -907,6 +895,13 @@
         "reason": "MRI must precede any lumbar puncture when a mass lesion is suspected, to identify mass effect and herniation risk before LP",
         "citation": "[Hasbun_2001]",
         "severity": "hard"
+      },
+      {
+        "before": "analyze_brain_mri",
+        "after": "obtain_tissue_diagnosis",
+        "reason": "Imaging plans the approach and identifies the enhancing target to sample; biopsying before it risks a non-diagnostic specimen from a necrotic centre",
+        "citation": "[EANO_2021]",
+        "severity": "soft"
       }
     ],
     "critical_actions": [
@@ -948,8 +943,8 @@
       "cardiac_monitoring": "normal",
       "specialized_test": "normal"
     },
-    "last_revised": "2026-05-26",
-    "revision_reason": "gold trajectory regen v5",
+    "last_revised": "2026-08-06",
+    "revision_reason": "clinical tool review: the biopsy was filed as an interpret_labs follow-up and no action required tissue; it is now obtain_tissue_diagnosis, required, with the laboratory route removed",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:GLIO-HG",
     "difficulty_rationale": "5 required tools, no embedded red herrings; classic GBM presentation with clear imaging pattern (ring-enhancing mass with necrosis, edema, mass effect) and unambiguous molecular features on biopsy",

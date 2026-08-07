@@ -19,8 +19,8 @@
       "specialized_test": "normal",
       "literature_search": "normal"
     },
-    "last_revised": "2026-05-26",
-    "revision_reason": "gold trajectory regen v5",
+    "last_revised": "2026-08-07",
+    "revision_reason": "clinical tool review: interpret_labs demoted to optional in the case, which is where the tier is scored — the panel had been changed alone",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:MIG-AURA",
     "difficulty_rationale": "Diagnostic puzzle: hemiplegic migraine with migralepsy and reversible MRI changes — extensive mimic exclusion (MELAS, encephalitis, primary epilepsy, stroke)",
@@ -164,7 +164,7 @@
         "action": "Repeat brain MRI at 48h and follow-up to document reversibility",
         "tool_name": "analyze_brain_mri",
         "expected_finding": "Reversible cortical / subcortical signal changes over 48h to weeks — consistent with hemiplegic migraine; no new infarct",
-        "category": "required",
+        "category": "optional",
         "tool_parameters": {
           "contrast": false,
           "sequences": [
@@ -197,7 +197,7 @@
         "action": "Mitochondrial / autoimmune workup and genetic panel for hemiplegic migraine",
         "tool_name": "interpret_labs",
         "expected_finding": "Normal lactate; negative autoimmune encephalitis panel; CACNA1A / ATP1A2 / SCN1A pending",
-        "category": "required",
+        "category": "optional",
         "tool_parameters": {
           "lab_type": "hemiplegic_migraine_workup",
           "panels": [
@@ -218,6 +218,18 @@
         "tool_parameters": {},
         "citation": "[AAN_2000]",
         "guideline_source": "AAN_2000"
+      },
+      {
+        "action": "Take a structured headache and aura history against ICHD-3 1.2: number of attacks, aura modality and full reversibility, gradual spread over at least five minutes, duration of each symptom between five and sixty minutes, unilaterality, temporal relation to the headache, and a documented red-flag review. This is the diagnostic test for this condition",
+        "tool_name": "perform_clinical_assessment",
+        "expected_finding": "ICHD-3 1.2 criteria documented item by item with at least three of the four criterion-C characteristics met, and the red-flag review recorded",
+        "category": "required",
+        "tool_parameters": {
+          "assessment_type": "structured_headache_history_ichd3"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD_3",
+        "step": 7
       }
     ],
     "useless_tools": [
@@ -264,7 +276,9 @@
     "key_reasoning_points": [
       "Migralepsy (ICHD-3 1.4.4) is a seizure triggered by migraine aura — requires aura to be temporally followed by a seizure",
       "Reversible MRI signal changes are recognised in hemiplegic migraine and should not be misinterpreted as permanent infarct",
-      "Hemiplegic migraine workup must exclude MELAS, autoimmune encephalitis, and structural causes"
+      "Hemiplegic migraine workup must exclude MELAS, autoimmune encephalitis, and structural causes",
+      "Tier per the July 2026 clinical review: ICHD-3: the diagnosis is made on the structured history. Imaging is for the red flags that history screens for, not for the diagnosis.",
+      "Tier per the July 2026 clinical review: No laboratory test contributes to a migraine diagnosis; a targeted assay belongs to a specific suspicion."
     ],
     "red_herrings": [
       {
@@ -402,6 +416,47 @@
       "interpretation": "Opening pressure: 15 cmH2O. Protein: 0.36 g/L. Glucose: 3.8 mmol/L.",
       "glucose_ratio": "",
       "special_tests": {}
+    },
+    "clinical_assessment": {
+      "assessment_type": "structured_headache_history_ichd3",
+      "scores": {
+        "ICHD-3 criterion C characteristics met": "2 of 4 (at least 3 required)",
+        "aura modalities documented": "visual"
+      },
+      "criteria_met": {
+        "at_least_two_attacks": true,
+        "fully_reversible_visual_aura": true,
+        "fully_reversible_sensory_aura": false,
+        "fully_reversible_speech_aura": false,
+        "gradual_spread_over_at_least_five_minutes": false,
+        "each_symptom_lasts_five_to_sixty_minutes": true,
+        "unilateral_symptoms": true,
+        "accompanied_or_followed_by_headache": false,
+        "at_least_three_of_the_four_characteristics": false,
+        "not_better_accounted_for_by_another_diagnosis": true,
+        "transient_ischaemic_attack_considered_and_excluded_on_the_history": true
+      },
+      "pre_post_comparison": null,
+      "findings": [
+        {
+          "element": "Aura description",
+          "result": "A 26-year-old woman presented to the emergency department brought by her partner with a 3-hour history of severe left-sided throbbing headache that began approximately 30 minutes after she developed blurred vision in her right visual field."
+        },
+        {
+          "element": "Temporal profile",
+          "result": "A 26-year-old woman presented to the emergency department brought by her partner with a 3-hour history of severe left-sided throbbing headache that began approximately 30 minutes after she developed blurred vision in her right visual field."
+        },
+        {
+          "element": "Temporal profile",
+          "result": "Within the following hour she experienced two brief episodes of right-hand rhythmic jerking lasting approximately 90 seconds each, during which she was unresponsive, followed by postictal confusion lasting approximately 20 minutes."
+        },
+        {
+          "element": "Red-flag review (SNNOOP10)",
+          "result": "Systemic features, neoplasia, neurological deficit outside the aura, sudden onset, older age at onset, pattern change, positional or Valsalva trigger, papilloedema, pregnancy and painful eye reviewed and recorded"
+        }
+      ],
+      "impression": "Structured headache and aura history taken against ICHD-3 1.2. 2 of the four criterion-C characteristics are documented — short of the three required, so the diagnosis remains provisional on the history and rests on the recurrence pattern. The distinction from a transient ischaemic attack is made here and not by imaging: aura spreads gradually over minutes and is positive before it is negative, whereas ischaemia is abrupt and negative from the outset. Imaging is for the red flags this history screens for, not for the diagnosis.",
+      "recommended_actions": []
     }
   },
   "followup_outputs": [
