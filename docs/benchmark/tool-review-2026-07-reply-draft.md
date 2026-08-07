@@ -131,17 +131,30 @@ Ci scusiamo: parte del vostro lavoro è stata spesa su un quadro incompleto per 
 
 Accolte. In sintesi:
 
-- **I 18 cambi di tier e le 6 rimozioni: applicati al pannello di generazione, e su questo
-  dobbiamo essere precisi con voi.** Il tier che il benchmark misura sta nel singolo caso, non
-  nel pannello, e la propagazione ai 600 casi è ancora parziale: al momento sono arrivate ai casi
-  la sincope (tutti e 30, vedi il punto 5) e la TC nell'ictus ischemico. Le altre restano nel
-  pannello — la rachicentesi nella SM è ancora obbligatoria in 29 casi, i laboratori sono ancora
-  obbligatori in 30 casi di Parkinson, 30 di NPH e 30 di epilessia temporale, la RM encefalo in
-  30 casi di ictus, la TC in 30 di encefalopatia epatica; e il monitoraggio cardiaco nella GBS,
-  che ci avete chiesto di rendere obbligatorio, nei casi è raccomandato. Le stiamo propagando
-  condizione per condizione con la stessa procedura usata per la sincope, che è l'unica in cui
-  la propagazione è completa e verificata. Le 6 rimozioni sono applicate; le altre 7 richieste di
-  rimozione le abbiamo declassate a opzionali: vedi il punto 5.
+- **I 18 cambi di tier e le 6 rimozioni: applicati, e vi raccontiamo un errore nostro.** Li
+  avevamo applicati al pannello di generazione, che è anche quello che alimenta il catalogo che
+  avete letto — ma il tier che il benchmark *misura* sta nel singolo caso. Verificando, abbiamo
+  trovato che 13 dei 18 esistevano solo nel pannello: cambiati dove si legge, non dove si misura.
+  È la stessa forma dell'errore del punto 3, e ora sono nei casi tutti tranne due, che vi chiediamo
+  di confermare (la TC cranio nell'encefalopatia epatica e nella meningite: 30 e 27 casi la
+  richiedono, nella meningite come esclusione di massa prima della rachicentesi, e togliere un passo
+  di esclusione prima di una procedura invasiva sulla nostra sola lettura non ci pareva corretto).
+- **Gli atti clinici che ci avevate indicato come obbligatori sono ora nei casi**, non solo nel
+  pannello: valutazione cognitiva strutturata in Alzheimer e FTD (60 casi), anamnesi ICHD-3
+  nell'emicrania (30), marcia e cognizione cronometrate prima e dopo il tap test nella NPH (30),
+  acquisizione tissutale con diagnosi istomolecolare integrata nel glioma (30), telemetria continua
+  nella GBS (30). I passi obbligatori da pannello assenti dai casi erano 211: ora sono 28, e tutti
+  e 28 sono esenzioni dichiarate con la motivazione clinica (26 sono casi di ESA in cui la TC è
+  diagnostica, e la rachicentesi è obbligatoria solo quando non lo è).
+- **Due cose che questo lavoro ha fatto emergere e che vale la pena dirvi.** Nell'emicrania il
+  declassamento della RM era stato applicato a metà dei casi e l'anamnesi ICHD-3 a nessuno: in 15
+  casi l'insieme obbligatorio conteneva soltanto i due strumenti a costo zero, e un agente prendeva
+  copertura piena **senza compiere un solo atto diagnostico**. E nel glioma la neuropatologia con il
+  pannello molecolare c'era in tutti e 30 i casi, ma archiviata come esito del tool di laboratorio:
+  la diagnosi integrata era ottenibile ordinando gli esami del sangue, e nessuna azione richiedeva
+  il prelievo di tessuto. Il vostro rilievo era esatto e la ragione per cui non si vedeva è che il
+  risultato stava sotto il tool sbagliato. Entrambi corretti, e ora c'è un controllo automatico che
+  blocca il ripetersi di entrambi.
 - **Quattro nuovi tool**, per colmare i vuoti reali che restano dopo la correzione del
   catalogo. Il problema di fondo che avete individuato è che l'agente può guardare solo
   l'encefalo e non può prelevare campioni:

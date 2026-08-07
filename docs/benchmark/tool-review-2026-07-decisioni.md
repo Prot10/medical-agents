@@ -63,44 +63,67 @@ del §8: la video-EEG resta obbligatoria dove ci sono eventi da registrare.
 | Riscritture delle descrizioni | 37 | ⚪ accolte, non ancora inserite — vanno nel *ground truth* e nella griglia di valutazione, non nella descrizione del tool (§6) |
 | Note di conferma senza modifica | 11 | ✅ nulla da fare |
 
-### 2bis. ⚠️ Stato reale della propagazione dei tier ai 600 casi (verificato 2026-08-06)
+### 2bis. Propagazione dei tier ai 600 casi: completata (2026-08-07)
 
 Il tier che la metrica legge è `ground_truth.optimal_actions[].category` **nel caso**.
-`conditions.yaml` è l'input di generazione e alimenta il catalogo che vedete voi. Aver cambiato
-solo il secondo significa aver cambiato ciò che si legge, non ciò che si misura.
+`conditions.yaml` è l'input di generazione e alimenta il catalogo che vedete voi. Il 6 agosto
+abbiamo verificato che 13 dei 18 cambi che ci avete chiesto esistevano **solo** in
+`conditions.yaml`: cambiati dove si legge, non dove si misura. Ora sono nei casi.
 
-| Richiesta | Nei casi oggi | Propagata |
+| Richiesta | Nei casi prima | Ora |
 |---|---|---|
-| SM: liquor → opzionale | obbligatorio in 29 | ❌ |
-| Emicrania: RM → opzionale | obbligatoria in 15, raccomandata in 5 | ⚠️ metà |
-| Emicrania: laboratori → opzionale | obbligatori in 4 | ❌ |
-| Parkinson: laboratori → opzionale | obbligatori in 30 | ❌ |
-| NPH: laboratori → opzionale | obbligatori in 30 | ❌ |
-| Epilessia temporale: laboratori → opzionale | obbligatori in 30 | ❌ |
-| Sincope: laboratori → opzionale | raccomandati in 19, obbligatori in 11 | ⚠️ in corso |
-| FTD: imaging avanzato → opzionale | misto | ⚠️ |
-| Ictus: RM → opzionale | obbligatoria in 30 | ❌ |
-| Encefalopatia epatica: EEG → opzionale | raccomandato in 23 | ⚠️ |
-| Encefalopatia epatica: TC → opzionale | obbligatoria in 30 | ❌ |
-| ESA: liquor → obbligatorio condizionale | presente in 3 casi su 30 | ❌ |
-| Ictus: TC → obbligatoria | obbligatoria | ✅ |
-| GBS: monitoraggio cardiaco → obbligatorio | raccomandato in 30 | ❌ |
-| Sincope: monitoraggio cardiaco → obbligatorio | obbligatorio in 30 | ✅ |
+| SM: liquor → opzionale | obbligatorio in 29 | ✅ opzionale |
+| Emicrania: RM → opzionale | obbligatoria in 15 | ✅ opzionale |
+| Emicrania: laboratori → opzionale | obbligatori in 4 | ✅ opzionale |
+| Parkinson: laboratori → opzionale | obbligatori in 30 | ✅ opzionale |
+| NPH: laboratori → opzionale | obbligatori in 30 | ✅ opzionale |
+| Epilessia temporale: laboratori → opzionale | obbligatori in 30 | ✅ opzionale |
+| Ictus: RM → opzionale | obbligatoria in 30 | ✅ opzionale |
+| FTD: imaging avanzato → opzionale | obbligatorio in 8 | ✅ opzionale |
+| Encefalopatia epatica: EEG → opzionale | obbligatorio in 1 | ✅ opzionale |
+| Sincope: tutti i cambi | ✅ già propagati | ✅ |
+| Ictus: TC → obbligatoria | ✅ già propagata | ✅ |
+| **GBS: monitoraggio cardiaco → obbligatorio** | raccomandato in 30 | ✅ obbligatorio, con il referto telemetrico che prima non esisteva in nessun caso |
+| ESA: liquor → obbligatorio condizionale | 3 casi su 30 | ✅ corretto così: l'obbligo scatta se la TC non è diagnostica, e in 27 casi la TC lo è. I 3 con TC negativa lo hanno |
+| Encefalopatia epatica: TC → opzionale | obbligatoria in 30 | ⚠️ **non applicata**, vedi §8.4 |
+| Meningite: TC → opzionale | obbligatoria in 27 | ⚠️ **non applicata**, vedi §8.4 |
 
-**La conseguenza peggiore, e la ragione per cui l'abbiamo trovato:** nell'emicrania il
-declassamento è stato applicato a metà dei casi e l'atto che doveva sostituirlo — l'anamnesi
-strutturata ICHD-3, che il Revisore 1 indica come *l'unico* esame davvero obbligatorio per questa
-condizione — non è presente in nessuno dei 30. In quei 15 casi l'insieme obbligatorio contiene
-soltanto i due tool a costo zero (ricerca in letteratura e controllo interazioni): un agente
-ottiene **copertura dei required 1.0 senza compiere un solo atto diagnostico**.
+Le ultime due non le abbiamo toccate di proposito: nella meningite la TC è l'esclusione di massa
+prima della rachicentesi, e rimuovere un passo di esclusione prima di una procedura invasiva sulla
+nostra sola lettura non ci sembra una cosa da fare senza la vostra conferma.
 
-Perché i gate di rilascio non lo vedevano: `validate_cases.py` e `check_perfect_agent.py`
-verificano ogni caso *al proprio interno* — che le sue azioni siano rispondibili e che un agente
-perfetto arrivi a 1.0. Nessuno dei due confronta un caso con il pannello della sua condizione.
-L'unico strumento che lo fa, `report_panel_case_tiers.py`, è un report e non un gate: 211 azioni
-obbligatorie da pannello sono assenti dai casi (120 valutazioni cliniche fra Alzheimer, FTD,
-emicrania e NPH; 30 diagnosi istologiche nel glioma; 30 monitoraggi cardiaci nella GBS; 29
-rachicentesi fra ESA e meningite).
+**Gli atti clinici obbligatori che mancavano nei casi sono stati scritti.** I passi che il pannello
+dichiarava obbligatori e che nessun caso conteneva erano 211; ora sono 28, e tutti e 28 sono
+esenzioni **dichiarate nel caso** con la motivazione clinica.
+
+| Atto aggiunto | Casi |
+|---|---|
+| Valutazione cognitiva strutturata (Alzheimer, FTD) | 60 |
+| Anamnesi strutturata ICHD-3 (emicrania) | 30 |
+| Marcia e cognizione cronometrate prima/dopo il tap test (NPH) | 30 |
+| Acquisizione tissutale con diagnosi istomolecolare integrata (glioma) | 30 |
+| Rachicentesi (i 2 casi di meningite che ne conservavano il referto senza richiederla) | 2 |
+| Telemetria continua (GBS) | 30 |
+
+**La cosa peggiore che questo lavoro ha fatto emergere, e che era il difetto più grave del
+dataset:** nell'emicrania il declassamento era stato applicato a metà dei casi e l'anamnesi
+strutturata che doveva sostituirlo a nessuno, quindi in **15 casi l'insieme obbligatorio conteneva
+soltanto i due strumenti a costo zero** e un agente prendeva copertura piena senza compiere un solo
+atto diagnostico. Oggi nessun caso del benchmark ha un percorso obbligatorio a costo zero.
+
+Nel glioma abbiamo trovato una cosa analoga e più insidiosa: la neuropatologia e il pannello
+molecolare **c'erano in tutti e 30 i casi, archiviati come esito del tool di laboratorio**. La
+diagnosi integrata era ottenibile ordinando gli esami del sangue e nessuna azione richiedeva il
+prelievo di tessuto. Il vostro rilievo — «con imaging, esami del sangue, EEG ed ECG il massimo
+risultato ottenibile è un sospetto» — era esatto, e la ragione per cui non si vedeva è che il
+risultato esisteva sotto il tool sbagliato.
+
+**Perché i nostri controlli non lo vedevano, e cosa abbiamo cambiato.** `validate_cases.py` e
+`check_perfect_agent.py` verificano ogni caso *al proprio interno*: che le sue azioni siano
+rispondibili e che un agente perfetto arrivi a 1.0. Nessuno dei due confrontava un caso con il
+pannello della sua condizione, e l'unico strumento che lo faceva era un *report*, non un gate. Ora
+c'è un test che blocca la build se un caso ha un insieme obbligatorio a costo zero, o se un passo
+obbligatorio del pannello manca da un caso senza esenzione dichiarata.
 
 ---
 
