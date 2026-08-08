@@ -11,7 +11,7 @@ from neuroagent_schemas import GroundTruth, ToolClassification
 from neuroagent_schemas.enums import SequenceSeverity
 
 from ..agent.reasoning import AgentTrace
-from ..tools.vocabulary import normalize_analyte
+from ..tools.vocabulary import analyte_satisfied_by, normalize_analyte
 
 
 # Heuristics for the "premature closure" metric: phrases that indicate the
@@ -517,6 +517,23 @@ def _accumulated(
     return frozenset(ordered)
 
 
+def _covers(want: frozenset[str], have: frozenset[str]) -> bool:
+    """Is every wanted analyte covered by what the agent ordered?
+
+    Plain containment, except that a wanted term naming a *class* of assays is covered by any member of
+    it. `AED_levels` is not a synonym of `valproate_level` — it is the family containing it — so
+    `normalize_analyte` keeps them apart, and the scoring consequence used to run backwards: a ground
+    truth asking for `AED_levels` was satisfied only by an agent that echoed the vague class term, while
+    an agent ordering the specific, clinically correct valproate level got nothing. Same for `ABG`
+    against its constituent gases and `beta-hCG` against a pregnancy test.
+
+    One-directional on purpose. Ordering the class does not satisfy a ground truth that names the
+    specific assay, so vagueness never becomes the cheaper way to score — which was the clinical
+    reviewers' objection to generic buckets in the first place.
+    """
+    return all(analyte_satisfied_by(analyte, have) for analyte in want)
+
+
 def _optimal_action_satisfied(
     tool_name: str,
     tool_parameters: dict[str, Any] | None,
@@ -535,7 +552,7 @@ def _optimal_action_satisfied(
         want = _as_set((tool_parameters or {}).get(parameter))
         if not want:
             return any(name == tool_name for name, _ in agent_calls)
-        return want <= _accumulated(agent_calls, tool_name, parameter)
+        return _covers(want, _accumulated(agent_calls, tool_name, parameter))
 
     pinned = _pinned_scalars(tool_name, tool_parameters)
     scalar_ok = any(
@@ -550,7 +567,7 @@ def _optimal_action_satisfied(
     if also is None:
         return True
     want = _as_set((tool_parameters or {}).get(also))
-    return not want or want <= _accumulated(agent_calls, tool_name, also)
+    return not want or _covers(want, _accumulated(agent_calls, tool_name, also))
 
 
 def _action_key(tool_name: str, tool_parameters: dict[str, Any] | None) -> tuple:

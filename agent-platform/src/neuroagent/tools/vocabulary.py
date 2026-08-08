@@ -84,6 +84,53 @@ _ANALYTE_SYNONYMS: dict[str, str] = {
 }
 
 
+# ---------------------------------------------------------------------------------------
+# Analyte *classes*: a term that names a family of assays rather than one assay.
+#
+# `AED_levels` is not a synonym of `valproate_level` — it is the family that contains it — so
+# `normalize_analyte` keeps them distinct, and rightly. But the scoring consequence ran backwards: a
+# ground truth asking for `AED_levels` was satisfied only by an agent that echoed the vague class term,
+# while an agent ordering the specific, clinically correct valproate level got no credit. The same held
+# for `ABG` against its constituent gases and `beta-hCG` against a pregnancy test.
+#
+# Containment is therefore one-directional, and deliberately so: a class request is satisfied by any
+# member (specific beats vague), but a request for a specific assay is **not** satisfied by the class
+# term. Vagueness must never be the cheaper way to score, which was the clinical reviewers' whole
+# objection to generic buckets.
+_ANALYTE_CLASSES: dict[str, frozenset[str]] = {
+    "aed_levels": frozenset({
+        "valproate_level", "levetiracetam_level", "phenytoin_level", "carbamazepine_level",
+        "lamotrigine_level", "lacosamide_level", "phenobarbital_level", "topiramate_level",
+        "oxcarbazepine_level", "zonisamide_level", "brivaracetam_level",
+    }),
+    "abg": frozenset({"ph", "pco2", "paco2", "po2", "pao2", "bicarbonate", "hco3", "base_excess",
+                      "blood_gas", "arterial_blood_gas"}),
+    "beta_hcg": frozenset({"pregnancy_test", "urine_hcg", "serum_hcg", "hcg"}),
+    "tox_screen": frozenset({"urine_drug_screen", "blood_alcohol_level", "ethanol"}),
+    "inflammatory_markers": frozenset({"crp", "esr", "procalcitonin", "ferritin"}),
+    "iron_studies": frozenset({"ferritin", "transferrin", "tibc", "serum_iron",
+                               "transferrin_saturation"}),
+}
+
+
+def analyte_class_members(value: str) -> frozenset[str]:
+    """The assays a class term stands for, or an empty set if it names one assay."""
+    return _ANALYTE_CLASSES.get(normalize_analyte(value), frozenset())
+
+
+def analyte_satisfied_by(wanted: str, available: set[str] | frozenset[str]) -> bool:
+    """Is this wanted analyte covered by what was ordered?
+
+    Either the analyte itself was ordered, or it names a class and at least one member was. Never the
+    reverse: ordering `AED_levels` does not satisfy a ground truth that asks for the valproate level.
+    """
+    key = normalize_analyte(wanted)
+    if key in available:
+        return True
+    members = _ANALYTE_CLASSES.get(key)
+    return bool(members and members & set(available))
+
+
 def _fold(value: str) -> str:
     """Punctuation- and case-folded form: `Protein C`, `protein-C` and `protein_C` agree."""
     return value.strip().lower().replace(" ", "_").replace("-", "_")
