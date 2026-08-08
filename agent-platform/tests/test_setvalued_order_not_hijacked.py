@@ -162,3 +162,42 @@ def test_no_set_valued_order_is_served_a_payload_another_one_beats() -> None:
                 crossed.append(f"{case.case_id} {action.tool_name}: served {served}/{len(wanted)}, "
                                f"another stored payload answers {best}")
     assert not crossed, "set-valued orders served a payload another one beats:\n" + "\n".join(crossed)
+
+
+@pytest.mark.skipif(not CASES.exists(), reason="cases not present")
+def test_no_required_order_receives_nothing_it_names() -> None:
+    """A required action must not be answered by a payload containing none of what it asks for.
+
+    Sharper than the comparison above and independent of it: this does not ask whether a better payload
+    exists, it asks whether the agent learned anything at all. It was 15 before the August 2026 delivery
+    audit — thirteen bacterial meningitis cases billing a 322 EUR multiplex PCR panel that no case
+    returned, plus the two below.
+
+    The two exemptions order `autoimmune_panel` and are served LGI1 and NMDAR antibodies, which are that
+    panel's members and exactly what their `expected_finding` describes. That is a gap in the scorer's
+    class map, not a missing measurement; closing it means extending `_ANALYTE_CLASSES`, which moves
+    published required-coverage numbers and is deferred to land with the re-baseline.
+    """
+    known = {("FEPI-TEMP-P02", "analyze_csf"), ("SE-S12", "analyze_csf")}
+    empty: list[str] = []
+    for path in sorted(CASES.glob("*.json")):
+        case = NeuroBenchCase.model_validate(json.loads(path.read_text()))
+        server = MockServer(case)
+        for action in case.ground_truth.optimal_actions:
+            key = SET_PARAM.get(action.tool_name or "")
+            if key is None or action.category.value != "required":
+                continue
+            params = dict(action.tool_parameters or {})
+            wanted = params.get(key) or []
+            if isinstance(wanted, str):
+                wanted = [wanted]
+            if not wanted:
+                continue
+            result = server.get_output(action.tool_name, params)
+            if not result.success or result.output is None:
+                continue
+            if MockServer._assays_named(result.output, wanted) == 0 and \
+                    (case.case_id, action.tool_name) not in known:
+                empty.append(f"{case.case_id} {action.tool_name}: ordered {list(wanted)}, "
+                             f"served a payload naming none of them")
+    assert not empty, "required orders answered by nothing they name:\n" + "\n".join(empty)
