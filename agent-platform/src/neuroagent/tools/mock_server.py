@@ -16,7 +16,9 @@ from .vocabulary import (
     specialized_test_types,
     tissue_procedures,
 )
-from typing import Any
+from typing import Any, Iterable
+import json
+import re
 from pydantic import BaseModel
 
 
@@ -91,6 +93,71 @@ class MockServer:
             return True  # the report names the study in prose; not ours to adjudicate
         return folded == self._fold(wanted)
 
+    # Tools whose study identity is a *set* of assays rather than one named study. A set gives the
+    # trigger matcher many values to match against, and one hit is enough for it to declare a
+    # specific re-order: a status-epilepticus case ordering
+    # `[CBC, CMP, magnesium, AED_levels, lactate, ABG, ESR, CRP, beta-hCG, urinalysis]` shares the
+    # token `aed` with `request_aed_optimization`, so the whole first-line order was answered by
+    # the post-dose-escalation drug level, and the case's own first-line panel — which contains all
+    # ten — was served instead to a later action asking for an autoimmune panel it does not carry.
+    # The two were crossed. Same shape as the CT/CTA crossing, on a set-valued parameter.
+    _SET_DISCRIMINATOR: dict[str, str] = {
+        "interpret_labs": "panels",
+        "analyze_csf": "special_tests",
+        "obtain_tissue_diagnosis": "molecular_assays",
+    }
+
+    # Words that identify no assay on their own; a hit on `panel` proves nothing about a lab report.
+    # `anti` is here for the same reason it is non-discriminating in the trigger matcher: it prefixes
+    # every antibody name, so without it a Miller-Fisher ganglioside panel counted as answering an
+    # order for myasthenia antibodies and the measurement flattered the routing it was checking.
+    _UNINFORMATIVE = frozenset({
+        "panel", "panels", "level", "levels", "test", "tests", "study", "studies", "screen",
+        "screening", "profile", "markers", "marker", "workup", "serum", "blood", "and", "for",
+        "anti",
+    })
+
+    @classmethod
+    def _assays_named(cls, output: Any, requested: Iterable[Any]) -> int:
+        """How many of the requested assays this stored report names.
+
+        Matching is deliberately generous — reports name assays in prose (`Anti-GM1 IgG` for
+        `anti-GM1 IgM`) — and is only ever used to *compare* two stored payloads answering the same
+        order, where a generous measure applied to both sides is sound. It is never used to judge
+        whether one report is adequate on its own. The probe that measured this defect imports it
+        rather than reimplementing it, so the measurement and the behaviour cannot drift apart —
+        a hand-maintained second copy of a rule is exactly what shipped the stale tool catalogue.
+        """
+        payload = output.model_dump() if isinstance(output, BaseModel) else output
+        blob = json.dumps(payload, default=str).lower()
+        hits = 0
+        for name in requested:
+            tokens = [t for t in re.split(r"[^a-z0-9]+", str(name).lower())
+                      if len(t) >= 3 and t not in cls._UNINFORMATIVE]
+            if tokens and any(t[:5] in blob for t in tokens):
+                hits += 1
+        return hits
+
+    def _initial_answers_more(
+        self, tool_name: str, parameters: dict[str, Any], initial: Any, candidate: Any
+    ) -> bool:
+        """True when the initial output names strictly more of a set-valued order than the follow-up.
+
+        The comparison, not a threshold: the share of the order a trigger names does not separate
+        the crossed calls from the sound ones — 35 legitimate matches name one item of four, the
+        same shape as the crossings. What separates them is whether another stored payload answers
+        more of the question, which is what answering a question means.
+        """
+        key = self._SET_DISCRIMINATOR.get(tool_name)
+        if key is None or initial is None or candidate is None:
+            return False
+        requested = parameters.get(key)
+        if isinstance(requested, str):
+            requested = [requested]
+        if not isinstance(requested, (list, tuple, set)) or len(requested) < 2:
+            return False
+        return self._assays_named(initial, requested) > self._assays_named(candidate, requested)
+
     def _match_by_discriminator(self, tool_name: str, parameters: dict[str, Any]) -> Any | None:
         """The follow-up whose stored report IS the study this call names, if there is one."""
         spec = self._DISCRIMINATOR.get(tool_name)
@@ -131,6 +198,15 @@ class MockServer:
                 has_initial_output=initial is not None,
                 is_repeat_call=is_repeat_call,
             )
+            # A set-valued order names several assays, and the trigger matcher can capture it on a
+            # single shared token. When the initial output names more of what was ordered, it is the
+            # answer to that order and the follow-up stays available for the narrower re-order it
+            # was written for. Applied only to the token match: a discriminator hit above is not a
+            # heuristic, so coverage does not get to overrule it.
+            if followup is not None and self._initial_answers_more(
+                tool_name, parameters, initial, followup.output
+            ):
+                followup = None
         if followup is not None and not self._answers_the_question(
             tool_name, parameters, followup.output
         ):

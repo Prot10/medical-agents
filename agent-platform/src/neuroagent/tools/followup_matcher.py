@@ -65,6 +65,12 @@ _GENERIC = {
     "interactions", "patient", "clinical", "pet", "ct", "mri", "mr", "ultrasound",
     "xray", "antibody", "antibodies", "biomarker", "biomarkers", "repeat", "repeated",
     "baseline", "followup", "follow",
+    # `anti` is the prefix of every antibody name and identifies none of them. While it counted as
+    # meaningful, MG-RS11's required myasthenia antibody order — spelled
+    # `[anti_AChR, anti_MuSK, anti_LRP4, TSH]` — matched `request_anti_gq1b_miller_fisher` on that
+    # token alone and was answered with the Miller-Fisher ganglioside panel, a different disease's
+    # antibody. `antibody`/`antibodies` were already here for the same reason.
+    "anti",
 }
 
 # Expand common abbreviations so a slug token can match a spelled-out parameter
