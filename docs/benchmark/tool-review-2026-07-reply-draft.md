@@ -1,7 +1,17 @@
-# Draft reply to Flavia and Antonio — tool review round 1
+# Reply to Flavia and Antonio — tool review round 1
 
-Draft for Andrea to review, adjust and send. Italian, matching the thread.
-Delete this file once sent.
+Ready to send. Italian, matching the thread. Delete this file once sent.
+
+Before sending, three things only Andrea can settle:
+
+1. **Section 8 is an ask, not a report.** It lists clinical text we composed and asks them to check
+   it. If you would rather not surface that in this letter, it has to move somewhere they will
+   actually read it — it must not simply disappear.
+2. **The timeline in section 9.** It says the three new conditions are not built yet. Put a real date
+   on it or remove the sentence; do not promise a week we have not planned.
+3. Whether to send now or wait for the deploy. The letter says the platform is up to date; that is
+   only true after `deployment/hostinger/deploy.sh` runs. **Sending before the deploy makes the
+   letter wrong** — they would log in and see the 10 July snapshot.
 
 ---
 
@@ -185,6 +195,13 @@ Accolte. In sintesi:
   che va escluso prima di una diagnosi di malattia del motoneurone — era nascosta dentro il referto
   della RM encefalo, in tutti e 30 i casi. Ora sono studi separati, ordinabili e valutabili, e la
   RM del midollo è obbligatoria in entrambe le patologie.
+- **La vostra obiezione sui "secchielli generici" era anche un buco nel punteggio, e l'abbiamo
+  chiuso.** Il ground truth conteneva già il dettaglio per singolo analita, ma il punteggio
+  riconosceva solo il nome del tool: chi ordinava «dosaggio del valproato» — l'ordine
+  clinicamente corretto — non prendeva credito per una richiesta di «livelli di antiepilettici»,
+  mentre chi ordinava il termine vago sì. Ora l'ordine specifico soddisfa la richiesta di classe,
+  **ma non il contrario**: una richiesta di esame specifico non è mai coperta dal nome generico.
+  La vaghezza non deve diventare il modo più economico di segnare punti.
 - Le vostre **descrizioni condizione-specifiche** vengono recepite, ma con un accorgimento:
   non possono comparire nella descrizione del tool che l'agente legge, perché rivelerebbero
   la diagnosi che deve invece inferire (se il tool dice "per la SM, RM encefalo e midollo con
@@ -223,19 +240,131 @@ Jacob 2025). Le abbiamo spostate sotto **Myasthenia gravis**, che altrimenti sar
 l'unica condizione senza review. Se non era intenzionale, fatecelo sapere e le rimettiamo
 dove erano.
 
-## 7. Prossimi passi
+Vale la pena dirvi cosa ha prodotto quello spostamento, perché è la dimostrazione più netta del
+valore della vostra review. Andando a verificare la MG proprio grazie alle vostre cinque
+annotazioni, abbiamo trovato che in **tutti e 9** i casi che archiviano un pannello
+anti-recettore dell'acetilcolina il referto era **irraggiungibile**: l'azione obbligatoria ordina
+`anti-AChR`, `anti-MuSK`, `anti-LRP4`, TSH — i nomi degli analiti — mentre il risultato era
+archiviato sotto un'etichetta che nominava la malattia. Nessun termine in comune, quindi nessuna
+chiamata lo raggiungeva. Otto casi rispondevano con un pannello di esclusione; uno rispondeva con
+il **pannello anti-gangliosidi di Miller-Fisher**, cioè l'anticorpo di un'altra malattia. In
+pratica il benchmark chiedeva di confermare sierologicamente la miastenia e non consegnava la
+sierologia. Corretto in tutti e nove, senza toccare una virgola dei referti.
 
-Per le quattro nuove patologie prepariamo noi una prima versione dei pannelli
-(tier + descrizioni) a partire dalle linee guida che avete citato, e la troverete nella
-piattaforma insieme ai casi: così la conferma è parte della review dei casi e non un compito
-aggiuntivo.
+## 7. Abbiamo riletto i 600 casi uno per uno, e dobbiamo dirvi cosa abbiamo trovato
 
-I 600 casi attuali passano tutti i controlli automatici di contratto (600/600, zero
-problemi), quindi non vi troverete davanti difetti tecnici che conosciamo già: quello che
-segnalerete sarà sostanza clinica.
+Applicando le vostre correzioni ci siamo accorti che alcune non si vedevano nei casi perché il
+*risultato* stava sotto il tool sbagliato (il glioma del punto 4 è l'esempio). Ci è sembrato che
+quel difetto non potesse essere isolato, quindi abbiamo fatto una cosa che avremmo dovuto fare
+prima di consegnarvi il dataset: abbiamo riprodotto **ogni singola azione del percorso ideale**
+contro il simulatore e controllato che il referto restituito contenesse davvero il risultato che
+l'azione chiede.
 
-Vi scriviamo appena i casi sono pronti per la review. Grazie ancora — il livello di
-dettaglio dei vostri commenti sta cambiando il progetto in meglio.
+Il punto che vi interessa più di tutti: **i controlli automatici erano verdi tutto il tempo.**
+Erano verdi anche quando la miastenia non consegnava la sua sierologia. Verificano che ogni caso
+sia coerente con se stesso, non che il simulatore risponda alla domanda posta. Nessuno dei difetti
+sotto sarebbe stato intercettato.
+
+Quelli che pesano clinicamente:
+
+- **In 21 casi di ictus ischemico su 30 non esisteva alcuna TC senza contrasto.** È l'esame che
+  esclude l'emorragia prima della trombolisi, cioè la decisione per cui quella condizione esiste
+  nel benchmark.
+- **Nell'ESA angio-TC e angiografia digitale erano incrociate**: 30 angio-TC archiviate sotto
+  un'etichetta che nominava la DSA e 3 referti DSA sotto etichette che nominavano l'angio-TC. In più
+  54 angiografie obbligatorie non erano raggiungibili dalla chiamata che le nomina, perché
+  l'angiografia si ordina con un flag e il simulatore leggeva solo i valori. E l'**angiografia
+  cerebrale non esisteva nemmeno nel listino**: c'era quella coronarica, non quella cerebrale. Ora
+  c'è, tariffata.
+- **In 28 casi il patogeno era ottenibile da un esame del sangue**: le emocolture erano archiviate
+  dentro l'esito del laboratorio, quindi l'organismo — il dato che nomina il patogeno e seleziona
+  l'antibiotico — arrivava senza fare microbiologia.
+- **21 referti microbiologici nominavano l'isolato e poi lo negavano** («nessuna crescita» con
+  l'organismo indicato nel campo accanto).
+- **In 31 casi lo stesso paziente aveva due o tre punteggi diversi sullo stesso strumento** — tutti
+  e 30 i FND più un FTD: PHQ-9 6 contro 14 contro 17, GAD-7 5 contro 14 contro 16, su fasce di
+  gravità differenti e senza alcuna nota di somministrazione ripetuta. Quale valore vedesse
+  l'agente dipendeva dall'ordine in cui chiamava gli strumenti. In più, 34 output archiviavano una
+  valutazione psichiatrica dentro il tool di laboratorio — PHQ-9, GAD-7, DES-II, PCL-5, diagnosi
+  DSM-5 e narrativa d'intervista impacchettati come «pannello» di esami, uno con unità di misura
+  «diagnosi» e un «test» chiamato *Trauma history* il cui valore è un paragrafo. In FND-M09
+  l'unico esame di laboratorio previsto è uno screening opzionale delle cause reversibili, quindi
+  un agente che chiedeva gli esami del sangue si vedeva restituire una valutazione psichiatrica.
+  Il ground truth non fissa nessun punteggio, quindi scegliere uno dei due avrebbe significato
+  inventare una misura: il difetto sta a monte del numero, e la correzione è una sola
+  somministrazione, nel tool che la esegue.
+- **Un test legato al cromosoma X era ordinato in 11 pazienti di sesso femminile.**
+- **41 "distrattori" dichiarati puntavano a campi inesistenti**, quindi non distraevano nessuno.
+- **13 casi di meningite fatturavano un pannello PCR multiplex (322 EUR) che nessun caso
+  restituiva** — e in 9 di quei 13 il Gram è negativo e la coltura ancora in corso, cioè
+  esattamente la situazione in cui quel pannello è l'unica identificazione disponibile.
+
+Non lo scriviamo per farci perdonare: lo scriviamo perché cambia cosa vi stiamo chiedendo. La
+frase che avevamo pronta per voi — «i casi passano i controlli automatici, quindi quello che
+segnalerete sarà sostanza clinica» — **era sbagliata**, e adesso lo sappiamo con precisione.
+Passare i controlli non significava essere clinicamente solidi.
+
+## 8. Testo clinico che abbiamo scritto noi, e che vi chiediamo di controllare
+
+Riparando i difetti del punto 7 in alcuni casi non bastava spostare un referto: bisognava
+**scrivere un risultato che non c'era**. Abbiamo seguito una regola sola — un caso che afferma una
+diagnosi afferma con essa che gli esami ordinati per escludere le alternative non ne hanno mostrata
+una, quindi riportarlo è riportare la posizione del caso; un numero, invece, sarebbe inventarlo.
+Non abbiamo mai scritto un valore numerico che il caso non contenesse già.
+
+Questa è la parte del dataset che più ha bisogno del vostro occhio, perché è l'unica in cui il
+contenuto clinico l'abbiamo prodotto noi:
+
+| Cosa | Dove | Cosa vi chiediamo |
+|---|---|---|
+| **Pannello PCR della meningite**, 13 casi | referto liquorale | L'organismo lo stabilisce il caso stesso (antigene latex, Gram, o identificazione colturale preliminare). Per *S. suis*, *Proteus mirabilis* e *Klebsiella* abbiamo scritto «nessun target rilevato» perché non sono target del pannello, aggiungendo che un pannello negativo non esclude una meningite batterica. **I target del pannello sono elencati nel referto** proprio perché possiate verificarli invece di fidarvi. |
+| **421 righe di esclusione** in 190 casi | pannelli di laboratorio e liquor | Dicono «ordinato per escludere una causa alternativa; il risultato non ne indica una». Abbiamo lasciato fuori di proposito 128 esami che *confermano* la diagnosi (NfH nella SLA, Abeta42 nell'Alzheimer, bande oligoclonali nella SM, citologia nel glioma) e 8 dosaggi di antiepilettico, perché terapeutico contro subterapeutico è un numero con conseguenze. |
+| **188 pannelli di base** in 135 casi | emocromo, metabolico, epatico, coagulazione, TSH, B12, HIV, gruppo e ricerca anticorpi irregolari | Refertati come non alterati **solo dove nulla nel caso dice il contrario** — nessun valore segnalato alterato in alcun output, niente nell'interpretazione, niente in ciò che il percorso ideale si aspetta, niente nell'anamnesi. Il gruppo sanguigno non è nominato: sarebbe stato inventare un dato del paziente, quindi riportiamo solo che la ricerca di anticorpi irregolari è negativa. Gli esami qualitativi mantengono una formulazione qualitativa (HIV «non reattivo», non «nei limiti»). |
+| **Angiografia cerebrale** in 3 casi di ESA | azione + referto | Abbiamo dichiarato il termine e aggiunto l'azione solo nei 3 casi che hanno un referto DSA. Se secondo voi la DSA va richiesta in tutti i casi con angio-TC negativa e pattern emorragico diffuso (AHA/ASA 2023), ditecelo: è un giudizio sul singolo risultato angiografico e non ce lo siamo voluto arrogare. |
+
+Due controlli automatici sorvegliano adesso questa parte, e vale la pena dire da dove vengono. Il
+primo nasce dai 21 referti colturali del punto 7: un test blocca qualunque referto che neghi
+l'isolato che il suo stesso campo nomina. È servito subito, perché la prima stesura del pannello
+PCR della meningite elencava *Haemophilus influenzae* **sia** fra i rilevati **sia** fra i non
+rilevati in un caso — intercettato prima di scrivere nulla sul dataset, ma è il tipo di errore che
+un occhio clinico coglie e un controllo di contratto no. Il secondo ha rifiutato di scrivere
+«emocromo nella norma» in undici casi in cui il caso descrive un'alterazione: otto Guillain-Barré
+con pannello metabolico alterato, un'encefalite anti-NMDA e due stati epilettici. Senza quel
+secondo controllo avremmo introdotto undici referti che contraddicono il proprio caso — cioè
+esattamente il difetto che stavamo rimuovendo.
+
+Su 600 casi restano **205 richieste di analiti senza risultato** (erano 742). Sono tutte
+classificate: 93 sono gli esami confermativi e i dosaggi terapeutici lasciati fuori di proposito,
+72 sono un nome di classe a cui il referto risponde con un suo membro (`autoimmune_panel` servito
+con LGI1 e NMDAR), 32 richiedono un giudizio clinico caso per caso — 21 di queste sono
+l'`anti-LRP4` nei casi di miastenia, dove il pannello referta AChR e MuSK — e 8 sono casi in cui il
+caso afferma un'alterazione senza darne il valore. **Se su qualcuna di queste quattro categorie
+avete un'opinione diversa, è il momento di dirlo**: sono decisioni nostre, non vincoli tecnici.
+
+## 9. Prossimi passi
+
+**Cosa è pronto adesso.** Le 20 patologie in piattaforma (600 casi, demenza vascolare compresa)
+sono revisionabili da subito, con il catalogo dei tool corretto e le riparazioni dei punti 4, 7 e 8
+applicate. Se volete iniziare, il posto dove il vostro tempo rende di più è la sezione 8: è
+contenuto che abbiamo scritto noi e su cui non c'è nessun controllo automatico possibile.
+
+**Cosa non è pronto.** Demenza a corpi di Lewy, emorragia intracerebrale spontanea ed encefalite
+erpetica **non sono ancora in piattaforma**: mancano i pannelli e i 30 casi ciascuna. Preferiamo
+dirvelo così invece di farvele trovare vuote. Prepariamo noi una prima versione dei pannelli (tier
+e descrizioni) dalle linee guida che avete citato, e la troverete insieme ai casi, così la conferma
+è parte della review e non un compito in più.
+
+Una cosa che vi chiediamo di tenere presente mentre leggete: i controlli automatici passano su
+600/600 casi, ma il punto 7 dice esattamente quanto poco questo garantisca. Trattate il verde come
+l'assenza di difetti *di contratto*, non come una promessa di solidità clinica. Se qualcosa vi
+sembra sbagliato, è più probabile che abbiate ragione voi.
+
+Scusateci per l'attesa: siete rimasti fermi più di quanto fosse giusto, e la ragione è che abbiamo
+preferito consegnarvi un dataset riparato piuttosto che farvi rifare la review su difetti nostri.
+
+Grazie ancora — il livello di dettaglio dei vostri commenti sta cambiando il progetto in meglio, e
+il punto 6 è la prova che anche un'annotazione finita nel posto sbagliato ha fatto emergere un
+difetto che da soli non avremmo visto.
 
 A presto,
 Andrea

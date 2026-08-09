@@ -392,3 +392,62 @@ ed era quella che il ground truth confrontava.
    sostituisce. Nei 30 casi si tratta di ricoveri fatti esattamente per quello. Negli altri 8
    casi, dove non ci sono eventi da registrare, la video-EEG non compare. Se preferite che sia
    opzionale anche lì, la declassiamo: è una riga di configurazione e 22 casi.
+
+---
+
+## 9. L'audit di consegna del simulatore (2026-08-06 → 08-09)
+
+Applicando i vostri tier ci siamo accorti che alcune correzioni non si vedevano nei casi perché il
+*risultato* stava sotto il tool sbagliato (glioma, SM/SLA: sezioni 5.2 e 7bis). Ipotizzando che il
+difetto non fosse isolato, abbiamo riprodotto **ogni azione del percorso ideale** contro il
+simulatore, verificando che il referto restituito contenesse il risultato che l'azione chiede.
+
+I controlli automatici di rilascio erano verdi durante tutto questo: verificano la coerenza interna
+di ogni caso, non che il simulatore risponda alla domanda posta. Nessuno dei difetti sotto sarebbe
+stato intercettato. Dettaglio metodologico completo in
+`docs/benchmark/simulator-delivery-audit-2026-08.md`.
+
+### 9.1 Decisioni prese senza che le chiedeste
+
+| Decisione | Cosa cambia | Stato |
+|---|---|---|
+| **Angiografia cerebrale (DSA) tariffata e ordinabile** — 2530 EUR, CPT 36224 + struttura | Nel listino c'era la coronarica, non la cerebrale: tutti e 30 i casi di ESA facevano dell'angio-TC lo studio definitivo, e i 3 referti DSA archiviati non erano raggiungibili. Come conseguenza è stata ritirata l'angio-RM opzionale di SAH-P02, che era servita dal referto DSA mal dichiarato | Fatto. **Ambito da confermare: 9.2.1** |
+| **Contenimento di classe nel punteggio** — l'ordine specifico soddisfa la richiesta di classe, non il contrario | Risponde all'obiezione sui «secchielli generici»: chi ordinava «dosaggio del valproato» non prendeva credito per «livelli di antiepilettici», chi ordinava il termine vago sì. Unidirezionale di proposito, perché la vaghezza non diventi il modo più economico di segnare punti | Fatto. **Sposta numeri pubblicati**: copertura richiesta ed efficienza cambiano per ogni modello le cui tracce ordinano esami specifici. Nulla pubblicato prima è confrontabile su quelle due metriche |
+| **421 righe di esclusione** in 190 casi | Un caso che afferma una diagnosi afferma con essa che gli esami di esclusione non ne hanno mostrata un'altra. Lasciati fuori 128 esami confermativi e 8 dosaggi di antiepilettico | Fatto. **Da confermare: 9.2.2** |
+| **Pannello PCR della meningite** in 13 casi | Tariffato 322 EUR e restituito da nessun caso: fatturato e senza risposta, in 9 dei 13 con Gram negativo e coltura in corso | Fatto. **Da confermare: 9.2.3** |
+| **188 pannelli di base** in 135 casi | Refertati non alterati solo dove nulla nel caso dice il contrario. Un secondo controllo per condizione ha rifiutato 11 scritture che avrebbero contraddetto il caso (8 GBS, 1 NMDAR, 2 SE) | Fatto. **Da confermare: 9.2.4** |
+| **Etichette di routing rinominate** in 12 casi | 9 MG (la sierologia anti-AChR irraggiungibile in tutti), 2 NMDAR (anticorpo anti-NMDAR), 1 SE (anti-Hu). Solo l'etichetta: nessun referto, valore, azione o tier modificato | Fatto, nessuna conferma necessaria |
+
+### 9.2 Aggiunte a «Da confermare»
+
+1. **DSA nell'ESA: ambito.** Abbiamo aggiunto l'azione solo nei 3 casi che hanno un referto DSA. Se
+   secondo voi le AHA/ASA 2023 la rendono obbligatoria in tutti i casi con angio-TC negativa e
+   pattern emorragico diffuso, il criterio va applicato caso per caso sul risultato angiografico e
+   serve il vostro giudizio: noi non ce lo siamo arrogato.
+2. **Gli esami confermativi lasciati fuori** (128, fra cui NfH nella SLA, Abeta42 nell'Alzheimer,
+   bande oligoclonali nella SM, citologia nel glioma) e gli 8 dosaggi di antiepilettico. Il criterio
+   è che un esame che *conferma* la diagnosi non può essere refertato come non contributivo. Se per
+   qualcuno di questi preferite un risultato esplicito, va scritto con voi.
+3. **Il pannello PCR della meningite.** L'organismo lo stabilisce il caso; per *S. suis*, *Proteus
+   mirabilis* e *Klebsiella* abbiamo scritto «nessun target rilevato» perché fuori pannello,
+   dichiarando il limite. I target sono elencati nel referto per essere verificabili.
+4. **Le 205 richieste di analiti che restano senza risultato** (erano 742), tutte classificate: 93
+   confermativi/terapeutici lasciati di proposito, 72 un nome di classe a cui il referto risponde
+   con un suo membro, 32 che richiedono giudizio clinico caso per caso (21 sono l'`anti-LRP4` nei
+   casi di MG, dove il pannello referta AChR e MuSK), 8 in cui il caso afferma un'alterazione senza
+   darne il valore. Sono decisioni nostre, non vincoli tecnici.
+
+### 9.3 Debito tecnico che questo lavoro ha creato
+
+- **Contenimento di classe da estendere ai pannelli anticorpali.** `analyze_csf` tariffa
+  `NMDAR_antibodies` 276 e `autoimmune_panel` 1840: chi fa l'ordine specifico e più economico non
+  prende credito per una richiesta di classe. Chiuderebbe anche le 2 azioni obbligatorie che
+  ricevono un payload che non nomina nulla di ciò che ordinano. **Deliberatamente rinviato** per
+  farlo insieme alla rigenerazione del corpus e al re-baseline, invece di muovere due volte i numeri
+  pubblicati.
+- **Re-baseline dovuto** dal contenimento di classe: corpus di traiettorie gold, prompt GRPO e
+  valutazione di riferimento.
+- **152 `difficulty_rationale` potenzialmente obsoleti**: il conteggio va riderivato prima di
+  agire — un ricontrollo con una firma diversa ne ha trovati 0, quindi la cifra non è affidabile.
+- **33 referti di RM encefalo con contenuto midollare**, 12 dei quali senza uno studio spinale
+  altrove (l'impressione di MG-RS16 è interamente sul midollo).
