@@ -554,7 +554,9 @@ SPEC += [
     dict(cond="migraine_with_aura", filed="analyze_csf", tool="analyze_csf",
          reviewer=1, tier="remove", status="confirm",
          response="Almost removed: one case (MIG-AURA-RM11) keeps it as recommended, on a "
-                  "suspicion of secondary headache. No case requires it."),
+                  "suspicion of secondary headache — the same case that keeps the video EEG for "
+                  "its migralepsy. No case requires it. If you consider a lumbar puncture "
+                  "unjustifiable even on that suspicion, tell us and it goes."),
     dict(cond="migraine_with_aura", filed="interpret_labs", tool="interpret_labs",
          reviewer=1, tier="optional", status="applied",
          response="Applied: no case requires blood tests; 4 carry them as optional and 1 as "
@@ -755,12 +757,16 @@ SPEC += [
                   "as syncope or pulmonary embolism (FEPI-TEMP-P05, -RP02). Answering your "
                   "comments one by one caught that these had been left at *recommended*, not "
                   "optional, which made the account we were about to send you wrong; they are "
-                  "optional now."),
+                  "optional now. The criterion we used is your own, from the syncope panel: the "
+                  "label is the hypothesis under test, so an agent that correctly suspects a "
+                  "cardiac cause must still be able to act. If you would rather the item be "
+                  "deleted from this condition outright, say so and we will edit both cases."),
     dict(cond="focal_epilepsy_temporal", filed="order_cardiac_monitoring",
          tool="order_cardiac_monitoring", reviewer=1, tier="remove", status="confirm",
          response="Same as the echocardiogram: optional in the 2 cases with syncope on the "
                   "differential, and corrected from recommended to optional while answering this "
-                  "comment."),
+                  "comment. Same question back to you — delete it from the condition, or leave it "
+                  "reachable for the agent that correctly suspects a cardiac cause?"),
 
     # === functional neurological disorder (reviewer 1) ===
     dict(cond="functional_neurological_disorder", filed="analyze_eeg", tool="analyze_eeg",

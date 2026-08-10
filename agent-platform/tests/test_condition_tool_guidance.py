@@ -138,3 +138,20 @@ def test_no_reviewer_code_leaks_into_a_committed_file(guidance):
     for condition, tools in guidance.items():
         for tool, entry in tools.items():
             assert entry["reviewer"] in (1, 2), f"{condition}/{tool}: bad reviewer label"
+
+
+def test_every_confirm_entry_actually_asks_something(guidance):
+    """`confirm` means we did something other than what was asked. The reviewer sees a badge
+    reading "needs your ruling" — if the response states a decision without putting a question,
+    they are told to rule on something and given nothing to rule on. Three entries were in that
+    state when this file was first generated."""
+    asks = ("tell us", "say so", "your ruling", "if you would rather", "?", "we will edit",
+            "decide whether")
+    silent = [
+        f"{condition}/{tool}"
+        for condition, tools in guidance.items()
+        for tool, entry in tools.items()
+        if entry["status"] == "confirm"
+        and not any(a in (entry.get("our_response") or "").lower() for a in asks)
+    ]
+    assert not silent, f"marked as needing the reviewers' ruling but asking nothing: {silent}"
