@@ -131,7 +131,12 @@ class TestToolDefinitions:
         params = defn["function"]["parameters"]["properties"]
         assert "eeg_type" in params
         assert "eeg_file_path" not in params  # removed
-        assert set(params["eeg_type"]["enum"]) == {"routine", "ambulatory", "video", "continuous_icu"}
+        # sleep_deprived was added on the July 2026 clinical review: reviewer 1 named it as the
+        # second-line recording when a normal routine EEG leaves the question open, and it had
+        # no orderable value. The enum derives from costs.yaml, so this list follows it.
+        assert set(params["eeg_type"]["enum"]) == {
+            "routine", "sleep_deprived", "ambulatory", "video", "continuous_icu"
+        }
 
     def test_ecg_no_file_path(self, registry):
         defn = registry.get_tool("analyze_ecg").get_tool_definition()
