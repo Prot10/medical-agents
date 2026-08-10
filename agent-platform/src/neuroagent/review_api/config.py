@@ -28,5 +28,10 @@ TOOL_COSTS_PATH = _REPO_ROOT / "agent-platform" / "config" / "tools" / "costs.ya
 CONDITIONS_YAML_PATH = (
     _REPO_ROOT / "dataset-generation" / "config" / "conditions.yaml"
 )
+# The clinical reviewers' per-condition guidance for each tool: their own revised
+# descriptions, which are condition-specific and therefore cannot live in the one-per-tool
+# `ToolMeta.description`, nor in the agent-facing schema without leaking the diagnosis.
+# Review-app only — see tests/test_condition_tool_guidance.py.
+CONDITION_TOOL_GUIDANCE_PATH = REVIEW_CONFIG_DIR / "condition_tool_guidance.yaml"
 
 WEB_DIST = _REPO_ROOT / "web-review" / "dist"

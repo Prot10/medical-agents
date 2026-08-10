@@ -1,0 +1,1297 @@
+# Per-condition tool guidance from the July 2026 clinical tool review.
+#
+# GENERATED — do not hand-edit. Source:
+#   agent-platform/scripts/review/build_condition_tool_guidance.py
+#
+# Two external neurologists reviewed the tool catalog condition by condition and left 91
+# annotations, most carrying a block headed "Revised description (to be inserted)". That text
+# is condition-specific, and `ToolMeta.description` is one string per tool shown under every
+# condition, so it had nowhere to live: "for MS, brain *and cord* MRI with an MS protocol" is
+# wrong in the other nineteen conditions, and putting a condition-specific indication in the
+# agent-facing schema would hand the agent the diagnosis it is meant to infer.
+#
+# This file is that missing place. It is served by the review API next to each condition-tool
+# row and rendered in the review app. It is READ ONLY BY `review_api`:
+# `tests/test_condition_tool_guidance.py` fails if anything under `neuroagent/tools/`,
+# `neuroagent/agents/` or `neuroagent/api/` reads it, because that would be the leak.
+#
+# Fields per entry:
+#   guidance       the reviewer's own revised description, sliced from their annotation
+#   rationale      their reasoning, including which elements they removed and why
+#   source         the guideline they cite
+#   requested_tier the tier they asked for in this condition
+#   status         applied | partial | confirm | no_change | open | retired
+#   our_response   what we actually did about this specific comment
+#   filed_under    the row they annotated, when it differs from the tool that performs the
+#                  study — eleven comments describe studies the twelve-tool action space could
+#                  not express, so they were filed against whichever row was nearest
+#
+# reviewer: 1 took the chronic conditions, 2 the acute ones. Reviewer codes are credentials
+# and never appear here.
+
+als:
+  analyze_brain_mri:
+    reviewer: 1
+    requested_tier: required
+    status: applied
+    guidance: |-
+      The MRI pathway should include brain and "spinal cord MRI", mainly to exclude ALS mimics such as cervical myelopathy, compressive lesions, brainstem/spinal cord lesions, multiple sclerosis or neoplastic/inflammatory disease.
+    source: |-
+      Gold Coast diagnostic criteria; NICE NG42.
+    our_response: |-
+      Applied: required in all 30.
+  analyze_csf:
+    reviewer: 1
+    requested_tier: optional
+    status: applied
+    guidance: |-
+      CSF analysis does not diagnose ALS and should not be part of the routine diagnostic workup in typical ALS. It should be reserved for atypical presentations or when inflammatory, infectious, demyelinating, neoplastic/paraneoplastic or prion-related mimics are clinically suspected.
+    source: |-
+      Gold Coast diagnostic criteria; NICE NG42; Awaji/IFCN electrodiagnostic criteria.
+    our_response: |-
+      Applied: CSF is recommended, never required, in all 30 cases.
+  interpret_labs:
+    reviewer: 1
+    requested_tier: required
+    status: applied
+    guidance: |-
+      Blood tests do not confirm ALS; they are used to exclude alternative or treatable causes of progressive weakness, wasting, fasciculations, cramps or upper motor neuron signs. A baseline rule-out panel may include: CBC, renal/liver function, electrolytes, calcium, thyroid function, vitamin B12/folate, creatine kinase, inflammatory markers and targeted infectious, autoimmune, paraneoplastic or metabolic tests when clinically indicated. 
+
+      Genetic testing should not be included as a routine laboratory panel for diagnosis; it should be considered separately, with counselling, especially after ALS diagnosis, in familial disease, young-onset disease or when gene-targeted therapy/trials may be relevant.
+    source: |-
+      Gold Coast diagnostic criteria; NICE NG42; EAN guideline 2024; ALS genetic testing consensus guideline 2023.
+    our_response: |-
+      Applied. Auditing this panel also caught an error of ours that a clinical reader would have spotted immediately: the androgen-receptor CAG repeat for Kennedy disease — an X-linked test — was in the ordered panel of 11 female patients, one of whom was even given a result, while the action's own text said '(in males)'.
+  order_body_imaging:
+    reviewer: 1
+    filed_under: [analyze_brain_mri]
+    requested_tier: required
+    status: applied
+    guidance: |-
+      The MRI pathway should include brain and "spinal cord MRI", mainly to exclude ALS mimics such as cervical myelopathy, compressive lesions, brainstem/spinal cord lesions, multiple sclerosis or neoplastic/inflammatory disease.
+    source: |-
+      Gold Coast diagnostic criteria; NICE NG42.
+    our_response: |-
+      Applied, and this comment found the same defect as in multiple sclerosis, one step worse: the exclusion of cervical myelopathy — the mimic that must be ruled out before a motor-neuron diagnosis — was buried inside the brain-MRI report in all 30 cases, so no action asked for it and no score could see it. spine_MRI is now a required order_body_imaging action in all 30.
+  order_specialized_test:
+    reviewer: 1
+    requested_tier: required
+    status: applied
+    guidance: |-
+      Revise description: for ALS, the REQUIRED specialized test should specifically be EMG/NCS.
+
+      Repetitive nerve stimulation, biopsies, evoked potentials and autonomic/tilt testing are not diagnostic tools for ALS --> Remove.
+
+      Neuropsychological testing and genetic testing may be relevant in selected contexts --> Optional
+    source: |-
+      Gold Coast diagnostic criteria; Awaji/IFCN electrodiagnostic criteria; NICE NG42; EAN guideline 2024.
+    our_response: |-
+      Applied: EMG/NCS is required in all 30 cases, respiratory function too, and genetic testing is recommended in 26 and required in 4. No case orders repetitive nerve stimulation, a biopsy, evoked potentials or tilt testing.
+
+alzheimers_early:
+  analyze_brain_mri:
+    reviewer: 1
+    requested_tier: required
+    status: applied
+    guidance: |-
+      Keep Brain MRI as REQUIRED. However, the current toolset is incomplete. The pathway must include:
+
+      1) structured cognitive/behavioral assessment with informant history and validated cognitive/neuropsychological testing (REQUIRED);
+      2) non-contrast head CT  when MRI is unavailable or contraindicated (OPTIONAL);
+      3) FDG-PET, or perfusion SPECT if FDG-PET is unavailable, as an OPTIONAL test when dementia subtype remains uncertain after clinical assessment, laboratory studies and structural imaging.
+
+      Suggested diagnostic sequence: first, perform structured cognitive/behavioral assessment, informant history, functional assessment and validated cognitive testing; second, obtain laboratory studies to exclude reversible or contributing causes of cognitive decline; third, obtain structural brain MRI, or non-contrast head CT if MRI is unavailable or contraindicated; fourth, if the dementia subtype remains uncertain, consider FDG-PET/perfusion SPECT; fifth, biomarker-confirmed Alzheimer’s disease is needed, use either CSF Alzheimer biomarkers or amyloid PET.
+    source: |-
+      NICE NG97; SNLG/ISS National Guideline on dementia and mild cognitive impairment; Alzheimer’s Association DETeCD-ADRD CPG 2025; ACR Appropriateness Criteria Dementia 2024 Update; Alzheimer’s Association/SNMMI amyloid and tau PET Appropriate Use Criteria 2025.
+    our_response: |-
+      Kept required in all 30 cases, as asked.
+  analyze_csf:
+    reviewer: 1
+    requested_tier: optional
+    status: applied
+    guidance: |-
+      Keep CSF analysis as OPTIONAL.
+    our_response: |-
+      Applied: CSF biomarkers are required in the 13 cases where the diagnosis needs biomarker confirmation and recommended in the other 17.
+  analyze_ecg:
+    reviewer: 1
+    requested_tier: remove
+    status: applied
+    guidance: |-
+      REMOVE
+    our_response: |-
+      Removed: no Alzheimer case orders an ECG.
+  analyze_eeg:
+    reviewer: 1
+    requested_tier: remove
+    status: confirm
+    guidance: |-
+      REMOVE
+    our_response: |-
+      Downgraded rather than removed, and we would like your ruling. One case (ALZ-EARLY-RP04) keeps EEG as optional because its differential includes Creutzfeldt-Jakob disease and an encephalopathy. The criterion we used is your own, from the syncope panel: the label is the hypothesis under test, so an agent that correctly suspects something else must still be able to act. If you would rather it be deleted outright, we will edit the case.
+  interpret_labs:
+    reviewer: 1
+    requested_tier: required
+    status: applied
+    guidance: |-
+      Maintain laboratory studies as REQUIRED, but revise the description. Laboratory tests are used to identify causes that are reversible or contribute to cognitive decline. A reasonable basic laboratory cognitive panel includes: TSH, vitamin B12, homocysteine, complete blood count with formula, complete metabolic panel including calcium, magnesium and liver function, ESR and C-reactive protein.
+    source: |-
+      NICE NG97; SNLG/ISS National Guidelines 2024; DETeCD-ADRD CPG Alzheimer's Association 2025.
+    our_response: |-
+      Applied: the required panel is the reversible-cause set you list.
+  order_advanced_imaging:
+    reviewer: 1
+    filed_under: [analyze_brain_mri, analyze_csf]
+    requested_tier: optional
+    status: applied
+    guidance: |-
+      3) FDG-PET, or perfusion SPECT if FDG-PET is unavailable, as an OPTIONAL test when dementia subtype remains uncertain after clinical assessment, laboratory studies and structural imaging.
+
+      Add amyloid PET as an OPTIONAL.
+      Amyloid PET can be used as an alternative to CSF Alzheimer biomarkers; if CSF biomarkers are already conclusive, amyloid PET is usually not required.
+    source: |-
+      NICE NG97; SNLG/ISS National Guideline on dementia and mild cognitive impairment; Alzheimer’s Association DETeCD-ADRD CPG 2025; ACR Appropriateness Criteria Dementia 2024 Update; Alzheimer’s Association/SNMMI amyloid and tau PET Appropriate Use Criteria 2025.
+
+      Alzheimer’s Association/SNMMI amyloid and tau PET Appropriate Use Criteria 2025; European intersocietal recommendations 2024; ACR Appropriateness Criteria Dementia 2024 Update.
+    our_response: |-
+      Applied: amyloid PET is available as the alternative to CSF biomarkers, and no case orders both where the CSF result is already conclusive.
+  order_ct_scan:
+    reviewer: 1
+    filed_under: [analyze_brain_mri]
+    requested_tier: optional
+    status: partial
+    guidance: |-
+      2) non-contrast head CT  when MRI is unavailable or contraindicated (OPTIONAL);
+    source: |-
+      NICE NG97; SNLG/ISS National Guideline on dementia and mild cognitive impairment; Alzheimer’s Association DETeCD-ADRD CPG 2025; ACR Appropriateness Criteria Dementia 2024 Update; Alzheimer’s Association/SNMMI amyloid and tau PET Appropriate Use Criteria 2025.
+    our_response: |-
+      Not done: the tool and the study exist, but no Alzheimer case uses head CT as the MRI alternative, because every case has an MRI. If you want the MRI-unavailable pathway represented, it needs a case built for it.
+  perform_clinical_assessment:
+    reviewer: 1
+    filed_under: [analyze_brain_mri]
+    requested_tier: required
+    status: applied
+    guidance: |-
+      1) structured cognitive/behavioral assessment with informant history and validated cognitive/neuropsychological testing (REQUIRED);
+    source: |-
+      NICE NG97; SNLG/ISS National Guideline on dementia and mild cognitive impairment; Alzheimer’s Association DETeCD-ADRD CPG 2025; ACR Appropriateness Criteria Dementia 2024 Update; Alzheimer’s Association/SNMMI amyloid and tau PET Appropriate Use Criteria 2025.
+    our_response: |-
+      Applied: a structured cognitive assessment is a required action in all 30 cases, scored against the functional criterion, so the 10 mild-cognitive-impairment cases are not required to have lost independence. This is one of the four mandatory steps you named that had no tool behind them at all.
+
+autoimmune_encephalitis_nmdar:
+  analyze_brain_mri:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Brain MRI
+
+      note: Brain MRI is abnormal in only about one-third of patients with anti-NMDA receptor encephalitis, and a normal study does not exclude the diagnosis. Its principal value in this condition is excluding alternative causes (e.g., herpes simplex encephalitis, structural lesions) and identifying overlapping demyelinating syndromes (e.g., anti-MOG or anti-aquaporin-4-associated changes).
+    source: |-
+      Titulaer MJ, McCracken L, Gabilondo I, et al. Treatment and prognostic factors for long-term outcome in patients with anti-NMDA receptor encephalitis. Lancet Neurol. 2013;12:157-65
+    our_response: |-
+      Applied: the MRI stays required in all 30 cases and its role in the ground truth is exclusion of alternatives, not confirmation.
+  analyze_csf:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Cerebrospinal fluid studies: cell count (mild-to-moderate lymphocytic pleocytosis is common but may be absent), protein, glucose; oligoclonal bands or elevated IgG index; PCR for herpes simplex virus, to be repeated if initially negative and clinical suspicion of herpes simplex encephalitis remains high; cell-based assay for IgG anti-GluN1 (NMDA receptor) antibodies, tested in parallel with serum.
+    source: |-
+      Graus F et al. Lancet Neurol. 2016;15:391-404
+    our_response: |-
+      Applied, and it uncovered a defect of exactly the kind you found in myasthenia: in two cases the anti-NMDAR result — the antibody that defines the disease — was stored under a trigger no call an agent can make could reach, so the required order was answered by an unrelated payload. Both are fixed; no report text changed.
+  analyze_ecg:
+    reviewer: 2
+    requested_tier: unchanged
+    status: no_change
+    guidance: |-
+      no change required
+    source: |-
+      Graus F et al. Lancet Neurol. 2016;15:391-404
+    our_response: |-
+      No change requested and none made.
+  analyze_eeg:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Electroencephalography — routine, ambulatory, video, or continuous ICU monitoring for epileptiform and encephalopathic patterns, including specific assessment for extreme delta brush, an EEG pattern relatively characteristic of anti-NMDA receptor encephalitis and one of the recognised abnormal patterns supporting the diagnosis.
+    source: |-
+      Graus F et al. Lancet Neurol. 2016;15:391-404
+    our_response: |-
+      Applied: EEG is required in all 30 cases and extreme delta brush is named.
+  interpret_labs:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Blood/serum panels — CBC, metabolic, coagulation, thyroid function and thyroid (peroxidase/thyroglobulin) antibodies, inflammatory markers, autoimmune/paraneoplastic panel including a cell-based assay for serum IgG anti-GluN1 (NMDA receptor) antibodies (to be interpreted together with CSF testing, given the risk of false-negative or false-positive results with serum alone), and genetic/metabolic testing where clinically indicated (mainly in children with atypical presentations, to exclude inherited or metabolic mimics).
+
+      Graus F, Titulaer MJ, Balu R, et al. A clinical approach to diagnosis of autoimmune encephalitis. Lancet Neurol. 2016;15:391-404
+    our_response: |-
+      Applied: the serum cell-based assay for anti-GluN1 is named in the required panel and read together with the CSF result, not alone.
+  order_body_imaging:
+    reviewer: 2
+    filed_under: [analyze_brain_mri]
+    requested_tier: required
+    status: applied
+    guidance: |-
+      Imaging screening for an underlying neoplasm associated with anti-NMDA receptor encephalitis, primarily ovarian teratoma. In female patients aged 12 years or older, pelvic and abdominal imaging (MRI, CT, or ultrasound) is indicated; in male patients and in children younger than 12 years, tumours other than ovarian teratoma are markedly less frequent, and the scope and frequency of screening should be adapted accordingly (e.g., chest imaging or testicular ultrasound where clinically indicated).
+    rationale: |-
+      Search for an underlying neoplasm is described as a required step once the syndrome is recognised, independent of antibody confirmation, and is not captured by any existing item in the panel (brain MRI addresses the central nervous system only). Because a missed tumour is a missed treatable cause with a direct impact on outcome and relapse risk, this is the highest-priority finding in this review.
+    source: |-
+      Graus F, Titulaer MJ, Balu R, et al. A clinical approach to diagnosis of autoimmune encephalitis. Lancet Neurol. 2016;15:391-404 
+      Titulaer MJ, McCracken L, Gabilondo I, et al. Treatment and prognostic factors for long-term outcome in patients with anti-NMDA receptor encephalitis. Lancet Neurol. 2013;12:157-65
+    our_response: |-
+      Applied: chest, abdomen and pelvis CT is a required action in all 30 cases. You called this the highest-priority finding in the review and you were right that no existing item covered it — before order_body_imaging existed the agent could image the brain and nothing else, so an ovarian teratoma was outside the action space entirely.
+
+bacterial_meningitis:
+  analyze_brain_mri:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      In acute bacterial meningitis, MRI is not part of the initial diagnostic pathway and does not substitute for lumbar puncture or for the imaging performed to exclude a space-occupying lesion before it. It is used where an intracranial complication is suspected or where the clinical course fails to improve on adequate therapy: subdural empyema, cerebral abscess or cerebritis, ventriculitis, hydrocephalus, arterial infarction, or venous sinus thrombosis.
+    our_response: |-
+      Applied: MRI is recommended rather than required in 27 cases and required in the 2 with a suspected intracranial complication.
+  analyze_csf:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Cerebrospinal fluid studies obtained at lumbar puncture. Opening pressure and macroscopic appearance; white blood cell count, total and differential; red blood cell count; total protein; glucose concentration, reported together with a blood glucose sample drawn immediately before the puncture so that the CSF-to-blood glucose ratio can be calculated; Gram stain; culture with antimicrobial susceptibility testing, interpreted against meningitis-specific breakpoints; PCR for the relevant bacterial and viral pathogens, single-target or syndromic panel. CSF lactate where antimicrobial therapy has not yet been given. The report states whether the sample was obtained before or after the first antimicrobial dose, since the yield of Gram stain, culture, PCR and lactate falls once treatment has started.
+    rationale: |-
+      Oligoclonal bands, 14-3-3 and RT-QuIC belong to demyelinating and prion work-ups and have no established role in acute bacterial meningitis; the unqualified reference to "antibodies" points to the same autoimmune panel. They are removed from this condition only and remain appropriate where those differentials apply. Gram stain, culture with susceptibility testing and the CSF-to-blood glucose ratio are added because each is the subject of an explicit recommendation and each is a step the current text omits: without the first two the panel cannot identify a pathogen or its resistance profile, and without a paired blood glucose the ratio cannot be computed. Opening pressure, appearance and red cell count are added because red cells discriminate a traumatic tap or subarachnoid haemorrhage from meningitis. Lactate is added as a conditional item confined to antibiotic-naive samples, and "PCR" is qualified because an unqualified reference does not tell the requester which pathogens are covered.
+    source: |-
+      World Health Organization. WHO guidelines on meningitis diagnosis, treatment and care. Geneva: World Health Organization; 2025
+    our_response: |-
+      Applied, and it found a billed study that returned nothing: 13 cases have a required order for the multiplex meningitis PCR panel (322 EUR) and no case reported a result for it — in 9 of the 13 the Gram stain is negative and the culture still pending, which is exactly where that panel decides. The result is now present in all 13. Separately, 21 culture reports named the organism in one field and denied it in another; a test now blocks that.
+  analyze_ecg:
+    reviewer: 2
+    requested_tier: unchanged
+    status: confirm
+    guidance: |-
+      Neither source assigns electrocardiography a role in this condition, so on diagnostic yield alone the item would not be justified here.
+    our_response: |-
+      Kept, and we would like your confirmation. No case requires it; it stays in the catalog at negligible cost as a differential action. If you would rather it disappear from this condition, say so and it goes.
+  interpret_labs:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Blood and serum panels. In suspected acute meningitis: full blood count with differential white cell count; C-reactive protein, or procalcitonin where C-reactive protein is not available; blood glucose, drawn immediately before lumbar puncture so that the CSF-to-blood glucose ratio can be calculated; coagulation studies including platelet count, prothrombin time and activated partial thromboplastin time, which also inform the safety of the puncture and the recognition of disseminated intravascular coagulation; serum electrolytes and renal and liver function; blood lactate where sepsis, shock or meningococcal disease is suspected; HIV testing. Blood cultures, whole-blood PCR and the throat swab are requested through the separate Microbiological studies item. No blood test confirms or excludes bacterial meningitis, and lumbar puncture is not deferred or delayed on the basis of a blood result.
+    rationale: |-
+      Thyroid, autoimmune or paraneoplastic and genetic panels are removed because none has an established role in acute bacterial meningitis and each adds cost without diagnostic yield here; the removal is scoped to this condition and leaves them available where their differentials apply. Named analytes replace the unspecified "inflammatory" entry because both sources identify C-reactive protein and procalcitonin specifically and make the choice between them conditional on local availability. Blood glucose is lifted out of the generic "metabolic" entry and given a timing requirement, since the ratio is uninterpretable unless the sample is paired with the puncture. Lactate and HIV testing are added as explicit items. Coagulation studies and organ function tests are retained and their purpose stated, because a bleeding diathesis is a contraindication to the puncture. The cross-reference to the microbiological item is added because the two items are adjacent and their boundary must be unambiguous. The closing sentence is the clause most likely to stop an agent deferring the puncture while awaiting a normal inflammatory marker.
+    source: |-
+      World Health Organization. WHO guidelines on meningitis diagnosis, treatment and care. Geneva: World Health Organization; 2025
+    our_response: |-
+      Applied: the required laboratory set is named analytes, and blood cultures are no longer reachable through this tool.
+  order_microbiology:
+    reviewer: 2
+    filed_under: [interpret_labs]
+    requested_tier: required
+    status: applied
+    guidance: |-
+      Microbiological sampling outside the cerebrospinal compartment, obtained as early as possible and preferably before the first dose of antimicrobial therapy: blood cultures with antimicrobial susceptibility testing; whole-blood PCR for the principal meningeal pathogens, including meningococcus and pneumococcus, where available; bacterial throat swab for meningococcal culture. The report states for each specimen whether it was collected before or after the first antimicrobial dose. Sampling must not delay empirical therapy: where lumbar puncture is deferred or cranial imaging is required first, blood cultures are drawn and antimicrobial treatment is started before imaging. Haematology, chemistry and serology are requested through the separate Laboratory studies item; cerebrospinal fluid microbiology through CSF analysis.
+    source: |-
+      World Health Organization. WHO guidelines on meningitis diagnosis, treatment and care. Geneva: World Health Organization
+    our_response: |-
+      Applied. order_microbiology now exists and is required in all 30 cases. The comment also uncovered a leak: in 28 cases across the dataset the blood cultures were stored inside the laboratory payload, so the organism — the finding that selects the antibiotic — arrived without any microbiology being ordered.
+
+brain_tumor_glioma:
+  analyze_brain_mri:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Brain MRI without and with a gadolinium-based contrast agent, acquired with a standardised brain tumour protocol: two-dimensional T2-weighted and FLAIR images with slice thickness of 4 mm or less, diffusion-weighted imaging with a maximum b-value of 1000 s/mm2, and three-dimensional T1-weighted images acquired in the same spatial geometry before and after contrast. Three-dimensional FLAIR is strongly preferred where available, to allow volumetric measurement. Susceptibility-weighted imaging, or axial gradient-echo T2* where unavailable, documents prior haemorrhage, calcification and neoangiogenesis. Contrast is not optional in this indication. After surgery, residual tumour is measured within 48 hours, without and with contrast, with diffusion-weighted sequences to detect perioperative ischaemia; if that window is missed, MRI is obtained before radiotherapy begins. Follow-up uses the identical protocol and is interpreted with RANO criteria.
+    rationale: |-
+      The wording that makes contrast optional is removed because a non-enhanced study in this indication can neither characterise the lesion nor establish the baseline against which every later scan is read, and because the panel offers no other item that could compensate. The generic protocol list is replaced: it is shared with panels for other conditions and offers dementia and multiple sclerosis protocols that have no application here, while omitting the sequence set both reference standards specify by name and parameter. The postoperative window is stated as a deadline because it behaves like one — once passed, residual tumour volume cannot be reconstructed, and the reference standards give a defined fallback rather than a later equivalent measurement.
+    source: |-
+      EANO 2021
+    our_response: |-
+      Applied: contrast is not optional in these cases. The sweep this triggered also found a cervical-cord glioblastoma being imaged by a brain MRI.
+  analyze_ecg:
+    reviewer: 2
+    requested_tier: unchanged
+    status: no_change
+    guidance: |-
+      Neither reference standard assigns electrocardiography a diagnostic or grading role in glioma, and none is claimed here. Both require that major cardiac disease be excluded before and during alkylating chemotherapy, which is the point at which this item earns its place, at negligible unit cost. Retaining it is therefore a pre-treatment safety decision rather than a diagnostic one, and the existing description is accurate for that purpose.
+    source: |-
+      EANO 2021
+    our_response: |-
+      No change requested and none made.
+  analyze_eeg:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Electroencephalography — routine, ambulatory, video, or continuous monitoring in the intensive care setting. Two uses in this population: characterisation and monitoring of tumour-associated epilepsy, which is one of the characteristic modes of presentation and may recur or change during treatment; and determination of the cause of altered consciousness, where a non-convulsive seizure must be separated from tumour progression, drug effect or a metabolic cause. EEG does not contribute to the diagnosis, typing or grading of the tumour and does not substitute for imaging or tissue.
+    source: |-
+      EANO 2021
+    our_response: |-
+      Applied: no case requires EEG for the tumour itself.
+  interpret_labs:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Blood and serum work-up for a patient with a suspected or established high-grade glioma. In this condition laboratory testing supports treatment safety and follow-up rather than diagnosis. Baseline and on-treatment panel: full blood count with platelets, liver and renal function, and exclusion of active infection, before and during alkylating chemotherapy; thrombocytopenia is the dose-limiting toxicity of temozolomide, while nitrosoureas produce delayed and cumulative leukopenia and thrombocytopenia. Antiepileptic drug levels where the agent is measurable and the clinical question warrants it. Germline genetic testing has a defined and narrow place: patients with relevant germline variants or a suspected hereditary cancer syndrome receive genetic counselling and may then be referred for testing. This is distinct from tumour molecular profiling, which belongs to the histomolecular item.
+    our_response: |-
+      Applied: laboratory studies in this condition are treatment-safety and follow-up, and tumour molecular profiling is no longer reachable through them.
+  obtain_tissue_diagnosis:
+    reviewer: 2
+    filed_under: [analyze_brain_mri, interpret_labs]
+    requested_tier: required
+    status: applied
+    guidance: |-
+      Surgical acquisition of tumour tissue: maximal safe resection where feasible, taking account of tumour site and the patient's clinical condition, or frame-based or frameless stereotactic biopsy where microsurgical resection is not safely feasible. Serial samples are taken along the biopsy trajectory to avoid sampling bias, and enough tissue is obtained for histology, immunohistochemistry and molecular assays; cryopreservation of part of the specimen supports assays requiring high-quality nucleic acids. Management without a tissue diagnosis is reserved for very exceptional situations, such as prohibitive operative risk, or a very unfavourable prognosis with a large lesion of typical radiological appearance and rapid neurological deterioration. The report should state the procedure performed and whether the specimen was adequate for molecular work-up.
+
+      Neuropathological diagnosis integrating histology with molecular testing, issued as a layered report: integrated diagnosis, histological diagnosis, CNS WHO grade, molecular findings listed. Core assays: IDH1 R132H immunohistochemistry and nuclear ATRX expression, performed routinely; sequencing of IDH1 codon 132 and IDH2 codon 172 where the immunohistochemistry is negative, in all grade 2 and 3 diffuse astrocytic and oligodendroglial gliomas and in glioblastomas of patients under 55 years of age; 1p/19q codeletion in IDH-mutant gliomas with retained nuclear ATRX; CDKN2A/B homozygous deletion in IDH-mutant astrocytomas; TERT promoter mutation, EGFR amplification and combined chromosome 7 gain with chromosome 10 loss in IDH-wildtype diffuse astrocytic gliomas lacking microvascular proliferation and necrosis; H3 K27 status in tumours involving the midline; MGMT promoter methylation in glioblastoma, by methylation-specific PCR, pyrosequencing or methylation array, not by immunocytochemistry. BRAF V600 may be assessed in IDH-wildtype tumours. Where the necessary molecular information is unavailable the diagnosis carries the NOS suffix and is reported as incomplete; where testing was performed but the results do not fit a WHO type, the suffix is NEC. Molecular work-up must not delay radiotherapy or tumour-specific pharmacotherapy.
+    rationale: |-
+      Without this item the pathway terminates in a radiological impression that no subsequent action can verify or refute, and every case is unsolvable by construction: the entity, the grade and the treatment branch all follow from tissue. The item is set REQUIRED rather than OPTIONAL because both reference standards place the burden of justification on the decision not to obtain tissue. The description distinguishes resection from biopsy rather than naming a single procedure, because the choice is dictated by site and clinical condition and because resection carries a therapeutic effect that biopsy does not; the sampling clauses are included because an inadequate specimen produces a diagnosis that cannot be completed molecularly, which is a different failure from no diagnosis at all.
+
+      The panel as published cannot reach a diagnosis in the sense the current classification uses the word: with imaging, blood tests, EEG and ECG the best attainable output is a suspicion, and the classification itself provides the label for that state — NOS — whose defined purpose is to alert the clinician that the molecular work-up has not been undertaken. Each assay in the list is included because it changes the answer, not because it completes a taxonomy: IDH separates the two grade 4 entities with different prognosis, 1p/19q separates oligodendroglioma from astrocytoma and with it PCV from temozolomide, CDKN2A/B assigns grade 4 in the absence of any histological feature of malignancy, and MGMT decides treatment in elderly or frail patients. Immunocytochemistry is excluded for MGMT because it is explicitly stated to be inadequate for that purpose. The age and sequence conditions are reproduced exactly because they are what makes the panel proportionate rather than exhaustive.
+    source: |-
+      AIOM 2023
+
+      WHO CNS5 (Louis et al., Neuro-Oncology 2021)
+    our_response: |-
+      Applied: the molecular assays you name are the vocabulary of the tool (IDH1 IHC, IDH1/IDH2 sequencing, 1p/19q, ATRX, CDKN2A/B, TERT, EGFR, chr7/10, H3 K27, MGMT by methylation not IHC), each priced, and the required assay set differs per case as your conditions require.
+  order_advanced_imaging:
+    reviewer: 2
+    filed_under: [analyze_eeg]
+    requested_tier: optional
+    status: applied
+    guidance: |-
+      Advanced imaging for specific questions, not for routine use. Dynamic susceptibility contrast perfusion MRI, reported as relative cerebral blood volume, is the most established perfusion technique in glioma and is used to separate treatment effect from true progression and to support grading. Amino acid PET with 11C-methionine or 18F-fluoroethyl-tyrosine distinguishes metabolically active tumour from necrotic or scarred tissue and can identify the most biologically aggressive area for targeted biopsy; PET use should follow RANO recommendations. 18F-FDG is not an adequate tracer for primary brain tumours. Magnetic resonance spectroscopy adds metabolic characterisation, including non-invasive detection of 2-hydroxyglutarate. Functional MRI and diffusion tensor tractography are used for presurgical planning near eloquent areas. Amino acid PET for radiotherapy target delineation is not standard practice.
+    rationale: |-
+      An increase in enhancement during the first months after chemoradiotherapy is the point at which the pathway most often goes wrong, and the reference standards address it with a dedicated recommendation while the panel offers no instrument to act on it: with structural MRI alone, pseudoprogression and progression are the same image. Biopsy does not resolve it either, since viable tumour cells are regularly found without excluding pseudoprogression. The tier is OPTIONAL because none of these techniques is needed at first diagnosis, and the negative statements are kept in the description because they prevent the two predictable misuses — ordering FDG PET for a primary brain tumour, and using amino acid PET for radiotherapy planning outside a trial.
+    source: |-
+      EANO 2021
+    our_response: |-
+      Applied: amino_acid_PET was added with the tracers EANO names, and perfusion MRI plus MR spectroscopy are recommended actions in all 30 cases. FDG-PET is not among them, per your note.
+
+focal_epilepsy_temporal:
+  analyze_brain_mri:
+    reviewer: 1
+    requested_tier: required
+    status: applied
+    guidance: |-
+      Revise the description. 
+      MRI should be performed with a dedicated epilepsy protocol, not generic.
+      The protocol should specifically assess temporal lobe and hippocampal abnormalities, including hippocampal sclerosis, focal cortical dysplasia, tumors, vascular malformations, post-traumatic or ischemic lesions and other structural epileptogenic causes.
+
+      CT should be considered when MRI is unavailable or contraindicated.
+    source: |-
+      NICE NG217 updated 2025; ILAE Neuroimaging Task Force MRI recommendations 2019; ACR Appropriateness Criteria Seizures and Epilepsy.
+    our_response: |-
+      Applied: required in all 30 with a dedicated epilepsy protocol.
+  analyze_ecg:
+    reviewer: 1
+    requested_tier: optional
+    status: applied
+    guidance: |-
+      ECG is not a diagnostic tool for temporal lobe epilepsy, but a 12-lead ECG is appropriate in the initial assessment of a first suspected seizure or transient loss of consciousness to identify cardiac conditions that may mimic epileptic seizures.
+    source: |-
+      NICE NG217 updated 2025.
+    our_response: |-
+      Applied as your note describes: the ECG survives in the 2 cases presenting as a first suspected seizure or transient loss of consciousness, and nowhere else.
+  analyze_eeg:
+    reviewer: 1
+    requested_tier: required
+    status: applied
+    guidance: |-
+      Revise the description. 
+      EEG should include routine awake EEG as first-line support for diagnosis and seizure/epilepsy classification. If routine EEG is normal and diagnostic uncertainty persists, sleep-deprived EEG should be considered; ambulatory EEG or video-EEG monitoring may be used when events need to be captured or differentiated from non-epileptic mimics. Continuous ICU EEG should not be part of the routine temporal lobe epilepsy workup and should be reserved for acute settings such as suspected non-convulsive status epilepticus. EEG supports diagnosis but a normal EEG does not exclude epilepsy.
+    source: |-
+      NICE NG217 updated 2025; IFCN/ILAE routine and sleep EEG standards 2023; ILAE epilepsy classification.
+    our_response: |-
+      Applied, and it caught a gap in the vocabulary: the sleep-deprived study you name as the second-line recording did not exist as an orderable value, so the request could be neither made nor scored. sleep_deprived is now priced (276 EUR, CPT 95819) and derives into the tool enum, the catalog and the cost tracker. Routine EEG comes first in the cases, with video or ambulatory recording where events have to be captured, and no case uses continuous ICU monitoring.
+  interpret_labs:
+    reviewer: 1
+    requested_tier: optional
+    status: applied
+    guidance: |-
+      Change in OPTIONAL. 
+
+      They should be used when clinically indicated to exclude acute symptomatic seizures or seizure mimics, such as hypoglycaemia, electrolyte disturbance, infection, toxic/drug-related causes, pregnancy-related issues or other metabolic disorders.
+    source: |-
+      NICE NG217 updated 2025; ILAE epilepsy classification.
+    our_response: |-
+      Applied: optional in all 30 cases.
+  order_cardiac_monitoring:
+    reviewer: 1
+    requested_tier: remove
+    status: confirm
+    guidance: |-
+      REMOVE
+    our_response: |-
+      Same as the echocardiogram: optional in the 2 cases with syncope on the differential, and corrected from recommended to optional while answering this comment.
+  order_echocardiogram:
+    reviewer: 1
+    requested_tier: remove
+    status: confirm
+    guidance: |-
+      REMOVE
+    our_response: |-
+      Downgraded to optional rather than removed, in the 2 cases initially worked up as syncope or pulmonary embolism (FEPI-TEMP-P05, -RP02). Answering your comments one by one caught that these had been left at *recommended*, not optional, which made the account we were about to send you wrong; they are optional now.
+
+ftd:
+  interpret_labs:
+    reviewer: 1
+    requested_tier: required
+    status: applied
+    guidance: |-
+      Laboratory testing are used to exclude reversible or contributing causes of cognitive and behavioural decline. A baseline panel should include common metabolic, thyroid, vitamin, inflammatory, renal/hepatic and infectious contributors when clinically appropriate. Autoimmune, paraneoplastic, coagulation or genetic testing should be targeted to atypical, rapidly progressive, young-onset or clinically suggestive presentations, not applied as a fixed broad panel.
+    source: |-
+      SNLG/ISS National Guideline on dementia and Mild Cognitive Impairment; NICE NG97.
+    our_response: |-
+      Applied: the required panel is the reversible-cause set, and autoimmune, paraneoplastic and genetic testing are no longer part of a fixed broad panel.
+  order_advanced_imaging:
+    reviewer: 1
+    requested_tier: optional
+    status: applied
+    guidance: |-
+      Change "Advanced imaging" from REQUIRED to OPTIONAL and narrow the FTD-specific description. For suspected frontotemporal dementia, imaging should mainly refer to FDG-PET, or perfusion SPECT if FDG-PET is unavailable. 
+      DaTscan, MIBG scintigraphy, MR/CT angiography, carotid duplex and transcranial Doppler are not diagnostic tools for frontotemporal dementia --> remove.
+    source: |-
+      SNLG/ISS National Guideline on dementia and Mild Cognitive Impairment; European intersocietal recommendations for biomarker-based diagnosis of neurocognitive disorders.
+    our_response: |-
+      Applied: no FTD case requires advanced imaging (27 optional, 32 recommended), and FDG-PET is the modality it points at.
+  order_ct_scan:
+    reviewer: 1
+    requested_tier: optional
+    status: partial
+    guidance: |-
+      Non-contrast head CT should be considered mainly as an alternative when brain MRI is unavailable or contraindicated. 
+
+      CT angiography, carotid duplex and transcranial Doppler are not tools for FTD diagnosis --> remove.
+    source: |-
+      SNLG/ISS National Guideline on dementia and Mild Cognitive Impairment.
+    our_response: |-
+      Applied as far as the catalog goes — CT angiography, carotid duplex and transcranial Doppler are not FTD actions in any case — but only one case uses head CT as the MRI alternative. The same gap as in Alzheimer's: the pathway is described and barely exercised.
+  order_specialized_test:
+    reviewer: 1
+    requested_tier: required
+    status: applied
+    guidance: |-
+      The current “Specialized test” description is too broad. 
+      Validated neuropsychological testing must be REQUIRED. 
+      Genetic testing should remain OPTIONAL, mainly for young-onset disease, strong family history (if we insert them here, insert them also in alzheimer, optional). 
+      EMG/NCS, repetitive nerve stimulation, biopsies, evoked potentials and autonomic/tilt testing are not diagnostic tools for frontotemporal dementia--> remove.
+    source: |-
+      SNLG/ISS National Guideline on dementia and Mild Cognitive Impairment; International FTDC criteria for behavioural variant frontotemporal dementia.
+    our_response: |-
+      Applied: the validated neuropsychological battery is required in all 30 cases; genetic testing is optional in 10, recommended in 7 and required only in the 10 with young onset or a strong family history. Your bracketed request — put genetics in Alzheimer's too, as optional — is done.
+  perform_clinical_assessment:
+    reviewer: 1
+    filed_under: [order_specialized_test]
+    requested_tier: required
+    status: applied
+    guidance: |-
+      Validated neuropsychological testing must be REQUIRED.
+    source: |-
+      SNLG/ISS National Guideline on dementia and Mild Cognitive Impairment; International FTDC criteria for behavioural variant frontotemporal dementia.
+    our_response: |-
+      Applied as a separate act: a structured cognitive and behavioural assessment is required in all 30 cases, scored against the six Rascovsky features, each marked present only where the history describes it.
+
+functional_neurological_disorder:
+  analyze_eeg:
+    reviewer: 1
+    status: open
+    guidance: |-
+      DISCUTERE SE TENERE PATOLOGIA, SE VOGLIAMO CONTROLLARE SE L'AGENTE AI FA OVERTESTING
+    our_response: |-
+      Your question, answered in the reply: yes, diagnostic overuse is an objective — cost tracking against Medicare reference rates is one of the project's main components — so we take your second option and keep the condition, with the diagnostic tools optional. Checking the cases showed your doubt was better founded than our answer: all 30 required a gadolinium brain MRI and a laboratory battery, none performed a functional-signs examination, no action anywhere was optional, and the required pathway cost 1303 EUR on average — more than bacterial meningitis (1204) or Guillain-Barre (1223). The condition meant to measure restraint was rewarding the opposite, and the ground truth encoded the diagnosis-of-exclusion model the literature has abandoned. Now the functional-signs examination is the mandatory act in all 30, the MRI is optional in 23 and recommended once without contrast in 7, laboratories are optional in 27, and EMG/NCS and evoked potentials are scored as useless calls in all 30 instead of being forbidden in prose. One deliberate departure: video-EEG stays required in the 22 cases with paroxysmal events, because a recorded habitual event without ictal correlate is the positive diagnostic act for psychogenic non-epileptic seizures (ILAE 2013), not an exclusion test. Say the word and we demote that too.
+
+guillain_barre:
+  analyze_brain_mri:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Structural brain MRI with contrast. GBS is a disease of the peripheral nervous system and the brain is not the region to image: this study answers a narrow set of questions and does not substitute for spinal or nerve imaging. Indicated where Bickerstaff brainstem encephalitis is suspected — ophthalmoplegia and ataxia with pyramidal signs and impaired consciousness — in which white matter changes may be seen; and where the differential includes a brainstem process such as stroke, inflammation or compression, which the presentation should have flagged. Alteration of consciousness is a finding that argues against GBS, Bickerstaff brainstem encephalitis excepted, and is the clinical trigger for this item rather than a feature of the disease itself.
+    rationale: |-
+      The generic protocol list is replaced because dementia and multiple sclerosis protocols have no application in an acute polyradiculoneuropathy, while the one indication that does exist is not named. The explicit statement that the brain is the wrong region is the operative sentence: as published, this is the only imaging item in the panel, and an agent facing a paralysed patient with an incomplete picture will order the imaging that exists rather than the imaging that is needed. Pairing this restriction with the new spinal item at section 4 is what makes both correct; either change alone leaves the pathway able to reach only the wrong anatomy.
+    source: |-
+      EAN/PNS 2023
+    our_response: |-
+      Applied in the strongest form: no Guillain-Barre case images the brain at all. The sweep this comment started moved 63 spine studies out of the brain-MRI tool across the whole dataset.
+  analyze_csf:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Lumbar puncture with cell count, total protein and glucose. The finding sought is albumino-cytological dissociation: raised protein with a normal or only slightly raised white cell count, usually below 5 cells/microlitre, rarely 5 to 50, very rarely above 50. Interpretation, not sampling, is where this test is misread. A normal protein is common during the first week and does not exclude the diagnosis; sensitivity rises with time from onset of weakness. A white cell count above 50 cells/microlitre should raise suspicion of an alternative diagnosis and prompt targeted testing for the infectious and malignant mimics. Both protein and cell count may be artefactually raised after IVIg, so the timing of any previous infusion must be recorded. 14-3-3 and RT-QuIC have no role in this condition.
+    rationale: |-
+      The generic wording lists assays belonging to other conditions and omits the pattern the test exists to detect, so an agent ordering it correctly may still not know what constitutes a positive result. The two interpretive clauses are the operative part: a normal early protein read as excluding GBS delays treatment in a disease where the treatment window is defined in weeks from onset, and a pleocytosis read as compatible with GBS keeps the pathway on the wrong diagnosis when the source explicitly redirects it. The IVIg clause is included because in a benchmark the lumbar puncture may well be ordered after treatment has started, at which point the raised values are an artefact rather than a finding.
+    source: |-
+      EAN/PNS 2023
+    our_response: |-
+      Applied: required in all 30, and 14-3-3/RT-QuIC are gone from this condition.
+  analyze_ecg:
+    reviewer: 2
+    requested_tier: unchanged
+    status: no_change
+    guidance: |-
+      The reference standard assigns no diagnostic role in GBS to a single electrocardiogram, and none is claimed here. It earns its place as the baseline tracing against which continuous cardiac monitoring is read, at negligible unit cost, and the optional tier is right because a single recording cannot detect the intermittent autonomic instability that matters: that is the continuous monitoring item, not this one. The existing description is accurate for that purpose.
+    source: |-
+      EAN/PNS 2023
+    our_response: |-
+      No change requested. The ECG is a recommended baseline in all 30 cases, which is the role your note describes.
+  interpret_labs:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Blood and serum work-up serving two purposes here, neither of them confirmation of the diagnosis. First, differential diagnosis and risk stratification: full blood count, sodium and potassium, glucose, renal function, liver function tests, serum albumin, creatine kinase, thyroid function, vitamin B12. Abnormal routine blood tests argue against GBS and point to a metabolic, electrolyte or toxic mimic; hyponatraemia, however, does occur in GBS. Abnormal liver function at presentation and hypoalbuminaemia are predictors of respiratory failure and are read as such. Second, antibodies: anti-GQ1b when Miller Fisher syndrome or its spectrum is suspected; anti-ganglioside testing is not advised routinely in typical motor-sensory GBS, and is not advised for subtyping; nodal-paranodal antibodies when autoimmune nodopathy is suspected, using cell-based assays validated with a second technique.
+    rationale: |-
+      The description is re-anchored rather than trimmed, because the generic bucket happens to contain the right categories for the wrong reasons: nothing in it signals that liver function and albumin are read as ventilation predictors rather than as organ screening, and nothing signals that the autoimmune panel is where anti-GQ1b has to live. The negative statements on antibody testing carry as much weight as the positive one — routine anti-ganglioside panels in typical motor-sensory GBS have low to moderate sensitivity and results frequently arrive beyond the therapeutic window, so ordering them is a cost without a decision attached. Genetic testing is marked as having no role in this condition, while remaining legitimate in other panels sharing the same block.
+    source: |-
+      EAN/PNS 2023
+    our_response: |-
+      Applied. The anti-GQ1b point also caught a routing defect elsewhere: a myasthenia case was being served a Miller-Fisher ganglioside panel because the matcher treated the token 'anti' as identifying an antibody.
+  order_body_imaging:
+    reviewer: 2
+    filed_under: [order_specialized_test]
+    requested_tier: optional
+    status: partial
+    guidance: |-
+      Whole spine MRI with contrast, and nerve or nerve root MRI or high-resolution nerve ultrasound where available. Not an add-on test in a typical presentation. Indicated when the presentation is atypical or when any finding argues against GBS: a sensory level, extensor plantar responses, hyperreflexia, marked and persistent asymmetric weakness, bladder or bowel dysfunction, fever at onset, or predominant sensory signs with mild weakness. The primary purpose is to exclude spinal cord compression, transverse myelitis, spinal cord tumour and other structural mimics. Nerve root enhancement supports GBS but does not rule out other causes of polyradiculopathy, and widespread nerve enlargement on ultrasound or MRI may favour acute-onset CIDP without being specific for it.
+    rationale: |-
+      The panel can image the brain but not the cord, which means the one mimic on the differential that is both common and time-critical — compression of the spinal cord — cannot be excluded by any available action, and a case of cord compression presenting as ascending flaccid weakness is misclassified with nothing in the action space that would have corrected it. The tier is OPTIONAL rather than REQUIRED because the reference standard explicitly advises against routine nerve imaging in typical presentations, so making it mandatory would teach the benchmark a guideline-discordant pathway at the highest unit cost in the panel; the trigger list is therefore written into the description, and it is taken from the guideline's own list of findings that make GBS less likely, so that the item fires exactly where the diagnosis is in doubt.
+    source: |-
+      EAN/PNS 2023
+    our_response: |-
+      Half done, and we would rather say so. The tool exists and whole-spine MRI is orderable and priced, so cord compression is no longer outside the action space; but no Guillain-Barre case orders it yet. Your trigger list — sensory level, extensor plantars, sphincter involvement, fever at onset — is what identifies the cases that should carry it, and that authoring is outstanding.
+  order_cardiac_monitoring:
+    reviewer: 2
+    requested_tier: required
+    status: applied
+    guidance: |-
+      Continuous inpatient cardiac monitoring with blood pressure surveillance, run alongside respiratory monitoring for as long as the patient is deteriorating and through the plateau phase. The question is autonomic instability — fluctuation of blood pressure and heart rate, bradyarrhythmia, sustained tachycardia — not paroxysmal arrhythmia in the ambulatory sense: Holter and extended event monitoring answer a different question and are not the modality here. Autonomic instability on monitoring is one of the clinical findings that place the patient in the high-risk band and support transfer to intensive care, independently of respiratory measurements. Monitoring should continue after discharge from intensive care, when a substantial share of deaths occurs.
+    rationale: |-
+      The optional tier is raised because autonomic instability is not an incidental finding to be looked for if convenient: in the reference standard it sits beside FVC and bulbar weakness as a trigger for escalation of care, and the pathway cannot reach that trigger unless the monitoring is running. The description is rewritten because the current wording points the item at outpatient rhythm capture, which is the wrong instrument for an inpatient with a rapidly progressive polyradiculoneuropathy; the same hardware serves both, but an agent reading the item as written has no reason to start it on admission. The post-ICU clause is included because the risk does not end with extubation.
+    source: |-
+      EAN/PNS 2023
+    our_response: |-
+      Applied: required in all 30 cases, and a telemetry report was authored from each case's own autonomic picture first, because raising a tier without a result makes the required act unanswerable.
+  order_specialized_test:
+    reviewer: 2
+    filed_under: [order_cardiac_monitoring]
+    requested_tier: required
+    status: applied
+    guidance: |-
+      Nerve conduction studies with needle EMG are the confirmatory test in this condition and the sub-test to select. Motor and sensory conduction studies, F waves, H reflexes, facial nerve direct responses and blink responses; somatosensory evoked potentials and root stimulation where the question is proximal conduction block. Supportive early findings: sensory or motor conduction abnormalities consistent with polyneuropathy, absent H reflexes, sural sparing pattern, distal CMAP duration prolongation above 8.5 ms. A normal study in the first week does not exclude the diagnosis, and repeating it later in the course is useful because abnormalities may take several weeks to develop. Electrodiagnostic subtyping into AIDP, AMAN or AMSAN is not advised: it does not aid early diagnosis and has no bearing on management or treatment. Repetitive nerve stimulation addresses the neuromuscular junction mimics on the differential. Nerve biopsy, neuropsychological batteries and genetic testing have no established role here. Tilt-table testing is not the modality for autonomic assessment in an acutely weak patient; autonomic monitoring belongs to the cardiac monitoring item.
+
+      Bedside monitoring of ventilatory function in suspected or confirmed GBS. Forced vital capacity is measured three to six times a day depending on severity and until significant worsening seems unlikely; while the patient is still declining, four-hourly measurement is appropriate. Single breath count — counting aloud from 1 to 20 in one breath — is recorded at the same intervals; a count below 20 indicates the need for transfer to intensive care. Maximum inspiratory and expiratory pressures are measured where available. The report should return the absolute FVC in mL/kg, the FVC as percentage of predicted, the change from the patient's own baseline, and the single breath count, because the decision thresholds are defined on all four.
+    rationale: |-
+      The generic bucket is re-anchored rather than replaced, because the item itself is correct and mandatory: what changes is that an agent reading it now knows which sub-test answers the question. The three clauses added are the ones that alter behaviour — without the first, a normal early study will be read as excluding GBS, which is the most consequential misreading available here; without the second, the study is never repeated; without the third, the tool will produce a subtype label that the reference standard has deliberately declined to endorse, on the grounds that no gold standard exists to choose between the published electrophysiological criteria. Biopsy, neuropsychological testing and genetics are marked as having no role in this condition rather than deleted from the shared bucket, since the same sub-tests are legitimate in other panels.
+
+      Without this item the panel cannot represent the single process that kills in this disease, and the pathway has no observable act corresponding to the decision to escalate care: a patient about to require intubation is indistinguishable from a stable one within the action space. Both the interval and the four reported quantities are specified because the published thresholds are not interchangeable — a percentage of predicted, an absolute mL/kg value and a fall from the patient's own baseline trigger different actions, and a report returning only one of them cannot drive the algorithm. Single breath count is included alongside FVC because it requires no equipment and is the tool the reference standard names for the transfer decision.
+    source: |-
+      EAN/PNS 2023
+    our_response: |-
+      Applied: respiratory_function already existed — the review app was showing 9 of 21 specialized tests, which is why it looked absent — and it is now a required action in all 30 cases.
+
+hepatic_encephalopathy:
+  analyze_brain_mri:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Brain MRI.
+
+      Structural brain MRI, used as an alternative or complement to CT for differential diagnosis when diagnostic doubt persists or the patient fails to respond to treatment; contrast at the radiologist's discretion. No MRI finding establishes HE: bilateral symmetric pallidal hyperintensity on T1-weighted sequences reflects portosystemic shunting rather than the encephalopathy itself, and conventional sequences do not show the slight oedema that may be present in type C HE. Magnetic resonance spectroscopy has been studied in the differential diagnosis but is restricted to specialised units and usually requires general anaesthesia in a delirious patient; it is not required here
+    source: |-
+      EASL 2022
+    our_response: |-
+      Applied: brain MRI is required in only the 5 cases with genuine diagnostic doubt and absent elsewhere.
+  analyze_ecg:
+    reviewer: 2
+    requested_tier: unchanged
+    status: no_change
+    guidance: |-
+      Checked against both reference standards and confirmed as published. Neither document assigns ECG a diagnostic role in HE, but perfusion disorders including myocardial infarction are named among the extrahepatic causes found in patients with liver disease investigated for suspected HE, and the electrolyte disturbances that precipitate HE are the same ones an ECG reflects; at this unit cost the item is justified as an optional differential-diagnostic action rather than removed.
+    our_response: |-
+      No change requested and none made.
+  analyze_eeg:
+    reviewer: 2
+    requested_tier: optional
+    status: applied
+    guidance: |-
+      Electroencephalography — routine study, or continuous monitoring in the intensive care setting. Indicated in cirrhosis with altered mental status when non-convulsive seizures or non-convulsive status epilepticus must be excluded: a witnessed or suspected seizure, depression of consciousness out of proportion to the clinical picture, or failure to improve after 48-72 hours of adequate HE therapy with precipitating factors corrected. Neither reference standard identifies an EEG pattern that establishes a diagnosis of HE, so the study is read for alternative or concomitant causes rather than for confirmation. Not indicated for a typical, precipitated, treatment-responsive episode, and not the instrument of choice for screening covert HE at the bedside.
+    rationale: |-
+      The mandatory tier is removed because neither document contains any recommendation, graded or otherwise, that makes electroencephalography routine in this condition; it appears only as a means of excluding non-convulsive seizures and among the investigations for suspected neurological comorbidity. Ambulatory and video recording are dropped from the description because they answer a question about recurrent unexplained events rather than about an acute confusional state, while continuous intensive-care monitoring is retained for the sedated or intubated patient in whom mental status cannot be assessed. The item itself is kept: removing it would make unsolvable, by construction, precisely the cases in which the encephalopathy is not hepatic.
+    source: |-
+      EASL 2022 and ACG 2026
+    our_response: |-
+      Applied: EEG is no longer required in any case (recommended in 23, optional in 1).
+  interpret_labs:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Blood and serum work-up for cirrhosis with altered mental status. Core set: plasma ammonia, sampled and processed according to the local laboratory pre-analytical protocol; full blood count; sodium, potassium and renal function; glucose; liver panel with bilirubin, albumin and INR; C-reactive protein; TSH; serum zinc. Toxicology: blood alcohol and a urine screen for psychoactive drugs. In suspected hepatic myelopathy add vitamin B12, thiamine and copper. Ammonia is interpreted for its negative predictive value: a normal value in a confused patient with cirrhosis puts the diagnosis of HE in question and should trigger a search for another cause. Ammonia must not be used to grade severity, to titrate therapy or to confirm recurrence.
+    rationale: |-
+      Autoimmune and paraneoplastic antibody panels and genetic testing are removed because neither reference standard assigns them a role in this condition; the clinical-genetic risk score that appears in the literature is a prognostic research instrument, not a diagnostic test, and ordering these panels adds cost without diagnostic yield here. Ammonia, electrolytes, glucose, renal function, C-reactive protein, blood alcohol and a drug screen are named because they are the alternative and concomitant causes the pathway is required to exclude, and because hyponatraemia and dehydration are themselves recognised precipitants. Serum zinc is added because the reference standard conditions zinc supplementation on a low blood zinc level, which the panel could not otherwise establish. Thyroid function is kept, hypothyroidism being explicitly named among the concomitant disorders to consider. Coagulation is retained as INR, which also feeds the prognostic score.
+    source: |-
+      EASL 2022
+    our_response: |-
+      Applied: ammonia, electrolytes, renal and liver function, CRP, TSH and zinc are named; autoimmune, paraneoplastic and genetic panels are out.
+  order_body_imaging:
+    reviewer: 2
+    filed_under: [analyze_brain_mri]
+    requested_tier: optional
+    status: partial
+    guidance: |-
+      Contrast-enhanced cross-sectional imaging of the abdomen (CT or MRI, portal venous phase) to identify spontaneous portosystemic shunts and to document a previously placed transjugular intrahepatic portosystemic shunt. Indicated when HE is recurrent or persistent despite adequate medical therapy, or when mental status has not recovered after 48-72 hours of adequate therapy with precipitating factors corrected and alternative neurological diagnoses excluded. The report should state the presence, site and diameter of any shunt and whether a TIPS is present and patent. Not indicated for a first, precipitated, treatment-responsive episode. Shunt closure is a separate therapeutic decision governed by hepatic reserve, not by the imaging finding alone.
+    rationale: |-
+      The panel can currently image the brain but not the portal circulation, which means the one anatomical cause of refractory encephalopathy that both reference standards tell the clinician to look for is outside the action space entirely. The reference standard reports that spontaneous shunts are found in a large majority of cases of HE refractory to medical therapy, against a much lower frequency in non-refractory disease, and it places cross-sectional imaging in the algorithm for non-response at 48-72 hours. Tier is OPTIONAL rather than REQUIRED because in a first precipitated episode that responds to treatment the examination adds cost without changing management; the trigger conditions are therefore written into the description rather than into the tier.
+    source: |-
+      ACG 2026
+    our_response: |-
+      The tool exists — order_body_imaging can now image the portal circulation, which nothing in the twelve-tool space could — but no hepatic-encephalopathy case orders it yet. The trigger conditions you wrote (recurrent or persistent HE, no recovery at 48-72 h) identify which cases should carry it, and that is case authoring we have not done.
+  order_ct_scan:
+    reviewer: 2
+    requested_tier: optional
+    status: confirm
+    guidance: |-
+      Non-contrast CT of the head, with CT angiography reserved for a suspected vascular lesion. Indicated in cirrhosis with altered mental status when any of the following is present: new-onset focal neurological deficit, seizure, recent head trauma or fall, a first episode of altered mental status in which another aetiology must be excluded, anticoagulation or clinical suspicion of intracranial bleeding, or failure to improve after 48-72 hours of adequate HE therapy with precipitating factors corrected. Routine imaging of a typical, precipitated, treatment-responsive episode in a patient with prior comparable episodes and no focal signs is not indicated. No CT finding establishes HE; the examination is performed to exclude or identify an alternative or additional cause.
+    rationale: |-
+      The unconditional REQUIRED status is removed because both reference standards position brain imaging as conditional, one by an explicit recommendation against routine imaging in the absence of new focal deficits and the other by restricting it to diagnostic doubt or non-response; leaving the item mandatory teaches the benchmark that guideline-discordant imaging is the correct pathway, at the highest unit cost of the three currently mandatory items. The unrestricted contrast and angiography framing is narrowed because the yield in this population comes from the non-contrast study, angiography being reserved for the vascular differential. The trigger list is added so that the item remains fully available for the cases that need it, in particular alcohol-related cirrhosis, where the risk of intracerebral bleeding is increased.
+    source: |-
+      ACG 2026, recommendation 6: "In patients with cirrhosis and confusion without new-onset focal neurologic deficits, we suggest against routine brain imaging" (conditional recommendation, very low certainty of evidence); narrative of the same section: brain imaging performed clinically does not diagnose HE and has limited value in patients without focal neurological deficits, seizures or multiple prior episodes, and is useful to investigate acute and chronic subdural haematoma, subarachnoid bleeding, stroke or brain lesion; narrative on expected improvement within 24-48 hours and non-response at 48 hours. EASL 2022, section on cerebral imaging in cirrhosis and delirium: recommendation "In patients with delirium/encephalopathy and liver disease, brain imaging by CT scan or MRI should be performed in case of diagnostic doubts or non-response to treatment" (LoE 5, strong recommendation, 96% Delphi consensus) — note LoE 5, expert opinion; statement "No cerebral imaging proves a diagnosis of HE" (LoE 4, 96% consensus); narrative of the same section: brain imaging is always warranted if there is clinical suspicion of a cerebral lesion or haemorrhage, as is often the case in alcohol-related cirrhosis, with a reported relative risk for intracerebral bleeding above 5 in alcohol overuse, attributed to a population-based case-control study and not verified on full text here. Time window: the description uses 48-72 hours, the wider of the two windows given by ACG 2026 (48 hours in narrative text, 48-72 hours in the key concept)
+    our_response: |-
+      Not applied, deliberately, and this is the one place we are asking you to overrule us. All 30 cases still require the head CT. Your reasoning is explicit (ACG 2026 suggests against routine imaging without focal deficits) and we accept it in principle; what stopped us is that dropping an exclusion step before an invasive procedure, on our own reading, is not our call. Tell us to demote it and we will.
+  order_microbiology:
+    reviewer: 2
+    filed_under: [interpret_labs]
+    requested_tier: required
+    status: applied
+    guidance: |-
+      Infection work-up in a patient with cirrhosis and altered mental status. Blood cultures (two sets), urinalysis and urine culture, and diagnostic paracentesis in every patient with ascites, with ascitic fluid polymorphonuclear cell count, total protein and culture inoculated into blood-culture bottles at the bedside. Chest imaging, sputum and stool cultures when clinically indicated. The structured report should state whether ascites was present and, if so, whether paracentesis was performed, because a patient with ascites who has not been tapped leaves spontaneous bacterial peritonitis unexcluded. Results are read as precipitant identification, not as a test for encephalopathy itself: a positive culture does not exclude a concurrent second precipitant.
+    source: |-
+      EASL 2022, section on identification, prevention and management of precipitating events
+    our_response: |-
+      Applied: blood cultures in all 30 cases, urine in all 30, and diagnostic paracentesis in the 13 with ascites — 73 required microbiology actions where before there was no tool able to sample anything outside the CNS.
+
+ischemic_stroke:
+  analyze_brain_mri:
+    reviewer: 2
+    requested_tier: optional
+    status: applied
+    guidance: |-
+      Brain MRI as an alternative to non-contrast CT for initial emergent imaging, where door-to-imaging time comparable to a CT protocol (~25 minutes) is achievable; gradient echo sequences detect hyperacute intraparenchymal haemorrhage as accurately as NCCT within 6 hours of onset. Two roles are specific to MRI: DWI-FLAIR mismatch for eligibility in stroke on awakening or of unknown onset, and greater reliability against stroke mimics. MRI/MRA is the preferred first-line modality in paediatric suspected arterial ischaemic stroke. Thrombolysis must never be delayed to obtain MRI, including where cerebral microbleed burden is unknown.
+    source: |-
+      Prabhakaran S, et al. Stroke. 2026
+    our_response: |-
+      Applied: brain MRI is optional in all 30 cases.
+  analyze_eeg:
+    reviewer: 2
+    requested_tier: optional
+    status: applied
+    guidance: |-
+      Electroencephalography — routine, ambulatory, video, or continuous ICU monitoring. Indicated only for stroke mimics (suspected seizure), unexplained altered consciousness (ruling out non-convulsive status epilepticus), and characterisation of unprovoked post-stroke seizures. No routine role in acute ischaemic stroke. EEG must never delay reperfusion therapy.
+    source: |-
+      Prabhakaran S, et al. Stroke. 2026, section 6.5 Seizures, synopsis
+    our_response: |-
+      Applied: no case requires EEG, and the two that reference it do so for a suspected seizure mimic.
+  interpret_labs:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Blood/serum studies for acute ischaemic stroke. Blood glucose, determined before initiating thrombolysis, since severe hypo- and hyperglycaemia may mimic acute stroke and require urgent correction; treat hypoglycaemia below 60 mg/dL. Baseline troponin in all patients with suspected acute stroke. Full blood count, coagulation studies (PT/INR, aPTT) and renal function, to be obtained but not awaited: thrombolysis within 4.5 hours of last known well must not be delayed pending haematologic or coagulation results where there is no reason to suspect an abnormal value, and CTA or CTP must not be delayed to obtain serum creatinine. Neither baseline ECG nor baseline troponin should delay thrombolysis or thrombectomy. Extended aetiological testing (thrombophilia, autoimmune or paraneoplastic panels, genetic and metabolic studies) has no established role in the emergency work-up and belongs to the subsequent aetiological evaluation of selected patients, typically stroke in the young or of undetermined cause.
+    rationale: |-
+      Two class 1 recommendations govern this item and neither is currently represented. Baseline troponin is the only laboratory test carrying a class 1 recommendation in this condition and is absent altogether — the most consequential defect here. Blood glucose conditions eligibility for thrombolysis, and the undifferentiated term "metabolic" is replaced by naming it, since the most time-critical test in the pathway should not depend on inference from a category label. The three do-not-delay statements are added because the sequencing rule is as clinically important as the test list: a REQUIRED laboratory item without them invites the agent to treat results as a precondition for reperfusion, the opposite of the source's intent. Thyroid, autoimmune/paraneoplastic and genetic testing are relocated rather than deleted — no role in the acute phase, where they add cost and turnaround time without yield, but legitimate in the later aetiological work-up. These over-inclusions are characteristic of a laboratory bucket shared across conditions and were assessed against this condition specifically, not removed by analogy with other panels.
+    source: |-
+      Prabhakaran S, et al. Stroke. 2026
+    our_response: |-
+      Applied: glucose before thrombolysis and a baseline troponin are named analytes in the required set, not a generic 'metabolic' bucket, and the do-not-delay sequencing is in the case reasoning.
+  order_advanced_imaging:
+    reviewer: 2
+    filed_under: [analyze_brain_mri]
+    requested_tier: optional
+    status: applied
+    guidance: |-
+      Advanced imaging for tissue-based patient selection outside the standard time window, using automated postprocessing software: CT perfusion (CTP), MR diffusion- and perfusion-weighted imaging (DWI-PWI) to quantify the core-to-penumbra relationship, and MRI DWI-FLAIR mismatch. Three indications: stroke on awakening or unknown onset beyond 4.5 hours from last known well, where DWI-FLAIR mismatch determines eligibility for extended-window thrombolysis; 4.5 to 24 hours from last known well, where CTP or MR DWI-PWI determines the same; and large vessel occlusion presenting 6 to 24 hours from last known well, where CTP, DWI-FLAIR mismatch or MR DWI-PWI supports thrombectomy selection, if immediately available. Not indicated when the diagnosis is clear and the patient is within the standard window, where advanced imaging is unnecessary and may delay time-sensitive thrombolysis.
+    source: |-
+      Prabhakaran S, et al. Stroke. 2026
+    our_response: |-
+      Applied: CT_perfusion was added to the imaging vocabulary and priced, so tissue-based selection is orderable; perfusion MRI already existed.
+  order_ct_scan:
+    reviewer: 2
+    requested_tier: required
+    status: applied
+    guidance: |-
+      Non-contrast head CT (NCCT) as the initial emergent brain imaging study, to exclude intracranial haemorrhage and assess ischaemic burden (e.g., ASPECTS) before any reperfusion therapy; target door-to-imaging time within approximately 25 minutes. NCCT alone is sufficient neuroimaging for the thrombolysis decision in most patients. Separately, CT angiography (CTA) of the cervical and intracranial vessels where large vessel occlusion is suspected within 24 hours of last known well, to be performed as rapidly as possible for thrombectomy selection and treatment planning; CTA must not be delayed in order to obtain a serum creatinine concentration.
+    source: |-
+      Prabhakaran S, Gonzalez NR, Zachrison KS, et al. 2026 guideline for the early management of patients with acute ischemic stroke: a guideline from the American Heart Association/American Stroke Association.
+    our_response: |-
+      Applied, and it exposed the most serious defect in the dataset: 21 of the 30 cases had no non-contrast CT at all — the study that excludes haemorrhage before thrombolysis. All 30 now have it as a required action, with CT angiography as a separate one.
+
+migraine_with_aura:
+  analyze_brain_mri:
+    reviewer: 1
+    requested_tier: optional
+    status: applied
+    guidance: |-
+      Change Brain MRI from REQUIRED to OPTIONAL. Migraine with aura is primarily a clinical diagnosis based on ICHD-3 criteria and neurological examination. Brain MRI should not be required in typical migraine with aura with a normal neurological exam. It should be reserved for red flags, unusual/prolonged/persistent aura, change in clinical pattern, migraine with brainstem aura, hemiplegic migraine, late-life aura, aura without headache, side-locked headache, post-traumatic headache, or suspicion of secondary headache.
+    source: |-
+      ICHD-3; EHF/EAN Consensus Statement 2021; American Headache Society neuroimaging guideline update 2019.
+    our_response: |-
+      Applied: MRI is optional in 15 cases, recommended in 5 and absent in the other 10 — no case requires it.
+  analyze_csf:
+    reviewer: 1
+    requested_tier: remove
+    status: confirm
+    guidance: |-
+      REMOVR. CSF analysis does not diagnose migraine with aura.
+    source: |-
+      EHF/EAN Consensus Statement 2021; NICE CG150 updated 2025
+    our_response: |-
+      Almost removed: one case (MIG-AURA-RM11) keeps it as recommended, on a suspicion of secondary headache. No case requires it.
+  analyze_ecg:
+    reviewer: 1
+    requested_tier: remove
+    status: applied
+    guidance: |-
+      REMOVE. ECG is not a diagnostic tool for migraine with aura.
+    source: |-
+      ICHD-3; NICE CG150 updated 2025.
+    our_response: |-
+      Removed: no migraine case orders an ECG.
+  analyze_eeg:
+    reviewer: 1
+    requested_tier: remove
+    status: confirm
+    guidance: |-
+      REMOVE. EEG is not a diagnostic tool for migraine with aura. It should not be used for routine headache evaluation.
+    source: |-
+      American Academy of Neurology Choosing Wisely recommendation; ICHD-3.
+    our_response: |-
+      Almost removed: 29 of 30 cases have no EEG. The exception is MIG-AURA-RM11, whose diagnosis is hemiplegic migraine *with migralepsy* — a seizure during aura, ICHD-3 1.4.4 — so the 24 h video EEG is the study that establishes half of the diagnosis rather than routine headache evaluation. We kept it required there. Tell us if you disagree and it goes.
+  interpret_labs:
+    reviewer: 1
+    requested_tier: optional
+    status: applied
+    guidance: |-
+      Change Laboratory studies from REQUIRED to OPTIONAL. Blood tests do not confirm migraine with aura and should not be part of the routine diagnostic workup for typical migraine. They should be ordered only when red flags or clinical context suggest a secondary headache disorder, such as infection, inflammation, giant cell arteritis, metabolic disturbance, immunosuppression, malignancy, or other systemic disease.
+    source: |-
+      NICE CG150 updated 2025; EHF/EAN Consensus Statement 2021
+    our_response: |-
+      Applied: no case requires blood tests; 4 carry them as optional and 1 as recommended, on a secondary-headache suspicion.
+  order_echocardiogram:
+    reviewer: 1
+    requested_tier: remove
+    status: confirm
+    guidance: |-
+      REMOVE. Echocardiogram is not a diagnostic tool for migraine with aura.
+    source: |-
+      ICHD-3; NICE CG150 updated 2025; American Headache Society neuroimaging guideline update 2019.
+    our_response: |-
+      We looked at this three times and each time reached the opposite of what we first wrote, so here is the full answer. Three cases order an echocardiogram at required, and none of them is a routine migraine: MIG-AURA-P03 is a migrainous infarction whose diagnosis rests on secondary causes having been excluded, MIG-AURA-P07 is a cardioembolic PCA infarct that is explicitly *not* migrainous infarction, and MIG-AURA-P08 is genetically confirmed MELAS where cardiomyopathy screening is standard. In each the echo is embolic-source or cardiomyopathy work-up. The routine migraine echo your comment targets does not exist in the cases — but the condition label is still 'migraine with aura', so you should decide whether that is acceptable or whether those cases belong elsewhere.
+  perform_clinical_assessment:
+    reviewer: 1
+    filed_under: [analyze_brain_mri]
+    requested_tier: required
+    status: applied
+    guidance: |-
+      Migraine with aura is primarily a clinical diagnosis. The true required diagnostic tool should be a "Structured headache/aura history with neurological examination and application of ICHD-3 criteria". This assessment should document headache features, aura type, complete reversibility, gradual spread, symptom succession, duration, unilateral/positive symptoms, relation to headache, medication use, and red flags. If we don't want include a clinical diagnostic tool such as structured ICHD-3 assessment, then replacing migraine with aura with another neurological condition more suited to test-based diagnostic workup could be considered.
+    source: |-
+      ICHD-3; EHF/EAN Consensus Statement 2021; NICE CG150 updated 2025; American Headache Society neuroimaging guideline update 2019; American Academy of Neurology Choosing Wisely 2013.
+    our_response: |-
+      Applied, and it closed a hole that makes the point better than we could. The structured ICHD-3 history is now a required action in all 30 cases. Before that, and after the MRI was demoted, 15 of the 30 cases had a required set consisting only of the two zero-cost universal tools: an agent scored full required coverage without performing a single diagnostic act. Your sentence — that the ICHD-3 history is the only true required test here — was the fix.
+
+multiple_sclerosis:
+  analyze_brain_mri:
+    reviewer: 1
+    requested_tier: required
+    status: applied
+    guidance: |-
+      Replace “Brain MRI” with “Brain and spinal cord MRI with MS protocol” and keep it as REQUIRED. “MS protocol” should be specified because diagnostic MRI for suspected multiple sclerosis requires appropriate brain and whole spinal cord coverage, MS-oriented acquisition sequences, and structured assessment of typical lesion locations. Baseline MRI should allow gadolinium contrast specifically, not generic contrast, when clinically appropriate, especially to detect enhancing lesions, support dissemination in time, and evaluate differential diagnoses.
+    source: |-
+      MAGNIMS-CMSC-NAIMS MRI consensus 2024/2025; NICE NG220 updated 2026
+    our_response: |-
+      Applied, and the comment found something no automatic check could: all 30 cases already carried both a brain and a cord study, but both went through the brain-MRI tool with the same parameter, so for the score they were one examination. Imaging the brain alone gave full coverage and the cord study was invisible. They are now separate, orderable and scored.
+  analyze_csf:
+    reviewer: 1
+    requested_tier: optional
+    status: applied
+    guidance: |-
+      Change CSF analysis from required to optional/conditional. CSF is an important diagnostic support tool, especially when clinical and MRI findings are insufficient, when dissemination in time needs support, or when differential diagnosis is needed. Positive CSF can be demonstrated by oligoclonal bands or kappa free light chains, but lumbar puncture is not universally required in every typical MS case if the 2024 McDonald criteria are otherwise fulfilled.
+    source: |-
+      2024 revised McDonald criteria; Deisenhammer et al. 2025.
+    our_response: |-
+      Applied: CSF is optional in 29 cases and recommended in 1.
+  analyze_ecg:
+    reviewer: 1
+    requested_tier: remove
+    status: applied
+    guidance: |-
+      REMOVE. It's not a diagnostic tool for multiple sclerosis
+    our_response: |-
+      Removed: no multiple-sclerosis case orders an ECG.
+  analyze_eeg:
+    reviewer: 1
+    requested_tier: remove
+    status: applied
+    guidance: |-
+      REMOVE. It's not a diagnostic tool for multiple sclerosis
+    our_response: |-
+      Removed: no multiple-sclerosis case orders an EEG.
+  interpret_labs:
+    reviewer: 1
+    requested_tier: required
+    status: applied
+    guidance: |-
+      Keep Laboratory studies as required, but revise the description. For suspected MS, laboratory testing should primarily exclude mimics rather than confirm MS. Suggested baseline panel: CBC, inflammatory markers, liver and kidney function, calcium, glucose, thyroid function, vitamin B12 and HIV serology
+    our_response: |-
+      Applied: the required panel is the mimic-exclusion set you list.
+  order_body_imaging:
+    reviewer: 1
+    filed_under: [analyze_brain_mri]
+    requested_tier: required
+    status: applied
+    guidance: |-
+      Replace “Brain MRI” with “Brain and spinal cord MRI with MS protocol” and keep it as REQUIRED. “MS protocol” should be specified because diagnostic MRI for suspected multiple sclerosis requires appropriate brain and whole spinal cord coverage, MS-oriented acquisition sequences, and structured assessment of typical lesion locations. Baseline MRI should allow gadolinium contrast specifically, not generic contrast, when clinically appropriate, especially to detect enhancing lesions, support dissemination in time, and evaluate differential diagnoses.
+    source: |-
+      MAGNIMS-CMSC-NAIMS MRI consensus 2024/2025; NICE NG220 updated 2026
+    our_response: |-
+      This is where 'brain and spinal cord' now lives: spine_MRI is a required order_body_imaging action in all 30 cases, priced separately from the brain study.
+  order_specialized_test:
+    reviewer: 1
+    requested_tier: optional
+    status: applied
+    guidance: |-
+      For MS, the current “Specialized test” description is too broad. EMG/NCS, repetitive nerve stimulation, biopsies and autonomic testing are not routine MS diagnostic tools. REMOVE them.
+      This tool must be OPTIONAL and focused on optic nerve testing, such as OCT and visual evoked potentials. Targeted serum AQP4-IgG/MOG-IgG antibodies may be included when the presentation is atypical
+    our_response: |-
+      Applied: optical coherence tomography and visual evoked potentials are ordered in all 30 cases and nothing else is. Both already existed in the vocabulary — OCT was one of the values the stale catalog hid from you.
+
+myasthenia_gravis:
+  analyze_brain_mri:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Contrast-enhanced MRI of the brain and orbits, with MR angiography where appropriate, to exclude structural intracranial or orbital disease. Indicated in the patient with ptosis and diplopia whose antibody testing and neurophysiology are both negative; it is not a first-line test and does not precede them. Orbital coverage is part of the request, not an option, since the differential at this point includes orbital and cavernous sinus disease rather than parenchymal pathology. Contrast is required unless contraindicated. Where symmetrical ophthalmoparesis suggests a mitochondrial disorder, imaging supports but does not establish that diagnosis, which rests on muscle and genetic testing.
+    rationale: |-
+      The generic protocol list was replaced by the single indication that applies here, with orbits and contrast made mandatory rather than selectable, because a non-contrast brain-only study does not answer the question the guideline asks it to answer and returns a falsely reassuring negative. The sequencing clause was added because the value of this item depends entirely on its position: requested before serology and neurophysiology it consumes 294 euro without altering the pathway, and requested after two negatives it is the step that excludes a structural mimic. The mitochondrial clause was added to prevent imaging being read as sufficient for that alternative diagnosis.
+    source: |-
+      Jacob S, et al. Pract Neurol 2025;25:422-437, section "Diagnostic tests": patients with diplopia and ptosis but who have negative serology and neurophysiology should have a contrast-enhanced MR brain and orbits (and MR angiography where appropriate) to exclude structural intracranial or orbital disease.
+    our_response: |-
+      Applied: exactly one case orders a brain MRI, and no case orders it as a first-line study.
+  analyze_csf:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Cerebrospinal fluid studies: cell count, protein, glucose, and special tests. This item has no role in the diagnosis of myasthenia gravis and does not contribute to confirming or excluding it. It is available only where the presentation raises an alternative diagnosis for which CSF is informative: ophthalmoplegia with areflexia or ataxia suggesting Miller-Fisher syndrome or another Guillain-Barre spectrum variant, in which raised protein with a normal cell count would be expected, or a suspected inflammatory or infectious central nervous system cause when the picture is atypical. It should not be requested in a patient with fatigable weakness whose presentation is typical, and a normal result does not support a diagnosis of myasthenia gravis.
+    our_response: |-
+      Applied in the strongest form: no myasthenia case orders CSF studies.
+  interpret_labs:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Blood and serum testing. Antibody testing is the confirmatory step and follows a fixed order: anti-acetylcholine receptor (AChR) antibodies first, by radioimmunoprecipitation or cell-based assay (ELISA has lower sensitivity and specificity and should not be used when the other methods are available); anti-MuSK antibodies in every AChR-negative case; where both are negative on standard assay and clinical suspicion persists, a high-sensitivity cell-based assay panel at a reference neuroimmunology laboratory (clustered AChR, clustered MuSK, LRP4), and repetition of the standard assay after 6 months, since antibodies may be undetectable at onset. Thyroid function and thyroid antibodies in all patients. Anti-titin and anti-ryanodine receptor antibodies are available only as thymoma markers, not as diagnostic tests. Also available: full blood count, urea and electrolytes, liver function tests, HbA1c and lipid profile, glucose, and creatine kinase and troponin where immune checkpoint inhibitor exposure raises the possibility of concurrent myositis or myocarditis. Broad paraneoplastic autoantibody panels have no established role in this condition.
+    rationale: |-
+      The generic autoimmune bucket was replaced by the named assays and their order because an unnamed "autoimmune panel" permits a clinically inadequate request — the wrong analyte, the wrong method, or a single negative result read as exclusion — and because the two antibodies are not interchangeable: MuSK disease has a different phenotype and a different treatment response. Serial retesting and the cell-based panel were added because seronegativity on a first standard assay is a common route to a missed diagnosis. Creatine kinase and troponin were added for checkpoint-inhibitor-associated disease, where concurrent myositis and myocarditis are frequent and drive mortality. Broad paraneoplastic panels were removed from the description because thymoma is pursued by imaging, not by paraneoplastic serology, and they add cost without diagnostic yield here.
+    source: |-
+      Evoli A, et al. Neurol Sci 2019;40:1111-1124, section "Antibody assays": anti-AChR are the first to be tested when MG is suspected on clinical ground; anti-MuSK should be assayed in all AChR-negative cases; negative results on radioimmunoprecipitation assay should be confirmed in two subsequent assays 6 months apart; diagnostic accuracy of anti-AChR RIPA 97-99%; cell-based assays detect antibodies in patients negative on standard assay; commercial assays for anti-LRP4 and anti-agrin are not available. Same source, section "Additional diagnosing testing": thyroid antibodies and hormones should be tested given the high-rate association with thyroid disease; screening for diabetes, hypertension, osteoporosis and active infections is recommended.
+    our_response: |-
+      Applied — and this is the comment that found the worst defect in the dataset. Myasthenia was the one condition nobody reviewed (these five annotations arrived filed under peripheral neuropathy), and checking it because of them showed that in all 9 cases holding an acetylcholine-receptor panel the report was unreachable: the required action orders anti-AChR, anti-MuSK, anti-LRP4 and TSH, while the result was stored under a label naming the disease. Eight cases answered with an exclusion panel and one with the Miller-Fisher ganglioside panel. The benchmark asked for serological confirmation of myasthenia and did not deliver the serology. Fixed in all nine without touching a word of the reports.
+  order_advanced_imaging:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Advanced imaging modalities. In myasthenia gravis only MR or CT angiography has an established indication: it is requested alongside contrast-enhanced MRI of the brain and orbits in the patient with ptosis and diplopia whose antibody testing and neurophysiology are both negative, to exclude an intracranial aneurysm, cavernous sinus disease or another vascular cause of an ocular motor palsy. Amyloid, tau and FDG PET, DaTscan, MIBG, perfusion and spectroscopy MRI, carotid duplex and transcranial Doppler have no established role in the diagnosis or differential diagnosis of this condition and should not be requested for it. Whole-body FDG PET for occult tumour search belongs to the work-up of Lambert-Eaton myasthenic syndrome, a separate diagnosis outside the scope of this panel.
+    rationale: |-
+      The tier is correct and is unchanged; the description was rewritten because it lists seven modalities of which one applies here, and an undifferentiated list charges 230 euro to whichever of them the agent selects while giving no signal that six of them answer questions this condition does not raise. MR and CT angiography were kept and given their indication and their position in the sequence, since the item is the only route to that acquisition and its removal would leave the vascular differential of a painful or isolated ocular motor palsy unreachable. FDG PET was retained in the text as explicitly out of scope rather than silently dropped, so that its absence here is not read as a statement about Lambert-Eaton syndrome.
+    source: |-
+      Jacob S, et al. Pract Neurol 2025;25:422-437
+    our_response: |-
+      Applied, and your scoping turned out to describe the cases exactly: the only two required advanced-imaging actions in this condition are whole-body FDG-PET in the two cases whose diagnosis is Lambert-Eaton myasthenic syndrome — the occult-tumour search you say belongs there and not to myasthenia.
+  order_body_imaging:
+    reviewer: 2
+    filed_under: [order_specialized_test]
+    requested_tier: required
+    status: applied
+    guidance: |-
+      CT or MRI of the anterior mediastinum, with contrast unless contraindicated, in every patient with suspected or newly diagnosed myasthenia gravis, irrespective of ocular or generalised distribution and irrespective of serostatus. Reports thymic hyperplasia, residual thymic tissue, and any anterior mediastinal mass with size, margins, invasion of adjacent structures, and pleural or pericardial deposits. Modality choice follows local radiological expertise. Chest radiograph alone is not an acceptable substitute and does not satisfy this item. The item may be repeated in a patient with unexplained deterioration, with or without a previously known thymoma, to detect development or recurrence of thymic pathology when no other precipitant is identified.
+    source: |-
+      Jacob S, et al. Pract Neurol 2025;25:422-437
+    our_response: |-
+      Applied: mediastinum_CT is a required action in all 30 cases. Before order_body_imaging existed the agent could image only the brain, so the thymus was unreachable.
+  order_specialized_test:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Neurophysiology and tissue or genetic testing. Repetitive nerve stimulation (RNS) at low frequency (2-5 Hz) is the initial test: a decrement greater than 10% between the first and the fourth response indicates a postsynaptic defect. Clinically weak muscles must be tested, with the limb warmed to 32-34 degrees C; when distal RNS is negative, or when symptoms are ocular or MuSK disease is suspected, extend to the accessory nerve and to cranial muscles (nasalis, orbicularis oculi, masseter). Single-fibre EMG is the most sensitive test, positive in more than 90% of cases when limb and facial muscles are examined, and must be available whenever RNS is negative and suspicion persists; a normal single-fibre EMG in a weak muscle would be extremely unusual in a neuromuscular junction disorder. Pyridostigmine is withheld for at least 12 hours before testing. A low-amplitude first CMAP with marked post-exercise or high-rate potentiation indicates Lambert-Eaton myasthenic syndrome rather than myasthenia gravis. Genetic testing for congenital myasthenic syndromes and muscle biopsy for suspected mitochondrial or dystrophic mimics remain available for the seronegative patient.
+    rationale: |-
+      Repetitive nerve stimulation was already named and is unchanged; single-fibre EMG was made explicit because it is the test that carries the negative predictive value of the whole neurophysiological work-up and, folded into "EMG/NCS", it can be neither requested nor scored. The technical clauses were added because the same test name yields opposite answers depending on execution: an unwarmed, non-symptomatic muscle in a patient who has taken pyridostigmine that morning generates a false negative, which in the seronegative patient is the point at which the diagnosis is lost. The facilitation pattern was added because the differential the panel most needs to resolve is Lambert-Eaton, not another myopathy. Neuropsychological batteries, evoked potentials and autonomic or tilt testing were removed from the description as having no established role here; biopsy and genetics were retained and are motivated by the congenital and mitochondrial mimics named in both sources.
+    source: |-
+      Evoli A, et al. Neurol Sci 2019;40:1111-1124
+    our_response: |-
+      Applied: repetitive nerve stimulation is required in 27 cases and single-fibre EMG is ordered in 24 (6 required, 17 recommended, 1 optional). emg_single_fiber already existed and was one of the values the stale catalog hid from you.
+
+nph:
+  analyze_brain_mri:
+    reviewer: 1
+    requested_tier: required
+    status: applied
+    guidance: |-
+      Revise the description. For suspected normal pressure hydrocephalus, imaging should focus on NPH-relevant structural markers: ventriculomegaly not fully attributable to atrophy, Evans index ≥0.3 or equivalent ventricular enlargement, absence of macroscopic CSF flow obstruction, callosal angle, temporal horn enlargement, periventricular signal changes, and DESH features.
+    source: |-
+      International INPH diagnostic guidelines; Japanese iNPH Guidelines Third Edition; AAN practice guideline on idiopathic normal pressure hydrocephalus.
+    our_response: |-
+      Applied: required in all 30, and the reports carry the NPH-specific markers you list rather than a generic structural read.
+  analyze_csf:
+    reviewer: 1
+    requested_tier: required
+    status: applied
+    guidance: |-
+      Keep CSF analysis as REQUIRED, but revise the description. 
+      This tool should specifically mean lumbar puncture with CSF opening pressure measurement and CSF tap test, ideally with objective pre/post assessment of gait and cognition. 
+
+      Generic CSF tests such as cell count, PCR, antibodies, 14-3-3 or RT-QuIC are not NPH diagnostic tests ---> REMOVE.
+    source: |-
+      International INPH diagnostic guidelines; AAN practice guideline on idiopathic normal pressure hydrocephalus; Japanese iNPH Guidelines Third Edition.
+    our_response: |-
+      Applied: required in all 30, as the large-volume tap with opening pressure.
+  interpret_labs:
+    reviewer: 1
+    requested_tier: optional
+    status: applied
+    guidance: |-
+      Change Laboratory studies in OPTIONAL. 
+      Blood tests do not diagnose normal pressure hydrocephalus and should not be part of a fixed routine NPH diagnostic panel. They may be used to exclude alternative or contributing causes of gait disturbance, cognitive decline or urinary symptoms, such as metabolic, endocrine, infectious, inflammatory, vitamin deficiency or medication-related causes.
+    source: |-
+      International INPH diagnostic guidelines; Japanese iNPH Guidelines Third Edition.
+    our_response: |-
+      Applied: blood tests are optional in all 30 cases.
+  order_advanced_imaging:
+    reviewer: 1
+    requested_tier: remove
+    status: confirm
+    guidance: |-
+      REMOVE
+    our_response: |-
+      Kept as optional in all 30 rather than removed, and we want your ruling. Every one of the 30 cases uses amyloid or FDG PET for the Alzheimer differential, not as a test for NPH — the distinction your own syncope comment draws. The tier is now uniformly optional across all 30. If you would rather it be deleted, say so.
+  order_specialized_test:
+    reviewer: 1
+    requested_tier: remove
+    status: applied
+    guidance: |-
+      The current “Specialized test” description is inappropriate.
+
+      EMG/NCS, repetitive nerve stimulation, biopsies, evoked potentials, autonomic/tilt testing and genetics are not routine diagnostic tools for NPH -->REMOVE
+
+      If Specialized test is kept as REQUIRED, it should be redefined as objective gait and cognitive assessment, ideally performed before and after CSF tap test. This may include timed walking tests, Timed Up and Go, standardized gait/balance assessment and cognitive testing. 
+
+      Neuropsychological testing --> REMOVE
+    source: |-
+      International INPH diagnostic guidelines; AAN practice guideline on idiopathic normal pressure hydrocephalus; Japanese iNPH Guidelines Third Edition.
+    our_response: |-
+      Applied, and this was still outstanding until we answered your comments one by one. The standalone neuropsychological battery had stayed REQUIRED in all 30 cases beside the new pre/post assessment — the duplication you objected to. It is now optional, and the redundant sequence rule that said 'battery before the tap' went with it, because leaving it would have penalised an agent that performs the mandatory assessment and skips the optional battery. No case orders EMG/NCS, a biopsy, evoked potentials or tilt testing.
+  perform_clinical_assessment:
+    reviewer: 1
+    filed_under: [order_specialized_test]
+    requested_tier: required
+    status: applied
+    guidance: |-
+      If Specialized test is kept as REQUIRED, it should be redefined as objective gait and cognitive assessment, ideally performed before and after CSF tap test. This may include timed walking tests, Timed Up and Go, standardized gait/balance assessment and cognitive testing.
+    source: |-
+      International INPH diagnostic guidelines; AAN practice guideline on idiopathic normal pressure hydrocephalus; Japanese iNPH Guidelines Third Edition.
+    our_response: |-
+      Applied exactly as written: perform_clinical_assessment{gait_and_balance_timed} is required in all 30 cases and its report carries the before-and-after comparison, with each case's own timed-up-and-go and 10-metre figures where it states them and the >=20% threshold where it does not. NPH-P08's negative tap is preserved as negative.
+
+parkinsons:
+  analyze_brain_mri:
+    reviewer: 1
+    requested_tier: required
+    status: applied
+    guidance: |-
+      Alternatively, CT scan
+    our_response: |-
+      MRI is required in all 30 cases.
+  analyze_ecg:
+    reviewer: 1
+    requested_tier: remove
+    status: applied
+    guidance: |-
+      REMOVE
+    our_response: |-
+      Removed: no Parkinson case orders an ECG.
+  analyze_eeg:
+    reviewer: 1
+    requested_tier: remove
+    status: applied
+    guidance: |-
+      REMOVE
+    our_response: |-
+      Removed: no Parkinson case orders an EEG.
+  interpret_labs:
+    reviewer: 1
+    requested_tier: optional
+    status: applied
+    guidance: |-
+      Change Laboratory studies from REQUIRED to OPTIONAL. 
+      Blood tests shouldn't be part of a fixed routine diagnostic panel for typical Parkinson’s disease. They should be used when the clinical presentation suggests secondary or alternative causes of parkinsonism, such as metabolic, toxic, infectious, inflammatory, autoimmune or Wilson-related causes, or when needed before treatment. 
+
+      Genetic testing should not be included; it should be a targeted optional test for young-onset disease, significant family history or patient-requested counselling.
+    source: |-
+      MDS clinical diagnostic criteria; NICE NG71; German Society for Neurology Parkinson guideline 2024.
+    our_response: |-
+      Applied: blood tests are optional in all 30 cases.
+  order_ct_scan:
+    reviewer: 1
+    filed_under: [analyze_brain_mri]
+    requested_tier: optional
+    status: partial
+    guidance: |-
+      Alternatively, CT scan
+    our_response: |-
+      Not done: no Parkinson case uses CT as the alternative to MRI.
+  order_specialized_test:
+    reviewer: 1
+    requested_tier: optional
+    status: applied
+    guidance: |-
+      “Specialized test” description is too broad for Parkinson’s disease.
+      EMG/NCS, repetitive nerve stimulation, biopsies and evoked potentials are not diagnostic tools for Parkinson’s disease --> REMOVE. 
+
+      Genetic testing --> see above (laboratory comment)
+
+      Autonomic testing or tilt-table testing --> REMOVE.
+
+      Neuropsychological testing should be considered when cognitive impairment or Parkinson’s disease dementia is clinically relevant --> Optional.
+    source: |-
+      German Society for Neurology Parkinson guideline 2024; MDS clinical diagnostic criteria; NICE NG71.
+    our_response: |-
+      Applied, and the residue is worth reading case by case: no case orders EMG/NCS, repetitive nerve stimulation, a biopsy or evoked potentials. The 10 remaining required actions are autonomic testing in the multiple-system-atrophy cases, polysomnography for REM-sleep behaviour disorder, and the neuropsychological battery in the cases whose diagnosis is dementia with Lewy bodies, progressive supranuclear palsy or Parkinson's with cognitive impairment — which is the 'when cognition is clinically relevant' exception you wrote.
+
+peripheral_neuropathy:
+  interpret_labs:
+    reviewer: 1
+    status: retired
+    guidance: |-
+      SOSTITUIRE PATOLOGIA
+    our_response: |-
+      Done: peripheral neuropathy is retired and vascular dementia is in its place, with 30 new cases. This annotation therefore points at a condition the catalog no longer has, so nothing renders it — which is why it is recorded here. Your file is untouched: it is your record, not ours to rewrite.
+
+status_epilepticus:
+  analyze_brain_mri:
+    reviewer: 2
+    requested_tier: unchanged
+    status: partial
+    guidance: |-
+      Brain MRI where status epilepticus remains unexplained after CT and blood studies, where it is refractory or new-onset refractory, and where encephalitis, autoimmune encephalitis, a tumour, a cortical malformation or a vascular lesion is suspected. Use an epilepsy-oriented protocol: volumetric T1, axial and thin coronal T2 and FLAIR angled to the hippocampi, diffusion-weighted and susceptibility-weighted sequences, with gadolinium where infection, inflammation or neoplasm is in question. Add MR venography where cerebral venous thrombosis is suspected. Peri-ictal cortical, thalamic or hippocampal signal change on diffusion and FLAIR may be a consequence of the status epilepticus itself rather than its cause, and should be re-imaged after recovery rather than treated as a structural diagnosis.
+    rationale: |-
+      The current text specifies protocols but not patients, so the item can be ordered when the cause is already established and omitted in the cryptogenic refractory case where it is the highest-yield remaining test. Contrast moves from an unconditioned option to an indication-linked one. Venous imaging is added for the same reason as in the CT item. The final sentence addresses a specific and common failure mode: restricted diffusion and FLAIR hyperintensity after prolonged status are frequent, and reading them as a fixed structural lesion diverts the pathway to the wrong aetiology and can prompt unnecessary biopsy.
+    source: |-
+      Lega Italiana Contro l’Epilessia, Commissione Stato Epilettico ed Emergenze/Urgenze. Linee guida per il trattamento del NORSE, 2024 (Italian adaptation of Wickström et al., Epilepsia 2022;63(11):2827–2839). Standard work-up within the first 48–72 hours: brain MRI with contrast, with arterial and venous MR angiography to be considered, alongside continuous EEG, with CT to be considered; brain biopsy is reserved for cryptogenic cases with a lesion on MRI. Ungraded flowchart. Verified on full text (LICE website).
+      Minicucci F, Ferlisi M, Brigo F, et al. Epilepsy Behav. 2020;102:106675, section 3.2.2: magnetic resonance imaging is listed among the aetiological exams in the definite status epilepticus stage, conditioned on the clinical context and ungraded. Verified on full text.
+      Riviello JJ Jr, Ashwal S, Hirtz D, et al. Neurology. 2006;67(9):1542–1550; reaffirmed 8 February 2025: neuroimaging may be considered where there are clinical indications or the aetiology is unknown (Level C); insufficient evidence for routine neuroimaging (Level U). The parameter does not separate MRI from CT and specifies no sequences. Verified on the official AAN clinician summary
+    our_response: |-
+      The epilepsy-oriented protocol and the indication list are applied, and MRI is required in 17 cases and absent where the cause is already established. MR_venography exists in the vocabulary and is priced, but no status-epilepticus case orders it yet: the venous question you raise has a tool and no case.
+  analyze_csf:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Cerebrospinal fluid study where the cause of status epilepticus is not established, and without delay where there is fever, immunosuppression, suspected meningoencephalitis, or new-onset refractory status epilepticus. Perform after neuroimaging where a mass lesion or raised intracranial pressure is possible, and never delay empirical antimicrobial or antiviral therapy waiting for it. Record opening pressure. Send cell count with differential and cytology, protein, glucose with the paired serum glucose ratio, lactate, Gram stain and culture, PCR for herpes simplex and other neurotropic viruses, syphilis serology, IgG/albumin ratio and isoelectric focusing, and neuronal surface and intracellular antibodies; add 14-3-3 or RT-QuIC where prion disease is suspected. Mild pleocytosis may follow prolonged seizures and never substitutes for excluding infection.
+    rationale: |-
+      The tier is right and is left unchanged; what was missing is the trigger list that converts "optional" into "mandatory in this patient", and the analyses that actually discriminate infection. Gram stain, culture and the paired cerebrospinal fluid to serum glucose ratio were absent from a description that already reached as far as prion markers, which inverts the diagnostic priority. Opening pressure and the sequence relative to imaging and to empirical therapy are added because they are procedural decisions the agent must make explicitly. The 14-3-3 and RT-QuIC element was checked against the aetiology list and is retained unchanged.
+    source: |-
+      Riviello JJ Jr, Ashwal S, Hirtz D, et al. Neurology. 2006;67(9):1542–1550
+    our_response: |-
+      Applied. One case also had its paraneoplastic panel — carrying an anti-Hu titre that mandates an urgent cancer search — stored where no call could reach it.
+  analyze_eeg:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      EEG for the diagnosis of nonconvulsive seizures and status epilepticus and for monitoring the response to treatment. Choose the modality by clinical state: a 30–60 minute routine EEG is acceptable only when the patient has returned to baseline; continuous video EEG is required when consciousness remains impaired after convulsive activity has stopped, when nonconvulsive status epilepticus is suspected, in paralysed patients, and throughout continuous intravenous anaesthetic therapy. Start as soon as feasible. Record for at least 24 hours, and for 48 hours or longer in comatose or sedated patients and when periodic discharges are present; continue for at least 24 hours after seizures are controlled and after anaesthetics are withdrawn. Interpret at least twice daily and report using ACNS 2021 terminology.
+    rationale: |-
+      The original text lists modalities without indications, so it is satisfied by a brief routine study in precisely the patient who needs prolonged recording: a 30–60 minute recording detects nonconvulsive seizures in only about half of the patients in whom they are eventually recorded, and nonconvulsive seizures are common after apparently successful treatment of generalised convulsive status epilepticus. Ambulatory EEG is removed as an over-inclusion: it belongs to outpatient epilepsy assessment. Timing, duration, review frequency and the anaesthetic-weaning window are the operational content of the ACNS consensus and are what make the item auditable. Mandating ACNS 2021 terminology forces the ictal–interictal continuum, BIRDs and electrographic status epilepticus to be named rather than described informally.
+    source: |-
+      Herman ST, Abend NS, Bleck TP, et al. Consensus Statement on Continuous EEG in Critically Ill Adults and Children, Part I: Indications. J Clin Neurophysiol. 2015;32(2):87–95. Section "Indications for Critical Care Continuous EEG", subsection "Diagnosis of Nonconvulsive Seizures, Nonconvulsive Status Epilepticus, and Other Paroxysmal Events", points 1a (persistently abnormal mental status after generalised convulsive status epilepticus; consider continuous EEG if the patient is not clearly improving within 10 minutes, or has any impairment of consciousness beyond 30 minutes, after clinically evident seizure activity stops), 4 (timing and duration: at least 24 hours, 48 hours or more in comatose, periodic-discharge or sedated patients; 30–60 minute recordings identify nonconvulsive seizures in 45–58% of those in whom they are eventually recorded) and 5 (interpretation at least twice daily); and subsection "Assessment of Efficacy of Therapy for Seizures and Status Epilepticus", points 1b and 4 (recording throughout continuous intravenous antiseizure drug infusion and for at least 24 hours after seizure control and after withdrawal)
+    our_response: |-
+      Applied: EEG is required in all 30 cases.
+  interpret_labs:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Blood and point-of-care studies to identify treatable causes and to guide drug therapy. Immediately: capillary blood glucose, with intravenous glucose if it is below 60 mg/dL, preceded by intramuscular thiamine where chronic alcohol misuse is suspected. On venous access: full blood count, sodium, potassium, calcium, magnesium, glucose, renal and liver function, creatine kinase, coagulation, ESR and C-reactive protein, blood gas and lactate. Serum levels of antiseizure medications in every patient already on treatment. Toxicology where no cause is immediately apparent; confirming a suspected ingestion requires a specific serum level, not urine screening alone. Blood cultures and viral or bacterial serology where infection is suspected. Thyroid, autoimmune and paraneoplastic antibodies and metabolic or genetic studies only where the initial evaluation identifies no cause.
+    rationale: |-
+      Antiseizure medication levels are added because subtherapeutic levels are the highest-yield finding in a patient already on treatment and carry the only Level B diagnostic recommendation in this condition. Toxicology is added with the serum-versus-urine qualification, which is the operative detail: urine screening alone cannot confirm a suspected ingestion. Point-of-care glucose with its numeric threshold and the thiamine-first sequence are added because they are time-critical and fully reversible, and because a venous metabolic panel returns too late to serve that purpose. Creatine kinase, blood gas and lactate cover rhabdomyolysis and acidosis. Thyroid, autoimmune and genetic testing are kept but conditioned on an unrevealing initial evaluation, since routine genetic testing is rated Level U.
+    source: |-
+      Glauser T, Shinnar S, Gloss D, et al. Epilepsy Curr. 2016;16(1):48–61
+    our_response: |-
+      Applied. Your point that antiseizure drug levels are the highest-yield finding also exposed a scoring hole: an agent ordering 'valproate level' — the clinically correct request — got no credit for a gold action naming 'AED levels', while the vague term scored. The specific order now satisfies the class request, and not the other way round.
+  order_ct_scan:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Non-contrast head CT as the first imaging study in status epilepticus, performed once the patient is stabilised and convulsive activity is controlled, to identify haemorrhage, mass lesion, hydrocephalus, large infarct or trauma requiring immediate intervention. Add CT angiography only where subarachnoid haemorrhage or another arterial cause is suspected, and CT venography where cerebral venous sinus thrombosis is suspected — headache preceding the event, papilloedema, a lesion crossing arterial territories, peripartum state or known thrombophilia. A normal CT does not exclude a structural, infectious or inflammatory cause and does not remove the indication for MRI when status epilepticus remains unexplained or refractory.
+    rationale: |-
+      Two substantive changes and one boundary. Timing is stated because the only graded recommendation on neuroimaging in this condition attaches the condition that imaging be performed after stabilisation and seizure control; as written, the item invites an agent to image a convulsing patient. Venous-phase imaging is added because cerebral venous sinus thrombosis is a listed and treatable cause of status epilepticus and the current text offers arterial angiography only, leaving that case unreachable. The closing sentence prevents a normal CT from being read as a completed aetiological work-up, which is the commonest way the pathway stops one step early.
+    source: |-
+      Riviello JJ Jr, Ashwal S, Hirtz D, et al. Neurology. 2006;67(9):1542–1550; reaffirmed 8 February 2025. Neuroimaging may be considered for the evaluation of the child with status epilepticus where there are clinical indications or the aetiology is unknown (Level C), and if neuroimaging is done it should be done only after the child is appropriately stabilised and the seizure activity controlled. There is insufficient evidence to support or refute routine neuroimaging (Level U). Reported yield across the reviewed studies: lesions detected by neuroimaging in about 8% of patients. Population: paediatric; the parameter does not distinguish CT from MRI in the recommendation itself. Verified on the official AAN clinician summary.
+      Minicucci F, Ferlisi M, Brigo F, et al. Epilepsy Behav. 2020;102:106675, section 3.2.2: computed tomography is listed among the exams for aetiological investigation in the definite status epilepticus stage, conditioned on the clinical context and ungraded; section 3.2.4 states that not all tests can be performed in all patients and that the investigation must be tailored. Verified on full text.
+      Trinka E, Cock H, Hesdorffer D, et al. Epilepsia. 2015;56(10):1515–1523, Appendix 1, item 1f: sinus venous thrombosis and cortical venous thrombosis are listed among the cerebrovascular causes of status epilepticus; items 1a–1e cover ischaemic stroke, intracerebral, subarachnoid, subdural and epidural bleeding. Verified on the attached full text.
+    our_response: |-
+      Applied: non-contrast head CT is required in all 30 cases.
+
+subarachnoid_hemorrhage:
+  analyze_csf:
+    reviewer: 2
+    requested_tier: required_conditional
+    status: applied
+    guidance: |-
+      Cerebrospinal fluid studies: cell count with comparison between first and last tube (to exclude traumatic tap), protein, glucose, spectrophotometric analysis for xanthochromia. Mandatory if head CT is negative/inconclusive and clinical suspicion persists, particularly in patients presenting >6 hours from symptom onset or with a new neurological deficit.
+    rationale: |-
+      Four elements are removed, none of which has any role in aSAH. Oligoclonal bands are a diagnostic test for multiple sclerosis and demyelinating disease. PCR is a diagnostic test for central nervous system infection. Antibody testing is directed at autoimmune encephalitis. 14-3-3 and RT-QuIC are diagnostic tests for prion disease. Their presence indicates that the description has been carried over from a neuroimmunological panel without adaptation to this condition.
+
+      Two elements are added. Spectrophotometric analysis for xanthochromia is the standard confirmatory CSF test for aSAH and was previously absent from the panel altogether; reported sensitivity is 100% and specificity 95.2% in CSF obtained after a negative or non-diagnostic head CT. Comparison of the erythrocyte count between the first and last tube is required to distinguish true subarachnoid bleeding from a traumatic tap artefact: without this comparison, a traumatic tap may be misread as a positive result.
+
+      The current description is consistent with a neuroimmunological panel and omits the confirmatory test indicated for this condition. Failure to identify a sentinel bleed exposes the patient to the risk of a subsequent, potentially fatal rebleed. The conditional REQUIRED tier reflects the guideline’s Class I recommendation for lumbar puncture following a negative CT in the defined clinical scenario, which is common and high-consequence.
+    source: |-
+      Hoh BL, Ko NU, Amin-Hanjani S, et al. 2023 Guideline for the Management of Patients With Aneurysmal Subarachnoid Hemorrhage. Stroke. 2023;54:e314-e370
+    our_response: |-
+      Applied as a conditional requirement, which is what the comment asks for: the 3 cases whose CT is negative carry a required lumbar puncture, and the 27 whose CT is diagnostic carry a stated exemption in metadata.panel_required_exemptions rather than a silent omission.
+  interpret_labs:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Blood/serum panels — CBC, metabolic, coagulation. Genetic testing only in patients with family history of multiple aneurysms or suspected connective tissue disorder (e.g., autosomal dominant polycystic kidney disease, Ehlers-Danlos syndrome type IV).
+    rationale: |-
+      Three elements are removed and one is restricted. Thyroid function testing has no established role in the diagnostic work-up of aSAH and is not listed anywhere in the governing guideline as a diagnostic test for this condition. Inflammatory markers have no condition-specific diagnostic role in aSAH: in this population they function as prognostic research variables rather than diagnostic tests. The autoimmune/paraneoplastic panel is pertinent to autoimmune encephalitis and paraneoplastic neurological syndromes, not to aneurysmal haemorrhage, and has no place in this pathway. Genetic testing is retained but restricted to a defined subgroup: it has no routine role in sporadic aSAH and is indicated only where a heritable syndrome associated with multiple aneurysms is suspected.
+    source: |-
+      Hoh BL, Ko NU, Amin-Hanjani S, et al. 2023 Guideline for the Management of Patients With Aneurysmal Subarachnoid Hemorrhage: A Guideline From the American Heart Association/American Stroke Association. Stroke. 2023;54:e314-e370
+    our_response: |-
+      Applied: thyroid, inflammatory and autoimmune/paraneoplastic panels are out of the required set in all 30 cases, and genetic testing is restricted to the cases with a family history or a connective-tissue phenotype.
+  order_advanced_imaging:
+    reviewer: 2
+    requested_tier: optional
+    status: applied
+    guidance: |-
+      Transcranial Doppler (TCD) for vasospasm monitoring and prediction of delayed cerebral > ischemia (reasonable, not mandatory)
+
+      remove: PET (amyloid/tau/FDG), DaTscan, MIBG, perfusion/spectroscopy MRI
+
+      Amyloid/tau/FDG PET is a diagnostic tool for neurodegenerative dementias, DaTscan for parkinsonian syndromes, and MIBG for dementia with Lewy bodies and autonomic disorders: none of the three has any role in aSAH, and none is mentioned at any point in the governing guideline. Perfusion and spectroscopy MRI are pertinent to tumoural and metabolic pathology and have no established diagnostic role in this condition. MR/CT angiography is a duplicate, already covered by the CT scan item, and retaining it here creates redundant billing. Carotid duplex is pertinent to extracranial carotid steno-occlusive disease and has no role in the diagnosis or management of aSAH. Transcranial Doppler is clinically pertinent and is retained, but it carries a COR 2a recommendation (“is reasonable”), not COR 1, which does not support a REQUIRED tier: it should be split out as a standalone OPTIONAL item.
+    source: |-
+      Hoh BL, Ko NU, Amin-Hanjani S, et al. 2023 Guideline for the Management of Patients With Aneurysmal Subarachnoid Hemorrhage. Stroke. 2023;54:e314-e370
+    our_response: |-
+      Transcranial Doppler already existed and is now ordered in all 30 cases; the review app had been showing 6 of 12 modalities, which is why it looked absent. The audit that followed this comment found something worse: cerebral angiography was not priced at all — only the coronary study was — so the gold standard of the aneurysmal pathway was unorderable. It is now priced at 2530 EUR and ordered in the 3 cases that document a DSA.
+  order_ct_scan:
+    reviewer: 2
+    requested_tier: required
+    status: applied
+    guidance: |-
+      Noncontrast head CT (mandatory, first-line, to diagnose/exclude aSAH); CT angiography (CTA) as a separate, subsequent study to localize the aneurysm and guide treatment planning, not a substitute for the initial noncontrast CT.
+    rationale: |-
+      The current wording presents contrast administration as an equivalent alternative to noncontrast CT for initial diagnosis. The governing guideline consistently specifies “noncontrast head CT” for the diagnostic phase: subarachnoid blood is hyperdense without contrast, which therefore adds no diagnostic yield and introduces avoidable delay in a time-critical pathway. CTA is a distinct, subsequent angiographic protocol used for aetiological assessment, not an alternative to the initial diagnostic CT.
+    source: |-
+      Hoh BL, Ko NU, Amin-Hanjani S, et al. 2023 Guideline for the Management of Patients With Aneurysmal Subarachnoid Hemorrhage: A Guideline From the American Heart Association/American Stroke Association. Stroke. 2023;54:e314-e370.
+    our_response: |-
+      Applied. Non-contrast CT and CT angiography are now two separate actions in all 30 cases. The comment also led us to a routing defect: 30 CT angiograms were stored under a label naming the DSA and 3 DSA reports under labels naming the CTA, so the two studies were crossed and 54 required angiograms were unreachable by the call that names them.
+
+syncope_cardiac:
+  analyze_brain_mri:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Brain MRI is not indicated in uncomplicated syncope and does not contribute to identifying a cardiac cause. It is reserved for a neurological examination showing parkinsonism, ataxia or cognitive impairment, where it supports the assessment of autonomic failure, and for focal neurological signs or a presentation that makes a non-syncopal cause of transient loss of consciousness likely. Protocol selection and contrast follow that indication. Note that the imaging which escalates a non-diagnostic echocardiogram in suspected cardiac syncope is cardiac, not cerebral, magnetic resonance.
+    rationale: |-
+      The item is retained on the same reasoning as EEG and for the same reason is given a restrictive description: the current text enumerates protocols for stroke, tumour, multiple sclerosis and dementia, none of which is a syncope indication, and reads as an invitation to image the brain in a cardiac presentation. The one indication the guideline supports is retained explicitly, since it belongs to the autonomic failure pathway rather than to this one. The closing sentence is added because the panel currently offers cerebral but no cardiac cross-sectional imaging, which makes a misdirected escalation the most likely error at this point in the pathway.
+    source: |-
+      2018 ESC Guidelines, section 8.2, neurological tests recommendation table: brain MRI recommended if neurological examination indicates parkinsonism, ataxia or cognitive impairment, Class I, LOE C; EEG, neck artery ultrasound and brain computed tomography or magnetic resonance imaging not indicated in patients with syncope, Class III, LOE B.
+    our_response: |-
+      Applied: exactly one case requires a brain MRI, and it is one where the presentation points at a central cause rather than at an uncomplicated syncope.
+  analyze_ecg:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Standard 12-lead ECG, part of the initial evaluation of every patient with transient loss of consciousness. Report rhythm, rate, PR, QRS and QT/QTc intervals, axis, conduction and repolarization. Patterns that make an arrhythmic cause highly probable: persistent sinus bradycardia below 40 b.p.m. or sinus pauses longer than 3 s in the awake, untrained patient; Mobitz II second-degree or third-degree AV block; alternating left and right bundle branch block; ventricular tachycardia or rapid paroxysmal supraventricular tachycardia; non-sustained polymorphic VT with a long or short QT interval; pacemaker or defibrillator malfunction with cardiac pauses. Patterns that only suggest an arrhythmic mechanism and require further testing: bifascicular block, QRS of 0.12 s or more, pre-excitation, type 1 Brugada morphology in V1–V3, early repolarization, negative T waves or epsilon waves in the right precordial leads, left ventricular hypertrophy. A normal ECG does not exclude cardiac syncope.
+    rationale: |-
+      The description is rewritten because the current text names only generic reporting parameters, which allows a formally complete report to be produced without the findings on which the diagnosis actually turns; the guideline separates the ECG patterns that are by themselves diagnostic at initial evaluation from those that merely suggest an arrhythmic mechanism, and the two sets lead to different next actions — treat, or continue investigating. Both lists are reproduced in full because their thresholds and morphologies are the content of the recommendation. The closing sentence is added because a normal tracing is common in cardiac syncope and must not be read as excluding it. The tier is confirmed: the ECG is one of the three components of the initial evaluation.
+    source: |-
+      2018 ESC Guidelines
+    our_response: |-
+      Applied: required in all 30 cases.
+  analyze_eeg:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Electroencephalography is not indicated in syncope: the interictal recording is normal and the test does not contribute to identifying a cardiac cause. It is reserved for the two situations in which it changes the diagnosis: transient loss of consciousness in which epilepsy is the likely cause or the clinical data are equivocal, and suspected psychogenic pseudosyncope, where a normal waking eye-closed pattern recorded during an attack, ideally a provoked one, supports the diagnosis. Ordering it in a patient whose presentation is consistent with cardiac syncope adds cost without diagnostic yield.
+    rationale: |-
+      The item is retained rather than removed because the panel label is the hypothesis under test, so an agent that correctly suspects a non-syncopal cause must still be able to act; the description is rewritten because the current text describes the full range of neurophysiological monitoring and gives no signal that the guideline places the test in Class III for this population. The two retained indications are the only ones the guideline supports, and both belong to the differential diagnosis of transient loss of consciousness rather than to the cardiac work-up, which is why the opening sentence states the Class III position explicitly rather than leaving it to be inferred.
+    source: |-
+      2018 ESC Guidelines, section 8.2, neurological tests recommendation table: EEG, ultrasound of neck arteries, and computed tomography or magnetic resonance imaging of the brain are not indicated in patients with syncope, Class III, LOE B.
+    our_response: |-
+      Applied: no case requires EEG; two carry it as optional for the pseudosyncope/epilepsy question.
+  interpret_labs:
+    reviewer: 2
+    requested_tier: optional
+    status: applied
+    guidance: |-
+      Targeted blood tests, ordered on a specific clinical suspicion rather than as a routine panel. Haemoglobin and haematocrit when haemorrhage is suspected; oxygen saturation and blood gas analysis when hypoxia is suspected; high-sensitivity troponin when ischaemia-related syncope is suspected; D-dimer when pulmonary embolism is suspected; electrolytes and glucose. Natriuretic peptides may support the identification of structural heart disease but do not establish the cause of syncope. Genetic testing is not a first-line test: it follows a phenotype already suggested by the ECG or by imaging — long QT, Brugada, a cardiomyopathy — or a family history of premature sudden death. Untargeted thyroid, inflammatory, autoimmune and paraneoplastic panels have no established role in cardiac syncope.
+    rationale: |-
+      The tier is lowered because no graded recommendation makes blood tests mandatory in syncope, while the guideline states that routine haematology, biochemistry, D-dimer and cardiac markers have a low diagnostic yield and should not be used unless the clinical evaluation specifically suggests them; that statement is advisory text rather than a graded recommendation, and the tier change rests on it. Generic panel labels are replaced by named tests because each one is tied to a specific competing mechanism, and that mapping is what the agent needs in order to choose. Autoimmune and paraneoplastic antibodies are removed because their Class I indication concerns acute or subacute multidomain autonomic failure, that is neurogenic orthostatic hypotension, not cardiac syncope. Genetic testing is scoped rather than removed, since inheritable arrhythmia syndromes are a recognized cause here but the test follows the phenotype.
+    source: |-
+      2018 ESC Guidelines, section 4.1.1, narrative list of blood tests performed when clinically indicated: haematocrit or haemoglobin for suspected haemorrhage, oxygen saturation and blood gas analysis for suspected hypoxia, troponin for suspected ischaemia-related syncope, D-dimer for suspected pulmonary embolism. Table 13 lists electrolytes, haemoglobin, troponin, B-type natriuretic peptide, glucose, D-dimer and blood gas analysis among the tests available in a syncope unit — an organizational table, not a graded recommendation.
+      Section 8.2.4 and the neurological tests recommendation table: screening for paraneoplastic antibodies and antiganglionic acetylcholine receptor antibodies in acute or subacute onset of multidomain autonomic failure, Class I, LOE B — an indication outside this condition. Section 4.2.7.2: the use of cardiovascular biomarkers in the diagnosis of syncope awaits further evidence.
+    our_response: |-
+      Applied, and the numbers were worse than the comment assumed: TSH was in the required panel of 29 of 30 cases and BNP of 27. Thyroid now survives only in the 4 cases with a thyroid mechanism on the differential and BNP in the 3 where a guideline risk-stratifies with it; the step is required in 11 cases and recommended in 19. Mandated laboratory spend fell from 6108 to 4686 EUR. A hard sequence rule requiring labs before monitoring in 28 cases had to go with it, or an agent that correctly skipped the panel took a violation.
+  order_advanced_imaging:
+    reviewer: 2
+    filed_under: [order_echocardiogram]
+    requested_tier: optional
+    status: applied
+    guidance: |-
+      Second-line cardiac imaging when echocardiography does not resolve a suspected structural or ischaemic cause. Cardiac magnetic resonance for tissue characterization, including late gadolinium enhancement, when arrhythmogenic or infiltrative cardiomyopathy, myocarditis, or an unexplained substrate for ventricular arrhythmia is suspected. Cardiac or thoracic CT angiography when aortic dissection, pulmonary embolism or a cardiac mass has to be confirmed or excluded rapidly. Coronary angiography follows the same indications as in patients without syncope, that is suspected myocardial ischaemia or infarction. Report the finding together with its relationship to the suspected mechanism: angiographic or structural imaging findings alone do not establish the cause of syncope.
+    rationale: |-
+      The item is created because the guideline directs computed tomography or magnetic resonance in selected patients with syncope of suspected cardiac structural origin when echocardiography is not diagnostic, and the panel offers no such escalation while it does offer brain MRI — the arrangement most likely to produce the wrong imaging choice. Coronary angiography is placed inside the same item because its indication is driven by suspected ischaemia rather than by syncope and because, as the guideline states explicitly, angiography by itself is not diagnostic of the cause. Note the weight of the evidence: the escalation to CT or MRI rests on advisory text rather than on a graded recommendation, whereas coronary angiography carries a Class IIa recommendation.
+    source: |-
+      2018 ESC Guidelines
+    our_response: |-
+      Applied. Half of this was already satisfied — cardiac MRI existed and 18 of 30 cases order it — and the rest was added and priced: coronary CTA, coronary angiography, cardiac FDG-PET, chest CT angiography. Your prediction that offering brain MRI and no cardiac imaging is 'the arrangement most likely to produce the wrong imaging choice' was already true in the data: one case was requesting a CT pulmonary angiogram through the head-CT tool.
+  order_cardiac_monitoring:
+    reviewer: 2
+    requested_tier: required
+    status: applied
+    guidance: |-
+      Non-invasive ECG monitoring aimed at symptom–rhythm correlation. The modality follows event frequency and risk: immediate in-hospital monitoring, in bed or by telemetry, when high-risk features are present; 24–48 h Holter when syncope or presyncope occurs at least once a week; external loop recorder, applied early after the index event, when the inter-symptom interval is four weeks or less. Report rhythm, rate, pauses, AV conduction, and any temporal correlation with symptoms. The finding is diagnostic when syncope coincides with a brady- or tachyarrhythmia. Without syncope, a pause longer than 3 s, Mobitz II or third-degree AV block, or rapid prolonged paroxysmal SVT or VT make an arrhythmic mechanism likely. Absence of arrhythmia during a recorded syncopal episode excludes an arrhythmic cause; presyncope alone is not a surrogate for syncope.
+    rationale: |-
+      The tier is raised because ECG monitoring is the only test that produces the symptom–rhythm correlation on which the diagnosis of arrhythmic syncope rests, and because in-hospital monitoring is a Class I recommendation in exactly the high-risk population this panel describes; at OPTIONAL it sits at the same level as EEG and brain MRI, which the same guideline places in Class III for syncope. The description is rewritten because listing three modalities without a selection rule invites the wrong one: the guideline ties each modality to event frequency, and an unselected Holter in a patient with rare episodes yields a diagnosis in 1–2% of cases. The diagnostic and exclusion criteria are added so that a negative recording is scored as an informative result rather than as a failed test.
+    source: |-
+      2018 ESC Guidelines, section 4.2.4, recommendation table on electrocardiographic monitoring: immediate in-hospital monitoring in high-risk patients, Class I, LOE C; Holter in patients with one or more episodes per week, Class IIa, LOE B; external loop recorder with an inter-symptom interval of four weeks or less, Class IIa, LOE B; arrhythmic syncope confirmed by a symptom–arrhythmia correlation, Class I, LOE B; asymptomatic Mobitz II or third-degree AV block, pause longer than 3 s, or rapid prolonged paroxysmal SVT or VT, Class IIa, LOE C.
+    our_response: |-
+      Applied: required in all 30 cases, with the modality selected by event frequency rather than left to an unqualified Holter.
+  order_echocardiogram:
+    reviewer: 2
+    requested_tier: unchanged
+    status: applied
+    guidance: |-
+      Transthoracic echocardiography for the diagnosis and risk stratification of suspected structural heart disease. Report left ventricular ejection fraction, maximal wall thickness, left atrial diameter, valve morphology and gradients, right ventricular size and function, estimated pulmonary artery pressure, pericardium and intracardiac masses. Targeted findings: severe aortic stenosis, obstructive tumour or thrombus, pericardial tamponade, aortic dissection, hypertrophic or arrhythmogenic cardiomyopathy, and signs of pulmonary embolism or pulmonary hypertension. In hypertrophic cardiomyopathy with a history of syncope and a resting or provoked peak instantaneous left ventricular outflow tract gradient below 50 mmHg, add exercise echocardiography in the standing, sitting or semi-supine position to detect provocable obstruction. Use the transoesophageal study when the transthoracic window is non-diagnostic and aortic dissection, prosthetic valve dysfunction or an intracardiac mass is suspected.
+    rationale: |-
+      Cardioembolic source and bubble study are removed because they describe a stroke work-up: a right-to-left shunt has no established role in the mechanism of syncope, and keeping the phrase in the description invites a contrast study that adds cost without diagnostic yield here, while transoesophageal imaging is retained and re-scoped to the situations in which the transthoracic study fails. The quantitative parameters are added because ejection fraction, maximal wall thickness and left atrial diameter are the echocardiographic inputs to the decisions that follow the diagnosis, and a report without them stops the pathway. Exercise echocardiography is added because it carries its own Class I recommendation in hypertrophic cardiomyopathy with syncope, and without it exertional syncope from provocable obstruction cannot be resolved.
+    source: |-
+      2018 ESC Guidelines
+    our_response: |-
+      Applied: required in all 30, and exercise echocardiography was added as its own study (exercise_echo, priced) because one case had been modelling a provoked outflow gradient as a treadmill stress test — a different study at a different price.

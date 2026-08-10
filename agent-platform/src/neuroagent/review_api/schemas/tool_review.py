@@ -145,6 +145,38 @@ class ToolMeta(BaseModel):
     output_fields: list[ToolOutputField] = Field(default_factory=list)
 
 
+GuidanceStatus = Literal["applied", "partial", "confirm", "no_change", "open", "retired"]
+
+
+class ConditionToolGuidance(BaseModel):
+    """One clinical reviewer's guidance for one tool in one condition, plus our answer.
+
+    The July 2026 review rewrote tool descriptions *per condition*: "for MS, brain and cord
+    MRI with an MS protocol", "not indicated in syncope". `ToolMeta.description` is a single
+    string shown under every condition, so that text had nowhere to live — and it cannot go
+    into the agent-facing `parameter_schema` either, because a condition-specific indication
+    hands the agent the diagnosis it is meant to infer. This model is where it lives, served
+    beside the condition→tool row and rendered in the review app only.
+    """
+
+    reviewer: int = Field(..., description="1 = chronic conditions, 2 = acute; never a code")
+    guidance: str = Field(default="", description="The reviewer's own revised description")
+    rationale: str = Field(default="", description="Their reasoning, including what they removed")
+    source: str = Field(default="", description="The guideline they cite")
+    requested_tier: str | None = Field(
+        default=None, description="The tier they asked for in this condition"
+    )
+    status: GuidanceStatus = Field(..., description="What happened to this specific comment")
+    our_response: str = Field(
+        default="", description="What we did about it, including where we did not comply"
+    )
+    filed_under: list[str] = Field(
+        default_factory=list,
+        description="The row(s) they annotated, when the study belongs to a different tool: "
+        "eleven comments describe studies the twelve-tool action space could not express",
+    )
+
+
 class ConditionToolMapping(BaseModel):
     """Which tools are required/optional for one condition."""
 
@@ -152,6 +184,12 @@ class ConditionToolMapping(BaseModel):
     label: str
     required_tools: list[str] = Field(default_factory=list)
     optional_tools: list[str] = Field(default_factory=list)
+    guidance: dict[str, ConditionToolGuidance] = Field(
+        default_factory=dict,
+        description="Reviewer guidance for this condition, keyed by tool name. A tool may "
+        "carry guidance without being in either tier list — that is a study the review asked "
+        "for and no case orders yet, and hiding it would hide the gap.",
+    )
 
 
 class ToolCatalog(BaseModel):

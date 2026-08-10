@@ -21,6 +21,7 @@ from typing import Any
 import yaml
 
 from ..schemas.tool_review import (
+    ConditionToolGuidance,
     ConditionToolMapping,
     ToolCatalog,
     ToolMeta,
@@ -40,22 +41,40 @@ logger = logging.getLogger(__name__)
 # *condition* ("mandatory if the head CT is negative", "not indicated in syncope") it cannot
 # be: the catalog shows one description per tool across all conditions, and a
 # condition-specific indication in the agent-facing text would hand the agent the diagnosis it
-# is meant to infer. Those go to the criteria packs and the per-case ground truth instead.
-# The two the reviewers named as carried over from a neuroimmunological panel — the labs and
-# CSF entries — were the clearest instances and are corrected below.
+# is meant to infer.
+#
+# The condition-specific half is not dropped: it is served from
+# `config/review/condition_tool_guidance.yaml` beside each condition-tool row, with the
+# reviewer's own text, their source and what we did about it. Until that file existed, 35 of
+# the 91 annotations landed on three tools whose description was never touched — brain MRI,
+# EEG and specialized test — so a reviewer logging back in would have read the exact string
+# they had asked us to delete. All three are rewritten below, and none of them now claims a
+# per-condition indication.
 _TOOL_META: list[dict[str, str | None]] = [
     {
         "name": "analyze_brain_mri",
         "label": "Brain MRI",
-        "description": "Structural brain MRI with protocol selection (standard, "
-        "epilepsy, stroke, tumor, MS, dementia); optional contrast.",
+        # Six protocols, from costs.yaml. The reviewers' objection was that the list reads as
+        # a menu with no consequence and that the cord is not here: spinal imaging is
+        # order_body_imaging{spine_MRI}, a separate study at a separate price, which is what
+        # made "brain and cord MRI" scoreable at all.
+        "description": "Structural brain MRI. The protocol is part of the request "
+        "(standard, epilepsy, stroke, tumor, MS, dementia) and so is contrast, which is not a "
+        "formality: in some indications a non-enhanced study cannot answer the question. "
+        "Covers the brain only — spinal cord imaging is a separate study under body imaging.",
         "modality": "MRI",
     },
     {
         "name": "analyze_eeg",
         "label": "EEG",
-        "description": "Electroencephalography — routine, ambulatory, video, or "
-        "continuous ICU monitoring for epileptiform and encephalopathic patterns.",
+        # The modality is the decision here, not the tool: a 30-60 minute routine study and
+        # continuous ICU monitoring answer different questions, and several reviewers noted
+        # that the shared text gave no signal of that.
+        "description": "Electroencephalography for epileptiform and encephalopathic patterns. "
+        "The recording type is the substance of the request: routine (awake, 30-60 min), "
+        "sleep-deprived or ambulatory to capture events, video for semiology, continuous ICU "
+        "monitoring where consciousness is impaired or the patient is sedated or paralysed. A "
+        "normal recording does not exclude epilepsy.",
         "modality": "EEG",
     },
     {
@@ -126,8 +145,18 @@ _TOOL_META: list[dict[str, str | None]] = [
     {
         "name": "order_specialized_test",
         "label": "Specialized test",
-        "description": "EMG/NCS, repetitive nerve stimulation, biopsies, "
-        "neuropsych battery, evoked potentials, autonomic/tilt testing, genetics.",
+        # Seven annotations quoted the previous string as "too broad" or "inappropriate", in
+        # multiple sclerosis, FTD, Parkinson's, NPH, ALS, GBS and myasthenia. It was a bag of
+        # categories; the named test is what is ordered, priced and scored, so the named tests
+        # are what the description lists.
+        "description": "One named test, not a category — the value chosen is what is billed "
+        "and scored. Nerve and muscle: emg_ncs, repetitive_nerve_stimulation, "
+        "emg_single_fiber, respiratory_function, muscle_biopsy, nerve_biopsy, "
+        "skin_biopsy_iencf, minor_salivary_gland_biopsy, ice_pack_test. Evoked potentials: "
+        "vep, ssep, baep. Vision: optical_coherence_tomography, visual_field_perimetry. "
+        "Autonomic and cardiac provocation: autonomic_testing, tilt_table, "
+        "exercise_stress_test. Cognition and sleep: neuropsych_battery, polysomnography. "
+        "Genetics: genetic_panel:<panel> for a named panel.",
         "modality": "specialized_test",
     },
     # Added after the July 2026 clinical tool review, which found the action space could
@@ -312,11 +341,34 @@ def _build_output_fields(tool_name: str) -> list[ToolOutputField]:
     ]
 
 
+def _load_guidance(path: Path | None) -> dict[str, dict[str, ConditionToolGuidance]]:
+    """The clinical reviewers' per-condition guidance, keyed condition -> tool.
+
+    Absent or malformed, the catalog is served without it: a reviewer must be able to work
+    even if this file is missing, and a validation error here must not take down the app.
+    """
+    if path is None or not path.exists():
+        logger.warning("Condition-tool guidance not found at %s", path)
+        return {}
+    raw = yaml.safe_load(path.read_text()) or {}
+    out: dict[str, dict[str, ConditionToolGuidance]] = {}
+    for condition, tools in raw.items():
+        if not isinstance(tools, dict):
+            continue
+        for tool, entry in tools.items():
+            try:
+                out.setdefault(condition, {})[tool] = ConditionToolGuidance.model_validate(entry)
+            except Exception:  # pragma: no cover — a bad row must not hide the good ones
+                logger.exception("Bad guidance entry for %s/%s", condition, tool)
+    return out
+
+
 def build_catalog(
     version: str,
     case_objects: dict[str, Any],
     conditions_yaml_path: Path,
     tool_costs_path: Path,
+    guidance_path: Path | None = None,
 ) -> ToolCatalog:
     """Assemble the tool catalog for ``version`` from the loaded cases."""
     conditions_spec: dict[str, Any] = {}
@@ -330,6 +382,8 @@ def build_catalog(
         tool_costs = yaml.safe_load(tool_costs_path.read_text()) or {}
     else:  # pragma: no cover
         logger.warning("Tool costs config not found at %s", tool_costs_path)
+
+    guidance = _load_guidance(guidance_path)
 
     tools = [
         ToolMeta(
@@ -365,12 +419,18 @@ def build_catalog(
         optional = [t for t in optional if t not in required]
         referenced_tools.update(required)
         referenced_tools.update(optional)
+        # A tool the review asked for and no case orders yet still carries guidance, and it
+        # still counts as referenced: leaving it out of `referenced_tools` would report it as
+        # an unmapped tool, which is the opposite of what the review established.
+        for_condition = guidance.get(key, {})
+        referenced_tools.update(for_condition)
         mappings.append(
             ConditionToolMapping(
                 condition=key,
                 label=present[key],
                 required_tools=required,
                 optional_tools=optional,
+                guidance=for_condition,
             )
         )
 

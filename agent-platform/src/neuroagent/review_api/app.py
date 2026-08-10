@@ -18,6 +18,7 @@ from fastapi.staticfiles import StaticFiles
 from .config import (
     ANNOTATIONS_DIR,
     AVAILABLE_DATASETS,
+    CONDITION_TOOL_GUIDANCE_PATH,
     CONDITIONS_YAML_PATH,
     DEFAULT_DATASET_VERSION,
     REVIEWER_CODES_PATH,
@@ -118,7 +119,11 @@ def create_app() -> FastAPI:
     # Tool catalog (read-only) — built once per dataset version at startup.
     tool_catalogs = {
         version: build_catalog(
-            version, objs, CONDITIONS_YAML_PATH, TOOL_COSTS_PATH
+            version,
+            objs,
+            CONDITIONS_YAML_PATH,
+            TOOL_COSTS_PATH,
+            CONDITION_TOOL_GUIDANCE_PATH,
         )
         for version, (_idx, objs) in all_datasets.items()
     }

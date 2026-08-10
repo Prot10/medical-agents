@@ -8,6 +8,7 @@ import pytest
 
 from neuroagent.review_api.config import (
     AVAILABLE_DATASETS,
+    CONDITION_TOOL_GUIDANCE_PATH,
     CONDITIONS_YAML_PATH,
     TOOL_COSTS_PATH,
 )
@@ -22,7 +23,15 @@ from neuroagent.review_api.services.tool_review_store import ToolReviewStore
 @pytest.fixture(scope="module")
 def neurobench_catalog():
     _idx, objs = load_dataset(AVAILABLE_DATASETS["neurobench"].path)
-    return build_catalog("neurobench", objs, CONDITIONS_YAML_PATH, TOOL_COSTS_PATH)
+    # The guidance path is passed exactly as app.py passes it, so the wiring is covered here
+    # and not only in the file's own test.
+    return build_catalog(
+        "neurobench",
+        objs,
+        CONDITIONS_YAML_PATH,
+        TOOL_COSTS_PATH,
+        CONDITION_TOOL_GUIDANCE_PATH,
+    )
 
 
 class TestToolCatalog:
@@ -127,3 +136,38 @@ class TestAnnotationStore:
         store.save(loaded)
         assert (tmp_path / "neurobench" / "R-001" / "CASE-001.json").exists()
         assert (tmp_path / "v5" / "R-001" / "CASE-001.json").exists()
+
+
+class TestConditionToolGuidance:
+    """The catalog must carry the reviewers' per-condition text, or the review app cannot
+    show a reviewer what happened to the comment they wrote."""
+
+    def test_the_catalog_serves_the_guidance(self, neurobench_catalog):
+        served = {
+            (m.condition, tool)
+            for m in neurobench_catalog.conditions
+            for tool in m.guidance
+        }
+        # 110 entries in the file, less the one for the retired condition, which no longer has
+        # a row to hang on.
+        assert len(served) == 109, len(served)
+        assert ("myasthenia_gravis", "order_body_imaging") in served
+
+    def test_a_tool_the_review_asked_to_remove_still_shows_our_answer(
+        self, neurobench_catalog
+    ):
+        """A "REMOVE this from this condition" comment we acted on leaves no tier row behind.
+        Without guidance on a tool outside both tier lists, the reviewer would see silence."""
+        ms = next(
+            m for m in neurobench_catalog.conditions if m.condition == "multiple_sclerosis"
+        )
+        assert "analyze_eeg" not in ms.required_tools + ms.optional_tools
+        eeg = ms.guidance["analyze_eeg"]
+        assert eeg.status == "applied"
+        assert eeg.our_response
+
+    def test_guidance_never_reports_a_tool_as_unmapped(self, neurobench_catalog):
+        """A study the review asked for and no case orders yet must not be counted as an
+        orphan tool: that would read as a coverage gap in the catalog rather than in the
+        cases, which is the opposite of what the review established."""
+        assert neurobench_catalog.unmapped_tools == []
