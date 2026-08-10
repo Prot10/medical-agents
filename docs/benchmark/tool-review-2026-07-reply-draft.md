@@ -154,8 +154,9 @@ Accolte. In sintesi:
   nell'emicrania (30), marcia e cognizione cronometrate prima e dopo il tap test nella NPH (30),
   acquisizione tissutale con diagnosi istomolecolare integrata nel glioma (30), telemetria continua
   nella GBS (30). I passi obbligatori da pannello assenti dai casi erano 211: ora sono 28, e tutti
-  e 28 sono esenzioni dichiarate con la motivazione clinica (26 sono casi di ESA in cui la TC è
-  diagnostica, e la rachicentesi è obbligatoria solo quando non lo è).
+  e 28 sono esenzioni dichiarate con la motivazione clinica: 27 sono casi di ESA in cui la TC è
+  diagnostica — la rachicentesi resta obbligatoria nei 3 con TC negativa — e il ventottesimo è il
+  caso di demenza vascolare con pacemaker non compatibile, in cui la RM è controindicata.
 - **Due cose che questo lavoro ha fatto emergere e che vale la pena dirvi.** Nell'emicrania il
   declassamento della RM era stato applicato a metà dei casi e l'anamnesi ICHD-3 a nessuno: in 15
   casi l'insieme obbligatorio conteneva soltanto i due strumenti a costo zero, e un agente prendeva

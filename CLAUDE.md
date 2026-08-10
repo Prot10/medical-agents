@@ -61,7 +61,7 @@ and the literature-aligned evaluation; `docs/training/distillation.md` for traje
   and (added after the July 2026 clinical tool review) order_body_imaging, order_microbiology, obtain_tissue_diagnosis, perform_clinical_assessment
 - Cost tracking: `CostTracker` in `tools/cost_tracker.py`, config in `config/tools/costs.yaml`, Medicare PFS reference rates
 - Tool vocabulary: `costs.yaml` is the single source; `tools/vocabulary.py` generates every enum from it,
-  so a term cannot exist without a price. `order_advanced_imaging` takes `modality` (17 values,
+  so a term cannot exist without a price. `order_advanced_imaging` takes `modality` (18 values,
   including the second-line cardiac studies);
   `order_specialized_test` takes `test_type` (19 + `genetic_panel:<panel>`); `order_body_imaging` takes
   `study` (12, `<region>_<modality>`); `order_microbiology` takes `specimen` (5); `obtain_tissue_diagnosis`
