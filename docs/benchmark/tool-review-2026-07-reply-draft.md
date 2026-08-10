@@ -203,12 +203,50 @@ Accolte. In sintesi:
   mentre chi ordinava il termine vago sì. Ora l'ordine specifico soddisfa la richiesta di classe,
   **ma non il contrario**: una richiesta di esame specifico non è mai coperta dal nome generico.
   La vaghezza non deve diventare il modo più economico di segnare punti.
-- Le vostre **descrizioni condizione-specifiche** vengono recepite, ma con un accorgimento:
-  non possono comparire nella descrizione del tool che l'agente legge, perché rivelerebbero
-  la diagnosi che deve invece inferire (se il tool dice "per la SM, RM encefalo e midollo con
-  protocollo SM", l'agente sa già che si tratta di SM). Le inseriamo quindi nel *ground
-  truth* e nella griglia di valutazione: è la sede corretta, ed è anche più utile, perché
-  rende misurabile la scelta del singolo esame invece di lasciarla al giudizio.
+- **Le vostre descrizioni condizione-specifiche ora sono in piattaforma, sotto la riga a cui le
+  avete scritte, con accanto la nostra risposta.** Questo era il punto in cui vi stavamo per dire
+  una cosa vaga, e ve lo raccontiamo perché il difetto era strutturale. Il testo che avete scritto
+  è *per patologia* («per la SM, RM encefalo **e midollo** con protocollo SM»), mentre il catalogo
+  aveva una sola descrizione per tool, mostrata identica in tutte e 20 le patologie: quel testo non
+  aveva letteralmente un posto dove stare. Non poteva nemmeno andare nella descrizione che legge
+  l'agente, perché un'indicazione condizione-specifica gli regala la diagnosi che deve inferire.
+  Risultato: la sostanza delle vostre riscritture era arrivata dove viene *misurata* (vocabolario e
+  ground truth), ma il testo che avreste riletto era ancora quello vecchio su tre tool — RM
+  encefalo, EEG e test specialistici — che da soli raccolgono **35 delle vostre 91 annotazioni**.
+  Avreste ritrovato parola per parola la stringa che avevate chiesto di cancellare.
+
+  Adesso esiste un livello dedicato: **110 voci** (le 91 annotazioni, più 19 perché alcune
+  contengono due item distinti), ognuna con il vostro testo, la vostra motivazione, la vostra
+  fonte, **e cosa abbiamo fatto**, con un'etichetta di stato che vi dice dove guardare:
+
+  | Stato | Voci | Cosa significa |
+  |---|---:|---|
+  | applicato | 89 | i casi e il vocabolario si comportano come chiedete |
+  | serve la vostra decisione | 9 | abbiamo fatto qualcosa di diverso da quanto chiesto, e lo dichiariamo |
+  | applicato in parte | 6 | il tool esiste, i casi che dovrebbero usarlo non sono ancora scritti |
+  | nessuna modifica richiesta | 4 | — |
+  | domanda aperta | 1 | la FND (punto 2) |
+  | patologia ritirata | 1 | la neuropatia periferica |
+
+  Undici delle vostre annotazioni descrivono esami che nello spazio d'azione a 12 tool non
+  esistevano, e le avevate quindi appoggiate alla riga più vicina: lo screening del teratoma sotto
+  la RM encefalo, le emocolture sotto il laboratorio, la biopsia del glioma sotto la RM. Ora il
+  vostro testo compare sul tool che esegue davvero l'esame, con l'indicazione di dove l'avevate
+  scritto — così vedete che non è stato perso.
+
+  Abbiamo anche riscritto le tre descrizioni condivise rimaste intatte. Quella dei test
+  specialistici era il vostro «too broad» in cinque patologie: ora elenca i 19 esami reali
+  raggruppati, con la regola che **il valore scelto è ciò che viene fatturato e valutato**, non la
+  categoria. E il vostro EEG deprivato di sonno nell'epilessia temporale **non esisteva come esame
+  ordinabile**: ora è tariffato (276 EUR, CPT 95819) e deriva automaticamente nel vocabolario, nel
+  catalogo e nel tracciamento costi.
+
+  Un ultimo effetto collaterale, che vale come prova che il metodo serve: rispondere a una
+  annotazione per volta ci ha costretti a scoprire **quattro casi in cui la risposta che stavamo per
+  darvi era falsa** — l'eco e il monitoraggio cardiaco nell'epilessia temporale erano rimasti a
+  *recommended* e non opzionali come vi stavamo scrivendo, e nella NPH la batteria
+  neuropsicologica era ancora obbligatoria in tutti e 30 i casi accanto alla nuova valutazione
+  pre/post, che è esattamente la duplicazione che avevate chiesto di togliere. Corretti.
 
 ## 5. Sette rimozioni che abbiamo declassato invece di eliminare — vi chiediamo conferma
 
@@ -229,9 +267,17 @@ un agente che sospetti correttamente una causa diversa deve comunque poter agire
 sembrato coerente estenderlo anche alle patologie croniche. **Se non siete d'accordo, li
 eliminiamo e correggiamo i casi.**
 
-Un punto separato: nei tre casi di emicrania l'ecocardiogramma è al tier **required**. Il
-vostro commento implica che sia sbagliato, e siamo d'accordo — è un difetto del caso, non del
-catalogo, e lo correggiamo.
+Un punto separato, e qui abbiamo cambiato idea due volte prima di darvi una risposta. Nei tre
+casi di emicrania in cui l'ecocardiogramma è **required** siamo andati a leggere la diagnosi, e
+nessuno dei tre è un'emicrania di routine: **MIG-AURA-P03** è un infarto migrainoso la cui
+diagnosi si regge sull'aver escluso le cause secondarie, **MIG-AURA-P07** è un ictus
+cardioembolico che il caso dichiara *non* essere un infarto migrainoso, e **MIG-AURA-P08** è una
+MELAS con mutazione confermata, dove lo screening della cardiomiopatia è standard. In tutti e tre
+l'eco è ricerca della fonte embolica o screening cardiologico, non un test per l'emicrania.
+Quindi resta, e la domanda che vi giriamo è un'altra: se quei casi possano stare sotto
+l'etichetta «emicrania con aura» o se vadano spostati. Stessa logica per la video-EEG in
+**MIG-AURA-RM11**, la cui diagnosi comprende una *migralepsia* — una crisi durante l'aura, ICHD-3
+1.4.4 — quindi l'EEG stabilisce metà della diagnosi e non è valutazione di routine della cefalea.
 
 ## 6. Miastenia gravis
 
@@ -346,8 +392,12 @@ avete un'opinione diversa, è il momento di dirlo**: sono decisioni nostre, non 
 
 **Cosa è pronto adesso.** Le 20 patologie in piattaforma (600 casi, demenza vascolare compresa)
 sono revisionabili da subito, con il catalogo dei tool corretto e le riparazioni dei punti 4, 7 e 8
-applicate. Se volete iniziare, il posto dove il vostro tempo rende di più è la sezione 8: è
-contenuto che abbiamo scritto noi e su cui non c'è nessun controllo automatico possibile.
+applicate. Nella scheda **Tool** ogni riga patologia-esame ora porta un'etichetta «review»: aprendola
+trovate il vostro commento, la vostra fonte e la nostra risposta. Le nove marcate **«serve la vostra
+decisione»** sono i punti in cui abbiamo fatto qualcosa di diverso da quello che avevate chiesto:
+sono la prima cosa da guardare, e bastano cinque minuti a testa. Il posto dove il vostro tempo rende
+di più resta la sezione 8: è contenuto clinico che abbiamo scritto noi e su cui non esiste nessun
+controllo automatico possibile.
 
 **Cosa non è pronto.** Demenza a corpi di Lewy, emorragia intracerebrale spontanea ed encefalite
 erpetica **non sono ancora in piattaforma**: mancano i pannelli e i 30 casi ciascuna. Preferiamo

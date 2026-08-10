@@ -528,6 +528,65 @@ at 1 242 EUR in those 22 cases, which is honest rather than tidy: restraint is n
 nihilism. `EMG_NCS` was also removed from the panel's optional list, since a panel cannot offer as
 defensible what every case now scores as waste.
 
+### The 37 description rewrites, closed properly (2026-08-10)
+
+The implementation table above counted the review's asks in five buckets, one per annotation, so
+they sum to 91. That bucketing hid the real shape: **most annotations carry description text**, not
+37 of them — 38 use the reviewers' own "Revised description (to be inserted)" heading, another 12
+ask in prose, and several *are* the new text with no heading at all.
+
+It also hid a gap. Measured by diffing `_TOOL_META` between the commit the reviewers read
+(`84af853^`) and HEAD: 7 of the 12 pre-existing tool descriptions had been rewritten, 5 had not,
+and the three untouched ones that carry reviewer text — `analyze_brain_mri` (16 annotations),
+`analyze_eeg` (12) and `order_specialized_test` (7) — accounted for **35 of the 91**. A reviewer
+logging back in would have read the exact string they asked us to delete.
+
+The reason was structural, not neglect. Their text is *per condition*; `ToolMeta.description` is
+one string rendered under all twenty conditions; and the agent-facing `parameter_schema` cannot
+carry a condition-specific indication without handing the agent the diagnosis. So the substance
+went to the vocabulary and the case ground truth, and the text went nowhere.
+
+**`agent-platform/config/review/condition_tool_guidance.yaml`** is that missing place: 110 entries
+(91 annotations, split where one annotation contains two items), each with the reviewer's guidance,
+rationale and source sliced out of the stored annotation — not retyped — plus a `status` and an
+`our_response`. It is served in `ConditionToolMapping.guidance` and rendered per row in the review
+app, including for tools in neither tier list, which is where the "remove this from this condition"
+answers live.
+
+| status | entries | meaning |
+|---|---:|---|
+| `applied` | 89 | the cases and the vocabulary behave as the comment asks |
+| `confirm` | 9 | we did something else, and say so |
+| `partial` | 6 | the tool exists; the cases that should use it are unwritten |
+| `no_change` | 4 | none requested |
+| `open` | 1 | FND |
+| `retired` | 1 | peripheral neuropathy |
+
+Guards: `tests/test_condition_tool_guidance.py` checks that every condition and tool exists, that
+every entry answers its comment, that no `guidance` value opens with a string the reviewers quoted
+for removal, that no reviewer code (a bearer credential) reaches the committed file, and that
+**nothing under `tools/`, `agents/`, `api/`, `evaluation/` or `llm/` reads the file** — the leak
+this design exists to prevent. `tests/test_tool_review.py` covers the wiring end to end.
+
+Three things fell out of answering the comments one at a time, which is the argument for doing it
+that way:
+
+1. **`sleep_deprived` EEG did not exist.** Reviewer 1 names it as the second-line recording when a
+   routine EEG is normal; the vocabulary had no such value, so the ask could be neither ordered nor
+   scored. Priced at 276 EUR (CPT 95819) in `costs.yaml`, from which the enum derives.
+2. **Two answers we were about to send were false.** Temporal-lobe echocardiogram and cardiac
+   monitoring were left at `recommended`, not `optional` as the reply claimed; and NPH kept
+   `order_specialized_test{neuropsych_battery}` REQUIRED in all 30 cases beside the new pre/post
+   assessment — the duplication the comment asked to remove. Both fixed, and the redundant NPH
+   sequence constraint went with the demotion, or an agent performing the mandatory assessment and
+   skipping the optional battery would have taken a violation.
+3. **One blunt fix was reverted after reading the diagnoses.** Three migraine cases order an
+   echocardiogram at REQUIRED; demoting them looked right until the diagnoses turned out to be a
+   migrainous infarction, a cardioembolic PCA infarct and a genetically confirmed MELAS. The echo is
+   embolic-source or cardiomyopathy work-up in each, so the comment's target — a routine migraine
+   echo — does not exist in the cases. Reverted, with the per-case reason recorded, and the question
+   handed back to the reviewers as one about the condition label rather than the tier.
+
 ### Remaining work
 
 **1. Redeploy the review app** — pair with sending the reply, since it changes what the

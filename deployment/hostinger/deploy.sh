@@ -116,6 +116,8 @@ rsync -az --delete \
 # IS shipped, further down with conditions.yaml — the tool catalog reads both, and
 # the enum vocabularies the review app serves are derived from costs.yaml, so a
 # stale copy silently misrepresents the action space to reviewers.
+# condition_tool_guidance.yaml goes with it: it carries the clinical reviewers' own revised
+# descriptions per condition, and without it the app renders their comments with no answer.
 # reviewer_codes.yaml itself is excluded here — gated behind --force-codes.
 rsync -az --delete \
   --exclude 'reviewer_codes.yaml' \
