@@ -146,25 +146,39 @@ Accolte. In sintesi:
   avete letto — ma il tier che il benchmark *misura* sta nel singolo caso. Verificando, abbiamo
   trovato che 13 dei 18 esistevano solo nel pannello: cambiati dove si legge, non dove si misura.
   È la stessa forma dell'errore del punto 3, e ora sono **tutti e diciotto nei casi**. L'ultimo a
-  cedere è stato il vostro sulla **TC cranio nell'encefalopatia epatica**, e vale la pena dire come
-  è andata perché è un errore nostro di metodo. Vi avevamo scritto che la lasciavamo obbligatoria in
-  tutti e 30 i casi e che vi chiedevamo di confermare, con la motivazione che non ci sembrava
-  corretto togliere un passo di esclusione prima di una procedura invasiva. Andando a verificare: in
-  questa condizione il percorso ideale esegue una rachicentesi in **1 caso su 30** — la motivazione
-  era copiata dalla meningite e non si applicava. E la TC nella meningite **non l'avevate mai
-  contestata**: le vostre quattro annotazioni su quella patologia sono liquor, laboratorio, RM ed
-  ECG. Avevamo accorpato due cose per farne una richiesta che non esisteva.
-  Applicato: il tier è ora assegnato caso per caso dalla lista di trigger che avete scritto voi,
-  leggendo ogni presentazione — **obbligatoria in 9** (una crisi testimoniata; un deficit focale
-  dopo una caduta non testimoniata; una Wernicke; una Wilson; un episodio descritto come
-  indistinguibile dal precedente TIA; tre pazienti trovati a terra senza testimoni; e il solo caso
-  in cui il percorso ideale raccomanda una rachicentesi, dove escludere un effetto massa prima del
-  prelievo non è opzionale), **raccomandata in 13** dove un'altra causa va plausibilmente esclusa (primo episodio, neoplasia
-  attiva, confusione che persiste dopo la correzione del precipitante) e **opzionale in 8** episodi
-  tipici con precipitante identificato. La spesa obbligatoria in TC su questa condizione passa da
-  5 520 a 1 656 EUR. Nota per voi: il Babinski bilaterale e l'asterixis sono presenti in molti di
-  questi casi e **non** li abbiamo trattati come trigger — sono il quadro metabolico, non segni
-  focali.
+  cedere è stato il vostro sulla **TC cranio nell'encefalopatia epatica**, e ve lo raccontiamo per
+  intero perché contiene due errori nostri, uno di merito e uno di metodo.
+  Vi avevamo scritto che la lasciavamo obbligatoria in tutti e 30 i casi e che vi chiedevamo di
+  confermare, perché non ci sembrava corretto togliere un passo di esclusione prima di una procedura
+  invasiva. Primo errore: in questa condizione il percorso ideale esegue una rachicentesi in **1 caso
+  su 30** — la motivazione era copiata dalla meningite. E la TC nella meningite **non l'avevate mai
+  contestata**: le vostre quattro annotazioni su quella patologia sono liquor, laboratorio, RM ed ECG.
+  Secondo errore: al primo tentativo abbiamo assegnato i tier con una ricerca per parole chiave, che
+  ha trovato «seizure» e «fall» in tutti e 30 i casi perché quelle parole stanno nei diagnostici
+  differenziali e nelle anamnesi *negate* («denied any focal limb weakness, facial droop, or new
+  falls»), e ha mancato HEP-ENC-P05, la cui atassia con oftalmoparesi è una Wernicke. Abbiamo buttato
+  quel lavoro e **letto i 30 casi per intero**.
+
+  Due fatti che vengono da quella lettura, non da un'assunzione:
+  **29 referti TC su 30 sono normali** — l'unico positivo è HEP-ENC-P09, un ematoma subdurale cronico
+  di 9 mm con 3 mm di shift della linea mediana — e **nessun caso ha un deficit focale tranne lo
+  stesso P09**: ogni altro esame obiettivo recita «no focal weakness» o «no focal paresis», e il
+  Babinski bilaterale e l'asterixis presenti in quasi tutti sono il quadro metabolico, non segni
+  focali. Il vostro rilievo era esatto: il benchmark imponeva un esame che in 29 casi su 30
+  restituisce «no acute intracranial abnormality».
+
+  **Applicato: la TC è opzionale in 25 casi su 30.** I cinque che restano obbligatori non li abbiamo
+  scelti noi con un giudizio clinico, ma con una regola testuale — il caso stesso scrive che la TC è
+  *mandatory*, *urgent* o *necessary*, oppure uno dei trigger della vostra lista compare alla lettera
+  nella presentazione: **P09** (segni focali destri; «mandate imaging»), **P06** («unresponsive after
+  a witnessed seizure»), **M10** e **S11** («mandatory given coagulopathy and thrombocytopenia», che
+  è il vostro «clinical suspicion of intracranial bleeding»), **P08** («necessary given repeated TIA
+  framing»). P08 è l'unico dei cinque che non corrisponde alla vostra lista parola per parola, e ve
+  lo segnaliamo come tale. Per smentirci su uno qualsiasi dei cinque vi bastano cinque frasi. La
+  spesa obbligatoria in TC sulla condizione passa da **5 520 a 920 EUR**. Il vincolo «immagine prima
+  della rachicentesi» resta intatto, tranne in HEP-ENC-M01 — il solo caso il cui percorso ideale
+  comprende una rachicentesi — dove è stato ammorbidito, perché altrimenti un agente che segue la
+  vostra indicazione verrebbe penalizzato.
 - **Gli atti clinici che ci avevate indicato come obbligatori sono ora nei casi**, non solo nel
   pannello: valutazione cognitiva strutturata in Alzheimer e FTD (60 casi), anamnesi ICHD-3
   nell'emicrania (30), marcia e cognizione cronometrate prima e dopo il tap test nella NPH (30),
