@@ -427,6 +427,15 @@ def validate_case(case: dict, schemas: dict[str, dict[str, Any]]) -> list[dict]:
         # puncture on imaging the case only recommended, and 3 gating drug selection on an ECG one
         # case never ordered at all. It is also how 28 cardiac-syncope cases would have penalised
         # an agent for skipping the untargeted laboratory panel the reviewers told us to demote.
+        #
+        # It is only a contradiction when the *dependent* step is one a good agent takes. If
+        # `after` is itself optional or absent from the gold standard, no correct pathway reaches
+        # the constraint, and the rule is a conditional safety gate rather than a self-inflicted
+        # penalty: "the CT is not mandatory here, but if you choose to tap, image first." That is
+        # the shape in hepatic encephalopathy after the July 2026 review demoted the head CT — the
+        # gold standard performs a lumbar puncture in 1 of the 30 cases, and in that one the CT is
+        # required. Checking `after` is what separates the two, and without it this rule would
+        # have forced the CT back to mandatory in 22 cases against the reviewers' instruction.
         if constraint.get("severity") == "hard":
             prerequisite = constraint.get("before")
             tiers = {
@@ -434,7 +443,13 @@ def validate_case(case: dict, schemas: dict[str, dict[str, Any]]) -> list[dict]:
                 for action in gt.get("optimal_actions") or []
                 if action.get("tool_name") == prerequisite
             }
-            if prerequisite in schemas and "required" not in tiers:
+            dependent_tiers = {
+                action.get("category")
+                for action in gt.get("optimal_actions") or []
+                if action.get("tool_name") == constraint.get("after")
+            }
+            binds_a_correct_agent = bool(dependent_tiers & {"required", "recommended"})
+            if prerequisite in schemas and "required" not in tiers and binds_a_correct_agent:
                 issues.append({
                     "code": "SEQ_PREREQ_NOT_REQUIRED",
                     "section": "sequence_constraints", "index": i, "tool": prerequisite,

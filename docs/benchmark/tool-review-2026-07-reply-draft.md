@@ -145,10 +145,26 @@ Accolte. In sintesi:
   avevamo applicati al pannello di generazione, che è anche quello che alimenta il catalogo che
   avete letto — ma il tier che il benchmark *misura* sta nel singolo caso. Verificando, abbiamo
   trovato che 13 dei 18 esistevano solo nel pannello: cambiati dove si legge, non dove si misura.
-  È la stessa forma dell'errore del punto 3, e ora sono nei casi tutti tranne due, che vi chiediamo
-  di confermare (la TC cranio nell'encefalopatia epatica e nella meningite: 30 e 27 casi la
-  richiedono, nella meningite come esclusione di massa prima della rachicentesi, e togliere un passo
-  di esclusione prima di una procedura invasiva sulla nostra sola lettura non ci pareva corretto).
+  È la stessa forma dell'errore del punto 3, e ora sono **tutti e diciotto nei casi**. L'ultimo a
+  cedere è stato il vostro sulla **TC cranio nell'encefalopatia epatica**, e vale la pena dire come
+  è andata perché è un errore nostro di metodo. Vi avevamo scritto che la lasciavamo obbligatoria in
+  tutti e 30 i casi e che vi chiedevamo di confermare, con la motivazione che non ci sembrava
+  corretto togliere un passo di esclusione prima di una procedura invasiva. Andando a verificare: in
+  questa condizione il percorso ideale esegue una rachicentesi in **1 caso su 30** — la motivazione
+  era copiata dalla meningite e non si applicava. E la TC nella meningite **non l'avevate mai
+  contestata**: le vostre quattro annotazioni su quella patologia sono liquor, laboratorio, RM ed
+  ECG. Avevamo accorpato due cose per farne una richiesta che non esisteva.
+  Applicato: il tier è ora assegnato caso per caso dalla lista di trigger che avete scritto voi,
+  leggendo ogni presentazione — **obbligatoria in 9** (una crisi testimoniata; un deficit focale
+  dopo una caduta non testimoniata; una Wernicke; una Wilson; un episodio descritto come
+  indistinguibile dal precedente TIA; tre pazienti trovati a terra senza testimoni; e il solo caso
+  in cui il percorso ideale raccomanda una rachicentesi, dove escludere un effetto massa prima del
+  prelievo non è opzionale), **raccomandata in 13** dove un'altra causa va plausibilmente esclusa (primo episodio, neoplasia
+  attiva, confusione che persiste dopo la correzione del precipitante) e **opzionale in 8** episodi
+  tipici con precipitante identificato. La spesa obbligatoria in TC su questa condizione passa da
+  5 520 a 1 656 EUR. Nota per voi: il Babinski bilaterale e l'asterixis sono presenti in molti di
+  questi casi e **non** li abbiamo trattati come trigger — sono il quadro metabolico, non segni
+  focali.
 - **Gli atti clinici che ci avevate indicato come obbligatori sono ora nei casi**, non solo nel
   pannello: valutazione cognitiva strutturata in Alzheimer e FTD (60 casi), anamnesi ICHD-3
   nell'emicrania (30), marcia e cognizione cronometrate prima e dopo il tap test nella NPH (30),
@@ -221,8 +237,8 @@ Accolte. In sintesi:
 
   | Stato | Voci | Cosa significa |
   |---|---:|---|
-  | applicato | 89 | i casi e il vocabolario si comportano come chiedete |
-  | serve la vostra decisione | 9 | abbiamo fatto qualcosa di diverso da quanto chiesto, e lo dichiariamo |
+  | applicato | 97 | i casi e il vocabolario si comportano come chiedete |
+  | serve la vostra decisione | 1 | l'unico punto su cui vi rimandiamo una domanda (punto 5) |
   | applicato in parte | 6 | il tool esiste, i casi che dovrebbero usarlo non sono ancora scritti |
   | nessuna modifica richiesta | 4 | — |
   | domanda aperta | 1 | la FND (punto 2) |
@@ -248,36 +264,37 @@ Accolte. In sintesi:
   neuropsicologica era ancora obbligatoria in tutti e 30 i casi accanto alla nuova valutazione
   pre/post, che è esattamente la duplicazione che avevate chiesto di togliere. Corretti.
 
-## 5. Sette rimozioni che abbiamo declassato invece di eliminare — vi chiediamo conferma
+## 5. Le rimozioni: applicate, e una sola domanda che vi rimandiamo
 
-Su 13 richieste di rimozione, 7 riguardano tool che un caso già esistente usa **in diagnosi
-differenziale**. In questi casi li abbiamo resi opzionali anziché eliminarli:
+Su 13 richieste di rimozione ne abbiamo eseguite 6 alla lettera. Nelle altre 7 il tool resta
+raggiungibile **come passo opzionale in uno o due casi specifici** che lo usano in diagnosi
+differenziale. Non ve lo chiediamo come autorizzazione: in nessuna delle sette il tool è più
+obbligatorio o raccomandato in alcun caso, quindi la vostra istruzione è applicata dove viene
+misurata. L'eccezione è scritta accanto alla riga in piattaforma, con il nome del caso, e se
+non siete d'accordo il posto naturale per dirlo è quel caso, quando lo revisionate.
 
-| Patologia | Tool | Perché lo abbiamo tenuto opzionale |
+| Patologia | Tool | L'eccezione, e dove la trovate |
 |---|---|---|
-| NPH | Imaging avanzato | Tutti e 30 i casi usano PET amiloide/FDG per il differenziale con l'Alzheimer, non come test per la NPH |
-| Epilessia temporale | Echo + monitoraggio cardiaco | FEPI-TEMP-P05 e -RP02 sono casi inizialmente attribuiti a sincope |
-| Emicrania con aura | Echo | MIG-AURA-P03/P07/P08 usano il bubble study per il PFO |
-| Emicrania con aura | EEG + liquor | MIG-AURA-RM11 li usa su un sospetto di cefalea secondaria |
-| Alzheimer | EEG | ALZ-EARLY-RP04 lo usa su un differenziale con CJD/encefalopatia |
+| NPH | Imaging avanzato | Opzionale in tutti e 30: usano PET amiloide/FDG per il differenziale con l'Alzheimer, che è il problema diagnostico centrale della condizione, non un test per la NPH |
+| Epilessia temporale | Echo + monitoraggio cardiaco | Opzionale in FEPI-TEMP-P05 e -RP02, inizialmente inquadrati come sincope e come embolia polmonare |
+| Emicrania con aura | Liquor | Opzionale nel solo MIG-AURA-RM11, su sospetto di cefalea secondaria |
+| Emicrania con aura | EEG | Resta **obbligatorio** solo in MIG-AURA-RM11, la cui diagnosi comprende una *migralepsia* (crisi durante l'aura, ICHD-3 1.4.4): la video-EEG stabilisce metà della diagnosi, non è valutazione di routine della cefalea. È l'unico caso su cui vale la pena litigare con noi, e il posto è il caso stesso |
+| Alzheimer | EEG | Opzionale nel solo ALZ-EARLY-RP04, il cui differenziale include la CJD |
 
-Il criterio che abbiamo applicato è quello formulato dal Revisore 2 a proposito di EEG e RM
-nella sincope: *"l'item va mantenuto perché l'etichetta del pannello è l'ipotesi sotto esame:
-un agente che sospetti correttamente una causa diversa deve comunque poter agire."* Ci è
-sembrato coerente estenderlo anche alle patologie croniche. **Se non siete d'accordo, li
-eliminiamo e correggiamo i casi.**
+Il criterio è il vostro, formulato dal Revisore 2 su EEG e RM nella sincope: *"l'item va
+mantenuto perché l'etichetta del pannello è l'ipotesi sotto esame: un agente che sospetti
+correttamente una causa diversa deve comunque poter agire."*
 
-Un punto separato, e qui abbiamo cambiato idea due volte prima di darvi una risposta. Nei tre
-casi di emicrania in cui l'ecocardiogramma è **required** siamo andati a leggere la diagnosi, e
-nessuno dei tre è un'emicrania di routine: **MIG-AURA-P03** è un infarto migrainoso la cui
-diagnosi si regge sull'aver escluso le cause secondarie, **MIG-AURA-P07** è un ictus
-cardioembolico che il caso dichiara *non* essere un infarto migrainoso, e **MIG-AURA-P08** è una
-MELAS con mutazione confermata, dove lo screening della cardiomiopatia è standard. In tutti e tre
-l'eco è ricerca della fonte embolica o screening cardiologico, non un test per l'emicrania.
-Quindi resta, e la domanda che vi giriamo è un'altra: se quei casi possano stare sotto
-l'etichetta «emicrania con aura» o se vadano spostati. Stessa logica per la video-EEG in
-**MIG-AURA-RM11**, la cui diagnosi comprende una *migralepsia* — una crisi durante l'aura, ICHD-3
-1.4.4 — quindi l'EEG stabilisce metà della diagnosi e non è valutazione di routine della cefalea.
+**L'unica cosa su cui vi rimandiamo una domanda, ed è di composizione, non di tier.** Tre casi di
+emicrania ordinano un ecocardiogramma come atto obbligatorio, e nessuno dei tre è un'emicrania di
+routine: **MIG-AURA-P03** è un infarto migrainoso la cui diagnosi si regge sull'aver escluso le
+cause secondarie, **MIG-AURA-P07** è un ictus cardioembolico che il caso dichiara *non* essere un
+infarto migrainoso, e **MIG-AURA-P08** è una MELAS con mutazione confermata, dove lo screening
+della cardiomiopatia è standard. In tutti e tre l'eco è ricerca della fonte embolica o screening
+cardiologico: l'ecocardiogramma di routine che il vostro commento colpisce non esiste nei casi.
+La domanda è la stessa che avete già risolto per la neuropatia periferica: **un ictus
+cardioembolico e una MELAS possono stare sotto l'etichetta «emicrania con aura»?** Nulla dipende
+dalla vostra risposta — i casi sono revisionabili così come sono.
 
 ## 6. Miastenia gravis
 
@@ -393,10 +410,10 @@ avete un'opinione diversa, è il momento di dirlo**: sono decisioni nostre, non 
 **Cosa è pronto adesso.** Le 20 patologie in piattaforma (600 casi, demenza vascolare compresa)
 sono revisionabili da subito, con il catalogo dei tool corretto e le riparazioni dei punti 4, 7 e 8
 applicate. Nella scheda **Tool** ogni riga patologia-esame ora porta un'etichetta «review»: aprendola
-trovate il vostro commento, la vostra fonte e la nostra risposta. Le nove marcate **«serve la vostra
-decisione»** sono i punti in cui abbiamo fatto qualcosa di diverso da quello che avevate chiesto:
-sono la prima cosa da guardare, e bastano cinque minuti a testa. Il posto dove il vostro tempo rende
-di più resta la sezione 8: è contenuto clinico che abbiamo scritto noi e su cui non esiste nessun
+trovate il vostro commento, la vostra fonte e la nostra risposta. **Non aspettiamo niente da voi per
+partire**: una sola voce su 110 vi rimanda una domanda (la composizione dei tre casi di emicrania,
+punto 5), e sei sono dichiarate incomplete da parte nostra. Il posto dove il vostro tempo rende di
+più è la sezione 8: è contenuto clinico che abbiamo scritto noi e su cui non esiste nessun
 controllo automatico possibile.
 
 **Cosa non è pronto.** Demenza a corpi di Lewy, emorragia intracerebrale spontanea ed encefalite

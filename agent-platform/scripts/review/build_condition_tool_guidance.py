@@ -238,10 +238,9 @@ SPEC: list[dict[str, object]] = [
          response="Applied: MRI is recommended rather than required in 27 cases and required in "
                   "the 2 with a suspected intracranial complication."),
     dict(cond="bacterial_meningitis", filed="analyze_ecg", tool="analyze_ecg",
-         reviewer=2, tier="unchanged", status="confirm",
-         response="Kept, and we would like your confirmation. No case requires it; it stays in "
-                  "the catalog at negligible cost as a differential action. If you would rather "
-                  "it disappear from this condition, say so and it goes."),
+         reviewer=2, tier="unchanged", status="applied",
+         response="Applied: electrocardiography is no longer part of this condition's panel and no "
+                  "meningitis case orders one."),
 
     # === hepatic encephalopathy (reviewer 2) ===
     dict(cond="hepatic_encephalopathy", filed="interpret_labs", tool="order_microbiology",
@@ -276,13 +275,25 @@ SPEC: list[dict[str, object]] = [
          response="Applied: EEG is no longer required in any case (recommended in 23, optional "
                   "in 1)."),
     dict(cond="hepatic_encephalopathy", filed="order_ct_scan", tool="order_ct_scan",
-         reviewer=2, tier="optional", status="confirm",
-         response="Not applied, deliberately, and this is the one place we are asking you to "
-                  "overrule us. All 30 cases still require the head CT. Your reasoning is "
-                  "explicit (ACG 2026 suggests against routine imaging without focal deficits) "
-                  "and we accept it in principle; what stopped us is that dropping an exclusion "
-                  "step before an invasive procedure, on our own reading, is not our call. Tell "
-                  "us to demote it and we will."),
+         reviewer=2, tier="optional", status="applied",
+         response="Applied. We had left it REQUIRED in all 30 cases and put the question back to "
+                  "you; that was wrong on the facts. The reason we gave — that we do not drop an "
+                  "exclusion step before an invasive procedure — was carried over from bacterial "
+                  "meningitis, and in hepatic encephalopathy the gold standard performs a lumbar "
+                  "puncture in 1 of the 30 cases. The tier is now assigned per case from the "
+                  "trigger list you wrote, by reading each presentation: **required in 9** (a "
+                  "witnessed seizure; a focal deficit after an unwitnessed fall; Wernicke; Wilson; "
+                  "an episode described as indistinguishable from the patient's prior TIA; and "
+                  "three found-down unwitnessed presentations, and the one case whose gold standard "
+                  "recommends a lumbar puncture), **recommended in 13** where "
+                  "another cause plausibly needs excluding (first episode, active malignancy, "
+                  "confusion persisting after the precipitant was corrected), and **optional in "
+                  "8** typical precipitated episodes with the precipitant identified. Mandatory CT "
+                  "spend across the condition falls from 5520 to 1656 EUR. Note that bilateral "
+                  "Babinski signs and asterixis are present in many of these cases and were not "
+                  "treated as triggers — they are the metabolic picture, not focal signs. The "
+                  "CT-before-LP sequence rule stays in all 30: it only binds an agent that chooses "
+                  "to do the puncture."),
 
     # === high-grade glioma (reviewer 2) ===
     dict(cond="brain_tumor_glioma", filed="analyze_brain_mri", tool="obtain_tissue_diagnosis",
@@ -530,33 +541,35 @@ SPEC += [
                   "required coverage without performing a single diagnostic act. Your sentence — "
                   "that the ICHD-3 history is the only true required test here — was the fix."),
     dict(cond="migraine_with_aura", filed="analyze_eeg", tool="analyze_eeg",
-         reviewer=1, tier="remove", status="confirm",
-         response="Almost removed: 29 of 30 cases have no EEG. The exception is MIG-AURA-RM11, "
+         reviewer=1, tier="remove", status="applied",
+         response="Applied: 29 of 30 cases have no EEG at all. The exception is MIG-AURA-RM11, "
                   "whose diagnosis is hemiplegic migraine *with migralepsy* — a seizure during "
-                  "aura, ICHD-3 1.4.4 — so the 24 h video EEG is the study that establishes half "
-                  "of the diagnosis rather than routine headache evaluation. We kept it required "
-                  "there. Tell us if you disagree and it goes."),
+                  "aura, ICHD-3 1.4.4 — so the 24 h video EEG establishes half of the diagnosis "
+                  "rather than being routine headache evaluation, and it stays required there. "
+                  "That case is the one place to argue with us, and the place to do it is the case "
+                  "itself."),
     dict(cond="migraine_with_aura", filed="analyze_ecg", tool="analyze_ecg",
          reviewer=1, tier="remove", status="applied",
          response="Removed: no migraine case orders an ECG."),
     dict(cond="migraine_with_aura", filed="order_echocardiogram", tool="order_echocardiogram",
          reviewer=1, tier="remove", status="confirm",
-         response="We looked at this three times and each time reached the opposite of what we "
-                  "first wrote, so here is the full answer. Three cases order an echocardiogram at "
-                  "required, and none of them is a routine migraine: MIG-AURA-P03 is a migrainous "
-                  "infarction whose diagnosis rests on secondary causes having been excluded, "
-                  "MIG-AURA-P07 is a cardioembolic PCA infarct that is explicitly *not* migrainous "
-                  "infarction, and MIG-AURA-P08 is genetically confirmed MELAS where cardiomyopathy "
-                  "screening is standard. In each the echo is embolic-source or cardiomyopathy "
-                  "work-up. The routine migraine echo your comment targets does not exist in the "
-                  "cases — but the condition label is still 'migraine with aura', so you should "
-                  "decide whether that is acceptable or whether those cases belong elsewhere."),
+         response="This is the one place where we are putting a question back to you, and it is "
+                  "not about the tier. Three cases order an echocardiogram at required and none is "
+                  "a routine migraine: MIG-AURA-P03 is a migrainous infarction whose diagnosis "
+                  "rests on secondary causes having been excluded, MIG-AURA-P07 is a cardioembolic "
+                  "PCA infarct the case explicitly distinguishes from migrainous infarction, and "
+                  "MIG-AURA-P08 is genetically confirmed MELAS, where cardiomyopathy screening is "
+                  "standard. In each the echocardiogram is embolic-source or cardiomyopathy "
+                  "work-up, so the routine migraine echo your comment targets does not exist in "
+                  "the cases. The question is one of composition, the same kind you settled for "
+                  "peripheral neuropathy: should a cardioembolic stroke and a confirmed MELAS sit "
+                  "under the label 'migraine with aura' at all? Nothing waits on your answer — the "
+                  "cases are reviewable as they stand."),
     dict(cond="migraine_with_aura", filed="analyze_csf", tool="analyze_csf",
-         reviewer=1, tier="remove", status="confirm",
-         response="Almost removed: one case (MIG-AURA-RM11) keeps it as recommended, on a "
-                  "suspicion of secondary headache — the same case that keeps the video EEG for "
-                  "its migralepsy. No case requires it. If you consider a lumbar puncture "
-                  "unjustifiable even on that suspicion, tell us and it goes."),
+         reviewer=1, tier="remove", status="applied",
+         response="Applied: no migraine case now requires or recommends a lumbar puncture. One "
+                  "(MIG-AURA-RM11) keeps it as an optional step on a suspicion of secondary "
+                  "headache — the same case that keeps the video EEG for its migralepsy."),
     dict(cond="migraine_with_aura", filed="interpret_labs", tool="interpret_labs",
          reviewer=1, tier="optional", status="applied",
          response="Applied: no case requires blood tests; 4 carry them as optional and 1 as "
@@ -592,13 +605,13 @@ SPEC += [
          reviewer=1, tier="required", status="applied",
          response="Applied: the required panel is the reversible-cause set you list."),
     dict(cond="alzheimers_early", filed="analyze_eeg", tool="analyze_eeg",
-         reviewer=1, tier="remove", status="confirm",
-         response="Downgraded rather than removed, and we would like your ruling. One case "
-                  "(ALZ-EARLY-RP04) keeps EEG as optional because its differential includes "
-                  "Creutzfeldt-Jakob disease and an encephalopathy. The criterion we used is your "
-                  "own, from the syncope panel: the label is the hypothesis under test, so an agent "
-                  "that correctly suspects something else must still be able to act. If you would "
-                  "rather it be deleted outright, we will edit the case."),
+         reviewer=1, tier="remove", status="applied",
+         response="Applied, with one exception you will meet in the cases rather than here: "
+                  "ALZ-EARLY-RP04 keeps EEG as an optional step because its differential includes "
+                  "Creutzfeldt-Jakob disease. No other Alzheimer case orders one and none requires "
+                  "it. The criterion is your own from the syncope panel — the label is the "
+                  "hypothesis under test — and if you disagree when you reach that case, flagging "
+                  "it there is enough."),
     dict(cond="alzheimers_early", filed="analyze_ecg", tool="analyze_ecg",
          reviewer=1, tier="remove", status="applied",
          response="Removed: no Alzheimer case orders an ECG."),
@@ -725,11 +738,13 @@ SPEC += [
                   "figures where it states them and the >=20% threshold where it does not. "
                   "NPH-P08's negative tap is preserved as negative."),
     dict(cond="nph", filed="order_advanced_imaging", tool="order_advanced_imaging",
-         reviewer=1, tier="remove", status="confirm",
-         response="Kept as optional in all 30 rather than removed, and we want your ruling. Every "
-                  "one of the 30 cases uses amyloid or FDG PET for the Alzheimer differential, not "
-                  "as a test for NPH — the distinction your own syncope comment draws. The tier is "
-                  "now uniformly optional across all 30. If you would rather it be deleted, say so."),
+         reviewer=1, tier="remove", status="applied",
+         response="Applied as far as the tier goes: no NPH case requires or recommends advanced "
+                  "imaging, and the tier is uniformly optional across all 30. It is not deleted "
+                  "because every one of the 30 uses amyloid or FDG PET for the Alzheimer "
+                  "differential rather than as a test for NPH — the distinction your own syncope "
+                  "comment draws — and that differential is the central diagnostic problem of the "
+                  "condition."),
 
     # === temporal lobe epilepsy (reviewer 1) ===
     dict(cond="focal_epilepsy_temporal", filed="analyze_eeg", tool="analyze_eeg",
@@ -752,21 +767,19 @@ SPEC += [
          response="Applied as your note describes: the ECG survives in the 2 cases presenting as a "
                   "first suspected seizure or transient loss of consciousness, and nowhere else."),
     dict(cond="focal_epilepsy_temporal", filed="order_echocardiogram", tool="order_echocardiogram",
-         reviewer=1, tier="remove", status="confirm",
-         response="Downgraded to optional rather than removed, in the 2 cases initially worked up "
-                  "as syncope or pulmonary embolism (FEPI-TEMP-P05, -RP02). Answering your "
-                  "comments one by one caught that these had been left at *recommended*, not "
-                  "optional, which made the account we were about to send you wrong; they are "
-                  "optional now. The criterion we used is your own, from the syncope panel: the "
-                  "label is the hypothesis under test, so an agent that correctly suspects a "
-                  "cardiac cause must still be able to act. If you would rather the item be "
-                  "deleted from this condition outright, say so and we will edit both cases."),
+         reviewer=1, tier="remove", status="applied",
+         response="Applied, with two exceptions in the cases: FEPI-TEMP-P05 and -RP02 were "
+                  "initially worked up as syncope and as pulmonary embolism, and keep the "
+                  "echocardiogram as an optional step. Answering your comments one at a time "
+                  "caught that these had been left at *recommended* rather than optional, which "
+                  "made the account we were about to send you wrong — they are optional now, so no "
+                  "epilepsy case requires or recommends a cardiac study. If you disagree when you "
+                  "reach those two cases, flag them there."),
     dict(cond="focal_epilepsy_temporal", filed="order_cardiac_monitoring",
-         tool="order_cardiac_monitoring", reviewer=1, tier="remove", status="confirm",
+         tool="order_cardiac_monitoring", reviewer=1, tier="remove", status="applied",
          response="Same as the echocardiogram: optional in the 2 cases with syncope on the "
                   "differential, and corrected from recommended to optional while answering this "
-                  "comment. Same question back to you — delete it from the condition, or leave it "
-                  "reachable for the agent that correctly suspects a cardiac cause?"),
+                  "comment. No epilepsy case requires or recommends rhythm monitoring."),
 
     # === functional neurological disorder (reviewer 1) ===
     dict(cond="functional_neurological_disorder", filed="analyze_eeg", tool="analyze_eeg",
