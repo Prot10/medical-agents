@@ -420,10 +420,12 @@ SPEC += [
     dict(cond="syncope_cardiac", filed="order_echocardiogram", tool="order_echocardiogram",
          reviewer=2, tier="unchanged", status="applied",
          seg=(None, "Item\nAdvanced cardiac imaging"),
-         response="Applied: required in all 30, and exercise echocardiography was added as its own "
-                  "study (exercise_echo, priced) because one case had been modelling a provoked "
-                  "outflow gradient as a treadmill stress test — a different study at a different "
-                  "price."),
+         response="Applied: required in 29 of the 30 cases, and recommended in the thirtieth "
+                  "(SYNC-CARD-P03), a Brugada syndrome where the diagnosis is electrocardiographic "
+                  "and the echocardiogram excludes structural disease rather than establishing the "
+                  "cause. Exercise echocardiography was added as its own study (exercise_echo, "
+                  "priced) because one case had been modelling a provoked outflow gradient as a "
+                  "treadmill stress test — a different study at a different price."),
     dict(cond="syncope_cardiac", filed="order_echocardiogram", tool="order_advanced_imaging",
          reviewer=2, tier="optional", status="applied",
          seg=("Item\nAdvanced cardiac imaging", None),
