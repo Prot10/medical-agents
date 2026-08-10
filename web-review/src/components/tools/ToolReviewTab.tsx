@@ -13,8 +13,10 @@ import {
 import { useMemo, useState } from "react"
 
 import type {
+  ConditionToolGuidance,
   ConditionToolMapping,
   FieldAnnotation,
+  GuidanceStatus,
   ProposedTool,
   ToolMeta,
 } from "@/api/types"
@@ -461,6 +463,7 @@ function ConditionBlock({
               meta={meta}
               toolName={name}
               tier="required"
+              guidance={mapping.guidance?.[name]}
               annotation={annByPath.get(path)}
               onComment={(e) =>
                 onComment(e, path, `${meta?.label ?? name} · ${mapping.label}`)
@@ -478,6 +481,7 @@ function ConditionBlock({
               meta={meta}
               toolName={name}
               tier="optional"
+              guidance={mapping.guidance?.[name]}
               annotation={annByPath.get(path)}
               onComment={(e) =>
                 onComment(e, path, `${meta?.label ?? name} · ${mapping.label}`)
@@ -486,6 +490,33 @@ function ConditionBlock({
             />
           )
         })}
+        {/* Tools this condition no longer lists, but which the review commented on — the
+            "REMOVE this from this condition" asks. Without this group the reviewer would see
+            no answer to a comment we acted on. */}
+        {Object.keys(mapping.guidance ?? {})
+          .filter(
+            (name) =>
+              !mapping.required_tools.includes(name) &&
+              !mapping.optional_tools.includes(name),
+          )
+          .sort()
+          .map((name) => {
+            const path = `condition_tool:${mapping.condition}:${name}`
+            const meta = toolByName.get(name)
+            return (
+              <ToolRow
+                key={name}
+                meta={meta}
+                toolName={name}
+                guidance={mapping.guidance[name]}
+                annotation={annByPath.get(path)}
+                onComment={(e) =>
+                  onComment(e, path, `${meta?.label ?? name} · ${mapping.label}`)
+                }
+                onOpenDetail={meta ? () => onOpenDetail(meta) : undefined}
+              />
+            )
+          })}
         {mapping.required_tools.length === 0 &&
           mapping.optional_tools.length === 0 && (
             <p className="text-xs text-muted-foreground italic">
@@ -503,6 +534,7 @@ function ToolRow({
   meta,
   toolName,
   tier,
+  guidance,
   annotation,
   onComment,
   onOpenDetail,
@@ -510,18 +542,26 @@ function ToolRow({
   meta: ToolMeta | undefined
   toolName: string
   tier?: "required" | "optional"
+  guidance?: ConditionToolGuidance
   annotation: FieldAnnotation | undefined
   onComment: (e: React.MouseEvent<HTMLButtonElement>) => void
   onOpenDetail?: () => void
 }) {
+  const [openGuidance, setOpenGuidance] = useState(false)
+
   return (
     <div
       className={cn(
-        "flex items-center gap-3 rounded-lg px-2.5 py-1.5 hover:bg-secondary/30 transition-colors group",
-        annotation && "border-l-2 -ml-px pl-2",
+        "rounded-lg px-0.5",
+        annotation && "border-l-2 -ml-px",
         annotation?.severity === "error" && "border-l-rose-500",
         annotation?.severity === "issue" && "border-l-amber-500",
         annotation?.severity === "note" && "border-l-sky-500",
+      )}
+    >
+    <div
+      className={cn(
+        "flex items-center gap-3 rounded-lg px-2.5 py-1.5 hover:bg-secondary/30 transition-colors group",
       )}
     >
       <div className="min-w-0 flex-1">
@@ -539,10 +579,22 @@ function ToolRow({
               {tier}
             </span>
           )}
+          {!tier && guidance && (
+            <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-dashed border-border text-muted-foreground">
+              not in this panel
+            </span>
+          )}
           {meta?.cost_summary && (
             <span className="text-[11px] text-muted-foreground tabular-nums">
               {meta.cost_summary}
             </span>
+          )}
+          {guidance && (
+            <GuidanceBadge
+              guidance={guidance}
+              open={openGuidance}
+              onToggle={() => setOpenGuidance((v) => !v)}
+            />
           )}
         </div>
         {meta?.description && (
@@ -562,6 +614,90 @@ function ToolRow({
         </button>
       )}
       <CommentButton annotation={annotation} onClick={onComment} />
+    </div>
+      {guidance && openGuidance && <GuidancePanel guidance={guidance} />}
+    </div>
+  )
+}
+
+// --- Reviewer guidance ------------------------------------------------
+//
+// The July 2026 review rewrote each tool's description *per condition*. That text cannot go
+// into the tool's own description (one string, shown under all twenty conditions) or into the
+// agent-facing schema (it names the diagnosis the agent must infer), so it is served here and
+// shown next to the row it belongs to, together with what we did about it.
+
+const GUIDANCE_STATUS: Record<GuidanceStatus, { label: string; className: string }> = {
+  applied: { label: "applied", className: "border-emerald-500/40 text-emerald-700 bg-emerald-500/10" },
+  partial: { label: "partly applied", className: "border-amber-500/40 text-amber-700 bg-amber-500/10" },
+  confirm: { label: "needs your ruling", className: "border-rose-500/40 text-rose-700 bg-rose-500/10" },
+  no_change: { label: "no change asked", className: "border-border text-muted-foreground bg-secondary/40" },
+  open: { label: "open question", className: "border-rose-500/40 text-rose-700 bg-rose-500/10" },
+  retired: { label: "condition retired", className: "border-border text-muted-foreground bg-secondary/40" },
+}
+
+function GuidanceBadge({
+  guidance,
+  open,
+  onToggle,
+}: {
+  guidance: ConditionToolGuidance
+  open: boolean
+  onToggle: () => void
+}) {
+  const status = GUIDANCE_STATUS[guidance.status]
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      className={cn(
+        "inline-flex items-center gap-1 text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border transition-colors",
+        status.className,
+      )}
+      aria-expanded={open}
+    >
+      <ChevronDown className={cn("w-3 h-3 transition-transform", open && "rotate-180")} />
+      review: {status.label}
+    </button>
+  )
+}
+
+function GuidancePanel({ guidance }: { guidance: ConditionToolGuidance }) {
+  return (
+    <div className="mx-2.5 mb-2 mt-1 rounded-lg border border-border bg-secondary/20 px-3 py-2.5 space-y-2">
+      <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
+        Reviewer {guidance.reviewer} · July 2026
+        {guidance.requested_tier && <> · requested tier: {guidance.requested_tier}</>}
+        {guidance.filed_under.length > 0 && (
+          <> · filed under {guidance.filed_under.join(", ")}</>
+        )}
+      </p>
+      {guidance.guidance && (
+        <div>
+          <p className="text-[11px] font-medium">Revised description</p>
+          <p className="text-xs leading-relaxed whitespace-pre-line">{guidance.guidance}</p>
+        </div>
+      )}
+      {guidance.rationale && (
+        <details className="group">
+          <summary className="text-[11px] font-medium cursor-pointer text-muted-foreground hover:text-foreground">
+            Reviewer's rationale
+          </summary>
+          <p className="text-xs leading-relaxed whitespace-pre-line mt-1">{guidance.rationale}</p>
+        </details>
+      )}
+      {guidance.source && (
+        <p className="text-[11px] text-muted-foreground leading-relaxed">
+          <span className="font-medium">Source: </span>
+          {guidance.source}
+        </p>
+      )}
+      {guidance.our_response && (
+        <div className="rounded-md border-l-2 border-l-primary/60 bg-background/60 px-2.5 py-2">
+          <p className="text-[11px] font-medium text-primary">What we did</p>
+          <p className="text-xs leading-relaxed whitespace-pre-line">{guidance.our_response}</p>
+        </div>
+      )}
     </div>
   )
 }

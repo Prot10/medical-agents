@@ -213,11 +213,39 @@ export interface ToolOutputField {
   required: boolean
 }
 
+export type GuidanceStatus =
+  | "applied"
+  | "partial"
+  | "confirm"
+  | "no_change"
+  | "open"
+  | "retired"
+
+/**
+ * One clinical reviewer's guidance for one tool in one condition, plus what we did about it.
+ *
+ * The July 2026 review rewrote tool descriptions per condition; `ToolMeta.description` is a
+ * single string shown under every condition, so this is where that text lives.
+ */
+export interface ConditionToolGuidance {
+  reviewer: number
+  guidance: string
+  rationale: string
+  source: string
+  requested_tier: string | null
+  status: GuidanceStatus
+  our_response: string
+  /** The row(s) they annotated, when the study belongs to a different tool. */
+  filed_under: string[]
+}
+
 export interface ConditionToolMapping {
   condition: string
   label: string
   required_tools: string[]
   optional_tools: string[]
+  /** Reviewer guidance for this condition, keyed by tool name. */
+  guidance: Record<string, ConditionToolGuidance>
 }
 
 export interface ToolCatalog {
