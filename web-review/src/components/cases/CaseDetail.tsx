@@ -39,6 +39,7 @@ import { AnnotatableField } from "@/components/annotation/AnnotatableField"
 import { AnnotationPopover } from "@/components/annotation/AnnotationPopover"
 import { AnnotationProvider } from "@/components/annotation/AnnotationContext"
 import { AnnotationSidebar } from "@/components/annotation/AnnotationSidebar"
+import { ReviewerAnnotationsPanel } from "@/components/annotation/ReviewerAnnotationsPanel"
 import { DifficultyStars } from "@/components/ui/DifficultyStars"
 import { StatusPill } from "@/components/ui/StatusPill"
 
@@ -57,6 +58,7 @@ export function CaseDetail({ caseId }: { caseId: string }) {
   const deleteComment = useDeleteComment(version)
   const setStatus = useSetStatus(version)
   const heartbeat = useHeartbeat()
+  const isAdmin = useReviewStore((s) => s.profile?.role === "admin")
 
   // Accumulate time-on-case server-side. Tick every 30s. Three gates against
   // counting idle time:
@@ -178,7 +180,8 @@ export function CaseDetail({ caseId }: { caseId: string }) {
           <MetadataSection metadata={caseDetail.data.metadata} />
         </div>
 
-        <div className="xl:sticky xl:top-20 xl:self-start">
+        <div className="xl:sticky xl:top-20 xl:self-start space-y-4 xl:max-h-[calc(100vh-6rem)] xl:overflow-y-auto xl:pr-1">
+          {isAdmin && <ReviewerAnnotationsPanel version={version} caseId={caseId} />}
           <AnnotationSidebar
             status={status}
             statusPending={setStatus.isPending}

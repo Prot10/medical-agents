@@ -607,8 +607,27 @@ function DiffTable({ diff, showAll }: { diff: CaseDiff; showAll: boolean }) {
 function ToolReviewView() {
   const version = useReviewStore((s) => s.datasetVersion)
   const { data, isLoading, error } = useAdminToolReview(version)
+  const [search, setSearch] = useState("")
+  const [reviewer, setReviewer] = useState("all")
+  const [severity, setSeverity] = useState<"all" | "note" | "issue" | "error">("all")
   if (isLoading) return <CenteredLoader />
   if (error || !data) return <ErrorBox error={error} />
+
+  const normalizedSearch = search.trim().toLowerCase()
+  const visibleCoverage = data.coverage
+    .map((row) => ({
+      ...row,
+      comments: row.comments.filter((comment) => {
+        if (reviewer !== "all" && comment.reviewer_code !== reviewer) return false
+        if (severity !== "all" && comment.severity !== severity) return false
+        if (!normalizedSearch) return true
+        return [row.field_path, comment.comment, comment.reviewer_name, comment.reviewer_code]
+          .join(" ")
+          .toLowerCase()
+          .includes(normalizedSearch)
+      }),
+    }))
+    .filter((row) => row.comments.length > 0)
 
   return (
     <div className="space-y-6">
@@ -697,48 +716,85 @@ function ToolReviewView() {
       </div>
 
       <div>
-        <h3 className="text-sm font-semibold mb-2">
-          Coverage flags ({data.coverage.length})
-        </h3>
+        <div className="flex flex-wrap items-end justify-between gap-3 mb-2">
+          <div>
+            <h3 className="text-sm font-semibold">Tool annotations</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Every reviewer comment, grouped by the exact tool or condition-tool row.
+            </p>
+          </div>
+          <span className="text-xs text-muted-foreground tabular-nums">
+            {visibleCoverage.length} / {data.coverage.length} targets
+          </span>
+        </div>
         {data.coverage.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border bg-card/40 p-10 text-center text-sm text-muted-foreground">
-            No coverage annotations yet.
+            No tool annotations yet.
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-2xl border border-border bg-card">
-            <table className="w-full text-sm">
-              <thead className="bg-secondary/40 border-b border-border">
-                <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground">
-                  <th className="px-4 py-2.5 font-semibold">Target</th>
-                  <th className="px-4 py-2.5 font-semibold">Reviewers</th>
-                  <th className="px-4 py-2.5 font-semibold">Comments</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.coverage.map((row) => (
-                  <tr key={row.field_path} className="border-b border-border/60 align-top">
-                    <td className="px-4 py-3 font-mono text-xs tracking-wider">
-                      {row.field_path}
-                    </td>
-                    <td className="px-4 py-3 text-xs">{row.reviewers.join(", ")}</td>
-                    <td className="px-4 py-3 space-y-1.5">
-                      {row.comments.map((c, i) => (
-                        <div key={i} className="flex items-start gap-1.5">
-                          <SeverityPill severity={c.severity} />
-                          <p className="text-xs leading-relaxed text-foreground/90 whitespace-pre-wrap">
-                            {c.comment}
-                            <span className="text-muted-foreground">
-                              {" "}
-                              — {c.reviewer_name}
-                            </span>
+          <div className="space-y-3">
+            <div className="flex flex-wrap gap-2">
+              <input
+                type="search"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search tool, condition, or comment…"
+                className="h-9 px-3 bg-secondary border border-border rounded-md text-sm min-w-64 flex-1 focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+              <select
+                value={reviewer}
+                onChange={(event) => setReviewer(event.target.value)}
+                className="h-9 px-2 bg-secondary border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              >
+                <option value="all">All reviewers</option>
+                {data.reviewer_status.map((item) => (
+                  <option key={item.reviewer_code} value={item.reviewer_code}>
+                    {item.reviewer_name}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={severity}
+                onChange={(event) => setSeverity(event.target.value as typeof severity)}
+                className="h-9 px-2 bg-secondary border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              >
+                <option value="all">All severities</option>
+                <option value="error">Errors</option>
+                <option value="issue">Issues</option>
+                <option value="note">Notes</option>
+              </select>
+            </div>
+            {visibleCoverage.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-border bg-card/40 p-10 text-center text-sm text-muted-foreground">
+                No tool annotations match these filters.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                {visibleCoverage.map((row) => (
+                  <article key={row.field_path} className="rounded-2xl border border-border bg-card p-4">
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <span className="font-mono text-xs tracking-wider break-all">{row.field_path}</span>
+                      <span className="shrink-0 text-[11px] text-muted-foreground tabular-nums">
+                        {row.comments.length} comment{row.comments.length === 1 ? "" : "s"}
+                      </span>
+                    </div>
+                    <div className="space-y-3">
+                      {row.comments.map((comment, index) => (
+                        <div key={`${comment.reviewer_code}-${index}`} className="border-l-2 border-primary/30 pl-2.5">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="text-xs font-medium">{comment.reviewer_name}</span>
+                            <SeverityPill severity={comment.severity} />
+                          </div>
+                          <p className="mt-1 text-xs leading-relaxed text-foreground/90 whitespace-pre-wrap">
+                            {comment.comment}
                           </p>
                         </div>
                       ))}
-                    </td>
-                  </tr>
+                    </div>
+                  </article>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -800,4 +856,3 @@ function SummaryStrip({
     </div>
   )
 }
-
