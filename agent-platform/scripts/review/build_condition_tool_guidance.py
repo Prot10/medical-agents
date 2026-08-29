@@ -160,42 +160,41 @@ SPEC: list[dict[str, object]] = [
     # === subarachnoid haemorrhage (reviewer 2) ===
     dict(cond="subarachnoid_hemorrhage", filed="analyze_csf", tool="analyze_csf",
          reviewer=2, tier="required_conditional", status="applied",
-         response="Applied as a conditional requirement, which is what the comment asks for: "
-                  "the 3 cases whose CT is negative carry a required lumbar puncture, and the "
-                  "27 whose CT is diagnostic carry a stated exemption in "
-                  "metadata.panel_required_exemptions rather than a silent omission."),
+         response="Applied as a conditional requirement: the 3 cases with a negative or "
+                  "inconclusive NCCT require LP; the 27 CT-positive cases explicitly avoid it. "
+                  "The selected reports and calls contain first-versus-last tube RBC counts, "
+                  "protein, glucose and the newly priced spectrophotometric xanthochromia assay; "
+                  "OCB, infection PCR, autoimmune antibodies and prion assays are absent."),
     dict(cond="subarachnoid_hemorrhage", filed="order_advanced_imaging",
          tool="order_advanced_imaging", reviewer=2, tier="optional", status="applied",
-         response="Transcranial Doppler already existed and is now ordered in all 30 cases; the "
-                  "review app had been showing 6 of 12 modalities, which is why it looked absent. "
-                  "The audit that followed this comment found something worse: cerebral "
-                  "angiography was not priced at all — only the coronary study was — so the "
-                  "gold standard of the aneurysmal pathway was unorderable. It is now priced at "
-                  "2530 EUR and ordered in the 3 cases that document a DSA."),
+         response="Applied: TCD is optional in all 30 cases and is the sole routine advanced "
+                  "surveillance modality. PET, DaTscan, MIBG, perfusion/spectroscopy MRI, MRA "
+                  "and carotid duplex are removed. Three case-specific catheter-DSA actions are "
+                  "retained as recommended because CTA is occult/uncertain or definitive "
+                  "endovascular anatomy is required; catheter DSA is not a duplicate CTA/MRA."),
     dict(cond="subarachnoid_hemorrhage", filed="order_ct_scan", tool="order_ct_scan",
          reviewer=2, tier="required", status="applied",
-         response="Applied. Non-contrast CT and CT angiography are now two separate actions in "
-                  "all 30 cases. The comment also led us to a routing defect: 30 CT angiograms "
-                  "were stored under a label naming the DSA and 3 DSA reports under labels "
-                  "naming the CTA, so the two studies were crossed and 54 required angiograms "
-                  "were unreachable by the call that names them."),
+         response="Applied. Every case has two explicitly discriminated required actions: "
+                  "first-line NCCT with contrast=false/angiography=false, then a distinct CTA "
+                  "with contrast=true/angiography=true. The 15 unrelated CT-perfusion outputs "
+                  "have been removed from this item, and CTA/DSA routing is no longer crossed."),
     dict(cond="subarachnoid_hemorrhage", filed="interpret_labs", tool="interpret_labs",
          reviewer=2, tier="unchanged", status="applied",
-         response="Applied: thyroid, inflammatory and autoimmune/paraneoplastic panels are out of "
-                  "the required set in all 30 cases, and genetic testing is restricted to the "
-                  "cases with a family history or a connective-tissue phenotype."),
+         response="Applied: the required laboratory action in all 30 cases is limited to CBC, "
+                  "metabolic panel and coagulation. Thyroid, inflammatory, autoimmune and "
+                  "paraneoplastic panels are absent; no sporadic case receives routine genetics."),
 
     # === ischaemic stroke (reviewer 2) ===
     dict(cond="ischemic_stroke", filed="order_ct_scan", tool="order_ct_scan",
          reviewer=2, tier="required", status="applied",
-         response="Applied, and it exposed the most serious defect in the dataset: 21 of the 30 "
-                  "cases had no non-contrast CT at all — the study that excludes haemorrhage "
-                  "before thrombolysis. All 30 now have it as a required action, with CT "
-                  "angiography as a separate one."),
+         response="Applied: all 30 cases have explicitly discriminated first-line NCCT and a "
+                  "separate subsequent CTA as 60 required actions. CTA is never represented as "
+                  "a substitute for NCCT and its call text states that creatinine must not delay it."),
     dict(cond="ischemic_stroke", filed="analyze_eeg", tool="analyze_eeg",
          reviewer=2, tier="optional", status="applied",
-         response="Applied: no case requires EEG, and the two that reference it do so for a "
-                  "suspected seizure mimic."),
+         response="Applied: no case requires EEG. One case retains it as optional for a witnessed "
+                  "tonic-hand seizure-mimic question; the other 29 have no EEG action or authored "
+                  "output, and every trace states that EEG must not delay reperfusion."),
     dict(cond="ischemic_stroke", filed="analyze_brain_mri", tool="analyze_brain_mri",
          reviewer=2, tier="optional", status="applied",
          seg=(None, "NEW ITEM OPTIONAL"),
@@ -203,40 +202,44 @@ SPEC: list[dict[str, object]] = [
     dict(cond="ischemic_stroke", filed="analyze_brain_mri", tool="order_advanced_imaging",
          reviewer=2, tier="optional", status="applied",
          seg=("NEW ITEM OPTIONAL", None),
-         response="Applied: CT_perfusion was added to the imaging vocabulary and priced, so "
-                  "tissue-based selection is orderable; perfusion MRI already existed."),
+         response="Applied end to end rather than only adding vocabulary: CT_perfusion is optional "
+                  "and reachable in the 2 wake-up/extended-window cases where an authored core/"
+                  "penumbra report changes selection. Four reports formerly misrouted through "
+                  "ordinary head CT were audited; three routine-window/non-selection uses were "
+                  "removed. Blanket MRA, TCD and carotid-duplex duplication is also removed."),
     dict(cond="ischemic_stroke", filed="interpret_labs", tool="interpret_labs",
          reviewer=2, tier="unchanged", status="applied",
-         response="Applied: glucose before thrombolysis and a baseline troponin are named "
-                  "analytes in the required set, not a generic 'metabolic' bucket, and the "
-                  "do-not-delay sequencing is in the case reasoning."),
+         response="Applied in all 30 cases: glucose, CBC, coagulation, creatinine and baseline "
+                  "troponin are the acute required set. Case-specific thrombophilia/autoimmune "
+                  "panels are demoted to subsequent recommended aetiological work-up. The ground "
+                  "truth explicitly encodes every requested do-not-delay rule."),
 
     # === bacterial meningitis (reviewer 2) ===
     dict(cond="bacterial_meningitis", filed="interpret_labs", tool="order_microbiology",
          reviewer=2, tier="required", status="applied",
          seg=(None, "Item\nLaboratory studies"),
-         response="Applied. order_microbiology now exists and is required in all 30 cases. The "
-                  "comment also uncovered a leak: in 28 cases across the dataset the blood "
-                  "cultures were stored inside the laboratory payload, so the organism — the "
-                  "finding that selects the antibiotic — arrived without any microbiology being "
-                  "ordered."),
+         response="Applied: blood culture with susceptibility is required and reachable in all 30 "
+                  "cases. Every action and trajectory states collection before antimicrobials when "
+                  "possible, while making explicit that sampling, LP or imaging never delays "
+                  "empirical therapy."),
     dict(cond="bacterial_meningitis", filed="interpret_labs", tool="interpret_labs",
          reviewer=2, tier="unchanged", status="applied",
          seg=("Item\nLaboratory studies", None),
-         response="Applied: the required laboratory set is named analytes, and blood cultures are "
-                  "no longer reachable through this tool."),
+         response="Applied: all 30 cases name CBC/differential, CMP, CRP or procalcitonin, paired "
+                  "blood glucose, coagulation and HIV. Blood cultures are no longer represented as "
+                  "a laboratory-panel result."),
     dict(cond="bacterial_meningitis", filed="analyze_csf", tool="analyze_csf",
          reviewer=2, tier="unchanged", status="applied",
-         response="Applied, and it found a billed study that returned nothing: 13 cases have a "
-                  "required order for the multiplex meningitis PCR panel (322 EUR) and no case "
-                  "reported a result for it — in 9 of the 13 the Gram stain is negative and the "
-                  "culture still pending, which is exactly where that panel decides. The result "
-                  "is now present in all 13. Separately, 21 culture reports named the organism in "
-                  "one field and denied it in another; a test now blocks that."),
+         response="Applied: every LP action explicitly names opening pressure, appearance, total and "
+                  "differential cells, RBC, protein, paired glucose, Gram stain, culture with "
+                  "susceptibility and relevant PCR, with pre/post-antibiotic timing. Unrelated CSF "
+                  "OCB, prion and autoimmune carry-over assays are absent."),
     dict(cond="bacterial_meningitis", filed="analyze_brain_mri", tool="analyze_brain_mri",
          reviewer=2, tier="unchanged", status="applied",
-         response="Applied: MRI is recommended rather than required in 27 cases and required in "
-                  "the 2 with a suspected intracranial complication."),
+         response="Corrected after re-reading the cases: MRI is absent from the 20 uncomplicated "
+                  "initial pathways, recommended only in 1 non-response/hydrocephalus case, and "
+                  "required in 9 cases with an authored abscess, ventriculitis, hydrocephalus, "
+                  "brainstem, shunt, skull-base or other structural-complication question."),
     dict(cond="bacterial_meningitis", filed="analyze_ecg", tool="analyze_ecg",
          reviewer=2, tier="unchanged", status="applied",
          response="Applied: electrocardiography is no longer part of this condition's panel and no "
@@ -255,13 +258,14 @@ SPEC: list[dict[str, object]] = [
          response="Applied: ammonia, electrolytes, renal and liver function, CRP, TSH and zinc "
                   "are named; autoimmune, paraneoplastic and genetic panels are out."),
     dict(cond="hepatic_encephalopathy", filed="analyze_brain_mri", tool="order_body_imaging",
-         reviewer=2, tier="optional", status="partial",
+         reviewer=2, tier="optional", status="applied",
          seg=(None, "Item\nBrain MRI."),
-         response="The tool exists — order_body_imaging can now image the portal circulation, "
-                  "which nothing in the twelve-tool space could — but no hepatic-encephalopathy "
-                  "case orders it yet. The trigger conditions you wrote (recurrent or persistent "
-                  "HE, no recovery at 48-72 h) identify which cases should carry it, and that is "
-                  "case authoring we have not done."),
+         response="Applied: HEP-ENC-M06 now uses optional abdominal Doppler through "
+                  "order_body_imaging to assess the pre-existing TIPS in new post-TIPS overt HE. "
+                  "The report was already authored in that case; it was attached to the wrong, "
+                  "brain-oriented tool. No blanket abdominal imaging was added: the reviewers' "
+                  "trigger remains recurrent/persistent or refractory HE, including a specific "
+                  "shunt/TIPS question or failure to recover after 48-72 hours."),
     dict(cond="hepatic_encephalopathy", filed="analyze_brain_mri", tool="analyze_brain_mri",
          reviewer=2, tier="unchanged", status="applied",
          seg=("Item\nBrain MRI.", None),
@@ -368,13 +372,16 @@ SPEC += [
          seg=(None, "Item\nSpinal and peripheral nerve imaging"),
          response="Applied: emg_ncs is required in all 30 cases."),
     dict(cond="guillain_barre", filed="order_specialized_test", tool="order_body_imaging",
-         reviewer=2, tier="optional", status="partial",
+         reviewer=2, tier="optional", status="applied",
          seg=("Item\nSpinal and peripheral nerve imaging", None),
-         response="Half done, and we would rather say so. The tool exists and whole-spine MRI is "
-                  "orderable and priced, so cord compression is no longer outside the action "
-                  "space; but no Guillain-Barre case orders it yet. Your trigger list — sensory "
-                  "level, extensor plantars, sphincter involvement, fever at onset — is what "
-                  "identifies the cases that should carry it, and that authoring is outstanding."),
+         response="Applied: optional contrast spine MRI is now reachable in five cases with a "
+                  "specific cord/structural alternative in their own text: post-spinal anaesthesia, "
+                  "post-laminectomy, major trauma, leukaemia/infiltration and cervical sensory "
+                  "level with new urinary incontinence. Fifteen hidden reports previously sat on "
+                  "a brain-oriented tool; the ten generic reports were removed rather than making "
+                  "spine MRI routine in GBS. The trigger remains a sensory level, extensor plantar "
+                  "response, sphincter involvement, fever/structural concern at onset, or another "
+                  "case-specific compressive/myelopathic alternative."),
     dict(cond="guillain_barre", filed="analyze_csf", tool="analyze_csf",
          reviewer=2, tier="unchanged", status="applied",
          response="Applied: required in all 30, and 14-3-3/RT-QuIC are gone from this condition."),
@@ -494,12 +501,11 @@ SPEC += [
                   "titre that mandates an urgent cancer search — stored where no call could "
                   "reach it."),
     dict(cond="status_epilepticus", filed="analyze_brain_mri", tool="analyze_brain_mri",
-         reviewer=2, tier="unchanged", status="partial",
+         reviewer=2, tier="unchanged", status="applied",
          response="The epilepsy-oriented protocol and the indication list are applied, and MRI is "
                   "required in 17 cases and absent where the cause is already established. "
-                  "MR_venography exists in the vocabulary and is priced, but no "
-                  "status-epilepticus case orders it yet: the venous question you raise has a "
-                  "tool and no case."),
+                  "MR_venography is now optional in the single pregnancy/PRES-CVST differential "
+                  "case, after stabilisation and brain MRI; it is not a blanket status test."),
     dict(cond="status_epilepticus", filed="order_ct_scan", tool="order_ct_scan",
          reviewer=2, tier="unchanged", status="applied",
          response="Applied: non-contrast head CT is required in all 30 cases."),
@@ -521,40 +527,48 @@ SPEC += [
                   "study."),
     dict(cond="multiple_sclerosis", filed="analyze_csf", tool="analyze_csf",
          reviewer=1, tier="optional", status="applied",
-         response="Applied: CSF is optional in 29 cases and recommended in 1."),
+         response="Applied case by case: CSF is optional in 19 cases and recommended in 11 "
+                  "equivocal or atypical cases; it is required in none. The panel now includes "
+                  "the kappa free-light-chain index accepted by the 2024 criteria, and mass-effect "
+                  "cases explicitly defer LP until imaging safety has been assessed."),
     dict(cond="multiple_sclerosis", filed="order_specialized_test", tool="order_specialized_test",
          reviewer=1, tier="optional", status="applied",
-         response="Applied: optical coherence tomography and visual evoked potentials are ordered "
-                  "in all 30 cases and nothing else is. Both already existed in the vocabulary — "
-                  "OCT was one of the values the stale catalog hid from you."),
+         response="Applied after correcting the first mechanical implementation: OCT is optional "
+                  "in 8 optic-neuritis cases and VEP in 14 optic or genuinely equivocal cases, "
+                  "rather than both being attached to all 30. No EMG/NCS, RNS, biopsy, autonomic "
+                  "test or unrelated evoked-potential action remains."),
     dict(cond="multiple_sclerosis", filed="interpret_labs", tool="interpret_labs",
          reviewer=1, tier="required", status="applied",
-         response="Applied: the required panel is the mimic-exclusion set you list."),
+         response="Applied: all 30 retain the required baseline mimic-exclusion panel. AQP4-IgG "
+                  "and MOG-IgG are targeted to 13 optic-neuritis or atypical/tumefactive cases, "
+                  "not used as a fixed universal screen."),
     dict(cond="multiple_sclerosis", filed="analyze_eeg", tool="analyze_eeg",
          reviewer=1, tier="remove", status="applied",
-         response="Removed: no multiple-sclerosis case orders an EEG."),
+         response="Removed end to end: no case orders EEG and no authored EEG result remains."),
     dict(cond="multiple_sclerosis", filed="analyze_ecg", tool="analyze_ecg",
          reviewer=1, tier="remove", status="applied",
-         response="Removed: no multiple-sclerosis case orders an ECG."),
+         response="Removed end to end: no case orders ECG and no authored ECG result remains."),
 
     # === migraine with aura (reviewer 1) ===
     dict(cond="migraine_with_aura", filed="analyze_brain_mri", tool="analyze_brain_mri",
          reviewer=1, tier="optional", status="applied",
          seg=(None, "Migraine with aura is primarily a clinical diagnosis. The true required"),
-         response="Applied: MRI is optional in 15 cases, recommended in 5 and absent in the other "
-                  "10 — no case requires it."),
+         response="Applied case by case and corrected beyond the first pass: MRI is absent in 11 "
+                  "typical cases, optional in 3 and recommended in 11 red-flag presentations. It "
+                  "is required in 5 strong non-routine exceptions: two documented infarcts, "
+                  "MELAS with persistent deficit, familial aneurysm evaluation and a witnessed "
+                  "seizure. Those scans establish or exclude the complication/alternative, not migraine."),
     dict(cond="migraine_with_aura", filed="analyze_brain_mri", tool="perform_clinical_assessment",
          reviewer=1, tier="required", status="applied",
          seg=("Migraine with aura is primarily a clinical diagnosis. The true required", None),
-         response="Applied, and it closed a hole that makes the point better than we could. The "
-                  "structured ICHD-3 history is now a required action in all 30 cases. Before "
-                  "that, and after the MRI was demoted, 15 of the 30 cases had a required set "
-                  "consisting only of the two zero-cost universal tools: an agent scored full "
-                  "required coverage without performing a single diagnostic act. Your sentence — "
-                  "that the ICHD-3 history is the only true required test here — was the fix."),
+         response="Applied and independently corrected: the structured history/examination is "
+                  "required in all 30 cases and now records the actual ICHD-3 rule (at least 3 of "
+                  "6 characteristics), full reversibility, attack count, aura modalities and red "
+                  "flags. The first implementation incorrectly encoded a 3-of-4 rule."),
     dict(cond="migraine_with_aura", filed="analyze_eeg", tool="analyze_eeg",
          reviewer=1, tier="remove", status="applied",
-         response="Applied: 29 of 30 cases have no EEG at all. The exception is MIG-AURA-RM11, "
+         response="Applied end to end: 29 of 30 cases have neither an EEG action nor an authored "
+                  "EEG result. The exception is MIG-AURA-RM11, "
                   "whose diagnosis is hemiplegic migraine *with migralepsy* — a seizure during "
                   "aura, ICHD-3 1.4.4 — so the 24 h video EEG establishes half of the diagnosis "
                   "rather than being routine headache evaluation, and it stays required there. "
@@ -562,10 +576,10 @@ SPEC += [
                   "itself."),
     dict(cond="migraine_with_aura", filed="analyze_ecg", tool="analyze_ecg",
          reviewer=1, tier="remove", status="applied",
-         response="Removed: no migraine case orders an ECG."),
+         response="Removed end to end: no migraine case orders an ECG and no authored ECG result remains."),
     dict(cond="migraine_with_aura", filed="order_echocardiogram", tool="order_echocardiogram",
-         reviewer=1, tier="remove", status="confirm",
-         response="This is the one place where we are putting a question back to you, and it is "
+         reviewer=1, tier="remove", status="applied",
+         response="Applied to routine migraine evaluation. Three cases order an echocardiogram, "
                   "not about the tier. Three cases order an echocardiogram at required and none is "
                   "a routine migraine: MIG-AURA-P03 is a migrainous infarction whose diagnosis "
                   "rests on secondary causes having been excluded, MIG-AURA-P07 is a cardioembolic "
@@ -579,9 +593,8 @@ SPEC += [
                   "cases are reviewable as they stand."),
     dict(cond="migraine_with_aura", filed="analyze_csf", tool="analyze_csf",
          reviewer=1, tier="remove", status="applied",
-         response="Applied: no migraine case now requires or recommends a lumbar puncture. One "
-                  "(MIG-AURA-RM11) keeps it as an optional step on a suspicion of secondary "
-                  "headache — the same case that keeps the video EEG for its migralepsy."),
+         response="Removed end to end: no migraine case orders CSF analysis and no authored CSF result remains. "
+                  "The seizure exception retains EEG, but lacked a specific clinical indication for LP."),
     dict(cond="migraine_with_aura", filed="interpret_labs", tool="interpret_labs",
          reviewer=1, tier="optional", status="applied",
          response="Applied: no case requires blood tests; 4 carry them as optional and 1 as "
@@ -590,7 +603,9 @@ SPEC += [
     # === early Alzheimer's disease (reviewer 1) ===
     dict(cond="alzheimers_early", filed="analyze_brain_mri", tool="analyze_brain_mri",
          reviewer=1, tier="required", status="applied",
-         response="Kept required in all 30 cases, as asked."),
+         response="Applied at pathway level: structural imaging is required in all 30 cases. "
+                  "Twenty-nine use MRI; ALZ-EARLY-RS05 uses the requested non-contrast CT "
+                  "alternative because severe claustrophobia makes MRI unavailable."),
     dict(cond="alzheimers_early", filed="analyze_brain_mri", tool="perform_clinical_assessment",
          reviewer=1, tier="required", status="applied",
          seg=("1) structured cognitive", "2) non-contrast"),
@@ -600,59 +615,73 @@ SPEC += [
                   "impairment cases are not required to have lost independence. This is one of "
                   "the four mandatory steps you named that had no tool behind them at all."),
     dict(cond="alzheimers_early", filed="analyze_brain_mri", tool="order_ct_scan",
-         reviewer=1, tier="optional", status="partial",
+         reviewer=1, tier="optional", status="applied",
          seg=("2) non-contrast", "3) FDG-PET"),
          src_seg=("Source:", None),
-         response="Not done: the tool and the study exist, but no Alzheimer case uses head CT as "
-                  "the MRI alternative, because every case has an MRI. If you want the "
-                  "MRI-unavailable pathway represented, it needs a case built for it."),
+         response="Applied without increasing the dataset: ALZ-EARLY-RS05 now uses non-contrast "
+                  "head CT because severe claustrophobia makes MRI unavailable. The report "
+                  "states CT's lower sensitivity for microbleeds, subtle vascular disease and "
+                  "regional volumetry."),
     dict(cond="alzheimers_early", filed="analyze_brain_mri", tool="order_advanced_imaging",
          reviewer=1, tier="optional", status="applied",
          seg=("3) FDG-PET", "Suggested diagnostic sequence"),
          src_seg=("Source:", None),
-         response="Applied: FDG-PET and amyloid PET are ordered across the 30 cases (18 amyloid "
-                  "recommended, 12 required, 16 FDG optional, 6 required), and no case treats "
-                  "either as a first-line test."),
+         response="Applied: all subtype studies are optional and occur only after the core "
+                  "assessment. Six atypical cases use FDG-PET and one exercises the newly "
+                  "priced perfusion-SPECT substitute. Amyloid PET is optional in 8 cases as "
+                  "the sole biomarker route, never paired with CSF."),
     dict(cond="alzheimers_early", filed="interpret_labs", tool="interpret_labs",
          reviewer=1, tier="required", status="applied",
-         response="Applied: the required panel is the reversible-cause set you list."),
+         response="Applied in all 30 cases: CBC, CMP, TSH, B12, folate, homocysteine, "
+                  "magnesium, ESR and CRP are named and delivered; abnormal case-specific "
+                  "values, including functional B12 deficiency, are preserved."),
     dict(cond="alzheimers_early", filed="analyze_eeg", tool="analyze_eeg",
          reviewer=1, tier="remove", status="applied",
-         response="Applied, with one exception you will meet in the cases rather than here: "
-                  "ALZ-EARLY-RP04 keeps EEG as an optional step because its differential includes "
-                  "Creutzfeldt-Jakob disease. No other Alzheimer case orders one and none requires "
-                  "it. The criterion is your own from the syncope panel — the label is the "
-                  "hypothesis under test — and if you disagree when you reach that case, flagging "
-                  "it there is enough."),
+         response="Removed as routine Alzheimer testing, including the previously exposed reports. "
+                  "Two optional case-level exceptions remain for questions other than diagnosing "
+                  "Alzheimer disease: RP04 tests for periodic complexes because CJD is active in a "
+                  "rapidly progressive dementia, and RP05 records recurrent witnessed unresponsive "
+                  "spells to assess seizure. The other 28 cases expose no authored EEG result."),
     dict(cond="alzheimers_early", filed="analyze_ecg", tool="analyze_ecg",
          reviewer=1, tier="remove", status="applied",
-         response="Removed: no Alzheimer case orders an ECG."),
+         response="Removed completely from the Alzheimer diagnostic pathway: no case orders one "
+                  "and none exposes a case-authored ECG result."),
     dict(cond="alzheimers_early", filed="analyze_csf", tool="analyze_csf",
          reviewer=1, tier="optional", status="applied",
          seg=(None, "Add amyloid PET"),
-         response="Applied: CSF biomarkers are required in the 13 cases where the diagnosis needs "
-                  "biomarker confirmation and recommended in the other 17."),
+         response="Applied: CSF Alzheimer biomarkers are optional in 21 cases. RP04 is the sole "
+                  "required exception because the same lumbar puncture must answer the independent, "
+                  "high-stakes CJD differential with RT-QuIC and 14-3-3; it has no amyloid PET."),
     dict(cond="alzheimers_early", filed="analyze_csf", tool="order_advanced_imaging",
          reviewer=1, tier="optional", status="applied",
          seg=("Add amyloid PET", None),
-         response="Applied: amyloid PET is available as the alternative to CSF biomarkers, and no "
-                  "case orders both where the CSF result is already conclusive."),
+         response="Applied across actions, stored reports and SFT traces: 8 cases use optional "
+                  "amyloid PET as their sole biomarker route, 22 use CSF, and zero cases expose or "
+                  "order both. FDG-PET/perfusion SPECT remains a separate optional subtype question."),
 
     # === frontotemporal dementia (reviewer 1) ===
     dict(cond="ftd", filed="interpret_labs", tool="interpret_labs",
          reviewer=1, tier="required", status="applied",
-         response="Applied: the required panel is the reversible-cause set, and autoimmune, "
-                  "paraneoplastic and genetic testing are no longer part of a fixed broad panel."),
+         response="Applied in all 30 cases: the required baseline names CBC, CMP, TSH, B12, "
+                  "folate, ESR and CRP. Infectious, toxic, CK, progranulin and other studies are "
+                  "added only where the presentation supplies a question; genetics is not hidden "
+                  "inside the blood panel."),
     dict(cond="ftd", filed="order_advanced_imaging", tool="order_advanced_imaging",
          reviewer=1, tier="optional", status="applied",
-         response="Applied: no FTD case requires advanced imaging (27 optional, 32 recommended), "
-                  "and FDG-PET is the modality it points at."),
+         response="Applied across actions and authored reports: no FTD case requires or recommends "
+                  "advanced imaging. Twenty-nine offer optional FDG-PET and one the requested "
+                  "perfusion-SPECT substitute. Amyloid PET remains optional in only 3 cases with "
+                  "an active AD differential. P04 has one explicit optional DaTscan exception for "
+                  "co-existing Parkinson's disease; it is not presented as an FTD test. Tau PET "
+                  "and all vascular imaging modalities are absent."),
     dict(cond="ftd", filed="order_specialized_test", tool="order_specialized_test",
          reviewer=1, tier="required", status="applied",
-         response="Applied: the validated neuropsychological battery is required in all 30 cases; "
-                  "genetic testing is optional in 10, recommended in 7 and required only in the 10 "
-                  "with young onset or a strong family history. Your bracketed request — put "
-                  "genetics in Alzheimer's too, as optional — is done."),
+         response="Applied: the validated neuropsychological battery is required in all 30 cases. "
+                  "Genetic testing is optional in 17 young-onset or familial cases and is never "
+                  "required or recommended. EMG/NCS and respiratory testing remain required only "
+                  "in P08, whose diagnosis explicitly includes motor neuron disease; they are "
+                  "removed from every FTD-only case. Genetics is also optional in 7 selected "
+                  "young/familial Alzheimer cases."),
     dict(cond="ftd", filed="order_specialized_test", tool="perform_clinical_assessment",
          reviewer=1, tier="required", status="applied",
          seg=("Validated neuropsychological testing must be REQUIRED", "Genetic testing should"),
@@ -661,16 +690,20 @@ SPEC += [
                   "required in all 30 cases, scored against the six Rascovsky features, each "
                   "marked present only where the history describes it."),
     dict(cond="ftd", filed="order_ct_scan", tool="order_ct_scan",
-         reviewer=1, tier="optional", status="partial",
-         response="Applied as far as the catalog goes — CT angiography, carotid duplex and "
-                  "transcranial Doppler are not FTD actions in any case — but only one case uses "
-                  "head CT as the MRI alternative. The same gap as in Alzheimer's: the pathway is "
-                  "described and barely exercised."),
+         reviewer=1, tier="optional", status="applied",
+         response="Applied without adding cases: S06 uses non-contrast CT because severe "
+                  "claustrophobia makes MRI unavailable. M09 separately receives acute non-contrast "
+                  "CT in the emergency department before MRI because the immediate question is "
+                  "haemorrhage or mass. CT angiography, carotid duplex and transcranial Doppler are "
+                  "absent from every FTD case and authored report."),
 
     # === Parkinson's disease (reviewer 1) ===
     dict(cond="parkinsons", filed="interpret_labs", tool="interpret_labs",
          reviewer=1, tier="optional", status="applied",
-         response="Applied: blood tests are optional in all 30 cases."),
+         response="Applied case by case: the fixed routine panel was removed. Nine of 30 cases "
+                  "retain targeted optional studies for a live thyroid/tremor, Wilson, medication-"
+                  "toxicity, metabolic or pretreatment question; the other 21 have no laboratory "
+                  "action or authored laboratory report."),
     dict(cond="parkinsons", filed="analyze_eeg", tool="analyze_eeg",
          reviewer=1, tier="remove", status="applied",
          response="Removed: no Parkinson case orders an EEG."),
@@ -679,26 +712,33 @@ SPEC += [
          response="Removed: no Parkinson case orders an ECG."),
     dict(cond="parkinsons", filed="order_specialized_test", tool="order_specialized_test",
          reviewer=1, tier="optional", status="applied",
-         response="Applied, and the residue is worth reading case by case: no case orders EMG/NCS, "
-                  "repetitive nerve stimulation, a biopsy or evoked potentials. The 10 remaining "
-                  "required actions are autonomic testing in the multiple-system-atrophy cases, "
-                  "polysomnography for REM-sleep behaviour disorder, and the neuropsychological "
-                  "battery in the cases whose diagnosis is dementia with Lewy bodies, progressive "
-                  "supranuclear palsy or Parkinson's with cognitive impairment — which is the "
-                  "'when cognition is clinically relevant' exception you wrote."),
+         response="Applied end to end: EMG/NCS, repetitive stimulation, biopsies, evoked potentials, "
+                  "formal autonomic testing and tilt-table testing are absent from actions and authored "
+                  "reports. Neuropsychology remains in 11 cognitively relevant cases and is optional in "
+                  "10; PD-RP04 is the documented strong exception because formal neuropsychology is a "
+                  "required pre-DBS safety assessment rather than routine PD diagnosis. Polysomnography "
+                  "is optional in 11 cases with reported dream enactment. Counselled PD genetics is "
+                  "optional only in the 42-year-old young-onset case and one case with an affected "
+                  "first-degree relative."),
     dict(cond="parkinsons", filed="analyze_brain_mri", tool="analyze_brain_mri",
          reviewer=1, tier="required", status="applied",
-         response="MRI is required in all 30 cases."),
+         response="Structural imaging remains required, but is described as exclusion of a secondary or "
+                  "atypical parkinsonian syndrome rather than proof of idiopathic PD: MRI in 29 cases and "
+                  "the reviewed CT alternative in one."),
     dict(cond="parkinsons", filed="analyze_brain_mri", tool="order_ct_scan",
-         reviewer=1, tier="optional", status="partial",
-         response="Not done: no Parkinson case uses CT as the alternative to MRI."),
+         reviewer=1, tier="optional", status="applied",
+         response="Applied without adding a case: PD-S06 uses non-contrast CT because severe "
+                  "claustrophobia makes MRI unavailable; the report explicitly states CT's lower sensitivity."),
 
     # === amyotrophic lateral sclerosis (reviewer 1) ===
     dict(cond="als", filed="order_specialized_test", tool="order_specialized_test",
          reviewer=1, tier="required", status="applied",
-         response="Applied: EMG/NCS is required in all 30 cases, respiratory function too, and "
-                  "genetic testing is recommended in 26 and required in 4. No case orders "
-                  "repetitive nerve stimulation, a biopsy, evoked potentials or tilt testing."),
+         response="Applied and corrected case by case: EMG/NCS is the only ALS-specific required "
+                  "specialized study in all 30. Respiratory function is recommended in all 30 as "
+                  "a post-diagnostic safety/staging baseline, not diagnostic confirmation. An ALS "
+                  "gene panel is separately optional/offered after counselling in all 30, consistent "
+                  "with the 2023 consensus guideline; it is never embedded in routine labs or required. "
+                  "No RNS, biopsy, unrelated evoked potential, autonomic or tilt action remains."),
     dict(cond="als", filed="analyze_brain_mri", tool="analyze_brain_mri",
          reviewer=1, tier="required", status="applied",
          response="Applied: required in all 30."),
@@ -711,14 +751,17 @@ SPEC += [
                   "now a required order_body_imaging action in all 30."),
     dict(cond="als", filed="interpret_labs", tool="interpret_labs",
          reviewer=1, tier="required", status="applied",
-         response="Applied. Auditing this panel also caught an error of ours that a clinical "
-                  "reader would have spotted immediately: the androgen-receptor CAG repeat for "
-                  "Kennedy disease — an X-linked test — was in the ordered panel of 11 female "
-                  "patients, one of whom was even given a result, while the action's own text "
-                  "said '(in males)'."),
+         response="Applied in all 30 as a rule-out rather than confirmatory panel. CBC, CMP, "
+                  "calcium, thyroid, B12/folate, CK and inflammatory markers form the baseline; "
+                  "anti-GM1, paraprotein, HIV, paraneoplastic and androgen-receptor testing occur "
+                  "only in the corresponding phenotype. ALS genetic results were removed from "
+                  "laboratory payloads and moved to the counselled genetic-panel action."),
     dict(cond="als", filed="analyze_csf", tool="analyze_csf",
          reviewer=1, tier="optional", status="applied",
-         response="Applied: CSF is recommended, never required, in all 30 cases."),
+         response="Applied after correcting the first blanket implementation: 25 cases have no "
+                  "CSF action or authored result. Five atypical cases retain optional, targeted "
+                  "CSF for a specific neoplastic, demyelinating/PML, inflammatory-neuropathy, HIV "
+                  "or paraprotein mimic; none uses CSF neurofilament as an ALS diagnostic test."),
 
     # === normal pressure hydrocephalus (reviewer 1) ===
     dict(cond="nph", filed="analyze_brain_mri", tool="analyze_brain_mri",
@@ -733,13 +776,11 @@ SPEC += [
          response="Applied: required in all 30, as the large-volume tap with opening pressure."),
     dict(cond="nph", filed="order_specialized_test", tool="order_specialized_test",
          reviewer=1, tier="remove", status="applied",
-         response="Applied, and this was still outstanding until we answered your comments one by "
-                  "one. The standalone neuropsychological battery had stayed REQUIRED in all 30 "
-                  "cases beside the new pre/post assessment — the duplication you objected to. It "
-                  "is now optional, and the redundant sequence rule that said 'battery before the "
-                  "tap' went with it, because leaving it would have penalised an agent that "
-                  "performs the mandatory assessment and skips the optional battery. No case "
-                  "orders EMG/NCS, a biopsy, evoked potentials or tilt testing."),
+         response="Applied after a case-level re-audit: no NPH gold pathway orders a standalone "
+                  "neuropsychological battery or any other specialized test, and the 58 legacy "
+                  "specialized-test follow-ups are no longer callable in the NPH cases. The "
+                  "required timed gait and brief cognitive comparison is represented by the "
+                  "clinical-assessment tool instead."),
     dict(cond="nph", filed="order_specialized_test", tool="perform_clinical_assessment",
          reviewer=1, tier="required", status="applied",
          seg=("If Specialized test is kept as REQUIRED", "Neuropsychological testing"),
@@ -747,73 +788,76 @@ SPEC += [
          response="Applied exactly as written: perform_clinical_assessment"
                   "{gait_and_balance_timed} is required in all 30 cases and its report carries the "
                   "before-and-after comparison, with each case's own timed-up-and-go and 10-metre "
-                  "figures where it states them and the >=20% threshold where it does not. "
-                  "NPH-P08's negative tap is preserved as negative."),
+                  "figures. The previous universal >=20% cutoff was not supported by the cited "
+                  "guidelines: the cases now state the commonly used >10% TUG criterion and require "
+                  "interpretation of absolute and concordant changes. NPH-P08 remains negative "
+                  "because it shows no objective improvement."),
     dict(cond="nph", filed="order_advanced_imaging", tool="order_advanced_imaging",
          reviewer=1, tier="remove", status="applied",
-         response="Applied as far as the tier goes: no NPH case requires or recommends advanced "
-                  "imaging, and the tier is uniformly optional across all 30. It is not deleted "
-                  "because every one of the 30 uses amyloid or FDG PET for the Alzheimer "
-                  "differential rather than as a test for NPH — the distinction your own syncope "
-                  "comment draws — and that differential is the central diagnostic problem of the "
-                  "condition."),
+         response="Applied: advanced imaging is absent from the NPH panel, all 30 gold pathways, "
+                  "and the callable case follow-ups (60 legacy PET, flow-MRI, DaTscan and other "
+                  "advanced-imaging payloads removed). The previous implementation had merely "
+                  "relabelled PET as optional, which did not implement a request to remove it."),
 
     # === temporal lobe epilepsy (reviewer 1) ===
     dict(cond="focal_epilepsy_temporal", filed="analyze_eeg", tool="analyze_eeg",
          reviewer=1, tier="required", status="applied",
-         response="Applied, and it caught a gap in the vocabulary: the sleep-deprived study you "
-                  "name as the second-line recording did not exist as an orderable value, so the "
-                  "request could be neither made nor scored. sleep_deprived is now priced (276 "
-                  "EUR, CPT 95819) and derives into the tool enum, the catalog and the cost "
-                  "tracker. Routine EEG comes first in the cases, with video or ambulatory "
-                  "recording where events have to be captured, and no case uses continuous ICU "
-                  "monitoring."),
+         response="Applied end to end. The previous answer was false: sleep_deprived had been added "
+                  "to the vocabulary but no case used it, ambulatory was absent, and 22 cases still "
+                  "carried video EEG. The audited cases now contain 23 routine recordings, 5 staged "
+                  "sleep-deprived studies, 2 ambulatory studies after non-diagnostic routine/sleep "
+                  "recordings, and 10 video studies limited to event capture, PNES or tertiary "
+                  "evaluation. RP01 is the single continuous-ICU exception because its presentation "
+                  "is non-convulsive status epilepticus, exactly the acute setting you named."),
     dict(cond="focal_epilepsy_temporal", filed="analyze_brain_mri", tool="analyze_brain_mri",
          reviewer=1, tier="required", status="applied",
-         response="Applied: required in all 30 with a dedicated epilepsy protocol."),
+         response="Applied: dedicated epilepsy-protocol MRI is required in 29 cases. The MRI-negative "
+                  "drug-resistant case P04 uses the reviewed non-contrast CT alternative because "
+                  "severe claustrophobia makes MRI unavailable; the report states CT's limitations."),
     dict(cond="focal_epilepsy_temporal", filed="interpret_labs", tool="interpret_labs",
          reviewer=1, tier="optional", status="applied",
-         response="Applied: optional in all 30 cases."),
+         response="Applied case by case: 23 cases retain optional targeted tests for acute metabolic "
+                  "provocation, antiseizure-drug levels or a concurrent emergency. Seven stable "
+                  "tertiary/recurrent cases have no lab action or authored report. Prolactin was "
+                  "removed from the routine template."),
     dict(cond="focal_epilepsy_temporal", filed="analyze_ecg", tool="analyze_ecg",
          reviewer=1, tier="optional", status="applied",
-         response="Applied as your note describes: the ECG survives in the 2 cases presenting as a "
-                  "first suspected seizure or transient loss of consciousness, and nowhere else."),
+         response="Applied using NICE NG217 rather than the previous arbitrary count: ECG is required "
+                  "in 21 first-suspected-seizure or transient-loss-of-consciousness assessments and "
+                  "absent from the 9 established/tertiary cases. It is framed as a cardiac-mimic test, "
+                  "not an epilepsy test."),
     dict(cond="focal_epilepsy_temporal", filed="order_echocardiogram", tool="order_echocardiogram",
          reviewer=1, tier="remove", status="applied",
-         response="Applied, with two exceptions in the cases: FEPI-TEMP-P05 and -RP02 were "
-                  "initially worked up as syncope and as pulmonary embolism, and keep the "
-                  "echocardiogram as an optional step. Answering your comments one at a time "
-                  "caught that these had been left at *recommended* rather than optional, which "
-                  "made the account we were about to send you wrong — they are optional now, so no "
-                  "epilepsy case requires or recommends a cardiac study. If you disagree when you "
-                  "reach those two cases, flag them there."),
+         response="Removed from all 30 actions and authored reports. P05 already had a completed "
+                  "normal cardiac work-up in its history. RP02 has a genuine separate pulmonary-"
+                  "embolism emergency, but generic echo was the wrong substitute: it now orders "
+                  "the required chest CT angiogram through body imaging."),
     dict(cond="focal_epilepsy_temporal", filed="order_cardiac_monitoring",
          tool="order_cardiac_monitoring", reviewer=1, tier="remove", status="applied",
-         response="Same as the echocardiogram: optional in the 2 cases with syncope on the "
-                  "differential, and corrected from recommended to optional while answering this "
-                  "comment. No epilepsy case requires or recommends rhythm monitoring."),
+         response="Removed from all 30 actions and authored reports. P05's prior Holter was already "
+                  "normal, and RP02 requires urgent pulmonary vascular imaging rather than generic "
+                  "rhythm monitoring."),
 
     # === functional neurological disorder (reviewer 1) ===
     dict(cond="functional_neurological_disorder", filed="analyze_eeg", tool="analyze_eeg",
-         reviewer=1, tier=None, status="open",
-         response="Your question, answered in the reply: yes, diagnostic overuse is an objective — "
-                  "cost tracking against Medicare reference rates is one of the project's main "
-                  "components — so we take your second option and keep the condition, with the "
-                  "diagnostic tools optional. Checking the cases showed your doubt was better "
-                  "founded than our answer: all 30 required a gadolinium brain MRI and a "
-                  "laboratory battery, none performed a functional-signs examination, no action "
-                  "anywhere was optional, and the required pathway cost 1303 EUR on average — more "
-                  "than bacterial meningitis (1204) or Guillain-Barre (1223). The condition meant "
-                  "to measure restraint was rewarding the opposite, and the ground truth encoded "
-                  "the diagnosis-of-exclusion model the literature has abandoned. Now the "
-                  "functional-signs examination is the mandatory act in all 30, the MRI is optional "
-                  "in 23 and recommended once without contrast in 7, laboratories are optional in "
-                  "27, and EMG/NCS and evoked potentials are scored as useless calls in all 30 "
-                  "instead of being forbidden in prose. One deliberate departure: video-EEG stays "
-                  "required in the 22 cases with paroxysmal events, because a recorded habitual "
-                  "event without ictal correlate is the positive diagnostic act for psychogenic "
-                  "non-epileptic seizures (ILAE 2013), not an exclusion test. Say the word and we "
-                  "demote that too."),
+         reviewer=1, tier=None, status="applied",
+         response="Applied as your second option for this frozen phase: "
+                  "the current phase is frozen at 20 conditions and 600 cases, so authoring DLB "
+                  "and retiring FND are explicitly deferred. Your fallback option has now been "
+                  "applied end to end: the positive functional-sign examination is the sole required "
+                  "diagnostic act in all 30 cases; every instrumental action is optional. Video-EEG "
+                  "appears in 22 event-capture cases, MRI in 20 explicit red-flag/organic-comorbidity "
+                  "cases and targeted labs in 12; no ECG, CSF, neuropsychology or unexecutable null "
+                  "action remains. Efficient traces stop after the positive examination. "
+                  "The earlier rationale for keeping FND said it was "
+                  "the only way to measure diagnostic overuse; that is not true in this benchmark. "
+                  "Every current condition has case-level useless-tool penalties, and 16 of the 19 "
+                  "non-FND conditions also contain optional actions, so restraint and cost remain "
+                  "measurable without FND. The interim FND correction exposed a real defect — the "
+                  "old cases encoded diagnosis by exclusion — but it is not a strong reason to "
+                  "override your composition recommendation. FND therefore remains a temporary "
+                  "member of the frozen dataset, not the final composition choice; DLB is the "
+                  "first replacement in the backlog."),
 ]
 
 SPEC += [
@@ -821,11 +865,11 @@ SPEC += [
     dict(cond="autoimmune_encephalitis_nmdar", filed="analyze_brain_mri",
          tool="order_body_imaging", reviewer=2, tier="required", status="applied",
          seg=(None, "Item:\nBrain MRI"),
-         response="Applied: chest, abdomen and pelvis CT is a required action in all 30 cases. "
-                  "You called this the highest-priority finding in the review and you were right "
-                  "that no existing item covered it — before order_body_imaging existed the agent "
-                  "could image the brain and nothing else, so an ovarian teratoma was outside the "
-                  "action space entirely."),
+         response="Applied after correcting the first over-broad implementation. Tumour screening "
+                  "is required in all 30 cases but not as blanket CAP CT: all 23 women receive "
+                  "pelvic/abdominal ultrasound, 4 younger men receive targeted testicular "
+                  "ultrasound, and 3 older men with an oncologic context receive CAP CT. Existing "
+                  "pelvic/testicular reports were moved out of the laboratory payload."),
     dict(cond="autoimmune_encephalitis_nmdar", filed="analyze_brain_mri",
          tool="analyze_brain_mri", reviewer=2, tier="unchanged", status="applied",
          seg=("Item:\nBrain MRI", None),
@@ -833,18 +877,23 @@ SPEC += [
                   "truth is exclusion of alternatives, not confirmation."),
     dict(cond="autoimmune_encephalitis_nmdar", filed="interpret_labs", tool="interpret_labs",
          reviewer=2, tier="unchanged", status="applied",
-         response="Applied: the serum cell-based assay for anti-GluN1 is named in the required "
-                  "panel and read together with the CSF result, not alone."),
+         response="Applied in all 30 cases: CBC, metabolic/coagulation, thyroid function and "
+                  "antibodies, inflammatory markers, autoimmune/paraneoplastic antibodies and a "
+                  "separately priced serum IgG anti-GluN1 cell-based assay are named. Serum is "
+                  "explicitly read with CSF, never alone; there are no paediatric cases requiring "
+                  "selected genetic/metabolic testing."),
     dict(cond="autoimmune_encephalitis_nmdar", filed="analyze_csf", tool="analyze_csf",
          reviewer=2, tier="unchanged", status="applied",
-         response="Applied, and it uncovered a defect of exactly the kind you found in myasthenia: "
-                  "in two cases the anti-NMDAR result — the antibody that defines the disease — "
-                  "was stored under a trigger no call an agent can make could reach, so the "
-                  "required order was answered by an unrelated payload. Both are fixed; no report "
-                  "text changed."),
+         response="Applied in all 30 cases: basic CSF, OCB/IgG index, HSV PCR and the CSF "
+                  "anti-GluN1 assay are one reachable required order. Six initially unreachable "
+                  "or pending antibody results were reconciled with the authored confirmatory "
+                  "reports; the seronegative case remains negative rather than being forced positive."),
     dict(cond="autoimmune_encephalitis_nmdar", filed="analyze_eeg", tool="analyze_eeg",
          reviewer=2, tier="unchanged", status="applied",
-         response="Applied: EEG is required in all 30 cases and extreme delta brush is named."),
+         response="Applied: a routine EEG is required in all 30 cases and explicitly assesses "
+                  "extreme delta brush without calling it pathognomonic. Continuous ICU EEG is a "
+                  "recommended escalation in the 13 cases with severe encephalopathy or "
+                  "electrographic seizures, rather than a blanket order in all 30."),
     dict(cond="autoimmune_encephalitis_nmdar", filed="analyze_ecg", tool="analyze_ecg",
          reviewer=2, tier="unchanged", status="no_change",
          response="No change requested and none made."),
