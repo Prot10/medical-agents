@@ -237,8 +237,14 @@ class TestMockServerRouting:
         assert "impression" in result.output
 
     def test_alzheimer_amyloid_pet_routing(self):
-        """Advanced imaging should return AdvancedImagingReport for amyloid PET."""
-        case = _load_case("ALZ-EARLY-M01")
+        """Advanced imaging should return AdvancedImagingReport for amyloid PET.
+
+        Read on a case that actually orders one. The July 2026 review made amyloid PET an
+        *alternative* to CSF biomarkers rather than an addition, so eight cases take the PET
+        route and twenty-two take the CSF route; ALZ-EARLY-M01 is now one of the latter and
+        exposes no PET at all.
+        """
+        case = _load_case("ALZ-EARLY-P01")
         mock = MockServer(case)
         result = mock.get_output("order_advanced_imaging", {"clinical_context": "AD confirmation", "modality": "amyloid_PET"})
         assert result.success

@@ -592,62 +592,29 @@
     ],
     "optimal_actions": [
       {
-        "step": 1,
-        "action": "Send targeted laboratory studies: CBC, BMP, CRP, procalcitonin, coagulation",
+        "action": "Obtain CBC with differential, CRP (or procalcitonin), paired blood glucose, coagulation, renal/liver function and HIV testing; results must not delay LP or empirical therapy",
         "tool_name": "interpret_labs",
-        "expected_finding": "Leukocytosis with neutrophilia and bandemia; thrombocytopenia; elevated procalcitonin, CRP, and lactate; coagulopathy pattern consistent with DIC.",
+        "expected_finding": "Inflammation/sepsis and LP safety context; blood values neither confirm nor exclude bacterial meningitis",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
+            "CMP",
             "CRP",
             "procalcitonin",
-            "coagulation"
+            "glucose",
+            "coagulation",
+            "HIV"
           ]
         },
-        "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §VI"
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 1
       },
       {
-        "step": 2,
-        "action": "Perform lumbar puncture with opening-pressure measurement and send CSF for cell count with differential, glucose (with paired serum), protein, Gram stain, bacterial culture, meningitis multiplex PCR panel, and CSF lactate. LP can proceed without CT in this young, immunocompetent patient with no focal neurological deficits, no papilledema, no altered mental status, and no seizure.",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Elevated opening pressure; markedly elevated PMN-predominant pleocytosis; very low CSF:serum glucose ratio; elevated protein; Gram-negative diplococci on stain; PCR positive for Neisseria meningitidis.",
-        "category": "required",
-        "tool_parameters": {
-          "special_tests": [
-            "meningitis_panel"
-          ]
-        },
-        "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §V"
-      },
-      {
-        "step": 3,
-        "action": "Search the literature for empiric antibiotic selection by age and risk, evidence for adjunctive dexamethasone, and guidance on meningococcal disease management including contact prophylaxis.",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "IDSA 2004 and ESCMID 2016 guidance on vancomycin + ceftriaxone as empiric regimen; De Gans 2002 evidence for dexamethasone; meningococcal-specific 7-day treatment duration; chemoprophylaxis for close contacts.",
-        "category": "required",
-        "tool_parameters": {},
-        "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §VII"
-      },
-      {
-        "step": 4,
-        "action": "Check drug interactions for empiric vancomycin + ceftriaxone and adjunctive dexamethasone, confirming dexamethasone timing BEFORE or WITH the first antibiotic dose and assessing any interactions with planned regimen.",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Dexamethasone reduces vancomycin CNS penetration but this is not a contraindication empirically; ceftriaxone penetration is unaffected; no prohibitive drug interactions; de-escalation to ceftriaxone monotherapy recommended once meningococcal susceptibility confirmed.",
-        "category": "required",
-        "tool_parameters": {},
-        "citation": "[De_Gans_2002]",
-        "guideline_source": "De Gans 2002"
-      },
-      {
-        "step": 5,
-        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
+        "action": "Draw blood cultures with susceptibility testing as early as possible, preferably before antimicrobials, but start empirical therapy immediately if LP/imaging is delayed",
         "tool_name": "order_microbiology",
-        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started. blood cultures will yield Gram-negative diplococci.",
+        "expected_finding": "Pathogen and susceptibility, with collection timing recorded",
         "category": "required",
         "tool_parameters": {
           "specimen": "blood_culture",
@@ -658,8 +625,52 @@
           ],
           "before_antimicrobials": true
         },
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 2
+      },
+      {
+        "action": "Perform LP with opening pressure, appearance, total/differential WBC, RBC, protein, CSF-to-blood glucose ratio, Gram stain, culture/susceptibility and relevant PCR; record whether collected before antibiotics",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Bacterial pattern and organism/susceptibility; PCR and culture yield depend on whether antibiotics preceded sampling",
+        "category": "required",
+        "tool_parameters": {
+          "basic": [
+            "opening_pressure",
+            "appearance",
+            "cell_count_total_and_differential",
+            "rbc_count",
+            "protein",
+            "glucose"
+          ],
+          "paired_serum": true,
+          "special_tests": [
+            "meningitis_panel"
+          ]
+        },
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 3
+      },
+      {
+        "step": 4,
+        "action": "Search the literature for empiric antibiotic selection by age and risk, evidence for adjunctive dexamethasone, and guidance on meningococcal disease management including contact prophylaxis.",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "IDSA 2004 and ESCMID 2016 guidance on vancomycin + ceftriaxone as empiric regimen; De Gans 2002 evidence for dexamethasone; meningococcal-specific 7-day treatment duration; chemoprophylaxis for close contacts.",
+        "category": "recommended",
+        "tool_parameters": {},
         "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §VI"
+        "guideline_source": "IDSA 2004 §VII"
+      },
+      {
+        "step": 5,
+        "action": "Check drug interactions for empiric vancomycin + ceftriaxone and adjunctive dexamethasone, confirming dexamethasone timing BEFORE or WITH the first antibiotic dose and assessing any interactions with planned regimen.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "Dexamethasone reduces vancomycin CNS penetration but this is not a contraindication empirically; ceftriaxone penetration is unaffected; no prohibitive drug interactions; de-escalation to ceftriaxone monotherapy recommended once meningococcal susceptibility confirmed.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[De_Gans_2002]",
+        "guideline_source": "De Gans 2002"
       }
     ],
     "useless_tools": [
@@ -707,15 +718,7 @@
       }
     ],
     "harmful_tools": [],
-    "sequence_constraints": [
-      {
-        "before": "interpret_labs",
-        "after": "analyze_csf",
-        "reason": "Blood cultures (drawn via order_microbiology{specimen: blood_culture}) must be collected BEFORE the first antibiotic dose so that culture yield is not compromised. This is a patient-safety constraint: loss of blood culture positivity eliminates organism identification and susceptibility data needed to de-escalate therapy.",
-        "citation": "[IDSA_2004]",
-        "severity": "hard"
-      }
-    ],
+    "sequence_constraints": [],
     "critical_actions": [
       "Administer empiric IV antibiotics (vancomycin 25-30 mg/kg loading dose + ceftriaxone 2 g IV) within 30-60 minutes of presentation; do NOT delay antibiotics for LP beyond the minimum time needed to collect blood cultures.",
       "Give adjunctive dexamethasone 0.15 mg/kg IV (10 mg in standard adult dosing) before or with the first antibiotic dose; continue q6h for 4 days.",
@@ -739,7 +742,8 @@
       "CT before LP is NOT required in this case: the patient is young, immunocompetent, alert (GCS 15), has no papilledema, no focal neurological deficits, and no seizure — all of the IDSA 2004 imaging-first criteria are absent. Ordering CT would introduce dangerous delay.",
       "Gram-negative diplococci on CSF Gram stain combined with PCR positivity for Neisseria meningitidis provides high-confidence pathogen identification; empiric vancomycin can be de-escalated to ceftriaxone monotherapy once susceptibility is confirmed.",
       "Dexamethasone given before or with the first antibiotic dose reduces inflammation-driven morbidity; although its mortality benefit is greatest in pneumococcal disease, it is recommended empirically across all causes of bacterial meningitis.",
-      "Public health response is mandatory: close contacts in dormitory settings require chemoprophylaxis to prevent secondary cases; meningococcal disease is a notifiable condition."
+      "Public health response is mandatory: close contacts in dormitory settings require chemoprophylaxis to prevent secondary cases; meningococcal disease is a notifiable condition.",
+      "WHO 2025: obtain cultures promptly, but neither LP nor cranial imaging may delay empirical antimicrobials when the pathway requires treatment first."
     ],
     "red_herrings": [
       {
@@ -757,8 +761,8 @@
     "organism": "Neisseria meningitidis serogroup B",
     "subtype": "Meningococcal meningitis, first meningococcal case in BACT-MEN set",
     "source_of_infection": "Community-acquired, dormitory exposure, Neisseria meningitidis serogroup B",
-    "last_revised": "2026-08-08",
-    "revision_reason": "per-case audit: the culture report named the organism in its findings and denied it in its impression, so the same report supported opposite treatment decisions",
+    "last_revised": "2026-08-10",
+    "revision_reason": "Reviewer 2 meningitis audit: complete LP/microbiology/lab pathway, no ECG, and MRI restricted to complications or non-response",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:BACT-MEN",
     "difficulty_rationale": "4 required tools; 1 red herring (petechial rash misread as allergic reaction); classic meningococcal presentation with Gram-negative diplococci on stain and PCR confirmation — straightforward single-chain diagnosis requiring minimal cross-modality synthesis. No CT required (no imaging-first criteria), reducing required tool count versus typical moderate BACT-MEN cases.",

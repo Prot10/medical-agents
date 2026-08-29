@@ -528,60 +528,6 @@
           "Meropenem 2 g IV q8h is an appropriate alternative or escalation if ESBL-producing organism is subsequently identified"
         ]
       }
-    },
-    {
-      "trigger_action": "request_brain_mri",
-      "tool_name": "analyze_brain_mri",
-      "output": {
-        "findings": [
-          {
-            "type": "Leptomeningeal enhancement",
-            "location": "Bilateral cerebral convexities and basal cisterns, more prominent on the left",
-            "size": null,
-            "signal_characteristics": {
-              "T1_post_gadolinium": "Thin, continuous linear leptomeningeal enhancement along bilateral frontal and parietal convexities; enhancement extends into the left Sylvian fissure and along the basal cisterns. Left-sided predominance consistent with ipsilateral otomastoid source.",
-              "FLAIR": "Sulcal FLAIR hyperintensity in the left frontoparietal region and basal cisterns, suggesting proteinaceous or cellular material in the subarachnoid space"
-            },
-            "mass_effect": "None",
-            "borders": "Indistinct"
-          },
-          {
-            "type": "Left otomastoid inflammatory changes",
-            "location": "Left mastoid, left middle ear",
-            "size": null,
-            "signal_characteristics": {
-              "T2": "Hyperintense signal filling the left mastoid air cells and left middle ear space",
-              "T1_post_gadolinium": "Enhancement of left mastoid mucosal surfaces and middle ear mucosa; no intracranial extension or epidural empyema identified"
-            },
-            "mass_effect": "None",
-            "borders": "Well-defined"
-          },
-          {
-            "type": "Normal brain parenchyma",
-            "location": "Bilateral cerebral hemispheres",
-            "size": null,
-            "signal_characteristics": {
-              "DWI": "No restricted diffusion in the brain parenchyma",
-              "T2": "No focal parenchymal signal abnormality. No cerebritis.",
-              "FLAIR": "No parenchymal FLAIR abnormality beyond the sulcal signal noted above"
-            },
-            "mass_effect": "None",
-            "borders": null
-          }
-        ],
-        "volumetrics": null,
-        "additional_observations": [
-          "No subdural empyema",
-          "No epidural collection",
-          "No cerebral abscess",
-          "No acute infarction on DWI",
-          "No hydrocephalus",
-          "No midline shift",
-          "Ventricular system normal in size"
-        ],
-        "impression": "Leptomeningeal enhancement along bilateral convexities and basal cisterns with left-sided predominance and sulcal FLAIR hyperintensity — consistent with an active meningeal process. Left otomastoid inflammatory changes without identifiable intracranial extension, epidural empyema, or cerebral abscess. No parenchymal restricted diffusion, cerebritis, or acute infarction",
-        "recommended_actions": []
-      }
     }
   ],
   "fallback_tool_outputs": {
@@ -721,7 +667,68 @@
     ],
     "optimal_actions": [
       {
-        "step": 1,
+        "action": "Obtain CBC with differential, CRP (or procalcitonin), paired blood glucose, coagulation, renal/liver function and HIV testing; results must not delay LP or empirical therapy",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Inflammation/sepsis and LP safety context; blood values neither confirm nor exclude bacterial meningitis",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "CRP",
+            "procalcitonin",
+            "glucose",
+            "coagulation",
+            "HIV"
+          ]
+        },
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 1
+      },
+      {
+        "action": "Draw blood cultures with susceptibility testing as early as possible, preferably before antimicrobials, but start empirical therapy immediately if LP/imaging is delayed",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Pathogen and susceptibility, with collection timing recorded",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "blood_culture",
+          "tests": [
+            "culture",
+            "gram_stain",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 2
+      },
+      {
+        "action": "Perform LP with opening pressure, appearance, total/differential WBC, RBC, protein, CSF-to-blood glucose ratio, Gram stain, culture/susceptibility and relevant PCR; record whether collected before antibiotics",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Bacterial pattern and organism/susceptibility; PCR and culture yield depend on whether antibiotics preceded sampling",
+        "category": "required",
+        "tool_parameters": {
+          "basic": [
+            "opening_pressure",
+            "appearance",
+            "cell_count_total_and_differential",
+            "rbc_count",
+            "protein",
+            "glucose"
+          ],
+          "paired_serum": true,
+          "special_tests": [
+            "meningitis_panel"
+          ]
+        },
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 3
+      },
+      {
+        "step": 4,
         "action": "Obtain non-contrast CT head to exclude mass effect, midline shift, basal cistern obliteration, or herniation that would contraindicate lumbar puncture; imaging-first criteria are present (altered mental status, focal neurological deficit, age >50).",
         "tool_name": "order_ct_scan",
         "expected_finding": "No intracranial hemorrhage, mass lesion, or herniation — confirms lumbar puncture is safe; left mastoid opacification consistent with otomastoiditis as potential source.",
@@ -733,86 +740,24 @@
         "guideline_source": "IDSA 2004 §V"
       },
       {
-        "step": 2,
-        "action": "Send targeted laboratory studies: CBC, BMP, CRP, procalcitonin, HbA1c",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Marked leukocytosis with left shift, elevated procalcitonin (>2 ng/mL strongly suggests bacterial etiology), markedly elevated CRP, elevated lactate; HbA1c reflecting poorly controlled diabetes.",
-        "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP",
-            "CRP",
-            "procalcitonin",
-            "HbA1c"
-          ]
-        },
-        "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §VI"
-      },
-      {
-        "step": 3,
-        "action": "Perform lumbar puncture with opening-pressure measurement and send CSF for cell count with differential, glucose (with paired serum glucose), protein, Gram stain, bacterial culture, meningitis multiplex PCR panel, and CSF lactate.",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Markedly elevated opening pressure; severe neutrophilic pleocytosis (tens of thousands of cells); critically low CSF glucose (absolute value misleadingly low even for severe hyperglycemia — CSF:serum ratio <0.1 is the key metric); markedly elevated protein; elevated CSF lactate; culture eventually positive for Gram-negative bacillus.",
-        "category": "required",
-        "tool_parameters": {
-          "special_tests": [
-            "meningitis_panel"
-          ]
-        },
-        "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §V"
-      },
-      {
-        "step": 4,
+        "step": 5,
         "action": "Search medical literature for empiric antibiotic selection for Gram-negative bacillary meningitis in a patient with uncontrolled diabetes and reported penicillin allergy, and confirm dexamethasone evidence.",
         "tool_name": "search_medical_literature",
         "expected_finding": "Retrieval of IDSA 2004, ESCMID 2016, and Brouwer 2012 supporting ceftriaxone (low cross-reactivity with penicillin) or meropenem for Gram-negative meningitis; 21-day treatment duration for Enterobacteriaceae; dexamethasone before first antibiotic dose.",
-        "category": "required",
+        "category": "recommended",
         "tool_parameters": {},
         "citation": "[IDSA_2004]",
         "guideline_source": "IDSA 2004 §VII"
       },
       {
-        "step": 5,
+        "step": 6,
         "action": "Check drug interactions for the empiric regimen (ceftriaxone + vancomycin + dexamethasone) in the context of the patient's reported penicillin allergy, diabetes medications (metformin, glipizide), lisinopril, and borderline renal function.",
         "tool_name": "check_drug_interactions",
         "expected_finding": "Low cross-reactivity between ceftriaxone and penicillin allergy history; dexamethasone antagonizes glipizide requiring glucose monitoring; metformin should be held given elevated creatinine and acute illness; vancomycin dose adjustment warranted for borderline renal function; ampicillin contraindicated given Klebsiella intrinsic resistance.",
-        "category": "required",
+        "category": "recommended",
         "tool_parameters": {},
         "citation": "[De_Gans_2002]",
         "guideline_source": "De Gans 2002"
-      },
-      {
-        "step": 6,
-        "action": "Obtain contrast-enhanced brain MRI to assess for parenchymal complications (cerebritis, cerebral abscess, subdural empyema, ventriculitis, venous sinus thrombosis, infarction) and delineate the extent of otomastoid disease.",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Leptomeningeal enhancement with left-sided predominance reflecting otomastoid source; no cerebral abscess or subdural empyema; left otomastoid inflammatory changes without intracranial extension.",
-        "category": "recommended",
-        "tool_parameters": {
-          "contrast": true
-        },
-        "citation": "[Brouwer_2012]",
-        "guideline_source": "Brouwer 2012"
-      },
-      {
-        "step": 7,
-        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
-        "tool_name": "order_microbiology",
-        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started. eventual blood culture growth of the pathogen;",
-        "category": "required",
-        "tool_parameters": {
-          "specimen": "blood_culture",
-          "tests": [
-            "culture",
-            "gram_stain",
-            "susceptibility"
-          ],
-          "before_antimicrobials": true
-        },
-        "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §VI"
       }
     ],
     "useless_tools": [
@@ -851,13 +796,6 @@
         "reason": "Per IDSA 2004, non-contrast CT head must precede lumbar puncture whenever any imaging-first criterion is present. This patient has altered mental status and focal neurological deficit (left Babinski, facial asymmetry) — LP without prior CT risks herniation if an intracranial mass lesion or obstructive hydrocephalus is present.",
         "citation": "[IDSA_2004]",
         "severity": "hard"
-      },
-      {
-        "before": "interpret_labs",
-        "after": "analyze_csf",
-        "reason": "Blood cultures must be drawn before the first antibiotic dose to preserve culture yield; peripheral cultures are collected at the same time as the lab draw, before LP or antibiotics are initiated.",
-        "citation": "[IDSA_2004]",
-        "severity": "hard"
       }
     ],
     "critical_actions": [
@@ -888,7 +826,8 @@
       "A reported childhood penicillin rash does not contraindicate ceftriaxone in life-threatening infection; cross-reactivity is low and the risk-benefit ratio favors treatment.",
       "The dramatically low CSF glucose (8 mg/dL) and markedly elevated CSF lactate (14.2 mmol/L) are the critical confirmatory markers of bacterial meningitis, even when the Gram stain is initially negative — multiplex PCR and culture are essential.",
       "Gram-negative bacillary meningitis requires 21 days of IV antibiotic therapy — longer than pneumococcal (10-14 days) or meningococcal (7 days) meningitis; de-escalation to targeted ceftriaxone monotherapy is appropriate once susceptibilities are confirmed.",
-      "CT before LP is mandated when any imaging-first criterion is present (altered mental status, focal neurological deficit, age >50); this patient has multiple criteria."
+      "CT before LP is mandated when any imaging-first criterion is present (altered mental status, focal neurological deficit, age >50); this patient has multiple criteria.",
+      "WHO 2025: obtain cultures promptly, but neither LP nor cranial imaging may delay empirical antimicrobials when the pathway requires treatment first."
     ],
     "red_herrings": [
       {
@@ -931,8 +870,8 @@
       "advanced_imaging": "normal"
     },
     "version": "1.0",
-    "last_revised": "2026-08-08",
-    "revision_reason": "per-case audit: a required action orders the multiplex meningitis PCR panel, which is priced as a distinct study, and the served CSF report carried no result for it — in this case the panel result is now present (reused the case's own Meningitis_PCR_panel result). No cell count, protein, glucose, pressure or organism was changed",
+    "last_revised": "2026-08-10",
+    "revision_reason": "Reviewer 2 meningitis audit: complete LP/microbiology/lab pathway, no ECG, and MRI restricted to complications or non-response",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:BACT-MEN",
     "difficulty_rationale": "5 required tools; 3 red herrings; rare Gram-negative organism; CSF glucose interpretation complicated by severe hyperglycemia; penicillin allergy complicates empiric antibiotic selection; distinct from all other BACT-MEN cases in organism, demographic, and diagnostic trap",

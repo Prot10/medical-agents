@@ -250,7 +250,8 @@
       ],
       "interpretation": "Sinus tachycardia, rate 102. Deep T-wave inversions in V1–V5. QTc prolonged at 494 ms. No ST-segment elevation",
       "clinical_correlation": ""
-    }
+    },
+    "csf": null
   },
   "followup_outputs": [
     {
@@ -379,41 +380,6 @@
       }
     },
     {
-      "trigger_action": "request_continuous_eeg",
-      "tool_name": "analyze_eeg",
-      "output": {
-        "classification": "abnormal",
-        "background": {
-          "dominant_frequency": "Mixed delta-theta",
-          "amplitude": "Moderate",
-          "symmetry": "Diffuse but slight right predominance"
-        },
-        "findings": [
-          {
-            "type": "Diffuse slowing",
-            "location": "Generalized",
-            "frequency": "2-5 Hz delta-theta",
-            "morphology": "Irregular",
-            "state": "Continuous",
-            "clinical_correlation": ""
-          },
-          {
-            "type": "Sharply contoured waves",
-            "location": "Right temporal",
-            "frequency": "Occasional",
-            "morphology": "Sharp transients",
-            "state": "Intermittent",
-            "clinical_correlation": ""
-          }
-        ],
-        "artifacts": [],
-        "activating_procedures": {},
-        "impression": "No clear ictal activity. Right temporal sharply contoured transients warrant continued monitoring",
-        "limitations": "",
-        "recommended_actions": []
-      }
-    },
-    {
       "trigger_action": "request_order_cardiac_monitoring",
       "tool_name": "order_cardiac_monitoring",
       "output": {
@@ -527,48 +493,61 @@
     ],
     "optimal_actions": [
       {
-        "step": 1,
-        "action": "Obtain urgent non-contrast CT head as first imaging modality for suspected SAH",
+        "action": "Obtain an urgent noncontrast head CT as the mandatory first-line study for suspected aneurysmal subarachnoid hemorrhage",
         "tool_name": "order_ct_scan",
-        "expected_finding": "Hyperdense blood in subarachnoid spaces (basal cisterns, Sylvian or interhemispheric fissures); CT sensitivity ~98% within 6 h, declines thereafter",
-        "category": "required",
-        "tool_parameters": {},
-        "citation": "[Connolly_2012]",
-        "guideline_source": "Connolly_2012"
-      },
-      {
-        "step": 2,
-        "action": "Obtain CT angiography (CTA) of the head and neck to characterize aneurysm location, size, and morphology",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "Saccular aneurysm at the culprit location; morphologic features (neck width, dome-to-neck ratio, lobulation) inform clipping vs coiling",
+        "expected_finding": "Acute subarachnoid blood or, in a late/low-attenuation presentation, a negative or inconclusive index study that triggers the conditional LP pathway",
         "category": "required",
         "tool_parameters": {
-          "angiography": true
+          "contrast": false,
+          "angiography": false
         },
-        "citation": "[Connolly_2012]",
-        "guideline_source": "Connolly_2012"
+        "citation": "[Hoh_2023]",
+        "guideline_source": "AHA/ASA aneurysmal subarachnoid hemorrhage guideline 2023",
+        "step": 1
       },
       {
-        "step": 3,
-        "action": "Interpret labs: CBC, BMP (sodium for cerebral salt wasting / SIADH), coagulation panel, type & screen, troponin, BNP",
+        "action": "After the noncontrast CT, obtain a separate head-and-neck CT angiogram to localize the culprit aneurysm and plan treatment; CTA does not replace the index NCCT",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "Culprit aneurysm location, size, neck and branch anatomy, or an angiographically occult pattern requiring selected catheter DSA",
+        "category": "required",
+        "tool_parameters": {
+          "contrast": true,
+          "angiography": true
+        },
+        "citation": "[Hoh_2023]",
+        "guideline_source": "AHA/ASA aneurysmal subarachnoid hemorrhage guideline 2023",
+        "step": 2
+      },
+      {
+        "action": "Obtain the condition-specific baseline blood work: CBC, metabolic panel and coagulation studies",
         "tool_name": "interpret_labs",
-        "expected_finding": "Mild leukocytosis (stress response), troponin elevation (neurogenic stress cardiomyopathy), normal coagulation if not on anticoagulation",
+        "expected_finding": "Anemia/platelets, sodium and renal function, and PT/INR/aPTT relevant to acute management and invasive procedures; no routine thyroid, inflammatory, autoimmune or paraneoplastic panel",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
             "BMP",
-            "coagulation",
-            "type_and_screen",
-            "troponin",
-            "BNP"
+            "coagulation"
           ]
         },
-        "citation": "[Connolly_2012]",
-        "guideline_source": "Connolly_2012"
+        "citation": "[Hoh_2023]",
+        "guideline_source": "AHA/ASA aneurysmal subarachnoid hemorrhage guideline 2023",
+        "step": 3
       },
       {
-        "step": 4,
+        "action": "Consider serial transcranial Doppler during the vasospasm-risk window to monitor for vasospasm and delayed cerebral ischemia",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Velocity and Lindegaard-ratio trends that support or argue against clinically significant vasospasm; reasonable but not mandatory",
+        "category": "optional",
+        "tool_parameters": {
+          "modality": "transcranial_doppler"
+        },
+        "citation": "[Hoh_2023]",
+        "guideline_source": "AHA/ASA aneurysmal subarachnoid hemorrhage guideline 2023",
+        "step": 4
+      },
+      {
+        "step": 5,
         "action": "Obtain 12-lead ECG to evaluate for neurogenic stress changes and exclude concurrent primary cardiac event",
         "tool_name": "analyze_ecg",
         "expected_finding": "Neurogenic T-wave inversions, QTc prolongation, ST changes typical of catecholamine surge in SAH; not primary ACS",
@@ -578,11 +557,11 @@
         "guideline_source": "Connolly_2012"
       },
       {
-        "step": 5,
+        "step": 6,
         "action": "Search medical literature for current SAH grading scales (Hunt-Hess, WFNS, modified Fisher) and clipping vs endovascular coiling indications",
         "tool_name": "search_medical_literature",
         "expected_finding": "Society guidelines (AHA/ASA 2012/2023) confirm grading, vasospasm prophylaxis with nimodipine, and timing of definitive aneurysm securing",
-        "category": "required",
+        "category": "recommended",
         "tool_parameters": {
           "query": "aneurysmal SAH management Hunt-Hess WFNS Fisher coiling clipping"
         },
@@ -590,21 +569,11 @@
         "guideline_source": "Hoh_2023"
       },
       {
-        "step": 6,
-        "action": "Urgent consultation with neurosurgery and interventional neuroradiology for definitive aneurysm securing within 24-72 hours",
-        "tool_name": null,
-        "expected_finding": "Joint decision for endovascular coiling versus surgical clipping based on aneurysm morphology, location, and patient factors",
-        "category": "required",
-        "tool_parameters": {},
-        "citation": "[Connolly_2012]",
-        "guideline_source": "Connolly_2012"
-      },
-      {
         "step": 7,
         "action": "Check drug interactions for nimodipine and any pre-existing antithrombotic / antihypertensive regimen; plan anticoagulation reversal if applicable",
         "tool_name": "check_drug_interactions",
         "expected_finding": "Nimodipine well-tolerated with most antihypertensives (monitor for hypotension); anticoagulation reversed if patient is on a DOAC or warfarin pre-securing aneurysm",
-        "category": "required",
+        "category": "recommended",
         "tool_parameters": {
           "drug": "nimodipine"
         },
@@ -632,18 +601,6 @@
         "tool_parameters": {},
         "citation": "[Connolly_2012]",
         "guideline_source": "Connolly_2012"
-      },
-      {
-        "step": 10,
-        "action": "Initiate daily transcranial Doppler monitoring days 4-14 post-bleed for vasospasm surveillance",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Mean flow velocities and Lindegaard ratios to detect cerebral vasospasm preceding delayed cerebral ischemia",
-        "category": "recommended",
-        "tool_parameters": {
-          "modality": "transcranial_doppler"
-        },
-        "citation": "[Hoh_2023]",
-        "guideline_source": "Hoh_2023"
       }
     ],
     "useless_tools": [
@@ -672,34 +629,82 @@
       {
         "tool_name": "order_advanced_imaging",
         "tool_parameters": {
-          "modality": "amyloid_PET"
-        },
-        "rationale": "Amyloid PET evaluates Alzheimer biomarkers and has no role in acute hemorrhagic stroke workup.",
-        "citation": "[Connolly_2012]"
-      },
-      {
-        "tool_name": "order_advanced_imaging",
-        "tool_parameters": {
           "modality": "DaTscan"
         },
-        "rationale": "Dopamine-transporter SPECT is for parkinsonism differentiation and has no role in SAH.",
-        "citation": "[Connolly_2012]"
+        "rationale": "This modality does not answer the aneurysmal-SAH diagnostic or vasospasm-monitoring question reviewed for this dataset.",
+        "citation": "[Hoh_2023]"
       },
       {
         "tool_name": "order_advanced_imaging",
         "tool_parameters": {
           "modality": "FDG_PET"
         },
-        "rationale": "FDG PET has no role in acute SAH diagnosis or management.",
-        "citation": "[Connolly_2012]"
+        "rationale": "This modality does not answer the aneurysmal-SAH diagnostic or vasospasm-monitoring question reviewed for this dataset.",
+        "citation": "[Hoh_2023]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "MIBG_scan"
+        },
+        "rationale": "This modality does not answer the aneurysmal-SAH diagnostic or vasospasm-monitoring question reviewed for this dataset.",
+        "citation": "[Hoh_2023]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "MR_angiography"
+        },
+        "rationale": "This modality does not answer the aneurysmal-SAH diagnostic or vasospasm-monitoring question reviewed for this dataset.",
+        "citation": "[Hoh_2023]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "MR_spectroscopy"
+        },
+        "rationale": "This modality does not answer the aneurysmal-SAH diagnostic or vasospasm-monitoring question reviewed for this dataset.",
+        "citation": "[Hoh_2023]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "rationale": "This modality does not answer the aneurysmal-SAH diagnostic or vasospasm-monitoring question reviewed for this dataset.",
+        "citation": "[Hoh_2023]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "carotid_duplex"
+        },
+        "rationale": "This modality does not answer the aneurysmal-SAH diagnostic or vasospasm-monitoring question reviewed for this dataset.",
+        "citation": "[Hoh_2023]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "perfusion_MRI"
+        },
+        "rationale": "This modality does not answer the aneurysmal-SAH diagnostic or vasospasm-monitoring question reviewed for this dataset.",
+        "citation": "[Hoh_2023]"
+      },
+      {
+        "tool_name": "order_advanced_imaging",
+        "tool_parameters": {
+          "modality": "tau_PET"
+        },
+        "rationale": "This modality does not answer the aneurysmal-SAH diagnostic or vasospasm-monitoring question reviewed for this dataset.",
+        "citation": "[Hoh_2023]"
       }
     ],
     "harmful_tools": [
       {
         "tool_name": "analyze_csf",
         "tool_parameters": {},
-        "rationale": "CT non-contrast head already confirms SAH; lumbar puncture adds no diagnostic value and carries procedural / herniation risk, particularly if any mass effect develops.",
-        "citation": "[Edlow_2008]"
+        "rationale": "The noncontrast CT already establishes SAH; diagnostic LP adds procedural risk without diagnostic benefit.",
+        "citation": "[Hoh_2023]"
       }
     ],
     "sequence_constraints": [
@@ -725,7 +730,8 @@
       "Obtain urgent neurosurgery and interventional neuroradiology consultation for definitive aneurysm securing (clipping or coiling) within 24-72 hours.",
       "Admit to a neurocritical care unit with continuous neurologic checks, blood-pressure control (SBP target generally <160 mmHg pre-securing), and cardiac telemetry.",
       "Monitor serum sodium closely for cerebral salt wasting / SIADH and avoid hypotonic fluids.",
-      "Initiate daily transcranial Doppler monitoring days 4-14 post-bleed for vasospasm surveillance."
+      "Initiate daily transcranial Doppler monitoring days 4-14 post-bleed for vasospasm surveillance.",
+      "Urgent consultation with neurosurgery and interventional neuroradiology for definitive aneurysm securing within 24-72 hours"
     ],
     "contraindicated_actions": [
       "Do not perform lumbar puncture before non-contrast CT in suspected SAH.",
@@ -762,15 +768,15 @@
     "fallback_tool_kinds": {
       "cardiac_monitoring": "normal"
     },
-    "last_revised": "2026-08-08",
-    "revision_reason": "per-case audit: baseline panels named by an optimal action and absent from the payload actually served (type_and_screen). Reported as unremarkable only after checking that nothing in the case — no abnormal row, no interpretation, no expected_finding, no reasoning — states an abnormality for them",
+    "last_revised": "2026-08-10",
+    "revision_reason": "Reviewer 2 aSAH audit: separate first-line NCCT and subsequent CTA; conditional LP only in SAH-P01/P03/P06 with tube comparison and spectrophotometric xanthochromia; TCD optional; generic CSF/advanced-imaging panels and CT-perfusion carry-over removed",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:SAH",
     "difficulty_rationale": "Classic thunderclap headache with diagnostic CT (Fisher 3); 7 required tools forming a single diagnostic chain (CT→CTA→labs→ECG→consult→nimodipine); no significant red herrings beyond neurogenic cardiac findings.",
     "citation_gap": [],
     "vocab_gap": [],
     "panel_required_exemptions": {
-      "analyze_csf": "The panel marks CSF required conditionally: mandatory only when the index CT is non-diagnostic. This case's CT is diagnostic for subarachnoid haemorrhage, so a lumbar puncture adds risk without adding information — the three cases with a negative CT (SAH-P01, P03, P06) do require it."
+      "analyze_csf": "CSF is conditionally required only after a negative/inconclusive NCCT with persistent suspicion. This case has diagnostic subarachnoid blood on NCCT, so LP is unnecessary and invasive."
     }
   }
 }

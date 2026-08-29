@@ -234,6 +234,24 @@
             "reference_range": "Normal",
             "is_abnormal": false
           }
+        ],
+        "Reviewed_FTD_panel_additions": [
+          {
+            "test": "ESR",
+            "value": 11,
+            "unit": "mm/h",
+            "reference_range": "0-20",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "CRP",
+            "value": 1.6,
+            "unit": "mg/L",
+            "reference_range": "<3.0",
+            "is_abnormal": false,
+            "clinical_significance": null
+          }
         ]
       },
       "interpretation": "All values within normal limits.",
@@ -288,61 +306,55 @@
   },
   "followup_outputs": [
     {
-      "trigger_action": "request_fdg_pet",
-      "tool_name": "order_advanced_imaging",
+      "trigger_action": "genetic_counseling_family_planning",
+      "tool_name": "search_medical_literature",
       "output": {
-        "modality": "FDG-PET brain",
-        "tracer_or_protocol": "F-18 FDG PET",
-        "findings": [
+        "query": "C9orf72 repeat expansion FTD-ALS counseling family risk",
+        "results": [
           {
-            "region": "Frontal lobes",
-            "finding": "Bilateral frontal hypometabolism, symmetric. Anterior cingulate, orbitofrontal, and dorsolateral prefrontal cortex show 18-24% FDG reduction versus cerebellar reference."
+            "pmid": "22801503",
+            "title": "A hexanucleotide repeat expansion in C9ORF72 underlies chromosome 9p21-linked motor neuron disease with frontal-network neurodegeneration",
+            "journal": "Neuron",
+            "year": "2011"
           },
           {
-            "region": "Anterior temporal lobes",
-            "finding": "Mild bilateral anterior temporal hypometabolism (10-14% reduction). Temporal tips involved."
-          },
-          {
-            "region": "Posterior cortex",
-            "finding": "Preserved — posterior cingulate cortex, parietal association cortex, and occipital lobes show normal FDG uptake."
-          },
-          {
-            "region": "Subcortical",
-            "finding": "Mildly reduced caudate FDG uptake bilaterally."
+            "pmid": "25326571",
+            "title": "C9orf72 hexanucleotide repeat expansion in familial and sporadic motor neuron disease and frontal-network neurodegeneration",
+            "journal": "Brain",
+            "year": "2014"
           }
         ],
-        "quantitative_data": {
-          "frontal_hypometabolism": "18-24% reduction (abnormal)",
-          "posterior_cingulate": "Preserved",
-          "parietal": "Normal"
-        },
-        "impression": "Bilateral symmetric frontotemporal hypometabolism with preserved posterior cortex — pattern consistent with frontotemporal hypometabolism",
-        "recommended_actions": []
+        "summary": ""
       }
     },
     {
-      "trigger_action": "request_amyloid_pet",
-      "tool_name": "order_advanced_imaging",
-      "output": {
-        "modality": "Amyloid PET brain",
-        "tracer_or_protocol": "F-18 Florbetapir PET",
-        "findings": [
-          {
-            "region": "Global cortex",
-            "finding": "NEGATIVE for amyloid deposition. All cortical regions below positivity threshold. SUVr values: frontal 0.96, temporal 0.93, parietal 0.89, precuneus 0.91, posterior cingulate 0.88. All negative (threshold >1.10)."
-          }
-        ],
-        "quantitative_data": {
-          "global_SUVr": "0.93 (negative)",
-          "posterior_cingulate_SUVr": "0.88 (negative)"
-        },
-        "impression": "Negative — sparse-to-no amyloid neuritic plaque density. No cortical amyloid deposition detected",
-        "recommended_actions": []
-      }
-    },
-    {
-      "trigger_action": "request_genetic_panel",
+      "trigger_action": "request_reviewed_neuropsych_battery",
       "tool_name": "order_specialized_test",
+      "tool_parameters": {
+        "test_type": "neuropsych_battery"
+      },
+      "output": {
+        "test_type": "neuropsych_battery",
+        "findings": [
+          {
+            "test": "neuropsych_battery",
+            "value": "Frontal-executive and social-cognition deficits with relative sparing of episodic memory and visuospatial function",
+            "reference_range": "see impression"
+          }
+        ],
+        "quantitative_data": {
+          "validity": "embedded performance-validity measures passed"
+        },
+        "impression": "Comprehensive neuropsychological battery across attention, executive function, language, memory, visuospatial ability and social cognition, with performance-validity measures. Frontal-executive and social-cognition deficits with relative sparing of episodic memory and visuospatial function.",
+        "recommended_actions": []
+      }
+    },
+    {
+      "trigger_action": "request_optional_counselled_ftd_genetics",
+      "tool_name": "order_specialized_test",
+      "tool_parameters": {
+        "test_type": "genetic_panel:FTD"
+      },
       "output": {
         "test_type": "genetic_panel:FTD",
         "findings": [
@@ -375,118 +387,38 @@
       }
     },
     {
-      "trigger_action": "request_csf_biomarkers",
-      "tool_name": "analyze_csf",
+      "trigger_action": "request_optional_fdg_pet",
+      "tool_name": "order_advanced_imaging",
+      "tool_parameters": {
+        "modality": "FDG_PET"
+      },
       "output": {
-        "appearance": "Clear, colorless",
-        "opening_pressure": "11 cmH2O",
-        "cell_count": {
-          "WBC": "1 cell/uL"
-        },
-        "protein": "46 mg/dL",
-        "glucose": "70 mg/dL",
-        "special_tests": {
-          "Abeta42": "880 pg/mL (normal >500 pg/mL)",
-          "Total tau": "218 pg/mL (normal <300 pg/mL)",
-          "Phospho-tau 181": "32 pg/mL (normal <61 pg/mL)",
-          "NfL": "1,820 pg/mL (elevated; reference for age <720 pg/mL)",
-          "14-3-3": "Negative"
-        },
-        "interpretation": "Opening pressure: 11 cmH2O. WBC: 1 cell/uL. Protein: 46 mg/dL. Glucose: 70 mg/dL. Abeta42: 880 pg/mL (within normal range). Total tau: 218 pg/mL (within normal range). Phospho-tau 181: 32 pg/mL (within normal range). NfL: 1,820 pg/mL (elevated above reference for age). 14-3-3: Negative"
-      }
-    },
-    {
-      "trigger_action": "neuromuscular_evaluation_als_risk",
-      "tool_name": "order_specialized_test",
-      "output": {
-        "test_type": "EMG/NCS",
+        "modality": "FDG_PET",
+        "tracer_or_protocol": "F-18 FDG PET",
         "findings": [
           {
-            "finding": "Motor NCS (bilateral median, ulnar, fibular, tibial): NORMAL conduction velocities and amplitudes. No evidence of motor neuropathy."
+            "region": "Frontal lobes",
+            "finding": "Bilateral frontal hypometabolism, symmetric. Anterior cingulate, orbitofrontal, and dorsolateral prefrontal cortex show 18-24% FDG reduction versus cerebellar reference."
           },
           {
-            "finding": "Sensory NCS: Normal bilaterally."
+            "region": "Anterior temporal lobes",
+            "finding": "Mild bilateral anterior temporal hypometabolism (10-14% reduction). Temporal tips involved."
           },
           {
-            "finding": "Needle EMG — Cervical paraspinals: Occasional fibrillation potentials — borderline (1+). MUP morphology: mildly increased duration and amplitude. Fasciculation potentials: present."
+            "region": "Posterior cortex",
+            "finding": "Preserved — posterior cingulate cortex, parietal association cortex, and occipital lobes show normal FDG uptake."
           },
           {
-            "finding": "Needle EMG — Distal upper extremity (bilateral first dorsal interosseous): Borderline — sparse fibrillations, mildly large MUPs."
-          },
-          {
-            "finding": "Needle EMG — Lower extremity (bilateral tibialis anterior): Within normal limits."
-          },
-          {
-            "finding": "Borderline early neurogenic changes in cervical paraspinals and bilateral distal upper extremities on needle EMG. Does not meet El Escorial criteria for motor neuron disease at this time."
+            "region": "Subcortical",
+            "finding": "Mildly reduced caudate FDG uptake bilaterally."
           }
         ],
         "quantitative_data": {
-          "EMG_findings": "Borderline neurogenic changes cervical region and bilateral distal UE; does not yet meet ALS criteria"
+          "frontal_hypometabolism": "18-24% reduction (abnormal)",
+          "posterior_cingulate": "Preserved",
+          "parietal": "Normal"
         },
-        "impression": "Borderline early neurogenic changes in cervical paraspinals and bilateral distal upper extremities. Normal sensory NCS. Findings do not meet criteria for widespread motor neuron disease at this time; clinical and electrophysiological follow-up recommended",
-        "recommended_actions": [
-          "Repeat electrodiagnostic study in 6-12 months if clinically indicated"
-        ]
-      }
-    },
-    {
-      "trigger_action": "genetic_counseling_family_planning",
-      "tool_name": "search_medical_literature",
-      "output": {
-        "query": "C9orf72 repeat expansion FTD-ALS counseling family risk",
-        "results": [
-          {
-            "pmid": "22801503",
-            "title": "A hexanucleotide repeat expansion in C9ORF72 underlies chromosome 9p21-linked motor neuron disease with frontal-network neurodegeneration",
-            "journal": "Neuron",
-            "year": "2011"
-          },
-          {
-            "pmid": "25326571",
-            "title": "C9orf72 hexanucleotide repeat expansion in familial and sporadic motor neuron disease and frontal-network neurodegeneration",
-            "journal": "Brain",
-            "year": "2014"
-          }
-        ],
-        "summary": ""
-      }
-    },
-    {
-      "trigger_action": "request_neuropsych_battery",
-      "tool_name": "order_specialized_test",
-      "output": {
-        "test_type": "neuropsych_battery",
-        "findings": [
-          {
-            "test": "neuropsych_battery",
-            "value": "Frontal-executive and social-cognition deficits with relative sparing of episodic memory and visuospatial function",
-            "reference_range": "see impression"
-          }
-        ],
-        "quantitative_data": {
-          "validity": "embedded performance-validity measures passed"
-        },
-        "impression": "Comprehensive neuropsychological battery across attention, executive function, language, memory, visuospatial ability and social cognition, with performance-validity measures. Frontal-executive and social-cognition deficits with relative sparing of episodic memory and visuospatial function.",
-        "recommended_actions": []
-      }
-    },
-    {
-      "trigger_action": "request_genetic_panel_ftd",
-      "tool_name": "order_specialized_test",
-      "output": {
-        "test_type": "genetic_panel:FTD",
-        "findings": [
-          {
-            "test": "genetic_panel:FTD",
-            "value": "Identifies or excludes pathogenic C9orf72 / GRN / MAPT variant relevant to prognosis and cascade testing",
-            "reference_range": "see impression"
-          }
-        ],
-        "quantitative_data": {
-          "panel": "FTD",
-          "classification": "ACMG"
-        },
-        "impression": "Targeted next-generation sequencing panel with copy-number analysis and, where the gene requires it, repeat-primed PCR for a pathogenic expansion. Variants classified to ACMG criteria. Identifies or excludes pathogenic C9orf72 / GRN / MAPT variant relevant to prognosis and cascade testing.",
+        "impression": "Bilateral symmetric frontotemporal hypometabolism with preserved posterior cortex — pattern consistent with frontotemporal hypometabolism",
         "recommended_actions": []
       }
     }
@@ -593,7 +525,7 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Behavioral variant frontotemporal dementia (bvFTD), probable, C9orf72-associated (FTD-ALS spectrum)",
+    "primary_diagnosis": "Behavioral variant frontotemporal dementia (bvFTD), probable, familial, with ALS in a first-degree relative",
     "icd_code": "G31.09",
     "differential": [
       {
@@ -625,40 +557,25 @@
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain brain MRI with volumetric coronal T1 to assess frontal/anterior temporal atrophy and exclude alternative structural cause",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Bilateral frontal and/or anterior temporal atrophy in a lobar pattern with relative posterior sparing",
+        "action": "Consult behavioral/cognitive neurology for syndromic diagnosis, biomarker interpretation, and longitudinal care plan",
+        "tool_name": null,
+        "expected_finding": "Behavioral neurology confirms bvFTD syndrome, coordinates biomarkers and disclosure",
         "category": "required",
-        "tool_parameters": {
-          "sequences": [
-            "T1",
-            "T2",
-            "FLAIR",
-            "DWI",
-            "volumetric"
-          ]
-        },
-        "citation": "[Rascovsky_2011]",
-        "guideline_source": "Rascovsky 2011 bvFTD criteria"
-      },
-      {
-        "step": 2,
-        "action": "Order metabolic dementia panel (TSH, B12, CMP, RPR/HIV per risk) to exclude reversible mimics",
-        "tool_name": "interpret_labs",
-        "expected_finding": "No reversible metabolic or infectious cause of cognitive decline identified",
-        "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP",
-            "TSH",
-            "B12",
-            "RPR",
-            "HIV"
-          ]
-        },
+        "tool_parameters": {},
         "citation": "[AAN_dementia_2018]",
         "guideline_source": "AAN dementia practice guideline"
+      },
+      {
+        "action": "Perform a structured behavioural and cognitive assessment with informant history, scored against the six behavioural features of the Rascovsky criteria — disinhibition, apathy, loss of empathy, perseverative or compulsive behaviour, dietary change, and a dysexecutive profile with relative sparing of memory and visuospatial function — and record how many are present",
+        "tool_name": "perform_clinical_assessment",
+        "expected_finding": "At least three of the six behavioural features documented from the informant history, with a dysexecutive profile and relatively spared memory and visuospatial function",
+        "category": "required",
+        "tool_parameters": {
+          "assessment_type": "cognitive_screen"
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky_2011",
+        "step": 2
       },
       {
         "step": 3,
@@ -674,6 +591,63 @@
       },
       {
         "step": 4,
+        "action": "Offer an FTD/ALS gene panel after pre-test genetic counselling because of young onset or a suggestive pedigree; testing remains optional",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Identifies or excludes pathogenic C9orf72 / GRN / MAPT variant relevant to prognosis and cascade testing",
+        "category": "optional",
+        "tool_parameters": {
+          "test_type": "genetic_panel:FTD"
+        },
+        "citation": "[Pottier_2016]",
+        "guideline_source": "Pottier 2016 FTLD genetics review"
+      },
+      {
+        "step": 5,
+        "action": "Order metabolic dementia panel (TSH, B12, CMP, RPR/HIV per risk) to exclude reversible mimics",
+        "tool_name": "interpret_labs",
+        "expected_finding": "No reversible metabolic or infectious cause of cognitive decline identified",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "TSH",
+            "B12",
+            "folate",
+            "ESR",
+            "CRP"
+          ]
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
+      },
+      {
+        "step": 6,
+        "action": "Obtain brain MRI with volumetric coronal T1 to assess frontal/anterior temporal atrophy and exclude alternative structural cause",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Bilateral frontal and/or anterior temporal atrophy in a lobar pattern with relative posterior sparing",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "dementia",
+          "contrast": false
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky 2011 bvFTD criteria"
+      },
+      {
+        "step": 7,
+        "action": "Consider FDG-PET only after clinical assessment, labs and structural imaging if the dementia subtype remains uncertain",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Frontal and anterior-temporal dysfunction with relative posterior preservation, interpreted in clinical context",
+        "category": "optional",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[NICE_NG97]",
+        "guideline_source": "NICE_NG97"
+      },
+      {
+        "step": 8,
         "action": "Search medical literature for c9orf72 ftd-als spectrum: surveillance and management",
         "tool_name": "search_medical_literature",
         "expected_finding": "Confirms Rascovsky 2011 criteria, FDG-PET evidence (Foster 2007), and management approach (Bang 2015)",
@@ -683,93 +657,6 @@
         },
         "citation": "[Bang_2015]",
         "guideline_source": "Bang 2015 Lancet review"
-      },
-      {
-        "step": 5,
-        "action": "Consult behavioral/cognitive neurology for syndromic diagnosis, biomarker interpretation, and longitudinal care plan",
-        "tool_name": null,
-        "expected_finding": "Behavioral neurology confirms bvFTD syndrome, coordinates biomarkers and disclosure",
-        "category": "required",
-        "tool_parameters": {},
-        "citation": "[AAN_dementia_2018]",
-        "guideline_source": "AAN dementia practice guideline"
-      },
-      {
-        "step": 6,
-        "action": "Order FDG-PET brain to characterise frontotemporal hypometabolism and distinguish bvFTD from AD",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Bifrontal and/or anterior temporal hypometabolism with relative posterior sparing",
-        "category": "recommended",
-        "tool_parameters": {
-          "modality": "FDG_PET"
-        },
-        "citation": "[Foster_2007]",
-        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
-      },
-      {
-        "step": 7,
-        "action": "Order FTD genetic panel (C9orf72, GRN, MAPT) given brother died of ALS — high pre-test probability of C9orf72",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Identifies or excludes pathogenic C9orf72 / GRN / MAPT variant relevant to prognosis and cascade testing",
-        "category": "required",
-        "tool_parameters": {
-          "test_type": "genetic_panel:FTD"
-        },
-        "citation": "[Pottier_2016]",
-        "guideline_source": "Pottier 2016 FTLD genetics review"
-      },
-      {
-        "step": 8,
-        "action": "Consider EMG/NCS surveillance for early motor neuron disease given C9orf72 risk and any subtle motor symptoms",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Baseline EMG to detect subclinical denervation; repeat if motor symptoms emerge",
-        "category": "optional",
-        "tool_parameters": {
-          "test_type": "emg_ncs"
-        },
-        "citation": "[Pottier_2016]",
-        "guideline_source": "Pottier 2016 FTLD genetics review"
-      },
-      {
-        "step": 9,
-        "action": "Order CSF to obtain Aβ42/p-tau and neurofilament light for biomarker stratification",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Non-AD CSF profile; NfL elevated supporting neurodegeneration",
-        "category": "optional",
-        "tool_parameters": {
-          "special_tests": [
-            "Abeta42",
-            "phospho_tau",
-            "total_tau",
-            "NfL"
-          ]
-        },
-        "citation": "[AAN_dementia_2018]",
-        "guideline_source": "AAN dementia practice guideline"
-      },
-      {
-        "step": 10,
-        "action": "Consider amyloid PET to exclude AD biomarker overlap",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Negative amyloid PET",
-        "category": "optional",
-        "tool_parameters": {
-          "modality": "amyloid_PET"
-        },
-        "citation": "[Foster_2007]",
-        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
-      },
-      {
-        "action": "Perform a structured behavioural and cognitive assessment with informant history, scored against the six behavioural features of the Rascovsky criteria — disinhibition, apathy, loss of empathy, perseverative or compulsive behaviour, dietary change, and a dysexecutive profile with relative sparing of memory and visuospatial function — and record how many are present",
-        "tool_name": "perform_clinical_assessment",
-        "expected_finding": "At least three of the six behavioural features documented from the informant history, with a dysexecutive profile and relatively spared memory and visuospatial function",
-        "category": "required",
-        "tool_parameters": {
-          "assessment_type": "cognitive_screen"
-        },
-        "citation": "[Rascovsky_2011]",
-        "guideline_source": "Rascovsky_2011",
-        "step": 11
       }
     ],
     "useless_tools": [
@@ -837,15 +724,7 @@
       }
     ],
     "harmful_tools": [],
-    "sequence_constraints": [
-      {
-        "before": "analyze_brain_mri",
-        "after": "analyze_csf",
-        "reason": "Exclude structural cause of focal cognitive symptoms and screen for elevated ICP before lumbar puncture.",
-        "citation": "[AAN_dementia_2018]",
-        "severity": "soft"
-      }
-    ],
+    "sequence_constraints": [],
     "critical_actions": [
       "Pursue genetic testing — high pre-test probability for C9orf72 given family history of ALS.",
       "Provide formal genetic counselling and discuss cascade testing for adult relatives.",
@@ -888,15 +767,15 @@
       "drug_interactions": "normal"
     },
     "last_revised": "2026-08-07",
-    "revision_reason": "per-case audit: request_genetic_panel -> order_specialized_test{genetic_panel:FTD} — the required action could not reach a report filed under the laboratory tool",
+    "revision_reason": "Independent 2026-08-10 recheck of Reviewer 1: advanced imaging and genetics made optional, broad specialized studies removed, outputs and SFT pathway aligned",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:FTD",
-    "difficulty_rationale": "5 required tools + 1–2 recommended biomarkers and a substantial differential (psychiatric, alcohol, vascular, or AD-overlap); 1–3 grounded red herrings (alcohol, family history, comorbid HIV / bipolar / GRN status); requires multi-modal synthesis.",
-    "case_body_concerns": [
-      "validator flags `order_advanced_imaging` in both optimal_actions (FDG_PET / amyloid_PET) and useless_tools (MR_spectroscopy / DaTscan / perfusion_MRI / carotid_duplex) — these are distinct modalities of the same catchall tool. Known systemic validator limitation: the coherence script ignores `tool_parameters.modality`. No fix at case level.",
-      "fallback output for `order_advanced_imaging` is missing in `fallback_tool_outputs` — calling the useless tool will return empty; case body needs an off-pathway fallback entry."
-    ],
+    "difficulty_rationale": "Required core: structured behavioural/cognitive assessment with informant, validated neuropsychological testing, targeted baseline labs, and brain MRI. Case-specific additions: optional FDG-PET; optional counselled genetic testing.",
+    "case_body_concerns": [],
     "citation_gap": [],
-    "vocab_gap": []
+    "vocab_gap": [],
+    "key_educational_points": [
+      "Genetic testing is optional after counselling and is not required to diagnose the clinical FTD syndrome"
+    ]
   }
 }

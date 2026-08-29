@@ -178,33 +178,28 @@
             "reference_range": "70-140",
             "is_abnormal": false
           }
+        ],
+        "Reviewed_FTD_panel_additions": [
+          {
+            "test": "ESR",
+            "value": 11,
+            "unit": "mm/h",
+            "reference_range": "0-20",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "CRP",
+            "value": 1.6,
+            "unit": "mg/L",
+            "reference_range": "<3.0",
+            "is_abnormal": false,
+            "clinical_significance": null
+          }
         ]
       },
       "interpretation": "All values within normal limits.",
       "abnormal_values_summary": []
-    },
-    "advanced_imaging": {
-      "modality": "FDG-PET brain",
-      "tracer_or_protocol": "18F-FDG",
-      "findings": [
-        {
-          "region": "Bilateral frontal cortex",
-          "finding": "Severe hypometabolism, orbitofrontal predominant"
-        },
-        {
-          "region": "Anterior temporal",
-          "finding": "Moderate hypometabolism"
-        },
-        {
-          "region": "Posterior cingulate, parietal",
-          "finding": "Normal"
-        }
-      ],
-      "quantitative_data": {
-        "frontal_hypometabolism_Z": "-4.1 SD"
-      },
-      "impression": "Severe bilateral frontotemporal hypometabolism, orbitofrontal predominant — a pattern consistent with a frontotemporal metabolic profile. Posterior cingulate cortex and parietal metabolism preserved",
-      "recommended_actions": []
     },
     "clinical_assessment": {
       "assessment_type": "cognitive_screen",
@@ -256,8 +251,63 @@
   },
   "followup_outputs": [
     {
-      "trigger_action": "request_genetic_panel",
+      "trigger_action": "request_literature_grn_management",
+      "tool_name": "search_medical_literature",
+      "output": {
+        "query": "GRN progranulin FTD treatment clinical trials",
+        "results": [
+          {
+            "title": "GRN-associated frontal-network neurodegeneration: pathophysiology",
+            "finding": "GRN haploinsufficiency leads to TDP-43 pathology (type A); clinical trials targeting progranulin replacement underway"
+          },
+          {
+            "title": "AL001 progranulin replacement trial in GRN mutation carriers",
+            "finding": "Phase 3 trial of progranulin-restoring therapy in GRN mutation carriers ongoing"
+          }
+        ],
+        "summary": ""
+      }
+    },
+    {
+      "trigger_action": "request_reviewed_neuropsych_battery",
       "tool_name": "order_specialized_test",
+      "tool_parameters": {
+        "test_type": "neuropsych_battery"
+      },
+      "output": {
+        "test_type": "neuropsych_battery",
+        "findings": [
+          {
+            "domain": "Executive Function",
+            "result": "Severely impaired — FAB 11/18"
+          },
+          {
+            "domain": "Social Cognition",
+            "result": "Severely impaired — Faux Pas 5/20"
+          },
+          {
+            "domain": "Memory",
+            "result": "Moderately impaired, retrieval pattern"
+          },
+          {
+            "domain": "Behavior",
+            "result": "Severe disinhibition and compulsive behaviors on NPI-Q"
+          }
+        ],
+        "quantitative_data": {
+          "MMSE": "23/30",
+          "FAB": "11/18"
+        },
+        "impression": "Neuropsychological profile: severely impaired executive function (FAB 11/18) and social cognition (Faux Pas 5/20) with moderate retrieval-predominant memory impairment. Severe disinhibition and compulsive behaviors on caregiver-rated scales. Selective anterior-network deficit pattern with posterior cortical sparing",
+        "recommended_actions": []
+      }
+    },
+    {
+      "trigger_action": "request_optional_counselled_ftd_genetics",
+      "tool_name": "order_specialized_test",
+      "tool_parameters": {
+        "test_type": "genetic_panel:FTD"
+      },
       "output": {
         "test_type": "genetic_panel:FTD",
         "findings": [
@@ -290,110 +340,32 @@
       }
     },
     {
-      "trigger_action": "request_amyloid_pet",
+      "trigger_action": "request_optional_fdg_pet",
       "tool_name": "order_advanced_imaging",
+      "tool_parameters": {
+        "modality": "FDG_PET"
+      },
       "output": {
-        "modality": "Amyloid PET",
-        "tracer_or_protocol": "18F-Florbetapir",
+        "modality": "FDG_PET",
+        "tracer_or_protocol": "18F-FDG",
         "findings": [
           {
-            "region": "Global cortex",
-            "finding": "Amyloid negative"
+            "region": "Bilateral frontal cortex",
+            "finding": "Severe hypometabolism, orbitofrontal predominant"
+          },
+          {
+            "region": "Anterior temporal",
+            "finding": "Moderate hypometabolism"
+          },
+          {
+            "region": "Posterior cingulate, parietal",
+            "finding": "Normal"
           }
         ],
         "quantitative_data": {
-          "SUVR_global": "0.94"
+          "frontal_hypometabolism_Z": "-4.1 SD"
         },
-        "impression": "Negative — sparse-to-no amyloid neuritic plaque density. Global SUVR 0.94, below positivity threshold",
-        "recommended_actions": []
-      }
-    },
-    {
-      "trigger_action": "request_csf_biomarkers",
-      "tool_name": "analyze_csf",
-      "output": {
-        "appearance": "Clear",
-        "opening_pressure": "128 mmH2O",
-        "cell_count": {
-          "WBC": "1 cell/mm3"
-        },
-        "protein": "41 mg/dL",
-        "glucose": "60 mg/dL",
-        "glucose_ratio": "0.67",
-        "special_tests": {
-          "Abeta42": "830 pg/mL (normal)",
-          "Total tau": "205 pg/mL (normal)",
-          "Phospho-tau 181": "35 pg/mL (normal)",
-          "NfL": "2,180 pg/mL (elevated)"
-        },
-        "interpretation": "Opening pressure: 128 mmH2O. WBC: 1 cell/mm3 (N/A PMN/N/A lymph). Protein: 41 mg/dL. Glucose: 60 mg/dL (ratio 0.67). Abeta42: 830 pg/mL (normal). Total tau: 205 pg/mL (normal). Phospho-tau 181: 35 pg/mL (normal). NfL: 2,180 pg/mL (elevated)."
-      }
-    },
-    {
-      "trigger_action": "request_comprehensive_neuropsych",
-      "tool_name": "order_specialized_test",
-      "output": {
-        "test_type": "Neuropsychological Evaluation",
-        "findings": [
-          {
-            "domain": "Executive Function",
-            "result": "Severely impaired — FAB 11/18"
-          },
-          {
-            "domain": "Social Cognition",
-            "result": "Severely impaired — Faux Pas 5/20"
-          },
-          {
-            "domain": "Memory",
-            "result": "Moderately impaired, retrieval pattern"
-          },
-          {
-            "domain": "Behavior",
-            "result": "Severe disinhibition and compulsive behaviors on NPI-Q"
-          }
-        ],
-        "quantitative_data": {
-          "MMSE": "23/30",
-          "FAB": "11/18"
-        },
-        "impression": "Neuropsychological profile: severely impaired executive function (FAB 11/18) and social cognition (Faux Pas 5/20) with moderate retrieval-predominant memory impairment. Severe disinhibition and compulsive behaviors on caregiver-rated scales. Selective anterior-network deficit pattern with posterior cortical sparing",
-        "recommended_actions": []
-      }
-    },
-    {
-      "trigger_action": "request_literature_grn_management",
-      "tool_name": "search_medical_literature",
-      "output": {
-        "query": "GRN progranulin FTD treatment clinical trials",
-        "results": [
-          {
-            "title": "GRN-associated frontal-network neurodegeneration: pathophysiology",
-            "finding": "GRN haploinsufficiency leads to TDP-43 pathology (type A); clinical trials targeting progranulin replacement underway"
-          },
-          {
-            "title": "AL001 progranulin replacement trial in GRN mutation carriers",
-            "finding": "Phase 3 trial of progranulin-restoring therapy in GRN mutation carriers ongoing"
-          }
-        ],
-        "summary": ""
-      }
-    },
-    {
-      "trigger_action": "request_tau_pet",
-      "tool_name": "order_advanced_imaging",
-      "output": {
-        "modality": "Tau PET",
-        "tracer_or_protocol": "18F-Flortaucipir",
-        "findings": [
-          {
-            "region": "Global cortex",
-            "finding": "No tau accumulation above threshold"
-          }
-        ],
-        "quantitative_data": {
-          "SUVR_temporal_meta_ROI": "1.09 (tau-negative)"
-        },
-        "impression": "No Alzheimer-typical tau distribution identified. Temporal meta-ROI SUVR 1.09, below tau-positivity threshold",
+        "impression": "Severe bilateral frontotemporal hypometabolism, orbitofrontal predominant — a pattern consistent with a frontotemporal metabolic profile. Posterior cingulate cortex and parietal metabolism preserved",
         "recommended_actions": []
       }
     }
@@ -500,7 +472,7 @@
     }
   },
   "ground_truth": {
-    "primary_diagnosis": "Behavioral variant frontotemporal dementia (bvFTD), probable, GRN (progranulin)-associated",
+    "primary_diagnosis": "Behavioral variant frontotemporal dementia (bvFTD), probable, familial",
     "icd_code": "G31.09",
     "differential": [
       {
@@ -532,40 +504,25 @@
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain brain MRI with volumetric coronal T1 to assess frontal/anterior temporal atrophy and exclude alternative structural cause",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Bilateral frontal and/or anterior temporal atrophy in a lobar pattern with relative posterior sparing",
+        "action": "Consult behavioral/cognitive neurology for syndromic diagnosis, biomarker interpretation, and longitudinal care plan",
+        "tool_name": null,
+        "expected_finding": "Behavioral neurology confirms bvFTD syndrome, coordinates biomarkers and disclosure",
         "category": "required",
-        "tool_parameters": {
-          "sequences": [
-            "T1",
-            "T2",
-            "FLAIR",
-            "DWI",
-            "volumetric"
-          ]
-        },
-        "citation": "[Rascovsky_2011]",
-        "guideline_source": "Rascovsky 2011 bvFTD criteria"
-      },
-      {
-        "step": 2,
-        "action": "Order metabolic dementia panel (TSH, B12, CMP, RPR/HIV per risk) to exclude reversible mimics",
-        "tool_name": "interpret_labs",
-        "expected_finding": "No reversible metabolic or infectious cause of cognitive decline identified",
-        "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP",
-            "TSH",
-            "B12",
-            "RPR",
-            "HIV"
-          ]
-        },
+        "tool_parameters": {},
         "citation": "[AAN_dementia_2018]",
         "guideline_source": "AAN dementia practice guideline"
+      },
+      {
+        "action": "Perform a structured behavioural and cognitive assessment with informant history, scored against the six behavioural features of the Rascovsky criteria — disinhibition, apathy, loss of empathy, perseverative or compulsive behaviour, dietary change, and a dysexecutive profile with relative sparing of memory and visuospatial function — and record how many are present",
+        "tool_name": "perform_clinical_assessment",
+        "expected_finding": "At least three of the six behavioural features documented from the informant history, with a dysexecutive profile and relatively spared memory and visuospatial function",
+        "category": "required",
+        "tool_parameters": {
+          "assessment_type": "cognitive_screen"
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky_2011",
+        "step": 2
       },
       {
         "step": 3,
@@ -581,6 +538,63 @@
       },
       {
         "step": 4,
+        "action": "Offer an FTD/ALS gene panel after pre-test genetic counselling because of young onset or a suggestive pedigree; testing remains optional",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Identifies or excludes pathogenic C9orf72 / GRN / MAPT variant relevant to prognosis and cascade testing",
+        "category": "optional",
+        "tool_parameters": {
+          "test_type": "genetic_panel:FTD"
+        },
+        "citation": "[Pottier_2016]",
+        "guideline_source": "Pottier 2016 FTLD genetics review"
+      },
+      {
+        "step": 5,
+        "action": "Order metabolic dementia panel (TSH, B12, CMP, RPR/HIV per risk) to exclude reversible mimics",
+        "tool_name": "interpret_labs",
+        "expected_finding": "No reversible metabolic or infectious cause of cognitive decline identified",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "TSH",
+            "B12",
+            "folate",
+            "ESR",
+            "CRP"
+          ]
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
+      },
+      {
+        "step": 6,
+        "action": "Obtain brain MRI with volumetric coronal T1 to assess frontal/anterior temporal atrophy and exclude alternative structural cause",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Bilateral frontal and/or anterior temporal atrophy in a lobar pattern with relative posterior sparing",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "dementia",
+          "contrast": false
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky 2011 bvFTD criteria"
+      },
+      {
+        "step": 7,
+        "action": "Consider FDG-PET only after clinical assessment, labs and structural imaging if the dementia subtype remains uncertain",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Frontal and anterior-temporal dysfunction with relative posterior preservation, interpreted in clinical context",
+        "category": "optional",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[NICE_NG97]",
+        "guideline_source": "NICE_NG97"
+      },
+      {
+        "step": 8,
         "action": "Search medical literature for grn-associated ftd: phenotype and management",
         "tool_name": "search_medical_literature",
         "expected_finding": "Confirms Rascovsky 2011 criteria, FDG-PET evidence (Foster 2007), and management approach (Bang 2015)",
@@ -590,64 +604,6 @@
         },
         "citation": "[Bang_2015]",
         "guideline_source": "Bang 2015 Lancet review"
-      },
-      {
-        "step": 5,
-        "action": "Consult behavioral/cognitive neurology for syndromic diagnosis, biomarker interpretation, and longitudinal care plan",
-        "tool_name": null,
-        "expected_finding": "Behavioral neurology confirms bvFTD syndrome, coordinates biomarkers and disclosure",
-        "category": "required",
-        "tool_parameters": {},
-        "citation": "[AAN_dementia_2018]",
-        "guideline_source": "AAN dementia practice guideline"
-      },
-      {
-        "step": 6,
-        "action": "Order FDG-PET brain to characterise frontotemporal hypometabolism and distinguish bvFTD from AD",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Bifrontal and/or anterior temporal hypometabolism with relative posterior sparing",
-        "category": "recommended",
-        "tool_parameters": {
-          "modality": "FDG_PET"
-        },
-        "citation": "[Foster_2007]",
-        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
-      },
-      {
-        "step": 7,
-        "action": "Order FTD genetic panel (C9orf72, GRN, MAPT) given strong familial history (mother and maternal aunt with frontal dementia)",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Identifies or excludes pathogenic C9orf72 / GRN / MAPT variant relevant to prognosis and cascade testing",
-        "category": "required",
-        "tool_parameters": {
-          "test_type": "genetic_panel:FTD"
-        },
-        "citation": "[Pottier_2016]",
-        "guideline_source": "Pottier 2016 FTLD genetics review"
-      },
-      {
-        "step": 8,
-        "action": "Consider amyloid PET to exclude AD biomarker overlap",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Negative amyloid PET",
-        "category": "optional",
-        "tool_parameters": {
-          "modality": "amyloid_PET"
-        },
-        "citation": "[Foster_2007]",
-        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
-      },
-      {
-        "action": "Perform a structured behavioural and cognitive assessment with informant history, scored against the six behavioural features of the Rascovsky criteria — disinhibition, apathy, loss of empathy, perseverative or compulsive behaviour, dietary change, and a dysexecutive profile with relative sparing of memory and visuospatial function — and record how many are present",
-        "tool_name": "perform_clinical_assessment",
-        "expected_finding": "At least three of the six behavioural features documented from the informant history, with a dysexecutive profile and relatively spared memory and visuospatial function",
-        "category": "required",
-        "tool_parameters": {
-          "assessment_type": "cognitive_screen"
-        },
-        "citation": "[Rascovsky_2011]",
-        "guideline_source": "Rascovsky_2011",
-        "step": 9
       }
     ],
     "useless_tools": [
@@ -715,15 +671,7 @@
       }
     ],
     "harmful_tools": [],
-    "sequence_constraints": [
-      {
-        "before": "analyze_brain_mri",
-        "after": "analyze_csf",
-        "reason": "Exclude structural cause of focal cognitive symptoms and screen for elevated ICP before lumbar puncture.",
-        "citation": "[AAN_dementia_2018]",
-        "severity": "soft"
-      }
-    ],
+    "sequence_constraints": [],
     "critical_actions": [
       "Pursue genetic testing — clear familial pattern (maternal lineage).",
       "Discuss GRN-targeted clinical trial eligibility and cascade family testing.",
@@ -766,15 +714,15 @@
       "drug_interactions": "normal"
     },
     "last_revised": "2026-08-07",
-    "revision_reason": "per-case audit: request_genetic_panel -> order_specialized_test{genetic_panel:FTD} — the required action could not reach a report filed under the laboratory tool",
+    "revision_reason": "Independent 2026-08-10 recheck of Reviewer 1: advanced imaging and genetics made optional, broad specialized studies removed, outputs and SFT pathway aligned",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:FTD",
-    "difficulty_rationale": "5 required tools (MRI, labs, neuropsych, literature, consult) plus recommended FDG-PET / amyloid PET / genetic panel; 1–2 red herrings (mild rigidity ± family history); requires cross-modal synthesis (structural + metabolic + biomarker + neuropsych) to exclude AD and document Rascovsky criteria.",
-    "case_body_concerns": [
-      "validator flags `order_advanced_imaging` in both optimal_actions (FDG_PET / amyloid_PET) and useless_tools (MR_spectroscopy / DaTscan / perfusion_MRI / carotid_duplex) — these are distinct modalities of the same catchall tool. Known systemic validator limitation: the coherence script ignores `tool_parameters.modality`. No fix at case level.",
-      "fallback output for `order_advanced_imaging` is missing in `fallback_tool_outputs` — calling the useless tool will return empty; case body needs an off-pathway fallback entry."
-    ],
+    "difficulty_rationale": "Required core: structured behavioural/cognitive assessment with informant, validated neuropsychological testing, targeted baseline labs, and brain MRI. Case-specific additions: optional FDG-PET; optional counselled genetic testing.",
+    "case_body_concerns": [],
     "citation_gap": [],
-    "vocab_gap": []
+    "vocab_gap": [],
+    "key_educational_points": [
+      "Genetic testing is optional after counselling and is not required to diagnose the clinical FTD syndrome"
+    ]
   }
 }

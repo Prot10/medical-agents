@@ -11,17 +11,12 @@ focal_epilepsy_temporal:
     age_range: [18, 60]
     sex_bias: null
   encounter_type: "inpatient"
-  # Clinical tool review, July 2026: LABS required->optional (only to exclude acute symptomatic
-  # seizures); CT optional where MRI is unavailable. R1 asked to REMOVE echo and
-  # cardiac_monitoring; kept optional because FEPI-TEMP-P05 and -RP02 are puzzles first attributed
-  # to syncope and need the branch
+  # Independent application of the July 2026 review: staged EEG pathway (routine ->
+  # sleep-deprived -> ambulatory when still uncertain; video for event capture/tertiary work-up;
+  # continuous ICU only for NCSE), targeted optional labs in 23, ECG in 21 first-suspected/TLOC
+  # presentations, dedicated MRI in 29 and one CT alternative. Echo and rhythm monitoring removed.
   required_modalities: [EEG, MRI]
-  # Echo + cardiac_monitoring are used only in atypical presentations where
-  # syncope-mimic ruleout is on the differential (e.g. FEPI-TEMP-P05 was
-  # initially attributed to vasovagal/cardiac syncope before EEG localised
-  # focal temporal onset). Low overall usage; the option must remain so the
-  # clinical pathway can branch.
-  optional_modalities: [LABS, ECG, CT, echo, cardiac_monitoring]
+  optional_modalities: [LABS, ECG, CT, specialized_test, body_imaging]
   key_findings:
     eeg:
       straightforward:
@@ -47,11 +42,10 @@ focal_epilepsy_temporal:
         - "Normal MRI (MRI-negative focal epilepsy)"
         - "Incidental non-specific white matter lesions (red herring)"
     labs:
-      all_difficulties:
-        - "Basic metabolic panel: normal"
-        - "CBC: normal"
-        - "Post-ictal prolactin may be elevated (if drawn within 20 minutes)"
-        - "Antiepileptic drug levels: not on AEDs (first presentation) or subtherapeutic"
+      selected_cases_only:
+        - "Glucose, sodium and calcium when an acute symptomatic seizure or mimic is plausible"
+        - "Antiseizure medication level and organ function only when treatment exposure makes them relevant"
+        - "Case-specific emergency studies, such as D-dimer/troponin/BNP in the concurrent pulmonary embolism case"
   differential_diagnoses:
     - diagnosis: "Psychogenic non-epileptic seizures (PNES)"
       key_distinguishing: "No EEG correlate, atypical semiology, eyes closed during event"
@@ -72,9 +66,15 @@ focal_epilepsy_temporal:
       presentation: "Episodes initially diagnosed as panic attacks — sudden fear, palpitations, depersonalization. Normal MRI, initially normal EEG."
       expected_agent_confidence: 0.40
   common_followups:
+    - trigger_action: "request_sleep_deprived_eeg"
+      tool_name: "analyze_eeg"
+      description: "Sleep-deprived EEG when routine EEG is normal or equivocal and uncertainty persists"
+    - trigger_action: "request_ambulatory_eeg"
+      tool_name: "analyze_eeg"
+      description: "Ambulatory EEG after routine and sleep-deprived studies remain non-diagnostic"
     - trigger_action: "request_video_eeg"
       tool_name: "analyze_eeg"
-      description: "Prolonged video-EEG monitoring to capture habitual events"
+      description: "Prolonged video-EEG only when habitual events must be captured, PNES differentiated, or presurgical localization performed"
     - trigger_action: "request_mri_epilepsy_protocol"
       tool_name: "analyze_brain_mri"
       description: "3T MRI with epilepsy protocol (thin coronal cuts through temporal lobes)"
@@ -155,20 +155,20 @@ ischemic_stroke:
       expected_agent_confidence: 0.45
   common_followups:
     - trigger_action: "request_ct_angiography"
-      tool_name: "analyze_brain_mri"
+      tool_name: "order_ct_scan"
       description: "CTA head and neck for vascular evaluation"
+    - trigger_action: "request_ct_perfusion"
+      tool_name: "order_advanced_imaging"
+      description: "Automated core-penumbra assessment in selected wake-up or extended-window stroke"
     - trigger_action: "request_echocardiogram"
-      tool_name: "interpret_labs"
+      tool_name: "order_echocardiogram"
       description: "Transthoracic or transesophageal echocardiogram"
     - trigger_action: "request_holter_monitor"
-      tool_name: "analyze_ecg"
+      tool_name: "order_cardiac_monitoring"
       description: "24-72h Holter monitor for paroxysmal AF"
     - trigger_action: "request_hypercoagulability_panel"
       tool_name: "interpret_labs"
       description: "Factor V Leiden, protein C/S, antiphospholipid antibodies"
-    - trigger_action: "request_carotid_doppler"
-      tool_name: "analyze_brain_mri"
-      description: "Carotid duplex ultrasound for stenosis"
 
 autoimmune_encephalitis_nmdar:
   name: "Anti-NMDA receptor encephalitis"
@@ -179,15 +179,16 @@ autoimmune_encephalitis_nmdar:
     age_range: [18, 40]
     sex_bias: "female_predominant"
   encounter_type: "emergency"
-  # Clinical tool review, July 2026: occult-tumour screening imaging added as REQUIRED
-  # (body_imaging): a missed ovarian teratoma is a missed treatable cause and no existing item
-  # covered it (Graus 2016)
+  # Clinical tool review, July 2026: occult-tumour screening is REQUIRED but tailored rather
+  # than blanket whole-body CT — pelvic/abdominal imaging in women >=12 years, selected
+  # testicular imaging in younger men, and broader chest/body imaging only when context supports
+  # it. Routine EEG is the baseline; continuous ICU monitoring is a selected escalation.
   required_modalities: [EEG, MRI, LABS, CSF, body_imaging]
   optional_modalities: [ECG]
   key_findings:
     eeg:
       straightforward:
-        - "Extreme delta brush (EDB) pattern — pathognomonic"
+        - "Extreme delta brush (EDB) pattern — relatively characteristic, not pathognomonic"
         - "Generalized rhythmic delta activity with superimposed beta"
         - "Electrographic seizures, often subclinical"
       moderate:
@@ -253,16 +254,19 @@ autoimmune_encephalitis_nmdar:
   common_followups:
     - trigger_action: "request_nmdar_antibodies"
       tool_name: "interpret_labs"
-      description: "Serum and CSF anti-NMDAR antibody panel"
+      description: "Serum IgG anti-GluN1 cell-based assay, interpreted only with the CSF assay"
     - trigger_action: "request_pelvic_ultrasound"
-      tool_name: "interpret_labs"
-      description: "Pelvic ultrasound to rule out ovarian teratoma"
+      tool_name: "order_body_imaging"
+      description: "Pelvic and abdominal ultrasound to screen for ovarian teratoma"
+    - trigger_action: "request_testicular_ultrasound"
+      tool_name: "order_body_imaging"
+      description: "Targeted germ-cell tumour screening in a selected younger male"
     - trigger_action: "request_autoimmune_panel"
       tool_name: "interpret_labs"
       description: "Comprehensive autoimmune encephalitis antibody panel (LGI1, CASPR2, GABA-B, AMPA)"
     - trigger_action: "request_ct_chest_abdomen_pelvis"
-      tool_name: "analyze_brain_mri"
-      description: "CT body for paraneoplastic workup"
+      tool_name: "order_body_imaging"
+      description: "Context-adapted broader occult-neoplasm workup in selected older patients"
     - trigger_action: "request_repeat_lp"
       tool_name: "analyze_csf"
       description: "Repeat lumbar puncture if initial was early/equivocal"
@@ -278,9 +282,9 @@ alzheimers_early:
   encounter_type: "outpatient"
   # Clinical tool review, July 2026: structured cognitive assessment added as REQUIRED and
   # sequenced first; CT optional where MRI is contraindicated; advanced_imaging optional for
-  # FDG-PET/amyloid PET; specialized_test optional for genetics in young onset. ECG removed. R1
-  # asked to REMOVE EEG; kept optional because ALZ-EARLY-RP04 uses it on a CJD/encephalopathy
-  # differential
+  # FDG-PET/perfusion SPECT and amyloid PET; specialized_test optional for genetics in young
+  # onset. ECG removed. EEG is not routine and survives only for explicit non-AD questions:
+  # CJD in RP04 and recurrent unresponsive spells in RP05.
   required_modalities: [clinical_assessment, MRI, LABS]
   optional_modalities: [CSF, advanced_imaging, CT, specialized_test, EEG]
   key_findings:
@@ -307,15 +311,6 @@ alzheimers_early:
         - "Folate: normal"
         - "RPR/VDRL: non-reactive (rules out neurosyphilis)"
         - "HIV: negative"
-    eeg:
-      straightforward:
-        - "Slowed posterior dominant rhythm (7-8 Hz instead of 9-10 Hz)"
-        - "Increased theta activity diffusely"
-      moderate:
-        - "Borderline PDR at 8 Hz"
-        - "Mild excess theta, could be drowsiness"
-      diagnostic_puzzle:
-        - "Normal EEG (early stage)"
     csf:
       straightforward:
         - "Decreased Aβ42 (< 500 pg/mL)"
@@ -351,20 +346,23 @@ alzheimers_early:
       expected_agent_confidence: 0.35
   common_followups:
     - trigger_action: "request_neuropsych_testing"
-      tool_name: "interpret_labs"
+      tool_name: "order_specialized_test"
       description: "Comprehensive neuropsychological battery"
     - trigger_action: "request_amyloid_pet"
-      tool_name: "analyze_brain_mri"
+      tool_name: "order_advanced_imaging"
       description: "Amyloid PET scan (florbetapir/florbetaben)"
     - trigger_action: "request_fdg_pet"
-      tool_name: "analyze_brain_mri"
+      tool_name: "order_advanced_imaging"
       description: "FDG-PET showing temporoparietal hypometabolism"
+    - trigger_action: "request_perfusion_spect"
+      tool_name: "order_advanced_imaging"
+      description: "Brain perfusion SPECT when FDG-PET is unavailable"
     - trigger_action: "request_csf_biomarkers"
       tool_name: "analyze_csf"
       description: "CSF Aβ42, phospho-tau, total tau"
     - trigger_action: "request_genetic_testing"
-      tool_name: "interpret_labs"
-      description: "APOE genotyping, consider early-onset panel if <65"
+      tool_name: "order_specialized_test"
+      description: "Optional APP/PSEN1/PSEN2 panel after genetic counselling in young-onset or strongly familial disease; APOE is not a diagnostic test"
 
 syncope_cardiac:
   name: "Cardiac syncope"
@@ -479,7 +477,8 @@ multiple_sclerosis:
   encounter_type: "inpatient"
   # Clinical tool review, July 2026: CSF required->optional (2024 McDonald: LP not universally
   # required if criteria are otherwise met); EEG and ECG removed (no diagnostic role);
-  # specialized_test narrowed to optic-nerve testing (OCT, VEP).
+  # specialized_test narrowed to optional, case-targeted optic-nerve testing (OCT, VEP), and
+  # AQP4/MOG serology restricted to optic-neuritis or atypical/tumefactive presentations.
   # body_imaging is required because the reviewers asked for brain *and* cord imaging by name and
   # the cord counts toward dissemination in space. All 30 cases already required it — as a second
   # `analyze_brain_mri` carrying a `region: cervical_thoracic_spine` annotation the brain tool
@@ -494,7 +493,7 @@ multiple_sclerosis:
         - "At least one gadolinium-enhancing lesion (active inflammation)"
         - "Juxtacortical and infratentorial lesions present"
         - "Spinal cord lesion on sagittal imaging"
-        - "Meets McDonald 2017 criteria for DIS and DIT"
+        - "Meets the 2024 revised McDonald diagnostic framework"
       moderate:
         - "Several non-specific white matter lesions, some periventricular"
         - "No definite Dawson fingers morphology"
@@ -515,12 +514,12 @@ multiple_sclerosis:
         - "BMP: normal"
         - "ANA: negative or low-titer positive (nonspecific)"
         - "Vitamin B12: normal"
-        - "NMO-IgG (aquaporin-4 antibodies): negative"
-        - "MOG antibodies: negative"
+        - "Targeted AQP4-IgG/MOG-IgG: negative when optic-neuritis or atypical features justify testing"
         - "ESR/CRP: usually normal"
     csf:
       straightforward:
         - "Oligoclonal bands present (>=2 unique to CSF)"
+        - "Kappa free-light-chain index elevated as an accepted alternative positive-CSF marker"
         - "Elevated IgG index (>0.7)"
         - "Mild lymphocytic pleocytosis (5-25 cells)"
         - "Normal glucose, mildly elevated protein"
@@ -657,13 +656,13 @@ bacterial_meningitis:
       tool_name: "analyze_csf"
       description: "Repeat LP at 48h to assess treatment response"
     - trigger_action: "request_ct_head"
-      tool_name: "analyze_brain_mri"
+      tool_name: "order_ct_scan"
       description: "CT head before LP if focal deficits or papilledema"
     - trigger_action: "request_blood_cultures"
-      tool_name: "interpret_labs"
+      tool_name: "order_microbiology"
       description: "Blood cultures drawn before antibiotics"
     - trigger_action: "request_pcr_panel"
-      tool_name: "interpret_labs"
+      tool_name: "analyze_csf"
       description: "CSF meningitis/encephalitis PCR panel (FilmArray)"
     - trigger_action: "request_audiometry"
       tool_name: "interpret_labs"
@@ -678,11 +677,12 @@ parkinsons:
     age_range: [55, 80]
     sex_bias: "slight_male"
   encounter_type: "outpatient"
-  # Clinical tool review, July 2026: LABS required->optional (MDS criteria: no fixed routine
-  # panel); EEG and ECG removed; specialized_test optional and limited to neuropsychological
-  # testing; CT optional as the MRI alternative
+  # Independent application of the July 2026 clinical review: there is no fixed routine lab
+  # panel (only nine cases retain targeted optional studies); EEG, ECG, autonomic and tilt
+  # testing are removed. Neuropsychology is optional only when cognition is active, except the
+  # required pre-DBS safety assessment. CT is exercised once as the MRI alternative.
   required_modalities: [MRI]
-  optional_modalities: [LABS, specialized_test, CT]
+  optional_modalities: [LABS, specialized_test, advanced_imaging, CT]
   key_findings:
     mri:
       straightforward:
@@ -698,13 +698,10 @@ parkinsons:
         - "OR: symmetric putaminal atrophy (suggesting MSA-P)"
         - "OR: midbrain atrophy with hummingbird sign (suggesting PSP)"
     labs:
-      all_difficulties:
-        - "CBC: normal"
-        - "BMP: normal"
-        - "Thyroid function: normal (rules out hypothyroid-related slowness)"
-        - "Ceruloplasmin: normal (rules out Wilson disease if age <50)"
-        - "Vitamin B12: normal"
-        - "RPR: negative"
+      selected_cases_only:
+        - "Target a metabolic, toxic, young-onset or pretreatment question; do not order a fixed PD panel"
+        - "Wilson studies may be appropriate in young-onset parkinsonism"
+        - "Medication levels, renal/liver function or thyroid testing are used only when the case supplies that indication"
   differential_diagnoses:
     - diagnosis: "Essential tremor"
       key_distinguishing: "Action/postural tremor (not resting), bilateral, no rigidity/bradykinesia, FH positive"
@@ -728,20 +725,17 @@ parkinsons:
       expected_agent_confidence: 0.35
   common_followups:
     - trigger_action: "request_datscan"
-      tool_name: "analyze_brain_mri"
-      description: "DaTscan (dopamine transporter SPECT) showing reduced striatal uptake"
-    - trigger_action: "request_levodopa_challenge"
-      tool_name: "interpret_labs"
-      description: "Levodopa challenge test — response supports PD diagnosis"
-    - trigger_action: "request_autonomic_testing"
-      tool_name: "interpret_labs"
-      description: "Autonomic reflex testing (tilt table, QSART, thermoregulatory sweat test)"
+      tool_name: "order_advanced_imaging"
+      description: "Optional DaTscan only for a live degenerative-vs-nondegenerative differential; it does not distinguish PD from MSA/PSP"
     - trigger_action: "request_neuropsych_testing"
-      tool_name: "interpret_labs"
-      description: "Neuropsychological testing for cognitive involvement"
+      tool_name: "order_specialized_test"
+      description: "Optional neuropsychological testing when cognitive impairment is clinically relevant; required for pre-DBS selection"
     - trigger_action: "request_sleep_study"
-      tool_name: "interpret_labs"
-      description: "Polysomnography to evaluate for REM sleep behavior disorder"
+      tool_name: "order_specialized_test"
+      description: "Optional polysomnography only when reported dream enactment leaves an active RBD question"
+    - trigger_action: "request_counselled_pd_genetics"
+      tool_name: "order_specialized_test"
+      description: "Optional genetic_panel:PD in selected young-onset/familial disease after counselling"
 
 brain_tumor_glioma:
   name: "Brain tumor — high-grade glioma (GBM)"
@@ -843,36 +837,14 @@ functional_neurological_disorder:
     age_range: [20, 50]
     sex_bias: "female_predominant"
   encounter_type: "inpatient"
-  # Clinical tool review, July 2026: Retained as the benchmark's diagnostic-restraint probe
-  # against the reviewers' first preference: it is the only condition where correct behaviour is
-  # to withhold testing, and cost tracking needs a case class with teeth. Their objection (a
-  # purely clinical diagnosis has no diagnostic tool) is answered by
-  # perform_clinical_assessment{functional_neuro_signs} -- FND is a positive clinical diagnosis,
-  # so the examination is the required act and every instrumental study is optional. NOT an empty
-  # required set: that would leave required_coverage with a zero denominator. What separates a
-  # good agent here is ground_truth.useless_tools and cost, not coverage
-  #
-  # Made true in the cases on 2026-08-06, because until then it was only true here. All 30 cases
-  # required a brain MRI *with gadolinium* and a laboratory battery, none called
-  # perform_clinical_assessment, and nothing anywhere in the condition was tiered optional -- so
-  # the gold workup cost 1303 EUR on average, more than bacterial meningitis, and the tiers
-  # encoded the discredited diagnosis-of-exclusion model. Now: the functional-signs examination
-  # is REQUIRED in all 30; MRI is OPTIONAL (RECOMMENDED, once and without contrast, in the 7
-  # cases with a specific alternative question); laboratories are OPTIONAL (RECOMMENDED and
-  # narrowed to named assays in the 3 with a targeted mimic). The required set costs 138 EUR in
-  # the 8 non-paroxysmal cases -- the cheapest correct workup in the benchmark.
-  #
-  # One deliberate departure from the reviewers' wording, flagged for their confirmation: video-EEG
-  # is REQUIRED, not optional, in the 22 cases with paroxysmal events. Capturing a habitual event
-  # without EEG correlate is the positive diagnostic act for psychogenic non-epileptic seizures
-  # (ILAE 2013 'documented' certainty), not an exclusion test, and no bedside sign substitutes for
-  # it. It stays in optional_modalities because it is conditional on the phenotype, not universal
-  # -- the same treatment as the conditionally required CSF in subarachnoid haemorrhage.
-  #
-  # EMG_NCS was removed from the optional list: the cases now score it as a useless call, and a
-  # panel that offers it as defensible while every case penalises it contradicts itself.
+  # Interim composition decision, August 2026: DLB remains the reviewers' preferred replacement,
+  # but the dataset is frozen at 20 conditions/600 cases. Their fallback FND option is therefore
+  # applied literally: perform_clinical_assessment{functional_neuro_signs} is the sole required
+  # diagnostic act, and every instrumental study is optional and case-targeted. Video-EEG is used
+  # only to capture an ambiguous typical event; MRI only for an explicit red flag or organic
+  # comorbidity; labs only for a named mimic. Efficient traces stop after the positive examination.
   required_modalities: [clinical_assessment]
-  optional_modalities: [EEG, MRI, LABS, ECG]
+  optional_modalities: [EEG, MRI, LABS]
   key_findings:
     eeg:
       all_difficulties:
@@ -1147,14 +1119,13 @@ subarachnoid_hemorrhage:
     age_range: [40, 70]
     sex_bias: "slight_female"
   encounter_type: "emergency"
-  # CSF is only mandatory when the index CT is non-diagnostic; CT-positive
-  # SAH (9 straightforward cases) legitimately skip LP. Keep CSF as optional
-  # to reflect the conditional-required clinical reality.
-  # Clinical tool review, July 2026: CSF optional->REQUIRED (conditional on a negative or
-  # non-diagnostic CT with persisting suspicion; AHA/ASA 2023 Class I); advanced_imaging
-  # required->optional and reduced to transcranial Doppler, which carries COR 2a not COR 1
-  required_modalities: [CT, LABS, CSF]
-  optional_modalities: [advanced_imaging, ECG, echo]
+  # Clinical tool review, July 2026: NCCT is the mandatory first study and CTA is a distinct
+  # subsequent acquisition. CSF becomes required per case only after a negative/inconclusive
+  # NCCT with persistent suspicion; it is deliberately not a blanket required modality here.
+  # TCD is optional surveillance (COR 2a). Catheter DSA is retained only in selected occult or
+  # anatomically uncertain cases and must never be confused with CTA/MRA.
+  required_modalities: [CT, LABS]
+  optional_modalities: [CSF, advanced_imaging, ECG, echo]
   key_findings:
     ct:
       straightforward:
@@ -1171,6 +1142,9 @@ subarachnoid_hemorrhage:
         - "CT negative (occurs in ~5% of SAH, especially >6-12 hours after ictus)"
         - "Subtle sulcal effacement without obvious hyperdensity"
         - "CT artifact or isodense blood in anemic patient"
+      vascular_assessment:
+        - "CTA is obtained only after the noncontrast CT to localize the aneurysm and plan treatment"
+        - "Aneurysm location, neck, dome and branch anatomy; CTA is not a substitute for first-line NCCT"
     csf:
       straightforward:
         - "Grossly bloody CSF, non-clearing across tubes 1-4"
@@ -1195,17 +1169,11 @@ subarachnoid_hemorrhage:
         - "Glucose: elevated (stress hyperglycemia)"
     advanced_imaging:
       straightforward:
-        - "CT angiography (CTA): saccular aneurysm identified at anterior communicating artery (most common)"
-        - "OR: posterior communicating artery aneurysm with irregular lobulation"
-        - "Aneurysm neck and dome measurements for endovascular planning"
-        - "No vasospasm acutely"
+        - "Optional TCD: normal or mildly elevated flow velocities early after hemorrhage"
       moderate:
-        - "CTA: small aneurysm (<5 mm) at MCA bifurcation, difficult to characterize"
-        - "Possible second incidental aneurysm — identify ruptured vs unruptured"
+        - "Optional serial TCD: rising MCA/ACA velocities and Lindegaard ratio suggesting vasospasm"
       diagnostic_puzzle:
-        - "CTA negative: no aneurysm seen (perimesencephalic SAH pattern on CT — benign)"
-        - "Multiple aneurysms: determining which one bled"
-        - "Mycotic or fusiform aneurysm — atypical morphology"
+        - "Selected catheter DSA after CTA-occult or uncertain aneurysmal anatomy"
     ecg:
       all_difficulties:
         - "Diffuse deep T-wave inversions (neurogenic T-waves)"
@@ -1238,17 +1206,11 @@ subarachnoid_hemorrhage:
       tool_name: "order_advanced_imaging"
       description: "Conventional DSA gold standard for aneurysm characterization and endovascular treatment"
     - trigger_action: "request_transcranial_doppler"
-      tool_name: "order_specialized_test"
+      tool_name: "order_advanced_imaging"
       description: "Daily TCD monitoring for vasospasm (days 4-14 post-SAH)"
-    - trigger_action: "request_ct_perfusion"
-      tool_name: "order_ct_scan"
-      description: "CT perfusion for delayed cerebral ischemia due to vasospasm"
     - trigger_action: "request_echocardiogram"
       tool_name: "order_echocardiogram"
       description: "Echocardiogram for neurogenic cardiac injury and Takotsubo cardiomyopathy"
-    - trigger_action: "request_repeat_cta"
-      tool_name: "order_advanced_imaging"
-      description: "Repeat CTA or MRA at 3-6 months post-treatment to check for aneurysm remnant"
 
 migraine_with_aura:
   name: "Migraine with aura"
@@ -1259,14 +1221,13 @@ migraine_with_aura:
     age_range: [18, 50]
     sex_bias: "female_predominant"
   encounter_type: "outpatient"
-  # Clinical tool review, July 2026: MRI and LABS required->optional (ICHD-3 clinical diagnosis;
-  # imaging reserved for red flags); the structured ICHD-3 history is the actual required act. ECG
-  # removed. R1 asked to REMOVE echo, EEG and CSF; kept optional because MIG-AURA-P03/P07/P08 use
-  # a bubble study for PFO and -RM11 uses EEG and CSF on a secondary-headache differential — but
-  # see the report: those three cases have echo at the REQUIRED tier, which R1's comment implies
-  # is wrong and is a case-level fix, not a catalog one
+  # Clinical tool review, July 2026: the structured ICHD-3 history/examination is the actual
+  # required migraine act and uses the true >=3-of-6 rule. MRI and labs are selected only for
+  # documented red flags. ECG and CSF are removed. The sole EEG case has a witnessed seizure;
+  # the three echo cases are two infarct mechanisms and MELAS cardiomyopathy screening, not
+  # routine migraine investigations.
   required_modalities: [clinical_assessment]
-  optional_modalities: [MRI, LABS, echo, EEG, CSF]
+  optional_modalities: [MRI, LABS, echo, cardiac_monitoring, EEG, advanced_imaging, specialized_test]
   key_findings:
     mri:
       straightforward:
@@ -1292,21 +1253,6 @@ migraine_with_aura:
         - "Coagulation: normal (rules out thrombophilia)"
         - "Fasting lipids: may show hyperlipidemia (vascular risk in complex migraine)"
         - "TSH: normal"
-    eeg:
-      straightforward:
-        - "Normal background with symmetric posterior dominant rhythm"
-        - "Posterior intermittent rhythmic delta activity (PIRDA) during or after migraine"
-        - "No epileptiform abnormalities"
-      moderate:
-        - "Mild intermittent posterior slowing — non-specific"
-        - "Normal between attacks"
-      diagnostic_puzzle:
-        - "Focal posterior slowing mimicking seizure focus"
-        - "Occipital spikes (rare, may represent Panayiotopoulos vs migrainous)"
-    ecg:
-      all_difficulties:
-        - "Normal sinus rhythm (patent foramen ovale screen: requires bubble echo, not ECG)"
-        - "No arrhythmia"
   differential_diagnoses:
     - diagnosis: "Transient ischemic attack"
       key_distinguishing: "Sudden onset, negative symptoms (visual field cut vs spreading scotoma), older age, vascular risk factors, DWI restriction"
@@ -1329,18 +1275,12 @@ migraine_with_aura:
       presentation: "42-year-old woman with episodic expressive language difficulty lasting 15-20 minutes with subsequent headache. TIA vs migraine with aphasic aura. DWI negative on MRI."
       expected_agent_confidence: 0.38
   common_followups:
-    - trigger_action: "request_mra_head_neck"
-      tool_name: "order_advanced_imaging"
-      description: "MRA head and neck to exclude vascular malformation or dissection"
-    - trigger_action: "request_bubble_echo"
-      tool_name: "order_echocardiogram"
-      description: "Bubble echocardiogram to screen for patent foramen ovale (PFO) in stroke-like migraine"
     - trigger_action: "request_prolonged_eeg"
       tool_name: "analyze_eeg"
-      description: "Prolonged EEG or video-EEG if seizure-migraine overlap cannot be excluded"
+      description: "Video-EEG only when an actual seizure event requires classification; not for routine aura"
     - trigger_action: "request_thrombophilia_panel"
       tool_name: "interpret_labs"
-      description: "Thrombophilia panel in complex aura or migrainous infarction workup"
+      description: "Targeted vascular testing only in a documented infarction workup"
     - trigger_action: "request_mitochondrial_workup"
       tool_name: "interpret_labs"
       description: "Lactate, pyruvate, mtDNA sequencing if MELAS suspected"
@@ -1358,10 +1298,9 @@ frontotemporal_dementia:
   # (specialized_test) and cognitive assessment REQUIRED; advanced_imaging required->optional and
   # narrowed to FDG-PET or perfusion SPECT; CT optional as the MRI alternative
   required_modalities: [clinical_assessment, MRI, LABS, specialized_test]
-  # CT appears in 2 cases that present acutely via ED (e.g. FTD-M09 brought
-  # by police after shoplifting arrest) — any acute behavioural change in
-  # the ED legitimately gets head CT to exclude haemorrhage/mass/hydrocephalus
-  # before further workup. Not appropriate for outpatient FTD evaluation.
+  # CT appears in 2 cases for different explicit reasons: FTD-M09 presents acutely in the ED
+  # and needs haemorrhage/mass exclusion before the dementia work-up; FTD-S06 cannot tolerate
+  # MRI because of severe claustrophobia and uses non-contrast CT as the reviewed alternative.
   optional_modalities: [advanced_imaging, CT]
   key_findings:
     mri:
@@ -1382,14 +1321,12 @@ frontotemporal_dementia:
     labs:
       all_difficulties:
         - "CBC: normal"
-        - "BMP: normal"
+        - "Complete metabolic panel including renal and hepatic function: normal"
         - "Thyroid function (TSH): normal"
         - "Vitamin B12: normal"
-        - "RPR: negative"
-        - "HIV: negative"
-        - "Copper/ceruloplasmin: normal (rules out Wilson disease in young-onset)"
-        - "Heavy metal screen: normal"
-        - "CSF 14-3-3: negative (rules out CJD)"
+        - "Folate: normal"
+        - "ESR and CRP: no inflammatory signal"
+        - "Infectious, autoimmune, toxic, nutritional and genetic studies are targeted to the presentation rather than fixed"
     advanced_imaging:
       straightforward:
         - "FDG-PET: severe frontal and anterior temporal hypometabolism"
@@ -1399,8 +1336,8 @@ frontotemporal_dementia:
         - "FDG-PET: asymmetric right frontotemporal hypometabolism"
         - "Mild bilateral frontal hypometabolism — needs clinical correlation"
       diagnostic_puzzle:
-        - "FDG-PET: frontal hypometabolism subtle, borderline"
-        - "Amyloid PET: negative (supports FTD over Alzheimer's) — key distinguishing step"
+        - "FDG-PET or perfusion SPECT: frontal dysfunction may be subtle or borderline and must be interpreted with the clinical syndrome"
+        - "Amyloid PET is reserved for a specific active Alzheimer-pathology differential, not routine FTD imaging"
     specialized_test:
       straightforward:
         - "Neuropsychological testing: severely impaired executive function (go/no-go, trails B)"
@@ -1435,21 +1372,15 @@ frontotemporal_dementia:
       presentation: "54-year-old with 18-month behavioral changes. Normal MRI. Referred as 'depression vs personality disorder.' FDG-PET shows subtle frontal hypometabolism. C9orf72 genetic testing pending."
       expected_agent_confidence: 0.32
   common_followups:
-    - trigger_action: "request_amyloid_pet"
+    - trigger_action: "request_fdg_pet_or_perfusion_spect"
       tool_name: "order_advanced_imaging"
-      description: "Amyloid PET — negative result supports FTD over Alzheimer's disease"
+      description: "Optional FDG-PET, or brain perfusion SPECT when FDG-PET is unavailable, after the core assessment if subtype remains uncertain"
     - trigger_action: "request_genetic_panel"
-      tool_name: "interpret_labs"
-      description: "FTD genetic panel: C9orf72 repeat expansion, GRN, MAPT mutations (especially with family history)"
-    - trigger_action: "request_csf_biomarkers"
-      tool_name: "analyze_csf"
-      description: "CSF Aβ42, tau, phospho-tau, NfL to support or exclude Alzheimer's pathology"
+      tool_name: "order_specialized_test"
+      description: "Optional counselled C9orf72/GRN/MAPT panel in young-onset or familial FTD; not required for the clinical syndrome diagnosis"
     - trigger_action: "request_comprehensive_neuropsych"
       tool_name: "order_specialized_test"
       description: "Comprehensive neuropsychological battery including social cognition measures"
-    - trigger_action: "request_tau_pet"
-      tool_name: "order_advanced_imaging"
-      description: "Tau PET (flortaucipir) to characterize underlying proteinopathy"
 
 status_epilepticus:
   name: "Status epilepticus"
@@ -1731,11 +1662,10 @@ normal_pressure_hydrocephalus:
   encounter_type: "inpatient"
   # Clinical tool review, July 2026: specialized_test replaced by clinical_assessment: the
   # required act is objective gait and cognition before and after the tap test, not the generic
-  # test bucket. LABS required->optional. R1 asked to REMOVE advanced_imaging; kept optional
-  # because all 30 NPH cases use amyloid or FDG PET to address the Alzheimer differential, not as
-  # an NPH test
+  # test bucket. LABS required->optional. Advanced imaging and the standalone
+  # neuropsychological battery were removed as requested; neither is a gold NPH study.
   required_modalities: [MRI, CSF, clinical_assessment]
-  optional_modalities: [LABS, advanced_imaging]
+  optional_modalities: [LABS]
   key_findings:
     mri:
       straightforward:
@@ -1769,7 +1699,7 @@ normal_pressure_hydrocephalus:
         - "Protein: normal or mildly elevated"
         - "Glucose: normal"
         - "High-volume tap trial (30-50 mL CSF removed): significant gait improvement within 2-24 hours"
-        - "Gait speed improvement >20% post-tap (positive predictive for shunt response)"
+        - ">10% TUG improvement is a commonly used positive criterion; absolute change and concordant gait/cognitive findings must also be interpreted"
       moderate:
         - "Opening pressure normal"
         - "Tap trial: modest improvement in gait (equivocal positive)"
@@ -1778,26 +1708,20 @@ normal_pressure_hydrocephalus:
         - "Tap trial: no clear improvement (false negative ~40% of eventual shunt responders)"
         - "Opening pressure borderline elevated (18-22 cmH2O)"
         - "CSF shows mild pleocytosis — alternative etiology vs coincidental"
-    specialized_test:
+    clinical_assessment:
       straightforward:
         - "Gait analysis: magnetic or apraxic gait pattern — short steps, wide base, reduced step height"
         - "Timed Up and Go (TUG): >20 seconds, improves >10% after high-volume tap"
         - "10-meter walk test: significant improvement post-tap"
-        - "Urodynamics: detrusor hyperactivity (neurogenic overactive bladder)"
       moderate:
         - "Gait analysis: mild magnetic gait component, borderline TUG improvement"
         - "Cognitive testing: executive dysfunction predominant (MoCA 18-22)"
       diagnostic_puzzle:
         - "Gait impairment minimal or attributed to orthopedic causes"
         - "No clear tap trial response; continuous lumbar drainage trial may be required"
-    advanced_imaging:
-      all_difficulties:
-        - "Cisternography (radionuclide): ventricular reflux and delayed clearance — supportive but rarely used"
-        - "CSF flow MRI (phase-contrast): hyperdynamic aqueductal flow (peak velocity >18 cm/s)"
-        - "FDG-PET: frontal hypometabolism (may overlap with FTD)"
   differential_diagnoses:
     - diagnosis: "Alzheimer's disease"
-      key_distinguishing: "Episodic memory predominant, hippocampal atrophy > frontal, no gait apraxia early, amyloid PET positive"
+      key_distinguishing: "Episodic-memory-predominant syndrome, hippocampal atrophy, and no early gait apraxia; use targeted AD biomarkers only when copathology remains a specific question"
     - diagnosis: "Parkinson's disease"
       key_distinguishing: "Resting tremor, cogwheel rigidity, responds to levodopa, DaTscan abnormal, no ventriculomegaly"
     - diagnosis: "Vascular dementia"
@@ -1818,20 +1742,8 @@ normal_pressure_hydrocephalus:
       expected_agent_confidence: 0.32
   common_followups:
     - trigger_action: "request_continuous_lumbar_drainage"
-      tool_name: "order_specialized_test"
+      tool_name: "analyze_csf"
       description: "Continuous external lumbar drainage trial (72h, 150-200 mL/day) for equivocal tap trial"
-    - trigger_action: "request_csf_flow_mri"
-      tool_name: "order_advanced_imaging"
-      description: "Phase-contrast MRI for aqueductal CSF flow quantification"
-    - trigger_action: "request_neuropsych_pre_post_tap"
-      tool_name: "order_specialized_test"
-      description: "Neuropsychological testing before and after high-volume tap trial"
-    - trigger_action: "request_amyloid_pet"
-      tool_name: "order_advanced_imaging"
-      description: "Amyloid PET to detect concurrent Alzheimer's pathology (reduces shunt response)"
-    - trigger_action: "request_urodynamics"
-      tool_name: "order_specialized_test"
-      description: "Urodynamic study for detrusor hyperactivity characterization"
 
 hepatic_encephalopathy:
   name: "Hepatic encephalopathy"
@@ -1959,6 +1871,9 @@ amyotrophic_lateral_sclerosis:
   # by an `include_cervical_spine` annotation the brain tool has no parameter for and drops. So the
   # exclusion of compressive myelopathy — the mimic that must be ruled out before a motor neuron
   # disease diagnosis — was neither separately orderable nor scoreable.
+  # Respiratory function is recommended for safety/staging rather than diagnostic confirmation.
+  # Genetic testing is a separate optional offer with counselling in all cases (2023 consensus),
+  # and CSF is limited to five targeted atypical-mimic work-ups.
   required_modalities: [specialized_test, MRI, body_imaging, LABS]
   optional_modalities: [CSF]
   key_findings:
@@ -1999,23 +1914,13 @@ amyotrophic_lateral_sclerosis:
         - "CK: mildly to moderately elevated (500-2000 U/L) — myopathic overlap"
         - "Thyroid function: normal (rules out thyrotoxic myopathy)"
         - "Vitamin B12: normal"
-        - "Anti-GM1 antibodies: negative (positive would suggest MMN — treatable mimic)"
-        - "SPEP: no M-spike (rules out paraproteinemic motor neuropathy)"
-        - "HIV: negative"
-        - "Hexosaminidase A: normal (rules out adult-onset Tay-Sachs)"
-        - "Androgen receptor gene CAG repeat: normal (rules out Kennedy disease/SBMA)"
+        - "Targeted anti-GM1 only for an MMN phenotype; paraprotein studies only when clinically suggested"
+        - "Targeted HIV, paraneoplastic or metabolic testing according to exposure, comorbidity and phenotype"
+        - "Androgen-receptor CAG repeat only for a compatible male lower-motor-neuron phenotype"
     csf:
-      straightforward:
-        - "CSF protein: mildly elevated (50-80 mg/dL) — common in ALS"
-        - "WBC: normal (<5 cells)"
-        - "CSF neurofilament light chain (NfL): markedly elevated (correlates with progression rate)"
-        - "No oligoclonal bands"
-      moderate:
-        - "CSF protein: normal or borderline elevated"
-        - "NfL elevated — supports neurodegeneration but not specific to ALS"
-      diagnostic_puzzle:
-        - "CSF pleocytosis (>5 cells) — atypical for ALS, raises question of alternative diagnosis"
-        - "CSF normal — does not exclude ALS"
+      atypical_only:
+        - "Basic CSF and selected assays answer a named inflammatory, infectious, demyelinating or neoplastic mimic"
+        - "CSF neurofilament is not used to diagnose ALS; normal CSF does not exclude ALS"
   differential_diagnoses:
     - diagnosis: "Cervical spondylotic myelopathy"
       key_distinguishing: "Cord compression on MRI, predominantly upper motor neuron below lesion, no widespread EMG denervation, no bulbar involvement"
@@ -2042,7 +1947,7 @@ amyotrophic_lateral_sclerosis:
       tool_name: "order_specialized_test"
       description: "Repeat EMG at 3-6 months to detect spread to additional body regions (diagnostic evolution)"
     - trigger_action: "request_pulmonary_function_als"
-      tool_name: "interpret_labs"
+      tool_name: "order_specialized_test"
       description: "FVC, sniff nasal inspiratory pressure (SNIP), NIF for respiratory involvement and NIV timing"
     - trigger_action: "request_genetic_als_panel"
       tool_name: "interpret_labs"

@@ -220,6 +220,24 @@
             "is_abnormal": false,
             "clinical_significance": null
           }
+        ],
+        "Reviewed_FTD_panel_additions": [
+          {
+            "test": "ESR",
+            "value": 11,
+            "unit": "mm/h",
+            "reference_range": "0-20",
+            "is_abnormal": false,
+            "clinical_significance": null
+          },
+          {
+            "test": "CRP",
+            "value": 1.6,
+            "unit": "mg/L",
+            "reference_range": "<3.0",
+            "is_abnormal": false,
+            "clinical_significance": null
+          }
         ]
       },
       "interpretation": "Abnormal values: Anti-TPO antibody 320 IU/mL (H), Anti-thyroglobulin antibody 144 IU/mL (H).",
@@ -277,80 +295,64 @@
   },
   "followup_outputs": [
     {
-      "trigger_action": "request_fdg_pet",
-      "tool_name": "order_advanced_imaging",
+      "trigger_action": "disclosure_conversation_work_fitness",
+      "tool_name": "search_medical_literature",
       "output": {
-        "modality": "FDG-PET brain",
-        "tracer_or_protocol": "F-18 FDG PET",
-        "findings": [
+        "query": "bvFTD occupational function legal competency disclosure",
+        "results": [
           {
-            "region": "Frontal lobes",
-            "finding": "Bilateral frontal hypometabolism, left greater than right. Left dorsolateral prefrontal cortex, left orbitofrontal, and bilateral anterior cingulate cortex show 18-22% FDG reduction versus cerebellar reference."
-          },
-          {
-            "region": "Anterior temporal lobes",
-            "finding": "Mild bilateral anterior temporal hypometabolism (10-14% reduction), left slightly more than right."
-          },
-          {
-            "region": "Posterior cortex",
-            "finding": "Preserved — posterior cingulate cortex, parietal cortex, and occipital lobes show normal FDG uptake."
+            "pmid": "24920938",
+            "title": "Occupational disability and fitness-for-duty in frontal-network neurodegenerative syndromes: implications for high-functioning professionals",
+            "journal": "JNNP",
+            "year": "2014"
           }
         ],
-        "quantitative_data": {
-          "left_frontal_hypometabolism": "20% reduction (abnormal)",
-          "right_frontal_hypometabolism": "14% reduction (mild)",
-          "posterior_cingulate": "Normal"
-        },
-        "impression": "Asymmetric left frontotemporal hypometabolism with preserved posterior cortex — pattern consistent with frontotemporal hypometabolism, left frontal predominance",
-        "recommended_actions": []
+        "summary": "bvFTD disproportionately affects orbitofrontal-mediated judgment and social cognition while initially preserving procedural and routine cognitive tasks. High-functioning professionals (attorneys, physicians, executives) may continue performing routine procedural work while developing profound impairments in judgment, ethical reasoning, and social cognition — the exact faculties essential for professional practice. Key considerations: (1) fitness-for-duty evaluation is often required; (2) driving assessment is mandatory; (3) financial and legal decision-making capacity should be formally assessed; (4) power of attorney and advance healthcare directive planning should be initiated early while capacity is still present; (5) the firm was correct to place her on leave — this protects both the patient and clients."
       }
     },
     {
-      "trigger_action": "request_amyloid_pet",
-      "tool_name": "order_advanced_imaging",
-      "output": {
-        "modality": "Amyloid PET",
-        "tracer_or_protocol": "F-18 Florbetapir PET",
-        "findings": [
-          {
-            "region": "Global cortex",
-            "finding": "NEGATIVE — global SUVr 0.91. All neocortical regions below positivity threshold (>1.10). No cortical amyloid deposition."
-          }
-        ],
-        "quantitative_data": {
-          "global_SUVr": "0.91 (negative)"
-        },
-        "impression": "Negative — sparse-to-no amyloid neuritic plaque density. No cortical amyloid deposition detected",
-        "recommended_actions": []
-      }
-    },
-    {
-      "trigger_action": "hashimoto_encephalopathy_exclusion_eeg_csf",
-      "tool_name": "analyze_csf",
-      "output": {
-        "appearance": "Clear, colorless",
-        "opening_pressure": "13 cmH2O",
-        "cell_count": {
-          "WBC": "2 cells/uL (normal)"
-        },
-        "protein": "38 mg/dL",
-        "glucose": "64 mg/dL",
-        "special_tests": {
-          "Oligoclonal bands": "Absent",
-          "IgG index": "0.44 (normal)",
-          "Abeta42": "906 pg/mL (within normal range; reference >500 pg/mL)",
-          "Total tau": "198 pg/mL (within normal range; reference <300 pg/mL)",
-          "Phospho-tau": "28 pg/mL (within normal range; reference <61 pg/mL)",
-          "NfL": "980 pg/mL (elevated; reference for age <600 pg/mL)",
-          "14-3-3": "Negative",
-          "Anti-TPO in CSF": "Not detected above background"
-        },
-        "interpretation": "Opening pressure: 13 cmH2O. WBC: 2 cells/uL (normal). Protein: 38 mg/dL. Glucose: 64 mg/dL. Oligoclonal bands: Absent. IgG index: 0.44 (within normal range). Abeta42: 906 pg/mL (within normal range). Total tau: 198 pg/mL (within normal range). Phospho-tau: 28 pg/mL (within normal range). NfL: 980 pg/mL (elevated; reference for age <600 pg/mL). 14-3-3: Negative. Anti-TPO in CSF: Not detected above background"
-      }
-    },
-    {
-      "trigger_action": "request_genetic_panel",
+      "trigger_action": "request_reviewed_neuropsych_battery",
       "tool_name": "order_specialized_test",
+      "tool_parameters": {
+        "test_type": "neuropsych_battery"
+      },
+      "output": {
+        "test_type": "neuropsych_battery",
+        "findings": [
+          {
+            "finding": "Executive function (DKEFS Trails condition 4, Color-Word): Severely impaired. Trails switching: 3rd percentile. Note: Standard DKEFS norms underestimate impairment in high-premorbid IQ — using education-adjusted norms, she is at <1st percentile."
+          },
+          {
+            "finding": "Social cognition (Reading the Mind in the Eyes): 16/36 (<5th percentile). Faux Pas: 4/10 (<5th percentile) — severely impaired."
+          },
+          {
+            "finding": "Episodic memory: Relatively preserved for her age (40th percentile after education correction) — distinctive bvFTD pattern of relative episodic memory preservation vs severely impaired social cognition."
+          },
+          {
+            "finding": "Language: BNT 52/60 (35th percentile — low average), verbal fluency mildly reduced."
+          },
+          {
+            "finding": "Visuospatial (Rey-O copy): 32/36 (60th percentile) — PRESERVED."
+          },
+          {
+            "finding": "IQ estimation (TOPF): Estimated premorbid IQ 128 (superior range). Current Performance IQ subtests: low average to average. Large discrepancy from estimated premorbid level."
+          }
+        ],
+        "quantitative_data": {
+          "social_cognition_percentile": "<5th percentile",
+          "executive_percentile": "<3rd percentile (education-corrected)",
+          "episodic_memory": "Relatively preserved"
+        },
+        "impression": "Severe executive dysfunction and social cognition impairment with relative preservation of episodic memory and visuospatial function. Estimated premorbid IQ substantially above current executive test performance. Neuropsychological profile shows selective anterior-network impairment with relative posterior sparing",
+        "recommended_actions": []
+      }
+    },
+    {
+      "trigger_action": "request_optional_counselled_ftd_genetics",
+      "tool_name": "order_specialized_test",
+      "tool_parameters": {
+        "test_type": "genetic_panel:FTD"
+      },
       "output": {
         "test_type": "genetic_panel:FTD",
         "findings": [
@@ -390,53 +392,57 @@
       }
     },
     {
-      "trigger_action": "request_comprehensive_neuropsych",
-      "tool_name": "order_specialized_test",
+      "trigger_action": "request_optional_fdg_pet",
+      "tool_name": "order_advanced_imaging",
+      "tool_parameters": {
+        "modality": "FDG_PET"
+      },
       "output": {
-        "test_type": "Comprehensive neuropsychological battery",
+        "modality": "FDG_PET",
+        "tracer_or_protocol": "F-18 FDG PET",
         "findings": [
           {
-            "finding": "Executive function (DKEFS Trails condition 4, Color-Word): Severely impaired. Trails switching: 3rd percentile. Note: Standard DKEFS norms underestimate impairment in high-premorbid IQ — using education-adjusted norms, she is at <1st percentile."
+            "region": "Frontal lobes",
+            "finding": "Bilateral frontal hypometabolism, left greater than right. Left dorsolateral prefrontal cortex, left orbitofrontal, and bilateral anterior cingulate cortex show 18-22% FDG reduction versus cerebellar reference."
           },
           {
-            "finding": "Social cognition (Reading the Mind in the Eyes): 16/36 (<5th percentile). Faux Pas: 4/10 (<5th percentile) — severely impaired."
+            "region": "Anterior temporal lobes",
+            "finding": "Mild bilateral anterior temporal hypometabolism (10-14% reduction), left slightly more than right."
           },
           {
-            "finding": "Episodic memory: Relatively preserved for her age (40th percentile after education correction) — distinctive bvFTD pattern of relative episodic memory preservation vs severely impaired social cognition."
-          },
-          {
-            "finding": "Language: BNT 52/60 (35th percentile — low average), verbal fluency mildly reduced."
-          },
-          {
-            "finding": "Visuospatial (Rey-O copy): 32/36 (60th percentile) — PRESERVED."
-          },
-          {
-            "finding": "IQ estimation (TOPF): Estimated premorbid IQ 128 (superior range). Current Performance IQ subtests: low average to average. Large discrepancy from estimated premorbid level."
+            "region": "Posterior cortex",
+            "finding": "Preserved — posterior cingulate cortex, parietal cortex, and occipital lobes show normal FDG uptake."
           }
         ],
         "quantitative_data": {
-          "social_cognition_percentile": "<5th percentile",
-          "executive_percentile": "<3rd percentile (education-corrected)",
-          "episodic_memory": "Relatively preserved"
+          "left_frontal_hypometabolism": "20% reduction (abnormal)",
+          "right_frontal_hypometabolism": "14% reduction (mild)",
+          "posterior_cingulate": "Normal"
         },
-        "impression": "Severe executive dysfunction and social cognition impairment with relative preservation of episodic memory and visuospatial function. Estimated premorbid IQ substantially above current executive test performance. Neuropsychological profile shows selective anterior-network impairment with relative posterior sparing",
+        "impression": "Asymmetric left frontotemporal hypometabolism with preserved posterior cortex — pattern consistent with frontotemporal hypometabolism, left frontal predominance",
         "recommended_actions": []
       }
     },
     {
-      "trigger_action": "disclosure_conversation_work_fitness",
-      "tool_name": "search_medical_literature",
+      "trigger_action": "request_optional_amyloid_pet_for_ad_differential",
+      "tool_name": "order_advanced_imaging",
+      "tool_parameters": {
+        "modality": "amyloid_PET"
+      },
       "output": {
-        "query": "bvFTD occupational function legal competency disclosure",
-        "results": [
+        "modality": "amyloid_PET",
+        "tracer_or_protocol": "F-18 Florbetapir PET",
+        "findings": [
           {
-            "pmid": "24920938",
-            "title": "Occupational disability and fitness-for-duty in frontal-network neurodegenerative syndromes: implications for high-functioning professionals",
-            "journal": "JNNP",
-            "year": "2014"
+            "region": "Global cortex",
+            "finding": "NEGATIVE — global SUVr 0.91. All neocortical regions below positivity threshold (>1.10). No cortical amyloid deposition."
           }
         ],
-        "summary": "bvFTD disproportionately affects orbitofrontal-mediated judgment and social cognition while initially preserving procedural and routine cognitive tasks. High-functioning professionals (attorneys, physicians, executives) may continue performing routine procedural work while developing profound impairments in judgment, ethical reasoning, and social cognition — the exact faculties essential for professional practice. Key considerations: (1) fitness-for-duty evaluation is often required; (2) driving assessment is mandatory; (3) financial and legal decision-making capacity should be formally assessed; (4) power of attorney and advance healthcare directive planning should be initiated early while capacity is still present; (5) the firm was correct to place her on leave — this protects both the patient and clients."
+        "quantitative_data": {
+          "global_SUVr": "0.91 (negative)"
+        },
+        "impression": "Negative — sparse-to-no amyloid neuritic plaque density. No cortical amyloid deposition detected",
+        "recommended_actions": []
       }
     }
   ],
@@ -574,40 +580,25 @@
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain brain MRI with volumetric coronal T1 to assess frontal/anterior temporal atrophy and exclude alternative structural cause",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Bilateral frontal and/or anterior temporal atrophy in a lobar pattern with relative posterior sparing",
+        "action": "Consult behavioral/cognitive neurology for syndromic diagnosis, biomarker interpretation, and longitudinal care plan",
+        "tool_name": null,
+        "expected_finding": "Behavioral neurology confirms bvFTD syndrome, coordinates biomarkers and disclosure",
         "category": "required",
-        "tool_parameters": {
-          "sequences": [
-            "T1",
-            "T2",
-            "FLAIR",
-            "DWI",
-            "volumetric"
-          ]
-        },
-        "citation": "[Rascovsky_2011]",
-        "guideline_source": "Rascovsky 2011 bvFTD criteria"
-      },
-      {
-        "step": 2,
-        "action": "Order metabolic dementia panel (TSH, B12, CMP, RPR/HIV per risk) to exclude reversible mimics",
-        "tool_name": "interpret_labs",
-        "expected_finding": "No reversible metabolic or infectious cause of cognitive decline identified",
-        "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP",
-            "TSH",
-            "B12",
-            "RPR",
-            "HIV"
-          ]
-        },
+        "tool_parameters": {},
         "citation": "[AAN_dementia_2018]",
         "guideline_source": "AAN dementia practice guideline"
+      },
+      {
+        "action": "Perform a structured behavioural and cognitive assessment with informant history, scored against the six behavioural features of the Rascovsky criteria — disinhibition, apathy, loss of empathy, perseverative or compulsive behaviour, dietary change, and a dysexecutive profile with relative sparing of memory and visuospatial function — and record how many are present",
+        "tool_name": "perform_clinical_assessment",
+        "expected_finding": "At least three of the six behavioural features documented from the informant history, with a dysexecutive profile and relatively spared memory and visuospatial function",
+        "category": "required",
+        "tool_parameters": {
+          "assessment_type": "cognitive_screen"
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky_2011",
+        "step": 2
       },
       {
         "step": 3,
@@ -623,6 +614,75 @@
       },
       {
         "step": 4,
+        "action": "Offer an FTD/ALS gene panel after pre-test genetic counselling because of young onset or a suggestive pedigree; testing remains optional",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Identifies or excludes pathogenic C9orf72 / GRN / MAPT variant relevant to prognosis and cascade testing",
+        "category": "optional",
+        "tool_parameters": {
+          "test_type": "genetic_panel:FTD"
+        },
+        "citation": "[Pottier_2016]",
+        "guideline_source": "Pottier 2016 FTLD genetics review"
+      },
+      {
+        "step": 5,
+        "action": "Order metabolic dementia panel (TSH, B12, CMP, RPR/HIV per risk) to exclude reversible mimics",
+        "tool_name": "interpret_labs",
+        "expected_finding": "No reversible metabolic or infectious cause of cognitive decline identified",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "TSH",
+            "B12",
+            "folate",
+            "ESR",
+            "CRP"
+          ]
+        },
+        "citation": "[AAN_dementia_2018]",
+        "guideline_source": "AAN dementia practice guideline"
+      },
+      {
+        "step": 6,
+        "action": "Obtain brain MRI with volumetric coronal T1 to assess frontal/anterior temporal atrophy and exclude alternative structural cause",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Bilateral frontal and/or anterior temporal atrophy in a lobar pattern with relative posterior sparing",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "dementia",
+          "contrast": false
+        },
+        "citation": "[Rascovsky_2011]",
+        "guideline_source": "Rascovsky 2011 bvFTD criteria"
+      },
+      {
+        "step": 7,
+        "action": "Consider FDG-PET only after clinical assessment, labs and structural imaging if the dementia subtype remains uncertain",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Frontal and anterior-temporal dysfunction with relative posterior preservation, interpreted in clinical context",
+        "category": "optional",
+        "tool_parameters": {
+          "modality": "FDG_PET"
+        },
+        "citation": "[NICE_NG97]",
+        "guideline_source": "NICE_NG97"
+      },
+      {
+        "step": 8,
+        "action": "Consider amyloid PET only for the active Alzheimer-pathology differential; it is not routine FTD imaging",
+        "tool_name": "order_advanced_imaging",
+        "expected_finding": "Amyloid-negative result weighs against Alzheimer pathology",
+        "category": "optional",
+        "tool_parameters": {
+          "modality": "amyloid_PET"
+        },
+        "citation": "[Amyloid_PET_AUC_2025]",
+        "guideline_source": "Amyloid_PET_AUC_2025"
+      },
+      {
+        "step": 9,
         "action": "Search medical literature for young-onset ftd vs early-onset ad",
         "tool_name": "search_medical_literature",
         "expected_finding": "Confirms Rascovsky 2011 criteria, FDG-PET evidence (Foster 2007), and management approach (Bang 2015)",
@@ -632,86 +692,6 @@
         },
         "citation": "[Bang_2015]",
         "guideline_source": "Bang 2015 Lancet review"
-      },
-      {
-        "step": 5,
-        "action": "Consult behavioral/cognitive neurology for syndromic diagnosis, biomarker interpretation, and longitudinal care plan",
-        "tool_name": null,
-        "expected_finding": "Behavioral neurology confirms bvFTD syndrome, coordinates biomarkers and disclosure",
-        "category": "required",
-        "tool_parameters": {},
-        "citation": "[AAN_dementia_2018]",
-        "guideline_source": "AAN dementia practice guideline"
-      },
-      {
-        "step": 6,
-        "action": "Order FDG-PET brain to characterise frontotemporal hypometabolism and distinguish bvFTD from AD",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Bifrontal and/or anterior temporal hypometabolism with relative posterior sparing",
-        "category": "recommended",
-        "tool_parameters": {
-          "modality": "FDG_PET"
-        },
-        "citation": "[Foster_2007]",
-        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
-      },
-      {
-        "step": 7,
-        "action": "Order FTD genetic panel (C9orf72, GRN, MAPT) given young onset (age 53) and paternal dementia",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Identifies or excludes pathogenic C9orf72 / GRN / MAPT variant relevant to prognosis and cascade testing",
-        "category": "recommended",
-        "tool_parameters": {
-          "test_type": "genetic_panel:FTD"
-        },
-        "citation": "[Pottier_2016]",
-        "guideline_source": "Pottier 2016 FTLD genetics review"
-      },
-      {
-        "step": 8,
-        "action": "Order amyloid PET (and/or CSF Aβ42/p-tau) to exclude early-onset AD",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Negative amyloid PET expected — would secure FTD diagnosis",
-        "category": "recommended",
-        "tool_parameters": {
-          "modality": "amyloid_PET"
-        },
-        "citation": "[Foster_2007]",
-        "guideline_source": "Foster 2007 FDG-PET in FTD vs AD"
-      },
-      {
-        "step": 9,
-        "action": "Add Hashimoto encephalopathy screen (TPO, thyroglobulin antibodies) and CSF inflammatory profile if rapid decline or atypical features",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Bland CSF; absent inflammatory markers; AD biomarkers help stratify",
-        "category": "optional",
-        "tool_parameters": {
-          "basic": [
-            "cell_count",
-            "protein",
-            "glucose"
-          ],
-          "special_tests": [
-            "Abeta42",
-            "phospho_tau",
-            "total_tau",
-            "oligoclonal_bands"
-          ]
-        },
-        "citation": "[AAN_dementia_2018]",
-        "guideline_source": "AAN dementia practice guideline"
-      },
-      {
-        "action": "Perform a structured behavioural and cognitive assessment with informant history, scored against the six behavioural features of the Rascovsky criteria — disinhibition, apathy, loss of empathy, perseverative or compulsive behaviour, dietary change, and a dysexecutive profile with relative sparing of memory and visuospatial function — and record how many are present",
-        "tool_name": "perform_clinical_assessment",
-        "expected_finding": "At least three of the six behavioural features documented from the informant history, with a dysexecutive profile and relatively spared memory and visuospatial function",
-        "category": "required",
-        "tool_parameters": {
-          "assessment_type": "cognitive_screen"
-        },
-        "citation": "[Rascovsky_2011]",
-        "guideline_source": "Rascovsky_2011",
-        "step": 10
       }
     ],
     "useless_tools": [
@@ -779,15 +759,7 @@
       }
     ],
     "harmful_tools": [],
-    "sequence_constraints": [
-      {
-        "before": "analyze_brain_mri",
-        "after": "analyze_csf",
-        "reason": "Exclude structural cause of focal cognitive symptoms and screen for elevated ICP before lumbar puncture.",
-        "citation": "[AAN_dementia_2018]",
-        "severity": "soft"
-      }
-    ],
+    "sequence_constraints": [],
     "critical_actions": [
       "Address anosognosia explicitly: prioritise informant history and functional status over patient self-report.",
       "Discuss employment / leave-of-absence status with HR and document professional capacity assessment.",
@@ -829,15 +801,15 @@
       "drug_interactions": "normal"
     },
     "last_revised": "2026-08-07",
-    "revision_reason": "per-case audit: request_genetic_panel -> order_specialized_test{genetic_panel:FTD} — the required action could not reach a report filed under the laboratory tool",
+    "revision_reason": "Independent 2026-08-10 recheck of Reviewer 1: advanced imaging and genetics made optional, broad specialized studies removed, outputs and SFT pathway aligned",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:FTD",
-    "difficulty_rationale": "5 required tools + 1–2 recommended biomarkers and a substantial differential (psychiatric, alcohol, vascular, or AD-overlap); 1–3 grounded red herrings (alcohol, family history, comorbid HIV / bipolar / GRN status); requires multi-modal synthesis.",
-    "case_body_concerns": [
-      "validator flags `order_advanced_imaging` in both optimal_actions (FDG_PET / amyloid_PET) and useless_tools (MR_spectroscopy / DaTscan / perfusion_MRI / carotid_duplex) — these are distinct modalities of the same catchall tool. Known systemic validator limitation: the coherence script ignores `tool_parameters.modality`. No fix at case level.",
-      "fallback output for `order_advanced_imaging` is missing in `fallback_tool_outputs` — calling the useless tool will return empty; case body needs an off-pathway fallback entry."
-    ],
+    "difficulty_rationale": "Required core: structured behavioural/cognitive assessment with informant, validated neuropsychological testing, targeted baseline labs, and brain MRI. Case-specific additions: optional FDG-PET; optional amyloid PET for an active AD differential; optional counselled genetic testing.",
+    "case_body_concerns": [],
     "citation_gap": [],
-    "vocab_gap": []
+    "vocab_gap": [],
+    "key_educational_points": [
+      "Genetic testing is optional after counselling and is not required to diagnose the clinical FTD syndrome"
+    ]
   }
 }

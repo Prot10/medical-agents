@@ -230,6 +230,26 @@
             "is_abnormal": false,
             "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on"
           }
+        ],
+        "TSH": [
+          {
+            "test": "TSH",
+            "value": 2.1,
+            "unit": "mIU/L",
+            "reference_range": "0.4-4.0",
+            "is_abnormal": false,
+            "clinical_significance": null
+          }
+        ],
+        "Zinc": [
+          {
+            "test": "Serum zinc",
+            "value": 82,
+            "unit": "µg/dL",
+            "reference_range": "60-120",
+            "is_abnormal": false,
+            "clinical_significance": null
+          }
         ]
       },
       "interpretation": "Abnormal values: Hemoglobin 11.2 g/dL (L), Platelets 98 x10^9/L (L), Potassium 2.6 mEq/L (L), BUN 28 mg/dL (H), Creatinine 1.6 mg/dL (H), Glucose 118 mg/dL (H), AST 112 U/L (H), ALT 78 U/L (H), Total bilirubin 3.4 mg/dL (H), Albumin 2.5 g/dL (L), INR 1.7 (H), Ammonia 94 µmol/L (H).",
@@ -318,32 +338,47 @@
   "followup_outputs": [
     {
       "trigger_action": "request_tips_shunt_assessment",
-      "tool_name": "order_advanced_imaging",
+      "tool_name": "order_body_imaging",
       "output": {
-        "modality": "Abdominal Doppler Ultrasound — TIPS shunt patency assessment",
+        "region": "abdomen",
+        "modality": "Doppler ultrasound",
+        "contrast": false,
         "findings": [
           {
-            "description": "TIPS shunt patent and functioning"
+            "type": "TIPS shunt",
+            "location": "intrahepatic portosystemic shunt",
+            "description": "Patent and functioning."
           },
           {
-            "description": "Doppler flow velocity 90 cm/s in main shunt (normal 90-190 cm/s)"
+            "type": "Doppler flow",
+            "location": "main shunt",
+            "description": "Velocity 90 cm/s (reference 90–190 cm/s)."
           },
           {
-            "description": "No evidence of shunt stenosis or thrombosis"
+            "type": "Shunt complication",
+            "location": "TIPS",
+            "description": "No stenosis or thrombosis."
           },
           {
-            "description": "No shunt revision indicated"
+            "type": "Ascites",
+            "location": "peritoneal cavity",
+            "description": "No recurrent ascites."
           },
           {
-            "description": "No recurrent ascites"
-          },
-          {
-            "description": "Splenomegaly consistent with portal hypertension"
+            "type": "Spleen",
+            "location": "left upper quadrant",
+            "description": "Splenomegaly, compatible with portal hypertension."
           }
         ],
-        "impression": "TIPS shunt patent with normal flow velocities (90 cm/s in main shunt; normal range 90–190 cm/s). No evidence of shunt stenosis or thrombosis. No recurrent ascites. Splenomegaly noted, consistent with portal hypertension",
-        "recommended_actions": [],
-        "tracer_or_protocol": null
+        "measurements": {
+          "main_shunt_velocity_cm_s": "90"
+        },
+        "impression": "Patent TIPS with normal main-shunt velocity. No stenosis, thrombosis or recurrent ascites.",
+        "recommended_actions": []
+      },
+      "tool_parameters": {
+        "study": "pelvis_abdomen_ultrasound",
+        "contrast": false
       }
     },
     {
@@ -618,9 +653,9 @@
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Send targeted laboratory studies: CBC, CMP, ammonia, magnesium, lactate, coagulation. Confirms liver dysfunction and screens for precipitants.",
+        "action": "Obtain the core HE/precipitant panel: CBC, electrolytes/renal/liver function, glucose, ammonia, magnesium, lactate, INR/coagulation, CRP, TSH, zinc and blood alcohol/urine drug screen; add phenotype-specific tests only when indicated.",
         "tool_name": "interpret_labs",
-        "expected_finding": "K 2.6 (severe hypokalemia), Cr 1.6 (AKI), ammonia 94 — pinpoints over-diuresis from lactulose; cirrhosis features.",
+        "expected_finding": "Metabolic, infectious, endocrine, nutritional or toxic precipitant, interpreted with ammonia as supportive rather than a severity marker.",
         "category": "required",
         "tool_parameters": {
           "panels": [
@@ -629,7 +664,10 @@
             "ammonia",
             "magnesium",
             "lactate",
-            "coagulation"
+            "coagulation",
+            "TSH",
+            "zinc",
+            "toxicology"
           ]
         },
         "citation": "[AASLD_2014]",
@@ -667,13 +705,16 @@
       },
       {
         "step": 5,
-        "action": "TIPS Doppler ultrasound — assess shunt patency given new-onset HE worsening.",
-        "tool_name": null,
-        "expected_finding": "Interventional radiology assessment of TIPS patency.",
-        "category": "recommended",
-        "tool_parameters": {},
-        "citation": "[AASLD_2014]",
-        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
+        "action": "Obtain abdominal Doppler ultrasound to assess TIPS patency because this post-TIPS patient has new overt encephalopathy; use it to identify shunt stenosis or thrombosis, not as routine brain imaging.",
+        "tool_name": "order_body_imaging",
+        "expected_finding": "TIPS patency and flow velocity, with any stenosis, thrombosis or recurrent ascites.",
+        "category": "optional",
+        "tool_parameters": {
+          "study": "pelvis_abdomen_ultrasound",
+          "contrast": false
+        },
+        "citation": "[ACG_HE_2026]",
+        "guideline_source": "ACG 2026 hepatic encephalopathy guideline"
       },
       {
         "step": 6,
@@ -812,7 +853,7 @@
       "literature_search": "normal"
     },
     "last_revised": "2026-08-10",
-    "revision_reason": "July 2026 clinical tool review: reviewer 2 asked that the head CT go from REQUIRED to OPTIONAL in hepatic encephalopathy, citing ACG 2026 recommendation 6 (\"in patients with cirrhosis and confusion without new-onset focal neurologic deficits, we suggest against routine brain imaging\") and writing the indications into the tool description rather than the tier. Applied. All 30 cases were read in full: this one has no focal deficit, no seizure, no trauma, no stated suspicion of intracranial bleeding, and its CT report is normal. The action stays available, and the sequence rule that imaging precedes a lumbar puncture is untouched",
+    "revision_reason": "Reviewer 2 HE audit: core endocrine, zinc and toxicology studies are now named in the order and available in the laboratory output; phenotype-specific additions retained.",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:HEP-ENC",
     "difficulty_rationale": "4 required tools + IR consult; iatrogenic precipitant (lactulose overdose) requires recognizing 8-10 stools/day as problematic, not just 'good ammonia control'.",

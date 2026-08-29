@@ -686,7 +686,81 @@
     ],
     "optimal_actions": [
       {
-        "step": 1,
+        "action": "Obtain CBC with differential, CRP (or procalcitonin), paired blood glucose, coagulation, renal/liver function and HIV testing; results must not delay LP or empirical therapy",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Inflammation/sepsis and LP safety context; blood values neither confirm nor exclude bacterial meningitis",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "CRP",
+            "procalcitonin",
+            "glucose",
+            "coagulation",
+            "HIV"
+          ]
+        },
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 1
+      },
+      {
+        "action": "Draw blood cultures with susceptibility testing as early as possible, preferably before antimicrobials, but start empirical therapy immediately if LP/imaging is delayed",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Pathogen and susceptibility, with collection timing recorded",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "blood_culture",
+          "tests": [
+            "culture",
+            "gram_stain",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 2
+      },
+      {
+        "action": "Perform LP with opening pressure, appearance, total/differential WBC, RBC, protein, CSF-to-blood glucose ratio, Gram stain, culture/susceptibility and relevant PCR; record whether collected before antibiotics",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Bacterial pattern and organism/susceptibility; PCR and culture yield depend on whether antibiotics preceded sampling",
+        "category": "required",
+        "tool_parameters": {
+          "basic": [
+            "opening_pressure",
+            "appearance",
+            "cell_count_total_and_differential",
+            "rbc_count",
+            "protein",
+            "glucose"
+          ],
+          "paired_serum": true,
+          "special_tests": [
+            "meningitis_panel"
+          ]
+        },
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 3
+      },
+      {
+        "action": "Obtain contrast brain MRI only for this case's suspected intracranial complication, structural alternative or failure to improve; it does not replace LP",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Abscess, empyema, ventriculitis, hydrocephalus, infarction or the stated alternative/complication",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "standard",
+          "contrast": true
+        },
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 4
+      },
+      {
+        "step": 5,
         "action": "Obtain non-contrast CT head to exclude mass effect, midline shift, or basal cistern obliteration that would contraindicate lumbar puncture in this patient with age >60, immunocompromise (chronic steroids + diabetes), and focal neurological signs (abducens palsy).",
         "tool_name": "order_ct_scan",
         "expected_finding": "No mass lesion, no midline shift, patent basal cisterns — confirms LP is safe to proceed.",
@@ -698,84 +772,24 @@
         "guideline_source": "IDSA 2004 §V"
       },
       {
-        "step": 2,
-        "action": "Send targeted laboratory studies: CBC, BMP, inflammatory_markers",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Leukocytosis with left shift; elevated inflammatory markers.",
-        "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP",
-            "inflammatory_markers"
-          ]
-        },
-        "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §VI"
-      },
-      {
-        "step": 3,
-        "action": "Perform lumbar puncture with opening-pressure measurement; send CSF for cell count with differential, glucose with paired serum, protein, Gram stain, bacterial culture, meningitis/encephalitis multiplex PCR panel, and CSF lactate.",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Elevated opening pressure; mixed neutrophilic-lymphocytic pleocytosis; low CSF:serum glucose ratio (<0.4); elevated protein; elevated CSF lactate; Gram stain negative; culture and PCR grow Listeria monocytogenes.",
-        "category": "required",
-        "tool_parameters": {
-          "special_tests": [
-            "meningitis_panel"
-          ]
-        },
-        "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §V"
-      },
-      {
-        "step": 4,
+        "step": 6,
         "action": "Verify empiric antibiotic regimen for an elderly immunocompromised patient — specifically confirm that ampicillin must be added alongside vancomycin and ceftriaxone for Listeria coverage — and review interactions with current medications including insulin, prednisone, and amlodipine.",
         "tool_name": "check_drug_interactions",
         "expected_finding": "Confirmation that ampicillin is required for Listeria coverage in this host; no prohibitive interactions; warnings about glucose monitoring with dexamethasone and vancomycin trough monitoring in CKD.",
-        "category": "required",
+        "category": "recommended",
         "tool_parameters": {},
         "citation": "[IDSA_2004]",
         "guideline_source": "IDSA 2004 §VII"
-      },
-      {
-        "step": 5,
-        "action": "Search the literature for Listeria meningitis risk factors, the importance of ampicillin coverage in elderly/immunocompromised hosts, CSF Gram stain sensitivity in Listeria, and the rhombencephalitis presentation.",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "IDSA 2004, ESCMID 2016, and Brouwer 2012 confirming Listeria risk group definition, ampicillin requirement, and low Gram stain sensitivity (~33%) for Listeria.",
-        "category": "required",
-        "tool_parameters": {},
-        "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §VII"
-      },
-      {
-        "step": 6,
-        "action": "Obtain contrast-enhanced brain MRI to characterize brainstem and cerebellar lesion in detail, assess for leptomeningeal enhancement, and exclude abscess, empyema, or vascular complications.",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "T2/FLAIR signal abnormality in dorsal pons and left middle cerebellar peduncle with faint enhancement; subtle left cerebellar leptomeningeal enhancement; no abscess or restricted diffusion.",
-        "category": "required",
-        "tool_parameters": {
-          "contrast": true
-        },
-        "citation": "[Brouwer_2012]",
-        "guideline_source": "Brouwer 2012"
       },
       {
         "step": 7,
-        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
-        "tool_name": "order_microbiology",
-        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started. eventual blood culture growth of Listeria monocytogenes.",
-        "category": "required",
-        "tool_parameters": {
-          "specimen": "blood_culture",
-          "tests": [
-            "culture",
-            "gram_stain",
-            "susceptibility"
-          ],
-          "before_antimicrobials": true
-        },
+        "action": "Search the literature for Listeria meningitis risk factors, the importance of ampicillin coverage in elderly/immunocompromised hosts, CSF Gram stain sensitivity in Listeria, and the rhombencephalitis presentation.",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "IDSA 2004, ESCMID 2016, and Brouwer 2012 confirming Listeria risk group definition, ampicillin requirement, and low Gram stain sensitivity (~33%) for Listeria.",
+        "category": "recommended",
+        "tool_parameters": {},
         "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §VI"
+        "guideline_source": "IDSA 2004 §VII"
       }
     ],
     "useless_tools": [
@@ -822,13 +836,6 @@
         "reason": "Per IDSA 2004, non-contrast CT head must precede lumbar puncture when any imaging-first criterion is present. This patient has age >60, immunocompromise (chronic corticosteroids, diabetes), altered mental status, and focal neurological signs (abducens palsy) — multiple independent indications for CT-first.",
         "citation": "[IDSA_2004]",
         "severity": "hard"
-      },
-      {
-        "before": "interpret_labs",
-        "after": "analyze_csf",
-        "reason": "Blood cultures must be drawn before the first antibiotic dose to preserve culture yield; peripheral cultures are collected via order_microbiology{specimen: blood_culture} and must precede antibiotic administration.",
-        "citation": "[IDSA_2004]",
-        "severity": "hard"
       }
     ],
     "critical_actions": [
@@ -854,7 +861,8 @@
       "The CSF pleocytosis in Listeria meningitis is often mixed (neutrophilic-lymphocytic) rather than the classic PMN-dominant pattern of pneumococcal meningitis; this atypical pattern anchors a naive clinician toward viral meningitis.",
       "Listeria is intrinsically resistant to all cephalosporins; standard empiric regimens omitting ampicillin (vancomycin + ceftriaxone alone) provide NO Listeria coverage and must be expanded in any patient aged >50 or immunocompromised.",
       "Rhombencephalitis — brainstem and cerebellar involvement — is a recognized manifestation of CNS Listeria infection; cranial nerve palsies (particularly abducens, facial) and ataxia reflect dorsal pontine involvement and should prompt MRI and Listeria-inclusive empiric therapy.",
-      "The posterior-circulation stroke mimic (abducens palsy + pontine MRI signal) must be actively excluded by DWI (no restriction here) and integration with the infectious syndrome before narrowing to a vascular diagnosis."
+      "The posterior-circulation stroke mimic (abducens palsy + pontine MRI signal) must be actively excluded by DWI (no restriction here) and integration with the infectious syndrome before narrowing to a vascular diagnosis.",
+      "WHO 2025: obtain cultures promptly, but neither LP nor cranial imaging may delay empirical antimicrobials when the pathway requires treatment first."
     ],
     "red_herrings": [
       {
@@ -880,8 +888,8 @@
     "difficulty_description": "Moderate — first Listeria case in the set; atypical CSF (mixed pleocytosis, negative Gram stain), brainstem signs mimicking posterior-circulation stroke, and the critical ampicillin-coverage reasoning step distinguish this from standard bacterial meningitis presentations",
     "expected_agent_confidence": 0.6,
     "authoring_agent": "condition-expert:BACT-MEN",
-    "last_revised": "2026-08-08",
-    "revision_reason": "per-case audit: the culture report named the organism in its findings and denied it in its impression, so the same report supported opposite treatment decisions",
+    "last_revised": "2026-08-10",
+    "revision_reason": "Reviewer 2 meningitis audit: complete LP/microbiology/lab pathway, no ECG, and MRI restricted to complications or non-response",
     "criteria_pack_version": "1.0",
     "difficulty_rationale": "6 required tools (CT + labs + CSF + drug-interactions + literature + MRI); 2 red herrings (negative Gram stain anchoring to viral; abducens palsy anchoring to stroke); requires recognition of Listeria risk group and ampicillin-coverage reasoning",
     "case_body_concerns": [],

@@ -106,44 +106,7 @@
   },
   "initial_tool_outputs": {
     "eeg": null,
-    "mri": {
-      "findings": [
-        {
-          "type": "Leptomeningeal enhancement",
-          "location": "Diffuse, bilateral cerebral convexities and basal cisterns",
-          "size": null,
-          "signal_characteristics": {
-            "T1_post_contrast": "Diffuse avid leptomeningeal enhancement along bilateral cerebral convexities, sylvian fissures, and basal cisterns",
-            "FLAIR": "Hyperintense signal within bilateral cerebral sulci consistent with proteinaceous or inflammatory material in the subarachnoid space",
-            "DWI": "No parenchymal restricted diffusion. Subtle increased sulcal signal bilaterally consistent with purulent exudate.",
-            "T2": "Sulcal hyperintensity bilaterally"
-          },
-          "mass_effect": "Mild diffuse cerebral edema with subtle sulcal effacement. No midline shift. No uncal or tonsillar herniation.",
-          "borders": "Diffuse bilateral without focal parenchymal lesion"
-        },
-        {
-          "type": "Moderate diffuse cerebral volume loss",
-          "location": "Global",
-          "size": null,
-          "signal_characteristics": {
-            "T1": "Widened sulci and prominent ventricles appropriate for age",
-            "FLAIR": "Scattered periventricular and subcortical white matter hyperintensities consistent with chronic small vessel ischemic changes"
-          },
-          "mass_effect": null,
-          "borders": null
-        }
-      ],
-      "volumetrics": null,
-      "additional_observations": [
-        "No subdural empyema or epidural abscess identified",
-        "No evidence of cerebritis or brain abscess formation",
-        "No hydrocephalus; ventricles mildly prominent, age-appropriate",
-        "No evidence of dural venous sinus thrombosis on post-contrast sequences",
-        "Scattered periventricular white matter T2/FLAIR hyperintensities consistent with moderate chronic small vessel ischemic changes"
-      ],
-      "impression": "Moderate age-appropriate cerebral volume loss with scattered chronic small vessel ischemic white matter changes. No abscess, empyema, or acute vascular complication identified",
-      "recommended_actions": []
-    },
+    "mri": null,
     "ecg": null,
     "labs": {
       "panels": {
@@ -493,38 +456,6 @@
       }
     },
     {
-      "trigger_action": "request_mri_complications",
-      "tool_name": "analyze_brain_mri",
-      "output": {
-        "findings": [
-          {
-            "type": "Leptomeningeal enhancement",
-            "location": "Diffuse bilateral cerebral convexities and basal cisterns",
-            "size": null,
-            "signal_characteristics": {
-              "T1_post_contrast": "Diffuse avid leptomeningeal enhancement along bilateral cerebral convexities, sylvian fissures, and basal cisterns",
-              "FLAIR": "Hyperintense signal within bilateral cerebral sulci consistent with proteinaceous or purulent subarachnoid material",
-              "DWI": "No parenchymal restricted diffusion. Subtle sulcal DWI signal bilaterally.",
-              "T2": "Sulcal hyperintensity bilaterally"
-            },
-            "mass_effect": "Mild diffuse cerebral edema. No midline shift. No uncal or tonsillar herniation.",
-            "borders": "Diffuse bilateral without focal parenchymal lesion"
-          }
-        ],
-        "volumetrics": null,
-        "additional_observations": [
-          "No subdural empyema or epidural abscess identified",
-          "No cerebritis or intraparenchymal abscess",
-          "No hydrocephalus",
-          "No dural venous sinus thrombosis",
-          "Scattered periventricular T2/FLAIR hyperintensities consistent with chronic small vessel ischemic change, unchanged from initial imaging",
-          "No rhombencephalitis pattern identified"
-        ],
-        "impression": "Diffuse leptomeningeal enhancement without parenchymal abscess, empyema, hydrocephalus, or venous sinus thrombosis. Chronic small vessel ischemic changes unchanged. No rhombencephalitis. No acute complication identified on this examination",
-        "recommended_actions": []
-      }
-    },
-    {
       "trigger_action": "request_blood_culture_final",
       "tool_name": "order_microbiology",
       "output": {
@@ -734,7 +665,68 @@
     ],
     "optimal_actions": [
       {
-        "step": 1,
+        "action": "Obtain CBC with differential, CRP (or procalcitonin), paired blood glucose, coagulation, renal/liver function and HIV testing; results must not delay LP or empirical therapy",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Inflammation/sepsis and LP safety context; blood values neither confirm nor exclude bacterial meningitis",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "CRP",
+            "procalcitonin",
+            "glucose",
+            "coagulation",
+            "HIV"
+          ]
+        },
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 1
+      },
+      {
+        "action": "Draw blood cultures with susceptibility testing as early as possible, preferably before antimicrobials, but start empirical therapy immediately if LP/imaging is delayed",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Pathogen and susceptibility, with collection timing recorded",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "blood_culture",
+          "tests": [
+            "culture",
+            "gram_stain",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 2
+      },
+      {
+        "action": "Perform LP with opening pressure, appearance, total/differential WBC, RBC, protein, CSF-to-blood glucose ratio, Gram stain, culture/susceptibility and relevant PCR; record whether collected before antibiotics",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Bacterial pattern and organism/susceptibility; PCR and culture yield depend on whether antibiotics preceded sampling",
+        "category": "required",
+        "tool_parameters": {
+          "basic": [
+            "opening_pressure",
+            "appearance",
+            "cell_count_total_and_differential",
+            "rbc_count",
+            "protein",
+            "glucose"
+          ],
+          "paired_serum": true,
+          "special_tests": [
+            "meningitis_panel"
+          ]
+        },
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 3
+      },
+      {
+        "step": 4,
         "action": "Obtain non-contrast CT head to exclude mass effect, midline shift, or herniation risk before lumbar puncture; imaging-first is mandatory given patient age >60, altered mental status, and immunocompromised state.",
         "tool_name": "order_ct_scan",
         "expected_finding": "No mass lesion, midline shift, or herniation — confirms LP is safe to proceed.",
@@ -746,86 +738,24 @@
         "guideline_source": "IDSA 2004 §V"
       },
       {
-        "step": 2,
-        "action": "Send targeted laboratory studies: CBC, BMP, CRP, procalcitonin, LFTs",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Peripheral leukocytosis with left shift, markedly elevated procalcitonin/CRP and lactate, mildly elevated creatinine reflecting baseline CKD.",
-        "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP",
-            "CRP",
-            "procalcitonin",
-            "LFTs"
-          ]
-        },
-        "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §VI"
-      },
-      {
-        "step": 3,
-        "action": "Perform lumbar puncture with opening-pressure measurement and send CSF for cell count with differential, glucose (with paired serum), protein, Gram stain, bacterial culture, meningitis multiplex PCR panel, and CSF lactate.",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Elevated opening pressure, PMN-predominant pleocytosis, markedly low CSF:serum glucose ratio (<0.4), markedly elevated protein and CSF lactate; Gram stain shows Gram-positive rods; PCR and culture identify Listeria monocytogenes.",
-        "category": "required",
-        "tool_parameters": {
-          "special_tests": [
-            "meningitis_panel"
-          ]
-        },
-        "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §V"
-      },
-      {
-        "step": 4,
+        "step": 5,
         "action": "Search the literature for current guideline-directed empiric antibiotic selection for Listeria meningitis in older immunocompromised adults, including Listeria's intrinsic cephalosporin resistance and the evidence for adjunctive dexamethasone.",
         "tool_name": "search_medical_literature",
         "expected_finding": "Retrieval of IDSA 2004 and ESCMID 2016 confirming ampicillin (not ceftriaxone alone) as the cornerstone of Listeria coverage, 21-day treatment duration, and De Gans 2002 dexamethasone evidence.",
-        "category": "required",
+        "category": "recommended",
         "tool_parameters": {},
         "citation": "[IDSA_2004]",
         "guideline_source": "IDSA 2004 §VII"
       },
       {
-        "step": 5,
+        "step": 6,
         "action": "Verify compatibility of empiric ampicillin + vancomycin + ceftriaxone regimen and adjunctive dexamethasone with the patient's current medications (methotrexate, prednisone, levothyroxine), and flag CKD implications for vancomycin dosing.",
         "tool_name": "check_drug_interactions",
         "expected_finding": "Interaction between dexamethasone and chronic methotrexate (hold methotrexate; monitor LFTs); additive immunosuppression with prednisone; vancomycin requires AUC-guided dosing in CKD; no contraindications to ampicillin.",
-        "category": "required",
+        "category": "recommended",
         "tool_parameters": {},
         "citation": "[De_Gans_2002]",
         "guideline_source": "De Gans 2002"
-      },
-      {
-        "step": 6,
-        "action": "Obtain contrast-enhanced brain MRI to assess for parenchymal complications (rhombencephalitis, cerebritis, abscess, ventriculitis, subdural empyema, venous sinus thrombosis) — Listeria is a particular cause of rhombencephalitis.",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Diffuse leptomeningeal enhancement; absence of rhombencephalitis or parenchymal abscess on this examination.",
-        "category": "recommended",
-        "tool_parameters": {
-          "contrast": true
-        },
-        "citation": "[Brouwer_2012]",
-        "guideline_source": "Brouwer 2012"
-      },
-      {
-        "step": 7,
-        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
-        "tool_name": "order_microbiology",
-        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started. blood cultures positive for Gram-positive rods.",
-        "category": "required",
-        "tool_parameters": {
-          "specimen": "blood_culture",
-          "tests": [
-            "culture",
-            "gram_stain",
-            "susceptibility"
-          ],
-          "before_antimicrobials": true
-        },
-        "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §VI"
       }
     ],
     "useless_tools": [
@@ -872,13 +802,6 @@
         "reason": "Per IDSA 2004, non-contrast CT head must precede lumbar puncture whenever any imaging-first criterion is present. This patient meets multiple criteria: age >60, altered mental status, and immunocompromised state (prednisone + methotrexate). LP in undetected mass effect can precipitate fatal herniation.",
         "citation": "[IDSA_2004]",
         "severity": "hard"
-      },
-      {
-        "before": "interpret_labs",
-        "after": "analyze_csf",
-        "reason": "Blood cultures must be drawn before the first antibiotic dose; the interpret_labs step captures blood cultures and peripheral markers before LP and before empiric antibiotics are started.",
-        "citation": "[IDSA_2004]",
-        "severity": "hard"
       }
     ],
     "critical_actions": [
@@ -905,7 +828,8 @@
       "Listeria is uniformly resistant to cephalosporins; failure to include ampicillin in the empiric regimen would leave the causative organism uncovered despite an otherwise appropriate vancomycin + ceftriaxone backbone.",
       "The CSF pattern (neutrophilic pleocytosis, very low glucose ratio, markedly elevated protein, positive Gram stain for Gram-positive rods) is consistent with bacterial infection; multiplex PCR and culture confirming Listeria monocytogenes establishes the diagnosis.",
       "CT head before LP is mandatory: this patient is aged >60, immunocompromised, and has altered mental status — three independent imaging-first criteria per IDSA 2004.",
-      "Drug-induced aseptic meningitis from methotrexate is a red herring: it produces a sterile lymphocytic CSF, whereas this CSF shows neutrophilic pleocytosis with a positive Gram stain and culture."
+      "Drug-induced aseptic meningitis from methotrexate is a red herring: it produces a sterile lymphocytic CSF, whereas this CSF shows neutrophilic pleocytosis with a positive Gram stain and culture.",
+      "WHO 2025: obtain cultures promptly, but neither LP nor cranial imaging may delay empirical antimicrobials when the pathway requires treatment first."
     ],
     "red_herrings": [
       {
@@ -936,8 +860,8 @@
       "literature_search": "normal"
     },
     "version": "1.0",
-    "last_revised": "2026-08-08",
-    "revision_reason": "per-case audit: the culture report named the organism in its findings and denied it in its impression, so the same report supported opposite treatment decisions",
+    "last_revised": "2026-08-10",
+    "revision_reason": "Reviewer 2 meningitis audit: complete LP/microbiology/lab pathway, no ECG, and MRI restricted to complications or non-response",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:BACT-MEN",
     "difficulty_rationale": "5 required tools (CT + labs + CSF + literature + drug-interactions), 1 red herring, single diagnostic chain; CT required pre-LP due to age>60 and immunocompromise",

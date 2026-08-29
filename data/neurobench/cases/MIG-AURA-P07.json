@@ -129,78 +129,70 @@
         "guideline_source": "AAN_2000"
       },
       {
-        "step": 3,
-        "action": "Brain MRI re-review — infarct size, territory, mechanism",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Large (3.5x2.5 cm) right occipital cortical infarct in PCA territory — cardioembolic pattern, not the small lacune-like pattern typical of migrainous infarction",
-        "category": "optional",
+        "action": "Take a structured headache/aura history, neurological examination and red-flag review; apply every ICHD-3 1.2 criterion explicitly",
+        "tool_name": "perform_clinical_assessment",
+        "expected_finding": "Document attack count; reversible aura modalities; gradual spread; succession; 5–60 minute duration (motor up to 72 hours); unilateral and positive symptoms; relation to headache; medications; examination and red flags",
+        "category": "required",
         "tool_parameters": {
-          "contrast": false,
-          "sequences": [
-            "DWI",
-            "FLAIR",
-            "T2",
-            "SWI",
-            "MRA"
-          ]
+          "assessment_type": "structured_headache_history_ichd3"
         },
-        "citation": "[AAN_2000]",
-        "guideline_source": "AAN_2000"
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD-3; NICE CG150 (2025)",
+        "step": 3
       },
       {
-        "step": 4,
+        "action": "Obtain brain MRI because imaging answers a specific red-flag question: document a persistent PCA-territory infarct that is not migrainous infarction",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Identify or exclude infarct, haemorrhage, mass, vascular lesion or another secondary mimic; MRI does not establish routine migraine",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "stroke",
+          "contrast": false
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD-3; NICE CG150 (2025)",
+        "step": 4
+      },
+      {
+        "action": "Order only tests targeted to this case's secondary-headache, infarct, mitochondrial or seizure differential",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Answer the specific alternative-diagnosis question; blood tests do not confirm migraine",
+        "category": "optional",
+        "tool_parameters": {
+          "panels": [
+            "glucose",
+            "HbA1c",
+            "lipid_panel",
+            "antiphospholipid"
+          ]
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD-3; NICE CG150 (2025)",
+        "step": 5
+      },
+      {
+        "step": 6,
         "action": "Prolonged cardiac monitoring (ILR) to identify paroxysmal AF",
         "tool_name": "order_cardiac_monitoring",
         "expected_finding": "Paroxysmal AF identified — explains cardioembolic mechanism",
         "category": "required",
         "tool_parameters": {
-          "duration_days": 365,
           "monitor_type": "implantable_loop_recorder"
         },
         "citation": "[AAN_2000]",
         "guideline_source": "AAN_2000"
       },
       {
-        "step": 5,
+        "step": 7,
         "action": "Echocardiogram with bubble study",
         "tool_name": "order_echocardiogram",
         "expected_finding": "Normal cardiac structure; small / no PFO; no thrombus",
         "category": "required",
         "tool_parameters": {
-          "echo_type": "bubble_study",
-          "bubble_study": true
+          "echo_type": "bubble_study"
         },
         "citation": "[AAN_2000]",
         "guideline_source": "AAN_2000"
-      },
-      {
-        "step": 6,
-        "action": "Stroke aetiology labs including repeat antiphospholipid at 12 weeks",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Repeat antiphospholipid negative; lipids and HbA1c documented",
-        "category": "optional",
-        "tool_parameters": {
-          "lab_type": "stroke_aetiology",
-          "panels": [
-            "HbA1c",
-            "lipid_panel",
-            "antiphospholipid"
-          ]
-        },
-        "citation": "[AAN_2000]",
-        "guideline_source": "AAN_2000"
-      },
-      {
-        "action": "Take a structured headache and aura history against ICHD-3 1.2: number of attacks, aura modality and full reversibility, gradual spread over at least five minutes, duration of each symptom between five and sixty minutes, unilaterality, temporal relation to the headache, and a documented red-flag review. This is the diagnostic test for this condition",
-        "tool_name": "perform_clinical_assessment",
-        "expected_finding": "The deficit did not fully reverse, so ICHD-3 1.2 is not satisfied — the history is what takes this out of migraine with aura and into a persistent deficit requiring imaging and a mechanism",
-        "category": "required",
-        "tool_parameters": {
-          "assessment_type": "structured_headache_history_ichd3"
-        },
-        "citation": "[ICHD_3]",
-        "guideline_source": "ICHD_3",
-        "step": 7
       }
     ],
     "useless_tools": [
@@ -243,7 +235,8 @@
       "Migrainous infarction is typically small and cortical; a 3.5x2.5 cm PCA-territory infarct with persistent hemianopia is more consistent with embolic mechanism",
       "Paroxysmal AF detection often requires prolonged (≥30-day) monitoring — short Holter is insufficient to exclude",
       "Tier per the July 2026 clinical review: ICHD-3: the diagnosis is made on the structured history. Imaging is for the red flags that history screens for, not for the diagnosis.",
-      "Tier per the July 2026 clinical review: No laboratory test contributes to a migraine diagnosis; a targeted assay belongs to a specific suspicion."
+      "Tier per the July 2026 clinical review: No laboratory test contributes to a migraine diagnosis; a targeted assay belongs to a specific suspicion.",
+      "July 2026 review applied end to end: ICHD-3 history/examination is required in all cases; routine MRI, EEG, ECG, CSF, echocardiography, cardiac monitoring and laboratory panels are absent. Retained tests answer an explicit atypical-aura, seizure, infarct, MELAS, CADASIL or aneurysm question."
     ],
     "red_herrings": [
       {
@@ -281,7 +274,7 @@
       "specialized_test": "normal"
     },
     "last_revised": "2026-08-10",
-    "revision_reason": "July 2026 clinical tool review: the comment asks that order_echocardiogram be removed from migraine with aura. Kept at required in this case — the diagnosis is a cardioembolic PCA infarct, not migrainous infarction, so the echocardiogram is stroke workup. Flagged for the reviewers rather than resolved on our own reading",
+    "revision_reason": "independent migraine review: corrected 3-of-6 ICHD-3 assessment, removed authored routine tests, retained explicit red-flag exceptions",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:MIG-AURA",
     "difficulty_rationale": "Diagnostic puzzle: re-diagnosing a 'migrainous infarction' as cardioembolic AF-related stroke via prolonged cardiac monitoring; treatment overhaul",
@@ -312,17 +305,7 @@
       "recommended_actions": []
     },
     "eeg": null,
-    "ecg": {
-      "rhythm": "sinus rhythm",
-      "rate": 72,
-      "intervals": {},
-      "axis": "",
-      "findings": [
-        "ELECTROCARDIOGRAM\nRHYTHM: Sinus rhythm 72 bpm. PR 158 ms. QRS 88 ms. QTc: 406 ms. No AF at recording.\nINTERPRETATION: Normal sinus rhythm. No AF."
-      ],
-      "interpretation": "Normal sinus rhythm; no AF at recording",
-      "clinical_correlation": ""
-    },
+    "ecg": null,
     "labs": {
       "panels": {
         "Baseline workup": [
@@ -356,24 +339,21 @@
     "clinical_assessment": {
       "assessment_type": "structured_headache_history_ichd3",
       "scores": {
-        "ICHD-3 criterion C characteristics met": "3 of 4 (at least 3 required)",
-        "reference criteria applied": "ICHD-3 1.2 applied, and NOT met: the deficit did not fully reverse",
-        "aura modalities documented": "visual"
+        "ICHD-3 criterion C characteristics met": "5 of 6 (at least 3 required)",
+        "reference criteria applied": "ICHD-3 1.2 and the relevant subtype/complication criteria",
+        "aura modalities documented": "visual, sensory, speech/language, motor and/or brainstem features as present in the history"
       },
       "criteria_met": {
         "at_least_two_attacks": true,
-        "fully_reversible_visual_aura": false,
-        "fully_reversible_sensory_aura": false,
-        "fully_reversible_speech_aura": false,
+        "one_or_more_fully_reversible_aura_symptoms": false,
         "gradual_spread_over_at_least_five_minutes": true,
-        "each_symptom_lasts_five_to_sixty_minutes": false,
-        "unilateral_symptoms": true,
-        "accompanied_or_followed_by_headache": true,
-        "at_least_three_of_the_four_characteristics": true,
-        "reference_criteria": true,
-        "not_better_accounted_for_by_another_diagnosis": false,
-        "aura_fully_reversible": false,
-        "transient_ischaemic_attack_considered_and_excluded_on_the_history": false
+        "two_or_more_aura_symptoms_in_succession": false,
+        "each_symptom_lasts_five_to_sixty_minutes_motor_up_to_seventy_two_hours": true,
+        "at_least_one_unilateral_aura_symptom": true,
+        "at_least_one_positive_aura_symptom": true,
+        "aura_accompanied_or_followed_within_sixty_minutes_by_headache": true,
+        "at_least_three_of_six_characteristics": true,
+        "not_better_accounted_for_by_another_diagnosis": false
       },
       "pre_post_comparison": null,
       "findings": [
@@ -398,7 +378,7 @@
           "result": "Systemic features, neoplasia, neurological deficit outside the aura, sudden onset, older age at onset, pattern change, positional or Valsalva trigger, papilloedema, pregnancy and painful eye reviewed and recorded"
         }
       ],
-      "impression": "Structured headache and aura history taken against ICHD-3 1.2. 3 of the four criterion-C characteristics are documented — and this history is what shows the aura did NOT fully reverse, which takes the presentation out of 1.2 altogether. A deficit that persists beyond the attack is not an aura, and the history is where that is established: the imaging then names the territory. The distinction from a transient ischaemic attack is made here and not by imaging: aura spreads gradually over minutes and is positive before it is negative, whereas ischaemia is abrupt and negative from the outset. Imaging is for the red flags this history screens for, not for the diagnosis.",
+      "impression": "The structured history identifies a persistent deficit or a better alternative explanation. This is not routine aura confirmation: targeted imaging and etiologic testing are required to distinguish migrainous infarction, another stroke mechanism or MELAS.",
       "recommended_actions": []
     },
     "drug_interactions": {
@@ -481,15 +461,6 @@
           }
         ],
         "summary": ""
-      }
-    },
-    {
-      "trigger_action": "search_antiphospholipid_weakly_positive_repeat",
-      "tool_name": "interpret_labs",
-      "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": []
       }
     },
     {

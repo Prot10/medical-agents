@@ -118,35 +118,6 @@
             "clinical_significance": null
           },
           {
-            "test": "Anti-GM1 IgM",
-            "value": "Negative",
-            "unit": "titer",
-            "reference_range": "Negative",
-            "is_abnormal": false
-          },
-          {
-            "test": "HIV",
-            "value": "Non-reactive",
-            "unit": "qualitative",
-            "reference_range": "Non-reactive",
-            "is_abnormal": false
-          },
-          {
-            "test": "SPEP",
-            "value": "No M-spike",
-            "unit": "qualitative",
-            "reference_range": "No M-spike",
-            "is_abnormal": false
-          },
-          {
-            "test": "Anti-Hu (ANNA-1)",
-            "value": "Negative",
-            "unit": "titer",
-            "reference_range": "Negative",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
             "test": "LFTs (ALT)",
             "value": 24,
             "unit": "U/L",
@@ -200,16 +171,6 @@
             "is_abnormal": false
           }
         ],
-        "Mimic exclusion": [
-          {
-            "test": "B12",
-            "value": "Within reference range",
-            "unit": "",
-            "reference_range": "",
-            "is_abnormal": false,
-            "clinical_significance": "Reported negative in this case's own workup; excludes this reversible mimic"
-          }
-        ],
         "Exclusion studies": [
           {
             "test": "Free T4",
@@ -218,32 +179,50 @@
             "reference_range": "",
             "is_abnormal": false,
             "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on"
+          }
+        ],
+        "Reviewer baseline rule-out additions": [
+          {
+            "test": "ESR",
+            "value": 8,
+            "unit": "mm/h",
+            "reference_range": "0-20",
+            "is_abnormal": false,
+            "clinical_significance": null
           },
           {
-            "test": "androgen receptor CAG repeat",
-            "value": "No pathogenic variant detected",
-            "unit": "",
-            "reference_range": "",
+            "test": "CRP",
+            "value": 2,
+            "unit": "mg/L",
+            "reference_range": "<5",
             "is_abnormal": false,
-            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on"
+            "clinical_significance": null
           },
           {
-            "test": "cytology",
-            "value": "No abnormality identified",
-            "unit": "",
-            "reference_range": "",
+            "test": "Vitamin B12",
+            "value": 420,
+            "unit": "pg/mL",
+            "reference_range": "200-900",
             "is_abnormal": false,
-            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on"
+            "clinical_significance": null
+          },
+          {
+            "test": "Folate",
+            "value": 10,
+            "unit": "ng/mL",
+            "reference_range": ">4",
+            "is_abnormal": false,
+            "clinical_significance": null
           }
         ]
       },
-      "interpretation": "Abnormal values: CK 540 U/L (H).",
+      "interpretation": "Rule-out studies do not confirm ALS. Targeted abnormalities are listed above.",
       "abnormal_values_summary": [
-        "CK 540 U/L (elevated)"
+        "CK: 540"
       ]
     },
     "specialized_test": {
-      "test_type": "EMG and NCS",
+      "test_type": "emg_ncs",
       "findings": [
         {
           "region": "Bulbar",
@@ -298,12 +277,38 @@
         ],
         "summary": "Awaji-Shima 2008 / Gold Coast 2020 diagnostic criteria; AAN 2009 practice parameter on ALS care"
       }
-    }
+    },
+    "eeg": null,
+    "ecg": null,
+    "advanced_imaging": null,
+    "csf": null
   },
   "followup_outputs": [
     {
-      "trigger_action": "request_pulmonary_function_als",
+      "trigger_action": "check_riluzole_levothyroxine_interaction",
+      "tool_name": "check_drug_interactions",
+      "output": {
+        "proposed": "Riluzole 50 mg twice daily",
+        "interactions": [
+          "Levothyroxine: no direct pharmacokinetic interaction with riluzole. However, riluzole initiation may subtly affect CYP metabolism — monitor TSH at 3-month check to ensure thyroid replacement remains adequate."
+        ],
+        "contraindications": [],
+        "warnings": [
+          "Monthly LFT monitoring required for riluzole",
+          "TSH check in 3 months given levothyroxine co-administration — physiological stress of the underlying neurological illness may affect thyroid requirements"
+        ],
+        "formulary_status": "Covered with prior authorization",
+        "alternatives": [
+          "AMX0035"
+        ]
+      }
+    },
+    {
+      "trigger_action": "request_baseline_respiratory_function",
       "tool_name": "order_specialized_test",
+      "tool_parameters": {
+        "test_type": "respiratory_function"
+      },
       "output": {
         "test_type": "respiratory_function",
         "findings": [
@@ -343,106 +348,11 @@
       }
     },
     {
-      "trigger_action": "swallowing_evaluation_bulbar",
+      "trigger_action": "offer_als_genetic_panel_after_counselling",
       "tool_name": "order_specialized_test",
-      "output": {
-        "test_type": "Videofluoroscopic Swallowing Study (VFSS)",
-        "findings": [
-          {
-            "finding": "Reduced tongue base retraction with premature bolus spillage"
-          },
-          {
-            "finding": "Pharyngeal residue after thin liquid swallow"
-          },
-          {
-            "finding": "Penetration to vocal cords with thin liquids — PAS score 4"
-          },
-          {
-            "finding": "No aspiration below cords with nectar-thick liquids"
-          }
-        ],
-        "quantitative_data": {
-          "PAS_thin_liquids": "4 (penetration without aspiration)",
-          "PAS_nectar_thick": "2 (residue above laryngeal vestibule)"
-        },
-        "impression": "Oropharyngeal dysphagia with penetration to the vocal cords on thin liquids (PAS score 4). No aspiration below the cords with nectar-thick liquids. Reduced tongue base retraction and pharyngeal residue. Nectar-thick liquids and soft/minced diet recommended. Refer to speech-language pathology for compensatory strategy instruction.",
-        "recommended_actions": [
-          "Nectar-thick liquids",
-          "Soft/minced diet",
-          "Speech-language pathology follow-up"
-        ]
-      }
-    },
-    {
-      "trigger_action": "check_riluzole_levothyroxine_interaction",
-      "tool_name": "check_drug_interactions",
-      "output": {
-        "proposed": "Riluzole 50 mg twice daily",
-        "interactions": [
-          "Levothyroxine: no direct pharmacokinetic interaction with riluzole. However, riluzole initiation may subtly affect CYP metabolism — monitor TSH at 3-month check to ensure thyroid replacement remains adequate."
-        ],
-        "contraindications": [],
-        "warnings": [
-          "Monthly LFT monitoring required for riluzole",
-          "TSH check in 3 months given levothyroxine co-administration — physiological stress of the underlying neurological illness may affect thyroid requirements"
-        ],
-        "formulary_status": "Covered with prior authorization",
-        "alternatives": [
-          "AMX0035"
-        ]
-      }
-    },
-    {
-      "trigger_action": "request_csf_nfl",
-      "tool_name": "analyze_csf",
-      "output": {
-        "appearance": "Clear, colorless",
-        "opening_pressure": "14 cmH2O",
-        "cell_count": {
-          "WBC": "2 cells/uL"
-        },
-        "protein": "62 mg/dL",
-        "glucose": "64 mg/dL",
-        "glucose_ratio": "0.69",
-        "special_tests": {
-          "NfL": "9,280 pg/mL",
-          "Oligoclonal bands": "Absent"
-        },
-        "interpretation": "Opening pressure: 14 cmH2O. WBC: 2 cells/uL (N/A PMN/N/A lymph). Protein: 62 mg/dL. Glucose: 64 mg/dL (ratio 0.69). NfL: 9,280 pg/mL. Oligoclonal bands: Absent."
-      }
-    },
-    {
-      "trigger_action": "request_als_multidisciplinary_clinic",
-      "tool_name": "interpret_labs",
-      "output": {
-        "panels": {
-          "Functional_Rating_Scale_Assessment": [
-            {
-              "test": "ALSFRS-R",
-              "value": 32,
-              "unit": "points",
-              "reference_range": "48 (maximum)",
-              "is_abnormal": true
-            },
-            {
-              "test": "ALSFRS-R Bulbar subscale",
-              "value": 8,
-              "unit": "points",
-              "reference_range": "12 (maximum)",
-              "is_abnormal": true
-            }
-          ]
-        },
-        "interpretation": "Abnormal values: ALSFRS-R 32 points (L), ALSFRS-R Bulbar subscale 8 points (L).",
-        "abnormal_values_summary": [
-          "ALSFRS-R 32/48",
-          "Bulbar subscale 8/12"
-        ]
-      }
-    },
-    {
-      "trigger_action": "request_genetic_als_panel",
-      "tool_name": "order_specialized_test",
+      "tool_parameters": {
+        "test_type": "genetic_panel:ALS"
+      },
       "output": {
         "test_type": "genetic_panel:ALS",
         "findings": [
@@ -450,13 +360,15 @@
             "panel": "Neurodegenerative_Genetic_Panel",
             "test": "C9orf72 repeat expansion",
             "result": "Negative",
-            "reference_range": "<30 repeats"
+            "reference_range": "<30 repeats",
+            "interpretation": ""
           },
           {
             "panel": "Neurodegenerative_Genetic_Panel",
             "test": "SOD1",
             "result": "No pathogenic variant",
-            "reference_range": "No pathogenic variant"
+            "reference_range": "No pathogenic variant",
+            "interpretation": ""
           }
         ],
         "quantitative_data": {
@@ -602,72 +514,6 @@
     "optimal_actions": [
       {
         "step": 1,
-        "action": "Obtain brain MRI to exclude an intracranial structural mimic — demyelination, brainstem tumour, multi-infarct disease",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "No structural lesion explaining the motor/bulbar findings; corticospinal-tract signal change or non-specific findings may be seen but are not by themselves diagnostic",
-        "category": "required",
-        "tool_parameters": {
-          "sequences": [
-            "T1",
-            "T2",
-            "FLAIR",
-            "DWI",
-            "T1+Gd"
-          ]
-        },
-        "citation": "[AAN_2009]",
-        "guideline_source": "AAN_2009"
-      },
-      {
-        "step": 2,
-        "action": "Perform EMG with nerve conduction studies sampling bulbar plus ≥2 spinal regions to document lower motor neuron involvement (fibrillations, positive sharp waves, complex fasciculation potentials, large-amplitude long-duration polyphasic MUPs with reduced recruitment) and exclude conduction block",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Active denervation and chronic reinnervation in ≥2 body regions with normal sensory NCS and no conduction block — meets Awaji / El Escorial revised criteria",
-        "category": "required",
-        "tool_parameters": {
-          "test_type": "emg_ncs"
-        },
-        "citation": "[Awaji_2008]",
-        "guideline_source": "Awaji_2008"
-      },
-      {
-        "step": 3,
-        "action": "Order a mimic-exclusion lab panel: CK, B12, TSH, HbA1c, HIV, RPR, SPEP, anti-GM1 IgM antibodies, and (in males) androgen receptor CAG repeat for Kennedy disease",
-        "tool_name": "interpret_labs",
-        "expected_finding": "CK often mildly to moderately elevated (2–5× ULN); reversible mimics (B12, TSH, HIV, RPR) negative; anti-GM1 negative; SPEP without high-titer M-spike; CAG repeat normal",
-        "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP",
-            "LFTs",
-            "CK",
-            "B12",
-            "TSH",
-            "Free T4",
-            "HIV",
-            "RPR",
-            "SPEP",
-            "anti-GM1 IgM"
-          ]
-        },
-        "citation": "[AAN_2009]",
-        "guideline_source": "AAN_2009"
-      },
-      {
-        "step": 4,
-        "action": "Measure respiratory function (FVC, MIP/MEP, SNIP/NIF) at baseline to inform NIV timing and prognostication",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "FVC and SNIP/MIP often reduced even in early disease; values guide timing of NIV (FVC <50% predicted or SNIP <40 cmH₂O are conventional thresholds)",
-        "category": "required",
-        "tool_parameters": {
-          "test_type": "respiratory_function"
-        },
-        "citation": "[AAN_2009]",
-        "guideline_source": "AAN_2009"
-      },
-      {
-        "step": 5,
         "action": "Search the medical literature to confirm Awaji and Gold Coast diagnostic thresholds and AAN practice-parameter recommendations relevant to this presentation",
         "tool_name": "search_medical_literature",
         "expected_finding": "Awaji-Shima 2008 / Gold Coast 2020 diagnostic criteria; AAN 2009 practice parameter on ALS care",
@@ -679,41 +525,7 @@
         "guideline_source": "Awaji_2008"
       },
       {
-        "step": 6,
-        "action": "Order an ALS-focused genetic panel (C9orf72 repeat expansion, SOD1, TARDBP, FUS, TBK1) — required when family history is positive or onset is young (<50)",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "C9orf72 expansion in ~40% of familial cases; SOD1/TARDBP/FUS in additional familial subset; ~10% of apparently sporadic cases also carry a variant",
-        "category": "recommended",
-        "tool_parameters": {
-          "test_type": "genetic_panel:ALS"
-        },
-        "citation": "[Brown_2017]",
-        "guideline_source": "Brown_2017"
-      },
-      {
-        "step": 7,
-        "action": "Obtain CSF for neurofilament light chain (NfL) for prognostic stratification when the diagnosis remains uncertain or when prognostic information will change management",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Markedly elevated CSF NfL (typically >5,000 pg/mL) supports a motor-neuron-disease degenerative process and correlates with faster progression",
-        "category": "recommended",
-        "tool_parameters": {
-          "basic": [
-            "cell count",
-            "protein",
-            "glucose"
-          ],
-          "special_tests": [
-            "NfL",
-            "NfH",
-            "oligoclonal_bands",
-            "cytology"
-          ]
-        },
-        "citation": "[ENCALS_2018]",
-        "guideline_source": "ENCALS_2018"
-      },
-      {
-        "step": 8,
+        "step": 2,
         "action": "Check interactions before initiating riluzole 50 mg twice daily; review baseline LFTs and CBC and counsel on monitoring",
         "tool_name": "check_drug_interactions",
         "expected_finding": "No major interactions for typical chronic medications; advise alcohol and grapefruit-juice avoidance (CYP1A2 modulators); monthly LFTs for first 3 months",
@@ -725,17 +537,88 @@
         "guideline_source": "AAN_2009"
       },
       {
-        "step": 9,
-        "action": "Obtain cervical and thoracic spine MRI to exclude compressive myelopathy and radiculopathy — the mimic that must be excluded before a motor neuron disease diagnosis",
+        "action": "Obtain brain MRI to exclude structural, brainstem, inflammatory, demyelinating or neoplastic ALS mimics",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "No better structural explanation for progressive upper and lower motor-neuron findings",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "standard",
+          "contrast": true
+        },
+        "citation": "[EAN_ALS_2024]",
+        "guideline_source": "Gold Coast; EAN 2024; NICE NG42",
+        "step": 3
+      },
+      {
+        "action": "Obtain cervical and thoracic spinal-cord MRI to exclude compressive myelopathy and other cord lesions",
         "tool_name": "order_body_imaging",
-        "expected_finding": "Spondylotic change may be present but without cord signal change or a compressive lesion explaining the distribution of weakness, and never explaining upper- and lower-motor-neuron signs in three or more regions",
+        "expected_finding": "No compressive, neoplastic, inflammatory or demyelinating cord mimic",
         "category": "required",
         "tool_parameters": {
           "study": "spine_MRI",
           "contrast": false
         },
-        "citation": "[AAN_2009]",
-        "guideline_source": "AAN_2009"
+        "citation": "[EAN_ALS_2024]",
+        "guideline_source": "Gold Coast; EAN 2024; NICE NG42",
+        "step": 4
+      },
+      {
+        "action": "Order a baseline treatable-mimic panel, adding only phenotype-specific infectious, immune, paraprotein or metabolic tests",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Exclude common hematologic, renal/hepatic, electrolyte, calcium, thyroid, B12/folate, muscle and inflammatory alternatives; tests do not confirm ALS",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "calcium",
+            "TSH",
+            "vitamin_B12",
+            "folate",
+            "CK",
+            "ESR",
+            "CRP"
+          ]
+        },
+        "citation": "[EAN_ALS_2024]",
+        "guideline_source": "Gold Coast; EAN 2024; NICE NG42",
+        "step": 5
+      },
+      {
+        "action": "Perform EMG/NCS across bulbar, cervical, thoracic and lumbosacral regions using ALS electrodiagnostic criteria",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Active and chronic neurogenic change in multiple regions with preserved sensory studies and no conduction block",
+        "category": "required",
+        "tool_parameters": {
+          "test_type": "emg_ncs"
+        },
+        "citation": "[EAN_ALS_2024]",
+        "guideline_source": "Gold Coast; EAN 2024; NICE NG42",
+        "step": 6
+      },
+      {
+        "action": "Obtain baseline FVC/VC and SNIP or MIP after suspected ALS is established; this is a safety and management assessment, not a diagnostic confirmation",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "Quantify respiratory involvement and need for surveillance or non-invasive ventilation",
+        "category": "recommended",
+        "tool_parameters": {
+          "test_type": "respiratory_function"
+        },
+        "citation": "[EAN_ALS_2024]",
+        "guideline_source": "Gold Coast; EAN 2024; NICE NG42",
+        "step": 7
+      },
+      {
+        "action": "Offer an ALS gene panel including C9orf72 and SOD1 after pre-test counselling; do not embed genetics in a routine blood panel",
+        "tool_name": "order_specialized_test",
+        "expected_finding": "A pathogenic result can affect counselling, family risk and gene-targeted therapy/trial eligibility; a negative result does not exclude ALS",
+        "category": "optional",
+        "tool_parameters": {
+          "test_type": "genetic_panel:ALS"
+        },
+        "citation": "[EAN_ALS_2024]",
+        "guideline_source": "Gold Coast; EAN 2024; NICE NG42",
+        "step": 8
       }
     ],
     "useless_tools": [
@@ -820,8 +703,8 @@
       "Mild-to-moderate CK elevation (2–5× ULN) is consistent with ALS and does not itself indicate a primary myopathy.",
       "Cervical spondylotic changes on MRI are common incidental findings in the at-risk age group; bulbar findings or multi-region EMG denervation cannot be attributed to cervical disease.",
       "Baseline FVC, MIP/MEP, and SNIP/NIF inform NIV timing — NIV initiation at FVC <50% predicted or SNIP <40 cmH₂O prolongs survival and improves quality of life.",
-      "Markedly elevated CSF neurofilament light chain (>5,000 pg/mL) supports motor neuron degeneration and correlates with progression rate (ENCALS prediction model).",
-      "Bulbar-onset disease carries a worse prognosis; early NIV planning and swallowing/feeding strategy are higher priority than in limb-onset disease."
+      "Bulbar-onset disease carries a worse prognosis; early NIV planning and swallowing/feeding strategy are higher priority than in limb-onset disease.",
+      "July 2026 review applied end to end: EMG/NCS is the required ALS-specific test; brain and cord MRI and targeted labs exclude mimics; respiratory function is a recommended safety baseline; genetics is separately offered after counselling; CSF is absent except in five atypical mimic work-ups."
     ],
     "red_herrings": []
   },
@@ -837,8 +720,8 @@
       "advanced_imaging": "normal",
       "literature_search": "normal"
     },
-    "last_revised": "2026-08-08",
-    "revision_reason": "per-case audit: 3 assay(s) the gold standard requires were never delivered, so an agent doing what the gold says saw nothing; reported as exclusions, which is what the case asserts by asserting its diagnosis",
+    "last_revised": "2026-08-10",
+    "revision_reason": "independent ALS review: targeted CSF/labs, separate optional genetics, EMG diagnostic, respiratory safety baseline, brain+cord MRI",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:ALS",
     "difficulty_rationale": "Bulbar-onset with early respiratory compromise prioritizes respiratory function and aspiration evaluation; otherwise classic",

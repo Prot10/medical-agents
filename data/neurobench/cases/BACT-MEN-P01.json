@@ -82,53 +82,7 @@
   },
   "initial_tool_outputs": {
     "eeg": null,
-    "mri": {
-      "findings": [
-        {
-          "type": "Normal parenchyma",
-          "location": "Bilateral cerebral hemispheres",
-          "size": null,
-          "signal_characteristics": {
-            "T1": "Normal gray-white matter differentiation throughout",
-            "T2_FLAIR": "No parenchymal signal abnormality",
-            "DWI": "No restricted diffusion"
-          },
-          "mass_effect": "None",
-          "borders": null
-        },
-        {
-          "type": "Equivocal leptomeningeal enhancement",
-          "location": "Bilateral frontoparietal convexities",
-          "size": null,
-          "signal_characteristics": {
-            "T1_post_contrast": "Subtle, thin linear enhancement along bilateral frontoparietal sulci, difficult to distinguish from normal vascular enhancement versus post-lumbar-puncture changes"
-          },
-          "mass_effect": "None",
-          "borders": "Ill-defined"
-        },
-        {
-          "type": "Mucosal thickening",
-          "location": "Bilateral maxillary and ethmoid sinuses",
-          "size": "Mild",
-          "signal_characteristics": {
-            "T2": "Mild mucosal thickening with retained secretions in bilateral maxillary sinuses"
-          },
-          "mass_effect": "None",
-          "borders": null
-        }
-      ],
-      "volumetrics": null,
-      "additional_observations": [
-        "No acute infarcts on DWI sequences",
-        "No mass lesions identified",
-        "No hydrocephalus",
-        "No subdural collections or empyema",
-        "Ventricular system normal in size and configuration",
-        "Mild paranasal sinus disease as described"
-      ],
-      "impression": "Largely unremarkable brain MRI with the exception of subtle, equivocal leptomeningeal enhancement along the frontoparietal convexities bilaterally. No acute parenchymal abnormality, mass lesion, hydrocephalus, or empyema",
-      "recommended_actions": []
-    },
+    "mri": null,
     "ecg": null,
     "labs": {
       "panels": {
@@ -930,7 +884,68 @@
     ],
     "optimal_actions": [
       {
-        "step": 1,
+        "action": "Obtain CBC with differential, CRP (or procalcitonin), paired blood glucose, coagulation, renal/liver function and HIV testing; results must not delay LP or empirical therapy",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Inflammation/sepsis and LP safety context; blood values neither confirm nor exclude bacterial meningitis",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "CRP",
+            "procalcitonin",
+            "glucose",
+            "coagulation",
+            "HIV"
+          ]
+        },
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 1
+      },
+      {
+        "action": "Draw blood cultures with susceptibility testing as early as possible, preferably before antimicrobials, but start empirical therapy immediately if LP/imaging is delayed",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Pathogen and susceptibility, with collection timing recorded",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "blood_culture",
+          "tests": [
+            "culture",
+            "gram_stain",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 2
+      },
+      {
+        "action": "Perform LP with opening pressure, appearance, total/differential WBC, RBC, protein, CSF-to-blood glucose ratio, Gram stain, culture/susceptibility and relevant PCR; record whether collected before antibiotics",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Bacterial pattern and organism/susceptibility; PCR and culture yield depend on whether antibiotics preceded sampling",
+        "category": "required",
+        "tool_parameters": {
+          "basic": [
+            "opening_pressure",
+            "appearance",
+            "cell_count_total_and_differential",
+            "rbc_count",
+            "protein",
+            "glucose"
+          ],
+          "paired_serum": true,
+          "special_tests": [
+            "meningitis_panel"
+          ]
+        },
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 3
+      },
+      {
+        "step": 4,
         "action": "Obtain non-contrast CT head to exclude mass effect, midline shift, basal cistern obliteration, or hydrocephalus that would contraindicate lumbar puncture in this patient with altered mental status and/or immunocompromise.",
         "tool_name": "order_ct_scan",
         "expected_finding": "Absence of mass lesion, midline shift, or signs of impending herniation — confirms LP is safe.",
@@ -942,38 +957,7 @@
         "guideline_source": "IDSA 2004 §V"
       },
       {
-        "step": 2,
-        "action": "Send targeted laboratory studies: CBC, BMP, CRP, procalcitonin",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Peripheral leukocytosis with left shift, elevated procalcitonin/CRP, eventual blood-culture growth of the pathogen.",
-        "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP",
-            "CRP",
-            "procalcitonin"
-          ]
-        },
-        "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §VI"
-      },
-      {
-        "step": 3,
-        "action": "Perform lumbar puncture with opening-pressure measurement and send CSF for cell count with differential, glucose (with paired serum), protein, Gram stain, bacterial culture, meningitis multiplex PCR panel, and CSF lactate.",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Elevated opening pressure, PMN-predominant pleocytosis, low CSF:serum glucose ratio (<0.4), elevated protein, elevated CSF lactate; PCR or culture identifies the organism.",
-        "category": "required",
-        "tool_parameters": {
-          "special_tests": [
-            "meningitis_panel"
-          ]
-        },
-        "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §V"
-      },
-      {
-        "step": 4,
+        "step": 5,
         "action": "Verify compatibility of empiric vancomycin + ceftriaxone (+ ampicillin if Listeria coverage indicated) and adjunctive dexamethasone with the patient's current medications, and confirm timing of dexamethasone BEFORE or WITH the first antibiotic dose.",
         "tool_name": "check_drug_interactions",
         "expected_finding": "No prohibitive interactions; confirmation of standard guideline-directed empiric regimen with dose adjustments as required.",
@@ -983,44 +967,14 @@
         "guideline_source": "De Gans 2002"
       },
       {
-        "step": 5,
+        "step": 6,
         "action": "Search the literature for current guideline-directed empiric antibiotic selection by age and host factors and for the evidence base supporting adjunctive dexamethasone in pneumococcal meningitis.",
         "tool_name": "search_medical_literature",
         "expected_finding": "Retrieval of IDSA 2004, ESCMID 2016, and De Gans 2002 to support empiric regimen and steroid timing.",
-        "category": "required",
+        "category": "recommended",
         "tool_parameters": {},
         "citation": "[IDSA_2004]",
         "guideline_source": "IDSA 2004 §VII"
-      },
-      {
-        "step": 6,
-        "action": "Obtain contrast-enhanced brain MRI to assess for parenchymal complications (cerebritis, abscess, subdural empyema, ventriculitis, venous sinus thrombosis, infarction).",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Leptomeningeal enhancement; identification or exclusion of complications that modify management.",
-        "category": "recommended",
-        "tool_parameters": {
-          "contrast": true
-        },
-        "citation": "[Brouwer_2012]",
-        "guideline_source": "Brouwer 2012"
-      },
-      {
-        "step": 7,
-        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
-        "tool_name": "order_microbiology",
-        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started",
-        "category": "required",
-        "tool_parameters": {
-          "specimen": "blood_culture",
-          "tests": [
-            "culture",
-            "gram_stain",
-            "susceptibility"
-          ],
-          "before_antimicrobials": true
-        },
-        "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §VI"
       }
     ],
     "useless_tools": [
@@ -1067,13 +1021,6 @@
         "reason": "Per IDSA 2004, non-contrast CT head must precede lumbar puncture whenever any imaging-first criterion is present (altered mental status, focal neurological deficit, papilledema, recent seizure, immunocompromise, or age >60). LP performed in undetected mass effect can precipitate fatal herniation.",
         "citation": "[IDSA_2004]",
         "severity": "hard"
-      },
-      {
-        "before": "interpret_labs",
-        "after": "analyze_csf",
-        "reason": "Blood cultures must be drawn (via order_microbiology{specimen: blood_culture}) before the first dose of empiric antibiotics so that culture yield is not lost; in practice this means peripheral cultures are collected at the same draw as the CSF analysis is initiated, and the lab tube sequencing prevents antibiotic exposure before specimen acquisition.",
-        "citation": "[IDSA_2004]",
-        "severity": "hard"
       }
     ],
     "critical_actions": [
@@ -1099,7 +1046,8 @@
       "Adjunctive dexamethasone (10 mg IV q6h × 4 days) given BEFORE or WITH the first antibiotic dose reduces mortality and unfavourable outcomes in pneumococcal meningitis (De Gans 2002, NEJM).",
       "A negative CSF Gram stain (sensitivity ~60-90%, lower if antibiotic pretreated) does not exclude bacterial meningitis; multiplex PCR or antigen testing retains sensitivity.",
       "CSF:serum glucose ratio <0.4 is more reliable than absolute CSF glucose for distinguishing bacterial from viral meningitis.",
-      "Empiric coverage must include vancomycin + ceftriaxone in adults; add ampicillin for Listeria coverage if age >50 or immunocompromised."
+      "Empiric coverage must include vancomycin + ceftriaxone in adults; add ampicillin for Listeria coverage if age >50 or immunocompromised.",
+      "WHO 2025: obtain cultures promptly, but neither LP nor cranial imaging may delay empirical antimicrobials when the pathway requires treatment first."
     ],
     "red_herrings": [
       {
@@ -1145,8 +1093,8 @@
       "literature_search": "normal",
       "drug_interactions": "normal"
     },
-    "last_revised": "2026-08-08",
-    "revision_reason": "per-case audit: a required literature or interaction check returned an empty payload while its expected_finding promised specific published evidence, so the judge assessed the agent against knowledge the simulation withheld",
+    "last_revised": "2026-08-10",
+    "revision_reason": "Reviewer 2 meningitis audit: complete LP/microbiology/lab pathway, no ECG, and MRI restricted to complications or non-response",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:BACT-MEN",
     "difficulty_rationale": "5 required tools; 3 red herrings",

@@ -481,40 +481,6 @@
           "Rifampin 600 mg IV q24h may be added if vancomycin CSF penetration is a concern (off-guideline, use with specialist input)."
         ]
       }
-    },
-    {
-      "trigger_action": "request_mri_brain_contrast",
-      "tool_name": "analyze_brain_mri",
-      "output": {
-        "findings": [
-          {
-            "type": "Leptomeningeal enhancement",
-            "location": "Bilateral cerebral convexities, basal cisterns, sulci",
-            "size": null,
-            "signal_characteristics": {
-              "T1_post_contrast": "Smooth, thin curvilinear leptomeningeal enhancement along bilateral cerebral convexities, sylvian fissures, and basal cisterns — consistent with bacterial meningitis",
-              "FLAIR": "Subtle sulcal FLAIR hyperintensity bilaterally consistent with proteinaceous/inflammatory material in the subarachnoid space",
-              "DWI": "No restricted diffusion in the parenchyma or cisterns"
-            },
-            "mass_effect": "None",
-            "borders": "Follows pial surface"
-          }
-        ],
-        "volumetrics": null,
-        "additional_observations": [
-          "No parenchymal ring-enhancing lesion to suggest abscess",
-          "No subdural collection to suggest empyema",
-          "Patent dural venous sinuses on MR venography — no cerebral venous sinus thrombosis",
-          "Ventricles normal in size and configuration — no obstructive hydrocephalus",
-          "No infarct on DWI"
-        ],
-        "impression": "Diffuse leptomeningeal enhancement consistent with bacterial meningitis. No parenchymal abscess, subdural empyema, hydrocephalus, infarct, or cerebral venous sinus thrombosis. Imaging supports uncomplicated bacterial meningitis at this stage; clinical correlation and short-interval follow-up imaging recommended if neurological status worsens.",
-        "recommended_actions": [
-          "Continue current empiric antibiotic regimen and dexamethasone",
-          "Repeat imaging if clinical deterioration or new focal deficit",
-          "No need for surgical drainage — no abscess or empyema identified"
-        ]
-      }
     }
   ],
   "fallback_tool_outputs": {
@@ -643,85 +609,29 @@
     ],
     "optimal_actions": [
       {
-        "step": 1,
-        "action": "Send targeted laboratory studies: CBC, BMP, CRP, procalcitonin",
+        "action": "Obtain CBC with differential, CRP (or procalcitonin), paired blood glucose, coagulation, renal/liver function and HIV testing; results must not delay LP or empirical therapy",
         "tool_name": "interpret_labs",
-        "expected_finding": "Marked neutrophilic leukocytosis, elevated procalcitonin and CRP, elevated lactate, mild hyponatremia.",
+        "expected_finding": "Inflammation/sepsis and LP safety context; blood values neither confirm nor exclude bacterial meningitis",
         "category": "required",
         "tool_parameters": {
           "panels": [
             "CBC",
-            "BMP",
+            "CMP",
             "CRP",
-            "procalcitonin"
+            "procalcitonin",
+            "glucose",
+            "coagulation",
+            "HIV"
           ]
         },
-        "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §VI"
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 1
       },
       {
-        "step": 2,
-        "action": "Perform lumbar puncture with opening-pressure measurement and send CSF for cell count with differential, glucose (with paired serum), protein, Gram stain, bacterial culture, meningitis multiplex PCR panel, and CSF lactate.",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Markedly elevated opening pressure, turbid appearance, PMN-predominant pleocytosis (>1000 cells), critically low CSF:serum glucose ratio (<0.2), elevated protein, elevated CSF lactate; Gram-positive diplococci on Gram stain confirming S. pneumoniae.",
-        "category": "required",
-        "tool_parameters": {
-          "special_tests": [
-            "meningitis_panel"
-          ]
-        },
-        "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §V"
-      },
-      {
-        "step": 3,
-        "action": "Search the literature for guideline-directed empiric antibiotic selection by age and host factors, and for the evidence supporting adjunctive dexamethasone in pneumococcal meningitis.",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Retrieval of IDSA 2004, ESCMID 2016, and De Gans 2002 supporting vancomycin plus ceftriaxone empirically and dexamethasone before or with the first antibiotic dose.",
-        "category": "required",
-        "tool_parameters": {},
-        "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §VII"
-      },
-      {
-        "step": 4,
-        "action": "Verify compatibility of empiric vancomycin plus ceftriaxone and adjunctive dexamethasone with the patient's home medications, and confirm the required timing of dexamethasone BEFORE or WITH the first antibiotic dose.",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "No prohibitive interactions; clinically important note that dexamethasone may reduce CSF vancomycin penetration; hydrochlorothiazide-corticosteroid potassium-wasting interaction noted; regimen is safe with monitoring.",
-        "category": "required",
-        "tool_parameters": {},
-        "citation": "[De_Gans_2002]",
-        "guideline_source": "De Gans 2002"
-      },
-      {
-        "step": 5,
-        "action": "Obtain non-contrast CT head to exclude mass effect or unsuspected contraindication to LP if there is any clinical uncertainty, or to assess left mastoid as a parameningeal focus.",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "No mass effect, no midline shift, no hydrocephalus; left mastoid opacification consistent with recent otomastoiditis as the likely pneumococcal portal.",
-        "category": "optional",
-        "tool_parameters": {
-          "contrast": false
-        },
-        "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §V"
-      },
-      {
-        "step": 6,
-        "action": "Obtain contrast-enhanced brain MRI to assess for parenchymal complications (subdural empyema, ventriculitis, brain abscess, venous sinus thrombosis) if clinical course fails to improve or complications are suspected.",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Leptomeningeal enhancement; exclusion of abscess, empyema, or vascular complications.",
-        "category": "recommended",
-        "tool_parameters": {
-          "contrast": true
-        },
-        "citation": "[Brouwer_2012]",
-        "guideline_source": "Brouwer 2012"
-      },
-      {
-        "step": 7,
-        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
+        "action": "Draw blood cultures with susceptibility testing as early as possible, preferably before antimicrobials, but start empirical therapy immediately if LP/imaging is delayed",
         "tool_name": "order_microbiology",
-        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started. blood cultures will later grow Streptococcus pneumoniae.",
+        "expected_finding": "Pathogen and susceptibility, with collection timing recorded",
         "category": "required",
         "tool_parameters": {
           "specimen": "blood_culture",
@@ -732,8 +642,64 @@
           ],
           "before_antimicrobials": true
         },
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 2
+      },
+      {
+        "action": "Perform LP with opening pressure, appearance, total/differential WBC, RBC, protein, CSF-to-blood glucose ratio, Gram stain, culture/susceptibility and relevant PCR; record whether collected before antibiotics",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Bacterial pattern and organism/susceptibility; PCR and culture yield depend on whether antibiotics preceded sampling",
+        "category": "required",
+        "tool_parameters": {
+          "basic": [
+            "opening_pressure",
+            "appearance",
+            "cell_count_total_and_differential",
+            "rbc_count",
+            "protein",
+            "glucose"
+          ],
+          "paired_serum": true,
+          "special_tests": [
+            "meningitis_panel"
+          ]
+        },
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 3
+      },
+      {
+        "step": 4,
+        "action": "Search the literature for guideline-directed empiric antibiotic selection by age and host factors, and for the evidence supporting adjunctive dexamethasone in pneumococcal meningitis.",
+        "tool_name": "search_medical_literature",
+        "expected_finding": "Retrieval of IDSA 2004, ESCMID 2016, and De Gans 2002 supporting vancomycin plus ceftriaxone empirically and dexamethasone before or with the first antibiotic dose.",
+        "category": "recommended",
+        "tool_parameters": {},
         "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §VI"
+        "guideline_source": "IDSA 2004 §VII"
+      },
+      {
+        "step": 5,
+        "action": "Verify compatibility of empiric vancomycin plus ceftriaxone and adjunctive dexamethasone with the patient's home medications, and confirm the required timing of dexamethasone BEFORE or WITH the first antibiotic dose.",
+        "tool_name": "check_drug_interactions",
+        "expected_finding": "No prohibitive interactions; clinically important note that dexamethasone may reduce CSF vancomycin penetration; hydrochlorothiazide-corticosteroid potassium-wasting interaction noted; regimen is safe with monitoring.",
+        "category": "recommended",
+        "tool_parameters": {},
+        "citation": "[De_Gans_2002]",
+        "guideline_source": "De Gans 2002"
+      },
+      {
+        "step": 6,
+        "action": "Obtain non-contrast CT head to exclude mass effect or unsuspected contraindication to LP if there is any clinical uncertainty, or to assess left mastoid as a parameningeal focus.",
+        "tool_name": "order_ct_scan",
+        "expected_finding": "No mass effect, no midline shift, no hydrocephalus; left mastoid opacification consistent with recent otomastoiditis as the likely pneumococcal portal.",
+        "category": "optional",
+        "tool_parameters": {
+          "contrast": false
+        },
+        "citation": "[IDSA_2004]",
+        "guideline_source": "IDSA 2004 §V"
       }
     ],
     "useless_tools": [
@@ -771,15 +737,7 @@
       }
     ],
     "harmful_tools": [],
-    "sequence_constraints": [
-      {
-        "before": "interpret_labs",
-        "after": "analyze_csf",
-        "reason": "Blood cultures (collected via order_microbiology{specimen: blood_culture}) must be drawn before the first antibiotic dose; in practice this draw occurs at the same time as LP preparation but must not be skipped. Post-antibiotic blood cultures yield false-negative results.",
-        "citation": "[IDSA_2004]",
-        "severity": "hard"
-      }
-    ],
+    "sequence_constraints": [],
     "critical_actions": [
       "Draw two sets of peripheral blood cultures before the first antibiotic dose.",
       "Administer empiric IV antibiotics (vancomycin 15-20 mg/kg plus ceftriaxone 2 g) promptly — within 60 minutes of clinical suspicion; do not delay for LP beyond what patient safety allows.",
@@ -801,7 +759,8 @@
       "This 50-year-old immunocompetent adult without focal neurologic signs, papilledema, or severe altered mental status does not strictly meet IDSA 2004 criteria mandating CT before LP; performing LP without prior CT is clinically defensible and should not be penalized. CT is useful if there is any uncertainty or to characterize the mastoid focus.",
       "Blood cultures must be obtained BEFORE the first antibiotic dose to preserve yield; empiric antibiotics must then follow immediately — every hour of delay increases mortality.",
       "Adjunctive dexamethasone (10 mg IV q6h for 4 days) initiated before or with the first antibiotic dose reduces mortality and unfavorable outcomes in pneumococcal meningitis (De Gans et al., NEJM 2002); the interaction with vancomycin CSF penetration is clinically relevant but does not contraindicate its use.",
-      "CSF:serum glucose ratio of 0.18 is far below the 0.4 threshold for bacterial meningitis; combined with neutrophilic pleocytosis of 2840 cells/microL and markedly elevated protein, this pattern is highly specific for bacterial infection before Gram stain or culture results are available."
+      "CSF:serum glucose ratio of 0.18 is far below the 0.4 threshold for bacterial meningitis; combined with neutrophilic pleocytosis of 2840 cells/microL and markedly elevated protein, this pattern is highly specific for bacterial infection before Gram stain or culture results are available.",
+      "WHO 2025: obtain cultures promptly, but neither LP nor cranial imaging may delay empirical antimicrobials when the pathway requires treatment first."
     ],
     "red_herrings": [
       {
@@ -833,8 +792,8 @@
       "advanced_imaging": "normal",
       "literature_search": "normal"
     },
-    "last_revised": "2026-08-08",
-    "revision_reason": "per-case audit: the culture report named the organism in its findings and denied it in its impression, so the same report supported opposite treatment decisions",
+    "last_revised": "2026-08-10",
+    "revision_reason": "Reviewer 2 meningitis audit: complete LP/microbiology/lab pathway, no ECG, and MRI restricted to complications or non-response",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:BACT-MEN",
     "difficulty_rationale": "4 required tools; 1 red herring; classic Gram-stain-positive presentation; no AMS/papilledema/focal-signs so no mandatory CT-before-LP constraint; single diagnostic chain to confident pneumococcal diagnosis",

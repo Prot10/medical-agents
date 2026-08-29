@@ -90,7 +90,53 @@
   },
   "initial_tool_outputs": {
     "eeg": null,
-    "mri": null,
+    "mri": {
+      "findings": [
+        {
+          "type": "Postoperative resection cavity",
+          "location": "Right parietal lobe",
+          "size": null,
+          "signal_characteristics": {
+            "T1_post_contrast": "Thin rim enhancement at the margins of the resection cavity, consistent with expected postoperative granulation tissue; no thick, irregular enhancing wall to suggest abscess",
+            "T2_FLAIR": "Perilesional FLAIR hyperintensity in the right parietal white matter, stable compared to prior MRI at the time of initial diagnosis",
+            "DWI": "No restricted diffusion within the resection cavity or surrounding parenchyma"
+          },
+          "mass_effect": "No significant mass effect; no midline shift",
+          "borders": "Smooth, thin rim"
+        },
+        {
+          "type": "Leptomeningeal and ependymal enhancement",
+          "location": "Bilateral convexities and ependymal lining of the lateral ventricles, right greater than left",
+          "size": null,
+          "signal_characteristics": {
+            "T1_post_contrast": "Diffuse leptomeningeal enhancement along bilateral cerebral convexities and sulci; ependymal enhancement lining the lateral ventricles, most prominent along the right lateral ventricle in proximity to the EVD catheter tip",
+            "FLAIR": "Sulcal FLAIR hyperintensity bilaterally consistent with proteinaceous/inflammatory material in the subarachnoid space"
+          },
+          "mass_effect": "None",
+          "borders": "Follows sulcal and ependymal contours"
+        },
+        {
+          "type": "EVD catheter tract",
+          "location": "Right parietal entry to right lateral ventricle",
+          "size": null,
+          "signal_characteristics": {
+            "T2": "Thin T2-hyperintense tract along EVD catheter path, consistent with postoperative changes"
+          },
+          "mass_effect": "None",
+          "borders": "Not applicable"
+        }
+      ],
+      "volumetrics": null,
+      "additional_observations": [
+        "No parenchymal ring-enhancing abscess identified",
+        "No subdural empyema",
+        "No cerebral venous sinus thrombosis on MR venography sequences",
+        "Mild right lateral ventricle enlargement consistent with CT finding; no obstructive hydrocephalus",
+        "Residual surgical blood products in the right parietal resection cavity — expected at 8 days post-craniotomy"
+      ],
+      "impression": "1. Diffuse leptomeningeal enhancement along bilateral cerebral convexities with ependymal enhancement of the lateral ventricles (right greater than left), most prominent adjacent to EVD catheter tip — findings consistent with meningitis and early ventriculitis. 2. Expected postoperative changes at right parietal resection cavity with thin rim enhancement; no features of abscess formation. 3. No subdural empyema or cerebral venous sinus thrombosis. 4. Mild right lateral ventricle enlargement without obstructive hydrocephalus",
+      "recommended_actions": []
+    },
     "ecg": null,
     "labs": {
       "panels": {
@@ -436,57 +482,6 @@
         "impression": "Staphylococcus aureus isolated. Susceptibilities are reported above and are what allow empirical therapy to be narrowed. The specimen was taken before the first antimicrobial dose, so the isolate is interpretable.",
         "recommended_actions": []
       }
-    },
-    {
-      "trigger_action": "request_mri_brain_contrast",
-      "tool_name": "analyze_brain_mri",
-      "output": {
-        "findings": [
-          {
-            "type": "Postoperative resection cavity",
-            "location": "Right parietal lobe",
-            "size": null,
-            "signal_characteristics": {
-              "T1_post_contrast": "Thin rim enhancement at the margins of the resection cavity, consistent with expected postoperative granulation tissue; no thick, irregular enhancing wall to suggest abscess",
-              "T2_FLAIR": "Perilesional FLAIR hyperintensity in the right parietal white matter, stable compared to prior MRI at the time of initial diagnosis",
-              "DWI": "No restricted diffusion within the resection cavity or surrounding parenchyma"
-            },
-            "mass_effect": "No significant mass effect; no midline shift",
-            "borders": "Smooth, thin rim"
-          },
-          {
-            "type": "Leptomeningeal and ependymal enhancement",
-            "location": "Bilateral convexities and ependymal lining of the lateral ventricles, right greater than left",
-            "size": null,
-            "signal_characteristics": {
-              "T1_post_contrast": "Diffuse leptomeningeal enhancement along bilateral cerebral convexities and sulci; ependymal enhancement lining the lateral ventricles, most prominent along the right lateral ventricle in proximity to the EVD catheter tip",
-              "FLAIR": "Sulcal FLAIR hyperintensity bilaterally consistent with proteinaceous/inflammatory material in the subarachnoid space"
-            },
-            "mass_effect": "None",
-            "borders": "Follows sulcal and ependymal contours"
-          },
-          {
-            "type": "EVD catheter tract",
-            "location": "Right parietal entry to right lateral ventricle",
-            "size": null,
-            "signal_characteristics": {
-              "T2": "Thin T2-hyperintense tract along EVD catheter path, consistent with postoperative changes"
-            },
-            "mass_effect": "None",
-            "borders": "Not applicable"
-          }
-        ],
-        "volumetrics": null,
-        "additional_observations": [
-          "No parenchymal ring-enhancing abscess identified",
-          "No subdural empyema",
-          "No cerebral venous sinus thrombosis on MR venography sequences",
-          "Mild right lateral ventricle enlargement consistent with CT finding; no obstructive hydrocephalus",
-          "Residual surgical blood products in the right parietal resection cavity — expected at 8 days post-craniotomy"
-        ],
-        "impression": "1. Diffuse leptomeningeal enhancement along bilateral cerebral convexities with ependymal enhancement of the lateral ventricles (right greater than left), most prominent adjacent to EVD catheter tip — findings consistent with meningitis and early ventriculitis. 2. Expected postoperative changes at right parietal resection cavity with thin rim enhancement; no features of abscess formation. 3. No subdural empyema or cerebral venous sinus thrombosis. 4. Mild right lateral ventricle enlargement without obstructive hydrocephalus",
-        "recommended_actions": []
-      }
     }
   ],
   "fallback_tool_outputs": {
@@ -635,7 +630,81 @@
     ],
     "optimal_actions": [
       {
-        "step": 1,
+        "action": "Obtain CBC with differential, CRP (or procalcitonin), paired blood glucose, coagulation, renal/liver function and HIV testing; results must not delay LP or empirical therapy",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Inflammation/sepsis and LP safety context; blood values neither confirm nor exclude bacterial meningitis",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "CRP",
+            "procalcitonin",
+            "glucose",
+            "coagulation",
+            "HIV"
+          ]
+        },
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 1
+      },
+      {
+        "action": "Draw blood cultures with susceptibility testing as early as possible, preferably before antimicrobials, but start empirical therapy immediately if LP/imaging is delayed",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Pathogen and susceptibility, with collection timing recorded",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "blood_culture",
+          "tests": [
+            "culture",
+            "gram_stain",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 2
+      },
+      {
+        "action": "Perform LP with opening pressure, appearance, total/differential WBC, RBC, protein, CSF-to-blood glucose ratio, Gram stain, culture/susceptibility and relevant PCR; record whether collected before antibiotics",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Bacterial pattern and organism/susceptibility; PCR and culture yield depend on whether antibiotics preceded sampling",
+        "category": "required",
+        "tool_parameters": {
+          "basic": [
+            "opening_pressure",
+            "appearance",
+            "cell_count_total_and_differential",
+            "rbc_count",
+            "protein",
+            "glucose"
+          ],
+          "paired_serum": true,
+          "special_tests": [
+            "meningitis_panel"
+          ]
+        },
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 3
+      },
+      {
+        "action": "Obtain contrast brain MRI only for this case's suspected intracranial complication, structural alternative or failure to improve; it does not replace LP",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Abscess, empyema, ventriculitis, hydrocephalus, infarction or the stated alternative/complication",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "standard",
+          "contrast": true
+        },
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 4
+      },
+      {
+        "step": 5,
         "action": "Obtain non-contrast CT head to evaluate for new mass effect, midline shift, or hydrocephalus — particularly given EVD in situ, prior craniotomy, and altered mental status — before sampling CSF from the EVD.",
         "tool_name": "order_ct_scan",
         "expected_finding": "Expected postoperative changes at the right parietal resection cavity; EVD catheter in appropriate position; mild right lateral ventricular enlargement; no new hemorrhage, no midline shift, no herniation — confirms EVD sampling is safe.",
@@ -647,85 +716,24 @@
         "guideline_source": "IDSA 2004 §V"
       },
       {
-        "step": 2,
-        "action": "Send targeted laboratory studies: CBC, BMP, CRP, procalcitonin",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Peripheral leukocytosis with neutrophilia, elevated CRP and procalcitonin.",
-        "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP",
-            "CRP",
-            "procalcitonin"
-          ]
-        },
-        "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §VI"
-      },
-      {
-        "step": 3,
-        "action": "Sample CSF from the EVD with opening-pressure measurement and send for cell count with differential, glucose (with paired serum), protein, Gram stain, bacterial culture, meningitis/encephalitis multiplex PCR panel, and CSF lactate.",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Turbid CSF with marked PMN-predominant pleocytosis, very low CSF:serum glucose ratio, elevated protein, elevated CSF lactate; Gram-positive cocci in clusters on Gram stain; PCR detects Staphylococcus aureus. RBCs present from surgical blood products.",
-        "category": "required",
-        "tool_parameters": {
-          "special_tests": [
-            "meningitis_panel"
-          ]
-        },
-        "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §V"
-      },
-      {
-        "step": 4,
+        "step": 6,
         "action": "Search the literature for guideline-directed empiric antibiotic selection for healthcare-associated meningitis and EVD-associated ventriculitis, including IDSA recommendations on vancomycin plus anti-pseudomonal beta-lactam.",
         "tool_name": "search_medical_literature",
         "expected_finding": "IDSA guidance specifying vancomycin plus cefepime/ceftazidime/meropenem as empiric regimen for post-neurosurgical CNS infection; EVD removal or replacement as source control; modified CSF diagnostic thresholds in post-neurosurgical patients.",
-        "category": "required",
+        "category": "recommended",
         "tool_parameters": {},
         "citation": "[IDSA_2004]",
         "guideline_source": "IDSA 2004 §VII"
       },
       {
-        "step": 5,
+        "step": 7,
         "action": "Perform a drug interaction check for empiric vancomycin plus cefepime in the context of the patient's concurrent dexamethasone, levetiracetam, temozolomide, and trimethoprim-sulfamethoxazole.",
         "tool_name": "check_drug_interactions",
         "expected_finding": "No prohibitive pharmacokinetic interactions; key warnings include dexamethasone reducing vancomycin CNS penetration, additive nephrotoxicity with TMP-SMX, and cefepime lowering seizure threshold in a post-craniotomy patient on levetiracetam.",
-        "category": "required",
+        "category": "recommended",
         "tool_parameters": {},
         "citation": "[De_Gans_2002]",
         "guideline_source": "De Gans 2002"
-      },
-      {
-        "step": 6,
-        "action": "Obtain contrast-enhanced brain MRI with FLAIR and DWI to assess for ventriculitis, ependymal enhancement, parenchymal abscess, subdural empyema, and leptomeningeal spread versus tumor progression.",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Diffuse leptomeningeal enhancement and ependymal enhancement of the lateral ventricles; no parenchymal abscess; no subdural empyema; no cerebral venous sinus thrombosis; helps distinguish ventriculitis from tumoral leptomeningeal spread.",
-        "category": "recommended",
-        "tool_parameters": {
-          "contrast": true
-        },
-        "citation": "[Brouwer_2012]",
-        "guideline_source": "Brouwer 2012"
-      },
-      {
-        "step": 7,
-        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
-        "tool_name": "order_microbiology",
-        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started. blood cultures may be negative in isolated device-associated ventriculitis but should be obtained to detect concurrent bacteremia.",
-        "category": "required",
-        "tool_parameters": {
-          "specimen": "blood_culture",
-          "tests": [
-            "culture",
-            "gram_stain",
-            "susceptibility"
-          ],
-          "before_antimicrobials": true
-        },
-        "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §VI"
       }
     ],
     "useless_tools": [
@@ -772,13 +780,6 @@
         "reason": "Per IDSA 2004, CT head must precede CSF sampling whenever imaging-first criteria are present (altered mental status, focal deficit, recent craniotomy with mass-effect risk, EVD in situ). CT confirms no new mass effect or herniation risk before EVD manipulation or sampling.",
         "citation": "[IDSA_2004]",
         "severity": "hard"
-      },
-      {
-        "before": "interpret_labs",
-        "after": "analyze_csf",
-        "reason": "Blood cultures must be collected before any antibiotic dose to preserve culture yield; in practice, blood cultures are drawn at the same time as CSF is sampled from the EVD.",
-        "citation": "[IDSA_2004]",
-        "severity": "hard"
       }
     ],
     "critical_actions": [
@@ -804,7 +805,8 @@
       "The post-surgical CSF RBC count (here 310 cells/µL) represents blood products from the craniotomy, not a new hemorrhage — this is a chemical-meningitis red herring that creates diagnostic noise but does not account for the Gram-positive cocci on stain, the markedly low CSF glucose, or the rising cell count on day 8.",
       "Dexamethasone reduces blood-brain barrier permeability and may reduce vancomycin CNS penetration; this is an important pharmacokinetic interaction unique to the post-neurosurgical setting on corticosteroids.",
       "Procalcitonin >3 ng/mL supports systemic bacterial infection rather than purely localised chemical irritation, though procalcitonin is not perfectly specific in post-operative patients.",
-      "MRI showing ependymal enhancement adjacent to the EVD catheter tip confirms ventriculitis as the anatomical substrate of infection."
+      "MRI showing ependymal enhancement adjacent to the EVD catheter tip confirms ventriculitis as the anatomical substrate of infection.",
+      "WHO 2025: obtain cultures promptly, but neither LP nor cranial imaging may delay empirical antimicrobials when the pathway requires treatment first."
     ],
     "red_herrings": [
       {
@@ -825,8 +827,8 @@
   },
   "metadata": {
     "authoring_agent": "condition-expert:BACT-MEN",
-    "last_revised": "2026-08-08",
-    "revision_reason": "per-case audit: the culture report named the organism in its findings and denied it in its impression, so the same report supported opposite treatment decisions",
+    "last_revised": "2026-08-10",
+    "revision_reason": "Reviewer 2 meningitis audit: complete LP/microbiology/lab pathway, no ECG, and MRI restricted to complications or non-response",
     "criteria_pack_version": "1.0",
     "difficulty_rationale": "5 required tools; 2 red herrings (post-op fever anchoring; chemical-meningitis CSF blood products confounder); nosocomial organism requiring non-standard empiric coverage; drug interaction complexity from concurrent dexamethasone/temozolomide/TMP-SMX",
     "condition_name": "Healthcare-associated bacterial meningitis",

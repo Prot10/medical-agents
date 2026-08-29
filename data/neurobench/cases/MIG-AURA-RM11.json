@@ -20,7 +20,7 @@
       "literature_search": "normal"
     },
     "last_revised": "2026-08-10",
-    "revision_reason": "July 2026 clinical tool review: the comment asks that CSF analysis be removed from migraine with aura. This case suspects a secondary headache, so the lumbar puncture stays available, but at the optional tier — no migraine case now requires or recommends it",
+    "revision_reason": "independent migraine review: corrected 3-of-6 ICHD-3 assessment, removed authored routine tests, retained explicit red-flag exceptions",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:MIG-AURA",
     "difficulty_rationale": "Diagnostic puzzle: hemiplegic migraine with migralepsy and reversible MRI changes — extensive mimic exclusion (MELAS, encephalitis, primary epilepsy, stroke)",
@@ -160,76 +160,58 @@
         "guideline_source": "AAN_2000"
       },
       {
-        "step": 3,
-        "action": "Repeat brain MRI at 48h and follow-up to document reversibility",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Reversible cortical / subcortical signal changes over 48h to weeks — consistent with hemiplegic migraine; no new infarct",
-        "category": "optional",
-        "tool_parameters": {
-          "contrast": false,
-          "sequences": [
-            "DWI",
-            "FLAIR",
-            "T2",
-            "SWI",
-            "MRA"
-          ]
-        },
-        "citation": "[AAN_2000]",
-        "guideline_source": "AAN_2000"
-      },
-      {
-        "step": 4,
-        "action": "EEG to evaluate for ongoing epileptiform activity",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "No interictal epileptiform activity; possible focal slowing during/after the migralepsy episode",
-        "category": "required",
-        "tool_parameters": {
-          "eeg_type": "video",
-          "duration": "24 hours",
-          "video_eeg": true
-        },
-        "citation": "[AAN_2000]",
-        "guideline_source": "AAN_2000"
-      },
-      {
-        "step": 5,
-        "action": "Mitochondrial / autoimmune workup and genetic panel for hemiplegic migraine",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Normal lactate; negative autoimmune encephalitis panel; CACNA1A / ATP1A2 / SCN1A pending",
-        "category": "optional",
-        "tool_parameters": {
-          "lab_type": "hemiplegic_migraine_workup",
-          "panels": [
-            "lactate",
-            "autoimmune_encephalitis_panel",
-            "genetic"
-          ]
-        },
-        "citation": "[AAN_2000]",
-        "guideline_source": "AAN_2000"
-      },
-      {
-        "step": 6,
-        "action": "Lumbar puncture given encephalopathy-like features and to exclude infectious / autoimmune cause",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Normal CSF — no pleocytosis, normal protein/glucose; supports exclusion of encephalitis",
-        "category": "optional",
-        "tool_parameters": {},
-        "citation": "[AAN_2000]",
-        "guideline_source": "AAN_2000"
-      },
-      {
-        "action": "Take a structured headache and aura history against ICHD-3 1.2: number of attacks, aura modality and full reversibility, gradual spread over at least five minutes, duration of each symptom between five and sixty minutes, unilaterality, temporal relation to the headache, and a documented red-flag review. This is the diagnostic test for this condition",
+        "action": "Take a structured headache/aura history, neurological examination and red-flag review; apply every ICHD-3 1.2 criterion explicitly",
         "tool_name": "perform_clinical_assessment",
-        "expected_finding": "ICHD-3 1.2 criteria documented item by item against the reference set for this subtype, with the red-flag review recorded",
+        "expected_finding": "Document attack count; reversible aura modalities; gradual spread; succession; 5–60 minute duration (motor up to 72 hours); unilateral and positive symptoms; relation to headache; medications; examination and red flags",
         "category": "required",
         "tool_parameters": {
           "assessment_type": "structured_headache_history_ichd3"
         },
         "citation": "[ICHD_3]",
-        "guideline_source": "ICHD_3",
-        "step": 7
+        "guideline_source": "ICHD-3; NICE CG150 (2025)",
+        "step": 3
+      },
+      {
+        "action": "Obtain brain MRI because imaging answers a specific red-flag question: exclude an acute structural lesion after motor aura and a witnessed seizure",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Identify or exclude infarct, haemorrhage, mass, vascular lesion or another secondary mimic; MRI does not establish routine migraine",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "stroke",
+          "contrast": false
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD-3; NICE CG150 (2025)",
+        "step": 4
+      },
+      {
+        "action": "Obtain video-EEG because a convulsive event was witnessed; this evaluates the seizure component, not the migraine",
+        "tool_name": "analyze_eeg",
+        "expected_finding": "Capture or assess epileptiform activity relevant to the suspected aura-triggered seizure",
+        "category": "required",
+        "tool_parameters": {
+          "eeg_type": "video"
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD-3; NICE CG150 (2025)",
+        "step": 5
+      },
+      {
+        "action": "Order only tests targeted to this case's secondary-headache, infarct, mitochondrial or seizure differential",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Answer the specific alternative-diagnosis question; blood tests do not confirm migraine",
+        "category": "optional",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "glucose",
+            "lactate"
+          ]
+        },
+        "citation": "[ICHD_3]",
+        "guideline_source": "ICHD-3; NICE CG150 (2025)",
+        "step": 6
       }
     ],
     "useless_tools": [
@@ -278,7 +260,8 @@
       "Reversible MRI signal changes are recognised in hemiplegic migraine and should not be misinterpreted as permanent infarct",
       "Hemiplegic migraine workup must exclude MELAS, autoimmune encephalitis, and structural causes",
       "Tier per the July 2026 clinical review: ICHD-3: the diagnosis is made on the structured history. Imaging is for the red flags that history screens for, not for the diagnosis.",
-      "Tier per the July 2026 clinical review: No laboratory test contributes to a migraine diagnosis; a targeted assay belongs to a specific suspicion."
+      "Tier per the July 2026 clinical review: No laboratory test contributes to a migraine diagnosis; a targeted assay belongs to a specific suspicion.",
+      "July 2026 review applied end to end: ICHD-3 history/examination is required in all cases; routine MRI, EEG, ECG, CSF, echocardiography, cardiac monitoring and laboratory panels are absent. Retained tests answer an explicit atypical-aura, seizure, infarct, MELAS, CADASIL or aneurysm question."
     ],
     "red_herrings": [
       {
@@ -418,37 +401,25 @@
       "interpretation": "All values within normal limits.",
       "abnormal_values_summary": []
     },
-    "csf": {
-      "opening_pressure": "15 cmH2O (normal)",
-      "appearance": "Clear and colourless",
-      "cell_count": {},
-      "protein": "0.36 g/L",
-      "glucose": "3.8 mmol/L",
-      "interpretation": "Opening pressure: 15 cmH2O. Protein: 0.36 g/L. Glucose: 3.8 mmol/L.",
-      "glucose_ratio": "",
-      "special_tests": {}
-    },
+    "csf": null,
     "clinical_assessment": {
       "assessment_type": "structured_headache_history_ichd3",
       "scores": {
-        "ICHD-3 criterion C characteristics met": "3 of 4 (at least 3 required)",
-        "reference criteria applied": "ICHD-3 1.2.3, hemiplegic migraine — motor weakness required in addition",
-        "aura modalities documented": "visual, speech"
+        "ICHD-3 criterion C characteristics met": "5 of 6 (at least 3 required)",
+        "reference criteria applied": "ICHD-3 1.2 and the relevant subtype/complication criteria",
+        "aura modalities documented": "visual, sensory, speech/language, motor and/or brainstem features as present in the history"
       },
       "criteria_met": {
         "at_least_two_attacks": true,
-        "fully_reversible_visual_aura": true,
-        "fully_reversible_sensory_aura": false,
-        "fully_reversible_speech_aura": true,
+        "one_or_more_fully_reversible_aura_symptoms": true,
         "gradual_spread_over_at_least_five_minutes": false,
-        "each_symptom_lasts_five_to_sixty_minutes": true,
-        "unilateral_symptoms": true,
-        "accompanied_or_followed_by_headache": true,
-        "at_least_three_of_the_four_characteristics": true,
-        "reference_criteria": true,
-        "not_better_accounted_for_by_another_diagnosis": true,
-        "aura_fully_reversible": true,
-        "transient_ischaemic_attack_considered_and_excluded_on_the_history": true
+        "two_or_more_aura_symptoms_in_succession": true,
+        "each_symptom_lasts_five_to_sixty_minutes_motor_up_to_seventy_two_hours": true,
+        "at_least_one_unilateral_aura_symptom": true,
+        "at_least_one_positive_aura_symptom": true,
+        "aura_accompanied_or_followed_within_sixty_minutes_by_headache": true,
+        "at_least_three_of_six_characteristics": true,
+        "not_better_accounted_for_by_another_diagnosis": true
       },
       "pre_post_comparison": null,
       "findings": [
@@ -477,7 +448,7 @@
           "result": "Systemic features, neoplasia, neurological deficit outside the aura, sudden onset, older age at onset, pattern change, positional or Valsalva trigger, papilloedema, pregnancy and painful eye reviewed and recorded"
         }
       ],
-      "impression": "Structured headache and aura history taken against ICHD-3 1.2. 3 of the four criterion-C characteristics are documented — this presentation is hemiplegic migraine (ICHD-3 1.2.3), which requires motor weakness in addition to the 1.2 criteria; the weakness is documented, and the diagnosis is met on the history. The distinction from a transient ischaemic attack is made here and not by imaging: aura spreads gradually over minutes and is positive before it is negative, whereas ischaemia is abrupt and negative from the outset. Imaging is for the red flags this history screens for, not for the diagnosis.",
+      "impression": "Structured history documents 5 of 6 ICHD-3 criterion-C characteristics with reversible aura symptoms, neurological examination and red-flag review. Imaging or laboratory testing is not the diagnostic test for a typical attack.",
       "recommended_actions": []
     },
     "literature_search": {
@@ -492,95 +463,14 @@
         ],
         "summary": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup"
       }
-    }
+    },
+    "ecg": null,
+    "echo": null,
+    "cardiac_monitoring": null,
+    "advanced_imaging": null,
+    "specialized_test": null
   },
   "followup_outputs": [
-    {
-      "trigger_action": "request_repeat_mri_48h",
-      "tool_name": "analyze_brain_mri",
-      "output": {
-        "findings": [
-          {
-            "type": "cortical_swelling",
-            "location": "left cerebral hemisphere",
-            "size": "near-complete resolution",
-            "signal_characteristics": {
-              "FLAIR": "marked interval improvement; residual mild cortical signal change only",
-              "T2": "near-normal; minimal residual hyperintensity",
-              "DWI": "normal — no restriction"
-            },
-            "mass_effect": "resolved",
-            "borders": "normal sulcal pattern restored"
-          },
-          {
-            "type": "vascular_assessment",
-            "location": "circle of Willis",
-            "size": null,
-            "signal_characteristics": {
-              "MRA": "patent; no change from initial scan"
-            },
-            "mass_effect": "none",
-            "borders": null
-          }
-        ],
-        "volumetrics": null,
-        "additional_observations": [],
-        "impression": "Marked interval improvement compared with prior study. Near-complete resolution of left hemispheric cortical swelling and FLAIR signal changes. Sulcal pattern restored. DWI normal throughout — no restricted diffusion. MRA unchanged and patent. The imaging changes were reversible over 72 hours",
-        "recommended_actions": []
-      }
-    },
-    {
-      "trigger_action": "request_mra_head_neck",
-      "tool_name": "order_advanced_imaging",
-      "output": {
-        "modality": "MRA Head and Neck (time-of-flight)",
-        "findings": [
-          {
-            "region": "Intracranial arteries",
-            "finding": "Patent circle of Willis. No stenosis, occlusion, dissection, or aneurysm."
-          },
-          {
-            "region": "Extracranial carotid arteries",
-            "finding": "Patent bilateral internal and external carotid arteries. No dissection. No significant stenosis."
-          },
-          {
-            "region": "Vertebral arteries",
-            "finding": "Normal calibre bilaterally. No dissection."
-          }
-        ],
-        "impression": "Normal MRA head and neck. No stenosis, occlusion, dissection, or aneurysm identified.",
-        "recommended_actions": [
-          "No vascular intervention required"
-        ]
-      }
-    },
-    {
-      "trigger_action": "request_mitochondrial_workup",
-      "tool_name": "interpret_labs",
-      "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": []
-      }
-    },
-    {
-      "trigger_action": "request_autoimmune_encephalitis_panel",
-      "tool_name": "interpret_labs",
-      "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": []
-      }
-    },
-    {
-      "trigger_action": "request_casc1_cacna1a_atp1a2_genetic_testing",
-      "tool_name": "interpret_labs",
-      "output": {
-        "panels": {},
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": []
-      }
-    },
     {
       "trigger_action": "check_ocp_safety_hemiplegic_migraine",
       "tool_name": "check_drug_interactions",

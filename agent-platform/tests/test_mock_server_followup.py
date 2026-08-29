@@ -129,11 +129,18 @@ class TestMockServerIntegration:
         assert bare.success
         init_fp = json.dumps(case.initial_tool_outputs.eeg.model_dump(), sort_keys=True, default=str)
         assert json.dumps(bare.output, sort_keys=True, default=str) == init_fp
-        # A specific re-order (video EEG) escalates to the authored follow-up.
-        vid = srv.get_output("analyze_eeg", {"eeg_type": "video EEG", "clinical_context": "video eeg"})
-        assert vid.success
-        authored = next(fu for fu in case.followup_outputs if fu.trigger_action == "request_video_eeg")
-        assert json.dumps(vid.output, sort_keys=True, default=str) == \
+        # A specific re-order follows the reviewed staged pathway: equivocal routine EEG
+        # escalates to the authored sleep-deprived study, not directly to video-EEG.
+        sleep = srv.get_output(
+            "analyze_eeg",
+            {"eeg_type": "sleep_deprived", "clinical_context": "equivocal routine EEG"},
+        )
+        assert sleep.success
+        authored = next(
+            fu for fu in case.followup_outputs
+            if fu.trigger_action == "request_sleep_deprived_eeg"
+        )
+        assert json.dumps(sleep.output, sort_keys=True, default=str) == \
                json.dumps(authored.output.model_dump(), sort_keys=True, default=str)
 
     def test_confirmatory_labs_reachable_bact_men(self):

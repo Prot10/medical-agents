@@ -43,7 +43,8 @@ class NeurologicalCondition(str, Enum):
     ATYPICAL_PARKINSONISM_MSA = "atypical_parkinsonism_msa"
     ATYPICAL_PARKINSONISM_PSP = "atypical_parkinsonism_psp"
     FUNCTIONAL_NEUROLOGICAL_DISORDER = "functional_neurological_disorder"
-    # Added for the 23-condition set agreed with the clinical reviewers, 2026-08-05.
+    # Added to represent the reviewers' composition proposals, 2026-08-05. The current
+    # delivery remains frozen at 20 conditions: VaD is active; DLB, ICH and HSE are deferred.
     # HEMORRHAGIC_STROKE and VIRAL_ENCEPHALITIS above were already defined but unused; they
     # now carry spontaneous intracerebral haemorrhage and HSV encephalitis respectively. The
     # keys are deliberately not renamed: five hospital_rules trigger lists match

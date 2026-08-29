@@ -645,7 +645,81 @@
     ],
     "optimal_actions": [
       {
-        "step": 1,
+        "action": "Obtain CBC with differential, CRP (or procalcitonin), paired blood glucose, coagulation, renal/liver function and HIV testing; results must not delay LP or empirical therapy",
+        "tool_name": "interpret_labs",
+        "expected_finding": "Inflammation/sepsis and LP safety context; blood values neither confirm nor exclude bacterial meningitis",
+        "category": "required",
+        "tool_parameters": {
+          "panels": [
+            "CBC",
+            "CMP",
+            "CRP",
+            "procalcitonin",
+            "glucose",
+            "coagulation",
+            "HIV"
+          ]
+        },
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 1
+      },
+      {
+        "action": "Draw blood cultures with susceptibility testing as early as possible, preferably before antimicrobials, but start empirical therapy immediately if LP/imaging is delayed",
+        "tool_name": "order_microbiology",
+        "expected_finding": "Pathogen and susceptibility, with collection timing recorded",
+        "category": "required",
+        "tool_parameters": {
+          "specimen": "blood_culture",
+          "tests": [
+            "culture",
+            "gram_stain",
+            "susceptibility"
+          ],
+          "before_antimicrobials": true
+        },
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 2
+      },
+      {
+        "action": "Perform LP with opening pressure, appearance, total/differential WBC, RBC, protein, CSF-to-blood glucose ratio, Gram stain, culture/susceptibility and relevant PCR; record whether collected before antibiotics",
+        "tool_name": "analyze_csf",
+        "expected_finding": "Bacterial pattern and organism/susceptibility; PCR and culture yield depend on whether antibiotics preceded sampling",
+        "category": "required",
+        "tool_parameters": {
+          "basic": [
+            "opening_pressure",
+            "appearance",
+            "cell_count_total_and_differential",
+            "rbc_count",
+            "protein",
+            "glucose"
+          ],
+          "paired_serum": true,
+          "special_tests": [
+            "meningitis_panel"
+          ]
+        },
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 3
+      },
+      {
+        "action": "Obtain contrast brain MRI only for this case's suspected intracranial complication, structural alternative or failure to improve; it does not replace LP",
+        "tool_name": "analyze_brain_mri",
+        "expected_finding": "Abscess, empyema, ventriculitis, hydrocephalus, infarction or the stated alternative/complication",
+        "category": "required",
+        "tool_parameters": {
+          "protocol": "standard",
+          "contrast": true
+        },
+        "citation": "[WHO_Meningitis_2025]",
+        "guideline_source": "WHO meningitis guideline 2025",
+        "step": 4
+      },
+      {
+        "step": 5,
         "action": "Obtain non-contrast CT head to exclude mass effect, hydrocephalus, midline shift, or basal cistern obliteration that would contraindicate lumbar puncture; the CT should also include skull-base bone-algorithm reconstructions to characterise any bony defect.",
         "tool_name": "order_ct_scan",
         "expected_finding": "No contraindication to LP; focal left cribriform plate bony defect with trace pneumocephalus; left paranasal sinus opacification.",
@@ -657,85 +731,24 @@
         "guideline_source": "IDSA 2004 §V"
       },
       {
-        "step": 2,
-        "action": "Send targeted laboratory studies: CBC, BMP, CRP, procalcitonin",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Marked leukocytosis with left shift, markedly elevated CRP and procalcitonin.",
-        "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP",
-            "CRP",
-            "procalcitonin"
-          ]
-        },
-        "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §VI"
-      },
-      {
-        "step": 3,
-        "action": "Perform lumbar puncture; send CSF for cell count with differential, paired glucose (with serum glucose), protein, Gram stain, bacterial culture, meningitis multiplex PCR panel, and CSF lactate. Additionally, collect nasal secretion sample for beta-2-transferrin assay to confirm CSF rhinorrhea.",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Markedly elevated opening pressure, neutrophilic pleocytosis (>3000 cells), critically low glucose ratio (<0.2), markedly elevated protein and CSF lactate, numerous Gram-positive diplococci on Gram stain, S. pneumoniae detected on PCR; beta-2-transferrin positive in nasal secretions.",
-        "category": "required",
-        "tool_parameters": {
-          "special_tests": [
-            "meningitis_panel"
-          ]
-        },
-        "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §V"
-      },
-      {
-        "step": 4,
-        "action": "Obtain gadolinium-enhanced brain MRI to characterise the skull-base defect and any meningoencephalocele, confirm leptomeningeal enhancement, and exclude parenchymal complications (abscess, ventriculitis, empyema, venous sinus thrombosis).",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Left cribriform plate defect with small meningoencephalocele; diffuse leptomeningeal enhancement; no abscess or empyema.",
-        "category": "required",
-        "tool_parameters": {
-          "contrast": true
-        },
-        "citation": "[Brouwer_2012]",
-        "guideline_source": "Brouwer 2012"
-      },
-      {
-        "step": 5,
+        "step": 6,
         "action": "Search the literature for recurrent bacterial meningitis causes, diagnostic approach to CSF rhinorrhea (beta-2-transferrin, skull-base imaging), empiric antibiotic selection, and evidence base for adjunctive dexamethasone in pneumococcal meningitis.",
         "tool_name": "search_medical_literature",
         "expected_finding": "Evidence that recurrent meningitis mandates structural and immune workup; beta-2-transferrin as standard CSF-leak confirmation; skull-base CT first-line for bony defect localisation; IDSA 2004 empiric regimen and dexamethasone benefit.",
-        "category": "required",
+        "category": "recommended",
         "tool_parameters": {},
         "citation": "[IDSA_2004]",
         "guideline_source": "IDSA 2004 §VII"
       },
       {
-        "step": 6,
+        "step": 7,
         "action": "Verify compatibility of empiric vancomycin + ceftriaxone + adjunctive dexamethasone with the patient's current medications; confirm dexamethasone timing before or with first antibiotic dose.",
         "tool_name": "check_drug_interactions",
         "expected_finding": "No prohibitive interactions; dexamethasone timing and vancomycin AUC-based dosing guidance confirmed.",
-        "category": "required",
+        "category": "recommended",
         "tool_parameters": {},
         "citation": "[De_Gans_2002]",
         "guideline_source": "De Gans 2002"
-      },
-      {
-        "step": 7,
-        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
-        "tool_name": "order_microbiology",
-        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started. blood cultures grow Streptococcus pneumoniae at 24 hours.",
-        "category": "required",
-        "tool_parameters": {
-          "specimen": "blood_culture",
-          "tests": [
-            "culture",
-            "gram_stain",
-            "susceptibility"
-          ],
-          "before_antimicrobials": true
-        },
-        "citation": "[IDSA_2004]",
-        "guideline_source": "IDSA 2004 §VI"
       }
     ],
     "useless_tools": [
@@ -780,13 +793,6 @@
         "reason": "Per IDSA 2004, non-contrast CT head must precede lumbar puncture when imaging-first criteria are present (altered mental status, immunocompromise, focal signs, seizure, papilledema, age >60). This patient has altered mental status (disorientation, GCS 14). LP in undetected mass effect can precipitate fatal herniation.",
         "citation": "[IDSA_2004]",
         "severity": "hard"
-      },
-      {
-        "before": "interpret_labs",
-        "after": "analyze_csf",
-        "reason": "Blood cultures must be drawn before the first antibiotic dose to preserve microbiological yield; this is captured via order_microbiology{specimen: blood_culture} (blood_cultures panel). Antibiotic pre-treatment reduces culture sensitivity by >50%.",
-        "citation": "[IDSA_2004]",
-        "severity": "hard"
       }
     ],
     "critical_actions": [
@@ -815,7 +821,8 @@
       "Skull-base CT with high-resolution bone-algorithm coronal reconstructions is first-line imaging to localise the bony defect and guide surgical planning; MRI with gadolinium provides complementary soft tissue characterisation and detects meningoencephalocele.",
       "Normal immunoglobulins and CH50 effectively exclude CVID and terminal complement deficiency as the predisposing cause, making the anatomical defect the unifying diagnosis in this case.",
       "Adjunctive dexamethasone (0.15 mg/kg IV q6h x 4 days), given BEFORE or WITH the first antibiotic dose, reduces mortality and unfavourable outcomes in pneumococcal meningitis (De Gans 2002, NEJM).",
-      "Definitive prevention of further recurrence requires surgical repair of the cribriform plate defect (typically endoscopic endonasal approach) combined with pneumococcal and meningococcal vaccination."
+      "Definitive prevention of further recurrence requires surgical repair of the cribriform plate defect (typically endoscopic endonasal approach) combined with pneumococcal and meningococcal vaccination.",
+      "WHO 2025: obtain cultures promptly, but neither LP nor cranial imaging may delay empirical antimicrobials when the pathway requires treatment first."
     ],
     "red_herrings": [
       {
@@ -857,8 +864,8 @@
       "advanced_imaging": "non-contributory"
     },
     "version": "1.0",
-    "last_revised": "2026-08-08",
-    "revision_reason": "per-case audit: blood cultures were reachable through interpret_labs, so the organism that names the pathogen and selects the antibiotic could be obtained without ordering a culture — removed lab panel Blood_Cultures; constraint reason now names order_microbiology",
+    "last_revised": "2026-08-10",
+    "revision_reason": "Reviewer 2 meningitis audit: complete LP/microbiology/lab pathway, no ECG, and MRI restricted to complications or non-response",
     "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:BACT-MEN",
     "difficulty_rationale": "6 required tools; 3 embedded red herrings (rhinorrhea misdiagnosed as allergic rhinitis, anchoring on isolated-episode framing, sinusitis as alternative focus); requires cross-modality synthesis (CSF + CT + MRI + immune labs + literature) to diagnose both the acute infection and the underlying anatomical predisposition; normal immune workup means the puzzle has only one unifying answer (structural defect).",
