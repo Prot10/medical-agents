@@ -51,6 +51,8 @@ class BodyImagingTool(BaseTool):
                 "description": (
                     "Region and modality. 'pelvis_abdomen_CT'/'_MRI'/'_ultrasound': occult "
                     "neoplasm search (ovarian teratoma in anti-NMDAR encephalitis), "
+                    "'testicular_ultrasound': age- and sex-adapted germ-cell tumour screening "
+                    "in selected male anti-NMDAR cases, "
                     "portosystemic shunts in refractory hepatic encephalopathy. "
                     "'chest_CT': lung parenchyma, mediastinum, an intrathoracic mass. "
                     "'chest_CTA': CT angiography of the thorax — pulmonary embolism, aortic "

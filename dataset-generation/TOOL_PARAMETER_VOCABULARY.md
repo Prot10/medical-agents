@@ -148,6 +148,7 @@ studies at different prices.
 | Value | Study | When |
 |---|---|---|
 | `pelvis_abdomen_CT` / `_MRI` / `_ultrasound` | Pelvic + abdominal imaging | Ovarian teratoma in anti-NMDAR encephalitis; portosystemic shunts in refractory hepatic encephalopathy |
+| `testicular_ultrasound` | Scrotal ultrasound | Selected male anti-NMDAR encephalitis tumour screening |
 | `chest_CT` | Thoracic CT | Lung parenchyma, an intrathoracic mass |
 | `chest_CTA` | Thoracic CT angiography | Pulmonary embolism, aortic dissection, when either must be confirmed or excluded rapidly. `order_ct_scan` images the head and neck only and cannot answer this |
 | `chest_abdomen_pelvis_CT` | Staging / occult-primary CT, one acquisition | Paraneoplastic tumour search (anti-NMDAR, anti-Hu); excluding an extracranial primary before calling a lesion a primary brain tumour |
