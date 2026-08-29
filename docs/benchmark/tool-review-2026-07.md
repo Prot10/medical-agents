@@ -126,8 +126,8 @@ Reviewer 1 adds four clinical-assessment items with no tool at all behind them:
 - Structured ICHD-3 headache/aura history + neurological exam — the *only* true required
   "test" for `migraine_with_aura`
 - Objective gait and cognitive assessment before/after CSF tap test — REQUIRED for `nph`
-- FDG-PET / perfusion SPECT and amyloid PET — OPTIONAL for `alzheimers_early`, `ftd`
-  (arguably reachable through `order_advanced_imaging`)
+- FDG-PET / perfusion SPECT and amyloid PET — OPTIONAL for `alzheimers_early`, `ftd`;
+  perfusion SPECT is now a separately priced and orderable `order_advanced_imaging` modality
 
 This is the structural finding of the review: for several conditions the mandatory
 diagnostic step is **not expressible** in the current action space, so those cases are
@@ -171,9 +171,12 @@ case every diagnostic tool for it must be optional. They recommend against that 
 prefer DLB. Their FND annotation reads
 `DISCUTERE SE TENERE PATOLOGIA, SE VOGLIAMO CONTROLLARE SE L'AGENTE AI FA OVERTESTING`.
 
-Net effect: **20 conditions → 22** (two swaps, which are net-neutral, plus two straight
-additions). **120 cases to generate, 60 to retire, 660 total** — up from 600, which
-changes the train/test split (currently 500/100).
+If all proposals were implemented, the net effect would be **20 conditions → 22** (two
+swaps plus two straight additions), with 120 cases to generate, 60 to retire and 660 total.
+That is the scope requested in the email, **not the current implementation decision**: this
+phase is frozen at 20 conditions/600 cases. VaD has replaced peripheral neuropathy; DLB, ICH
+and HSE are explicitly deferred. DLB can later replace FND without changing the total, while
+the two acute additions would require a separate decision to expand to 660.
 
 `hemorrhagic_stroke` and `viral_encephalitis` already exist as enum values with no cases
 and no `conditions.yaml` entry, so they can host ICH and HSV encephalitis — but the
@@ -456,12 +459,16 @@ coverage guard sharp for every other case. The corpus was already due for regene
 required coverage of the existing traces fell to 0.566 when the required set became
 study-specific — and these cases are covered by that run.
 
-### FND: their option 2 was recorded, not implemented — now it is
+### FND: corrected interim block; DLB replacement deferred
 
-The register accepted their option 2 (keep FND, every diagnostic tool optional, scored on
-restraint) and `conditions.yaml` said so. The cases said the opposite, and the gap is worth
-recording because it is the same failure mode as the stale catalog: a decision that lives only in
-the place nobody scores.
+The register initially accepted their option 2 (keep FND, every diagnostic tool optional, scored
+on restraint) and `conditions.yaml` said so. An independent recheck reversed that composition
+decision: all 20 current conditions already carry useless-tool penalties and 16 of the 19 non-FND
+conditions have optional actions, so FND is not uniquely necessary to measure overtesting. We will
+agree with the reviewers' preferred first option in clinical principle, but the user has frozen
+this phase at 20 conditions/600 cases and deferred authoring any new condition. The cases said the opposite
+of even the interim decision, however, and the correction remains worth recording because it is
+the same failure mode as the stale catalog: a decision that lives only where nobody scores.
 
 | | before | after |
 |---|---|---|
@@ -519,14 +526,17 @@ each case's own history, which is also what un-bans `order_specialized_test` for
 gate: that gate bans a tool by name unless the case's own `optimal_actions` name it, so condemning
 two of its studies had banned all of them.
 
-**One deliberate departure from their wording, flagged for confirmation** (§8.5 of the register):
-video-EEG is REQUIRED, not optional, in the 22 cases with paroxysmal events. A recorded habitual
+The interim implementation also departed from their wording: video-EEG is REQUIRED, not optional,
+in the 22 cases with paroxysmal events. A recorded habitual
 event without ictal EEG correlate is the positive diagnostic act for psychogenic non-epileptic
 seizures at the ILAE 2013 *documented* level of certainty; no bedside sign substitutes for it, and
 all 30 cases are inpatient admissions made for exactly that purpose. That keeps the required set
 at 1 242 EUR in those 22 cases, which is honest rather than tidy: restraint is not diagnostic
 nihilism. `EMG_NCS` was also removed from the panel's optional list, since a panel cannot offer as
-defensible what every case now scores as waste.
+defensible what every case now scores as waste. That clinical choice may be reasonable, but it is
+further evidence that option 2 was not implemented literally. The 30 FND cases remain in the
+current frozen dataset; deleting them without the deferred DLB replacement would leave a
+570-case benchmark. This is a temporary scope decision, not a clinical rejection of DLB.
 
 ### The 37 description rewrites, closed properly (2026-08-10)
 
@@ -576,10 +586,13 @@ that way:
    scored. Priced at 276 EUR (CPT 95819) in `costs.yaml`, from which the enum derives.
 2. **Two answers we were about to send were false.** Temporal-lobe echocardiogram and cardiac
    monitoring were left at `recommended`, not `optional` as the reply claimed; and NPH kept
-   `order_specialized_test{neuropsych_battery}` REQUIRED in all 30 cases beside the new pre/post
-   assessment — the duplication the comment asked to remove. Both fixed, and the redundant NPH
-   sequence constraint went with the demotion, or an agent performing the mandatory assessment and
-   skipping the optional battery would have taken a violation.
+   `order_specialized_test{neuropsych_battery}` in all 30 cases beside the new pre/post assessment
+   — the duplication the comment asked to remove. The first pass only demoted it and retained PET
+   in every NPH case. A full case-level re-audit removed both from all 30 gold pathways **and from
+   the callable authored outputs** (58 specialized-test and 60 advanced-imaging follow-ups), routed
+   the tap reports to CSF, and retained the timed gait/brief cognitive comparison under the
+   clinical-assessment tool. This distinction matters: changing only the reward labels still let
+   the simulated agent order the removed tests and receive their old, often load-bearing results.
 3. **One blunt fix was reverted after reading the diagnoses.** Three migraine cases order an
    echocardiogram at REQUIRED; demoting them looked right until the diagnoses turned out to be a
    migrainous infarction, a cardioembolic PCA infarct and a genetically confirmed MELAS. The echo is

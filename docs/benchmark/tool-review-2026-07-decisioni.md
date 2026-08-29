@@ -17,16 +17,18 @@ non ancora implementata · ⚠️ modificata rispetto alla richiesta, serve conf
 |---|---|---|---|
 | 1.1 | Rimuovere *Peripheral neuropathy* | ✅ **completata** | Categoria troppo ampia, siamo d'accordo. Rimossi i 30 casi, i 7 seed reali, il criteria pack, la voce del filtro MedCaseReasoning, il valore dell'enum e la label dell'app di review |
 | 1.2 | Sostituirla con *Demenza vascolare* | ✅ **completata** | Pannello in `conditions.yaml`, criteria pack `VASC-DEM.md` (VASCOG 2014 / NINDS-AIREN / STRIVE-2 / Boston v2.0 / AHA-ASA 2021), **30 casi generati** (11 S / 10 M / 9 P) su sette meccanismi vascolari, split rigenerato preservando le assegnazioni precedenti. Tutti i gate verdi: 600/600 casi puliti, agente perfetto 1.0 su 600/600 |
-| 1.3 | Aggiungere *Demenza a corpi di Lewy* | 🟡 accolta | Completa le quattro demenze principali (AD, FTD, DLB, VaD) e apre l'asse della diagnosi differenziale fra loro, che ci mancava. `MIBG_scan` e `DaTscan` erano già disponibili e prezzati |
-| 1.4 | Aggiungere *Emorragia intracerebrale spontanea* | 🟡 accolta | Percorso terapeutico distinto (pressione, reversal, indicazione neurochirurgica): valuta decisioni diverse da ictus ischemico ed ESA |
-| 1.5 | Aggiungere *Encefalite erpetica* | 🟡 accolta | Completa il capitolo infezioni SNC e mette alla prova la tempestività della terapia empirica con aciclovir |
-| 1.6 | Rimuovere la *FND* (vostra prima opzione) | ❌ **non accolta** | Vedi 1.7. È l'unica decisione in cui andiamo contro la vostra preferenza dichiarata |
-| 1.7 | Tenere la FND con tutti i tool opzionali (vostra seconda opzione) | ✅ **completata nei casi** | Il *diagnostic overuse* è un obiettivo del progetto: il tracciamento dei costi su tariffe di riferimento è una delle nostre metriche principali. La FND è la sola condizione in cui il comportamento corretto è astenersi; senza di lei non possiamo rispondere alla domanda "l'agente sa quando *non* indagare?". La vostra obiezione (diagnosi puramente clinica, nessun tool diagnostico) è risolta dal nuovo tool di valutazione clinica: i segni positivi — Hoover, entrainment — rendono la diagnosi raggiungibile senza imaging, che è il percorso corretto |
+| 1.3 | Sostituire FND con *Demenza a corpi di Lewy* | ⚪ **rinviata** | La proposta resta clinicamente valida, ma non generiamo ora una nuova categoria e 30 casi DLB; resta nel backlog |
+| 1.4 | Aggiungere *Emorragia intracerebrale spontanea* | ⚪ **rinviata** | Proposta clinicamente solida, ma aggiungerebbe 30 casi. La conserviamo nel backlog senza ampliare ora il dataset |
+| 1.5 | Aggiungere *Encefalite erpetica* | ⚪ **rinviata** | Proposta clinicamente solida, ma aggiungerebbe 30 casi. La conserviamo nel backlog senza ampliare ora il dataset |
+| 1.6 | Rimuovere la *FND* (vostra prima opzione) | ⚪ **rinviata insieme a DLB** | Non riduciamo il benchmark a 570 casi e non creiamo ora i 30 sostitutivi |
+| 1.7 | Tenere la FND con tutti i tool opzionali (vostra seconda opzione) | ✅ **scelta per questa fase** | FND resta per valutare anche il diagnostic overuse: l'esame dei segni funzionali positivi è l'unico atto richiesto; tutti gli strumenti diagnostici sono opzionali |
 
-**Esito:** 23 patologie invece di 20. Aggiungiamo la DLB *e* teniamo la FND, quindi non
-perdiamo nulla di quanto avete proposto.
+**Perimetro deciso per questa fase:** **20 patologie, 600 casi**. Peripheral neuropathy → VaD è
+completata. FND → DLB, ICH spontanea e HSE restano tre interventi separati nel backlog e non
+fanno parte della revisione corrente. DLB potrà sostituire FND senza cambiare la dimensione;
+ICH e HSE porterebbero il dataset a 660 casi e richiederanno una decisione successiva esplicita.
 
-### 1.7bis — La scelta era registrata ma non implementata: ora lo è (2026-08-06)
+### 1.7bis — FND: audit di overuse adottato in questa fase
 
 Vale la pena dirlo per come lo abbiamo trovato, perché la vostra obiezione era più fondata di
 quanto la nostra prima risposta ammettesse. Il pannello diceva già «esame clinico obbligatorio,
@@ -41,15 +43,15 @@ strumentale tutto opzionale». I 30 casi dicevano il contrario:
 | EMG/NCS e potenziali evocati | vietati solo a parole | **conteggiati come chiamate inutili** in tutti e 30 |
 | Costo del percorso obbligatorio | 1 303 EUR di media, più della meningite batterica (1 204) | **138 EUR** negli 8 casi senza eventi e 1 242 nei 22 con eventi, contro 2 426 EUR del percorso difendibile completo: è quel divario che la metrica di *overuse* ora vede |
 
-Al di là della metrica, i tier di prima scrivevano nel ground truth il modello «diagnosi per
-esclusione», che la letteratura ha abbandonato: la FND si diagnostica per segni positivi.
-Correggendoli non abbiamo piegato la clinica alla metrica: abbiamo tolto un errore clinico.
+Al di là della metrica, questa correzione resta valida come audit: i tier precedenti scrivevano nel
+ground truth il modello «diagnosi per esclusione», mentre la FND si diagnostica per segni positivi.
+Questa è anche la ragione per cui, nella fase corrente, adottiamo la vostra seconda opzione.
 
 Nota tecnica: la valutazione clinica resta **required** e un insieme di richiesti vuoto
 lascerebbe la copertura con denominatore zero, assegnando lo stesso punteggio a qualunque
 agente. Ciò che distingue un buon agente qui è il non ordinare esami inutili e il costo, non la
-copertura. **Una sola deroga alla vostra formulazione**, con la motivazione clinica, al punto 5
-del §8: la video-EEG resta obbligatoria dove ci sono eventi da registrare.
+copertura. Tutto lo strumentale, inclusa la video-EEG nei casi parossistici, è ora opzionale.
+Il blocco resta nel dataset congelato; DLB è rinviata come futura sostituzione.
 
 ---
 
@@ -58,7 +60,7 @@ del §8: la video-EEG resta obbligatoria dove ci sono eventi da registrare.
 | Tipo di richiesta | N. | Decisione |
 |---|---|---|
 | Cambi di tier (required ↔ optional) | 18 | ✅ tutti applicati |
-| Rimozioni di tool da una patologia | 13 | ✅ 6 applicate · ⚠️ 7 declassate a opzionale (§4) |
+| Rimozioni di tool da una patologia | 13 | ✅ 7 applicate · ⚠️ 6 declassate a opzionale (§4) |
 | Nuovi item diagnostici | 12 | ✅ 6 già esistevano (§3) · ✅ 4 nuovi tool · ✅ 2 completati (glioma, sincope: §5, §5.1) · ⚪ 2 da valutare |
 | Riscritture delle descrizioni | 37 | ⚪ accolte, non ancora inserite — vanno nel *ground truth* e nella griglia di valutazione, non nella descrizione del tool (§6) |
 | Note di conferma senza modifica | 11 | ✅ nulla da fare |
@@ -75,7 +77,7 @@ abbiamo verificato che 13 dei 18 cambi che ci avete chiesto esistevano **solo** 
 | SM: liquor → opzionale | obbligatorio in 29 | ✅ opzionale |
 | Emicrania: RM → opzionale | obbligatoria in 15 | ✅ opzionale |
 | Emicrania: laboratori → opzionale | obbligatori in 4 | ✅ opzionale |
-| Parkinson: laboratori → opzionale | obbligatori in 30 | ✅ opzionale |
+| Parkinson: laboratori → opzionale e non routinari | obbligatori in 30 | ✅ 9 casi con pannelli opzionali mirati; nessuna azione/referto laboratoristico negli altri 21 |
 | NPH: laboratori → opzionale | obbligatori in 30 | ✅ opzionale |
 | Epilessia temporale: laboratori → opzionale | obbligatori in 30 | ✅ opzionale |
 | Ictus: RM → opzionale | obbligatoria in 30 | ✅ opzionale |
@@ -149,15 +151,14 @@ né richiesta né valutata» descriveva il catalogo obsoleto, non il tool.
 
 ---
 
-## 4. ⚠️ Sette rimozioni declassate a opzionale — serve la vostra conferma
+## 4. ⚠️ Sei rimozioni declassate a opzionale — serve la vostra conferma
 
 | Patologia | Tool | Perché non eliminato |
 |---|---|---|
-| NPH | Imaging avanzato | Tutti e 30 i casi lo usano (PET amiloide/FDG) per il differenziale con l'Alzheimer, non come test per la NPH |
 | Epilessia temporale | Echo, monitoraggio cardiaco | FEPI-TEMP-P05 e -RP02 sono casi inizialmente attribuiti a sincope |
 | Emicrania con aura | Echo | MIG-AURA-P03/P07/P08: bubble study per il PFO |
 | Emicrania con aura | EEG, liquor | MIG-AURA-RM11: sospetto di cefalea secondaria |
-| Alzheimer | EEG | ALZ-EARLY-RP04: differenziale con CJD/encefalopatia |
+| Alzheimer | EEG | ALZ-EARLY-RP04: differenziale con CJD; ALZ-EARLY-RP05: episodi ricorrenti di mancata responsività da distinguere da crisi focali. Negli altri 28 casi non esiste alcun referto EEG authored |
 
 **Criterio applicato** — quello formulato dal Revisore 2 su EEG e RM nella sincope:
 *«l'item va mantenuto perché l'etichetta del pannello è l'ipotesi sotto esame: un agente
@@ -165,9 +166,8 @@ che sospetti correttamente una causa diversa deve comunque poter agire».* Ci è
 coerente estenderlo alle patologie croniche. Se non siete d'accordo li eliminiamo e
 correggiamo i casi.
 
-**Difetto separato che il vostro commento ha fatto emergere:** nei tre casi di emicrania
-l'ecocardiogramma è al tier *required*. È sbagliato e lo correggiamo — è un difetto del
-caso, non del catalogo.
+Nei tre casi di emicrania che mantengono l'ecocardiogramma, l'esame risponde a una domanda
+cardioembolica o di cardiomiopatia documentata; non è parte del work-up routinario dell'aura.
 
 ---
 
@@ -196,7 +196,7 @@ costruzione.
 | PET con aminoacidi (¹¹C-metionina, ¹⁸F-FET) per il glioma | ✅ **aggiunta** (EUR 2300). Avete ragione anche sul fatto che il FDG non è adeguato per i tumori primitivi: era l'unica strada disponibile, cioè proprio l'esame che la linea guida esclude. Ora la descrizione del tool lo dice esplicitamente all'agente |
 | RM funzionale e trattografia DTI | ❌ **non aggiunte come modalità** — le collocate nella pianificazione prechirurgica presso aree eloquenti: è una domanda operatoria, non diagnostica. Restano come annotazione di sequenza della RM encefalo, che è la sede corretta |
 | Imaging cardiaco di seconda linea (RM cardiaca, TC cardiaca, coronarografia) | ✅ **completato** — vedi §5.1 |
-| SPECT di perfusione (alternativa alla FDG-PET, AD/FTD) | ⚪ da valutare |
+| SPECT di perfusione (alternativa alla FDG-PET, AD/FTD) | ✅ **aggiunta e tariffata** come `perfusion_SPECT` (EUR 920); esercitata in un caso Alzheimer e uno FTD quando FDG-PET non è disponibile |
 | RM encefalo **e midollo** con protocollo SM | ✅ **fatto** — e non era un collegamento: vedi §5.2 |
 
 ### 5.1 Imaging cardiaco di seconda linea — la sincope cardiaca, chiusa per intero ✅

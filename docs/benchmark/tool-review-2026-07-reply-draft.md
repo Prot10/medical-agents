@@ -38,80 +38,25 @@ Abbiamo letto tutti i 91 commenti. Di seguito le decisioni, così potete partire
   strumentale è conservata; in un altro la RM è controindicata (pacemaker non compatibile) e la
   diagnosi va raggiunta con TC, ecodoppler e interrogazione del dispositivo, dichiarando che la
   TC non può escludere l'angiopatia amiloide.
-- Aggiungiamo la **demenza a corpi di Lewy**, così le quattro principali forme di demenza
-  sono coperte (AD, FTD, DLB, VaD). L'argomento della diagnosi differenziale tra le quattro
-  ci convince, ed è un asse di valutazione che al momento ci manca.
-- Aggiungiamo entrambe le condizioni acute proposte dal Revisore 2: **emorragia
-  intracerebrale spontanea** ed **encefalite erpetica**. Le motivazioni ci sembrano solide —
-  in particolare il fatto che l'ICH abbia un percorso terapeutico distinto (pressione,
-  reversal, indicazione neurochirurgica) e che l'HSV metta alla prova la tempestività della
-  terapia empirica con aciclovir.
+- La **demenza a corpi di Lewy** è la sostituzione clinicamente preferibile per FND e
+  completerebbe le quattro principali forme di demenza. La teniamo come primo intervento
+  futuro, ma non generiamo il nuovo blocco in questa fase.
+- **Emorragia intracerebrale spontanea** ed **encefalite erpetica** sono entrambe proposte
+  solide. Le registriamo nel backlog, senza aggiungere ora i 60 casi necessari.
 
-Si passa quindi da 20 a **23 patologie**, 30 casi ciascuna.
+Per questa consegna congeliamo quindi il dataset a **20 patologie e 600 casi**. Rivaluteremo
+separatamente DLB come sostituzione a dimensione invariata e, solo dopo, le due aggiunte acute
+che porterebbero il totale a 660.
 
-## 2. FND: vorremmo tenerla, e vi spieghiamo perché
+## 2. FND: seconda opzione adottata in questa fase
 
-Avete posto una domanda diretta — se ci interessi anche misurare il *diagnostic overuse* —
-e la risposta è sì: il tracciamento dei costi (tariffe di riferimento Medicare per ogni
-singolo esame) è una delle componenti principali del progetto.
+In questa fase adottiamo la vostra seconda opzione. Manteniamo i 30 casi FND nel dataset congelato
+per valutare il *diagnostic overuse*: l'esame clinico dei segni funzionali positivi è l'unico atto
+diagnostico richiesto e tutti gli strumenti strumentali sono opzionali. La FND resta una diagnosi
+positiva, non una diagnosi ottenuta per esclusione indiscriminata.
 
-Il problema è che la FND è l'unica condizione in cui il comportamento corretto è
-**astenersi**. Se la togliamo, ci restano solo condizioni in cui la risposta giusta è
-ordinare qualcosa, e non abbiamo più modo di rispondere alla domanda "l'agente sa quando
-*non* indagare?" — che è precisamente ciò che un revisore ci chiederà, visto che il costo è
-una delle nostre metriche.
-
-Quindi seguiamo la vostra seconda opzione: **teniamo la FND con tutti i tool diagnostici
-opzionali**, e la valutiamo sulla capacità di astenersi anziché sulla scelta dell'esame.
-Aggiungiamo anche la demenza a corpi di Lewy, quindi non perdiamo nulla di quanto proposto.
-
-Un elemento che rende la cosa praticabile: stiamo aggiungendo un tool di **valutazione
-clinica strutturata** (vedi punto 4), che copre i segni clinici positivi della FND. Così la
-diagnosi diventa raggiungibile per via clinica, senza imaging — che è esattamente il
-percorso corretto.
-
-**E qui vi dobbiamo una precisazione, perché la vostra obiezione era più fondata di quanto la
-nostra risposta iniziale ammettesse.** Quando siamo andati a verificare i 30 casi abbiamo
-trovato che la scelta che vi stavamo comunicando era vera solo nella configurazione, non nei
-casi: **tutti e 30 richiedevano una RM encefalo con gadolinio e una batteria di laboratorio**,
-nessuno eseguiva l'esame dei segni funzionali, e nessuna azione in tutta la condizione era
-opzionale. Il percorso obbligatorio costava 1 303 EUR di media — più della meningite batterica
-(1 204) e della Guillain-Barré (1 223), due condizioni in cui indagare a fondo è doveroso. La
-condizione che doveva misurare l'astensione premiava l'opposto. E, cosa che ci preme più della
-metrica, quei tier scrivevano nel ground truth il modello «diagnosi per esclusione» che la
-letteratura sulla FND ha abbandonato.
-
-L'abbiamo corretto su tutti e 30 i casi:
-
-- **l'esame dei segni funzionali è l'atto obbligatorio** — con i segni che l'esame obiettivo di
-  ciascun caso già documentava: Hoover in 21 casi più 2 equivoci, miglioramento con distrazione in 20, cedimento
-  (give-way) in 17, andatura trascinata in 16, incoerenza al riesame in 15, dissociazione
-  sensitiva non anatomica in 14, sulla linea mediana in 10, entrainment del tremore in 9. Nei 3
-  casi puramente parossistici, dove i segni sugli arti non si applicano, il referto porta la
-  semeiologia dell'evento e dice esplicitamente che l'atto diagnostico positivo è la
-  registrazione video-EEG;
-- **la RM è opzionale** in 23 casi e raccomandata *una volta e senza contrasto* nei 7 in cui c'è
-  una domanda alternativa precisa (esordio focale acuto trattato come mimico di ictus, nuovo
-  deficit su SM o su malattia di Parkinson, paraplegia acuta, diplopia prima di accettare lo
-  spasmo di convergenza). Il gadolinio senza indicazione è esso stesso l'*overuse* che vogliamo
-  misurare;
-- **i laboratori sono opzionali** in 27 casi e ristretti agli analiti nominati nei 3 con un
-  mimico preciso (glicemia dopo una dose di insulina; elettroliti, magnesio e tiamina in un
-  vomito protratto con perdita di peso);
-- **EMG/NCS e potenziali evocati sono conteggiati come chiamate inutili** in tutti e 30: prima
-  erano vietati solo a parole, e ciò che non è misurato non è testato — è la stessa lezione del
-  punto 3;
-- risultato: negli 8 casi senza eventi parossistici il percorso obbligatorio costa **138 EUR** e
-  nei 22 con eventi 1 242 EUR, contro **2 426 EUR** del percorso difendibile completo: è quel
-  divario che rende misurabile l'*overuse*, non il costo assoluto.
-
-**Una sola deroga alla vostra formulazione, e vi chiediamo se siete d'accordo.** Avete scritto
-«tutti i tool diagnostici opzionali»: abbiamo reso opzionale tutto tranne la **video-EEG nei 22
-casi con eventi**. Non ci sembra un esame di esclusione ma l'atto diagnostico positivo delle
-crisi non epilettiche psicogene — un evento abituale registrato senza correlato EEG è ciò che dà
-la certezza «documentata» secondo la Task Force ILAE 2013, e nessun segno da letto lo
-sostituisce; tutti e 30 i casi sono ricoveri fatti esattamente per quello. Se preferite che sia
-opzionale anche lì, la declassiamo.
+La demenza a corpi di Lewy resta una proposta clinicamente valida per una futura sostituzione,
+ma non generiamo ora una nuova categoria o 30 casi aggiuntivi.
 
 ## 3. Un errore nostro sul catalogo dei tool, di cui dovete sapere
 
@@ -252,10 +197,10 @@ Accolte. In sintesi:
   | Stato | Voci | Cosa significa |
   |---|---:|---|
   | applicato | 97 | i casi e il vocabolario si comportano come chiedete |
-  | serve la vostra decisione | 1 | l'unico punto su cui vi rimandiamo una domanda (punto 5) |
+  | decisione di composizione rinviata | 1 | riclassificazione futura di due casi-limite di emicrania |
   | applicato in parte | 6 | il tool esiste, i casi che dovrebbero usarlo non sono ancora scritti |
   | nessuna modifica richiesta | 4 | — |
-  | domanda aperta | 1 | la FND (punto 2) |
+  | scelta di fase | 1 | FND mantenuta per valutare l'overuse (punto 2) |
   | patologia ritirata | 1 | la neuropatia periferica |
 
   Undici delle vostre annotazioni descrivono esami che nello spazio d'azione a 12 tool non
@@ -275,12 +220,16 @@ Accolte. In sintesi:
   annotazione per volta ci ha costretti a scoprire **quattro casi in cui la risposta che stavamo per
   darvi era falsa** — l'eco e il monitoraggio cardiaco nell'epilessia temporale erano rimasti a
   *recommended* e non opzionali come vi stavamo scrivendo, e nella NPH la batteria
-  neuropsicologica era ancora obbligatoria in tutti e 30 i casi accanto alla nuova valutazione
-  pre/post, che è esattamente la duplicazione che avevate chiesto di togliere. Corretti.
+  neuropsicologica era ancora presente in tutti e 30 i gold pathway accanto alla nuova valutazione
+  pre/post, che è esattamente la duplicazione che avevate chiesto di togliere. Ora la batteria e
+  l'imaging avanzato sono rimossi dai 30/30 casi NPH, non soltanto declassati: abbiamo eliminato
+  anche i 118 referti di follow-up ancora richiamabili (58 test specialistici e 60 esami di imaging
+  avanzato), perché altrimenti l'agente avrebbe continuato a ottenere i risultati degli esami
+  rimossi.
 
-## 5. Le rimozioni: applicate, e una sola domanda che vi rimandiamo
+## 5. Le rimozioni: applicate, con eccezioni cliniche documentate
 
-Su 13 richieste di rimozione ne abbiamo eseguite 6 alla lettera. Nelle altre 7 il tool resta
+Su 13 richieste di rimozione ne abbiamo eseguite 7 alla lettera. Nelle altre 6 il tool resta
 raggiungibile **come passo opzionale in uno o due casi specifici** che lo usano in diagnosi
 differenziale. Non ve lo chiediamo come autorizzazione: in nessuna delle sette il tool è più
 obbligatorio o raccomandato in alcun caso, quindi la vostra istruzione è applicata dove viene
@@ -289,26 +238,22 @@ non siete d'accordo il posto naturale per dirlo è quel caso, quando lo revision
 
 | Patologia | Tool | L'eccezione, e dove la trovate |
 |---|---|---|
-| NPH | Imaging avanzato | Opzionale in tutti e 30: usano PET amiloide/FDG per il differenziale con l'Alzheimer, che è il problema diagnostico centrale della condizione, non un test per la NPH |
 | Epilessia temporale | Echo + monitoraggio cardiaco | Opzionale in FEPI-TEMP-P05 e -RP02, inizialmente inquadrati come sincope e come embolia polmonare |
 | Emicrania con aura | Liquor | Opzionale nel solo MIG-AURA-RM11, su sospetto di cefalea secondaria |
 | Emicrania con aura | EEG | Resta **obbligatorio** solo in MIG-AURA-RM11, la cui diagnosi comprende una *migralepsia* (crisi durante l'aura, ICHD-3 1.4.4): la video-EEG stabilisce metà della diagnosi, non è valutazione di routine della cefalea. È l'unico caso su cui vale la pena litigare con noi, e il posto è il caso stesso |
-| Alzheimer | EEG | Opzionale nel solo ALZ-EARLY-RP04, il cui differenziale include la CJD |
+| Alzheimer | EEG | Opzionale in ALZ-EARLY-RP04 per la CJD e in ALZ-EARLY-RP05 per episodi ricorrenti di mancata responsività; negli altri 28 casi non è esposto alcun referto EEG |
 
 Il criterio è il vostro, formulato dal Revisore 2 su EEG e RM nella sincope: *"l'item va
 mantenuto perché l'etichetta del pannello è l'ipotesi sotto esame: un agente che sospetti
 correttamente una causa diversa deve comunque poter agire."*
 
-**L'unica cosa su cui vi rimandiamo una domanda, ed è di composizione, non di tier.** Tre casi di
-emicrania ordinano un ecocardiogramma come atto obbligatorio, e nessuno dei tre è un'emicrania di
-routine: **MIG-AURA-P03** è un infarto migrainoso la cui diagnosi si regge sull'aver escluso le
-cause secondarie, **MIG-AURA-P07** è un ictus cardioembolico che il caso dichiara *non* essere un
-infarto migrainoso, e **MIG-AURA-P08** è una MELAS con mutazione confermata, dove lo screening
-della cardiomiopatia è standard. In tutti e tre l'eco è ricerca della fonte embolica o screening
-cardiologico: l'ecocardiogramma di routine che il vostro commento colpisce non esiste nei casi.
-La domanda è la stessa che avete già risolto per la neuropatia periferica: **un ictus
-cardioembolico e una MELAS possono stare sotto l'etichetta «emicrania con aura»?** Nulla dipende
-dalla vostra risposta — i casi sono revisionabili così come sono.
+**Emicrania con aura.** Abbiamo applicato la rimozione dell'ecocardiogramma dal work-up di routine.
+I tre casi che lo mantengono sono eccezioni cliniche documentate: **MIG-AURA-P03** è un infarto
+migrainoso con esclusione delle cause secondarie, **MIG-AURA-P07** richiede ricerca di fonte
+cardioembolica e **MIG-AURA-P08** screening di cardiomiopatia nella MELAS. L'ecocardiogramma non
+è quindi usato per diagnosticare l'aura. Per non riscrivere ora la categoria, i casi restano
+esplicitamente annotati come eccezioni fenotipiche; la loro eventuale riclassificazione è rinviata
+a una revisione strutturale futura.
 
 ## 6. Miastenia gravis
 
@@ -430,11 +375,11 @@ punto 5), e sei sono dichiarate incomplete da parte nostra. Il posto dove il vos
 più è la sezione 8: è contenuto clinico che abbiamo scritto noi e su cui non esiste nessun
 controllo automatico possibile.
 
-**Cosa non è pronto.** Demenza a corpi di Lewy, emorragia intracerebrale spontanea ed encefalite
-erpetica **non sono ancora in piattaforma**: mancano i pannelli e i 30 casi ciascuna. Preferiamo
-dirvelo così invece di farvele trovare vuote. Prepariamo noi una prima versione dei pannelli (tier
-e descrizioni) dalle linee guida che avete citato, e la troverete insieme ai casi, così la conferma
-è parte della review e non un compito in più.
+**Cosa è rinviato.** Demenza a corpi di Lewy, emorragia intracerebrale spontanea ed encefalite
+erpetica **non sono in piattaforma e non fanno parte di questa consegna**. Le motivazioni cliniche
+restano valide; la scelta è di non ampliare ora un dataset che deve ancora essere revisionato in
+profondità. DLB resta la sostituzione futura prioritaria, mentre le due condizioni acute saranno
+rivalutate come eventuale ampliamento separato.
 
 Una cosa che vi chiediamo di tenere presente mentre leggete: i controlli automatici passano su
 600/600 casi, ma il punto 7 dice esattamente quanto poco questo garantisca. Trattate il verde come
