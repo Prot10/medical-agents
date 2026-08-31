@@ -1,0 +1,47 @@
+# Composite reward function weights for GRPO training.
+# Dynamic scheduling shifts focus across training phases.
+
+# Default (static) weights — used if dynamic scheduling is disabled
+default_weights:
+  correctness: 0.30
+  actions: 0.20
+  safety: 0.20
+  cost: 0.15
+  compliance: 0.10
+  format: 0.05
+
+# Dynamic reward scheduling (from ToolRL NeurIPS 2025)
+# Curriculum: format → accuracy → efficiency
+dynamic_schedule:
+  # Phase 1 (epochs 1-3): Learn tool-calling syntax
+  - epoch_start: 1
+    epoch_end: 3
+    weights:
+      correctness: 0.20
+      actions: 0.25
+      safety: 0.15
+      cost: 0.05
+      compliance: 0.05
+      format: 0.30
+
+  # Phase 2 (epochs 4-8): Optimize clinical accuracy
+  - epoch_start: 4
+    epoch_end: 8
+    weights:
+      correctness: 0.35
+      actions: 0.20
+      safety: 0.25
+      cost: 0.05
+      compliance: 0.10
+      format: 0.05
+
+  # Phase 3 (epochs 9-15): Refine cost-efficiency
+  - epoch_start: 9
+    epoch_end: 15
+    weights:
+      correctness: 0.25
+      actions: 0.15
+      safety: 0.20
+      cost: 0.25
+      compliance: 0.15
+      format: 0.00
