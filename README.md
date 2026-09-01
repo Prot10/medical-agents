@@ -49,17 +49,18 @@ npm run dev
 
 Synthetic cases begin as `draft`. A reportable policy requires two independent all-dimension approvals; disagreement is adjudicated by a third physician.
 
-## Training
+## GPU validation and training
 
-Typed bootstrap episodes live in `training_data/bootstrap/candidate_episodes.jsonl` and are explicitly labeled `candidate_not_gold`.
+Follow the [A100 validation handoff](docs/A100_VALIDATION_HANDOFF.md) before running model or training experiments. It defines the environment capture, contract tests, eight-profile smoke matrix, reward checks, performance measurements and required artifacts.
+
+No episode training JSONL is committed on this branch. SFT requires a separately supplied, replay-valid typed episode file with review provenance:
 
 ```bash
 uv run python -m neuroagent.training.train_sft \
   --model qwen3.5-9b \
-  --episodes training_data/bootstrap/candidate_episodes.jsonl \
+  --episodes /path/to/approved-episodes.jsonl \
   --cases data/neurobench/cases \
-  --output outputs/qwen-sft \
-  --allow-candidates
+  --output outputs/qwen-sft
 ```
 
-Candidate opt-in is intended for bootstrap experiments. Final reportable SFT should use replay-valid, quality-gated episodes under the preregistered data policy.
+Do not restore the removed text trajectories or represent candidate episodes as physician-approved data. The current GRPO surface is a backend contract, not a completed distributed trainer.
