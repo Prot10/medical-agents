@@ -18,7 +18,7 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-from neuroagent.datasets import DATASET_VERSION_ALIASES, normalize_dataset_version
+from neuroagent.datasets import DATASETS
 
 from ..schemas.tool_review import ToolReview
 
@@ -47,46 +47,26 @@ class ToolReviewStore:
     # Path resolution
 
     def _validate_version(self, version: str) -> str:
-        if not _VERSION_PATTERN.fullmatch(version):
-            raise ValueError(f"Invalid dataset version: {version!r}")
-        return normalize_dataset_version(version)
-
-    def _version_candidates(self, version: str) -> list[str]:
-        canonical = self._validate_version(version)
-        aliases = [
-            alias
-            for alias, target in DATASET_VERSION_ALIASES.items()
-            if target == canonical and alias != canonical
-        ]
-        return [canonical, *aliases]
+        if not _VERSION_PATTERN.fullmatch(version) or version not in DATASETS:
+            raise ValueError(f"Unknown dataset version: {version!r}")
+        return version
 
     def _path_for(self, version: str, reviewer_code: str) -> Path:
-        canonical = self._validate_version(version)
+        dataset_version = self._validate_version(version)
         if not _CODE_PATTERN.fullmatch(reviewer_code):
             raise ValueError(f"Invalid reviewer code: {reviewer_code!r}")
-        return self._root / canonical / f"{reviewer_code}.json"
-
-    def _path_for_key(self, version: str, reviewer_code: str) -> Path:
-        if not _CODE_PATTERN.fullmatch(reviewer_code):
-            raise ValueError(f"Invalid reviewer code: {reviewer_code!r}")
-        return self._root / version / f"{reviewer_code}.json"
+        return self._root / dataset_version / f"{reviewer_code}.json"
 
     # ------------------------------------------------------------------
     # CRUD
 
     def load(self, version: str, reviewer_code: str) -> ToolReview | None:
         """Return the existing tool review or None if no file exists."""
-        paths = [
-            self._path_for_key(candidate, reviewer_code)
-            for candidate in self._version_candidates(version)
-        ]
-        path = next((candidate for candidate in paths if candidate.exists()), None)
-        if path is None:
+        path = self._path_for(version, reviewer_code)
+        if not path.exists():
             return None
         try:
-            review = ToolReview.model_validate_json(path.read_text())
-            review.dataset_version = normalize_dataset_version(review.dataset_version)
-            return review
+            return ToolReview.model_validate_json(path.read_text())
         except Exception as exc:  # pragma: no cover — corrupted file
             logger.error("Failed to parse tool review at %s: %s", path, exc)
             return None
@@ -104,7 +84,7 @@ class ToolReviewStore:
         now = _utcnow()
         review = ToolReview(
             reviewer_code=reviewer_code,
-            dataset_version=normalize_dataset_version(version),
+            dataset_version=self._validate_version(version),
             first_opened_at=now,
             last_updated_at=now,
         )
@@ -114,7 +94,6 @@ class ToolReviewStore:
     def save(self, review: ToolReview) -> ToolReview:
         """Persist the review atomically (tempfile + rename)."""
         review.last_updated_at = _utcnow()
-        review.dataset_version = normalize_dataset_version(review.dataset_version)
         path = self._path_for(review.dataset_version, review.reviewer_code)
         path.parent.mkdir(parents=True, exist_ok=True)
         with tempfile.NamedTemporaryFile(
@@ -135,12 +114,9 @@ class ToolReviewStore:
 
     def list_all_reviewers(self, version: str) -> list[str]:
         """List reviewer codes that have a stored tool review for ``version``."""
-        reviewers: set[str] = set()
-        for candidate in self._version_candidates(version):
-            version_dir = self._root / candidate
-            if not version_dir.exists():
-                continue
-            reviewers.update(
-                f.stem for f in version_dir.glob("*.json") if _CODE_PATTERN.fullmatch(f.stem)
-            )
-        return sorted(reviewers)
+        version_dir = self._root / self._validate_version(version)
+        if not version_dir.exists():
+            return []
+        return sorted(
+            f.stem for f in version_dir.glob("*.json") if _CODE_PATTERN.fullmatch(f.stem)
+        )

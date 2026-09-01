@@ -3,21 +3,921 @@
   "condition": "multiple_sclerosis",
   "difficulty": "diagnostic_puzzle",
   "encounter_type": "inpatient",
-  "patient": {
-    "patient_id": "NB-MS-RR-RM01",
-    "demographics": {
-      "age": 29,
-      "sex": "male",
-      "handedness": "right",
-      "ethnicity": "Caucasian",
-      "bmi": 22.4
-    },
-    "clinical_history": {
-      "past_medical_history": [
-        "No significant past medical history",
-        "Recent upper respiratory tract infection approximately 3 weeks prior to presentation"
+  "fallback_tool_outputs": {
+    "advanced_imaging": null,
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
       ],
-      "medications": [],
+      "heart_rate_range": {
+        "average": 81,
+        "max": 127,
+        "min": 53
+      },
+      "impression": "Normal 24-hour Holter monitor.",
+      "monitor_type": "holter_24h",
+      "recommended_actions": [],
+      "rhythm_summary": "Sinus rhythm throughout the recording"
+    },
+    "csf": null,
+    "ct": {
+      "additional_observations": [],
+      "angiography_findings": null,
+      "contrast_used": false,
+      "findings": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "drug_interactions": null,
+    "ecg": null,
+    "echo": {
+      "chambers": {
+        "LA": "normal size",
+        "LV": "normal size and systolic function",
+        "RA": "normal size",
+        "RV": "normal size and function"
+      },
+      "ejection_fraction": 61.0,
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": [],
+      "valves": {
+        "aortic": "structurally normal",
+        "mitral": "structurally normal",
+        "pulmonic": "normal",
+        "tricuspid": "normal"
+      },
+      "wall_motion": "no regional wall-motion abnormality"
+    },
+    "eeg": null,
+    "labs": null,
+    "literature_search": null,
+    "mri": null,
+    "specialized_test": null
+  },
+  "followup_outputs": [
+    {
+      "output": {
+        "contrast": true,
+        "findings": [
+          {
+            "description": "",
+            "location": "C2-C3 level, posterior columns of the cervical spinal cord",
+            "size": "Spanning approximately 1 vertebral segment in length, occupying less than one-third of the cross-sectional area",
+            "type": "Spinal cord lesion"
+          },
+          {
+            "description": "Single short-segment cervical cord lesion, clinically silent \u2014 no corresponding myelopathic symptoms",
+            "location": "spine",
+            "type": "additional_observation"
+          },
+          {
+            "description": "No thoracic or lumbar cord lesions identified",
+            "location": "spine",
+            "type": "additional_observation"
+          },
+          {
+            "description": "No leptomeningeal enhancement along the cord",
+            "location": "spine",
+            "type": "additional_observation"
+          }
+        ],
+        "impression": "Single short-segment T2 hyperintense lesion in the posterior columns at C2-C3, non-enhancing, peripherally located. No cord expansion. No longitudinally extensive cord signal abnormality",
+        "measurements": null,
+        "modality": "MRI",
+        "recommended_actions": [],
+        "region": "cervical and thoracic spine"
+      },
+      "tool_name": "order_body_imaging",
+      "trigger_action": "request_spine_mri"
+    },
+    {
+      "output": {
+        "findings": [
+          {
+            "description": "MR Spectroscopy \u2014 single voxel from the right parietal lesion",
+            "region": "Right parietal deep white matter lesion (largest supratentorial lesion)",
+            "signal": "NAA_Cr_ratio: 1.8 (mildly reduced; normal >2.0) \u2014 suggests neuronal injury/loss but not as severely reduced as in high-grade glioma (typically <1.0); Cho_Cr_ratio: 1.6 (mildly elevated; normal <1.5) \u2014 suggests increased membrane turnover from demyelination or cellular proliferation; Lactate: Small lactate doublet peak present \u2014 indicates anaerobic metabolism, seen in both active demyelination and tumor; Lipid: No significant lipid peak \u2014 argues against necrosis seen in high-grade glioma; Glutamate_Glutamine: Mildly elevated \u2014 can be seen in inflammatory processes; Myo_inositol: Elevated myo-inositol peak \u2014 marker of glial proliferation, often elevated in demyelinating lesions"
+          }
+        ],
+        "impression": "The mildly reduced NAA with mildly elevated choline, elevated myo-inositol, and absent lipid peak favor tumefactive demyelination. However, spectroscopy alone cannot definitively exclude neoplasm, and tissue diagnosis may still be warranted if clinical uncertainty persists",
+        "modality": "MR_spectroscopy",
+        "quantitative_data": null,
+        "recommended_actions": [],
+        "tracer_or_protocol": null
+      },
+      "tool_name": "order_advanced_imaging",
+      "trigger_action": "request_mr_spectroscopy"
+    },
+    {
+      "output": {
+        "abnormal_values_summary": [
+          "Active demyelination with relative axonal preservation on H&E",
+          "Loss of myelin staining on Luxol Fast Blue with sharp borders",
+          "Abundant CD68+ foamy macrophages at the lesion edge",
+          "Reactive astrogliosis with Creutzfeldt cells on GFAP stain",
+          "Mixed T-cell and B-cell perivascular inflammatory infiltrate"
+        ],
+        "interpretation": "Abnormal values: H&E staining Extensive demyelination with relative axonal preservation, perivascular inflammatory infiltrate composed predominantly of lymphocytes and macrophages, with abundant foamy macrophages containing myelin debris (H), Luxol Fast Blue (LFB) stain Extensive loss of myelin staining in the biopsied region with sharp demarcation between demyelinated and normally myelinated tissue (H), CD68 immunostain Abundant CD68-positive foamy macrophages throughout the lesion, particularly at the lesion edge (H), GFAP immunostain Reactive astrogliosis with Creutzfeldt cells (hypertrophic astrocytes with fragmented nuclei) (H), CD20/CD3 immunostains Mixed T-cell (CD3+) and B-cell (CD20+) perivascular infiltrate with T-cell predominance (H).",
+        "panels": {
+          "Brain Biopsy Pathology": [
+            {
+              "clinical_significance": null,
+              "is_abnormal": true,
+              "reference_range": "Normal brain tissue",
+              "test": "H&E staining",
+              "unit": "",
+              "value": "Extensive demyelination with relative axonal preservation, perivascular inflammatory infiltrate composed predominantly of lymphocytes and macrophages, with abundant foamy macrophages containing myelin debris"
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": true,
+              "reference_range": "Normal myelin staining",
+              "test": "Luxol Fast Blue (LFB) stain",
+              "unit": "",
+              "value": "Extensive loss of myelin staining in the biopsied region with sharp demarcation between demyelinated and normally myelinated tissue"
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "Normal axonal density",
+              "test": "Neurofilament stain",
+              "unit": "",
+              "value": "Relative preservation of axons within the demyelinated zone"
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": true,
+              "reference_range": "Rare scattered macrophages",
+              "test": "CD68 immunostain",
+              "unit": "",
+              "value": "Abundant CD68-positive foamy macrophages throughout the lesion, particularly at the lesion edge"
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": true,
+              "reference_range": "Normal astrocyte morphology",
+              "test": "GFAP immunostain",
+              "unit": "",
+              "value": "Reactive astrogliosis with Creutzfeldt cells (hypertrophic astrocytes with fragmented nuclei)"
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "< 3%",
+              "test": "Ki-67 proliferation index",
+              "unit": "",
+              "value": "< 2%"
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "Negative",
+              "test": "IDH1 R132H mutation",
+              "unit": "",
+              "value": "Negative"
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": true,
+              "reference_range": "No significant lymphocytic infiltrate",
+              "test": "CD20/CD3 immunostains",
+              "unit": "",
+              "value": "Mixed T-cell (CD3+) and B-cell (CD20+) perivascular infiltrate with T-cell predominance"
+            }
+          ]
+        }
+      },
+      "tool_name": "interpret_labs",
+      "trigger_action": "request_biopsy_pathology"
+    },
+    {
+      "output": {
+        "query": "tumefactive multiple sclerosis treatment management guidelines",
+        "results": [
+          {
+            "authors": "Lucchinetti CF, Gavrilova RH, Metz I, et al.",
+            "journal": "Lancet Neurology",
+            "key_finding": "Tumefactive MS lesions (>2 cm with mass effect, edema, or ring enhancement) occur in 1-2 per 1000 MS cases. Most patients initially suspected of brain tumor. Brain biopsy often required for definitive diagnosis. Approximately 70% of patients with tumefactive demyelination go on to develop clinically definite MS.",
+            "title": "Tumefactive Demyelinating Lesions: A Review of the Literature",
+            "year": "2008"
+          },
+          {
+            "authors": "Hardy TA, Reddel SW, Barnett MH, et al.",
+            "journal": "Journal of Neurology, Neurosurgery & Psychiatry",
+            "key_finding": "Open ring enhancement (with opening toward gray matter), absence of cortical involvement, and DWI shine-through without restriction are MRI features that help distinguish tumefactive MS from glioma and lymphoma. MR spectroscopy showing elevated myo-inositol and absence of lipid peak further supports demyelination.",
+            "title": "Clinical and MRI features distinguishing tumefactive MS from CNS neoplasms",
+            "year": "2016"
+          },
+          {
+            "authors": "Defined Expert Group",
+            "journal": "Multiple Sclerosis Journal",
+            "key_finding": "First-line treatment is high-dose IV methylprednisolone (1 g/day for 5 days). For steroid-refractory cases, plasma exchange (PLEX) should be considered, particularly for severe presentations. After acute treatment, disease-modifying therapy should be initiated. High-efficacy DMTs (natalizumab, fingolimod, or anti-CD20 therapies) are often preferred given the aggressive initial presentation.",
+            "title": "Acute management of tumefactive demyelination",
+            "year": "2020"
+          }
+        ],
+        "summary": "Tumefactive MS is a rare presentation of demyelinating disease characterized by large (>2 cm) lesions that mimic brain tumors. Diagnosis often requires brain biopsy when imaging and CSF findings are inconclusive. MRI features favoring demyelination over neoplasm include open ring enhancement, DWI shine-through without restriction, and MR spectroscopy showing elevated myo-inositol without lipid peaks. Acute treatment with high-dose IV corticosteroids has been used, with plasma exchange as an alternative in refractory cases. Approximately 70% of patients with tumefactive demyelination go on to develop clinically definite relapsing-remitting MS."
+      },
+      "tool_name": "search_medical_literature",
+      "trigger_action": "search_tumefactive_ms_treatment"
+    },
+    {
+      "output": {
+        "alternatives": [
+          "Plasma exchange (PLEX) \u2014 5-7 exchanges over 10-14 days, for steroid-refractory cases",
+          "IV immunoglobulin (IVIG) 0.4 g/kg/day for 5 days \u2014 less evidence in tumefactive MS but considered if PLEX unavailable",
+          "Oral high-dose methylprednisolone (equivalent dose) \u2014 less commonly used for tumefactive presentation"
+        ],
+        "contraindications": [],
+        "formulary_status": "First-line agent for acute relapses in inflammatory demyelinating conditions",
+        "interactions": [
+          "Levetiracetam 500 mg BID (seizure prophylaxis): No significant pharmacokinetic interaction. Both can be used together safely."
+        ],
+        "proposed": "IV Methylprednisolone 1 g daily for 5 days, followed by oral prednisone taper",
+        "warnings": [
+          "Monitor blood glucose closely \u2014 corticosteroids cause hyperglycemia; patient already has stress hyperglycemia (118 mg/dL)",
+          "Stress ulcer prophylaxis recommended (omeprazole or pantoprazole) given high-dose corticosteroid use",
+          "Insomnia and psychiatric effects (agitation, psychosis) can occur with high-dose IV steroids \u2014 monitor given patient's pre-existing behavioral changes",
+          "Electrolyte monitoring: corticosteroids can cause sodium retention and potassium wasting \u2014 patient already has mild hyponatremia and hyperkalemia",
+          "Consider PJP prophylaxis if prolonged steroid course anticipated"
+        ]
+      },
+      "tool_name": "check_drug_interactions",
+      "trigger_action": "check_drug_interactions_steroids"
+    }
+  ],
+  "ground_truth": {
+    "action_criteria": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "contrast": true,
+              "protocol": "ms"
+            },
+            "tool_name": "analyze_brain_mri"
+          }
+        ],
+        "citations": [
+          "[McDonald_2024]",
+          "2024 revised McDonald criteria; MAGNIMS-CMSC-NAIMS 2024/2025"
+        ],
+        "criterion_id": "action-1-analyze-brain-mri",
+        "expected_evidence": "Multifocal T2/FLAIR hyperintensities in MS-typical regions; assess for enhancing lesions, T1 black holes, and Dawson-finger morphology",
+        "importance": "required",
+        "label": "Obtain brain MRI with a dedicated MS protocol, including MS-oriented FLAIR/T2/DWI and pre/post-gadolinium T1 when clinically appropriate",
+        "rationale": "Obtain brain MRI with a dedicated MS protocol, including MS-oriented FLAIR/T2/DWI and pre/post-gadolinium T1 when clinically appropriate"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "contrast": true,
+              "study": "spine_MRI"
+            },
+            "tool_name": "order_body_imaging"
+          }
+        ],
+        "citations": [
+          "[McDonald_2024]",
+          "2024 revised McDonald criteria; MAGNIMS-CMSC-NAIMS 2024/2025"
+        ],
+        "criterion_id": "action-2-order-body-imaging",
+        "expected_evidence": "Short-segment (<2 vertebral bodies) peripheral cord lesions favor MS over NMOSD (which characteristically shows longitudinally extensive transverse myelitis \u22653 segments)",
+        "importance": "required",
+        "label": "Obtain cervical and thoracic spinal-cord MRI with a dedicated MS protocol and gadolinium when clinically appropriate",
+        "rationale": "Obtain cervical and thoracic spinal-cord MRI with a dedicated MS protocol and gadolinium when clinically appropriate"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "query": "McDonald 2017 criteria multiple sclerosis disease-modifying therapy first-line high-efficacy"
+            },
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[Reich_2018]",
+          "Reich 2018 NEJM review"
+        ],
+        "criterion_id": "action-3-search-medical-literature",
+        "expected_evidence": "Retrieves McDonald 2017 criteria and contemporary DMT guidance (platform vs. high-efficacy choice, NEDA-3 outcome framework)",
+        "importance": "required",
+        "label": "Search the medical literature for the McDonald 2017 diagnostic criteria and current first-line / high-efficacy DMT options for RRMS",
+        "rationale": "Search the medical literature for the McDonald 2017 diagnostic criteria and current first-line / high-efficacy DMT options for RRMS"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "proposed_class": "MS_DMT",
+              "screen_for": [
+                "JCV_serostatus",
+                "live_vaccines",
+                "hepatic_function",
+                "lymphocyte_count"
+              ]
+            },
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [
+          "[Reich_2018]",
+          "Reich 2018 NEJM review"
+        ],
+        "criterion_id": "action-4-check-drug-interactions",
+        "expected_evidence": "Confirms DMT compatibility with current medications; flags PML risk for natalizumab in JCV-positive patients and first-dose bradyarrhythmia risk for fingolimod",
+        "importance": "required",
+        "label": "Run a drug-interaction and contraindication check for the proposed disease-modifying therapy, including JC virus serostatus considerations, live-vaccine timing, and (for fingolimod) baseline ECG / first-dose bradyarrhythmia monitoring",
+        "rationale": "Run a drug-interaction and contraindication check for the proposed disease-modifying therapy, including JC virus serostatus considerations, live-vaccine timing, and (for fingolimod) baseline ECG / first-dose bradyarrhythmia monitoring"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "special_tests": [
+                "oligoclonal_bands",
+                "IgG_index",
+                "kappa_free_light_chain_index"
+              ]
+            },
+            "tool_name": "analyze_csf"
+          }
+        ],
+        "citations": [
+          "[McDonald_2024]",
+          "2024 revised McDonald criteria; NICE NG220 (2026)"
+        ],
+        "criterion_id": "action-5-analyze-csf",
+        "expected_evidence": "CSF-restricted oligoclonal bands or an elevated kappa free-light-chain index can support the 2024 diagnostic pathway",
+        "importance": "recommended",
+        "label": "Consider CSF analysis with paired serum after imaging excludes unsafe mass effect only when clinical and MRI evidence is insufficient or a competing diagnosis remains",
+        "rationale": "Consider CSF analysis with paired serum after imaging excludes unsafe mass effect only when clinical and MRI evidence is insufficient or a competing diagnosis remains"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "CBC",
+                "ESR",
+                "CRP",
+                "CMP",
+                "calcium",
+                "glucose",
+                "TSH",
+                "vitamin_B12",
+                "HIV",
+                "AQP4_IgG_cell_based",
+                "MOG_IgG_cell_based"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[McDonald_2024]",
+          "2024 revised McDonald criteria; NICE NG220 (2026)"
+        ],
+        "criterion_id": "action-6-interpret-labs",
+        "expected_evidence": "CBC, inflammatory markers, renal/liver function, calcium, glucose, thyroid function, vitamin B12 and HIV; targeted AQP4/MOG only when the phenotype is atypical",
+        "importance": "required",
+        "label": "Order a mimic-exclusion laboratory panel; it supports exclusion of alternatives and does not confirm MS",
+        "rationale": "Order a mimic-exclusion laboratory panel; it supports exclusion of alternatives and does not confirm MS"
+      }
+    ],
+    "assessment": {
+      "prohibited_recommendations": [
+        "Do not diagnose MS based on non-specific white-matter lesions alone without meeting the 2024 revised McDonald criteria and excluding mimics",
+        "Do not start natalizumab in a JC virus-antibody-positive patient (especially with high index) without explicit benefit-risk discussion of PML",
+        "Do not initiate fingolimod without a baseline ECG and first-dose bradyarrhythmia monitoring; avoid in patients with second-degree AV block, prior MI, or severe sleep apnea",
+        "Do not start teriflunomide in a woman of child-bearing potential without effective contraception (teratogenic, long elimination half-life)",
+        "Do not use chronic oral corticosteroids as a maintenance treatment for MS \u2014 they are ineffective long-term and carry significant harm",
+        "Do not administer live-attenuated vaccines after initiation of B-cell depleting therapy (ocrelizumab, ofatumumab) or S1P modulators (fingolimod, ozanimod)",
+        "Do not omit spinal-cord MRI in a patient with myelopathic signs even if the brain MRI alone meets DIS criteria \u2014 cord lesions change relapse counting and management",
+        "Do not pursue aggressive cytoreductive surgery for a presumed tumefactive demyelinating lesion before exhausting non-invasive workup \u2014 open ring enhancement, CSF OCBs, and AQP4/MOG serology should be obtained first"
+      ],
+      "required_recommendations": [
+        "Establish dissemination in space (DIS) using brain and spinal-cord MRI in MS-typical regions (periventricular, juxtacortical/cortical, infratentorial, spinal cord)",
+        "Establish dissemination in time (DIT) by demonstrating simultaneous enhancing and non-enhancing lesions, a new lesion on follow-up MRI, or CSF-restricted oligoclonal bands (per the 2024 revised McDonald)",
+        "Exclude NMOSD and MOGAD with AQP4-IgG and MOG-IgG cell-based assays before committing to an MS diagnosis and DMT",
+        "For tumefactive presentations with mass effect, consult neurosurgery and consider brain biopsy if imaging plus CSF/serology do not establish diagnosis with confidence",
+        "Treat the acute relapse with high-dose IV methylprednisolone (1 g daily for 3\u20135 days), with plasma exchange reserved for steroid-refractory severe relapses",
+        "Initiate a disease-modifying therapy (DMT) after relapse stabilization; choice between platform vs. high-efficacy agent based on disease activity, MRI burden, and patient preference",
+        "Check JC virus antibody serostatus before considering natalizumab; verify up-to-date vaccinations (especially live-attenuated) before initiating B-cell depleting or S1P-modulator DMTs",
+        "Counsel on Uhthoff phenomenon, heat avoidance, smoking cessation, and vitamin D supplementation as modifiable lifestyle factors"
+      ]
+    },
+    "avoided_actions": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_ct_scan"
+          }
+        ],
+        "citations": [
+          "[MAGNIMS_2016]"
+        ],
+        "criterion_id": "avoid-waste-1-order-ct-scan",
+        "rationale": "CT is markedly inferior to MRI for visualising demyelinating plaques; ordering CT delays diagnosis and adds radiation without clinical benefit.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_echocardiogram"
+          }
+        ],
+        "citations": [
+          "[Reich_2018]"
+        ],
+        "criterion_id": "avoid-waste-2-order-echocardiogram",
+        "rationale": "No cardiac indication in a typical MS workup; echocardiography does not inform the demyelinating differential.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_cardiac_monitoring"
+          }
+        ],
+        "citations": [
+          "[Reich_2018]"
+        ],
+        "criterion_id": "avoid-waste-3-order-cardiac-monitoring",
+        "rationale": "Cardiac monitoring is only indicated for first-dose fingolimod initiation (bradyarrhythmia risk) \u2014 not as part of MS diagnostic workup.",
+        "severity": "waste"
+      }
+    ],
+    "diagnosis": {
+      "accepted": [
+        "Multiple sclerosis, relapsing-remitting type (tumefactive variant)"
+      ],
+      "icd_codes": [
+        "G35.A"
+      ]
+    },
+    "differential": [
+      {
+        "diagnosis": "CNS lymphoma (primary CNS lymphoma)",
+        "icd_code": "C85.9",
+        "key_features": "Homogeneous enhancement (often without open ring), periventricular location, restricted diffusion, marked steroid sensitivity; consider in immunocompromised hosts \u2014 distinguish by biopsy if imaging is equivocal",
+        "likelihood": "high"
+      },
+      {
+        "diagnosis": "High-grade glioma (glioblastoma)",
+        "icd_code": "C71.9",
+        "key_features": "Closed-ring enhancement (rather than open ring with cortical-side break), elevated choline:NAA on spectroscopy, lack of CSF oligoclonal bands; tissue diagnosis often required",
+        "likelihood": "high"
+      },
+      {
+        "diagnosis": "Neuromyelitis optica spectrum disorder (NMOSD)",
+        "icd_code": "G36.0",
+        "key_features": "AQP4-IgG positivity, longitudinally extensive transverse myelitis, area postrema syndrome \u2014 must be excluded before DMT selection",
+        "likelihood": "moderate"
+      },
+      {
+        "diagnosis": "MOG antibody-associated disease (MOGAD)",
+        "icd_code": "G37.81",
+        "key_features": "MOG-IgG positivity, ADEM-like large lesions especially in younger patients, frequent lesion resolution on follow-up MRI",
+        "likelihood": "moderate"
+      },
+      {
+        "diagnosis": "Brain abscess",
+        "icd_code": "G06.0",
+        "key_features": "Restricted diffusion centrally (not peripheral), thick smooth ring, fever and elevated inflammatory markers, predisposing source (dental, sinus, endocarditis)",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Acute disseminated encephalomyelitis (ADEM)",
+        "icd_code": "G04.81",
+        "key_features": "Monophasic, post-infectious/post-vaccination, encephalopathy hallmark; large confluent lesions; MOG-IgG sometimes positive in young adults",
+        "likelihood": "low"
+      }
+    ],
+    "key_clinical_evidence": [
+      "MS is a clinical-radiographic diagnosis: the 2024 revised McDonald requires dissemination in space (DIS) and dissemination in time (DIT) plus exclusion of better explanations \u2014 no single test confirms it",
+      "MS-typical MRI regions are periventricular, juxtacortical/cortical, infratentorial, and spinal cord \u2014 recognising a lesion in three of these regions establishes DIS for an attack-meeting clinical event",
+      "CSF-restricted oligoclonal bands (\u22652 bands not present in paired serum) can substitute for DIT under the 2024 revised McDonald when DIS is met \u2014 this changes the calculus for clinically isolated syndromes",
+      "Short-segment (<2 vertebral bodies), peripheral, dorsolateral or dorsal-column spinal cord lesions strongly favour MS over NMOSD (which characteristically produces longitudinally extensive transverse myelitis \u22653 segments)",
+      "Tumefactive demyelinating lesions are a recognised MS variant \u2014 distinguishing imaging features from neoplasm include open ring enhancement, prominent intralesional venules, less mass effect than expected for size, and CSF OCBs; brain biopsy should be a last resort",
+      "Open-ring enhancement with the opening oriented toward the cortex is a high-specificity sign of demyelination, distinguishing tumefactive MS from neoplasm and abscess",
+      "AQP4-IgG and MOG-IgG must be ordered as cell-based assays, not ELISA \u2014 the older ELISA-based AQP4 assays have unacceptable false-negative rates",
+      "T1 hypointense 'black holes' indicate axonal loss from prior inflammatory episodes and contribute evidence of dissemination in time even without simultaneous enhancing lesions",
+      "Choice of DMT \u2014 platform agent (interferon-\u03b2, glatiramer, teriflunomide, dimethyl fumarate) vs. high-efficacy agent (natalizumab, ocrelizumab, ofatumumab, cladribine, S1P modulators) \u2014 should weigh disease activity, MRI burden, patient comorbidities, JCV serostatus, and reproductive plans",
+      "If the initial brain MRI does not include the spinal cord, extending imaging to cervical and thoracic cord is essential \u2014 both for diagnostic DIS and for relapse counting",
+      "Tier per the July 2026 clinical review: McDonald 2024: dissemination in space and time is established on MRI, and oligoclonal bands substitute for dissemination in time rather than being required \u2014 the reviewers' point.",
+      "July 2026 review applied end to end: brain and cervical/thoracic cord MRI use an MS protocol; CSF is conditional, never mandatory; OCT/VEP and AQP4/MOG testing answer selected optic or atypical questions rather than forming a blanket panel.",
+      "The 2024 revised McDonald framework recognizes the optic nerve as a fifth topography and accepts the kappa free-light-chain index as an alternative positive-CSF marker; these additions do not make optic testing or lumbar puncture universal."
+    ],
+    "red_herrings": [],
+    "review_status": "draft",
+    "sequence_constraints": [
+      {
+        "after_criterion_id": "action-5-analyze-csf",
+        "before_criterion_id": "action-1-analyze-brain-mri",
+        "citations": [
+          "[McDonald_2017]"
+        ],
+        "reason": "Standard pre-LP imaging: confirm absence of mass effect / herniation risk on brain MRI before lumbar puncture",
+        "severity": "soft"
+      }
+    ],
+    "stop_rule": {
+      "max_additional_actions": 0,
+      "required_before_assessment": [
+        "action-1-analyze-brain-mri",
+        "action-2-order-body-imaging",
+        "action-3-search-medical-literature",
+        "action-4-check-drug-interactions",
+        "action-6-interpret-labs"
+      ]
+    }
+  },
+  "initial_tool_outputs": {
+    "csf": {
+      "appearance": "Clear and colorless",
+      "cell_count": {
+        "RBC": "1 cell/uL",
+        "WBC": "8 cells/uL (95% lymphocytes, 5% monocytes)"
+      },
+      "glucose": "58 mg/dL",
+      "glucose_ratio": "0.49 (serum glucose 118 mg/dL)",
+      "interpretation": "Opening pressure: 18 cm. WBC: 8 cells/uL (95% lymphocytes, 5% monocytes) (N/A PMN/N/A lymph). Protein: 52 mg/dL. Glucose: 58 mg/dL (ratio 0.49 (serum glucose 118 mg/dL)). Oligoclonal bands: Present \u2014 4 unique bands in CSF not found in paired serum sample. IgG index: 0.82 (elevated; reference: <0.70). Myelin basic protein: 8.6 ng/mL (elevated; reference: <4.0 ng/mL). Cytology: No malignant cells identified; reactive lymphocytes present. HSV 1/2 PCR (CSF): Not detected. JC virus PCR (CSF): Not detected. Meningitis/encephalitis panel: All targets negative (includes S. pneumoniae, N. meningitidis, H. influenzae, L. monocytogenes, E. coli K1, S. agalactiae, CMV, enterovirus, HSV-1, HSV-2, HHV-6, parechovirus, VZV, Cryptococcus neoformans/gattii). VDRL (CSF): Nonreactive. Anti-NMDA receptor antibodies (CSF): Negative. Flow cytometry: Polyclonal lymphocyte population \u2014 no evidence of lymphoma.",
+      "opening_pressure": "18 cm H2O",
+      "protein": "52 mg/dL",
+      "special_tests": {
+        "Anti-NMDA receptor antibodies (CSF)": "Negative",
+        "Cytology": "No malignant cells identified; reactive lymphocytes present",
+        "Flow cytometry": "Polyclonal lymphocyte population \u2014 no evidence of lymphoma",
+        "HSV 1/2 PCR (CSF)": "Not detected",
+        "IgG index": "0.82 (elevated; reference: <0.70)",
+        "JC virus PCR (CSF)": "Not detected",
+        "Meningitis/encephalitis panel": "All targets negative (includes S. pneumoniae, N. meningitidis, H. influenzae, L. monocytogenes, E. coli K1, S. agalactiae, CMV, enterovirus, HSV-1, HSV-2, HHV-6, parechovirus, VZV, Cryptococcus neoformans/gattii)",
+        "Myelin basic protein": "8.6 ng/mL (elevated; reference: <4.0 ng/mL)",
+        "Oligoclonal bands": "Present \u2014 4 unique bands in CSF not found in paired serum sample",
+        "VDRL (CSF)": "Nonreactive"
+      }
+    },
+    "drug_interactions": null,
+    "ecg": null,
+    "eeg": null,
+    "labs": {
+      "abnormal_values_summary": [
+        "WBC: 17.1 x10^9/L \u2014 Leukocytosis with left shift (H)",
+        "Neutrophils: 82% \u2014 Neutrophilia (H)",
+        "Lymphocytes: 11% \u2014 Relative lymphopenia (L)",
+        "Sodium: 135 mEq/L \u2014 Mild hyponatremia (L)",
+        "Potassium: 5.3 mEq/L \u2014 Mild hyperkalemia (H)",
+        "Chloride: 95 mEq/L \u2014 Mild hypochloremia (L)",
+        "Glucose: 118 mg/dL \u2014 Stress hyperglycemia (H)",
+        "CRP: 7.63 mg/L \u2014 Mildly elevated (H)",
+        "ESR: 48 mm/hr \u2014 Elevated (H)"
+      ],
+      "interpretation": "Abnormal values: WBC 17.1 x10^9/L (H), Neutrophils 82 % (H), Lymphocytes 11 % (L), Sodium 135 mEq/L (L), Potassium 5.3 mEq/L (H), Chloride 95 mEq/L (L), Glucose 118 mg/dL (H), CRP 7.63 mg/L (H), ESR 48 mm/hr (H).",
+      "panels": {
+        "Autoimmune and Infectious Panel": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Negative",
+            "test": "ANA",
+            "unit": "",
+            "value": "Negative"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Nonreactive",
+            "test": "HIV Ag/Ab combo",
+            "unit": "",
+            "value": "Nonreactive"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Not detected",
+            "test": "HSV 1/2 PCR (serum)",
+            "unit": "",
+            "value": "Not detected"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Negative",
+            "test": "West Nile virus IgM",
+            "unit": "",
+            "value": "Negative"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Nonreactive",
+            "test": "VDRL",
+            "unit": "",
+            "value": "Nonreactive"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Negative",
+            "test": "Anti-NMDA receptor antibodies (serum)",
+            "unit": "",
+            "value": "Negative"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "200-900",
+            "test": "Vitamin B12",
+            "unit": "pg/mL",
+            "value": 385
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.4-4.0",
+            "test": "TSH",
+            "unit": "mIU/L",
+            "value": 2.4
+          }
+        ],
+        "BMP": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "136-145",
+            "test": "Sodium",
+            "unit": "mEq/L",
+            "value": 135
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "3.5-5.0",
+            "test": "Potassium",
+            "unit": "mEq/L",
+            "value": 5.3
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "98-106",
+            "test": "Chloride",
+            "unit": "mEq/L",
+            "value": 95
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "22-29",
+            "test": "Bicarbonate",
+            "unit": "mEq/L",
+            "value": 22
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "7-20",
+            "test": "BUN",
+            "unit": "mg/dL",
+            "value": 18
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.74-1.35",
+            "test": "Creatinine",
+            "unit": "mg/dL",
+            "value": 1.26
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "70-100",
+            "test": "Glucose",
+            "unit": "mg/dL",
+            "value": 118
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "8.5-10.5",
+            "test": "Calcium",
+            "unit": "mg/dL",
+            "value": 9.2
+          }
+        ],
+        "CBC": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "4.5-11.0",
+            "test": "WBC",
+            "unit": "x10^9/L",
+            "value": 17.1
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "40-70",
+            "test": "Neutrophils",
+            "unit": "%",
+            "value": 82
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "20-40",
+            "test": "Lymphocytes",
+            "unit": "%",
+            "value": 11
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "13.5-17.5",
+            "test": "Hemoglobin",
+            "unit": "g/dL",
+            "value": 14.8
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "38.3-48.6",
+            "test": "Hematocrit",
+            "unit": "%",
+            "value": 44.1
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "150-400",
+            "test": "Platelets",
+            "unit": "x10^9/L",
+            "value": 258
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "80-100",
+            "test": "MCV",
+            "unit": "fL",
+            "value": 88.2
+          }
+        ],
+        "Inflammatory Markers": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "<5.0",
+            "test": "CRP",
+            "unit": "mg/L",
+            "value": 7.63
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "0-15",
+            "test": "ESR",
+            "unit": "mm/hr",
+            "value": 48
+          }
+        ],
+        "Mimic exclusion": [
+          {
+            "clinical_significance": "Reported negative in this case's own workup; excludes this reversible mimic",
+            "is_abnormal": false,
+            "reference_range": "",
+            "test": "AQP4_IgG",
+            "unit": "",
+            "value": "Negative"
+          }
+        ],
+        "Targeted demyelinating serology": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Negative",
+            "test": "MOG-IgG (cell-based assay)",
+            "unit": "",
+            "value": "Negative"
+          }
+        ]
+      }
+    },
+    "literature_search": null,
+    "mri": {
+      "additional_observations": [
+        "No leptomeningeal enhancement",
+        "No hemorrhage on susceptibility-weighted imaging",
+        "MR angiography of the circle of Willis demonstrates normal caliber intracranial vessels with no evidence of vasculitis, beading, or occlusion",
+        "The open ring enhancement pattern in the largest supratentorial lesion is a key finding that favors demyelination over neoplasm or abscess"
+      ],
+      "findings": [
+        {
+          "borders": "Ill-defined margins with open ring enhancement pattern \u2014 the opening faces the cortical surface, a pattern more suggestive of demyelination than neoplasm",
+          "location": "Right parietal deep white matter extending into the right temporal lobe",
+          "mass_effect": "Mild mass effect on the right lateral ventricle with effacement of the adjacent sulci; no midline shift",
+          "signal_characteristics": {
+            "DWI": "Shine-through effect on DWI without definite restricted diffusion on ADC map \u2014 does not support acute infarction or high-grade tumor",
+            "FLAIR": "Hyperintense with surrounding vasogenic edema extending into the right frontal, parietal, and temporal lobes",
+            "T1": "Hypointense to isointense centrally",
+            "T1_post_contrast": "Incomplete ring enhancement with the open portion oriented toward the cortex",
+            "T2": "Hyperintense, expansile signal involving the right parietal deep white matter and right temporal lobe"
+          },
+          "size": "4.2 x 3.8 x 3.5 cm",
+          "type": "Expansile white matter lesion"
+        },
+        {
+          "borders": "Poorly defined, following white matter tracts",
+          "location": "Midbrain, pons, middle cerebellar peduncles (right greater than left), right pontomedullary junction, and right anterior cerebellar hemisphere",
+          "mass_effect": "Mild diffuse enlargement of the pons and middle cerebellar peduncles",
+          "signal_characteristics": {
+            "FLAIR": "Hyperintense, diffuse enlargement of the affected structures",
+            "T1_post_contrast": "Patchy, incomplete enhancement in the pons and right middle cerebellar peduncle",
+            "T2": "Hyperintense signal involving the brainstem and cerebellar structures in a confluent pattern"
+          },
+          "size": "Diffuse involvement without a discrete mass",
+          "type": "Brainstem and cerebellar signal abnormality"
+        },
+        {
+          "borders": "Ill-defined, extending from the splenium into the right thalamus and posterior basal ganglia",
+          "location": "Splenium of the corpus callosum",
+          "mass_effect": null,
+          "signal_characteristics": {
+            "FLAIR": "Hyperintense",
+            "T1": "Mildly hypointense",
+            "T1_post_contrast": "Faint peripheral enhancement",
+            "T2": "Hyperintense, swollen appearance of the splenium"
+          },
+          "size": "2.1 x 1.5 cm",
+          "type": "Corpus callosum involvement"
+        },
+        {
+          "borders": null,
+          "location": "Right thalamus and right posterior basal ganglia (posterior putamen and globus pallidus)",
+          "mass_effect": null,
+          "signal_characteristics": {
+            "FLAIR": "Hyperintense",
+            "T1_post_contrast": "No definite enhancement in these structures",
+            "T2": "Hyperintense signal in the right thalamus and posterior basal ganglia, contiguous with the splenial lesion"
+          },
+          "size": "Diffuse involvement",
+          "type": "Deep gray matter involvement"
+        }
+      ],
+      "impression": "Large expansile right hemispheric white matter lesion (4.2 cm) with surrounding edema and incomplete ring enhancement, with the open portion facing the cortex \u2014 findings suspicious for an underlying mass or primary brain neoplasm, though the open ring enhancement pattern raises the possibility of tumefactive demyelination. Diffuse confluent T2/FLAIR signal abnormalities involving the midbrain, pons, middle cerebellar peduncles, right pontomedullary junction, right anterior cerebellum, splenium of the corpus callosum, right thalamus, and posterior basal ganglia, with patchy enhancement. No evidence of restricted diffusion to suggest abscess or acute infarction. MR angiography normal \u2014 no evidence of vasculitis. The extensive, multifocal involvement crossing vascular territories, combined with the open ring enhancement pattern, is atypical for a single neoplastic process and should prompt consideration of tumefactive demyelinating disease, acute disseminated encephalomyelitis (ADEM), or less likely, CNS lymphoma",
+      "recommended_actions": [],
+      "volumetrics": null
+    },
+    "specialized_test": null
+  },
+  "metadata": {
+    "authoring_agent": "condition-expert:MS-RR",
+    "case_body_concerns": [
+      "initial_tool_outputs.ecg: interpretation previously read 'Sinus tachycardia, rate 90 bpm' contradicting the rhythm field/findings ('Normal sinus rhythm'); rate 90 is not tachycardic (threshold 100). Corrected to 'Normal sinus rhythm, rate 90 bpm' by MS-RR audit 2026-07-06."
+    ],
+    "citation_gap": [],
+    "clinical_pearls": [
+      "Open ring enhancement with the opening facing the cortex (gray matter) is highly specific for demyelinating lesions and should prompt consideration of tumefactive MS even when the lesion otherwise resembles a neoplasm",
+      "Creutzfeldt cells (hypertrophic reactive astrocytes with fragmented nuclei) are characteristic of tumefactive demyelination and can be mistaken for mitotic figures in a neoplasm \u2014 pathologists must be aware of this pitfall",
+      "MR spectroscopy showing elevated myo-inositol without significant lipid peaks favors demyelination over high-grade glioma, though it cannot replace tissue diagnosis",
+      "CSF oligoclonal bands are present in approximately 85-95% of MS but are typically absent in ADEM \u2014 their presence in a tumefactive lesion context strongly favors MS over ADEM",
+      "The DWI shine-through phenomenon (high signal on DWI but normal or elevated ADC) reflects T2 prolongation rather than true restricted diffusion, and is an important distinguishing feature from brain abscess"
+    ],
+    "condition_name": "Multiple sclerosis \u2014 relapsing-remitting (tumefactive variant)",
+    "criteria_pack_version": "1.0",
+    "difficulty_description": "Moderate \u2014 presentation mimics a brain neoplasm with large expansile lesions, mass effect, and seizures. The family history of Behcet's disease and elevated inflammatory markers add confounding features. Diagnosis requires integration of advanced MRI features (open ring enhancement), CSF analysis (oligoclonal bands, negative infectious workup), and ultimately brain biopsy to confirm tumefactive demyelination over neoplasm.",
+    "difficulty_rationale": "Tumefactive demyelinating lesion overlaps imaging features with neoplasm/abscess; differential must include CNS lymphoma and high-grade glioma; agent must integrate open-ring enhancement, CSF OCB status, and AQP4/MOG serology to avoid biopsy",
+    "expected_agent_confidence": 0.6,
+    "fallback_tool_kinds": {
+      "cardiac_monitoring": "normal",
+      "ct": "normal",
+      "echo": "normal"
+    },
+    "generation_method": "real_case_seed",
+    "last_revised": "2026-08-10",
+    "policy_spec_status": "draft",
+    "revision_reason": "independent MS review: brain+cord MS-protocol MRI, conditional CSF with kFLC, targeted optic testing/serology, authored EEG/ECG removed",
+    "source": "MedCaseReasoning",
+    "source_license": "CC-BY 4.0",
+    "source_pmcid": "PMC11623848",
+    "version": "policy-v1",
+    "vocab_gap": []
+  },
+  "patient": {
+    "chief_complaint": "Extreme lethargy and witnessed generalized seizure with progressive left-sided weakness",
+    "clinical_history": {
       "allergies": [
         "No known drug allergies"
       ],
@@ -27,858 +927,47 @@
         "Paternal grandmother with rheumatoid arthritis",
         "No family history of multiple sclerosis or other demyelinating diseases"
       ],
+      "medications": [],
+      "past_medical_history": [
+        "No significant past medical history",
+        "Recent upper respiratory tract infection approximately 3 weeks prior to presentation"
+      ],
       "social_history": {
-        "smoking": "Never smoker",
         "alcohol": "Social drinker, 2-3 beers per week",
-        "occupation": "Software developer, works from home",
+        "exercise": "Previously active \u2014 jogging 3 times per week, but has been increasingly sedentary over the past 2 months due to fatigue",
+        "illicit_drugs": "Denies any illicit drug use; urine drug screen negative in emergency department",
         "living_situation": "Lives alone in a ground-floor apartment",
-        "exercise": "Previously active — jogging 3 times per week, but has been increasingly sedentary over the past 2 months due to fatigue",
-        "illicit_drugs": "Denies any illicit drug use; urine drug screen negative in emergency department"
+        "occupation": "Software developer, works from home",
+        "smoking": "Never smoker"
       }
     },
+    "demographics": {
+      "age": 29,
+      "bmi": 22.4,
+      "ethnicity": "Caucasian",
+      "handedness": "right",
+      "sex": "male"
+    },
+    "history_present_illness": "Mr. James Kowalczyk is a 29-year-old right-handed Caucasian man with no significant past medical history who was brought to the emergency department after a witnessed generalized tonic-clonic seizure. Per the patient's roommate, the patient awoke that morning complaining of a severe right frontotemporal headache, described as the worst headache of his life, and shortly thereafter collapsed with generalized shaking of all four extremities lasting approximately 90 seconds. Emergency medical services administered intravenous midazolam 5 mg en route to the hospital, after which the seizure activity ceased. In the emergency department, naloxone was empirically administered given uncertain circumstances, with no response, and the patient received intravenous normal saline for volume resuscitation. On further history-taking from family members, they report that over the preceding six weeks, the patient has experienced progressive left-sided weakness, initially noticed as difficulty using his left hand for typing at work, then progressing to left leg heaviness and an unsteady gait. Family also reports that the patient has become increasingly lethargic over the past several months, sleeping 12 to 14 hours per day on weekends, and that his personality has changed with increased impulsivity and irritability, which they initially attributed to work-related stress. Most alarmingly, family estimates the patient has lost approximately 30 to 45 pounds over the past six months without intentional dieting or changes in appetite, though the patient himself seems unconcerned about this. Approximately three weeks prior to presentation, the patient had an upper respiratory tract infection with cough and low-grade fevers lasting about one week, which resolved without medical attention. The family history is notable for the patient's father having been diagnosed with Behcet's disease, prompting early rheumatologic consultation during this admission, though no uveitis, oral ulcers, genital ulcers, or other classic features of Behcet's disease were identified on examination. The patient denies any recent travel, tick exposures, or new sexual contacts. He denies any prior episodes of visual symptoms, limb numbness, or urinary difficulties.",
     "neurological_exam": {
-      "mental_status": "Alert and oriented to person, place, and time. Glasgow Coma Scale 15. Mildly inattentive on serial sevens (2 errors). Language fluent without paraphasic errors. Memory: 3/3 immediate recall, 2/3 at five minutes (missed 'bicycle'). Mild impulsivity noted during interview — interrupts examiner repeatedly. No evidence of aphasia or neglect.",
-      "cranial_nerves": "Pupils 3 mm bilaterally, equal and reactive to light and accommodation. Visual acuity 20/20 right eye, 20/25 left eye. Visual fields full to confrontation bilaterally. No afferent pupillary defect. Extraocular movements full without nystagmus in primary gaze. Subtle left abducens paresis noted on extreme lateral gaze. No internuclear ophthalmoplegia. Facial sensation intact bilaterally via V1-V3. Mild left nasolabial fold flattening. Hearing grossly intact bilaterally. Palate elevates symmetrically. Tongue midline without fasciculations.",
-      "motor": "Upper extremities: right 5/5 throughout; left grip 4+/5, left wrist extension 4+/5, left deltoid 4/5, left triceps 4+/5. Lower extremities: right 5/5 throughout; left hip flexion 4/5, left knee extension 4/5, left ankle dorsiflexion 4+/5. No pronator drift on the right; subtle left pronator drift. No fasciculations or atrophy.",
-      "sensory": "Light touch intact bilaterally in upper and lower extremities. Pinprick slightly diminished on the left face and left upper extremity compared to the right. Vibration and proprioception intact at great toes bilaterally. Temperature sensation not formally tested.",
-      "reflexes": "Right biceps 2+, triceps 2+, brachioradialis 2+. Left biceps 3+, triceps 3+, brachioradialis 3+. Patellar reflexes: right 2+, left 3+. Achilles reflexes: right 2+, left 3+. Left plantar response equivocal (neither clearly flexor nor extensor). Right plantar response flexor. No clonus.",
+      "additional": "Significant unintentional weight loss of approximately 30-45 pounds over the preceding 6 months per family report. Patient had a witnessed generalized tonic-clonic seizure on the morning of presentation, lasting approximately 90 seconds, with postictal confusion resolving over 30 minutes. No prior seizure history. No meningismus. No papilledema on fundoscopy.",
       "coordination": "Finger-to-nose: intact on the right, mild dysmetria on the left with past-pointing. Heel-to-shin: intact on the right, mild ataxia on the left. Rapid alternating movements slowed on the left.",
+      "cranial_nerves": "Pupils 3 mm bilaterally, equal and reactive to light and accommodation. Visual acuity 20/20 right eye, 20/25 left eye. Visual fields full to confrontation bilaterally. No afferent pupillary defect. Extraocular movements full without nystagmus in primary gaze. Subtle left abducens paresis noted on extreme lateral gaze. No internuclear ophthalmoplegia. Facial sensation intact bilaterally via V1-V3. Mild left nasolabial fold flattening. Hearing grossly intact bilaterally. Palate elevates symmetrically. Tongue midline without fasciculations.",
       "gait": "Mildly unsteady gait with tendency to veer leftward. Tandem gait impaired with 4 missteps over 10 steps. Romberg sign positive with sway to the left. Unable to hop on left foot.",
-      "additional": "Significant unintentional weight loss of approximately 30-45 pounds over the preceding 6 months per family report. Patient had a witnessed generalized tonic-clonic seizure on the morning of presentation, lasting approximately 90 seconds, with postictal confusion resolving over 30 minutes. No prior seizure history. No meningismus. No papilledema on fundoscopy."
+      "mental_status": "Alert and oriented to person, place, and time. Glasgow Coma Scale 15. Mildly inattentive on serial sevens (2 errors). Language fluent without paraphasic errors. Memory: 3/3 immediate recall, 2/3 at five minutes (missed 'bicycle'). Mild impulsivity noted during interview \u2014 interrupts examiner repeatedly. No evidence of aphasia or neglect.",
+      "motor": "Upper extremities: right 5/5 throughout; left grip 4+/5, left wrist extension 4+/5, left deltoid 4/5, left triceps 4+/5. Lower extremities: right 5/5 throughout; left hip flexion 4/5, left knee extension 4/5, left ankle dorsiflexion 4+/5. No pronator drift on the right; subtle left pronator drift. No fasciculations or atrophy.",
+      "reflexes": "Right biceps 2+, triceps 2+, brachioradialis 2+. Left biceps 3+, triceps 3+, brachioradialis 3+. Patellar reflexes: right 2+, left 3+. Achilles reflexes: right 2+, left 3+. Left plantar response equivocal (neither clearly flexor nor extensor). Right plantar response flexor. No clonus.",
+      "sensory": "Light touch intact bilaterally in upper and lower extremities. Pinprick slightly diminished on the left face and left upper extremity compared to the right. Vibration and proprioception intact at great toes bilaterally. Temperature sensation not formally tested."
     },
+    "patient_id": "NB-MS-RR-RM01",
     "vitals": {
-      "bp_systolic": 138,
       "bp_diastolic": 82,
+      "bp_systolic": 138,
       "hr": 92,
-      "temp": 37.2,
       "rr": 16,
-      "spo2": 97
-    },
-    "chief_complaint": "Extreme lethargy and witnessed generalized seizure with progressive left-sided weakness",
-    "history_present_illness": "Mr. James Kowalczyk is a 29-year-old right-handed Caucasian man with no significant past medical history who was brought to the emergency department after a witnessed generalized tonic-clonic seizure. Per the patient's roommate, the patient awoke that morning complaining of a severe right frontotemporal headache, described as the worst headache of his life, and shortly thereafter collapsed with generalized shaking of all four extremities lasting approximately 90 seconds. Emergency medical services administered intravenous midazolam 5 mg en route to the hospital, after which the seizure activity ceased. In the emergency department, naloxone was empirically administered given uncertain circumstances, with no response, and the patient received intravenous normal saline for volume resuscitation. On further history-taking from family members, they report that over the preceding six weeks, the patient has experienced progressive left-sided weakness, initially noticed as difficulty using his left hand for typing at work, then progressing to left leg heaviness and an unsteady gait. Family also reports that the patient has become increasingly lethargic over the past several months, sleeping 12 to 14 hours per day on weekends, and that his personality has changed with increased impulsivity and irritability, which they initially attributed to work-related stress. Most alarmingly, family estimates the patient has lost approximately 30 to 45 pounds over the past six months without intentional dieting or changes in appetite, though the patient himself seems unconcerned about this. Approximately three weeks prior to presentation, the patient had an upper respiratory tract infection with cough and low-grade fevers lasting about one week, which resolved without medical attention. The family history is notable for the patient's father having been diagnosed with Behcet's disease, prompting early rheumatologic consultation during this admission, though no uveitis, oral ulcers, genital ulcers, or other classic features of Behcet's disease were identified on examination. The patient denies any recent travel, tick exposures, or new sexual contacts. He denies any prior episodes of visual symptoms, limb numbness, or urinary difficulties."
-  },
-  "initial_tool_outputs": {
-    "eeg": null,
-    "mri": {
-      "findings": [
-        {
-          "type": "Expansile white matter lesion",
-          "location": "Right parietal deep white matter extending into the right temporal lobe",
-          "size": "4.2 x 3.8 x 3.5 cm",
-          "signal_characteristics": {
-            "T2": "Hyperintense, expansile signal involving the right parietal deep white matter and right temporal lobe",
-            "FLAIR": "Hyperintense with surrounding vasogenic edema extending into the right frontal, parietal, and temporal lobes",
-            "T1": "Hypointense to isointense centrally",
-            "DWI": "Shine-through effect on DWI without definite restricted diffusion on ADC map — does not support acute infarction or high-grade tumor",
-            "T1_post_contrast": "Incomplete ring enhancement with the open portion oriented toward the cortex"
-          },
-          "mass_effect": "Mild mass effect on the right lateral ventricle with effacement of the adjacent sulci; no midline shift",
-          "borders": "Ill-defined margins with open ring enhancement pattern — the opening faces the cortical surface, a pattern more suggestive of demyelination than neoplasm"
-        },
-        {
-          "type": "Brainstem and cerebellar signal abnormality",
-          "location": "Midbrain, pons, middle cerebellar peduncles (right greater than left), right pontomedullary junction, and right anterior cerebellar hemisphere",
-          "size": "Diffuse involvement without a discrete mass",
-          "signal_characteristics": {
-            "T2": "Hyperintense signal involving the brainstem and cerebellar structures in a confluent pattern",
-            "FLAIR": "Hyperintense, diffuse enlargement of the affected structures",
-            "T1_post_contrast": "Patchy, incomplete enhancement in the pons and right middle cerebellar peduncle"
-          },
-          "mass_effect": "Mild diffuse enlargement of the pons and middle cerebellar peduncles",
-          "borders": "Poorly defined, following white matter tracts"
-        },
-        {
-          "type": "Corpus callosum involvement",
-          "location": "Splenium of the corpus callosum",
-          "size": "2.1 x 1.5 cm",
-          "signal_characteristics": {
-            "T2": "Hyperintense, swollen appearance of the splenium",
-            "FLAIR": "Hyperintense",
-            "T1": "Mildly hypointense",
-            "T1_post_contrast": "Faint peripheral enhancement"
-          },
-          "mass_effect": null,
-          "borders": "Ill-defined, extending from the splenium into the right thalamus and posterior basal ganglia"
-        },
-        {
-          "type": "Deep gray matter involvement",
-          "location": "Right thalamus and right posterior basal ganglia (posterior putamen and globus pallidus)",
-          "size": "Diffuse involvement",
-          "signal_characteristics": {
-            "T2": "Hyperintense signal in the right thalamus and posterior basal ganglia, contiguous with the splenial lesion",
-            "FLAIR": "Hyperintense",
-            "T1_post_contrast": "No definite enhancement in these structures"
-          },
-          "mass_effect": null,
-          "borders": null
-        }
-      ],
-      "volumetrics": null,
-      "additional_observations": [
-        "No leptomeningeal enhancement",
-        "No hemorrhage on susceptibility-weighted imaging",
-        "MR angiography of the circle of Willis demonstrates normal caliber intracranial vessels with no evidence of vasculitis, beading, or occlusion",
-        "The open ring enhancement pattern in the largest supratentorial lesion is a key finding that favors demyelination over neoplasm or abscess"
-      ],
-      "impression": "Large expansile right hemispheric white matter lesion (4.2 cm) with surrounding edema and incomplete ring enhancement, with the open portion facing the cortex — findings suspicious for an underlying mass or primary brain neoplasm, though the open ring enhancement pattern raises the possibility of tumefactive demyelination. Diffuse confluent T2/FLAIR signal abnormalities involving the midbrain, pons, middle cerebellar peduncles, right pontomedullary junction, right anterior cerebellum, splenium of the corpus callosum, right thalamus, and posterior basal ganglia, with patchy enhancement. No evidence of restricted diffusion to suggest abscess or acute infarction. MR angiography normal — no evidence of vasculitis. The extensive, multifocal involvement crossing vascular territories, combined with the open ring enhancement pattern, is atypical for a single neoplastic process and should prompt consideration of tumefactive demyelinating disease, acute disseminated encephalomyelitis (ADEM), or less likely, CNS lymphoma",
-      "recommended_actions": []
-    },
-    "ecg": null,
-    "labs": {
-      "panels": {
-        "CBC": [
-          {
-            "test": "WBC",
-            "value": 17.1,
-            "unit": "x10^9/L",
-            "reference_range": "4.5-11.0",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "Neutrophils",
-            "value": 82,
-            "unit": "%",
-            "reference_range": "40-70",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "Lymphocytes",
-            "value": 11,
-            "unit": "%",
-            "reference_range": "20-40",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "Hemoglobin",
-            "value": 14.8,
-            "unit": "g/dL",
-            "reference_range": "13.5-17.5",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Hematocrit",
-            "value": 44.1,
-            "unit": "%",
-            "reference_range": "38.3-48.6",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Platelets",
-            "value": 258,
-            "unit": "x10^9/L",
-            "reference_range": "150-400",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "MCV",
-            "value": 88.2,
-            "unit": "fL",
-            "reference_range": "80-100",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ],
-        "BMP": [
-          {
-            "test": "Sodium",
-            "value": 135,
-            "unit": "mEq/L",
-            "reference_range": "136-145",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "Potassium",
-            "value": 5.3,
-            "unit": "mEq/L",
-            "reference_range": "3.5-5.0",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "Chloride",
-            "value": 95,
-            "unit": "mEq/L",
-            "reference_range": "98-106",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "Bicarbonate",
-            "value": 22,
-            "unit": "mEq/L",
-            "reference_range": "22-29",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "BUN",
-            "value": 18,
-            "unit": "mg/dL",
-            "reference_range": "7-20",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Creatinine",
-            "value": 1.26,
-            "unit": "mg/dL",
-            "reference_range": "0.74-1.35",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Glucose",
-            "value": 118,
-            "unit": "mg/dL",
-            "reference_range": "70-100",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "Calcium",
-            "value": 9.2,
-            "unit": "mg/dL",
-            "reference_range": "8.5-10.5",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ],
-        "Inflammatory Markers": [
-          {
-            "test": "CRP",
-            "value": 7.63,
-            "unit": "mg/L",
-            "reference_range": "<5.0",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "ESR",
-            "value": 48,
-            "unit": "mm/hr",
-            "reference_range": "0-15",
-            "is_abnormal": true,
-            "clinical_significance": null
-          }
-        ],
-        "Autoimmune and Infectious Panel": [
-          {
-            "test": "ANA",
-            "value": "Negative",
-            "unit": "",
-            "reference_range": "Negative",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "HIV Ag/Ab combo",
-            "value": "Nonreactive",
-            "unit": "",
-            "reference_range": "Nonreactive",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "HSV 1/2 PCR (serum)",
-            "value": "Not detected",
-            "unit": "",
-            "reference_range": "Not detected",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "West Nile virus IgM",
-            "value": "Negative",
-            "unit": "",
-            "reference_range": "Negative",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "VDRL",
-            "value": "Nonreactive",
-            "unit": "",
-            "reference_range": "Nonreactive",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Anti-NMDA receptor antibodies (serum)",
-            "value": "Negative",
-            "unit": "",
-            "reference_range": "Negative",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Vitamin B12",
-            "value": 385,
-            "unit": "pg/mL",
-            "reference_range": "200-900",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "TSH",
-            "value": 2.4,
-            "unit": "mIU/L",
-            "reference_range": "0.4-4.0",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ],
-        "Mimic exclusion": [
-          {
-            "test": "AQP4_IgG",
-            "value": "Negative",
-            "unit": "",
-            "reference_range": "",
-            "is_abnormal": false,
-            "clinical_significance": "Reported negative in this case's own workup; excludes this reversible mimic"
-          }
-        ],
-        "Targeted demyelinating serology": [
-          {
-            "test": "MOG-IgG (cell-based assay)",
-            "value": "Negative",
-            "unit": "",
-            "reference_range": "Negative",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ]
-      },
-      "interpretation": "Abnormal values: WBC 17.1 x10^9/L (H), Neutrophils 82 % (H), Lymphocytes 11 % (L), Sodium 135 mEq/L (L), Potassium 5.3 mEq/L (H), Chloride 95 mEq/L (L), Glucose 118 mg/dL (H), CRP 7.63 mg/L (H), ESR 48 mm/hr (H).",
-      "abnormal_values_summary": [
-        "WBC: 17.1 x10^9/L — Leukocytosis with left shift (H)",
-        "Neutrophils: 82% — Neutrophilia (H)",
-        "Lymphocytes: 11% — Relative lymphopenia (L)",
-        "Sodium: 135 mEq/L — Mild hyponatremia (L)",
-        "Potassium: 5.3 mEq/L — Mild hyperkalemia (H)",
-        "Chloride: 95 mEq/L — Mild hypochloremia (L)",
-        "Glucose: 118 mg/dL — Stress hyperglycemia (H)",
-        "CRP: 7.63 mg/L — Mildly elevated (H)",
-        "ESR: 48 mm/hr — Elevated (H)"
-      ]
-    },
-    "csf": {
-      "appearance": "Clear and colorless",
-      "opening_pressure": "18 cm H2O",
-      "cell_count": {
-        "WBC": "8 cells/uL (95% lymphocytes, 5% monocytes)",
-        "RBC": "1 cell/uL"
-      },
-      "protein": "52 mg/dL",
-      "glucose": "58 mg/dL",
-      "glucose_ratio": "0.49 (serum glucose 118 mg/dL)",
-      "special_tests": {
-        "Oligoclonal bands": "Present — 4 unique bands in CSF not found in paired serum sample",
-        "IgG index": "0.82 (elevated; reference: <0.70)",
-        "Myelin basic protein": "8.6 ng/mL (elevated; reference: <4.0 ng/mL)",
-        "Cytology": "No malignant cells identified; reactive lymphocytes present",
-        "HSV 1/2 PCR (CSF)": "Not detected",
-        "JC virus PCR (CSF)": "Not detected",
-        "Meningitis/encephalitis panel": "All targets negative (includes S. pneumoniae, N. meningitidis, H. influenzae, L. monocytogenes, E. coli K1, S. agalactiae, CMV, enterovirus, HSV-1, HSV-2, HHV-6, parechovirus, VZV, Cryptococcus neoformans/gattii)",
-        "VDRL (CSF)": "Nonreactive",
-        "Anti-NMDA receptor antibodies (CSF)": "Negative",
-        "Flow cytometry": "Polyclonal lymphocyte population — no evidence of lymphoma"
-      },
-      "interpretation": "Opening pressure: 18 cm. WBC: 8 cells/uL (95% lymphocytes, 5% monocytes) (N/A PMN/N/A lymph). Protein: 52 mg/dL. Glucose: 58 mg/dL (ratio 0.49 (serum glucose 118 mg/dL)). Oligoclonal bands: Present — 4 unique bands in CSF not found in paired serum sample. IgG index: 0.82 (elevated; reference: <0.70). Myelin basic protein: 8.6 ng/mL (elevated; reference: <4.0 ng/mL). Cytology: No malignant cells identified; reactive lymphocytes present. HSV 1/2 PCR (CSF): Not detected. JC virus PCR (CSF): Not detected. Meningitis/encephalitis panel: All targets negative (includes S. pneumoniae, N. meningitidis, H. influenzae, L. monocytogenes, E. coli K1, S. agalactiae, CMV, enterovirus, HSV-1, HSV-2, HHV-6, parechovirus, VZV, Cryptococcus neoformans/gattii). VDRL (CSF): Nonreactive. Anti-NMDA receptor antibodies (CSF): Negative. Flow cytometry: Polyclonal lymphocyte population — no evidence of lymphoma."
-    },
-    "literature_search": null,
-    "drug_interactions": null,
-    "specialized_test": null
-  },
-  "followup_outputs": [
-    {
-      "trigger_action": "request_spine_mri",
-      "tool_name": "order_body_imaging",
-      "output": {
-        "region": "cervical and thoracic spine",
-        "modality": "MRI",
-        "contrast": true,
-        "findings": [
-          {
-            "type": "Spinal cord lesion",
-            "location": "C2-C3 level, posterior columns of the cervical spinal cord",
-            "description": "",
-            "size": "Spanning approximately 1 vertebral segment in length, occupying less than one-third of the cross-sectional area"
-          },
-          {
-            "type": "additional_observation",
-            "location": "spine",
-            "description": "Single short-segment cervical cord lesion, clinically silent — no corresponding myelopathic symptoms"
-          },
-          {
-            "type": "additional_observation",
-            "location": "spine",
-            "description": "No thoracic or lumbar cord lesions identified"
-          },
-          {
-            "type": "additional_observation",
-            "location": "spine",
-            "description": "No leptomeningeal enhancement along the cord"
-          }
-        ],
-        "measurements": null,
-        "impression": "Single short-segment T2 hyperintense lesion in the posterior columns at C2-C3, non-enhancing, peripherally located. No cord expansion. No longitudinally extensive cord signal abnormality",
-        "recommended_actions": []
-      }
-    },
-    {
-      "trigger_action": "request_mr_spectroscopy",
-      "tool_name": "order_advanced_imaging",
-      "output": {
-        "modality": "MR_spectroscopy",
-        "tracer_or_protocol": null,
-        "findings": [
-          {
-            "region": "Right parietal deep white matter lesion (largest supratentorial lesion)",
-            "signal": "NAA_Cr_ratio: 1.8 (mildly reduced; normal >2.0) — suggests neuronal injury/loss but not as severely reduced as in high-grade glioma (typically <1.0); Cho_Cr_ratio: 1.6 (mildly elevated; normal <1.5) — suggests increased membrane turnover from demyelination or cellular proliferation; Lactate: Small lactate doublet peak present — indicates anaerobic metabolism, seen in both active demyelination and tumor; Lipid: No significant lipid peak — argues against necrosis seen in high-grade glioma; Glutamate_Glutamine: Mildly elevated — can be seen in inflammatory processes; Myo_inositol: Elevated myo-inositol peak — marker of glial proliferation, often elevated in demyelinating lesions",
-            "description": "MR Spectroscopy — single voxel from the right parietal lesion"
-          }
-        ],
-        "quantitative_data": null,
-        "impression": "The mildly reduced NAA with mildly elevated choline, elevated myo-inositol, and absent lipid peak favor tumefactive demyelination. However, spectroscopy alone cannot definitively exclude neoplasm, and tissue diagnosis may still be warranted if clinical uncertainty persists",
-        "recommended_actions": []
-      }
-    },
-    {
-      "trigger_action": "request_biopsy_pathology",
-      "tool_name": "interpret_labs",
-      "output": {
-        "panels": {
-          "Brain Biopsy Pathology": [
-            {
-              "test": "H&E staining",
-              "value": "Extensive demyelination with relative axonal preservation, perivascular inflammatory infiltrate composed predominantly of lymphocytes and macrophages, with abundant foamy macrophages containing myelin debris",
-              "unit": "",
-              "reference_range": "Normal brain tissue",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Luxol Fast Blue (LFB) stain",
-              "value": "Extensive loss of myelin staining in the biopsied region with sharp demarcation between demyelinated and normally myelinated tissue",
-              "unit": "",
-              "reference_range": "Normal myelin staining",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Neurofilament stain",
-              "value": "Relative preservation of axons within the demyelinated zone",
-              "unit": "",
-              "reference_range": "Normal axonal density",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "CD68 immunostain",
-              "value": "Abundant CD68-positive foamy macrophages throughout the lesion, particularly at the lesion edge",
-              "unit": "",
-              "reference_range": "Rare scattered macrophages",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "GFAP immunostain",
-              "value": "Reactive astrogliosis with Creutzfeldt cells (hypertrophic astrocytes with fragmented nuclei)",
-              "unit": "",
-              "reference_range": "Normal astrocyte morphology",
-              "is_abnormal": true,
-              "clinical_significance": null
-            },
-            {
-              "test": "Ki-67 proliferation index",
-              "value": "< 2%",
-              "unit": "",
-              "reference_range": "< 3%",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "IDH1 R132H mutation",
-              "value": "Negative",
-              "unit": "",
-              "reference_range": "Negative",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "CD20/CD3 immunostains",
-              "value": "Mixed T-cell (CD3+) and B-cell (CD20+) perivascular infiltrate with T-cell predominance",
-              "unit": "",
-              "reference_range": "No significant lymphocytic infiltrate",
-              "is_abnormal": true,
-              "clinical_significance": null
-            }
-          ]
-        },
-        "interpretation": "Abnormal values: H&E staining Extensive demyelination with relative axonal preservation, perivascular inflammatory infiltrate composed predominantly of lymphocytes and macrophages, with abundant foamy macrophages containing myelin debris (H), Luxol Fast Blue (LFB) stain Extensive loss of myelin staining in the biopsied region with sharp demarcation between demyelinated and normally myelinated tissue (H), CD68 immunostain Abundant CD68-positive foamy macrophages throughout the lesion, particularly at the lesion edge (H), GFAP immunostain Reactive astrogliosis with Creutzfeldt cells (hypertrophic astrocytes with fragmented nuclei) (H), CD20/CD3 immunostains Mixed T-cell (CD3+) and B-cell (CD20+) perivascular infiltrate with T-cell predominance (H).",
-        "abnormal_values_summary": [
-          "Active demyelination with relative axonal preservation on H&E",
-          "Loss of myelin staining on Luxol Fast Blue with sharp borders",
-          "Abundant CD68+ foamy macrophages at the lesion edge",
-          "Reactive astrogliosis with Creutzfeldt cells on GFAP stain",
-          "Mixed T-cell and B-cell perivascular inflammatory infiltrate"
-        ]
-      }
-    },
-    {
-      "trigger_action": "search_tumefactive_ms_treatment",
-      "tool_name": "search_medical_literature",
-      "output": {
-        "query": "tumefactive multiple sclerosis treatment management guidelines",
-        "results": [
-          {
-            "title": "Tumefactive Demyelinating Lesions: A Review of the Literature",
-            "authors": "Lucchinetti CF, Gavrilova RH, Metz I, et al.",
-            "journal": "Lancet Neurology",
-            "year": "2008",
-            "key_finding": "Tumefactive MS lesions (>2 cm with mass effect, edema, or ring enhancement) occur in 1-2 per 1000 MS cases. Most patients initially suspected of brain tumor. Brain biopsy often required for definitive diagnosis. Approximately 70% of patients with tumefactive demyelination go on to develop clinically definite MS."
-          },
-          {
-            "title": "Clinical and MRI features distinguishing tumefactive MS from CNS neoplasms",
-            "authors": "Hardy TA, Reddel SW, Barnett MH, et al.",
-            "journal": "Journal of Neurology, Neurosurgery & Psychiatry",
-            "year": "2016",
-            "key_finding": "Open ring enhancement (with opening toward gray matter), absence of cortical involvement, and DWI shine-through without restriction are MRI features that help distinguish tumefactive MS from glioma and lymphoma. MR spectroscopy showing elevated myo-inositol and absence of lipid peak further supports demyelination."
-          },
-          {
-            "title": "Acute management of tumefactive demyelination",
-            "authors": "Defined Expert Group",
-            "journal": "Multiple Sclerosis Journal",
-            "year": "2020",
-            "key_finding": "First-line treatment is high-dose IV methylprednisolone (1 g/day for 5 days). For steroid-refractory cases, plasma exchange (PLEX) should be considered, particularly for severe presentations. After acute treatment, disease-modifying therapy should be initiated. High-efficacy DMTs (natalizumab, fingolimod, or anti-CD20 therapies) are often preferred given the aggressive initial presentation."
-          }
-        ],
-        "summary": "Tumefactive MS is a rare presentation of demyelinating disease characterized by large (>2 cm) lesions that mimic brain tumors. Diagnosis often requires brain biopsy when imaging and CSF findings are inconclusive. MRI features favoring demyelination over neoplasm include open ring enhancement, DWI shine-through without restriction, and MR spectroscopy showing elevated myo-inositol without lipid peaks. Acute treatment with high-dose IV corticosteroids has been used, with plasma exchange as an alternative in refractory cases. Approximately 70% of patients with tumefactive demyelination go on to develop clinically definite relapsing-remitting MS."
-      }
-    },
-    {
-      "trigger_action": "check_drug_interactions_steroids",
-      "tool_name": "check_drug_interactions",
-      "output": {
-        "proposed": "IV Methylprednisolone 1 g daily for 5 days, followed by oral prednisone taper",
-        "interactions": [
-          "Levetiracetam 500 mg BID (seizure prophylaxis): No significant pharmacokinetic interaction. Both can be used together safely."
-        ],
-        "contraindications": [],
-        "warnings": [
-          "Monitor blood glucose closely — corticosteroids cause hyperglycemia; patient already has stress hyperglycemia (118 mg/dL)",
-          "Stress ulcer prophylaxis recommended (omeprazole or pantoprazole) given high-dose corticosteroid use",
-          "Insomnia and psychiatric effects (agitation, psychosis) can occur with high-dose IV steroids — monitor given patient's pre-existing behavioral changes",
-          "Electrolyte monitoring: corticosteroids can cause sodium retention and potassium wasting — patient already has mild hyponatremia and hyperkalemia",
-          "Consider PJP prophylaxis if prolonged steroid course anticipated"
-        ],
-        "formulary_status": "First-line agent for acute relapses in inflammatory demyelinating conditions",
-        "alternatives": [
-          "Plasma exchange (PLEX) — 5-7 exchanges over 10-14 days, for steroid-refractory cases",
-          "IV immunoglobulin (IVIG) 0.4 g/kg/day for 5 days — less evidence in tumefactive MS but considered if PLEX unavailable",
-          "Oral high-dose methylprednisolone (equivalent dose) — less commonly used for tumefactive presentation"
-        ]
-      }
+      "spo2": 97,
+      "temp": 37.2
     }
-  ],
-  "fallback_tool_outputs": {
-    "eeg": null,
-    "mri": null,
-    "ecg": null,
-    "labs": null,
-    "csf": null,
-    "ct": {
-      "findings": [],
-      "contrast_used": false,
-      "angiography_findings": null,
-      "additional_observations": [],
-      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
-      "recommended_actions": []
-    },
-    "echo": {
-      "chambers": {
-        "LV": "normal size and systolic function",
-        "RV": "normal size and function",
-        "LA": "normal size",
-        "RA": "normal size"
-      },
-      "valves": {
-        "mitral": "structurally normal",
-        "aortic": "structurally normal",
-        "tricuspid": "normal",
-        "pulmonic": "normal"
-      },
-      "ejection_fraction": 61.0,
-      "wall_motion": "no regional wall-motion abnormality",
-      "findings": [
-        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
-      ],
-      "impression": "Normal transthoracic echocardiogram.",
-      "recommended_actions": []
-    },
-    "cardiac_monitoring": {
-      "duration_hours": 24,
-      "monitor_type": "holter_24h",
-      "rhythm_summary": "Sinus rhythm throughout the recording",
-      "heart_rate_range": {
-        "min": 53,
-        "max": 127,
-        "average": 81
-      },
-      "events": [],
-      "findings": [
-        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
-      ],
-      "impression": "Normal 24-hour Holter monitor.",
-      "recommended_actions": []
-    },
-    "advanced_imaging": null,
-    "specialized_test": null,
-    "literature_search": null,
-    "drug_interactions": null
   },
-  "ground_truth": {
-    "primary_diagnosis": "Multiple sclerosis, relapsing-remitting type (tumefactive variant)",
-    "icd_code": "G35.A",
-    "differential": [
-      {
-        "diagnosis": "CNS lymphoma (primary CNS lymphoma)",
-        "likelihood": "high",
-        "key_features": "Homogeneous enhancement (often without open ring), periventricular location, restricted diffusion, marked steroid sensitivity; consider in immunocompromised hosts — distinguish by biopsy if imaging is equivocal",
-        "icd_code": "C85.9"
-      },
-      {
-        "diagnosis": "High-grade glioma (glioblastoma)",
-        "likelihood": "high",
-        "key_features": "Closed-ring enhancement (rather than open ring with cortical-side break), elevated choline:NAA on spectroscopy, lack of CSF oligoclonal bands; tissue diagnosis often required",
-        "icd_code": "C71.9"
-      },
-      {
-        "diagnosis": "Neuromyelitis optica spectrum disorder (NMOSD)",
-        "likelihood": "moderate",
-        "key_features": "AQP4-IgG positivity, longitudinally extensive transverse myelitis, area postrema syndrome — must be excluded before DMT selection",
-        "icd_code": "G36.0"
-      },
-      {
-        "diagnosis": "MOG antibody-associated disease (MOGAD)",
-        "likelihood": "moderate",
-        "key_features": "MOG-IgG positivity, ADEM-like large lesions especially in younger patients, frequent lesion resolution on follow-up MRI",
-        "icd_code": "G37.81"
-      },
-      {
-        "diagnosis": "Brain abscess",
-        "likelihood": "low",
-        "key_features": "Restricted diffusion centrally (not peripheral), thick smooth ring, fever and elevated inflammatory markers, predisposing source (dental, sinus, endocarditis)",
-        "icd_code": "G06.0"
-      },
-      {
-        "diagnosis": "Acute disseminated encephalomyelitis (ADEM)",
-        "likelihood": "low",
-        "key_features": "Monophasic, post-infectious/post-vaccination, encephalopathy hallmark; large confluent lesions; MOG-IgG sometimes positive in young adults",
-        "icd_code": "G04.81"
-      }
-    ],
-    "optimal_actions": [
-      {
-        "step": 1,
-        "action": "Obtain brain MRI with a dedicated MS protocol, including MS-oriented FLAIR/T2/DWI and pre/post-gadolinium T1 when clinically appropriate",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Multifocal T2/FLAIR hyperintensities in MS-typical regions; assess for enhancing lesions, T1 black holes, and Dawson-finger morphology",
-        "category": "required",
-        "tool_parameters": {
-          "protocol": "ms",
-          "contrast": true
-        },
-        "citation": "[McDonald_2024]",
-        "guideline_source": "2024 revised McDonald criteria; MAGNIMS-CMSC-NAIMS 2024/2025"
-      },
-      {
-        "step": 2,
-        "action": "Obtain cervical and thoracic spinal-cord MRI with a dedicated MS protocol and gadolinium when clinically appropriate",
-        "tool_name": "order_body_imaging",
-        "expected_finding": "Short-segment (<2 vertebral bodies) peripheral cord lesions favor MS over NMOSD (which characteristically shows longitudinally extensive transverse myelitis ≥3 segments)",
-        "category": "required",
-        "tool_parameters": {
-          "study": "spine_MRI",
-          "contrast": true
-        },
-        "citation": "[McDonald_2024]",
-        "guideline_source": "2024 revised McDonald criteria; MAGNIMS-CMSC-NAIMS 2024/2025"
-      },
-      {
-        "step": 3,
-        "action": "Search the medical literature for the McDonald 2017 diagnostic criteria and current first-line / high-efficacy DMT options for RRMS",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Retrieves McDonald 2017 criteria and contemporary DMT guidance (platform vs. high-efficacy choice, NEDA-3 outcome framework)",
-        "category": "required",
-        "tool_parameters": {
-          "query": "McDonald 2017 criteria multiple sclerosis disease-modifying therapy first-line high-efficacy"
-        },
-        "citation": "[Reich_2018]",
-        "guideline_source": "Reich 2018 NEJM review"
-      },
-      {
-        "step": 4,
-        "action": "Run a drug-interaction and contraindication check for the proposed disease-modifying therapy, including JC virus serostatus considerations, live-vaccine timing, and (for fingolimod) baseline ECG / first-dose bradyarrhythmia monitoring",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Confirms DMT compatibility with current medications; flags PML risk for natalizumab in JCV-positive patients and first-dose bradyarrhythmia risk for fingolimod",
-        "category": "required",
-        "tool_parameters": {
-          "proposed_class": "MS_DMT",
-          "screen_for": [
-            "JCV_serostatus",
-            "live_vaccines",
-            "hepatic_function",
-            "lymphocyte_count"
-          ]
-        },
-        "citation": "[Reich_2018]",
-        "guideline_source": "Reich 2018 NEJM review"
-      },
-      {
-        "action": "Consider CSF analysis with paired serum after imaging excludes unsafe mass effect only when clinical and MRI evidence is insufficient or a competing diagnosis remains",
-        "tool_name": "analyze_csf",
-        "expected_finding": "CSF-restricted oligoclonal bands or an elevated kappa free-light-chain index can support the 2024 diagnostic pathway",
-        "category": "recommended",
-        "tool_parameters": {
-          "special_tests": [
-            "oligoclonal_bands",
-            "IgG_index",
-            "kappa_free_light_chain_index"
-          ]
-        },
-        "citation": "[McDonald_2024]",
-        "guideline_source": "2024 revised McDonald criteria; NICE NG220 (2026)",
-        "step": 5
-      },
-      {
-        "action": "Order a mimic-exclusion laboratory panel; it supports exclusion of alternatives and does not confirm MS",
-        "tool_name": "interpret_labs",
-        "expected_finding": "CBC, inflammatory markers, renal/liver function, calcium, glucose, thyroid function, vitamin B12 and HIV; targeted AQP4/MOG only when the phenotype is atypical",
-        "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "ESR",
-            "CRP",
-            "CMP",
-            "calcium",
-            "glucose",
-            "TSH",
-            "vitamin_B12",
-            "HIV",
-            "AQP4_IgG_cell_based",
-            "MOG_IgG_cell_based"
-          ]
-        },
-        "citation": "[McDonald_2024]",
-        "guideline_source": "2024 revised McDonald criteria; NICE NG220 (2026)",
-        "step": 6
-      }
-    ],
-    "useless_tools": [
-      {
-        "tool_name": "order_ct_scan",
-        "tool_parameters": {},
-        "rationale": "CT is markedly inferior to MRI for visualising demyelinating plaques; ordering CT delays diagnosis and adds radiation without clinical benefit.",
-        "citation": "[MAGNIMS_2016]"
-      },
-      {
-        "tool_name": "order_echocardiogram",
-        "tool_parameters": {},
-        "rationale": "No cardiac indication in a typical MS workup; echocardiography does not inform the demyelinating differential.",
-        "citation": "[Reich_2018]"
-      },
-      {
-        "tool_name": "order_cardiac_monitoring",
-        "tool_parameters": {},
-        "rationale": "Cardiac monitoring is only indicated for first-dose fingolimod initiation (bradyarrhythmia risk) — not as part of MS diagnostic workup.",
-        "citation": "[Reich_2018]"
-      }
-    ],
-    "harmful_tools": [],
-    "sequence_constraints": [
-      {
-        "before": "analyze_brain_mri",
-        "after": "analyze_csf",
-        "reason": "Standard pre-LP imaging: confirm absence of mass effect / herniation risk on brain MRI before lumbar puncture",
-        "citation": "[McDonald_2017]",
-        "severity": "soft"
-      }
-    ],
-    "critical_actions": [
-      "Establish dissemination in space (DIS) using brain and spinal-cord MRI in MS-typical regions (periventricular, juxtacortical/cortical, infratentorial, spinal cord)",
-      "Establish dissemination in time (DIT) by demonstrating simultaneous enhancing and non-enhancing lesions, a new lesion on follow-up MRI, or CSF-restricted oligoclonal bands (per the 2024 revised McDonald)",
-      "Exclude NMOSD and MOGAD with AQP4-IgG and MOG-IgG cell-based assays before committing to an MS diagnosis and DMT",
-      "For tumefactive presentations with mass effect, consult neurosurgery and consider brain biopsy if imaging plus CSF/serology do not establish diagnosis with confidence",
-      "Treat the acute relapse with high-dose IV methylprednisolone (1 g daily for 3–5 days), with plasma exchange reserved for steroid-refractory severe relapses",
-      "Initiate a disease-modifying therapy (DMT) after relapse stabilization; choice between platform vs. high-efficacy agent based on disease activity, MRI burden, and patient preference",
-      "Check JC virus antibody serostatus before considering natalizumab; verify up-to-date vaccinations (especially live-attenuated) before initiating B-cell depleting or S1P-modulator DMTs",
-      "Counsel on Uhthoff phenomenon, heat avoidance, smoking cessation, and vitamin D supplementation as modifiable lifestyle factors"
-    ],
-    "contraindicated_actions": [
-      "Do not diagnose MS based on non-specific white-matter lesions alone without meeting the 2024 revised McDonald criteria and excluding mimics",
-      "Do not start natalizumab in a JC virus-antibody-positive patient (especially with high index) without explicit benefit-risk discussion of PML",
-      "Do not initiate fingolimod without a baseline ECG and first-dose bradyarrhythmia monitoring; avoid in patients with second-degree AV block, prior MI, or severe sleep apnea",
-      "Do not start teriflunomide in a woman of child-bearing potential without effective contraception (teratogenic, long elimination half-life)",
-      "Do not use chronic oral corticosteroids as a maintenance treatment for MS — they are ineffective long-term and carry significant harm",
-      "Do not administer live-attenuated vaccines after initiation of B-cell depleting therapy (ocrelizumab, ofatumumab) or S1P modulators (fingolimod, ozanimod)",
-      "Do not omit spinal-cord MRI in a patient with myelopathic signs even if the brain MRI alone meets DIS criteria — cord lesions change relapse counting and management",
-      "Do not pursue aggressive cytoreductive surgery for a presumed tumefactive demyelinating lesion before exhausting non-invasive workup — open ring enhancement, CSF OCBs, and AQP4/MOG serology should be obtained first"
-    ],
-    "key_reasoning_points": [
-      "MS is a clinical-radiographic diagnosis: the 2024 revised McDonald requires dissemination in space (DIS) and dissemination in time (DIT) plus exclusion of better explanations — no single test confirms it",
-      "MS-typical MRI regions are periventricular, juxtacortical/cortical, infratentorial, and spinal cord — recognising a lesion in three of these regions establishes DIS for an attack-meeting clinical event",
-      "CSF-restricted oligoclonal bands (≥2 bands not present in paired serum) can substitute for DIT under the 2024 revised McDonald when DIS is met — this changes the calculus for clinically isolated syndromes",
-      "Short-segment (<2 vertebral bodies), peripheral, dorsolateral or dorsal-column spinal cord lesions strongly favour MS over NMOSD (which characteristically produces longitudinally extensive transverse myelitis ≥3 segments)",
-      "Tumefactive demyelinating lesions are a recognised MS variant — distinguishing imaging features from neoplasm include open ring enhancement, prominent intralesional venules, less mass effect than expected for size, and CSF OCBs; brain biopsy should be a last resort",
-      "Open-ring enhancement with the opening oriented toward the cortex is a high-specificity sign of demyelination, distinguishing tumefactive MS from neoplasm and abscess",
-      "AQP4-IgG and MOG-IgG must be ordered as cell-based assays, not ELISA — the older ELISA-based AQP4 assays have unacceptable false-negative rates",
-      "T1 hypointense 'black holes' indicate axonal loss from prior inflammatory episodes and contribute evidence of dissemination in time even without simultaneous enhancing lesions",
-      "Choice of DMT — platform agent (interferon-β, glatiramer, teriflunomide, dimethyl fumarate) vs. high-efficacy agent (natalizumab, ocrelizumab, ofatumumab, cladribine, S1P modulators) — should weigh disease activity, MRI burden, patient comorbidities, JCV serostatus, and reproductive plans",
-      "If the initial brain MRI does not include the spinal cord, extending imaging to cervical and thoracic cord is essential — both for diagnostic DIS and for relapse counting",
-      "Tier per the July 2026 clinical review: McDonald 2024: dissemination in space and time is established on MRI, and oligoclonal bands substitute for dissemination in time rather than being required — the reviewers' point.",
-      "July 2026 review applied end to end: brain and cervical/thoracic cord MRI use an MS protocol; CSF is conditional, never mandatory; OCT/VEP and AQP4/MOG testing answer selected optic or atypical questions rather than forming a blanket panel.",
-      "The 2024 revised McDonald framework recognizes the optic nerve as a fifth topography and accepts the kappa free-light-chain index as an alternative positive-CSF marker; these additions do not make optic testing or lumbar puncture universal."
-    ],
-    "red_herrings": []
-  },
-  "metadata": {
-    "source": "MedCaseReasoning",
-    "source_pmcid": "PMC11623848",
-    "source_license": "CC-BY 4.0",
-    "generation_method": "real_case_seed",
-    "condition_name": "Multiple sclerosis — relapsing-remitting (tumefactive variant)",
-    "difficulty_description": "Moderate — presentation mimics a brain neoplasm with large expansile lesions, mass effect, and seizures. The family history of Behcet's disease and elevated inflammatory markers add confounding features. Diagnosis requires integration of advanced MRI features (open ring enhancement), CSF analysis (oligoclonal bands, negative infectious workup), and ultimately brain biopsy to confirm tumefactive demyelination over neoplasm.",
-    "expected_agent_confidence": 0.6,
-    "clinical_pearls": [
-      "Open ring enhancement with the opening facing the cortex (gray matter) is highly specific for demyelinating lesions and should prompt consideration of tumefactive MS even when the lesion otherwise resembles a neoplasm",
-      "Creutzfeldt cells (hypertrophic reactive astrocytes with fragmented nuclei) are characteristic of tumefactive demyelination and can be mistaken for mitotic figures in a neoplasm — pathologists must be aware of this pitfall",
-      "MR spectroscopy showing elevated myo-inositol without significant lipid peaks favors demyelination over high-grade glioma, though it cannot replace tissue diagnosis",
-      "CSF oligoclonal bands are present in approximately 85-95% of MS but are typically absent in ADEM — their presence in a tumefactive lesion context strongly favors MS over ADEM",
-      "The DWI shine-through phenomenon (high signal on DWI but normal or elevated ADC) reflects T2 prolongation rather than true restricted diffusion, and is an important distinguishing feature from brain abscess"
-    ],
-    "fallback_tool_kinds": {
-      "ct": "normal",
-      "echo": "normal",
-      "cardiac_monitoring": "normal"
-    },
-    "last_revised": "2026-08-10",
-    "revision_reason": "independent MS review: brain+cord MS-protocol MRI, conditional CSF with kFLC, targeted optic testing/serology, authored EEG/ECG removed",
-    "criteria_pack_version": "1.0",
-    "authoring_agent": "condition-expert:MS-RR",
-    "difficulty_rationale": "Tumefactive demyelinating lesion overlaps imaging features with neoplasm/abscess; differential must include CNS lymphoma and high-grade glioma; agent must integrate open-ring enhancement, CSF OCB status, and AQP4/MOG serology to avoid biopsy",
-    "case_body_concerns": [
-      "initial_tool_outputs.ecg: interpretation previously read 'Sinus tachycardia, rate 90 bpm' contradicting the rhythm field/findings ('Normal sinus rhythm'); rate 90 is not tachycardic (threshold 100). Corrected to 'Normal sinus rhythm, rate 90 bpm' by MS-RR audit 2026-07-06."
-    ],
-    "citation_gap": [],
-    "vocab_gap": []
-  }
+  "schema_version": "2.0"
 }

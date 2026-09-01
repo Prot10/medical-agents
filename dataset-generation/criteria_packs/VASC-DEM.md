@@ -55,8 +55,8 @@ mixed disease.
 
 ## 2. Standard workup hierarchy
 
-These tiers are the defaults. Two things move per case, both stated in the case's own
-`optimal_actions`: the **embolic workup** (ECG, monitoring, echocardiography, carotid duplex)
+These tiers are defaults. Two things move per case, both stated in the case's own
+`action_criteria`: the **embolic workup** (ECG, monitoring, echocardiography, carotid duplex)
 is required only where the lesion pattern is embolic, because that is where an occult source
 converts management from risk-factor control to anticoagulation; and **CSF or amyloid
 biomarkers** are required only where mixed Alzheimer pathology is the question being asked.
@@ -154,7 +154,7 @@ biomarkers** are required only where mixed Alzheimer pathology is the question b
 - No other member of the tool set carries a safety concern here; the harm in this condition is
   therapeutic rather than diagnostic (anticoagulating a patient whose lobar microbleeds and
   siderosis indicate amyloid angiopathy), and that belongs in
-  `contraindicated_actions` [Boston_v2]
+  `assessment.prohibited_recommendations` [Boston_v2]
 
 ## 5. Sequence constraints
 

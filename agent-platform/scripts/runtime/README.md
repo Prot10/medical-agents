@@ -1,12 +1,13 @@
-# Runtime Scripts
+# Runtime
 
-Manual agent execution and model serving utilities.
+`serve_model.sh` accepts only `qwen3.5-9b`, `gemma-4-e4b` or `medgemma-1.5-4b`. It launches the colocated `vllm_serve.py` wrapper.
 
-Keep:
-- `run_single_case.py` — single-case CLI smoke/debug runner.
-- `interactive_demo.py` — manual text-entry demo runner.
-- `serve_model.sh`, `vllm_serve.py` — local/vLLM serving used by the API and benchmarks.
-- `nano_v3_reasoning_parser.py`, `nemotron_toolcall_parser.py` — vLLM parser plugins used by `serve_model.sh`.
+Environment controls:
 
-Note:
-- The `v3` in `nano_v3_reasoning_parser.py` refers to the Nemotron-3 Nano model family, not dataset v3. It registers the `nano_v3` vLLM reasoning parser used by `serve_model.sh nemotron-3-nano-4b` (`--reasoning-parser nano_v3`).
+- `VLLM_VENV`: vLLM environment path.
+- `HF_HOME`: Hugging Face cache.
+- `GPU_MEMORY_UTILIZATION` and `MAX_NUM_SEQS`.
+- `NO_PREFIX_CACHING=1`.
+- `LORA_ADAPTER` and optional `MAX_LORA_RANK`.
+
+The script rejects arbitrary model paths to keep the benchmark matrix reproducible.

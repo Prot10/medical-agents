@@ -13,7 +13,6 @@ import type {
   NeuroBenchCase,
   PatientProfile,
   ReviewStatus,
-  ToolClassification,
 } from "@/api/types"
 import {
   useCaseDetail,
@@ -185,8 +184,8 @@ export function CaseDetail({ caseId }: { caseId: string }) {
           <AnnotationSidebar
             status={status}
             statusPending={setStatus.isPending}
-            onSetStatus={async (s) => {
-              await setStatus.mutateAsync({ caseId, status: s })
+            onSetStatus={async (s, policyVerdict) => {
+              await setStatus.mutateAsync({ caseId, status: s, policyVerdict })
             }}
             cases={(cases.data ?? []) as CaseIndexEntry[]}
             reviews={(reviews.data ?? []) as CaseReviewSummary[]}
@@ -734,51 +733,54 @@ function PathwaySection({
 
 function GroundTruthSection({ groundTruth }: { groundTruth: GroundTruth }) {
   return (
-    <Section title="Ground truth">
+    <Section title="Clinical policy specification">
       <div className="rounded-xl bg-accent/40 border border-accent/30 p-5 space-y-5">
-        <AnnotatableField
-          path="ground_truth.primary_diagnosis"
-          snippet={groundTruth.primary_diagnosis}
-        >
-          <div className="pr-6">
-            <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
-              Primary diagnosis
+        <div className="flex items-center justify-between gap-3">
+          <AnnotatableField
+            path="ground_truth.diagnosis"
+            snippet={groundTruth.diagnosis.accepted.join(", ")}
+          >
+            <div className="pr-6">
+              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
+                Accepted diagnosis
+              </div>
+              <div className="text-2xl font-semibold tracking-tight">
+                {groundTruth.diagnosis.accepted.join(" / ")}
+              </div>
+              {groundTruth.diagnosis.icd_codes.length > 0 && (
+                <span className="text-[11px] font-mono text-muted-foreground">
+                  ICD {groundTruth.diagnosis.icd_codes.join(", ")}
+                </span>
+              )}
             </div>
-            <div className="text-2xl font-semibold tracking-tight">
-              {groundTruth.primary_diagnosis}
-            </div>
-            {groundTruth.icd_code && (
-              <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-background border border-border text-[11px] font-mono">
-                ICD {groundTruth.icd_code}
-              </span>
-            )}
-          </div>
-        </AnnotatableField>
+          </AnnotatableField>
+          <span className="px-2 py-1 rounded-full border border-border text-[10px] uppercase">
+            {groundTruth.review_status}
+          </span>
+        </div>
 
-        {groundTruth.differential && groundTruth.differential.length > 0 && (
+        {groundTruth.differential.length > 0 && (
           <div>
             <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
               Differential
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {groundTruth.differential.map((d, i) => (
+              {groundTruth.differential.map((item, index) => (
                 <AnnotatableField
-                  key={i}
-                  path={`ground_truth.differential[${i}]`}
-                  snippet={d.diagnosis}
+                  key={index}
+                  path={`ground_truth.differential[${index}]`}
+                  snippet={item.diagnosis}
                   attachRight
                 >
-                  <div className="bg-card border border-border rounded-lg p-3 border-l-4 border-l-amber-500/60">
-                    <div className="flex items-center justify-between gap-2 mb-1 pr-4">
-                      <span className="font-medium text-sm">{d.diagnosis}</span>
-                      <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                        {d.likelihood}
+                  <div className="bg-card border border-border rounded-lg p-3 pr-6">
+                    <div className="flex justify-between gap-2 text-sm">
+                      <span className="font-medium">{item.diagnosis}</span>
+                      <span className="text-[10px] uppercase text-muted-foreground">
+                        {item.likelihood}
                       </span>
                     </div>
-                    {d.key_distinguishing && (
-                      <p className="text-xs text-muted-foreground leading-relaxed">
-                        {d.key_distinguishing}
-                      </p>
+                    {item.key_features && (
+                      <p className="text-xs text-muted-foreground mt-1">{item.key_features}</p>
                     )}
                   </div>
                 </AnnotatableField>
@@ -787,163 +789,63 @@ function GroundTruthSection({ groundTruth }: { groundTruth: GroundTruth }) {
           </div>
         )}
 
-        {groundTruth.optimal_actions && groundTruth.optimal_actions.length > 0 && (
-          <div>
-            <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
-              Optimal actions
-            </h4>
-            <ol className="space-y-1.5">
-              {groundTruth.optimal_actions.map((a, i) => (
-                <AnnotatableField
-                  key={a.step}
-                  path={`ground_truth.optimal_actions[${i}]`}
-                  snippet={a.action}
-                >
-                  <li className="flex items-start gap-3 text-sm leading-relaxed pr-6">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/15 text-primary text-xs font-semibold flex items-center justify-center">
-                      {a.step}
+        <div>
+          <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
+            Action criteria
+          </h4>
+          <div className="space-y-2">
+            {groundTruth.action_criteria.map((criterion, index) => (
+              <AnnotatableField
+                key={criterion.criterion_id}
+                path={`ground_truth.action_criteria[${index}]`}
+                snippet={criterion.label}
+                attachRight
+              >
+                <div className="bg-card border border-border rounded-lg p-3 pr-6">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-medium text-sm">{criterion.label}</span>
+                    <ActionTierBadge category={criterion.importance} />
+                    <span className="font-mono text-[10px] text-muted-foreground">
+                      {criterion.criterion_id}
                     </span>
-                    <div className="space-y-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span>{a.action}</span>
-                        {a.category && <ActionTierBadge category={a.category} />}
-                        {a.tool_name && (
-                          <span className="px-1.5 py-0.5 rounded bg-secondary text-[10px] font-mono">
-                            {a.tool_name}
-                          </span>
-                        )}
-                      </div>
-                      {a.expected_finding && (
-                        <p className="text-xs text-muted-foreground leading-relaxed">
-                          <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70">
-                            Expected ·{" "}
-                          </span>
-                          {a.expected_finding}
-                        </p>
-                      )}
-                      {a.tool_parameters &&
-                        Object.keys(a.tool_parameters).length > 0 && (
-                          <p className="text-[11px] font-mono text-muted-foreground/80 break-words">
-                            {formatParams(a.tool_parameters)}
-                          </p>
-                        )}
-                    </div>
-                  </li>
-                </AnnotatableField>
-              ))}
-            </ol>
+                  </div>
+                  <div className="mt-1 text-[11px] font-mono text-muted-foreground">
+                    {criterion.alternatives.map((alternative) =>
+                      `${alternative.tool_name}(${formatParams(alternative.required_arguments)})`,
+                    ).join(" OR ")}
+                  </div>
+                  {criterion.rationale && (
+                    <p className="text-xs text-muted-foreground mt-1">{criterion.rationale}</p>
+                  )}
+                </div>
+              </AnnotatableField>
+            ))}
           </div>
-        )}
+        </div>
 
-        {groundTruth.sequence_constraints &&
-          groundTruth.sequence_constraints.length > 0 && (
-            <div>
-              <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
-                Ordering constraints
-              </h4>
-              <div className="space-y-2">
-                {groundTruth.sequence_constraints.map((sc, i) => (
-                  <AnnotatableField
-                    key={i}
-                    path={`ground_truth.sequence_constraints[${i}]`}
-                    snippet={`${sc.before} → ${sc.after}`}
-                    attachRight
-                  >
-                    <div className="bg-card border border-border rounded-lg p-3 pr-6">
-                      <div className="flex items-center gap-2 flex-wrap text-sm">
-                        <span className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-secondary">
-                          {sc.before}
-                        </span>
-                        <span className="text-muted-foreground">→</span>
-                        <span className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-secondary">
-                          {sc.after}
-                        </span>
-                        <span
-                          className={cn(
-                            "ml-1 px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider border",
-                            sc.severity === "hard"
-                              ? "border-rose-500/40 bg-rose-500/10 text-rose-600 dark:text-rose-300"
-                              : "border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-300",
-                          )}
-                        >
-                          {sc.severity}
-                        </span>
-                      </div>
-                      <p className="text-xs text-muted-foreground leading-relaxed mt-1">
-                        {sc.reason}
-                      </p>
-                    </div>
-                  </AnnotatableField>
-                ))}
-              </div>
-            </div>
-          )}
-
-        {groundTruth.critical_actions &&
-          groundTruth.critical_actions.length > 0 && (
-            <ListGroup
-              title="Critical actions (musts)"
-              tone="success"
-              items={groundTruth.critical_actions}
-              basePath="ground_truth.critical_actions"
-            />
-          )}
-
-        {groundTruth.contraindicated_actions &&
-          groundTruth.contraindicated_actions.length > 0 && (
-            <ListGroup
-              title="Contraindicated"
-              tone="danger"
-              items={groundTruth.contraindicated_actions}
-              basePath="ground_truth.contraindicated_actions"
-            />
-          )}
-
-        {groundTruth.harmful_tools && groundTruth.harmful_tools.length > 0 && (
-          <ToolClassGroup
-            title="Harmful tools (safety)"
-            tone="danger"
-            items={groundTruth.harmful_tools}
-            basePath="ground_truth.harmful_tools"
-          />
-        )}
-
-        {groundTruth.useless_tools && groundTruth.useless_tools.length > 0 && (
-          <ToolClassGroup
-            title="Useless tools (low yield)"
-            tone="muted"
-            items={groundTruth.useless_tools}
-            basePath="ground_truth.useless_tools"
-          />
-        )}
-
-        {groundTruth.red_herrings && groundTruth.red_herrings.length > 0 && (
+        {groundTruth.avoided_actions.length > 0 && (
           <div>
             <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
-              Red herrings
+              Tests/actions to avoid
             </h4>
             <div className="space-y-2">
-              {groundTruth.red_herrings.map((rh, i) => (
+              {groundTruth.avoided_actions.map((criterion, index) => (
                 <AnnotatableField
-                  key={i}
-                  path={`ground_truth.red_herrings[${i}]`}
-                  snippet={rh.data_point}
+                  key={criterion.criterion_id}
+                  path={`ground_truth.avoided_actions[${index}]`}
+                  snippet={criterion.alternatives.map((item) => item.tool_name).join(" / ")}
                   attachRight
                 >
-                  <div className="border-2 border-dashed border-amber-500/40 rounded-lg p-3 bg-amber-500/5 pr-6">
-                    <div className="text-sm font-medium">{rh.data_point}</div>
-                    <div className="text-[11px] uppercase tracking-wider text-muted-foreground mt-1.5">
-                      Intended effect
+                  <div className="border border-rose-500/30 bg-rose-500/5 rounded-lg p-3 pr-6">
+                    <div className="flex gap-2 items-center">
+                      <span className="text-[10px] uppercase font-semibold text-rose-600">
+                        {criterion.severity}
+                      </span>
+                      <span className="font-mono text-[11px]">
+                        {criterion.alternatives.map((item) => item.tool_name).join(" OR ")}
+                      </span>
                     </div>
-                    <p className="text-sm text-foreground/90">
-                      {rh.intended_effect}
-                    </p>
-                    <div className="text-[11px] uppercase tracking-wider text-muted-foreground mt-2">
-                      Correct interpretation
-                    </div>
-                    <p className="text-sm text-foreground/90">
-                      {rh.correct_interpretation}
-                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">{criterion.rationale}</p>
                   </div>
                 </AnnotatableField>
               ))}
@@ -951,74 +853,108 @@ function GroundTruthSection({ groundTruth }: { groundTruth: GroundTruth }) {
           </div>
         )}
 
-        {groundTruth.key_reasoning_points &&
-          groundTruth.key_reasoning_points.length > 0 && (
-            <div className="rounded-lg bg-primary/5 border border-primary/15 p-4">
-              <h4 className="text-xs uppercase tracking-wider text-primary mb-2">
-                Teaching pearls
-              </h4>
-              <ul className="space-y-1.5 prose-serif text-sm leading-relaxed">
-                {groundTruth.key_reasoning_points.map((point, i) => (
-                  <AnnotatableField
-                    key={i}
-                    path={`ground_truth.key_reasoning_points[${i}]`}
-                    snippet={point}
-                  >
-                    <li className="pl-4 border-l-2 border-primary/30 pr-6">
-                      {point}
-                    </li>
-                  </AnnotatableField>
-                ))}
-              </ul>
+        {groundTruth.sequence_constraints.length > 0 && (
+          <div>
+            <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
+              Ordering constraints
+            </h4>
+            <div className="space-y-2">
+              {groundTruth.sequence_constraints.map((constraint, index) => (
+                <AnnotatableField
+                  key={index}
+                  path={`ground_truth.sequence_constraints[${index}]`}
+                  snippet={`${constraint.before_criterion_id} → ${constraint.after_criterion_id}`}
+                  attachRight
+                >
+                  <div className="bg-card border border-border rounded-lg p-3 pr-6 text-sm">
+                    <span className="font-mono text-[11px]">
+                      {constraint.before_criterion_id} → {constraint.after_criterion_id}
+                    </span>
+                    <span className="ml-2 text-[10px] uppercase text-muted-foreground">
+                      {constraint.severity}
+                    </span>
+                    <p className="text-xs text-muted-foreground mt-1">{constraint.reason}</p>
+                  </div>
+                </AnnotatableField>
+              ))}
             </div>
-          )}
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <AnnotatableField path="ground_truth.stop_rule" attachRight>
+            <div className="bg-card border border-border rounded-lg p-3 pr-6">
+              <h4 className="text-xs uppercase text-muted-foreground">Stop rule</h4>
+              <p className="text-xs mt-1">
+                Required first: {groundTruth.stop_rule.required_before_assessment.join(", ") || "none"}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Extra actions allowed: {groundTruth.stop_rule.max_additional_actions}
+              </p>
+            </div>
+          </AnnotatableField>
+          <AnnotatableField path="ground_truth.assessment" attachRight>
+            <div className="bg-card border border-border rounded-lg p-3 pr-6">
+              <h4 className="text-xs uppercase text-muted-foreground">Assessment contract</h4>
+              <p className="text-xs mt-1">
+                Required: {groundTruth.assessment.required_recommendations.join("; ") || "none"}
+              </p>
+              <p className="text-xs text-rose-600">
+                Prohibited: {groundTruth.assessment.prohibited_recommendations.join("; ") || "none"}
+              </p>
+            </div>
+          </AnnotatableField>
+        </div>
+
+        {groundTruth.key_clinical_evidence.length > 0 && (
+          <div className="rounded-lg bg-primary/5 border border-primary/15 p-4">
+            <h4 className="text-xs uppercase tracking-wider text-primary mb-2">
+              Key clinical evidence
+            </h4>
+            <ul className="space-y-1 text-sm">
+              {groundTruth.key_clinical_evidence.map((point, index) => (
+                <AnnotatableField
+                  key={index}
+                  path={`ground_truth.key_clinical_evidence[${index}]`}
+                  snippet={point}
+                >
+                  <li className="pl-3 border-l-2 border-primary/30 pr-6">{point}</li>
+                </AnnotatableField>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {groundTruth.red_herrings.length > 0 && (
+          <div>
+            <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
+              Red herrings
+            </h4>
+            <div className="space-y-2">
+              {groundTruth.red_herrings.map((item, index) => (
+                <AnnotatableField
+                  key={index}
+                  path={`ground_truth.red_herrings[${index}]`}
+                  snippet={item.data_point}
+                  attachRight
+                >
+                  <div className="border-2 border-dashed border-amber-500/40 rounded-lg p-3 pr-6">
+                    <div className="text-sm font-medium">{item.data_point}</div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {item.correct_interpretation}
+                    </p>
+                  </div>
+                </AnnotatableField>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </Section>
   )
 }
 
-function ListGroup({
-  title,
-  items,
-  tone,
-  basePath,
-}: {
-  title: string
-  items: string[]
-  tone: "success" | "danger"
-  basePath: string
-}) {
-  const toneClasses =
-    tone === "success"
-      ? "border-emerald-500/40 bg-emerald-500/5 text-emerald-700 dark:text-emerald-300"
-      : "border-rose-500/40 bg-rose-500/5 text-rose-700 dark:text-rose-300"
-  return (
-    <div>
-      <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
-        {title}
-      </h4>
-      <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
-        {items.map((item, i) => (
-          <AnnotatableField
-            key={i}
-            path={`${basePath}[${i}]`}
-            snippet={item}
-            attachRight
-          >
-            <li
-              className={cn(
-                "text-sm p-2.5 border rounded-md leading-relaxed pr-6",
-                toneClasses,
-              )}
-            >
-              {item}
-            </li>
-          </AnnotatableField>
-        ))}
-      </ul>
-    </div>
-  )
-}
+
 
 function formatDuration(seconds: number): string {
   if (seconds < 60) return `${seconds}s`
@@ -1063,59 +999,7 @@ function formatParams(params: Record<string, unknown>): string {
     .join(" · ")
 }
 
-function ToolClassGroup({
-  title,
-  items,
-  tone,
-  basePath,
-}: {
-  title: string
-  items: ToolClassification[]
-  tone: "danger" | "muted"
-  basePath: string
-}) {
-  const toneClasses =
-    tone === "danger"
-      ? "border-rose-500/40 bg-rose-500/5"
-      : "border-border bg-secondary/30"
-  return (
-    <div>
-      <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
-        {title}
-      </h4>
-      <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
-        {items.map((t, i) => (
-          <AnnotatableField
-            key={i}
-            path={`${basePath}[${i}]`}
-            snippet={t.tool_name}
-            attachRight
-          >
-            <li
-              className={cn(
-                "text-sm p-2.5 border rounded-md leading-relaxed pr-6",
-                toneClasses,
-              )}
-            >
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-secondary">
-                  {t.tool_name}
-                </span>
-                {t.tool_parameters &&
-                  Object.keys(t.tool_parameters).length > 0 && (
-                    <span className="text-[11px] font-mono text-muted-foreground/80 break-words">
-                      {formatParams(t.tool_parameters)}
-                    </span>
-                  )}
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">{t.rationale}</p>
-            </li>
-          </AnnotatableField>
-        ))}
-      </ul>
-    </div>
-  )
-}
+
 
 function MetadataSection({ metadata }: { metadata: Record<string, unknown> }) {
   if (!metadata || Object.keys(metadata).length === 0) return null

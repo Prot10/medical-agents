@@ -3,48 +3,866 @@
   "condition": "hepatic_encephalopathy",
   "difficulty": "moderate",
   "encounter_type": "emergency",
-  "patient": {
-    "patient_id": "NB-HEP-ENC-M03",
-    "demographics": {
-      "age": 57,
-      "sex": "female",
-      "handedness": "right",
-      "ethnicity": "African American",
-      "bmi": 31.2
+  "fallback_tool_outputs": {
+    "advanced_imaging": {
+      "findings": [],
+      "impression": "No abnormality identified.",
+      "modality": "",
+      "quantitative_data": null,
+      "recommended_actions": [],
+      "tracer_or_protocol": null
     },
-    "clinical_history": {
-      "past_medical_history": [
-        "Hepatitis C-related cirrhosis (Child-Pugh B, MELD 12)",
-        "Recently completed direct-acting antiviral therapy (sofosbuvir/velpatasvir, SVR12 confirmed 2 months ago)",
-        "Hypertension",
-        "Hypothyroidism"
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "events": [],
+      "findings": [
+        "Rare isolated premature ventricular complexes (under 1% burden), benign. No sustained arrhythmia, no pauses greater than 2 seconds, no AV block."
       ],
-      "medications": [
+      "heart_rate_range": {
+        "average": 72,
+        "max": 126,
+        "min": 49
+      },
+      "impression": "24-hour Holter monitor with only benign findings.",
+      "monitor_type": "holter_24h",
+      "recommended_actions": [],
+      "rhythm_summary": "Predominant sinus rhythm throughout the recording"
+    },
+    "csf": {
+      "appearance": "clear and colourless",
+      "cell_count": {
+        "rbc": "0 /uL",
+        "wbc": "2 /uL"
+      },
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose.",
+      "opening_pressure": "16 cm H2O",
+      "protein": "38 mg/dL",
+      "special_tests": {}
+    },
+    "ct": null,
+    "drug_interactions": null,
+    "ecg": {
+      "axis": "normal",
+      "clinical_correlation": "",
+      "findings": [
+        "Normal sinus rhythm. Normal axis and intervals. No acute ST-T changes."
+      ],
+      "interpretation": "Normal ECG",
+      "intervals": {
+        "PR": "172 ms",
+        "QRS": "89 ms",
+        "QTc": "400 ms"
+      },
+      "rate": 65,
+      "rhythm": "normal sinus rhythm"
+    },
+    "echo": {
+      "chambers": {
+        "LA": "normal size",
+        "LV": "normal size and systolic function",
+        "RA": "normal size",
+        "RV": "normal size and function"
+      },
+      "ejection_fraction": 60.0,
+      "findings": [
+        "Trace mitral regurgitation, physiological. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Structurally near-normal heart with a benign incidental finding.",
+      "recommended_actions": [],
+      "valves": {
+        "aortic": "structurally normal",
+        "mitral": "structurally normal",
+        "pulmonic": "normal",
+        "tricuspid": "normal"
+      },
+      "wall_motion": "no regional wall-motion abnormality"
+    },
+    "eeg": null,
+    "labs": null,
+    "literature_search": null,
+    "mri": {
+      "additional_observations": [],
+      "findings": [],
+      "impression": "No acute intracranial abnormality. No mass, haemorrhage, midline shift, or restricted diffusion. Ventricles and sulci appropriate for age.",
+      "recommended_actions": [],
+      "volumetrics": null
+    },
+    "specialized_test": {
+      "findings": [],
+      "impression": "Study within normal limits.",
+      "quantitative_data": null,
+      "recommended_actions": [],
+      "test_type": ""
+    }
+  },
+  "followup_outputs": [
+    {
+      "output": {
+        "abnormal_values_summary": [
+          "Ammonia: 72 \u2192 44 \u00b5mol/L (improving, now within normal limits)"
+        ],
+        "interpretation": "Abnormal values: Ammonia (admission) 72 \u00b5mol/L (H).",
+        "panels": {
+          "Ammonia_Trend": [
+            {
+              "is_abnormal": true,
+              "reference_range": "11-51",
+              "test": "Ammonia (admission)",
+              "unit": "\u00b5mol/L",
+              "value": 72
+            },
+            {
+              "is_abnormal": false,
+              "reference_range": "11-51",
+              "test": "Ammonia (48h post-lactulose increase + rifaximin)",
+              "unit": "\u00b5mol/L",
+              "value": 44
+            }
+          ]
+        }
+      },
+      "tool_name": "interpret_labs",
+      "trigger_action": "request_lactulose_rifaximin"
+    },
+    {
+      "output": {
+        "alternatives": [
+          "Levothyroxine 112 mcg daily as dose increase; recheck TSH/free T4 in 6-8 weeks"
+        ],
+        "contraindications": [
+          "Avoid dose increase >25 mcg per step in patients >50 years \u2014 risk of atrial fibrillation"
+        ],
+        "formulary_status": "Levothyroxine 112 mcg daily (increase from 88 mcg)",
+        "interactions": [
+          "Levothyroxine absorption affected by calcium, iron, cholestyramine \u2014 take on empty stomach 30 min before food",
+          "Cirrhosis reduces T4-binding globulin \u2014 free T4 may be lower than TSH suggests"
+        ],
+        "proposed": "Increase levothyroxine for undertreated hypothyroidism (TSH 8.4, free T4 0.7)",
+        "warnings": [
+          "Hypothyroidism independently causes encephalopathy \u2014 contributing to HE picture; treat both concurrently"
+        ]
+      },
+      "tool_name": "check_drug_interactions",
+      "trigger_action": "request_thyroid_treatment"
+    },
+    {
+      "output": {
+        "abnormal_values_summary": [
+          "PMN 45 cells/mm3 (within normal limits)"
+        ],
+        "interpretation": "All values within normal limits.",
+        "panels": {
+          "Ascitic_Fluid": [
+            {
+              "is_abnormal": false,
+              "reference_range": "<250",
+              "test": "PMN count",
+              "unit": "cells/mm3",
+              "value": 45
+            },
+            {
+              "is_abnormal": false,
+              "reference_range": ">1.1 = portal hypertension",
+              "test": "SAAG",
+              "unit": "g/dL",
+              "value": 1.6
+            },
+            {
+              "is_abnormal": false,
+              "reference_range": "negative",
+              "test": "Ascitic fluid culture",
+              "unit": "",
+              "value": "No growth"
+            }
+          ]
+        }
+      },
+      "tool_name": "interpret_labs",
+      "trigger_action": "request_sbp_paracentesis"
+    },
+    {
+      "output": {
+        "alternatives": [
+          "Continue methadone at current dose; recheck level if encephalopathy worsens after HE treatment"
+        ],
+        "contraindications": [
+          "No dose reduction needed currently \u2014 therapeutic level confirmed"
+        ],
+        "interactions": [
+          "Methadone is hepatically metabolized \u2014 in cirrhosis, half-life may be prolonged; check serum level",
+          "Methadone level 0.28 mg/L \u2014 therapeutic range; no evidence of accumulation",
+          "Rifaximin does not significantly interact with methadone"
+        ],
+        "proposed": "Review methadone safety in cirrhosis \u2014 evaluate for contribution to cognitive changes",
+        "warnings": [
+          "Monitor for methadone accumulation if hepatic function worsens (MELD rising)",
+          "QTc monitoring recommended for methadone in any patient \u2014 QTc was not measured at admission; order ECG"
+        ]
+      },
+      "tool_name": "check_drug_interactions",
+      "trigger_action": "check_methadone_hep_interaction"
+    },
+    {
+      "output": {
+        "query": "Hepatic encephalopathy after HCV SVR cirrhosis \u2014 does SVR eliminate HE risk",
+        "results": [
+          {
+            "summary": "SVR significantly reduces but does not eliminate risk of hepatic decompensation including HE in patients with established cirrhosis. Cirrhosis may partially reverse (Child-Pugh improvement) but portal hypertension may persist. HE risk remains, particularly with additional precipitants (constipation, infection, drugs). Lifelong surveillance and HE prophylaxis may be needed in cirrhotic patients even after SVR.",
+            "title": "Risk of hepatic decompensation after SVR in HCV-related cirrhosis"
+          }
+        ],
+        "summary": ""
+      },
+      "tool_name": "search_medical_literature",
+      "trigger_action": "search_hcv_svr_he_risk"
+    },
+    {
+      "output": {
+        "cell_counts": null,
+        "collected_before_antimicrobials": true,
+        "findings": [
+          {
+            "result": "No growth reported at the time of this encounter",
+            "test": "culture"
+          }
+        ],
+        "gram_stain": null,
+        "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
+        "organism": null,
+        "recommended_actions": [],
+        "specimen": "urine",
+        "susceptibility": null,
+        "tests": [
+          "culture",
+          "microscopy",
+          "susceptibility"
+        ]
+      },
+      "tool_name": "order_microbiology",
+      "trigger_action": "request_urine_specimen"
+    }
+  ],
+  "ground_truth": {
+    "action_criteria": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "CBC",
+                "CMP",
+                "ammonia",
+                "magnesium",
+                "lactate",
+                "coagulation",
+                "TSH",
+                "zinc",
+                "toxicology"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[AASLD_2014]",
+          "AASLD/EASL 2014 HE practice guideline"
+        ],
+        "criterion_id": "action-1-interpret-labs",
+        "expected_evidence": "Metabolic, infectious, endocrine, nutritional or toxic precipitant, interpreted with ammonia as supportive rather than a severity marker.",
+        "importance": "required",
+        "label": "Obtain the core HE/precipitant panel: CBC, electrolytes/renal/liver function, glucose, ammonia, magnesium, lactate, INR/coagulation, CRP, TSH, zinc and blood alcohol/urine drug screen; add phenotype-specific tests only when indicated.",
+        "rationale": "Obtain the core HE/precipitant panel: CBC, electrolytes/renal/liver function, glucose, ammonia, magnesium, lactate, INR/coagulation, CRP, TSH, zinc and blood alcohol/urine drug screen; add phenotype-specific tests only when indicated."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_ct_scan"
+          }
+        ],
+        "citations": [
+          "[AASLD_2014]",
+          "AASLD/EASL 2014 HE practice guideline"
+        ],
+        "criterion_id": "action-2-order-ct-scan",
+        "expected_evidence": "No acute intracranial process; mild atrophy \u2014 structural cause excluded.",
+        "importance": "optional",
+        "label": "Non-contrast CT head \u2014 exclude structural alternate cause of AMS (hemorrhage, large stroke, mass) before any LP.",
+        "rationale": "Non-contrast CT head \u2014 exclude structural alternate cause of AMS (hemorrhage, large stroke, mass) before any LP."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[AASLD_2014]",
+          "AASLD/EASL 2014 HE practice guideline"
+        ],
+        "criterion_id": "action-3-search-medical-literature",
+        "expected_evidence": "AASLD/EASL 2014 guidance retrieved; West Haven criteria and precipitant-driven management framework confirmed.",
+        "importance": "required",
+        "label": "Literature/guideline search to confirm West Haven grading, precipitant management, and lactulose/rifaximin dosing (AASLD/EASL HE management; antibiotic-induced gut flora disruption and HE; hypothyroidism cognitive effects).",
+        "rationale": "Literature/guideline search to confirm West Haven grading, precipitant management, and lactulose/rifaximin dosing (AASLD/EASL HE management; antibiotic-induced gut flora disruption and HE; hypothyroidism cognitive effects)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [
+          "[Bajaj_2011]",
+          "Bajaj 2011 HE management review"
+        ],
+        "criterion_id": "action-4-check-drug-interactions",
+        "expected_evidence": "Sedating/CNS-depressant medications identified; lactulose and rifaximin reviewed for hepatic dose adjustment.",
+        "importance": "required",
+        "label": "Drug-interaction and medication-reconciliation review covering TMP-SMX, levothyroxine, lactulose, rifaximin \u2014 review TMP-SMX completion and consider alternative antibiotic next time; reconcile thyroid replacement; flag any CNS depressants (benzodiazepines, opioids, sedating antiemetics, antihistamines) and confirm lactulose/rifaximin dosing in liver disease.",
+        "rationale": "Drug-interaction and medication-reconciliation review covering TMP-SMX, levothyroxine, lactulose, rifaximin \u2014 review TMP-SMX completion and consider alternative antibiotic next time; reconcile thyroid replacement; flag any CNS depressants (benzodiazepines, opioids, sedating antiemetics, antihistamines) and confirm lactulose/rifaximin dosing in liver disease."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_eeg"
+          }
+        ],
+        "citations": [
+          "[Ferenci_2002]",
+          "Ferenci 2002 HE nomenclature/quantification"
+        ],
+        "criterion_id": "action-6-analyze-eeg",
+        "expected_evidence": "Generalized slowing if obtained; non-specific.",
+        "importance": "recommended",
+        "label": "EEG \u2014 consider only if alternate diagnosis suspected or no improvement with lactulose. Triphasic waves are classic but non-specific (metabolic encephalopathies broadly); main role is exclusion of non-convulsive status epilepticus where the differential supports it.",
+        "rationale": "EEG \u2014 consider only if alternate diagnosis suspected or no improvement with lactulose. Triphasic waves are classic but non-specific (metabolic encephalopathies broadly); main role is exclusion of non-convulsive status epilepticus where the differential supports it."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "before_antimicrobials": true,
+              "specimen": "blood_culture",
+              "tests": [
+                "culture",
+                "gram_stain",
+                "susceptibility"
+              ]
+            },
+            "tool_name": "order_microbiology"
+          }
+        ],
+        "citations": [
+          "[AASLD_2014]",
+          "AASLD/EASL 2014 HE practice guideline"
+        ],
+        "criterion_id": "action-7-order-microbiology",
+        "expected_evidence": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started",
+        "importance": "required",
+        "label": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
+        "rationale": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "before_antimicrobials": true,
+              "specimen": "urine",
+              "tests": [
+                "culture",
+                "microscopy",
+                "susceptibility"
+              ]
+            },
+            "tool_name": "order_microbiology"
+          }
+        ],
+        "citations": [
+          "[AASLD_2014]",
+          "AASLD/EASL 2014 HE practice guideline"
+        ],
+        "criterion_id": "action-8-order-microbiology",
+        "expected_evidence": "Pyuria and bacteriuria identify a urinary source; a negative result removes it from the list of precipitants",
+        "importance": "required",
+        "label": "Send urine for microscopy and culture as part of the infection screen",
+        "rationale": "Send urine for microscopy and culture as part of the infection screen"
+      }
+    ],
+    "assessment": {
+      "prohibited_recommendations": [
+        "Do not prescribe benzodiazepines for anxiety/agitation \u2014 they precipitate and prolong HE (use haloperidol or non-pharmacologic measures for agitation).",
+        "Do not prescribe sedating opioids \u2014 they worsen HE; consider acetaminophen at hepatic-safe dosing for pain.",
+        "Do not perform LP before neuroimaging excludes mass effect when the patient has altered mental status.",
+        "Do not stop rifaximin out of concern for antibiotic interaction with TMP-SMX \u2014 rifaximin is non-absorbable and essential for HE control."
+      ],
+      "required_recommendations": [
+        "Lactulose 30 mL TID-QID titrated to 2-4 soft stools/day \u2014 address the constipation precipitant directly.",
+        "Rifaximin 550 mg BID \u2014 restart if interrupted.",
+        "Adjust levothyroxine dose for elevated TSH after acute illness resolves and recheck in 6 weeks.",
+        "Counsel about avoiding TMP-SMX and other broad-spectrum antibiotics that disrupt gut flora when possible."
+      ]
+    },
+    "avoided_actions": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_echocardiogram"
+          }
+        ],
+        "citations": [
+          "[AASLD_2014]"
+        ],
+        "criterion_id": "avoid-waste-1-order-echocardiogram",
+        "rationale": "No clinical suspicion for hepatopulmonary syndrome, portopulmonary hypertension, or endocarditis; echocardiography is not part of the HE workup.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "amyloid_PET"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[AASLD_2014]"
+        ],
+        "criterion_id": "avoid-waste-2-order-advanced-imaging",
+        "rationale": "Amyloid PET has no role in HE workup; reversible metabolic encephalopathy is the issue, not Alzheimer pathology.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "DaTscan"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[AASLD_2014]"
+        ],
+        "criterion_id": "avoid-waste-3-order-advanced-imaging",
+        "rationale": "DaTscan has no role in HE workup; the question is metabolic encephalopathy, not nigrostriatal degeneration.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "genetic_panel:early_onset_AD"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[AASLD_2014]"
+        ],
+        "criterion_id": "avoid-waste-4-order-specialized-test",
+        "rationale": "Early-onset AD genetic panel has no role in HE workup; reversible metabolic encephalopathy is the diagnosis under consideration.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "vep"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[AASLD_2014]"
+        ],
+        "criterion_id": "avoid-waste-5-order-specialized-test",
+        "rationale": "Visual evoked potentials have no role in HE workup; no demyelinating process is on the differential.",
+        "severity": "waste"
+      }
+    ],
+    "diagnosis": {
+      "accepted": [
+        "Hepatic encephalopathy (West Haven grade II), HCV cirrhosis post-SVR (Child-Pugh B, MELD 12) \u2014 precipitated by constipation and recent TMP-SMX antibiotic use (gut microbiome disruption reducing lactulose/rifaximin efficacy); undertreated hypothyroidism is a contributing cognitive factor."
+      ],
+      "icd_codes": [
+        "K72.90"
+      ]
+    },
+    "differential": [
+      {
+        "diagnosis": "Hypothyroid encephalopathy / myxedema-related cognitive impairment",
+        "icd_code": "E03.5",
+        "key_features": "TSH elevated \u2014 hypothyroidism contributes to cognitive slowing but does not produce asterixis or rapid lactulose response; treat both.",
+        "likelihood": "moderate"
+      },
+      {
+        "diagnosis": "Drug-induced encephalopathy (TMP-SMX or other recent medication)",
+        "icd_code": "G92",
+        "key_features": "TMP-SMX rarely causes direct CNS toxicity; main role is gut flora disruption that reduces lactulose efficacy.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Spontaneous bacterial peritonitis",
+        "icd_code": "K65.2",
+        "key_features": "Diagnostic paracentesis to exclude if ascites present.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Recurrent HCV / cirrhosis decompensation despite SVR",
+        "icd_code": "B18.2",
+        "key_features": "SVR12 confirmed but cirrhosis morphology persists; portal hypertension still drives HE susceptibility.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Mild cognitive impairment / neurodegenerative process",
+        "icd_code": "G31.84",
+        "key_features": "Acute 3-day course with reversibility makes neurodegeneration unlikely; PHES testing later if minimal HE concern persists.",
+        "likelihood": "very_low"
+      }
+    ],
+    "key_clinical_evidence": [
+      "HE is a clinical diagnosis: West Haven grading + evidence of liver dysfunction + exclusion of other causes of AMS \u2014 ammonia level is supportive only and correlates poorly with grade (AASLD 2014).",
+      "Precipitant identification is more actionable than the ammonia number: infection (SBP especially), GI bleed, electrolyte disturbance (hypokalemia/hyponatremia), constipation, sedative/CNS-depressant use, dehydration, dietary protein load, renal failure.",
+      "SVR12 cures HCV but does not reverse established cirrhosis morphology or portal hypertension \u2014 patients remain at HE risk and require ongoing surveillance.",
+      "Broad-spectrum antibiotics disrupt the gut microbiome on which lactulose/rifaximin efficacy depends; this is an under-recognized HE precipitant."
+    ],
+    "red_herrings": [
+      {
+        "correct_interpretation": "SVR cures HCV viremia but cirrhosis and portal hypertension persist; HE risk continues for years post-SVR.",
+        "data_point": "HCV cured with SVR12 confirmed",
+        "field_path": "patient.clinical_history.past_medical_history[1]",
+        "intended_effect": "Dismiss HE as 'liver disease is cured'.",
+        "location": "patient.clinical_history.past_medical_history"
+      },
+      {
+        "correct_interpretation": "Hypothyroidism contributes to cognitive slowing but does not produce asterixis or respond to lactulose; treat HE concurrently.",
+        "data_point": "Elevated TSH (undertreated hypothyroidism)",
+        "field_path": "initial_tool_outputs.labs.panels",
+        "intended_effect": "Attribute confusion entirely to hypothyroidism.",
+        "location": "initial_tool_outputs.labs"
+      }
+    ],
+    "review_status": "draft",
+    "sequence_constraints": []
+,
+    "stop_rule": {
+      "max_additional_actions": 0,
+      "required_before_assessment": [
+        "action-1-interpret-labs",
+        "action-3-search-medical-literature",
+        "action-4-check-drug-interactions",
+        "action-7-order-microbiology",
+        "action-8-order-microbiology"
+      ]
+    }
+  },
+  "initial_tool_outputs": {
+    "ct": {
+      "additional_observations": [],
+      "angiography_findings": null,
+      "contrast_used": false,
+      "findings": [],
+      "impression": "No acute intracranial abnormality. Mild non-specific cortical atrophy. No hemorrhage, mass, midline shift, or restricted diffusion",
+      "recommended_actions": []
+    },
+    "eeg": {
+      "activating_procedures": {},
+      "artifacts": [],
+      "background": {
+        "amplitude": "Low-moderate amplitude (40-70 \u00b5V)",
+        "dominant_rhythm": "Generalized theta slowing 5-7 Hz; occasional delta bursts",
+        "organization": "Mildly disorganized",
+        "symmetry": "Symmetric"
+      },
+      "classification": "abnormal",
+      "findings": [
         {
-          "drug": "Spironolactone",
-          "dose": "50 mg",
-          "frequency": "once daily",
-          "indication": "Mild ascites"
+          "clinical_correlation": "",
+          "frequency": "5-7 Hz",
+          "location": "Diffuse",
+          "morphology": "Irregular theta activity; no organized background; absent posterior dominant rhythm",
+          "state": "Continuous",
+          "type": "Generalized theta slowing"
         },
         {
-          "drug": "Levothyroxine",
-          "dose": "88 mcg",
-          "frequency": "once daily",
-          "indication": "Hypothyroidism"
+          "clinical_correlation": "",
+          "frequency": "N/A",
+          "location": "N/A",
+          "morphology": "No triphasic morphology identified in this recording",
+          "state": "Absent",
+          "type": "No triphasic waves identified"
         },
         {
-          "drug": "Amlodipine",
-          "dose": "10 mg",
-          "frequency": "once daily",
-          "indication": "Hypertension"
-        },
-        {
-          "drug": "Lactulose",
-          "dose": "20 mL",
-          "frequency": "twice daily",
-          "indication": "HE prophylaxis"
+          "clinical_correlation": "",
+          "frequency": "N/A",
+          "location": "N/A",
+          "morphology": "No spikes, sharp waves, or NCSE pattern",
+          "state": "Absent",
+          "type": "No epileptiform discharges"
         }
       ],
+      "impression": "This is an ABNORMAL EEG due to: 1. Generalized theta slowing at 5\u20137 Hz with occasional delta bursts, mildly disorganized background, absent posterior dominant rhythm. No triphasic waves identified. No epileptiform discharges. No electrographic seizures recorded",
+      "limitations": "",
+      "recommended_actions": []
+    },
+    "labs": {
+      "abnormal_values_summary": [
+        "Ammonia 72 \u00b5mol/L",
+        "TSH 8.4 (hypothyroid)",
+        "Free T4 0.7 (low)",
+        "Albumin 2.8",
+        "INR 1.4",
+        "Sodium 134",
+        "Platelets 104"
+      ],
+      "interpretation": "Abnormal values: Hemoglobin 11.4 g/dL (L), Platelets 104 x10^9/L (L), Sodium 134 mEq/L (L), AST 68 U/L (H), Total bilirubin 2.2 mg/dL (H), Albumin 2.8 g/dL (L), INR 1.4 (H), Ammonia 72 \u00b5mol/L (H), TSH 8.4 \u00b5IU/mL (H), Free T4 0.7 ng/dL (L).",
+      "panels": {
+        "BMP": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "136-145",
+            "test": "Sodium",
+            "unit": "mEq/L",
+            "value": 134
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "3.5-5.0",
+            "test": "Potassium",
+            "unit": "mEq/L",
+            "value": 4.1
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "0.6-1.1",
+            "test": "Creatinine",
+            "unit": "mg/dL",
+            "value": 0.9
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "7-20",
+            "test": "BUN",
+            "unit": "mg/dL",
+            "value": 14
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "70-100",
+            "test": "Glucose",
+            "unit": "mg/dL",
+            "value": 92
+          }
+        ],
+        "CBC": [
+          {
+            "is_abnormal": false,
+            "reference_range": "4.5-11.0",
+            "test": "WBC",
+            "unit": "x10^9/L",
+            "value": 6.2
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "12.0-16.0",
+            "test": "Hemoglobin",
+            "unit": "g/dL",
+            "value": 11.4
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "150-400",
+            "test": "Platelets",
+            "unit": "x10^9/L",
+            "value": 104
+          }
+        ],
+        "Exclusion studies": [
+          {
+            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on",
+            "is_abnormal": false,
+            "reference_range": "",
+            "test": "magnesium",
+            "unit": "",
+            "value": "Within reference range"
+          },
+          {
+            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on",
+            "is_abnormal": false,
+            "reference_range": "",
+            "test": "lactate",
+            "unit": "",
+            "value": "Within reference range"
+          }
+        ],
+        "LFTs": [
+          {
+            "is_abnormal": true,
+            "reference_range": "10-40",
+            "test": "AST",
+            "unit": "U/L",
+            "value": 68
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "7-56",
+            "test": "ALT",
+            "unit": "U/L",
+            "value": 44
+          },
+          {
+            "is_abnormal": true,
+            "reference_range": "0.2-1.2",
+            "test": "Total bilirubin",
+            "unit": "mg/dL",
+            "value": 2.2
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "3.5-5.0",
+            "test": "Albumin",
+            "unit": "g/dL",
+            "value": 2.8
+          },
+          {
+            "is_abnormal": true,
+            "reference_range": "<1.2",
+            "test": "INR",
+            "unit": "",
+            "value": 1.4
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "11-51",
+            "test": "Ammonia",
+            "unit": "\u00b5mol/L",
+            "value": 72
+          }
+        ],
+        "TSH": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.4-4.0",
+            "test": "TSH",
+            "unit": "mIU/L",
+            "value": 2.1
+          }
+        ],
+        "Thyroid": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "0.4-4.0",
+            "test": "TSH",
+            "unit": "\u00b5IU/mL",
+            "value": 8.4
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "0.8-1.8",
+            "test": "Free T4",
+            "unit": "ng/dL",
+            "value": 0.7
+          }
+        ],
+        "Toxicology": [
+          {
+            "is_abnormal": false,
+            "reference_range": "Methadone maintenance \u2014 expected",
+            "test": "Urine drug screen",
+            "unit": "",
+            "value": "Positive opioids (methadone metabolite)"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Therapeutic 0.15-0.60 mg/L",
+            "test": "Serum methadone level",
+            "unit": "mg/L",
+            "value": 0.28
+          }
+        ],
+        "Zinc": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "60-120",
+            "test": "Serum zinc",
+            "unit": "\u00b5g/dL",
+            "value": 82
+          }
+        ]
+      }
+    },
+    "microbiology": {
+      "cell_counts": null,
+      "collected_before_antimicrobials": true,
+      "findings": [
+        {
+          "result": "No growth reported at the time of this encounter",
+          "test": "culture"
+        }
+      ],
+      "gram_stain": null,
+      "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
+      "organism": null,
+      "recommended_actions": [],
+      "specimen": "blood_culture",
+      "susceptibility": null,
+      "tests": [
+        "culture",
+        "gram_stain",
+        "susceptibility"
+      ]
+    }
+  },
+  "metadata": {
+    "authoring_agent": "condition-expert:HEP-ENC",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "condition_full_name": "Hepatic encephalopathy",
+    "criteria_pack_version": "1.0",
+    "difficulty_description": "Moderate HE post-HCV SVR: TMP-SMX as unrecognized precipitant disrupting gut flora, undertreated hypothyroidism contributing, methadone red herring, EEG without classic triphasic waves",
+    "difficulty_rationale": "4 required tools and 2 recommended; 2 grounded distractors (post-SVR 'cure' framing, elevated TSH); identifying TMP-SMX as a precipitant requires medication-history synthesis with mechanism.",
+    "expected_agent_confidence": 0.61,
+    "fallback_tool_kinds": {
+      "advanced_imaging": "normal",
+      "cardiac_monitoring": "incidental",
+      "csf": "normal",
+      "ecg": "normal",
+      "echo": "incidental",
+      "mri": "normal",
+      "specialized_test": "normal"
+    },
+    "generated_by": "claude-sonnet-4-6",
+    "generation_method": "synthetic_from_schema",
+    "last_revised": "2026-08-10",
+    "policy_spec_status": "draft",
+    "revision_reason": "Reviewer 2 HE audit: core endocrine, zinc and toxicology studies are now named in the order and available in the laboratory output; phenotype-specific additions retained.",
+    "source": "synthetic",
+    "source_license": null,
+    "source_pmcid": null,
+    "version": "policy-v1",
+    "vocab_gap": []
+  },
+  "patient": {
+    "chief_complaint": "Daughter noticed increased confusion and word-finding difficulty for 3 days",
+    "clinical_history": {
       "allergies": [
         "Codeine (nausea)"
       ],
@@ -52,799 +870,73 @@
         "Mother: hypertension",
         "No family history of liver disease"
       ],
+      "medications": [
+        {
+          "dose": "50 mg",
+          "drug": "Spironolactone",
+          "frequency": "once daily",
+          "indication": "Mild ascites"
+        },
+        {
+          "dose": "88 mcg",
+          "drug": "Levothyroxine",
+          "frequency": "once daily",
+          "indication": "Hypothyroidism"
+        },
+        {
+          "dose": "10 mg",
+          "drug": "Amlodipine",
+          "frequency": "once daily",
+          "indication": "Hypertension"
+        },
+        {
+          "dose": "20 mL",
+          "drug": "Lactulose",
+          "frequency": "twice daily",
+          "indication": "HE prophylaxis"
+        }
+      ],
+      "past_medical_history": [
+        "Hepatitis C-related cirrhosis (Child-Pugh B, MELD 12)",
+        "Recently completed direct-acting antiviral therapy (sofosbuvir/velpatasvir, SVR12 confirmed 2 months ago)",
+        "Hypertension",
+        "Hypothyroidism"
+      ],
       "social_history": {
-        "occupation": "Hospital dietary worker",
+        "alcohol": "Denies \u2014 HCV acquired via prior IV drug use 20 years ago; on stable methadone maintenance for opioid use disorder",
         "education": "Some college",
         "living_situation": "Lives with adult daughter",
-        "tobacco": "Never",
-        "alcohol": "Denies — HCV acquired via prior IV drug use 20 years ago; on stable methadone maintenance for opioid use disorder"
+        "occupation": "Hospital dietary worker",
+        "tobacco": "Never"
       }
     },
+    "demographics": {
+      "age": 57,
+      "bmi": 31.2,
+      "ethnicity": "African American",
+      "handedness": "right",
+      "sex": "female"
+    },
+    "history_present_illness": "Ms. D. is a 57-year-old woman with HCV-related cirrhosis who achieved sustained virologic response 2 months ago with direct-acting antiviral therapy, presenting at her daughter's insistence with a 3-day history of increasing confusion, word-finding difficulty, and personality change. The daughter noted her mother had been more forgetful, had missed two medication doses this week, was having difficulty balancing her checkbook (which she typically manages perfectly), and had been sleeping 12-14 hours per day. The patient herself minimized symptoms. She was afebrile and hemodynamically stable. She denied hematemesis or melena. She denied changes in her methadone dose or missed doses. Review of systems was positive for mild abdominal discomfort over the prior week and constipation. Her last bowel movement was 4 days ago. She had been started on trimethoprim-sulfamethoxazole (TMP-SMX) one week ago by her primary care physician for a urinary tract infection.",
     "neurological_exam": {
-      "mental_status": "GCS 13 (E3V4M6). Oriented to person and place; disoriented to time. Slow but coherent speech. Subtle asterixis bilaterally. Anxious affect. Number Connection Test mildly impaired (34 seconds, threshold 29 seconds).",
-      "cranial_nerves": "Pupils 3 mm, equal, briskly reactive. Extraocular movements full. No nystagmus. Facial symmetry intact. Gag present.",
-      "motor": "Strength 5/5 all extremities. Tone normal. No myoclonus.",
-      "sensory": "Intact to light touch and pinprick.",
-      "reflexes": "DTRs 2+ throughout. Plantar reflexes flexor.",
+      "additional": "Mild jaundice. Mild ascites on exam. No spider angiomata. No caput medusae. Methadone 80 mg/day \u2014 taken this morning per patient report.",
       "coordination": "Mildly slowed but intact on finger-nose. No truncal ataxia.",
+      "cranial_nerves": "Pupils 3 mm, equal, briskly reactive. Extraocular movements full. No nystagmus. Facial symmetry intact. Gag present.",
       "gait": "Mildly unsteady with slight widened base. No falls during testing.",
-      "additional": "Mild jaundice. Mild ascites on exam. No spider angiomata. No caput medusae. Methadone 80 mg/day — taken this morning per patient report."
+      "mental_status": "GCS 13 (E3V4M6). Oriented to person and place; disoriented to time. Slow but coherent speech. Subtle asterixis bilaterally. Anxious affect. Number Connection Test mildly impaired (34 seconds, threshold 29 seconds).",
+      "motor": "Strength 5/5 all extremities. Tone normal. No myoclonus.",
+      "reflexes": "DTRs 2+ throughout. Plantar reflexes flexor.",
+      "sensory": "Intact to light touch and pinprick."
     },
+    "patient_id": "NB-HEP-ENC-M03",
     "vitals": {
-      "bp_systolic": 148,
       "bp_diastolic": 88,
+      "bp_systolic": 148,
       "hr": 84,
-      "temp": 37.0,
       "rr": 14,
-      "spo2": 98
-    },
-    "chief_complaint": "Daughter noticed increased confusion and word-finding difficulty for 3 days",
-    "history_present_illness": "Ms. D. is a 57-year-old woman with HCV-related cirrhosis who achieved sustained virologic response 2 months ago with direct-acting antiviral therapy, presenting at her daughter's insistence with a 3-day history of increasing confusion, word-finding difficulty, and personality change. The daughter noted her mother had been more forgetful, had missed two medication doses this week, was having difficulty balancing her checkbook (which she typically manages perfectly), and had been sleeping 12-14 hours per day. The patient herself minimized symptoms. She was afebrile and hemodynamically stable. She denied hematemesis or melena. She denied changes in her methadone dose or missed doses. Review of systems was positive for mild abdominal discomfort over the prior week and constipation. Her last bowel movement was 4 days ago. She had been started on trimethoprim-sulfamethoxazole (TMP-SMX) one week ago by her primary care physician for a urinary tract infection."
-  },
-  "initial_tool_outputs": {
-    "labs": {
-      "panels": {
-        "CBC": [
-          {
-            "test": "WBC",
-            "value": 6.2,
-            "unit": "x10^9/L",
-            "reference_range": "4.5-11.0",
-            "is_abnormal": false
-          },
-          {
-            "test": "Hemoglobin",
-            "value": 11.4,
-            "unit": "g/dL",
-            "reference_range": "12.0-16.0",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "Platelets",
-            "value": 104,
-            "unit": "x10^9/L",
-            "reference_range": "150-400",
-            "is_abnormal": true,
-            "clinical_significance": null
-          }
-        ],
-        "BMP": [
-          {
-            "test": "Sodium",
-            "value": 134,
-            "unit": "mEq/L",
-            "reference_range": "136-145",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "Potassium",
-            "value": 4.1,
-            "unit": "mEq/L",
-            "reference_range": "3.5-5.0",
-            "is_abnormal": false
-          },
-          {
-            "test": "Creatinine",
-            "value": 0.9,
-            "unit": "mg/dL",
-            "reference_range": "0.6-1.1",
-            "is_abnormal": false
-          },
-          {
-            "test": "BUN",
-            "value": 14,
-            "unit": "mg/dL",
-            "reference_range": "7-20",
-            "is_abnormal": false
-          },
-          {
-            "test": "Glucose",
-            "value": 92,
-            "unit": "mg/dL",
-            "reference_range": "70-100",
-            "is_abnormal": false
-          }
-        ],
-        "LFTs": [
-          {
-            "test": "AST",
-            "value": 68,
-            "unit": "U/L",
-            "reference_range": "10-40",
-            "is_abnormal": true
-          },
-          {
-            "test": "ALT",
-            "value": 44,
-            "unit": "U/L",
-            "reference_range": "7-56",
-            "is_abnormal": false
-          },
-          {
-            "test": "Total bilirubin",
-            "value": 2.2,
-            "unit": "mg/dL",
-            "reference_range": "0.2-1.2",
-            "is_abnormal": true
-          },
-          {
-            "test": "Albumin",
-            "value": 2.8,
-            "unit": "g/dL",
-            "reference_range": "3.5-5.0",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "INR",
-            "value": 1.4,
-            "unit": "",
-            "reference_range": "<1.2",
-            "is_abnormal": true
-          },
-          {
-            "test": "Ammonia",
-            "value": 72,
-            "unit": "µmol/L",
-            "reference_range": "11-51",
-            "is_abnormal": true,
-            "clinical_significance": null
-          }
-        ],
-        "Thyroid": [
-          {
-            "test": "TSH",
-            "value": 8.4,
-            "unit": "µIU/mL",
-            "reference_range": "0.4-4.0",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "Free T4",
-            "value": 0.7,
-            "unit": "ng/dL",
-            "reference_range": "0.8-1.8",
-            "is_abnormal": true,
-            "clinical_significance": null
-          }
-        ],
-        "Toxicology": [
-          {
-            "test": "Urine drug screen",
-            "value": "Positive opioids (methadone metabolite)",
-            "unit": "",
-            "reference_range": "Methadone maintenance — expected",
-            "is_abnormal": false
-          },
-          {
-            "test": "Serum methadone level",
-            "value": 0.28,
-            "unit": "mg/L",
-            "reference_range": "Therapeutic 0.15-0.60 mg/L",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ],
-        "Exclusion studies": [
-          {
-            "test": "magnesium",
-            "value": "Within reference range",
-            "unit": "",
-            "reference_range": "",
-            "is_abnormal": false,
-            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on"
-          },
-          {
-            "test": "lactate",
-            "value": "Within reference range",
-            "unit": "",
-            "reference_range": "",
-            "is_abnormal": false,
-            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on"
-          }
-        ],
-        "TSH": [
-          {
-            "test": "TSH",
-            "value": 2.1,
-            "unit": "mIU/L",
-            "reference_range": "0.4-4.0",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ],
-        "Zinc": [
-          {
-            "test": "Serum zinc",
-            "value": 82,
-            "unit": "µg/dL",
-            "reference_range": "60-120",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ]
-      },
-      "interpretation": "Abnormal values: Hemoglobin 11.4 g/dL (L), Platelets 104 x10^9/L (L), Sodium 134 mEq/L (L), AST 68 U/L (H), Total bilirubin 2.2 mg/dL (H), Albumin 2.8 g/dL (L), INR 1.4 (H), Ammonia 72 µmol/L (H), TSH 8.4 µIU/mL (H), Free T4 0.7 ng/dL (L).",
-      "abnormal_values_summary": [
-        "Ammonia 72 µmol/L",
-        "TSH 8.4 (hypothyroid)",
-        "Free T4 0.7 (low)",
-        "Albumin 2.8",
-        "INR 1.4",
-        "Sodium 134",
-        "Platelets 104"
-      ]
-    },
-    "eeg": {
-      "classification": "abnormal",
-      "background": {
-        "dominant_rhythm": "Generalized theta slowing 5-7 Hz; occasional delta bursts",
-        "amplitude": "Low-moderate amplitude (40-70 µV)",
-        "symmetry": "Symmetric",
-        "organization": "Mildly disorganized"
-      },
-      "findings": [
-        {
-          "type": "Generalized theta slowing",
-          "location": "Diffuse",
-          "frequency": "5-7 Hz",
-          "morphology": "Irregular theta activity; no organized background; absent posterior dominant rhythm",
-          "state": "Continuous",
-          "clinical_correlation": ""
-        },
-        {
-          "type": "No triphasic waves identified",
-          "location": "N/A",
-          "frequency": "N/A",
-          "morphology": "No triphasic morphology identified in this recording",
-          "state": "Absent",
-          "clinical_correlation": ""
-        },
-        {
-          "type": "No epileptiform discharges",
-          "location": "N/A",
-          "frequency": "N/A",
-          "morphology": "No spikes, sharp waves, or NCSE pattern",
-          "state": "Absent",
-          "clinical_correlation": ""
-        }
-      ],
-      "artifacts": [],
-      "activating_procedures": {},
-      "impression": "This is an ABNORMAL EEG due to: 1. Generalized theta slowing at 5–7 Hz with occasional delta bursts, mildly disorganized background, absent posterior dominant rhythm. No triphasic waves identified. No epileptiform discharges. No electrographic seizures recorded",
-      "limitations": "",
-      "recommended_actions": []
-    },
-    "ct": {
-      "findings": [],
-      "contrast_used": false,
-      "angiography_findings": null,
-      "additional_observations": [],
-      "impression": "No acute intracranial abnormality. Mild non-specific cortical atrophy. No hemorrhage, mass, midline shift, or restricted diffusion",
-      "recommended_actions": []
-    },
-    "microbiology": {
-      "specimen": "blood_culture",
-      "tests": [
-        "culture",
-        "gram_stain",
-        "susceptibility"
-      ],
-      "collected_before_antimicrobials": true,
-      "organism": null,
-      "gram_stain": null,
-      "susceptibility": null,
-      "cell_counts": null,
-      "findings": [
-        {
-          "test": "culture",
-          "result": "No growth reported at the time of this encounter"
-        }
-      ],
-      "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
-      "recommended_actions": []
+      "spo2": 98,
+      "temp": 37.0
     }
   },
-  "followup_outputs": [
-    {
-      "trigger_action": "request_lactulose_rifaximin",
-      "tool_name": "interpret_labs",
-      "output": {
-        "panels": {
-          "Ammonia_Trend": [
-            {
-              "test": "Ammonia (admission)",
-              "value": 72,
-              "unit": "µmol/L",
-              "reference_range": "11-51",
-              "is_abnormal": true
-            },
-            {
-              "test": "Ammonia (48h post-lactulose increase + rifaximin)",
-              "value": 44,
-              "unit": "µmol/L",
-              "reference_range": "11-51",
-              "is_abnormal": false
-            }
-          ]
-        },
-        "interpretation": "Abnormal values: Ammonia (admission) 72 µmol/L (H).",
-        "abnormal_values_summary": [
-          "Ammonia: 72 → 44 µmol/L (improving, now within normal limits)"
-        ]
-      }
-    },
-    {
-      "trigger_action": "request_thyroid_treatment",
-      "tool_name": "check_drug_interactions",
-      "output": {
-        "proposed": "Increase levothyroxine for undertreated hypothyroidism (TSH 8.4, free T4 0.7)",
-        "interactions": [
-          "Levothyroxine absorption affected by calcium, iron, cholestyramine — take on empty stomach 30 min before food",
-          "Cirrhosis reduces T4-binding globulin — free T4 may be lower than TSH suggests"
-        ],
-        "contraindications": [
-          "Avoid dose increase >25 mcg per step in patients >50 years — risk of atrial fibrillation"
-        ],
-        "warnings": [
-          "Hypothyroidism independently causes encephalopathy — contributing to HE picture; treat both concurrently"
-        ],
-        "formulary_status": "Levothyroxine 112 mcg daily (increase from 88 mcg)",
-        "alternatives": [
-          "Levothyroxine 112 mcg daily as dose increase; recheck TSH/free T4 in 6-8 weeks"
-        ]
-      }
-    },
-    {
-      "trigger_action": "request_sbp_paracentesis",
-      "tool_name": "interpret_labs",
-      "output": {
-        "panels": {
-          "Ascitic_Fluid": [
-            {
-              "test": "PMN count",
-              "value": 45,
-              "unit": "cells/mm3",
-              "reference_range": "<250",
-              "is_abnormal": false
-            },
-            {
-              "test": "SAAG",
-              "value": 1.6,
-              "unit": "g/dL",
-              "reference_range": ">1.1 = portal hypertension",
-              "is_abnormal": false
-            },
-            {
-              "test": "Ascitic fluid culture",
-              "value": "No growth",
-              "unit": "",
-              "reference_range": "negative",
-              "is_abnormal": false
-            }
-          ]
-        },
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": [
-          "PMN 45 cells/mm3 (within normal limits)"
-        ]
-      }
-    },
-    {
-      "trigger_action": "check_methadone_hep_interaction",
-      "tool_name": "check_drug_interactions",
-      "output": {
-        "proposed": "Review methadone safety in cirrhosis — evaluate for contribution to cognitive changes",
-        "interactions": [
-          "Methadone is hepatically metabolized — in cirrhosis, half-life may be prolonged; check serum level",
-          "Methadone level 0.28 mg/L — therapeutic range; no evidence of accumulation",
-          "Rifaximin does not significantly interact with methadone"
-        ],
-        "contraindications": [
-          "No dose reduction needed currently — therapeutic level confirmed"
-        ],
-        "warnings": [
-          "Monitor for methadone accumulation if hepatic function worsens (MELD rising)",
-          "QTc monitoring recommended for methadone in any patient — QTc was not measured at admission; order ECG"
-        ],
-        "alternatives": [
-          "Continue methadone at current dose; recheck level if encephalopathy worsens after HE treatment"
-        ]
-      }
-    },
-    {
-      "trigger_action": "search_hcv_svr_he_risk",
-      "tool_name": "search_medical_literature",
-      "output": {
-        "query": "Hepatic encephalopathy after HCV SVR cirrhosis — does SVR eliminate HE risk",
-        "results": [
-          {
-            "title": "Risk of hepatic decompensation after SVR in HCV-related cirrhosis",
-            "summary": "SVR significantly reduces but does not eliminate risk of hepatic decompensation including HE in patients with established cirrhosis. Cirrhosis may partially reverse (Child-Pugh improvement) but portal hypertension may persist. HE risk remains, particularly with additional precipitants (constipation, infection, drugs). Lifelong surveillance and HE prophylaxis may be needed in cirrhotic patients even after SVR."
-          }
-        ],
-        "summary": ""
-      }
-    },
-    {
-      "trigger_action": "request_urine_specimen",
-      "tool_name": "order_microbiology",
-      "output": {
-        "specimen": "urine",
-        "tests": [
-          "culture",
-          "microscopy",
-          "susceptibility"
-        ],
-        "collected_before_antimicrobials": true,
-        "organism": null,
-        "gram_stain": null,
-        "susceptibility": null,
-        "cell_counts": null,
-        "findings": [
-          {
-            "test": "culture",
-            "result": "No growth reported at the time of this encounter"
-          }
-        ],
-        "impression": "No organism isolated to date. Specimen taken before the first antimicrobial dose.",
-        "recommended_actions": []
-      }
-    }
-  ],
-  "fallback_tool_outputs": {
-    "eeg": null,
-    "mri": {
-      "findings": [],
-      "volumetrics": null,
-      "additional_observations": [],
-      "impression": "No acute intracranial abnormality. No mass, haemorrhage, midline shift, or restricted diffusion. Ventricles and sulci appropriate for age.",
-      "recommended_actions": []
-    },
-    "ecg": {
-      "rhythm": "normal sinus rhythm",
-      "rate": 65,
-      "intervals": {
-        "PR": "172 ms",
-        "QRS": "89 ms",
-        "QTc": "400 ms"
-      },
-      "axis": "normal",
-      "findings": [
-        "Normal sinus rhythm. Normal axis and intervals. No acute ST-T changes."
-      ],
-      "interpretation": "Normal ECG",
-      "clinical_correlation": ""
-    },
-    "labs": null,
-    "csf": {
-      "appearance": "clear and colourless",
-      "opening_pressure": "16 cm H2O",
-      "cell_count": {
-        "wbc": "2 /uL",
-        "rbc": "0 /uL"
-      },
-      "protein": "38 mg/dL",
-      "glucose": "62 mg/dL",
-      "glucose_ratio": "0.6",
-      "special_tests": {},
-      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
-    },
-    "ct": null,
-    "echo": {
-      "chambers": {
-        "LV": "normal size and systolic function",
-        "RV": "normal size and function",
-        "LA": "normal size",
-        "RA": "normal size"
-      },
-      "valves": {
-        "mitral": "structurally normal",
-        "aortic": "structurally normal",
-        "tricuspid": "normal",
-        "pulmonic": "normal"
-      },
-      "ejection_fraction": 60.0,
-      "wall_motion": "no regional wall-motion abnormality",
-      "findings": [
-        "Trace mitral regurgitation, physiological. No intracardiac thrombus or vegetation. No pericardial effusion."
-      ],
-      "impression": "Structurally near-normal heart with a benign incidental finding.",
-      "recommended_actions": []
-    },
-    "cardiac_monitoring": {
-      "duration_hours": 24,
-      "monitor_type": "holter_24h",
-      "rhythm_summary": "Predominant sinus rhythm throughout the recording",
-      "heart_rate_range": {
-        "min": 49,
-        "max": 126,
-        "average": 72
-      },
-      "events": [],
-      "findings": [
-        "Rare isolated premature ventricular complexes (under 1% burden), benign. No sustained arrhythmia, no pauses greater than 2 seconds, no AV block."
-      ],
-      "impression": "24-hour Holter monitor with only benign findings.",
-      "recommended_actions": []
-    },
-    "advanced_imaging": {
-      "modality": "",
-      "tracer_or_protocol": null,
-      "findings": [],
-      "quantitative_data": null,
-      "impression": "No abnormality identified.",
-      "recommended_actions": []
-    },
-    "specialized_test": {
-      "test_type": "",
-      "findings": [],
-      "quantitative_data": null,
-      "impression": "Study within normal limits.",
-      "recommended_actions": []
-    },
-    "literature_search": null,
-    "drug_interactions": null
-  },
-  "ground_truth": {
-    "primary_diagnosis": "Hepatic encephalopathy (West Haven grade II), HCV cirrhosis post-SVR (Child-Pugh B, MELD 12) — precipitated by constipation and recent TMP-SMX antibiotic use (gut microbiome disruption reducing lactulose/rifaximin efficacy); undertreated hypothyroidism is a contributing cognitive factor.",
-    "icd_code": "K72.90",
-    "differential": [
-      {
-        "diagnosis": "Hypothyroid encephalopathy / myxedema-related cognitive impairment",
-        "likelihood": "moderate",
-        "key_features": "TSH elevated — hypothyroidism contributes to cognitive slowing but does not produce asterixis or rapid lactulose response; treat both.",
-        "icd_code": "E03.5"
-      },
-      {
-        "diagnosis": "Drug-induced encephalopathy (TMP-SMX or other recent medication)",
-        "likelihood": "low",
-        "key_features": "TMP-SMX rarely causes direct CNS toxicity; main role is gut flora disruption that reduces lactulose efficacy.",
-        "icd_code": "G92"
-      },
-      {
-        "diagnosis": "Spontaneous bacterial peritonitis",
-        "likelihood": "low",
-        "key_features": "Diagnostic paracentesis to exclude if ascites present.",
-        "icd_code": "K65.2"
-      },
-      {
-        "diagnosis": "Recurrent HCV / cirrhosis decompensation despite SVR",
-        "likelihood": "low",
-        "key_features": "SVR12 confirmed but cirrhosis morphology persists; portal hypertension still drives HE susceptibility.",
-        "icd_code": "B18.2"
-      },
-      {
-        "diagnosis": "Mild cognitive impairment / neurodegenerative process",
-        "likelihood": "very_low",
-        "key_features": "Acute 3-day course with reversibility makes neurodegeneration unlikely; PHES testing later if minimal HE concern persists.",
-        "icd_code": "G31.84"
-      }
-    ],
-    "optimal_actions": [
-      {
-        "step": 1,
-        "action": "Obtain the core HE/precipitant panel: CBC, electrolytes/renal/liver function, glucose, ammonia, magnesium, lactate, INR/coagulation, CRP, TSH, zinc and blood alcohol/urine drug screen; add phenotype-specific tests only when indicated.",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Metabolic, infectious, endocrine, nutritional or toxic precipitant, interpreted with ammonia as supportive rather than a severity marker.",
-        "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "CMP",
-            "ammonia",
-            "magnesium",
-            "lactate",
-            "coagulation",
-            "TSH",
-            "zinc",
-            "toxicology"
-          ]
-        },
-        "citation": "[AASLD_2014]",
-        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
-      },
-      {
-        "step": 2,
-        "action": "Non-contrast CT head — exclude structural alternate cause of AMS (hemorrhage, large stroke, mass) before any LP.",
-        "tool_name": "order_ct_scan",
-        "expected_finding": "No acute intracranial process; mild atrophy — structural cause excluded.",
-        "category": "optional",
-        "tool_parameters": {},
-        "citation": "[AASLD_2014]",
-        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
-      },
-      {
-        "step": 3,
-        "action": "Literature/guideline search to confirm West Haven grading, precipitant management, and lactulose/rifaximin dosing (AASLD/EASL HE management; antibiotic-induced gut flora disruption and HE; hypothyroidism cognitive effects).",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "AASLD/EASL 2014 guidance retrieved; West Haven criteria and precipitant-driven management framework confirmed.",
-        "category": "required",
-        "tool_parameters": {},
-        "citation": "[AASLD_2014]",
-        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
-      },
-      {
-        "step": 4,
-        "action": "Drug-interaction and medication-reconciliation review covering TMP-SMX, levothyroxine, lactulose, rifaximin — review TMP-SMX completion and consider alternative antibiotic next time; reconcile thyroid replacement; flag any CNS depressants (benzodiazepines, opioids, sedating antiemetics, antihistamines) and confirm lactulose/rifaximin dosing in liver disease.",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Sedating/CNS-depressant medications identified; lactulose and rifaximin reviewed for hepatic dose adjustment.",
-        "category": "required",
-        "tool_parameters": {},
-        "citation": "[Bajaj_2011]",
-        "guideline_source": "Bajaj 2011 HE management review"
-      },
-      {
-        "step": 5,
-        "action": "Consult hepatology — coordinate definitive care, transplant candidacy assessment where applicable.",
-        "tool_name": null,
-        "expected_finding": "Hepatology / critical-care guidance integrated into management.",
-        "category": "recommended",
-        "tool_parameters": {},
-        "citation": "[AASLD_2014]",
-        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
-      },
-      {
-        "step": 6,
-        "action": "EEG — consider only if alternate diagnosis suspected or no improvement with lactulose. Triphasic waves are classic but non-specific (metabolic encephalopathies broadly); main role is exclusion of non-convulsive status epilepticus where the differential supports it.",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Generalized slowing if obtained; non-specific.",
-        "category": "recommended",
-        "tool_parameters": {},
-        "citation": "[Ferenci_2002]",
-        "guideline_source": "Ferenci 2002 HE nomenclature/quantification"
-      },
-      {
-        "step": 7,
-        "action": "Draw two sets of blood cultures, aerobic and anaerobic, before the first antimicrobial dose",
-        "tool_name": "order_microbiology",
-        "expected_finding": "Growth identifies the organism and its susceptibility; a negative or pending culture does not exclude the diagnosis, and yield falls once treatment has started",
-        "category": "required",
-        "tool_parameters": {
-          "specimen": "blood_culture",
-          "tests": [
-            "culture",
-            "gram_stain",
-            "susceptibility"
-          ],
-          "before_antimicrobials": true
-        },
-        "citation": "[AASLD_2014]",
-        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
-      },
-      {
-        "step": 8,
-        "action": "Send urine for microscopy and culture as part of the infection screen",
-        "tool_name": "order_microbiology",
-        "expected_finding": "Pyuria and bacteriuria identify a urinary source; a negative result removes it from the list of precipitants",
-        "category": "required",
-        "tool_parameters": {
-          "specimen": "urine",
-          "tests": [
-            "culture",
-            "microscopy",
-            "susceptibility"
-          ],
-          "before_antimicrobials": true
-        },
-        "citation": "[AASLD_2014]",
-        "guideline_source": "AASLD/EASL 2014 HE practice guideline"
-      }
-    ],
-    "useless_tools": [
-      {
-        "tool_name": "order_echocardiogram",
-        "tool_parameters": {},
-        "rationale": "No clinical suspicion for hepatopulmonary syndrome, portopulmonary hypertension, or endocarditis; echocardiography is not part of the HE workup.",
-        "citation": "[AASLD_2014]"
-      },
-      {
-        "tool_name": "order_advanced_imaging",
-        "tool_parameters": {
-          "modality": "amyloid_PET"
-        },
-        "rationale": "Amyloid PET has no role in HE workup; reversible metabolic encephalopathy is the issue, not Alzheimer pathology.",
-        "citation": "[AASLD_2014]"
-      },
-      {
-        "tool_name": "order_advanced_imaging",
-        "tool_parameters": {
-          "modality": "DaTscan"
-        },
-        "rationale": "DaTscan has no role in HE workup; the question is metabolic encephalopathy, not nigrostriatal degeneration.",
-        "citation": "[AASLD_2014]"
-      },
-      {
-        "tool_name": "order_specialized_test",
-        "tool_parameters": {
-          "test_type": "genetic_panel:early_onset_AD"
-        },
-        "rationale": "Early-onset AD genetic panel has no role in HE workup; reversible metabolic encephalopathy is the diagnosis under consideration.",
-        "citation": "[AASLD_2014]"
-      },
-      {
-        "tool_name": "order_specialized_test",
-        "tool_parameters": {
-          "test_type": "vep"
-        },
-        "rationale": "Visual evoked potentials have no role in HE workup; no demyelinating process is on the differential.",
-        "citation": "[AASLD_2014]"
-      }
-    ],
-    "harmful_tools": [],
-    "sequence_constraints": [
-      {
-        "before": "order_ct_scan",
-        "after": "analyze_csf",
-        "reason": "In altered mental status, exclude intracranial mass effect / hemorrhage on imaging before LP to avoid herniation risk.",
-        "citation": "[AASLD_2014]",
-        "severity": "hard"
-      }
-    ],
-    "critical_actions": [
-      "Lactulose 30 mL TID-QID titrated to 2-4 soft stools/day — address the constipation precipitant directly.",
-      "Rifaximin 550 mg BID — restart if interrupted.",
-      "Adjust levothyroxine dose for elevated TSH after acute illness resolves and recheck in 6 weeks.",
-      "Counsel about avoiding TMP-SMX and other broad-spectrum antibiotics that disrupt gut flora when possible."
-    ],
-    "contraindicated_actions": [
-      "Do not prescribe benzodiazepines for anxiety/agitation — they precipitate and prolong HE (use haloperidol or non-pharmacologic measures for agitation).",
-      "Do not prescribe sedating opioids — they worsen HE; consider acetaminophen at hepatic-safe dosing for pain.",
-      "Do not perform LP before neuroimaging excludes mass effect when the patient has altered mental status.",
-      "Do not stop rifaximin out of concern for antibiotic interaction with TMP-SMX — rifaximin is non-absorbable and essential for HE control."
-    ],
-    "key_reasoning_points": [
-      "HE is a clinical diagnosis: West Haven grading + evidence of liver dysfunction + exclusion of other causes of AMS — ammonia level is supportive only and correlates poorly with grade (AASLD 2014).",
-      "Precipitant identification is more actionable than the ammonia number: infection (SBP especially), GI bleed, electrolyte disturbance (hypokalemia/hyponatremia), constipation, sedative/CNS-depressant use, dehydration, dietary protein load, renal failure.",
-      "SVR12 cures HCV but does not reverse established cirrhosis morphology or portal hypertension — patients remain at HE risk and require ongoing surveillance.",
-      "Broad-spectrum antibiotics disrupt the gut microbiome on which lactulose/rifaximin efficacy depends; this is an under-recognized HE precipitant."
-    ],
-    "red_herrings": [
-      {
-        "data_point": "HCV cured with SVR12 confirmed",
-        "location": "patient.clinical_history.past_medical_history",
-        "field_path": "patient.clinical_history.past_medical_history[1]",
-        "intended_effect": "Dismiss HE as 'liver disease is cured'.",
-        "correct_interpretation": "SVR cures HCV viremia but cirrhosis and portal hypertension persist; HE risk continues for years post-SVR."
-      },
-      {
-        "data_point": "Elevated TSH (undertreated hypothyroidism)",
-        "location": "initial_tool_outputs.labs",
-        "field_path": "initial_tool_outputs.labs.panels",
-        "intended_effect": "Attribute confusion entirely to hypothyroidism.",
-        "correct_interpretation": "Hypothyroidism contributes to cognitive slowing but does not produce asterixis or respond to lactulose; treat HE concurrently."
-      }
-    ]
-  },
-  "metadata": {
-    "generated_by": "claude-sonnet-4-6",
-    "source": "synthetic",
-    "source_pmcid": null,
-    "source_license": null,
-    "generation_method": "synthetic_from_schema",
-    "condition_full_name": "Hepatic encephalopathy",
-    "difficulty_description": "Moderate HE post-HCV SVR: TMP-SMX as unrecognized precipitant disrupting gut flora, undertreated hypothyroidism contributing, methadone red herring, EEG without classic triphasic waves",
-    "expected_agent_confidence": 0.61,
-    "version": "v5",
-    "fallback_tool_kinds": {
-      "mri": "normal",
-      "ecg": "normal",
-      "csf": "normal",
-      "echo": "incidental",
-      "cardiac_monitoring": "incidental",
-      "advanced_imaging": "normal",
-      "specialized_test": "normal"
-    },
-    "last_revised": "2026-08-10",
-    "revision_reason": "Reviewer 2 HE audit: core endocrine, zinc and toxicology studies are now named in the order and available in the laboratory output; phenotype-specific additions retained.",
-    "criteria_pack_version": "1.0",
-    "authoring_agent": "condition-expert:HEP-ENC",
-    "difficulty_rationale": "4 required tools and 2 recommended; 2 grounded distractors (post-SVR 'cure' framing, elevated TSH); identifying TMP-SMX as a precipitant requires medication-history synthesis with mechanism.",
-    "case_body_concerns": [],
-    "citation_gap": [],
-    "vocab_gap": []
-  }
+  "schema_version": "2.0"
 }

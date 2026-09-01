@@ -3,743 +3,882 @@
   "condition": "als",
   "difficulty": "moderate",
   "encounter_type": "outpatient",
-  "patient": {
-    "patient_id": "NB-ALS-M06",
-    "demographics": {
-      "age": 71,
-      "sex": "female",
-      "handedness": "left",
-      "ethnicity": "White",
-      "bmi": 22.4
+  "fallback_tool_outputs": {
+    "advanced_imaging": {
+      "findings": [],
+      "impression": "No abnormality identified.",
+      "modality": "",
+      "quantitative_data": null,
+      "recommended_actions": [],
+      "tracer_or_protocol": null
     },
-    "clinical_history": {
-      "past_medical_history": [
-        "Rheumatoid arthritis, on methotrexate and hydroxychloroquine",
-        "Osteoporosis",
-        "Mild hypertension"
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
       ],
-      "medications": [
+      "heart_rate_range": {
+        "average": 68,
+        "max": 122,
+        "min": 55
+      },
+      "impression": "Normal 24-hour Holter monitor.",
+      "monitor_type": "holter_24h",
+      "recommended_actions": [],
+      "rhythm_summary": "Sinus rhythm throughout the recording"
+    },
+    "csf": null,
+    "ct": {
+      "additional_observations": [],
+      "angiography_findings": null,
+      "contrast_used": false,
+      "findings": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "drug_interactions": null,
+    "ecg": {
+      "axis": "normal",
+      "clinical_correlation": "",
+      "findings": [
+        "Normal sinus rhythm. Normal axis and intervals. No acute ST-T changes."
+      ],
+      "interpretation": "Normal ECG",
+      "intervals": {
+        "PR": "162 ms",
+        "QRS": "91 ms",
+        "QTc": "438 ms"
+      },
+      "rate": 66,
+      "rhythm": "normal sinus rhythm"
+    },
+    "echo": {
+      "chambers": {
+        "LA": "normal size",
+        "LV": "normal size and systolic function",
+        "RA": "normal size",
+        "RV": "normal size and function"
+      },
+      "ejection_fraction": 62.0,
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": [],
+      "valves": {
+        "aortic": "structurally normal",
+        "mitral": "structurally normal",
+        "pulmonic": "normal",
+        "tricuspid": "normal"
+      },
+      "wall_motion": "no regional wall-motion abnormality"
+    },
+    "eeg": {
+      "activating_procedures": {},
+      "artifacts": [],
+      "background": {
+        "overall": "normal organisation for age",
+        "pdr": "9-10 Hz posterior dominant rhythm, symmetric and reactive",
+        "sleep_features": "normal vertex waves and sleep spindles"
+      },
+      "classification": "normal",
+      "findings": [],
+      "impression": "Normal awake and drowsy EEG. No epileptiform discharges and no focal slowing.",
+      "limitations": "",
+      "recommended_actions": []
+    },
+    "labs": null,
+    "literature_search": null,
+    "mri": null,
+    "specialized_test": null
+  },
+  "followup_outputs": [
+    {
+      "output": {
+        "alternatives": [
+          "AMX0035 \u2014 lower hepatotoxicity profile, may be preferred given MTX use"
+        ],
+        "contraindications": [],
+        "formulary_status": "Covered with prior authorisation",
+        "interactions": [
+          "Methotrexate: both hepatotoxic \u2014 LFT monitoring frequency increased to every 2 weeks initially, then monthly",
+          "Hydroxychloroquine: no significant interaction with riluzole"
+        ],
+        "proposed": "Riluzole 50 mg twice daily",
+        "warnings": [
+          "Significantly increased hepatotoxicity risk with concurrent MTX \u2014 LFT monitoring critical",
+          "Consider reducing MTX dose after rheumatology discussion if LFTs become abnormal",
+          "Folic acid should be continued as it does not affect riluzole"
+        ]
+      },
+      "tool_name": "check_drug_interactions",
+      "trigger_action": "check_riluzole_methotrexate_interaction"
+    },
+    {
+      "output": {
+        "query": "ALS rheumatoid arthritis comorbidity differential diagnosis",
+        "results": [
+          {
+            "finding": "Rheumatoid arthritis and motor neuron disease may co-occur but are biologically distinct conditions; concurrent diagnosis requires independent electrodiagnostic evaluation",
+            "title": "Motor neuron disease and autoimmune disease comorbidity"
+          },
+          {
+            "finding": "Methotrexate neurotoxicity predominantly affects the CNS (leukoencephalopathy) at high doses; peripheral motor neuron disease is not a recognized MTX adverse effect",
+            "title": "MTX neurotoxicity"
+          }
+        ],
+        "summary": "Co-occurrence of motor neuron disease and rheumatoid arthritis is reported in the literature; both conditions require independent diagnostic evaluation. Methotrexate neurotoxicity predominantly affects the CNS (leukoencephalopathy) at high doses; peripheral motor neuron disease is not a recognized methotrexate adverse effect."
+      },
+      "tool_name": "search_medical_literature",
+      "trigger_action": "search_als_ra_comorbidity"
+    },
+    {
+      "output": {
+        "findings": [
+          {
+            "panel": "PFT",
+            "reference_range": ">80%",
+            "result": "76",
+            "test": "FVC"
+          },
+          {
+            "panel": "PFT",
+            "reference_range": ">70 cmH2O women",
+            "result": "55",
+            "test": "SNIP"
+          }
+        ],
+        "impression": "Abnormal values: FVC 76 % predicted (L), SNIP 55 cmH2O (L).",
+        "quantitative_data": {
+          "FVC": "76",
+          "SNIP": "55"
+        },
+        "recommended_actions": [],
+        "test_type": "respiratory_function"
+      },
+      "tool_name": "order_specialized_test",
+      "tool_parameters": {
+        "test_type": "respiratory_function"
+      },
+      "trigger_action": "request_baseline_respiratory_function"
+    },
+    {
+      "output": {
+        "findings": [
+          {
+            "interpretation": "",
+            "panel": "Neurodegenerative_Genetic_Panel",
+            "reference_range": "<30 repeats",
+            "result": "Negative",
+            "test": "C9orf72"
+          },
+          {
+            "interpretation": "",
+            "panel": "Neurodegenerative_Genetic_Panel",
+            "reference_range": "No pathogenic variant",
+            "result": "No pathogenic variant",
+            "test": "SOD1"
+          }
+        ],
+        "impression": "All values within normal limits.",
+        "quantitative_data": {
+          "C9orf72": "Negative",
+          "SOD1": "No pathogenic variant"
+        },
+        "recommended_actions": [],
+        "test_type": "genetic_panel:ALS"
+      },
+      "tool_name": "order_specialized_test",
+      "tool_parameters": {
+        "test_type": "genetic_panel:ALS"
+      },
+      "trigger_action": "offer_als_genetic_panel_after_counselling"
+    }
+  ],
+  "ground_truth": {
+    "action_criteria": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "query": "ALS diagnostic criteria Awaji Gold Coast AAN practice parameter"
+            },
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[Awaji_2008]",
+          "Awaji_2008"
+        ],
+        "criterion_id": "action-1-search-medical-literature",
+        "expected_evidence": "Awaji-Shima 2008 / Gold Coast 2020 diagnostic criteria; AAN 2009 practice parameter on ALS care",
+        "importance": "recommended",
+        "label": "Search the medical literature to confirm Awaji and Gold Coast diagnostic thresholds and AAN practice-parameter recommendations relevant to this presentation",
+        "rationale": "Search the medical literature to confirm Awaji and Gold Coast diagnostic thresholds and AAN practice-parameter recommendations relevant to this presentation"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "drug": "riluzole"
+            },
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [
+          "[AAN_2009]",
+          "AAN_2009"
+        ],
+        "criterion_id": "action-2-check-drug-interactions",
+        "expected_evidence": "No major interactions for typical chronic medications; advise alcohol and grapefruit-juice avoidance (CYP1A2 modulators); monthly LFTs for first 3 months",
+        "importance": "recommended",
+        "label": "Check interactions before initiating riluzole 50 mg twice daily; review baseline LFTs and CBC and counsel on monitoring",
+        "rationale": "Check interactions before initiating riluzole 50 mg twice daily; review baseline LFTs and CBC and counsel on monitoring"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "contrast": true,
+              "protocol": "standard"
+            },
+            "tool_name": "analyze_brain_mri"
+          }
+        ],
+        "citations": [
+          "[EAN_ALS_2024]",
+          "Gold Coast; EAN 2024; NICE NG42"
+        ],
+        "criterion_id": "action-3-analyze-brain-mri",
+        "expected_evidence": "No better structural explanation for progressive upper and lower motor-neuron findings",
+        "importance": "required",
+        "label": "Obtain brain MRI to exclude structural, brainstem, inflammatory, demyelinating or neoplastic ALS mimics",
+        "rationale": "Obtain brain MRI to exclude structural, brainstem, inflammatory, demyelinating or neoplastic ALS mimics"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "contrast": false,
+              "study": "spine_MRI"
+            },
+            "tool_name": "order_body_imaging"
+          }
+        ],
+        "citations": [
+          "[EAN_ALS_2024]",
+          "Gold Coast; EAN 2024; NICE NG42"
+        ],
+        "criterion_id": "action-4-order-body-imaging",
+        "expected_evidence": "No compressive, neoplastic, inflammatory or demyelinating cord mimic",
+        "importance": "required",
+        "label": "Obtain cervical and thoracic spinal-cord MRI to exclude compressive myelopathy and other cord lesions",
+        "rationale": "Obtain cervical and thoracic spinal-cord MRI to exclude compressive myelopathy and other cord lesions"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "CBC",
+                "CMP",
+                "calcium",
+                "TSH",
+                "vitamin_B12",
+                "folate",
+                "CK",
+                "ESR",
+                "CRP"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[EAN_ALS_2024]",
+          "Gold Coast; EAN 2024; NICE NG42"
+        ],
+        "criterion_id": "action-5-interpret-labs",
+        "expected_evidence": "Exclude common hematologic, renal/hepatic, electrolyte, calcium, thyroid, B12/folate, muscle and inflammatory alternatives; tests do not confirm ALS",
+        "importance": "required",
+        "label": "Order a baseline treatable-mimic panel, adding only phenotype-specific infectious, immune, paraprotein or metabolic tests",
+        "rationale": "Order a baseline treatable-mimic panel, adding only phenotype-specific infectious, immune, paraprotein or metabolic tests"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "emg_ncs"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[EAN_ALS_2024]",
+          "Gold Coast; EAN 2024; NICE NG42"
+        ],
+        "criterion_id": "action-6-order-specialized-test",
+        "expected_evidence": "Active and chronic neurogenic change in multiple regions with preserved sensory studies and no conduction block",
+        "importance": "required",
+        "label": "Perform EMG/NCS across bulbar, cervical, thoracic and lumbosacral regions using ALS electrodiagnostic criteria",
+        "rationale": "Perform EMG/NCS across bulbar, cervical, thoracic and lumbosacral regions using ALS electrodiagnostic criteria"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "respiratory_function"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[EAN_ALS_2024]",
+          "Gold Coast; EAN 2024; NICE NG42"
+        ],
+        "criterion_id": "action-7-order-specialized-test",
+        "expected_evidence": "Quantify respiratory involvement and need for surveillance or non-invasive ventilation",
+        "importance": "recommended",
+        "label": "Obtain baseline FVC/VC and SNIP or MIP after suspected ALS is established; this is a safety and management assessment, not a diagnostic confirmation",
+        "rationale": "Obtain baseline FVC/VC and SNIP or MIP after suspected ALS is established; this is a safety and management assessment, not a diagnostic confirmation"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "genetic_panel:ALS"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[EAN_ALS_2024]",
+          "Gold Coast; EAN 2024; NICE NG42"
+        ],
+        "criterion_id": "action-8-order-specialized-test",
+        "expected_evidence": "A pathogenic result can affect counselling, family risk and gene-targeted therapy/trial eligibility; a negative result does not exclude ALS",
+        "importance": "optional",
+        "label": "Offer an ALS gene panel including C9orf72 and SOD1 after pre-test counselling; do not embed genetics in a routine blood panel",
+        "rationale": "Offer an ALS gene panel including C9orf72 and SOD1 after pre-test counselling; do not embed genetics in a routine blood panel"
+      }
+    ],
+    "assessment": {
+      "prohibited_recommendations": [
+        "Do not commit the patient to cervical spine surgery on the basis of incidental spondylotic changes when EMG findings extend beyond the cervical cord.",
+        "Do not start chronic immunosuppression (steroids, IVIG, plasma exchange) for ALS \u2014 there is no benefit and treatment delays correct diagnosis.",
+        "Do not defer respiratory assessment in a symptomatic patient \u2014 even mild FVC reduction warrants close monitoring and NIV planning.",
+        "Do not dismiss bulbar or progressive symptoms as functional / psychiatric without a complete neurological workup."
+      ],
+      "required_recommendations": [
+        "Perform EMG/NCS sampling the bulbar region plus \u22652 spinal regions to document lower-motor-neuron involvement and exclude conduction block.",
+        "Obtain brain MRI to exclude structural mimics (cervical myelopathy, demyelinating disease, brainstem tumor).",
+        "Order a mimic-exclusion lab panel (CK, B12, TSH, HIV, RPR, SPEP, anti-GM1 IgM, androgen receptor CAG repeat in males).",
+        "Measure baseline respiratory function (FVC, MIP/MEP, SNIP) to inform NIV timing.",
+        "Apply Awaji-Shima 2008 / Gold Coast 2020 criteria to confirm the diagnosis.",
+        "Initiate riluzole 50 mg twice daily after baseline LFTs unless contraindicated; arrange monthly LFT monitoring for the first 3 months.",
+        "Refer to a multidisciplinary ALS clinic for SLP, dietetics, respiratory, and social-work input."
+      ]
+    },
+    "avoided_actions": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_eeg"
+          }
+        ],
+        "citations": [
+          "[AAN_2009]"
+        ],
+        "criterion_id": "avoid-waste-1-analyze-eeg",
+        "rationale": "ALS is a motor-neuron disease without cortical electrical signature; EEG has no diagnostic role and adds cost without benefit.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_ecg"
+          }
+        ],
+        "citations": [
+          "[AAN_2009]"
+        ],
+        "criterion_id": "avoid-waste-2-analyze-ecg",
+        "rationale": "ECG is unrelated to motor neuron disease and not part of the standard ALS workup absent specific cardiac symptoms or pre-medication QTc checks.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_echocardiogram"
+          }
+        ],
+        "citations": [
+          "[AAN_2009]"
+        ],
+        "criterion_id": "avoid-waste-3-order-echocardiogram",
+        "rationale": "Echocardiography is unrelated to ALS diagnosis; no indication absent comorbid cardiac disease.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_cardiac_monitoring"
+          }
+        ],
+        "citations": [
+          "[AAN_2009]"
+        ],
+        "criterion_id": "avoid-waste-4-order-cardiac-monitoring",
+        "rationale": "Cardiac monitoring has no role in ALS diagnostic workup.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_ct_scan"
+          }
+        ],
+        "citations": [
+          "[AAN_2009]"
+        ],
+        "criterion_id": "avoid-waste-5-order-ct-scan",
+        "rationale": "MRI is the standard structural study for ALS workup; head CT adds no diagnostic value and exposes the patient to ionizing radiation.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "amyloid_PET"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[AAN_2009]"
+        ],
+        "criterion_id": "avoid-waste-6-order-advanced-imaging",
+        "rationale": "Amyloid PET has no role in ALS diagnosis (motor-neuron rather than amyloid pathology) and carries a high cost.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "DaTscan"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[AAN_2009]"
+        ],
+        "criterion_id": "avoid-waste-7-order-advanced-imaging",
+        "rationale": "DaTscan evaluates nigrostriatal dopaminergic integrity; it has no role in ALS, which spares the dopaminergic system.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "FDG_PET"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[AAN_2009]"
+        ],
+        "criterion_id": "avoid-waste-8-order-advanced-imaging",
+        "rationale": "FDG-PET has no established diagnostic role in ALS and adds substantial cost.",
+        "severity": "waste"
+      }
+    ],
+    "diagnosis": {
+      "accepted": [
+        "Amyotrophic lateral sclerosis (ALS) with concurrent rheumatoid arthritis"
+      ],
+      "icd_codes": [
+        "G12.21"
+      ]
+    },
+    "differential": [
+      {
+        "diagnosis": "Rheumatoid muscle/tendon disease",
+        "icd_code": null,
+        "key_features": "Patient has active RA, but wasting is muscular rather than tenosynovial and UMN signs are present",
+        "likelihood": "moderate"
+      },
+      {
+        "diagnosis": "Vasculitic neuropathy (RA-associated)",
+        "icd_code": null,
+        "key_features": "Sensory NCS normal; RA-vasculitis typically painful and sensorimotor",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Inclusion body myositis",
+        "icd_code": null,
+        "key_features": "Quadriceps and finger flexor preference not seen; EMG shows denervation pattern, not myopathic",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Cervical myelopathy from RA cervical spine disease",
+        "icd_code": null,
+        "key_features": "Brain/cervical MRI does not show significant cord compromise",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Methotrexate myopathy",
+        "icd_code": null,
+        "key_features": "MTX rarely causes weakness of this pattern; EMG is neurogenic",
+        "likelihood": "very_low"
+      }
+    ],
+    "key_clinical_evidence": [
+      "Diagnosis requires evidence of both upper-motor-neuron involvement (hyperreflexia, Babinski, Hoffman, brisk jaw jerk, spasticity) and lower-motor-neuron involvement (atrophy, fasciculations, EMG denervation) with progressive spread, while excluding mimics \u2014 Awaji 2008 / Gold Coast 2020.",
+      "EMG in bulbar plus \u22652 spinal regions documenting fibrillations, positive sharp waves, complex fasciculation potentials, and large-amplitude long-duration polyphasic MUPs with reduced recruitment satisfies the electrodiagnostic criterion.",
+      "Normal sensory NCS and absence of conduction block are pivotal: they exclude common mimics including multifocal motor neuropathy, CIDP, and Kennedy disease.",
+      "Mild-to-moderate CK elevation (2\u20135\u00d7 ULN) is consistent with ALS and does not itself indicate a primary myopathy.",
+      "Cervical spondylotic changes on MRI are common incidental findings in the at-risk age group; bulbar findings or multi-region EMG denervation cannot be attributed to cervical disease.",
+      "Baseline FVC, MIP/MEP, and SNIP/NIF inform NIV timing \u2014 NIV initiation at FVC <50% predicted or SNIP <40 cmH\u2082O prolongs survival and improves quality of life.",
+      "July 2026 review applied end to end: EMG/NCS is the required ALS-specific test; brain and cord MRI and targeted labs exclude mimics; respiratory function is a recommended safety baseline; genetics is separately offered after counselling; CSF is absent except in five atypical mimic work-ups."
+    ],
+    "red_herrings": [
+      {
+        "correct_interpretation": "Muscle (not articular) wasting with fasciculations, UMN signs, and multi-region EMG denervation cannot be attributed to RA",
+        "data_point": "Active rheumatoid arthritis on methotrexate",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Anchors weakness on RA-related joint/tendon pathology",
+        "location": "Past medical history"
+      }
+    ],
+    "review_status": "draft",
+    "sequence_constraints": [],
+    "stop_rule": {
+      "max_additional_actions": 0,
+      "required_before_assessment": [
+        "action-3-analyze-brain-mri",
+        "action-4-order-body-imaging",
+        "action-5-interpret-labs",
+        "action-6-order-specialized-test"
+      ]
+    }
+  },
+  "initial_tool_outputs": {
+    "advanced_imaging": null,
+    "body_imaging": {
+      "contrast": false,
+      "findings": [
         {
-          "drug": "Methotrexate",
-          "dose": "15 mg",
-          "frequency": "once weekly",
-          "indication": "Rheumatoid arthritis"
+          "description": "{\"signal_characteristics\": {\"T2\": \"Mild degenerative changes, no cord signal change\"}, \"mass_effect\": \"Mild foraminal narrowing, no significant cord compression\"}",
+          "location": "C3-C6",
+          "type": "Cervical spine"
         },
         {
-          "drug": "Hydroxychloroquine",
-          "dose": "200 mg",
-          "frequency": "twice daily",
-          "indication": "Rheumatoid arthritis"
-        },
-        {
-          "drug": "Folic acid",
-          "dose": "1 mg",
-          "frequency": "once daily (except MTX day)",
-          "indication": "Methotrexate supplementation"
-        },
-        {
-          "drug": "Alendronate",
-          "dose": "70 mg",
-          "frequency": "once weekly",
-          "indication": "Osteoporosis"
-        },
-        {
-          "drug": "Losartan",
-          "dose": "50 mg",
-          "frequency": "once daily",
-          "indication": "Hypertension"
+          "description": "No evidence of RA-related cervical pannus at C1-C2 \u2014 atlantoaxial junction normal",
+          "location": "spine",
+          "type": "additional_observation"
         }
       ],
+      "impression": "No cervical cord compression from RA pannus. No demyelinating disease",
+      "measurements": null,
+      "modality": "MRI",
+      "recommended_actions": [],
+      "region": "cervical and thoracic spine"
+    },
+    "csf": null,
+    "ecg": null,
+    "eeg": null,
+    "labs": {
+      "abnormal_values_summary": [
+        "Hemoglobin: 11.8",
+        "ESR: 58",
+        "CRP: 12.4",
+        "CK: 580"
+      ],
+      "interpretation": "Rule-out studies do not confirm ALS. Targeted abnormalities are listed above.",
+      "panels": {
+        "BMP": [
+          {
+            "is_abnormal": false,
+            "reference_range": "0.5-1.1",
+            "test": "Creatinine",
+            "unit": "mg/dL",
+            "value": 0.8
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "70-100",
+            "test": "Glucose",
+            "unit": "mg/dL",
+            "value": 90
+          }
+        ],
+        "CBC": [
+          {
+            "is_abnormal": false,
+            "reference_range": "4.5-11.0",
+            "test": "WBC",
+            "unit": "K/uL",
+            "value": 7.8
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "12.0-16.0",
+            "test": "Hemoglobin",
+            "unit": "g/dL",
+            "value": 11.8
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "80-100",
+            "test": "MCV",
+            "unit": "fL",
+            "value": 84
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "150-400",
+            "test": "Platelets",
+            "unit": "K/uL",
+            "value": 320
+          }
+        ],
+        "Exclusion studies": [
+          {
+            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on",
+            "is_abnormal": false,
+            "reference_range": "",
+            "test": "Free T4",
+            "unit": "",
+            "value": "Within reference range"
+          }
+        ],
+        "Neuromuscular_Panel": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "24-170",
+            "test": "CK",
+            "unit": "U/L",
+            "value": 580
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "0.4-4.0",
+            "test": "TSH",
+            "unit": "mIU/L",
+            "value": 2.8
+          }
+        ],
+        "RA_Panel": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "0-20",
+            "test": "ESR",
+            "unit": "mm/hr",
+            "value": 58
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "0-5.0",
+            "test": "CRP",
+            "unit": "mg/L",
+            "value": 12.4
+          }
+        ],
+        "Reviewer baseline rule-out additions": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "200-900",
+            "test": "Vitamin B12",
+            "unit": "pg/mL",
+            "value": 420
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": ">4",
+            "test": "Folate",
+            "unit": "ng/mL",
+            "value": 10
+          }
+        ]
+      }
+    },
+    "mri": {
+      "additional_observations": [
+        "No demyelinating plaques",
+        "No mass"
+      ],
+      "findings": [
+        {
+          "borders": null,
+          "location": "Bilateral corticospinal tracts, internal capsule",
+          "mass_effect": null,
+          "signal_characteristics": {
+            "T2": "Subtle bilateral signal change"
+          },
+          "size": null,
+          "type": "T2 signal"
+        }
+      ],
+      "impression": "No cervical cord compression from RA pannus. No demyelinating disease",
+      "recommended_actions": [],
+      "volumetrics": null
+    },
+    "specialized_test": {
+      "findings": [
+        {
+          "finding": "Bilateral FDI, APB, extensor digitorum communis: fibrillations +2, PSWs +2, complex fasciculation potentials. Large amplitude (6-8 mV) long duration polyphasic MUPs. Severely reduced recruitment. Cervical paraspinals: fibrillations +1 bilaterally.",
+          "region": "Cervical"
+        },
+        {
+          "finding": "Tongue: fibrillations +1, fasciculation potentials. Mentalis muscle: fibrillations +1.",
+          "region": "Bulbar"
+        },
+        {
+          "finding": "T6-T8 paraspinals: fibrillations +1 bilaterally.",
+          "region": "Thoracic"
+        },
+        {
+          "finding": "Bilateral tibialis anterior: fasciculation potentials, mildly large MUPs, subtle fibrillations. Early lumbosacral involvement.",
+          "region": "Lumbosacral"
+        },
+        {
+          "finding": "All sensory studies normal. The abnormalities are purely motor.",
+          "finding_type": "Sensory NCS"
+        },
+        {
+          "finding": "Reduced CMAP amplitudes median and ulnar motor bilaterally. Normal conduction velocities. No conduction block. No multifocal conduction slowing.",
+          "finding_type": "Motor NCS"
+        }
+      ],
+      "impression": "Active denervation (fibrillations, positive sharp waves) and chronic reinnervation (large amplitude, polyphasic MUPs, severely reduced recruitment) are present in all 4 body regions (bulbar, cervical, thoracic, lumbosacral). Sensory NCS entirely normal. No multifocal conduction block. Motor NCS show reduced CMAP amplitudes with preserved conduction velocities. Findings indicate a widespread disorder of anterior horn cells",
+      "quantitative_data": {
+        "pattern": "Multi-region motor denervation, not confined to the territory of individual named nerves",
+        "regions": "4 regions (bulbar, cervical, thoracic, early lumbosacral)"
+      },
+      "recommended_actions": [
+        "Pulmonary function testing recommended."
+      ],
+      "test_type": "emg_ncs"
+    }
+  },
+  "metadata": {
+    "authoring_agent": "condition-expert:ALS",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "criteria_pack_version": "1.0",
+    "difficulty_rationale": "Comorbid RA anchors the team on inflammatory/articular explanation; 4 required tools, distinguishing muscular vs articular wasting is the key reasoning step",
+    "fallback_tool_kinds": {
+      "advanced_imaging": "normal",
+      "cardiac_monitoring": "normal",
+      "ct": "normal",
+      "ecg": "normal",
+      "echo": "normal",
+      "eeg": "normal"
+    },
+    "last_revised": "2026-08-10",
+    "notes": "Moderate ALS with concurrent RA. RA-related conditions (vasculitic neuropathy, myopathy, MTX toxicity) must be systematically excluded. Drug interaction between riluzole and MTX requires enhanced monitoring.",
+    "policy_spec_status": "draft",
+    "revision_reason": "independent ALS review: targeted CSF/labs, separate optional genetics, EMG diagnostic, respiratory safety baseline, brain+cord MRI",
+    "version": "policy-v1",
+    "vocab_gap": []
+  },
+  "patient": {
+    "chief_complaint": "Progressive bilateral arm weakness and hand wasting over 11 months in setting of rheumatoid arthritis",
+    "clinical_history": {
       "allergies": [
-        "NSAIDs — GI bleed history"
+        "NSAIDs \u2014 GI bleed history"
       ],
       "family_history": [
         "Husband: alive, type 2 diabetes",
         "Two children healthy",
         "No family history of ALS"
       ],
+      "medications": [
+        {
+          "dose": "15 mg",
+          "drug": "Methotrexate",
+          "frequency": "once weekly",
+          "indication": "Rheumatoid arthritis"
+        },
+        {
+          "dose": "200 mg",
+          "drug": "Hydroxychloroquine",
+          "frequency": "twice daily",
+          "indication": "Rheumatoid arthritis"
+        },
+        {
+          "dose": "1 mg",
+          "drug": "Folic acid",
+          "frequency": "once daily (except MTX day)",
+          "indication": "Methotrexate supplementation"
+        },
+        {
+          "dose": "70 mg",
+          "drug": "Alendronate",
+          "frequency": "once weekly",
+          "indication": "Osteoporosis"
+        },
+        {
+          "dose": "50 mg",
+          "drug": "Losartan",
+          "frequency": "once daily",
+          "indication": "Hypertension"
+        }
+      ],
+      "past_medical_history": [
+        "Rheumatoid arthritis, on methotrexate and hydroxychloroquine",
+        "Osteoporosis",
+        "Mild hypertension"
+      ],
       "social_history": {
-        "occupation": "Retired librarian",
-        "tobacco": "Never",
         "alcohol": "None",
+        "functional_status": "Progressive difficulty with manual tasks; grip weakness affecting daily activities",
         "living_situation": "Lives with husband",
-        "functional_status": "Progressive difficulty with manual tasks; grip weakness affecting daily activities"
+        "occupation": "Retired librarian",
+        "tobacco": "Never"
       }
     },
+    "demographics": {
+      "age": 71,
+      "bmi": 22.4,
+      "ethnicity": "White",
+      "handedness": "left",
+      "sex": "female"
+    },
+    "history_present_illness": "Mrs. B is a 71-year-old left-handed woman with rheumatoid arthritis who presents with an 11-month history of progressive bilateral arm weakness and hand wasting that is distinct from her known joint disease. She and her rheumatologist initially attributed her progressive hand weakness to worsening RA-related joint disease, tendon involvement, or possible vasculitis.\n\nHowever, over the past 6 months, the pattern became clearly different from her typical RA flares. She noticed prominent wasting of the muscles between her fingers (intrinsic muscles) and at the base of her thumbs bilaterally, disproportionate to her joint swelling. Her rheumatologist noted the atrophy was muscular rather than tenosynovial in origin. She also developed fasciculations visible in both arms at rest, which is not a feature of RA.\n\nShe has had progressive difficulty lifting objects, reaching overhead, and using scissors. Over the past 3-4 months she has noticed mild swallowing difficulties with solid foods. Her husband noted her speech occasionally sounds different. She denies sensory symptoms, noting that her hand numbness from RA is unchanged.\n\nHer rheumatologist ordered EMG to evaluate for possible mononeuritis multiplex (a rare RA complication) and found widespread denervation inconsistent with vasculitic neuropathy pattern. Anti-CCP and RF remain elevated consistent with active RA, and CK was found to be elevated at 580 U/L, initially attributed to RA-associated myopathy. The rheumatologist referred to neurology given the EMG findings and clinical picture of combined upper and lower motor neuron signs.",
     "neurological_exam": {
-      "mental_status": "Alert and oriented x4. Warm affect, good historian. No cognitive change noted by patient or family.",
-      "cranial_nerves": "Tongue midline with visible fasciculations. Mild palatal weakness right. Jaw jerk normal. No definite dysarthria at rest; slurring on rapid repetition of /pa-ta-ka/.",
-      "motor": "Upper extremities: bilateral proximal weakness deltoids 4/5, biceps 4/5. Bilateral hand weakness with difficulty with fine pinch. Thenar atrophy bilaterally, right greater than left. Lower extremities: mild bilateral hip flexor weakness 4+/5; otherwise 5/5 distally. Visible fasciculations bilateral deltoids.",
-      "sensory": "Intact to all modalities including vibration and proprioception.",
-      "reflexes": "Biceps 3+, brachioradialis 3+ bilaterally. Knee jerks 3+. Ankle jerks 2+. Hoffman bilateral. Babinski: equivocal right, extensor left.",
+      "additional": "Joint deformities consistent with rheumatoid arthritis \u2014 bilateral MCP and PIP joints. Fasciculations in bilateral deltoids.",
       "coordination": "Normal coordination excluding motor weakness artifact.",
+      "cranial_nerves": "Tongue midline with visible fasciculations. Mild palatal weakness right. Jaw jerk normal. No definite dysarthria at rest; slurring on rapid repetition of /pa-ta-ka/.",
       "gait": "Gait normal cadence. Mild bilateral shoulder girdle instability on arm swing.",
-      "additional": "Joint deformities consistent with rheumatoid arthritis — bilateral MCP and PIP joints. Fasciculations in bilateral deltoids."
+      "mental_status": "Alert and oriented x4. Warm affect, good historian. No cognitive change noted by patient or family.",
+      "motor": "Upper extremities: bilateral proximal weakness deltoids 4/5, biceps 4/5. Bilateral hand weakness with difficulty with fine pinch. Thenar atrophy bilaterally, right greater than left. Lower extremities: mild bilateral hip flexor weakness 4+/5; otherwise 5/5 distally. Visible fasciculations bilateral deltoids.",
+      "reflexes": "Biceps 3+, brachioradialis 3+ bilaterally. Knee jerks 3+. Ankle jerks 2+. Hoffman bilateral. Babinski: equivocal right, extensor left.",
+      "sensory": "Intact to all modalities including vibration and proprioception."
     },
+    "patient_id": "NB-ALS-M06",
     "vitals": {
-      "bp_systolic": 122,
       "bp_diastolic": 74,
+      "bp_systolic": 122,
       "hr": 68,
-      "temp": 36.6,
       "rr": 14,
-      "spo2": 98
-    },
-    "chief_complaint": "Progressive bilateral arm weakness and hand wasting over 11 months in setting of rheumatoid arthritis",
-    "history_present_illness": "Mrs. B is a 71-year-old left-handed woman with rheumatoid arthritis who presents with an 11-month history of progressive bilateral arm weakness and hand wasting that is distinct from her known joint disease. She and her rheumatologist initially attributed her progressive hand weakness to worsening RA-related joint disease, tendon involvement, or possible vasculitis.\n\nHowever, over the past 6 months, the pattern became clearly different from her typical RA flares. She noticed prominent wasting of the muscles between her fingers (intrinsic muscles) and at the base of her thumbs bilaterally, disproportionate to her joint swelling. Her rheumatologist noted the atrophy was muscular rather than tenosynovial in origin. She also developed fasciculations visible in both arms at rest, which is not a feature of RA.\n\nShe has had progressive difficulty lifting objects, reaching overhead, and using scissors. Over the past 3-4 months she has noticed mild swallowing difficulties with solid foods. Her husband noted her speech occasionally sounds different. She denies sensory symptoms, noting that her hand numbness from RA is unchanged.\n\nHer rheumatologist ordered EMG to evaluate for possible mononeuritis multiplex (a rare RA complication) and found widespread denervation inconsistent with vasculitic neuropathy pattern. Anti-CCP and RF remain elevated consistent with active RA, and CK was found to be elevated at 580 U/L, initially attributed to RA-associated myopathy. The rheumatologist referred to neurology given the EMG findings and clinical picture of combined upper and lower motor neuron signs."
-  },
-  "initial_tool_outputs": {
-    "mri": {
-      "findings": [
-        {
-          "type": "T2 signal",
-          "location": "Bilateral corticospinal tracts, internal capsule",
-          "size": null,
-          "signal_characteristics": {
-            "T2": "Subtle bilateral signal change"
-          },
-          "mass_effect": null,
-          "borders": null
-        }
-      ],
-      "volumetrics": null,
-      "additional_observations": [
-        "No demyelinating plaques",
-        "No mass"
-      ],
-      "impression": "No cervical cord compression from RA pannus. No demyelinating disease",
-      "recommended_actions": []
-    },
-    "labs": {
-      "panels": {
-        "CBC": [
-          {
-            "test": "WBC",
-            "value": 7.8,
-            "unit": "K/uL",
-            "reference_range": "4.5-11.0",
-            "is_abnormal": false
-          },
-          {
-            "test": "Hemoglobin",
-            "value": 11.8,
-            "unit": "g/dL",
-            "reference_range": "12.0-16.0",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "MCV",
-            "value": 84,
-            "unit": "fL",
-            "reference_range": "80-100",
-            "is_abnormal": false
-          },
-          {
-            "test": "Platelets",
-            "value": 320,
-            "unit": "K/uL",
-            "reference_range": "150-400",
-            "is_abnormal": false
-          }
-        ],
-        "BMP": [
-          {
-            "test": "Creatinine",
-            "value": 0.8,
-            "unit": "mg/dL",
-            "reference_range": "0.5-1.1",
-            "is_abnormal": false
-          },
-          {
-            "test": "Glucose",
-            "value": 90,
-            "unit": "mg/dL",
-            "reference_range": "70-100",
-            "is_abnormal": false
-          }
-        ],
-        "RA_Panel": [
-          {
-            "test": "ESR",
-            "value": 58,
-            "unit": "mm/hr",
-            "reference_range": "0-20",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "CRP",
-            "value": 12.4,
-            "unit": "mg/L",
-            "reference_range": "0-5.0",
-            "is_abnormal": true,
-            "clinical_significance": null
-          }
-        ],
-        "Neuromuscular_Panel": [
-          {
-            "test": "CK",
-            "value": 580,
-            "unit": "U/L",
-            "reference_range": "24-170",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "TSH",
-            "value": 2.8,
-            "unit": "mIU/L",
-            "reference_range": "0.4-4.0",
-            "is_abnormal": false
-          }
-        ],
-        "Exclusion studies": [
-          {
-            "test": "Free T4",
-            "value": "Within reference range",
-            "unit": "",
-            "reference_range": "",
-            "is_abnormal": false,
-            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on"
-          }
-        ],
-        "Reviewer baseline rule-out additions": [
-          {
-            "test": "Vitamin B12",
-            "value": 420,
-            "unit": "pg/mL",
-            "reference_range": "200-900",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Folate",
-            "value": 10,
-            "unit": "ng/mL",
-            "reference_range": ">4",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ]
-      },
-      "interpretation": "Rule-out studies do not confirm ALS. Targeted abnormalities are listed above.",
-      "abnormal_values_summary": [
-        "Hemoglobin: 11.8",
-        "ESR: 58",
-        "CRP: 12.4",
-        "CK: 580"
-      ]
-    },
-    "specialized_test": {
-      "test_type": "emg_ncs",
-      "findings": [
-        {
-          "region": "Cervical",
-          "finding": "Bilateral FDI, APB, extensor digitorum communis: fibrillations +2, PSWs +2, complex fasciculation potentials. Large amplitude (6-8 mV) long duration polyphasic MUPs. Severely reduced recruitment. Cervical paraspinals: fibrillations +1 bilaterally."
-        },
-        {
-          "region": "Bulbar",
-          "finding": "Tongue: fibrillations +1, fasciculation potentials. Mentalis muscle: fibrillations +1."
-        },
-        {
-          "region": "Thoracic",
-          "finding": "T6-T8 paraspinals: fibrillations +1 bilaterally."
-        },
-        {
-          "region": "Lumbosacral",
-          "finding": "Bilateral tibialis anterior: fasciculation potentials, mildly large MUPs, subtle fibrillations. Early lumbosacral involvement."
-        },
-        {
-          "finding_type": "Sensory NCS",
-          "finding": "All sensory studies normal. The abnormalities are purely motor."
-        },
-        {
-          "finding_type": "Motor NCS",
-          "finding": "Reduced CMAP amplitudes median and ulnar motor bilaterally. Normal conduction velocities. No conduction block. No multifocal conduction slowing."
-        }
-      ],
-      "quantitative_data": {
-        "pattern": "Multi-region motor denervation, not confined to the territory of individual named nerves",
-        "regions": "4 regions (bulbar, cervical, thoracic, early lumbosacral)"
-      },
-      "impression": "Active denervation (fibrillations, positive sharp waves) and chronic reinnervation (large amplitude, polyphasic MUPs, severely reduced recruitment) are present in all 4 body regions (bulbar, cervical, thoracic, lumbosacral). Sensory NCS entirely normal. No multifocal conduction block. Motor NCS show reduced CMAP amplitudes with preserved conduction velocities. Findings indicate a widespread disorder of anterior horn cells",
-      "recommended_actions": [
-        "Pulmonary function testing recommended."
-      ]
-    },
-    "body_imaging": {
-      "region": "cervical and thoracic spine",
-      "modality": "MRI",
-      "contrast": false,
-      "findings": [
-        {
-          "type": "Cervical spine",
-          "location": "C3-C6",
-          "description": "{\"signal_characteristics\": {\"T2\": \"Mild degenerative changes, no cord signal change\"}, \"mass_effect\": \"Mild foraminal narrowing, no significant cord compression\"}"
-        },
-        {
-          "type": "additional_observation",
-          "location": "spine",
-          "description": "No evidence of RA-related cervical pannus at C1-C2 — atlantoaxial junction normal"
-        }
-      ],
-      "measurements": null,
-      "impression": "No cervical cord compression from RA pannus. No demyelinating disease",
-      "recommended_actions": []
-    },
-    "eeg": null,
-    "ecg": null,
-    "advanced_imaging": null,
-    "csf": null
-  },
-  "followup_outputs": [
-    {
-      "trigger_action": "check_riluzole_methotrexate_interaction",
-      "tool_name": "check_drug_interactions",
-      "output": {
-        "proposed": "Riluzole 50 mg twice daily",
-        "interactions": [
-          "Methotrexate: both hepatotoxic — LFT monitoring frequency increased to every 2 weeks initially, then monthly",
-          "Hydroxychloroquine: no significant interaction with riluzole"
-        ],
-        "contraindications": [],
-        "warnings": [
-          "Significantly increased hepatotoxicity risk with concurrent MTX — LFT monitoring critical",
-          "Consider reducing MTX dose after rheumatology discussion if LFTs become abnormal",
-          "Folic acid should be continued as it does not affect riluzole"
-        ],
-        "formulary_status": "Covered with prior authorisation",
-        "alternatives": [
-          "AMX0035 — lower hepatotoxicity profile, may be preferred given MTX use"
-        ]
-      }
-    },
-    {
-      "trigger_action": "search_als_ra_comorbidity",
-      "tool_name": "search_medical_literature",
-      "output": {
-        "query": "ALS rheumatoid arthritis comorbidity differential diagnosis",
-        "results": [
-          {
-            "title": "Motor neuron disease and autoimmune disease comorbidity",
-            "finding": "Rheumatoid arthritis and motor neuron disease may co-occur but are biologically distinct conditions; concurrent diagnosis requires independent electrodiagnostic evaluation"
-          },
-          {
-            "title": "MTX neurotoxicity",
-            "finding": "Methotrexate neurotoxicity predominantly affects the CNS (leukoencephalopathy) at high doses; peripheral motor neuron disease is not a recognized MTX adverse effect"
-          }
-        ],
-        "summary": "Co-occurrence of motor neuron disease and rheumatoid arthritis is reported in the literature; both conditions require independent diagnostic evaluation. Methotrexate neurotoxicity predominantly affects the CNS (leukoencephalopathy) at high doses; peripheral motor neuron disease is not a recognized methotrexate adverse effect."
-      }
-    },
-    {
-      "trigger_action": "request_baseline_respiratory_function",
-      "tool_name": "order_specialized_test",
-      "tool_parameters": {
-        "test_type": "respiratory_function"
-      },
-      "output": {
-        "test_type": "respiratory_function",
-        "findings": [
-          {
-            "panel": "PFT",
-            "test": "FVC",
-            "result": "76",
-            "reference_range": ">80%"
-          },
-          {
-            "panel": "PFT",
-            "test": "SNIP",
-            "result": "55",
-            "reference_range": ">70 cmH2O women"
-          }
-        ],
-        "quantitative_data": {
-          "FVC": "76",
-          "SNIP": "55"
-        },
-        "impression": "Abnormal values: FVC 76 % predicted (L), SNIP 55 cmH2O (L).",
-        "recommended_actions": []
-      }
-    },
-    {
-      "trigger_action": "offer_als_genetic_panel_after_counselling",
-      "tool_name": "order_specialized_test",
-      "tool_parameters": {
-        "test_type": "genetic_panel:ALS"
-      },
-      "output": {
-        "test_type": "genetic_panel:ALS",
-        "findings": [
-          {
-            "panel": "Neurodegenerative_Genetic_Panel",
-            "test": "C9orf72",
-            "result": "Negative",
-            "reference_range": "<30 repeats",
-            "interpretation": ""
-          },
-          {
-            "panel": "Neurodegenerative_Genetic_Panel",
-            "test": "SOD1",
-            "result": "No pathogenic variant",
-            "reference_range": "No pathogenic variant",
-            "interpretation": ""
-          }
-        ],
-        "quantitative_data": {
-          "C9orf72": "Negative",
-          "SOD1": "No pathogenic variant"
-        },
-        "impression": "All values within normal limits.",
-        "recommended_actions": []
-      }
+      "spo2": 98,
+      "temp": 36.6
     }
-  ],
-  "fallback_tool_outputs": {
-    "eeg": {
-      "classification": "normal",
-      "background": {
-        "pdr": "9-10 Hz posterior dominant rhythm, symmetric and reactive",
-        "sleep_features": "normal vertex waves and sleep spindles",
-        "overall": "normal organisation for age"
-      },
-      "findings": [],
-      "artifacts": [],
-      "activating_procedures": {},
-      "impression": "Normal awake and drowsy EEG. No epileptiform discharges and no focal slowing.",
-      "limitations": "",
-      "recommended_actions": []
-    },
-    "mri": null,
-    "ecg": {
-      "rhythm": "normal sinus rhythm",
-      "rate": 66,
-      "intervals": {
-        "PR": "162 ms",
-        "QRS": "91 ms",
-        "QTc": "438 ms"
-      },
-      "axis": "normal",
-      "findings": [
-        "Normal sinus rhythm. Normal axis and intervals. No acute ST-T changes."
-      ],
-      "interpretation": "Normal ECG",
-      "clinical_correlation": ""
-    },
-    "labs": null,
-    "csf": null,
-    "ct": {
-      "findings": [],
-      "contrast_used": false,
-      "angiography_findings": null,
-      "additional_observations": [],
-      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
-      "recommended_actions": []
-    },
-    "echo": {
-      "chambers": {
-        "LV": "normal size and systolic function",
-        "RV": "normal size and function",
-        "LA": "normal size",
-        "RA": "normal size"
-      },
-      "valves": {
-        "mitral": "structurally normal",
-        "aortic": "structurally normal",
-        "tricuspid": "normal",
-        "pulmonic": "normal"
-      },
-      "ejection_fraction": 62.0,
-      "wall_motion": "no regional wall-motion abnormality",
-      "findings": [
-        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
-      ],
-      "impression": "Normal transthoracic echocardiogram.",
-      "recommended_actions": []
-    },
-    "cardiac_monitoring": {
-      "duration_hours": 24,
-      "monitor_type": "holter_24h",
-      "rhythm_summary": "Sinus rhythm throughout the recording",
-      "heart_rate_range": {
-        "min": 55,
-        "max": 122,
-        "average": 68
-      },
-      "events": [],
-      "findings": [
-        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
-      ],
-      "impression": "Normal 24-hour Holter monitor.",
-      "recommended_actions": []
-    },
-    "advanced_imaging": {
-      "modality": "",
-      "tracer_or_protocol": null,
-      "findings": [],
-      "quantitative_data": null,
-      "impression": "No abnormality identified.",
-      "recommended_actions": []
-    },
-    "specialized_test": null,
-    "literature_search": null,
-    "drug_interactions": null
   },
-  "ground_truth": {
-    "primary_diagnosis": "Amyotrophic lateral sclerosis (ALS) with concurrent rheumatoid arthritis",
-    "icd_code": "G12.21",
-    "differential": [
-      {
-        "diagnosis": "Rheumatoid muscle/tendon disease",
-        "likelihood": "moderate",
-        "key_features": "Patient has active RA, but wasting is muscular rather than tenosynovial and UMN signs are present",
-        "icd_code": null
-      },
-      {
-        "diagnosis": "Vasculitic neuropathy (RA-associated)",
-        "likelihood": "low",
-        "key_features": "Sensory NCS normal; RA-vasculitis typically painful and sensorimotor",
-        "icd_code": null
-      },
-      {
-        "diagnosis": "Inclusion body myositis",
-        "likelihood": "low",
-        "key_features": "Quadriceps and finger flexor preference not seen; EMG shows denervation pattern, not myopathic",
-        "icd_code": null
-      },
-      {
-        "diagnosis": "Cervical myelopathy from RA cervical spine disease",
-        "likelihood": "low",
-        "key_features": "Brain/cervical MRI does not show significant cord compromise",
-        "icd_code": null
-      },
-      {
-        "diagnosis": "Methotrexate myopathy",
-        "likelihood": "very_low",
-        "key_features": "MTX rarely causes weakness of this pattern; EMG is neurogenic",
-        "icd_code": null
-      }
-    ],
-    "optimal_actions": [
-      {
-        "step": 1,
-        "action": "Search the medical literature to confirm Awaji and Gold Coast diagnostic thresholds and AAN practice-parameter recommendations relevant to this presentation",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Awaji-Shima 2008 / Gold Coast 2020 diagnostic criteria; AAN 2009 practice parameter on ALS care",
-        "category": "recommended",
-        "tool_parameters": {
-          "query": "ALS diagnostic criteria Awaji Gold Coast AAN practice parameter"
-        },
-        "citation": "[Awaji_2008]",
-        "guideline_source": "Awaji_2008"
-      },
-      {
-        "step": 2,
-        "action": "Check interactions before initiating riluzole 50 mg twice daily; review baseline LFTs and CBC and counsel on monitoring",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "No major interactions for typical chronic medications; advise alcohol and grapefruit-juice avoidance (CYP1A2 modulators); monthly LFTs for first 3 months",
-        "category": "recommended",
-        "tool_parameters": {
-          "drug": "riluzole"
-        },
-        "citation": "[AAN_2009]",
-        "guideline_source": "AAN_2009"
-      },
-      {
-        "action": "Obtain brain MRI to exclude structural, brainstem, inflammatory, demyelinating or neoplastic ALS mimics",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "No better structural explanation for progressive upper and lower motor-neuron findings",
-        "category": "required",
-        "tool_parameters": {
-          "protocol": "standard",
-          "contrast": true
-        },
-        "citation": "[EAN_ALS_2024]",
-        "guideline_source": "Gold Coast; EAN 2024; NICE NG42",
-        "step": 3
-      },
-      {
-        "action": "Obtain cervical and thoracic spinal-cord MRI to exclude compressive myelopathy and other cord lesions",
-        "tool_name": "order_body_imaging",
-        "expected_finding": "No compressive, neoplastic, inflammatory or demyelinating cord mimic",
-        "category": "required",
-        "tool_parameters": {
-          "study": "spine_MRI",
-          "contrast": false
-        },
-        "citation": "[EAN_ALS_2024]",
-        "guideline_source": "Gold Coast; EAN 2024; NICE NG42",
-        "step": 4
-      },
-      {
-        "action": "Order a baseline treatable-mimic panel, adding only phenotype-specific infectious, immune, paraprotein or metabolic tests",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Exclude common hematologic, renal/hepatic, electrolyte, calcium, thyroid, B12/folate, muscle and inflammatory alternatives; tests do not confirm ALS",
-        "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "CMP",
-            "calcium",
-            "TSH",
-            "vitamin_B12",
-            "folate",
-            "CK",
-            "ESR",
-            "CRP"
-          ]
-        },
-        "citation": "[EAN_ALS_2024]",
-        "guideline_source": "Gold Coast; EAN 2024; NICE NG42",
-        "step": 5
-      },
-      {
-        "action": "Perform EMG/NCS across bulbar, cervical, thoracic and lumbosacral regions using ALS electrodiagnostic criteria",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Active and chronic neurogenic change in multiple regions with preserved sensory studies and no conduction block",
-        "category": "required",
-        "tool_parameters": {
-          "test_type": "emg_ncs"
-        },
-        "citation": "[EAN_ALS_2024]",
-        "guideline_source": "Gold Coast; EAN 2024; NICE NG42",
-        "step": 6
-      },
-      {
-        "action": "Obtain baseline FVC/VC and SNIP or MIP after suspected ALS is established; this is a safety and management assessment, not a diagnostic confirmation",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Quantify respiratory involvement and need for surveillance or non-invasive ventilation",
-        "category": "recommended",
-        "tool_parameters": {
-          "test_type": "respiratory_function"
-        },
-        "citation": "[EAN_ALS_2024]",
-        "guideline_source": "Gold Coast; EAN 2024; NICE NG42",
-        "step": 7
-      },
-      {
-        "action": "Offer an ALS gene panel including C9orf72 and SOD1 after pre-test counselling; do not embed genetics in a routine blood panel",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "A pathogenic result can affect counselling, family risk and gene-targeted therapy/trial eligibility; a negative result does not exclude ALS",
-        "category": "optional",
-        "tool_parameters": {
-          "test_type": "genetic_panel:ALS"
-        },
-        "citation": "[EAN_ALS_2024]",
-        "guideline_source": "Gold Coast; EAN 2024; NICE NG42",
-        "step": 8
-      }
-    ],
-    "useless_tools": [
-      {
-        "tool_name": "analyze_eeg",
-        "tool_parameters": {},
-        "rationale": "ALS is a motor-neuron disease without cortical electrical signature; EEG has no diagnostic role and adds cost without benefit.",
-        "citation": "[AAN_2009]"
-      },
-      {
-        "tool_name": "analyze_ecg",
-        "tool_parameters": {},
-        "rationale": "ECG is unrelated to motor neuron disease and not part of the standard ALS workup absent specific cardiac symptoms or pre-medication QTc checks.",
-        "citation": "[AAN_2009]"
-      },
-      {
-        "tool_name": "order_echocardiogram",
-        "tool_parameters": {},
-        "rationale": "Echocardiography is unrelated to ALS diagnosis; no indication absent comorbid cardiac disease.",
-        "citation": "[AAN_2009]"
-      },
-      {
-        "tool_name": "order_cardiac_monitoring",
-        "tool_parameters": {},
-        "rationale": "Cardiac monitoring has no role in ALS diagnostic workup.",
-        "citation": "[AAN_2009]"
-      },
-      {
-        "tool_name": "order_ct_scan",
-        "tool_parameters": {},
-        "rationale": "MRI is the standard structural study for ALS workup; head CT adds no diagnostic value and exposes the patient to ionizing radiation.",
-        "citation": "[AAN_2009]"
-      },
-      {
-        "tool_name": "order_advanced_imaging",
-        "tool_parameters": {
-          "modality": "amyloid_PET"
-        },
-        "rationale": "Amyloid PET has no role in ALS diagnosis (motor-neuron rather than amyloid pathology) and carries a high cost.",
-        "citation": "[AAN_2009]"
-      },
-      {
-        "tool_name": "order_advanced_imaging",
-        "tool_parameters": {
-          "modality": "DaTscan"
-        },
-        "rationale": "DaTscan evaluates nigrostriatal dopaminergic integrity; it has no role in ALS, which spares the dopaminergic system.",
-        "citation": "[AAN_2009]"
-      },
-      {
-        "tool_name": "order_advanced_imaging",
-        "tool_parameters": {
-          "modality": "FDG_PET"
-        },
-        "rationale": "FDG-PET has no established diagnostic role in ALS and adds substantial cost.",
-        "citation": "[AAN_2009]"
-      }
-    ],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "critical_actions": [
-      "Perform EMG/NCS sampling the bulbar region plus ≥2 spinal regions to document lower-motor-neuron involvement and exclude conduction block.",
-      "Obtain brain MRI to exclude structural mimics (cervical myelopathy, demyelinating disease, brainstem tumor).",
-      "Order a mimic-exclusion lab panel (CK, B12, TSH, HIV, RPR, SPEP, anti-GM1 IgM, androgen receptor CAG repeat in males).",
-      "Measure baseline respiratory function (FVC, MIP/MEP, SNIP) to inform NIV timing.",
-      "Apply Awaji-Shima 2008 / Gold Coast 2020 criteria to confirm the diagnosis.",
-      "Initiate riluzole 50 mg twice daily after baseline LFTs unless contraindicated; arrange monthly LFT monitoring for the first 3 months.",
-      "Refer to a multidisciplinary ALS clinic for SLP, dietetics, respiratory, and social-work input."
-    ],
-    "contraindicated_actions": [
-      "Do not commit the patient to cervical spine surgery on the basis of incidental spondylotic changes when EMG findings extend beyond the cervical cord.",
-      "Do not start chronic immunosuppression (steroids, IVIG, plasma exchange) for ALS — there is no benefit and treatment delays correct diagnosis.",
-      "Do not defer respiratory assessment in a symptomatic patient — even mild FVC reduction warrants close monitoring and NIV planning.",
-      "Do not dismiss bulbar or progressive symptoms as functional / psychiatric without a complete neurological workup."
-    ],
-    "key_reasoning_points": [
-      "Diagnosis requires evidence of both upper-motor-neuron involvement (hyperreflexia, Babinski, Hoffman, brisk jaw jerk, spasticity) and lower-motor-neuron involvement (atrophy, fasciculations, EMG denervation) with progressive spread, while excluding mimics — Awaji 2008 / Gold Coast 2020.",
-      "EMG in bulbar plus ≥2 spinal regions documenting fibrillations, positive sharp waves, complex fasciculation potentials, and large-amplitude long-duration polyphasic MUPs with reduced recruitment satisfies the electrodiagnostic criterion.",
-      "Normal sensory NCS and absence of conduction block are pivotal: they exclude common mimics including multifocal motor neuropathy, CIDP, and Kennedy disease.",
-      "Mild-to-moderate CK elevation (2–5× ULN) is consistent with ALS and does not itself indicate a primary myopathy.",
-      "Cervical spondylotic changes on MRI are common incidental findings in the at-risk age group; bulbar findings or multi-region EMG denervation cannot be attributed to cervical disease.",
-      "Baseline FVC, MIP/MEP, and SNIP/NIF inform NIV timing — NIV initiation at FVC <50% predicted or SNIP <40 cmH₂O prolongs survival and improves quality of life.",
-      "July 2026 review applied end to end: EMG/NCS is the required ALS-specific test; brain and cord MRI and targeted labs exclude mimics; respiratory function is a recommended safety baseline; genetics is separately offered after counselling; CSF is absent except in five atypical mimic work-ups."
-    ],
-    "red_herrings": [
-      {
-        "data_point": "Active rheumatoid arthritis on methotrexate",
-        "location": "Past medical history",
-        "field_path": "patient.clinical_history.past_medical_history",
-        "intended_effect": "Anchors weakness on RA-related joint/tendon pathology",
-        "correct_interpretation": "Muscle (not articular) wasting with fasciculations, UMN signs, and multi-region EMG denervation cannot be attributed to RA"
-      }
-    ]
-  },
-  "metadata": {
-    "version": "v5",
-    "notes": "Moderate ALS with concurrent RA. RA-related conditions (vasculitic neuropathy, myopathy, MTX toxicity) must be systematically excluded. Drug interaction between riluzole and MTX requires enhanced monitoring.",
-    "fallback_tool_kinds": {
-      "eeg": "normal",
-      "ecg": "normal",
-      "ct": "normal",
-      "echo": "normal",
-      "cardiac_monitoring": "normal",
-      "advanced_imaging": "normal"
-    },
-    "last_revised": "2026-08-10",
-    "revision_reason": "independent ALS review: targeted CSF/labs, separate optional genetics, EMG diagnostic, respiratory safety baseline, brain+cord MRI",
-    "criteria_pack_version": "1.0",
-    "authoring_agent": "condition-expert:ALS",
-    "difficulty_rationale": "Comorbid RA anchors the team on inflammatory/articular explanation; 4 required tools, distinguishing muscular vs articular wasting is the key reasoning step",
-    "case_body_concerns": [],
-    "citation_gap": [],
-    "vocab_gap": []
-  }
+  "schema_version": "2.0"
 }

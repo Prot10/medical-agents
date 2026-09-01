@@ -3,41 +3,625 @@
   "condition": "functional_neurological_disorder",
   "difficulty": "straightforward",
   "encounter_type": "inpatient",
-  "patient": {
-    "patient_id": "NB-FND-S09",
-    "demographics": {
-      "age": 31,
-      "sex": "male",
-      "handedness": "right",
-      "ethnicity": "White",
-      "bmi": 25.8
+  "fallback_tool_outputs": {
+    "advanced_imaging": {
+      "findings": [],
+      "impression": "No abnormality identified.",
+      "modality": "",
+      "quantitative_data": null,
+      "recommended_actions": [],
+      "tracer_or_protocol": null
     },
-    "clinical_history": {
-      "past_medical_history": [
-        "Post-traumatic stress disorder (combat-related, 3 tours of duty)",
-        "Chronic low back pain",
-        "Mild TBI (diagnosed after blast exposure in 2019)"
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
       ],
-      "medications": [
+      "heart_rate_range": {
+        "average": 77,
+        "max": 111,
+        "min": 52
+      },
+      "impression": "Normal 24-hour Holter monitor.",
+      "monitor_type": "holter_24h",
+      "recommended_actions": [],
+      "rhythm_summary": "Sinus rhythm throughout the recording"
+    },
+    "csf": {
+      "appearance": "clear and colourless",
+      "cell_count": {
+        "rbc": "0 /uL",
+        "wbc": "2 /uL"
+      },
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose.",
+      "opening_pressure": "16 cm H2O",
+      "protein": "38 mg/dL",
+      "special_tests": {}
+    },
+    "ct": {
+      "additional_observations": [],
+      "angiography_findings": null,
+      "contrast_used": false,
+      "findings": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "drug_interactions": null,
+    "ecg": {
+      "axis": "normal",
+      "clinical_correlation": "",
+      "findings": [
+        "Normal sinus rhythm. Normal axis and intervals. No acute ST-T changes."
+      ],
+      "interpretation": "Normal ECG",
+      "intervals": {
+        "PR": "140 ms",
+        "QRS": "100 ms",
+        "QTc": "432 ms"
+      },
+      "rate": 70,
+      "rhythm": "normal sinus rhythm"
+    },
+    "echo": {
+      "chambers": {
+        "LA": "normal size",
+        "LV": "normal size and systolic function",
+        "RA": "normal size",
+        "RV": "normal size and function"
+      },
+      "ejection_fraction": 63.0,
+      "findings": [
+        "Trace mitral regurgitation, physiological. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Structurally near-normal heart with a benign incidental finding.",
+      "recommended_actions": [],
+      "valves": {
+        "aortic": "structurally normal",
+        "mitral": "structurally normal",
+        "pulmonic": "normal",
+        "tricuspid": "normal"
+      },
+      "wall_motion": "no regional wall-motion abnormality"
+    },
+    "eeg": null,
+    "labs": null,
+    "literature_search": null,
+    "mri": null,
+    "specialized_test": {
+      "findings": [],
+      "impression": "Study within normal limits.",
+      "quantitative_data": null,
+      "recommended_actions": [],
+      "test_type": ""
+    }
+  },
+  "followup_outputs": [
+    {
+      "output": {
+        "query": "functional neurological disorder veterans PTSD co-occurrence disability",
+        "results": [
+          {
+            "journal": "Journal of Neuropsychiatry",
+            "pmid": "30503873",
+            "title": "Functional neurological symptom disorder in veterans: prevalence and relationship to PTSD",
+            "year": "2018"
+          }
+        ],
+        "summary": ""
+      },
+      "tool_name": "search_medical_literature",
+      "trigger_action": "va_fnd_ptsd_documentation"
+    },
+    {
+      "output": {
+        "alternatives": [
+          "Acamprosate if hepatic function worsens"
+        ],
+        "contraindications": [
+          "Active opioid use \u2014 patient denies"
+        ],
+        "formulary_status": "VA formulary \u2014 covered",
+        "interactions": [
+          "Sertraline: no clinically significant interaction",
+          "Prazosin: no interaction"
+        ],
+        "proposed": "Naltrexone 50 mg daily (for alcohol use disorder)",
+        "warnings": [
+          "Do not use naltrexone if patient uses opioids \u2014 will precipitate withdrawal",
+          "Monitor liver enzymes given elevated GGT at baseline",
+          "Naltrexone has no significant interaction with concurrent neurological or psychological therapies and can be co-administered"
+        ]
+      },
+      "tool_name": "check_drug_interactions",
+      "trigger_action": "alcohol_counseling_referral"
+    }
+  ],
+  "ground_truth": {
+    "action_criteria": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "query": "functional neurological disorder diagnosis treatment"
+            },
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[Nielsen_2015]",
+          "FND criteria pack \u2014 treatment evidence"
+        ],
+        "criterion_id": "action-1-search-medical-literature",
+        "expected_evidence": "Confirms multidisciplinary CBT + physiotherapy is the evidence-based treatment for FND",
+        "importance": "recommended",
+        "label": "Search current literature on FND diagnostic signs and evidence-based treatment (CBT for PNES, specialized physiotherapy for functional motor symptoms)",
+        "rationale": "Search current literature on FND diagnostic signs and evidence-based treatment (CBT for PNES, specialized physiotherapy for functional motor symptoms)"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [
+          "FND criteria pack \u2014 medication review"
+        ],
+        "criterion_id": "action-2-check-drug-interactions",
+        "expected_evidence": "Identification of medication contributors that should be tapered or discontinued",
+        "importance": "recommended",
+        "label": "Review current medications for agents that may exacerbate symptoms (e.g., benzodiazepines, dopamine-blocking antipsychotics, AEDs initiated for PNES)",
+        "rationale": "Review current medications for agents that may exacerbate symptoms (e.g., benzodiazepines, dopamine-blocking antipsychotics, AEDs initiated for PNES)"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "assessment_type": "functional_neuro_signs"
+            },
+            "tool_name": "perform_clinical_assessment"
+          }
+        ],
+        "citations": [
+          "[AAN_Functional_Seizures_2025]",
+          "positive FND signs; AAN functional seizures guideline 2025"
+        ],
+        "criterion_id": "action-3-perform-clinical-assessment",
+        "expected_evidence": "Positive rule-in signs establish FND; symptoms are real and involuntary, and psychological stress is not a required diagnostic criterion",
+        "importance": "required",
+        "label": "Perform and document a positive FND examination: internal inconsistency/incongruity, Hoover sign, entrainment/distractibility or positive functional-seizure semiology as appropriate",
+        "rationale": "Perform and document a positive FND examination: internal inconsistency/incongruity, Hoover sign, entrainment/distractibility or positive functional-seizure semiology as appropriate"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "eeg_type": "video"
+            },
+            "tool_name": "analyze_eeg"
+          }
+        ],
+        "citations": [
+          "[AAN_Functional_Seizures_2025]",
+          "positive FND signs; AAN functional seizures guideline 2025"
+        ],
+        "criterion_id": "action-4-analyze-eeg",
+        "expected_evidence": "Typical clinical event without an epileptic ictal correlate, interpreted together with semiology; interictal normality alone is insufficient",
+        "importance": "optional",
+        "label": "Consider video-EEG capture of a typical event when epilepsy versus functional seizure remains ambiguous",
+        "rationale": "Consider video-EEG capture of a typical event when epilepsy versus functional seizure remains ambiguous"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "CMP",
+                "magnesium",
+                "thiamine_B1"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[AAN_Functional_Seizures_2025]",
+          "positive FND signs; AAN functional seizures guideline 2025"
+        ],
+        "criterion_id": "action-5-interpret-labs",
+        "expected_evidence": "Answer the specific alternative diagnosis; normal blood tests do not establish FND",
+        "importance": "optional",
+        "label": "Consider only case-targeted blood tests for the named metabolic, inflammatory, nutritional or treatment-related mimic",
+        "rationale": "Consider only case-targeted blood tests for the named metabolic, inflammatory, nutritional or treatment-related mimic"
+      }
+    ],
+    "assessment": {
+      "prohibited_recommendations": [
+        "Do not pursue ever-expanding negative investigations \u2014 per Stone 2018, repeated negative workups reinforce illness conviction and worsen prognosis",
+        "Do not frame the diagnosis as 'all in your head', 'nothing wrong', or 'we couldn't find anything' \u2014 this damages the therapeutic alliance and is the most common avoidable harm in FND",
+        "Do not perform invasive testing (lumbar puncture, nerve biopsy, muscle biopsy, cerebral angiography) when positive rule-in signs are present and there is no clinical indication",
+        "Do not order EMG/NCS, muscle biopsy, or nerve biopsy as part of an FND workup \u2014 these invasive tests reinforce the somatic illness model per Stone 2018",
+        "Do not start or continue long-term anti-epileptic drugs for functional (psychogenic non-epileptic) seizures \u2014 AEDs are ineffective for PNES and expose the patient to side effects",
+        "Do not give benzodiazepines as abortive therapy for witnessed PNES events (no benefit and risk of respiratory depression)",
+        "Do not give gadolinium without a specific indication \u2014 contrast adds cost and risk and answers no question that positive functional signs have not already answered",
+        "Do not repeat the brain MRI, the laboratory panel or the lumbar puncture once a first normal study and positive rule-in signs are documented: each repetition strengthens the patient's belief that something organic has been missed"
+      ],
+      "required_recommendations": [
+        "Do NOT make the diagnosis by exclusion: document at least one positive rule-in sign, which is the act that establishes it",
+        "Obtain video-EEG capturing a habitual event with normal interictal EEG to confirm PNES",
+        "Communicate the diagnosis transparently using positive language and the rule-in signs as the basis",
+        "Refer for FND-informed physiotherapy and CBT / psychological therapy",
+        "Order a comprehensive neuropsychological battery to characterize comorbid depression, anxiety, somatization, and trauma exposure \u2014 informs treatment planning (criteria-pack 'recommended' tier)",
+        "Communicate the diagnosis transparently using positive language anchored on the rule-in signs; explicitly state the diagnosis is FND, the symptoms are real and involuntary, and there is an evidence-based treatment plan",
+        "Refer to specialized FND-informed physiotherapy (for functional motor symptoms) and to CBT / psychological therapy (for PNES and comorbid mood / anxiety)"
+      ]
+    },
+    "avoided_actions": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_ecg"
+          }
+        ],
+        "citations": [
+          "[Stone_2018]"
+        ],
+        "criterion_id": "avoid-waste-1-analyze-ecg",
+        "rationale": "ECG has no diagnostic role in FND; cardiac etiology is not on the differential for the presenting neurological deficit.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_echocardiogram"
+          }
+        ],
+        "citations": [
+          "[Stone_2018]"
+        ],
+        "criterion_id": "avoid-waste-2-order-echocardiogram",
+        "rationale": "Echocardiography has no role in FND; no structural cardiac question is raised by the presentation.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_cardiac_monitoring"
+          }
+        ],
+        "citations": [
+          "[Stone_2018]"
+        ],
+        "criterion_id": "avoid-waste-3-order-cardiac-monitoring",
+        "rationale": "Cardiac rhythm monitoring is not indicated; the events are non-syncopal and the rule-in signs point to FND.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_ct_scan"
+          }
+        ],
+        "citations": [
+          "[Espay_2018]"
+        ],
+        "criterion_id": "avoid-waste-4-order-ct-scan",
+        "rationale": "Non-contrast head CT adds no information beyond MRI for an FND workup and contributes diagnostic noise plus radiation exposure.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_csf"
+          }
+        ],
+        "citations": [
+          "[Stone_2018]"
+        ],
+        "criterion_id": "avoid-waste-5-analyze-csf",
+        "rationale": "Lumbar puncture is not indicated in typical FND; invasive testing reinforces somatic illness model and adds iatrogenic risk without changing management.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "FDG_PET"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[Espay_2018]"
+        ],
+        "criterion_id": "avoid-waste-6-order-advanced-imaging",
+        "rationale": "Advanced PET imaging has no indication in FND; standard MRI is the appropriate structural workup.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "emg_ncs"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Stone_2018]"
+        ],
+        "criterion_id": "avoid-waste-7-order-specialized-test",
+        "rationale": "Nerve conduction studies and EMG have no role once positive functional signs are documented: the deficit is not neuromuscular, the study is uncomfortable, and a normal result reinforces the patient's search for an organic cause \u2014 the principal iatrogenic harm in this condition",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "ssep"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Stone_2018]"
+        ],
+        "criterion_id": "avoid-waste-8-order-specialized-test",
+        "rationale": "Somatosensory evoked potentials answer a question about a lesion in the somatosensory pathway; a midline-splitting, non-anatomical sensory deficit is not that question",
+        "severity": "waste"
+      }
+    ],
+    "diagnosis": {
+      "accepted": [
+        "Functional neurological disorder \u2014 right-sided functional hemimotor syndrome and PNES, with comorbid PTSD and alcohol use disorder"
+      ],
+      "icd_codes": [
+        "F44.7"
+      ]
+    },
+    "differential": [
+      {
+        "diagnosis": "Epileptic seizures",
+        "icd_code": "G40.909",
+        "key_features": "Witnessed convulsive-appearing events; ictal video-EEG showing absence of electrographic correlate during a captured habitual event is the key differentiator.",
+        "likelihood": "moderate"
+      },
+      {
+        "diagnosis": "Structural CNS lesion (tumor, demyelination, stroke)",
+        "icd_code": null,
+        "key_features": "Focal complaints warrant imaging; normal brain MRI without lesion, mass, or enhancement effectively excludes a structural cause for the presenting deficit.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Autoimmune or paraneoplastic encephalitis",
+        "icd_code": "G04.81",
+        "key_features": "Episodic neurological symptoms can occur in autoimmune encephalitis; normal MRI, normal EEG background, and (when obtained) negative antibody panel render this very unlikely.",
+        "likelihood": "very_low"
+      },
+      {
+        "diagnosis": "Malingering or factitious disorder",
+        "icd_code": "F68.10",
+        "key_features": "FND is involuntary; preserved effort on symptom-validity testing and absence of clear secondary gain argue against feigning. The rule-in signs do not distinguish FND from malingering by themselves, but the clinical context does not support a feigning explanation.",
+        "likelihood": "very_low"
+      }
+    ],
+    "key_clinical_evidence": [
+      "FND is a positive diagnosis based on rule-in signs (Hoover, tremor entrainment, give-way weakness, non-dermatomal sensory loss with midline split) \u2014 not a diagnosis of exclusion (Espay 2018, Stone 2018).",
+      "Brain MRI and basic laboratory testing are OPTIONAL here, not due diligence: the diagnosis rests on the positive signs, and each additional negative study is a cost and an iatrogenic harm rather than a confirmation. Where imaging is recommended in this case it is for one specific alternative question, once.",
+      "Over-investigation is the principal iatrogenic harm in FND; every additional negative test reinforces the patient's illness conviction and worsens prognosis (Stone 2018).",
+      "Psychiatric comorbidity (anxiety, depression, trauma) is common and informs treatment planning but is NOT required for the diagnosis and does not 'explain' the symptoms in a reductive sense.",
+      "Diagnostic communication matters: using positive language anchored on the rule-in signs is associated with better engagement and outcomes (Stone 2018).",
+      "Evidence-based treatment is multidisciplinary \u2014 CBT for PNES and FND-informed physiotherapy for functional motor symptoms (Nielsen 2015).",
+      "Video-EEG capturing a habitual event with normal interictal EEG is diagnostic for PNES (ILAE PNES Task Force 2013); routine EEG alone is insufficient.",
+      "Interim composition decision, August 2026: FND remains only to keep the frozen dataset at 20 conditions/600 cases. The positive functional-neurological examination is the sole required diagnostic act; every instrumental test is optional and case-targeted. DLB remains the preferred future replacement when composition work resumes."
+    ],
+    "red_herrings": [
+      {
+        "correct_interpretation": "Many organic conditions (MS, migraine, epilepsy) also flare with stress. Stress at onset is supportive context, not a diagnostic substitute for the positive rule-in signs.",
+        "data_point": "Symptom onset coincident with a major psychosocial stressor",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Conclude prematurely that stress 'caused' the symptoms and that the workup can be abbreviated",
+        "location": "History of present illness"
+      }
+    ],
+    "review_status": "draft",
+    "sequence_constraints": [],
+    "stop_rule": {
+      "max_additional_actions": 0,
+      "required_before_assessment": [
+        "action-3-perform-clinical-assessment"
+      ]
+    }
+  },
+  "initial_tool_outputs": {
+    "advanced_imaging": null,
+    "cardiac_monitoring": null,
+    "clinical_assessment": {
+      "assessment_type": "functional_neuro_signs",
+      "criteria_met": {
+        "diagnosis_made_by_exclusion_only": false,
+        "positive_clinical_sign_present": true,
+        "psychological_stressor_required_for_diagnosis": false,
+        "symptoms_inconsistent_with_organic_disease": true
+      },
+      "findings": [
         {
-          "drug": "Prazosin",
-          "dose": "2 mg",
-          "frequency": "at bedtime",
-          "indication": "PTSD nightmares"
+          "result": "However, POSITIVE Hoover sign \u2014 right hip extension 5/5 during left leg contralateral flexion.",
+          "sign": "Hoover sign"
         },
         {
-          "drug": "Sertraline",
-          "dose": "100 mg",
-          "frequency": "once daily",
-          "indication": "PTSD"
+          "result": "Right arm weakness inconsistent during exam \u2014 varies 2/5 to 4/5 with different examiner instructions.",
+          "sign": "Internal inconsistency on repeat testing"
         },
         {
-          "drug": "Ibuprofen",
-          "dose": "400 mg",
-          "frequency": "as needed, up to 3 times daily",
-          "indication": "Chronic low back pain"
+          "result": "Right leg dragging pattern with exaggerated hip hiking;",
+          "sign": "Dragging monoplegic gait"
+        },
+        {
+          "result": "resolves when distracted by conversation.",
+          "sign": "Improvement with attentional distraction"
+        },
+        {
+          "result": "Tremor in right hand \u2014 variable frequency (4-8 Hz), entrains to tapping rhythm.",
+          "sign": "Tremor entrainment test"
         }
       ],
+      "impression": "Positive functional signs elicited and documented: Hoover sign, Internal inconsistency on repeat testing, Dragging monoplegic gait, Improvement with attentional distraction, Tremor entrainment test. Functional neurological disorder is a rule-in diagnosis under DSM-5 and the criterion satisfied here is clinical incompatibility, not the absence of another disease. No further investigation is required to make the diagnosis; whatever imaging or laboratory testing is performed is for a separate, specific question.",
+      "pre_post_comparison": null,
+      "recommended_actions": [],
+      "scores": {
+        "distribution_consistent_with_a_single_lesion": "no",
+        "internal_inconsistency": "present",
+        "positive_rule_in_signs_documented": "5"
+      }
+    },
+    "csf": null,
+    "ecg": null,
+    "echo": null,
+    "eeg": {
+      "activating_procedures": {},
+      "artifacts": [],
+      "background": {
+        "description": "Normal symmetric 10 Hz posterior dominant rhythm. Normal background."
+      },
+      "classification": "normal",
+      "findings": [
+        {
+          "clinical_correlation": "",
+          "frequency": "",
+          "location": "generalized",
+          "morphology": "NO EEG CHANGE during entire episode. Normal continuous background. Prominent muscle artifact from tensed neck muscles suggesting voluntary muscle contraction. No ictal pattern.",
+          "state": "awake",
+          "type": "Unresponsive episode \u2014 1 min 52 sec"
+        }
+      ],
+      "impression": "Normal EEG. Unresponsive episode captured with NO EEG CORRELATE",
+      "limitations": "",
+      "recommended_actions": []
+    },
+    "labs": {
+      "abnormal_values_summary": [
+        "GGT 88 U/L (mildly elevated \u2014 alcohol use)"
+      ],
+      "interpretation": "Abnormal values: GGT 88 U/L (H).",
+      "panels": {
+        "Baseline workup": [
+          {
+            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on",
+            "is_abnormal": false,
+            "reference_range": "",
+            "test": "CMP",
+            "unit": "",
+            "value": "Within reference range"
+          },
+          {
+            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on",
+            "is_abnormal": false,
+            "reference_range": "",
+            "test": "B12",
+            "unit": "",
+            "value": "Within reference range"
+          }
+        ],
+        "Standard_Workup": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "<10",
+            "test": "Blood alcohol level",
+            "unit": "mg/dL",
+            "value": 0
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "0.4-4.0",
+            "test": "TSH",
+            "unit": "mIU/L",
+            "value": 2.4
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "4.5-11.0",
+            "test": "CBC WBC",
+            "unit": "K/uL",
+            "value": 7.4
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "13.5-17.5",
+            "test": "Hemoglobin",
+            "unit": "g/dL",
+            "value": 14.8
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "136-145",
+            "test": "Sodium",
+            "unit": "mEq/L",
+            "value": 137
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "70-100",
+            "test": "Glucose",
+            "unit": "mg/dL",
+            "value": 96
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "10-71",
+            "test": "GGT",
+            "unit": "U/L",
+            "value": 88
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "2-18 ng/mL (men)",
+            "test": "Prolactin (post-episode, 20 min)",
+            "unit": "ng/mL",
+            "value": 8.2
+          }
+        ]
+      }
+    },
+    "mri": null,
+    "specialized_test": null
+  },
+  "metadata": {
+    "authoring_agent": "condition-expert:FND",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "criteria_pack_version": "1.0",
+    "difficulty_rationale": "Clear positive rule-in signs (Hoover sign and/or distractible tremor and/or non-dermatomal sensory loss with midline split) with normal MRI and supportive normal labs. Workup is hygiene-level; the diagnostic challenge is communication, not investigation.",
+    "fallback_tool_kinds": {
+      "advanced_imaging": "normal",
+      "cardiac_monitoring": "normal",
+      "csf": "normal",
+      "ct": "normal",
+      "ecg": "normal",
+      "echo": "incidental",
+      "specialized_test": "normal"
+    },
+    "last_revised": "2026-08-10",
+    "notes": "Straightforward FND in veteran with PTSD and remote TBI. Remote microhemorrhage is a red herring. FND and PTSD co-occur and are both valid diagnoses.",
+    "policy_spec_status": "draft",
+    "revision_reason": "FND interim reviewer option: positive clinical diagnosis required; every instrumental test optional and selected for explicit red flags",
+    "version": "policy-v1",
+    "vocab_gap": []
+  },
+  "patient": {
+    "chief_complaint": "Right-sided weakness, tremor, and episodes of unresponsiveness \u2014 3 months",
+    "clinical_history": {
       "allergies": [
         "NKDA"
       ],
@@ -45,535 +629,65 @@
         "No neurological family history",
         "Father: PTSD (Vietnam veteran)"
       ],
+      "medications": [
+        {
+          "dose": "2 mg",
+          "drug": "Prazosin",
+          "frequency": "at bedtime",
+          "indication": "PTSD nightmares"
+        },
+        {
+          "dose": "100 mg",
+          "drug": "Sertraline",
+          "frequency": "once daily",
+          "indication": "PTSD"
+        },
+        {
+          "dose": "400 mg",
+          "drug": "Ibuprofen",
+          "frequency": "as needed, up to 3 times daily",
+          "indication": "Chronic low back pain"
+        }
+      ],
+      "past_medical_history": [
+        "Post-traumatic stress disorder (combat-related, 3 tours of duty)",
+        "Chronic low back pain",
+        "Mild TBI (diagnosed after blast exposure in 2019)"
+      ],
       "social_history": {
-        "occupation": "Veteran, currently unemployed — applying for VA disability",
-        "tobacco": "Current, 10 pack-years",
         "alcohol": "2-4 beers daily (above recommended limits)",
-        "recent_stressor": "VA disability claim denial 6 weeks ago; court hearing for disability appeal upcoming"
+        "occupation": "Veteran, currently unemployed \u2014 applying for VA disability",
+        "recent_stressor": "VA disability claim denial 6 weeks ago; court hearing for disability appeal upcoming",
+        "tobacco": "Current, 10 pack-years"
       }
     },
+    "demographics": {
+      "age": 31,
+      "bmi": 25.8,
+      "ethnicity": "White",
+      "handedness": "right",
+      "sex": "male"
+    },
+    "history_present_illness": "Mr. K is a 31-year-old veteran with combat-related PTSD who presents with a 3-month history of progressive right-sided weakness, right hand tremor, and episodes of unresponsiveness. He served three tours of duty in the Middle East and experienced a blast exposure in 2019 for which he was diagnosed with mild traumatic brain injury. He has been applying for VA disability benefits and his claim was denied 6 weeks ago, which he finds devastating. He is appealing the decision. His neurological symptoms first appeared approximately 3 months ago, shortly after the disability claim process intensified. He initially attributed his symptoms to sequelae of his mild TBI. The episodes of unresponsiveness have been witnessed by his partner: lasting 1-2 minutes, with closed eyes, no limb movements, and immediate full recovery. He has no prior history of seizures. His PTSD symptoms include nightmares, hypervigilance, avoidance, and emotional numbing. He drinks 2-4 beers daily. He acknowledges that his symptoms cause him distress but is resistant to considering a psychological explanation, feeling that this would invalidate his disability claim.",
     "neurological_exam": {
-      "mental_status": "Alert and oriented x4. Guarded and hypervigilant. Reports feeling 'checked out' at times.",
-      "cranial_nerves": "Normal. No facial asymmetry.",
-      "motor": "Right arm apparent 2/5 weakness during formal motor exam. However, POSITIVE Hoover sign — right hip extension 5/5 during left leg contralateral flexion. Right arm weakness inconsistent during exam — varies 2/5 to 4/5 with different examiner instructions.",
-      "sensory": "Right hemibody sensory loss to pinprick, not following dermatomal or peripheral nerve distribution. Vibration intact throughout (peripheral nerve would show stocking-glove loss if polyneuropathy).",
-      "reflexes": "Normal 2+ symmetric throughout. No pathological reflexes.",
+      "additional": "Tremor in right hand \u2014 variable frequency (4-8 Hz), entrains to tapping rhythm. Episode of staring and unresponsiveness on ward \u2014 90 seconds, eyes closed, not responsive to voice, immediate recovery.",
       "coordination": "Normal.",
+      "cranial_nerves": "Normal. No facial asymmetry.",
       "gait": "Right leg dragging pattern with exaggerated hip hiking; resolves when distracted by conversation.",
-      "additional": "Tremor in right hand — variable frequency (4-8 Hz), entrains to tapping rhythm. Episode of staring and unresponsiveness on ward — 90 seconds, eyes closed, not responsive to voice, immediate recovery."
+      "mental_status": "Alert and oriented x4. Guarded and hypervigilant. Reports feeling 'checked out' at times.",
+      "motor": "Right arm apparent 2/5 weakness during formal motor exam. However, POSITIVE Hoover sign \u2014 right hip extension 5/5 during left leg contralateral flexion. Right arm weakness inconsistent during exam \u2014 varies 2/5 to 4/5 with different examiner instructions.",
+      "reflexes": "Normal 2+ symmetric throughout. No pathological reflexes.",
+      "sensory": "Right hemibody sensory loss to pinprick, not following dermatomal or peripheral nerve distribution. Vibration intact throughout (peripheral nerve would show stocking-glove loss if polyneuropathy)."
     },
+    "patient_id": "NB-FND-S09",
     "vitals": {
-      "bp_systolic": 128,
       "bp_diastolic": 78,
+      "bp_systolic": 128,
       "hr": 86,
-      "temp": 37.0,
       "rr": 15,
-      "spo2": 98
-    },
-    "chief_complaint": "Right-sided weakness, tremor, and episodes of unresponsiveness — 3 months",
-    "history_present_illness": "Mr. K is a 31-year-old veteran with combat-related PTSD who presents with a 3-month history of progressive right-sided weakness, right hand tremor, and episodes of unresponsiveness. He served three tours of duty in the Middle East and experienced a blast exposure in 2019 for which he was diagnosed with mild traumatic brain injury. He has been applying for VA disability benefits and his claim was denied 6 weeks ago, which he finds devastating. He is appealing the decision. His neurological symptoms first appeared approximately 3 months ago, shortly after the disability claim process intensified. He initially attributed his symptoms to sequelae of his mild TBI. The episodes of unresponsiveness have been witnessed by his partner: lasting 1-2 minutes, with closed eyes, no limb movements, and immediate full recovery. He has no prior history of seizures. His PTSD symptoms include nightmares, hypervigilance, avoidance, and emotional numbing. He drinks 2-4 beers daily. He acknowledges that his symptoms cause him distress but is resistant to considering a psychological explanation, feeling that this would invalidate his disability claim."
-  },
-  "initial_tool_outputs": {
-    "mri": null,
-    "eeg": {
-      "classification": "normal",
-      "background": {
-        "description": "Normal symmetric 10 Hz posterior dominant rhythm. Normal background."
-      },
-      "findings": [
-        {
-          "type": "Unresponsive episode — 1 min 52 sec",
-          "location": "generalized",
-          "frequency": "",
-          "morphology": "NO EEG CHANGE during entire episode. Normal continuous background. Prominent muscle artifact from tensed neck muscles suggesting voluntary muscle contraction. No ictal pattern.",
-          "state": "awake",
-          "clinical_correlation": ""
-        }
-      ],
-      "artifacts": [],
-      "activating_procedures": {},
-      "impression": "Normal EEG. Unresponsive episode captured with NO EEG CORRELATE",
-      "limitations": "",
-      "recommended_actions": []
-    },
-    "labs": {
-      "panels": {
-        "Standard_Workup": [
-          {
-            "test": "Blood alcohol level",
-            "value": 0,
-            "unit": "mg/dL",
-            "reference_range": "<10",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "TSH",
-            "value": 2.4,
-            "unit": "mIU/L",
-            "reference_range": "0.4-4.0",
-            "is_abnormal": false
-          },
-          {
-            "test": "CBC WBC",
-            "value": 7.4,
-            "unit": "K/uL",
-            "reference_range": "4.5-11.0",
-            "is_abnormal": false
-          },
-          {
-            "test": "Hemoglobin",
-            "value": 14.8,
-            "unit": "g/dL",
-            "reference_range": "13.5-17.5",
-            "is_abnormal": false
-          },
-          {
-            "test": "Sodium",
-            "value": 137,
-            "unit": "mEq/L",
-            "reference_range": "136-145",
-            "is_abnormal": false
-          },
-          {
-            "test": "Glucose",
-            "value": 96,
-            "unit": "mg/dL",
-            "reference_range": "70-100",
-            "is_abnormal": false
-          },
-          {
-            "test": "GGT",
-            "value": 88,
-            "unit": "U/L",
-            "reference_range": "10-71",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "Prolactin (post-episode, 20 min)",
-            "value": 8.2,
-            "unit": "ng/mL",
-            "reference_range": "2-18 ng/mL (men)",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ],
-        "Baseline workup": [
-          {
-            "test": "CMP",
-            "value": "Within reference range",
-            "unit": "",
-            "reference_range": "",
-            "is_abnormal": false,
-            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on"
-          },
-          {
-            "test": "B12",
-            "value": "Within reference range",
-            "unit": "",
-            "reference_range": "",
-            "is_abnormal": false,
-            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on"
-          }
-        ]
-      },
-      "interpretation": "Abnormal values: GGT 88 U/L (H).",
-      "abnormal_values_summary": [
-        "GGT 88 U/L (mildly elevated — alcohol use)"
-      ]
-    },
-    "clinical_assessment": {
-      "assessment_type": "functional_neuro_signs",
-      "scores": {
-        "positive_rule_in_signs_documented": "5",
-        "internal_inconsistency": "present",
-        "distribution_consistent_with_a_single_lesion": "no"
-      },
-      "criteria_met": {
-        "positive_clinical_sign_present": true,
-        "symptoms_inconsistent_with_organic_disease": true,
-        "diagnosis_made_by_exclusion_only": false,
-        "psychological_stressor_required_for_diagnosis": false
-      },
-      "pre_post_comparison": null,
-      "findings": [
-        {
-          "sign": "Hoover sign",
-          "result": "However, POSITIVE Hoover sign — right hip extension 5/5 during left leg contralateral flexion."
-        },
-        {
-          "sign": "Internal inconsistency on repeat testing",
-          "result": "Right arm weakness inconsistent during exam — varies 2/5 to 4/5 with different examiner instructions."
-        },
-        {
-          "sign": "Dragging monoplegic gait",
-          "result": "Right leg dragging pattern with exaggerated hip hiking;"
-        },
-        {
-          "sign": "Improvement with attentional distraction",
-          "result": "resolves when distracted by conversation."
-        },
-        {
-          "sign": "Tremor entrainment test",
-          "result": "Tremor in right hand — variable frequency (4-8 Hz), entrains to tapping rhythm."
-        }
-      ],
-      "impression": "Positive functional signs elicited and documented: Hoover sign, Internal inconsistency on repeat testing, Dragging monoplegic gait, Improvement with attentional distraction, Tremor entrainment test. Functional neurological disorder is a rule-in diagnosis under DSM-5 and the criterion satisfied here is clinical incompatibility, not the absence of another disease. No further investigation is required to make the diagnosis; whatever imaging or laboratory testing is performed is for a separate, specific question.",
-      "recommended_actions": []
-    },
-    "specialized_test": null,
-    "ecg": null,
-    "csf": null,
-    "echo": null,
-    "cardiac_monitoring": null,
-    "advanced_imaging": null
-  },
-  "followup_outputs": [
-    {
-      "trigger_action": "va_fnd_ptsd_documentation",
-      "tool_name": "search_medical_literature",
-      "output": {
-        "query": "functional neurological disorder veterans PTSD co-occurrence disability",
-        "results": [
-          {
-            "pmid": "30503873",
-            "title": "Functional neurological symptom disorder in veterans: prevalence and relationship to PTSD",
-            "journal": "Journal of Neuropsychiatry",
-            "year": "2018"
-          }
-        ],
-        "summary": ""
-      }
-    },
-    {
-      "trigger_action": "alcohol_counseling_referral",
-      "tool_name": "check_drug_interactions",
-      "output": {
-        "proposed": "Naltrexone 50 mg daily (for alcohol use disorder)",
-        "interactions": [
-          "Sertraline: no clinically significant interaction",
-          "Prazosin: no interaction"
-        ],
-        "contraindications": [
-          "Active opioid use — patient denies"
-        ],
-        "warnings": [
-          "Do not use naltrexone if patient uses opioids — will precipitate withdrawal",
-          "Monitor liver enzymes given elevated GGT at baseline",
-          "Naltrexone has no significant interaction with concurrent neurological or psychological therapies and can be co-administered"
-        ],
-        "formulary_status": "VA formulary — covered",
-        "alternatives": [
-          "Acamprosate if hepatic function worsens"
-        ]
-      }
+      "spo2": 98,
+      "temp": 37.0
     }
-  ],
-  "fallback_tool_outputs": {
-    "eeg": null,
-    "mri": null,
-    "ecg": {
-      "rhythm": "normal sinus rhythm",
-      "rate": 70,
-      "intervals": {
-        "PR": "140 ms",
-        "QRS": "100 ms",
-        "QTc": "432 ms"
-      },
-      "axis": "normal",
-      "findings": [
-        "Normal sinus rhythm. Normal axis and intervals. No acute ST-T changes."
-      ],
-      "interpretation": "Normal ECG",
-      "clinical_correlation": ""
-    },
-    "labs": null,
-    "csf": {
-      "appearance": "clear and colourless",
-      "opening_pressure": "16 cm H2O",
-      "cell_count": {
-        "wbc": "2 /uL",
-        "rbc": "0 /uL"
-      },
-      "protein": "38 mg/dL",
-      "glucose": "62 mg/dL",
-      "glucose_ratio": "0.6",
-      "special_tests": {},
-      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
-    },
-    "ct": {
-      "findings": [],
-      "contrast_used": false,
-      "angiography_findings": null,
-      "additional_observations": [],
-      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
-      "recommended_actions": []
-    },
-    "echo": {
-      "chambers": {
-        "LV": "normal size and systolic function",
-        "RV": "normal size and function",
-        "LA": "normal size",
-        "RA": "normal size"
-      },
-      "valves": {
-        "mitral": "structurally normal",
-        "aortic": "structurally normal",
-        "tricuspid": "normal",
-        "pulmonic": "normal"
-      },
-      "ejection_fraction": 63.0,
-      "wall_motion": "no regional wall-motion abnormality",
-      "findings": [
-        "Trace mitral regurgitation, physiological. No intracardiac thrombus or vegetation. No pericardial effusion."
-      ],
-      "impression": "Structurally near-normal heart with a benign incidental finding.",
-      "recommended_actions": []
-    },
-    "cardiac_monitoring": {
-      "duration_hours": 24,
-      "monitor_type": "holter_24h",
-      "rhythm_summary": "Sinus rhythm throughout the recording",
-      "heart_rate_range": {
-        "min": 52,
-        "max": 111,
-        "average": 77
-      },
-      "events": [],
-      "findings": [
-        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
-      ],
-      "impression": "Normal 24-hour Holter monitor.",
-      "recommended_actions": []
-    },
-    "advanced_imaging": {
-      "modality": "",
-      "tracer_or_protocol": null,
-      "findings": [],
-      "quantitative_data": null,
-      "impression": "No abnormality identified.",
-      "recommended_actions": []
-    },
-    "specialized_test": {
-      "test_type": "",
-      "findings": [],
-      "quantitative_data": null,
-      "impression": "Study within normal limits.",
-      "recommended_actions": []
-    },
-    "literature_search": null,
-    "drug_interactions": null
   },
-  "ground_truth": {
-    "primary_diagnosis": "Functional neurological disorder — right-sided functional hemimotor syndrome and PNES, with comorbid PTSD and alcohol use disorder",
-    "icd_code": "F44.7",
-    "differential": [
-      {
-        "diagnosis": "Epileptic seizures",
-        "likelihood": "moderate",
-        "key_features": "Witnessed convulsive-appearing events; ictal video-EEG showing absence of electrographic correlate during a captured habitual event is the key differentiator.",
-        "icd_code": "G40.909"
-      },
-      {
-        "diagnosis": "Structural CNS lesion (tumor, demyelination, stroke)",
-        "likelihood": "low",
-        "key_features": "Focal complaints warrant imaging; normal brain MRI without lesion, mass, or enhancement effectively excludes a structural cause for the presenting deficit.",
-        "icd_code": null
-      },
-      {
-        "diagnosis": "Autoimmune or paraneoplastic encephalitis",
-        "likelihood": "very_low",
-        "key_features": "Episodic neurological symptoms can occur in autoimmune encephalitis; normal MRI, normal EEG background, and (when obtained) negative antibody panel render this very unlikely.",
-        "icd_code": "G04.81"
-      },
-      {
-        "diagnosis": "Malingering or factitious disorder",
-        "likelihood": "very_low",
-        "key_features": "FND is involuntary; preserved effort on symptom-validity testing and absence of clear secondary gain argue against feigning. The rule-in signs do not distinguish FND from malingering by themselves, but the clinical context does not support a feigning explanation.",
-        "icd_code": "F68.10"
-      }
-    ],
-    "optimal_actions": [
-      {
-        "step": 1,
-        "action": "Search current literature on FND diagnostic signs and evidence-based treatment (CBT for PNES, specialized physiotherapy for functional motor symptoms)",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Confirms multidisciplinary CBT + physiotherapy is the evidence-based treatment for FND",
-        "category": "recommended",
-        "tool_parameters": {
-          "query": "functional neurological disorder diagnosis treatment"
-        },
-        "citation": "[Nielsen_2015]",
-        "guideline_source": "FND criteria pack — treatment evidence"
-      },
-      {
-        "step": 2,
-        "action": "Review current medications for agents that may exacerbate symptoms (e.g., benzodiazepines, dopamine-blocking antipsychotics, AEDs initiated for PNES)",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Identification of medication contributors that should be tapered or discontinued",
-        "category": "recommended",
-        "tool_parameters": {},
-        "citation": "",
-        "guideline_source": "FND criteria pack — medication review"
-      },
-      {
-        "action": "Perform and document a positive FND examination: internal inconsistency/incongruity, Hoover sign, entrainment/distractibility or positive functional-seizure semiology as appropriate",
-        "tool_name": "perform_clinical_assessment",
-        "expected_finding": "Positive rule-in signs establish FND; symptoms are real and involuntary, and psychological stress is not a required diagnostic criterion",
-        "category": "required",
-        "tool_parameters": {
-          "assessment_type": "functional_neuro_signs"
-        },
-        "citation": "[AAN_Functional_Seizures_2025]",
-        "guideline_source": "positive FND signs; AAN functional seizures guideline 2025",
-        "step": 3
-      },
-      {
-        "action": "Consider video-EEG capture of a typical event when epilepsy versus functional seizure remains ambiguous",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Typical clinical event without an epileptic ictal correlate, interpreted together with semiology; interictal normality alone is insufficient",
-        "category": "optional",
-        "tool_parameters": {
-          "eeg_type": "video"
-        },
-        "citation": "[AAN_Functional_Seizures_2025]",
-        "guideline_source": "positive FND signs; AAN functional seizures guideline 2025",
-        "step": 4
-      },
-      {
-        "action": "Consider only case-targeted blood tests for the named metabolic, inflammatory, nutritional or treatment-related mimic",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Answer the specific alternative diagnosis; normal blood tests do not establish FND",
-        "category": "optional",
-        "tool_parameters": {
-          "panels": [
-            "CMP",
-            "magnesium",
-            "thiamine_B1"
-          ]
-        },
-        "citation": "[AAN_Functional_Seizures_2025]",
-        "guideline_source": "positive FND signs; AAN functional seizures guideline 2025",
-        "step": 5
-      }
-    ],
-    "useless_tools": [
-      {
-        "tool_name": "analyze_ecg",
-        "tool_parameters": {},
-        "rationale": "ECG has no diagnostic role in FND; cardiac etiology is not on the differential for the presenting neurological deficit.",
-        "citation": "[Stone_2018]"
-      },
-      {
-        "tool_name": "order_echocardiogram",
-        "tool_parameters": {},
-        "rationale": "Echocardiography has no role in FND; no structural cardiac question is raised by the presentation.",
-        "citation": "[Stone_2018]"
-      },
-      {
-        "tool_name": "order_cardiac_monitoring",
-        "tool_parameters": {},
-        "rationale": "Cardiac rhythm monitoring is not indicated; the events are non-syncopal and the rule-in signs point to FND.",
-        "citation": "[Stone_2018]"
-      },
-      {
-        "tool_name": "order_ct_scan",
-        "tool_parameters": {},
-        "rationale": "Non-contrast head CT adds no information beyond MRI for an FND workup and contributes diagnostic noise plus radiation exposure.",
-        "citation": "[Espay_2018]"
-      },
-      {
-        "tool_name": "analyze_csf",
-        "tool_parameters": {},
-        "rationale": "Lumbar puncture is not indicated in typical FND; invasive testing reinforces somatic illness model and adds iatrogenic risk without changing management.",
-        "citation": "[Stone_2018]"
-      },
-      {
-        "tool_name": "order_advanced_imaging",
-        "tool_parameters": {
-          "modality": "FDG_PET"
-        },
-        "rationale": "Advanced PET imaging has no indication in FND; standard MRI is the appropriate structural workup.",
-        "citation": "[Espay_2018]"
-      },
-      {
-        "tool_name": "order_specialized_test",
-        "tool_parameters": {
-          "test_type": "emg_ncs"
-        },
-        "rationale": "Nerve conduction studies and EMG have no role once positive functional signs are documented: the deficit is not neuromuscular, the study is uncomfortable, and a normal result reinforces the patient's search for an organic cause — the principal iatrogenic harm in this condition",
-        "citation": "[Stone_2018]"
-      },
-      {
-        "tool_name": "order_specialized_test",
-        "tool_parameters": {
-          "test_type": "ssep"
-        },
-        "rationale": "Somatosensory evoked potentials answer a question about a lesion in the somatosensory pathway; a midline-splitting, non-anatomical sensory deficit is not that question",
-        "citation": "[Stone_2018]"
-      }
-    ],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "critical_actions": [
-      "Do NOT make the diagnosis by exclusion: document at least one positive rule-in sign, which is the act that establishes it",
-      "Obtain video-EEG capturing a habitual event with normal interictal EEG to confirm PNES",
-      "Communicate the diagnosis transparently using positive language and the rule-in signs as the basis",
-      "Refer for FND-informed physiotherapy and CBT / psychological therapy",
-      "Order a comprehensive neuropsychological battery to characterize comorbid depression, anxiety, somatization, and trauma exposure — informs treatment planning (criteria-pack 'recommended' tier)",
-      "Communicate the diagnosis transparently using positive language anchored on the rule-in signs; explicitly state the diagnosis is FND, the symptoms are real and involuntary, and there is an evidence-based treatment plan",
-      "Refer to specialized FND-informed physiotherapy (for functional motor symptoms) and to CBT / psychological therapy (for PNES and comorbid mood / anxiety)"
-    ],
-    "contraindicated_actions": [
-      "Do not pursue ever-expanding negative investigations — per Stone 2018, repeated negative workups reinforce illness conviction and worsen prognosis",
-      "Do not frame the diagnosis as 'all in your head', 'nothing wrong', or 'we couldn't find anything' — this damages the therapeutic alliance and is the most common avoidable harm in FND",
-      "Do not perform invasive testing (lumbar puncture, nerve biopsy, muscle biopsy, cerebral angiography) when positive rule-in signs are present and there is no clinical indication",
-      "Do not order EMG/NCS, muscle biopsy, or nerve biopsy as part of an FND workup — these invasive tests reinforce the somatic illness model per Stone 2018",
-      "Do not start or continue long-term anti-epileptic drugs for functional (psychogenic non-epileptic) seizures — AEDs are ineffective for PNES and expose the patient to side effects",
-      "Do not give benzodiazepines as abortive therapy for witnessed PNES events (no benefit and risk of respiratory depression)",
-      "Do not give gadolinium without a specific indication — contrast adds cost and risk and answers no question that positive functional signs have not already answered",
-      "Do not repeat the brain MRI, the laboratory panel or the lumbar puncture once a first normal study and positive rule-in signs are documented: each repetition strengthens the patient's belief that something organic has been missed"
-    ],
-    "key_reasoning_points": [
-      "FND is a positive diagnosis based on rule-in signs (Hoover, tremor entrainment, give-way weakness, non-dermatomal sensory loss with midline split) — not a diagnosis of exclusion (Espay 2018, Stone 2018).",
-      "Brain MRI and basic laboratory testing are OPTIONAL here, not due diligence: the diagnosis rests on the positive signs, and each additional negative study is a cost and an iatrogenic harm rather than a confirmation. Where imaging is recommended in this case it is for one specific alternative question, once.",
-      "Over-investigation is the principal iatrogenic harm in FND; every additional negative test reinforces the patient's illness conviction and worsens prognosis (Stone 2018).",
-      "Psychiatric comorbidity (anxiety, depression, trauma) is common and informs treatment planning but is NOT required for the diagnosis and does not 'explain' the symptoms in a reductive sense.",
-      "Diagnostic communication matters: using positive language anchored on the rule-in signs is associated with better engagement and outcomes (Stone 2018).",
-      "Evidence-based treatment is multidisciplinary — CBT for PNES and FND-informed physiotherapy for functional motor symptoms (Nielsen 2015).",
-      "Video-EEG capturing a habitual event with normal interictal EEG is diagnostic for PNES (ILAE PNES Task Force 2013); routine EEG alone is insufficient.",
-      "Interim composition decision, August 2026: FND remains only to keep the frozen dataset at 20 conditions/600 cases. The positive functional-neurological examination is the sole required diagnostic act; every instrumental test is optional and case-targeted. DLB remains the preferred future replacement when composition work resumes."
-    ],
-    "red_herrings": [
-      {
-        "data_point": "Symptom onset coincident with a major psychosocial stressor",
-        "location": "History of present illness",
-        "field_path": "patient.history_present_illness",
-        "intended_effect": "Conclude prematurely that stress 'caused' the symptoms and that the workup can be abbreviated",
-        "correct_interpretation": "Many organic conditions (MS, migraine, epilepsy) also flare with stress. Stress at onset is supportive context, not a diagnostic substitute for the positive rule-in signs."
-      }
-    ]
-  },
-  "metadata": {
-    "version": "v5",
-    "notes": "Straightforward FND in veteran with PTSD and remote TBI. Remote microhemorrhage is a red herring. FND and PTSD co-occur and are both valid diagnoses.",
-    "fallback_tool_kinds": {
-      "ecg": "normal",
-      "csf": "normal",
-      "ct": "normal",
-      "echo": "incidental",
-      "cardiac_monitoring": "normal",
-      "advanced_imaging": "normal",
-      "specialized_test": "normal"
-    },
-    "last_revised": "2026-08-10",
-    "revision_reason": "FND interim reviewer option: positive clinical diagnosis required; every instrumental test optional and selected for explicit red flags",
-    "criteria_pack_version": "1.0",
-    "authoring_agent": "condition-expert:FND",
-    "difficulty_rationale": "Clear positive rule-in signs (Hoover sign and/or distractible tremor and/or non-dermatomal sensory loss with midline split) with normal MRI and supportive normal labs. Workup is hygiene-level; the diagnostic challenge is communication, not investigation.",
-    "case_body_concerns": [],
-    "citation_gap": [],
-    "vocab_gap": []
-  }
+  "schema_version": "2.0"
 }

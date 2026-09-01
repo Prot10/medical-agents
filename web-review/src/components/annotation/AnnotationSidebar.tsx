@@ -1,9 +1,11 @@
-import { ArrowRight, MessageSquarePlus, Pencil, Send, ShieldCheck, Trash2 } from "lucide-react"
-import { useMemo, useState } from "react"
+import { ArrowRight, MessageSquarePlus, Pencil, Send, Trash2 } from "lucide-react"
+import { useEffect, useMemo, useState } from "react"
 
 import type {
   CaseIndexEntry,
   CaseReviewSummary,
+  DimensionDecision,
+  PolicyReviewVerdict,
   ReviewStatus,
   Severity,
 } from "@/api/types"
@@ -11,11 +13,10 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/Button"
 import { SeverityPill } from "@/components/ui/SeverityPill"
 import { useAnnotationContext } from "./AnnotationContext"
-import { StatusSwitcher } from "./StatusSwitcher"
 
 interface AnnotationSidebarProps {
   status: ReviewStatus
-  onSetStatus: (s: ReviewStatus) => Promise<void>
+  onSetStatus: (s: ReviewStatus, verdict?: PolicyReviewVerdict) => Promise<void>
   statusPending: boolean
   cases: CaseIndexEntry[]
   reviews: CaseReviewSummary[]
@@ -82,39 +83,24 @@ export function AnnotationSidebar({
 
   return (
     <aside className="space-y-4">
-      <section className="bg-card border border-border rounded-2xl p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
-            Status
-          </h3>
-        </div>
-        <StatusSwitcher
-          status={status}
-          onChange={onSetStatus}
-          disabled={statusPending}
-        />
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <Button
-            size="sm"
-            className="flex-1 min-w-0"
-            onClick={() => onSetStatus("approved")}
-            disabled={statusPending || status === "approved"}
-          >
-            <ShieldCheck className="w-4 h-4" />
-            Approve case
-          </Button>
-          {nextPending && (
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={() => onNavigate(nextPending)}
-            >
-              Next pending
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-          )}
-        </div>
-      </section>
+      <PolicyReviewPanel
+        status={status}
+        existing={ctx.review?.policy_verdict ?? null}
+        pending={statusPending}
+        unresolvedErrors={annotations.filter((a) => a.severity === "error" && !a.resolved).length}
+        onSubmit={onSetStatus}
+      />
+      {nextPending && (
+        <Button
+          size="sm"
+          variant="secondary"
+          className="w-full"
+          onClick={() => onNavigate(nextPending)}
+        >
+          Next pending
+          <ArrowRight className="w-4 h-4" />
+        </Button>
+      )}
 
       <CaseThread
         comments={comments}
@@ -216,6 +202,135 @@ export function AnnotationSidebar({
         )}
       </section>
     </aside>
+  )
+}
+
+
+type DimensionKey =
+  | "scenario_plausibility"
+  | "diagnosis"
+  | "actions"
+  | "avoided_actions"
+  | "sequencing"
+  | "stopping"
+  | "assessment"
+
+const POLICY_DIMENSIONS: Array<[DimensionKey, string]> = [
+  ["scenario_plausibility", "Scenario plausibility"],
+  ["diagnosis", "Diagnosis standard"],
+  ["actions", "Required / equivalent actions"],
+  ["avoided_actions", "Waste and harmful-test labels"],
+  ["sequencing", "Ordering constraints"],
+  ["stopping", "Stop rule"],
+  ["assessment", "Final recommendations"],
+]
+
+const DEFAULT_DECISIONS: Record<DimensionKey, DimensionDecision> = {
+  scenario_plausibility: "approve",
+  diagnosis: "approve",
+  actions: "approve",
+  avoided_actions: "approve",
+  sequencing: "approve",
+  stopping: "approve",
+  assessment: "approve",
+}
+
+function PolicyReviewPanel({
+  status,
+  existing,
+  pending,
+  unresolvedErrors,
+  onSubmit,
+}: {
+  status: ReviewStatus
+  existing: PolicyReviewVerdict | null
+  pending: boolean
+  unresolvedErrors: number
+  onSubmit: (status: ReviewStatus, verdict?: PolicyReviewVerdict) => Promise<void>
+}) {
+  const [decisions, setDecisions] =
+    useState<Record<DimensionKey, DimensionDecision>>(DEFAULT_DECISIONS)
+  const [comment, setComment] = useState("")
+  useEffect(() => {
+    const next = { ...DEFAULT_DECISIONS }
+    if (existing) {
+      for (const [key] of POLICY_DIMENSIONS) next[key] = existing[key]
+    }
+    setDecisions(next)
+    setComment(existing?.comment ?? "")
+  }, [existing])
+
+  const allApproved = Object.values(decisions).every((value) => value === "approve")
+  const submit = async () => {
+    const verdict: PolicyReviewVerdict = { ...decisions, comment }
+    await onSubmit(allApproved ? "approved" : "needs_changes", verdict)
+  }
+
+  return (
+    <section className="bg-card border border-border rounded-2xl p-4">
+      <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+        Physician policy review
+      </h3>
+      <p className="text-xs text-muted-foreground mt-1 mb-3">
+        Judge each scoring dimension independently. Two concordant physician approvals are
+        required; disagreement triggers a third review.
+      </p>
+      <div className="space-y-2">
+        {POLICY_DIMENSIONS.map(([key, label]) => (
+          <div key={key} className="flex items-center justify-between gap-2 text-xs">
+            <span>{label}</span>
+            <div className="flex rounded-md border border-border overflow-hidden">
+              {(["approve", "needs_revision"] as DimensionDecision[]).map((decision) => (
+                <button
+                  key={decision}
+                  type="button"
+                  onClick={() => setDecisions((value) => ({ ...value, [key]: decision }))}
+                  className={cn(
+                    "px-2 py-1",
+                    decisions[key] === decision
+                      ? decision === "approve"
+                        ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                        : "bg-amber-500/15 text-amber-700 dark:text-amber-300"
+                      : "text-muted-foreground hover:bg-secondary",
+                  )}
+                >
+                  {decision === "approve" ? "Approve" : "Revise"}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      <textarea
+        value={comment}
+        onChange={(event) => setComment(event.target.value)}
+        placeholder="Required context for revisions; optional for approval"
+        rows={2}
+        className="mt-3 w-full bg-background border border-input rounded-md text-xs p-2 resize-none"
+      />
+      {unresolvedErrors > 0 && allApproved && (
+        <p className="mt-2 text-xs text-rose-600">
+          Resolve {unresolvedErrors} error annotation(s) before approval.
+        </p>
+      )}
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={() => onSubmit("in_progress")}
+          disabled={pending || status === "in_progress"}
+        >
+          Save in progress
+        </Button>
+        <Button
+          size="sm"
+          onClick={submit}
+          disabled={pending || (allApproved && unresolvedErrors > 0)}
+        >
+          {allApproved ? "Submit approval" : "Request revision"}
+        </Button>
+      </div>
+    </section>
   )
 }
 

@@ -3,257 +3,392 @@
   "condition": "nph",
   "difficulty": "diagnostic_puzzle",
   "encounter_type": "inpatient",
-  "patient": {
-    "patient_id": "NPH-M06",
-    "demographics": {
-      "age": 74,
-      "sex": "male",
-      "handedness": "right",
-      "ethnicity": "White",
-      "bmi": 28.6
+  "fallback_tool_outputs": {
+    "advanced_imaging": null,
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "heart_rate_range": {
+        "average": 74,
+        "max": 125,
+        "min": 49
+      },
+      "impression": "Normal 24-hour Holter monitor.",
+      "monitor_type": "holter_24h",
+      "recommended_actions": [],
+      "rhythm_summary": "Sinus rhythm throughout the recording"
     },
-    "clinical_history": {
-      "past_medical_history": [
-        "Chronic subdural hematoma (bilateral, evacuated 14 months ago)",
-        "Hypertension",
-        "Atrial fibrillation (CHA2DS2-VASc 4)"
+    "csf": null,
+    "ct": {
+      "additional_observations": [
+        "No acute intracranial haemorrhage, established infarct, mass, or midline shift.",
+        "Grey-white differentiation preserved; basal cisterns patent.",
+        "Bone windows unremarkable."
       ],
-      "medications": [
-        {
-          "drug": "Rivaroxaban",
-          "dose": "20 mg",
-          "frequency": "daily with evening meal",
-          "indication": "atrial fibrillation"
-        },
-        {
-          "drug": "Lisinopril",
-          "dose": "5 mg",
-          "frequency": "daily",
-          "indication": "hypertension"
-        },
-        {
-          "drug": "Atorvastatin",
-          "dose": "40 mg",
-          "frequency": "daily",
-          "indication": "cardiovascular risk reduction"
-        }
+      "angiography_findings": null,
+      "contrast_used": false,
+      "findings": [],
+      "impression": "Non-contrast head CT without acute intracranial abnormality.",
+      "recommended_actions": []
+    },
+    "drug_interactions": null,
+    "ecg": {
+      "axis": "normal",
+      "clinical_correlation": "",
+      "findings": [
+        "Normal sinus rhythm. Normal axis and intervals. No acute ST-T changes."
       ],
-      "allergies": [
-        "No known drug allergies"
+      "interpretation": "Normal ECG",
+      "intervals": {
+        "PR": "152 ms",
+        "QRS": "100 ms",
+        "QTc": "427 ms"
+      },
+      "rate": 82,
+      "rhythm": "normal sinus rhythm"
+    },
+    "echo": {
+      "chambers": {
+        "LA": "normal size",
+        "LV": "normal size and systolic function",
+        "RA": "normal size",
+        "RV": "normal size and function"
+      },
+      "ejection_fraction": 62.0,
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
       ],
-      "family_history": [
-        "No relevant family history"
-      ],
-      "social_history": {
-        "occupation": "Retired accountant",
-        "living_situation": "Lives with wife",
-        "tobacco": "Former smoker, quit 30 years ago",
-        "alcohol": "Minimal",
-        "illicit_drugs": "Denied"
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": [],
+      "valves": {
+        "aortic": "structurally normal",
+        "mitral": "structurally normal",
+        "pulmonic": "normal",
+        "tricuspid": "normal"
+      },
+      "wall_motion": "no regional wall-motion abnormality"
+    },
+    "eeg": {
+      "activating_procedures": {},
+      "artifacts": [],
+      "background": {
+        "overall": "normal organisation for age",
+        "pdr": "9-10 Hz posterior dominant rhythm, symmetric and reactive",
+        "sleep_features": "normal vertex waves and sleep spindles"
+      },
+      "classification": "normal",
+      "findings": [],
+      "impression": "Normal awake and drowsy EEG. No epileptiform discharges and no focal slowing.",
+      "limitations": "",
+      "recommended_actions": []
+    },
+    "labs": null,
+    "literature_search": null,
+    "mri": null,
+    "specialized_test": null
+  },
+  "followup_outputs": [
+    {
+      "output": {
+        "alternatives": [],
+        "contraindications": [],
+        "formulary_status": "Available",
+        "interactions": [
+          "Rivaroxaban must be held 48h prior to neurosurgical procedure"
+        ],
+        "proposed": "VP shunt surgery with rivaroxaban management (AF, CHA2DS2-VASc 4)",
+        "warnings": [
+          "CHA2DS2-VASc 4 \u2014 discuss bridging anticoagulation with neurosurgery and cardiology for high-stroke-risk AF patient during rivaroxaban hold",
+          "Resume rivaroxaban 24-48h post-operatively once hemostasis confirmed"
+        ]
+      },
+      "tool_name": "check_drug_interactions",
+      "trigger_action": "request_drug_interactions_shunt_anticoagulation"
+    },
+    {
+      "output": {
+        "query": "secondary normal pressure hydrocephalus after subdural hematoma evacuation VP shunt outcomes",
+        "results": [
+          {
+            "key_finding": "Secondary NPH following subdural hematoma evacuation responds well to VP shunting with 70-80% improvement rates; better prognosis than idiopathic NPH",
+            "title": "Communicating hydrocephalus following subdural haematoma evacuation: incidence and management",
+            "year": "2018"
+          }
+        ],
+        "summary": "Secondary NPH following subdural hematoma evacuation is a well-recognized complication, reported in 1\u20135% of cases. The proposed mechanism involves disruption of arachnoid granule CSF reabsorption. Published series report VP shunt improvement rates of 70\u201380% in this etiology, with outcomes generally more favorable than idiopathic NPH. Clinical correlation required to determine applicability in individual cases."
+      },
+      "tool_name": "search_medical_literature",
+      "trigger_action": "request_literature_secondary_nph"
+    }
+  ],
+  "ground_truth": {
+    "action_criteria": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[Williams_2016]",
+          "NPH_pack"
+        ],
+        "criterion_id": "action-1-search-medical-literature",
+        "expected_evidence": "Relkin 2005 INPH Study Group criteria; Tisell 2011 tap-test predictors; Williams 2016 review",
+        "importance": "recommended",
+        "label": "Literature review of iNPH diagnostic criteria and shunt-response predictors",
+        "rationale": "Literature review of iNPH diagnostic criteria and shunt-response predictors"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_brain_mri"
+          }
+        ],
+        "citations": [
+          "[Relkin_2005]",
+          "NPH_pack"
+        ],
+        "criterion_id": "action-2-analyze-brain-mri",
+        "expected_evidence": "Ventriculomegaly with Evans index >0.3, DESH pattern (tight high-convexity sulci + widened Sylvian fissures), callosal angle <90\u00b0, periventricular transependymal signal; no mass effect or aqueductal obstruction",
+        "importance": "required",
+        "label": "Brain MRI \u2014 measure Evans index, callosal angle, assess DESH pattern; exclude mass effect, hydrocephalus from secondary cause, and atrophy",
+        "rationale": "Brain MRI \u2014 measure Evans index, callosal angle, assess DESH pattern; exclude mass effect, hydrocephalus from secondary cause, and atrophy"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "TSH",
+                "B12",
+                "RPR",
+                "HIV"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[Relkin_2005]",
+          "NPH_pack"
+        ],
+        "criterion_id": "action-3-interpret-labs",
+        "expected_evidence": "TSH, B12, RPR, HIV negative or within normal range; reversible mimics excluded",
+        "importance": "optional",
+        "label": "Reversible-cause labs (TSH, B12, RPR, HIV) to exclude metabolic / infectious dementia mimics",
+        "rationale": "Reversible-cause labs (TSH, B12, RPR, HIV) to exclude metabolic / infectious dementia mimics"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_csf"
+          }
+        ],
+        "citations": [
+          "[Tisell_2011]",
+          "NPH_pack"
+        ],
+        "criterion_id": "action-4-analyze-csf",
+        "expected_evidence": "Opening pressure compatible with NPH criteria; 30-50 mL CSF removed; prespecified pre/post gait and cognitive measures show objective change relevant to shunt responsiveness",
+        "importance": "required",
+        "label": "Large-volume lumbar puncture (30-50 mL tap test) with opening pressure and prespecified pre/post objective gait and cognitive assessment",
+        "rationale": "Large-volume lumbar puncture (30-50 mL tap test) with opening pressure and prespecified pre/post objective gait and cognitive assessment"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "assessment_type": "gait_and_balance_timed"
+            },
+            "tool_name": "perform_clinical_assessment"
+          }
+        ],
+        "citations": [
+          "[Relkin_2005]",
+          "Relkin_2005"
+        ],
+        "criterion_id": "action-6-perform-clinical-assessment",
+        "expected_evidence": "Baseline timed gait recorded before the tap and repeated after it, with the response interpreted from the prespecified objective change and the cognitive screen repeated alongside",
+        "importance": "required",
+        "label": "Measure gait and balance objectively before the large-volume tap \u2014 timed-up-and-go, 10-metre walk, step length, falls risk \u2014 and repeat the same measures and the cognitive screen after it. The baseline must be recorded before the puncture or the post-tap change cannot be interpreted",
+        "rationale": "Measure gait and balance objectively before the large-volume tap \u2014 timed-up-and-go, 10-metre walk, step length, falls risk \u2014 and repeat the same measures and the cognitive screen after it. The baseline must be recorded before the puncture or the post-tap change cannot be interpreted"
       }
+    ],
+    "assessment": {
+      "prohibited_recommendations": [
+        "Do not perform large-volume lumbar puncture before MRI excludes mass effect or obstructive hydrocephalus",
+        "Do not infer iNPH from ventriculomegaly alone \u2014 DESH, callosal angle <90\u00b0, and a clinical triad are required",
+        "Do not diagnose Alzheimer's disease in a patient with gait-predominant presentation and ventriculomegaly without first excluding NPH",
+        "Do not attribute the syndrome to 'normal ageing' or 'deconditioning' once the imaging criteria for ventriculomegaly are met"
+      ],
+      "required_recommendations": [
+        "Obtain brain MRI before lumbar puncture to exclude mass effect or obstructive hydrocephalus",
+        "Document objective pre-tap gait (TUG and 10-metre walk) and a brief cognitive baseline so that pre/post-tap change can be quantified",
+        "Remove 30-50 mL of CSF during the tap test (a low-volume LP under-samples and biases the test toward false negative)",
+        "Re-assess gait and cognition 1-4 hours after the tap and again at 24 hours (the response window for tap-test prediction of shunt benefit)",
+        "Refer to neurosurgery for VP shunt evaluation when imaging, clinical, and tap-test criteria support iNPH",
+        "Inspect MRI for residual or recurrent subdural collection before LP given prior burr-hole evacuation"
+      ]
     },
-    "chief_complaint": "Progressive gait deterioration and mild cognitive decline 14 months after bilateral subdural hematoma evacuation",
-    "history_present_illness": "A 74-year-old right-handed man with hypertension, atrial fibrillation, and bilateral chronic subdural hematomas (surgically evacuated 14 months ago via bilateral burr holes) was admitted for NPH evaluation. Post-operatively following his subdural evacuation, he had an acceptable recovery — cognitive function improved and he was ambulatory without assistance. However, over the past 8 months his gait has progressively deteriorated with increasing shuffling, wide-based gait, and two falls. He requires a walker. Cognitive performance has also declined gradually, though he remains able to manage daily activities with his wife's assistance. He has developed urinary urgency with occasional incontinence. His neurosurgical team has been monitoring him post-operatively and noted that repeat head CT shows hydrocephalus that was not present at 6-month post-operative CT — Evans index on current CT is 0.36. The neurosurgeon suspects secondary NPH (post-operative communicating hydrocephalus following subdural evacuation), a known complication. He is admitted for tap trial. Anticoagulation management is a safety concern for LP.",
-    "neurological_exam": {
-      "mental_status": "Alert, oriented x3. MoCA 22/30. Word-finding mildly impaired. Memory 3/5 delayed recall. Processing speed slow.",
-      "cranial_nerves": "Normal.",
-      "motor": "Normal tone and strength. No focal deficits.",
-      "sensory": "Vibration mildly reduced at ankles.",
-      "reflexes": "2+ throughout. Plantar flexor bilaterally.",
-      "coordination": "Finger-nose intact. Heel-shin mildly awkward.",
-      "gait": "Wide-based, short-stepped, shuffling gait. Magnetic quality. TUG 26 seconds (with walker). 10-meter walk 20 seconds.",
-      "additional": "Post-operative burr hole scars bilateral fronto-parietal. No nuchal rigidity."
+    "avoided_actions": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_eeg"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "avoid-waste-1-analyze-eeg",
+        "rationale": "EEG is non-specific for NPH and does not distinguish from neurodegenerative alternatives in this chronic gait/cognitive presentation",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_ecg"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "avoid-waste-2-analyze-ecg",
+        "rationale": "ECG is unrelated to the diagnostic workup of chronic gait + cognitive + urinary triad once cardiogenic syncope is not on the differential",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_echocardiogram"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "avoid-waste-3-order-echocardiogram",
+        "rationale": "Echocardiography does not contribute to NPH evaluation in the absence of syncope or cardioembolic stroke workup",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_ct_scan"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "avoid-waste-4-order-ct-scan",
+        "rationale": "Head CT is inferior to MRI for measuring Evans index and callosal angle and for excluding secondary causes; only justified if MRI is contraindicated",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_cardiac_monitoring"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "avoid-waste-5-order-cardiac-monitoring",
+        "rationale": "Cardiac monitoring has no diagnostic role in NPH and is reserved for syncope or arrhythmia workup",
+        "severity": "waste"
+      }
+    ],
+    "diagnosis": {
+      "accepted": [
+        "Secondary normal pressure hydrocephalus, post-subdural haematoma evacuation"
+      ],
+      "icd_codes": [
+        "G91.0"
+      ]
     },
-    "vitals": {
-      "bp_systolic": 138,
-      "bp_diastolic": 84,
-      "hr": 76,
-      "temp": 36.8,
-      "rr": 14,
-      "spo2": 97
+    "differential": [
+      {
+        "diagnosis": "Vascular cognitive impairment / progressive small-vessel ischaemic disease",
+        "icd_code": "F01.50",
+        "key_features": "Prior infarct and ongoing vascular risk can produce a stepwise decline with gait apraxia, but disproportionate ventriculomegaly with DESH and a positive tap response are not explained by small-vessel disease alone",
+        "likelihood": "high"
+      },
+      {
+        "diagnosis": "Parkinson's disease / atypical parkinsonism",
+        "icd_code": "G20",
+        "key_features": "Shuffling gait overlaps, but absence of resting tremor, asymmetric rigidity, or L-dopa response and presence of magnetic gait + DESH favour NPH",
+        "likelihood": "moderate"
+      },
+      {
+        "diagnosis": "Alzheimer's disease",
+        "icd_code": "G30.9",
+        "key_features": "Cognitive decline overlaps; AD typically presents with episodic-memory predominance and hippocampal atrophy rather than frontal-subcortical pattern and magnetic gait; targeted CSF Alzheimer biomarkers can evaluate suspected copathology when the result would change counselling or management",
+        "likelihood": "moderate"
+      },
+      {
+        "diagnosis": "Cerebral atrophy with secondary ex-vacuo ventriculomegaly",
+        "icd_code": "G31.9",
+        "key_features": "Ventriculomegaly proportionate to sulcal widening, callosal angle >90\u00b0, and absence of DESH or transependymal signal argue against true NPH",
+        "likelihood": "moderate"
+      },
+      {
+        "diagnosis": "Post-traumatic / post-SAH / post-meningitic communicating hydrocephalus",
+        "icd_code": "G91.0",
+        "key_features": "Prior intracranial event (SAH, subdural, meningitis) can cause delayed communicating hydrocephalus clinically indistinguishable from iNPH; designation as 'secondary' affects research classification but not management",
+        "likelihood": "moderate"
+      }
+    ],
+    "key_clinical_evidence": [
+      "iNPH diagnosis (Relkin 2005 INPH Study Group) requires (a) Hakim's triad of gait disturbance, cognitive impairment, and urinary urgency/incontinence \u2014 gait is typically first and most prominent; (b) ventriculomegaly with Evans >0.3 and DESH on MRI without mass effect; (c) age >40 and chronic course; (d) opening pressure <25 cmH2O; (e) absence of an alternative explanation",
+      "MRI is the imaging modality of choice \u2014 measure Evans index and callosal angle (<90\u00b0 supports NPH) and confirm DESH (tight high-convexity sulci + wide Sylvian fissures)",
+      "The tap test removes 30-50 mL of CSF after measuring opening pressure and compares prespecified objective gait and cognitive measures before and after drainage; a positive response supports shunt responsiveness, while a negative single tap does not exclude NPH",
+      "Tap-test sensitivity is only 50-80%; a single negative tap does not exclude NPH \u2014 an extended (3-5 day) lumbar drainage trial can resolve borderline cases",
+      "Reversible-cause laboratory tests do not diagnose NPH and are optional; order targeted tests only when the presentation suggests a metabolic, endocrine, infectious, inflammatory, vitamin, or medication-related mimic",
+      "Alzheimer copathology is common in iNPH and may reduce cognitive benefit from shunting without necessarily eliminating gait benefit",
+      "Shunt response is best predicted by an objectively positive tap test or extended drainage trial in a patient who meets imaging and clinical criteria",
+      "Bilateral chronic subdural haematomas can produce delayed communicating hydrocephalus by impairing arachnoid resorption \u2014 clinically and surgically managed identically to iNPH",
+      "Tier per the July 2026 clinical review: The reversible-cause screen is good practice but does not establish or exclude hydrocephalus; the tap test does."
+    ],
+    "red_herrings": [],
+    "review_status": "draft",
+    "sequence_constraints": [
+      {
+        "after_criterion_id": "action-4-analyze-csf",
+        "before_criterion_id": "action-2-analyze-brain-mri",
+        "citations": [
+          "[Relkin_2005]"
+        ],
+        "reason": "MRI must precede large-volume LP to exclude mass effect or secondary obstructive hydrocephalus before removing 30-50 mL of CSF",
+        "severity": "hard"
+      },
+      {
+        "after_criterion_id": "action-4-analyze-csf",
+        "before_criterion_id": "action-6-perform-clinical-assessment",
+        "citations": [
+          "[Relkin_2005]"
+        ],
+        "reason": "The baseline gait and cognition must be measured before the large-volume tap, or the post-tap change cannot be interpreted and the tap test yields nothing",
+        "severity": "soft"
+      }
+    ],
+    "stop_rule": {
+      "max_additional_actions": 0,
+      "required_before_assessment": [
+        "action-2-analyze-brain-mri",
+        "action-4-analyze-csf",
+        "action-6-perform-clinical-assessment"
+      ]
     }
   },
   "initial_tool_outputs": {
-    "mri": {
-      "findings": [
-        {
-          "type": "ventriculomegaly",
-          "location": "bilateral lateral ventricles",
-          "size": null,
-          "signal_characteristics": {
-            "description": "Evans index 0.36 — significant"
-          },
-          "mass_effect": null,
-          "borders": null
-        },
-        {
-          "type": "post-operative changes",
-          "location": "bilateral fronto-parietal",
-          "size": null,
-          "signal_characteristics": {
-            "description": "Bilateral burr hole sites with post-surgical hemosiderin signal"
-          },
-          "mass_effect": null,
-          "borders": null
-        },
-        {
-          "type": "tight sulci",
-          "location": "high convexity",
-          "size": null,
-          "signal_characteristics": {
-            "description": "Tight high-convexity sulci"
-          },
-          "mass_effect": null,
-          "borders": null
-        },
-        {
-          "type": "callosal angle",
-          "location": "corpus callosum",
-          "size": null,
-          "signal_characteristics": {
-            "description": "Callosal angle 78 degrees"
-          },
-          "mass_effect": null,
-          "borders": null
-        },
-        {
-          "type": "white matter",
-          "location": "periventricular",
-          "size": null,
-          "signal_characteristics": {
-            "description": "Mild-moderate periventricular white matter changes"
-          },
-          "mass_effect": null,
-          "borders": null
-        }
-      ],
-      "volumetrics": null,
-      "additional_observations": [],
-      "impression": "1. Significant ventriculomegaly; Evans index 0.36. Callosal angle 78 degrees. Tight high-convexity sulci. Mild-to-moderate periventricular white matter changes. 2. Bilateral fronto-parietal post-surgical hemosiderin signal at burr hole sites. No residual subdural collection identified. No new hemorrhage",
-      "recommended_actions": []
-    },
-    "labs": {
-      "panels": {
-        "CBC": [
-          {
-            "test": "WBC",
-            "value": 7.6,
-            "unit": "x10^9/L",
-            "reference_range": "4.5-11.0",
-            "is_abnormal": false
-          },
-          {
-            "test": "Hemoglobin",
-            "value": 13.4,
-            "unit": "g/dL",
-            "reference_range": "13.5-17.5",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "Platelets",
-            "value": 188,
-            "unit": "x10^9/L",
-            "reference_range": "150-400",
-            "is_abnormal": false
-          }
-        ],
-        "BMP": [
-          {
-            "test": "Sodium",
-            "value": 140,
-            "unit": "mmol/L",
-            "reference_range": "136-145",
-            "is_abnormal": false
-          },
-          {
-            "test": "Creatinine",
-            "value": 1.1,
-            "unit": "mg/dL",
-            "reference_range": "0.7-1.3",
-            "is_abnormal": false
-          }
-        ],
-        "Metabolic": [
-          {
-            "test": "TSH",
-            "value": 2.0,
-            "unit": "mIU/L",
-            "reference_range": "0.4-4.0",
-            "is_abnormal": false
-          },
-          {
-            "test": "B12",
-            "value": 398,
-            "unit": "pg/mL",
-            "reference_range": "200-900",
-            "is_abnormal": false
-          }
-        ],
-        "Coagulation": [
-          {
-            "test": "Anti-Xa (rivaroxaban)",
-            "value": "Hold rivaroxaban 24h prior to LP",
-            "unit": "",
-            "reference_range": "Level not measured — clinical hold protocol",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ],
-        "Baseline workup": [
-          {
-            "test": "HIV",
-            "value": "Non-reactive",
-            "unit": "",
-            "reference_range": "",
-            "is_abnormal": false,
-            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on"
-          }
-        ]
-      },
-      "interpretation": "Abnormal values: Hemoglobin 13.4 g/dL (L).",
-      "abnormal_values_summary": [
-        "Hemoglobin 13.4 g/dL (borderline low)"
-      ]
-    },
-    "csf": {
-      "appearance": "Clear, slightly xanthochromic (residual post-operative)",
-      "opening_pressure": "17 cmH2O",
-      "cell_count": {
-        "WBC": "3 cells/mcL",
-        "differential": "Lymphocytes",
-        "RBC": "8"
-      },
-      "protein": "56 mg/dL",
-      "glucose": "62 mg/dL",
-      "glucose_ratio": "0.64",
-      "special_tests": {
-        "volume_removed": "45 mL",
-        "pre_tap_tug": "26 seconds",
-        "post_tap_tug_2h": "20 seconds (23% improvement)",
-        "post_tap_tug_24h": "18 seconds (31% improvement)",
-        "post_tap_10m_walk": "From 20 sec to 14.5 sec (28% improvement at 24h)",
-        "cognitive": "MoCA 22 to 24 (2 point improvement)"
-      },
-      "interpretation": "Opening pressure: 17 cmH2O. WBC: 3 cells/mcL; RBC: 8. Protein: 56 mg/dL. Glucose: 62 mg/dL. High-volume tap trial (45 mL): TUG improved from 26 seconds pre-tap to 18 seconds at 24 hours (31% improvement). 10-meter walk improved from 20 to 14.5 seconds at 24 hours (28% improvement). MoCA improved 2 points at 24 hours"
-    },
     "clinical_assessment": {
       "assessment_type": "gait_and_balance_timed",
-      "scores": {
-        "MoCA (from the bedside examination)": "22/30",
-        "assessment timing": "immediately before the large-volume tap, then repeated after it",
-        "positive-response threshold": ">10% TUG improvement is a commonly used criterion; interpret with absolute change and concordant gait/cognitive findings"
-      },
       "criteria_met": {
-        "objective_gait_measured_before_the_tap": true,
-        "same_measures_repeated_after_the_tap": true,
         "cognition_reassessed_after_the_tap": true,
-        "response_meets_the_threshold": true
-      },
-      "pre_post_comparison": {
-        "before the tap": "Wide-based, short-stepped, shuffling gait.; Magnetic quality.",
-        "after the tap": "The same measures were repeated after the tap, and this is what the case's own tap-trial report states: High-volume tap trial (45 mL): TUG improved from 26 seconds pre-tap to 18 seconds at 24 hours (31% improvement). 10-meter walk improved from 20 to 14.5 seconds at 24 hours (28% improvement). MoCA improved 2 points at 24 hours.",
-        "interpretation": "positive tap test"
+        "objective_gait_measured_before_the_tap": true,
+        "response_meets_the_threshold": true,
+        "same_measures_repeated_after_the_tap": true
       },
       "findings": [
         {
@@ -266,331 +401,274 @@
         }
       ],
       "impression": "Objective gait and cognition were measured before the large-volume tap and repeated after it. The objective improvement is consistent with a positive tap response and increases the likelihood of shunt responsiveness; it must be integrated with the clinical syndrome and structural imaging.",
-      "recommended_actions": []
-    }
-  },
-  "followup_outputs": [
-    {
-      "trigger_action": "request_drug_interactions_shunt_anticoagulation",
-      "tool_name": "check_drug_interactions",
-      "output": {
-        "proposed": "VP shunt surgery with rivaroxaban management (AF, CHA2DS2-VASc 4)",
-        "interactions": [
-          "Rivaroxaban must be held 48h prior to neurosurgical procedure"
-        ],
-        "contraindications": [],
-        "warnings": [
-          "CHA2DS2-VASc 4 — discuss bridging anticoagulation with neurosurgery and cardiology for high-stroke-risk AF patient during rivaroxaban hold",
-          "Resume rivaroxaban 24-48h post-operatively once hemostasis confirmed"
-        ],
-        "formulary_status": "Available",
-        "alternatives": []
+      "pre_post_comparison": {
+        "after the tap": "The same measures were repeated after the tap, and this is what the case's own tap-trial report states: High-volume tap trial (45 mL): TUG improved from 26 seconds pre-tap to 18 seconds at 24 hours (31% improvement). 10-meter walk improved from 20 to 14.5 seconds at 24 hours (28% improvement). MoCA improved 2 points at 24 hours.",
+        "before the tap": "Wide-based, short-stepped, shuffling gait.; Magnetic quality.",
+        "interpretation": "positive tap test"
+      },
+      "recommended_actions": [],
+      "scores": {
+        "MoCA (from the bedside examination)": "22/30",
+        "assessment timing": "immediately before the large-volume tap, then repeated after it",
+        "positive-response threshold": ">10% TUG improvement is a commonly used criterion; interpret with absolute change and concordant gait/cognitive findings"
       }
     },
-    {
-      "trigger_action": "request_literature_secondary_nph",
-      "tool_name": "search_medical_literature",
-      "output": {
-        "query": "secondary normal pressure hydrocephalus after subdural hematoma evacuation VP shunt outcomes",
-        "results": [
+    "csf": {
+      "appearance": "Clear, slightly xanthochromic (residual post-operative)",
+      "cell_count": {
+        "RBC": "8",
+        "WBC": "3 cells/mcL",
+        "differential": "Lymphocytes"
+      },
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.64",
+      "interpretation": "Opening pressure: 17 cmH2O. WBC: 3 cells/mcL; RBC: 8. Protein: 56 mg/dL. Glucose: 62 mg/dL. High-volume tap trial (45 mL): TUG improved from 26 seconds pre-tap to 18 seconds at 24 hours (31% improvement). 10-meter walk improved from 20 to 14.5 seconds at 24 hours (28% improvement). MoCA improved 2 points at 24 hours",
+      "opening_pressure": "17 cmH2O",
+      "protein": "56 mg/dL",
+      "special_tests": {
+        "cognitive": "MoCA 22 to 24 (2 point improvement)",
+        "post_tap_10m_walk": "From 20 sec to 14.5 sec (28% improvement at 24h)",
+        "post_tap_tug_24h": "18 seconds (31% improvement)",
+        "post_tap_tug_2h": "20 seconds (23% improvement)",
+        "pre_tap_tug": "26 seconds",
+        "volume_removed": "45 mL"
+      }
+    },
+    "labs": {
+      "abnormal_values_summary": [
+        "Hemoglobin 13.4 g/dL (borderline low)"
+      ],
+      "interpretation": "Abnormal values: Hemoglobin 13.4 g/dL (L).",
+      "panels": {
+        "BMP": [
           {
-            "title": "Communicating hydrocephalus following subdural haematoma evacuation: incidence and management",
-            "year": "2018",
-            "key_finding": "Secondary NPH following subdural hematoma evacuation responds well to VP shunting with 70-80% improvement rates; better prognosis than idiopathic NPH"
+            "is_abnormal": false,
+            "reference_range": "136-145",
+            "test": "Sodium",
+            "unit": "mmol/L",
+            "value": 140
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "0.7-1.3",
+            "test": "Creatinine",
+            "unit": "mg/dL",
+            "value": 1.1
           }
         ],
-        "summary": "Secondary NPH following subdural hematoma evacuation is a well-recognized complication, reported in 1–5% of cases. The proposed mechanism involves disruption of arachnoid granule CSF reabsorption. Published series report VP shunt improvement rates of 70–80% in this etiology, with outcomes generally more favorable than idiopathic NPH. Clinical correlation required to determine applicability in individual cases."
+        "Baseline workup": [
+          {
+            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on",
+            "is_abnormal": false,
+            "reference_range": "",
+            "test": "HIV",
+            "unit": "",
+            "value": "Non-reactive"
+          }
+        ],
+        "CBC": [
+          {
+            "is_abnormal": false,
+            "reference_range": "4.5-11.0",
+            "test": "WBC",
+            "unit": "x10^9/L",
+            "value": 7.6
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "13.5-17.5",
+            "test": "Hemoglobin",
+            "unit": "g/dL",
+            "value": 13.4
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "150-400",
+            "test": "Platelets",
+            "unit": "x10^9/L",
+            "value": 188
+          }
+        ],
+        "Coagulation": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Level not measured \u2014 clinical hold protocol",
+            "test": "Anti-Xa (rivaroxaban)",
+            "unit": "",
+            "value": "Hold rivaroxaban 24h prior to LP"
+          }
+        ],
+        "Metabolic": [
+          {
+            "is_abnormal": false,
+            "reference_range": "0.4-4.0",
+            "test": "TSH",
+            "unit": "mIU/L",
+            "value": 2.0
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "200-900",
+            "test": "B12",
+            "unit": "pg/mL",
+            "value": 398
+          }
+        ]
       }
+    },
+    "mri": {
+      "additional_observations": [],
+      "findings": [
+        {
+          "borders": null,
+          "location": "bilateral lateral ventricles",
+          "mass_effect": null,
+          "signal_characteristics": {
+            "description": "Evans index 0.36 \u2014 significant"
+          },
+          "size": null,
+          "type": "ventriculomegaly"
+        },
+        {
+          "borders": null,
+          "location": "bilateral fronto-parietal",
+          "mass_effect": null,
+          "signal_characteristics": {
+            "description": "Bilateral burr hole sites with post-surgical hemosiderin signal"
+          },
+          "size": null,
+          "type": "post-operative changes"
+        },
+        {
+          "borders": null,
+          "location": "high convexity",
+          "mass_effect": null,
+          "signal_characteristics": {
+            "description": "Tight high-convexity sulci"
+          },
+          "size": null,
+          "type": "tight sulci"
+        },
+        {
+          "borders": null,
+          "location": "corpus callosum",
+          "mass_effect": null,
+          "signal_characteristics": {
+            "description": "Callosal angle 78 degrees"
+          },
+          "size": null,
+          "type": "callosal angle"
+        },
+        {
+          "borders": null,
+          "location": "periventricular",
+          "mass_effect": null,
+          "signal_characteristics": {
+            "description": "Mild-moderate periventricular white matter changes"
+          },
+          "size": null,
+          "type": "white matter"
+        }
+      ],
+      "impression": "1. Significant ventriculomegaly; Evans index 0.36. Callosal angle 78 degrees. Tight high-convexity sulci. Mild-to-moderate periventricular white matter changes. 2. Bilateral fronto-parietal post-surgical hemosiderin signal at burr hole sites. No residual subdural collection identified. No new hemorrhage",
+      "recommended_actions": [],
+      "volumetrics": null
     }
-  ],
-  "fallback_tool_outputs": {
-    "eeg": {
-      "classification": "normal",
-      "background": {
-        "pdr": "9-10 Hz posterior dominant rhythm, symmetric and reactive",
-        "sleep_features": "normal vertex waves and sleep spindles",
-        "overall": "normal organisation for age"
-      },
-      "findings": [],
-      "artifacts": [],
-      "activating_procedures": {},
-      "impression": "Normal awake and drowsy EEG. No epileptiform discharges and no focal slowing.",
-      "limitations": "",
-      "recommended_actions": []
-    },
-    "mri": null,
-    "ecg": {
-      "rhythm": "normal sinus rhythm",
-      "rate": 82,
-      "intervals": {
-        "PR": "152 ms",
-        "QRS": "100 ms",
-        "QTc": "427 ms"
-      },
-      "axis": "normal",
-      "findings": [
-        "Normal sinus rhythm. Normal axis and intervals. No acute ST-T changes."
-      ],
-      "interpretation": "Normal ECG",
-      "clinical_correlation": ""
-    },
-    "labs": null,
-    "csf": null,
-    "ct": {
-      "findings": [],
-      "contrast_used": false,
-      "angiography_findings": null,
-      "additional_observations": [
-        "No acute intracranial haemorrhage, established infarct, mass, or midline shift.",
-        "Grey-white differentiation preserved; basal cisterns patent.",
-        "Bone windows unremarkable."
-      ],
-      "impression": "Non-contrast head CT without acute intracranial abnormality.",
-      "recommended_actions": []
-    },
-    "echo": {
-      "chambers": {
-        "LV": "normal size and systolic function",
-        "RV": "normal size and function",
-        "LA": "normal size",
-        "RA": "normal size"
-      },
-      "valves": {
-        "mitral": "structurally normal",
-        "aortic": "structurally normal",
-        "tricuspid": "normal",
-        "pulmonic": "normal"
-      },
-      "ejection_fraction": 62.0,
-      "wall_motion": "no regional wall-motion abnormality",
-      "findings": [
-        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
-      ],
-      "impression": "Normal transthoracic echocardiogram.",
-      "recommended_actions": []
-    },
-    "cardiac_monitoring": {
-      "duration_hours": 24,
-      "monitor_type": "holter_24h",
-      "rhythm_summary": "Sinus rhythm throughout the recording",
-      "heart_rate_range": {
-        "min": 49,
-        "max": 125,
-        "average": 74
-      },
-      "events": [],
-      "findings": [
-        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
-      ],
-      "impression": "Normal 24-hour Holter monitor.",
-      "recommended_actions": []
-    },
-    "advanced_imaging": null,
-    "specialized_test": null,
-    "literature_search": null,
-    "drug_interactions": null
-  },
-  "ground_truth": {
-    "primary_diagnosis": "Secondary normal pressure hydrocephalus, post-subdural haematoma evacuation",
-    "icd_code": "G91.0",
-    "differential": [
-      {
-        "diagnosis": "Vascular cognitive impairment / progressive small-vessel ischaemic disease",
-        "likelihood": "high",
-        "key_features": "Prior infarct and ongoing vascular risk can produce a stepwise decline with gait apraxia, but disproportionate ventriculomegaly with DESH and a positive tap response are not explained by small-vessel disease alone",
-        "icd_code": "F01.50"
-      },
-      {
-        "diagnosis": "Parkinson's disease / atypical parkinsonism",
-        "likelihood": "moderate",
-        "key_features": "Shuffling gait overlaps, but absence of resting tremor, asymmetric rigidity, or L-dopa response and presence of magnetic gait + DESH favour NPH",
-        "icd_code": "G20"
-      },
-      {
-        "diagnosis": "Alzheimer's disease",
-        "likelihood": "moderate",
-        "key_features": "Cognitive decline overlaps; AD typically presents with episodic-memory predominance and hippocampal atrophy rather than frontal-subcortical pattern and magnetic gait; targeted CSF Alzheimer biomarkers can evaluate suspected copathology when the result would change counselling or management",
-        "icd_code": "G30.9"
-      },
-      {
-        "diagnosis": "Cerebral atrophy with secondary ex-vacuo ventriculomegaly",
-        "likelihood": "moderate",
-        "key_features": "Ventriculomegaly proportionate to sulcal widening, callosal angle >90°, and absence of DESH or transependymal signal argue against true NPH",
-        "icd_code": "G31.9"
-      },
-      {
-        "diagnosis": "Post-traumatic / post-SAH / post-meningitic communicating hydrocephalus",
-        "likelihood": "moderate",
-        "key_features": "Prior intracranial event (SAH, subdural, meningitis) can cause delayed communicating hydrocephalus clinically indistinguishable from iNPH; designation as 'secondary' affects research classification but not management",
-        "icd_code": "G91.0"
-      }
-    ],
-    "optimal_actions": [
-      {
-        "step": 1,
-        "action": "Literature review of iNPH diagnostic criteria and shunt-response predictors",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Relkin 2005 INPH Study Group criteria; Tisell 2011 tap-test predictors; Williams 2016 review",
-        "category": "recommended",
-        "tool_parameters": {},
-        "citation": "[Williams_2016]",
-        "guideline_source": "NPH_pack"
-      },
-      {
-        "step": 2,
-        "action": "Brain MRI — measure Evans index, callosal angle, assess DESH pattern; exclude mass effect, hydrocephalus from secondary cause, and atrophy",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Ventriculomegaly with Evans index >0.3, DESH pattern (tight high-convexity sulci + widened Sylvian fissures), callosal angle <90°, periventricular transependymal signal; no mass effect or aqueductal obstruction",
-        "category": "required",
-        "tool_parameters": {},
-        "citation": "[Relkin_2005]",
-        "guideline_source": "NPH_pack"
-      },
-      {
-        "step": 3,
-        "action": "Reversible-cause labs (TSH, B12, RPR, HIV) to exclude metabolic / infectious dementia mimics",
-        "tool_name": "interpret_labs",
-        "expected_finding": "TSH, B12, RPR, HIV negative or within normal range; reversible mimics excluded",
-        "category": "optional",
-        "tool_parameters": {
-          "panels": [
-            "TSH",
-            "B12",
-            "RPR",
-            "HIV"
-          ]
-        },
-        "citation": "[Relkin_2005]",
-        "guideline_source": "NPH_pack"
-      },
-      {
-        "step": 4,
-        "action": "Large-volume lumbar puncture (30-50 mL tap test) with opening pressure and prespecified pre/post objective gait and cognitive assessment",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Opening pressure compatible with NPH criteria; 30-50 mL CSF removed; prespecified pre/post gait and cognitive measures show objective change relevant to shunt responsiveness",
-        "category": "required",
-        "tool_parameters": {},
-        "citation": "[Tisell_2011]",
-        "guideline_source": "NPH_pack"
-      },
-      {
-        "step": 5,
-        "action": "Neurosurgery consultation for VP shunt candidacy and perioperative planning",
-        "tool_name": null,
-        "expected_finding": "Neurosurgery accepts patient for VP shunt evaluation with programmable valve",
-        "category": "required",
-        "tool_parameters": {},
-        "citation": "[Marmarou_2005]",
-        "guideline_source": "NPH_pack"
-      },
-      {
-        "action": "Measure gait and balance objectively before the large-volume tap — timed-up-and-go, 10-metre walk, step length, falls risk — and repeat the same measures and the cognitive screen after it. The baseline must be recorded before the puncture or the post-tap change cannot be interpreted",
-        "tool_name": "perform_clinical_assessment",
-        "expected_finding": "Baseline timed gait recorded before the tap and repeated after it, with the response interpreted from the prespecified objective change and the cognitive screen repeated alongside",
-        "category": "required",
-        "tool_parameters": {
-          "assessment_type": "gait_and_balance_timed"
-        },
-        "citation": "[Relkin_2005]",
-        "guideline_source": "Relkin_2005",
-        "step": 6
-      }
-    ],
-    "useless_tools": [
-      {
-        "tool_name": "analyze_eeg",
-        "tool_parameters": {},
-        "rationale": "EEG is non-specific for NPH and does not distinguish from neurodegenerative alternatives in this chronic gait/cognitive presentation",
-        "citation": ""
-      },
-      {
-        "tool_name": "analyze_ecg",
-        "tool_parameters": {},
-        "rationale": "ECG is unrelated to the diagnostic workup of chronic gait + cognitive + urinary triad once cardiogenic syncope is not on the differential",
-        "citation": ""
-      },
-      {
-        "tool_name": "order_echocardiogram",
-        "tool_parameters": {},
-        "rationale": "Echocardiography does not contribute to NPH evaluation in the absence of syncope or cardioembolic stroke workup",
-        "citation": ""
-      },
-      {
-        "tool_name": "order_ct_scan",
-        "tool_parameters": {},
-        "rationale": "Head CT is inferior to MRI for measuring Evans index and callosal angle and for excluding secondary causes; only justified if MRI is contraindicated",
-        "citation": ""
-      },
-      {
-        "tool_name": "order_cardiac_monitoring",
-        "tool_parameters": {},
-        "rationale": "Cardiac monitoring has no diagnostic role in NPH and is reserved for syncope or arrhythmia workup",
-        "citation": ""
-      }
-    ],
-    "harmful_tools": [],
-    "sequence_constraints": [
-      {
-        "before": "analyze_brain_mri",
-        "after": "analyze_csf",
-        "reason": "MRI must precede large-volume LP to exclude mass effect or secondary obstructive hydrocephalus before removing 30-50 mL of CSF",
-        "citation": "[Relkin_2005]",
-        "severity": "hard"
-      },
-      {
-        "before": "perform_clinical_assessment",
-        "after": "analyze_csf",
-        "reason": "The baseline gait and cognition must be measured before the large-volume tap, or the post-tap change cannot be interpreted and the tap test yields nothing",
-        "citation": "[Relkin_2005]",
-        "severity": "soft"
-      }
-    ],
-    "critical_actions": [
-      "Obtain brain MRI before lumbar puncture to exclude mass effect or obstructive hydrocephalus",
-      "Document objective pre-tap gait (TUG and 10-metre walk) and a brief cognitive baseline so that pre/post-tap change can be quantified",
-      "Remove 30-50 mL of CSF during the tap test (a low-volume LP under-samples and biases the test toward false negative)",
-      "Re-assess gait and cognition 1-4 hours after the tap and again at 24 hours (the response window for tap-test prediction of shunt benefit)",
-      "Refer to neurosurgery for VP shunt evaluation when imaging, clinical, and tap-test criteria support iNPH",
-      "Inspect MRI for residual or recurrent subdural collection before LP given prior burr-hole evacuation"
-    ],
-    "contraindicated_actions": [
-      "Do not perform large-volume lumbar puncture before MRI excludes mass effect or obstructive hydrocephalus",
-      "Do not infer iNPH from ventriculomegaly alone — DESH, callosal angle <90°, and a clinical triad are required",
-      "Do not diagnose Alzheimer's disease in a patient with gait-predominant presentation and ventriculomegaly without first excluding NPH",
-      "Do not attribute the syndrome to 'normal ageing' or 'deconditioning' once the imaging criteria for ventriculomegaly are met"
-    ],
-    "key_reasoning_points": [
-      "iNPH diagnosis (Relkin 2005 INPH Study Group) requires (a) Hakim's triad of gait disturbance, cognitive impairment, and urinary urgency/incontinence — gait is typically first and most prominent; (b) ventriculomegaly with Evans >0.3 and DESH on MRI without mass effect; (c) age >40 and chronic course; (d) opening pressure <25 cmH2O; (e) absence of an alternative explanation",
-      "MRI is the imaging modality of choice — measure Evans index and callosal angle (<90° supports NPH) and confirm DESH (tight high-convexity sulci + wide Sylvian fissures)",
-      "The tap test removes 30-50 mL of CSF after measuring opening pressure and compares prespecified objective gait and cognitive measures before and after drainage; a positive response supports shunt responsiveness, while a negative single tap does not exclude NPH",
-      "Tap-test sensitivity is only 50-80%; a single negative tap does not exclude NPH — an extended (3-5 day) lumbar drainage trial can resolve borderline cases",
-      "Reversible-cause laboratory tests do not diagnose NPH and are optional; order targeted tests only when the presentation suggests a metabolic, endocrine, infectious, inflammatory, vitamin, or medication-related mimic",
-      "Alzheimer copathology is common in iNPH and may reduce cognitive benefit from shunting without necessarily eliminating gait benefit",
-      "Shunt response is best predicted by an objectively positive tap test or extended drainage trial in a patient who meets imaging and clinical criteria",
-      "Bilateral chronic subdural haematomas can produce delayed communicating hydrocephalus by impairing arachnoid resorption — clinically and surgically managed identically to iNPH",
-      "Tier per the July 2026 clinical review: The reversible-cause screen is good practice but does not establish or exclude hydrocephalus; the tap test does."
-    ],
-    "red_herrings": []
   },
   "metadata": {
-    "created_by": "NeuroBench v5 generator",
-    "difficulty_variant_description": "Moderate secondary NPH following bilateral subdural hematoma evacuation — moderate difficulty from DOAC management complexity and prior subdural history as potential confounder.",
-    "expected_agent_confidence": 0.58,
-    "fallback_tool_kinds": {
-      "eeg": "normal",
-      "ecg": "normal",
-      "echo": "normal",
-      "cardiac_monitoring": "normal"
-    },
-    "last_revised": "2026-08-10",
-    "revision_reason": "case-level re-audit of all NPH reviewer requests: the tap report is routed to CSF, timed gait/cognitive assessment is the required pre/post measure, the standalone neuropsychological battery and advanced imaging are removed from gold actions and callable authored follow-ups, laboratories remain optional, unrelated CSF assays are no longer returned for free, and the unsupported universal 20% response threshold is corrected",
-    "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:NPH",
-    "difficulty_rationale": "4 required, 1 recommended, and 1 optional actions after the July 2026 NPH review; 0 grounded red herring(s); 5 differential alternatives.",
     "case_body_concerns": [],
     "citation_gap": [],
+    "created_by": "NeuroBench v5 generator",
+    "criteria_pack_version": "1.0",
+    "difficulty_rationale": "4 required, 1 recommended, and 1 optional actions after the July 2026 NPH review; 0 grounded red herring(s); 5 differential alternatives.",
+    "difficulty_variant_description": "Moderate secondary NPH following bilateral subdural hematoma evacuation \u2014 moderate difficulty from DOAC management complexity and prior subdural history as potential confounder.",
+    "expected_agent_confidence": 0.58,
+    "fallback_tool_kinds": {
+      "cardiac_monitoring": "normal",
+      "ecg": "normal",
+      "echo": "normal",
+      "eeg": "normal"
+    },
+    "last_revised": "2026-08-10",
+    "policy_spec_status": "draft",
+    "revision_reason": "case-level re-audit of all NPH reviewer requests: the tap report is routed to CSF, timed gait/cognitive assessment is the required pre/post measure, the standalone neuropsychological battery and advanced imaging are removed from gold actions and callable authored follow-ups, laboratories remain optional, unrelated CSF assays are no longer returned for free, and the unsupported universal 20% response threshold is corrected",
+    "version": "policy-v1",
     "vocab_gap": [
-      "Phase-contrast (CSF flow) MRI is referenced in followup outputs but is not in the TOOL_PARAMETER_VOCABULARY closed list for order_advanced_imaging — recommend adding 'phase_contrast_MRI' or 'CSF_flow_MRI' to the modality vocabulary"
+      "Phase-contrast (CSF flow) MRI is referenced in followup outputs but is not in the TOOL_PARAMETER_VOCABULARY closed list for order_advanced_imaging \u2014 recommend adding 'phase_contrast_MRI' or 'CSF_flow_MRI' to the modality vocabulary"
     ]
-  }
+  },
+  "patient": {
+    "chief_complaint": "Progressive gait deterioration and mild cognitive decline 14 months after bilateral subdural hematoma evacuation",
+    "clinical_history": {
+      "allergies": [
+        "No known drug allergies"
+      ],
+      "family_history": [
+        "No relevant family history"
+      ],
+      "medications": [
+        {
+          "dose": "20 mg",
+          "drug": "Rivaroxaban",
+          "frequency": "daily with evening meal",
+          "indication": "atrial fibrillation"
+        },
+        {
+          "dose": "5 mg",
+          "drug": "Lisinopril",
+          "frequency": "daily",
+          "indication": "hypertension"
+        },
+        {
+          "dose": "40 mg",
+          "drug": "Atorvastatin",
+          "frequency": "daily",
+          "indication": "cardiovascular risk reduction"
+        }
+      ],
+      "past_medical_history": [
+        "Chronic subdural hematoma (bilateral, evacuated 14 months ago)",
+        "Hypertension",
+        "Atrial fibrillation (CHA2DS2-VASc 4)"
+      ],
+      "social_history": {
+        "alcohol": "Minimal",
+        "illicit_drugs": "Denied",
+        "living_situation": "Lives with wife",
+        "occupation": "Retired accountant",
+        "tobacco": "Former smoker, quit 30 years ago"
+      }
+    },
+    "demographics": {
+      "age": 74,
+      "bmi": 28.6,
+      "ethnicity": "White",
+      "handedness": "right",
+      "sex": "male"
+    },
+    "history_present_illness": "A 74-year-old right-handed man with hypertension, atrial fibrillation, and bilateral chronic subdural hematomas (surgically evacuated 14 months ago via bilateral burr holes) was admitted for NPH evaluation. Post-operatively following his subdural evacuation, he had an acceptable recovery \u2014 cognitive function improved and he was ambulatory without assistance. However, over the past 8 months his gait has progressively deteriorated with increasing shuffling, wide-based gait, and two falls. He requires a walker. Cognitive performance has also declined gradually, though he remains able to manage daily activities with his wife's assistance. He has developed urinary urgency with occasional incontinence. His neurosurgical team has been monitoring him post-operatively and noted that repeat head CT shows hydrocephalus that was not present at 6-month post-operative CT \u2014 Evans index on current CT is 0.36. The neurosurgeon suspects secondary NPH (post-operative communicating hydrocephalus following subdural evacuation), a known complication. He is admitted for tap trial. Anticoagulation management is a safety concern for LP.",
+    "neurological_exam": {
+      "additional": "Post-operative burr hole scars bilateral fronto-parietal. No nuchal rigidity.",
+      "coordination": "Finger-nose intact. Heel-shin mildly awkward.",
+      "cranial_nerves": "Normal.",
+      "gait": "Wide-based, short-stepped, shuffling gait. Magnetic quality. TUG 26 seconds (with walker). 10-meter walk 20 seconds.",
+      "mental_status": "Alert, oriented x3. MoCA 22/30. Word-finding mildly impaired. Memory 3/5 delayed recall. Processing speed slow.",
+      "motor": "Normal tone and strength. No focal deficits.",
+      "reflexes": "2+ throughout. Plantar flexor bilaterally.",
+      "sensory": "Vibration mildly reduced at ankles."
+    },
+    "patient_id": "NPH-M06",
+    "vitals": {
+      "bp_diastolic": 84,
+      "bp_systolic": 138,
+      "hr": 76,
+      "rr": 14,
+      "spo2": 97,
+      "temp": 36.8
+    }
+  },
+  "schema_version": "2.0"
 }

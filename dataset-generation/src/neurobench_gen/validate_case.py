@@ -31,8 +31,7 @@ def validate_json_file(json_path: str | Path, strict: bool = False) -> tuple[boo
         return False, [f"File not found: {path}"]
 
     try:
-        with open(path) as f:
-            raw = f.read()
+        raw = path.read_text()
     except Exception as e:
         return False, [f"Cannot read file: {e}"]
 
@@ -105,20 +104,29 @@ def _check_completeness(case: NeuroBenchCase) -> list[str]:
     """Check that required fields are populated."""
     issues = []
 
-    # Ground truth checks
+    # Clinician-reviewable policy checks
     gt = case.ground_truth
-    if not gt.primary_diagnosis:
-        issues.append("WARNING: Missing primary_diagnosis in ground_truth")
-    if not gt.icd_code:
-        issues.append("WARNING: Missing icd_code in ground_truth")
+    if not gt.diagnosis.icd_codes:
+        issues.append("WARNING: No ICD code in ground_truth.diagnosis")
     if len(gt.differential) < 2:
-        issues.append(f"WARNING: Only {len(gt.differential)} differential diagnoses (expected 3+)")
-    if len(gt.optimal_actions) < 3:
-        issues.append(f"WARNING: Only {len(gt.optimal_actions)} optimal actions (expected 3+)")
-    if not gt.critical_actions:
-        issues.append("WARNING: No critical_actions defined")
-    if not gt.key_reasoning_points:
-        issues.append("WARNING: No key_reasoning_points defined")
+        issues.append(
+            f"WARNING: Only {len(gt.differential)} differential diagnoses (expected 3+)"
+        )
+    if len(gt.action_criteria) < 3:
+        issues.append(
+            f"WARNING: Only {len(gt.action_criteria)} action criteria (expected 3+)"
+        )
+    if not any(c.importance.value == "required" for c in gt.action_criteria):
+        issues.append("WARNING: Policy contains no required action criterion")
+    if not gt.assessment.required_recommendations:
+        issues.append("WARNING: No required assessment recommendations defined")
+    if not gt.key_clinical_evidence:
+        issues.append("WARNING: No key clinical evidence defined")
+    if gt.review_status.value != "draft":
+        issues.append(
+            "WARNING: Generated policies must start as draft; approval is assigned only "
+            "through independent physician review"
+        )
 
     # Follow-up outputs
     if len(case.followup_outputs) < 5:

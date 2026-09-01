@@ -1,4 +1,15 @@
-from .client import LLMClient, LLMResponse, LLMToolCall
-from .prompts import load_prompt, format_tool_result
+"""OpenAI-compatible model client used by harness adapters."""
 
-__all__ = ["LLMClient", "LLMResponse", "LLMToolCall", "load_prompt", "format_tool_result"]
+from .client import (
+    LLMClient,
+    LLMResponse,
+    LLMResponseDecodeError,
+    LLMToolCall,
+)
+
+__all__ = [
+    "LLMClient",
+    "LLMResponse",
+    "LLMResponseDecodeError",
+    "LLMToolCall",
+]

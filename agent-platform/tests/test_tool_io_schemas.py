@@ -1,7 +1,7 @@
 """The gate on the *fourth* copy of the tool vocabulary: the review app's mirror.
 
-`test_case_tool_contract.py` locked the tool schemas, `costs.yaml` and the 600 cases
-together. It missed `review_api/services/tool_io.py`, which carries its own mirror of the
+The schema contract tests lock the tool schemas, `costs.yaml` and the 600 cases
+together. An earlier version missed `review_api/services/tool_io.py`, which carries its own mirror of the
 agent-facing `parameter_schema` dicts because `tools/` is deliberately not shipped to the
 review VPS. That mirror then drifted, and the drift was invisible: nothing failed, the
 review app simply served an obsolete catalog.
@@ -18,21 +18,14 @@ These tests make the mirror's correctness a CI property. The tool class is the t
 
 from __future__ import annotations
 
-import sys
-from pathlib import Path
-
 import pytest
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(REPO_ROOT / "agent-platform" / "scripts" / "validation"))
-
-from validate_cases import _tool_schemas  # noqa: E402
-
-from neuroagent.review_api.services.tool_io import (  # noqa: E402
+from neuroagent.review_api.services.tool_io import (
     _COSTS_DERIVED_ENUMS,
     parameters_for,
 )
-from neuroagent.tools.vocabulary import (  # noqa: E402
+from neuroagent.tools.tool_registry import ToolRegistry
+from neuroagent.tools.vocabulary import (
     advanced_imaging_modalities,
     by_type_values,
     genetic_panels,
@@ -44,7 +37,11 @@ from neuroagent.tools.vocabulary import (  # noqa: E402
 @pytest.fixture(scope="module")
 def real_schemas() -> dict[str, dict]:
     """The agent-facing parameter schemas, straight off the registered tool classes."""
-    return _tool_schemas()
+    registry = ToolRegistry.create_default_registry()
+    return {
+        name: tool.get_tool_definition()["function"]["parameters"]
+        for name, tool in registry.tools.items()
+    }
 
 
 def test_mirror_covers_every_registered_tool(real_schemas):
@@ -55,19 +52,12 @@ def test_mirror_covers_every_registered_tool(real_schemas):
     )
 
 
-@pytest.mark.parametrize("tool_name", sorted(_tool_schemas()))
-def test_tool_io_schemas_match(tool_name: str, real_schemas):
-    """The promised drift test: mirror == real schema, parameter for parameter.
-
-    Compares whole schemas rather than just enums, because the *description* drifted too:
-    the stale `order_specialized_test` text never mentioned `emg_single_fiber` or
-    `respiratory_function`, which is why a reviewer concluded single-fibre EMG was "folded
-    into EMG/NCS" and could be "neither requested nor scored".
-    """
-    assert parameters_for(tool_name) == real_schemas[tool_name], (
-        f"{tool_name}: review_api/services/tool_io.py has drifted from the tool class. "
-        "Sync the mirror — reviewers assess the catalog through it."
-    )
+def test_tool_io_schemas_match(real_schemas):
+    """The review mirror must equal every real schema, parameter for parameter."""
+    for tool_name, schema in real_schemas.items():
+        assert parameters_for(tool_name) == schema, (
+            f"{tool_name}: review_api/services/tool_io.py has drifted from the tool class"
+        )
 
 
 class TestCostsDerivedVocabularies:

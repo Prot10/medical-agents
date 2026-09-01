@@ -17,7 +17,7 @@ import threading
 from datetime import datetime, timezone
 from pathlib import Path
 
-from neuroagent.datasets import DATASET_VERSION_ALIASES, normalize_dataset_version
+from neuroagent.datasets import DATASETS
 
 from ..schemas.annotations import CaseReview, CaseReviewSummary
 
@@ -33,7 +33,7 @@ def _utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
 
-# Per-(canonical version, reviewer, case) write locks. Module-level so every
+# Per-(dataset version, reviewer, case) write locks. Module-level so every
 # AnnotationStore instance serializes on the same lock for the same file.
 # Reentrant so load_or_init can call save() while already holding the lock.
 _REVIEW_LOCKS: dict[tuple[str, str, str], threading.RLock] = {}
@@ -63,44 +63,20 @@ class AnnotationStore:
     # Path resolution
 
     def _validate_version(self, version: str) -> str:
-        if not _VERSION_PATTERN.fullmatch(version):
-            raise ValueError(f"Invalid dataset version: {version!r}")
-        return normalize_dataset_version(version)
-
-    def _version_candidates(self, version: str) -> list[str]:
-        canonical = self._validate_version(version)
-        aliases = [
-            alias
-            for alias, target in DATASET_VERSION_ALIASES.items()
-            if target == canonical and alias != canonical
-        ]
-        return [canonical, *aliases]
+        if not _VERSION_PATTERN.fullmatch(version) or version not in DATASETS:
+            raise ValueError(f"Unknown dataset version: {version!r}")
+        return version
 
     def _reviewer_dir(self, version: str, reviewer_code: str) -> Path:
-        canonical = self._validate_version(version)
+        dataset_version = self._validate_version(version)
         if not _CODE_PATTERN.fullmatch(reviewer_code):
             raise ValueError(f"Invalid reviewer code: {reviewer_code!r}")
-        return self._root / canonical / reviewer_code
-
-    def _reviewer_dir_for_key(self, version: str, reviewer_code: str) -> Path:
-        if not _CODE_PATTERN.fullmatch(reviewer_code):
-            raise ValueError(f"Invalid reviewer code: {reviewer_code!r}")
-        return self._root / version / reviewer_code
+        return self._root / dataset_version / reviewer_code
 
     def _path_for(self, version: str, reviewer_code: str, case_id: str) -> Path:
         if not _CASE_ID_PATTERN.fullmatch(case_id):
             raise ValueError(f"Invalid case id: {case_id!r}")
         return self._reviewer_dir(version, reviewer_code) / f"{case_id}.json"
-
-    def _path_candidates(
-        self, version: str, reviewer_code: str, case_id: str
-    ) -> list[Path]:
-        if not _CASE_ID_PATTERN.fullmatch(case_id):
-            raise ValueError(f"Invalid case id: {case_id!r}")
-        return [
-            self._reviewer_dir_for_key(candidate, reviewer_code) / f"{case_id}.json"
-            for candidate in self._version_candidates(version)
-        ]
 
     def lock_for(
         self, version: str, reviewer_code: str, case_id: str
@@ -111,12 +87,12 @@ class AnnotationStore:
         that do a load → mutate → save sequence can hold it across the whole
         sequence to make the read-modify-write atomic.
         """
-        canonical = self._validate_version(version)
+        dataset_version = self._validate_version(version)
         if not _CODE_PATTERN.fullmatch(reviewer_code):
             raise ValueError(f"Invalid reviewer code: {reviewer_code!r}")
         if not _CASE_ID_PATTERN.fullmatch(case_id):
             raise ValueError(f"Invalid case id: {case_id!r}")
-        return _review_lock(canonical, reviewer_code, case_id)
+        return _review_lock(dataset_version, reviewer_code, case_id)
 
     # ------------------------------------------------------------------
     # CRUD
@@ -128,14 +104,11 @@ class AnnotationStore:
         case_id: str,
     ) -> CaseReview | None:
         """Return the existing review or None if no file exists."""
-        paths = self._path_candidates(version, reviewer_code, case_id)
-        path = next((candidate for candidate in paths if candidate.exists()), None)
-        if path is None:
+        path = self._path_for(version, reviewer_code, case_id)
+        if not path.exists():
             return None
         try:
-            review = CaseReview.model_validate_json(path.read_text())
-            review.dataset_version = normalize_dataset_version(review.dataset_version)
-            return review
+            return CaseReview.model_validate_json(path.read_text())
         except Exception as exc:  # pragma: no cover — corrupted file
             logger.error("Failed to parse review at %s: %s", path, exc)
             return None
@@ -157,10 +130,9 @@ class AnnotationStore:
                 return existing
 
             now = _utcnow()
-            canonical = normalize_dataset_version(version)
             review = CaseReview(
                 case_id=case_id,
-                dataset_version=canonical,
+                dataset_version=self._validate_version(version),
                 reviewer_code=reviewer_code,
                 first_opened_at=now,
                 last_updated_at=now,
@@ -170,7 +142,6 @@ class AnnotationStore:
 
     def save(self, review: CaseReview) -> CaseReview:
         """Persist the review atomically."""
-        review.dataset_version = normalize_dataset_version(review.dataset_version)
         with self.lock_for(
             review.dataset_version, review.reviewer_code, review.case_id
         ):
@@ -210,12 +181,12 @@ class AnnotationStore:
         reviewer_code: str,
     ) -> list[CaseReviewSummary]:
         """Cheap per-reviewer summary, suitable for the case-list sidebar."""
-        case_ids: set[str] = set()
-        for candidate in self._version_candidates(version):
-            directory = self._reviewer_dir_for_key(candidate, reviewer_code)
-            if not directory.exists():
-                continue
-            case_ids.update(case_file.stem for case_file in directory.glob("*.json"))
+        directory = self._reviewer_dir(version, reviewer_code)
+        case_ids = (
+            {case_file.stem for case_file in directory.glob("*.json")}
+            if directory.exists()
+            else set()
+        )
 
         summaries: list[CaseReviewSummary] = []
         for case_id in sorted(case_ids):
@@ -242,14 +213,11 @@ class AnnotationStore:
 
     def list_all_reviewers(self, version: str) -> list[str]:
         """List every reviewer code that has at least one stored review for ``version``."""
-        reviewers: set[str] = set()
-        for candidate in self._version_candidates(version):
-            version_dir = self._root / candidate
-            if not version_dir.exists():
-                continue
-            reviewers.update(
-                entry.name
-                for entry in version_dir.iterdir()
-                if entry.is_dir() and _CODE_PATTERN.fullmatch(entry.name)
-            )
-        return sorted(reviewers)
+        version_dir = self._root / self._validate_version(version)
+        if not version_dir.exists():
+            return []
+        return sorted(
+            entry.name
+            for entry in version_dir.iterdir()
+            if entry.is_dir() and _CODE_PATTERN.fullmatch(entry.name)
+        )

@@ -3,5 +3,6 @@
 from .enums import *
 from .patient import *
 from .tool_outputs import *
+from .actions import *
 from .case import *
 from .evaluation import *

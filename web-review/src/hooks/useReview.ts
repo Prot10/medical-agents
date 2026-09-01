@@ -24,6 +24,7 @@ import type {
   Methodology,
   MyProgress,
   NeuroBenchCase,
+  PolicyReviewVerdict,
   ReviewStatus,
   ReviewerProfile,
   Severity,
@@ -145,13 +146,15 @@ export function useSetStatus(version: string) {
     mutationFn: ({
       caseId,
       status,
+      policyVerdict,
     }: {
       caseId: string
       status: ReviewStatus
+      policyVerdict?: PolicyReviewVerdict
     }) =>
       patchJSON<CaseReview>(
         `/datasets/${version}/reviews/${caseId}/status`,
-        { status },
+        { status, policy_verdict: policyVerdict },
       ),
     onSuccess: (data, vars) => applyMutationResult(queryClient, version, vars.caseId, code, data),
   })

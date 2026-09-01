@@ -15,6 +15,8 @@ export interface ReviewerProfile {
   code: string
   name: string
   role: ReviewerRole
+  specialty: string | null
+  credentials: string | null
 }
 
 export interface DatasetSummary {
@@ -54,11 +56,26 @@ export interface CaseComment {
   updated_at: string
 }
 
+export type DimensionDecision = "approve" | "needs_revision"
+
+export interface PolicyReviewVerdict {
+  scenario_plausibility: DimensionDecision
+  diagnosis: DimensionDecision
+  actions: DimensionDecision
+  avoided_actions: DimensionDecision
+  sequencing: DimensionDecision
+  stopping: DimensionDecision
+  assessment: DimensionDecision
+  comment: string
+  submitted_at?: string
+}
+
 export interface CaseReview {
   case_id: string
   dataset_version: string
   reviewer_code: string
   status: ReviewStatus
+  policy_verdict: PolicyReviewVerdict | null
   field_annotations: FieldAnnotation[]
   case_comments: CaseComment[]
   first_opened_at: string | null
@@ -315,6 +332,7 @@ export interface AdminToolReviewSummary {
 // fields as JSON values and lets typed sub-components claim what they need.
 
 export interface NeuroBenchCase {
+  schema_version: "2.0"
   case_id: string
   condition: string
   difficulty: string
@@ -374,46 +392,62 @@ export interface PatientProfile {
   history_present_illness: string
 }
 
-export interface ToolClassification {
+export interface ToolCallPattern {
   tool_name: string
-  tool_parameters?: Record<string, unknown>
+  required_arguments: Record<string, unknown>
+}
+
+export interface ActionCriterion {
+  criterion_id: string
+  label: string
+  importance: "required" | "recommended" | "optional"
+  alternatives: ToolCallPattern[]
+  expected_evidence: string
   rationale: string
-  citation?: string
+  citations: string[]
+}
+
+export interface AvoidedActionCriterion {
+  criterion_id: string
+  severity: "waste" | "harm" | "contraindicated"
+  alternatives: ToolCallPattern[]
+  rationale: string
+  citations: string[]
 }
 
 export interface SequenceConstraint {
-  before: string
-  after: string
+  before_criterion_id: string
+  after_criterion_id: string
   reason: string
-  citation?: string
+  citations: string[]
   severity: "soft" | "hard"
 }
 
 export interface GroundTruth {
-  primary_diagnosis: string
-  icd_code?: string
-  differential?: Array<{
+  review_status: "draft" | "needs_revision" | "approved"
+  diagnosis: { accepted: string[]; icd_codes: string[] }
+  differential: Array<{
     diagnosis: string
     likelihood: string
-    key_distinguishing?: string
+    key_features: string
+    icd_code: string | null
   }>
-  optimal_actions?: Array<{
-    step: number
-    action: string
-    tool_name?: string
-    expected_finding?: string
-    category?: string
-    tool_parameters?: Record<string, unknown>
-  }>
-  useless_tools?: ToolClassification[]
-  harmful_tools?: ToolClassification[]
-  sequence_constraints?: SequenceConstraint[]
-  critical_actions?: string[]
-  contraindicated_actions?: string[]
-  key_reasoning_points?: string[]
-  red_herrings?: Array<{
+  action_criteria: ActionCriterion[]
+  avoided_actions: AvoidedActionCriterion[]
+  sequence_constraints: SequenceConstraint[]
+  stop_rule: {
+    required_before_assessment: string[]
+    max_additional_actions: number
+  }
+  assessment: {
+    required_recommendations: string[]
+    prohibited_recommendations: string[]
+  }
+  key_clinical_evidence: string[]
+  red_herrings: Array<{
     data_point: string
     location: string
+    field_path: string
     intended_effect: string
     correct_interpretation: string
   }>

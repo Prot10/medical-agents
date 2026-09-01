@@ -18,6 +18,8 @@ class ReviewerCode(BaseModel):
     code: str = Field(..., description="Unique uppercase code")
     name: str = Field(..., min_length=1, max_length=120)
     role: ReviewerRole = "reviewer"
+    specialty: str | None = Field(default=None, max_length=120)
+    credentials: str | None = Field(default=None, max_length=120)
     active: bool = True
 
     @field_validator("code", mode="before")
@@ -39,3 +41,5 @@ class ReviewerProfile(BaseModel):
     code: str
     name: str
     role: ReviewerRole
+    specialty: str | None = None
+    credentials: str | None = None

@@ -3,43 +3,834 @@
   "condition": "focal_epilepsy_temporal",
   "difficulty": "moderate",
   "encounter_type": "inpatient",
-  "patient": {
-    "patient_id": "NB-FEPI-TEMP-M03",
-    "demographics": {
-      "age": 35,
-      "sex": "male",
-      "handedness": "right",
-      "ethnicity": "Caucasian",
-      "bmi": 26.4
-    },
-    "clinical_history": {
-      "past_medical_history": [
-        "Metabolic syndrome diagnosed at age 22",
-        "Mild obstructive sleep apnea, non-compliant with CPAP",
-        "Anxiety disorder treated with sertraline for the past 3 years",
-        "Appendectomy at age 15",
-        "No history of febrile seizures or central nervous system infections"
+  "fallback_tool_outputs": {
+    "advanced_imaging": null,
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
       ],
-      "medications": [
+      "heart_rate_range": {
+        "average": 74,
+        "max": 110,
+        "min": 48
+      },
+      "impression": "Normal 24-hour Holter monitor.",
+      "monitor_type": "holter_24h",
+      "recommended_actions": [],
+      "rhythm_summary": "Sinus rhythm throughout the recording"
+    },
+    "csf": {
+      "appearance": "clear and colourless",
+      "cell_count": {
+        "rbc": "0 /uL",
+        "wbc": "2 /uL"
+      },
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose.",
+      "opening_pressure": "16 cm H2O",
+      "protein": "38 mg/dL",
+      "special_tests": {}
+    },
+    "ct": {
+      "additional_observations": [],
+      "angiography_findings": null,
+      "contrast_used": false,
+      "findings": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "drug_interactions": null,
+    "ecg": null,
+    "echo": {
+      "chambers": {
+        "LA": "normal size",
+        "LV": "normal size and systolic function",
+        "RA": "normal size",
+        "RV": "normal size and function"
+      },
+      "ejection_fraction": 62.0,
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": [],
+      "valves": {
+        "aortic": "structurally normal",
+        "mitral": "structurally normal",
+        "pulmonic": "normal",
+        "tricuspid": "normal"
+      },
+      "wall_motion": "no regional wall-motion abnormality"
+    },
+    "eeg": null,
+    "labs": null,
+    "literature_search": null,
+    "mri": null,
+    "specialized_test": null
+  },
+  "followup_outputs": [
+    {
+      "output": {
+        "findings": [
+          {
+            "description": "Hypometabolism",
+            "region": "Right mesial and anterolateral temporal lobe",
+            "signal": "FDG_uptake: Reduced FDG uptake in the right mesial temporal structures (hippocampus and parahippocampal gyrus) and mild reduction in the right anterolateral temporal neocortex compared to symmetric uptake on the left; asymmetry_index: Right-to-left temporal lobe asymmetry index 0.82 (normal >0.90), indicating moderate right temporal hypometabolism"
+          },
+          {
+            "description": "Normal metabolism",
+            "region": "Bilateral frontal, parietal, and occipital lobes; left temporal lobe; basal ganglia; thalami; cerebellum",
+            "signal": "FDG_uptake: Symmetric and normal FDG uptake in remaining brain regions"
+          }
+        ],
+        "impression": "Interictal FDG-PET demonstrates moderate right mesial and anterolateral temporal hypometabolism. Metabolic reduction involves the right hippocampal region and extends into the right anterior lateral temporal cortex. Remainder of the brain shows symmetric, normal FDG uptake",
+        "modality": "FDG_PET",
+        "quantitative_data": null,
+        "recommended_actions": [],
+        "tracer_or_protocol": null
+      },
+      "tool_name": "order_advanced_imaging",
+      "trigger_action": "request_pet_scan"
+    },
+    {
+      "output": {
+        "query": "subtle mesial temporal sclerosis MRI-negative epilepsy quantitative volumetry",
+        "results": [
+          {
+            "source": "Bernasconi et al., Ann Neurol 2003;54(6):739-746",
+            "summary": "Automated hippocampal volumetry detected subtle hippocampal atrophy in 30% of visually MRI-negative temporal lobe epilepsy patients, correlating with histopathological hippocampal sclerosis and favorable surgical outcomes.",
+            "title": "Quantitative MRI in temporal lobe epilepsy: relationship with neuropathology and surgical outcome"
+          },
+          {
+            "source": "Coan et al., Epilepsy Behav 2014;35:45-51",
+            "summary": "Quantitative volumetric analysis can reveal hippocampal sclerosis not visible on standard visual MRI interpretation, supporting the use of automated tools in epilepsy presurgical evaluation.",
+            "title": "Subtle hippocampal malformations and volumetric reduction in temporal lobe epilepsy"
+          },
+          {
+            "source": "LoPinto-Khoury et al., Epilepsia 2012;53(12):2140-2145",
+            "summary": "FDG-PET demonstrated temporal hypometabolism in 70-80% of MRI-negative temporal lobe epilepsy patients, with good surgical outcomes when PET and EEG were concordant.",
+            "title": "FDG-PET in MRI-negative temporal lobe epilepsy: lateralizing value and surgical outcomes"
+          }
+        ],
+        "summary": "In patients with temporal lobe epilepsy and subtle or initially negative MRI findings, quantitative hippocampal volumetry and FDG-PET provide important additional lateralizing information. Automated volumetric analysis can detect hippocampal sclerosis missed on visual inspection in up to 30% of cases. FDG-PET lateralizes the epileptogenic zone in 70-80% of MRI-negative cases. Multi-modal concordance (EEG, MRI volumetrics, PET, neuropsychology) is essential for surgical planning and predicts favorable postoperative seizure outcomes."
+      },
+      "tool_name": "search_medical_literature",
+      "trigger_action": "search_literature_temporal_epilepsy_subtle_mts"
+    },
+    {
+      "output": {
+        "alternatives": [
+          "Levetiracetam 500 mg twice daily, titrate to 1000-1500 mg twice daily (faster titration, but higher risk of psychiatric side effects given patient's anxiety history)",
+          "Lacosamide 50 mg twice daily, titrate to 200 mg twice daily",
+          "Oxcarbazepine 300 mg twice daily, titrate to 600 mg twice daily (monitor sodium levels)"
+        ],
+        "contraindications": [],
+        "formulary_status": "On formulary, no prior authorization required",
+        "interactions": [
+          "No significant interaction with sertraline",
+          "No significant interaction with metformin",
+          "No significant interaction with vitamin D3"
+        ],
+        "proposed": "Lamotrigine 25 mg daily, titrate over 6 weeks to 200 mg daily",
+        "warnings": [
+          "Risk of Stevens-Johnson syndrome / toxic epidermal necrolysis, especially with rapid titration. Must titrate slowly over 6-8 weeks.",
+          "Risk of serious rash is increased with concurrent valproate use (not applicable in this patient)",
+          "Patient has sulfonamide allergy (rash) - counsel to report any rash immediately and distinguish from drug hypersensitivity",
+          "Monitor for Stevens-Johnson syndrome, especially during titration phase"
+        ]
+      },
+      "tool_name": "check_drug_interactions",
+      "trigger_action": "check_drug_interactions_lamotrigine"
+    },
+    {
+      "output": {
+        "activating_procedures": {},
+        "artifacts": [
+          {
+            "impact": "Moderate during wakefulness, minimal during sleep when interictal activity best appreciated",
+            "location": "Bilateral temporal chains, intermittent during wakefulness",
+            "type": "Muscle artifact"
+          }
+        ],
+        "background": {
+          "continuity": "Continuous",
+          "posterior_dominant_rhythm": "9 Hz alpha rhythm, symmetric, reactive",
+          "sleep_features": "Sleep architecture captured over 96 hours. Mildly fragmented sleep with frequent arousals, consistent with known obstructive sleep apnea.",
+          "symmetry": "Symmetric"
+        },
+        "classification": "abnormal",
+        "eeg_type": "sleep_deprived",
+        "findings": [],
+        "impression": "Normal sleep-deprived EEG with adequate NREM sleep captured; no epileptiform discharge or seizure. A normal study does not exclude epilepsy.",
+        "limitations": "Only one clinical event captured despite 96 hours of recording. Patient's habitual event frequency (twice monthly) limits capture probability.",
+        "recommended_actions": []
+      },
+      "tool_name": "analyze_eeg",
+      "tool_parameters": {
+        "eeg_type": "sleep_deprived"
+      },
+      "trigger_action": "request_sleep_deprived_eeg"
+    },
+    {
+      "output": {
+        "activating_procedures": {},
+        "artifacts": [
+          {
+            "impact": "Moderate during wakefulness, minimal during sleep when interictal activity best appreciated",
+            "location": "Bilateral temporal chains, intermittent during wakefulness",
+            "type": "Muscle artifact"
+          }
+        ],
+        "background": {
+          "continuity": "Continuous",
+          "posterior_dominant_rhythm": "9 Hz alpha rhythm, symmetric, reactive",
+          "sleep_features": "Sleep architecture captured over 96 hours. Mildly fragmented sleep with frequent arousals, consistent with known obstructive sleep apnea.",
+          "symmetry": "Symmetric"
+        },
+        "classification": "abnormal",
+        "eeg_type": "ambulatory",
+        "findings": [
+          {
+            "clinical_correlation": "",
+            "frequency": "Occasional, averaging 5-6 per hour during NREM sleep, 1-2 per hour during wakefulness",
+            "location": "Right anterior temporal (F8/T4)",
+            "morphology": "Phase reversal at F8 with field extending to T4 and occasionally to F4. Duration 40-70 ms with consistent after-going slow wave. Morphology now clearly epileptiform on prolonged recording with multiple examples for comparison.",
+            "state": "All states, maximal during NREM sleep stage II",
+            "type": "Interictal sharp waves"
+          },
+          {
+            "clinical_correlation": "",
+            "frequency": "One clinical seizure captured on day 3 of monitoring",
+            "location": "Right anterior temporal onset (F8/T4), evolving to right hemispheric then bilateral",
+            "morphology": "Seizure onset with right anterior temporal low-amplitude fast activity (beta-range), evolving to 5-6 Hz rhythmic theta over right temporal chain within 10 seconds, then progressive slowing to 3-4 Hz rhythmic delta with spread to right parasagittal leads by 35 seconds. Total electrographic duration 78 seconds. No bilateral tonic-clonic evolution.",
+            "state": "Occurred during relaxed wakefulness while patient was watching television",
+            "type": "Electrographic seizure with clinical correlate"
+          },
+          {
+            "clinical_correlation": "",
+            "frequency": "Intermittent runs of polymorphic theta-delta slowing",
+            "location": "Right temporal (T4-T6)",
+            "morphology": "Polymorphic 3-5 Hz slowing",
+            "state": "Relaxed wakefulness and drowsiness",
+            "type": "Intermittent focal slowing"
+          }
+        ],
+        "impression": "Abnormal 48-hour 48-hour ambulatory EEG. One habitual clinical seizure captured with clear right anterior temporal electrographic onset (F8/T4). Seizure onset with right temporal rhythmic theta evolving to delta, remaining lateralized to the right temporal region over the ictal period. Occasional right anterior temporal interictal epileptiform discharges confirmed, maximal during NREM sleep",
+        "limitations": "Only one clinical event captured despite 96 hours of recording. Patient's habitual event frequency (twice monthly) limits capture probability.",
+        "recommended_actions": []
+      },
+      "tool_name": "analyze_eeg",
+      "tool_parameters": {
+        "eeg_type": "ambulatory"
+      },
+      "trigger_action": "request_ambulatory_eeg"
+    }
+  ],
+  "ground_truth": {
+    "action_criteria": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "contrast": true,
+              "protocol": "epilepsy"
+            },
+            "tool_name": "analyze_brain_mri"
+          }
+        ],
+        "citations": [
+          "[AAN_2007]",
+          "AAN_2007"
+        ],
+        "criterion_id": "action-3-analyze-brain-mri",
+        "expected_evidence": "Hippocampal sclerosis, low-grade tumor (DNET, ganglioglioma), cavernoma, or focal cortical dysplasia; rule out alternative structural causes.",
+        "importance": "required",
+        "label": "Obtain brain MRI using a dedicated epilepsy protocol to identify a structural epileptogenic cause",
+        "rationale": "Obtain brain MRI using a dedicated epilepsy protocol to identify a structural epileptogenic cause"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[ILAE_drug_2017]",
+          "ILAE_drug_2017"
+        ],
+        "criterion_id": "action-4-search-medical-literature",
+        "expected_evidence": "Evidence-based AED options for focal epilepsy (levetiracetam, lamotrigine, oxcarbazepine, lacosamide); ILAE classification framework.",
+        "importance": "required",
+        "label": "Search current literature for AED selection in focal epilepsy and ILAE 2017 seizure classification.",
+        "rationale": "Search current literature for AED selection in focal epilepsy and ILAE 2017 seizure classification."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [
+          "[ILAE_drug_2017]",
+          "ILAE_drug_2017"
+        ],
+        "criterion_id": "action-5-check-drug-interactions",
+        "expected_evidence": "Identify pharmacokinetic interactions (CYP induction by carbamazepine/phenytoin) and CNS adverse-effect overlap.",
+        "importance": "required",
+        "label": "Check drug interactions before initiating or modifying AED therapy (enzyme inducers, OCP, other CNS-active drugs).",
+        "rationale": "Check drug interactions before initiating or modifying AED therapy (enzyme inducers, OCP, other CNS-active drugs)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "eeg_type": "routine"
+            },
+            "tool_name": "analyze_eeg"
+          }
+        ],
+        "citations": [
+          "[NICE_NG217_2025]",
+          "NICE_NG217_2025"
+        ],
+        "criterion_id": "action-6-analyze-eeg",
+        "expected_evidence": "Interictal focal temporal discharges may support the clinical diagnosis",
+        "importance": "required",
+        "label": "Obtain an awake routine EEG promptly to support classification; never use a normal result to exclude epilepsy",
+        "rationale": "Obtain an awake routine EEG promptly to support classification; never use a normal result to exclude epilepsy"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "eeg_type": "sleep_deprived"
+            },
+            "tool_name": "analyze_eeg"
+          }
+        ],
+        "citations": [
+          "[NICE_NG217_2025]",
+          "NICE_NG217_2025"
+        ],
+        "criterion_id": "action-7-analyze-eeg",
+        "expected_evidence": "Sleep may activate focal temporal epileptiform discharges",
+        "importance": "recommended",
+        "label": "Because the routine recording is normal or equivocal, consider a sleep-deprived EEG after discussing risks and benefits",
+        "rationale": "Because the routine recording is normal or equivocal, consider a sleep-deprived EEG after discussing risks and benefits"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "eeg_type": "ambulatory"
+            },
+            "tool_name": "analyze_eeg"
+          }
+        ],
+        "citations": [
+          "[NICE_NG217_2025]",
+          "NICE_NG217_2025"
+        ],
+        "criterion_id": "action-8-analyze-eeg",
+        "expected_evidence": "Electroclinical temporal-onset event during prolonged ambulatory recording",
+        "importance": "recommended",
+        "label": "Because routine and sleep-deprived studies remain non-diagnostic, consider ambulatory EEG to capture a habitual event",
+        "rationale": "Because routine and sleep-deprived studies remain non-diagnostic, consider ambulatory EEG to capture a habitual event"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "glucose",
+                "sodium",
+                "calcium"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[NICE_NG217_2025]",
+          "NICE_NG217_2025"
+        ],
+        "criterion_id": "action-9-interpret-labs",
+        "expected_evidence": "Answer the specific provocation or treatment question in this presentation",
+        "importance": "optional",
+        "label": "Order only case-targeted tests for an acute symptomatic seizure, metabolic mimic, drug level or concurrent emergency; do not use a fixed epilepsy panel",
+        "rationale": "Order only case-targeted tests for an acute symptomatic seizure, metabolic mimic, drug level or concurrent emergency; do not use a fixed epilepsy panel"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_ecg"
+          }
+        ],
+        "citations": [
+          "[NICE_NG217_2025]",
+          "NICE_NG217_2025"
+        ],
+        "criterion_id": "action-10-analyze-ecg",
+        "expected_evidence": "Identify or exclude pre-excitation, conduction disease, long-QT or Brugada pattern; ECG does not diagnose epilepsy",
+        "importance": "required",
+        "label": "Obtain a 12-lead ECG in this first suspected seizure/transient-loss-of-consciousness assessment to identify a cardiac mimic",
+        "rationale": "Obtain a 12-lead ECG in this first suspected seizure/transient-loss-of-consciousness assessment to identify a cardiac mimic"
+      }
+    ],
+    "assessment": {
+      "prohibited_recommendations": [
+        "Do not perform lumbar puncture without features of CNS infection.",
+        "Do not rely solely on a single normal routine EEG to exclude epilepsy.",
+        "Do not start a broad-spectrum AED such as valproate without considering focal-epilepsy first-line options."
+      ],
+      "required_recommendations": [
+        "Recognize recurrent stereotyped behavioral arrest with automatisms and amnesia as focal impaired-awareness seizures.",
+        "Obtain prolonged video-EEG to capture a habitual event and confirm focal temporal onset.",
+        "Order 3T MRI epilepsy protocol to look for hippocampal sclerosis or other epileptogenic substrate.",
+        "Initiate first-line AED for focal epilepsy after diagnosis confirmation.",
+        "Counsel on driving restrictions and seizure safety."
+      ]
+    },
+    "avoided_actions": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_csf"
+          }
+        ],
+        "citations": [
+          "[AAN_2007]"
+        ],
+        "criterion_id": "avoid-waste-1-analyze-csf",
+        "rationale": "No clinical features of CNS infection, encephalitis, or immunocompromise; CSF analysis is not indicated for routine focal epilepsy workup and exposes the patient to procedural risk and cost.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "echo_type": "TTE"
+            },
+            "tool_name": "order_echocardiogram"
+          }
+        ],
+        "citations": [
+          "[AAN_2007]"
+        ],
+        "criterion_id": "avoid-waste-2-order-echocardiogram",
+        "rationale": "No syncope-versus-seizure question and no structural-heart concern; echocardiogram contributes nothing to epilepsy workup.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "monitor_type": "holter_24h"
+            },
+            "tool_name": "order_cardiac_monitoring"
+          }
+        ],
+        "citations": [
+          "[AAN_2007]"
+        ],
+        "criterion_id": "avoid-waste-3-order-cardiac-monitoring",
+        "rationale": "Ambulatory cardiac monitoring is reserved for syncope-versus-seizure differentiation; not indicated when semiology is clearly epileptic.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_ct_scan"
+          }
+        ],
+        "citations": [
+          "[AAN_2007]"
+        ],
+        "criterion_id": "avoid-waste-4-order-ct-scan",
+        "rationale": "Non-contrast head CT is inferior to MRI for detecting epileptogenic substrates (hippocampal sclerosis, FCD, low-grade tumor) and adds ionizing radiation without diagnostic yield.",
+        "severity": "waste"
+      }
+    ],
+    "diagnosis": {
+      "accepted": [
+        "Focal epilepsy of right temporal lobe origin with subtle mesial temporal sclerosis (focal impaired-awareness seizures)"
+      ],
+      "icd_codes": [
+        "G40.209"
+      ]
+    },
+    "differential": [
+      {
+        "diagnosis": "Psychogenic non-epileptic spells",
+        "icd_code": "F44.5",
+        "key_features": "Distinguished by video-EEG capturing event without electrographic correlate; current semiology with automatisms and amnesia favors epilepsy.",
+        "likelihood": "moderate"
+      },
+      {
+        "diagnosis": "Frontal lobe focal epilepsy",
+        "icd_code": "G40.209",
+        "key_features": "Lacks hypermotor or nocturnal features; oroalimentary automatisms and post-ictal confusion favor temporal localization.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Absence seizures (idiopathic generalized epilepsy)",
+        "icd_code": "G40.A09",
+        "key_features": "Absences are shorter (<20 s), without post-ictal confusion, and have 3-Hz generalized spike-wave on EEG.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Convulsive syncope / autonomic dysfunction",
+        "icd_code": "R55",
+        "key_features": "No postural prodrome, no documented bradycardia or hypotension; semiology is not syncope-like.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "TIA (transient ischemic attack)",
+        "icd_code": "G45.9",
+        "key_features": "TIA produces negative neurological symptoms (weakness, aphasia), not stereotyped behavioral arrest with automatisms.",
+        "likelihood": "very_low"
+      }
+    ],
+    "key_clinical_evidence": [
+      "Frequency of ~2 episodes/month over 8 months meets ILAE epilepsy criteria (\u22652 unprovoked events).",
+      "Routine EEG sensitivity is limited; prolonged monitoring or sleep-deprived EEG increases yield.",
+      "Imaging-negative TLE still benefits from dedicated 3T epilepsy-protocol MRI; some lesions are subtle.",
+      "Cross-modal concordance is the diagnostic gold standard before considering surgical evaluation.",
+      "Tier per the July 2026 clinical review: Laboratory testing does not diagnose focal epilepsy; it addresses a provoked seizure or a metabolic mimic when one is suspected.",
+      "July 2026 review applied end to end: routine EEG first when appropriate, staged sleep-deprived/ambulatory escalation, video only for event capture or tertiary evaluation, and continuous ICU EEG only for NCSE."
+    ],
+    "red_herrings": [],
+    "review_status": "draft",
+    "sequence_constraints": [
+      {
+        "after_criterion_id": "action-5-check-drug-interactions",
+        "before_criterion_id": "action-3-analyze-brain-mri",
+        "citations": [
+          "[ILAE_drug_2017]"
+        ],
+        "reason": "Structural cause influences AED choice (e.g., low-grade tumor \u2192 consider AEDs with CYP-neutral profile; hippocampal sclerosis \u2192 multiple equally appropriate options). MRI should inform drug selection.",
+        "severity": "soft"
+      }
+    ],
+    "stop_rule": {
+      "max_additional_actions": 0,
+      "required_before_assessment": [
+        "action-3-analyze-brain-mri",
+        "action-4-search-medical-literature",
+        "action-5-check-drug-interactions",
+        "action-6-analyze-eeg",
+        "action-10-analyze-ecg"
+      ]
+    }
+  },
+  "initial_tool_outputs": {
+    "csf": null,
+    "drug_interactions": null,
+    "ecg": {
+      "axis": "Normal axis (55 degrees)",
+      "clinical_correlation": "",
+      "findings": [
+        "No ST-segment or T-wave abnormalities",
+        "No conduction abnormalities",
+        "No ventricular ectopy"
+      ],
+      "interpretation": "Normal sinus rhythm with no acute abnormalities. No arrhythmia or conduction disorder identified.",
+      "intervals": {
+        "PR": "152 ms (normal)",
+        "QRS": "82 ms (normal)",
+        "QTc": "418 ms (normal)"
+      },
+      "rate": 74,
+      "rhythm": "Normal sinus rhythm"
+    },
+    "eeg": {
+      "activating_procedures": {
+        "hyperventilation": "Three minutes of hyperventilation performed. Generalized background slowing noted, symmetric. No clear focal abnormality provoked.",
+        "photic_stimulation": "Normal photic driving response at 10-18 Hz bilaterally. No photoparoxysmal response."
+      },
+      "artifacts": [
         {
-          "drug": "Sertraline",
-          "dose": "100 mg",
-          "frequency": "Once daily",
-          "indication": "Generalized anxiety disorder"
+          "impact": "Moderate, intermittently obscuring temporal discharges during wakefulness. Less prominent during drowsiness when sharps were better visualized.",
+          "location": "Bilateral temporal chains",
+          "type": "Muscle artifact"
         },
         {
-          "drug": "Metformin",
-          "dose": "500 mg",
-          "frequency": "Twice daily",
-          "indication": "Insulin resistance associated with metabolic syndrome"
-        },
-        {
-          "drug": "Vitamin D3",
-          "dose": "2000 IU",
-          "frequency": "Once daily",
-          "indication": "Vitamin D insufficiency"
+          "impact": "Expected, no impact on temporal chain interpretation",
+          "location": "Frontopolar leads (Fp1/Fp2)",
+          "type": "Eye movement artifact"
         }
       ],
+      "background": {
+        "continuity": "Continuous",
+        "posterior_dominant_rhythm": "9 Hz alpha rhythm, symmetric, reactive to eye opening",
+        "sleep_features": "Stage II sleep captured with vertex waves and sleep spindles. Sleep architecture appears mildly fragmented.",
+        "symmetry": "Grossly symmetric between hemispheres"
+      },
+      "classification": "abnormal",
+      "eeg_type": "routine",
+      "findings": [
+        {
+          "clinical_correlation": "",
+          "frequency": "Rare, approximately 3-4 noted during the 45-minute recording",
+          "location": "Right anterior temporal region (F8/T4)",
+          "morphology": "Sharply contoured waveforms with phase reversal at F8, duration 50-80 ms, followed by a subtle after-going slow wave. Morphology not definitively epileptiform versus benign sharp transients.",
+          "state": "Two noted during drowsiness, one during wakefulness, one during light sleep",
+          "type": "Sharp transients"
+        },
+        {
+          "clinical_correlation": "",
+          "frequency": "Intermittent bursts of theta-range slowing, 4-6 Hz, lasting 2-5 seconds, noted on multiple occasions",
+          "location": "Right temporal region (T4-T6)",
+          "morphology": "Polymorphic theta activity, slightly more prominent than the left temporal region",
+          "state": "Predominantly during relaxed wakefulness",
+          "type": "Intermittent focal slowing"
+        }
+      ],
+      "impression": "Mildly abnormal EEG. Rare sharply contoured transients noted in the right anterior temporal region (F8/T4) with equivocal epileptiform morphology. Intermittent right temporal polymorphic theta slowing also noted. No electrographic seizures captured during this routine recording",
+      "limitations": "Routine 45-minute recording with no clinical events captured. Temporal muscle artifact intermittently limited assessment. Recording duration insufficient to confidently classify rare sharp transients.",
+      "recommended_actions": []
+    },
+    "labs": {
+      "abnormal_values_summary": [
+        "Chloride: 112 mEq/L (H)",
+        "Glucose: 114 mg/dL (H)",
+        "Magnesium: 2.3 mg/dL (H)",
+        "Vitamin D (25-OH): 23 ng/mL (L)"
+      ],
+      "interpretation": "Abnormal values: Chloride 112 mEq/L (H), Glucose 114 mg/dL (H), Magnesium 2.3 mg/dL (H), Vitamin D (25-OH) 23 ng/mL (L).",
+      "panels": {
+        "Additional": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "4.8-23.3",
+            "test": "Prolactin",
+            "unit": "ng/mL",
+            "value": 17.6
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "1.7-2.2",
+            "test": "Magnesium",
+            "unit": "mg/dL",
+            "value": 2.3
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.4-4.0",
+            "test": "TSH",
+            "unit": "mIU/L",
+            "value": 2.8
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "30-100",
+            "test": "Vitamin D (25-OH)",
+            "unit": "ng/mL",
+            "value": 23
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Negative",
+            "test": "Urine drug screen",
+            "unit": "",
+            "value": "Negative"
+          }
+        ],
+        "BMP": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "136-145",
+            "test": "Sodium",
+            "unit": "mEq/L",
+            "value": 137
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.5-5.0",
+            "test": "Potassium",
+            "unit": "mEq/L",
+            "value": 4.0
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "98-106",
+            "test": "Chloride",
+            "unit": "mEq/L",
+            "value": 112
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "22-29",
+            "test": "Bicarbonate",
+            "unit": "mEq/L",
+            "value": 23
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "7-20",
+            "test": "BUN",
+            "unit": "mg/dL",
+            "value": 12
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.6-1.2",
+            "test": "Creatinine",
+            "unit": "mg/dL",
+            "value": 0.73
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "70-100",
+            "test": "Glucose",
+            "unit": "mg/dL",
+            "value": 114
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "8.5-10.5",
+            "test": "Calcium",
+            "unit": "mg/dL",
+            "value": 10.1
+          }
+        ],
+        "CBC": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "4.0-11.0",
+            "test": "WBC",
+            "unit": "x10^9/L",
+            "value": 6.2
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "12.0-16.0",
+            "test": "Hemoglobin",
+            "unit": "g/dL",
+            "value": 13.8
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "36.0-46.0",
+            "test": "Hematocrit",
+            "unit": "%",
+            "value": 36.0
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "150-400",
+            "test": "Platelets",
+            "unit": "x10^9/L",
+            "value": 239
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "80-100",
+            "test": "MCV",
+            "unit": "fL",
+            "value": 91.6
+          }
+        ]
+      }
+    },
+    "literature_search": null,
+    "mri": {
+      "additional_observations": [
+        "No evidence of focal cortical dysplasia or heterotopia",
+        "No mass lesion or pathological enhancement after gadolinium",
+        "Ventricular system normal in size and configuration",
+        "Periventricular white matter foci are nonspecific and may represent small vessel changes or migrainous changes given patient age"
+      ],
+      "findings": [
+        {
+          "borders": "No discrete mass or focal cortical dysplasia identified",
+          "location": "Right hippocampus",
+          "mass_effect": "None",
+          "signal_characteristics": {
+            "DWI": "No restricted diffusion",
+            "FLAIR": "Equivocal subtle signal increase in the right hippocampal body; not clearly abnormal in isolation",
+            "T1": "Borderline loss of normal internal architecture of the right hippocampus compared to the left, most apparent on thin coronal sections",
+            "T2": "Questionable mild hyperintensity in the right hippocampal body compared to the left; could represent early sclerosis versus normal variant"
+          },
+          "size": "Mild volumetric asymmetry; right hippocampus appears slightly smaller than left on visual inspection of coronal T2 and FLAIR sequences",
+          "type": "Subtle hippocampal asymmetry"
+        },
+        {
+          "borders": "Well-defined, punctate",
+          "location": "Periventricular white matter",
+          "mass_effect": "None",
+          "signal_characteristics": {
+            "FLAIR": "Hyperintense, nonspecific",
+            "T1": "Not visible on T1-weighted images",
+            "T2": "Hyperintense punctate foci in bilateral periventricular white matter"
+          },
+          "size": "2-3 mm punctate foci",
+          "type": "Incidental finding"
+        }
+      ],
+      "impression": "Subtle right hippocampal asymmetry with borderline volume reduction and equivocal FLAIR signal abnormality. The hippocampal volumetric asymmetry index of 0.08 falls below the definitive threshold for abnormal (0.10), though the right hippocampus is at the 10th percentile for age and sex. A few nonspecific periventricular white matter punctate foci are noted, likely related to migraine or small vessel changes. No mass lesion, acute infarction, or obvious structural epileptogenic lesion identified",
+      "recommended_actions": [],
+      "volumetrics": {
+        "asymmetry_index": "0.08 (borderline; threshold for abnormal >0.10)",
+        "left_hippocampus": "3.3 cm3 (40th percentile for age and sex)",
+        "right_hippocampus": "2.8 cm3 (10th percentile for age and sex)"
+      }
+    }
+  },
+  "metadata": {
+    "authoring_agent": "condition-expert:FEPI-TEMP",
+    "case_body_concerns": [
+      "useless_tools entry for `analyze_ecg` dropped: tool output is provided up-front in initial_tool_outputs, so declaring it useless to call would be incoherent (agent never had to call it)."
+    ],
+    "citation_gap": [],
+    "clinical_domain": "Epilepsy",
+    "created_by": "neurobench_generator",
+    "criteria_pack_version": "1.0",
+    "difficulty_rationale": "Five required tools with video-EEG follow-up needed; routine EEG may be non-diagnostic, requiring escalation.",
+    "estimated_complexity": "Moderate - equivocal initial EEG and subtle MRI findings requiring additional investigation for definitive diagnosis",
+    "fallback_tool_kinds": {
+      "cardiac_monitoring": "normal",
+      "csf": "normal",
+      "ct": "normal",
+      "echo": "normal"
+    },
+    "generation_date": "2026-03-13",
+    "last_revised": "2026-08-10",
+    "policy_spec_status": "draft",
+    "revision_reason": "independent focal-epilepsy review: staged EEG pathway, dedicated structural imaging, targeted labs/ECG, cardiac tools removed",
+    "sub_domain": "Temporal lobe epilepsy",
+    "version": "policy-v1",
+    "vocab_gap": []
+  },
+  "patient": {
+    "chief_complaint": "Recurrent episodes of staring and unresponsiveness, sometimes with repetitive hand and mouth movements, occurring approximately twice monthly for the past eight months",
+    "clinical_history": {
       "allergies": [
         "Sulfonamides (rash)"
       ],
@@ -49,771 +840,70 @@
         "One sibling (brother) with a history of a single unprovoked seizure at age 28, never treated",
         "No family history of epilepsy syndromes or neurodegenerative conditions"
       ],
+      "medications": [
+        {
+          "dose": "100 mg",
+          "drug": "Sertraline",
+          "frequency": "Once daily",
+          "indication": "Generalized anxiety disorder"
+        },
+        {
+          "dose": "500 mg",
+          "drug": "Metformin",
+          "frequency": "Twice daily",
+          "indication": "Insulin resistance associated with metabolic syndrome"
+        },
+        {
+          "dose": "2000 IU",
+          "drug": "Vitamin D3",
+          "frequency": "Once daily",
+          "indication": "Vitamin D insufficiency"
+        }
+      ],
+      "past_medical_history": [
+        "Metabolic syndrome diagnosed at age 22",
+        "Mild obstructive sleep apnea, non-compliant with CPAP",
+        "Anxiety disorder treated with sertraline for the past 3 years",
+        "Appendectomy at age 15",
+        "No history of febrile seizures or central nervous system infections"
+      ],
       "social_history": {
-        "occupation": "high school chemistry teacher",
         "alcohol": "Occasional glass of wine on weekends, approximately 2-3 per month",
-        "tobacco": "Never smoker",
-        "recreational_drugs": "Denies any current or prior illicit drug use",
-        "living_situation": "Lives with wife and two children (ages 8 and 12) in suburban home",
         "driving": "Drives daily for work commute and children's activities",
-        "exercise": "Walks 3-4 times per week, occasional yoga class"
+        "exercise": "Walks 3-4 times per week, occasional yoga class",
+        "living_situation": "Lives with wife and two children (ages 8 and 12) in suburban home",
+        "occupation": "high school chemistry teacher",
+        "recreational_drugs": "Denies any current or prior illicit drug use",
+        "tobacco": "Never smoker"
       }
     },
+    "demographics": {
+      "age": 35,
+      "bmi": 26.4,
+      "ethnicity": "Caucasian",
+      "handedness": "right",
+      "sex": "male"
+    },
+    "history_present_illness": "Mr. Kapoor is a 35-year-old right-handed male high school chemistry teacher who presents for inpatient evaluation of recurrent episodic spells of altered awareness that have been occurring approximately twice monthly over the past eight months. He was referred by his primary care physician after his wife witnessed two distinct episodes and became increasingly concerned.\n\nThe patient himself has limited recall of the events. He reports that on several occasions at work, colleagues have told him he appeared to suddenly stop mid-sentence while lecturing, stared blankly for what seemed like a minute, and then seemed confused for several minutes afterward. He did not fall during any of these episodes and had no preceding warning that he could recall. His wife has witnessed two episodes at home. During the most recent event two weeks ago, he describes his suddenly becoming unresponsive while they were watching television. He appeared to make repetitive chewing motions with his mouth and was picking at his shirt with his right hand. She called his name repeatedly but he did not respond. The episode lasted approximately 60 to 90 seconds, after which he appeared disoriented and asked her what had happened. He seemed confused for about five minutes before returning to his baseline. He noted that his speech seemed slightly slurred during the recovery period.\n\nWhen specifically asked, the patient is uncertain whether he experiences any preceding sensations, though he notes that on a few occasions he has had a brief feeling of something being oddly familiar, which he attributed to distraction or daydreaming. He has never had a generalized convulsion, tongue bite, or urinary incontinence during any episode. He denies any preceding headaches, visual disturbances, lightheadedness, or palpitations. He reports feeling more fatigued recently and has had some difficulty concentrating at work, which he attributes to poor sleep related to his untreated sleep apnea and work-related stress. There has been no recent weight change, fever, or other systemic complaints. His anxiety has been stable on sertraline.",
     "neurological_exam": {
-      "mental_status": "Alert and oriented to person, place, time, and situation. Mildly anxious in demeanor. Speech fluent with normal rate and prosody. No paraphasic errors. Naming and repetition intact. Follows complex three-step commands. Registers 3/3 objects; recalls 2/3 at five minutes without cues, 3/3 with categorical cues. Able to spell WORLD backwards correctly. Draws intersecting pentagons accurately.",
-      "cranial_nerves": "Pupils equal, round, reactive to light and accommodation bilaterally (3.5 mm to 2 mm). Visual fields full to confrontation. Extraocular movements full without nystagmus. Facial sensation intact to light touch and pinprick bilaterally. Facial movements symmetric at rest and with activation. Hearing intact to finger rub bilaterally. Palate elevates symmetrically. Gag reflex present bilaterally. Sternocleidomastoid and trapezius 5/5 bilaterally. Tongue midline, no fasciculations or atrophy.",
-      "motor": "Normal bulk and tone in all four extremities. No spasticity or rigidity. Strength 5/5 in all major muscle groups bilaterally (deltoids, biceps, triceps, wrist extensors, finger abductors, hip flexors, quadriceps, hamstrings, tibialis anterior, gastrocnemius). No pronator drift. No tremor or involuntary movements.",
-      "sensory": "Light touch, pinprick, temperature, vibration, and proprioception intact throughout. No extinction to double simultaneous stimulation.",
-      "reflexes": "2+ and symmetric at biceps, triceps, brachioradialis, patellar, and Achilles bilaterally. Plantar responses flexor bilaterally. No clonus.",
+      "additional": "No evidence of tongue bite or other oral trauma at time of examination. Wife reports that during one witnessed episode approximately two weeks ago the patient appeared to chew repeatedly and pick at his shirt for about one minute, after which he appeared confused for several minutes.",
       "coordination": "Finger-to-nose and heel-to-shin testing normal bilaterally without dysmetria or intention tremor. Rapid alternating movements intact and symmetric.",
+      "cranial_nerves": "Pupils equal, round, reactive to light and accommodation bilaterally (3.5 mm to 2 mm). Visual fields full to confrontation. Extraocular movements full without nystagmus. Facial sensation intact to light touch and pinprick bilaterally. Facial movements symmetric at rest and with activation. Hearing intact to finger rub bilaterally. Palate elevates symmetrically. Gag reflex present bilaterally. Sternocleidomastoid and trapezius 5/5 bilaterally. Tongue midline, no fasciculations or atrophy.",
       "gait": "Gait normal with symmetric arm swing. Tandem gait intact. Romberg negative.",
-      "additional": "No evidence of tongue bite or other oral trauma at time of examination. Wife reports that during one witnessed episode approximately two weeks ago the patient appeared to chew repeatedly and pick at his shirt for about one minute, after which he appeared confused for several minutes."
+      "mental_status": "Alert and oriented to person, place, time, and situation. Mildly anxious in demeanor. Speech fluent with normal rate and prosody. No paraphasic errors. Naming and repetition intact. Follows complex three-step commands. Registers 3/3 objects; recalls 2/3 at five minutes without cues, 3/3 with categorical cues. Able to spell WORLD backwards correctly. Draws intersecting pentagons accurately.",
+      "motor": "Normal bulk and tone in all four extremities. No spasticity or rigidity. Strength 5/5 in all major muscle groups bilaterally (deltoids, biceps, triceps, wrist extensors, finger abductors, hip flexors, quadriceps, hamstrings, tibialis anterior, gastrocnemius). No pronator drift. No tremor or involuntary movements.",
+      "reflexes": "2+ and symmetric at biceps, triceps, brachioradialis, patellar, and Achilles bilaterally. Plantar responses flexor bilaterally. No clonus.",
+      "sensory": "Light touch, pinprick, temperature, vibration, and proprioception intact throughout. No extinction to double simultaneous stimulation."
     },
+    "patient_id": "NB-FEPI-TEMP-M03",
     "vitals": {
-      "bp_systolic": 121,
       "bp_diastolic": 81,
+      "bp_systolic": 121,
       "hr": 76,
-      "temp": 36.8,
       "rr": 16,
-      "spo2": 97
-    },
-    "chief_complaint": "Recurrent episodes of staring and unresponsiveness, sometimes with repetitive hand and mouth movements, occurring approximately twice monthly for the past eight months",
-    "history_present_illness": "Mr. Kapoor is a 35-year-old right-handed male high school chemistry teacher who presents for inpatient evaluation of recurrent episodic spells of altered awareness that have been occurring approximately twice monthly over the past eight months. He was referred by his primary care physician after his wife witnessed two distinct episodes and became increasingly concerned.\n\nThe patient himself has limited recall of the events. He reports that on several occasions at work, colleagues have told him he appeared to suddenly stop mid-sentence while lecturing, stared blankly for what seemed like a minute, and then seemed confused for several minutes afterward. He did not fall during any of these episodes and had no preceding warning that he could recall. His wife has witnessed two episodes at home. During the most recent event two weeks ago, he describes his suddenly becoming unresponsive while they were watching television. He appeared to make repetitive chewing motions with his mouth and was picking at his shirt with his right hand. She called his name repeatedly but he did not respond. The episode lasted approximately 60 to 90 seconds, after which he appeared disoriented and asked her what had happened. He seemed confused for about five minutes before returning to his baseline. He noted that his speech seemed slightly slurred during the recovery period.\n\nWhen specifically asked, the patient is uncertain whether he experiences any preceding sensations, though he notes that on a few occasions he has had a brief feeling of something being oddly familiar, which he attributed to distraction or daydreaming. He has never had a generalized convulsion, tongue bite, or urinary incontinence during any episode. He denies any preceding headaches, visual disturbances, lightheadedness, or palpitations. He reports feeling more fatigued recently and has had some difficulty concentrating at work, which he attributes to poor sleep related to his untreated sleep apnea and work-related stress. There has been no recent weight change, fever, or other systemic complaints. His anxiety has been stable on sertraline."
-  },
-  "initial_tool_outputs": {
-    "mri": {
-      "findings": [
-        {
-          "type": "Subtle hippocampal asymmetry",
-          "location": "Right hippocampus",
-          "size": "Mild volumetric asymmetry; right hippocampus appears slightly smaller than left on visual inspection of coronal T2 and FLAIR sequences",
-          "signal_characteristics": {
-            "T1": "Borderline loss of normal internal architecture of the right hippocampus compared to the left, most apparent on thin coronal sections",
-            "T2": "Questionable mild hyperintensity in the right hippocampal body compared to the left; could represent early sclerosis versus normal variant",
-            "FLAIR": "Equivocal subtle signal increase in the right hippocampal body; not clearly abnormal in isolation",
-            "DWI": "No restricted diffusion"
-          },
-          "mass_effect": "None",
-          "borders": "No discrete mass or focal cortical dysplasia identified"
-        },
-        {
-          "type": "Incidental finding",
-          "location": "Periventricular white matter",
-          "size": "2-3 mm punctate foci",
-          "signal_characteristics": {
-            "T2": "Hyperintense punctate foci in bilateral periventricular white matter",
-            "FLAIR": "Hyperintense, nonspecific",
-            "T1": "Not visible on T1-weighted images"
-          },
-          "mass_effect": "None",
-          "borders": "Well-defined, punctate"
-        }
-      ],
-      "volumetrics": {
-        "right_hippocampus": "2.8 cm3 (10th percentile for age and sex)",
-        "left_hippocampus": "3.3 cm3 (40th percentile for age and sex)",
-        "asymmetry_index": "0.08 (borderline; threshold for abnormal >0.10)"
-      },
-      "additional_observations": [
-        "No evidence of focal cortical dysplasia or heterotopia",
-        "No mass lesion or pathological enhancement after gadolinium",
-        "Ventricular system normal in size and configuration",
-        "Periventricular white matter foci are nonspecific and may represent small vessel changes or migrainous changes given patient age"
-      ],
-      "impression": "Subtle right hippocampal asymmetry with borderline volume reduction and equivocal FLAIR signal abnormality. The hippocampal volumetric asymmetry index of 0.08 falls below the definitive threshold for abnormal (0.10), though the right hippocampus is at the 10th percentile for age and sex. A few nonspecific periventricular white matter punctate foci are noted, likely related to migraine or small vessel changes. No mass lesion, acute infarction, or obvious structural epileptogenic lesion identified",
-      "recommended_actions": []
-    },
-    "labs": {
-      "panels": {
-        "CBC": [
-          {
-            "test": "WBC",
-            "value": 6.2,
-            "unit": "x10^9/L",
-            "reference_range": "4.0-11.0",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Hemoglobin",
-            "value": 13.8,
-            "unit": "g/dL",
-            "reference_range": "12.0-16.0",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Hematocrit",
-            "value": 36.0,
-            "unit": "%",
-            "reference_range": "36.0-46.0",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Platelets",
-            "value": 239,
-            "unit": "x10^9/L",
-            "reference_range": "150-400",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "MCV",
-            "value": 91.6,
-            "unit": "fL",
-            "reference_range": "80-100",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ],
-        "BMP": [
-          {
-            "test": "Sodium",
-            "value": 137,
-            "unit": "mEq/L",
-            "reference_range": "136-145",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Potassium",
-            "value": 4.0,
-            "unit": "mEq/L",
-            "reference_range": "3.5-5.0",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Chloride",
-            "value": 112,
-            "unit": "mEq/L",
-            "reference_range": "98-106",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "Bicarbonate",
-            "value": 23,
-            "unit": "mEq/L",
-            "reference_range": "22-29",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "BUN",
-            "value": 12,
-            "unit": "mg/dL",
-            "reference_range": "7-20",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Creatinine",
-            "value": 0.73,
-            "unit": "mg/dL",
-            "reference_range": "0.6-1.2",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Glucose",
-            "value": 114,
-            "unit": "mg/dL",
-            "reference_range": "70-100",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "Calcium",
-            "value": 10.1,
-            "unit": "mg/dL",
-            "reference_range": "8.5-10.5",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ],
-        "Additional": [
-          {
-            "test": "Prolactin",
-            "value": 17.6,
-            "unit": "ng/mL",
-            "reference_range": "4.8-23.3",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Magnesium",
-            "value": 2.3,
-            "unit": "mg/dL",
-            "reference_range": "1.7-2.2",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "TSH",
-            "value": 2.8,
-            "unit": "mIU/L",
-            "reference_range": "0.4-4.0",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Vitamin D (25-OH)",
-            "value": 23,
-            "unit": "ng/mL",
-            "reference_range": "30-100",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "Urine drug screen",
-            "value": "Negative",
-            "unit": "",
-            "reference_range": "Negative",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ]
-      },
-      "interpretation": "Abnormal values: Chloride 112 mEq/L (H), Glucose 114 mg/dL (H), Magnesium 2.3 mg/dL (H), Vitamin D (25-OH) 23 ng/mL (L).",
-      "abnormal_values_summary": [
-        "Chloride: 112 mEq/L (H)",
-        "Glucose: 114 mg/dL (H)",
-        "Magnesium: 2.3 mg/dL (H)",
-        "Vitamin D (25-OH): 23 ng/mL (L)"
-      ]
-    },
-    "csf": null,
-    "literature_search": null,
-    "drug_interactions": null,
-    "eeg": {
-      "classification": "abnormal",
-      "background": {
-        "posterior_dominant_rhythm": "9 Hz alpha rhythm, symmetric, reactive to eye opening",
-        "continuity": "Continuous",
-        "symmetry": "Grossly symmetric between hemispheres",
-        "sleep_features": "Stage II sleep captured with vertex waves and sleep spindles. Sleep architecture appears mildly fragmented."
-      },
-      "findings": [
-        {
-          "type": "Sharp transients",
-          "location": "Right anterior temporal region (F8/T4)",
-          "frequency": "Rare, approximately 3-4 noted during the 45-minute recording",
-          "morphology": "Sharply contoured waveforms with phase reversal at F8, duration 50-80 ms, followed by a subtle after-going slow wave. Morphology not definitively epileptiform versus benign sharp transients.",
-          "state": "Two noted during drowsiness, one during wakefulness, one during light sleep",
-          "clinical_correlation": ""
-        },
-        {
-          "type": "Intermittent focal slowing",
-          "location": "Right temporal region (T4-T6)",
-          "frequency": "Intermittent bursts of theta-range slowing, 4-6 Hz, lasting 2-5 seconds, noted on multiple occasions",
-          "morphology": "Polymorphic theta activity, slightly more prominent than the left temporal region",
-          "state": "Predominantly during relaxed wakefulness",
-          "clinical_correlation": ""
-        }
-      ],
-      "artifacts": [
-        {
-          "type": "Muscle artifact",
-          "location": "Bilateral temporal chains",
-          "impact": "Moderate, intermittently obscuring temporal discharges during wakefulness. Less prominent during drowsiness when sharps were better visualized."
-        },
-        {
-          "type": "Eye movement artifact",
-          "location": "Frontopolar leads (Fp1/Fp2)",
-          "impact": "Expected, no impact on temporal chain interpretation"
-        }
-      ],
-      "activating_procedures": {
-        "hyperventilation": "Three minutes of hyperventilation performed. Generalized background slowing noted, symmetric. No clear focal abnormality provoked.",
-        "photic_stimulation": "Normal photic driving response at 10-18 Hz bilaterally. No photoparoxysmal response."
-      },
-      "impression": "Mildly abnormal EEG. Rare sharply contoured transients noted in the right anterior temporal region (F8/T4) with equivocal epileptiform morphology. Intermittent right temporal polymorphic theta slowing also noted. No electrographic seizures captured during this routine recording",
-      "limitations": "Routine 45-minute recording with no clinical events captured. Temporal muscle artifact intermittently limited assessment. Recording duration insufficient to confidently classify rare sharp transients.",
-      "recommended_actions": [],
-      "eeg_type": "routine"
-    },
-    "ecg": {
-      "rhythm": "Normal sinus rhythm",
-      "rate": 74,
-      "intervals": {
-        "PR": "152 ms (normal)",
-        "QRS": "82 ms (normal)",
-        "QTc": "418 ms (normal)"
-      },
-      "axis": "Normal axis (55 degrees)",
-      "findings": [
-        "No ST-segment or T-wave abnormalities",
-        "No conduction abnormalities",
-        "No ventricular ectopy"
-      ],
-      "interpretation": "Normal sinus rhythm with no acute abnormalities. No arrhythmia or conduction disorder identified.",
-      "clinical_correlation": ""
+      "spo2": 97,
+      "temp": 36.8
     }
   },
-  "followup_outputs": [
-    {
-      "trigger_action": "request_pet_scan",
-      "tool_name": "order_advanced_imaging",
-      "output": {
-        "modality": "FDG_PET",
-        "tracer_or_protocol": null,
-        "findings": [
-          {
-            "region": "Right mesial and anterolateral temporal lobe",
-            "signal": "FDG_uptake: Reduced FDG uptake in the right mesial temporal structures (hippocampus and parahippocampal gyrus) and mild reduction in the right anterolateral temporal neocortex compared to symmetric uptake on the left; asymmetry_index: Right-to-left temporal lobe asymmetry index 0.82 (normal >0.90), indicating moderate right temporal hypometabolism",
-            "description": "Hypometabolism"
-          },
-          {
-            "region": "Bilateral frontal, parietal, and occipital lobes; left temporal lobe; basal ganglia; thalami; cerebellum",
-            "signal": "FDG_uptake: Symmetric and normal FDG uptake in remaining brain regions",
-            "description": "Normal metabolism"
-          }
-        ],
-        "quantitative_data": null,
-        "impression": "Interictal FDG-PET demonstrates moderate right mesial and anterolateral temporal hypometabolism. Metabolic reduction involves the right hippocampal region and extends into the right anterior lateral temporal cortex. Remainder of the brain shows symmetric, normal FDG uptake",
-        "recommended_actions": []
-      }
-    },
-    {
-      "trigger_action": "search_literature_temporal_epilepsy_subtle_mts",
-      "tool_name": "search_medical_literature",
-      "output": {
-        "query": "subtle mesial temporal sclerosis MRI-negative epilepsy quantitative volumetry",
-        "results": [
-          {
-            "title": "Quantitative MRI in temporal lobe epilepsy: relationship with neuropathology and surgical outcome",
-            "source": "Bernasconi et al., Ann Neurol 2003;54(6):739-746",
-            "summary": "Automated hippocampal volumetry detected subtle hippocampal atrophy in 30% of visually MRI-negative temporal lobe epilepsy patients, correlating with histopathological hippocampal sclerosis and favorable surgical outcomes."
-          },
-          {
-            "title": "Subtle hippocampal malformations and volumetric reduction in temporal lobe epilepsy",
-            "source": "Coan et al., Epilepsy Behav 2014;35:45-51",
-            "summary": "Quantitative volumetric analysis can reveal hippocampal sclerosis not visible on standard visual MRI interpretation, supporting the use of automated tools in epilepsy presurgical evaluation."
-          },
-          {
-            "title": "FDG-PET in MRI-negative temporal lobe epilepsy: lateralizing value and surgical outcomes",
-            "source": "LoPinto-Khoury et al., Epilepsia 2012;53(12):2140-2145",
-            "summary": "FDG-PET demonstrated temporal hypometabolism in 70-80% of MRI-negative temporal lobe epilepsy patients, with good surgical outcomes when PET and EEG were concordant."
-          }
-        ],
-        "summary": "In patients with temporal lobe epilepsy and subtle or initially negative MRI findings, quantitative hippocampal volumetry and FDG-PET provide important additional lateralizing information. Automated volumetric analysis can detect hippocampal sclerosis missed on visual inspection in up to 30% of cases. FDG-PET lateralizes the epileptogenic zone in 70-80% of MRI-negative cases. Multi-modal concordance (EEG, MRI volumetrics, PET, neuropsychology) is essential for surgical planning and predicts favorable postoperative seizure outcomes."
-      }
-    },
-    {
-      "trigger_action": "check_drug_interactions_lamotrigine",
-      "tool_name": "check_drug_interactions",
-      "output": {
-        "proposed": "Lamotrigine 25 mg daily, titrate over 6 weeks to 200 mg daily",
-        "interactions": [
-          "No significant interaction with sertraline",
-          "No significant interaction with metformin",
-          "No significant interaction with vitamin D3"
-        ],
-        "contraindications": [],
-        "warnings": [
-          "Risk of Stevens-Johnson syndrome / toxic epidermal necrolysis, especially with rapid titration. Must titrate slowly over 6-8 weeks.",
-          "Risk of serious rash is increased with concurrent valproate use (not applicable in this patient)",
-          "Patient has sulfonamide allergy (rash) - counsel to report any rash immediately and distinguish from drug hypersensitivity",
-          "Monitor for Stevens-Johnson syndrome, especially during titration phase"
-        ],
-        "formulary_status": "On formulary, no prior authorization required",
-        "alternatives": [
-          "Levetiracetam 500 mg twice daily, titrate to 1000-1500 mg twice daily (faster titration, but higher risk of psychiatric side effects given patient's anxiety history)",
-          "Lacosamide 50 mg twice daily, titrate to 200 mg twice daily",
-          "Oxcarbazepine 300 mg twice daily, titrate to 600 mg twice daily (monitor sodium levels)"
-        ]
-      }
-    },
-    {
-      "trigger_action": "request_sleep_deprived_eeg",
-      "tool_name": "analyze_eeg",
-      "tool_parameters": {
-        "eeg_type": "sleep_deprived"
-      },
-      "output": {
-        "classification": "abnormal",
-        "background": {
-          "posterior_dominant_rhythm": "9 Hz alpha rhythm, symmetric, reactive",
-          "continuity": "Continuous",
-          "symmetry": "Symmetric",
-          "sleep_features": "Sleep architecture captured over 96 hours. Mildly fragmented sleep with frequent arousals, consistent with known obstructive sleep apnea."
-        },
-        "findings": [],
-        "artifacts": [
-          {
-            "type": "Muscle artifact",
-            "location": "Bilateral temporal chains, intermittent during wakefulness",
-            "impact": "Moderate during wakefulness, minimal during sleep when interictal activity best appreciated"
-          }
-        ],
-        "activating_procedures": {},
-        "impression": "Normal sleep-deprived EEG with adequate NREM sleep captured; no epileptiform discharge or seizure. A normal study does not exclude epilepsy.",
-        "limitations": "Only one clinical event captured despite 96 hours of recording. Patient's habitual event frequency (twice monthly) limits capture probability.",
-        "recommended_actions": [],
-        "eeg_type": "sleep_deprived"
-      }
-    },
-    {
-      "trigger_action": "request_ambulatory_eeg",
-      "tool_name": "analyze_eeg",
-      "tool_parameters": {
-        "eeg_type": "ambulatory"
-      },
-      "output": {
-        "classification": "abnormal",
-        "background": {
-          "posterior_dominant_rhythm": "9 Hz alpha rhythm, symmetric, reactive",
-          "continuity": "Continuous",
-          "symmetry": "Symmetric",
-          "sleep_features": "Sleep architecture captured over 96 hours. Mildly fragmented sleep with frequent arousals, consistent with known obstructive sleep apnea."
-        },
-        "findings": [
-          {
-            "type": "Interictal sharp waves",
-            "location": "Right anterior temporal (F8/T4)",
-            "frequency": "Occasional, averaging 5-6 per hour during NREM sleep, 1-2 per hour during wakefulness",
-            "morphology": "Phase reversal at F8 with field extending to T4 and occasionally to F4. Duration 40-70 ms with consistent after-going slow wave. Morphology now clearly epileptiform on prolonged recording with multiple examples for comparison.",
-            "state": "All states, maximal during NREM sleep stage II",
-            "clinical_correlation": ""
-          },
-          {
-            "type": "Electrographic seizure with clinical correlate",
-            "location": "Right anterior temporal onset (F8/T4), evolving to right hemispheric then bilateral",
-            "frequency": "One clinical seizure captured on day 3 of monitoring",
-            "morphology": "Seizure onset with right anterior temporal low-amplitude fast activity (beta-range), evolving to 5-6 Hz rhythmic theta over right temporal chain within 10 seconds, then progressive slowing to 3-4 Hz rhythmic delta with spread to right parasagittal leads by 35 seconds. Total electrographic duration 78 seconds. No bilateral tonic-clonic evolution.",
-            "state": "Occurred during relaxed wakefulness while patient was watching television",
-            "clinical_correlation": ""
-          },
-          {
-            "type": "Intermittent focal slowing",
-            "location": "Right temporal (T4-T6)",
-            "frequency": "Intermittent runs of polymorphic theta-delta slowing",
-            "morphology": "Polymorphic 3-5 Hz slowing",
-            "state": "Relaxed wakefulness and drowsiness",
-            "clinical_correlation": ""
-          }
-        ],
-        "artifacts": [
-          {
-            "type": "Muscle artifact",
-            "location": "Bilateral temporal chains, intermittent during wakefulness",
-            "impact": "Moderate during wakefulness, minimal during sleep when interictal activity best appreciated"
-          }
-        ],
-        "activating_procedures": {},
-        "impression": "Abnormal 48-hour 48-hour ambulatory EEG. One habitual clinical seizure captured with clear right anterior temporal electrographic onset (F8/T4). Seizure onset with right temporal rhythmic theta evolving to delta, remaining lateralized to the right temporal region over the ictal period. Occasional right anterior temporal interictal epileptiform discharges confirmed, maximal during NREM sleep",
-        "limitations": "Only one clinical event captured despite 96 hours of recording. Patient's habitual event frequency (twice monthly) limits capture probability.",
-        "recommended_actions": [],
-        "eeg_type": "ambulatory"
-      }
-    }
-  ],
-  "fallback_tool_outputs": {
-    "eeg": null,
-    "mri": null,
-    "ecg": null,
-    "labs": null,
-    "csf": {
-      "appearance": "clear and colourless",
-      "opening_pressure": "16 cm H2O",
-      "cell_count": {
-        "wbc": "2 /uL",
-        "rbc": "0 /uL"
-      },
-      "protein": "38 mg/dL",
-      "glucose": "62 mg/dL",
-      "glucose_ratio": "0.6",
-      "special_tests": {},
-      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose."
-    },
-    "ct": {
-      "findings": [],
-      "contrast_used": false,
-      "angiography_findings": null,
-      "additional_observations": [],
-      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
-      "recommended_actions": []
-    },
-    "echo": {
-      "chambers": {
-        "LV": "normal size and systolic function",
-        "RV": "normal size and function",
-        "LA": "normal size",
-        "RA": "normal size"
-      },
-      "valves": {
-        "mitral": "structurally normal",
-        "aortic": "structurally normal",
-        "tricuspid": "normal",
-        "pulmonic": "normal"
-      },
-      "ejection_fraction": 62.0,
-      "wall_motion": "no regional wall-motion abnormality",
-      "findings": [
-        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
-      ],
-      "impression": "Normal transthoracic echocardiogram.",
-      "recommended_actions": []
-    },
-    "cardiac_monitoring": {
-      "duration_hours": 24,
-      "monitor_type": "holter_24h",
-      "rhythm_summary": "Sinus rhythm throughout the recording",
-      "heart_rate_range": {
-        "min": 48,
-        "max": 110,
-        "average": 74
-      },
-      "events": [],
-      "findings": [
-        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
-      ],
-      "impression": "Normal 24-hour Holter monitor.",
-      "recommended_actions": []
-    },
-    "advanced_imaging": null,
-    "specialized_test": null,
-    "literature_search": null,
-    "drug_interactions": null
-  },
-  "ground_truth": {
-    "primary_diagnosis": "Focal epilepsy of right temporal lobe origin with subtle mesial temporal sclerosis (focal impaired-awareness seizures)",
-    "icd_code": "G40.209",
-    "differential": [
-      {
-        "diagnosis": "Psychogenic non-epileptic spells",
-        "likelihood": "moderate",
-        "key_features": "Distinguished by video-EEG capturing event without electrographic correlate; current semiology with automatisms and amnesia favors epilepsy.",
-        "icd_code": "F44.5"
-      },
-      {
-        "diagnosis": "Frontal lobe focal epilepsy",
-        "likelihood": "low",
-        "key_features": "Lacks hypermotor or nocturnal features; oroalimentary automatisms and post-ictal confusion favor temporal localization.",
-        "icd_code": "G40.209"
-      },
-      {
-        "diagnosis": "Absence seizures (idiopathic generalized epilepsy)",
-        "likelihood": "low",
-        "key_features": "Absences are shorter (<20 s), without post-ictal confusion, and have 3-Hz generalized spike-wave on EEG.",
-        "icd_code": "G40.A09"
-      },
-      {
-        "diagnosis": "Convulsive syncope / autonomic dysfunction",
-        "likelihood": "low",
-        "key_features": "No postural prodrome, no documented bradycardia or hypotension; semiology is not syncope-like.",
-        "icd_code": "R55"
-      },
-      {
-        "diagnosis": "TIA (transient ischemic attack)",
-        "likelihood": "very_low",
-        "key_features": "TIA produces negative neurological symptoms (weakness, aphasia), not stereotyped behavioral arrest with automatisms.",
-        "icd_code": "G45.9"
-      }
-    ],
-    "optimal_actions": [
-      {
-        "step": 1,
-        "action": "Obtain detailed seizure history including semiology, aura, automatisms, duration, frequency, witness accounts, and post-ictal features.",
-        "tool_name": null,
-        "expected_finding": "Stereotyped focal impaired-awareness events with temporal-lobe aura and post-ictal confusion.",
-        "category": "required",
-        "tool_parameters": {},
-        "citation": "[ILAE_2017]",
-        "guideline_source": "ILAE_2017"
-      },
-      {
-        "step": 2,
-        "action": "Perform complete neurological examination.",
-        "tool_name": null,
-        "expected_finding": "Interictal exam typically normal; subtle memory deficit may be present.",
-        "category": "required",
-        "tool_parameters": {},
-        "citation": "",
-        "guideline_source": ""
-      },
-      {
-        "step": 3,
-        "action": "Obtain brain MRI using a dedicated epilepsy protocol to identify a structural epileptogenic cause",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Hippocampal sclerosis, low-grade tumor (DNET, ganglioglioma), cavernoma, or focal cortical dysplasia; rule out alternative structural causes.",
-        "category": "required",
-        "tool_parameters": {
-          "protocol": "epilepsy",
-          "contrast": true
-        },
-        "citation": "[AAN_2007]",
-        "guideline_source": "AAN_2007"
-      },
-      {
-        "step": 4,
-        "action": "Search current literature for AED selection in focal epilepsy and ILAE 2017 seizure classification.",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Evidence-based AED options for focal epilepsy (levetiracetam, lamotrigine, oxcarbazepine, lacosamide); ILAE classification framework.",
-        "category": "required",
-        "tool_parameters": {},
-        "citation": "[ILAE_drug_2017]",
-        "guideline_source": "ILAE_drug_2017"
-      },
-      {
-        "step": 5,
-        "action": "Check drug interactions before initiating or modifying AED therapy (enzyme inducers, OCP, other CNS-active drugs).",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Identify pharmacokinetic interactions (CYP induction by carbamazepine/phenytoin) and CNS adverse-effect overlap.",
-        "category": "required",
-        "tool_parameters": {},
-        "citation": "[ILAE_drug_2017]",
-        "guideline_source": "ILAE_drug_2017"
-      },
-      {
-        "action": "Obtain an awake routine EEG promptly to support classification; never use a normal result to exclude epilepsy",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Interictal focal temporal discharges may support the clinical diagnosis",
-        "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        },
-        "citation": "[NICE_NG217_2025]",
-        "guideline_source": "NICE_NG217_2025",
-        "step": 6
-      },
-      {
-        "action": "Because the routine recording is normal or equivocal, consider a sleep-deprived EEG after discussing risks and benefits",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Sleep may activate focal temporal epileptiform discharges",
-        "category": "recommended",
-        "tool_parameters": {
-          "eeg_type": "sleep_deprived"
-        },
-        "citation": "[NICE_NG217_2025]",
-        "guideline_source": "NICE_NG217_2025",
-        "step": 7
-      },
-      {
-        "action": "Because routine and sleep-deprived studies remain non-diagnostic, consider ambulatory EEG to capture a habitual event",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Electroclinical temporal-onset event during prolonged ambulatory recording",
-        "category": "recommended",
-        "tool_parameters": {
-          "eeg_type": "ambulatory"
-        },
-        "citation": "[NICE_NG217_2025]",
-        "guideline_source": "NICE_NG217_2025",
-        "step": 8
-      },
-      {
-        "action": "Order only case-targeted tests for an acute symptomatic seizure, metabolic mimic, drug level or concurrent emergency; do not use a fixed epilepsy panel",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Answer the specific provocation or treatment question in this presentation",
-        "category": "optional",
-        "tool_parameters": {
-          "panels": [
-            "glucose",
-            "sodium",
-            "calcium"
-          ]
-        },
-        "citation": "[NICE_NG217_2025]",
-        "guideline_source": "NICE_NG217_2025",
-        "step": 9
-      },
-      {
-        "action": "Obtain a 12-lead ECG in this first suspected seizure/transient-loss-of-consciousness assessment to identify a cardiac mimic",
-        "tool_name": "analyze_ecg",
-        "expected_finding": "Identify or exclude pre-excitation, conduction disease, long-QT or Brugada pattern; ECG does not diagnose epilepsy",
-        "category": "required",
-        "tool_parameters": {},
-        "citation": "[NICE_NG217_2025]",
-        "guideline_source": "NICE_NG217_2025",
-        "step": 10
-      }
-    ],
-    "useless_tools": [
-      {
-        "tool_name": "analyze_csf",
-        "tool_parameters": {},
-        "rationale": "No clinical features of CNS infection, encephalitis, or immunocompromise; CSF analysis is not indicated for routine focal epilepsy workup and exposes the patient to procedural risk and cost.",
-        "citation": "[AAN_2007]"
-      },
-      {
-        "tool_name": "order_echocardiogram",
-        "tool_parameters": {
-          "echo_type": "TTE"
-        },
-        "rationale": "No syncope-versus-seizure question and no structural-heart concern; echocardiogram contributes nothing to epilepsy workup.",
-        "citation": "[AAN_2007]"
-      },
-      {
-        "tool_name": "order_cardiac_monitoring",
-        "tool_parameters": {
-          "monitor_type": "holter_24h"
-        },
-        "rationale": "Ambulatory cardiac monitoring is reserved for syncope-versus-seizure differentiation; not indicated when semiology is clearly epileptic.",
-        "citation": "[AAN_2007]"
-      },
-      {
-        "tool_name": "order_ct_scan",
-        "tool_parameters": {},
-        "rationale": "Non-contrast head CT is inferior to MRI for detecting epileptogenic substrates (hippocampal sclerosis, FCD, low-grade tumor) and adds ionizing radiation without diagnostic yield.",
-        "citation": "[AAN_2007]"
-      }
-    ],
-    "harmful_tools": [],
-    "sequence_constraints": [
-      {
-        "before": "analyze_brain_mri",
-        "after": "check_drug_interactions",
-        "reason": "Structural cause influences AED choice (e.g., low-grade tumor → consider AEDs with CYP-neutral profile; hippocampal sclerosis → multiple equally appropriate options). MRI should inform drug selection.",
-        "citation": "[ILAE_drug_2017]",
-        "severity": "soft"
-      }
-    ],
-    "critical_actions": [
-      "Recognize recurrent stereotyped behavioral arrest with automatisms and amnesia as focal impaired-awareness seizures.",
-      "Obtain prolonged video-EEG to capture a habitual event and confirm focal temporal onset.",
-      "Order 3T MRI epilepsy protocol to look for hippocampal sclerosis or other epileptogenic substrate.",
-      "Initiate first-line AED for focal epilepsy after diagnosis confirmation.",
-      "Counsel on driving restrictions and seizure safety."
-    ],
-    "contraindicated_actions": [
-      "Do not perform lumbar puncture without features of CNS infection.",
-      "Do not rely solely on a single normal routine EEG to exclude epilepsy.",
-      "Do not start a broad-spectrum AED such as valproate without considering focal-epilepsy first-line options."
-    ],
-    "key_reasoning_points": [
-      "Frequency of ~2 episodes/month over 8 months meets ILAE epilepsy criteria (≥2 unprovoked events).",
-      "Routine EEG sensitivity is limited; prolonged monitoring or sleep-deprived EEG increases yield.",
-      "Imaging-negative TLE still benefits from dedicated 3T epilepsy-protocol MRI; some lesions are subtle.",
-      "Cross-modal concordance is the diagnostic gold standard before considering surgical evaluation.",
-      "Tier per the July 2026 clinical review: Laboratory testing does not diagnose focal epilepsy; it addresses a provoked seizure or a metabolic mimic when one is suspected.",
-      "July 2026 review applied end to end: routine EEG first when appropriate, staged sleep-deprived/ambulatory escalation, video only for event capture or tertiary evaluation, and continuous ICU EEG only for NCSE."
-    ],
-    "red_herrings": []
-  },
-  "metadata": {
-    "version": "1.0",
-    "generation_date": "2026-03-13",
-    "clinical_domain": "Epilepsy",
-    "sub_domain": "Temporal lobe epilepsy",
-    "estimated_complexity": "Moderate - equivocal initial EEG and subtle MRI findings requiring additional investigation for definitive diagnosis",
-    "created_by": "neurobench_generator",
-    "fallback_tool_kinds": {
-      "csf": "normal",
-      "ct": "normal",
-      "echo": "normal",
-      "cardiac_monitoring": "normal"
-    },
-    "last_revised": "2026-08-10",
-    "revision_reason": "independent focal-epilepsy review: staged EEG pathway, dedicated structural imaging, targeted labs/ECG, cardiac tools removed",
-    "criteria_pack_version": "1.0",
-    "authoring_agent": "condition-expert:FEPI-TEMP",
-    "difficulty_rationale": "Five required tools with video-EEG follow-up needed; routine EEG may be non-diagnostic, requiring escalation.",
-    "case_body_concerns": [
-      "useless_tools entry for `analyze_ecg` dropped: tool output is provided up-front in initial_tool_outputs, so declaring it useless to call would be incoherent (agent never had to call it)."
-    ],
-    "citation_gap": [],
-    "vocab_gap": []
-  }
+  "schema_version": "2.0"
 }

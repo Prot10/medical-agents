@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from neuroagent.datasets import normalize_dataset_version
 
 from ..dependencies import current_reviewer
 from ..schemas.reviewers import ReviewerCode
@@ -20,7 +19,6 @@ def my_progress(
     request: Request,
     reviewer: ReviewerCode = Depends(current_reviewer),
 ) -> dict[str, Any]:
-    version = normalize_dataset_version(version)
     all_datasets = request.app.state.all_datasets
     if version not in all_datasets:
         raise HTTPException(

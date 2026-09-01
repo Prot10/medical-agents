@@ -94,9 +94,9 @@ preserved awareness, prolonged duration with normal post-ictal state.
   somatosensory pathway, and midline-splitting sensory loss is not that question. Also scored
 - `order_specialized_test` (`muscle_biopsy / nerve_biopsy`) — invasive testing reinforces the
   somatic illness model; not indicated
-- **Repetition of any normal study.** Not expressible as a `useless_tools` entry (the metric has no
-  notion of a second order), so it lives in `contraindicated_actions` in every case and is caught
-  by the redundant-call counter. In FND the iatrogenic harm is usually the second and third
+- **Repetition of any normal study.** Encode the first unnecessary call in `avoided_actions`
+  when it is case-specific; repeated identical calls are also caught by the harness's
+  redundant-call penalty. In FND the iatrogenic harm is usually the second and third
   investigation, not the first [Stone_2018]
 
 ## 4. Tools that are HARMFUL / contraindicated

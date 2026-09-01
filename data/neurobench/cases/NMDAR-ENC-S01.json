@@ -3,549 +3,560 @@
   "condition": "autoimmune_encephalitis_nmdar",
   "difficulty": "moderate",
   "encounter_type": "emergency",
-  "patient": {
-    "patient_id": "NB-NMDAR-S01",
-    "demographics": {
-      "age": 24,
-      "sex": "female",
-      "handedness": "right",
-      "ethnicity": "Caucasian",
-      "bmi": 22.4
+  "fallback_tool_outputs": {
+    "advanced_imaging": {
+      "findings": [],
+      "impression": "No abnormality identified.",
+      "modality": "FDG-PET",
+      "quantitative_data": null,
+      "recommended_actions": [],
+      "tracer_or_protocol": null
     },
-    "clinical_history": {
-      "past_medical_history": [
-        "Seasonal allergic rhinitis",
-        "Iron deficiency anemia, resolved"
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
       ],
-      "medications": [
-        {
-          "drug": "Cetirizine",
-          "dose": "10 mg",
-          "frequency": "daily as needed",
-          "indication": "Allergic rhinitis"
-        },
-        {
-          "drug": "Combined oral contraceptive (ethinylestradiol/levonorgestrel)",
-          "dose": "30 mcg/150 mcg",
-          "frequency": "daily",
-          "indication": "Contraception"
-        }
+      "heart_rate_range": {
+        "average": 69,
+        "max": 130,
+        "min": 53
+      },
+      "impression": "Normal 24-hour Holter monitor.",
+      "monitor_type": "holter_24h",
+      "recommended_actions": [],
+      "rhythm_summary": "Sinus rhythm throughout the recording"
+    },
+    "csf": null,
+    "ct": null,
+    "drug_interactions": null,
+    "ecg": null,
+    "echo": {
+      "chambers": {
+        "LA": "normal size",
+        "LV": "normal size and systolic function",
+        "RA": "normal size",
+        "RV": "normal size and function"
+      },
+      "ejection_fraction": 66.0,
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
       ],
-      "allergies": [
-        "ACE inhibitors (angioedema)"
-      ],
-      "family_history": [
-        "Mother: hypothyroidism",
-        "Father: hypertension",
-        "No family history of epilepsy, autoimmune disease, or psychiatric illness"
-      ],
-      "social_history": {
-        "occupation": "graduate student",
-        "tobacco": "Never smoker",
-        "alcohol": "Occasional social drinking, 1-2 drinks per week",
-        "recreational_drugs": "Denies any illicit drug use",
-        "living_situation": "Lives with partner in an apartment"
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": [],
+      "valves": {
+        "aortic": "structurally normal",
+        "mitral": "structurally normal",
+        "pulmonic": "normal",
+        "tricuspid": "normal"
+      },
+      "wall_motion": "no regional wall-motion abnormality"
+    },
+    "eeg": null,
+    "labs": null,
+    "literature_search": null,
+    "mri": null,
+    "specialized_test": {
+      "findings": [],
+      "impression": "Study within normal limits.",
+      "quantitative_data": null,
+      "recommended_actions": [],
+      "test_type": "neuropsychological_testing"
+    }
+  },
+  "followup_outputs": [
+    {
+      "output": {
+        "query": "Search the medical literature for the Graus 2016 autoimmune-encephalitis diagnostic criteria, first-line immunotherapy (corticosteroids + IVIG or plasma exchange), and second-line therapy (rituximab, ",
+        "results": [
+          {
+            "evidence_level": "see the case's cited guideline",
+            "finding": "Confirms diagnostic criteria, treatment sequence, and emerging evidence (e.g., post-HSV NMDAR-E, checkpoint-inhibitor-associated AE) relevant to this case.",
+            "source": "guideline / primary literature"
+          }
+        ],
+        "summary": "Confirms diagnostic criteria, treatment sequence, and emerging evidence (e.g., post-HSV NMDAR-E, checkpoint-inhibitor-associated AE) relevant to this case."
+      },
+      "tool_name": "search_medical_literature",
+      "trigger_action": "request_search_medical_literature"
+    },
+    {
+      "output": {
+        "alternatives": [],
+        "contraindications": [],
+        "formulary_status": "on formulary",
+        "interactions": [],
+        "proposed": "Check drug interactions and safety profile for first- and second-line immunotherapy (high-dose corticosteroids, IVIG, rituximab) and for antipsychotic choices used to manage acute agitation.",
+        "summary": "No prohibitive interactions for steroid+IVIG; rituximab requires hepatitis B/C and TB screening; flags haloperidol and other dopamine-2 blockers as relatively contraindicated due to risk of worsening extrapyramidal symptoms.",
+        "warnings": [
+          "No prohibitive interactions for steroid+IVIG; rituximab requires hepatitis B/C and TB screening; flags haloperidol and other dopamine-2 blockers as relatively contraindicated due to risk of worsening extrapyramidal symptoms."
+        ]
+      },
+      "tool_name": "check_drug_interactions",
+      "trigger_action": "request_check_drug_interactions"
+    }
+  ],
+  "ground_truth": {
+    "action_criteria": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "contrast": true,
+              "protocol": "standard"
+            },
+            "tool_name": "analyze_brain_mri"
+          }
+        ],
+        "citations": [
+          "[Graus_2016]",
+          "Graus 2016; Titulaer 2013"
+        ],
+        "criterion_id": "action-1-analyze-brain-mri",
+        "expected_evidence": "Often normal or nonspecific; temporal/cortical signal or overlapping inflammatory lesions may support the differential but do not confirm anti-NMDAR encephalitis",
+        "importance": "required",
+        "label": "Obtain contrast-enhanced brain MRI to exclude HSV encephalitis, structural lesions and overlapping demyelination; a normal MRI does not exclude anti-NMDAR encephalitis",
+        "rationale": "Obtain contrast-enhanced brain MRI to exclude HSV encephalitis, structural lesions and overlapping demyelination; a normal MRI does not exclude anti-NMDAR encephalitis"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "basic": [
+                "cell_count",
+                "protein",
+                "glucose"
+              ],
+              "special_tests": [
+                "oligoclonal_bands",
+                "IgG_index",
+                "HSV_PCR",
+                "NMDAR_antibodies"
+              ]
+            },
+            "tool_name": "analyze_csf"
+          }
+        ],
+        "citations": [
+          "[Graus_2016]",
+          "Graus 2016; Titulaer 2013"
+        ],
+        "criterion_id": "action-2-analyze-csf",
+        "expected_evidence": "Variable lymphocytic inflammation; HSV PCR addresses the infectious mimic; CSF anti-GluN1 is the decisive antibody compartment and may differ from serum",
+        "importance": "required",
+        "label": "Analyze CSF for cells, protein and glucose, OCB/IgG index, HSV PCR and a cell-based IgG anti-GluN1 assay interpreted in parallel with serum",
+        "rationale": "Analyze CSF for cells, protein and glucose, OCB/IgG index, HSV PCR and a cell-based IgG anti-GluN1 assay interpreted in parallel with serum"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "eeg_type": "routine"
+            },
+            "tool_name": "analyze_eeg"
+          }
+        ],
+        "citations": [
+          "[Graus_2016]",
+          "Graus 2016; Titulaer 2013"
+        ],
+        "criterion_id": "action-3-analyze-eeg",
+        "expected_evidence": "Diffuse slowing, seizures or extreme delta brush; absence of the latter does not exclude the diagnosis",
+        "importance": "required",
+        "label": "Obtain EEG for encephalopathic and epileptiform abnormalities, explicitly assessing for extreme delta brush",
+        "rationale": "Obtain EEG for encephalopathic and epileptiform abnormalities, explicitly assessing for extreme delta brush"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "CBC",
+                "CMP",
+                "coagulation",
+                "thyroid",
+                "anti_TPO",
+                "anti_thyroglobulin",
+                "ESR",
+                "CRP",
+                "autoimmune_encephalitis_panel",
+                "paraneoplastic_panel",
+                "NMDAR_IgG_cell_based"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[Graus_2016]",
+          "Graus 2016; Titulaer 2013"
+        ],
+        "criterion_id": "action-4-interpret-labs",
+        "expected_evidence": "Systemic, thyroid/inflammatory and alternative autoimmune/paraneoplastic results; paired serum anti-GluN1 can be false positive or false negative in isolation",
+        "importance": "required",
+        "label": "Obtain the reviewed serum work-up, including a cell-based IgG anti-GluN1 assay that must be interpreted with CSF rather than alone",
+        "rationale": "Obtain the reviewed serum work-up, including a cell-based IgG anti-GluN1 assay that must be interpreted with CSF rather than alone"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "contrast": false,
+              "study": "pelvis_abdomen_ultrasound"
+            },
+            "tool_name": "order_body_imaging"
+          }
+        ],
+        "citations": [
+          "[Graus_2016]",
+          "Graus 2016; Titulaer 2013"
+        ],
+        "criterion_id": "action-5-order-body-imaging",
+        "expected_evidence": "Identify or exclude an ovarian/testicular germ-cell tumour or another context-appropriate occult neoplasm whose treatment changes outcome and relapse risk",
+        "importance": "required",
+        "label": "Perform required pelvic and abdominal ultrasound screening for an ovarian teratoma once anti-NMDAR encephalitis is recognised",
+        "rationale": "Perform required pelvic and abdominal ultrasound screening for an ovarian teratoma once anti-NMDAR encephalitis is recognised"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "query": "anti-NMDA receptor encephalitis diagnosis treatment Graus 2016"
+            },
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[Graus_2016]",
+          "Graus_2016"
+        ],
+        "criterion_id": "action-6-search-medical-literature",
+        "expected_evidence": "Confirms diagnostic criteria, treatment sequence, and emerging evidence (e.g., post-HSV NMDAR-E, checkpoint-inhibitor-associated AE) relevant to this case.",
+        "importance": "recommended",
+        "label": "Search the medical literature for the Graus 2016 autoimmune-encephalitis diagnostic criteria, first-line immunotherapy (corticosteroids + IVIG or plasma exchange), and second-line therapy (rituximab, cyclophosphamide).",
+        "rationale": "Search the medical literature for the Graus 2016 autoimmune-encephalitis diagnostic criteria, first-line immunotherapy (corticosteroids + IVIG or plasma exchange), and second-line therapy (rituximab, cyclophosphamide)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "drug": "methylprednisolone",
+              "screen_for": [
+                "IVIG",
+                "rituximab",
+                "haloperidol",
+                "olanzapine"
+              ]
+            },
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [
+          "[Lancaster_2016]",
+          "Lancaster_2016"
+        ],
+        "criterion_id": "action-7-check-drug-interactions",
+        "expected_evidence": "No prohibitive interactions for steroid+IVIG; rituximab requires hepatitis B/C and TB screening; flags haloperidol and other dopamine-2 blockers as relatively contraindicated due to risk of worsening extrapyramidal symptoms.",
+        "importance": "recommended",
+        "label": "Check drug interactions and safety profile for first- and second-line immunotherapy (high-dose corticosteroids, IVIG, rituximab) and for antipsychotic choices used to manage acute agitation.",
+        "rationale": "Check drug interactions and safety profile for first- and second-line immunotherapy (high-dose corticosteroids, IVIG, rituximab) and for antipsychotic choices used to manage acute agitation."
       }
+    ],
+    "assessment": {
+      "prohibited_recommendations": [
+        "Do not give haloperidol or other high-potency D2 antagonists; they worsen the movement disorder and can mimic neuroleptic malignant syndrome in anti-NMDAR encephalitis.",
+        "Do not delay immunotherapy while waiting for the anti-NMDAR antibody result when clinical probability is high \u2014 antibody turnaround can take 1\u20132 weeks and delay worsens outcome.",
+        "Do not anchor on a primary psychiatric diagnosis without first excluding autoimmune encephalitis in a young patient with subacute neuropsychiatric symptoms plus any of seizures, dyskinesias, dysautonomia, or CSF pleocytosis.",
+        "Do not perform lumbar puncture without prior imaging in a patient with altered consciousness, focal signs, or new seizures \u2014 exclude mass effect first.",
+        "Do not interpret a negative serum anti-NMDAR antibody as ruling out the disease; the CSF assay is the gold standard and may be positive when serum is negative."
+      ],
+      "required_recommendations": [
+        "Send paired CSF and serum for anti-NMDAR (GluN1) IgG; CSF is the gold-standard sample and must not be omitted in favor of serum-only testing.",
+        "Start empiric IV acyclovir 10 mg/kg every 8 hours until CSF HSV-1/2 PCR returns negative; HSV encephalitis is the can't-miss differential.",
+        "Initiate first-line immunotherapy promptly once clinical probability is high \u2014 IV methylprednisolone 1 g daily for 5 days combined with IVIG 0.4 g/kg/day for 5 days or therapeutic plasma exchange; do not wait for antibody results.",
+        "Screen for ovarian teratoma with pelvic imaging (transvaginal ultrasound and/or contrast-enhanced CT of chest/abdomen/pelvis); proceed to gynecologic-oncology resection if a teratoma is identified.",
+        "Control seizures aggressively with levetiracetam or valproate; obtain continuous EEG monitoring to detect non-convulsive status epilepticus.",
+        "Plan escalation to second-line therapy (rituximab 375 mg/m\u00b2 weekly \u00d74 and/or cyclophosphamide) if there is no meaningful response to first-line immunotherapy by day 10\u201314.",
+        "Consult neurology (primary), psychiatry (behavioral management), and gynecology/gynecologic oncology if pelvic imaging identifies a teratoma; engage critical care if dysautonomia or central hypoventilation develops."
+      ]
     },
-    "neurological_exam": {
-      "mental_status": "Alert but disoriented to date and place. Intermittently agitated, with periods of unresponsiveness lasting 20-30 seconds. Speech is disorganized with paraphasic errors and echolalia. Unable to follow multi-step commands. Montreal Cognitive Assessment attempted but patient unable to cooperate. Short-term memory severely impaired; unable to recall any of 3 objects at 5 minutes.",
-      "cranial_nerves": "Pupils equal and reactive, 3 mm bilaterally. Extraocular movements intact without nystagmus. Facial sensation intact to light touch. Mild bilateral facial weakness noted with decreased nasolabial fold depth. Hearing grossly intact. Palate elevates symmetrically. Tongue midline. Prominent orofacial dyskinesias with repetitive lip-smacking and jaw movements observed throughout the examination.",
-      "motor": "Tone increased in bilateral upper extremities with intermittent rigidity. Strength 4/5 throughout when patient cooperates, though limited by inconsistent effort due to encephalopathy. No frank hemiparesis. Intermittent dystonic posturing of the left hand observed.",
-      "sensory": "Withdraws symmetrically to pain in all four extremities. Detailed sensory examination limited by encephalopathy.",
-      "reflexes": "Biceps 2+ bilaterally, brachioradialis 2+ bilaterally, patellar 3+ bilaterally, Achilles 2+ bilaterally. Plantar responses flexor bilaterally.",
-      "coordination": "Unable to perform finger-to-nose or heel-to-shin testing reliably due to encephalopathy and involuntary movements.",
-      "gait": "Unable to assess; patient is bed-bound due to altered mental status and agitation.",
-      "additional": "Prominent orofacial dyskinesias with stereotyped lip-smacking, tongue protrusion, and jaw movements. Intermittent choreoathetoid movements of the upper extremities bilaterally. Episodes of autonomic instability observed during examination including transient tachycardia to 130 bpm and blood pressure fluctuations. Two brief episodes of staring with behavioral arrest lasting approximately 15 seconds each observed during the encounter, concerning for subclinical seizures."
+    "avoided_actions": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_echocardiogram"
+          }
+        ],
+        "citations": [
+          "[Graus_2016]"
+        ],
+        "criterion_id": "avoid-waste-1-order-echocardiogram",
+        "rationale": "Transthoracic echo is not indicated for anti-NMDAR encephalitis; it adds cost without informing diagnosis or management unless a discrete cardiac concern (e.g., new murmur, embolic stroke) coexists.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "emg_ncs"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Graus_2016]"
+        ],
+        "criterion_id": "avoid-waste-2-order-specialized-test",
+        "rationale": "EMG/NCS plays no role in the diagnostic workup of anti-NMDAR encephalitis; it neither confirms the antibody-mediated CNS process nor distinguishes among the differential diagnoses.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "amyloid_PET"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[Dalmau_2018]"
+        ],
+        "criterion_id": "avoid-waste-3-order-advanced-imaging",
+        "rationale": "Amyloid PET targets Alzheimer pathology and contributes no information to the diagnosis or treatment of autoimmune encephalitis in a young patient with subacute neuropsychiatric symptoms.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "DaTscan"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[Dalmau_2018]"
+        ],
+        "criterion_id": "avoid-waste-4-order-advanced-imaging",
+        "rationale": "DaTscan evaluates nigrostriatal dopaminergic function and has no role in autoimmune encephalitis; the orofacial dyskinesias of anti-NMDAR encephalitis are antibody-mediated, not presynaptic dopaminergic.",
+        "severity": "waste"
+      }
+    ],
+    "diagnosis": {
+      "accepted": [
+        "Anti-NMDA receptor encephalitis"
+      ],
+      "icd_codes": [
+        "G04.81"
+      ]
     },
-    "vitals": {
-      "bp_systolic": 150,
-      "bp_diastolic": 96,
-      "hr": 114,
-      "temp": 38.4,
-      "rr": 18,
-      "spo2": 99
-    },
-    "chief_complaint": "Progressive confusion, seizures, and abnormal movements over two weeks",
-    "history_present_illness": "This 24-year-old right-handed woman was brought to the emergency department by her partner and mother after two weeks of progressively worsening behavioral changes, confusion, and new-onset seizures. Approximately three weeks ago, the patient developed a mild upper respiratory illness with low-grade fevers, sore throat, malaise, and rhinorrhea lasting 4-5 days, for which she did not seek medical attention. She appeared to recover, but approximately one week later her partner noticed personality changes: she became increasingly irritable, anxious, and paranoid, expressing unfounded beliefs that her classmates were plotting against her. She stopped attending her graduate classes and became withdrawn. Over the following days, she developed progressive confusion, insomnia, and difficulty finding words. Five days prior to presentation, she had her first witnessed generalized tonic-clonic seizure lasting approximately 90 seconds with post-ictal confusion lasting 30 minutes. She was taken to an outside emergency department where she was given lorazepam 2 mg IV and discharged with a referral to neurology. Over the subsequent days, her condition deteriorated rapidly. She developed repetitive lip-smacking and jaw movements that her family initially mistook for a medication side effect. She became increasingly agitated with periods of unresponsiveness alternating with combative episodes. On the day of presentation, her partner witnessed a second generalized seizure and called emergency services. In the emergency department, the patient was noted to have fluctuating levels of consciousness, prominent orofacial dyskinesias, intermittent tachycardia, and blood pressure lability. She was unable to provide a coherent history. Her partner reports no prior psychiatric history, no recent travel, no tick bites, no new medications, and no illicit drug use."
+    "differential": [
+      {
+        "diagnosis": "Herpes simplex virus (HSV-1) encephalitis",
+        "icd_code": "B00.4",
+        "key_features": "Acute febrile encephalopathy with temporal-lobe focus; mandatory empiric acyclovir until CSF HSV-1/2 PCR returns negative.",
+        "likelihood": "high"
+      },
+      {
+        "diagnosis": "Other autoimmune (paraneoplastic) encephalitis (anti-LGI1, CASPR2, GABA-B, or AMPAR)",
+        "icd_code": "G04.81",
+        "key_features": "Limbic encephalitis phenotype with similar imaging; distinguished by surface-antigen antibody panel and demographic skew (LGI1/CASPR2 older men, GABA-B with SCLC, AMPAR with thymoma).",
+        "likelihood": "moderate"
+      },
+      {
+        "diagnosis": "Primary psychiatric disorder (first-episode psychosis / catatonia)",
+        "icd_code": "F23",
+        "key_features": "Subacute course, seizures, dyskinesias, autonomic instability, abnormal EEG, or CSF pleocytosis argue strongly against a primary psychiatric etiology.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Drug-induced psychosis or NMS/serotonin syndrome",
+        "icd_code": "F19.159",
+        "key_features": "Requires recent ingestion of NMDA antagonist (ketamine/PCP), neuroleptic exposure (NMS: lead-pipe rigidity, CK >1000), or serotonergic drug; toxicology and medication review usually clarifying.",
+        "likelihood": "low"
+      }
+    ],
+    "key_clinical_evidence": [
+      "The recognizable phenotype is a subacute (<3 months) progression in a young adult \u2014 viral prodrome \u2192 psychiatric/behavioral changes \u2192 seizures, orofacial dyskinesias, and autonomic instability or decreased consciousness \u2014 fulfilling Graus 2016 criteria for probable/definite anti-NMDAR encephalitis.",
+      "CSF anti-NMDAR (GluN1) IgG is the gold-standard test (100% sensitive); serum alone is less reliable, and a negative serum result does not exclude the diagnosis. Paired CSF/serum sampling with confirmation on tissue-based assay is the standard.",
+      "Extreme delta brush on EEG is highly specific (30\u201350% sensitivity) for anti-NMDAR encephalitis; combined with the clinical syndrome it strongly supports the diagnosis even before antibody results return.",
+      "Treatment is time-sensitive: clinical probability should drive empiric immunotherapy (high-dose IV methylprednisolone + IVIG or plasma exchange) rather than waiting for antibody confirmation; earlier treatment correlates with better functional outcome (Titulaer 2013).",
+      "Tumor screen is part of the workup, not optional: ~50% of young women have an ovarian teratoma, and tumor removal is itself a core therapeutic step. CT chest/abdomen/pelvis or transvaginal ultrasound is mandatory in women of reproductive age."
+    ],
+    "red_herrings": [
+      {
+        "correct_interpretation": "Viral prodromes precede ~70% of anti-NMDAR encephalitis cases; negative HSV PCR and the multi-stage progression should redirect the workup to anti-NMDAR antibody testing.",
+        "data_point": "Viral prodrome (URI, fever, cough) preceding the neuropsychiatric syndrome.",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Suggests a primary viral encephalitis (HSV) or post-viral psychosis; tempts the agent to commit to empiric antiviral therapy without pursuing autoimmune workup.",
+        "location": "history_present_illness"
+      },
+      {
+        "correct_interpretation": "Concurrent or subsequent seizures, dyskinesias, dysautonomia, abnormal EEG, or CSF pleocytosis are red flags that mandate exclusion of anti-NMDAR encephalitis before accepting a psychiatric diagnosis.",
+        "data_point": "Acute psychiatric presentation (paranoia, hallucinations, bizarre behavior) in a previously well young adult.",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Anchors the agent on a primary psychiatric diagnosis (first-episode psychosis, brief psychotic disorder) and delays neurologic workup.",
+        "location": "history_present_illness"
+      },
+      {
+        "correct_interpretation": "Mild hyponatremia is a recognized SIADH-mediated complication of anti-NMDAR encephalitis; it should be corrected slowly and does not reframe the diagnosis.",
+        "data_point": "Mild hyponatremia (sodium 133 mEq/L).",
+        "field_path": "initial_tool_outputs.labs.panels.BMP[0]",
+        "intended_effect": "Tempts the agent toward a primary metabolic-encephalopathy framing (SIADH from another cause, dehydration, polydipsia) instead of recognizing SIADH as a known complication of NMDAR-E.",
+        "location": "labs.BMP"
+      },
+      {
+        "correct_interpretation": "NMS requires antipsychotic exposure and a CK typically >1000 with lead-pipe rigidity; mild CK elevation in this clinical context is non-specific muscle activity from dyskinesias and does not change management.",
+        "data_point": "Mildly elevated CK (179 U/L).",
+        "field_path": "initial_tool_outputs.labs.panels.Other[0]",
+        "intended_effect": "Raises concern for neuroleptic malignant syndrome or rhabdomyolysis when combined with dyskinesias and hyperthermia.",
+        "location": "labs.Other"
+      }
+    ],
+    "review_status": "draft",
+    "sequence_constraints": [],
+    "stop_rule": {
+      "max_additional_actions": 0,
+      "required_before_assessment": [
+        "action-1-analyze-brain-mri",
+        "action-2-analyze-csf",
+        "action-3-analyze-eeg",
+        "action-4-interpret-labs",
+        "action-5-order-body-imaging"
+      ]
+    }
   },
   "initial_tool_outputs": {
-    "eeg": {
-      "classification": "abnormal",
-      "background": {
-        "posterior_dominant_rhythm": "Absent; no identifiable alpha rhythm",
-        "overall_organization": "Severely disorganized",
-        "continuity": "Continuous but with intermittent attenuation",
-        "asymmetry": "No consistent hemispheric asymmetry"
-      },
+    "advanced_imaging": null,
+    "body_imaging": {
+      "contrast": false,
       "findings": [
         {
-          "type": "Extreme delta brush",
-          "location": "Generalized, maximal over frontocentral regions",
-          "frequency": "1-2 Hz delta activity with superimposed 20-30 Hz beta",
-          "morphology": "Rhythmic delta waves with overriding fast activity resembling a brush pattern",
-          "state": "Present in both wakefulness and drowsiness",
-          "clinical_correlation": ""
+          "abnormal": "true",
+          "finding": "3.2 x 2.1 x 2.5 cm, contains a 1.8 cm complex mass with mixed solid and cystic components, including echogenic foci suggesting calcification or fat (dermoid/teratoma). Doppler shows mild internal vascularity.",
+          "structure": "Right ovary"
         },
         {
-          "type": "Electrographic seizures",
-          "location": "Left temporal onset with secondary generalization",
-          "frequency": "Two subclinical electrographic seizures captured during 30-minute recording",
-          "morphology": "Rhythmic theta evolving to repetitive sharp waves",
-          "state": "Occurred during apparent behavioral arrest",
-          "clinical_correlation": ""
+          "abnormal": "false",
+          "finding": "Normal, 2.8 x 1.9 x 2.0 cm, follicular pattern appropriate for age",
+          "structure": "Left ovary"
         },
         {
-          "type": "Generalized rhythmic delta activity",
-          "location": "Bifrontal predominance",
-          "frequency": "1.5-2.5 Hz",
-          "morphology": "Semi-rhythmic, high amplitude (100-200 microvolts)",
-          "state": "Continuous during wakefulness",
-          "clinical_correlation": ""
-        }
-      ],
-      "artifacts": [
+          "abnormal": "false",
+          "finding": "Normal size and echotexture, endometrial stripe 6 mm",
+          "structure": "Uterus"
+        },
         {
-          "type": "Movement artifact",
-          "description": "Intermittent movement artifact related to orofacial dyskinesias and upper extremity choreoathetoid movements"
+          "abnormal": "false",
+          "finding": "Trace physiologic free fluid in cul-de-sac",
+          "structure": "Free fluid"
         }
       ],
-      "activating_procedures": {
-        "hyperventilation": "Not performed due to patient's inability to cooperate",
-        "photic_stimulation": "No photic driving response; no photoparoxysmal response"
-      },
-      "impression": "Severely abnormal EEG showing extreme delta brush pattern, generalized rhythmic delta activity, and two electrographic seizures of left temporal origin. The overall pattern indicates diffuse cortical dysfunction with epileptogenic activity",
-      "limitations": "Recording limited to 30 minutes; continuous EEG monitoring recommended to assess full seizure burden",
+      "impression": "Abnormal values: Right ovary 3.2 x 2.1 x 2.5 cm, contains a 1.8 cm complex mass with mixed solid and cystic components, including echogenic foci suggesting calcification or fat (dermoid/teratoma). Doppler shows mild internal vascularity. (H).",
+      "measurements": null,
+      "modality": "ultrasound",
       "recommended_actions": [],
-      "eeg_type": "routine"
+      "region": "pelvis_abdomen"
     },
-    "mri": {
-      "findings": [
-        {
-          "type": "FLAIR hyperintensity",
-          "location": "Bilateral medial temporal lobes, more prominent on the left",
-          "size": "Left: 2.1 x 1.4 cm, Right: 1.3 x 0.9 cm",
-          "signal_characteristics": {
-            "T1": "Isointense to hypointense",
-            "T2": "Hyperintense",
-            "FLAIR": "Hyperintense",
-            "DWI": "No restricted diffusion",
-            "post_contrast": "No pathological enhancement"
-          },
-          "mass_effect": "None",
-          "borders": "Ill-defined"
-        },
-        {
-          "type": "Mild cortical signal abnormality",
-          "location": "Bilateral insular cortices",
-          "size": null,
-          "signal_characteristics": {
-            "FLAIR": "Subtle hyperintensity",
-            "DWI": "No restricted diffusion"
-          },
-          "mass_effect": "None",
-          "borders": "Ill-defined"
-        }
-      ],
-      "volumetrics": null,
-      "additional_observations": [
-        "No midline shift",
-        "Ventricles normal in size and configuration",
-        "No hydrocephalus",
-        "No extra-axial collections",
-        "No acute hemorrhage",
-        "Normal vascular flow voids"
-      ],
-      "impression": "Bilateral medial temporal FLAIR hyperintensities without restricted diffusion, enhancement, or mass effect, left greater than right. Subtle bilateral insular cortical signal abnormality. The absence of restricted diffusion and hemorrhagic changes makes HSV encephalitis less likely but does not exclude it",
-      "recommended_actions": []
-    },
-    "ecg": {
-      "rhythm": "Sinus tachycardia",
-      "rate": 112,
-      "intervals": {
-        "PR": "160 ms",
-        "QRS": "88 ms",
-        "QTc": "440 ms"
+    "csf": {
+      "appearance": "Clear, colorless",
+      "cell_count": {
+        "Lymphocytes": "95%",
+        "Monocytes": "2%",
+        "Neutrophils": "3%",
+        "RBC": "1 cell/uL",
+        "WBC": "59 cells/uL (elevated)"
       },
+      "glucose": "62.0 mg/dL",
+      "glucose_ratio": "0.59 (serum glucose 98 mg/dL)",
+      "interpretation": "Opening pressure: 24 cmH2O. WBC: 59 cells/uL (elevated) (3% PMN/95% lymph). Protein: 78.3 mg/dL. Glucose: 62.0 mg/dL (ratio 0.59 (serum glucose 98 mg/dL)). Oligoclonal bands: Positive (6 bands, not present in serum). IgG index: 0.85 (elevated, normal <0.70). HSV-1 PCR: Negative. HSV-2 PCR: Negative. VZV PCR: Negative. Enterovirus PCR: Negative. Bacterial culture: No growth at 48 hours. Gram stain: No organisms seen. Cytology: Reactive lymphocytes, no malignant cells. Anti-NMDA receptor antibodies: Positive (titer 1:320).",
+      "opening_pressure": "24 cmH2O (mildly elevated)",
+      "protein": "78.3 mg/dL",
+      "special_tests": {
+        "Anti-NMDA receptor antibodies": "Positive (titer 1:320)",
+        "Bacterial culture": "No growth at 48 hours",
+        "Cytology": "Reactive lymphocytes, no malignant cells",
+        "Enterovirus PCR": "Negative",
+        "Gram stain": "No organisms seen",
+        "HSV-1 PCR": "Negative",
+        "HSV-2 PCR": "Negative",
+        "IgG index": "0.85 (elevated, normal <0.70)",
+        "NMDAR_antibodies": "Positive (titer 1:320)",
+        "Oligoclonal bands": "Positive (6 bands, not present in serum)",
+        "VZV PCR": "Negative"
+      }
+    },
+    "drug_interactions": null,
+    "ecg": {
       "axis": "Normal axis (65 degrees)",
+      "clinical_correlation": "",
       "findings": [
         "Sinus tachycardia",
         "No ST-T wave changes",
         "No acute ischemic changes"
       ],
       "interpretation": "Sinus tachycardia at 112 bpm. No acute ischemic changes. QTc at upper limit of normal.",
-      "clinical_correlation": ""
+      "intervals": {
+        "PR": "160 ms",
+        "QRS": "88 ms",
+        "QTc": "440 ms"
+      },
+      "rate": 112,
+      "rhythm": "Sinus tachycardia"
+    },
+    "eeg": {
+      "activating_procedures": {
+        "hyperventilation": "Not performed due to patient's inability to cooperate",
+        "photic_stimulation": "No photic driving response; no photoparoxysmal response"
+      },
+      "artifacts": [
+        {
+          "description": "Intermittent movement artifact related to orofacial dyskinesias and upper extremity choreoathetoid movements",
+          "type": "Movement artifact"
+        }
+      ],
+      "background": {
+        "asymmetry": "No consistent hemispheric asymmetry",
+        "continuity": "Continuous but with intermittent attenuation",
+        "overall_organization": "Severely disorganized",
+        "posterior_dominant_rhythm": "Absent; no identifiable alpha rhythm"
+      },
+      "classification": "abnormal",
+      "eeg_type": "routine",
+      "findings": [
+        {
+          "clinical_correlation": "",
+          "frequency": "1-2 Hz delta activity with superimposed 20-30 Hz beta",
+          "location": "Generalized, maximal over frontocentral regions",
+          "morphology": "Rhythmic delta waves with overriding fast activity resembling a brush pattern",
+          "state": "Present in both wakefulness and drowsiness",
+          "type": "Extreme delta brush"
+        },
+        {
+          "clinical_correlation": "",
+          "frequency": "Two subclinical electrographic seizures captured during 30-minute recording",
+          "location": "Left temporal onset with secondary generalization",
+          "morphology": "Rhythmic theta evolving to repetitive sharp waves",
+          "state": "Occurred during apparent behavioral arrest",
+          "type": "Electrographic seizures"
+        },
+        {
+          "clinical_correlation": "",
+          "frequency": "1.5-2.5 Hz",
+          "location": "Bifrontal predominance",
+          "morphology": "Semi-rhythmic, high amplitude (100-200 microvolts)",
+          "state": "Continuous during wakefulness",
+          "type": "Generalized rhythmic delta activity"
+        }
+      ],
+      "impression": "Severely abnormal EEG showing extreme delta brush pattern, generalized rhythmic delta activity, and two electrographic seizures of left temporal origin. The overall pattern indicates diffuse cortical dysfunction with epileptogenic activity",
+      "limitations": "Recording limited to 30 minutes; continuous EEG monitoring recommended to assess full seizure burden",
+      "recommended_actions": []
     },
     "labs": {
-      "panels": {
-        "CBC": [
-          {
-            "test": "WBC",
-            "value": 11.2,
-            "unit": "x10^9/L",
-            "reference_range": "4.0-11.0",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "Hemoglobin",
-            "value": 14.2,
-            "unit": "g/dL",
-            "reference_range": "12.0-16.0",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Hematocrit",
-            "value": 35.4,
-            "unit": "%",
-            "reference_range": "36.0-46.0",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "Platelets",
-            "value": 257,
-            "unit": "x10^9/L",
-            "reference_range": "150-400",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Lymphocytes",
-            "value": 3.9,
-            "unit": "x10^9/L",
-            "reference_range": "1.0-4.0",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Neutrophils",
-            "value": 6.0,
-            "unit": "x10^9/L",
-            "reference_range": "2.0-7.5",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ],
-        "BMP": [
-          {
-            "test": "Sodium",
-            "value": 133,
-            "unit": "mEq/L",
-            "reference_range": "136-145",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "Potassium",
-            "value": 4.4,
-            "unit": "mEq/L",
-            "reference_range": "3.5-5.0",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Chloride",
-            "value": 97,
-            "unit": "mEq/L",
-            "reference_range": "98-106",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "Bicarbonate",
-            "value": 25,
-            "unit": "mEq/L",
-            "reference_range": "22-29",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "BUN",
-            "value": 10,
-            "unit": "mg/dL",
-            "reference_range": "7-20",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Creatinine",
-            "value": 0.6,
-            "unit": "mg/dL",
-            "reference_range": "0.6-1.2",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Glucose",
-            "value": 106,
-            "unit": "mg/dL",
-            "reference_range": "70-100",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "Calcium",
-            "value": 10.0,
-            "unit": "mg/dL",
-            "reference_range": "8.5-10.5",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ],
-        "Inflammatory markers": [
-          {
-            "test": "CRP",
-            "value": 1.7,
-            "unit": "mg/dL",
-            "reference_range": "0.0-0.5",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "ESR",
-            "value": 28,
-            "unit": "mm/hr",
-            "reference_range": "0-20",
-            "is_abnormal": true,
-            "clinical_significance": null
-          }
-        ],
-        "Thyroid function": [
-          {
-            "test": "TSH",
-            "value": 2.3,
-            "unit": "mIU/L",
-            "reference_range": "0.4-4.0",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Free T4",
-            "value": 1.2,
-            "unit": "ng/dL",
-            "reference_range": "0.8-1.8",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ],
-        "Hepatic panel": [
-          {
-            "test": "AST",
-            "value": 23,
-            "unit": "U/L",
-            "reference_range": "10-40",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "ALT",
-            "value": 18,
-            "unit": "U/L",
-            "reference_range": "7-56",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Alkaline phosphatase",
-            "value": 63,
-            "unit": "U/L",
-            "reference_range": "44-147",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ],
-        "Other": [
-          {
-            "test": "CK",
-            "value": 179,
-            "unit": "U/L",
-            "reference_range": "30-135",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "Urine drug screen",
-            "value": "Negative",
-            "unit": "",
-            "reference_range": "Negative",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Blood alcohol level",
-            "value": "Undetectable",
-            "unit": "",
-            "reference_range": "0",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ],
-        "Exclusion studies": [
-          {
-            "test": "HIV",
-            "value": "Non-reactive",
-            "unit": "",
-            "reference_range": "",
-            "is_abnormal": false,
-            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on"
-          },
-          {
-            "test": "paraneoplastic_panel",
-            "value": "No abnormality identified",
-            "unit": "",
-            "reference_range": "",
-            "is_abnormal": false,
-            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on"
-          }
-        ],
-        "Anti-Neuronal_Autoantibody_Panel": [
-          {
-            "test": "Serum anti-NMDA receptor IgG",
-            "value": "Positive (titer 1:160)",
-            "unit": "",
-            "reference_range": "Negative",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "CSF anti-NMDA receptor IgG",
-            "value": "Positive (titer 1:320)",
-            "unit": "",
-            "reference_range": "Negative",
-            "is_abnormal": true,
-            "clinical_significance": null
-          }
-        ],
-        "Autoimmune Encephalitis Panel": [
-          {
-            "test": "Anti-NMDA receptor Ab (CSF)",
-            "value": "Positive (1:320)",
-            "unit": "",
-            "reference_range": "Negative",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "Anti-LGI1 Ab (serum)",
-            "value": "Negative",
-            "unit": "",
-            "reference_range": "Negative",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Anti-CASPR2 Ab (serum)",
-            "value": "Negative",
-            "unit": "",
-            "reference_range": "Negative",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Anti-GABA-B Ab (serum)",
-            "value": "Negative",
-            "unit": "",
-            "reference_range": "Negative",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Anti-AMPA Ab (serum)",
-            "value": "Negative",
-            "unit": "",
-            "reference_range": "Negative",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Anti-DPPX Ab (serum)",
-            "value": "Negative",
-            "unit": "",
-            "reference_range": "Negative",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Anti-TPO Ab",
-            "value": "12 IU/mL",
-            "unit": "IU/mL",
-            "reference_range": "<35",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "ANA",
-            "value": "Negative",
-            "unit": "",
-            "reference_range": "Negative",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ],
-        "Coagulation": [
-          {
-            "test": "PT/INR",
-            "value": "Within reference range",
-            "unit": "",
-            "reference_range": "laboratory reference",
-            "is_abnormal": false
-          },
-          {
-            "test": "aPTT",
-            "value": "Within reference range",
-            "unit": "",
-            "reference_range": "laboratory reference",
-            "is_abnormal": false
-          }
-        ],
-        "Thyroid autoantibodies": [
-          {
-            "test": "Anti-TPO Ab",
-            "value": "12 IU/mL",
-            "unit": "IU/mL",
-            "reference_range": "<35",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "anti-thyroglobulin",
-            "value": "Negative",
-            "unit": "",
-            "reference_range": "negative",
-            "is_abnormal": false
-          }
-        ],
-        "Reviewed inflammatory markers": [
-          {
-            "test": "ESR",
-            "value": 28,
-            "unit": "mm/hr",
-            "reference_range": "0-20",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "CRP",
-            "value": 1.7,
-            "unit": "mg/dL",
-            "reference_range": "0.0-0.5",
-            "is_abnormal": true,
-            "clinical_significance": null
-          }
-        ],
-        "Serum anti-GluN1 cell-based assay": [
-          {
-            "test": "Serum anti-NMDA receptor IgG",
-            "value": "Positive (titer 1:160)",
-            "unit": "",
-            "reference_range": "Negative",
-            "is_abnormal": true,
-            "clinical_significance": null
-          }
-        ]
-      },
-      "interpretation": "Abnormal values: WBC 11.2 x10^9/L (H), Hematocrit 35.4 % (L), Sodium 133 mEq/L (L), Chloride 97 mEq/L (L), Glucose 106 mg/dL (H), CRP 1.7 mg/dL (H), ESR 28 mm/hr (H), CK 179 U/L (H).",
       "abnormal_values_summary": [
         "WBC: 11.2 x10^9/L (H)",
         "Hematocrit: 35.4 % (L)",
@@ -555,418 +566,508 @@
         "CRP: 1.7 mg/dL (H)",
         "ESR: 28 mm/hr (H)",
         "CK: 179 U/L (H)"
-      ]
-    },
-    "csf": {
-      "appearance": "Clear, colorless",
-      "opening_pressure": "24 cmH2O (mildly elevated)",
-      "cell_count": {
-        "WBC": "59 cells/uL (elevated)",
-        "RBC": "1 cell/uL",
-        "Lymphocytes": "95%",
-        "Neutrophils": "3%",
-        "Monocytes": "2%"
-      },
-      "protein": "78.3 mg/dL",
-      "glucose": "62.0 mg/dL",
-      "glucose_ratio": "0.59 (serum glucose 98 mg/dL)",
-      "special_tests": {
-        "Oligoclonal bands": "Positive (6 bands, not present in serum)",
-        "IgG index": "0.85 (elevated, normal <0.70)",
-        "HSV-1 PCR": "Negative",
-        "HSV-2 PCR": "Negative",
-        "VZV PCR": "Negative",
-        "Enterovirus PCR": "Negative",
-        "Bacterial culture": "No growth at 48 hours",
-        "Gram stain": "No organisms seen",
-        "Cytology": "Reactive lymphocytes, no malignant cells",
-        "Anti-NMDA receptor antibodies": "Positive (titer 1:320)",
-        "NMDAR_antibodies": "Positive (titer 1:320)"
-      },
-      "interpretation": "Opening pressure: 24 cmH2O. WBC: 59 cells/uL (elevated) (3% PMN/95% lymph). Protein: 78.3 mg/dL. Glucose: 62.0 mg/dL (ratio 0.59 (serum glucose 98 mg/dL)). Oligoclonal bands: Positive (6 bands, not present in serum). IgG index: 0.85 (elevated, normal <0.70). HSV-1 PCR: Negative. HSV-2 PCR: Negative. VZV PCR: Negative. Enterovirus PCR: Negative. Bacterial culture: No growth at 48 hours. Gram stain: No organisms seen. Cytology: Reactive lymphocytes, no malignant cells. Anti-NMDA receptor antibodies: Positive (titer 1:320)."
-    },
-    "literature_search": null,
-    "drug_interactions": null,
-    "microbiology": null,
-    "body_imaging": {
-      "region": "pelvis_abdomen",
-      "modality": "ultrasound",
-      "contrast": false,
-      "findings": [
-        {
-          "structure": "Right ovary",
-          "finding": "3.2 x 2.1 x 2.5 cm, contains a 1.8 cm complex mass with mixed solid and cystic components, including echogenic foci suggesting calcification or fat (dermoid/teratoma). Doppler shows mild internal vascularity.",
-          "abnormal": "true"
-        },
-        {
-          "structure": "Left ovary",
-          "finding": "Normal, 2.8 x 1.9 x 2.0 cm, follicular pattern appropriate for age",
-          "abnormal": "false"
-        },
-        {
-          "structure": "Uterus",
-          "finding": "Normal size and echotexture, endometrial stripe 6 mm",
-          "abnormal": "false"
-        },
-        {
-          "structure": "Free fluid",
-          "finding": "Trace physiologic free fluid in cul-de-sac",
-          "abnormal": "false"
-        }
       ],
-      "measurements": null,
-      "impression": "Abnormal values: Right ovary 3.2 x 2.1 x 2.5 cm, contains a 1.8 cm complex mass with mixed solid and cystic components, including echogenic foci suggesting calcification or fat (dermoid/teratoma). Doppler shows mild internal vascularity. (H).",
-      "recommended_actions": []
-    },
-    "advanced_imaging": null
-  },
-  "followup_outputs": [
-    {
-      "trigger_action": "request_search_medical_literature",
-      "tool_name": "search_medical_literature",
-      "output": {
-        "query": "Search the medical literature for the Graus 2016 autoimmune-encephalitis diagnostic criteria, first-line immunotherapy (corticosteroids + IVIG or plasma exchange), and second-line therapy (rituximab, ",
-        "results": [
+      "interpretation": "Abnormal values: WBC 11.2 x10^9/L (H), Hematocrit 35.4 % (L), Sodium 133 mEq/L (L), Chloride 97 mEq/L (L), Glucose 106 mg/dL (H), CRP 1.7 mg/dL (H), ESR 28 mm/hr (H), CK 179 U/L (H).",
+      "panels": {
+        "Anti-Neuronal_Autoantibody_Panel": [
           {
-            "source": "guideline / primary literature",
-            "finding": "Confirms diagnostic criteria, treatment sequence, and emerging evidence (e.g., post-HSV NMDAR-E, checkpoint-inhibitor-associated AE) relevant to this case.",
-            "evidence_level": "see the case's cited guideline"
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "Negative",
+            "test": "Serum anti-NMDA receptor IgG",
+            "unit": "",
+            "value": "Positive (titer 1:160)"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "Negative",
+            "test": "CSF anti-NMDA receptor IgG",
+            "unit": "",
+            "value": "Positive (titer 1:320)"
           }
         ],
-        "summary": "Confirms diagnostic criteria, treatment sequence, and emerging evidence (e.g., post-HSV NMDAR-E, checkpoint-inhibitor-associated AE) relevant to this case."
-      }
-    },
-    {
-      "trigger_action": "request_check_drug_interactions",
-      "tool_name": "check_drug_interactions",
-      "output": {
-        "proposed": "Check drug interactions and safety profile for first- and second-line immunotherapy (high-dose corticosteroids, IVIG, rituximab) and for antipsychotic choices used to manage acute agitation.",
-        "interactions": [],
-        "contraindications": [],
-        "warnings": [
-          "No prohibitive interactions for steroid+IVIG; rituximab requires hepatitis B/C and TB screening; flags haloperidol and other dopamine-2 blockers as relatively contraindicated due to risk of worsening extrapyramidal symptoms."
+        "Autoimmune Encephalitis Panel": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "Negative",
+            "test": "Anti-NMDA receptor Ab (CSF)",
+            "unit": "",
+            "value": "Positive (1:320)"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Negative",
+            "test": "Anti-LGI1 Ab (serum)",
+            "unit": "",
+            "value": "Negative"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Negative",
+            "test": "Anti-CASPR2 Ab (serum)",
+            "unit": "",
+            "value": "Negative"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Negative",
+            "test": "Anti-GABA-B Ab (serum)",
+            "unit": "",
+            "value": "Negative"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Negative",
+            "test": "Anti-AMPA Ab (serum)",
+            "unit": "",
+            "value": "Negative"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Negative",
+            "test": "Anti-DPPX Ab (serum)",
+            "unit": "",
+            "value": "Negative"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "<35",
+            "test": "Anti-TPO Ab",
+            "unit": "IU/mL",
+            "value": "12 IU/mL"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Negative",
+            "test": "ANA",
+            "unit": "",
+            "value": "Negative"
+          }
         ],
-        "formulary_status": "on formulary",
-        "alternatives": [],
-        "summary": "No prohibitive interactions for steroid+IVIG; rituximab requires hepatitis B/C and TB screening; flags haloperidol and other dopamine-2 blockers as relatively contraindicated due to risk of worsening extrapyramidal symptoms."
+        "BMP": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "136-145",
+            "test": "Sodium",
+            "unit": "mEq/L",
+            "value": 133
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.5-5.0",
+            "test": "Potassium",
+            "unit": "mEq/L",
+            "value": 4.4
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "98-106",
+            "test": "Chloride",
+            "unit": "mEq/L",
+            "value": 97
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "22-29",
+            "test": "Bicarbonate",
+            "unit": "mEq/L",
+            "value": 25
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "7-20",
+            "test": "BUN",
+            "unit": "mg/dL",
+            "value": 10
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.6-1.2",
+            "test": "Creatinine",
+            "unit": "mg/dL",
+            "value": 0.6
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "70-100",
+            "test": "Glucose",
+            "unit": "mg/dL",
+            "value": 106
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "8.5-10.5",
+            "test": "Calcium",
+            "unit": "mg/dL",
+            "value": 10.0
+          }
+        ],
+        "CBC": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "4.0-11.0",
+            "test": "WBC",
+            "unit": "x10^9/L",
+            "value": 11.2
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "12.0-16.0",
+            "test": "Hemoglobin",
+            "unit": "g/dL",
+            "value": 14.2
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "36.0-46.0",
+            "test": "Hematocrit",
+            "unit": "%",
+            "value": 35.4
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "150-400",
+            "test": "Platelets",
+            "unit": "x10^9/L",
+            "value": 257
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "1.0-4.0",
+            "test": "Lymphocytes",
+            "unit": "x10^9/L",
+            "value": 3.9
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "2.0-7.5",
+            "test": "Neutrophils",
+            "unit": "x10^9/L",
+            "value": 6.0
+          }
+        ],
+        "Coagulation": [
+          {
+            "is_abnormal": false,
+            "reference_range": "laboratory reference",
+            "test": "PT/INR",
+            "unit": "",
+            "value": "Within reference range"
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "laboratory reference",
+            "test": "aPTT",
+            "unit": "",
+            "value": "Within reference range"
+          }
+        ],
+        "Exclusion studies": [
+          {
+            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on",
+            "is_abnormal": false,
+            "reference_range": "",
+            "test": "HIV",
+            "unit": "",
+            "value": "Non-reactive"
+          },
+          {
+            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on",
+            "is_abnormal": false,
+            "reference_range": "",
+            "test": "paraneoplastic_panel",
+            "unit": "",
+            "value": "No abnormality identified"
+          }
+        ],
+        "Hepatic panel": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "10-40",
+            "test": "AST",
+            "unit": "U/L",
+            "value": 23
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "7-56",
+            "test": "ALT",
+            "unit": "U/L",
+            "value": 18
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "44-147",
+            "test": "Alkaline phosphatase",
+            "unit": "U/L",
+            "value": 63
+          }
+        ],
+        "Inflammatory markers": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "0.0-0.5",
+            "test": "CRP",
+            "unit": "mg/dL",
+            "value": 1.7
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "0-20",
+            "test": "ESR",
+            "unit": "mm/hr",
+            "value": 28
+          }
+        ],
+        "Other": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "30-135",
+            "test": "CK",
+            "unit": "U/L",
+            "value": 179
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Negative",
+            "test": "Urine drug screen",
+            "unit": "",
+            "value": "Negative"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0",
+            "test": "Blood alcohol level",
+            "unit": "",
+            "value": "Undetectable"
+          }
+        ],
+        "Reviewed inflammatory markers": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "0-20",
+            "test": "ESR",
+            "unit": "mm/hr",
+            "value": 28
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "0.0-0.5",
+            "test": "CRP",
+            "unit": "mg/dL",
+            "value": 1.7
+          }
+        ],
+        "Serum anti-GluN1 cell-based assay": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "Negative",
+            "test": "Serum anti-NMDA receptor IgG",
+            "unit": "",
+            "value": "Positive (titer 1:160)"
+          }
+        ],
+        "Thyroid autoantibodies": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "<35",
+            "test": "Anti-TPO Ab",
+            "unit": "IU/mL",
+            "value": "12 IU/mL"
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "negative",
+            "test": "anti-thyroglobulin",
+            "unit": "",
+            "value": "Negative"
+          }
+        ],
+        "Thyroid function": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.4-4.0",
+            "test": "TSH",
+            "unit": "mIU/L",
+            "value": 2.3
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.8-1.8",
+            "test": "Free T4",
+            "unit": "ng/dL",
+            "value": 1.2
+          }
+        ]
       }
-    }
-  ],
-  "fallback_tool_outputs": {
-    "eeg": null,
-    "mri": null,
-    "ecg": null,
-    "labs": null,
-    "csf": null,
-    "ct": null,
-    "echo": {
-      "chambers": {
-        "LV": "normal size and systolic function",
-        "RV": "normal size and function",
-        "LA": "normal size",
-        "RA": "normal size"
-      },
-      "valves": {
-        "mitral": "structurally normal",
-        "aortic": "structurally normal",
-        "tricuspid": "normal",
-        "pulmonic": "normal"
-      },
-      "ejection_fraction": 66.0,
-      "wall_motion": "no regional wall-motion abnormality",
-      "findings": [
-        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
-      ],
-      "impression": "Normal transthoracic echocardiogram.",
-      "recommended_actions": []
-    },
-    "cardiac_monitoring": {
-      "duration_hours": 24,
-      "monitor_type": "holter_24h",
-      "rhythm_summary": "Sinus rhythm throughout the recording",
-      "heart_rate_range": {
-        "min": 53,
-        "max": 130,
-        "average": 69
-      },
-      "events": [],
-      "findings": [
-        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
-      ],
-      "impression": "Normal 24-hour Holter monitor.",
-      "recommended_actions": []
-    },
-    "advanced_imaging": {
-      "modality": "FDG-PET",
-      "tracer_or_protocol": null,
-      "findings": [],
-      "quantitative_data": null,
-      "impression": "No abnormality identified.",
-      "recommended_actions": []
-    },
-    "specialized_test": {
-      "test_type": "neuropsychological_testing",
-      "findings": [],
-      "quantitative_data": null,
-      "impression": "Study within normal limits.",
-      "recommended_actions": []
     },
     "literature_search": null,
-    "drug_interactions": null
-  },
-  "ground_truth": {
-    "primary_diagnosis": "Anti-NMDA receptor encephalitis",
-    "icd_code": "G04.81",
-    "differential": [
-      {
-        "diagnosis": "Herpes simplex virus (HSV-1) encephalitis",
-        "likelihood": "high",
-        "key_features": "Acute febrile encephalopathy with temporal-lobe focus; mandatory empiric acyclovir until CSF HSV-1/2 PCR returns negative.",
-        "icd_code": "B00.4"
-      },
-      {
-        "diagnosis": "Other autoimmune (paraneoplastic) encephalitis (anti-LGI1, CASPR2, GABA-B, or AMPAR)",
-        "likelihood": "moderate",
-        "key_features": "Limbic encephalitis phenotype with similar imaging; distinguished by surface-antigen antibody panel and demographic skew (LGI1/CASPR2 older men, GABA-B with SCLC, AMPAR with thymoma).",
-        "icd_code": "G04.81"
-      },
-      {
-        "diagnosis": "Primary psychiatric disorder (first-episode psychosis / catatonia)",
-        "likelihood": "low",
-        "key_features": "Subacute course, seizures, dyskinesias, autonomic instability, abnormal EEG, or CSF pleocytosis argue strongly against a primary psychiatric etiology.",
-        "icd_code": "F23"
-      },
-      {
-        "diagnosis": "Drug-induced psychosis or NMS/serotonin syndrome",
-        "likelihood": "low",
-        "key_features": "Requires recent ingestion of NMDA antagonist (ketamine/PCP), neuroleptic exposure (NMS: lead-pipe rigidity, CK >1000), or serotonergic drug; toxicology and medication review usually clarifying.",
-        "icd_code": "F19.159"
-      }
-    ],
-    "optimal_actions": [
-      {
-        "action": "Obtain contrast-enhanced brain MRI to exclude HSV encephalitis, structural lesions and overlapping demyelination; a normal MRI does not exclude anti-NMDAR encephalitis",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Often normal or nonspecific; temporal/cortical signal or overlapping inflammatory lesions may support the differential but do not confirm anti-NMDAR encephalitis",
-        "category": "required",
-        "tool_parameters": {
-          "protocol": "standard",
-          "contrast": true
+    "microbiology": null,
+    "mri": {
+      "additional_observations": [
+        "No midline shift",
+        "Ventricles normal in size and configuration",
+        "No hydrocephalus",
+        "No extra-axial collections",
+        "No acute hemorrhage",
+        "Normal vascular flow voids"
+      ],
+      "findings": [
+        {
+          "borders": "Ill-defined",
+          "location": "Bilateral medial temporal lobes, more prominent on the left",
+          "mass_effect": "None",
+          "signal_characteristics": {
+            "DWI": "No restricted diffusion",
+            "FLAIR": "Hyperintense",
+            "T1": "Isointense to hypointense",
+            "T2": "Hyperintense",
+            "post_contrast": "No pathological enhancement"
+          },
+          "size": "Left: 2.1 x 1.4 cm, Right: 1.3 x 0.9 cm",
+          "type": "FLAIR hyperintensity"
         },
-        "citation": "[Graus_2016]",
-        "guideline_source": "Graus 2016; Titulaer 2013",
-        "step": 1
-      },
-      {
-        "action": "Analyze CSF for cells, protein and glucose, OCB/IgG index, HSV PCR and a cell-based IgG anti-GluN1 assay interpreted in parallel with serum",
-        "tool_name": "analyze_csf",
-        "expected_finding": "Variable lymphocytic inflammation; HSV PCR addresses the infectious mimic; CSF anti-GluN1 is the decisive antibody compartment and may differ from serum",
-        "category": "required",
-        "tool_parameters": {
-          "basic": [
-            "cell_count",
-            "protein",
-            "glucose"
-          ],
-          "special_tests": [
-            "oligoclonal_bands",
-            "IgG_index",
-            "HSV_PCR",
-            "NMDAR_antibodies"
-          ]
-        },
-        "citation": "[Graus_2016]",
-        "guideline_source": "Graus 2016; Titulaer 2013",
-        "step": 2
-      },
-      {
-        "action": "Obtain EEG for encephalopathic and epileptiform abnormalities, explicitly assessing for extreme delta brush",
-        "tool_name": "analyze_eeg",
-        "expected_finding": "Diffuse slowing, seizures or extreme delta brush; absence of the latter does not exclude the diagnosis",
-        "category": "required",
-        "tool_parameters": {
-          "eeg_type": "routine"
-        },
-        "citation": "[Graus_2016]",
-        "guideline_source": "Graus 2016; Titulaer 2013",
-        "step": 3
-      },
-      {
-        "action": "Obtain the reviewed serum work-up, including a cell-based IgG anti-GluN1 assay that must be interpreted with CSF rather than alone",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Systemic, thyroid/inflammatory and alternative autoimmune/paraneoplastic results; paired serum anti-GluN1 can be false positive or false negative in isolation",
-        "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "CMP",
-            "coagulation",
-            "thyroid",
-            "anti_TPO",
-            "anti_thyroglobulin",
-            "ESR",
-            "CRP",
-            "autoimmune_encephalitis_panel",
-            "paraneoplastic_panel",
-            "NMDAR_IgG_cell_based"
-          ]
-        },
-        "citation": "[Graus_2016]",
-        "guideline_source": "Graus 2016; Titulaer 2013",
-        "step": 4
-      },
-      {
-        "action": "Perform required pelvic and abdominal ultrasound screening for an ovarian teratoma once anti-NMDAR encephalitis is recognised",
-        "tool_name": "order_body_imaging",
-        "expected_finding": "Identify or exclude an ovarian/testicular germ-cell tumour or another context-appropriate occult neoplasm whose treatment changes outcome and relapse risk",
-        "category": "required",
-        "tool_parameters": {
-          "study": "pelvis_abdomen_ultrasound",
-          "contrast": false
-        },
-        "citation": "[Graus_2016]",
-        "guideline_source": "Graus 2016; Titulaer 2013",
-        "step": 5
-      },
-      {
-        "step": 6,
-        "action": "Search the medical literature for the Graus 2016 autoimmune-encephalitis diagnostic criteria, first-line immunotherapy (corticosteroids + IVIG or plasma exchange), and second-line therapy (rituximab, cyclophosphamide).",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Confirms diagnostic criteria, treatment sequence, and emerging evidence (e.g., post-HSV NMDAR-E, checkpoint-inhibitor-associated AE) relevant to this case.",
-        "category": "recommended",
-        "tool_parameters": {
-          "query": "anti-NMDA receptor encephalitis diagnosis treatment Graus 2016"
-        },
-        "citation": "[Graus_2016]",
-        "guideline_source": "Graus_2016"
-      },
-      {
-        "step": 7,
-        "action": "Check drug interactions and safety profile for first- and second-line immunotherapy (high-dose corticosteroids, IVIG, rituximab) and for antipsychotic choices used to manage acute agitation.",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "No prohibitive interactions for steroid+IVIG; rituximab requires hepatitis B/C and TB screening; flags haloperidol and other dopamine-2 blockers as relatively contraindicated due to risk of worsening extrapyramidal symptoms.",
-        "category": "recommended",
-        "tool_parameters": {
-          "drug": "methylprednisolone",
-          "screen_for": [
-            "IVIG",
-            "rituximab",
-            "haloperidol",
-            "olanzapine"
-          ]
-        },
-        "citation": "[Lancaster_2016]",
-        "guideline_source": "Lancaster_2016"
-      }
-    ],
-    "useless_tools": [
-      {
-        "tool_name": "order_echocardiogram",
-        "tool_parameters": {},
-        "rationale": "Transthoracic echo is not indicated for anti-NMDAR encephalitis; it adds cost without informing diagnosis or management unless a discrete cardiac concern (e.g., new murmur, embolic stroke) coexists.",
-        "citation": "[Graus_2016]"
-      },
-      {
-        "tool_name": "order_specialized_test",
-        "tool_parameters": {
-          "test_type": "emg_ncs"
-        },
-        "rationale": "EMG/NCS plays no role in the diagnostic workup of anti-NMDAR encephalitis; it neither confirms the antibody-mediated CNS process nor distinguishes among the differential diagnoses.",
-        "citation": "[Graus_2016]"
-      },
-      {
-        "tool_name": "order_advanced_imaging",
-        "tool_parameters": {
-          "modality": "amyloid_PET"
-        },
-        "rationale": "Amyloid PET targets Alzheimer pathology and contributes no information to the diagnosis or treatment of autoimmune encephalitis in a young patient with subacute neuropsychiatric symptoms.",
-        "citation": "[Dalmau_2018]"
-      },
-      {
-        "tool_name": "order_advanced_imaging",
-        "tool_parameters": {
-          "modality": "DaTscan"
-        },
-        "rationale": "DaTscan evaluates nigrostriatal dopaminergic function and has no role in autoimmune encephalitis; the orofacial dyskinesias of anti-NMDAR encephalitis are antibody-mediated, not presynaptic dopaminergic.",
-        "citation": "[Dalmau_2018]"
-      }
-    ],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "critical_actions": [
-      "Send paired CSF and serum for anti-NMDAR (GluN1) IgG; CSF is the gold-standard sample and must not be omitted in favor of serum-only testing.",
-      "Start empiric IV acyclovir 10 mg/kg every 8 hours until CSF HSV-1/2 PCR returns negative; HSV encephalitis is the can't-miss differential.",
-      "Initiate first-line immunotherapy promptly once clinical probability is high — IV methylprednisolone 1 g daily for 5 days combined with IVIG 0.4 g/kg/day for 5 days or therapeutic plasma exchange; do not wait for antibody results.",
-      "Screen for ovarian teratoma with pelvic imaging (transvaginal ultrasound and/or contrast-enhanced CT of chest/abdomen/pelvis); proceed to gynecologic-oncology resection if a teratoma is identified.",
-      "Control seizures aggressively with levetiracetam or valproate; obtain continuous EEG monitoring to detect non-convulsive status epilepticus.",
-      "Plan escalation to second-line therapy (rituximab 375 mg/m² weekly ×4 and/or cyclophosphamide) if there is no meaningful response to first-line immunotherapy by day 10–14.",
-      "Consult neurology (primary), psychiatry (behavioral management), and gynecology/gynecologic oncology if pelvic imaging identifies a teratoma; engage critical care if dysautonomia or central hypoventilation develops."
-    ],
-    "contraindicated_actions": [
-      "Do not give haloperidol or other high-potency D2 antagonists; they worsen the movement disorder and can mimic neuroleptic malignant syndrome in anti-NMDAR encephalitis.",
-      "Do not delay immunotherapy while waiting for the anti-NMDAR antibody result when clinical probability is high — antibody turnaround can take 1–2 weeks and delay worsens outcome.",
-      "Do not anchor on a primary psychiatric diagnosis without first excluding autoimmune encephalitis in a young patient with subacute neuropsychiatric symptoms plus any of seizures, dyskinesias, dysautonomia, or CSF pleocytosis.",
-      "Do not perform lumbar puncture without prior imaging in a patient with altered consciousness, focal signs, or new seizures — exclude mass effect first.",
-      "Do not interpret a negative serum anti-NMDAR antibody as ruling out the disease; the CSF assay is the gold standard and may be positive when serum is negative."
-    ],
-    "key_reasoning_points": [
-      "The recognizable phenotype is a subacute (<3 months) progression in a young adult — viral prodrome → psychiatric/behavioral changes → seizures, orofacial dyskinesias, and autonomic instability or decreased consciousness — fulfilling Graus 2016 criteria for probable/definite anti-NMDAR encephalitis.",
-      "CSF anti-NMDAR (GluN1) IgG is the gold-standard test (100% sensitive); serum alone is less reliable, and a negative serum result does not exclude the diagnosis. Paired CSF/serum sampling with confirmation on tissue-based assay is the standard.",
-      "Extreme delta brush on EEG is highly specific (30–50% sensitivity) for anti-NMDAR encephalitis; combined with the clinical syndrome it strongly supports the diagnosis even before antibody results return.",
-      "Treatment is time-sensitive: clinical probability should drive empiric immunotherapy (high-dose IV methylprednisolone + IVIG or plasma exchange) rather than waiting for antibody confirmation; earlier treatment correlates with better functional outcome (Titulaer 2013).",
-      "Tumor screen is part of the workup, not optional: ~50% of young women have an ovarian teratoma, and tumor removal is itself a core therapeutic step. CT chest/abdomen/pelvis or transvaginal ultrasound is mandatory in women of reproductive age."
-    ],
-    "red_herrings": [
-      {
-        "data_point": "Viral prodrome (URI, fever, cough) preceding the neuropsychiatric syndrome.",
-        "location": "history_present_illness",
-        "field_path": "patient.history_present_illness",
-        "intended_effect": "Suggests a primary viral encephalitis (HSV) or post-viral psychosis; tempts the agent to commit to empiric antiviral therapy without pursuing autoimmune workup.",
-        "correct_interpretation": "Viral prodromes precede ~70% of anti-NMDAR encephalitis cases; negative HSV PCR and the multi-stage progression should redirect the workup to anti-NMDAR antibody testing."
-      },
-      {
-        "data_point": "Acute psychiatric presentation (paranoia, hallucinations, bizarre behavior) in a previously well young adult.",
-        "location": "history_present_illness",
-        "field_path": "patient.history_present_illness",
-        "intended_effect": "Anchors the agent on a primary psychiatric diagnosis (first-episode psychosis, brief psychotic disorder) and delays neurologic workup.",
-        "correct_interpretation": "Concurrent or subsequent seizures, dyskinesias, dysautonomia, abnormal EEG, or CSF pleocytosis are red flags that mandate exclusion of anti-NMDAR encephalitis before accepting a psychiatric diagnosis."
-      },
-      {
-        "data_point": "Mild hyponatremia (sodium 133 mEq/L).",
-        "location": "labs.BMP",
-        "field_path": "initial_tool_outputs.labs.panels.BMP[0]",
-        "intended_effect": "Tempts the agent toward a primary metabolic-encephalopathy framing (SIADH from another cause, dehydration, polydipsia) instead of recognizing SIADH as a known complication of NMDAR-E.",
-        "correct_interpretation": "Mild hyponatremia is a recognized SIADH-mediated complication of anti-NMDAR encephalitis; it should be corrected slowly and does not reframe the diagnosis."
-      },
-      {
-        "data_point": "Mildly elevated CK (179 U/L).",
-        "location": "labs.Other",
-        "field_path": "initial_tool_outputs.labs.panels.Other[0]",
-        "intended_effect": "Raises concern for neuroleptic malignant syndrome or rhabdomyolysis when combined with dyskinesias and hyperthermia.",
-        "correct_interpretation": "NMS requires antipsychotic exposure and a CK typically >1000 with lead-pipe rigidity; mild CK elevation in this clinical context is non-specific muscle activity from dyskinesias and does not change management."
-      }
-    ]
+        {
+          "borders": "Ill-defined",
+          "location": "Bilateral insular cortices",
+          "mass_effect": "None",
+          "signal_characteristics": {
+            "DWI": "No restricted diffusion",
+            "FLAIR": "Subtle hyperintensity"
+          },
+          "size": null,
+          "type": "Mild cortical signal abnormality"
+        }
+      ],
+      "impression": "Bilateral medial temporal FLAIR hyperintensities without restricted diffusion, enhancement, or mass effect, left greater than right. Subtle bilateral insular cortical signal abnormality. The absence of restricted diffusion and hemorrhagic changes makes HSV encephalitis less likely but does not exclude it",
+      "recommended_actions": [],
+      "volumetrics": null
+    }
   },
   "metadata": {
-    "version": "1.0",
-    "created_date": "2026-03-13",
-    "condition_category": "autoimmune",
+    "authoring_agent": "condition-expert:NMDAR-ENC",
+    "case_body_concerns": [],
+    "citation_gap": [],
     "clinical_setting": "emergency_department_to_ICU",
-    "expected_agent_confidence": 0.8,
+    "condition_category": "autoimmune",
     "created_by": "neurobench_generator",
+    "created_date": "2026-03-13",
+    "criteria_pack_version": "1.0",
+    "difficulty_rationale": "5 required tools, 4 red herrings, subtype=S; requires CSF antibody confirmation + MRI/EEG/labs synthesis",
+    "expected_agent_confidence": 0.8,
     "fallback_tool_kinds": {
-      "echo": "normal",
-      "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
+      "cardiac_monitoring": "normal",
+      "echo": "normal",
       "specialized_test": "normal"
     },
     "last_revised": "2026-08-10",
+    "policy_spec_status": "draft",
     "revision_reason": "Independent Reviewer 2 anti-NMDAR audit: tumour screening tailored by age/sex and moved out of lab payloads; paired serum/CSF anti-GluN1 reachable; routine EEG baseline with selected continuous escalation; blanket CAP CT, FDG-PET and blood cultures removed",
-    "criteria_pack_version": "1.0",
-    "authoring_agent": "condition-expert:NMDAR-ENC",
-    "difficulty_rationale": "5 required tools, 4 red herrings, subtype=S; requires CSF antibody confirmation + MRI/EEG/labs synthesis",
-    "case_body_concerns": [],
-    "citation_gap": [],
+    "version": "policy-v1",
     "vocab_gap": []
-  }
+  },
+  "patient": {
+    "chief_complaint": "Progressive confusion, seizures, and abnormal movements over two weeks",
+    "clinical_history": {
+      "allergies": [
+        "ACE inhibitors (angioedema)"
+      ],
+      "family_history": [
+        "Mother: hypothyroidism",
+        "Father: hypertension",
+        "No family history of epilepsy, autoimmune disease, or psychiatric illness"
+      ],
+      "medications": [
+        {
+          "dose": "10 mg",
+          "drug": "Cetirizine",
+          "frequency": "daily as needed",
+          "indication": "Allergic rhinitis"
+        },
+        {
+          "dose": "30 mcg/150 mcg",
+          "drug": "Combined oral contraceptive (ethinylestradiol/levonorgestrel)",
+          "frequency": "daily",
+          "indication": "Contraception"
+        }
+      ],
+      "past_medical_history": [
+        "Seasonal allergic rhinitis",
+        "Iron deficiency anemia, resolved"
+      ],
+      "social_history": {
+        "alcohol": "Occasional social drinking, 1-2 drinks per week",
+        "living_situation": "Lives with partner in an apartment",
+        "occupation": "graduate student",
+        "recreational_drugs": "Denies any illicit drug use",
+        "tobacco": "Never smoker"
+      }
+    },
+    "demographics": {
+      "age": 24,
+      "bmi": 22.4,
+      "ethnicity": "Caucasian",
+      "handedness": "right",
+      "sex": "female"
+    },
+    "history_present_illness": "This 24-year-old right-handed woman was brought to the emergency department by her partner and mother after two weeks of progressively worsening behavioral changes, confusion, and new-onset seizures. Approximately three weeks ago, the patient developed a mild upper respiratory illness with low-grade fevers, sore throat, malaise, and rhinorrhea lasting 4-5 days, for which she did not seek medical attention. She appeared to recover, but approximately one week later her partner noticed personality changes: she became increasingly irritable, anxious, and paranoid, expressing unfounded beliefs that her classmates were plotting against her. She stopped attending her graduate classes and became withdrawn. Over the following days, she developed progressive confusion, insomnia, and difficulty finding words. Five days prior to presentation, she had her first witnessed generalized tonic-clonic seizure lasting approximately 90 seconds with post-ictal confusion lasting 30 minutes. She was taken to an outside emergency department where she was given lorazepam 2 mg IV and discharged with a referral to neurology. Over the subsequent days, her condition deteriorated rapidly. She developed repetitive lip-smacking and jaw movements that her family initially mistook for a medication side effect. She became increasingly agitated with periods of unresponsiveness alternating with combative episodes. On the day of presentation, her partner witnessed a second generalized seizure and called emergency services. In the emergency department, the patient was noted to have fluctuating levels of consciousness, prominent orofacial dyskinesias, intermittent tachycardia, and blood pressure lability. She was unable to provide a coherent history. Her partner reports no prior psychiatric history, no recent travel, no tick bites, no new medications, and no illicit drug use.",
+    "neurological_exam": {
+      "additional": "Prominent orofacial dyskinesias with stereotyped lip-smacking, tongue protrusion, and jaw movements. Intermittent choreoathetoid movements of the upper extremities bilaterally. Episodes of autonomic instability observed during examination including transient tachycardia to 130 bpm and blood pressure fluctuations. Two brief episodes of staring with behavioral arrest lasting approximately 15 seconds each observed during the encounter, concerning for subclinical seizures.",
+      "coordination": "Unable to perform finger-to-nose or heel-to-shin testing reliably due to encephalopathy and involuntary movements.",
+      "cranial_nerves": "Pupils equal and reactive, 3 mm bilaterally. Extraocular movements intact without nystagmus. Facial sensation intact to light touch. Mild bilateral facial weakness noted with decreased nasolabial fold depth. Hearing grossly intact. Palate elevates symmetrically. Tongue midline. Prominent orofacial dyskinesias with repetitive lip-smacking and jaw movements observed throughout the examination.",
+      "gait": "Unable to assess; patient is bed-bound due to altered mental status and agitation.",
+      "mental_status": "Alert but disoriented to date and place. Intermittently agitated, with periods of unresponsiveness lasting 20-30 seconds. Speech is disorganized with paraphasic errors and echolalia. Unable to follow multi-step commands. Montreal Cognitive Assessment attempted but patient unable to cooperate. Short-term memory severely impaired; unable to recall any of 3 objects at 5 minutes.",
+      "motor": "Tone increased in bilateral upper extremities with intermittent rigidity. Strength 4/5 throughout when patient cooperates, though limited by inconsistent effort due to encephalopathy. No frank hemiparesis. Intermittent dystonic posturing of the left hand observed.",
+      "reflexes": "Biceps 2+ bilaterally, brachioradialis 2+ bilaterally, patellar 3+ bilaterally, Achilles 2+ bilaterally. Plantar responses flexor bilaterally.",
+      "sensory": "Withdraws symmetrically to pain in all four extremities. Detailed sensory examination limited by encephalopathy."
+    },
+    "patient_id": "NB-NMDAR-S01",
+    "vitals": {
+      "bp_diastolic": 96,
+      "bp_systolic": 150,
+      "hr": 114,
+      "rr": 18,
+      "spo2": 99,
+      "temp": 38.4
+    }
+  },
+  "schema_version": "2.0"
 }

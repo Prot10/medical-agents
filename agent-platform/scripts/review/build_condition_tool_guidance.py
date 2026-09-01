@@ -776,8 +776,8 @@ SPEC += [
          response="Applied: required in all 30, as the large-volume tap with opening pressure."),
     dict(cond="nph", filed="order_specialized_test", tool="order_specialized_test",
          reviewer=1, tier="remove", status="applied",
-         response="Applied after a case-level re-audit: no NPH gold pathway orders a standalone "
-                  "neuropsychological battery or any other specialized test, and the 58 legacy "
+         response="Applied after a case-level re-audit: no NPH case policy requires a standalone "
+                  "neuropsychological battery or any other specialized test, and the 58 removed "
                   "specialized-test follow-ups are no longer callable in the NPH cases. The "
                   "required timed gait and brief cognitive comparison is represented by the "
                   "clinical-assessment tool instead."),
@@ -794,8 +794,8 @@ SPEC += [
                   "because it shows no objective improvement."),
     dict(cond="nph", filed="order_advanced_imaging", tool="order_advanced_imaging",
          reviewer=1, tier="remove", status="applied",
-         response="Applied: advanced imaging is absent from the NPH panel, all 30 gold pathways, "
-                  "and the callable case follow-ups (60 legacy PET, flow-MRI, DaTscan and other "
+         response="Applied: advanced imaging is absent from the NPH panel, all 30 case policies, "
+                  "and the callable case follow-ups (60 PET, flow-MRI, DaTscan and other "
                   "advanced-imaging payloads removed). The previous implementation had merely "
                   "relabelled PET as optional, which did not implement a request to remove it."),
 

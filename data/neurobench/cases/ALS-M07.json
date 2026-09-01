@@ -3,36 +3,748 @@
   "condition": "als",
   "difficulty": "moderate",
   "encounter_type": "outpatient",
-  "patient": {
-    "patient_id": "NB-ALS-M07",
-    "demographics": {
-      "age": 59,
-      "sex": "male",
-      "handedness": "right",
-      "ethnicity": "White",
-      "bmi": 27.2
+  "fallback_tool_outputs": {
+    "advanced_imaging": {
+      "findings": [],
+      "impression": "No abnormality identified.",
+      "modality": "",
+      "quantitative_data": null,
+      "recommended_actions": [],
+      "tracer_or_protocol": null
     },
-    "clinical_history": {
-      "past_medical_history": [
-        "Obstructive sleep apnea, uses CPAP nightly",
-        "Hypertension",
-        "Obesity class I",
-        "Prior L5-S1 discectomy 10 years ago"
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
       ],
-      "medications": [
-        {
-          "drug": "Amlodipine",
-          "dose": "10 mg",
-          "frequency": "once daily",
-          "indication": "Hypertension"
+      "heart_rate_range": {
+        "average": 72,
+        "max": 114,
+        "min": 55
+      },
+      "impression": "Normal 24-hour Holter monitor.",
+      "monitor_type": "holter_24h",
+      "recommended_actions": [],
+      "rhythm_summary": "Sinus rhythm throughout the recording"
+    },
+    "csf": null,
+    "ct": {
+      "additional_observations": [],
+      "angiography_findings": null,
+      "contrast_used": false,
+      "findings": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "drug_interactions": null,
+    "ecg": {
+      "axis": "normal",
+      "clinical_correlation": "",
+      "findings": [
+        "Normal sinus rhythm. Normal axis and intervals. No acute ST-T changes."
+      ],
+      "interpretation": "Normal ECG.",
+      "intervals": {
+        "PR": "188 ms",
+        "QRS": "98 ms",
+        "QTc": "413 ms"
+      },
+      "rate": 84,
+      "rhythm": "normal sinus rhythm"
+    },
+    "echo": {
+      "chambers": {
+        "LA": "normal size",
+        "LV": "normal size and systolic function",
+        "RA": "normal size",
+        "RV": "normal size and function"
+      },
+      "ejection_fraction": 62.0,
+      "findings": [
+        "Trace mitral regurgitation, physiological. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Structurally near-normal heart with a benign incidental finding.",
+      "recommended_actions": [],
+      "valves": {
+        "aortic": "structurally normal",
+        "mitral": "structurally normal",
+        "pulmonic": "normal",
+        "tricuspid": "normal"
+      },
+      "wall_motion": "no regional wall-motion abnormality"
+    },
+    "eeg": {
+      "activating_procedures": {},
+      "artifacts": [],
+      "background": {
+        "overall": "normal organisation for age",
+        "pdr": "9-10 Hz posterior dominant rhythm, symmetric and reactive",
+        "sleep_features": "normal vertex waves and sleep spindles"
+      },
+      "classification": "normal",
+      "findings": [],
+      "impression": "Normal awake and drowsy EEG. No epileptiform discharges and no focal slowing.",
+      "limitations": "",
+      "recommended_actions": []
+    },
+    "labs": null,
+    "literature_search": null,
+    "mri": null,
+    "specialized_test": null
+  },
+  "followup_outputs": [
+    {
+      "output": {
+        "query": "lead toxicity ALS motor neuron disease occupational exposure firefighter",
+        "results": [
+          {
+            "finding": "Firefighters have a modestly increased risk of motor neuron disease (OR 1.3-2.0) potentially related to heavy metal and toxic combustion product exposures; however, acute lead toxicity does not produce a motor neuronopathy",
+            "title": "Occupational metal exposure and motor neuron disease risk"
+          },
+          {
+            "finding": "Lead neuropathy: wrist drop, extensor weakness, predominantly motor, conduction slowing; motor neuron disease: combined UMN+LMN, paraspinal denervation, no conduction slowing, no sensory involvement \u2014 these are distinct entities",
+            "title": "Lead neuropathy vs motor neuron disease"
+          }
+        ],
+        "summary": "Firefighting is associated with a modestly increased risk of motor neuron disease, possibly related to heavy metal and combustion product exposures. Lead neuropathy has a distinct presentation characterized by wrist drop, predominantly motor peripheral neuropathy, conduction slowing, and radial nerve predilection \u2014 features distinct from a motor neuronopathy electrodiagnostic pattern."
+      },
+      "tool_name": "search_medical_literature",
+      "trigger_action": "search_lead_toxicity_als"
+    },
+    {
+      "output": {
+        "alternatives": [
+          "AMX0035 if alcohol cessation not achievable"
+        ],
+        "contraindications": [],
+        "formulary_status": "Covered with PA",
+        "interactions": [
+          "Amlodipine: no clinically significant interaction",
+          "Hydrochlorothiazide: no significant interaction"
+        ],
+        "proposed": "Riluzole 50 mg twice daily",
+        "warnings": [
+          "Monthly LFT monitoring",
+          "Alcohol consumption increases riluzole hepatotoxicity risk via CYP1A2 inhibition \u2014 abstinence recommended during therapy"
+        ]
+      },
+      "tool_name": "check_drug_interactions",
+      "trigger_action": "check_riluzole_interactions"
+    },
+    {
+      "output": {
+        "findings": [
+          {
+            "panel": "PFT",
+            "reference_range": ">80%",
+            "result": "82",
+            "test": "FVC"
+          },
+          {
+            "panel": "PFT",
+            "reference_range": ">70 cmH2O men",
+            "result": "74",
+            "test": "SNIP"
+          }
+        ],
+        "impression": "All values within normal limits.",
+        "quantitative_data": {
+          "FVC": "82",
+          "SNIP": "74"
         },
+        "recommended_actions": [],
+        "test_type": "respiratory_function"
+      },
+      "tool_name": "order_specialized_test",
+      "tool_parameters": {
+        "test_type": "respiratory_function"
+      },
+      "trigger_action": "request_baseline_respiratory_function"
+    },
+    {
+      "output": {
+        "findings": [
+          {
+            "interpretation": "",
+            "result": "No pathogenic expansion detected",
+            "test": "C9orf72 repeat expansion"
+          },
+          {
+            "interpretation": "",
+            "result": "No pathogenic variant detected",
+            "test": "ALS gene panel (including SOD1, TARDBP, FUS, TBK1)"
+          }
+        ],
+        "impression": "Pathogenic ALS-associated variant identified; provide post-test counselling.",
+        "quantitative_data": null,
+        "recommended_actions": [
+          "Pre- and post-test genetic counselling; discuss implications for relatives and gene-targeted therapy/trials"
+        ],
+        "test_type": "genetic_panel:ALS"
+      },
+      "tool_name": "order_specialized_test",
+      "tool_parameters": {
+        "test_type": "genetic_panel:ALS"
+      },
+      "trigger_action": "offer_als_genetic_panel_after_counselling"
+    }
+  ],
+  "ground_truth": {
+    "action_criteria": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "query": "ALS diagnostic criteria Awaji Gold Coast AAN practice parameter"
+            },
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[Awaji_2008]",
+          "Awaji_2008"
+        ],
+        "criterion_id": "action-1-search-medical-literature",
+        "expected_evidence": "Awaji-Shima 2008 / Gold Coast 2020 diagnostic criteria; AAN 2009 practice parameter on ALS care",
+        "importance": "recommended",
+        "label": "Search the medical literature to confirm Awaji and Gold Coast diagnostic thresholds and AAN practice-parameter recommendations relevant to this presentation",
+        "rationale": "Search the medical literature to confirm Awaji and Gold Coast diagnostic thresholds and AAN practice-parameter recommendations relevant to this presentation"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "drug": "riluzole"
+            },
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [
+          "[AAN_2009]",
+          "AAN_2009"
+        ],
+        "criterion_id": "action-2-check-drug-interactions",
+        "expected_evidence": "No major interactions for typical chronic medications; advise alcohol and grapefruit-juice avoidance (CYP1A2 modulators); monthly LFTs for first 3 months",
+        "importance": "recommended",
+        "label": "Check interactions before initiating riluzole 50 mg twice daily; review baseline LFTs and CBC and counsel on monitoring",
+        "rationale": "Check interactions before initiating riluzole 50 mg twice daily; review baseline LFTs and CBC and counsel on monitoring"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "contrast": true,
+              "protocol": "standard"
+            },
+            "tool_name": "analyze_brain_mri"
+          }
+        ],
+        "citations": [
+          "[EAN_ALS_2024]",
+          "Gold Coast; EAN 2024; NICE NG42"
+        ],
+        "criterion_id": "action-3-analyze-brain-mri",
+        "expected_evidence": "No better structural explanation for progressive upper and lower motor-neuron findings",
+        "importance": "required",
+        "label": "Obtain brain MRI to exclude structural, brainstem, inflammatory, demyelinating or neoplastic ALS mimics",
+        "rationale": "Obtain brain MRI to exclude structural, brainstem, inflammatory, demyelinating or neoplastic ALS mimics"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "contrast": false,
+              "study": "spine_MRI"
+            },
+            "tool_name": "order_body_imaging"
+          }
+        ],
+        "citations": [
+          "[EAN_ALS_2024]",
+          "Gold Coast; EAN 2024; NICE NG42"
+        ],
+        "criterion_id": "action-4-order-body-imaging",
+        "expected_evidence": "No compressive, neoplastic, inflammatory or demyelinating cord mimic",
+        "importance": "required",
+        "label": "Obtain cervical and thoracic spinal-cord MRI to exclude compressive myelopathy and other cord lesions",
+        "rationale": "Obtain cervical and thoracic spinal-cord MRI to exclude compressive myelopathy and other cord lesions"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "CBC",
+                "CMP",
+                "calcium",
+                "TSH",
+                "vitamin_B12",
+                "folate",
+                "CK",
+                "ESR",
+                "CRP"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[EAN_ALS_2024]",
+          "Gold Coast; EAN 2024; NICE NG42"
+        ],
+        "criterion_id": "action-5-interpret-labs",
+        "expected_evidence": "Exclude common hematologic, renal/hepatic, electrolyte, calcium, thyroid, B12/folate, muscle and inflammatory alternatives; tests do not confirm ALS",
+        "importance": "required",
+        "label": "Order a baseline treatable-mimic panel, adding only phenotype-specific infectious, immune, paraprotein or metabolic tests",
+        "rationale": "Order a baseline treatable-mimic panel, adding only phenotype-specific infectious, immune, paraprotein or metabolic tests"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "emg_ncs"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[EAN_ALS_2024]",
+          "Gold Coast; EAN 2024; NICE NG42"
+        ],
+        "criterion_id": "action-6-order-specialized-test",
+        "expected_evidence": "Active and chronic neurogenic change in multiple regions with preserved sensory studies and no conduction block",
+        "importance": "required",
+        "label": "Perform EMG/NCS across bulbar, cervical, thoracic and lumbosacral regions using ALS electrodiagnostic criteria",
+        "rationale": "Perform EMG/NCS across bulbar, cervical, thoracic and lumbosacral regions using ALS electrodiagnostic criteria"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "respiratory_function"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[EAN_ALS_2024]",
+          "Gold Coast; EAN 2024; NICE NG42"
+        ],
+        "criterion_id": "action-7-order-specialized-test",
+        "expected_evidence": "Quantify respiratory involvement and need for surveillance or non-invasive ventilation",
+        "importance": "recommended",
+        "label": "Obtain baseline FVC/VC and SNIP or MIP after suspected ALS is established; this is a safety and management assessment, not a diagnostic confirmation",
+        "rationale": "Obtain baseline FVC/VC and SNIP or MIP after suspected ALS is established; this is a safety and management assessment, not a diagnostic confirmation"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "genetic_panel:ALS"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[EAN_ALS_2024]",
+          "Gold Coast; EAN 2024; NICE NG42"
+        ],
+        "criterion_id": "action-8-order-specialized-test",
+        "expected_evidence": "A pathogenic result can affect counselling, family risk and gene-targeted therapy/trial eligibility; a negative result does not exclude ALS",
+        "importance": "optional",
+        "label": "Offer an ALS gene panel including C9orf72 and SOD1 after pre-test counselling; do not embed genetics in a routine blood panel",
+        "rationale": "Offer an ALS gene panel including C9orf72 and SOD1 after pre-test counselling; do not embed genetics in a routine blood panel"
+      }
+    ],
+    "assessment": {
+      "prohibited_recommendations": [
+        "Do not commit the patient to cervical spine surgery on the basis of incidental spondylotic changes when EMG findings extend beyond the cervical cord.",
+        "Do not start chronic immunosuppression (steroids, IVIG, plasma exchange) for ALS \u2014 there is no benefit and treatment delays correct diagnosis.",
+        "Do not defer respiratory assessment in a symptomatic patient \u2014 even mild FVC reduction warrants close monitoring and NIV planning.",
+        "Do not dismiss bulbar or progressive symptoms as functional / psychiatric without a complete neurological workup."
+      ],
+      "required_recommendations": [
+        "Perform EMG/NCS sampling the bulbar region plus \u22652 spinal regions to document lower-motor-neuron involvement and exclude conduction block.",
+        "Obtain brain MRI to exclude structural mimics (cervical myelopathy, demyelinating disease, brainstem tumor).",
+        "Order a mimic-exclusion lab panel (CK, B12, TSH, HIV, RPR, SPEP, anti-GM1 IgM, androgen receptor CAG repeat in males).",
+        "Measure baseline respiratory function (FVC, MIP/MEP, SNIP) to inform NIV timing.",
+        "Apply Awaji-Shima 2008 / Gold Coast 2020 criteria to confirm the diagnosis.",
+        "Initiate riluzole 50 mg twice daily after baseline LFTs unless contraindicated; arrange monthly LFT monitoring for the first 3 months.",
+        "Refer to a multidisciplinary ALS clinic for SLP, dietetics, respiratory, and social-work input."
+      ]
+    },
+    "avoided_actions": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_eeg"
+          }
+        ],
+        "citations": [
+          "[AAN_2009]"
+        ],
+        "criterion_id": "avoid-waste-1-analyze-eeg",
+        "rationale": "ALS is a motor-neuron disease without cortical electrical signature; EEG has no diagnostic role and adds cost without benefit.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_ecg"
+          }
+        ],
+        "citations": [
+          "[AAN_2009]"
+        ],
+        "criterion_id": "avoid-waste-2-analyze-ecg",
+        "rationale": "ECG is unrelated to motor neuron disease and not part of the standard ALS workup absent specific cardiac symptoms or pre-medication QTc checks.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_echocardiogram"
+          }
+        ],
+        "citations": [
+          "[AAN_2009]"
+        ],
+        "criterion_id": "avoid-waste-3-order-echocardiogram",
+        "rationale": "Echocardiography is unrelated to ALS diagnosis; no indication absent comorbid cardiac disease.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_cardiac_monitoring"
+          }
+        ],
+        "citations": [
+          "[AAN_2009]"
+        ],
+        "criterion_id": "avoid-waste-4-order-cardiac-monitoring",
+        "rationale": "Cardiac monitoring has no role in ALS diagnostic workup.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_ct_scan"
+          }
+        ],
+        "citations": [
+          "[AAN_2009]"
+        ],
+        "criterion_id": "avoid-waste-5-order-ct-scan",
+        "rationale": "MRI is the standard structural study for ALS workup; head CT adds no diagnostic value and exposes the patient to ionizing radiation.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "amyloid_PET"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[AAN_2009]"
+        ],
+        "criterion_id": "avoid-waste-6-order-advanced-imaging",
+        "rationale": "Amyloid PET has no role in ALS diagnosis (motor-neuron rather than amyloid pathology) and carries a high cost.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "DaTscan"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[AAN_2009]"
+        ],
+        "criterion_id": "avoid-waste-7-order-advanced-imaging",
+        "rationale": "DaTscan evaluates nigrostriatal dopaminergic integrity; it has no role in ALS, which spares the dopaminergic system.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "FDG_PET"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[AAN_2009]"
+        ],
+        "criterion_id": "avoid-waste-8-order-advanced-imaging",
+        "rationale": "FDG-PET has no established diagnostic role in ALS and adds substantial cost.",
+        "severity": "waste"
+      }
+    ],
+    "diagnosis": {
+      "accepted": [
+        "Amyotrophic lateral sclerosis (ALS), limb-onset, probable progressing to definite"
+      ],
+      "icd_codes": [
+        "G12.21"
+      ]
+    },
+    "differential": [
+      {
+        "diagnosis": "Lead toxic motor neuropathy",
+        "icd_code": null,
+        "key_features": "Occupational exposure history; blood lead and NCS pattern distinguish \u2014 ALS has axonal pattern with UMN signs, not lead",
+        "likelihood": "moderate"
+      },
+      {
+        "diagnosis": "Multifocal motor neuropathy (MMN)",
+        "icd_code": null,
+        "key_features": "No conduction block, anti-GM1 negative",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Hereditary motor neuropathy / CMT2 motor variant",
+        "icd_code": null,
+        "key_features": "Adult-onset, no family history, UMN signs argue against",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Cervical myelopathy",
+        "icd_code": null,
+        "key_features": "Multi-region EMG denervation including bulbar cannot be explained by cervical disease",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Inclusion body myositis",
+        "icd_code": null,
+        "key_features": "Fasciculations and neurogenic EMG pattern distinguish from IBM",
+        "likelihood": "very_low"
+      }
+    ],
+    "key_clinical_evidence": [
+      "Diagnosis requires evidence of both upper-motor-neuron involvement (hyperreflexia, Babinski, Hoffman, brisk jaw jerk, spasticity) and lower-motor-neuron involvement (atrophy, fasciculations, EMG denervation) with progressive spread, while excluding mimics \u2014 Awaji 2008 / Gold Coast 2020.",
+      "EMG in bulbar plus \u22652 spinal regions documenting fibrillations, positive sharp waves, complex fasciculation potentials, and large-amplitude long-duration polyphasic MUPs with reduced recruitment satisfies the electrodiagnostic criterion.",
+      "Normal sensory NCS and absence of conduction block are pivotal: they exclude common mimics including multifocal motor neuropathy, CIDP, and Kennedy disease.",
+      "Mild-to-moderate CK elevation (2\u20135\u00d7 ULN) is consistent with ALS and does not itself indicate a primary myopathy.",
+      "Cervical spondylotic changes on MRI are common incidental findings in the at-risk age group; bulbar findings or multi-region EMG denervation cannot be attributed to cervical disease.",
+      "Baseline FVC, MIP/MEP, and SNIP/NIF inform NIV timing \u2014 NIV initiation at FVC <50% predicted or SNIP <40 cmH\u2082O prolongs survival and improves quality of life.",
+      "July 2026 review applied end to end: EMG/NCS is the required ALS-specific test; brain and cord MRI and targeted labs exclude mimics; respiratory function is a recommended safety baseline; genetics is separately offered after counselling; CSF is absent except in five atypical mimic work-ups."
+    ],
+    "red_herrings": [
+      {
+        "correct_interpretation": "Lead neuropathy is wrist-drop predominant and has demyelinating NCS features; blood lead level + literature search supports ALS rather than lead toxicity",
+        "data_point": "Occupational lead exposure history",
+        "field_path": "patient.clinical_history.social_history",
+        "intended_effect": "Suggests reversible lead-induced motor neuropathy",
+        "location": "Social history"
+      }
+    ],
+    "review_status": "draft",
+    "sequence_constraints": [],
+    "stop_rule": {
+      "max_additional_actions": 0,
+      "required_before_assessment": [
+        "action-3-analyze-brain-mri",
+        "action-4-order-body-imaging",
+        "action-5-interpret-labs",
+        "action-6-order-specialized-test"
+      ]
+    }
+  },
+  "initial_tool_outputs": {
+    "advanced_imaging": null,
+    "body_imaging": {
+      "contrast": false,
+      "findings": [
         {
-          "drug": "Hydrochlorothiazide",
-          "dose": "25 mg",
-          "frequency": "once daily",
-          "indication": "Hypertension"
+          "description": "{\"signal_characteristics\": {\"T2\": \"Post-surgical signal, no recurrent disc herniation\"}, \"mass_effect\": \"No nerve root compression\"}",
+          "location": "L5-S1 laminectomy",
+          "type": "Old surgical changes"
         }
       ],
+      "impression": "Cervical and thoracic cord imaged; no compressive lesion and no cord signal change to explain the deficit.",
+      "measurements": null,
+      "modality": "MRI",
+      "recommended_actions": [],
+      "region": "cervical and thoracic spine"
+    },
+    "csf": null,
+    "ecg": null,
+    "eeg": null,
+    "labs": {
+      "abnormal_values_summary": [
+        "CK: 892"
+      ],
+      "interpretation": "Rule-out studies do not confirm ALS. Targeted abnormalities are listed above.",
+      "panels": {
+        "CBC": [
+          {
+            "is_abnormal": false,
+            "reference_range": "13.5-17.5",
+            "test": "Hemoglobin",
+            "unit": "g/dL",
+            "value": 15.2
+          }
+        ],
+        "Exclusion studies": [
+          {
+            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on",
+            "is_abnormal": false,
+            "reference_range": "",
+            "test": "Free T4",
+            "unit": "",
+            "value": "Within reference range"
+          }
+        ],
+        "Neuromuscular_Panel": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "38-174",
+            "test": "CK",
+            "unit": "U/L",
+            "value": 892
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "0.4-4.0",
+            "test": "TSH",
+            "unit": "mIU/L",
+            "value": 1.6
+          }
+        ],
+        "Reviewer baseline rule-out additions": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0-20",
+            "test": "ESR",
+            "unit": "mm/h",
+            "value": 8
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "<5",
+            "test": "CRP",
+            "unit": "mg/L",
+            "value": 2
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "200-900",
+            "test": "Vitamin B12",
+            "unit": "pg/mL",
+            "value": 420
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": ">4",
+            "test": "Folate",
+            "unit": "ng/mL",
+            "value": 10
+          }
+        ]
+      }
+    },
+    "mri": {
+      "additional_observations": [
+        "No lead encephalopathy changes (no white matter edema, no diffuse T2 change)",
+        "No mass lesion"
+      ],
+      "findings": [
+        {
+          "borders": null,
+          "location": "Bilateral posterior limb internal capsule, corticospinal tracts",
+          "mass_effect": null,
+          "signal_characteristics": {
+            "T2": "Subtle bilateral symmetric hyperintensity"
+          },
+          "size": null,
+          "type": "T2 signal change"
+        }
+      ],
+      "impression": "No imaging evidence of lead encephalopathy. Post-surgical L5-S1 without recurrent pathology",
+      "recommended_actions": [],
+      "volumetrics": null
+    },
+    "specialized_test": {
+      "findings": [
+        {
+          "finding": "Left FDI, APB, pronator teres: fibrillations +2, complex fasciculation potentials, large amplitude long duration polyphasic MUPs, severely reduced recruitment. Right FDI: fibrillations +1, fasciculations. Cervical paraspinals bilateral: fibrillations +1.",
+          "region": "Cervical"
+        },
+        {
+          "finding": "Bilateral tibialis anterior: fibrillations +1, fasciculations, mildly large MUPs. Left gastrocnemius: fasciculations.",
+          "region": "Lumbosacral"
+        },
+        {
+          "finding": "T7-T9 paraspinals bilateral: fibrillations +1.",
+          "region": "Thoracic"
+        },
+        {
+          "finding": "Tongue: fasciculation potentials only on this study.",
+          "region": "Bulbar"
+        },
+        {
+          "finding": "Left median motor: CMAP 3.4 mV (reduced), DL 3.9 ms, CV 52 m/s. Left ulnar: CMAP 2.8 mV (reduced). Conduction velocities are normal, without conduction slowing.",
+          "finding_type": "Motor NCS"
+        },
+        {
+          "finding": "All sensory studies normal. The abnormalities are purely motor.",
+          "finding_type": "Sensory NCS"
+        }
+      ],
+      "impression": "Active denervation (fibrillations, positive sharp waves) and chronic reinnervation (large amplitude, long duration, polyphasic MUPs, severely reduced recruitment) are present in the cervical, lumbosacral, and thoracic body regions. Bulbar region shows fasciculation potentials without definite fibrillations on this study. Sensory NCS are normal. Motor NCS show reduced CMAP amplitudes with preserved conduction velocities; no conduction block. Findings indicate a widespread disorder of anterior horn cells",
+      "quantitative_data": {
+        "pattern": "Multi-region motor denervation with paraspinal involvement; no conduction slowing or multifocal slowing; sensory NCS normal",
+        "regions": "Cervical, thoracic, and lumbosacral active denervation; bulbar fasciculations"
+      },
+      "recommended_actions": [
+        "Pulmonary function testing recommended."
+      ],
+      "test_type": "emg_ncs"
+    }
+  },
+  "metadata": {
+    "authoring_agent": "condition-expert:ALS",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "criteria_pack_version": "1.0",
+    "difficulty_rationale": "Occupational lead exposure history requires explicit rule-out; 4 required tools with literature support",
+    "fallback_tool_kinds": {
+      "advanced_imaging": "normal",
+      "cardiac_monitoring": "normal",
+      "ct": "normal",
+      "ecg": "normal",
+      "echo": "incidental",
+      "eeg": "normal"
+    },
+    "last_revised": "2026-08-10",
+    "notes": "Moderate ALS with occupational heavy metal exposure creating diagnostic confusion. Key teaching: lead neuropathy vs ALS distinguished by EMG conduction velocity pattern, paraspinal involvement, and UMN signs.",
+    "policy_spec_status": "draft",
+    "revision_reason": "independent ALS review: targeted CSF/labs, separate optional genetics, EMG diagnostic, respiratory safety baseline, brain+cord MRI",
+    "version": "policy-v1",
+    "vocab_gap": []
+  },
+  "patient": {
+    "chief_complaint": "Left arm weakness and wasting over 9 months, occupational concerns",
+    "clinical_history": {
       "allergies": [
         "NKDA"
       ],
@@ -41,634 +753,61 @@
         "Mother: alive, hypertension",
         "No family history of ALS"
       ],
+      "medications": [
+        {
+          "dose": "10 mg",
+          "drug": "Amlodipine",
+          "frequency": "once daily",
+          "indication": "Hypertension"
+        },
+        {
+          "dose": "25 mg",
+          "drug": "Hydrochlorothiazide",
+          "frequency": "once daily",
+          "indication": "Hypertension"
+        }
+      ],
+      "past_medical_history": [
+        "Obstructive sleep apnea, uses CPAP nightly",
+        "Hypertension",
+        "Obesity class I",
+        "Prior L5-S1 discectomy 10 years ago"
+      ],
       "social_history": {
-        "occupation": "Firefighter (active duty, light duty for 3 months)",
-        "tobacco": "Former, quit 8 years ago, 10 pack-years",
         "alcohol": "Weekend social, 3-4 drinks per week",
         "living_situation": "Married, 3 children",
-        "occupational_exposures": "Heavy metal exposure (firefighting), formaldehyde — occupational ALS risk factors reported"
+        "occupation": "Firefighter (active duty, light duty for 3 months)",
+        "occupational_exposures": "Heavy metal exposure (firefighting), formaldehyde \u2014 occupational ALS risk factors reported",
+        "tobacco": "Former, quit 8 years ago, 10 pack-years"
       }
     },
+    "demographics": {
+      "age": 59,
+      "bmi": 27.2,
+      "ethnicity": "White",
+      "handedness": "right",
+      "sex": "male"
+    },
+    "history_present_illness": "Mr. D is a 59-year-old active duty firefighter who presents with a 9-month history of progressive left arm weakness and visible wasting. He first noticed difficulty performing overhead activities at work and reduced grip strength in his left hand approximately 9 months ago. He was placed on light duty 3 months ago when his supervising officer noted visible wasting of his left forearm and hand.\n\nHe initially attributed the weakness to a shoulder injury sustained during a training exercise 11 months ago and received physical therapy for 2 months without improvement. He has visible twitching in his left arm and both calves that his wife describes as involuntary and constant. He has developed cramps in his left hand and bilateral calves.\n\nOver the past 4 months, he has noticed milder right arm weakness and bilateral leg weakness, particularly when climbing stairs or pulling heavy equipment. He denies sensory symptoms. He has no swallowing difficulties. No bladder or bowel changes.\n\nHe is concerned about his ability to continue working. His occupational health physician noted that he may have had heavy metal exposures (lead, mercury) during firefighting activities and ordered a heavy metals panel. This returned elevated lead level at 28 mcg/dL (normal <5 mcg/dL), raising the question of lead toxicity as an etiology of his weakness. Examination shows combined upper and lower motor neuron signs. He was referred to neurology for comprehensive evaluation.",
     "neurological_exam": {
-      "mental_status": "Alert and oriented x4. No cognitive changes.",
-      "cranial_nerves": "Tongue midline, subtle left-sided atrophy, occasional fasciculations. No significant dysarthria.",
-      "motor": "Left arm weakness: shoulder abduction 3+/5, elbow flexion 4/5, wrist extension 4/5, intrinsic muscles 3/5. Left thenar and hypothenar wasting prominent. Right arm: mild weakness deltoid 4+/5, otherwise 4+/5. Lower extremities: left tibialis anterior 4/5, otherwise mild bilateral leg weakness 4+/5. Bilateral calf fasciculations. Left arm atrophy visible.",
-      "sensory": "Intact to all modalities.",
-      "reflexes": "Left biceps 3+, right biceps 3+. Brisk bilateral brachioradialis 3+. Knee jerks 3+ bilaterally. Hoffman bilateral. Left Babinski positive.",
+      "additional": "Visible fasciculations bilateral calves and left arm. Left arm atrophy disproportionate to right.",
       "coordination": "Mildly impaired on left consistent with weakness.",
+      "cranial_nerves": "Tongue midline, subtle left-sided atrophy, occasional fasciculations. No significant dysarthria.",
       "gait": "Mildly antalgic on left. No frank foot drop.",
-      "additional": "Visible fasciculations bilateral calves and left arm. Left arm atrophy disproportionate to right."
+      "mental_status": "Alert and oriented x4. No cognitive changes.",
+      "motor": "Left arm weakness: shoulder abduction 3+/5, elbow flexion 4/5, wrist extension 4/5, intrinsic muscles 3/5. Left thenar and hypothenar wasting prominent. Right arm: mild weakness deltoid 4+/5, otherwise 4+/5. Lower extremities: left tibialis anterior 4/5, otherwise mild bilateral leg weakness 4+/5. Bilateral calf fasciculations. Left arm atrophy visible.",
+      "reflexes": "Left biceps 3+, right biceps 3+. Brisk bilateral brachioradialis 3+. Knee jerks 3+ bilaterally. Hoffman bilateral. Left Babinski positive.",
+      "sensory": "Intact to all modalities."
     },
+    "patient_id": "NB-ALS-M07",
     "vitals": {
-      "bp_systolic": 138,
       "bp_diastolic": 86,
+      "bp_systolic": 138,
       "hr": 76,
-      "temp": 37.1,
       "rr": 16,
-      "spo2": 96
-    },
-    "chief_complaint": "Left arm weakness and wasting over 9 months, occupational concerns",
-    "history_present_illness": "Mr. D is a 59-year-old active duty firefighter who presents with a 9-month history of progressive left arm weakness and visible wasting. He first noticed difficulty performing overhead activities at work and reduced grip strength in his left hand approximately 9 months ago. He was placed on light duty 3 months ago when his supervising officer noted visible wasting of his left forearm and hand.\n\nHe initially attributed the weakness to a shoulder injury sustained during a training exercise 11 months ago and received physical therapy for 2 months without improvement. He has visible twitching in his left arm and both calves that his wife describes as involuntary and constant. He has developed cramps in his left hand and bilateral calves.\n\nOver the past 4 months, he has noticed milder right arm weakness and bilateral leg weakness, particularly when climbing stairs or pulling heavy equipment. He denies sensory symptoms. He has no swallowing difficulties. No bladder or bowel changes.\n\nHe is concerned about his ability to continue working. His occupational health physician noted that he may have had heavy metal exposures (lead, mercury) during firefighting activities and ordered a heavy metals panel. This returned elevated lead level at 28 mcg/dL (normal <5 mcg/dL), raising the question of lead toxicity as an etiology of his weakness. Examination shows combined upper and lower motor neuron signs. He was referred to neurology for comprehensive evaluation."
-  },
-  "initial_tool_outputs": {
-    "mri": {
-      "findings": [
-        {
-          "type": "T2 signal change",
-          "location": "Bilateral posterior limb internal capsule, corticospinal tracts",
-          "size": null,
-          "signal_characteristics": {
-            "T2": "Subtle bilateral symmetric hyperintensity"
-          },
-          "mass_effect": null,
-          "borders": null
-        }
-      ],
-      "volumetrics": null,
-      "additional_observations": [
-        "No lead encephalopathy changes (no white matter edema, no diffuse T2 change)",
-        "No mass lesion"
-      ],
-      "impression": "No imaging evidence of lead encephalopathy. Post-surgical L5-S1 without recurrent pathology",
-      "recommended_actions": []
-    },
-    "labs": {
-      "panels": {
-        "CBC": [
-          {
-            "test": "Hemoglobin",
-            "value": 15.2,
-            "unit": "g/dL",
-            "reference_range": "13.5-17.5",
-            "is_abnormal": false
-          }
-        ],
-        "Neuromuscular_Panel": [
-          {
-            "test": "CK",
-            "value": 892,
-            "unit": "U/L",
-            "reference_range": "38-174",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "TSH",
-            "value": 1.6,
-            "unit": "mIU/L",
-            "reference_range": "0.4-4.0",
-            "is_abnormal": false
-          }
-        ],
-        "Exclusion studies": [
-          {
-            "test": "Free T4",
-            "value": "Within reference range",
-            "unit": "",
-            "reference_range": "",
-            "is_abnormal": false,
-            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on"
-          }
-        ],
-        "Reviewer baseline rule-out additions": [
-          {
-            "test": "ESR",
-            "value": 8,
-            "unit": "mm/h",
-            "reference_range": "0-20",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "CRP",
-            "value": 2,
-            "unit": "mg/L",
-            "reference_range": "<5",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Vitamin B12",
-            "value": 420,
-            "unit": "pg/mL",
-            "reference_range": "200-900",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Folate",
-            "value": 10,
-            "unit": "ng/mL",
-            "reference_range": ">4",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ]
-      },
-      "interpretation": "Rule-out studies do not confirm ALS. Targeted abnormalities are listed above.",
-      "abnormal_values_summary": [
-        "CK: 892"
-      ]
-    },
-    "specialized_test": {
-      "test_type": "emg_ncs",
-      "findings": [
-        {
-          "region": "Cervical",
-          "finding": "Left FDI, APB, pronator teres: fibrillations +2, complex fasciculation potentials, large amplitude long duration polyphasic MUPs, severely reduced recruitment. Right FDI: fibrillations +1, fasciculations. Cervical paraspinals bilateral: fibrillations +1."
-        },
-        {
-          "region": "Lumbosacral",
-          "finding": "Bilateral tibialis anterior: fibrillations +1, fasciculations, mildly large MUPs. Left gastrocnemius: fasciculations."
-        },
-        {
-          "region": "Thoracic",
-          "finding": "T7-T9 paraspinals bilateral: fibrillations +1."
-        },
-        {
-          "region": "Bulbar",
-          "finding": "Tongue: fasciculation potentials only on this study."
-        },
-        {
-          "finding_type": "Motor NCS",
-          "finding": "Left median motor: CMAP 3.4 mV (reduced), DL 3.9 ms, CV 52 m/s. Left ulnar: CMAP 2.8 mV (reduced). Conduction velocities are normal, without conduction slowing."
-        },
-        {
-          "finding_type": "Sensory NCS",
-          "finding": "All sensory studies normal. The abnormalities are purely motor."
-        }
-      ],
-      "quantitative_data": {
-        "pattern": "Multi-region motor denervation with paraspinal involvement; no conduction slowing or multifocal slowing; sensory NCS normal",
-        "regions": "Cervical, thoracic, and lumbosacral active denervation; bulbar fasciculations"
-      },
-      "impression": "Active denervation (fibrillations, positive sharp waves) and chronic reinnervation (large amplitude, long duration, polyphasic MUPs, severely reduced recruitment) are present in the cervical, lumbosacral, and thoracic body regions. Bulbar region shows fasciculation potentials without definite fibrillations on this study. Sensory NCS are normal. Motor NCS show reduced CMAP amplitudes with preserved conduction velocities; no conduction block. Findings indicate a widespread disorder of anterior horn cells",
-      "recommended_actions": [
-        "Pulmonary function testing recommended."
-      ]
-    },
-    "body_imaging": {
-      "region": "cervical and thoracic spine",
-      "modality": "MRI",
-      "contrast": false,
-      "findings": [
-        {
-          "type": "Old surgical changes",
-          "location": "L5-S1 laminectomy",
-          "description": "{\"signal_characteristics\": {\"T2\": \"Post-surgical signal, no recurrent disc herniation\"}, \"mass_effect\": \"No nerve root compression\"}"
-        }
-      ],
-      "measurements": null,
-      "impression": "Cervical and thoracic cord imaged; no compressive lesion and no cord signal change to explain the deficit.",
-      "recommended_actions": []
-    },
-    "eeg": null,
-    "ecg": null,
-    "advanced_imaging": null,
-    "csf": null
-  },
-  "followup_outputs": [
-    {
-      "trigger_action": "search_lead_toxicity_als",
-      "tool_name": "search_medical_literature",
-      "output": {
-        "query": "lead toxicity ALS motor neuron disease occupational exposure firefighter",
-        "results": [
-          {
-            "title": "Occupational metal exposure and motor neuron disease risk",
-            "finding": "Firefighters have a modestly increased risk of motor neuron disease (OR 1.3-2.0) potentially related to heavy metal and toxic combustion product exposures; however, acute lead toxicity does not produce a motor neuronopathy"
-          },
-          {
-            "title": "Lead neuropathy vs motor neuron disease",
-            "finding": "Lead neuropathy: wrist drop, extensor weakness, predominantly motor, conduction slowing; motor neuron disease: combined UMN+LMN, paraspinal denervation, no conduction slowing, no sensory involvement — these are distinct entities"
-          }
-        ],
-        "summary": "Firefighting is associated with a modestly increased risk of motor neuron disease, possibly related to heavy metal and combustion product exposures. Lead neuropathy has a distinct presentation characterized by wrist drop, predominantly motor peripheral neuropathy, conduction slowing, and radial nerve predilection — features distinct from a motor neuronopathy electrodiagnostic pattern."
-      }
-    },
-    {
-      "trigger_action": "check_riluzole_interactions",
-      "tool_name": "check_drug_interactions",
-      "output": {
-        "proposed": "Riluzole 50 mg twice daily",
-        "interactions": [
-          "Amlodipine: no clinically significant interaction",
-          "Hydrochlorothiazide: no significant interaction"
-        ],
-        "contraindications": [],
-        "warnings": [
-          "Monthly LFT monitoring",
-          "Alcohol consumption increases riluzole hepatotoxicity risk via CYP1A2 inhibition — abstinence recommended during therapy"
-        ],
-        "formulary_status": "Covered with PA",
-        "alternatives": [
-          "AMX0035 if alcohol cessation not achievable"
-        ]
-      }
-    },
-    {
-      "trigger_action": "request_baseline_respiratory_function",
-      "tool_name": "order_specialized_test",
-      "tool_parameters": {
-        "test_type": "respiratory_function"
-      },
-      "output": {
-        "test_type": "respiratory_function",
-        "findings": [
-          {
-            "panel": "PFT",
-            "test": "FVC",
-            "result": "82",
-            "reference_range": ">80%"
-          },
-          {
-            "panel": "PFT",
-            "test": "SNIP",
-            "result": "74",
-            "reference_range": ">70 cmH2O men"
-          }
-        ],
-        "quantitative_data": {
-          "FVC": "82",
-          "SNIP": "74"
-        },
-        "impression": "All values within normal limits.",
-        "recommended_actions": []
-      }
-    },
-    {
-      "trigger_action": "offer_als_genetic_panel_after_counselling",
-      "tool_name": "order_specialized_test",
-      "tool_parameters": {
-        "test_type": "genetic_panel:ALS"
-      },
-      "output": {
-        "test_type": "genetic_panel:ALS",
-        "findings": [
-          {
-            "test": "C9orf72 repeat expansion",
-            "result": "No pathogenic expansion detected",
-            "interpretation": ""
-          },
-          {
-            "test": "ALS gene panel (including SOD1, TARDBP, FUS, TBK1)",
-            "result": "No pathogenic variant detected",
-            "interpretation": ""
-          }
-        ],
-        "quantitative_data": null,
-        "impression": "Pathogenic ALS-associated variant identified; provide post-test counselling.",
-        "recommended_actions": [
-          "Pre- and post-test genetic counselling; discuss implications for relatives and gene-targeted therapy/trials"
-        ]
-      }
+      "spo2": 96,
+      "temp": 37.1
     }
-  ],
-  "fallback_tool_outputs": {
-    "eeg": {
-      "classification": "normal",
-      "background": {
-        "pdr": "9-10 Hz posterior dominant rhythm, symmetric and reactive",
-        "sleep_features": "normal vertex waves and sleep spindles",
-        "overall": "normal organisation for age"
-      },
-      "findings": [],
-      "artifacts": [],
-      "activating_procedures": {},
-      "impression": "Normal awake and drowsy EEG. No epileptiform discharges and no focal slowing.",
-      "limitations": "",
-      "recommended_actions": []
-    },
-    "mri": null,
-    "ecg": {
-      "rhythm": "normal sinus rhythm",
-      "rate": 84,
-      "intervals": {
-        "PR": "188 ms",
-        "QRS": "98 ms",
-        "QTc": "413 ms"
-      },
-      "axis": "normal",
-      "findings": [
-        "Normal sinus rhythm. Normal axis and intervals. No acute ST-T changes."
-      ],
-      "interpretation": "Normal ECG.",
-      "clinical_correlation": ""
-    },
-    "labs": null,
-    "csf": null,
-    "ct": {
-      "findings": [],
-      "contrast_used": false,
-      "angiography_findings": null,
-      "additional_observations": [],
-      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
-      "recommended_actions": []
-    },
-    "echo": {
-      "chambers": {
-        "LV": "normal size and systolic function",
-        "RV": "normal size and function",
-        "LA": "normal size",
-        "RA": "normal size"
-      },
-      "valves": {
-        "mitral": "structurally normal",
-        "aortic": "structurally normal",
-        "tricuspid": "normal",
-        "pulmonic": "normal"
-      },
-      "ejection_fraction": 62.0,
-      "wall_motion": "no regional wall-motion abnormality",
-      "findings": [
-        "Trace mitral regurgitation, physiological. No intracardiac thrombus or vegetation. No pericardial effusion."
-      ],
-      "impression": "Structurally near-normal heart with a benign incidental finding.",
-      "recommended_actions": []
-    },
-    "cardiac_monitoring": {
-      "duration_hours": 24,
-      "monitor_type": "holter_24h",
-      "rhythm_summary": "Sinus rhythm throughout the recording",
-      "heart_rate_range": {
-        "min": 55,
-        "max": 114,
-        "average": 72
-      },
-      "events": [],
-      "findings": [
-        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
-      ],
-      "impression": "Normal 24-hour Holter monitor.",
-      "recommended_actions": []
-    },
-    "advanced_imaging": {
-      "modality": "",
-      "tracer_or_protocol": null,
-      "findings": [],
-      "quantitative_data": null,
-      "impression": "No abnormality identified.",
-      "recommended_actions": []
-    },
-    "specialized_test": null,
-    "literature_search": null,
-    "drug_interactions": null
   },
-  "ground_truth": {
-    "primary_diagnosis": "Amyotrophic lateral sclerosis (ALS), limb-onset, probable progressing to definite",
-    "icd_code": "G12.21",
-    "differential": [
-      {
-        "diagnosis": "Lead toxic motor neuropathy",
-        "likelihood": "moderate",
-        "key_features": "Occupational exposure history; blood lead and NCS pattern distinguish — ALS has axonal pattern with UMN signs, not lead",
-        "icd_code": null
-      },
-      {
-        "diagnosis": "Multifocal motor neuropathy (MMN)",
-        "likelihood": "low",
-        "key_features": "No conduction block, anti-GM1 negative",
-        "icd_code": null
-      },
-      {
-        "diagnosis": "Hereditary motor neuropathy / CMT2 motor variant",
-        "likelihood": "low",
-        "key_features": "Adult-onset, no family history, UMN signs argue against",
-        "icd_code": null
-      },
-      {
-        "diagnosis": "Cervical myelopathy",
-        "likelihood": "low",
-        "key_features": "Multi-region EMG denervation including bulbar cannot be explained by cervical disease",
-        "icd_code": null
-      },
-      {
-        "diagnosis": "Inclusion body myositis",
-        "likelihood": "very_low",
-        "key_features": "Fasciculations and neurogenic EMG pattern distinguish from IBM",
-        "icd_code": null
-      }
-    ],
-    "optimal_actions": [
-      {
-        "step": 1,
-        "action": "Search the medical literature to confirm Awaji and Gold Coast diagnostic thresholds and AAN practice-parameter recommendations relevant to this presentation",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Awaji-Shima 2008 / Gold Coast 2020 diagnostic criteria; AAN 2009 practice parameter on ALS care",
-        "category": "recommended",
-        "tool_parameters": {
-          "query": "ALS diagnostic criteria Awaji Gold Coast AAN practice parameter"
-        },
-        "citation": "[Awaji_2008]",
-        "guideline_source": "Awaji_2008"
-      },
-      {
-        "step": 2,
-        "action": "Check interactions before initiating riluzole 50 mg twice daily; review baseline LFTs and CBC and counsel on monitoring",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "No major interactions for typical chronic medications; advise alcohol and grapefruit-juice avoidance (CYP1A2 modulators); monthly LFTs for first 3 months",
-        "category": "recommended",
-        "tool_parameters": {
-          "drug": "riluzole"
-        },
-        "citation": "[AAN_2009]",
-        "guideline_source": "AAN_2009"
-      },
-      {
-        "action": "Obtain brain MRI to exclude structural, brainstem, inflammatory, demyelinating or neoplastic ALS mimics",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "No better structural explanation for progressive upper and lower motor-neuron findings",
-        "category": "required",
-        "tool_parameters": {
-          "protocol": "standard",
-          "contrast": true
-        },
-        "citation": "[EAN_ALS_2024]",
-        "guideline_source": "Gold Coast; EAN 2024; NICE NG42",
-        "step": 3
-      },
-      {
-        "action": "Obtain cervical and thoracic spinal-cord MRI to exclude compressive myelopathy and other cord lesions",
-        "tool_name": "order_body_imaging",
-        "expected_finding": "No compressive, neoplastic, inflammatory or demyelinating cord mimic",
-        "category": "required",
-        "tool_parameters": {
-          "study": "spine_MRI",
-          "contrast": false
-        },
-        "citation": "[EAN_ALS_2024]",
-        "guideline_source": "Gold Coast; EAN 2024; NICE NG42",
-        "step": 4
-      },
-      {
-        "action": "Order a baseline treatable-mimic panel, adding only phenotype-specific infectious, immune, paraprotein or metabolic tests",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Exclude common hematologic, renal/hepatic, electrolyte, calcium, thyroid, B12/folate, muscle and inflammatory alternatives; tests do not confirm ALS",
-        "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "CMP",
-            "calcium",
-            "TSH",
-            "vitamin_B12",
-            "folate",
-            "CK",
-            "ESR",
-            "CRP"
-          ]
-        },
-        "citation": "[EAN_ALS_2024]",
-        "guideline_source": "Gold Coast; EAN 2024; NICE NG42",
-        "step": 5
-      },
-      {
-        "action": "Perform EMG/NCS across bulbar, cervical, thoracic and lumbosacral regions using ALS electrodiagnostic criteria",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Active and chronic neurogenic change in multiple regions with preserved sensory studies and no conduction block",
-        "category": "required",
-        "tool_parameters": {
-          "test_type": "emg_ncs"
-        },
-        "citation": "[EAN_ALS_2024]",
-        "guideline_source": "Gold Coast; EAN 2024; NICE NG42",
-        "step": 6
-      },
-      {
-        "action": "Obtain baseline FVC/VC and SNIP or MIP after suspected ALS is established; this is a safety and management assessment, not a diagnostic confirmation",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "Quantify respiratory involvement and need for surveillance or non-invasive ventilation",
-        "category": "recommended",
-        "tool_parameters": {
-          "test_type": "respiratory_function"
-        },
-        "citation": "[EAN_ALS_2024]",
-        "guideline_source": "Gold Coast; EAN 2024; NICE NG42",
-        "step": 7
-      },
-      {
-        "action": "Offer an ALS gene panel including C9orf72 and SOD1 after pre-test counselling; do not embed genetics in a routine blood panel",
-        "tool_name": "order_specialized_test",
-        "expected_finding": "A pathogenic result can affect counselling, family risk and gene-targeted therapy/trial eligibility; a negative result does not exclude ALS",
-        "category": "optional",
-        "tool_parameters": {
-          "test_type": "genetic_panel:ALS"
-        },
-        "citation": "[EAN_ALS_2024]",
-        "guideline_source": "Gold Coast; EAN 2024; NICE NG42",
-        "step": 8
-      }
-    ],
-    "useless_tools": [
-      {
-        "tool_name": "analyze_eeg",
-        "tool_parameters": {},
-        "rationale": "ALS is a motor-neuron disease without cortical electrical signature; EEG has no diagnostic role and adds cost without benefit.",
-        "citation": "[AAN_2009]"
-      },
-      {
-        "tool_name": "analyze_ecg",
-        "tool_parameters": {},
-        "rationale": "ECG is unrelated to motor neuron disease and not part of the standard ALS workup absent specific cardiac symptoms or pre-medication QTc checks.",
-        "citation": "[AAN_2009]"
-      },
-      {
-        "tool_name": "order_echocardiogram",
-        "tool_parameters": {},
-        "rationale": "Echocardiography is unrelated to ALS diagnosis; no indication absent comorbid cardiac disease.",
-        "citation": "[AAN_2009]"
-      },
-      {
-        "tool_name": "order_cardiac_monitoring",
-        "tool_parameters": {},
-        "rationale": "Cardiac monitoring has no role in ALS diagnostic workup.",
-        "citation": "[AAN_2009]"
-      },
-      {
-        "tool_name": "order_ct_scan",
-        "tool_parameters": {},
-        "rationale": "MRI is the standard structural study for ALS workup; head CT adds no diagnostic value and exposes the patient to ionizing radiation.",
-        "citation": "[AAN_2009]"
-      },
-      {
-        "tool_name": "order_advanced_imaging",
-        "tool_parameters": {
-          "modality": "amyloid_PET"
-        },
-        "rationale": "Amyloid PET has no role in ALS diagnosis (motor-neuron rather than amyloid pathology) and carries a high cost.",
-        "citation": "[AAN_2009]"
-      },
-      {
-        "tool_name": "order_advanced_imaging",
-        "tool_parameters": {
-          "modality": "DaTscan"
-        },
-        "rationale": "DaTscan evaluates nigrostriatal dopaminergic integrity; it has no role in ALS, which spares the dopaminergic system.",
-        "citation": "[AAN_2009]"
-      },
-      {
-        "tool_name": "order_advanced_imaging",
-        "tool_parameters": {
-          "modality": "FDG_PET"
-        },
-        "rationale": "FDG-PET has no established diagnostic role in ALS and adds substantial cost.",
-        "citation": "[AAN_2009]"
-      }
-    ],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "critical_actions": [
-      "Perform EMG/NCS sampling the bulbar region plus ≥2 spinal regions to document lower-motor-neuron involvement and exclude conduction block.",
-      "Obtain brain MRI to exclude structural mimics (cervical myelopathy, demyelinating disease, brainstem tumor).",
-      "Order a mimic-exclusion lab panel (CK, B12, TSH, HIV, RPR, SPEP, anti-GM1 IgM, androgen receptor CAG repeat in males).",
-      "Measure baseline respiratory function (FVC, MIP/MEP, SNIP) to inform NIV timing.",
-      "Apply Awaji-Shima 2008 / Gold Coast 2020 criteria to confirm the diagnosis.",
-      "Initiate riluzole 50 mg twice daily after baseline LFTs unless contraindicated; arrange monthly LFT monitoring for the first 3 months.",
-      "Refer to a multidisciplinary ALS clinic for SLP, dietetics, respiratory, and social-work input."
-    ],
-    "contraindicated_actions": [
-      "Do not commit the patient to cervical spine surgery on the basis of incidental spondylotic changes when EMG findings extend beyond the cervical cord.",
-      "Do not start chronic immunosuppression (steroids, IVIG, plasma exchange) for ALS — there is no benefit and treatment delays correct diagnosis.",
-      "Do not defer respiratory assessment in a symptomatic patient — even mild FVC reduction warrants close monitoring and NIV planning.",
-      "Do not dismiss bulbar or progressive symptoms as functional / psychiatric without a complete neurological workup."
-    ],
-    "key_reasoning_points": [
-      "Diagnosis requires evidence of both upper-motor-neuron involvement (hyperreflexia, Babinski, Hoffman, brisk jaw jerk, spasticity) and lower-motor-neuron involvement (atrophy, fasciculations, EMG denervation) with progressive spread, while excluding mimics — Awaji 2008 / Gold Coast 2020.",
-      "EMG in bulbar plus ≥2 spinal regions documenting fibrillations, positive sharp waves, complex fasciculation potentials, and large-amplitude long-duration polyphasic MUPs with reduced recruitment satisfies the electrodiagnostic criterion.",
-      "Normal sensory NCS and absence of conduction block are pivotal: they exclude common mimics including multifocal motor neuropathy, CIDP, and Kennedy disease.",
-      "Mild-to-moderate CK elevation (2–5× ULN) is consistent with ALS and does not itself indicate a primary myopathy.",
-      "Cervical spondylotic changes on MRI are common incidental findings in the at-risk age group; bulbar findings or multi-region EMG denervation cannot be attributed to cervical disease.",
-      "Baseline FVC, MIP/MEP, and SNIP/NIF inform NIV timing — NIV initiation at FVC <50% predicted or SNIP <40 cmH₂O prolongs survival and improves quality of life.",
-      "July 2026 review applied end to end: EMG/NCS is the required ALS-specific test; brain and cord MRI and targeted labs exclude mimics; respiratory function is a recommended safety baseline; genetics is separately offered after counselling; CSF is absent except in five atypical mimic work-ups."
-    ],
-    "red_herrings": [
-      {
-        "data_point": "Occupational lead exposure history",
-        "location": "Social history",
-        "field_path": "patient.clinical_history.social_history",
-        "intended_effect": "Suggests reversible lead-induced motor neuropathy",
-        "correct_interpretation": "Lead neuropathy is wrist-drop predominant and has demyelinating NCS features; blood lead level + literature search supports ALS rather than lead toxicity"
-      }
-    ]
-  },
-  "metadata": {
-    "version": "v5",
-    "notes": "Moderate ALS with occupational heavy metal exposure creating diagnostic confusion. Key teaching: lead neuropathy vs ALS distinguished by EMG conduction velocity pattern, paraspinal involvement, and UMN signs.",
-    "fallback_tool_kinds": {
-      "eeg": "normal",
-      "ecg": "normal",
-      "ct": "normal",
-      "echo": "incidental",
-      "cardiac_monitoring": "normal",
-      "advanced_imaging": "normal"
-    },
-    "last_revised": "2026-08-10",
-    "revision_reason": "independent ALS review: targeted CSF/labs, separate optional genetics, EMG diagnostic, respiratory safety baseline, brain+cord MRI",
-    "criteria_pack_version": "1.0",
-    "authoring_agent": "condition-expert:ALS",
-    "difficulty_rationale": "Occupational lead exposure history requires explicit rule-out; 4 required tools with literature support",
-    "case_body_concerns": [],
-    "citation_gap": [],
-    "vocab_gap": []
-  }
+  "schema_version": "2.0"
 }

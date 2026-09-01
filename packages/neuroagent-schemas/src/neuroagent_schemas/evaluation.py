@@ -1,100 +1,171 @@
-"""Evaluation and ground truth Pydantic models."""
+"""Clinician-reviewable policy specifications for evaluation and training."""
 
 from __future__ import annotations
 
+import re
+from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from .enums import ActionCategory, Likelihood, SequenceSeverity
+from .actions import ToolAction
+from .enums import Likelihood, SequenceSeverity
 
 
-class DifferentialDx(BaseModel):
-    """A differential diagnosis entry with structured likelihood."""
+class StrictModel(BaseModel):
+    model_config = ConfigDict(extra="forbid")
 
+
+class PolicyReviewStatus(str, Enum):
+    DRAFT = "draft"
+    NEEDS_REVISION = "needs_revision"
+    APPROVED = "approved"
+
+
+class ActionImportance(str, Enum):
+    REQUIRED = "required"
+    RECOMMENDED = "recommended"
+    OPTIONAL = "optional"
+
+
+class AvoidanceSeverity(str, Enum):
+    WASTE = "waste"
+    HARM = "harm"
+    CONTRAINDICATED = "contraindicated"
+
+
+def _fold(value: Any) -> Any:
+    if isinstance(value, str):
+        return " ".join(value.strip().lower().replace("_", " ").split())
+    if isinstance(value, list):
+        return [_fold(item) for item in value]
+    if isinstance(value, dict):
+        return {key: _fold(item) for key, item in value.items()}
+    return value
+
+
+def _contains_required(actual: Any, required: Any) -> bool:
+    actual, required = _fold(actual), _fold(required)
+    if isinstance(required, list):
+        if not isinstance(actual, list):
+            return False
+        return all(any(_contains_required(candidate, item) for candidate in actual) for item in required)
+    if isinstance(required, dict):
+        return isinstance(actual, dict) and all(
+            key in actual and _contains_required(actual[key], value)
+            for key, value in required.items()
+        )
+    return actual == required
+
+
+class ToolCallPattern(StrictModel):
+    tool_name: str = Field(min_length=1)
+    required_arguments: dict[str, Any] = Field(default_factory=dict)
+
+    def matches(self, action: ToolAction) -> bool:
+        return (
+            action.tool_name == self.tool_name
+            and _contains_required(action.arguments, self.required_arguments)
+        )
+
+
+class DiagnosisCriterion(StrictModel):
+    accepted: list[str] = Field(min_length=1)
+    icd_codes: list[str] = Field(default_factory=list)
+
+    def matches(self, diagnosis: str) -> bool:
+        candidate = re.sub(r"[^a-z0-9]+", " ", diagnosis.lower()).strip()
+        return any(
+            candidate == re.sub(r"[^a-z0-9]+", " ", accepted.lower()).strip()
+            or candidate in re.sub(r"[^a-z0-9]+", " ", accepted.lower()).strip()
+            or re.sub(r"[^a-z0-9]+", " ", accepted.lower()).strip() in candidate
+            for accepted in self.accepted
+        )
+
+
+class DifferentialDx(StrictModel):
     diagnosis: str
     likelihood: Likelihood
     key_features: str = ""
     icd_code: str | None = None
 
 
-class ActionStep(BaseModel):
-    """A step in the optimal diagnostic workup.
+class ActionCriterion(StrictModel):
+    criterion_id: str = Field(pattern=r"^[a-z][a-z0-9_.-]*$")
+    label: str = Field(min_length=1)
+    importance: ActionImportance
+    alternatives: list[ToolCallPattern] = Field(min_length=1)
+    expected_evidence: str = ""
+    rationale: str = ""
+    citations: list[str] = Field(default_factory=list)
 
-    Only steps that *should* be performed live here (required / recommended /
-    optional). Steps that should NOT be performed live in `harmful_tools` or
-    `contraindicated_actions` on the parent GroundTruth.
-    """
-
-    step: int
-    action: str
-    tool_name: str | None = None
-    expected_finding: str = ""
-    category: ActionCategory
-    tool_parameters: dict[str, Any] = {}
-    citation: str = ""  # e.g., "AAN 2009 Practice Parameter ALS", "AHA/ASA 2019 §3.2"
-    guideline_source: str = ""  # short tag matching the criteria pack allow-list
+    def matches(self, action: ToolAction) -> bool:
+        return any(pattern.matches(action) for pattern in self.alternatives)
 
 
-class ToolClassification(BaseModel):
-    """A per-case classification of a tool that should NOT be called.
+class AvoidedActionCriterion(StrictModel):
+    criterion_id: str = Field(pattern=r"^[a-z][a-z0-9_.-]*$")
+    severity: AvoidanceSeverity
+    alternatives: list[ToolCallPattern] = Field(min_length=1)
+    rationale: str
+    citations: list[str] = Field(default_factory=list)
 
-    Used in `GroundTruth.useless_tools` and `GroundTruth.harmful_tools`.
-    The distinction matters for metric weighting:
-    - useless = wasted resources (precision / cost penalty)
-    - harmful = patient harm (safety penalty)
-    """
-
-    tool_name: str
-    tool_parameters: dict[str, Any] = {}
-    rationale: str  # one-sentence justification, clinician-readable
-    citation: str = ""  # guideline reference when applicable
+    def matches(self, action: ToolAction) -> bool:
+        return any(pattern.matches(action) for pattern in self.alternatives)
 
 
-class SequenceConstraint(BaseModel):
-    """An ordering constraint between two tool calls.
-
-    Only authored where ordering is clinically load-bearing (don't over-author).
-    Typical entries: imaging-before-LP in suspected mass effect; labs-before-empiric
-    therapy in suspected metabolic disease; MRI-before-LP in unexplained
-    encephalopathy.
-    """
-
-    before: str  # tool_name that must precede
-    after: str  # tool_name that must follow
+class SequenceConstraint(StrictModel):
+    before_criterion_id: str
+    after_criterion_id: str
     reason: str
-    citation: str = ""
+    citations: list[str] = Field(default_factory=list)
     severity: SequenceSeverity = SequenceSeverity.SOFT
 
 
-class RedHerring(BaseModel):
-    """An intentional distractor embedded in a case to test agent reasoning."""
-
-    data_point: str  # what the misleading element is
-    location: str  # legacy free-text label (e.g., "labs", "history")
-    field_path: str = ""  # structured dotted path (e.g., "initial_tool_outputs.labs.panels.metabolic[3]")
-    intended_effect: str  # how it might mislead
-    correct_interpretation: str  # what the agent should conclude
+class StopRule(StrictModel):
+    required_before_assessment: list[str] = Field(default_factory=list)
+    max_additional_actions: int = Field(default=0, ge=0)
 
 
-class GroundTruth(BaseModel):
-    primary_diagnosis: str
-    icd_code: str
-    differential: list[DifferentialDx] = []
-    optimal_actions: list[ActionStep] = []
-    # NEW (v5 gold trajectory regen): explicit per-case classification of tools
-    # the agent should NOT call. Enables tool_precision / safety metrics that
-    # the previous set-membership-only model could not express.
-    useless_tools: list[ToolClassification] = []
-    harmful_tools: list[ToolClassification] = []
-    sequence_constraints: list[SequenceConstraint] = []
-    critical_actions: list[str] = Field(
-        default_factory=list,
-        description="Free-text MUST-do clinical actions (some may not map to a tool).",
-    )
-    contraindicated_actions: list[str] = Field(
-        default_factory=list,
-        description="Free-text MUST-NOT-do clinical actions (some may not map to a tool).",
-    )
-    key_reasoning_points: list[str] = []
-    red_herrings: list[RedHerring] = []
+class AssessmentCriteria(StrictModel):
+    required_recommendations: list[str] = Field(default_factory=list)
+    prohibited_recommendations: list[str] = Field(default_factory=list)
+
+
+class RedHerring(StrictModel):
+    data_point: str
+    location: str
+    field_path: str = ""
+    intended_effect: str
+    correct_interpretation: str
+
+
+class GroundTruth(StrictModel):
+    review_status: PolicyReviewStatus
+    diagnosis: DiagnosisCriterion
+    differential: list[DifferentialDx] = Field(default_factory=list)
+    action_criteria: list[ActionCriterion] = Field(default_factory=list)
+    avoided_actions: list[AvoidedActionCriterion] = Field(default_factory=list)
+    sequence_constraints: list[SequenceConstraint] = Field(default_factory=list)
+    stop_rule: StopRule
+    assessment: AssessmentCriteria = Field(default_factory=AssessmentCriteria)
+    key_clinical_evidence: list[str] = Field(default_factory=list)
+    red_herrings: list[RedHerring] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def validate_references(self) -> "GroundTruth":
+        action_ids = [criterion.criterion_id for criterion in self.action_criteria]
+        avoided_ids = [criterion.criterion_id for criterion in self.avoided_actions]
+        if len(action_ids) != len(set(action_ids)):
+            raise ValueError("action criterion ids must be unique")
+        if len(avoided_ids) != len(set(avoided_ids)):
+            raise ValueError("avoided-action criterion ids must be unique")
+        known = set(action_ids)
+        referenced = set(self.stop_rule.required_before_assessment)
+        for constraint in self.sequence_constraints:
+            referenced.add(constraint.before_criterion_id)
+            referenced.add(constraint.after_criterion_id)
+        missing = sorted(referenced - known)
+        if missing:
+            raise ValueError(f"policy references unknown action criteria: {missing}")
+        return self

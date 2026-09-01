@@ -10,7 +10,6 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from neuroagent.datasets import normalize_dataset_version
 
 from ..dependencies import current_reviewer
 from ..schemas.annotations import (
@@ -45,7 +44,6 @@ def _store(request: Request) -> ToolReviewStore:
 
 
 def _ensure_dataset(request: Request, version: str) -> str:
-    version = normalize_dataset_version(version)
     if version not in request.app.state.all_datasets:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

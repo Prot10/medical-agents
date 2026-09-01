@@ -57,7 +57,7 @@ electrodiagnostic equivalents of fibrillations under Awaji.
 - **M (mild):** typical presentation, single-region onset; standard workup
 - **S (standard):** multi-region or bulbar onset; standard workup + respiratory function moves to REQUIRED
 - **P (progressive):** rapid progression or respiratory involvement; add `order_specialized_test` (`respiratory_function`) at REQUIRED; consider genetic panel if young
-- **R (reverse / mimic):** the case is NOT ALS — typical mimics are MMN with conduction block (treatable!), Kennedy disease, IBM, cervical myelopathy, post-polio. For R cases the gold trajectory adds rule-out tools: anti-GM1 antibodies (under labs), repeat EMG with NCS for conduction block, MRI cervical spine
+- **R (reverse / mimic):** the case is NOT ALS — typical mimics are MMN with conduction block (treatable!), Kennedy disease, IBM, cervical myelopathy, post-polio. For R cases the action policy adds rule-out criteria: anti-GM1 antibodies (under labs), repeat EMG with NCS for conduction block, MRI cervical spine
 
 ## 7. Common red-herring categories
 

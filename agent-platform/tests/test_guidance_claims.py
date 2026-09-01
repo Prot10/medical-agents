@@ -23,21 +23,29 @@ def cases_with(cond, tool, cats=None, param=None):
     """case ids where `tool` appears at one of `cats`, optionally with `param` in its parameters."""
     out = set()
     for d in CASES[cond]:
-        for a in d['ground_truth']['optimal_actions']:
-            if a.get('tool_name') != tool: continue
-            if cats and a.get('category') not in cats: continue
-            if param and param not in json.dumps(a.get('tool_parameters') or {}): continue
-            out.add(d['case_id'])
+        for criterion in d['ground_truth']['action_criteria']:
+            if cats and criterion['importance'] not in cats:
+                continue
+            for pattern in criterion['alternatives']:
+                if pattern['tool_name'] != tool:
+                    continue
+                if param and param not in json.dumps(pattern.get('required_arguments') or {}):
+                    continue
+                out.add(d['case_id'])
+                break
     return out
 
 def n_actions(cond, tool, cats=None, param=None):
     n = 0
     for d in CASES[cond]:
-        for a in d['ground_truth']['optimal_actions']:
-            if a.get('tool_name') != tool: continue
-            if cats and a.get('category') not in cats: continue
-            if param and param not in json.dumps(a.get('tool_parameters') or {}): continue
-            n += 1
+        for criterion in d['ground_truth']['action_criteria']:
+            if cats and criterion['importance'] not in cats:
+                continue
+            n += sum(
+                pattern['tool_name'] == tool
+                and (not param or param in json.dumps(pattern.get('required_arguments') or {}))
+                for pattern in criterion['alternatives']
+            )
     return n
 
 R = 'required'; C = 'recommended'; O = 'optional'

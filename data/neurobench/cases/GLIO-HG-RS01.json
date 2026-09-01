@@ -3,170 +3,927 @@
   "condition": "brain_tumor_glioma",
   "difficulty": "diagnostic_puzzle",
   "encounter_type": "inpatient",
-  "patient": {
-    "patient_id": "NB-GLIO-HG-RS01",
-    "demographics": {
-      "age": 35,
-      "sex": "male",
-      "handedness": "right",
-      "ethnicity": "Hispanic",
-      "bmi": 24.8
-    },
-    "clinical_history": {
-      "past_medical_history": [
-        "Resection of abdominal para-aortic paraganglioma at age 11",
-        "Right adrenalectomy for pheochromocytoma at age 19",
-        "Childhood history of episodic hypertension, tachycardia, and diaphoresis, resolved after second surgery",
-        "Mild traumatic brain injury 6 weeks ago after a fall from a bicycle, managed conservatively",
-        "Borderline hypertension noted on recent primary care visit"
+  "fallback_tool_outputs": {
+    "advanced_imaging": null,
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
       ],
-      "medications": [
-        {
-          "drug": "Amlodipine",
-          "dose": "5 mg",
-          "frequency": "once daily",
-          "indication": "Borderline hypertension"
-        },
-        {
-          "drug": "Acetaminophen",
-          "dose": "500 mg",
-          "frequency": "as needed",
-          "indication": "Headache"
+      "heart_rate_range": {
+        "average": 79,
+        "max": 110,
+        "min": 48
+      },
+      "impression": "Normal 24-hour Holter monitor.",
+      "monitor_type": "holter_24h",
+      "recommended_actions": [],
+      "rhythm_summary": "Sinus rhythm throughout the recording"
+    },
+    "csf": {
+      "appearance": "clear and colourless",
+      "cell_count": {
+        "rbc": "0 /uL",
+        "wbc": "3 /uL"
+      },
+      "glucose": "61 mg/dL",
+      "glucose_ratio": "0.6",
+      "interpretation": "Mildly elevated CSF protein, a non-specific finding. Cell count and glucose normal.",
+      "opening_pressure": "17 cm H2O",
+      "protein": "55 mg/dL",
+      "special_tests": {}
+    },
+    "ct": null,
+    "drug_interactions": null,
+    "ecg": null,
+    "echo": {
+      "chambers": {
+        "LA": "normal size",
+        "LV": "normal size and systolic function",
+        "RA": "normal size",
+        "RV": "normal size and function"
+      },
+      "ejection_fraction": 66.0,
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": [],
+      "valves": {
+        "aortic": "structurally normal",
+        "mitral": "structurally normal",
+        "pulmonic": "normal",
+        "tricuspid": "normal"
+      },
+      "wall_motion": "no regional wall-motion abnormality"
+    },
+    "eeg": null,
+    "labs": null,
+    "literature_search": null,
+    "mri": null,
+    "specialized_test": {
+      "findings": [],
+      "impression": "Study within normal limits.",
+      "quantitative_data": null,
+      "recommended_actions": [],
+      "test_type": ""
+    }
+  },
+  "followup_outputs": [
+    {
+      "output": {
+        "findings": [
+          {
+            "description": "Elevated relative cerebral blood volume (rCBV)",
+            "region": "Enhancing rim of the right frontotemporal mass",
+            "signal": "rCBV_ratio: 4.1 (reference: normal brain = 1.0; high-grade glioma threshold > 1.75); rCBF: Elevated in enhancing components; Ktrans: Elevated, indicating blood-brain barrier disruption"
+          },
+          {
+            "description": "Low cerebral blood volume",
+            "region": "Central necrotic core of the mass",
+            "signal": "rCBV_ratio: 0.3 (markedly reduced, consistent with necrosis)"
+          }
+        ],
+        "impression": "MR perfusion demonstrates markedly elevated rCBV ratio (4.1) in the enhancing rim of the right frontotemporal mass, with elevated Ktrans indicating blood-brain barrier disruption. The central necrotic core shows markedly reduced rCBV (ratio 0.3). Mildly elevated rCBV is noted in the perilesional FLAIR-abnormal region",
+        "modality": "perfusion_MRI",
+        "quantitative_data": null,
+        "recommended_actions": [],
+        "tracer_or_protocol": null
+      },
+      "tool_name": "order_advanced_imaging",
+      "trigger_action": "request_mri_perfusion"
+    },
+    {
+      "output": {
+        "findings": [
+          {
+            "description": "Abnormal metabolite ratios consistent with high-grade neoplasm",
+            "region": "Enhancing component of right frontotemporal mass",
+            "signal": "choline: Markedly elevated (Cho/Cr ratio 3.9; normal < 1.5); NAA: Markedly reduced (NAA/Cr ratio 0.3; normal > 1.5); Cho_NAA_ratio: 13.0 (markedly elevated, consistent with high-grade tumor); lipid_lactate: Prominent lipid and lactate peaks present, indicating necrosis and anaerobic metabolism; myoinositol: Mildly elevated"
+          },
+          {
+            "description": "Perilesional spectroscopy abnormality",
+            "region": "FLAIR-hyperintense region adjacent to enhancing mass",
+            "signal": "choline: Mildly elevated (Cho/Cr ratio 1.9); NAA: Mildly reduced (NAA/Cr ratio 1.0); lipid_lactate: Absent"
+          }
+        ],
+        "impression": "MR spectroscopy of the enhancing component demonstrates markedly elevated choline (Cho/Cr ratio 3.9), severely reduced NAA (NAA/Cr ratio 0.3), and a Cho/NAA ratio of 13.0. Prominent lipid and lactate peaks are present. Myoinositol is mildly elevated. The perilesional FLAIR-abnormal region shows mildly elevated choline (Cho/Cr ratio 1.9) and mildly reduced NAA (NAA/Cr ratio 1.0) without lipid or lactate peaks",
+        "modality": "MR_spectroscopy",
+        "quantitative_data": null,
+        "recommended_actions": [],
+        "tracer_or_protocol": null
+      },
+      "tool_name": "order_advanced_imaging",
+      "trigger_action": "request_mr_spectroscopy"
+    },
+    {
+      "output": {
+        "contrast": true,
+        "findings": [
+          {
+            "description": "Clear, no masses or nodules.",
+            "location": "Lungs",
+            "type": "survey"
+          },
+          {
+            "description": "No lymphadenopathy.",
+            "location": "Mediastinum",
+            "type": "survey"
+          },
+          {
+            "description": "Homogeneous, no focal lesions.",
+            "location": "Liver",
+            "type": "survey"
+          },
+          {
+            "description": "Normal size and enhancement bilaterally.",
+            "location": "Kidneys",
+            "type": "survey"
+          },
+          {
+            "description": "Left adrenal normal. Right adrenal absent consistent with prior right adrenalectomy.",
+            "location": "Adrenals",
+            "type": "post-surgical change"
+          },
+          {
+            "description": "No recurrent para-aortic mass. No lymphadenopathy.",
+            "location": "Retroperitoneum",
+            "type": "survey"
+          },
+          {
+            "description": "No suspicious masses or lymphadenopathy.",
+            "location": "Pelvis",
+            "type": "survey"
+          },
+          {
+            "description": "No suspicious lytic or blastic lesions.",
+            "location": "Osseous structures",
+            "type": "survey"
+          }
+        ],
+        "impression": "No evidence of recurrent paraganglioma or extracranial malignancy. Expected post-surgical absence of the right adrenal gland. No lymphadenopathy or visceral masses. No metastatic disease identified.",
+        "measurements": null,
+        "modality": "CT",
+        "recommended_actions": [],
+        "region": "chest abdomen pelvis"
+      },
+      "tool_name": "order_body_imaging",
+      "trigger_action": "request_ct_chest_abdomen"
+    },
+    {
+      "output": {
+        "findings": [
+          {
+            "description": "Motor cortex activation mapping",
+            "region": "Primary motor cortex (precentral gyrus)",
+            "signal": "left_hand_activation: BOLD activation identified in the right precentral gyrus, displaced superiorly and posteriorly by the mass. The activation focus for left hand motor function is approximately 12 mm from the superior margin of the tumor.; right_hand_activation: Normal BOLD activation in the left precentral gyrus, anatomically intact; foot_activation: Bilateral paracentral lobule activation, normal position"
+          },
+          {
+            "description": "Language mapping",
+            "region": "Left hemisphere dominant for language",
+            "signal": "Broca_area: Normal BOLD activation in the left inferior frontal gyrus; Wernicke_area: Normal BOLD activation in the left posterior superior temporal gyrus; laterality_index: 0.82 (strongly left-lateralized for language)"
+          }
+        ],
+        "impression": "Functional MRI demonstrates displacement of the right primary motor cortex superiorly and posteriorly by the frontotemporal mass. BOLD activation for left hand motor function is approximately 12 mm from the tumor margin. Left hemisphere language dominance is demonstrated with Broca and Wernicke area activations remote from the lesion. DTI tractography demonstrates displacement but apparent preservation of the right corticospinal tract",
+        "modality": "perfusion_MRI",
+        "quantitative_data": null,
+        "recommended_actions": [],
+        "tracer_or_protocol": null
+      },
+      "tool_name": "order_advanced_imaging",
+      "trigger_action": "request_functional_mri"
+    },
+    {
+      "output": {
+        "query": "glioblastoma standard treatment protocol Stupp regimen young adult",
+        "results": [
+          {
+            "authors": "Stupp R, Mason WP, van den Bent MJ, et al.",
+            "journal": "N Engl J Med",
+            "key_finding": "Concomitant and adjuvant temozolomide with radiotherapy significantly improved median survival (14.6 vs 12.1 months) and 2-year survival (26.5% vs 10.4%) compared to radiotherapy alone",
+            "title": "Radiotherapy plus concomitant and adjuvant temozolomide for glioblastoma",
+            "year": "2005"
+          },
+          {
+            "authors": "Stupp R, Taillibert S, Kanner A, et al.",
+            "journal": "JAMA",
+            "key_finding": "Addition of tumor-treating fields (TTFields) to maintenance temozolomide improved median overall survival (20.9 vs 16.0 months) in newly diagnosed glioblastoma",
+            "title": "Effect of tumor-treating fields plus maintenance temozolomide vs maintenance temozolomide alone on survival in patients with glioblastoma",
+            "year": "2017"
+          },
+          {
+            "authors": "Hegi ME, Diserens AC, Gorlia T, et al.",
+            "journal": "N Engl J Med",
+            "key_finding": "MGMT promoter methylation is a strong predictive biomarker for benefit from temozolomide; methylated patients show significantly better overall survival with temozolomide",
+            "title": "MGMT gene silencing and benefit from temozolomide in glioblastoma",
+            "year": "2005"
+          },
+          {
+            "authors": "Ostrom QT, et al.",
+            "journal": "Neuro-Oncology",
+            "key_finding": "GBM in patients under 40 is uncommon but aggressive; IDH-wildtype tumors in younger adults carry a prognosis intermediate between IDH-mutant and older IDH-wildtype patients; maximal safe resection and Stupp protocol remain standard of care",
+            "title": "Glioblastoma in young adults: a distinct molecular and clinical entity",
+            "year": "2021"
+          }
+        ],
+        "summary": ""
+      },
+      "tool_name": "search_medical_literature",
+      "trigger_action": "search_glioblastoma_treatment_protocols"
+    },
+    {
+      "output": {
+        "alternatives": [
+          "Methylprednisolone as alternative corticosteroid, though dexamethasone is preferred in neuro-oncology",
+          "Lacosamide as alternative antiepileptic if levetiracetam causes intolerable behavioral side effects"
+        ],
+        "contraindications": [],
+        "formulary_status": "Both medications on formulary, no restrictions",
+        "interactions": [
+          "Amlodipine + Dexamethasone: Corticosteroids may reduce antihypertensive effect; monitor blood pressure closely"
+        ],
+        "proposed": "Dexamethasone 10 mg IV loading dose then 4 mg IV every 6 hours; Levetiracetam 500 mg IV twice daily",
+        "warnings": [
+          "Dexamethasone may cause steroid-induced hyperglycemia; monitor blood glucose regularly even in non-diabetic patients",
+          "Levetiracetam may cause behavioral side effects including irritability and mood changes; monitor given patient's partner-reported irritability",
+          "Consider GI prophylaxis with proton pump inhibitor while on high-dose corticosteroids",
+          "Taper dexamethasone to lowest effective dose as soon as clinically feasible"
+        ]
+      },
+      "tool_name": "check_drug_interactions",
+      "trigger_action": "check_drug_interactions_dexamethasone_levetiracetam"
+    },
+    {
+      "output": {
+        "abnormal_values_summary": [],
+        "interpretation": "All values within normal limits.",
+        "panels": {
+          "Catecholamine_Panel": [
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "< 57",
+              "test": "Plasma free metanephrine",
+              "unit": "pg/mL",
+              "value": 42
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "< 148",
+              "test": "Plasma free normetanephrine",
+              "unit": "pg/mL",
+              "value": 118
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "86-320",
+              "test": "24-hour urine metanephrines",
+              "unit": "mcg/24h",
+              "value": 195
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "120-400",
+              "test": "24-hour urine normetanephrines",
+              "unit": "mcg/24h",
+              "value": 310
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "< 93",
+              "test": "Chromogranin A",
+              "unit": "ng/mL",
+              "value": 85
+            }
+          ]
         }
-      ],
-      "allergies": [
-        "No known drug allergies"
-      ],
-      "family_history": [
-        "Father with history of paraganglioma, treated surgically at age 40",
-        "Paternal uncle diagnosed with pheochromocytoma",
-        "Mother healthy at age 60",
-        "No family history of brain tumors or neurological disorders"
-      ],
-      "social_history": {
-        "smoking": "Never smoker",
-        "alcohol": "Occasional social drinker, 1-2 drinks per month",
-        "occupation": "Graphic designer, works at a computer",
-        "living_situation": "Lives with his partner in an apartment",
-        "exercise": "Regular cyclist, 3-4 times per week until recent injury",
-        "illicit_drugs": "Denies"
+      },
+      "tool_name": "interpret_labs",
+      "trigger_action": "request_catecholamine_workup"
+    }
+  ],
+  "ground_truth": {
+    "action_criteria": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "contrast": true,
+              "protocol": "tumor"
+            },
+            "tool_name": "analyze_brain_mri"
+          }
+        ],
+        "citations": [
+          "[Stupp_2005]",
+          "Stupp_2005"
+        ],
+        "criterion_id": "action-1-analyze-brain-mri",
+        "expected_evidence": "Heterogeneously enhancing mass with ring/irregular enhancement, central necrosis, restricted diffusion at the enhancing rim, perilesional FLAIR-hyperintense edema, and mass effect consistent with high-grade glioma",
+        "importance": "required",
+        "label": "Order MRI brain with and without gadolinium contrast (tumor protocol with DWI, FLAIR, post-contrast T1) to characterize the right frontotemporal lesion, define mass effect, and plan surgery",
+        "rationale": "Order MRI brain with and without gadolinium contrast (tumor protocol with DWI, FLAIR, post-contrast T1) to characterize the right frontotemporal lesion, define mass effect, and plan surgery"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "CBC",
+                "BMP",
+                "coagulation",
+                "type_and_screen"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[NCCN_CNS]",
+          "NCCN_CNS"
+        ],
+        "criterion_id": "action-2-interpret-labs",
+        "expected_evidence": "Baseline values acceptable for surgery; identify any coagulopathy, electrolyte derangement, or steroid-relevant abnormality (e.g., hyperglycemia, hyponatremia) before craniotomy",
+        "importance": "required",
+        "label": "Order pre-operative laboratory workup: CBC, comprehensive metabolic panel, coagulation studies (PT/INR, aPTT), and type & screen in anticipation of surgical biopsy/resection",
+        "rationale": "Order pre-operative laboratory workup: CBC, comprehensive metabolic panel, coagulation studies (PT/INR, aPTT), and type & screen in anticipation of surgical biopsy/resection"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[WHO_2021]",
+          "WHO_2021"
+        ],
+        "criterion_id": "action-3-search-medical-literature",
+        "expected_evidence": "Confirmation that maximal safe resection followed by concurrent chemoradiation (Stupp protocol) is the standard of care, with molecular profiling (IDH, MGMT, 1p/19q, TERT) guiding prognosis and treatment selection",
+        "importance": "required",
+        "label": "Search medical literature for management of newly suspected high-grade glioma: WHO 2021 classification, Stupp protocol indications, and timing of surgical referral",
+        "rationale": "Search medical literature for management of newly suspected high-grade glioma: WHO 2021 classification, Stupp protocol indications, and timing of surgical referral"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "perfusion_MRI"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[Law_2003]",
+          "Law_2003"
+        ],
+        "criterion_id": "action-6-order-advanced-imaging",
+        "expected_evidence": "Elevated rCBV (typically > 1.75) in enhancing component supports high-grade neoplasm and helps direct biopsy",
+        "importance": "recommended",
+        "label": "Order MR perfusion imaging (DSC perfusion) to assess tumor vascularity and target highest-grade region for biopsy",
+        "rationale": "Order MR perfusion imaging (DSC perfusion) to assess tumor vascularity and target highest-grade region for biopsy"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "MR_spectroscopy"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[Bulik_2013]",
+          "Bulik_2013"
+        ],
+        "criterion_id": "action-7-order-advanced-imaging",
+        "expected_evidence": "Elevated Cho/NAA ratio with lipid-lactate peaks supports high-grade malignancy and helps differentiate tumor from treatment-related change at follow-up",
+        "importance": "recommended",
+        "label": "Order MR spectroscopy (1H-MRS) to characterize tumor metabolic profile",
+        "rationale": "Order MR spectroscopy (1H-MRS) to characterize tumor metabolic profile"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "contrast": true,
+              "study": "chest_abdomen_pelvis_CT"
+            },
+            "tool_name": "order_body_imaging"
+          }
+        ],
+        "citations": [
+          "[NCCN_CNS]",
+          "NCCN_CNS"
+        ],
+        "criterion_id": "action-8-order-body-imaging",
+        "expected_evidence": "No extracranial primary malignancy identified, supporting primary brain tumor as the working diagnosis",
+        "importance": "optional",
+        "label": "Order CT chest/abdomen/pelvis as staging to exclude an extracranial primary if a solitary metastasis is on the differential",
+        "rationale": "Order CT chest/abdomen/pelvis as staging to exclude an extracranial primary if a solitary metastasis is on the differential"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [
+          "[NCCN_CNS]",
+          "NCCN_CNS"
+        ],
+        "criterion_id": "action-9-check-drug-interactions",
+        "expected_evidence": "Identify steroid-induced hyperglycemia in diabetics and any AED-chemotherapy interaction concerns relevant to upcoming temozolomide therapy",
+        "importance": "optional",
+        "label": "Check drug interactions before starting/continuing antiepileptic medication and corticosteroids (levetiracetam preferred over enzyme-inducing AEDs; steroid effect on glycemic control)",
+        "rationale": "Check drug interactions before starting/continuing antiepileptic medication and corticosteroids (levetiracetam preferred over enzyme-inducing AEDs; steroid effect on glycemic control)"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "molecular_assays": [
+                "MGMT_methylation",
+                "1p_19q_codeletion",
+                "TERT_promoter",
+                "EGFR_amplification",
+                "chr7_gain_chr10_loss"
+              ],
+              "procedure": "stereotactic_biopsy"
+            },
+            "tool_name": "obtain_tissue_diagnosis"
+          }
+        ],
+        "citations": [
+          "[EANO_2021]",
+          "WHO_CNS5"
+        ],
+        "criterion_id": "action-10-obtain-tissue-diagnosis",
+        "expected_evidence": "Integrated diagnosis established as Glioblastoma, IDH-wildtype, WHO grade 4, with the molecular findings that determine the protocol",
+        "importance": "required",
+        "label": "Obtain tissue (stereotactic biopsy) and request an integrated histomolecular diagnosis: histology and grade with the molecular panel the classification requires \u2014 IDH status, MGMT promoter methylation, 1p/19q, ATRX, TERT and the copy-number markers. Imaging establishes a suspicion; only tissue establishes the diagnosis, and the molecular result selects the treatment",
+        "rationale": "Obtain tissue (stereotactic biopsy) and request an integrated histomolecular diagnosis: histology and grade with the molecular panel the classification requires \u2014 IDH status, MGMT promoter methylation, 1p/19q, ATRX, TERT and the copy-number markers. Imaging establishes a suspicion; only tissue establishes the diagnosis, and the molecular result selects the treatment"
       }
+    ],
+    "assessment": {
+      "prohibited_recommendations": [
+        "Do not perform lumbar puncture in the setting of significant mass effect and midline shift \u2014 herniation risk",
+        "Do not initiate definitive tumor-directed therapy (radiation, temozolomide, alkylating chemotherapy) before tissue diagnosis is established",
+        "Do not start therapeutic anticoagulation without a clear thromboembolic indication, given upcoming neurosurgical intervention and bleeding risk"
+      ],
+      "required_recommendations": [
+        "Obtain urgent neurosurgical consultation for tissue diagnosis (stereotactic biopsy or maximal safe resection) and operative planning",
+        "Obtain MRI brain with and without gadolinium contrast (tumor protocol) before any invasive procedure",
+        "Administer dexamethasone (loading dose 10 mg IV, then 4 mg IV every 6 hours) to reduce vasogenic edema given imaging evidence of herniation/significant mass effect",
+        "Initiate antiepileptic therapy with levetiracetam (preferred non-enzyme-inducing AED) for documented seizure activity",
+        "Obtain pre-operative labs (CBC, BMP, coagulation, type & screen) before craniotomy/biopsy",
+        "Plan multimodal treatment per molecular and histological profile (e.g., Stupp protocol \u2014 concurrent chemoradiation with temozolomide for IDH-wildtype GBM)"
+      ]
     },
-    "neurological_exam": {
-      "mental_status": "Alert and oriented to person, place, and time. Mildly inattentive on serial sevens with two errors. Language is fluent with occasional word-finding difficulty. Follows three-step commands. Recalls 2/3 objects at 5 minutes. Fund of knowledge and judgment intact.",
-      "cranial_nerves": "Pupils equal, round, reactive to light, 3 mm bilaterally. Right eye shows mild proptosis. Visual acuity reduced on the right (20/40 OD, 20/20 OS). Right temporal visual field deficit on confrontation testing. No papilledema. Extraocular movements intact. Decreased sensation to light touch and pinprick over the right V2 and V3 distributions. No facial asymmetry. Hearing decreased to finger rub on the right. Weber lateralizes to the left. Palate elevates symmetrically. Tongue midline.",
-      "motor": "Right upper and lower extremity: 5/5 throughout. Left upper extremity: 4+/5 deltoid, 4+/5 biceps, 5/5 triceps, 5/5 grip. Left lower extremity: 5/5 throughout. Subtle left pronator drift. No fasciculations or atrophy.",
-      "sensory": "Light touch and pinprick intact bilaterally in all extremities. Proprioception intact at the great toes. Vibration sense intact at the ankles. Decreased facial sensation on the right as noted above.",
-      "reflexes": "Right upper extremity 2+, right lower extremity 2+. Left upper extremity 2+, left lower extremity 2+ with an equivocal plantar response on the left. Right plantar response is flexor.",
-      "coordination": "Finger-to-nose slightly dysmetric on the left, intact on the right. Heel-to-shin intact bilaterally. Rapid alternating movements intact.",
-      "gait": "Ambulates independently with normal stride length. Mild left arm swing reduction noted. No Romberg sign.",
-      "additional": "No meningismus. One witnessed seizure in the emergency department: left arm tonic-clonic activity lasting approximately 60 seconds with preserved awareness, followed by 10 minutes of postictal confusion."
+    "avoided_actions": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "echo_type": "TTE"
+            },
+            "tool_name": "order_echocardiogram"
+          }
+        ],
+        "citations": [
+          "[NCCN_CNS]"
+        ],
+        "criterion_id": "avoid-waste-1-order-echocardiogram",
+        "rationale": "Echocardiogram has no role in the diagnostic workup of suspected high-grade glioma absent a specific cardiac question (e.g., suspected paraneoplastic endocarditis)",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "monitor_type": "holter_24h"
+            },
+            "tool_name": "order_cardiac_monitoring"
+          }
+        ],
+        "citations": [
+          "[NCCN_CNS]"
+        ],
+        "criterion_id": "avoid-waste-2-order-cardiac-monitoring",
+        "rationale": "Cardiac monitoring is unrelated to the diagnostic workup of a brain mass and adds resource cost without informing management",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_csf"
+          }
+        ],
+        "citations": [
+          "[Hasbun_2001]"
+        ],
+        "criterion_id": "avoid-harm-1-analyze-csf",
+        "rationale": "Lumbar puncture is contraindicated in suspected intracranial mass with imaging evidence of herniation: the pressure gradient created by LP risks transtentorial or tonsillar herniation. Even when LP is otherwise safe, CSF studies are low-yield for primary brain tumor diagnosis.",
+        "severity": "harm"
+      }
+    ],
+    "diagnosis": {
+      "accepted": [
+        "Glioblastoma, IDH-wildtype, WHO grade 4"
+      ],
+      "icd_codes": [
+        "C71.9"
+      ]
     },
-    "vitals": {
-      "bp_systolic": 138,
-      "bp_diastolic": 92,
-      "hr": 82,
-      "temp": 36.9,
-      "rr": 16,
-      "spo2": 98
-    },
-    "chief_complaint": "Progressive headaches, new left-sided weakness, and a first-time seizure",
-    "history_present_illness": "Mr. Carlos Mendez is a 35-year-old right-handed man with a significant past surgical history including resection of a para-aortic paraganglioma in childhood and a right adrenalectomy for pheochromocytoma at age 19, who presents to the emergency department after a witnessed focal seizure. The patient reports that approximately six weeks ago he sustained a mild traumatic brain injury after falling from his bicycle, for which he was evaluated at an outside hospital. He states that a head scan performed at that time revealed an unexpected finding in his skull base, but he did not follow up on it. Over the ensuing four weeks, he has developed progressively worsening headaches that are predominantly right-sided, worst in the early morning, and occasionally wake him from sleep. Acetaminophen has provided only modest relief. His partner reports that over the past two to three weeks, he has become noticeably more forgetful, occasionally repeating himself and missing deadlines at work, which is uncharacteristic for him. Approximately ten days ago, he began experiencing intermittent difficulty with fine motor tasks in his left hand, such as difficulty using his computer mouse and dropping his coffee mug on two occasions. His partner also noted that he has seemed less animated and more irritable than usual. This morning, while at his desk, his partner witnessed his left arm begin to shake rhythmically for approximately one minute, during which he appeared confused and did not respond to questions. He was brought to the emergency department by ambulance. On arrival, he was alert but reported a persistent mild headache and some confusion about the events. He denies any prior seizure history, recent febrile illness, vision changes beyond what he attributes to his old injury, nausea, vomiting, or weight loss. He has not experienced any recurrence of the childhood symptoms of episodic chest pain, palpitations, or diaphoresis. A non-contrast CT scan obtained in the emergency department demonstrated a large right frontotemporal mass with surrounding hypodensity consistent with edema and approximately 9 mm of midline shift to the left, distinct from and more superior to the previously noted skull-base abnormality. He was admitted to the neurology service for further evaluation."
+    "differential": [
+      {
+        "diagnosis": "Brain metastasis from malignant paraganglioma/pheochromocytoma",
+        "key_features": "Paraganglioma history raises this; CT staging negative, biopsy chromogranin-A negative, IDH-wildtype molecular profile rule it out",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Brain metastasis (solitary)",
+        "key_features": "No known primary cancer; staging CT chest/abdomen/pelvis negative; infiltrative margins and corpus-callosum or eloquent-cortex involvement more typical of primary glioma than metastasis",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Primary CNS lymphoma",
+        "key_features": "In immunocompetent patients typically presents as homogeneously enhancing periventricular mass with diffuse DWI restriction and no central necrosis; ring enhancement with necrosis argues against",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Brain abscess",
+        "key_features": "No fever or leukocytosis; DWI restriction at the enhancing rim (not centrally as in pyogenic pus) and elevated rCBV are inconsistent with abscess",
+        "likelihood": "very_low"
+      },
+      {
+        "diagnosis": "Tumefactive demyelinating lesion",
+        "key_features": "Closed ring enhancement, marked mass effect, and central necrosis are atypical for tumefactive MS; demyelinating lesions usually show incomplete ('open') ring enhancement on the cortical side",
+        "likelihood": "very_low"
+      }
+    ],
+    "key_clinical_evidence": [
+      "Combination of progressive headache (worse mornings), new focal neurological deficit, and/or new-onset seizure in an adult is a high-risk presentation requiring urgent contrast-enhanced brain MRI",
+      "MRI features of a right frontotemporal heterogeneously / ring-enhancing mass with central necrosis, perilesional FLAIR-hyperintense edema, restricted diffusion at the enhancing rim, and mass effect are characteristic of high-grade glioma",
+      "Perfusion MRI (elevated rCBV) and MR spectroscopy (elevated Cho/NAA, lipid-lactate) corroborate high-grade neoplasm and help guide biopsy targeting",
+      "Significant midline shift / herniation risk mandates urgent dexamethasone and neurosurgical evaluation; lumbar puncture is contraindicated",
+      "Definitive diagnosis requires tissue (stereotactic biopsy or surgical resection) with molecular profiling (IDH, MGMT, 1p/19q, TERT, H3K27M); imaging alone cannot substitute for histology",
+      "For IDH-wildtype GBM, current standard of care is maximal safe resection followed by the Stupp protocol (concurrent radiation + temozolomide, then adjuvant temozolomide)",
+      "Avoid ordering off-pathway advanced-imaging modalities (DaTscan, amyloid PET, FDG-PET, carotid duplex, transcranial Doppler) \u2014 they address other neurological differentials and add cost without informing glioma management",
+      "New-onset focal or generalized seizure with a focal-onset mass mandates AED therapy (levetiracetam preferred \u2014 non-enzyme-inducing, fewer interactions with temozolomide)"
+    ],
+    "red_herrings": [
+      {
+        "correct_interpretation": "Staging shows no recurrence; biopsy is a distinct primary high-grade glial neoplasm (chromogranin-A negative, IDH-wildtype)",
+        "data_point": "Personal and family history of paraganglioma and pheochromocytoma with prior bilateral catecholamine-tumor surgeries",
+        "field_path": "",
+        "intended_effect": "Anchors toward metastatic neuroendocrine tumor explanation",
+        "location": "patient.clinical_history.past_medical_history"
+      },
+      {
+        "correct_interpretation": "The frontotemporal mass is anatomically distinct from and superior to the skull-base finding; imaging features are diagnostic of high-grade glioma, not post-traumatic change",
+        "data_point": "Mild traumatic brain injury six weeks ago with incidental skull-base finding on outside CT",
+        "field_path": "",
+        "intended_effect": "Suggests post-traumatic contusion evolution or that the skull-base finding is the active lesion",
+        "location": "patient.history_present_illness"
+      }
+    ],
+    "review_status": "draft",
+    "sequence_constraints": [
+      {
+        "after_criterion_id": "action-10-obtain-tissue-diagnosis",
+        "before_criterion_id": "action-1-analyze-brain-mri",
+        "citations": [
+          "[EANO_2021]"
+        ],
+        "reason": "Imaging plans the approach and identifies the enhancing target to sample; biopsying before it risks a non-diagnostic specimen from a necrotic centre",
+        "severity": "soft"
+      }
+    ],
+    "stop_rule": {
+      "max_additional_actions": 0,
+      "required_before_assessment": [
+        "action-1-analyze-brain-mri",
+        "action-2-interpret-labs",
+        "action-3-search-medical-literature",
+        "action-10-obtain-tissue-diagnosis"
+      ]
+    }
   },
   "initial_tool_outputs": {
-    "eeg": {
-      "classification": "abnormal",
-      "background": {
-        "posterior_dominant_rhythm": "9 Hz alpha, better organized over the left hemisphere",
-        "symmetry": "Marked asymmetry with attenuation and slowing over the right frontotemporal region",
-        "reactivity": "Posterior dominant rhythm attenuates with eye opening bilaterally"
-      },
+    "csf": null,
+    "drug_interactions": null,
+    "ecg": {
+      "axis": "Normal axis (62 degrees)",
+      "clinical_correlation": "",
       "findings": [
-        {
-          "type": "Continuous polymorphic delta activity",
-          "location": "Right frontotemporal region (F4, F8, T4)",
-          "frequency": "1-3 Hz",
-          "morphology": "High-amplitude polymorphic slow waves",
-          "state": "Present in wakefulness and drowsiness",
-          "clinical_correlation": ""
-        },
-        {
-          "type": "Intermittent rhythmic delta activity",
-          "location": "Right frontal region",
-          "frequency": "2-3 Hz",
-          "morphology": "Semi-rhythmic notched delta waves",
-          "state": "Wakefulness",
-          "clinical_correlation": ""
-        },
-        {
-          "type": "Sharp waves",
-          "location": "Right frontotemporal (F8, T4)",
-          "frequency": "Occasional, approximately 2-3 per minute in drowsiness",
-          "morphology": "Phase-reversing sharp waves with aftergoing slow wave",
-          "state": "Drowsiness and light sleep",
-          "clinical_correlation": ""
-        }
+        "No ST-segment or T-wave abnormalities",
+        "No conduction delays",
+        "No evidence of ventricular hypertrophy"
       ],
-      "artifacts": [
-        {
-          "type": "Muscle artifact",
-          "location": "Bilateral temporal electrodes",
-          "impact": "Intermittent, does not obscure key findings"
-        }
-      ],
+      "interpretation": "Normal sinus rhythm at 82 bpm. No acute ischemic changes. No conduction abnormalities. Normal ECG.",
+      "intervals": {
+        "PR": "158 ms",
+        "QRS": "86 ms",
+        "QTc": "412 ms"
+      },
+      "rate": 82,
+      "rhythm": "Normal sinus rhythm"
+    },
+    "eeg": {
       "activating_procedures": {
         "hyperventilation": "Not performed due to concern for elevated intracranial pressure",
         "photic_stimulation": "No photoparoxysmal response"
       },
+      "artifacts": [
+        {
+          "impact": "Intermittent, does not obscure key findings",
+          "location": "Bilateral temporal electrodes",
+          "type": "Muscle artifact"
+        }
+      ],
+      "background": {
+        "posterior_dominant_rhythm": "9 Hz alpha, better organized over the left hemisphere",
+        "reactivity": "Posterior dominant rhythm attenuates with eye opening bilaterally",
+        "symmetry": "Marked asymmetry with attenuation and slowing over the right frontotemporal region"
+      },
+      "classification": "abnormal",
+      "findings": [
+        {
+          "clinical_correlation": "",
+          "frequency": "1-3 Hz",
+          "location": "Right frontotemporal region (F4, F8, T4)",
+          "morphology": "High-amplitude polymorphic slow waves",
+          "state": "Present in wakefulness and drowsiness",
+          "type": "Continuous polymorphic delta activity"
+        },
+        {
+          "clinical_correlation": "",
+          "frequency": "2-3 Hz",
+          "location": "Right frontal region",
+          "morphology": "Semi-rhythmic notched delta waves",
+          "state": "Wakefulness",
+          "type": "Intermittent rhythmic delta activity"
+        },
+        {
+          "clinical_correlation": "",
+          "frequency": "Occasional, approximately 2-3 per minute in drowsiness",
+          "location": "Right frontotemporal (F8, T4)",
+          "morphology": "Phase-reversing sharp waves with aftergoing slow wave",
+          "state": "Drowsiness and light sleep",
+          "type": "Sharp waves"
+        }
+      ],
       "impression": "Background asymmetry with attenuation and slowing over the right hemisphere",
       "limitations": "Hyperventilation not performed due to clinical concern for elevated intracranial pressure.",
       "recommended_actions": []
     },
+    "labs": {
+      "abnormal_values_summary": [],
+      "interpretation": "All values within normal limits.",
+      "panels": {
+        "BMP": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "136-145",
+            "test": "Sodium",
+            "unit": "mEq/L",
+            "value": 140
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.5-5.0",
+            "test": "Potassium",
+            "unit": "mEq/L",
+            "value": 4.1
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "98-106",
+            "test": "Chloride",
+            "unit": "mEq/L",
+            "value": 103
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "22-28",
+            "test": "Bicarbonate",
+            "unit": "mEq/L",
+            "value": 25
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "7-20",
+            "test": "BUN",
+            "unit": "mg/dL",
+            "value": 14
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.7-1.3",
+            "test": "Creatinine",
+            "unit": "mg/dL",
+            "value": 0.95
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "70-100",
+            "test": "Glucose",
+            "unit": "mg/dL",
+            "value": 95
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "8.5-10.5",
+            "test": "Calcium",
+            "unit": "mg/dL",
+            "value": 9.7
+          }
+        ],
+        "Baseline workup": [
+          {
+            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on",
+            "is_abnormal": false,
+            "reference_range": "",
+            "test": "type_and_screen",
+            "unit": "",
+            "value": "Group and antibody screen completed; antibody screen negative, no incompatibility identified"
+          }
+        ],
+        "CBC": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "4.0-11.0",
+            "test": "WBC",
+            "unit": "x10^9/L",
+            "value": 8.2
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "13.5-17.5",
+            "test": "Hemoglobin",
+            "unit": "g/dL",
+            "value": 15.1
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "38.8-50.0",
+            "test": "Hematocrit",
+            "unit": "%",
+            "value": 44.2
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "150-400",
+            "test": "Platelets",
+            "unit": "x10^9/L",
+            "value": 245
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "80-100",
+            "test": "MCV",
+            "unit": "fL",
+            "value": 89
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "40-70",
+            "test": "Neutrophils",
+            "unit": "%",
+            "value": 62
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "20-40",
+            "test": "Lymphocytes",
+            "unit": "%",
+            "value": 28
+          }
+        ],
+        "Coagulation": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "11.0-13.5",
+            "test": "PT",
+            "unit": "seconds",
+            "value": 12.8
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.9-1.1",
+            "test": "INR",
+            "unit": "",
+            "value": 1.0
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "25-35",
+            "test": "aPTT",
+            "unit": "seconds",
+            "value": 28
+          }
+        ],
+        "Exclusion studies": [
+          {
+            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on",
+            "is_abnormal": false,
+            "reference_range": "",
+            "test": "chr7_gain_chr10_loss",
+            "unit": "",
+            "value": "Within reference range"
+          }
+        ],
+        "Hepatic": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "10-40",
+            "test": "AST",
+            "unit": "U/L",
+            "value": 24
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "7-56",
+            "test": "ALT",
+            "unit": "U/L",
+            "value": 28
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "44-147",
+            "test": "Alkaline phosphatase",
+            "unit": "U/L",
+            "value": 68
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.1-1.2",
+            "test": "Total bilirubin",
+            "unit": "mg/dL",
+            "value": 0.7
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.5-5.5",
+            "test": "Albumin",
+            "unit": "g/dL",
+            "value": 4.2
+          }
+        ],
+        "Other": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "140-280",
+            "test": "LDH",
+            "unit": "U/L",
+            "value": 205
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0-5",
+            "test": "CRP",
+            "unit": "mg/L",
+            "value": 3.8
+          }
+        ]
+      }
+    },
+    "literature_search": null,
     "mri": {
-      "findings": [
-        {
-          "type": "Heterogeneously enhancing mass with central necrosis",
-          "location": "Right frontotemporal region, centered in the inferior frontal and superior temporal gyri, extending into the insular cortex and subcortical white matter",
-          "size": "5.8 x 5.1 x 4.5 cm",
-          "signal_characteristics": {
-            "T1": "Heterogeneous, predominantly hypointense with scattered foci of T1 hyperintensity suggesting hemorrhage or proteinaceous material",
-            "T2": "Heterogeneous mixed signal intensity with central T2 hyperintensity indicating necrosis",
-            "FLAIR": "Extensive perilesional FLAIR hyperintensity extending through the right frontal and temporal white matter, corona radiata, and external capsule",
-            "DWI": "Restricted diffusion along the enhancing rim indicating high cellularity; central areas show facilitated diffusion consistent with necrosis",
-            "post_gadolinium": "Thick irregular ring enhancement with nodular enhancing components along the superior and medial margins"
-          },
-          "mass_effect": "Effacement of the right sylvian fissure and right frontal horn of the lateral ventricle. Approximately 9 mm leftward midline shift of the septum pellucidum. Mild uncal herniation on the right. Sulcal effacement over the right frontotemporal convexity.",
-          "borders": "Irregular and infiltrative margins with indistinct interface with adjacent brain parenchyma"
-        },
-        {
-          "type": "Perilesional vasogenic edema",
-          "location": "Right frontal and temporal lobe white matter extending into the ipsilateral corona radiata, external capsule, and anterior limb of the internal capsule",
-          "size": null,
-          "signal_characteristics": {
-            "FLAIR": "Hyperintense",
-            "T2": "Hyperintense",
-            "DWI": "No restricted diffusion in the edematous regions"
-          },
-          "mass_effect": "Contributing to overall mass effect and midline shift",
-          "borders": "Finger-like projections extending along white matter tracts"
-        },
-        {
-          "type": "Incidental skull-base lesion",
-          "location": "Right middle cranial fossa, centered at the jugular foramen extending to the petrous apex",
-          "size": "2.3 x 1.8 cm",
-          "signal_characteristics": {
-            "T1": "Isointense to gray matter",
-            "T2": "Hyperintense with internal flow voids (salt-and-pepper appearance)",
-            "post_gadolinium": "Avid homogeneous enhancement"
-          },
-          "mass_effect": "Mild expansion of the right jugular foramen. No significant intracranial mass effect from this lesion.",
-          "borders": "Well-circumscribed with smooth margins"
-        }
-      ],
-      "volumetrics": {
-        "lesion_volume": "Approximately 68 cm³ including enhancing and necrotic components of the frontotemporal mass",
-        "edema_volume": "Approximately 95 cm³ of perilesional FLAIR signal abnormality"
-      },
       "additional_observations": [
         "No additional parenchymal enhancing lesions identified besides the two described above",
         "No leptomeningeal enhancement",
@@ -174,281 +931,54 @@
         "Major dural sinuses are patent",
         "No hydrocephalus despite midline shift"
       ],
-      "impression": "Large heterogeneously enhancing right frontotemporal mass with central necrosis, thick irregular ring enhancement, extensive surrounding vasogenic edema, and significant midline shift (9 mm) with early right uncal herniation. The lesion involves the inferior frontal and superior temporal gyri and extends into the insular cortex",
-      "recommended_actions": []
-    },
-    "ecg": {
-      "rhythm": "Normal sinus rhythm",
-      "rate": 82,
-      "intervals": {
-        "PR": "158 ms",
-        "QRS": "86 ms",
-        "QTc": "412 ms"
-      },
-      "axis": "Normal axis (62 degrees)",
       "findings": [
-        "No ST-segment or T-wave abnormalities",
-        "No conduction delays",
-        "No evidence of ventricular hypertrophy"
+        {
+          "borders": "Irregular and infiltrative margins with indistinct interface with adjacent brain parenchyma",
+          "location": "Right frontotemporal region, centered in the inferior frontal and superior temporal gyri, extending into the insular cortex and subcortical white matter",
+          "mass_effect": "Effacement of the right sylvian fissure and right frontal horn of the lateral ventricle. Approximately 9 mm leftward midline shift of the septum pellucidum. Mild uncal herniation on the right. Sulcal effacement over the right frontotemporal convexity.",
+          "signal_characteristics": {
+            "DWI": "Restricted diffusion along the enhancing rim indicating high cellularity; central areas show facilitated diffusion consistent with necrosis",
+            "FLAIR": "Extensive perilesional FLAIR hyperintensity extending through the right frontal and temporal white matter, corona radiata, and external capsule",
+            "T1": "Heterogeneous, predominantly hypointense with scattered foci of T1 hyperintensity suggesting hemorrhage or proteinaceous material",
+            "T2": "Heterogeneous mixed signal intensity with central T2 hyperintensity indicating necrosis",
+            "post_gadolinium": "Thick irregular ring enhancement with nodular enhancing components along the superior and medial margins"
+          },
+          "size": "5.8 x 5.1 x 4.5 cm",
+          "type": "Heterogeneously enhancing mass with central necrosis"
+        },
+        {
+          "borders": "Finger-like projections extending along white matter tracts",
+          "location": "Right frontal and temporal lobe white matter extending into the ipsilateral corona radiata, external capsule, and anterior limb of the internal capsule",
+          "mass_effect": "Contributing to overall mass effect and midline shift",
+          "signal_characteristics": {
+            "DWI": "No restricted diffusion in the edematous regions",
+            "FLAIR": "Hyperintense",
+            "T2": "Hyperintense"
+          },
+          "size": null,
+          "type": "Perilesional vasogenic edema"
+        },
+        {
+          "borders": "Well-circumscribed with smooth margins",
+          "location": "Right middle cranial fossa, centered at the jugular foramen extending to the petrous apex",
+          "mass_effect": "Mild expansion of the right jugular foramen. No significant intracranial mass effect from this lesion.",
+          "signal_characteristics": {
+            "T1": "Isointense to gray matter",
+            "T2": "Hyperintense with internal flow voids (salt-and-pepper appearance)",
+            "post_gadolinium": "Avid homogeneous enhancement"
+          },
+          "size": "2.3 x 1.8 cm",
+          "type": "Incidental skull-base lesion"
+        }
       ],
-      "interpretation": "Normal sinus rhythm at 82 bpm. No acute ischemic changes. No conduction abnormalities. Normal ECG.",
-      "clinical_correlation": ""
+      "impression": "Large heterogeneously enhancing right frontotemporal mass with central necrosis, thick irregular ring enhancement, extensive surrounding vasogenic edema, and significant midline shift (9 mm) with early right uncal herniation. The lesion involves the inferior frontal and superior temporal gyri and extends into the insular cortex",
+      "recommended_actions": [],
+      "volumetrics": {
+        "edema_volume": "Approximately 95 cm\u00b3 of perilesional FLAIR signal abnormality",
+        "lesion_volume": "Approximately 68 cm\u00b3 including enhancing and necrotic components of the frontotemporal mass"
+      }
     },
-    "labs": {
-      "panels": {
-        "CBC": [
-          {
-            "test": "WBC",
-            "value": 8.2,
-            "unit": "x10^9/L",
-            "reference_range": "4.0-11.0",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Hemoglobin",
-            "value": 15.1,
-            "unit": "g/dL",
-            "reference_range": "13.5-17.5",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Hematocrit",
-            "value": 44.2,
-            "unit": "%",
-            "reference_range": "38.8-50.0",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Platelets",
-            "value": 245,
-            "unit": "x10^9/L",
-            "reference_range": "150-400",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "MCV",
-            "value": 89,
-            "unit": "fL",
-            "reference_range": "80-100",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Neutrophils",
-            "value": 62,
-            "unit": "%",
-            "reference_range": "40-70",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Lymphocytes",
-            "value": 28,
-            "unit": "%",
-            "reference_range": "20-40",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ],
-        "BMP": [
-          {
-            "test": "Sodium",
-            "value": 140,
-            "unit": "mEq/L",
-            "reference_range": "136-145",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Potassium",
-            "value": 4.1,
-            "unit": "mEq/L",
-            "reference_range": "3.5-5.0",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Chloride",
-            "value": 103,
-            "unit": "mEq/L",
-            "reference_range": "98-106",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Bicarbonate",
-            "value": 25,
-            "unit": "mEq/L",
-            "reference_range": "22-28",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "BUN",
-            "value": 14,
-            "unit": "mg/dL",
-            "reference_range": "7-20",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Creatinine",
-            "value": 0.95,
-            "unit": "mg/dL",
-            "reference_range": "0.7-1.3",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Glucose",
-            "value": 95,
-            "unit": "mg/dL",
-            "reference_range": "70-100",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Calcium",
-            "value": 9.7,
-            "unit": "mg/dL",
-            "reference_range": "8.5-10.5",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ],
-        "Coagulation": [
-          {
-            "test": "PT",
-            "value": 12.8,
-            "unit": "seconds",
-            "reference_range": "11.0-13.5",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "INR",
-            "value": 1.0,
-            "unit": "",
-            "reference_range": "0.9-1.1",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "aPTT",
-            "value": 28,
-            "unit": "seconds",
-            "reference_range": "25-35",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ],
-        "Hepatic": [
-          {
-            "test": "AST",
-            "value": 24,
-            "unit": "U/L",
-            "reference_range": "10-40",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "ALT",
-            "value": 28,
-            "unit": "U/L",
-            "reference_range": "7-56",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Alkaline phosphatase",
-            "value": 68,
-            "unit": "U/L",
-            "reference_range": "44-147",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Total bilirubin",
-            "value": 0.7,
-            "unit": "mg/dL",
-            "reference_range": "0.1-1.2",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Albumin",
-            "value": 4.2,
-            "unit": "g/dL",
-            "reference_range": "3.5-5.5",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ],
-        "Other": [
-          {
-            "test": "LDH",
-            "value": 205,
-            "unit": "U/L",
-            "reference_range": "140-280",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "CRP",
-            "value": 3.8,
-            "unit": "mg/L",
-            "reference_range": "0-5",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ],
-        "Exclusion studies": [
-          {
-            "test": "chr7_gain_chr10_loss",
-            "value": "Within reference range",
-            "unit": "",
-            "reference_range": "",
-            "is_abnormal": false,
-            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on"
-          }
-        ],
-        "Baseline workup": [
-          {
-            "test": "type_and_screen",
-            "value": "Group and antibody screen completed; antibody screen negative, no incompatibility identified",
-            "unit": "",
-            "reference_range": "",
-            "is_abnormal": false,
-            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on"
-          }
-        ]
-      },
-      "interpretation": "All values within normal limits.",
-      "abnormal_values_summary": []
-    },
-    "csf": null,
-    "literature_search": null,
-    "drug_interactions": null,
     "tissue_diagnosis": {
-      "procedure": "stereotactic_biopsy",
-      "site": "as targeted on the contrast-enhancing rim",
-      "specimen_adequate": true,
-      "integrated_diagnosis": "Glioblastoma, IDH-wildtype, WHO grade 4",
-      "histological_diagnosis": "High-grade astrocytic neoplasm with microvascular proliferation and palisading necrosis",
-      "who_grade": "4",
-      "molecular_findings": {
-        "Microscopic description": "Highly cellular glial neoplasm with marked nuclear atypia, brisk mitotic activity (15 mitoses per 10 HPF), microvascular proliferation with glomeruloid bodies, and extensive palisading necrosis",
-        "IDH1/IDH2 mutation": "Wild-type (negative)",
-        "MGMT promoter methylation": "Methylated",
-        "1p/19q codeletion": "Absent",
-        "TERT promoter mutation": "Present",
-        "EGFR amplification": "Present",
-        "+7/-10 chromosome": "Present"
-      },
       "diagnosis_suffix": null,
       "findings": [
         {
@@ -488,575 +1018,119 @@
           "result": "Present"
         }
       ],
-      "impression": "Integrated diagnosis: Glioblastoma, IDH-wildtype, WHO grade 4. The layered report is what the WHO CNS5 classification requires — histology, grade and molecular findings combined — and it is what converts a radiological suspicion into a diagnosis that determines treatment. Imaging cannot substitute for it, and the molecular result changes the protocol, not merely the label.",
-      "recommended_actions": []
+      "histological_diagnosis": "High-grade astrocytic neoplasm with microvascular proliferation and palisading necrosis",
+      "impression": "Integrated diagnosis: Glioblastoma, IDH-wildtype, WHO grade 4. The layered report is what the WHO CNS5 classification requires \u2014 histology, grade and molecular findings combined \u2014 and it is what converts a radiological suspicion into a diagnosis that determines treatment. Imaging cannot substitute for it, and the molecular result changes the protocol, not merely the label.",
+      "integrated_diagnosis": "Glioblastoma, IDH-wildtype, WHO grade 4",
+      "molecular_findings": {
+        "+7/-10 chromosome": "Present",
+        "1p/19q codeletion": "Absent",
+        "EGFR amplification": "Present",
+        "IDH1/IDH2 mutation": "Wild-type (negative)",
+        "MGMT promoter methylation": "Methylated",
+        "Microscopic description": "Highly cellular glial neoplasm with marked nuclear atypia, brisk mitotic activity (15 mitoses per 10 HPF), microvascular proliferation with glomeruloid bodies, and extensive palisading necrosis",
+        "TERT promoter mutation": "Present"
+      },
+      "procedure": "stereotactic_biopsy",
+      "recommended_actions": [],
+      "site": "as targeted on the contrast-enhancing rim",
+      "specimen_adequate": true,
+      "who_grade": "4"
     }
-  },
-  "followup_outputs": [
-    {
-      "trigger_action": "request_mri_perfusion",
-      "tool_name": "order_advanced_imaging",
-      "output": {
-        "modality": "perfusion_MRI",
-        "tracer_or_protocol": null,
-        "findings": [
-          {
-            "region": "Enhancing rim of the right frontotemporal mass",
-            "signal": "rCBV_ratio: 4.1 (reference: normal brain = 1.0; high-grade glioma threshold > 1.75); rCBF: Elevated in enhancing components; Ktrans: Elevated, indicating blood-brain barrier disruption",
-            "description": "Elevated relative cerebral blood volume (rCBV)"
-          },
-          {
-            "region": "Central necrotic core of the mass",
-            "signal": "rCBV_ratio: 0.3 (markedly reduced, consistent with necrosis)",
-            "description": "Low cerebral blood volume"
-          }
-        ],
-        "quantitative_data": null,
-        "impression": "MR perfusion demonstrates markedly elevated rCBV ratio (4.1) in the enhancing rim of the right frontotemporal mass, with elevated Ktrans indicating blood-brain barrier disruption. The central necrotic core shows markedly reduced rCBV (ratio 0.3). Mildly elevated rCBV is noted in the perilesional FLAIR-abnormal region",
-        "recommended_actions": []
-      }
-    },
-    {
-      "trigger_action": "request_mr_spectroscopy",
-      "tool_name": "order_advanced_imaging",
-      "output": {
-        "modality": "MR_spectroscopy",
-        "tracer_or_protocol": null,
-        "findings": [
-          {
-            "region": "Enhancing component of right frontotemporal mass",
-            "signal": "choline: Markedly elevated (Cho/Cr ratio 3.9; normal < 1.5); NAA: Markedly reduced (NAA/Cr ratio 0.3; normal > 1.5); Cho_NAA_ratio: 13.0 (markedly elevated, consistent with high-grade tumor); lipid_lactate: Prominent lipid and lactate peaks present, indicating necrosis and anaerobic metabolism; myoinositol: Mildly elevated",
-            "description": "Abnormal metabolite ratios consistent with high-grade neoplasm"
-          },
-          {
-            "region": "FLAIR-hyperintense region adjacent to enhancing mass",
-            "signal": "choline: Mildly elevated (Cho/Cr ratio 1.9); NAA: Mildly reduced (NAA/Cr ratio 1.0); lipid_lactate: Absent",
-            "description": "Perilesional spectroscopy abnormality"
-          }
-        ],
-        "quantitative_data": null,
-        "impression": "MR spectroscopy of the enhancing component demonstrates markedly elevated choline (Cho/Cr ratio 3.9), severely reduced NAA (NAA/Cr ratio 0.3), and a Cho/NAA ratio of 13.0. Prominent lipid and lactate peaks are present. Myoinositol is mildly elevated. The perilesional FLAIR-abnormal region shows mildly elevated choline (Cho/Cr ratio 1.9) and mildly reduced NAA (NAA/Cr ratio 1.0) without lipid or lactate peaks",
-        "recommended_actions": []
-      }
-    },
-    {
-      "trigger_action": "request_ct_chest_abdomen",
-      "tool_name": "order_body_imaging",
-      "output": {
-        "region": "chest abdomen pelvis",
-        "modality": "CT",
-        "contrast": true,
-        "findings": [
-          {
-            "type": "survey",
-            "location": "Lungs",
-            "description": "Clear, no masses or nodules."
-          },
-          {
-            "type": "survey",
-            "location": "Mediastinum",
-            "description": "No lymphadenopathy."
-          },
-          {
-            "type": "survey",
-            "location": "Liver",
-            "description": "Homogeneous, no focal lesions."
-          },
-          {
-            "type": "survey",
-            "location": "Kidneys",
-            "description": "Normal size and enhancement bilaterally."
-          },
-          {
-            "type": "post-surgical change",
-            "location": "Adrenals",
-            "description": "Left adrenal normal. Right adrenal absent consistent with prior right adrenalectomy."
-          },
-          {
-            "type": "survey",
-            "location": "Retroperitoneum",
-            "description": "No recurrent para-aortic mass. No lymphadenopathy."
-          },
-          {
-            "type": "survey",
-            "location": "Pelvis",
-            "description": "No suspicious masses or lymphadenopathy."
-          },
-          {
-            "type": "survey",
-            "location": "Osseous structures",
-            "description": "No suspicious lytic or blastic lesions."
-          }
-        ],
-        "measurements": null,
-        "impression": "No evidence of recurrent paraganglioma or extracranial malignancy. Expected post-surgical absence of the right adrenal gland. No lymphadenopathy or visceral masses. No metastatic disease identified.",
-        "recommended_actions": []
-      }
-    },
-    {
-      "trigger_action": "request_functional_mri",
-      "tool_name": "order_advanced_imaging",
-      "output": {
-        "modality": "perfusion_MRI",
-        "tracer_or_protocol": null,
-        "findings": [
-          {
-            "region": "Primary motor cortex (precentral gyrus)",
-            "signal": "left_hand_activation: BOLD activation identified in the right precentral gyrus, displaced superiorly and posteriorly by the mass. The activation focus for left hand motor function is approximately 12 mm from the superior margin of the tumor.; right_hand_activation: Normal BOLD activation in the left precentral gyrus, anatomically intact; foot_activation: Bilateral paracentral lobule activation, normal position",
-            "description": "Motor cortex activation mapping"
-          },
-          {
-            "region": "Left hemisphere dominant for language",
-            "signal": "Broca_area: Normal BOLD activation in the left inferior frontal gyrus; Wernicke_area: Normal BOLD activation in the left posterior superior temporal gyrus; laterality_index: 0.82 (strongly left-lateralized for language)",
-            "description": "Language mapping"
-          }
-        ],
-        "quantitative_data": null,
-        "impression": "Functional MRI demonstrates displacement of the right primary motor cortex superiorly and posteriorly by the frontotemporal mass. BOLD activation for left hand motor function is approximately 12 mm from the tumor margin. Left hemisphere language dominance is demonstrated with Broca and Wernicke area activations remote from the lesion. DTI tractography demonstrates displacement but apparent preservation of the right corticospinal tract",
-        "recommended_actions": []
-      }
-    },
-    {
-      "trigger_action": "search_glioblastoma_treatment_protocols",
-      "tool_name": "search_medical_literature",
-      "output": {
-        "query": "glioblastoma standard treatment protocol Stupp regimen young adult",
-        "results": [
-          {
-            "title": "Radiotherapy plus concomitant and adjuvant temozolomide for glioblastoma",
-            "authors": "Stupp R, Mason WP, van den Bent MJ, et al.",
-            "journal": "N Engl J Med",
-            "year": "2005",
-            "key_finding": "Concomitant and adjuvant temozolomide with radiotherapy significantly improved median survival (14.6 vs 12.1 months) and 2-year survival (26.5% vs 10.4%) compared to radiotherapy alone"
-          },
-          {
-            "title": "Effect of tumor-treating fields plus maintenance temozolomide vs maintenance temozolomide alone on survival in patients with glioblastoma",
-            "authors": "Stupp R, Taillibert S, Kanner A, et al.",
-            "journal": "JAMA",
-            "year": "2017",
-            "key_finding": "Addition of tumor-treating fields (TTFields) to maintenance temozolomide improved median overall survival (20.9 vs 16.0 months) in newly diagnosed glioblastoma"
-          },
-          {
-            "title": "MGMT gene silencing and benefit from temozolomide in glioblastoma",
-            "authors": "Hegi ME, Diserens AC, Gorlia T, et al.",
-            "journal": "N Engl J Med",
-            "year": "2005",
-            "key_finding": "MGMT promoter methylation is a strong predictive biomarker for benefit from temozolomide; methylated patients show significantly better overall survival with temozolomide"
-          },
-          {
-            "title": "Glioblastoma in young adults: a distinct molecular and clinical entity",
-            "authors": "Ostrom QT, et al.",
-            "journal": "Neuro-Oncology",
-            "year": "2021",
-            "key_finding": "GBM in patients under 40 is uncommon but aggressive; IDH-wildtype tumors in younger adults carry a prognosis intermediate between IDH-mutant and older IDH-wildtype patients; maximal safe resection and Stupp protocol remain standard of care"
-          }
-        ],
-        "summary": ""
-      }
-    },
-    {
-      "trigger_action": "check_drug_interactions_dexamethasone_levetiracetam",
-      "tool_name": "check_drug_interactions",
-      "output": {
-        "proposed": "Dexamethasone 10 mg IV loading dose then 4 mg IV every 6 hours; Levetiracetam 500 mg IV twice daily",
-        "interactions": [
-          "Amlodipine + Dexamethasone: Corticosteroids may reduce antihypertensive effect; monitor blood pressure closely"
-        ],
-        "contraindications": [],
-        "warnings": [
-          "Dexamethasone may cause steroid-induced hyperglycemia; monitor blood glucose regularly even in non-diabetic patients",
-          "Levetiracetam may cause behavioral side effects including irritability and mood changes; monitor given patient's partner-reported irritability",
-          "Consider GI prophylaxis with proton pump inhibitor while on high-dose corticosteroids",
-          "Taper dexamethasone to lowest effective dose as soon as clinically feasible"
-        ],
-        "formulary_status": "Both medications on formulary, no restrictions",
-        "alternatives": [
-          "Methylprednisolone as alternative corticosteroid, though dexamethasone is preferred in neuro-oncology",
-          "Lacosamide as alternative antiepileptic if levetiracetam causes intolerable behavioral side effects"
-        ]
-      }
-    },
-    {
-      "trigger_action": "request_catecholamine_workup",
-      "tool_name": "interpret_labs",
-      "output": {
-        "panels": {
-          "Catecholamine_Panel": [
-            {
-              "test": "Plasma free metanephrine",
-              "value": 42,
-              "unit": "pg/mL",
-              "reference_range": "< 57",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Plasma free normetanephrine",
-              "value": 118,
-              "unit": "pg/mL",
-              "reference_range": "< 148",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "24-hour urine metanephrines",
-              "value": 195,
-              "unit": "mcg/24h",
-              "reference_range": "86-320",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "24-hour urine normetanephrines",
-              "value": 310,
-              "unit": "mcg/24h",
-              "reference_range": "120-400",
-              "is_abnormal": false,
-              "clinical_significance": null
-            },
-            {
-              "test": "Chromogranin A",
-              "value": 85,
-              "unit": "ng/mL",
-              "reference_range": "< 93",
-              "is_abnormal": false,
-              "clinical_significance": null
-            }
-          ]
-        },
-        "interpretation": "All values within normal limits.",
-        "abnormal_values_summary": []
-      }
-    }
-  ],
-  "fallback_tool_outputs": {
-    "eeg": null,
-    "mri": null,
-    "ecg": null,
-    "labs": null,
-    "csf": {
-      "appearance": "clear and colourless",
-      "opening_pressure": "17 cm H2O",
-      "cell_count": {
-        "wbc": "3 /uL",
-        "rbc": "0 /uL"
-      },
-      "protein": "55 mg/dL",
-      "glucose": "61 mg/dL",
-      "glucose_ratio": "0.6",
-      "special_tests": {},
-      "interpretation": "Mildly elevated CSF protein, a non-specific finding. Cell count and glucose normal."
-    },
-    "ct": null,
-    "echo": {
-      "chambers": {
-        "LV": "normal size and systolic function",
-        "RV": "normal size and function",
-        "LA": "normal size",
-        "RA": "normal size"
-      },
-      "valves": {
-        "mitral": "structurally normal",
-        "aortic": "structurally normal",
-        "tricuspid": "normal",
-        "pulmonic": "normal"
-      },
-      "ejection_fraction": 66.0,
-      "wall_motion": "no regional wall-motion abnormality",
-      "findings": [
-        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
-      ],
-      "impression": "Normal transthoracic echocardiogram.",
-      "recommended_actions": []
-    },
-    "cardiac_monitoring": {
-      "duration_hours": 24,
-      "monitor_type": "holter_24h",
-      "rhythm_summary": "Sinus rhythm throughout the recording",
-      "heart_rate_range": {
-        "min": 48,
-        "max": 110,
-        "average": 79
-      },
-      "events": [],
-      "findings": [
-        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
-      ],
-      "impression": "Normal 24-hour Holter monitor.",
-      "recommended_actions": []
-    },
-    "advanced_imaging": null,
-    "specialized_test": {
-      "test_type": "",
-      "findings": [],
-      "quantitative_data": null,
-      "impression": "Study within normal limits.",
-      "recommended_actions": []
-    },
-    "literature_search": null,
-    "drug_interactions": null
-  },
-  "ground_truth": {
-    "primary_diagnosis": "Glioblastoma, IDH-wildtype, WHO grade 4",
-    "icd_code": "C71.9",
-    "differential": [
-      {
-        "diagnosis": "Brain metastasis from malignant paraganglioma/pheochromocytoma",
-        "likelihood": "low",
-        "key_features": "Paraganglioma history raises this; CT staging negative, biopsy chromogranin-A negative, IDH-wildtype molecular profile rule it out"
-      },
-      {
-        "diagnosis": "Brain metastasis (solitary)",
-        "likelihood": "low",
-        "key_features": "No known primary cancer; staging CT chest/abdomen/pelvis negative; infiltrative margins and corpus-callosum or eloquent-cortex involvement more typical of primary glioma than metastasis"
-      },
-      {
-        "diagnosis": "Primary CNS lymphoma",
-        "likelihood": "low",
-        "key_features": "In immunocompetent patients typically presents as homogeneously enhancing periventricular mass with diffuse DWI restriction and no central necrosis; ring enhancement with necrosis argues against"
-      },
-      {
-        "diagnosis": "Brain abscess",
-        "likelihood": "very_low",
-        "key_features": "No fever or leukocytosis; DWI restriction at the enhancing rim (not centrally as in pyogenic pus) and elevated rCBV are inconsistent with abscess"
-      },
-      {
-        "diagnosis": "Tumefactive demyelinating lesion",
-        "likelihood": "very_low",
-        "key_features": "Closed ring enhancement, marked mass effect, and central necrosis are atypical for tumefactive MS; demyelinating lesions usually show incomplete ('open') ring enhancement on the cortical side"
-      }
-    ],
-    "optimal_actions": [
-      {
-        "step": 1,
-        "action": "Order MRI brain with and without gadolinium contrast (tumor protocol with DWI, FLAIR, post-contrast T1) to characterize the right frontotemporal lesion, define mass effect, and plan surgery",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Heterogeneously enhancing mass with ring/irregular enhancement, central necrosis, restricted diffusion at the enhancing rim, perilesional FLAIR-hyperintense edema, and mass effect consistent with high-grade glioma",
-        "category": "required",
-        "tool_parameters": {
-          "protocol": "tumor",
-          "contrast": true
-        },
-        "citation": "[Stupp_2005]",
-        "guideline_source": "Stupp_2005"
-      },
-      {
-        "step": 2,
-        "action": "Order pre-operative laboratory workup: CBC, comprehensive metabolic panel, coagulation studies (PT/INR, aPTT), and type & screen in anticipation of surgical biopsy/resection",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Baseline values acceptable for surgery; identify any coagulopathy, electrolyte derangement, or steroid-relevant abnormality (e.g., hyperglycemia, hyponatremia) before craniotomy",
-        "category": "required",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "BMP",
-            "coagulation",
-            "type_and_screen"
-          ]
-        },
-        "citation": "[NCCN_CNS]",
-        "guideline_source": "NCCN_CNS"
-      },
-      {
-        "step": 3,
-        "action": "Search medical literature for management of newly suspected high-grade glioma: WHO 2021 classification, Stupp protocol indications, and timing of surgical referral",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Confirmation that maximal safe resection followed by concurrent chemoradiation (Stupp protocol) is the standard of care, with molecular profiling (IDH, MGMT, 1p/19q, TERT) guiding prognosis and treatment selection",
-        "category": "required",
-        "tool_parameters": {},
-        "citation": "[WHO_2021]",
-        "guideline_source": "WHO_2021"
-      },
-      {
-        "step": 4,
-        "action": "Obtain urgent neurosurgical and neuro-oncology consultation for tissue diagnosis (stereotactic biopsy or maximal safe resection) and multidisciplinary treatment planning",
-        "tool_name": null,
-        "expected_finding": "Multidisciplinary plan including tissue acquisition, molecular profiling, and adjuvant treatment per current standards",
-        "category": "required",
-        "tool_parameters": {},
-        "citation": "[Stupp_2005]",
-        "guideline_source": "Stupp_2005"
-      },
-      {
-        "step": 5,
-        "action": "Obtain neuro-oncology consultation for adjuvant therapy planning and molecular-marker-guided treatment selection",
-        "tool_name": null,
-        "expected_finding": "Plan for concurrent chemoradiation (Stupp protocol with temozolomide) for IDH-wildtype GBM; alternative chemoradiation regimens for other tumor types or for atypical histologies",
-        "category": "required",
-        "tool_parameters": {},
-        "citation": "[Stupp_2005]",
-        "guideline_source": "Stupp_2005"
-      },
-      {
-        "step": 6,
-        "action": "Order MR perfusion imaging (DSC perfusion) to assess tumor vascularity and target highest-grade region for biopsy",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Elevated rCBV (typically > 1.75) in enhancing component supports high-grade neoplasm and helps direct biopsy",
-        "category": "recommended",
-        "tool_parameters": {
-          "modality": "perfusion_MRI"
-        },
-        "citation": "[Law_2003]",
-        "guideline_source": "Law_2003"
-      },
-      {
-        "step": 7,
-        "action": "Order MR spectroscopy (1H-MRS) to characterize tumor metabolic profile",
-        "tool_name": "order_advanced_imaging",
-        "expected_finding": "Elevated Cho/NAA ratio with lipid-lactate peaks supports high-grade malignancy and helps differentiate tumor from treatment-related change at follow-up",
-        "category": "recommended",
-        "tool_parameters": {
-          "modality": "MR_spectroscopy"
-        },
-        "citation": "[Bulik_2013]",
-        "guideline_source": "Bulik_2013"
-      },
-      {
-        "step": 8,
-        "action": "Order CT chest/abdomen/pelvis as staging to exclude an extracranial primary if a solitary metastasis is on the differential",
-        "tool_name": "order_body_imaging",
-        "expected_finding": "No extracranial primary malignancy identified, supporting primary brain tumor as the working diagnosis",
-        "category": "optional",
-        "tool_parameters": {
-          "study": "chest_abdomen_pelvis_CT",
-          "contrast": true
-        },
-        "citation": "[NCCN_CNS]",
-        "guideline_source": "NCCN_CNS"
-      },
-      {
-        "step": 9,
-        "action": "Check drug interactions before starting/continuing antiepileptic medication and corticosteroids (levetiracetam preferred over enzyme-inducing AEDs; steroid effect on glycemic control)",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Identify steroid-induced hyperglycemia in diabetics and any AED-chemotherapy interaction concerns relevant to upcoming temozolomide therapy",
-        "category": "optional",
-        "tool_parameters": {},
-        "citation": "[NCCN_CNS]",
-        "guideline_source": "NCCN_CNS"
-      },
-      {
-        "action": "Obtain tissue (stereotactic biopsy) and request an integrated histomolecular diagnosis: histology and grade with the molecular panel the classification requires — IDH status, MGMT promoter methylation, 1p/19q, ATRX, TERT and the copy-number markers. Imaging establishes a suspicion; only tissue establishes the diagnosis, and the molecular result selects the treatment",
-        "tool_name": "obtain_tissue_diagnosis",
-        "expected_finding": "Integrated diagnosis established as Glioblastoma, IDH-wildtype, WHO grade 4, with the molecular findings that determine the protocol",
-        "category": "required",
-        "tool_parameters": {
-          "procedure": "stereotactic_biopsy",
-          "molecular_assays": [
-            "MGMT_methylation",
-            "1p_19q_codeletion",
-            "TERT_promoter",
-            "EGFR_amplification",
-            "chr7_gain_chr10_loss"
-          ]
-        },
-        "citation": "[EANO_2021]",
-        "guideline_source": "WHO_CNS5",
-        "step": 10
-      }
-    ],
-    "useless_tools": [
-      {
-        "tool_name": "order_echocardiogram",
-        "tool_parameters": {
-          "echo_type": "TTE"
-        },
-        "rationale": "Echocardiogram has no role in the diagnostic workup of suspected high-grade glioma absent a specific cardiac question (e.g., suspected paraneoplastic endocarditis)",
-        "citation": "[NCCN_CNS]"
-      },
-      {
-        "tool_name": "order_cardiac_monitoring",
-        "tool_parameters": {
-          "monitor_type": "holter_24h"
-        },
-        "rationale": "Cardiac monitoring is unrelated to the diagnostic workup of a brain mass and adds resource cost without informing management",
-        "citation": "[NCCN_CNS]"
-      }
-    ],
-    "harmful_tools": [
-      {
-        "tool_name": "analyze_csf",
-        "tool_parameters": {},
-        "rationale": "Lumbar puncture is contraindicated in suspected intracranial mass with imaging evidence of herniation: the pressure gradient created by LP risks transtentorial or tonsillar herniation. Even when LP is otherwise safe, CSF studies are low-yield for primary brain tumor diagnosis.",
-        "citation": "[Hasbun_2001]"
-      }
-    ],
-    "sequence_constraints": [
-      {
-        "before": "analyze_brain_mri",
-        "after": "analyze_csf",
-        "reason": "MRI must precede any lumbar puncture when a mass lesion is suspected, to identify mass effect and herniation risk before LP",
-        "citation": "[Hasbun_2001]",
-        "severity": "hard"
-      },
-      {
-        "before": "analyze_brain_mri",
-        "after": "obtain_tissue_diagnosis",
-        "reason": "Imaging plans the approach and identifies the enhancing target to sample; biopsying before it risks a non-diagnostic specimen from a necrotic centre",
-        "citation": "[EANO_2021]",
-        "severity": "soft"
-      }
-    ],
-    "critical_actions": [
-      "Obtain urgent neurosurgical consultation for tissue diagnosis (stereotactic biopsy or maximal safe resection) and operative planning",
-      "Obtain MRI brain with and without gadolinium contrast (tumor protocol) before any invasive procedure",
-      "Administer dexamethasone (loading dose 10 mg IV, then 4 mg IV every 6 hours) to reduce vasogenic edema given imaging evidence of herniation/significant mass effect",
-      "Initiate antiepileptic therapy with levetiracetam (preferred non-enzyme-inducing AED) for documented seizure activity",
-      "Obtain pre-operative labs (CBC, BMP, coagulation, type & screen) before craniotomy/biopsy",
-      "Plan multimodal treatment per molecular and histological profile (e.g., Stupp protocol — concurrent chemoradiation with temozolomide for IDH-wildtype GBM)"
-    ],
-    "contraindicated_actions": [
-      "Do not perform lumbar puncture in the setting of significant mass effect and midline shift — herniation risk",
-      "Do not initiate definitive tumor-directed therapy (radiation, temozolomide, alkylating chemotherapy) before tissue diagnosis is established",
-      "Do not start therapeutic anticoagulation without a clear thromboembolic indication, given upcoming neurosurgical intervention and bleeding risk"
-    ],
-    "key_reasoning_points": [
-      "Combination of progressive headache (worse mornings), new focal neurological deficit, and/or new-onset seizure in an adult is a high-risk presentation requiring urgent contrast-enhanced brain MRI",
-      "MRI features of a right frontotemporal heterogeneously / ring-enhancing mass with central necrosis, perilesional FLAIR-hyperintense edema, restricted diffusion at the enhancing rim, and mass effect are characteristic of high-grade glioma",
-      "Perfusion MRI (elevated rCBV) and MR spectroscopy (elevated Cho/NAA, lipid-lactate) corroborate high-grade neoplasm and help guide biopsy targeting",
-      "Significant midline shift / herniation risk mandates urgent dexamethasone and neurosurgical evaluation; lumbar puncture is contraindicated",
-      "Definitive diagnosis requires tissue (stereotactic biopsy or surgical resection) with molecular profiling (IDH, MGMT, 1p/19q, TERT, H3K27M); imaging alone cannot substitute for histology",
-      "For IDH-wildtype GBM, current standard of care is maximal safe resection followed by the Stupp protocol (concurrent radiation + temozolomide, then adjuvant temozolomide)",
-      "Avoid ordering off-pathway advanced-imaging modalities (DaTscan, amyloid PET, FDG-PET, carotid duplex, transcranial Doppler) — they address other neurological differentials and add cost without informing glioma management",
-      "New-onset focal or generalized seizure with a focal-onset mass mandates AED therapy (levetiracetam preferred — non-enzyme-inducing, fewer interactions with temozolomide)"
-    ],
-    "red_herrings": [
-      {
-        "data_point": "Personal and family history of paraganglioma and pheochromocytoma with prior bilateral catecholamine-tumor surgeries",
-        "location": "patient.clinical_history.past_medical_history",
-        "field_path": "",
-        "intended_effect": "Anchors toward metastatic neuroendocrine tumor explanation",
-        "correct_interpretation": "Staging shows no recurrence; biopsy is a distinct primary high-grade glial neoplasm (chromogranin-A negative, IDH-wildtype)"
-      },
-      {
-        "data_point": "Mild traumatic brain injury six weeks ago with incidental skull-base finding on outside CT",
-        "location": "patient.history_present_illness",
-        "field_path": "",
-        "intended_effect": "Suggests post-traumatic contusion evolution or that the skull-base finding is the active lesion",
-        "correct_interpretation": "The frontotemporal mass is anatomically distinct from and superior to the skull-base finding; imaging features are diagnostic of high-grade glioma, not post-traumatic change"
-      }
-    ]
   },
   "metadata": {
-    "source": "MedCaseReasoning",
-    "source_pmcid": "PMC7019207",
-    "source_license": "CC-BY 4.0",
-    "generation_method": "real_case_seed",
-    "condition_name": "Brain tumor — high-grade glioma (GBM)",
-    "difficulty_description": "Straightforward GBM presentation with classic symptoms (progressive headaches, focal deficits, seizure) and characteristic MRI findings. The patient's prior paraganglioma/pheochromocytoma history and incidental skull-base lesion add clinical interest but do not significantly obscure the primary diagnosis, as the frontotemporal mass has clear high-grade glioma imaging features.",
-    "expected_agent_confidence": 0.85,
-    "fallback_tool_kinds": {
-      "csf": "incidental",
-      "echo": "normal",
-      "cardiac_monitoring": "normal",
-      "specialized_test": "normal"
-    },
-    "last_revised": "2026-08-08",
-    "revision_reason": "per-case audit: baseline panels named by an optimal action and absent from the payload actually served (type_and_screen). Reported as unremarkable only after checking that nothing in the case — no abnormal row, no interpretation, no expected_finding, no reasoning — states an abnormality for them",
-    "criteria_pack_version": "1.0",
     "authoring_agent": "condition-expert:GLIO-HG",
-    "difficulty_rationale": "5 required tools, 2 red herrings (significant cognitive anchors that must be addressed); requires synthesis of MRI, advanced imaging (perfusion / MRS), and tissue/molecular profiling to confirm GBM and exclude mimics",
     "case_body_concerns": [],
     "citation_gap": [],
+    "condition_name": "Brain tumor \u2014 high-grade glioma (GBM)",
+    "criteria_pack_version": "1.0",
+    "difficulty_description": "Straightforward GBM presentation with classic symptoms (progressive headaches, focal deficits, seizure) and characteristic MRI findings. The patient's prior paraganglioma/pheochromocytoma history and incidental skull-base lesion add clinical interest but do not significantly obscure the primary diagnosis, as the frontotemporal mass has clear high-grade glioma imaging features.",
+    "difficulty_rationale": "5 required tools, 2 red herrings (significant cognitive anchors that must be addressed); requires synthesis of MRI, advanced imaging (perfusion / MRS), and tissue/molecular profiling to confirm GBM and exclude mimics",
+    "expected_agent_confidence": 0.85,
+    "fallback_tool_kinds": {
+      "cardiac_monitoring": "normal",
+      "csf": "incidental",
+      "echo": "normal",
+      "specialized_test": "normal"
+    },
+    "generation_method": "real_case_seed",
+    "last_revised": "2026-08-08",
+    "policy_spec_status": "draft",
+    "revision_reason": "per-case audit: baseline panels named by an optimal action and absent from the payload actually served (type_and_screen). Reported as unremarkable only after checking that nothing in the case \u2014 no abnormal row, no interpretation, no expected_finding, no reasoning \u2014 states an abnormality for them",
+    "source": "MedCaseReasoning",
+    "source_license": "CC-BY 4.0",
+    "source_pmcid": "PMC7019207",
+    "version": "policy-v1",
     "vocab_gap": []
-  }
+  },
+  "patient": {
+    "chief_complaint": "Progressive headaches, new left-sided weakness, and a first-time seizure",
+    "clinical_history": {
+      "allergies": [
+        "No known drug allergies"
+      ],
+      "family_history": [
+        "Father with history of paraganglioma, treated surgically at age 40",
+        "Paternal uncle diagnosed with pheochromocytoma",
+        "Mother healthy at age 60",
+        "No family history of brain tumors or neurological disorders"
+      ],
+      "medications": [
+        {
+          "dose": "5 mg",
+          "drug": "Amlodipine",
+          "frequency": "once daily",
+          "indication": "Borderline hypertension"
+        },
+        {
+          "dose": "500 mg",
+          "drug": "Acetaminophen",
+          "frequency": "as needed",
+          "indication": "Headache"
+        }
+      ],
+      "past_medical_history": [
+        "Resection of abdominal para-aortic paraganglioma at age 11",
+        "Right adrenalectomy for pheochromocytoma at age 19",
+        "Childhood history of episodic hypertension, tachycardia, and diaphoresis, resolved after second surgery",
+        "Mild traumatic brain injury 6 weeks ago after a fall from a bicycle, managed conservatively",
+        "Borderline hypertension noted on recent primary care visit"
+      ],
+      "social_history": {
+        "alcohol": "Occasional social drinker, 1-2 drinks per month",
+        "exercise": "Regular cyclist, 3-4 times per week until recent injury",
+        "illicit_drugs": "Denies",
+        "living_situation": "Lives with his partner in an apartment",
+        "occupation": "Graphic designer, works at a computer",
+        "smoking": "Never smoker"
+      }
+    },
+    "demographics": {
+      "age": 35,
+      "bmi": 24.8,
+      "ethnicity": "Hispanic",
+      "handedness": "right",
+      "sex": "male"
+    },
+    "history_present_illness": "Mr. Carlos Mendez is a 35-year-old right-handed man with a significant past surgical history including resection of a para-aortic paraganglioma in childhood and a right adrenalectomy for pheochromocytoma at age 19, who presents to the emergency department after a witnessed focal seizure. The patient reports that approximately six weeks ago he sustained a mild traumatic brain injury after falling from his bicycle, for which he was evaluated at an outside hospital. He states that a head scan performed at that time revealed an unexpected finding in his skull base, but he did not follow up on it. Over the ensuing four weeks, he has developed progressively worsening headaches that are predominantly right-sided, worst in the early morning, and occasionally wake him from sleep. Acetaminophen has provided only modest relief. His partner reports that over the past two to three weeks, he has become noticeably more forgetful, occasionally repeating himself and missing deadlines at work, which is uncharacteristic for him. Approximately ten days ago, he began experiencing intermittent difficulty with fine motor tasks in his left hand, such as difficulty using his computer mouse and dropping his coffee mug on two occasions. His partner also noted that he has seemed less animated and more irritable than usual. This morning, while at his desk, his partner witnessed his left arm begin to shake rhythmically for approximately one minute, during which he appeared confused and did not respond to questions. He was brought to the emergency department by ambulance. On arrival, he was alert but reported a persistent mild headache and some confusion about the events. He denies any prior seizure history, recent febrile illness, vision changes beyond what he attributes to his old injury, nausea, vomiting, or weight loss. He has not experienced any recurrence of the childhood symptoms of episodic chest pain, palpitations, or diaphoresis. A non-contrast CT scan obtained in the emergency department demonstrated a large right frontotemporal mass with surrounding hypodensity consistent with edema and approximately 9 mm of midline shift to the left, distinct from and more superior to the previously noted skull-base abnormality. He was admitted to the neurology service for further evaluation.",
+    "neurological_exam": {
+      "additional": "No meningismus. One witnessed seizure in the emergency department: left arm tonic-clonic activity lasting approximately 60 seconds with preserved awareness, followed by 10 minutes of postictal confusion.",
+      "coordination": "Finger-to-nose slightly dysmetric on the left, intact on the right. Heel-to-shin intact bilaterally. Rapid alternating movements intact.",
+      "cranial_nerves": "Pupils equal, round, reactive to light, 3 mm bilaterally. Right eye shows mild proptosis. Visual acuity reduced on the right (20/40 OD, 20/20 OS). Right temporal visual field deficit on confrontation testing. No papilledema. Extraocular movements intact. Decreased sensation to light touch and pinprick over the right V2 and V3 distributions. No facial asymmetry. Hearing decreased to finger rub on the right. Weber lateralizes to the left. Palate elevates symmetrically. Tongue midline.",
+      "gait": "Ambulates independently with normal stride length. Mild left arm swing reduction noted. No Romberg sign.",
+      "mental_status": "Alert and oriented to person, place, and time. Mildly inattentive on serial sevens with two errors. Language is fluent with occasional word-finding difficulty. Follows three-step commands. Recalls 2/3 objects at 5 minutes. Fund of knowledge and judgment intact.",
+      "motor": "Right upper and lower extremity: 5/5 throughout. Left upper extremity: 4+/5 deltoid, 4+/5 biceps, 5/5 triceps, 5/5 grip. Left lower extremity: 5/5 throughout. Subtle left pronator drift. No fasciculations or atrophy.",
+      "reflexes": "Right upper extremity 2+, right lower extremity 2+. Left upper extremity 2+, left lower extremity 2+ with an equivocal plantar response on the left. Right plantar response is flexor.",
+      "sensory": "Light touch and pinprick intact bilaterally in all extremities. Proprioception intact at the great toes. Vibration sense intact at the ankles. Decreased facial sensation on the right as noted above."
+    },
+    "patient_id": "NB-GLIO-HG-RS01",
+    "vitals": {
+      "bp_diastolic": 92,
+      "bp_systolic": 138,
+      "hr": 82,
+      "rr": 16,
+      "spo2": 98,
+      "temp": 36.9
+    }
+  },
+  "schema_version": "2.0"
 }

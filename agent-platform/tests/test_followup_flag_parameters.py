@@ -54,10 +54,20 @@ def test_ct_angiography_and_plain_ct_serve_different_reports() -> None:
     same: list[str] = []
     for path in sorted(CASES.glob("*.json")):
         raw = json.loads(path.read_text())
-        actions = [a for a in raw["ground_truth"]["optimal_actions"]
-                   if a["tool_name"] == "order_ct_scan"]
-        wants_angiography = any((a.get("tool_parameters") or {}).get("angiography") for a in actions)
-        wants_plain = any(not (a.get("tool_parameters") or {}).get("angiography") for a in actions)
+        patterns = [
+            pattern
+            for criterion in raw["ground_truth"]["action_criteria"]
+            for pattern in criterion["alternatives"]
+            if pattern["tool_name"] == "order_ct_scan"
+        ]
+        wants_angiography = any(
+            (pattern.get("required_arguments") or {}).get("angiography")
+            for pattern in patterns
+        )
+        wants_plain = any(
+            not (pattern.get("required_arguments") or {}).get("angiography")
+            for pattern in patterns
+        )
         if not (wants_angiography and wants_plain):
             continue
 

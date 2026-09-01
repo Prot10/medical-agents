@@ -1,3 +1,3 @@
-"""RL fine-tuning for tool-calling efficiency — GRPO + LoRA training pipeline."""
+"""SFT and GRPO over canonical clinical episodes."""
 
-from __future__ import annotations
+from .grpo import *

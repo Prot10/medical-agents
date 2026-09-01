@@ -19,13 +19,13 @@ atypical features may shift a tool up or down a tier (the authoring agent
 decides per-case, citing why).
 
 **Required (REQUIRED tier — must be called):**
-- `tool_name` (`tool_parameters`) — rationale [cite]
+- `tool_name` (`required_arguments`) — rationale [cite]
 
 **Recommended (RECOMMENDED tier — expected workup hygiene):**
-- `tool_name` (`tool_parameters`) — rationale [cite]
+- `tool_name` (`required_arguments`) — rationale [cite]
 
 **Optional (OPTIONAL tier — defensible if performed):**
-- `tool_name` (`tool_parameters`) — rationale [cite]
+- `tool_name` (`required_arguments`) — rationale [cite]
 
 ## 3. Tools that are typically USELESS for this condition
 
@@ -62,14 +62,14 @@ between tiers for each subtype.
 ## 7. Common red-herring categories
 
 The kinds of distractors typically embedded in cases of this condition.
-The fleet uses this when authoring `red_herrings[]` entries.
+Authors use this when defining `red_herrings[]` entries.
 
 - **Category name:** description of how it misleads.
 
 ## 8. Allowed citations
 
-The fleet may cite ONLY these references. Anything else is rejected by the
-post-fleet validator.
+Authors may cite only these references. The case validator rejects any
+citation outside this allowlist.
 
 - `[cite_tag_1]` — full citation
 - `[cite_tag_2]` — full citation

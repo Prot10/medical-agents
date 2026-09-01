@@ -3,558 +3,664 @@
   "condition": "functional_neurological_disorder",
   "difficulty": "moderate",
   "encounter_type": "inpatient",
-  "patient": {
-    "patient_id": "NB-FND-M05",
-    "demographics": {
-      "age": 29,
-      "sex": "female",
-      "handedness": "right",
-      "ethnicity": "Black",
-      "bmi": 27.2
+  "fallback_tool_outputs": {
+    "advanced_imaging": {
+      "findings": [],
+      "impression": "No abnormality identified.",
+      "modality": "MRI_brain_functional",
+      "quantitative_data": null,
+      "recommended_actions": [],
+      "tracer_or_protocol": null
     },
-    "clinical_history": {
-      "past_medical_history": [
-        "Lupus (SLE) — quiescent, established diagnosis 4 years ago",
-        "Depression"
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
       ],
-      "medications": [
-        {
-          "drug": "Hydroxychloroquine",
-          "dose": "200 mg",
-          "frequency": "twice daily",
-          "indication": "SLE maintenance"
-        },
-        {
-          "drug": "Sertraline",
-          "dose": "100 mg",
-          "frequency": "once daily",
-          "indication": "Depression"
-        }
+      "heart_rate_range": {
+        "average": 74,
+        "max": 125,
+        "min": 52
+      },
+      "impression": "Normal 24-hour Holter monitor.",
+      "monitor_type": "holter_24h",
+      "recommended_actions": [],
+      "rhythm_summary": "Sinus rhythm throughout the recording"
+    },
+    "csf": null,
+    "ct": {
+      "additional_observations": [],
+      "angiography_findings": null,
+      "contrast_used": false,
+      "findings": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "drug_interactions": null,
+    "ecg": {
+      "axis": "normal",
+      "clinical_correlation": "",
+      "findings": [
+        "Normal sinus rhythm. Normal axis and intervals. No acute ST-T changes."
       ],
-      "allergies": [
-        "Sulfonamides — rash"
+      "interpretation": "Normal ECG",
+      "intervals": {
+        "PR": "142 ms",
+        "QRS": "90 ms",
+        "QTc": "401 ms"
+      },
+      "rate": 61,
+      "rhythm": "normal sinus rhythm"
+    },
+    "echo": {
+      "chambers": {
+        "LA": "normal size",
+        "LV": "normal size and systolic function",
+        "RA": "normal size",
+        "RV": "normal size and function"
+      },
+      "ejection_fraction": 58.0,
+      "findings": [
+        "Trace mitral regurgitation, physiological. No intracardiac thrombus or vegetation. No pericardial effusion."
       ],
-      "family_history": [
-        "Mother: SLE",
-        "No family history of neurological disease"
-      ],
-      "social_history": {
-        "occupation": "Nursing student (second year)",
-        "tobacco": "Never",
-        "alcohol": "Rarely",
-        "recent_stressor": "Failed clinical rotation assessment 3 weeks ago; concern about being dismissed from nursing program"
+      "impression": "Normal cardiac structure and function. Trace mitral regurgitation, physiological.",
+      "recommended_actions": [],
+      "valves": {
+        "aortic": "structurally normal",
+        "mitral": "structurally normal",
+        "pulmonic": "normal",
+        "tricuspid": "normal"
+      },
+      "wall_motion": "no regional wall-motion abnormality"
+    },
+    "eeg": null,
+    "labs": null,
+    "literature_search": null,
+    "mri": null,
+    "specialized_test": {
+      "findings": [],
+      "impression": "Study within normal limits.",
+      "quantitative_data": null,
+      "recommended_actions": [],
+      "test_type": "neuropsych_battery"
+    }
+  },
+  "followup_outputs": [
+    {
+      "output": {
+        "query": "neuropsychiatric lupus NPSLE diagnosis criteria attribution",
+        "results": [
+          {
+            "journal": "Annals of Rheumatic Diseases",
+            "pmid": "28250016",
+            "title": "2019 European League Against Rheumatism recommendations for management of NPSLE",
+            "year": "2019"
+          }
+        ],
+        "summary": ""
+      },
+      "tool_name": "search_medical_literature",
+      "trigger_action": "rheumatology_consultation_sle"
+    },
+    {
+      "output": {
+        "alternatives": [],
+        "contraindications": [],
+        "formulary_status": "Both currently prescribed",
+        "interactions": [
+          "Hydroxychloroquine + sertraline: both QTc-prolonging agents. Combination can prolong QTc \u2014 baseline ECG recommended. At current doses, risk is generally low.",
+          "No pharmacokinetic interaction between hydroxychloroquine and sertraline"
+        ],
+        "proposed": "No new medications \u2014 reviewing current regimen",
+        "warnings": [
+          "ECG recommended to assess baseline QTc given hydroxychloroquine + sertraline combination"
+        ]
+      },
+      "tool_name": "check_drug_interactions",
+      "trigger_action": "hydroxychloroquine_interaction_check"
+    }
+  ],
+  "ground_truth": {
+    "action_criteria": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "query": "functional neurological disorder diagnosis treatment"
+            },
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[Nielsen_2015]",
+          "FND criteria pack \u2014 treatment evidence"
+        ],
+        "criterion_id": "action-1-search-medical-literature",
+        "expected_evidence": "Confirms multidisciplinary CBT + physiotherapy is the evidence-based treatment for FND",
+        "importance": "recommended",
+        "label": "Search current literature on FND diagnostic signs and evidence-based treatment (CBT for PNES, specialized physiotherapy for functional motor symptoms)",
+        "rationale": "Search current literature on FND diagnostic signs and evidence-based treatment (CBT for PNES, specialized physiotherapy for functional motor symptoms)"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [
+          "FND criteria pack \u2014 medication review"
+        ],
+        "criterion_id": "action-2-check-drug-interactions",
+        "expected_evidence": "Identification of medication contributors that should be tapered or discontinued",
+        "importance": "recommended",
+        "label": "Review current medications for agents that may exacerbate symptoms (e.g., benzodiazepines, dopamine-blocking antipsychotics, AEDs initiated for PNES)",
+        "rationale": "Review current medications for agents that may exacerbate symptoms (e.g., benzodiazepines, dopamine-blocking antipsychotics, AEDs initiated for PNES)"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "assessment_type": "functional_neuro_signs"
+            },
+            "tool_name": "perform_clinical_assessment"
+          }
+        ],
+        "citations": [
+          "[AAN_Functional_Seizures_2025]",
+          "positive FND signs; AAN functional seizures guideline 2025"
+        ],
+        "criterion_id": "action-3-perform-clinical-assessment",
+        "expected_evidence": "Positive rule-in signs establish FND; symptoms are real and involuntary, and psychological stress is not a required diagnostic criterion",
+        "importance": "required",
+        "label": "Perform and document a positive FND examination: internal inconsistency/incongruity, Hoover sign, entrainment/distractibility or positive functional-seizure semiology as appropriate",
+        "rationale": "Perform and document a positive FND examination: internal inconsistency/incongruity, Hoover sign, entrainment/distractibility or positive functional-seizure semiology as appropriate"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "contrast": false,
+              "protocol": "standard"
+            },
+            "tool_name": "analyze_brain_mri"
+          }
+        ],
+        "citations": [
+          "[AAN_Functional_Seizures_2025]",
+          "positive FND signs; AAN functional seizures guideline 2025"
+        ],
+        "criterion_id": "action-4-analyze-brain-mri",
+        "expected_evidence": "Exclude the named structural mimic; a normal scan does not itself diagnose FND",
+        "importance": "optional",
+        "label": "Consider MRI only for the explicit first focal deficit, acute red flag or competing organic neurological disease in this case",
+        "rationale": "Consider MRI only for the explicit first focal deficit, acute red flag or competing organic neurological disease in this case"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "CBC",
+                "CMP",
+                "ESR",
+                "CRP",
+                "complement C3/C4"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[AAN_Functional_Seizures_2025]",
+          "positive FND signs; AAN functional seizures guideline 2025"
+        ],
+        "criterion_id": "action-5-interpret-labs",
+        "expected_evidence": "Answer the specific alternative diagnosis; normal blood tests do not establish FND",
+        "importance": "optional",
+        "label": "Consider only case-targeted blood tests for the named metabolic, inflammatory, nutritional or treatment-related mimic",
+        "rationale": "Consider only case-targeted blood tests for the named metabolic, inflammatory, nutritional or treatment-related mimic"
       }
+    ],
+    "assessment": {
+      "prohibited_recommendations": [
+        "Do not pursue ever-expanding negative investigations \u2014 per Stone 2018, repeated negative workups reinforce illness conviction and worsen prognosis",
+        "Do not frame the diagnosis as 'all in your head', 'nothing wrong', or 'we couldn't find anything' \u2014 this damages the therapeutic alliance and is the most common avoidable harm in FND",
+        "Do not perform invasive testing (lumbar puncture, nerve biopsy, muscle biopsy, cerebral angiography) when positive rule-in signs are present and there is no clinical indication",
+        "Do not order EMG/NCS, muscle biopsy, or nerve biopsy as part of an FND workup \u2014 these invasive tests reinforce the somatic illness model per Stone 2018",
+        "Do not give gadolinium without a specific indication \u2014 contrast adds cost and risk and answers no question that positive functional signs have not already answered",
+        "Do not repeat the brain MRI, the laboratory panel or the lumbar puncture once a first normal study and positive rule-in signs are documented: each repetition strengthens the patient's belief that something organic has been missed"
+      ],
+      "required_recommendations": [
+        "Do NOT make the diagnosis by exclusion: document at least one positive rule-in sign, which is the act that establishes it",
+        "Communicate the diagnosis transparently using positive language and the rule-in signs as the basis",
+        "Refer for FND-informed physiotherapy and CBT / psychological therapy",
+        "Order a comprehensive neuropsychological battery to characterize comorbid depression, anxiety, somatization, and trauma exposure \u2014 informs treatment planning (criteria-pack 'recommended' tier)",
+        "Communicate the diagnosis transparently using positive language anchored on the rule-in signs; explicitly state the diagnosis is FND, the symptoms are real and involuntary, and there is an evidence-based treatment plan",
+        "Refer to specialized FND-informed physiotherapy (for functional motor symptoms) and to CBT / psychological therapy (for PNES and comorbid mood / anxiety)"
+      ]
     },
-    "neurological_exam": {
-      "mental_status": "Alert and oriented x4. Anxious. Demonstrates good medical knowledge from nursing training.",
-      "cranial_nerves": "Normal.",
-      "motor": "Right arm weakness 3/5 formal testing. POSITIVE Hoover sign right leg. Weakness variable during exam — improves with attention distraction. No wasting.",
-      "sensory": "Right-sided sensory loss — stops exactly at midline. Vibration intact throughout.",
-      "reflexes": "Normal 2+ symmetric. No Babinski. No pathological reflexes.",
-      "coordination": "Normal left side. Cannot fully test right due to apparent weakness.",
-      "gait": "Right leg dragging. Observed to walk normally to restroom when unaware of observation.",
-      "additional": "Witnessed during examination: right-sided weakness and sensory findings as above; no involuntary movements or seizure-like episodes observed."
+    "avoided_actions": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_ecg"
+          }
+        ],
+        "citations": [
+          "[Stone_2018]"
+        ],
+        "criterion_id": "avoid-waste-1-analyze-ecg",
+        "rationale": "ECG has no diagnostic role in FND; cardiac etiology is not on the differential for the presenting neurological deficit.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_echocardiogram"
+          }
+        ],
+        "citations": [
+          "[Stone_2018]"
+        ],
+        "criterion_id": "avoid-waste-2-order-echocardiogram",
+        "rationale": "Echocardiography has no role in FND; no structural cardiac question is raised by the presentation.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_cardiac_monitoring"
+          }
+        ],
+        "citations": [
+          "[Stone_2018]"
+        ],
+        "criterion_id": "avoid-waste-3-order-cardiac-monitoring",
+        "rationale": "Cardiac rhythm monitoring is not indicated; the events are non-syncopal and the rule-in signs point to FND.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_ct_scan"
+          }
+        ],
+        "citations": [
+          "[Espay_2018]"
+        ],
+        "criterion_id": "avoid-waste-4-order-ct-scan",
+        "rationale": "Non-contrast head CT adds no information beyond MRI for an FND workup and contributes diagnostic noise plus radiation exposure.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "FDG_PET"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[Espay_2018]"
+        ],
+        "criterion_id": "avoid-waste-5-order-advanced-imaging",
+        "rationale": "Advanced PET imaging has no indication in FND; standard MRI is the appropriate structural workup.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "emg_ncs"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Stone_2018]"
+        ],
+        "criterion_id": "avoid-waste-6-order-specialized-test",
+        "rationale": "Nerve conduction studies and EMG have no role once positive functional signs are documented: the deficit is not neuromuscular, the study is uncomfortable, and a normal result reinforces the patient's search for an organic cause \u2014 the principal iatrogenic harm in this condition",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "ssep"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Stone_2018]"
+        ],
+        "criterion_id": "avoid-waste-7-order-specialized-test",
+        "rationale": "Somatosensory evoked potentials answer a question about a lesion in the somatosensory pathway; a midline-splitting, non-anatomical sensory deficit is not that question",
+        "severity": "waste"
+      }
+    ],
+    "diagnosis": {
+      "accepted": [
+        "Functional neurological disorder \u2014 right-sided functional hemimotor syndrome, in patient with quiescent SLE (neuropsychiatric SLE excluded)"
+      ],
+      "icd_codes": [
+        "F44.4"
+      ]
     },
-    "vitals": {
-      "bp_systolic": 122,
-      "bp_diastolic": 74,
-      "hr": 94,
-      "temp": 37.2,
-      "rr": 15,
-      "spo2": 99
-    },
-    "chief_complaint": "Sudden right-sided weakness and sensory loss — 48 hours",
-    "history_present_illness": "Ms. W is a 29-year-old nursing student with established quiescent SLE who presents with 48 hours of right-sided arm and leg weakness and right hemisensory loss. She has had SLE for 4 years, managed with hydroxychloroquine, with no prior major organ involvement and quiescent disease activity for 18 months. Her rheumatologist last assessed her 3 months ago with normal complement levels and stable anti-dsDNA. The neurological symptoms began abruptly 48 hours ago without any prodrome. She has been in good health and her SLE has been well-controlled. She failed a clinical rotation assessment 3 weeks ago and is concerned about dismissal from her nursing program. Her nursing training makes her familiar with lupus cerebritis, antiphospholipid syndrome, and CNS vasculitis, and she is worried about CNS lupus involvement. She has no prior neurological presentations. She has no fever, no joint pain flare, no rash, and no renal symptoms. She denies headache. On directed questioning, she acknowledges significant stress from the nursing program failure and feels her symptoms began after a particularly difficult study session."
+    "differential": [
+      {
+        "diagnosis": "Multiple sclerosis (demyelinating disease)",
+        "icd_code": "G35",
+        "key_features": "Sensorimotor symptoms in a young adult raise demyelinating disease; brain (and when indicated spine) MRI without T2/FLAIR lesions or enhancement argues against an active demyelinating process.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Structural CNS lesion (tumor, demyelination, stroke)",
+        "icd_code": null,
+        "key_features": "Focal complaints warrant imaging; normal brain MRI without lesion, mass, or enhancement effectively excludes a structural cause for the presenting deficit.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Autoimmune or paraneoplastic encephalitis",
+        "icd_code": "G04.81",
+        "key_features": "Episodic neurological symptoms can occur in autoimmune encephalitis; normal MRI, normal EEG background, and (when obtained) negative antibody panel render this very unlikely.",
+        "likelihood": "very_low"
+      }
+    ],
+    "key_clinical_evidence": [
+      "FND is a positive diagnosis based on rule-in signs (Hoover, tremor entrainment, give-way weakness, non-dermatomal sensory loss with midline split) \u2014 not a diagnosis of exclusion (Espay 2018, Stone 2018).",
+      "Brain MRI and basic laboratory testing are OPTIONAL here, not due diligence: the diagnosis rests on the positive signs, and each additional negative study is a cost and an iatrogenic harm rather than a confirmation. Where imaging is recommended in this case it is for one specific alternative question, once.",
+      "Over-investigation is the principal iatrogenic harm in FND; every additional negative test reinforces the patient's illness conviction and worsens prognosis (Stone 2018).",
+      "Psychiatric comorbidity (anxiety, depression, trauma) is common and informs treatment planning but is NOT required for the diagnosis and does not 'explain' the symptoms in a reductive sense.",
+      "Diagnostic communication matters: using positive language anchored on the rule-in signs is associated with better engagement and outcomes (Stone 2018).",
+      "Evidence-based treatment is multidisciplinary \u2014 CBT for PNES and FND-informed physiotherapy for functional motor symptoms (Nielsen 2015).",
+      "Interim composition decision, August 2026: FND remains only to keep the frozen dataset at 20 conditions/600 cases. The positive functional-neurological examination is the sole required diagnostic act; every instrumental test is optional and case-targeted. DLB remains the preferred future replacement when composition work resumes."
+    ],
+    "red_herrings": [
+      {
+        "correct_interpretation": "Psychiatric comorbidity neither establishes nor refutes FND. Diagnosis requires positive rule-in signs on examination; psychiatric history is relevant for treatment planning, not for diagnosis.",
+        "data_point": "Pre-existing psychiatric diagnosis (anxiety or depression) in the past medical history",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Premature anchoring on a 'psychosomatic' label without obtaining positive rule-in signs; conversely, dismissing FND as a serious diagnosis because the patient is 'just anxious'",
+        "location": "Past medical history"
+      },
+      {
+        "correct_interpretation": "Many organic conditions (MS, migraine, epilepsy) also flare with stress. Stress at onset is supportive context, not a diagnostic substitute for the positive rule-in signs.",
+        "data_point": "Symptom onset coincident with a major psychosocial stressor",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Conclude prematurely that stress 'caused' the symptoms and that the workup can be abbreviated",
+        "location": "History of present illness"
+      }
+    ],
+    "review_status": "draft",
+    "sequence_constraints": [],
+    "stop_rule": {
+      "max_additional_actions": 0,
+      "required_before_assessment": [
+        "action-3-perform-clinical-assessment"
+      ]
+    }
   },
   "initial_tool_outputs": {
+    "advanced_imaging": null,
+    "cardiac_monitoring": null,
+    "clinical_assessment": {
+      "assessment_type": "functional_neuro_signs",
+      "criteria_met": {
+        "diagnosis_made_by_exclusion_only": false,
+        "positive_clinical_sign_present": true,
+        "psychological_stressor_required_for_diagnosis": false,
+        "symptoms_inconsistent_with_organic_disease": true
+      },
+      "findings": [
+        {
+          "result": "POSITIVE Hoover sign right leg.",
+          "sign": "Hoover sign"
+        },
+        {
+          "result": "Weakness variable during exam \u2014 improves with attention distraction.",
+          "sign": "Improvement with attentional distraction"
+        },
+        {
+          "result": "Right-sided sensory loss \u2014 stops exactly at midline.",
+          "sign": "Midline-splitting sensory loss"
+        },
+        {
+          "result": "Right leg dragging.",
+          "sign": "Dragging monoplegic gait"
+        }
+      ],
+      "impression": "Positive functional signs elicited and documented: Hoover sign, Improvement with attentional distraction, Midline-splitting sensory loss, Dragging monoplegic gait. Functional neurological disorder is a rule-in diagnosis under DSM-5 and the criterion satisfied here is clinical incompatibility, not the absence of another disease. No further investigation is required to make the diagnosis; whatever imaging or laboratory testing is performed is for a separate, specific question.",
+      "pre_post_comparison": null,
+      "recommended_actions": [],
+      "scores": {
+        "distribution_consistent_with_a_single_lesion": "no",
+        "internal_inconsistency": "present",
+        "positive_rule_in_signs_documented": "4"
+      }
+    },
+    "csf": null,
+    "ecg": null,
+    "echo": null,
+    "eeg": null,
+    "labs": {
+      "abnormal_values_summary": [
+        "ESR 22 mm/hr (mildly elevated \u2014 non-specific in SLE context)"
+      ],
+      "interpretation": "Abnormal values: ESR 22 mm/hr (H).",
+      "panels": {
+        "Baseline workup": [
+          {
+            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on",
+            "is_abnormal": false,
+            "reference_range": "",
+            "test": "CBC",
+            "unit": "",
+            "value": "Within reference range"
+          },
+          {
+            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on",
+            "is_abnormal": false,
+            "reference_range": "",
+            "test": "CMP",
+            "unit": "",
+            "value": "Within reference range"
+          },
+          {
+            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on",
+            "is_abnormal": false,
+            "reference_range": "",
+            "test": "TSH",
+            "unit": "",
+            "value": "Within reference range"
+          },
+          {
+            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on",
+            "is_abnormal": false,
+            "reference_range": "",
+            "test": "B12",
+            "unit": "",
+            "value": "Within reference range"
+          }
+        ],
+        "SLE_Activity_Panel": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "90-180",
+            "test": "C3 complement",
+            "unit": "mg/dL",
+            "value": 112
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "16-47",
+            "test": "C4 complement",
+            "unit": "mg/dL",
+            "value": 24
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "<10 IU/mL",
+            "test": "Anti-dsDNA",
+            "unit": "IU/mL",
+            "value": "<10 IU/mL"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0 = quiescent",
+            "test": "SLEDAI-2K score",
+            "unit": "score",
+            "value": 0
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Negative",
+            "test": "Antiphospholipid antibodies (aCL IgG/IgM)",
+            "unit": "titer",
+            "value": "Negative"
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "Negative",
+            "test": "Lupus anticoagulant",
+            "unit": "qualitative",
+            "value": "Negative"
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "Negative",
+            "test": "Beta-2 glycoprotein I antibodies",
+            "unit": "titer",
+            "value": "Negative"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "<20",
+            "test": "ESR",
+            "unit": "mm/hr",
+            "value": 22
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "<5",
+            "test": "CRP",
+            "unit": "mg/L",
+            "value": 0.8
+          }
+        ]
+      }
+    },
     "mri": {
-      "findings": [],
-      "volumetrics": null,
       "additional_observations": [
         "Normal brain MRI with and without contrast",
         "No T2/FLAIR white matter lesions",
         "No abnormal parenchymal or leptomeningeal enhancement",
         "No cortical or subcortical infarcts; normal diffusion"
       ],
+      "findings": [],
       "impression": "Normal brain MRI. No white matter lesions, no acute or chronic infarction, and no abnormal enhancement identified. Normal study",
-      "recommended_actions": []
+      "recommended_actions": [],
+      "volumetrics": null
     },
-    "eeg": null,
-    "labs": {
-      "panels": {
-        "SLE_Activity_Panel": [
-          {
-            "test": "C3 complement",
-            "value": 112,
-            "unit": "mg/dL",
-            "reference_range": "90-180",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "C4 complement",
-            "value": 24,
-            "unit": "mg/dL",
-            "reference_range": "16-47",
-            "is_abnormal": false
-          },
-          {
-            "test": "Anti-dsDNA",
-            "value": "<10 IU/mL",
-            "unit": "IU/mL",
-            "reference_range": "<10 IU/mL",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "SLEDAI-2K score",
-            "value": 0,
-            "unit": "score",
-            "reference_range": "0 = quiescent",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Antiphospholipid antibodies (aCL IgG/IgM)",
-            "value": "Negative",
-            "unit": "titer",
-            "reference_range": "Negative",
-            "is_abnormal": false,
-            "clinical_significance": null
-          },
-          {
-            "test": "Lupus anticoagulant",
-            "value": "Negative",
-            "unit": "qualitative",
-            "reference_range": "Negative",
-            "is_abnormal": false
-          },
-          {
-            "test": "Beta-2 glycoprotein I antibodies",
-            "value": "Negative",
-            "unit": "titer",
-            "reference_range": "Negative",
-            "is_abnormal": false
-          },
-          {
-            "test": "ESR",
-            "value": 22,
-            "unit": "mm/hr",
-            "reference_range": "<20",
-            "is_abnormal": true,
-            "clinical_significance": null
-          },
-          {
-            "test": "CRP",
-            "value": 0.8,
-            "unit": "mg/L",
-            "reference_range": "<5",
-            "is_abnormal": false,
-            "clinical_significance": null
-          }
-        ],
-        "Baseline workup": [
-          {
-            "test": "CBC",
-            "value": "Within reference range",
-            "unit": "",
-            "reference_range": "",
-            "is_abnormal": false,
-            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on"
-          },
-          {
-            "test": "CMP",
-            "value": "Within reference range",
-            "unit": "",
-            "reference_range": "",
-            "is_abnormal": false,
-            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on"
-          },
-          {
-            "test": "TSH",
-            "value": "Within reference range",
-            "unit": "",
-            "reference_range": "",
-            "is_abnormal": false,
-            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on"
-          },
-          {
-            "test": "B12",
-            "value": "Within reference range",
-            "unit": "",
-            "reference_range": "",
-            "is_abnormal": false,
-            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on"
-          }
-        ]
-      },
-      "interpretation": "Abnormal values: ESR 22 mm/hr (H).",
-      "abnormal_values_summary": [
-        "ESR 22 mm/hr (mildly elevated — non-specific in SLE context)"
-      ]
-    },
-    "clinical_assessment": {
-      "assessment_type": "functional_neuro_signs",
-      "scores": {
-        "positive_rule_in_signs_documented": "4",
-        "internal_inconsistency": "present",
-        "distribution_consistent_with_a_single_lesion": "no"
-      },
-      "criteria_met": {
-        "positive_clinical_sign_present": true,
-        "symptoms_inconsistent_with_organic_disease": true,
-        "diagnosis_made_by_exclusion_only": false,
-        "psychological_stressor_required_for_diagnosis": false
-      },
-      "pre_post_comparison": null,
-      "findings": [
-        {
-          "sign": "Hoover sign",
-          "result": "POSITIVE Hoover sign right leg."
-        },
-        {
-          "sign": "Improvement with attentional distraction",
-          "result": "Weakness variable during exam — improves with attention distraction."
-        },
-        {
-          "sign": "Midline-splitting sensory loss",
-          "result": "Right-sided sensory loss — stops exactly at midline."
-        },
-        {
-          "sign": "Dragging monoplegic gait",
-          "result": "Right leg dragging."
-        }
-      ],
-      "impression": "Positive functional signs elicited and documented: Hoover sign, Improvement with attentional distraction, Midline-splitting sensory loss, Dragging monoplegic gait. Functional neurological disorder is a rule-in diagnosis under DSM-5 and the criterion satisfied here is clinical incompatibility, not the absence of another disease. No further investigation is required to make the diagnosis; whatever imaging or laboratory testing is performed is for a separate, specific question.",
-      "recommended_actions": []
-    },
-    "specialized_test": null,
-    "ecg": null,
-    "csf": null,
-    "echo": null,
-    "cardiac_monitoring": null,
-    "advanced_imaging": null
-  },
-  "followup_outputs": [
-    {
-      "trigger_action": "rheumatology_consultation_sle",
-      "tool_name": "search_medical_literature",
-      "output": {
-        "query": "neuropsychiatric lupus NPSLE diagnosis criteria attribution",
-        "results": [
-          {
-            "pmid": "28250016",
-            "title": "2019 European League Against Rheumatism recommendations for management of NPSLE",
-            "journal": "Annals of Rheumatic Diseases",
-            "year": "2019"
-          }
-        ],
-        "summary": ""
-      }
-    },
-    {
-      "trigger_action": "hydroxychloroquine_interaction_check",
-      "tool_name": "check_drug_interactions",
-      "output": {
-        "proposed": "No new medications — reviewing current regimen",
-        "interactions": [
-          "Hydroxychloroquine + sertraline: both QTc-prolonging agents. Combination can prolong QTc — baseline ECG recommended. At current doses, risk is generally low.",
-          "No pharmacokinetic interaction between hydroxychloroquine and sertraline"
-        ],
-        "contraindications": [],
-        "warnings": [
-          "ECG recommended to assess baseline QTc given hydroxychloroquine + sertraline combination"
-        ],
-        "formulary_status": "Both currently prescribed",
-        "alternatives": []
-      }
-    }
-  ],
-  "fallback_tool_outputs": {
-    "eeg": null,
-    "mri": null,
-    "ecg": {
-      "rhythm": "normal sinus rhythm",
-      "rate": 61,
-      "intervals": {
-        "PR": "142 ms",
-        "QRS": "90 ms",
-        "QTc": "401 ms"
-      },
-      "axis": "normal",
-      "findings": [
-        "Normal sinus rhythm. Normal axis and intervals. No acute ST-T changes."
-      ],
-      "interpretation": "Normal ECG",
-      "clinical_correlation": ""
-    },
-    "labs": null,
-    "csf": null,
-    "ct": {
-      "findings": [],
-      "contrast_used": false,
-      "angiography_findings": null,
-      "additional_observations": [],
-      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
-      "recommended_actions": []
-    },
-    "echo": {
-      "chambers": {
-        "LV": "normal size and systolic function",
-        "RV": "normal size and function",
-        "LA": "normal size",
-        "RA": "normal size"
-      },
-      "valves": {
-        "mitral": "structurally normal",
-        "aortic": "structurally normal",
-        "tricuspid": "normal",
-        "pulmonic": "normal"
-      },
-      "ejection_fraction": 58.0,
-      "wall_motion": "no regional wall-motion abnormality",
-      "findings": [
-        "Trace mitral regurgitation, physiological. No intracardiac thrombus or vegetation. No pericardial effusion."
-      ],
-      "impression": "Normal cardiac structure and function. Trace mitral regurgitation, physiological.",
-      "recommended_actions": []
-    },
-    "cardiac_monitoring": {
-      "duration_hours": 24,
-      "monitor_type": "holter_24h",
-      "rhythm_summary": "Sinus rhythm throughout the recording",
-      "heart_rate_range": {
-        "min": 52,
-        "max": 125,
-        "average": 74
-      },
-      "events": [],
-      "findings": [
-        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
-      ],
-      "impression": "Normal 24-hour Holter monitor.",
-      "recommended_actions": []
-    },
-    "advanced_imaging": {
-      "modality": "MRI_brain_functional",
-      "tracer_or_protocol": null,
-      "findings": [],
-      "quantitative_data": null,
-      "impression": "No abnormality identified.",
-      "recommended_actions": []
-    },
-    "specialized_test": {
-      "test_type": "neuropsych_battery",
-      "findings": [],
-      "quantitative_data": null,
-      "impression": "Study within normal limits.",
-      "recommended_actions": []
-    },
-    "literature_search": null,
-    "drug_interactions": null
-  },
-  "ground_truth": {
-    "primary_diagnosis": "Functional neurological disorder — right-sided functional hemimotor syndrome, in patient with quiescent SLE (neuropsychiatric SLE excluded)",
-    "icd_code": "F44.4",
-    "differential": [
-      {
-        "diagnosis": "Multiple sclerosis (demyelinating disease)",
-        "likelihood": "low",
-        "key_features": "Sensorimotor symptoms in a young adult raise demyelinating disease; brain (and when indicated spine) MRI without T2/FLAIR lesions or enhancement argues against an active demyelinating process.",
-        "icd_code": "G35"
-      },
-      {
-        "diagnosis": "Structural CNS lesion (tumor, demyelination, stroke)",
-        "likelihood": "low",
-        "key_features": "Focal complaints warrant imaging; normal brain MRI without lesion, mass, or enhancement effectively excludes a structural cause for the presenting deficit.",
-        "icd_code": null
-      },
-      {
-        "diagnosis": "Autoimmune or paraneoplastic encephalitis",
-        "likelihood": "very_low",
-        "key_features": "Episodic neurological symptoms can occur in autoimmune encephalitis; normal MRI, normal EEG background, and (when obtained) negative antibody panel render this very unlikely.",
-        "icd_code": "G04.81"
-      }
-    ],
-    "optimal_actions": [
-      {
-        "step": 1,
-        "action": "Search current literature on FND diagnostic signs and evidence-based treatment (CBT for PNES, specialized physiotherapy for functional motor symptoms)",
-        "tool_name": "search_medical_literature",
-        "expected_finding": "Confirms multidisciplinary CBT + physiotherapy is the evidence-based treatment for FND",
-        "category": "recommended",
-        "tool_parameters": {
-          "query": "functional neurological disorder diagnosis treatment"
-        },
-        "citation": "[Nielsen_2015]",
-        "guideline_source": "FND criteria pack — treatment evidence"
-      },
-      {
-        "step": 2,
-        "action": "Review current medications for agents that may exacerbate symptoms (e.g., benzodiazepines, dopamine-blocking antipsychotics, AEDs initiated for PNES)",
-        "tool_name": "check_drug_interactions",
-        "expected_finding": "Identification of medication contributors that should be tapered or discontinued",
-        "category": "recommended",
-        "tool_parameters": {},
-        "citation": "",
-        "guideline_source": "FND criteria pack — medication review"
-      },
-      {
-        "action": "Perform and document a positive FND examination: internal inconsistency/incongruity, Hoover sign, entrainment/distractibility or positive functional-seizure semiology as appropriate",
-        "tool_name": "perform_clinical_assessment",
-        "expected_finding": "Positive rule-in signs establish FND; symptoms are real and involuntary, and psychological stress is not a required diagnostic criterion",
-        "category": "required",
-        "tool_parameters": {
-          "assessment_type": "functional_neuro_signs"
-        },
-        "citation": "[AAN_Functional_Seizures_2025]",
-        "guideline_source": "positive FND signs; AAN functional seizures guideline 2025",
-        "step": 3
-      },
-      {
-        "action": "Consider MRI only for the explicit first focal deficit, acute red flag or competing organic neurological disease in this case",
-        "tool_name": "analyze_brain_mri",
-        "expected_finding": "Exclude the named structural mimic; a normal scan does not itself diagnose FND",
-        "category": "optional",
-        "tool_parameters": {
-          "protocol": "standard",
-          "contrast": false
-        },
-        "citation": "[AAN_Functional_Seizures_2025]",
-        "guideline_source": "positive FND signs; AAN functional seizures guideline 2025",
-        "step": 4
-      },
-      {
-        "action": "Consider only case-targeted blood tests for the named metabolic, inflammatory, nutritional or treatment-related mimic",
-        "tool_name": "interpret_labs",
-        "expected_finding": "Answer the specific alternative diagnosis; normal blood tests do not establish FND",
-        "category": "optional",
-        "tool_parameters": {
-          "panels": [
-            "CBC",
-            "CMP",
-            "ESR",
-            "CRP",
-            "complement C3/C4"
-          ]
-        },
-        "citation": "[AAN_Functional_Seizures_2025]",
-        "guideline_source": "positive FND signs; AAN functional seizures guideline 2025",
-        "step": 5
-      }
-    ],
-    "useless_tools": [
-      {
-        "tool_name": "analyze_ecg",
-        "tool_parameters": {},
-        "rationale": "ECG has no diagnostic role in FND; cardiac etiology is not on the differential for the presenting neurological deficit.",
-        "citation": "[Stone_2018]"
-      },
-      {
-        "tool_name": "order_echocardiogram",
-        "tool_parameters": {},
-        "rationale": "Echocardiography has no role in FND; no structural cardiac question is raised by the presentation.",
-        "citation": "[Stone_2018]"
-      },
-      {
-        "tool_name": "order_cardiac_monitoring",
-        "tool_parameters": {},
-        "rationale": "Cardiac rhythm monitoring is not indicated; the events are non-syncopal and the rule-in signs point to FND.",
-        "citation": "[Stone_2018]"
-      },
-      {
-        "tool_name": "order_ct_scan",
-        "tool_parameters": {},
-        "rationale": "Non-contrast head CT adds no information beyond MRI for an FND workup and contributes diagnostic noise plus radiation exposure.",
-        "citation": "[Espay_2018]"
-      },
-      {
-        "tool_name": "order_advanced_imaging",
-        "tool_parameters": {
-          "modality": "FDG_PET"
-        },
-        "rationale": "Advanced PET imaging has no indication in FND; standard MRI is the appropriate structural workup.",
-        "citation": "[Espay_2018]"
-      },
-      {
-        "tool_name": "order_specialized_test",
-        "tool_parameters": {
-          "test_type": "emg_ncs"
-        },
-        "rationale": "Nerve conduction studies and EMG have no role once positive functional signs are documented: the deficit is not neuromuscular, the study is uncomfortable, and a normal result reinforces the patient's search for an organic cause — the principal iatrogenic harm in this condition",
-        "citation": "[Stone_2018]"
-      },
-      {
-        "tool_name": "order_specialized_test",
-        "tool_parameters": {
-          "test_type": "ssep"
-        },
-        "rationale": "Somatosensory evoked potentials answer a question about a lesion in the somatosensory pathway; a midline-splitting, non-anatomical sensory deficit is not that question",
-        "citation": "[Stone_2018]"
-      }
-    ],
-    "harmful_tools": [],
-    "sequence_constraints": [],
-    "critical_actions": [
-      "Do NOT make the diagnosis by exclusion: document at least one positive rule-in sign, which is the act that establishes it",
-      "Communicate the diagnosis transparently using positive language and the rule-in signs as the basis",
-      "Refer for FND-informed physiotherapy and CBT / psychological therapy",
-      "Order a comprehensive neuropsychological battery to characterize comorbid depression, anxiety, somatization, and trauma exposure — informs treatment planning (criteria-pack 'recommended' tier)",
-      "Communicate the diagnosis transparently using positive language anchored on the rule-in signs; explicitly state the diagnosis is FND, the symptoms are real and involuntary, and there is an evidence-based treatment plan",
-      "Refer to specialized FND-informed physiotherapy (for functional motor symptoms) and to CBT / psychological therapy (for PNES and comorbid mood / anxiety)"
-    ],
-    "contraindicated_actions": [
-      "Do not pursue ever-expanding negative investigations — per Stone 2018, repeated negative workups reinforce illness conviction and worsen prognosis",
-      "Do not frame the diagnosis as 'all in your head', 'nothing wrong', or 'we couldn't find anything' — this damages the therapeutic alliance and is the most common avoidable harm in FND",
-      "Do not perform invasive testing (lumbar puncture, nerve biopsy, muscle biopsy, cerebral angiography) when positive rule-in signs are present and there is no clinical indication",
-      "Do not order EMG/NCS, muscle biopsy, or nerve biopsy as part of an FND workup — these invasive tests reinforce the somatic illness model per Stone 2018",
-      "Do not give gadolinium without a specific indication — contrast adds cost and risk and answers no question that positive functional signs have not already answered",
-      "Do not repeat the brain MRI, the laboratory panel or the lumbar puncture once a first normal study and positive rule-in signs are documented: each repetition strengthens the patient's belief that something organic has been missed"
-    ],
-    "key_reasoning_points": [
-      "FND is a positive diagnosis based on rule-in signs (Hoover, tremor entrainment, give-way weakness, non-dermatomal sensory loss with midline split) — not a diagnosis of exclusion (Espay 2018, Stone 2018).",
-      "Brain MRI and basic laboratory testing are OPTIONAL here, not due diligence: the diagnosis rests on the positive signs, and each additional negative study is a cost and an iatrogenic harm rather than a confirmation. Where imaging is recommended in this case it is for one specific alternative question, once.",
-      "Over-investigation is the principal iatrogenic harm in FND; every additional negative test reinforces the patient's illness conviction and worsens prognosis (Stone 2018).",
-      "Psychiatric comorbidity (anxiety, depression, trauma) is common and informs treatment planning but is NOT required for the diagnosis and does not 'explain' the symptoms in a reductive sense.",
-      "Diagnostic communication matters: using positive language anchored on the rule-in signs is associated with better engagement and outcomes (Stone 2018).",
-      "Evidence-based treatment is multidisciplinary — CBT for PNES and FND-informed physiotherapy for functional motor symptoms (Nielsen 2015).",
-      "Interim composition decision, August 2026: FND remains only to keep the frozen dataset at 20 conditions/600 cases. The positive functional-neurological examination is the sole required diagnostic act; every instrumental test is optional and case-targeted. DLB remains the preferred future replacement when composition work resumes."
-    ],
-    "red_herrings": [
-      {
-        "data_point": "Pre-existing psychiatric diagnosis (anxiety or depression) in the past medical history",
-        "location": "Past medical history",
-        "field_path": "patient.clinical_history.past_medical_history",
-        "intended_effect": "Premature anchoring on a 'psychosomatic' label without obtaining positive rule-in signs; conversely, dismissing FND as a serious diagnosis because the patient is 'just anxious'",
-        "correct_interpretation": "Psychiatric comorbidity neither establishes nor refutes FND. Diagnosis requires positive rule-in signs on examination; psychiatric history is relevant for treatment planning, not for diagnosis."
-      },
-      {
-        "data_point": "Symptom onset coincident with a major psychosocial stressor",
-        "location": "History of present illness",
-        "field_path": "patient.history_present_illness",
-        "intended_effect": "Conclude prematurely that stress 'caused' the symptoms and that the workup can be abbreviated",
-        "correct_interpretation": "Many organic conditions (MS, migraine, epilepsy) also flare with stress. Stress at onset is supportive context, not a diagnostic substitute for the positive rule-in signs."
-      }
-    ]
+    "specialized_test": null
   },
   "metadata": {
-    "version": "v5",
-    "notes": "Moderate FND — right hemimotor in quiescent SLE patient. Must exclude NPSLE and APS rigorously before FND diagnosis. APS triple panel critical.",
+    "authoring_agent": "condition-expert:FND",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "criteria_pack_version": "1.0",
+    "difficulty_rationale": "Mixed motor and/or seizure phenotype with at least one prominent comorbidity or compelling red herring (family history of MS, antipsychotic exposure, comorbid SLE). Standard FND workup (MRI + basic labs + video-EEG when seizure phenotype) plus disciplined diagnostic communication.",
     "fallback_tool_kinds": {
-      "ecg": "normal",
-      "ct": "normal",
-      "echo": "incidental",
-      "cardiac_monitoring": "normal",
       "advanced_imaging": "normal",
+      "cardiac_monitoring": "normal",
+      "ct": "normal",
+      "ecg": "normal",
+      "echo": "incidental",
       "specialized_test": "normal"
     },
     "last_revised": "2026-08-10",
+    "notes": "Moderate FND \u2014 right hemimotor in quiescent SLE patient. Must exclude NPSLE and APS rigorously before FND diagnosis. APS triple panel critical.",
+    "policy_spec_status": "draft",
     "revision_reason": "FND interim reviewer option: positive clinical diagnosis required; every instrumental test optional and selected for explicit red flags",
-    "criteria_pack_version": "1.0",
-    "authoring_agent": "condition-expert:FND",
-    "difficulty_rationale": "Mixed motor and/or seizure phenotype with at least one prominent comorbidity or compelling red herring (family history of MS, antipsychotic exposure, comorbid SLE). Standard FND workup (MRI + basic labs + video-EEG when seizure phenotype) plus disciplined diagnostic communication.",
-    "case_body_concerns": [],
-    "citation_gap": [],
+    "version": "policy-v1",
     "vocab_gap": []
-  }
+  },
+  "patient": {
+    "chief_complaint": "Sudden right-sided weakness and sensory loss \u2014 48 hours",
+    "clinical_history": {
+      "allergies": [
+        "Sulfonamides \u2014 rash"
+      ],
+      "family_history": [
+        "Mother: SLE",
+        "No family history of neurological disease"
+      ],
+      "medications": [
+        {
+          "dose": "200 mg",
+          "drug": "Hydroxychloroquine",
+          "frequency": "twice daily",
+          "indication": "SLE maintenance"
+        },
+        {
+          "dose": "100 mg",
+          "drug": "Sertraline",
+          "frequency": "once daily",
+          "indication": "Depression"
+        }
+      ],
+      "past_medical_history": [
+        "Lupus (SLE) \u2014 quiescent, established diagnosis 4 years ago",
+        "Depression"
+      ],
+      "social_history": {
+        "alcohol": "Rarely",
+        "occupation": "Nursing student (second year)",
+        "recent_stressor": "Failed clinical rotation assessment 3 weeks ago; concern about being dismissed from nursing program",
+        "tobacco": "Never"
+      }
+    },
+    "demographics": {
+      "age": 29,
+      "bmi": 27.2,
+      "ethnicity": "Black",
+      "handedness": "right",
+      "sex": "female"
+    },
+    "history_present_illness": "Ms. W is a 29-year-old nursing student with established quiescent SLE who presents with 48 hours of right-sided arm and leg weakness and right hemisensory loss. She has had SLE for 4 years, managed with hydroxychloroquine, with no prior major organ involvement and quiescent disease activity for 18 months. Her rheumatologist last assessed her 3 months ago with normal complement levels and stable anti-dsDNA. The neurological symptoms began abruptly 48 hours ago without any prodrome. She has been in good health and her SLE has been well-controlled. She failed a clinical rotation assessment 3 weeks ago and is concerned about dismissal from her nursing program. Her nursing training makes her familiar with lupus cerebritis, antiphospholipid syndrome, and CNS vasculitis, and she is worried about CNS lupus involvement. She has no prior neurological presentations. She has no fever, no joint pain flare, no rash, and no renal symptoms. She denies headache. On directed questioning, she acknowledges significant stress from the nursing program failure and feels her symptoms began after a particularly difficult study session.",
+    "neurological_exam": {
+      "additional": "Witnessed during examination: right-sided weakness and sensory findings as above; no involuntary movements or seizure-like episodes observed.",
+      "coordination": "Normal left side. Cannot fully test right due to apparent weakness.",
+      "cranial_nerves": "Normal.",
+      "gait": "Right leg dragging. Observed to walk normally to restroom when unaware of observation.",
+      "mental_status": "Alert and oriented x4. Anxious. Demonstrates good medical knowledge from nursing training.",
+      "motor": "Right arm weakness 3/5 formal testing. POSITIVE Hoover sign right leg. Weakness variable during exam \u2014 improves with attention distraction. No wasting.",
+      "reflexes": "Normal 2+ symmetric. No Babinski. No pathological reflexes.",
+      "sensory": "Right-sided sensory loss \u2014 stops exactly at midline. Vibration intact throughout."
+    },
+    "patient_id": "NB-FND-M05",
+    "vitals": {
+      "bp_diastolic": 74,
+      "bp_systolic": 122,
+      "hr": 94,
+      "rr": 15,
+      "spo2": 99,
+      "temp": 37.2
+    }
+  },
+  "schema_version": "2.0"
 }

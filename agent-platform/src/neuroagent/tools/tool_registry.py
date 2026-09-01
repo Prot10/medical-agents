@@ -1,6 +1,8 @@
 from __future__ import annotations
-from .base import BaseTool, ToolCall, ToolResult
+
 from typing import Any
+
+from .base import BaseTool, ToolCall, ToolResult
 
 
 class ToolRegistry:
@@ -20,11 +22,14 @@ class ToolRegistry:
 
     def execute(self, tool_call: ToolCall) -> ToolResult:
         if tool_call.tool_name not in self.tools:
+            available = list(self.tools)
             return ToolResult(
                 tool_name=tool_call.tool_name,
                 success=False,
                 output=None,
-                error_message=f"Tool '{tool_call.tool_name}' not found. Available: {list(self.tools.keys())}",
+                error_message=(
+                    f"Tool '{tool_call.tool_name}' not found. Available: {available}"
+                ),
             )
         tool = self.get_tool(tool_call.tool_name)
         return tool.execute(tool_call.parameters)
@@ -41,32 +46,40 @@ class ToolRegistry:
         Returns:
             ToolRegistry with the 16 diagnostic tools.
         """
-        from .eeg_analyzer import EEGAnalyzerTool
-        from .mri_analyzer import MRIAnalyzerTool
-        from .ecg_analyzer import ECGAnalyzerTool
-        from .lab_interpreter import LabInterpreterTool
-        from .csf_analyzer import CSFAnalyzerTool
-        from .literature_search import LiteratureSearchTool
-        from .drug_interaction import DrugInteractionTool
-        from .ct_scanner import CTScanTool
-        from .echocardiogram import EchocardiogramTool
-        from .cardiac_monitoring import CardiacMonitoringTool
         from .advanced_imaging import AdvancedImagingTool
-        from .specialized_test import SpecializedTestTool
-        # Added after the July 2026 clinical tool review: the action space could only image
-        # the brain and could not obtain a specimen.
         from .body_imaging import BodyImagingTool
-        from .microbiology import MicrobiologyTool
-        from .tissue_diagnosis import TissueDiagnosisTool
+        from .cardiac_monitoring import CardiacMonitoringTool
         from .clinical_assessment import ClinicalAssessmentTool
+        from .csf_analyzer import CSFAnalyzerTool
+        from .ct_scanner import CTScanTool
+        from .drug_interaction import DrugInteractionTool
+        from .ecg_analyzer import ECGAnalyzerTool
+        from .echocardiogram import EchocardiogramTool
+        from .eeg_analyzer import EEGAnalyzerTool
+        from .lab_interpreter import LabInterpreterTool
+        from .literature_search import LiteratureSearchTool
+        from .microbiology import MicrobiologyTool
+        from .mri_analyzer import MRIAnalyzerTool
+        from .specialized_test import SpecializedTestTool
+        from .tissue_diagnosis import TissueDiagnosisTool
 
         registry = ToolRegistry()
         for tool_cls in [
-            EEGAnalyzerTool, MRIAnalyzerTool, ECGAnalyzerTool,
-            LabInterpreterTool, CSFAnalyzerTool, LiteratureSearchTool,
-            DrugInteractionTool, CTScanTool, EchocardiogramTool,
-            CardiacMonitoringTool, AdvancedImagingTool, SpecializedTestTool,
-            BodyImagingTool, MicrobiologyTool, TissueDiagnosisTool,
+            EEGAnalyzerTool,
+            MRIAnalyzerTool,
+            ECGAnalyzerTool,
+            LabInterpreterTool,
+            CSFAnalyzerTool,
+            LiteratureSearchTool,
+            DrugInteractionTool,
+            CTScanTool,
+            EchocardiogramTool,
+            CardiacMonitoringTool,
+            AdvancedImagingTool,
+            SpecializedTestTool,
+            BodyImagingTool,
+            MicrobiologyTool,
+            TissueDiagnosisTool,
             ClinicalAssessmentTool,
         ]:
             registry.register(tool_cls(mock_server=mock_server))

@@ -169,7 +169,7 @@ class CostTracker:
         return sum(e.cost_usd for e in self.entries)
 
     def get_summary(self) -> dict[str, Any]:
-        """Return cost summary for inclusion in agent trace."""
+        """Return a cost summary for the typed clinical episode."""
         by_tool: dict[str, float] = {}
         for e in self.entries:
             by_tool[e.tool_name] = by_tool.get(e.tool_name, 0) + e.cost_usd
