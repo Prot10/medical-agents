@@ -5,6 +5,11 @@ across the group. Packing the group into one sequence with a block-causal mask (
 attends to the prompt and to itself, never to a sibling) and prompt-continuing positions gives
 per-token log-probabilities identical to separate forwards while processing the prompt once.
 
+The mask is a FlexAttention `BlockMask`: block-sparse, so attention memory stays linear in the
+sequence length and sibling blocks are skipped. A dense 4D mask would push PyTorch's SDPA onto the
+materialised-scores kernel, which at ~18k packed tokens exhausts an A100-40GB. The model must be
+loaded with `attn_implementation="flex_attention"` (`packing_config` reports whether it can be).
+
 Exact for attention-only models (Granite 4.1; Gemma 4 with its per-layer-type masks). Not
 applicable to Qwen3.5, whose gated-delta-net layers carry a recurrent state that cannot be forked.
 """
@@ -14,21 +19,17 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 import torch
+from torch.nn.attention.flex_attention import BlockMask, create_block_mask
+
+ATTN_IMPLEMENTATION = "flex_attention"
 
 
 @dataclass
 class PackedGroup:
     input_ids: torch.Tensor  # (1, L)
     position_ids: torch.Tensor  # (1, L)
-    attention_mask: torch.Tensor | dict[str, torch.Tensor]  # (1, 1, L, L) bool, True = attend
+    attention_mask: BlockMask | dict[str, BlockMask]
     completion_slices: list[slice]  # where each completion sits in the packed sequence
-
-
-def _block_causal(segment: torch.Tensor, position: torch.Tensor) -> torch.Tensor:
-    """Attend iff key precedes-or-equals query in position and key is in the prompt or the same segment."""
-    q_seg, k_seg = segment[:, None], segment[None, :]
-    q_pos, k_pos = position[:, None], position[None, :]
-    return (k_pos <= q_pos) & ((k_seg == 0) | (k_seg == q_seg))
 
 
 def pack_group(
@@ -50,18 +51,27 @@ def pack_group(
         position += range(len(prompt_ids), len(prompt_ids) + len(completion))
     segment_t = torch.tensor(segment, device=device)
     position_t = torch.tensor(position, device=device)
-    full = _block_causal(segment_t, position_t)
+    length = len(ids)
+
+    def block_causal(batch, head, q, kv):
+        """Attend iff key precedes-or-equals query in position and key is in the prompt or the same segment."""
+        return (position_t[kv] <= position_t[q]) & ((segment_t[kv] == 0) | (segment_t[kv] == segment_t[q]))
+
+    def block_mask(mask_mod):
+        return create_block_mask(mask_mod, B=None, H=None, Q_LEN=length, KV_LEN=length, device=str(device))
+
+    full = block_mask(block_causal)
     if layer_types and "sliding_attention" in layer_types:
         if sliding_window is None:
             raise ValueError("sliding_window is required for models with sliding attention layers")
-        # transformers' overlay: kv_idx > q_idx - sliding_window, on logical positions.
-        window = position_t[None, :] > position_t[:, None] - sliding_window
-        mask: torch.Tensor | dict[str, torch.Tensor] = {
-            "full_attention": full[None, None],
-            "sliding_attention": (full & window)[None, None],
-        }
+
+        def sliding(batch, head, q, kv):
+            # transformers' overlay: kv_idx > q_idx - sliding_window, on logical positions.
+            return block_causal(batch, head, q, kv) & (position_t[kv] > position_t[q] - sliding_window)
+
+        mask: BlockMask | dict[str, BlockMask] = {"full_attention": full, "sliding_attention": block_mask(sliding)}
     else:
-        mask = full[None, None]
+        mask = full
     return PackedGroup(
         input_ids=torch.tensor([ids], device=device),
         position_ids=position_t[None],
@@ -70,9 +80,9 @@ def pack_group(
     )
 
 
-def packing_config(model) -> dict | None:
+def packing_config(config) -> dict | None:
     """Layer-type information for `pack_group`, or None when the architecture cannot be packed."""
-    config = getattr(model.config, "get_text_config", lambda: model.config)()
+    config = getattr(config, "get_text_config", lambda: config)()
     layer_types = getattr(config, "layer_types", None)
     if layer_types and any(t not in ("full_attention", "sliding_attention") for t in layer_types):
         return None  # e.g. Qwen3.5's linear_attention layers

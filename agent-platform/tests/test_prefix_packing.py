@@ -1,4 +1,4 @@
-"""Packed group forward must reproduce per-row log-probabilities exactly (tiny random models, CPU)."""
+"""Packed group forward (FlexAttention block mask) must reproduce per-row SDPA log-probabilities (tiny random models, CPU)."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ import pytest
 torch = pytest.importorskip("torch")
 transformers = pytest.importorskip("transformers")
 
-from neuroagent.training.prefix_packing import pack_group, packed_logits_to_keep, packing_config  # noqa: E402
+from neuroagent.training.prefix_packing import ATTN_IMPLEMENTATION, pack_group, packed_logits_to_keep, packing_config  # noqa: E402
 
 
 def _tiny(config_cls, **overrides):
@@ -32,8 +32,9 @@ def _per_row_logps(model, prompt, completions):
 
 
 def _packed_logps(model, prompt, completions):
-    cfg = packing_config(model)
+    cfg = packing_config(model.config)
     assert cfg is not None
+    model.set_attn_implementation(ATTN_IMPLEMENTATION)
     packed = pack_group(prompt, completions, **cfg)
     keep, targets = packed_logits_to_keep(packed, [list(range(len(c))) for c in completions])
     with torch.no_grad():
@@ -73,7 +74,4 @@ def test_qwen_style_hybrid_layers_are_not_packable():
     class Cfg:
         layer_types = ["linear_attention", "full_attention"]
 
-    class Model:
-        config = Cfg()
-
-    assert packing_config(Model()) is None
+    assert packing_config(Cfg()) is None

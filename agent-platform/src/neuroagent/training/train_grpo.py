@@ -42,7 +42,7 @@ from ..harness.interfaces import RunContext
 from ..harness.loops import ClinicalPolicyLoop
 from ..llm.client import LLMResponse, LLMToolCall
 from ..model_registry import KEY_TO_MODEL
-from .prefix_packing import pack_group, packed_logits_to_keep, packing_config
+from .prefix_packing import ATTN_IMPLEMENTATION, pack_group, packed_logits_to_keep, packing_config
 
 # Tool-call syntax is sampled freely, as in serving (serve_model.sh pins the same value).
 os.environ.setdefault("VLLM_ENFORCE_STRICT_TOOL_CALLING", "0")
@@ -438,7 +438,8 @@ def build_trainer(
     engine_kwargs = dict(entry.get("engine_kwargs", {}))
     from transformers import AutoConfig
 
-    packable = prefix_sharing and packing_config(type("M", (), {"config": AutoConfig.from_pretrained(entry["hf_model_id"])})()) is not None
+    packing = packing_config(AutoConfig.from_pretrained(entry["hf_model_id"])) if prefix_sharing else None
+    packable = packing is not None
     # GRPO needs stochastic rollouts: a greedy model-card default (Granite) yields identical
     # samples per group (no advantage) and a zero temperature breaks the trainer's logit scaling.
     request = {**entry["request_defaults"], "temperature": rollout_temperature or entry["request_defaults"].get("temperature") or 1.0}
@@ -684,7 +685,8 @@ def build_trainer(
         output_dir=output_dir,
         # bf16 weights loaded on the CPU: the colocated engine is created during trainer init and
         # must see a free GPU; the policy is moved to the GPU right after (see below).
-        model_init_kwargs={"dtype": "bfloat16", "device_map": "cpu"},
+        # A packed group needs FlexAttention's block-sparse mask (see prefix_packing).
+        model_init_kwargs={"dtype": "bfloat16", "device_map": "cpu", **({"attn_implementation": ATTN_IMPLEMENTATION} if packable else {})},
         max_steps=max_steps,
         learning_rate=learning_rate,
         lr_scheduler_type="constant_with_warmup",
@@ -739,7 +741,7 @@ def build_trainer(
         callbacks=[JsonlLog()],
     )
     trainer._env_masks = {}
-    trainer._packing = packing_config(trainer.model) if prefix_sharing else None
+    trainer._packing = packing
     trainer._packing_verified = False
     trainer.model.to(device)
     return trainer, diagnostics
