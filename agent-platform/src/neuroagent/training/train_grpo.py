@@ -42,6 +42,7 @@ from ..harness.interfaces import RunContext
 from ..harness.loops import ClinicalPolicyLoop
 from ..llm.client import LLMResponse, LLMToolCall
 from ..model_registry import KEY_TO_MODEL
+from .prefix_packing import pack_group, packed_logits_to_keep, packing_config
 
 # Tool-call syntax is sampled freely, as in serving (serve_model.sh pins the same value).
 os.environ.setdefault("VLLM_ENFORCE_STRICT_TOOL_CALLING", "0")
@@ -390,6 +391,8 @@ def build_trainer(
     seed: int,
     rollout_temperature: float | None = None,
     save_steps: int = 5,
+    prefix_sharing: bool = True,
+    verify_packing: bool = False,
 ):
     import torch
     from datasets import Dataset
@@ -433,6 +436,9 @@ def build_trainer(
     entry = KEY_TO_MODEL[model_key]
     tokenizer = AutoTokenizer.from_pretrained(entry["hf_model_id"])
     engine_kwargs = dict(entry.get("engine_kwargs", {}))
+    from transformers import AutoConfig
+
+    packable = prefix_sharing and packing_config(type("M", (), {"config": AutoConfig.from_pretrained(entry["hf_model_id"])})()) is not None
     # GRPO needs stochastic rollouts: a greedy model-card default (Granite) yields identical
     # samples per group (no advantage) and a zero temperature breaks the trainer's logit scaling.
     request = {**entry["request_defaults"], "temperature": rollout_temperature or entry["request_defaults"].get("temperature") or 1.0}
@@ -458,49 +464,98 @@ def build_trainer(
             self._log_metric("train/compute_loss_seconds", time.perf_counter() - started)
             return result
 
+        def _row_logps(self, model, ids, att, logits_to_keep, compute_entropy):
+            """Per-row path: one forward, vocabulary projection only at supervised positions."""
+            total = ids.size(0)
+            completion = ids[total - logits_to_keep:]
+            valid = int(att[total - logits_to_keep:].sum().item())
+            env_mask = self._env_masks.get(tuple(completion[:valid].tolist()))
+            if env_mask is None:
+                raise RuntimeError("no environment mask recorded for a completion; rollout bookkeeping is broken")
+            logps = torch.zeros(logits_to_keep, device=ids.device, dtype=torch.float32)
+            entropies = torch.zeros_like(logps)
+            supervised = [j for j, m in enumerate(env_mask) if m]
+            if supervised:
+                keep = torch.tensor([total - logits_to_keep + j - 1 for j in supervised], device=ids.device)
+                forward_started = time.perf_counter()
+                outputs = model(input_ids=ids[None], attention_mask=att[None], logits_to_keep=keep, use_cache=False)
+                torch.cuda.synchronize()
+                self._log_metric("train/forward_seconds_per_row", time.perf_counter() - forward_started)
+                self._log_metric("train/row_tokens", float(att.sum().item()))
+                logits = outputs.logits[0].div(self.temperature)
+                values = selective_log_softmax(logits, completion[supervised])
+                logps[supervised] = values.float()
+                if compute_entropy:
+                    with torch.no_grad():
+                        entropies[supervised] = entropy_from_logits(logits).float()
+            return logps, entropies
+
+        def _group_logps(self, model, input_ids, attention_mask, logits_to_keep, compute_entropy):
+            """Packed path: the group's shared prompt once, all completions block-causally masked."""
+            total = input_ids.size(1)
+            prompts, completions, supervised = [], [], []
+            for row in range(input_ids.size(0)):
+                ids, att = input_ids[row], attention_mask[row].bool()
+                prompt_part, completion_part = ids[: total - logits_to_keep], ids[total - logits_to_keep:]
+                prompts.append(prompt_part[att[: total - logits_to_keep]].tolist())
+                completion = completion_part[att[total - logits_to_keep:]].tolist()
+                env_mask = self._env_masks.get(tuple(completion))
+                if env_mask is None:
+                    raise RuntimeError("no environment mask recorded for a completion; rollout bookkeeping is broken")
+                completions.append(completion)
+                supervised.append([j for j, m in enumerate(env_mask) if m])
+            if any(prompt != prompts[0] for prompt in prompts):
+                return None
+            packed = pack_group(prompts[0], completions, device=input_ids.device, **self._packing)
+            keep, targets = packed_logits_to_keep(packed, supervised)
+            logps = torch.zeros(input_ids.size(0), logits_to_keep, device=input_ids.device, dtype=torch.float32)
+            entropies = torch.zeros_like(logps)
+            if keep.numel():
+                forward_started = time.perf_counter()
+                outputs = model(
+                    input_ids=packed.input_ids, position_ids=packed.position_ids,
+                    attention_mask=packed.attention_mask, logits_to_keep=keep, use_cache=False,
+                )
+                torch.cuda.synchronize()
+                self._log_metric("train/forward_seconds_per_group", time.perf_counter() - forward_started)
+                self._log_metric("train/packed_tokens", float(packed.input_ids.size(1)))
+                logits = outputs.logits[0].div(self.temperature)
+                values = selective_log_softmax(logits, targets).float()
+                if compute_entropy:
+                    with torch.no_grad():
+                        ent = entropy_from_logits(logits).float()
+                offset = 0
+                for row, positions in enumerate(supervised):
+                    if positions:
+                        index = torch.tensor(positions, device=input_ids.device)
+                        logps[row, index] = values[offset : offset + len(positions)]
+                        if compute_entropy:
+                            entropies[row, index] = ent[offset : offset + len(positions)]
+                    offset += len(positions)
+            return logps, entropies
+
         def _get_per_token_logps_and_entropies(
             self, model, input_ids, attention_mask, logits_to_keep, batch_size=None, compute_entropy=False,
             compute_aux_loss=False, **kwargs,
         ):
             started = time.perf_counter()
-            logps_rows, entropy_rows = [], []
-            for row in range(input_ids.size(0)):
-                ids, att = input_ids[row], attention_mask[row]
-                length = int(att.sum().item())
-                total = ids.size(0)
-                completion = ids[total - logits_to_keep:]
-                valid = int(att[total - logits_to_keep:].sum().item())
-                key = tuple(completion[:valid].tolist())
-                env_mask = self._env_masks.get(key)
-                logps = torch.zeros(logits_to_keep, device=ids.device, dtype=torch.float32)
-                entropies = torch.zeros_like(logps)
-                if env_mask is None:
-                    raise RuntimeError("no environment mask recorded for a completion; rollout bookkeeping is broken")
-                supervised = [j for j, m in enumerate(env_mask) if m]
-                if supervised:
-                    keep = torch.tensor([total - logits_to_keep + j - 1 for j in supervised], device=ids.device)
-                    forward_started = time.perf_counter()
-                    outputs = model(
-                        input_ids=ids[None], attention_mask=att[None], logits_to_keep=keep, use_cache=False
-                    )
-                    torch.cuda.synchronize()
-                    self._log_metric("train/forward_seconds_per_row", time.perf_counter() - forward_started)
-                    self._log_metric("train/row_tokens", float(length))
-                    logits = outputs.logits[0].div(self.temperature)
-                    targets = completion[supervised]
-                    values = selective_log_softmax(logits, targets)
-                    logps[supervised] = values.float()
-                    if compute_entropy:
-                        with torch.no_grad():
-                            entropies[supervised] = entropy_from_logits(logits).float()
-                logps_rows.append(logps)
-                entropy_rows.append(entropies)
-            logps = torch.stack(logps_rows)
+            result = None
+            if self._packing is not None and input_ids.size(0) > 1:
+                result = self._group_logps(model, input_ids, attention_mask, logits_to_keep, compute_entropy)
+                if result is not None and verify_packing and not self._packing_verified:
+                    per_row = torch.stack([self._row_logps(model, input_ids[r], attention_mask[r], logits_to_keep, False)[0] for r in range(input_ids.size(0))])
+                    gap = (result[0].detach() - per_row.detach()).abs().max().item()
+                    self._log_metric("train/packing_max_abs_logp_gap", gap)
+                    self._packing_verified = True
+            if result is None:
+                rows = [self._row_logps(model, input_ids[r], attention_mask[r], logits_to_keep, compute_entropy) for r in range(input_ids.size(0))]
+                result = torch.stack([r[0] for r in rows]), torch.stack([r[1] for r in rows])
+            logps, entropies = result
             if torch.is_grad_enabled() and not logps.requires_grad:
                 # Every row was masked (overlong episodes): keep a grad path so backward sees a zero.
                 logps.requires_grad_(True)
             self._log_metric("train/logps_seconds", time.perf_counter() - started)
-            return logps, (torch.stack(entropy_rows) if compute_entropy else None), None
+            return logps, (entropies if compute_entropy else None), None
 
     def log_logp_disagreement(trainer, inputs):
         """Where do the sampler (vLLM) and the trainer disagree most? Token, position, segment start."""
@@ -634,8 +689,10 @@ def build_trainer(
         learning_rate=learning_rate,
         lr_scheduler_type="constant_with_warmup",
         warmup_steps=min(5, max_steps),
-        per_device_train_batch_size=1,
-        gradient_accumulation_steps=num_generations * cases_per_step,
+        # A micro-batch is one group when the prompt prefix can be shared (Gemma, Granite); Qwen's
+        # recurrent layers cannot fork a prefix state, so it trains one row at a time.
+        per_device_train_batch_size=num_generations if packable else 1,
+        gradient_accumulation_steps=cases_per_step if packable else num_generations * cases_per_step,
         generation_batch_size=num_generations * cases_per_step,
         num_generations=num_generations,
         gradient_checkpointing=True,
@@ -682,6 +739,8 @@ def build_trainer(
         callbacks=[JsonlLog()],
     )
     trainer._env_masks = {}
+    trainer._packing = packing_config(trainer.model) if prefix_sharing else None
+    trainer._packing_verified = False
     trainer.model.to(device)
     return trainer, diagnostics
 
@@ -703,6 +762,8 @@ def main() -> None:
     parser.add_argument("--vllm-gpu-memory-utilization", type=float, default=0.8)
     parser.add_argument("--rollout-temperature", type=float, default=None, help="override the model card's sampling temperature for rollouts")
     parser.add_argument("--save-steps", type=int, default=5, help="adapter checkpoint interval (a VM stop must not lose the run)")
+    parser.add_argument("--no-prefix-sharing", action="store_true", help="train one row at a time even when the group prompt could be shared")
+    parser.add_argument("--verify-packing", action="store_true", help="also compute per-row log-probs on the first batch and log the gap")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--allow-draft-policies", action="store_true")
     args = parser.parse_args()
@@ -733,6 +794,8 @@ def main() -> None:
         seed=args.seed,
         rollout_temperature=args.rollout_temperature,
         save_steps=args.save_steps,
+        prefix_sharing=not args.no_prefix_sharing,
+        verify_packing=args.verify_packing,
     )
     trainer.train()
     trainer.save_model(args.output)
