@@ -7,6 +7,8 @@ from typing import Any, Callable, Mapping, Protocol
 
 from neuroagent_schemas import ClinicalAction, ClinicalEpisode, NeuroBenchCase, ToolAction
 
+from .store import MemoryEpisodeStore
+
 
 @dataclass(frozen=True, slots=True)
 class ModelTurn:
@@ -29,6 +31,7 @@ class ModelAdapter(Protocol):
         allowed_tools: list[dict[str, Any]],
         require_assessment: bool = False,
         react: bool = False,
+        correction: str | None = None,
     ) -> ModelTurn: ...
 
 
@@ -52,24 +55,18 @@ class RewardScorer(Protocol):
     def score(self, episode: ClinicalEpisode, case: NeuroBenchCase) -> Any: ...
 
 
-class EpisodeStore(Protocol):
-    store_id: str
-
-    def append(self, event: Any) -> None: ...
-    def load(self) -> ClinicalEpisode: ...
-
-
 @dataclass(slots=True)
 class RunContext:
     profile_id: str
     model: ModelAdapter
     loop: AgentLoop
     environment: ClinicalEnvironment
-    episode_store: EpisodeStore
     max_turns: int
     max_cost_usd: float | None = None
-    max_invalid_actions: int = 1
+    max_invalid_actions: int = 2
     plugin_versions: dict[str, str] = field(default_factory=dict)
+    episode_store: MemoryEpisodeStore = field(default_factory=MemoryEpisodeStore)
+    invalid_actions: int = 0
 
 
 @dataclass(frozen=True, slots=True)

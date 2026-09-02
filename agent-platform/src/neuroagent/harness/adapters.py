@@ -1,74 +1,81 @@
-"""Model-family adapters that normalize generation into one typed clinical action."""
+"""Model adapter that normalizes native tool calling into one typed clinical action."""
 
 from __future__ import annotations
 
-import json
 from typing import Any
 
 from neuroagent_schemas import ClinicalAction, SubmitAssessment, ToolAction
-from pydantic import TypeAdapter, ValidationError
+from pydantic import ValidationError
 
 from ..llm.client import LLMClient, LLMResponseDecodeError
-from .context import episode_messages
+from .context import SUBMIT_NAME, transcript
 from .interfaces import ModelTurn
-
-
-_ACTION_ADAPTER = TypeAdapter(ClinicalAction)
-_SUBMIT_NAME = "submit_assessment"
-_SUBMIT_TOOL = {
-    "type": "function",
-    "function": {
-        "name": _SUBMIT_NAME,
-        "description": "Finish the encounter with the structured clinical assessment.",
-        "parameters": {
-            "type": "object",
-            "additionalProperties": False,
-            "required": [
-                "primary_diagnosis",
-                "differential",
-                "confidence",
-                "urgency",
-                "recommendations",
-            ],
-            "properties": {
-                "primary_diagnosis": {"type": "string", "minLength": 1},
-                "differential": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "additionalProperties": False,
-                        "required": ["diagnosis"],
-                        "properties": {
-                            "diagnosis": {"type": "string", "minLength": 1},
-                            "confidence": {
-                                "anyOf": [{"type": "number", "minimum": 0, "maximum": 1}, {"type": "null"}]
-                            },
-                        },
-                    },
-                },
-                "confidence": {"type": "number", "minimum": 0, "maximum": 1},
-                "urgency": {"type": "string", "enum": ["emergent", "urgent", "routine"]},
-                "recommendations": {"type": "array", "items": {"type": "string"}},
-            },
-        },
-    },
-}
 
 
 class ActionDecodeError(ValueError):
     """The provider response cannot be normalized into exactly one allowed action."""
 
 
+def _inline_refs(schema: dict[str, Any]) -> dict[str, Any]:
+    """Resolve local ``$ref`` pointers so the schema can be embedded as a tool definition."""
+    definitions = schema.get("$defs", {})
+
+    def resolve(node: Any) -> Any:
+        if isinstance(node, dict):
+            if "$ref" in node:
+                return resolve(definitions[node["$ref"].rsplit("/", 1)[-1]])
+            return {key: resolve(value) for key, value in node.items() if key != "$defs"}
+        if isinstance(node, list):
+            return [resolve(item) for item in node]
+        return node
+
+    return resolve(schema)
+
+
+_SUBMIT_SCHEMA = _inline_refs(SubmitAssessment.model_json_schema())
+_SUBMIT_PARAMETERS = {
+    **_SUBMIT_SCHEMA,
+    "properties": {k: v for k, v in _SUBMIT_SCHEMA["properties"].items() if k != "type"},
+    "required": [k for k in _SUBMIT_SCHEMA["required"] if k != "type"],
+}
+_SUBMIT_PARAMETERS.pop("title", None)
+
+SUBMIT_TOOL = {
+    "type": "function",
+    "function": {
+        "name": SUBMIT_NAME,
+        "description": "Finish the encounter with the structured clinical assessment.",
+        "parameters": _SUBMIT_PARAMETERS,
+    },
+}
+
+
 def _usage(response: Any, key: str) -> int:
-    return int((response.usage or {}).get(key, 0))
+    return int(response.usage.get(key, 0))
+
+
+def _final_turn(correction: str | None) -> str:
+    """Models given full evidence tend to conclude in prose; the final turn must say what to call."""
+    instruction = "This is the final turn: call submit_assessment now with the structured assessment."
+    return f"{correction} {instruction}" if correction else instruction
+
+
+def _validate(action: ClinicalAction, allowed: set[str], *, require_assessment: bool) -> None:
+    if isinstance(action, ToolAction):
+        if require_assessment:
+            raise ActionDecodeError("a final assessment is required on this turn")
+        if action.tool_name not in allowed:
+            raise ActionDecodeError(
+                f"tool {action.tool_name!r} does not exist; available tools: {sorted(allowed)}"
+            )
 
 
 class NativeToolModelAdapter:
     adapter_id = "native-tools"
 
-    def __init__(self, client: LLMClient, model_id: str) -> None:
+    def __init__(self, client: LLMClient) -> None:
         self.client = client
-        self.model_id = model_id
+        self.model_id = client.model
 
     def next_action(
         self,
@@ -78,31 +85,47 @@ class NativeToolModelAdapter:
         allowed_tools: list[dict[str, Any]],
         require_assessment: bool = False,
         react: bool = False,
+        correction: str | None = None,
     ) -> ModelTurn:
-        tools = [_SUBMIT_TOOL] if require_assessment else [*allowed_tools, _SUBMIT_TOOL]
+        # The catalogue is identical on every turn so the rendered transcript chains as prefixes
+        # (training sequences depend on it); the final turn is enforced by instruction and validation.
+        tools = [*allowed_tools, SUBMIT_TOOL]
+        if require_assessment:
+            correction = _final_turn(correction)
+        # ``auto`` rather than ``required``: vLLM's required-mode grammar suppressed all assistant
+        # content (so the ReAct rationale never appeared) and still allowed several calls at once
+        # (measured on Qwen3.5-9B, vLLM 0.23). A text-only reply is an invalid action and is
+        # retried with a correction like any other decode failure.
         try:
             response = self.client.chat(
-                episode_messages(case, episode, react=react),
+                transcript(case, episode, react=react, correction=correction),
                 tools=tools,
-                tool_choice="required",
+                tool_choice="auto",
             )
         except LLMResponseDecodeError as exc:
             raise ActionDecodeError(str(exc)) from exc
-        calls = response.tool_calls or []
+        calls = response.tool_calls
+        if not calls:
+            raise ActionDecodeError(
+                "no function call in the response; a prose answer is not an action"
+                + (f" (response began: {response.content[:160]!r})" if response.content else "")
+            )
         if len(calls) != 1:
-            raise ActionDecodeError(f"expected exactly one tool call, received {len(calls)}")
+            raise ActionDecodeError(f"expected exactly one function call, received {len(calls)}")
         call = calls[0]
-        allowed_names = {item["function"]["name"] for item in tools}
-        if call.name not in allowed_names:
-            raise ActionDecodeError(f"tool {call.name!r} is not allowed")
         try:
             action = (
                 SubmitAssessment(**call.arguments)
-                if call.name == _SUBMIT_NAME
+                if call.name == SUBMIT_NAME
                 else ToolAction(tool_name=call.name, arguments=call.arguments)
             )
         except ValidationError as exc:
             raise ActionDecodeError(str(exc)) from exc
+        _validate(
+            action,
+            {item["function"]["name"] for item in allowed_tools},
+            require_assessment=require_assessment,
+        )
         payload = {}
         if react and response.content and response.content.strip():
             payload["react.rationale"] = response.content.strip()
@@ -112,57 +135,4 @@ class NativeToolModelAdapter:
             completion_tokens=_usage(response, "completion_tokens"),
             latency_seconds=response.latency_seconds,
             plugin_payload=payload,
-        )
-
-
-class JsonActionModelAdapter:
-    adapter_id = "json-action"
-
-    def __init__(self, client: LLMClient, model_id: str) -> None:
-        self.client = client
-        self.model_id = model_id
-
-    def next_action(
-        self,
-        *,
-        case,
-        episode,
-        allowed_tools: list[dict[str, Any]],
-        require_assessment: bool = False,
-        react: bool = False,
-    ) -> ModelTurn:
-        if react:
-            raise ActionDecodeError("the JSON adapter is not part of the ReAct ablation")
-        allowed_names = [item["function"]["name"] for item in allowed_tools]
-        instruction = (
-            "Return one JSON object matching the supplied schema. "
-            + ("You must submit_assessment now." if require_assessment else
-               f"For a tool action, tool_name must be one of: {allowed_names}.")
-        )
-        messages = episode_messages(case, episode)
-        messages.append({"role": "user", "content": instruction})
-        schema = _ACTION_ADAPTER.json_schema()
-        response = self.client.chat(
-            messages,
-            response_format={
-                "type": "json_schema",
-                "json_schema": {"name": "clinical_action", "strict": True, "schema": schema},
-            },
-        )
-        if not response.content:
-            raise ActionDecodeError("model returned no JSON content")
-        try:
-            raw = json.loads(response.content)
-            action = _ACTION_ADAPTER.validate_python(raw)
-        except (json.JSONDecodeError, ValidationError) as exc:
-            raise ActionDecodeError(str(exc)) from exc
-        if require_assessment and isinstance(action, ToolAction):
-            raise ActionDecodeError("a final assessment is required")
-        if isinstance(action, ToolAction) and action.tool_name not in allowed_names:
-            raise ActionDecodeError(f"tool {action.tool_name!r} is not allowed")
-        return ModelTurn(
-            action=action,
-            prompt_tokens=_usage(response, "prompt_tokens"),
-            completion_tokens=_usage(response, "completion_tokens"),
-            latency_seconds=response.latency_seconds,
         )

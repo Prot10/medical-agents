@@ -1,4 +1,4 @@
-"""Canonical action-observation loops and isolated experimental ablations."""
+"""Canonical action-observation loop and its isolated ablations."""
 
 from __future__ import annotations
 
@@ -20,11 +20,11 @@ from .interfaces import ModelTurn, RunContext
 
 
 class ClinicalPolicyLoop:
-    """Run one typed clinical action per turn.
+    """One typed clinical action per turn; the final turn must submit the assessment.
 
-    Invalid model output receives the configured number of corrective retries
-    without consuming a clinical turn. ReAct changes prompt context only; it
-    never changes the action or event contract.
+    Invalid model output is retried with a one-off correction, without consuming a clinical
+    turn, until the episode's invalid-action budget is spent. ReAct changes prompt context only;
+    it never changes the action or event contract.
     """
 
     loop_id = "clinical-policy"
@@ -32,16 +32,9 @@ class ClinicalPolicyLoop:
 
     def run(self, context: RunContext):
         self._start(context)
-        invalid_actions = 0
-
         for turn in range(1, context.max_turns + 1):
             require_assessment = turn == context.max_turns
-            model_turn, invalid_actions = self._request_valid_action(
-                context,
-                turn=turn,
-                require_assessment=require_assessment,
-                invalid_actions=invalid_actions,
-            )
+            model_turn = self._request_valid_action(context, turn, require_assessment)
             if model_turn is None:
                 return context.episode_store.load()
 
@@ -53,27 +46,10 @@ class ClinicalPolicyLoop:
                 context.episode_store.append(RunCompleted(turn=turn))
                 return context.episode_store.load()
 
-            if require_assessment:
-                context.episode_store.append(
-                    RunFailed(
-                        turn=turn,
-                        reason="invalid_action",
-                        message="tool action returned when assessment was required",
-                    )
-                )
-                return context.episode_store.load()
-
             try:
                 result = context.environment.execute(model_turn.action)
             except Exception as exc:
-                context.episode_store.append(
-                    RunFailed(
-                        turn=turn,
-                        reason="environment_error",
-                        message=f"{type(exc).__name__}: {exc}",
-                    )
-                )
-                return context.episode_store.load()
+                return self._fail(context, turn, "environment_error", f"{type(exc).__name__}: {exc}")
 
             context.episode_store.append(
                 ObservationReceived(
@@ -86,76 +62,48 @@ class ClinicalPolicyLoop:
                     from_fallback=result.from_fallback,
                 )
             )
-            episode = context.episode_store.load()
-            if (
-                context.max_cost_usd is not None
-                and episode.total_cost_usd > context.max_cost_usd
-            ):
-                context.episode_store.append(
-                    RunFailed(
-                        turn=turn,
-                        reason="budget_exhausted",
-                        message=f"cost exceeded USD {context.max_cost_usd:.2f}",
-                    )
+            total_cost = context.episode_store.load().total_cost_usd
+            if context.max_cost_usd is not None and total_cost > context.max_cost_usd:
+                return self._fail(
+                    context, turn, "budget_exhausted", f"cost exceeded USD {context.max_cost_usd:.2f}"
                 )
-                return context.episode_store.load()
-
-        context.episode_store.append(
-            RunFailed(
-                turn=context.max_turns,
-                reason="max_turns",
-                message="no assessment submitted",
-            )
-        )
-        return context.episode_store.load()
+        raise AssertionError("the final turn always submits or fails")
 
     def _request_valid_action(
-        self,
-        context: RunContext,
-        *,
-        turn: int,
-        require_assessment: bool,
-        invalid_actions: int,
-    ) -> tuple[ModelTurn | None, int]:
+        self, context: RunContext, turn: int, require_assessment: bool
+    ) -> ModelTurn | None:
+        correction: str | None = None
         while True:
             try:
-                model_turn = context.model.next_action(
+                return context.model.next_action(
                     case=context.environment.case,
                     episode=context.episode_store.load(),
                     allowed_tools=context.environment.tool_definitions(),
                     require_assessment=require_assessment,
                     react=self.react,
+                    correction=correction,
                 )
-                return model_turn, invalid_actions
             except ActionDecodeError as exc:
-                invalid_actions += 1
-                retry_allowed = invalid_actions <= context.max_invalid_actions
+                context.invalid_actions += 1
+                retry_allowed = context.invalid_actions <= context.max_invalid_actions
                 context.episode_store.append(
-                    ActionRejected(
-                        turn=turn,
-                        reason=str(exc),
-                        retry_allowed=retry_allowed,
-                    )
+                    ActionRejected(turn=turn, reason=str(exc), retry_allowed=retry_allowed)
                 )
-                if retry_allowed:
-                    continue
-                context.episode_store.append(
-                    RunFailed(
-                        turn=turn,
-                        reason="invalid_action",
-                        message=str(exc),
-                    )
+                if not retry_allowed:
+                    self._fail(context, turn, "invalid_action", str(exc))
+                    return None
+                correction = (
+                    f"The previous response was invalid: {exc}. "
+                    "Return exactly one valid structured action."
                 )
-                return None, invalid_actions
             except Exception as exc:
-                context.episode_store.append(
-                    RunFailed(
-                        turn=turn,
-                        reason="model_error",
-                        message=f"{type(exc).__name__}: {exc}",
-                    )
-                )
-                return None, invalid_actions
+                self._fail(context, turn, "model_error", f"{type(exc).__name__}: {exc}")
+                return None
+
+    @staticmethod
+    def _fail(context: RunContext, turn: int, reason: str, message: str):
+        context.episode_store.append(RunFailed(turn=turn, reason=reason, message=message))
+        return context.episode_store.load()
 
     def _start(self, context: RunContext) -> None:
         context.episode_store.append(
@@ -168,12 +116,8 @@ class ClinicalPolicyLoop:
             )
         )
 
-    def _record_model_turn(
-        self,
-        context: RunContext,
-        turn: int,
-        model_turn: ModelTurn,
-    ) -> None:
+    @staticmethod
+    def _record_model_turn(context: RunContext, turn: int, model_turn: ModelTurn) -> None:
         context.episode_store.append(
             ModelRequested(turn=turn, prompt_tokens=model_turn.prompt_tokens)
         )
@@ -187,11 +131,7 @@ class ClinicalPolicyLoop:
         )
         for namespace, value in model_turn.plugin_payload.items():
             context.episode_store.append(
-                PluginEvent(
-                    turn=turn,
-                    namespace=namespace,
-                    payload={"value": value},
-                )
+                PluginEvent(turn=turn, namespace=namespace, payload={"value": value})
             )
 
 
@@ -203,7 +143,7 @@ class ReactAblationLoop(ClinicalPolicyLoop):
 
 
 class DirectAnswerLoop(ClinicalPolicyLoop):
-    """Single-turn full-information baseline with no tool selection."""
+    """Single-turn full-information baseline: every stored result is given, no tool selection."""
 
     loop_id = "direct-answer"
 
@@ -217,33 +157,12 @@ class DirectAnswerLoop(ClinicalPolicyLoop):
                     success=result.success,
                     output=result.output,
                     error_message=result.error_message,
-                    cost_usd=0.0,
-                    from_fallback=False,
                 )
             )
-
-        model_turn, _ = self._request_valid_action(
-            context,
-            turn=1,
-            require_assessment=True,
-            invalid_actions=0,
-        )
+        model_turn = self._request_valid_action(context, 1, require_assessment=True)
         if model_turn is None:
             return context.episode_store.load()
-
         self._record_model_turn(context, 1, model_turn)
-        if not isinstance(model_turn.action, SubmitAssessment):
-            context.episode_store.append(
-                RunFailed(
-                    turn=1,
-                    reason="invalid_action",
-                    message="direct baseline requires an assessment",
-                )
-            )
-            return context.episode_store.load()
-
-        context.episode_store.append(
-            AssessmentSubmitted(turn=1, assessment=model_turn.action)
-        )
+        context.episode_store.append(AssessmentSubmitted(turn=1, assessment=model_turn.action))
         context.episode_store.append(RunCompleted(turn=1))
         return context.episode_store.load()

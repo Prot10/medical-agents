@@ -5,9 +5,13 @@ from __future__ import annotations
 import json
 import time
 from dataclasses import dataclass, field
-from typing import Any, Iterator
+from typing import Any
 
 from openai import OpenAI
+
+# Request keys the OpenAI SDK accepts as named parameters; everything else (top_k,
+# chat_template_kwargs, ...) travels in ``extra_body`` and is understood by vLLM.
+_NAMED_PARAMETERS = frozenset({"temperature", "top_p", "presence_penalty", "frequency_penalty", "max_tokens", "seed"})
 
 
 @dataclass(frozen=True, slots=True)
@@ -20,10 +24,9 @@ class LLMToolCall:
 @dataclass(frozen=True, slots=True)
 class LLMResponse:
     content: str | None = None
-    tool_calls: list[LLMToolCall] | None = None
+    tool_calls: list[LLMToolCall] = field(default_factory=list)
     usage: dict[str, int] = field(default_factory=dict)
     latency_seconds: float = 0.0
-    raw: Any = None
 
 
 class LLMResponseDecodeError(ValueError):
@@ -31,171 +34,89 @@ class LLMResponseDecodeError(ValueError):
 
 
 class LLMClient:
-    """Provider-neutral subset required by the clinical harness."""
+    """Provider-neutral subset required by the clinical harness.
+
+    ``request`` holds the sampling and template settings sent with every chat request
+    (temperature, top_p, top_k, presence_penalty, max_tokens, seed, chat_template_kwargs, ...).
+    """
 
     def __init__(
         self,
+        *,
+        model: str,
+        request: dict[str, Any],
         base_url: str = "http://localhost:8000/v1",
         api_key: str = "not-needed",
-        model: str = "Qwen/Qwen3.5-9B",
-        temperature: float = 0.2,
-        max_tokens: int = 4096,
-        top_p: float = 0.95,
-        presence_penalty: float = 0.0,
-        seed: int | None = None,
-        timeout: float = 120.0,
+        timeout: float = 300.0,
         max_retries: int = 2,
-        extra_body: dict[str, Any] | None = None,
     ) -> None:
-        self.client = OpenAI(
-            base_url=base_url,
-            api_key=api_key,
-            timeout=timeout,
-            max_retries=max_retries,
-        )
-        self.base_url = base_url
+        self.client = OpenAI(base_url=base_url, api_key=api_key, timeout=timeout, max_retries=max_retries)
         self.model = model
-        self.temperature = temperature
-        self.max_tokens = max_tokens
-        self.top_p = top_p
-        self.presence_penalty = presence_penalty
-        self.seed = seed
-        self.extra_body = extra_body or {}
-
-    def _kwargs(
-        self,
-        messages: list[dict[str, Any]],
-        *,
-        tools: list[dict[str, Any]] | None,
-        tool_choice: str | None,
-        temperature: float | None,
-        max_tokens: int | None,
-        response_format: dict[str, Any] | None,
-    ) -> dict[str, Any]:
-        kwargs: dict[str, Any] = {
-            "model": self.model,
-            "messages": messages,
-            "temperature": self.temperature if temperature is None else temperature,
-            "max_tokens": self.max_tokens if max_tokens is None else max_tokens,
-            "top_p": self.top_p,
-            "presence_penalty": self.presence_penalty,
-        }
-        if self.seed is not None:
-            kwargs["seed"] = self.seed
-        if self.extra_body:
-            kwargs["extra_body"] = self.extra_body
-        if tools is not None:
-            kwargs["tools"] = tools
-            kwargs["tool_choice"] = tool_choice
-        if response_format is not None:
-            kwargs["response_format"] = response_format
-        return kwargs
+        self.request = {"max_tokens": 4096, **request}
 
     def chat(
         self,
         messages: list[dict[str, Any]],
+        *,
         tools: list[dict[str, Any]] | None = None,
-        tool_choice: str | None = "auto",
-        temperature: float | None = None,
-        max_tokens: int | None = None,
+        tool_choice: str | None = None,
         response_format: dict[str, Any] | None = None,
     ) -> LLMResponse:
+        kwargs: dict[str, Any] = {"model": self.model, "messages": _wire_messages(messages)}
+        kwargs.update({key: value for key, value in self.request.items() if key in _NAMED_PARAMETERS})
+        extra_body = {key: value for key, value in self.request.items() if key not in _NAMED_PARAMETERS}
+        if extra_body:
+            kwargs["extra_body"] = extra_body
+        if tools is not None:
+            kwargs["tools"] = tools
+            kwargs["tool_choice"] = tool_choice or "auto"
+        if response_format is not None:
+            kwargs["response_format"] = response_format
         started = time.perf_counter()
-        response = self.client.chat.completions.create(
-            **self._kwargs(
-                messages,
-                tools=tools,
-                tool_choice=tool_choice,
-                temperature=temperature,
-                max_tokens=max_tokens,
-                response_format=response_format,
-            )
-        )
-        return self._parse_response(response, time.perf_counter() - started)
-
-    def chat_stream(
-        self,
-        messages: list[dict[str, Any]],
-        tools: list[dict[str, Any]] | None = None,
-        tool_choice: str | None = "auto",
-        temperature: float | None = None,
-        max_tokens: int | None = None,
-        response_format: dict[str, Any] | None = None,
-    ) -> Iterator[dict[str, Any]]:
-        started = time.perf_counter()
-        kwargs = self._kwargs(
-            messages,
-            tools=tools,
-            tool_choice=tool_choice,
-            temperature=temperature,
-            max_tokens=max_tokens,
-            response_format=response_format,
-        )
-        kwargs.update({"stream": True, "stream_options": {"include_usage": True}})
-        content: list[str] = []
-        calls: dict[int, dict[str, str]] = {}
-        usage: dict[str, int] = {}
-        for chunk in self.client.chat.completions.create(**kwargs):
-            if chunk.usage:
-                usage = {
-                    "prompt_tokens": int(chunk.usage.prompt_tokens),
-                    "completion_tokens": int(chunk.usage.completion_tokens),
-                    "total_tokens": int(chunk.usage.total_tokens),
-                }
-            if not chunk.choices:
-                continue
-            delta = chunk.choices[0].delta
-            if delta.content:
-                content.append(delta.content)
-                yield {"type": "content_delta", "delta": delta.content}
-            for call in delta.tool_calls or []:
-                current = calls.setdefault(call.index, {"id": "", "name": "", "arguments": ""})
-                if call.id:
-                    current["id"] = call.id
-                if call.function and call.function.name:
-                    current["name"] = call.function.name
-                if call.function and call.function.arguments:
-                    current["arguments"] += call.function.arguments
-        parsed_calls = [
-            LLMToolCall(
-                id=value["id"],
-                name=value["name"],
-                arguments=_decode_arguments(value["arguments"]),
-            )
-            for _, value in sorted(calls.items())
-        ] or None
-        response = LLMResponse(
-            content="".join(content) or None,
-            tool_calls=parsed_calls,
-            usage=usage,
-            latency_seconds=time.perf_counter() - started,
-        )
-        yield {"type": "done", "response": response}
-
-    def _parse_response(self, response: Any, latency: float) -> LLMResponse:
+        response = self.client.chat.completions.create(**kwargs)
         message = response.choices[0].message
-        calls = [
-            LLMToolCall(
-                id=call.id,
-                name=call.function.name,
-                arguments=_decode_arguments(call.function.arguments),
-            )
-            for call in (message.tool_calls or [])
-        ] or None
         usage = {}
         if response.usage:
             usage = {
                 "prompt_tokens": int(response.usage.prompt_tokens),
                 "completion_tokens": int(response.usage.completion_tokens),
-                "total_tokens": int(response.usage.total_tokens),
             }
         return LLMResponse(
             content=message.content,
-            tool_calls=calls,
+            tool_calls=[
+                LLMToolCall(
+                    id=call.id,
+                    name=call.function.name,
+                    arguments=_decode_arguments(call.function.arguments),
+                )
+                for call in (message.tool_calls or [])
+            ],
             usage=usage,
-            latency_seconds=latency,
-            raw=response,
+            latency_seconds=time.perf_counter() - started,
         )
+
+
+def _wire_messages(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Serialize tool-call arguments: the transcript keeps mappings, the API wants JSON strings."""
+    wired = []
+    for message in messages:
+        calls = message.get("tool_calls")
+        if calls:
+            message = {
+                **message,
+                "tool_calls": [
+                    {
+                        **call,
+                        "function": {
+                            **call["function"],
+                            "arguments": json.dumps(call["function"]["arguments"], sort_keys=True),
+                        },
+                    }
+                    for call in calls
+                ],
+            }
+        wired.append(message)
+    return wired
 
 
 def _decode_arguments(arguments: str | dict[str, Any]) -> dict[str, Any]:

@@ -6,14 +6,22 @@ from datetime import datetime, timezone
 from typing import Annotated, Any, Literal
 from uuid import uuid4
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class StrictModel(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
-class DiagnosisHypothesis(StrictModel):
+class LenientModel(BaseModel):
+    """Assessment payloads drop unknown keys: models decorate differential entries with labels such
+    as ``title`` under unconstrained decoding, and failing the episode over a cosmetic key would
+    measure the harness, not the policy. Tool arguments stay strict because tools execute them."""
+
+    model_config = ConfigDict(extra="ignore")
+
+
+class DiagnosisHypothesis(LenientModel):
     diagnosis: str = Field(min_length=1)
     confidence: float | None = Field(default=None, ge=0.0, le=1.0)
 
@@ -24,13 +32,24 @@ class ToolAction(StrictModel):
     arguments: dict[str, Any] = Field(default_factory=dict)
 
 
-class SubmitAssessment(StrictModel):
+class SubmitAssessment(LenientModel):
     type: Literal["submit_assessment"] = "submit_assessment"
     primary_diagnosis: str = Field(min_length=1)
+    icd10_code: str | None = Field(
+        default=None, description="ICD-10 code of the primary diagnosis, e.g. G40.209"
+    )
     differential: list[DiagnosisHypothesis] = Field(default_factory=list)
     confidence: float = Field(ge=0.0, le=1.0)
     urgency: Literal["emergent", "urgent", "routine"]
     recommendations: list[str] = Field(default_factory=list)
+
+    @field_validator("differential", mode="before")
+    @classmethod
+    def _bare_labels(cls, value: Any) -> Any:
+        """A differential given as plain strings is the same clinical content."""
+        if isinstance(value, list):
+            return [{"diagnosis": item} if isinstance(item, str) else item for item in value]
+        return value
 
 
 ClinicalAction = Annotated[
@@ -106,7 +125,6 @@ class RunFailed(EventBase):
     reason: Literal[
         "invalid_action",
         "budget_exhausted",
-        "max_turns",
         "model_error",
         "environment_error",
     ]
