@@ -104,3 +104,82 @@ def test_reward_funcs_score_episodes_from_the_extra_field():
     assert values["diagnosis"] == 1.0 and values["completed"] == 1.0
     assert 0 < values["policy_scalar"] < 1
     assert values["required_action_coverage"] == 0.0
+
+
+def test_engine_client_streams_turns_without_a_barrier():
+    """A slow episode must not hold up a fast one: turns are submitted as they arrive and the batch is stepped continuously."""
+    import threading
+    from types import SimpleNamespace
+
+    from neuroagent.training.train_grpo import BatchedEngineClient
+
+    class Engine:
+        def __init__(self):
+            self.queue = {}
+            self.timeline = []
+
+        def add_request(self, request_id, prompt, params):
+            # request ids carry the number of engine steps this turn takes
+            self.queue[request_id] = [int(prompt.split(":")[1]), prompt]
+
+        def step(self):
+            import time
+
+            time.sleep(0.01)  # a real decode step dwarfs the episode threads' bookkeeping
+            self.steps = getattr(self, "steps", 0) + 1
+            outs = []
+            for rid, entry in list(self.queue.items()):
+                entry[0] -= 1
+                if entry[0] <= 0:
+                    del self.queue[rid]
+                    self.timeline.append((rid, self.steps))
+                    outs.append(SimpleNamespace(
+                        request_id=rid, finished=True, prompt_token_ids=[1, 2],
+                        outputs=[SimpleNamespace(token_ids=[7], text="ok", logprobs=[{7: SimpleNamespace(logprob=-0.1)}], finish_reason="stop")],
+                    ))
+            return outs
+
+    class Tok:
+        def apply_chat_template(self, messages, **_):
+            return messages[-1]["content"]
+
+        def decode(self, ids, **_):
+            return "ok"
+
+    class Parser:
+        def __init__(self, *_, **__):
+            pass
+
+        def extract_tool_calls(self, text, request):
+            return SimpleNamespace(content=text, tool_calls=[])
+
+    client = object.__new__(BatchedEngineClient)
+    client.engine, client.tokenizer, client.parser_cls = Engine(), Tok(), Parser
+    client.request_cls = lambda **kw: SimpleNamespace(tools=kw.get("tools"))
+    client.template_kwargs, client.sampling, client.records = {}, None, {}
+    client.engine_steps = client.max_inflight = 0
+    client._pending, client._live, client._cv = {}, set(), threading.Condition()
+    from collections import defaultdict
+    client.records = defaultdict(list)
+
+    def episode(name, costs):
+        client.episode_started()
+        try:
+            for cost in costs:
+                client.chat([{"role": "user", "content": f"{name}:{cost}"}])
+        finally:
+            client.episode_finished()
+
+    threads = [threading.Thread(target=episode, args=("fast", [1, 1, 1])), threading.Thread(target=episode, args=("slow", [6]))]
+    for t in threads:
+        t.start()
+    client.serve_until_done(2)
+    for t in threads:
+        t.join()
+    # The fast episode's three turns were all served while the slow turn (6 engine steps) was
+    # still generating; a per-turn barrier would have needed 8 steps.
+    slow_thread = next(thread for thread, recs in client.records.items() if len(recs) == 1)
+    finished_at = {rid: step for rid, step in client.engine.timeline}
+    assert sorted(len(recs) for recs in client.records.values()) == [1, 3]
+    assert max(step for rid, step in finished_at.items() if not rid.startswith(f"{slow_thread}-")) <= 6
+    assert client.engine_steps == 6 and client.max_inflight == 2

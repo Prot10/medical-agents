@@ -89,13 +89,13 @@ class _Pending:
 
 
 class BatchedEngineClient:
-    """Duck-types `LLMClient.chat` for the harness adapter, batching all live episodes per turn.
+    """Duck-types `LLMClient.chat` for the harness adapter with continuous batching over episodes.
 
     Each episode runs the unchanged `ClinicalPolicyLoop` in its own thread. A turn request blocks
-    on a future; the coordinator waits until every live thread has a pending request, renders the
-    prompts with the model's chat template (exactly as the server does), runs one vLLM generate over
-    the batch and resolves the futures. Every call is recorded so the training sequence can be
-    assembled from the tokens the model actually produced.
+    on a future; the coordinator submits it to the colocated engine the moment it arrives (rendered
+    with the model's chat template, exactly as the server does) and keeps stepping the engine, so a
+    fast episode never waits for a slow one and the batch stays full until episodes run out. Every
+    call is recorded so the training sequence can be assembled from the tokens the model produced.
     """
 
     def __init__(self, llm, tokenizer, parser_name: str, request: dict[str, Any], *, max_tokens: int) -> None:
@@ -103,7 +103,7 @@ class BatchedEngineClient:
         from vllm.entrypoints.openai.chat_completion.protocol import ChatCompletionRequest
         from vllm.tool_parsers import ToolParserManager
 
-        self.llm = llm
+        self.engine = llm.llm_engine
         self.tokenizer = tokenizer
         self.parser_cls = ToolParserManager.get_tool_parser(parser_name)
         self.request_cls = ChatCompletionRequest
@@ -124,7 +124,8 @@ class BatchedEngineClient:
         )
         self.model = "colocated"
         self.records: dict[int, list[TurnRecord]] = defaultdict(list)
-        self.generate_calls = 0
+        self.engine_steps = 0
+        self.max_inflight = 0
         self._pending: dict[int, _Pending] = {}
         self._live: set[int] = set()
         self._cv = threading.Condition()
@@ -150,66 +151,75 @@ class BatchedEngineClient:
 
     # -- coordinator ----------------------------------------------------------------------------
     def serve_until_done(self, expected_threads: int) -> None:
+        """Submit turn requests as they arrive and step the engine until no episode is live."""
+        inflight: dict[str, tuple[_Pending, str, float]] = {}
         started = False
+        submitted = 0
         while True:
             with self._cv:
                 self._cv.wait_for(
                     lambda: (started or len(self._live) == expected_threads)
-                    and (not self._live or all(t in self._pending for t in self._live))
+                    and (not self._live or self._pending or inflight)
                 )
                 started = True
-                if not self._live:
+                if not self._live and not inflight:
                     return
-                batch = [self._pending.pop(t) for t in sorted(self._live)]
-            self._run_batch(batch)
+                ready = [self._pending.pop(thread) for thread in list(self._pending)]
+            for item in ready:
+                prompt = self.render(item)
+                request_id = f"{item.thread}-{submitted}"
+                submitted += 1
+                self.engine.add_request(request_id, prompt, self.sampling)
+                inflight[request_id] = (item, prompt, time.perf_counter())
+            if not inflight:
+                continue
+            self.max_inflight = max(self.max_inflight, len(inflight))
+            self.engine_steps += 1
+            for output in self.engine.step():
+                if output.finished:
+                    item, prompt, started_at = inflight.pop(output.request_id)
+                    self.finish(item, prompt, output, time.perf_counter() - started_at)
 
-    def _run_batch(self, batch: list[_Pending]) -> None:
-        prompts = [
-            self.tokenizer.apply_chat_template(
-                item.messages, tools=item.tools, tokenize=False,
-                add_generation_prompt=True, **self.template_kwargs,
+    def render(self, item: _Pending) -> str:
+        return self.tokenizer.apply_chat_template(
+            item.messages, tools=item.tools, tokenize=False, add_generation_prompt=True, **self.template_kwargs,
+        )
+
+    def finish(self, item: _Pending, prompt: str, output, latency: float) -> None:
+        sample = output.outputs[0]
+        raw = self.tokenizer.decode(sample.token_ids, skip_special_tokens=False)
+        # The server builds the parser per request with the request's tools: the Qwen parser
+        # casts XML parameter values (arrays, booleans, numbers) from the tool schemas.
+        request = self.request_cls(model="policy", messages=[{"role": "user", "content": "x"}], tools=item.tools)
+        parsed = self.parser_cls(self.tokenizer, tools=request.tools).extract_tool_calls(sample.text, request)
+        calls = []
+        for call in parsed.tool_calls:
+            try:
+                arguments = json.loads(call.function.arguments)
+            except json.JSONDecodeError:
+                arguments = None
+            if isinstance(arguments, dict):
+                calls.append(LLMToolCall(id=call.id, name=call.function.name, arguments=arguments))
+        self.records[item.thread].append(
+            TurnRecord(
+                prompt_text=prompt,
+                prompt_ids=list(output.prompt_token_ids),
+                token_ids=list(sample.token_ids),
+                logprobs=[lp[tok].logprob for tok, lp in zip(sample.token_ids, sample.logprobs)],
+                raw_text=raw,
+                messages=item.messages,
+                tools=item.tools,
+                finish_reason=str(sample.finish_reason),
             )
-            for item in batch
-        ]
-        started = time.perf_counter()
-        self.generate_calls += 1
-        outputs = self.llm.generate(prompts, sampling_params=self.sampling, use_tqdm=False)
-        latency = time.perf_counter() - started
-        for item, prompt, output in zip(batch, prompts, outputs):
-            sample = output.outputs[0]
-            raw = self.tokenizer.decode(sample.token_ids, skip_special_tokens=False)
-            # The server builds the parser per request with the request's tools: the Qwen parser
-            # casts XML parameter values (arrays, booleans, numbers) from the tool schemas.
-            request = self.request_cls(model="policy", messages=[{"role": "user", "content": "x"}], tools=item.tools)
-            parsed = self.parser_cls(self.tokenizer, tools=request.tools).extract_tool_calls(sample.text, request)
-            calls = []
-            for call in parsed.tool_calls:
-                try:
-                    arguments = json.loads(call.function.arguments)
-                except json.JSONDecodeError:
-                    arguments = None
-                if isinstance(arguments, dict):
-                    calls.append(LLMToolCall(id=call.id, name=call.function.name, arguments=arguments))
-            self.records[item.thread].append(
-                TurnRecord(
-                    prompt_text=prompt,
-                    prompt_ids=list(output.prompt_token_ids),
-                    token_ids=list(sample.token_ids),
-                    logprobs=[lp[tok].logprob for tok, lp in zip(sample.token_ids, sample.logprobs)],
-                    raw_text=raw,
-                    messages=item.messages,
-                    tools=item.tools,
-                    finish_reason=str(sample.finish_reason),
-                )
+        )
+        item.future.set_result(
+            LLMResponse(
+                content=parsed.content,
+                tool_calls=calls,
+                usage={"prompt_tokens": len(output.prompt_token_ids), "completion_tokens": len(sample.token_ids)},
+                latency_seconds=latency,
             )
-            item.future.set_result(
-                LLMResponse(
-                    content=parsed.content,
-                    tool_calls=calls,
-                    usage={"prompt_tokens": len(output.prompt_token_ids), "completion_tokens": len(sample.token_ids)},
-                    latency_seconds=latency,
-                )
-            )
+        )
 
 
 def run_episodes(client: BatchedEngineClient, cases: list[NeuroBenchCase], *, max_turns: int, max_cost_usd: float):
@@ -684,7 +694,8 @@ def build_trainer(
             handle.write("".join(json.dumps(row) + "\n" for row in rows))
         generated = sum(sum(t["tokens"] for t in row["raw_turns"]) for row in rows)
         trainer._log_metric("rollout/generated_tokens_per_second", generated / max(rollout_seconds, 1e-6))
-        trainer._log_metric("rollout/generate_calls", float(client.generate_calls))
+        trainer._log_metric("rollout/engine_steps", float(client.engine_steps))
+        trainer._log_metric("rollout/max_inflight", float(client.max_inflight))
         trainer._log_metric("rollout/completed_rate", sum(row["status"] == "run.completed" for row in rows) / len(rows))
         trainer._log_metric("rollout/truncated_turns_per_episode", truncated_turns / len(episodes))
         trainer._log_metric("rollout/seconds", rollout_seconds)
