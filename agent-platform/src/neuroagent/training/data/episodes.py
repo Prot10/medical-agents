@@ -1,47 +1,48 @@
-"""Typed episode loading and model-family SFT codecs."""
+"""Typed episode records and their rendering into SFT examples.
+
+An SFT example is rendered by the same transcript codec the harness uses at inference, so the
+trained format and the evaluated format cannot drift apart.
+"""
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any, Literal
 
-from neuroagent_schemas import (
-    ActionProposed,
-    ClinicalEpisode,
-    NeuroBenchCase,
-    ObservationReceived,
-)
-from pydantic import BaseModel, ConfigDict
+from neuroagent_schemas import ClinicalEpisode, NeuroBenchCase, RunCompleted
+from pydantic import BaseModel, ConfigDict, field_validator
 
-from ...harness.context import POLICY_SYSTEM_PROMPT, format_patient_info
+from ...harness.adapters import SUBMIT_TOOL
+from ...harness.context import transcript
+from ...harness.environment import NeuroBenchEnvironment
+
+EpisodeLabel = Literal["candidate_not_gold", "physician_approved"]
 
 
 class EpisodeRecord(BaseModel):
     model_config = ConfigDict(extra="forbid")
     candidate_id: str
     case_id: str
-    source_style: str
-    label: Literal["candidate_not_gold", "physician_approved"]
+    label: EpisodeLabel
+    provenance: dict[str, Any] = {}
     episode: ClinicalEpisode
 
+    @field_validator("episode")
+    @classmethod
+    def _completed(cls, episode: ClinicalEpisode) -> ClinicalEpisode:
+        if not episode.events or not isinstance(episode.events[-1], RunCompleted):
+            raise ValueError("only completed episodes can be training examples")
+        return episode
 
-def load_episode_records(
-    path: str | Path,
-    *,
-    allow_candidates: bool = False,
-) -> list[EpisodeRecord]:
-    allowed = {"physician_approved"}
-    if allow_candidates:
-        allowed.add("candidate_not_gold")
-    records = []
-    with Path(path).open(encoding="utf-8") as handle:
-        for line_number, line in enumerate(handle, 1):
-            if not line.strip():
-                continue
-            record = EpisodeRecord.model_validate_json(line)
-            if record.label in allowed:
-                records.append(record)
+
+def load_episode_records(path: str | Path, *, allow_candidates: bool = False) -> list[EpisodeRecord]:
+    allowed = {"physician_approved"} | ({"candidate_not_gold"} if allow_candidates else set())
+    records = [
+        record
+        for line in Path(path).read_text(encoding="utf-8").splitlines()
+        if line.strip()
+        if (record := EpisodeRecord.model_validate_json(line)).label in allowed
+    ]
     if not records:
         raise ValueError(
             "no training-eligible episodes; physician_approved is required unless "
@@ -57,87 +58,16 @@ def load_case_map(path: str | Path) -> dict[str, NeuroBenchCase]:
     }
 
 
-def episode_to_messages(
-    record: EpisodeRecord,
-    case: NeuroBenchCase,
-    *,
-    codec: Literal["native-tools", "json-action"],
-) -> list[dict[str, Any]]:
-    messages: list[dict[str, Any]] = [
-        {"role": "system", "content": POLICY_SYSTEM_PROMPT},
-        {"role": "user", "content": format_patient_info(case)},
+def tool_catalogue(case: NeuroBenchCase) -> list[dict[str, Any]]:
+    return [*NeuroBenchEnvironment(case).tool_definitions(), SUBMIT_TOOL]
+
+
+def sft_rows(record: EpisodeRecord, case: NeuroBenchCase) -> list[dict[str, Any]]:
+    """One prompt/completion pair per model turn: the transcript so far, then that turn's action."""
+    messages = transcript(case, record.episode)
+    tools = tool_catalogue(case)
+    return [
+        {"prompt": messages[:index], "completion": [message], "tools": tools}
+        for index, message in enumerate(messages)
+        if message["role"] == "assistant"
     ]
-    call_index = 0
-    for event in record.episode.events:
-        if isinstance(event, ActionProposed):
-            action = event.action
-            if codec == "json-action":
-                messages.append(
-                    {
-                        "role": "assistant",
-                        "content": json.dumps(action.model_dump(mode="json"), sort_keys=True),
-                    }
-                )
-            elif action.type == "tool":
-                call_index += 1
-                messages.append(
-                    {
-                        "role": "assistant",
-                        "content": None,
-                        "tool_calls": [
-                            {
-                                "id": f"call_{call_index}",
-                                "type": "function",
-                                "function": {
-                                    "name": action.tool_name,
-                                    "arguments": json.dumps(action.arguments, sort_keys=True),
-                                },
-                            }
-                        ],
-                    }
-                )
-            else:
-                call_index += 1
-                arguments = action.model_dump(mode="json", exclude={"type"})
-                messages.append(
-                    {
-                        "role": "assistant",
-                        "content": None,
-                        "tool_calls": [
-                            {
-                                "id": f"call_{call_index}",
-                                "type": "function",
-                                "function": {
-                                    "name": "submit_assessment",
-                                    "arguments": json.dumps(arguments, sort_keys=True),
-                                },
-                            }
-                        ],
-                    }
-                )
-        elif isinstance(event, ObservationReceived):
-            payload = json.dumps(
-                {
-                    "success": event.success,
-                    "output": event.output,
-                    "error_message": event.error_message,
-                },
-                sort_keys=True,
-            )
-            if codec == "native-tools":
-                messages.append(
-                    {
-                        "role": "tool",
-                        "tool_call_id": f"call_{call_index}",
-                        "name": event.tool_name,
-                        "content": payload,
-                    }
-                )
-            else:
-                messages.append(
-                    {
-                        "role": "user",
-                        "content": f"Observation from {event.tool_name}: {payload}",
-                    }
-                )
-    return messages
