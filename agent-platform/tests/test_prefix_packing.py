@@ -86,12 +86,12 @@ def test_qwen_style_hybrid_layers_are_not_packable():
 def test_group_preserving_shuffle_keeps_each_group_contiguous():
     torch.manual_seed(3)
     prompt_ids = torch.tensor([[p] * 2 for p in (0, 0, 0, 1, 1, 1, 2, 2, 2)])
-    batch = {"prompt_ids": prompt_ids, "case_id": ["a", "a", "a", "b", "b", "b", "c", "c", "c"], "none": None}
+    batch = {"prompt_ids": prompt_ids, "case_id": ["a", "a", "a", "b", "b", "b", "c", "c", "c"], "none": None, "scalar": torch.tensor(7)}
     out = group_preserving_shuffle(batch, group_size=3)
     groups = [out["case_id"][i : i + 3] for i in range(0, 9, 3)]
     assert all(len(set(g)) == 1 for g in groups) and sorted(g[0] for g in groups) == ["a", "b", "c"]
     assert torch.equal(out["prompt_ids"][:, 0], torch.tensor([{"a": 0, "b": 1, "c": 2}[c] for c in out["case_id"]]))
-    assert out["none"] is None
+    assert out["none"] is None and out["scalar"].item() == 7
     with pytest.raises(ValueError):
         group_preserving_shuffle(batch, group_size=4)
 

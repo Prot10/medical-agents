@@ -126,7 +126,12 @@ def group_preserving_shuffle(seq_dict: dict[str, Sequence | None], *, group_size
         raise ValueError(f"generation batch of {rows} rows is not a multiple of the group size {group_size}")
     order = torch.randperm(rows // group_size).repeat_interleave(group_size) * group_size
     order = order + torch.arange(rows) % group_size
-    return {
-        key: (value[order] if isinstance(value, torch.Tensor) else [value[i] for i in order.tolist()]) if value is not None else None
-        for key, value in seq_dict.items()
-    }
+
+    def permute(value):
+        if value is None or (isinstance(value, torch.Tensor) and value.ndim == 0):
+            return value  # scalars ride along unchanged, as in TRL's shuffle
+        if isinstance(value, torch.Tensor):
+            return value[order]
+        return [value[i] for i in order.tolist()]
+
+    return {key: permute(value) for key, value in seq_dict.items()}
