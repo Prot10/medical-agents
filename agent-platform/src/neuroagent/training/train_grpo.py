@@ -50,6 +50,15 @@ os.environ.setdefault("VLLM_ENFORCE_STRICT_TOOL_CALLING", "0")
 # those kernels JIT-compile with nvcc, which the training host lacks. The Triton kernels are used.
 os.environ.setdefault("FLA_TILELANG", "0")
 
+# LoRA on the language model's decoder projections only (attention, gated delta net, MLP). Qwen3.5
+# and Gemma 4 checkpoints carry vision/audio towers whose linears never see a gradient here and
+# which vLLM refuses to load as LoRA targets; Gemma's per-layer-embedding gates sit outside these
+# sub-modules and are excluded as well.
+LORA_TARGETS = (
+    r"^model(\.language_model)?\.layers\.\d+\.(self_attn|linear_attn|mlp)"
+    r"\.(q_proj|k_proj|v_proj|o_proj|gate_proj|up_proj|down_proj|in_proj_qkv|in_proj_z|in_proj_a|in_proj_b|out_proj)$"
+)
+
 TOOL_PARSERS = {"qwen3.5-9b": "qwen3_coder", "granite-4.1-8b": "granite4", "gemma-4-e4b": "gemma4"}
 REWARD_COMPONENTS = ("diagnosis", "required_action_coverage", "tool_accuracy", "safety", "stopping")
 
@@ -427,6 +436,8 @@ def build_trainer(
     class EngineLLM(_LLM):
         def __init__(self, *args_, **kwargs):
             kwargs["max_num_batched_tokens"] = 16384
+            if multimodal:
+                kwargs["language_model_only"] = True  # rollouts are text; skip the vision/audio towers
             if engine_kwargs:
                 kwargs.update(engine_kwargs)
             super().__init__(*args_, **kwargs)
@@ -438,7 +449,9 @@ def build_trainer(
     engine_kwargs = dict(entry.get("engine_kwargs", {}))
     from transformers import AutoConfig
 
-    packing = packing_config(AutoConfig.from_pretrained(entry["hf_model_id"])) if prefix_sharing else None
+    model_config = AutoConfig.from_pretrained(entry["hf_model_id"])
+    multimodal = getattr(model_config, "vision_config", None) is not None
+    packing = packing_config(model_config) if prefix_sharing else None
     packable = packing is not None
     # GRPO needs stochastic rollouts: a greedy model-card default (Granite) yields identical
     # samples per group (no advantage) and a zero temperature breaks the trainer's logit scaling.
@@ -736,7 +749,7 @@ def build_trainer(
         args=config,
         train_dataset=dataset,
         processing_class=tokenizer,
-        peft_config=LoraConfig(r=16, lora_alpha=32, lora_dropout=0.05, target_modules="all-linear", task_type="CAUSAL_LM"),
+        peft_config=LoraConfig(r=16, lora_alpha=32, lora_dropout=0.05, target_modules=LORA_TARGETS, task_type="CAUSAL_LM"),
         rollout_func=rollout_func,
         callbacks=[JsonlLog()],
     )
