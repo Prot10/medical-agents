@@ -6,6 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from neuroagent_schemas import (
     ActionImportance,
+    ActionProposed,
     ActionRejected,
     AvoidanceSeverity,
     ClinicalEpisode,
@@ -13,6 +14,12 @@ from neuroagent_schemas import (
     PolicyReviewStatus,
     SequenceSeverity,
 )
+
+from ..tools.cost_tracker import CostTracker
+
+# Completion tokens per episode at which token efficiency halves. Prompt tokens are dictated
+# by the harness (case, tools, observations), not by the policy, so they are not scored.
+_TOKEN_SCALE = 2048.0
 
 
 class RewardBreakdown(BaseModel):
@@ -38,6 +45,7 @@ class ClinicalPolicyReward:
 
     def __init__(self, *, require_approved: bool = True) -> None:
         self.require_approved = require_approved
+        self._costs = CostTracker()
 
     def score(self, episode: ClinicalEpisode, case: NeuroBenchCase) -> RewardBreakdown:
         policy = case.ground_truth
@@ -48,7 +56,9 @@ class ClinicalPolicyReward:
 
         actions = episode.tool_actions
         assessment = episode.assessment
-        diagnosis = float(bool(assessment and policy.diagnosis.matches(assessment.primary_diagnosis)))
+        diagnosis = float(
+            bool(assessment and policy.diagnosis.matches(assessment.primary_diagnosis, assessment.icd10_code))
+        )
 
         matched: dict[str, list[int]] = {
             criterion.criterion_id: [
@@ -56,21 +66,22 @@ class ClinicalPolicyReward:
             ]
             for criterion in policy.action_criteria
         }
-        required = [
-            criterion for criterion in policy.action_criteria
-            if criterion.importance is ActionImportance.REQUIRED
-        ]
-        recommended = [
-            criterion for criterion in policy.action_criteria
-            if criterion.importance is ActionImportance.RECOMMENDED
-        ]
+        required = [c for c in policy.action_criteria if c.importance is ActionImportance.REQUIRED]
+        recommended = [c for c in policy.action_criteria if c.importance is ActionImportance.RECOMMENDED]
         required_coverage = _coverage(required, matched)
         recommended_coverage = _coverage(recommended, matched)
 
-        positive = [
-            any(criterion.matches(action) for criterion in policy.action_criteria)
-            for action in actions
-        ]
+        # An action is justified when it satisfies a criterion no earlier action already
+        # satisfied; re-ordering a study that was already resulted is unjustified even though it
+        # matches the pattern. Criteria are claimed greedily in action order so overlapping
+        # patterns (a broad panel before a narrower one) credit each distinct criterion once.
+        unclaimed = list(policy.action_criteria)
+        positive = []
+        for action in actions:
+            claimed = next((c for c in unclaimed if c.matches(action)), None)
+            if claimed is not None:
+                unclaimed.remove(claimed)
+            positive.append(claimed is not None)
         tool_accuracy = sum(positive) / len(positive) if positive else 1.0
 
         avoided_hits = [
@@ -87,21 +98,26 @@ class ClinicalPolicyReward:
         safety = max(0.0, 1.0 - harmful / max(1, len(actions)))
         waste_avoidance = max(0.0, 1.0 - waste / max(1, len(actions)))
 
-        sequence_violations = []
-        for constraint in policy.sequence_constraints:
-            before = matched[constraint.before_criterion_id]
-            after = matched[constraint.after_criterion_id]
-            if after and (not before or min(before) >= min(after)):
-                sequence_violations.append(constraint)
+        # A constraint orders two actions the agent chose to take; skipping one is judged by
+        # coverage, not by sequence.
+        sequence_violations = [
+            constraint
+            for constraint in policy.sequence_constraints
+            if (before := matched[constraint.before_criterion_id])
+            and (after := matched[constraint.after_criterion_id])
+            and min(before) >= min(after)
+        ]
         sequence = (
             1.0 - len(sequence_violations) / len(policy.sequence_constraints)
             if policy.sequence_constraints else 1.0
         )
 
+        # Stopping penalizes unjustified actions taken after the required evidence is complete.
+        # Recommended and optional criteria are still credited, so they never count as "extra".
         required_stop = policy.stop_rule.required_before_assessment
         if all(matched[item] for item in required_stop):
             completion_index = max((min(matched[item]) for item in required_stop), default=-1)
-            extra = max(0, len(actions) - completion_index - 1)
+            extra = sum(not positive[index] for index in range(completion_index + 1, len(actions)))
             allowed = policy.stop_rule.max_additional_actions
             stopping = 1.0 if extra <= allowed else 1.0 / (1.0 + extra - allowed)
         else:
@@ -109,20 +125,31 @@ class ClinicalPolicyReward:
 
         assessment_score = _assessment_score(assessment, policy.assessment)
         efficiency_gate = diagnosis * required_coverage
-        cost_efficiency = efficiency_gate * (1.0 / (1.0 + episode.total_cost_usd / 1000.0))
-        token_efficiency = efficiency_gate * (1.0 / (1.0 + episode.total_tokens / 4096.0))
+        # Cost is judged against the policy's own required work-up, so a complete minimal
+        # work-up scores 1.0 whatever it costs, and over-testing decays proportionally.
+        reference_cost = sum(
+            self._costs.compute_cost(c.alternatives[0].tool_name, c.alternatives[0].required_arguments).cost_usd
+            for c in required
+        )
+        actual_cost = episode.total_cost_usd
+        cost_efficiency = efficiency_gate * (min(1.0, reference_cost / actual_cost) if actual_cost > 0 else 1.0)
+        completion_tokens = sum(
+            event.completion_tokens for event in episode.events if isinstance(event, ActionProposed)
+        )
+        token_efficiency = efficiency_gate / (1.0 + completion_tokens / _TOKEN_SCALE)
         invalid = sum(isinstance(event, ActionRejected) for event in episode.events)
 
+        # The assessment component (prose recommendations) is reported for physician review but
+        # carries no weight: substring matching of 16-word sentences measures phrasing, not care.
         scalar = (
-            0.25 * diagnosis
-            + 0.18 * required_coverage
+            0.26 * diagnosis
+            + 0.19 * required_coverage
             + 0.05 * recommended_coverage
-            + 0.10 * tool_accuracy
-            + 0.12 * safety
+            + 0.11 * tool_accuracy
+            + 0.13 * safety
             + 0.07 * waste_avoidance
             + 0.06 * sequence
-            + 0.05 * stopping
-            + 0.05 * assessment_score
+            + 0.06 * stopping
             + 0.04 * cost_efficiency
             + 0.03 * token_efficiency
         )
