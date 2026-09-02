@@ -42,7 +42,7 @@ from ..harness.interfaces import RunContext
 from ..harness.loops import ClinicalPolicyLoop
 from ..llm.client import LLMResponse, LLMToolCall
 from ..model_registry import KEY_TO_MODEL
-from .prefix_packing import ATTN_IMPLEMENTATION, pack_group, packed_logits_to_keep, packing_config
+from .prefix_packing import ATTN_IMPLEMENTATION, group_preserving_shuffle, pack_group, packed_logits_to_keep, packing_config
 
 # Tool-call syntax is sampled freely, as in serving (serve_model.sh pins the same value).
 os.environ.setdefault("VLLM_ENFORCE_STRICT_TOOL_CALLING", "0")
@@ -464,6 +464,10 @@ def build_trainer(
     )
     device = torch.device("cuda")
     diagnostics: dict[str, list[float]] = defaultdict(list)
+    self_packing_enabled = packable
+    if packable:
+        # Micro-batches must stay whole groups for the packed forward (TRL shuffles rows).
+        grpo_module.shuffle_sequence_dict = lambda seq_dict: group_preserving_shuffle(seq_dict, group_size=num_generations)
 
     class PolicyGRPOTrainer(GRPOTrainer):
         """Policy on CPU while the colocated engine starts; sparse-logit log-probs; swap around rollouts."""
@@ -478,6 +482,11 @@ def build_trainer(
             self._log_metric("train/compute_loss_seconds", time.perf_counter() - started)
             return result
 
+        @staticmethod
+        def _use_attention(model, implementation):
+            if self_packing_enabled and model.config._attn_implementation != implementation:
+                model.set_attn_implementation(implementation)
+
         def _row_logps(self, model, ids, att, logits_to_keep, compute_entropy):
             """Per-row path: one forward, vocabulary projection only at supervised positions."""
             total = ids.size(0)
@@ -491,6 +500,7 @@ def build_trainer(
             supervised = [j for j, m in enumerate(env_mask) if m]
             if supervised:
                 keep = torch.tensor([total - logits_to_keep + j - 1 for j in supervised], device=ids.device)
+                self._use_attention(model, "sdpa")  # flash kernels; FlexAttention would recompile per length
                 forward_started = time.perf_counter()
                 outputs = model(input_ids=ids[None], attention_mask=att[None], logits_to_keep=keep, use_cache=False)
                 torch.cuda.synchronize()
@@ -519,12 +529,13 @@ def build_trainer(
                 completions.append(completion)
                 supervised.append([j for j, m in enumerate(env_mask) if m])
             if any(prompt != prompts[0] for prompt in prompts):
-                return None
+                raise RuntimeError("a micro-batch mixes prompts; the group-preserving shuffle is not in effect")
             packed = pack_group(prompts[0], completions, device=input_ids.device, **self._packing)
             keep, targets = packed_logits_to_keep(packed, supervised)
             logps = torch.zeros(input_ids.size(0), logits_to_keep, device=input_ids.device, dtype=torch.float32)
             entropies = torch.zeros_like(logps)
             if keep.numel():
+                self._use_attention(model, ATTN_IMPLEMENTATION)
                 forward_started = time.perf_counter()
                 outputs = model(
                     input_ids=packed.input_ids, position_ids=packed.position_ids,
@@ -556,7 +567,7 @@ def build_trainer(
             result = None
             if self._packing is not None and input_ids.size(0) > 1:
                 result = self._group_logps(model, input_ids, attention_mask, logits_to_keep, compute_entropy)
-                if result is not None and verify_packing and not self._packing_verified:
+                if verify_packing and not self._packing_verified:
                     per_row = torch.stack([self._row_logps(model, input_ids[r], attention_mask[r], logits_to_keep, False)[0] for r in range(input_ids.size(0))])
                     gap = (result[0].detach() - per_row.detach()).abs().max().item()
                     self._log_metric("train/packing_max_abs_logp_gap", gap)

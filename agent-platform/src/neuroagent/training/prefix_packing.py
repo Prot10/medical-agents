@@ -16,6 +16,7 @@ applicable to Qwen3.5, whose gated-delta-net layers carry a recurrent state that
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 
 import torch
@@ -102,3 +103,21 @@ def packed_logits_to_keep(packed: PackedGroup, supervised: list[list[int]]) -> t
             keep.append(prompt_end if j == 0 else sl.start + j - 1)
             targets.append(packed.input_ids[0, sl.start + j].item())
     return torch.tensor(keep, device=packed.input_ids.device), torch.tensor(targets, device=packed.input_ids.device)
+
+
+def group_preserving_shuffle(seq_dict: dict[str, Sequence | None], *, group_size: int) -> dict[str, Sequence | None]:
+    """Shuffle a generation batch by whole groups so every micro-batch stays one prompt's completions.
+
+    TRL shuffles the generation batch row by row before splitting it into micro-batches, which
+    would mix prompts inside a micro-batch and make the packed forward impossible.
+    """
+    first = next(v for v in seq_dict.values() if v is not None)
+    rows = len(first)
+    if rows % group_size:
+        raise ValueError(f"generation batch of {rows} rows is not a multiple of the group size {group_size}")
+    order = torch.randperm(rows // group_size).repeat_interleave(group_size) * group_size
+    order = order + torch.arange(rows) % group_size
+    return {
+        key: (value[order] if isinstance(value, torch.Tensor) else [value[i] for i in order.tolist()]) if value is not None else None
+        for key, value in seq_dict.items()
+    }
