@@ -184,3 +184,16 @@ class TestMockServerIntegration:
         r2 = srv2.get_output("order_advanced_imaging", p)
         assert json.dumps(r1.output, sort_keys=True, default=str) == \
                json.dumps(r2.output, sort_keys=True, default=str)
+
+
+def test_genetic_panel_report_is_not_served_for_an_emg_order():
+    """ALS-M01 stores an emg_ncs initial output and a genetic_panel:ALS follow-up. An emg_ncs order
+    whose context mentions ALS token-matches the genetic-panel trigger; the discriminator guard
+    must refuse that report because `genetic_panel:<panel>` is vocabulary, not prose."""
+    server = MockServer(_load("ALS-M01"))
+    for _ in range(2):  # first order and a re-order
+        result = server.get_output(
+            "order_specialized_test",
+            {"test_type": "emg_ncs", "clinical_context": "fasciculations highly suggestive of ALS"},
+        )
+        assert result.success and result.output["test_type"] == "emg_ncs"

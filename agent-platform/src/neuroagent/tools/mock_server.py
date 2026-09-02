@@ -12,6 +12,7 @@ from .vocabulary import (
     assessment_types,
     body_imaging_studies,
     echocardiogram_types,
+    genetic_panels,
     microbiology_specimens,
     specialized_test_types,
     tissue_procedures,
@@ -42,7 +43,12 @@ class MockServer:
         "order_body_imaging": ("study", body_imaging_studies),
         "order_advanced_imaging": ("modality", advanced_imaging_modalities),
         "order_echocardiogram": ("echo_type", echocardiogram_types),
-        "order_specialized_test": ("test_type", specialized_test_types),
+        # Genetic panels are vocabulary too: without them a stored `genetic_panel:ALS` report
+        # passed as prose and was served for an `emg_ncs` order whose context mentioned ALS.
+        "order_specialized_test": (
+            "test_type",
+            lambda: specialized_test_types() + [f"genetic_panel:{p}" for p in genetic_panels()],
+        ),
         "obtain_tissue_diagnosis": ("procedure", tissue_procedures),
         "perform_clinical_assessment": ("assessment_type", assessment_types),
     }
