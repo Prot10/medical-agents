@@ -198,7 +198,22 @@ The episode's `run.started.model_id` and the summary's `model_id` must equal the
 
 ## 9. GRPO
 
-The branch contains the backend-neutral `GRPOCoordinator` and reward contract, not a trainer. Do not claim GRPO training was executed; a concrete backend is a separate tracked change that must verify rollout/training parity, checkpoint reload and adapter selection before a long job.
+`python -m neuroagent.training.train_grpo` runs RLVR on one GPU: the benchmark loop is the rollout
+against a vLLM engine colocated in the trainer process, the deterministic policy reward is the
+objective, and every rollout is persisted with its reward breakdown. Nothing else may use the GPU.
+
+```bash
+HF_HOME=/dev/shm/hf uv run python -m neuroagent.training.train_grpo --model granite-4.1-8b \
+  --cases FEPI-TEMP-M01 SAH-M01 --output outputs/grpo/granite-smoke --max-steps 2 \
+  --num-generations 4 --cases-per-step 2 --allow-draft-policies --verify-packing
+```
+
+Check in `train_log.jsonl`: every step completes episodes (`rollout/completed_rate`), rewards vary
+within the batch (`reward_std` > 0, `frac_reward_zero_std` < 1), gradients are finite and bounded,
+the engine/trainer log-prob ratio is near 1 (`sampling/importance_sampling_ratio/mean`), and with
+`--verify-packing` the packed-versus-per-row gap (`train/packing_max_abs_logp_gap`) is at bf16
+noise level. A learning claim requires the paired held-out evaluation of the saved adapter
+(`outputs/grpo/scripts/paired_eval.py`), never per-step reward alone.
 
 ## 10. Required artifacts and handback
 
