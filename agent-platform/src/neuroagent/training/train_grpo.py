@@ -59,6 +59,11 @@ LORA_TARGETS = (
     r"\.(q_proj|k_proj|v_proj|o_proj|gate_proj|up_proj|down_proj|in_proj_qkv|in_proj_z|in_proj_a|in_proj_b|out_proj)$"
 )
 
+_SAMPLING_METRICS = (
+    "sampling/sampling_logp_difference/mean", "sampling/sampling_logp_difference/max",
+    "sampling/importance_sampling_ratio/min", "sampling/importance_sampling_ratio/mean", "sampling/importance_sampling_ratio/max",
+)
+
 TOOL_PARSERS = {"qwen3.5-9b": "qwen3_coder", "granite-4.1-8b": "granite4", "gemma-4-e4b": "gemma4"}
 REWARD_COMPONENTS = ("diagnosis", "required_action_coverage", "tool_accuracy", "safety", "stopping")
 
@@ -486,9 +491,12 @@ def build_trainer(
             return None
 
         def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
-            log_logp_disagreement(self, inputs)
             started = time.perf_counter()
-            result = super().compute_loss(model, inputs, return_outputs=return_outputs, num_items_in_batch=num_items_in_batch)
+            self._current_inputs = inputs  # the training forward fills in old log-probs and the vLLM ratio
+            try:
+                result = super().compute_loss(model, inputs, return_outputs=return_outputs, num_items_in_batch=num_items_in_batch)
+            finally:
+                self._current_inputs = None
             self._log_metric("train/compute_loss_seconds", time.perf_counter() - started)
             return result
 
@@ -580,9 +588,11 @@ def build_trainer(
             if batch_size is not None and not torch.is_grad_enabled() and self._on_policy:
                 # TRL's old-log-prob pass over the generation batch (always run with vLLM importance
                 # sampling). On-policy with aligned steps the weights do not change before the loss is
-                # computed, so these equal the training forward's detached log-probs, which TRL uses
-                # when the pass returns None; skipping saves one full forward per row.
-                return None, None, None
+                # computed, so these equal the training forward's detached log-probs: the pass returns
+                # a placeholder, and the training forward replaces it together with the vLLM
+                # importance ratio TRL derives from it. One full forward per row less.
+                self._placeholder_pending = True
+                return torch.zeros(input_ids.size(0), logits_to_keep, device=input_ids.device), None, None
             started = time.perf_counter()
             chunk = batch_size or input_ids.size(0)
             parts = [
@@ -594,8 +604,36 @@ def build_trainer(
             if torch.is_grad_enabled() and not logps.requires_grad:
                 # Every row was masked (overlong episodes): keep a grad path so backward sees a zero.
                 logps.requires_grad_(True)
+            if torch.is_grad_enabled() and self._on_policy and self._current_inputs is not None:
+                self._fill_in_old_logps(self._current_inputs, logps.detach())
             self._log_metric("train/logps_seconds", time.perf_counter() - started)
             return logps, (entropies if compute_entropy else None), None
+
+        def _fill_in_old_logps(self, inputs, old_logps):
+            """On-policy: old log-probs are this forward's; recompute TRL's vLLM importance ratio from them."""
+            sampled = inputs.get("sampling_per_token_logps")
+            inputs["old_per_token_logps"] = old_logps
+            if sampled is None:
+                return
+            mask = inputs["completion_mask"] * inputs.get("tool_mask", torch.ones_like(inputs["completion_mask"]))
+            diff = (old_logps - sampled) * mask
+            ratio = torch.exp(diff).clamp(min=self.vllm_importance_sampling_clip_min, max=self.vllm_importance_sampling_clip_max)
+            inputs["importance_sampling_ratio"] = ratio
+            metrics = self._metrics["train"]
+            if self._placeholder_pending:  # drop the statistics TRL computed from the placeholder
+                for key in _SAMPLING_METRICS:
+                    if metrics.get(key):
+                        metrics[key].pop()
+                self._placeholder_pending = False
+            valid = mask.bool()
+            delta = (old_logps - sampled).abs()[valid]
+            flat = ratio[valid]
+            metrics["sampling/sampling_logp_difference/mean"].append(delta.mean().item() if delta.numel() else 0.0)
+            metrics["sampling/sampling_logp_difference/max"].append(delta.max().item() if delta.numel() else 0.0)
+            metrics["sampling/importance_sampling_ratio/min"].append(flat.min().item() if flat.numel() else 0.0)
+            metrics["sampling/importance_sampling_ratio/mean"].append(flat.mean().item() if flat.numel() else 0.0)
+            metrics["sampling/importance_sampling_ratio/max"].append(flat.max().item() if flat.numel() else 0.0)
+            log_logp_disagreement(self, inputs)
 
         def _chunk_logps(self, model, input_ids, attention_mask, logits_to_keep, compute_entropy):
             """One micro-batch: a packed group when the model allows it, per-row forwards otherwise."""
@@ -798,6 +836,10 @@ def build_trainer(
     trainer._packing_verified = False
     generate_every = config.steps_per_generation * trainer.num_iterations
     trainer._on_policy = trainer.num_iterations == 1 and config.gradient_accumulation_steps % generate_every == 0
+    if trainer._on_policy and trainer.vllm_importance_sampling_mode != "token_truncate":
+        raise ValueError("the on-policy importance ratio is implemented for token_truncate only")
+    trainer._placeholder_pending = False
+    trainer._current_inputs = None
     trainer.model.to(device)
     return trainer, diagnostics
 
