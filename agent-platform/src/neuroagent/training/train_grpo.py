@@ -577,8 +577,28 @@ def build_trainer(
             self, model, input_ids, attention_mask, logits_to_keep, batch_size=None, compute_entropy=False,
             compute_aux_loss=False, **kwargs,
         ):
+            if batch_size is not None and not torch.is_grad_enabled() and self._on_policy:
+                # TRL's old-log-prob pass over the generation batch (always run with vLLM importance
+                # sampling). On-policy with aligned steps the weights do not change before the loss is
+                # computed, so these equal the training forward's detached log-probs, which TRL uses
+                # when the pass returns None; skipping saves one full forward per row.
+                return None, None, None
             started = time.perf_counter()
-            result = None
+            chunk = batch_size or input_ids.size(0)
+            parts = [
+                self._chunk_logps(model, input_ids[i : i + chunk], attention_mask[i : i + chunk], logits_to_keep, compute_entropy)
+                for i in range(0, input_ids.size(0), chunk)
+            ]
+            logps = torch.cat([p[0] for p in parts])
+            entropies = torch.cat([p[1] for p in parts])
+            if torch.is_grad_enabled() and not logps.requires_grad:
+                # Every row was masked (overlong episodes): keep a grad path so backward sees a zero.
+                logps.requires_grad_(True)
+            self._log_metric("train/logps_seconds", time.perf_counter() - started)
+            return logps, (entropies if compute_entropy else None), None
+
+        def _chunk_logps(self, model, input_ids, attention_mask, logits_to_keep, compute_entropy):
+            """One micro-batch: a packed group when the model allows it, per-row forwards otherwise."""
             if self._packing is not None and input_ids.size(0) > 1:
                 result = self._group_logps(model, input_ids, attention_mask, logits_to_keep, compute_entropy)
                 if verify_packing and not self._packing_verified:
@@ -586,15 +606,9 @@ def build_trainer(
                     gap = (result[0].detach() - per_row.detach()).abs().max().item()
                     self._log_metric("train/packing_max_abs_logp_gap", gap)
                     self._packing_verified = True
-            if result is None:
-                rows = [self._row_logps(model, input_ids[r], attention_mask[r], logits_to_keep, compute_entropy) for r in range(input_ids.size(0))]
-                result = torch.stack([r[0] for r in rows]), torch.stack([r[1] for r in rows])
-            logps, entropies = result
-            if torch.is_grad_enabled() and not logps.requires_grad:
-                # Every row was masked (overlong episodes): keep a grad path so backward sees a zero.
-                logps.requires_grad_(True)
-            self._log_metric("train/logps_seconds", time.perf_counter() - started)
-            return logps, (entropies if compute_entropy else None), None
+                return result
+            rows = [self._row_logps(model, input_ids[r], attention_mask[r], logits_to_keep, compute_entropy) for r in range(input_ids.size(0))]
+            return torch.stack([r[0] for r in rows]), torch.stack([r[1] for r in rows])
 
     def log_logp_disagreement(trainer, inputs):
         """Where do the sampler (vLLM) and the trainer disagree most? Token, position, segment start."""
@@ -782,6 +796,8 @@ def build_trainer(
     trainer._env_masks = {}
     trainer._packing = packing
     trainer._packing_verified = False
+    generate_every = config.steps_per_generation * trainer.num_iterations
+    trainer._on_policy = trainer.num_iterations == 1 and config.gradient_accumulation_steps % generate_every == 0
     trainer.model.to(device)
     return trainer, diagnostics
 
