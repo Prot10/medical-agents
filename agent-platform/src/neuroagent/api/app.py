@@ -1,15 +1,13 @@
-"""FastAPI application for policy-harness runs and dataset review."""
+"""FastAPI application for policy-harness runs."""
 
 from __future__ import annotations
 
 import logging
 import os
 from pathlib import Path
-from typing import Any
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from neuroagent_schemas import NeuroBenchCase
 
 from neuroagent.datasets import DATASETS, DEFAULT_DATASET_VERSION, load_dataset
 
@@ -50,29 +48,17 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # Pre-load all datasets
-    all_datasets: dict[str, tuple[dict[str, dict[str, Any]], dict[str, NeuroBenchCase]]] = {}
-    for version, info in DATASETS.items():
-        idx, objs = load_dataset(info.path)
-        all_datasets[version] = (idx, objs)
-        logger.info("Loaded %d cases from %s", len(idx), version)
-
-    default_version = DEFAULT_DATASET_VERSION
-    app.state.active_dataset = default_version
-    app.state.all_datasets = all_datasets
-    app.state.case_index = all_datasets[default_version][0]
-    app.state.case_objects = all_datasets[default_version][1]
-
-    # Ensure the typed episode store exists.
+    dataset = DATASETS[DEFAULT_DATASET_VERSION]
+    case_index, case_objects = load_dataset(dataset.path)
+    logger.info("Loaded %d cases from %s", len(case_index), dataset.version)
     EPISODES_DIR.mkdir(parents=True, exist_ok=True)
 
-    # Store shared state on app
+    app.state.case_index = case_index
+    app.state.case_objects = case_objects
     app.state.rules_dir = str(RULES_DIR)
     app.state.profiles_dir = PROFILES_DIR
     app.state.episodes_dir = EPISODES_DIR
-    app.state.dataset_path = DATASETS[default_version].path
 
-    # Register routes
     app.include_router(cases.router, prefix="/api/v1")
     app.include_router(hospitals.router, prefix="/api/v1")
     app.include_router(models.router, prefix="/api/v1")
