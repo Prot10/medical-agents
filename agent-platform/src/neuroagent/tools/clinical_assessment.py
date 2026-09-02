@@ -27,13 +27,9 @@ the ground truth.
 
 from __future__ import annotations
 
-import logging
-from typing import Any
 
 from .base import BaseTool
-from .vocabulary import assessment_types, is_valid_assessment_type
-
-logger = logging.getLogger(__name__)
+from .vocabulary import assessment_types
 
 
 class ClinicalAssessmentTool(BaseTool):
@@ -78,15 +74,3 @@ class ClinicalAssessmentTool(BaseTool):
         },
         "required": ["clinical_context", "assessment_type"],
     }
-
-    def _validate_parameters(self, parameters: dict[str, Any]) -> None:
-        """Warn (only) when `assessment_type` is outside the closed vocabulary."""
-        assessment = parameters.get("assessment_type")
-        if isinstance(assessment, str) and not is_valid_assessment_type(assessment):
-            logger.warning(
-                "perform_clinical_assessment called with out-of-vocabulary "
-                "assessment_type %r (known: %s). Proceeding unchanged — fallback "
-                "output/cost will apply.",
-                assessment,
-                ", ".join(assessment_types()),
-            )

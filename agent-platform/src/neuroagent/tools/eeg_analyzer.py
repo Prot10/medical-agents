@@ -1,12 +1,8 @@
 from __future__ import annotations
 
-import logging
-from typing import Any
 
 from .base import BaseTool
-from .vocabulary import eeg_types, is_valid_eeg_type
-
-logger = logging.getLogger(__name__)
+from .vocabulary import eeg_types
 
 
 class EEGAnalyzerTool(BaseTool):
@@ -51,14 +47,3 @@ class EEGAnalyzerTool(BaseTool):
         },
         "required": ["clinical_context"],
     }
-
-    def _validate_parameters(self, parameters: dict[str, Any]) -> None:
-        """Warn (only) when `eeg_type` is outside the closed vocabulary."""
-        eeg_type = parameters.get("eeg_type")
-        if isinstance(eeg_type, str) and not is_valid_eeg_type(eeg_type):
-            logger.warning(
-                "analyze_eeg called with out-of-vocabulary eeg_type %r (known: %s). "
-                "Proceeding unchanged — fallback output/cost will apply.",
-                eeg_type,
-                ", ".join(eeg_types()),
-            )

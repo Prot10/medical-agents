@@ -82,8 +82,11 @@ HF_HOME=/dev/shm/hf uv run python -m neuroagent.training.train_grpo --model qwen
   order_echocardiogram, order_cardiac_monitoring, order_advanced_imaging, order_specialized_test,
   search_medical_literature, check_drug_interactions, order_body_imaging, order_microbiology,
   obtain_tissue_diagnosis, perform_clinical_assessment. `consult_medical_specialist` does not exist
-- Tool vocabulary: `costs.yaml` is the single source; the review app mirrors the schemas in
-  `review_api/services/tool_io.py` and `tests/test_tool_io_schemas.py` fails if the mirror drifts
+- Tool vocabulary: `costs.yaml` is the single source; `BaseTool.execute` validates every call
+  against the advertised schema (an out-of-vocabulary value is an error observation, not a
+  fallback result, and the cost registry has no fallback rates); the review app mirrors the
+  schemas in `review_api/services/tool_io.py` and `tests/test_tool_io_schemas.py` fails if the
+  mirror drifts
 - Read `docs/benchmark/tool-contract.md` before editing a case or a tool schema; a change to the
   policies must keep the perfect-agent check clean (every required action served by the MockServer)
 

@@ -1,10 +1,6 @@
 from __future__ import annotations
-import logging
-from typing import Any
 from .base import BaseTool
-from .vocabulary import advanced_imaging_modalities, is_valid_modality
-
-logger = logging.getLogger(__name__)
+from .vocabulary import advanced_imaging_modalities
 
 
 class AdvancedImagingTool(BaseTool):
@@ -55,20 +51,3 @@ class AdvancedImagingTool(BaseTool):
         },
         "required": ["clinical_context", "modality"],
     }
-
-    def _validate_parameters(self, parameters: dict[str, Any]) -> None:
-        """Warn (only) when `modality` is outside the closed vocabulary.
-
-        Out-of-vocabulary values silently get the off-pathway fallback output
-        and the default cost tier; that behavior is intentionally preserved
-        (changing it would change agent behavior mid-benchmark), but it must
-        be visible in the logs.
-        """
-        modality = parameters.get("modality")
-        if isinstance(modality, str) and not is_valid_modality(modality):
-            logger.warning(
-                "order_advanced_imaging called with out-of-vocabulary modality %r "
-                "(known: %s). Proceeding unchanged — fallback output/cost will apply.",
-                modality,
-                ", ".join(advanced_imaging_modalities()),
-            )

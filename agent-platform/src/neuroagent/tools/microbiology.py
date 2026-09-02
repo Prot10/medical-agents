@@ -20,13 +20,9 @@ state it rather than leave it to be inferred.
 
 from __future__ import annotations
 
-import logging
-from typing import Any
 
 from .base import BaseTool
-from .vocabulary import is_valid_specimen, microbiology_specimens
-
-logger = logging.getLogger(__name__)
+from .vocabulary import microbiology_specimens
 
 
 class MicrobiologyTool(BaseTool):
@@ -77,14 +73,3 @@ class MicrobiologyTool(BaseTool):
         },
         "required": ["clinical_context", "specimen"],
     }
-
-    def _validate_parameters(self, parameters: dict[str, Any]) -> None:
-        """Warn (only) when `specimen` is outside the closed vocabulary."""
-        specimen = parameters.get("specimen")
-        if isinstance(specimen, str) and not is_valid_specimen(specimen):
-            logger.warning(
-                "order_microbiology called with out-of-vocabulary specimen %r (known: %s). "
-                "Proceeding unchanged — fallback output/cost will apply.",
-                specimen,
-                ", ".join(microbiology_specimens()),
-            )

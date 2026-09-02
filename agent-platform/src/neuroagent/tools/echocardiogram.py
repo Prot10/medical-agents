@@ -1,12 +1,8 @@
 from __future__ import annotations
 
-import logging
-from typing import Any
 
 from .base import BaseTool
-from .vocabulary import echocardiogram_types, is_valid_echo_type
-
-logger = logging.getLogger(__name__)
+from .vocabulary import echocardiogram_types
 
 
 class EchocardiogramTool(BaseTool):
@@ -45,14 +41,3 @@ class EchocardiogramTool(BaseTool):
         },
         "required": ["clinical_context"],
     }
-
-    def _validate_parameters(self, parameters: dict[str, Any]) -> None:
-        """Warn (only) when `echo_type` is outside the closed vocabulary."""
-        echo_type = parameters.get("echo_type")
-        if isinstance(echo_type, str) and not is_valid_echo_type(echo_type):
-            logger.warning(
-                "order_echocardiogram called with out-of-vocabulary echo_type %r "
-                "(known: %s). Proceeding unchanged — fallback output/cost will apply.",
-                echo_type,
-                ", ".join(echocardiogram_types()),
-            )

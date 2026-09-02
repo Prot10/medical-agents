@@ -9,7 +9,7 @@ A run emits typed actions:
 - one tool call, or
 - one explicit final assessment.
 
-The environment executes the action and returns a typed observation. Invalid model output is retried with a one-off correction, without consuming a clinical turn, inside the profile's `max_invalid_actions` budget; every rejection is recorded. The final turn must submit the assessment, so every episode that does not fail carries a diagnosis. No regular-expression parser, `<think>` extractor or hidden reasoning field is part of the scoring contract.
+The environment executes the action and returns a typed observation. A tool call whose arguments violate the advertised schema (an enum value outside the catalogue, a missing required field) is a clinical turn that returns an error observation at no cost, never a substitute result. Invalid model output (no action, several calls, an unknown tool) is retried with a one-off correction, without consuming a clinical turn, inside the profile's `max_invalid_actions` budget; every rejection is recorded. The final turn must submit the assessment, so every episode that does not fail carries a diagnosis. No regular-expression parser, `<think>` extractor or hidden reasoning field is part of the scoring contract.
 
 The immutable execution path is:
 

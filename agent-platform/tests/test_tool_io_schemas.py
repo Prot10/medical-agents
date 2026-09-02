@@ -67,7 +67,11 @@ class TestCostsDerivedVocabularies:
         "tool_name,parameter,expected",
         [
             ("order_advanced_imaging", "modality", advanced_imaging_modalities),
-            ("order_specialized_test", "test_type", specialized_test_types),
+            (
+                "order_specialized_test",
+                "test_type",
+                lambda: specialized_test_types() + [f"genetic_panel:{p}" for p in genetic_panels()],
+            ),
             (
                 "order_cardiac_monitoring",
                 "monitor_type",
@@ -100,11 +104,9 @@ class TestCostsDerivedVocabularies:
             "costs-derived vocabulary and must be injected by parameters_for()"
         )
 
-    def test_genetic_panels_are_interpolated(self):
-        """`genetic_panel:<panel>` lives in prose, so the prose must be generated too."""
-        description = parameters_for("order_specialized_test")["properties"]["test_type"][
-            "description"
+    def test_genetic_panels_are_enum_members(self):
+        """Every priced panel is orderable as `genetic_panel:<panel>`, and nothing else is."""
+        enum = parameters_for("order_specialized_test")["properties"]["test_type"]["enum"]
+        assert [v for v in enum if v.startswith("genetic_panel:")] == [
+            f"genetic_panel:{p}" for p in genetic_panels()
         ]
-        assert "{genetic_panels}" not in description, "placeholder was not substituted"
-        for panel in genetic_panels():
-            assert panel in description, f"genetic panel {panel!r} missing from description"

@@ -370,15 +370,12 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                 "type": "string",
                 "description": "Clinical indication for the specialized test.",
             },
-            # `{genetic_panels}` is filled from costs.yaml by parameters_for() —
-            # JSON Schema `enum` cannot express the `genetic_panel:<panel>` family,
-            # so the real tool documents it in prose and we must reproduce that
-            # prose exactly, panel list included.
+            # The enum is the fixed test types plus one `genetic_panel:<panel>` member per
+            # priced panel, both filled from costs.yaml by parameters_for().
             "test_type": {
                 "type": "string",
                 "description": (
-                    "Type of specialized test. Also accepts 'genetic_panel:<panel>' where "
-                    "<panel> is one of: {genetic_panels}. "
+                    "Type of specialized test; targeted gene panels are 'genetic_panel:<panel>'. "
                     "'emg_ncs': nerve conduction + needle EMG. 'emg_single_fiber' and "
                     "'repetitive_nerve_stimulation': neuromuscular junction (myasthenia). "
                     "'respiratory_function': FVC, MIP/MEP, NIF (ALS monitoring, MG crisis "
@@ -643,9 +640,9 @@ def output_fields_for(tool_name: str) -> list[dict[str, Any]] | None:
 def parameters_for(tool_name: str) -> dict[str, Any] | None:
     """Return the agent-facing JSON schema for the tool's parameters.
 
-    Closed vocabularies (`_COSTS_DERIVED_ENUMS`) and the `{genetic_panels}`
-    placeholder are filled from costs.yaml, so what a reviewer sees is what the
-    agent can actually order. None if the tool isn't in the mirror — call site
+    Closed vocabularies (`_COSTS_DERIVED_ENUMS`, plus the genetic-panel members of
+    `order_specialized_test.test_type`) are filled from costs.yaml, so what a
+    reviewer sees is what the agent can actually order. None if the tool isn't in the mirror — call site
     should treat missing metadata as "unknown" rather than rendering an empty
     form.
     """
@@ -653,17 +650,14 @@ def parameters_for(tool_name: str) -> dict[str, Any] | None:
     if schema is None:
         return None
     schema = copy.deepcopy(schema)
-    panels = ", ".join(
-        sorted(_load_tool_costs().get("order_specialized_test", {}).get("genetic_panels", {}))
-    )
     for parameter, spec in schema.get("properties", {}).items():
         vocabulary = _vocabulary(tool_name, parameter)
+        if (tool_name, parameter) == ("order_specialized_test", "test_type"):
+            panels = sorted(_load_tool_costs().get("order_specialized_test", {}).get("genetic_panels", {}))
+            vocabulary = list(vocabulary) + [f"genetic_panel:{panel}" for panel in panels]
         if vocabulary:
             if (tool_name, parameter) in _ARRAY_VALUED:
                 spec.setdefault("items", {"type": "string"})["enum"] = vocabulary
             else:
                 spec["enum"] = vocabulary
-        description = spec.get("description")
-        if isinstance(description, str) and "{genetic_panels}" in description:
-            spec["description"] = description.format(genetic_panels=panels)
     return schema

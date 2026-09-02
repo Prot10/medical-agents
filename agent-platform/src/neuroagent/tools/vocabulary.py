@@ -27,8 +27,7 @@ import yaml
 DEFAULT_COSTS_PATH = Path(__file__).resolve().parents[3] / "config" / "tools" / "costs.yaml"
 
 # A genetic panel is written `genetic_panel:<panel>`; `<panel>` must be a row in the
-# `genetic_panels` block. JSON Schema `enum` cannot express this, so the tool schema lists
-# the fixed test types and the validator checks the prefixed form.
+# `genetic_panels` block, and the tool schema advertises one enum member per priced panel.
 GENETIC_PANEL_PREFIX = "genetic_panel:"
 
 
@@ -179,9 +178,8 @@ def _canonical_analytes(names: list[str]) -> list[str]:
 def lab_panels(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
     """The priced `interpret_labs.panels` vocabulary, aliases collapsed.
 
-    Not closed in the same sense as the catchall enums: an out-of-vocabulary analyte still
-    executes and is charged `default_panel`. The list exists so the agent can *name* the
-    assay it wants, because the score and the bill are both per-analyte.
+    Any spelling that normalises to a member is accepted at execution (`BaseTool.execute`),
+    so the score and the bill read the same per-analyte work-up; anything else is rejected.
     """
     return _canonical_analytes(
         list(_load_tools(costs_path).get("interpret_labs", {}).get("by_panel", {}))
@@ -259,48 +257,3 @@ def molecular_assays(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
 def assessment_types(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
     """The closed `perform_clinical_assessment.assessment_type` vocabulary."""
     return by_type_values("perform_clinical_assessment", costs_path)
-
-
-def is_valid_body_imaging_study(value: str, costs_path: Path = DEFAULT_COSTS_PATH) -> bool:
-    return value in body_imaging_studies(costs_path)
-
-
-def is_valid_specimen(value: str, costs_path: Path = DEFAULT_COSTS_PATH) -> bool:
-    return value in microbiology_specimens(costs_path)
-
-
-def is_valid_tissue_procedure(value: str, costs_path: Path = DEFAULT_COSTS_PATH) -> bool:
-    return value in tissue_procedures(costs_path)
-
-
-def is_valid_molecular_assay(value: str, costs_path: Path = DEFAULT_COSTS_PATH) -> bool:
-    return normalize_analyte(value) in {
-        normalize_analyte(a) for a in molecular_assays(costs_path)
-    }
-
-
-def is_valid_assessment_type(value: str, costs_path: Path = DEFAULT_COSTS_PATH) -> bool:
-    return value in assessment_types(costs_path)
-
-
-def is_valid_test_type(value: str, costs_path: Path = DEFAULT_COSTS_PATH) -> bool:
-    """True for a fixed test type or a `genetic_panel:<panel>` with a known panel."""
-    if value.startswith(GENETIC_PANEL_PREFIX):
-        return value[len(GENETIC_PANEL_PREFIX) :] in genetic_panels(costs_path)
-    return value in specialized_test_types(costs_path)
-
-
-def is_valid_modality(value: str, costs_path: Path = DEFAULT_COSTS_PATH) -> bool:
-    return value in advanced_imaging_modalities(costs_path)
-
-
-def is_valid_echo_type(value: str, costs_path: Path = DEFAULT_COSTS_PATH) -> bool:
-    return value in echocardiogram_types(costs_path)
-
-
-def is_valid_eeg_type(value: str, costs_path: Path = DEFAULT_COSTS_PATH) -> bool:
-    return value in eeg_types(costs_path)
-
-
-def is_valid_mri_protocol(value: str, costs_path: Path = DEFAULT_COSTS_PATH) -> bool:
-    return value in mri_protocols(costs_path)
