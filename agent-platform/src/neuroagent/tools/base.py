@@ -33,6 +33,7 @@ class ToolResult(BaseModel):
     error_message: str | None = None
     cost_usd: float | None = None  # populated by CostTracker
     from_fallback: bool = False  # True if served from the off-pathway fallback tier
+    rejected: bool = False  # True when the call violated the tool's schema and was never placed
 
 
 class BaseTool(ABC):
@@ -61,7 +62,7 @@ class BaseTool(ABC):
         """Execute the tool and return a result."""
         error = self.validation_error(parameters)
         if error is not None:
-            return ToolResult(tool_name=self.name, success=False, error_message=error)
+            return ToolResult(tool_name=self.name, success=False, error_message=error, rejected=True)
         if self.mock_server:
             return self.mock_server.get_output(self.name, parameters)
         return self._execute_real(parameters)

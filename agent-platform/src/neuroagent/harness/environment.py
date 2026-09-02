@@ -52,8 +52,8 @@ class NeuroBenchEnvironment:
         result = self.registry.execute(
             ToolCall(tool_name=action.tool_name, parameters=action.arguments)
         )
-        if not result.success:
-            return result.model_copy(update={"cost_usd": 0.0})  # rejected orders are not billed
+        if result.rejected:
+            return result.model_copy(update={"cost_usd": 0.0})  # an order the schema rejects is never placed
         cost = self.cost_tracker.compute_cost(action.tool_name, action.arguments)
         return result.model_copy(update={"cost_usd": cost.cost_usd})
 

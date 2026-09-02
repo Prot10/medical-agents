@@ -60,6 +60,7 @@ class ClinicalPolicyLoop:
                     error_message=result.error_message,
                     cost_usd=result.cost_usd or 0.0,
                     from_fallback=result.from_fallback,
+                    rejected=result.rejected,
                 )
             )
             total_cost = context.episode_store.load().total_cost_usd

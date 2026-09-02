@@ -67,7 +67,9 @@ The catalogue the agent sees is the contract. `BaseTool.execute` validates every
 the tool's advertised JSON schema before the MockServer or the cost registry sees it: a value
 outside a closed enum, a missing required field or a wrong type is answered with a failed
 observation naming the problem (`order_body_imaging: study='carotid_duplex' is not in the tool's
-vocabulary`), costs nothing, and is never served a substitute result. Assay lists (lab panels,
+vocabulary`), flagged `rejected`, costs nothing (the order was never placed), and is never served a
+substitute result. A legal order the case has no output for is a placed order: it fails with the
+MockServer's message and is billed. Assay lists (lab panels,
 CSF special tests, molecular assays) accept any spelling that normalises to an advertised member,
 because the score and the bill already read them that way. Genetic panels are ordinary enum
 members (`genetic_panel:<panel>`, one per priced panel). The cost registry therefore has no

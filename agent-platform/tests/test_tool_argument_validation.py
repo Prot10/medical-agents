@@ -35,7 +35,14 @@ def test_out_of_vocabulary_enum_is_rejected_and_not_billed(environment):
     result = _run(environment, "order_body_imaging", clinical_context="carotid disease", study="carotid_duplex")
     assert not result.success and result.output is None and not result.from_fallback
     assert result.error_message == "order_body_imaging: study='carotid_duplex' is not in the tool's vocabulary"
-    assert result.cost_usd == 0.0
+    assert result.rejected and result.cost_usd == 0.0
+
+
+def test_order_the_case_cannot_serve_is_still_billed(environment):
+    # Only schema rejections are free: a legal order without case data is a placed order.
+    result = _run(environment, "order_microbiology", clinical_context="fever", specimen="throat_swab")
+    assert not result.success and not result.rejected
+    assert result.cost_usd and result.cost_usd > 0
 
 
 def test_missing_required_argument_is_rejected(environment):

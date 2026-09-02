@@ -102,6 +102,7 @@ class ObservationReceived(EventBase):
     error_message: str | None = None
     cost_usd: float = Field(default=0.0, ge=0.0)
     from_fallback: bool = False
+    rejected: bool = False  # the call violated the tool's schema and was never placed
 
 
 class AssessmentSubmitted(EventBase):
