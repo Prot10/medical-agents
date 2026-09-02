@@ -32,12 +32,12 @@ hidden chain-of-thought is neither stored nor scored.
 | Model | Policy | Direct | ReAct |
 |---|---:|---:|---:|
 | Qwen/Qwen3.5-9B | yes | yes | yes |
+| ibm-granite/granite-4.1-8b | yes | yes | yes |
 | google/gemma-4-E4B-it | yes | yes | yes |
-| google/medgemma-1.5-4b-it | yes | yes | no |
 
 Policy is the primary condition. Direct access is a diagnostic upper-bound ablation. ReAct changes
-the prompt policy but uses the same typed action protocol, environment and scorer. MedGemma uses
-the strict JSON-action adapter because it does not provide native tool calling.
+the prompt policy but uses the same typed action protocol, environment and scorer. All three
+models call tools natively.
 
 ## Data and scoring
 

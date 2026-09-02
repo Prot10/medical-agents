@@ -5,9 +5,9 @@ NeuroBench is a physician-validated, 360-degree simulated-patient dataset and an
 ## What is implemented
 
 - 600 schema-v2 neurology cases across 20 conditions.
-- A typed policy harness with standard, direct and ReAct-prompt conditions.
-- A fixed under-10B panel: Qwen3.5-9B, Gemma 4 E4B and MedGemma 1.5 4B.
-- Eight checked experiment profiles.
+- A typed policy harness with standard, direct and ReAct-prompt conditions, and one transcript codec shared by inference and SFT.
+- A fixed under-10B panel: Qwen3.5-9B, IBM Granite 4.1 8B and Gemma 4 E4B.
+- Nine checked experiment profiles and a batch runner that persists every episode.
 - A clinical-policy reward with safety caps and adequacy-gated efficiency.
 - Structured independent physician review and adjudication.
 - LoRA SFT over typed episodes and a backend-neutral GRPO coordinator.
@@ -19,20 +19,22 @@ The architecture and experimental boundaries are documented in [agent-platform/d
 ## Setup
 
 ```bash
-uv sync --all-packages
-uv run pytest agent-platform/tests
+uv sync --all-packages --extra dev --extra training
+uv run pytest agent-platform/tests packages/neuroagent-schemas/tests
 ```
 
-Training dependencies are optional:
+## Serve a model and run the benchmark
 
 ```bash
-uv sync --all-packages --extra training
+uv venv .venv-vllm --python 3.12 && uv pip install --python .venv-vllm/bin/python vllm
+HF_HOME=/dev/shm/hf agent-platform/scripts/runtime/serve_model.sh qwen3.5-9b
+uv run python -m neuroagent.evaluation.benchmark --profile policy-qwen3.5-9b \
+  --cases FEPI-TEMP-M01 SAH-M01 --output outputs/smoke/policy-qwen --allow-draft-policies
 ```
 
-## Run the API
+The run API exposes the same path over HTTP:
 
 ```bash
-agent-platform/scripts/runtime/serve_model.sh qwen3.5-9b
 uv run uvicorn neuroagent.api.app:app --host 127.0.0.1 --port 8888
 ```
 
@@ -43,24 +45,22 @@ List `GET /api/v1/profiles`, then submit a case to `POST /api/v1/runs`.
 ```bash
 uv run uvicorn neuroagent.review_api.app:app --host 127.0.0.1 --port 8889
 cd web-review
-npm install
+npm ci
 npm run dev
 ```
 
-Synthetic cases begin as `draft`. A reportable policy requires two independent all-dimension approvals; disagreement is adjudicated by a third physician.
+Synthetic cases begin as `draft`. A reportable policy requires two independent all-dimension approvals; disagreement is adjudicated by a third physician. Draft policies are scoreable only with `--allow-draft-policies`, and those numbers are not reportable.
 
 ## GPU validation and training
 
-Follow the [A100 validation handoff](docs/A100_VALIDATION_HANDOFF.md) before running model or training experiments. It defines the environment capture, contract tests, eight-profile smoke matrix, reward checks, performance measurements and required artifacts.
+Follow the [A100 validation handoff](docs/A100_VALIDATION_HANDOFF.md) before running model or training experiments. It defines the environment capture, contract tests, the smoke matrix, reward checks, serving throughput measurements and required artifacts.
 
-No episode training JSONL is committed on this branch. SFT requires a separately supplied, replay-valid typed episode file with review provenance:
+No physician-approved episode file is committed. Candidate episodes are exported from benchmark runs and are training-eligible only with an explicit flag:
 
 ```bash
-uv run python -m neuroagent.training.train_sft \
-  --model qwen3.5-9b \
-  --episodes /path/to/approved-episodes.jsonl \
-  --cases data/neurobench/cases \
-  --output outputs/qwen-sft
+uv run python -m neuroagent.training.data.export_episodes --runs outputs/smoke/policy-qwen --output training_data/candidate_episodes.jsonl
+uv run python -m neuroagent.training.train_sft --model qwen3.5-9b \
+  --episodes training_data/candidate_episodes.jsonl --output outputs/qwen-sft --allow-candidates
 ```
 
-Do not restore the removed text trajectories or represent candidate episodes as physician-approved data. The current GRPO surface is a backend contract, not a completed distributed trainer.
+Serve the adapter with `LORA_ADAPTER=outputs/qwen-sft LORA_NAME=sft-qwen3.5-9b serve_model.sh qwen3.5-9b` and evaluate it with `--served-model sft-qwen3.5-9b`. The current GRPO surface is a backend contract, not a completed distributed trainer.
