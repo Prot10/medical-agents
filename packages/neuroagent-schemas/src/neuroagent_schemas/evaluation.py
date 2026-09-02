@@ -69,18 +69,31 @@ class ToolCallPattern(StrictModel):
         )
 
 
+def _tokens(text: str) -> set[str]:
+    return set(re.sub(r"[^a-z0-9]+", " ", text.lower()).split())
+
+
+def _code(text: str) -> str:
+    return re.sub(r"[^A-Z0-9]", "", text.upper())
+
+
 class DiagnosisCriterion(StrictModel):
+    """Accepted labels and ICD-10 codes for the primary diagnosis.
+
+    A submitted diagnosis matches when every token of an accepted label occurs in it (order
+    and punctuation insensitive), or when the submitted ICD-10 code equals an accepted code.
+    Labels are seeded per ICD code from `config/policies/diagnosis_synonyms.yaml` and refined by
+    physician review.
+    """
+
     accepted: list[str] = Field(min_length=1)
     icd_codes: list[str] = Field(default_factory=list)
 
-    def matches(self, diagnosis: str) -> bool:
-        candidate = re.sub(r"[^a-z0-9]+", " ", diagnosis.lower()).strip()
-        return any(
-            candidate == re.sub(r"[^a-z0-9]+", " ", accepted.lower()).strip()
-            or candidate in re.sub(r"[^a-z0-9]+", " ", accepted.lower()).strip()
-            or re.sub(r"[^a-z0-9]+", " ", accepted.lower()).strip() in candidate
-            for accepted in self.accepted
-        )
+    def matches(self, diagnosis: str, icd10_code: str | None = None) -> bool:
+        candidate = _tokens(diagnosis)
+        if any(label <= candidate for accepted in self.accepted if (label := _tokens(accepted))):
+            return True
+        return bool(icd10_code) and _code(icd10_code) in {_code(code) for code in self.icd_codes}
 
 
 class DifferentialDx(StrictModel):
