@@ -530,7 +530,10 @@ def build_trainer(
                 supervised.append([j for j, m in enumerate(env_mask) if m])
             if any(prompt != prompts[0] for prompt in prompts):
                 raise RuntimeError("a micro-batch mixes prompts; the group-preserving shuffle is not in effect")
-            packed = pack_group(prompts[0], completions, device=input_ids.device, **self._packing)
+            packed = pack_group(
+                prompts[0], completions, device=input_ids.device,
+                layer_types=self._packing["layer_types"], sliding_window=self._packing["sliding_window"],
+            )
             keep, targets = packed_logits_to_keep(packed, supervised)
             logps = torch.zeros(input_ids.size(0), logits_to_keep, device=input_ids.device, dtype=torch.float32)
             entropies = torch.zeros_like(logps)
@@ -540,6 +543,7 @@ def build_trainer(
                 outputs = model(
                     input_ids=packed.input_ids, position_ids=packed.position_ids,
                     attention_mask=packed.attention_mask, logits_to_keep=keep, use_cache=False,
+                    **({"kernel_options": self._packing["kernel_options"]} if self._packing["kernel_options"] else {}),
                 )
                 torch.cuda.synchronize()
                 self._log_metric("train/forward_seconds_per_group", time.perf_counter() - forward_started)

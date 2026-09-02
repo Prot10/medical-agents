@@ -39,9 +39,9 @@ def _per_row_logps(model, prompt, completions):
 
 def _packed_logps(model, prompt, completions):
     cfg = packing_config(model.config)
-    assert cfg is not None
+    assert cfg is not None and cfg["kernel_options"] is None  # tiny heads: default tiles
     model.set_attn_implementation(ATTN_IMPLEMENTATION)
-    packed = pack_group(prompt, completions, **cfg)
+    packed = pack_group(prompt, completions, layer_types=cfg["layer_types"], sliding_window=cfg["sliding_window"])
     keep, targets = packed_logits_to_keep(packed, [list(range(len(c))) for c in completions])
     with torch.no_grad():
         logits = model(
@@ -66,7 +66,7 @@ def test_packed_group_matches_separate_forwards(model_name):
         from transformers import Gemma4TextConfig
 
         # Three sliding layers then a full one, window smaller than the sequences so it matters.
-        model = _tiny(Gemma4TextConfig, sliding_window=8, layer_types=["sliding_attention"] * 3 + ["full_attention"], head_dim=16)
+        model = _tiny(Gemma4TextConfig, sliding_window=8, layer_types=["sliding_attention"] * 3 + ["full_attention"], head_dim=16, global_head_dim=16)
     torch.manual_seed(1)
     prompt = torch.randint(3, 250, (20,)).tolist()
     completions = [torch.randint(3, 250, (n,)).tolist() for n in (7, 12, 5)]
@@ -94,3 +94,13 @@ def test_group_preserving_shuffle_keeps_each_group_contiguous():
     assert out["none"] is None
     with pytest.raises(ValueError):
         group_preserving_shuffle(batch, group_size=4)
+
+
+def test_wide_heads_get_smaller_flex_tiles():
+    class Cfg:
+        layer_types = ["sliding_attention", "full_attention"]
+        sliding_window = 512
+        head_dim = 256
+        global_head_dim = 512
+
+    assert packing_config(Cfg())["kernel_options"] == {"BLOCK_M": 32, "BLOCK_N": 32}

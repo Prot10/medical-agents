@@ -82,12 +82,21 @@ def pack_group(
 
 
 def packing_config(config) -> dict | None:
-    """Layer-type information for `pack_group`, or None when the architecture cannot be packed."""
+    """Mask and kernel settings for the packed forward, or None when the architecture cannot be packed.
+
+    `kernel_options` go to FlexAttention: its default 128×128 tile exceeds an A100's shared memory
+    once the head dimension reaches 256 (Gemma 4: 256, and 512 on its global layers).
+    """
     config = getattr(config, "get_text_config", lambda: config)()
     layer_types = getattr(config, "layer_types", None)
     if layer_types and any(t not in ("full_attention", "sliding_attention") for t in layer_types):
         return None  # e.g. Qwen3.5's linear_attention layers
-    return {"layer_types": layer_types, "sliding_window": getattr(config, "sliding_window", None)}
+    head_dim = max(getattr(config, "head_dim", 0) or 0, getattr(config, "global_head_dim", 0) or 0)
+    return {
+        "layer_types": layer_types,
+        "sliding_window": getattr(config, "sliding_window", None),
+        "kernel_options": {"BLOCK_M": 32, "BLOCK_N": 32} if head_dim >= 256 else None,
+    }
 
 
 def packed_logits_to_keep(packed: PackedGroup, supervised: list[list[int]]) -> tuple[torch.Tensor, torch.Tensor]:
