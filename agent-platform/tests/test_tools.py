@@ -68,10 +68,10 @@ class TestMockServer:
         assert result.success
         assert "panels" in result.output
 
-    def test_missing_tool(self, mock_server: MockServer):
+    def test_missing_tool_is_answered_by_the_library(self, mock_server: MockServer):
         result = mock_server.get_output("analyze_csf", {"clinical_context": "seizure"})
-        assert not result.success
-        assert "No analyze_csf data available" in result.error_message
+        assert result.success and result.from_fallback and result.library
+        assert result.output["special_tests"] == {}
 
     def test_literature_search(self, mock_server: MockServer):
         result = mock_server.get_output("search_medical_literature", {"query": "DNET"})

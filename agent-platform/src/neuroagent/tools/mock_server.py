@@ -6,6 +6,7 @@ from neuroagent_schemas import (
     AdvancedImagingReport, SpecializedTestReport,
 )
 from .base import ToolCall, ToolResult
+from .fallback_library import FallbackLibrary, default_library
 from .followup_matcher import resolve_followup
 from .vocabulary import (
     advanced_imaging_modalities,
@@ -26,8 +27,9 @@ from pydantic import BaseModel
 class MockServer:
     """Serves pre-generated tool outputs from a NeuroBenchCase."""
 
-    def __init__(self, case: NeuroBenchCase):
+    def __init__(self, case: NeuroBenchCase, library: FallbackLibrary | None = None):
         self.case = case
+        self.library = library or default_library()
         self.call_log: list[ToolCall] = []
         # Trigger slugs of follow-ups already served this session. Lets distinct
         # re-orders of the same tool escalate through distinct follow-ups.
@@ -91,6 +93,8 @@ class MockServer:
         wanted = parameters.get(call_key)
         if wanted is None:
             return True
+        if tool_name == "order_body_imaging":
+            return self._body_study_matches(str(wanted), output)
         got = getattr(output, call_key, None) if isinstance(output, BaseModel) else None
         if got in (None, ""):
             return True
@@ -98,6 +102,42 @@ class MockServer:
         if folded not in {self._fold(term) for term in vocabulary()}:
             return True  # the report names the study in prose; not ours to adjudicate
         return folded == self._fold(wanted)
+
+    _BODY_MODALITIES = frozenset({"ct", "cta", "mri", "ultrasound"})
+
+    @classmethod
+    def _body_study_matches(cls, wanted: str, output: Any) -> bool:
+        """`study` fuses region and modality (`mediastinum_CT`); the report carries them apart.
+
+        The modality decides when the report's is a vocabulary term (a stored MRI does not answer
+        a CT order); the region decides when the report names one (a spine study does not answer
+        a mediastinal order). Prose or empty fields are not adjudicated, as for the other tools.
+        """
+        region_part, _, modality_part = wanted.rpartition("_")
+        got_modality = cls._fold(getattr(output, "modality", "") or "")
+        if got_modality and got_modality <= cls._BODY_MODALITIES and got_modality != cls._fold(modality_part):
+            return False
+        got_region = cls._fold(getattr(output, "region", "") or "")
+        if not got_region:
+            return True
+        return bool(cls._region_stems(cls._fold(region_part)) & cls._region_stems(got_region))
+
+    # Reports say "testes", "pelvic", "mediastinal", "thorax" for what the vocabulary spells
+    # testicular, pelvis, mediastinum, chest: compare word stems, with the few anatomical synonyms
+    # a stem cannot bridge.
+    _REGION_SYNONYMS = (
+        frozenset({"chest", "thorax", "thoracic", "lung", "lungs"}),
+        frozenset({"peripheral", "nerve", "nerves", "plexus", "brachial", "lumbosacral"}),
+        frozenset({"testicular", "testes", "testis", "scrotal", "scrotum"}),
+    )
+
+    @classmethod
+    def _region_stems(cls, tokens: frozenset[str]) -> frozenset[str]:
+        stems = {token[:4] for token in tokens if len(token) >= 4}
+        for group in cls._REGION_SYNONYMS:
+            if tokens & group:
+                stems |= {token[:4] for token in group}
+        return frozenset(stems)
 
     # Tools whose study identity is a *set* of assays rather than one named study. A set gives the
     # trigger matcher many values to match against, and one hit is enough for it to declare a
@@ -242,13 +282,14 @@ class MockServer:
                 tool_name=tool_name, success=True, from_fallback=True,
                 output=output.model_dump() if isinstance(output, BaseModel) else output,
             )
-
+        # Last tier: the benchmark-level library, the same normal report in every case, so an
+        # off-pathway order never reveals that it was off-pathway.
+        output = self.library.resolve(tool_name, parameters)
+        if output is not None:
+            return ToolResult(tool_name=tool_name, success=True, from_fallback=True, library=True, output=output.model_dump())
         return ToolResult(
             tool_name=tool_name, success=False, output=None,
-            error_message=(
-                f"No {tool_name} data available for this patient. "
-                f"Consider whether this test is appropriate."
-            ),
+            error_message=f"No {tool_name} data available for this patient.",
         )
 
     def _match_initial_output(self, tool_name: str, parameters: dict[str, Any]) -> BaseModel | None:

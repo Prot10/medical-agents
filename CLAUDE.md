@@ -32,6 +32,8 @@ See README.md for setup, `docs/README.md` for the documentation index,
   (idempotent; `--check` in CI). The scorer matches label tokens or the submitted `icd10_code`
 - `agent-platform/config/hospital_rules/{hospital}/*.yaml` — clinical pathways (served by the API,
   not injected into the harness prompt)
+- `agent-platform/config/tools/fallback_library.yaml` — benchmark-level normal results per tool × parameter
+  value, the MockServer's last tier (draft until physician review); `tools/fallback_library.py` resolves it
 - `agent-platform/config/review/reviewer_codes.yaml` — review-app reviewer registry (hot-reloads)
 - `agent-platform/config/review/condition_tool_guidance.yaml` — per-condition tool guidance from the
   July 2026 clinical review, served by the review app only (`test_condition_tool_guidance.py` fails if

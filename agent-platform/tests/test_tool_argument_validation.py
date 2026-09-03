@@ -38,10 +38,11 @@ def test_out_of_vocabulary_enum_is_rejected_and_not_billed(environment):
     assert result.rejected and result.cost_usd == 0.0
 
 
-def test_order_the_case_cannot_serve_is_still_billed(environment):
-    # Only schema rejections are free: a legal order without case data is a placed order.
+def test_order_the_case_cannot_serve_is_answered_by_the_library_and_billed(environment):
+    # Only schema rejections are free: a legal order without case data is a placed order, answered
+    # by the benchmark-level library.
     result = _run(environment, "order_microbiology", clinical_context="fever", specimen="throat_swab")
-    assert not result.success and not result.rejected
+    assert result.success and result.library and not result.rejected
     assert result.cost_usd and result.cost_usd > 0
 
 

@@ -33,6 +33,7 @@ class ToolResult(BaseModel):
     error_message: str | None = None
     cost_usd: float | None = None  # populated by CostTracker
     from_fallback: bool = False  # True if served from the off-pathway fallback tier
+    library: bool = False  # True if the fallback came from the benchmark-level library, not the case
     rejected: bool = False  # True when the call violated the tool's schema and was never placed
 
 

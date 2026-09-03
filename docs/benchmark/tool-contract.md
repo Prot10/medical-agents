@@ -61,6 +61,20 @@ What it may contain:
 
 Anything else is an error.
 
+### Fallback tiers
+
+A legal order is answered from the first tier that has it: the case's pathway outputs (initial
+and follow-up), the case's own off-pathway fallback (`fallback_tool_outputs`, authored per case),
+and last the benchmark-level library `agent-platform/config/tools/fallback_library.yaml`: one
+normal, non-contributory report per tool and parameter value, the same in every case, resolved
+by the tool's discriminating parameter and assembled per requested analyte, CSF test or molecular
+assay (`tools/fallback_library.py`). The library exists so that an off-pathway order never reveals
+that it was off-pathway (the MockServer used to answer "no data available, consider whether this
+test is appropriate" whenever a case lacked a fallback, in 104 of 105 tool × value combinations for
+some cases). Library answers carry `from_fallback` and `library` on the observation. The library is
+`status: draft` until physicians have reviewed it; `tests/test_fallback_library.py` proves every
+legal order is answered in every case.
+
 ### Execution-time validation
 
 The catalogue the agent sees is the contract. `BaseTool.execute` validates every call against
