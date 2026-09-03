@@ -497,6 +497,11 @@ def build_trainer(
         def _move_model_to_device(self, model, device):  # noqa: D401 - Trainer hook
             return None
 
+        def _log_metric(self, name: str, value: float) -> None:
+            # TRL parks custom metrics in a pending buffer that is flushed at the next generation,
+            # so anything logged after it (the training forward) would land one step late.
+            self._metrics["train"][name].append(float(value))
+
         def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
             started = time.perf_counter()
             self._current_inputs = inputs  # the training forward fills in old log-probs and the vLLM ratio
