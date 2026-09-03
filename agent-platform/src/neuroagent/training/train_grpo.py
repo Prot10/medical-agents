@@ -24,7 +24,7 @@ import argparse
 import json
 import os
 import threading
-import sys
+import logging
 import time
 from collections import defaultdict
 from concurrent.futures import Future
@@ -67,6 +67,8 @@ LORA_TARGETS = (
     r"^model(\.language_model)?\.layers\.\d+\.(self_attn|linear_attn|mlp)"
     r"\.(q_proj|k_proj|v_proj|o_proj|gate_proj|up_proj|down_proj|in_proj_qkv|in_proj_z|in_proj_a|in_proj_b|out_proj)$"
 )
+
+logger = logging.getLogger(__name__)
 
 _SAMPLING_METRICS = (
     "sampling/sampling_logp_difference/mean", "sampling/sampling_logp_difference/max",
@@ -497,7 +499,7 @@ def build_trainer(
         def shuffle_groups(seq_dict):
             before = [int(m.sum()) for m in seq_dict["prompt_mask"]]
             shuffled = group_preserving_shuffle(seq_dict, group_size=num_generations)
-            print(f"[rollout] prompt lengths before shuffle {before} after {[int(m.sum()) for m in shuffled['prompt_mask']]}", file=sys.stderr, flush=True)
+            logger.info("prompt lengths before shuffle %s after %s", before, [int(m.sum()) for m in shuffled["prompt_mask"]])
             return shuffled
 
         grpo_module.shuffle_sequence_dict = shuffle_groups
@@ -719,7 +721,7 @@ def build_trainer(
         swap_out_seconds = time.perf_counter() - phase
         client = BatchedEngineClient(llm, tokenizer, TOOL_PARSERS[model_key], request, max_tokens=max_completion_tokens)
         batch_cases = [case_by_prompt[prompt[1]["content"]] for prompt in prompts]
-        print(f"[rollout] cases in prompt order {[case.case_id for case in batch_cases]}", file=sys.stderr, flush=True)
+        logger.info("cases in prompt order %s", [case.case_id for case in batch_cases])
         started = time.perf_counter()
         episodes = run_episodes(client, batch_cases, max_turns=max_turns, max_cost_usd=max_cost_usd)
         rollout_seconds = time.perf_counter() - started
