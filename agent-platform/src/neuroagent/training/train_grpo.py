@@ -42,7 +42,14 @@ from ..harness.interfaces import RunContext
 from ..harness.loops import ClinicalPolicyLoop
 from ..llm.client import LLMResponse, LLMToolCall
 from ..model_registry import KEY_TO_MODEL
-from .prefix_packing import ATTN_IMPLEMENTATION, group_preserving_shuffle, pack_group, packed_logits_to_keep, packing_config
+from .prefix_packing import (
+    ATTN_IMPLEMENTATION,
+    group_preserving_shuffle,
+    pack_group,
+    packed_group_logps,
+    packed_logits_to_keep,
+    packing_config,
+)
 
 # Tool-call syntax is sampled freely, as in serving (serve_model.sh pins the same value).
 os.environ.setdefault("VLLM_ENFORCE_STRICT_TOOL_CALLING", "0")
@@ -547,7 +554,14 @@ def build_trainer(
                 completions.append(completion)
                 supervised.append([j for j, m in enumerate(env_mask) if m])
             if any(prompt != prompts[0] for prompt in prompts):
-                raise RuntimeError("a micro-batch mixes prompts; the group-preserving shuffle is not in effect")
+                current = self._current_inputs or {}
+                described = {k: (tuple(v.shape) if torch.is_tensor(v) else (type(v).__name__, len(v) if hasattr(v, "__len__") else None)) for k, v in current.items()}
+                divergence = [next((i for i, (a, b) in enumerate(zip(prompts[0], prompt)) if a != b), min(len(prompts[0]), len(prompt))) for prompt in prompts]
+                raise RuntimeError(
+                    "a micro-batch mixes prompts; the group-preserving shuffle is not in effect. "
+                    f"prompt lengths {[len(p) for p in prompts]}, first divergence {divergence}, "
+                    f"case ids {current.get('case_id')}, inputs {described}"
+                )
             packed = pack_group(
                 prompts[0], completions, device=input_ids.device,
                 layer_types=self._packing["layer_types"], sliding_window=self._packing["sliding_window"],
@@ -558,19 +572,13 @@ def build_trainer(
             if keep.numel():
                 self._use_attention(model, ATTN_IMPLEMENTATION)
                 forward_started = time.perf_counter()
-                outputs = model(
-                    input_ids=packed.input_ids, position_ids=packed.position_ids,
-                    attention_mask=packed.attention_mask, logits_to_keep=keep, use_cache=False,
-                    **({"kernel_options": self._packing["kernel_options"]} if self._packing["kernel_options"] else {}),
+                values, ent = packed_group_logps(
+                    model, packed, keep, targets, temperature=self.temperature,
+                    kernel_options=self._packing["kernel_options"], compute_entropy=compute_entropy,
                 )
                 torch.cuda.synchronize()
                 self._log_metric("train/forward_seconds_per_group", time.perf_counter() - forward_started)
                 self._log_metric("train/packed_tokens", float(packed.input_ids.size(1)))
-                logits = outputs.logits[0].div(self.temperature)
-                values = selective_log_softmax(logits, targets).float()
-                if compute_entropy:
-                    with torch.no_grad():
-                        ent = entropy_from_logits(logits).float()
                 offset = 0
                 for row, positions in enumerate(supervised):
                     if positions:

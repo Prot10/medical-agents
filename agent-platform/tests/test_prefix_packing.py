@@ -11,6 +11,7 @@ from neuroagent.training.prefix_packing import (  # noqa: E402
     ATTN_IMPLEMENTATION,
     group_preserving_shuffle,
     pack_group,
+    packed_group_logps,
     packed_logits_to_keep,
     packing_config,
 )
@@ -44,11 +45,8 @@ def _packed_logps(model, prompt, completions):
     packed = pack_group(prompt, completions, layer_types=cfg["layer_types"], sliding_window=cfg["sliding_window"])
     keep, targets = packed_logits_to_keep(packed, [list(range(len(c))) for c in completions])
     with torch.no_grad():
-        logits = model(
-            input_ids=packed.input_ids, position_ids=packed.position_ids, attention_mask=packed.attention_mask,
-            logits_to_keep=keep, use_cache=False,
-        ).logits[0].float()
-    logps = torch.log_softmax(logits, -1).gather(-1, targets[:, None])[:, 0]
+        logps, entropy = packed_group_logps(model, packed, keep, targets, compute_entropy=True, chunk=5)
+    assert entropy.shape == logps.shape and torch.isfinite(entropy).all()
     out, offset = [], 0
     for completion in completions:
         out.append(logps[offset : offset + len(completion)])
@@ -61,12 +59,15 @@ def test_packed_group_matches_separate_forwards(model_name):
     if model_name == "granite":
         from transformers import GraniteConfig
 
-        model = _tiny(GraniteConfig)
+        model = _tiny(GraniteConfig, logits_scaling=16.0)  # Granite 4.1 divides its logits
     else:
         from transformers import Gemma4TextConfig
 
         # Three sliding layers then a full one, window smaller than the sequences so it matters.
-        model = _tiny(Gemma4TextConfig, sliding_window=8, layer_types=["sliding_attention"] * 3 + ["full_attention"], head_dim=16, global_head_dim=16)
+        model = _tiny(
+            Gemma4TextConfig, sliding_window=8, layer_types=["sliding_attention"] * 3 + ["full_attention"],
+            head_dim=16, global_head_dim=16, final_logit_softcapping=30.0,  # Gemma 4 soft-caps its logits
+        )
     torch.manual_seed(1)
     prompt = torch.randint(3, 250, (20,)).tolist()
     completions = [torch.randint(3, 250, (n,)).tolist() for n in (7, 12, 5)]

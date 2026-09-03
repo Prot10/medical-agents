@@ -21,6 +21,7 @@ from dataclasses import dataclass
 
 import torch
 from torch.nn.attention.flex_attention import BlockMask, create_block_mask
+from torch.utils.checkpoint import checkpoint
 
 ATTN_IMPLEMENTATION = "flex_attention"
 
@@ -144,3 +145,49 @@ def group_preserving_shuffle(seq_dict: dict[str, Sequence | None], *, group_size
         return [value[i] for i in order.tolist()]
 
     return {key: permute(value) for key, value in seq_dict.items()}
+
+
+def packed_group_logps(
+    model, packed: PackedGroup, keep: torch.Tensor, targets: torch.Tensor, *, temperature: float = 1.0,
+    kernel_options: dict | None = None, compute_entropy: bool = False, chunk: int = 512,
+) -> tuple[torch.Tensor, torch.Tensor | None]:
+    """Log-probabilities of `targets` predicted at packed positions `keep`, with a chunked head.
+
+    The transformer body runs once over the packed sequence; the vocabulary projection, the
+    model's logit post-processing (Granite's `logits_scaling`, Gemma's `final_logit_softcapping`),
+    the temperature and the log-softmax run in checkpointed chunks of `chunk` positions, so at most
+    chunk × vocabulary logits exist at any time (Gemma 4's 262k vocabulary would otherwise need
+    several GB for one group's supervised positions).
+    """
+    base = model.get_base_model() if hasattr(model, "get_base_model") else model
+    config = base.config.get_text_config()
+    scaling = getattr(config, "logits_scaling", None)
+    softcap = getattr(config, "final_logit_softcapping", None)
+    hidden = base.model(
+        input_ids=packed.input_ids, position_ids=packed.position_ids, attention_mask=packed.attention_mask,
+        use_cache=False, **({"kernel_options": kernel_options} if kernel_options else {}),
+    ).last_hidden_state[0][keep]
+
+    def head(states, labels):
+        logits = base.lm_head(states)
+        if scaling:
+            logits = logits / scaling
+        if softcap:
+            logits = torch.tanh(logits / softcap) * softcap
+        logits = logits.float() / temperature
+        lse = torch.logsumexp(logits, dim=-1)
+        logps = logits.gather(-1, labels[:, None])[:, 0] - lse
+        with torch.no_grad():
+            probs = torch.softmax(logits, dim=-1)
+            entropy = lse - (probs * logits).sum(-1)
+        return logps, entropy
+
+    logps, entropies = [], []
+    for start in range(0, keep.numel(), chunk):
+        lp, ent = checkpoint(head, hidden[start : start + chunk], targets[start : start + chunk], use_reentrant=False)
+        logps.append(lp)
+        entropies.append(ent)
+    if not logps:
+        empty = hidden.new_zeros(0, dtype=torch.float32)
+        return empty, (empty if compute_entropy else None)
+    return torch.cat(logps), (torch.cat(entropies) if compute_entropy else None)
