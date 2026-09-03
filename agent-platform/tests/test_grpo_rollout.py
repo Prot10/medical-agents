@@ -86,6 +86,7 @@ def test_rejected_attempts_are_dropped_and_corrections_do_not_enter_the_sequence
     assert seq.dropped_retry_tokens == len("prose")
     assert seq.conditioning_mismatches == 1  # the accepted retry was conditioned on the correction
     assert seq.turns == 2
+    assert seq.prompt_ids == records[0].prompt_ids  # the canonical prompt, not the retry's corrected one
 
 
 def test_reward_funcs_score_episodes_from_the_extra_field():

@@ -357,7 +357,10 @@ def assemble_sequence(tokenizer, records: list[TurnRecord], template_kwargs: dic
         mask += [0] * len(ids)
         logprobs += [0.0] * len(ids)
     return Sequence(
-        prompt_ids=accepted[0].prompt_ids,
+        # The canonical prompt is the first request's: a retry of the first turn carries the
+        # correction, which is a conditioning mismatch like any other and must not become the
+        # sequence's prefix (the group shares one prompt).
+        prompt_ids=records[0].prompt_ids,
         completion_ids=completion,
         env_mask=mask,
         logprobs=logprobs,
@@ -540,7 +543,10 @@ def build_trainer(
                 keep = torch.tensor([total - logits_to_keep + j - 1 for j in supervised], device=ids.device)
                 self._use_attention(model, attention)  # sdpa by default: flash kernels, no per-length recompile
                 forward_started = time.perf_counter()
-                values, ent = row_logps(model, ids, att, keep, completion[supervised], temperature=self.temperature)
+                values, ent = row_logps(
+                    model, ids, att, keep, completion[supervised], temperature=self.temperature,
+                    kernel_options=self._packing["kernel_options"] if attention == ATTN_IMPLEMENTATION else None,
+                )
                 torch.cuda.synchronize()
                 self._log_metric("train/forward_seconds_per_row", time.perf_counter() - forward_started)
                 self._log_metric("train/row_tokens", float(att.sum().item()))
@@ -659,19 +665,18 @@ def build_trainer(
                 if verify_packing and not self._packing_verified:
                     with torch.no_grad():  # reference forwards only; their graphs would not fit next to the packed one
                         per_row = torch.stack([self._row_logps(model, input_ids[r], attention_mask[r], logits_to_keep, False)[0] for r in range(input_ids.size(0))])
-                        # Noise floor: the same row under FlexAttention vs SDPA, both per-row (bf16 kernels differ).
-                        row_flex = self._row_logps(model, input_ids[0], attention_mask[0], logits_to_keep, False, attention=ATTN_IMPLEMENTATION)[0]
+                        # Noise floor: the same rows under FlexAttention vs SDPA, both per-row (bf16 kernels differ).
+                        rows_flex = torch.stack([self._row_logps(model, input_ids[r], attention_mask[r], logits_to_keep, False, attention=ATTN_IMPLEMENTATION)[0] for r in range(input_ids.size(0))])
                     # Checkpointed layers are recomputed in backward with the implementation current
                     # *then*; the packed graph holds a BlockMask, so FlexAttention must be back in place.
                     self._use_attention(model, ATTN_IMPLEMENTATION)
                     supervised_mask = per_row != 0
                     gap = (result[0].detach() - per_row.detach()).abs()[supervised_mask]
-                    floor = (row_flex - per_row[0]).abs()[supervised_mask[0]]
-                    self._log_metric("train/packing_max_abs_logp_gap", gap.max().item() if gap.numel() else 0.0)
-                    self._log_metric("train/packing_mean_abs_logp_gap", gap.mean().item() if gap.numel() else 0.0)
-                    self._log_metric("train/packing_p99_abs_logp_gap", gap.quantile(0.99).item() if gap.numel() else 0.0)
-                    self._log_metric("train/kernel_floor_max_abs_logp_gap", floor.max().item() if floor.numel() else 0.0)
-                    self._log_metric("train/kernel_floor_mean_abs_logp_gap", floor.mean().item() if floor.numel() else 0.0)
+                    floor = (rows_flex - per_row).abs()[supervised_mask]
+                    for name, values in (("packing", gap), ("kernel_floor", floor)):
+                        self._log_metric(f"train/{name}_max_abs_logp_gap", values.max().item() if values.numel() else 0.0)
+                        self._log_metric(f"train/{name}_mean_abs_logp_gap", values.mean().item() if values.numel() else 0.0)
+                        self._log_metric(f"train/{name}_p99_abs_logp_gap", values.quantile(0.99).item() if values.numel() else 0.0)
                     self._packing_verified = True
                 return result
             rows = [self._row_logps(model, input_ids[r], attention_mask[r], logits_to_keep, compute_entropy) for r in range(input_ids.size(0))]

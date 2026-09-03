@@ -193,11 +193,14 @@ def head_logps(
 
 def row_logps(
     model, ids: torch.Tensor, attention_mask: torch.Tensor, keep: torch.Tensor, targets: torch.Tensor, *,
-    temperature: float = 1.0, chunk: int = 512,
+    temperature: float = 1.0, chunk: int = 512, kernel_options: dict | None = None,
 ) -> tuple[torch.Tensor, torch.Tensor]:
     """One sequence: the transformer body once, then `head_logps` at positions `keep`."""
     base = _base(model)
-    hidden = base.model(input_ids=ids[None], attention_mask=attention_mask[None], use_cache=False).last_hidden_state[0][keep]
+    hidden = base.model(
+        input_ids=ids[None], attention_mask=attention_mask[None], use_cache=False,
+        **({"kernel_options": kernel_options} if kernel_options else {}),
+    ).last_hidden_state[0][keep]
     return head_logps(base, hidden, targets, temperature=temperature, chunk=chunk)
 
 
