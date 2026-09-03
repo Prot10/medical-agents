@@ -642,6 +642,9 @@ def build_trainer(
                 if verify_packing and not self._packing_verified:
                     with torch.no_grad():  # reference forwards only; their graphs would not fit next to the packed one
                         per_row = torch.stack([self._row_logps(model, input_ids[r], attention_mask[r], logits_to_keep, False)[0] for r in range(input_ids.size(0))])
+                    # Checkpointed layers are recomputed in backward with the implementation current
+                    # *then*; the packed graph holds a BlockMask, so FlexAttention must be back in place.
+                    self._use_attention(model, ATTN_IMPLEMENTATION)
                     gap = (result[0].detach() - per_row.detach()).abs().max().item()
                     self._log_metric("train/packing_max_abs_logp_gap", gap)
                     self._packing_verified = True
