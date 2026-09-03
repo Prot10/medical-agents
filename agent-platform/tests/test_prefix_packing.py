@@ -14,6 +14,7 @@ from neuroagent.training.prefix_packing import (  # noqa: E402
     packed_group_logps,
     packed_logits_to_keep,
     packing_config,
+    row_logps,
 )
 
 
@@ -45,7 +46,7 @@ def _packed_logps(model, prompt, completions):
     packed = pack_group(prompt, completions, layer_types=cfg["layer_types"], sliding_window=cfg["sliding_window"])
     keep, targets = packed_logits_to_keep(packed, [list(range(len(c))) for c in completions])
     with torch.no_grad():
-        logps, entropy = packed_group_logps(model, packed, keep, targets, compute_entropy=True, chunk=5)
+        logps, entropy = packed_group_logps(model, packed, keep, targets, chunk=5)
     assert entropy.shape == logps.shape and torch.isfinite(entropy).all()
     out, offset = [], 0
     for completion in completions:
@@ -75,6 +76,13 @@ def test_packed_group_matches_separate_forwards(model_name):
     packed = _packed_logps(model, prompt, completions)
     for a, b in zip(separate, packed):
         assert torch.allclose(a, b, atol=1e-4, rtol=1e-4), (a - b).abs().max()
+    # The per-row training path goes through the same chunked fp32 head.
+    model.set_attn_implementation("sdpa")
+    ids = torch.tensor(prompt + completions[0])
+    keep = torch.arange(len(prompt) - 1, len(ids) - 1)
+    with torch.no_grad():
+        through_head, _ = row_logps(model, ids, torch.ones_like(ids), keep, ids[len(prompt):], chunk=4)
+    assert torch.allclose(through_head, separate[0], atol=1e-4, rtol=1e-4)
 
 
 def test_qwen_style_hybrid_layers_are_not_packable():

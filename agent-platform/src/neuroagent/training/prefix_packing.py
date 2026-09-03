@@ -147,26 +147,24 @@ def group_preserving_shuffle(seq_dict: dict[str, Sequence | None], *, group_size
     return {key: permute(value) for key, value in seq_dict.items()}
 
 
-def packed_group_logps(
-    model, packed: PackedGroup, keep: torch.Tensor, targets: torch.Tensor, *, temperature: float = 1.0,
-    kernel_options: dict | None = None, compute_entropy: bool = False, chunk: int = 512,
-) -> tuple[torch.Tensor, torch.Tensor | None]:
-    """Log-probabilities of `targets` predicted at packed positions `keep`, with a chunked head.
+def _base(model):
+    return model.get_base_model() if hasattr(model, "get_base_model") else model
 
-    The transformer body runs once over the packed sequence; the vocabulary projection, the
-    model's logit post-processing (Granite's `logits_scaling`, Gemma's `final_logit_softcapping`),
-    the temperature and the log-softmax run in checkpointed chunks of `chunk` positions, so at most
-    chunk × vocabulary logits exist at any time (Gemma 4's 262k vocabulary would otherwise need
-    several GB for one group's supervised positions).
+
+def head_logps(
+    base, hidden: torch.Tensor, targets: torch.Tensor, *, temperature: float = 1.0, chunk: int = 512,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """log p(target) and entropy at the given hidden states, through the model's head in fp32.
+
+    The vocabulary projection, the model's logit post-processing (Granite's `logits_scaling`,
+    Gemma's `final_logit_softcapping`), the temperature and the log-softmax run in checkpointed
+    chunks of `chunk` positions, so at most chunk × vocabulary logits exist at any time (Gemma 4's
+    262k vocabulary would otherwise need several GB for one group's supervised positions), and the
+    log-softmax is computed in fp32 rather than in the bf16 of the logits.
     """
-    base = model.get_base_model() if hasattr(model, "get_base_model") else model
     config = base.config.get_text_config()
     scaling = getattr(config, "logits_scaling", None)
     softcap = getattr(config, "final_logit_softcapping", None)
-    hidden = base.model(
-        input_ids=packed.input_ids, position_ids=packed.position_ids, attention_mask=packed.attention_mask,
-        use_cache=False, **({"kernel_options": kernel_options} if kernel_options else {}),
-    ).last_hidden_state[0][keep]
 
     def head(states, labels):
         logits = base.lm_head(states)
@@ -183,11 +181,34 @@ def packed_group_logps(
         return logps, entropy
 
     logps, entropies = [], []
-    for start in range(0, keep.numel(), chunk):
+    for start in range(0, targets.numel(), chunk):
         lp, ent = checkpoint(head, hidden[start : start + chunk], targets[start : start + chunk], use_reentrant=False)
         logps.append(lp)
         entropies.append(ent)
     if not logps:
         empty = hidden.new_zeros(0, dtype=torch.float32)
-        return empty, (empty if compute_entropy else None)
-    return torch.cat(logps), (torch.cat(entropies) if compute_entropy else None)
+        return empty, empty
+    return torch.cat(logps), torch.cat(entropies)
+
+
+def row_logps(
+    model, ids: torch.Tensor, attention_mask: torch.Tensor, keep: torch.Tensor, targets: torch.Tensor, *,
+    temperature: float = 1.0, chunk: int = 512,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """One sequence: the transformer body once, then `head_logps` at positions `keep`."""
+    base = _base(model)
+    hidden = base.model(input_ids=ids[None], attention_mask=attention_mask[None], use_cache=False).last_hidden_state[0][keep]
+    return head_logps(base, hidden, targets, temperature=temperature, chunk=chunk)
+
+
+def packed_group_logps(
+    model, packed: PackedGroup, keep: torch.Tensor, targets: torch.Tensor, *, temperature: float = 1.0,
+    kernel_options: dict | None = None, chunk: int = 512,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """A packed group: the transformer body once over `prompt + completions`, then `head_logps`."""
+    base = _base(model)
+    hidden = base.model(
+        input_ids=packed.input_ids, position_ids=packed.position_ids, attention_mask=packed.attention_mask,
+        use_cache=False, **({"kernel_options": kernel_options} if kernel_options else {}),
+    ).last_hidden_state[0][keep]
+    return head_logps(base, hidden, targets, temperature=temperature, chunk=chunk)

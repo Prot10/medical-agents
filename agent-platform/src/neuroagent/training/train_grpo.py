@@ -24,6 +24,7 @@ import argparse
 import json
 import os
 import threading
+import sys
 import time
 from collections import defaultdict
 from concurrent.futures import Future
@@ -49,6 +50,7 @@ from .prefix_packing import (
     packed_group_logps,
     packed_logits_to_keep,
     packing_config,
+    row_logps,
 )
 
 # Tool-call syntax is sampled freely, as in serving (serve_model.sh pins the same value).
@@ -489,7 +491,13 @@ def build_trainer(
     self_packing_enabled = packable
     if packable:
         # Micro-batches must stay whole groups for the packed forward (TRL shuffles rows).
-        grpo_module.shuffle_sequence_dict = lambda seq_dict: group_preserving_shuffle(seq_dict, group_size=num_generations)
+        def shuffle_groups(seq_dict):
+            before = [int(m.sum()) for m in seq_dict["prompt_mask"]]
+            shuffled = group_preserving_shuffle(seq_dict, group_size=num_generations)
+            print(f"[rollout] prompt lengths before shuffle {before} after {[int(m.sum()) for m in shuffled['prompt_mask']]}", file=sys.stderr, flush=True)
+            return shuffled
+
+        grpo_module.shuffle_sequence_dict = shuffle_groups
 
     class PolicyGRPOTrainer(GRPOTrainer):
         """Policy on CPU while the colocated engine starts; sparse-logit log-probs; swap around rollouts."""
@@ -517,7 +525,7 @@ def build_trainer(
             if self_packing_enabled and model.config._attn_implementation != implementation:
                 model.set_attn_implementation(implementation)
 
-        def _row_logps(self, model, ids, att, logits_to_keep, compute_entropy):
+        def _row_logps(self, model, ids, att, logits_to_keep, compute_entropy, attention="sdpa"):
             """Per-row path: one forward, vocabulary projection only at supervised positions."""
             total = ids.size(0)
             completion = ids[total - logits_to_keep:]
@@ -530,18 +538,15 @@ def build_trainer(
             supervised = [j for j, m in enumerate(env_mask) if m]
             if supervised:
                 keep = torch.tensor([total - logits_to_keep + j - 1 for j in supervised], device=ids.device)
-                self._use_attention(model, "sdpa")  # flash kernels; FlexAttention would recompile per length
+                self._use_attention(model, attention)  # sdpa by default: flash kernels, no per-length recompile
                 forward_started = time.perf_counter()
-                outputs = model(input_ids=ids[None], attention_mask=att[None], logits_to_keep=keep, use_cache=False)
+                values, ent = row_logps(model, ids, att, keep, completion[supervised], temperature=self.temperature)
                 torch.cuda.synchronize()
                 self._log_metric("train/forward_seconds_per_row", time.perf_counter() - forward_started)
                 self._log_metric("train/row_tokens", float(att.sum().item()))
-                logits = outputs.logits[0].div(self.temperature)
-                values = selective_log_softmax(logits, completion[supervised])
-                logps[supervised] = values.float()
+                logps[supervised] = values
                 if compute_entropy:
-                    with torch.no_grad():
-                        entropies[supervised] = entropy_from_logits(logits).float()
+                    entropies[supervised] = ent
             return logps, entropies
 
         def _group_logps(self, model, input_ids, attention_mask, logits_to_keep, compute_entropy):
@@ -578,8 +583,7 @@ def build_trainer(
                 self._use_attention(model, ATTN_IMPLEMENTATION)
                 forward_started = time.perf_counter()
                 values, ent = packed_group_logps(
-                    model, packed, keep, targets, temperature=self.temperature,
-                    kernel_options=self._packing["kernel_options"], compute_entropy=compute_entropy,
+                    model, packed, keep, targets, temperature=self.temperature, kernel_options=self._packing["kernel_options"],
                 )
                 torch.cuda.synchronize()
                 self._log_metric("train/forward_seconds_per_group", time.perf_counter() - forward_started)
@@ -656,8 +660,7 @@ def build_trainer(
                     with torch.no_grad():  # reference forwards only; their graphs would not fit next to the packed one
                         per_row = torch.stack([self._row_logps(model, input_ids[r], attention_mask[r], logits_to_keep, False)[0] for r in range(input_ids.size(0))])
                         # Noise floor: the same row under FlexAttention vs SDPA, both per-row (bf16 kernels differ).
-                        self._use_attention(model, ATTN_IMPLEMENTATION)
-                        row_flex = self._row_logps(model, input_ids[0], attention_mask[0], logits_to_keep, False)[0]
+                        row_flex = self._row_logps(model, input_ids[0], attention_mask[0], logits_to_keep, False, attention=ATTN_IMPLEMENTATION)[0]
                     # Checkpointed layers are recomputed in backward with the implementation current
                     # *then*; the packed graph holds a BlockMask, so FlexAttention must be back in place.
                     self._use_attention(model, ATTN_IMPLEMENTATION)
@@ -711,6 +714,7 @@ def build_trainer(
         swap_out_seconds = time.perf_counter() - phase
         client = BatchedEngineClient(llm, tokenizer, TOOL_PARSERS[model_key], request, max_tokens=max_completion_tokens)
         batch_cases = [case_by_prompt[prompt[1]["content"]] for prompt in prompts]
+        print(f"[rollout] cases in prompt order {[case.case_id for case in batch_cases]}", file=sys.stderr, flush=True)
         started = time.perf_counter()
         episodes = run_episodes(client, batch_cases, max_turns=max_turns, max_cost_usd=max_cost_usd)
         rollout_seconds = time.perf_counter() - started
