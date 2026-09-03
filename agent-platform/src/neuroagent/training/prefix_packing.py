@@ -81,11 +81,20 @@ def pack_group(
     )
 
 
+def _flex_kernel_options(head_dim: int) -> dict | None:
+    if head_dim >= 512:
+        return {"BLOCK_M": 16, "BLOCK_N": 16, "num_stages": 1}
+    if head_dim >= 256:
+        return {"BLOCK_M": 32, "BLOCK_N": 32}
+    return None
+
+
 def packing_config(config) -> dict | None:
     """Mask and kernel settings for the packed forward, or None when the architecture cannot be packed.
 
     `kernel_options` go to FlexAttention: its default 128×128 tile exceeds an A100's shared memory
-    once the head dimension reaches 256 (Gemma 4: 256, and 512 on its global layers).
+    once the head dimension reaches 256, and 32×32 tiles still do at 512 (Gemma 4: 256 on sliding
+    layers, 512 on global layers), so the tile shrinks with the widest head.
     """
     config = getattr(config, "get_text_config", lambda: config)()
     layer_types = getattr(config, "layer_types", None)
@@ -95,7 +104,7 @@ def packing_config(config) -> dict | None:
     return {
         "layer_types": layer_types,
         "sliding_window": getattr(config, "sliding_window", None),
-        "kernel_options": {"BLOCK_M": 32, "BLOCK_N": 32} if head_dim >= 256 else None,
+        "kernel_options": _flex_kernel_options(head_dim),
     }
 
 

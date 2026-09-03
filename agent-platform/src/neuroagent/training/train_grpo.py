@@ -640,7 +640,8 @@ def build_trainer(
             if self._packing is not None and input_ids.size(0) > 1:
                 result = self._group_logps(model, input_ids, attention_mask, logits_to_keep, compute_entropy)
                 if verify_packing and not self._packing_verified:
-                    per_row = torch.stack([self._row_logps(model, input_ids[r], attention_mask[r], logits_to_keep, False)[0] for r in range(input_ids.size(0))])
+                    with torch.no_grad():  # reference forwards only; their graphs would not fit next to the packed one
+                        per_row = torch.stack([self._row_logps(model, input_ids[r], attention_mask[r], logits_to_keep, False)[0] for r in range(input_ids.size(0))])
                     gap = (result[0].detach() - per_row.detach()).abs().max().item()
                     self._log_metric("train/packing_max_abs_logp_gap", gap)
                     self._packing_verified = True

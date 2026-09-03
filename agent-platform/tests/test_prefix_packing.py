@@ -103,4 +103,6 @@ def test_wide_heads_get_smaller_flex_tiles():
         head_dim = 256
         global_head_dim = 512
 
+    assert packing_config(Cfg())["kernel_options"] == {"BLOCK_M": 16, "BLOCK_N": 16, "num_stages": 1}
+    Cfg.global_head_dim = 256
     assert packing_config(Cfg())["kernel_options"] == {"BLOCK_M": 32, "BLOCK_N": 32}
