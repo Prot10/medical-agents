@@ -655,11 +655,20 @@ def build_trainer(
                 if verify_packing and not self._packing_verified:
                     with torch.no_grad():  # reference forwards only; their graphs would not fit next to the packed one
                         per_row = torch.stack([self._row_logps(model, input_ids[r], attention_mask[r], logits_to_keep, False)[0] for r in range(input_ids.size(0))])
+                        # Noise floor: the same row under FlexAttention vs SDPA, both per-row (bf16 kernels differ).
+                        self._use_attention(model, ATTN_IMPLEMENTATION)
+                        row_flex = self._row_logps(model, input_ids[0], attention_mask[0], logits_to_keep, False)[0]
                     # Checkpointed layers are recomputed in backward with the implementation current
                     # *then*; the packed graph holds a BlockMask, so FlexAttention must be back in place.
                     self._use_attention(model, ATTN_IMPLEMENTATION)
-                    gap = (result[0].detach() - per_row.detach()).abs().max().item()
-                    self._log_metric("train/packing_max_abs_logp_gap", gap)
+                    supervised_mask = per_row != 0
+                    gap = (result[0].detach() - per_row.detach()).abs()[supervised_mask]
+                    floor = (row_flex - per_row[0]).abs()[supervised_mask[0]]
+                    self._log_metric("train/packing_max_abs_logp_gap", gap.max().item() if gap.numel() else 0.0)
+                    self._log_metric("train/packing_mean_abs_logp_gap", gap.mean().item() if gap.numel() else 0.0)
+                    self._log_metric("train/packing_p99_abs_logp_gap", gap.quantile(0.99).item() if gap.numel() else 0.0)
+                    self._log_metric("train/kernel_floor_max_abs_logp_gap", floor.max().item() if floor.numel() else 0.0)
+                    self._log_metric("train/kernel_floor_mean_abs_logp_gap", floor.mean().item() if floor.numel() else 0.0)
                     self._packing_verified = True
                 return result
             rows = [self._row_logps(model, input_ids[r], attention_mask[r], logits_to_keep, compute_entropy) for r in range(input_ids.size(0))]
