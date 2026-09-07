@@ -21,6 +21,7 @@ layers in bf16, one optimizer step per group batch (on-policy).
 from __future__ import annotations
 
 import argparse
+import gc
 import json
 import os
 import threading
@@ -453,7 +454,14 @@ def build_trainer(
             super().__init__(*args_, max_num_seqs=concurrent_episodes, **kwargs)
 
         def sync_weights(self):
+            # The engine re-maps its 18 GB of weights for the sync; with the policy still resident
+            # that is two copies of the model on a 40 GB card, which allocator fragmentation turned
+            # into an out-of-memory at step 56 of the first long run. The policy sits on the CPU
+            # from here until the rollouts are done (rollout_func moves it back).
             started = time.perf_counter()
+            self.model.to("cpu")
+            gc.collect()
+            torch.cuda.empty_cache()
             super().sync_weights()
             sync_seconds.append(time.perf_counter() - started)
 
@@ -901,6 +909,7 @@ def main() -> None:
     parser.add_argument("--no-prefix-sharing", action="store_true", help="train one row at a time even when the group prompt could be shared")
     parser.add_argument("--verify-packing", action="store_true", help="also compute per-row log-probs on the first batch and log the gap")
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--resume", action="store_true", help="continue from the latest checkpoint-* in --output, if any")
     parser.add_argument("--allow-draft-policies", action="store_true")
     args = parser.parse_args()
 
@@ -933,7 +942,12 @@ def main() -> None:
         prefix_sharing=not args.no_prefix_sharing,
         verify_packing=args.verify_packing,
     )
-    trainer.train()
+    resume = None
+    if args.resume:
+        checkpoints = sorted(Path(args.output).glob("checkpoint-*"), key=lambda p: int(p.name.split("-")[1]))
+        resume = str(checkpoints[-1]) if checkpoints else None
+        print(f"resuming from {resume}" if resume else "no checkpoint to resume from; starting fresh", flush=True)
+    trainer.train(resume_from_checkpoint=resume)
     trainer.save_model(args.output)
     trainer.processing_class.save_pretrained(args.output)
     Path(args.output, "train_log.json").write_text(json.dumps(trainer.state.log_history, indent=2))
