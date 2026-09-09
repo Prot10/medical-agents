@@ -59,6 +59,9 @@ os.environ.setdefault("VLLM_ENFORCE_STRICT_TOOL_CALLING", "0")
 # fla auto-selects its TileLang backend when tilelang is importable (it is, as a vLLM dependency);
 # those kernels JIT-compile with nvcc, which the training host lacks. The Triton kernels are used.
 os.environ.setdefault("FLA_TILELANG", "0")
+# Long rows (up to ~16k tokens late in a run) fragment the caching allocator; expandable segments
+# let it grow in place instead of failing on a 1 GB block with 1.6 GB reserved but unusable.
+os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
 
 # LoRA on the language model's decoder projections only (attention, gated delta net, MLP). Qwen3.5
 # and Gemma 4 checkpoints carry vision/audio towers whose linears never see a gradient here and
