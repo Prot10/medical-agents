@@ -75,7 +75,10 @@ LORA_TARGETS = (
 
 logger = logging.getLogger(__name__)
 
-PACK_ROWS = 4  # completions per packed backward on a 40 GB card
+# Completions per packed backward on a 40 GB card. Four fits the 8B/9B models at the start of a
+# run; as a policy learns to take more turns the slice grows and the 8B dense model spikes past
+# the card at ~1k-token completions, so a run may lower it (same gradient: accumulation adjusts).
+PACK_ROWS = int(os.environ.get("GRPO_PACK_ROWS", "4"))
 
 _SAMPLING_METRICS = (
     "sampling/sampling_logp_difference/mean", "sampling/sampling_logp_difference/max",
