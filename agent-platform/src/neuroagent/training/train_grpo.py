@@ -75,6 +75,8 @@ LORA_TARGETS = (
 
 logger = logging.getLogger(__name__)
 
+PACK_ROWS = 4  # completions per packed backward on a 40 GB card
+
 _SAMPLING_METRICS = (
     "sampling/sampling_logp_difference/mean", "sampling/sampling_logp_difference/max",
     "sampling/importance_sampling_ratio/min", "sampling/importance_sampling_ratio/mean", "sampling/importance_sampling_ratio/max",
@@ -494,6 +496,12 @@ def build_trainer(
     multimodal = getattr(model_config, "vision_config", None) is not None
     packing = packing_config(model_config) if prefix_sharing else None
     packable = packing is not None
+    # A micro-batch is one backward. Packed, it is a slice of one group that fits the A100 as a
+    # single graph (~20k tokens: prompt + 4 completions, measured); a whole group of 8 packs to
+    # ~28k and does not. The group-preserving shuffle keeps a group's slices contiguous.
+    pack_rows = min(PACK_ROWS, num_generations) if packable else 1
+    if num_generations % pack_rows:
+        raise ValueError(f"num_generations ({num_generations}) must be a multiple of {pack_rows}")
     # GRPO needs stochastic rollouts: a greedy model-card default (Granite) yields identical
     # samples per group (no advantage) and a zero temperature breaks the trainer's logit scaling.
     request = {**entry["request_defaults"], "temperature": rollout_temperature or entry["request_defaults"].get("temperature") or 1.0}
@@ -835,10 +843,10 @@ def build_trainer(
         learning_rate=learning_rate,
         lr_scheduler_type="constant_with_warmup",
         warmup_steps=min(5, max_steps),
-        # A micro-batch is one group when the prompt prefix can be shared (Gemma, Granite); Qwen's
+        # A micro-batch is a packable slice of one group (Gemma, Granite; see pack_rows); Qwen's
         # recurrent layers cannot fork a prefix state, so it trains one row at a time.
-        per_device_train_batch_size=num_generations if packable else 1,
-        gradient_accumulation_steps=cases_per_step if packable else num_generations * cases_per_step,
+        per_device_train_batch_size=pack_rows,
+        gradient_accumulation_steps=num_generations * cases_per_step // pack_rows,
         generation_batch_size=num_generations * cases_per_step,
         num_generations=num_generations,
         gradient_checkpointing=True,
