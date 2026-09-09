@@ -52,6 +52,7 @@ from .prefix_packing import (
     packed_logits_to_keep,
     packing_config,
     row_logps,
+    split_by_budget,
 )
 
 # Tool-call syntax is sampled freely, as in serving (serve_model.sh pins the same value).
@@ -591,15 +592,17 @@ def build_trainer(
                     f"prompt lengths {[len(p) for p in prompts]}, first divergence {divergence}, "
                     f"case ids {current.get('case_id')}, inputs {described}"
                 )
-            packed = pack_group(
-                prompts[0], completions, device=input_ids.device,
-                layer_types=self._packing["layer_types"], sliding_window=self._packing["sliding_window"],
-            )
-            keep, targets = packed_logits_to_keep(packed, supervised)
             logps = torch.zeros(input_ids.size(0), logits_to_keep, device=input_ids.device, dtype=torch.float32)
             entropies = torch.zeros_like(logps)
-            if keep.numel():
-                self._use_attention(model, ATTN_IMPLEMENTATION)
+            self._use_attention(model, ATTN_IMPLEMENTATION)
+            for members in split_by_budget(len(prompts[0]), completions):
+                packed = pack_group(
+                    prompts[0], [completions[i] for i in members], device=input_ids.device,
+                    layer_types=self._packing["layer_types"], sliding_window=self._packing["sliding_window"],
+                )
+                keep, targets = packed_logits_to_keep(packed, [supervised[i] for i in members])
+                if not keep.numel():
+                    continue
                 forward_started = time.perf_counter()
                 values, ent = packed_group_logps(
                     model, packed, keep, targets, temperature=self.temperature, kernel_options=self._packing["kernel_options"],
@@ -607,8 +610,10 @@ def build_trainer(
                 torch.cuda.synchronize()
                 self._log_metric("train/forward_seconds_per_group", time.perf_counter() - forward_started)
                 self._log_metric("train/packed_tokens", float(packed.input_ids.size(1)))
+                self._log_metric("train/packed_subgroups", 1.0)
                 offset = 0
-                for row, positions in enumerate(supervised):
+                for row in members:
+                    positions = supervised[row]
                     if positions:
                         index = torch.tensor(positions, device=input_ids.device)
                         logps[row, index] = values[offset : offset + len(positions)]

@@ -15,6 +15,7 @@ from neuroagent.training.prefix_packing import (  # noqa: E402
     packed_logits_to_keep,
     packing_config,
     row_logps,
+    split_by_budget,
 )
 
 
@@ -115,3 +116,13 @@ def test_wide_heads_get_smaller_flex_tiles():
     assert packing_config(Cfg())["kernel_options"] == {"BLOCK_M": 16, "BLOCK_N": 16, "num_stages": 1}
     Cfg.global_head_dim = 256
     assert packing_config(Cfg())["kernel_options"] == {"BLOCK_M": 32, "BLOCK_N": 32}
+
+
+def test_split_by_budget_keeps_sub_groups_under_the_token_budget():
+    completions = [[0] * n for n in (3000, 2500, 4000, 1000, 6000, 500)]
+    groups = split_by_budget(8500, completions, budget=16000)
+    assert [i for g in groups for i in g] == list(range(6))  # every completion once, in order
+    for g in groups:
+        assert 8500 + sum(len(completions[i]) for i in g) <= 16000 or len(g) == 1
+    assert groups == [[0, 1], [2, 3], [4, 5]]
+    assert split_by_budget(8500, [[0] * 20000], budget=16000) == [[0]]  # oversize alone

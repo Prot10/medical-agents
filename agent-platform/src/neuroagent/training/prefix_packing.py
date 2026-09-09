@@ -215,3 +215,27 @@ def packed_group_logps(
         use_cache=False, **({"kernel_options": kernel_options} if kernel_options else {}),
     ).last_hidden_state[0][keep]
     return head_logps(base, hidden, targets, temperature=temperature, chunk=chunk)
+
+
+PACKED_TOKEN_BUDGET = 16384  # packed tokens per forward; a 40 GB card fits ~20k with the chunked head
+
+
+def split_by_budget(prompt_len: int, completions: list[list[int]], budget: int = PACKED_TOKEN_BUDGET) -> list[list[int]]:
+    """Indices of completions per sub-group so that prompt + completions stays under `budget` tokens.
+
+    A group of eight 2.5k-token completions on an 8.5k prompt is ~28k packed tokens, which the
+    backward pass cannot hold; two sub-groups of four cost one extra prompt forward and fit. A single
+    completion that exceeds the budget on its own forms its own sub-group.
+    """
+    groups: list[list[int]] = []
+    current: list[int] = []
+    size = prompt_len
+    for index, completion in enumerate(completions):
+        if current and size + len(completion) > budget:
+            groups.append(current)
+            current, size = [], prompt_len
+        current.append(index)
+        size += len(completion)
+    if current:
+        groups.append(current)
+    return groups
