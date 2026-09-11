@@ -207,5 +207,5 @@ def test_weights_are_refused_on_the_local_disk():
 
     assert require_eos(f"{WEIGHTS_ROOT}/run/qwen3.5-9b") == Path(f"{WEIGHTS_ROOT}/run/qwen3.5-9b")
     for local in ("outputs/grpo/run/train", "/home/user/weights", "/dev/shm/weights", "/eosx/run"):
-        with pytest.raises(ValueError, match="must be on EOS"):
+        with pytest.raises(ValueError, match="must be written on EOS"):
             require_eos(local)

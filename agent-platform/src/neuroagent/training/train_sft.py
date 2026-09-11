@@ -27,6 +27,7 @@ from ..model_registry import KEY_TO_MODEL
 
 # fla's TileLang backend needs nvcc (absent on the training host); use the Triton kernels.
 os.environ.setdefault("FLA_TILELANG", "0")
+from .storage import WEIGHTS_ROOT, require_eos
 from .data.episodes import load_case_map, load_episode_records, sft_rows
 
 
@@ -173,7 +174,7 @@ def main() -> None:
     parser.add_argument("--model", required=True, choices=sorted(KEY_TO_MODEL))
     parser.add_argument("--episodes", required=True)
     parser.add_argument("--cases", default="data/neurobench/cases")
-    parser.add_argument("--output", required=True)
+    parser.add_argument("--output", required=True, help=f"EOS directory for the adapter and its log, e.g. {WEIGHTS_ROOT}/sft-<run>/<model>")
     parser.add_argument("--allow-candidates", action="store_true")
     parser.add_argument("--epochs", type=float, default=2.0)
     parser.add_argument("--learning-rate", type=float, default=1e-4)
@@ -184,7 +185,7 @@ def main() -> None:
         model_key=args.model,
         episodes_path=args.episodes,
         cases_path=args.cases,
-        output_dir=args.output,
+        output_dir=str(require_eos(args.output)),
         allow_candidates=args.allow_candidates,
         epochs=args.epochs,
         learning_rate=args.learning_rate,

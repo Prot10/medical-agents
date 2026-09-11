@@ -40,6 +40,7 @@ from neuroagent_schemas import ClinicalEpisode, NeuroBenchCase, RunCompleted, Ru
 from ..datasets import DATASETS, DEFAULT_DATASET_VERSION, load_dataset
 from ..evaluation.policy_reward import ClinicalPolicyReward
 from ..harness.adapters import SUBMIT_TOOL, NativeToolModelAdapter
+from .storage import WEIGHTS_ROOT, require_eos
 from ..harness.context import transcript
 from ..harness.environment import NeuroBenchEnvironment
 from ..harness.interfaces import RunContext
@@ -84,17 +85,6 @@ PACK_ROWS = int(os.environ.get("GRPO_PACK_ROWS", "4"))
 
 ADAPTER_FILES = ("adapter_config.json", "adapter_model.safetensors")
 
-# Weights (checkpoints, archived adapters, the final adapter) live on EOS only: the VM's local disk
-# has no room for them. The local --output holds logs, rollouts and diagnostics.
-WEIGHTS_ROOT = "/eos/project-d/diagbox/dvc/NeuroAgent/checkpoints"
-
-
-def require_eos(path: str | Path) -> Path:
-    """Return ``path`` as an absolute EOS path; refuse anything on the local disk."""
-    absolute = Path(os.path.abspath(path))
-    if absolute.parts[:2] != ("/", "eos"):
-        raise ValueError(f"--weights-dir must be on EOS (e.g. {WEIGHTS_ROOT}/<run>/<model>), got {absolute}")
-    return absolute
 
 
 def archive_adapter(checkpoint_dir: Path, archive_root: Path) -> Path:

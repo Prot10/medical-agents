@@ -60,7 +60,7 @@ No physician-approved episode file is committed. Candidate episodes are exported
 ```bash
 uv run python -m neuroagent.training.data.export_episodes --runs outputs/smoke/policy-qwen --output training_data/candidate_episodes.jsonl
 uv run python -m neuroagent.training.train_sft --model qwen3.5-9b \
-  --episodes training_data/candidate_episodes.jsonl --output outputs/qwen-sft --allow-candidates
+  --episodes training_data/candidate_episodes.jsonl --output /eos/project-d/diagbox/dvc/NeuroAgent/checkpoints/sft-qwen/qwen3.5-9b --allow-candidates
 ```
 
-Serve the adapter with `LORA_ADAPTER=outputs/qwen-sft LORA_NAME=sft-qwen3.5-9b serve_model.sh qwen3.5-9b` and evaluate it with `--served-model sft-qwen3.5-9b`. The current GRPO surface is a backend contract, not a completed distributed trainer.
+Weights are written to EOS only (the trainers refuse a local path). Serve the adapter from a RAM copy, `cp -r <eos adapter dir> /dev/shm/sft-qwen && LORA_ADAPTER=/dev/shm/sft-qwen LORA_NAME=sft-qwen3.5-9b serve_model.sh qwen3.5-9b`, and evaluate it with `--served-model sft-qwen3.5-9b`. The current GRPO surface is a backend contract, not a completed distributed trainer.

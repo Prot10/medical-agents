@@ -59,9 +59,10 @@ uv run uvicorn neuroagent.api.app:app --host 127.0.0.1 --port 8888          # ru
 uv run uvicorn neuroagent.review_api.app:app --host 0.0.0.0 --port 8889     # review API
 cd web-review && npm ci && npm run dev:remote                                # review UI
 
-# SFT (needs --extra training); an adapter is served with LORA_ADAPTER=<dir> LORA_NAME=<alias>
+# SFT (needs --extra training); --output must be on EOS (weights never go on the local disk);
+# serve an adapter from a /dev/shm copy with LORA_ADAPTER=<dir> LORA_NAME=<alias>
 uv run python -m neuroagent.training.train_sft --model qwen3.5-9b \
-  --episodes training_data/approved_episodes.jsonl --output outputs/qwen-sft
+  --episodes training_data/approved_episodes.jsonl --output /eos/project-d/diagbox/dvc/NeuroAgent/checkpoints/sft-qwen/qwen3.5-9b
 # GRPO / RLVR on one GPU (colocated vLLM; nothing else may be on the GPU)
 # Weights (checkpoints, adapters) go to EOS only: --weights-dir must be under /eos/
 HF_HOME=/dev/shm/hf uv run python -m neuroagent.training.train_grpo --model qwen3.5-9b \

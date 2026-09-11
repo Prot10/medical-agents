@@ -181,7 +181,7 @@ uv run python -m neuroagent.training.data.export_episodes \
   --runs outputs/a100-validation/smoke/policy-qwen3.5-9b outputs/a100-validation/smoke/react-qwen3.5-9b \
   --output training_data/candidate_episodes.jsonl
 uv run python -m neuroagent.training.train_sft --model qwen3.5-9b \
-  --episodes training_data/candidate_episodes.jsonl --output outputs/a100-validation/qwen-sft-smoke \
+  --episodes training_data/candidate_episodes.jsonl --output /eos/project-d/diagbox/dvc/NeuroAgent/checkpoints/sft-smoke/qwen3.5-9b \
   --allow-candidates --max-steps 3
 ```
 
