@@ -24,6 +24,7 @@ import argparse
 import gc
 import json
 import os
+import shutil
 import threading
 import logging
 import time
@@ -79,6 +80,23 @@ logger = logging.getLogger(__name__)
 # run; as a policy learns to take more turns the slice grows and the 8B dense model spikes past
 # the card at ~1k-token completions, so a run may lower it (same gradient: accumulation adjusts).
 PACK_ROWS = int(os.environ.get("GRPO_PACK_ROWS", "4"))
+
+ADAPTER_FILES = ("adapter_config.json", "adapter_model.safetensors")
+
+
+def archive_adapter(checkpoint_dir: Path, archive_root: Path) -> Path:
+    """Copy a checkpoint's LoRA adapter out of the checkpoint rotation.
+
+    Full checkpoints (optimizer state included, ~430 MB) are rotated to the last two for --resume;
+    every adapter (~140 MB) is kept under ``adapters/`` so the best step can be chosen afterwards
+    on held-out cases. Keeping only the last checkpoints lost every pre-drift adapter of the
+    2026-09 long run (Qwen's best was step 400 of 425; Gemma's peaked near step 175).
+    """
+    target = archive_root / checkpoint_dir.name
+    target.mkdir(parents=True, exist_ok=True)
+    for name in ADAPTER_FILES:
+        shutil.copy2(checkpoint_dir / name, target / name)
+    return target
 
 _SAMPLING_METRICS = (
     "sampling/sampling_logp_difference/mean", "sampling/sampling_logp_difference/max",
@@ -836,6 +854,10 @@ def build_trainer(
             with open(Path(output_dir, "train_log.jsonl"), "a") as handle:
                 handle.write(json.dumps({"step": state.global_step, **(logs or {})}) + "\n")
 
+    class KeepAdapters(TrainerCallback):
+        def on_save(self, args, state, control, **kwargs):
+            archive_adapter(Path(output_dir, f"checkpoint-{state.global_step}"), Path(output_dir, "adapters"))
+
     config = GRPOConfig(
         output_dir=output_dir,
         # bf16 weights loaded on the CPU: the colocated engine is created during trainer init and
@@ -881,7 +903,7 @@ def build_trainer(
         logging_steps=1,
         save_strategy="steps",
         save_steps=save_steps,
-        save_total_limit=2,
+        save_total_limit=2,  # full checkpoints for --resume only; KeepAdapters archives every adapter
         report_to="none",
         log_completions=False,
     )
@@ -893,7 +915,7 @@ def build_trainer(
         processing_class=tokenizer,
         peft_config=LoraConfig(r=16, lora_alpha=32, lora_dropout=0.05, target_modules=LORA_TARGETS, task_type="CAUSAL_LM"),
         rollout_func=rollout_func,
-        callbacks=[JsonlLog()],
+        callbacks=[JsonlLog(), KeepAdapters()],
     )
     trainer._env_masks = {}
     trainer._packing = packing

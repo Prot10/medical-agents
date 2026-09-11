@@ -184,3 +184,17 @@ def test_engine_client_streams_turns_without_a_barrier():
     assert sorted(len(recs) for recs in client.records.values()) == [1, 3]
     assert max(step for rid, step in finished_at.items() if not rid.startswith(f"{slow_thread}-")) <= 6
     assert client.engine_steps == 6 and client.max_inflight == 2
+
+
+def test_archive_adapter_keeps_the_adapter_out_of_the_rotation(tmp_path):
+    from neuroagent.training.train_grpo import archive_adapter
+
+    checkpoint = tmp_path / "checkpoint-25"
+    checkpoint.mkdir()
+    (checkpoint / "adapter_config.json").write_text("{}")
+    (checkpoint / "adapter_model.safetensors").write_bytes(b"weights")
+    (checkpoint / "optimizer.pt").write_bytes(b"optimizer")
+    archived = archive_adapter(checkpoint, tmp_path / "adapters")
+    assert archived == tmp_path / "adapters" / "checkpoint-25"
+    assert sorted(path.name for path in archived.iterdir()) == ["adapter_config.json", "adapter_model.safetensors"]
+    assert (archived / "adapter_model.safetensors").read_bytes() == b"weights"
