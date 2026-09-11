@@ -201,10 +201,14 @@ The episode's `run.started.model_id` and the summary's `model_id` must equal the
 `python -m neuroagent.training.train_grpo` runs RLVR on one GPU: the benchmark loop is the rollout
 against a vLLM engine colocated in the trainer process, the deterministic policy reward is the
 objective, and every rollout is persisted with its reward breakdown. Nothing else may use the GPU.
+Checkpoints and adapters are written only to `--weights-dir`, which must be on EOS
+(`/eos/project-d/diagbox/dvc/NeuroAgent/checkpoints/<run>/<model>`); `--output` keeps logs and
+rollouts on the local disk. A Kerberos ticket must be valid for the whole run (`klist`).
 
 ```bash
 HF_HOME=/dev/shm/hf uv run python -m neuroagent.training.train_grpo --model granite-4.1-8b \
-  --cases FEPI-TEMP-M01 SAH-M01 --output outputs/grpo/granite-smoke --max-steps 2 \
+  --cases FEPI-TEMP-M01 SAH-M01 --output outputs/grpo/granite-smoke \
+  --weights-dir /eos/project-d/diagbox/dvc/NeuroAgent/checkpoints/grpo-smoke/granite-4.1-8b --max-steps 2 \
   --num-generations 4 --cases-per-step 2 --allow-draft-policies --verify-packing
 ```
 

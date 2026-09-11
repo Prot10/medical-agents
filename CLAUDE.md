@@ -22,7 +22,8 @@ See README.md for setup, `docs/README.md` for the documentation index,
 - `agent-platform/src/neuroagent/review_api/` — physician review API (port 8889, separate startup)
 - `agent-platform/src/neuroagent/training/` — `train_sft.py` (LoRA SFT, one sequence per episode,
   sparse-logits loss), `train_grpo.py` (RLVR: benchmark loop as rollout on a colocated vLLM engine,
-  DAPO loss, token-level IS correction, rollouts persisted), `data/episodes.py` (episode records)
+  DAPO loss, token-level IS correction, rollouts persisted; weights only on EOS via `--weights-dir`),
+  `data/episodes.py` (episode records)
 - `agent-platform/config/profiles/*.yaml` — the eight checked experiment profiles (model × loop);
   arbitrary model ids are rejected. Models live in `model_registry.py` with their per-request defaults
 - `agent-platform/config/tools/costs.yaml` — per-tool cost registry (Medicare reference rates); the
@@ -62,8 +63,10 @@ cd web-review && npm ci && npm run dev:remote                                # r
 uv run python -m neuroagent.training.train_sft --model qwen3.5-9b \
   --episodes training_data/approved_episodes.jsonl --output outputs/qwen-sft
 # GRPO / RLVR on one GPU (colocated vLLM; nothing else may be on the GPU)
+# Weights (checkpoints, adapters) go to EOS only: --weights-dir must be under /eos/
 HF_HOME=/dev/shm/hf uv run python -m neuroagent.training.train_grpo --model qwen3.5-9b \
-  --split train --output outputs/grpo/qwen --max-steps 50
+  --split train --output outputs/grpo/qwen \
+  --weights-dir /eos/project-d/diagbox/dvc/NeuroAgent/checkpoints/grpo-qwen/qwen3.5-9b --max-steps 50
 ```
 
 ## Conventions
