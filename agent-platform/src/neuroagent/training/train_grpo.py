@@ -15,7 +15,8 @@ normalization, truncation masking, vLLM importance-sampling correction, no KL te
 layers in bf16, one optimizer step per group batch (on-policy).
 
     uv run python -m neuroagent.training.train_grpo --model qwen3.5-9b --split train \\
-        --output outputs/grpo/qwen --max-steps 50 --allow-draft-policies
+        --output outputs/grpo/qwen --weights-dir /eos/project-d/diagbox/dvc/NeuroAgent/checkpoints/grpo-qwen/qwen3.5-9b \\
+        --max-steps 50 --allow-draft-policies
 """
 
 from __future__ import annotations
@@ -83,12 +84,24 @@ PACK_ROWS = int(os.environ.get("GRPO_PACK_ROWS", "4"))
 
 ADAPTER_FILES = ("adapter_config.json", "adapter_model.safetensors")
 
+# Weights (checkpoints, archived adapters, the final adapter) live on EOS only: the VM's local disk
+# has no room for them. The local --output holds logs, rollouts and diagnostics.
+WEIGHTS_ROOT = "/eos/project-d/diagbox/dvc/NeuroAgent/checkpoints"
+
+
+def require_eos(path: str | Path) -> Path:
+    """Return ``path`` as an absolute EOS path; refuse anything on the local disk."""
+    absolute = Path(os.path.abspath(path))
+    if absolute.parts[:2] != ("/", "eos"):
+        raise ValueError(f"--weights-dir must be on EOS (e.g. {WEIGHTS_ROOT}/<run>/<model>), got {absolute}")
+    return absolute
+
 
 def archive_adapter(checkpoint_dir: Path, archive_root: Path) -> Path:
     """Copy a checkpoint's LoRA adapter out of the checkpoint rotation.
 
     Full checkpoints (optimizer state included, ~430 MB) are rotated to the last two for --resume;
-    every adapter (~140 MB) is kept under ``adapters/`` so the best step can be chosen afterwards
+    every adapter (~140 MB) is kept under ``adapters/`` (both on EOS) so the best step can be chosen afterwards
     on held-out cases. Keeping only the last checkpoints lost every pre-drift adapter of the
     2026-09 long run (Qwen's best was step 400 of 425; Gemma's peaked near step 175).
     """
@@ -445,6 +458,7 @@ def build_trainer(
     cases: dict[str, NeuroBenchCase],
     train_cases: list[NeuroBenchCase],
     output_dir: str,
+    weights_dir: str,
     scorer: ClinicalPolicyReward,
     max_steps: int,
     num_generations: int,
@@ -856,10 +870,10 @@ def build_trainer(
 
     class KeepAdapters(TrainerCallback):
         def on_save(self, args, state, control, **kwargs):
-            archive_adapter(Path(output_dir, f"checkpoint-{state.global_step}"), Path(output_dir, "adapters"))
+            archive_adapter(Path(weights_dir, f"checkpoint-{state.global_step}"), Path(weights_dir, "adapters"))
 
     config = GRPOConfig(
-        output_dir=output_dir,
+        output_dir=weights_dir,  # checkpoints and adapters: EOS only (require_eos)
         # bf16 weights loaded on the CPU: the colocated engine is created during trainer init and
         # must see a free GPU; the policy is moved to the GPU right after (see below).
         # A packed group needs FlexAttention's block-sparse mask (see prefix_packing).
@@ -933,7 +947,8 @@ def build_trainer(
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--model", required=True, choices=sorted(KEY_TO_MODEL))
-    parser.add_argument("--output", required=True)
+    parser.add_argument("--output", required=True, help="local directory for logs, rollouts and diagnostics")
+    parser.add_argument("--weights-dir", required=True, help=f"EOS directory for checkpoints and adapters, e.g. {WEIGHTS_ROOT}/<run>/<model>")
     selection = parser.add_mutually_exclusive_group(required=True)
     selection.add_argument("--split", choices=["train", "test"])
     selection.add_argument("--cases", nargs="+")
@@ -950,9 +965,10 @@ def main() -> None:
     parser.add_argument("--no-prefix-sharing", action="store_true", help="train one row at a time even when the group prompt could be shared")
     parser.add_argument("--verify-packing", action="store_true", help="also compute per-row log-probs on the first batch and log the gap")
     parser.add_argument("--seed", type=int, default=0)
-    parser.add_argument("--resume", action="store_true", help="continue from the latest checkpoint-* in --output, if any")
+    parser.add_argument("--resume", action="store_true", help="continue from the latest checkpoint-* in --weights-dir, if any")
     parser.add_argument("--allow-draft-policies", action="store_true")
     args = parser.parse_args()
+    weights = require_eos(args.weights_dir)
 
     dataset = DATASETS[DEFAULT_DATASET_VERSION]
     _, cases = load_dataset(dataset.path)
@@ -962,12 +978,14 @@ def main() -> None:
         ids = (dataset.path / "splits" / f"{args.split}_cases.txt").read_text().split()
         train_cases = [cases[case_id] for case_id in ids]
     Path(args.output).mkdir(parents=True, exist_ok=True)
+    weights.mkdir(parents=True, exist_ok=True)
     Path(args.output, "run_config.json").write_text(json.dumps(vars(args), indent=2))
     trainer, _ = build_trainer(
         model_key=args.model,
         cases=cases,
         train_cases=train_cases,
         output_dir=args.output,
+        weights_dir=str(weights),
         scorer=ClinicalPolicyReward(require_approved=not args.allow_draft_policies),
         max_steps=args.max_steps,
         num_generations=args.num_generations,
@@ -985,12 +1003,12 @@ def main() -> None:
     )
     resume = None
     if args.resume:
-        checkpoints = sorted(Path(args.output).glob("checkpoint-*"), key=lambda p: int(p.name.split("-")[1]))
+        checkpoints = sorted(weights.glob("checkpoint-*"), key=lambda p: int(p.name.split("-")[1]))
         resume = str(checkpoints[-1]) if checkpoints else None
         print(f"resuming from {resume}" if resume else "no checkpoint to resume from; starting fresh", flush=True)
     trainer.train(resume_from_checkpoint=resume)
-    trainer.save_model(args.output)
-    trainer.processing_class.save_pretrained(args.output)
+    trainer.save_model(str(weights))
+    trainer.processing_class.save_pretrained(str(weights))
     Path(args.output, "train_log.json").write_text(json.dumps(trainer.state.log_history, indent=2))
 
 

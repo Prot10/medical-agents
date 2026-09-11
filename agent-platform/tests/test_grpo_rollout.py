@@ -198,3 +198,14 @@ def test_archive_adapter_keeps_the_adapter_out_of_the_rotation(tmp_path):
     assert archived == tmp_path / "adapters" / "checkpoint-25"
     assert sorted(path.name for path in archived.iterdir()) == ["adapter_config.json", "adapter_model.safetensors"]
     assert (archived / "adapter_model.safetensors").read_bytes() == b"weights"
+
+
+def test_weights_are_refused_on_the_local_disk():
+    import pytest
+
+    from neuroagent.training.train_grpo import WEIGHTS_ROOT, require_eos
+
+    assert require_eos(f"{WEIGHTS_ROOT}/run/qwen3.5-9b") == Path(f"{WEIGHTS_ROOT}/run/qwen3.5-9b")
+    for local in ("outputs/grpo/run/train", "/home/user/weights", "/dev/shm/weights", "/eosx/run"):
+        with pytest.raises(ValueError, match="must be on EOS"):
+            require_eos(local)
