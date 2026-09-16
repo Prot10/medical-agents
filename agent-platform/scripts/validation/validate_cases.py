@@ -15,9 +15,12 @@ What "correct" means here:
   intent, not complete calls, so a missing `clinical_context` is fine; an unknown key is not.
 * Enum-typed parameters carry legal values; the two catchall tools carry closed-vocabulary
   values.
-* `optimal_actions`, `useless_tools` and `harmful_tools` never contradict each other. The
-  comparison is on `(tool_name, tool_parameters)`, not on the name: a case may legitimately
-  require `order_advanced_imaging{modality: FDG_PET}` and condemn `{modality: MR_spectroscopy}`.
+* `optimal_actions`, `useless_tools`, `harmful_tools` and `contraindicated_actions` never
+  contradict each other. The comparison is on `(tool_name, tool_parameters)`, not on the name: a
+  case may legitimately require `order_advanced_imaging{modality: FDG_PET}` and condemn
+  `{modality: MR_spectroscopy}`. `contraindicated_actions` is prose, so the study is read out of
+  the sentence, and only parameters the scorer discriminates on count — otherwise "do not give
+  alteplase" would read as a ban on the interaction check the same case requires.
 * A `required` action has a stored output, a `useless` tool has a fallback output, sequence
   constraints name real tools, red-herring paths resolve, differentials are sorted.
 
@@ -33,7 +36,9 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import ast
 import json
+import re
 import sys
 from collections import Counter
 from pathlib import Path
@@ -154,6 +159,45 @@ def _signature(tool_name: str | None, params: dict | None) -> tuple[str, str]:
     if not params:
         return (tool_name or "", "")
     return (tool_name or "", json.dumps(params, sort_keys=True, default=str))
+
+
+_CONTRA_TOOL_CALL = re.compile(
+    r"`?(?P<tool>[a-z_]+)`?\s+with\s+(?:parameters\s*)?(?P<args>\{[^}]*\}|[^:—\n]+)"
+)
+
+
+def _prohibited_studies(bullet: str, schemas: dict[str, Any]) -> list[tuple[str, dict]]:
+    """The `(tool, parameters)` pairs a free-text contraindication actually forbids.
+
+    `contraindicated_actions` is prose, so the study it names has to be read out of the
+    sentence. Two shapes are authored in the dataset and both spell the discriminating
+    parameters out, which is what makes this checkable at all:
+
+        Avoid order_ct_scan with contrast=True, angiography=True: ...
+        Do not call `order_specialized_test` with parameters {'test_type': 'tilt_table'} — ...
+
+    A bullet that names no parameters is not returned: it forbids a *topic*, not a study, and
+    reading it as a blanket ban on the tool would condemn every legitimate "do not order the
+    TEE variant of this" written against a case that requires the TTE.
+    """
+    out: list[tuple[str, dict]] = []
+    for match in _CONTRA_TOOL_CALL.finditer(bullet):
+        tool = match.group("tool")
+        if tool not in schemas:
+            continue
+        args = match.group("args").strip()
+        params: dict[str, Any] = {}
+        if args.startswith("{"):
+            try:
+                params = dict(ast.literal_eval(args))
+            except (ValueError, SyntaxError):
+                continue
+        else:
+            for key, raw in re.findall(r"(\w+)\s*=\s*([\w.\-]+)", args):
+                params[key] = {"true": True, "false": False}.get(raw.lower(), raw)
+        if params:
+            out.append((tool, params))
+    return out
 
 
 def _resolver(case: dict):
@@ -401,6 +445,70 @@ def validate_case(case: dict, schemas: dict[str, dict[str, Any]]) -> list[dict]:
             ),
             "fix_class": "judgment",
         })
+
+    # A contraindication that forbids the very study the pathway requires is unsatisfiable: the
+    # agent is scored down for obeying either half. The structured sections already guard this
+    # (`optimal_actions` vs `useless_tools`/`harmful_tools`, on the identity not the tool name),
+    # but `contraindicated_actions` is prose and was outside the contract — which is how six
+    # ischaemic-stroke cases came to mark the CTA REQUIRED, action text "do not wait for serum
+    # creatinine", while a bullet forbade `order_ct_scan{contrast, angiography}` for contrast
+    # nephropathy. The clinical reviewer found the first of them by reading; this finds the rest.
+    #
+    # The comparison is `_action_key`, the metric layer's own study identity, so the many sound
+    # bullets that condemn a *sibling* study survive it: the tilt table against the required
+    # exercise stress test, the TEE against the required TTE. Those are different studies to the
+    # scorer, and the bullet naming the parameter is what makes them different here too.
+    required_studies = {
+        _action_key(action["tool_name"], action.get("tool_parameters")): action
+        for action in gt.get("optimal_actions") or []
+        if action.get("tool_name") in schemas
+        and action.get("category") in ("required", "recommended")
+    }
+    for i, bullet in enumerate(gt.get("contraindicated_actions") or []):
+        if not isinstance(bullet, str):
+            continue
+        for tool, params in _prohibited_studies(bullet, schemas):
+            # A bullet that spells out a parameter the tool does not have is not describing a tool
+            # call at all — it is a clinical prohibition wearing a tool call's clothes, e.g.
+            # "Avoid check_drug_interactions with proposed=alteplase" for a case that means "do not
+            # give alteplase" (`proposed` is not a parameter; `drug` is). The phrasing reads to a
+            # reviewer as forbidding the interaction *check*, which is never contraindicated.
+            unknown = sorted(
+                k for k in params
+                if k not in schemas[tool].get("properties", {}) and k not in ANNOTATION_KEYS
+            )
+            if unknown:
+                issues.append({
+                    "code": "CONTRA_UNKNOWN_PARAM",
+                    "section": "contraindicated_actions", "index": i, "tool": tool,
+                    "detail": (
+                        f"names `{tool}` parameters that do not exist ({', '.join(unknown)}); state "
+                        f"the clinical prohibition in prose instead: {bullet[:80]}"
+                    ),
+                    "fix_class": "judgment",
+                })
+                continue
+
+            # Parameters the scorer does not discriminate on collapse to the bare tool key, and
+            # comparing those would condemn any case that both requires a tool and warns about one
+            # way of using it — `check_drug_interactions` has no discriminators at all, so every
+            # "do not give alteplase" bullet would read as "do not run the interaction check".
+            # A bullet only names a *study* when its parameters survive `_action_key`.
+            key = _action_key(tool, params)
+            if key == _action_key(tool, {}):
+                continue
+            action = required_studies.get(key)
+            if action is None:
+                continue
+            issues.append({
+                "code": "CONTRA_FORBIDS_REQUIRED_STUDY",
+                "section": "contraindicated_actions", "index": i, "tool": tool,
+                "detail": (
+                    f"forbids `{tool}{params}`, the same study step {action.get('step')} marks "
+                    f"{action.get('category')}: {bullet[:90]}"
+                ),
+                "fix_class": "judgment",
+            })
 
     for i, constraint in enumerate(gt.get("sequence_constraints") or []):
         for key in ("before", "after"):
