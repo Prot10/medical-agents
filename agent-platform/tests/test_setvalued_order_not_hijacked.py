@@ -60,22 +60,19 @@ def _row(test: str, value: str, unit: str) -> dict:
             "reference_range": "n/a", "is_abnormal": False}
 
 
-def _case_with(initial_labs: dict, followup_labs: dict, ordered: list[str]) -> NeuroBenchCase:
-    """A real case with its labs payloads and its labs order replaced.
+def _case_with(initial_labs: dict, followup_labs: dict) -> NeuroBenchCase:
+    """A real case with its laboratory payloads replaced.
 
     Built from a case file rather than hand-written so the fixture cannot pass a schema the real
-    dataset would fail — the patient profile, encounter type and ground-truth identifiers stay
-    exactly as authored.
+    dataset would fail — the patient profile, encounter type and policy stay exactly as authored.
     """
     raw = json.loads(SEED.read_text())
     raw["initial_tool_outputs"]["labs"] = initial_labs
-    raw["followup_outputs"] = [{"trigger_action": "request_aed_optimization",
-                                "tool_name": "interpret_labs", "output": followup_labs}]
-    raw["ground_truth"]["optimal_actions"] = [
-        {"action": "Laboratory panel", "tool_name": "interpret_labs",
-         "expected_finding": "as authored", "category": "required",
-         "tool_parameters": {"panels": ordered}, "step": 1}
-    ]
+    raw["followup_outputs"] = [{
+        "trigger_action": "request_aed_optimization",
+        "tool_name": "interpret_labs",
+        "output": followup_labs,
+    }]
     return NeuroBenchCase.model_validate(raw)
 
 
@@ -98,7 +95,7 @@ AFTER_ESCALATION = {
 @pytest.mark.skipif(not SEED.exists(), reason="cases not present")
 def test_a_narrow_reorder_still_reaches_its_followup() -> None:
     """The guard must not close the escalation path it exists to protect."""
-    case = _case_with(FIRST_LINE, AFTER_ESCALATION, ["AED_levels"])
+    case = _case_with(FIRST_LINE, AFTER_ESCALATION)
     served = MockServer(case).get_output("interpret_labs", {"panels": ["AED_levels"]})
     assert served.success
     assert "After Dose Escalation" in json.dumps(served.output), (
@@ -109,8 +106,7 @@ def test_a_narrow_reorder_still_reaches_its_followup() -> None:
 
 @pytest.mark.skipif(not SEED.exists(), reason="cases not present")
 def test_a_broad_order_keeps_the_payload_that_answers_more_of_it() -> None:
-    case = _case_with(FIRST_LINE, AFTER_ESCALATION,
-                      ["CBC", "BMP", "magnesium", "lactate", "AED_levels"])
+    case = _case_with(FIRST_LINE, AFTER_ESCALATION)
     served = MockServer(case).get_output(
         "interpret_labs", {"panels": ["CBC", "BMP", "magnesium", "lactate", "AED_levels"]})
     assert served.success
@@ -142,25 +138,33 @@ def test_no_set_valued_order_is_served_a_payload_another_one_beats() -> None:
         raw = json.loads(path.read_text())
         case = NeuroBenchCase.model_validate(raw)
         server = MockServer(case)
-        for action in case.ground_truth.optimal_actions:
-            key = SET_PARAM.get(action.tool_name or "")
-            if key is None:
-                continue
-            params = dict(action.tool_parameters or {})
-            wanted = params.get(key) or []
-            if isinstance(wanted, str):
-                wanted = [wanted]
-            if not wanted:
-                continue
-            result = server.get_output(action.tool_name, params)
-            if not result.success or result.output is None:
-                continue
-            served = MockServer._assays_named(result.output, wanted)
-            best = max((MockServer._assays_named(p, wanted) for _, p in
-                        _payloads_for(raw, action.tool_name)), default=served)
-            if best > served and (case.case_id, action.tool_name) not in known:
-                crossed.append(f"{case.case_id} {action.tool_name}: served {served}/{len(wanted)}, "
-                               f"another stored payload answers {best}")
+        for criterion in case.ground_truth.action_criteria:
+            for pattern in criterion.alternatives:
+                key = SET_PARAM.get(pattern.tool_name)
+                if key is None:
+                    continue
+                params = dict(pattern.required_arguments)
+                wanted = params.get(key) or []
+                if isinstance(wanted, str):
+                    wanted = [wanted]
+                if not wanted:
+                    continue
+                result = server.get_output(pattern.tool_name, params)
+                if not result.success or result.output is None:
+                    continue
+                served = MockServer._assays_named(result.output, wanted)
+                best = max(
+                    (
+                        MockServer._assays_named(payload, wanted)
+                        for _, payload in _payloads_for(raw, pattern.tool_name)
+                    ),
+                    default=served,
+                )
+                if best > served and (case.case_id, pattern.tool_name) not in known:
+                    crossed.append(
+                        f"{case.case_id} {pattern.tool_name}: served {served}/{len(wanted)}, "
+                        f"another stored payload answers {best}"
+                    )
     assert not crossed, "set-valued orders served a payload another one beats:\n" + "\n".join(crossed)
 
 
@@ -183,21 +187,28 @@ def test_no_required_order_receives_nothing_it_names() -> None:
     for path in sorted(CASES.glob("*.json")):
         case = NeuroBenchCase.model_validate(json.loads(path.read_text()))
         server = MockServer(case)
-        for action in case.ground_truth.optimal_actions:
-            key = SET_PARAM.get(action.tool_name or "")
-            if key is None or action.category.value != "required":
+        for criterion in case.ground_truth.action_criteria:
+            if criterion.importance.value != "required":
                 continue
-            params = dict(action.tool_parameters or {})
-            wanted = params.get(key) or []
-            if isinstance(wanted, str):
-                wanted = [wanted]
-            if not wanted:
-                continue
-            result = server.get_output(action.tool_name, params)
-            if not result.success or result.output is None:
-                continue
-            if MockServer._assays_named(result.output, wanted) == 0 and \
-                    (case.case_id, action.tool_name) not in known:
-                empty.append(f"{case.case_id} {action.tool_name}: ordered {list(wanted)}, "
-                             f"served a payload naming none of them")
+            for pattern in criterion.alternatives:
+                key = SET_PARAM.get(pattern.tool_name)
+                if key is None:
+                    continue
+                params = dict(pattern.required_arguments)
+                wanted = params.get(key) or []
+                if isinstance(wanted, str):
+                    wanted = [wanted]
+                if not wanted:
+                    continue
+                result = server.get_output(pattern.tool_name, params)
+                if not result.success or result.output is None:
+                    continue
+                if (
+                    MockServer._assays_named(result.output, wanted) == 0
+                    and (case.case_id, pattern.tool_name) not in known
+                ):
+                    empty.append(
+                        f"{case.case_id} {pattern.tool_name}: ordered {list(wanted)}, "
+                        "served a payload naming none of them"
+                    )
     assert not empty, "required orders answered by nothing they name:\n" + "\n".join(empty)

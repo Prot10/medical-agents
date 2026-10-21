@@ -10,7 +10,6 @@ from __future__ import annotations
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from neuroagent.datasets import normalize_dataset_version
 
 from ..config import AVAILABLE_DATASETS
 from ..dependencies import current_reviewer
@@ -53,7 +52,6 @@ def list_cases(
     _reviewer: ReviewerCode = Depends(current_reviewer),
 ) -> list[dict[str, Any]]:
     """Lightweight index of every case in the given dataset version."""
-    version = normalize_dataset_version(version)
     all_datasets = _datasets(request)
     if version not in all_datasets:
         raise HTTPException(
@@ -72,7 +70,6 @@ def get_case(
     _reviewer: ReviewerCode = Depends(current_reviewer),
 ) -> dict[str, Any]:
     """Return the full NeuroBenchCase for the given (version, case_id)."""
-    version = normalize_dataset_version(version)
     all_datasets = _datasets(request)
     if version not in all_datasets:
         raise HTTPException(

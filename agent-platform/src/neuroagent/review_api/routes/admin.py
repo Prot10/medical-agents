@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from neuroagent.datasets import normalize_dataset_version
 
 from ..dependencies import get_reviewer_registry, require_admin
 from ..schemas.reviewers import ReviewerCode
@@ -22,7 +21,6 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 
 
 def _require_dataset(request: Request, version: str) -> tuple[str, dict]:
-    version = normalize_dataset_version(version)
     all_datasets = request.app.state.all_datasets
     if version not in all_datasets:
         raise HTTPException(

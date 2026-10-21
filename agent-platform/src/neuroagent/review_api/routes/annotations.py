@@ -11,7 +11,6 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from neuroagent.datasets import normalize_dataset_version
 
 from ..dependencies import current_reviewer
 from ..schemas.annotations import (
@@ -46,7 +45,6 @@ def _store(request: Request) -> AnnotationStore:
 
 
 def _ensure_dataset(request: Request, version: str) -> str:
-    version = normalize_dataset_version(version)
     if version not in request.app.state.all_datasets:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -115,6 +113,25 @@ def set_status(
     store = _store(request)
     with store.lock_for(version, reviewer.code, case_id):
         review = store.load_or_init(version, reviewer.code, case_id)
+        if body.status in {"approved", "needs_changes"}:
+            if body.policy_verdict is None:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="A complete policy verdict is required for a terminal review.",
+                )
+            if body.status == "approved" and not body.policy_verdict.approves_all:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="Approved status requires approval of every policy dimension.",
+                )
+            if body.status == "approved" and review.unresolved_errors:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="Resolve all error annotations before approval.",
+                )
+            review.policy_verdict = body.policy_verdict
+        else:
+            review.policy_verdict = None
         review.status = body.status
         return store.save(review)
 

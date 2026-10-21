@@ -9,13 +9,10 @@ from neuroagent_schemas import (
     NeuroBenchCase, CTReport, EchoReport, CardiacMonitoringReport,
     AdvancedImagingReport, SpecializedTestReport,
 )
-from neuroagent.tools.base import ToolCall, ToolResult
+from neuroagent.tools.base import ToolResult
 from neuroagent.tools.mock_server import MockServer
 from neuroagent.tools.tool_registry import ToolRegistry
-from neuroagent.tools.cost_tracker import CostTracker
 from neuroagent.tools.vocabulary import by_type_values
-from neuroagent.agent.reasoning import AgentTrace
-from neuroagent.evaluation.metrics import MetricsCalculator, CaseMetrics, check_critical_action
 
 NEUROBENCH_CASES_DIR = Path(__file__).resolve().parents[2] / "data" / "neurobench" / "cases"
 
@@ -292,7 +289,7 @@ class TestDatasetIntegrity:
             data = json.loads(path.read_text())
             case = NeuroBenchCase(**data)
             assert case.case_id
-            assert case.ground_truth.primary_diagnosis
+            assert case.ground_truth.diagnosis.accepted
 
     def test_no_misrouted_echo(self):
         """No echocardiogram followups should still be routed to interpret_labs."""
@@ -338,52 +335,6 @@ class TestDatasetIntegrity:
 
 
 # ---------------------------------------------------------------------------
-# Metrics with new tools
-# ---------------------------------------------------------------------------
-
-
-class TestMetricsWithNewTools:
-    """Test that evaluation metrics work with the full tool set."""
-
-    def test_critical_action_matches_ct(self):
-        assert check_critical_action("Order CT scan to rule out hemorrhage", ["order_ct_scan"], "")
-        assert not check_critical_action("Order CT scan to rule out hemorrhage", ["analyze_brain_mri"], "")
-
-    def test_critical_action_matches_echo(self):
-        assert check_critical_action("Order transthoracic echocardiogram", ["order_echocardiogram"], "")
-        assert not check_critical_action("Order transthoracic echocardiogram", ["interpret_labs"], "")
-
-    def test_critical_action_matches_holter(self):
-        assert check_critical_action("Order Holter monitor for arrhythmia", ["order_cardiac_monitoring"], "")
-
-    def test_critical_action_matches_pet(self):
-        assert check_critical_action("Order amyloid PET for AD confirmation", ["order_advanced_imaging"], "")
-        assert check_critical_action("Order DaTscan for parkinsonian evaluation", ["order_advanced_imaging"], "")
-
-    def test_critical_action_matches_neuropsych(self):
-        assert check_critical_action("Perform neuropsychological testing", ["order_specialized_test"], "")
-
-    def test_critical_action_matches_emg(self):
-        assert check_critical_action("Order EMG/nerve conduction studies", ["order_specialized_test"], "")
-
-    def test_cost_metrics_populated(self):
-        """Verify cost fields are computed in CaseMetrics."""
-        trace = AgentTrace(case_id="test")
-        trace.tools_called = ["analyze_brain_mri", "interpret_labs"]
-        trace.total_tool_calls = 2
-        trace.total_cost_usd = 345.0  # MRI(320) + labs(25)
-        trace.final_response = "### Primary Diagnosis\nTest"
-
-        fixture_path = Path(__file__).parent / "fixtures" / "sample_case.json"
-        case = NeuroBenchCase(**json.loads(fixture_path.read_text()))
-
-        calc = MetricsCalculator()
-        metrics = calc.compute_all(trace, case.ground_truth)
-        assert metrics.total_cost_usd == 345.0
-        assert metrics.optimal_cost_usd > 0  # Should be computed from ground truth
-
-
-# ---------------------------------------------------------------------------
 # ToolResult cost field
 # ---------------------------------------------------------------------------
 
@@ -396,24 +347,3 @@ class TestToolResultCost:
     def test_cost_field_optional(self):
         tr = ToolResult(tool_name="analyze_ecg", success=True, output={})
         assert tr.cost_usd is None
-
-
-# ---------------------------------------------------------------------------
-# AgentTrace cost fields
-# ---------------------------------------------------------------------------
-
-
-class TestAgentTraceCost:
-    def test_trace_has_cost_fields(self):
-        trace = AgentTrace()
-        assert trace.total_cost_usd == 0.0
-        assert trace.cost_entries == []
-
-    def test_trace_cost_serialization(self):
-        trace = AgentTrace(
-            total_cost_usd=1315.0,
-            cost_entries=[{"tool_name": "analyze_ecg", "cost_usd": 20.0}],
-        )
-        d = trace.model_dump()
-        assert d["total_cost_usd"] == 1315.0
-        assert len(d["cost_entries"]) == 1

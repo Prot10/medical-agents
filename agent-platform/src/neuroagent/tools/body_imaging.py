@@ -18,13 +18,9 @@ else. Four of the reviewers' twelve requests were the same gap in different orga
 
 from __future__ import annotations
 
-import logging
-from typing import Any
 
 from .base import BaseTool
-from .vocabulary import body_imaging_studies, is_valid_body_imaging_study
-
-logger = logging.getLogger(__name__)
+from .vocabulary import body_imaging_studies
 
 
 class BodyImagingTool(BaseTool):
@@ -75,14 +71,3 @@ class BodyImagingTool(BaseTool):
         },
         "required": ["clinical_context", "study"],
     }
-
-    def _validate_parameters(self, parameters: dict[str, Any]) -> None:
-        """Warn (only) when `study` is outside the closed vocabulary."""
-        study = parameters.get("study")
-        if isinstance(study, str) and not is_valid_body_imaging_study(study):
-            logger.warning(
-                "order_body_imaging called with out-of-vocabulary study %r (known: %s). "
-                "Proceeding unchanged — fallback output/cost will apply.",
-                study,
-                ", ".join(body_imaging_studies()),
-            )

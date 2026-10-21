@@ -1,44 +1,41 @@
 import { useMemo, useState } from "react"
-import { Search, Brain, Heart, Zap, Activity, FlaskConical, Pill, AlertCircle, Microscope, Stethoscope, HeartPulse, Database } from "lucide-react"
+import { Search, Brain, Heart, Zap, Activity, FlaskConical, Pill, AlertCircle, Microscope, Stethoscope, HeartPulse, Gauge, Wind, Hand, Droplets } from "lucide-react"
 import { DifficultyStars } from "@/components/ui/DifficultyStars"
 import { QueryError } from "@/components/ui/QueryError"
-import { useCases, useDatasets, useActivateDataset } from "@/hooks/useCases"
+import { useCases } from "@/hooks/useCases"
 import { useAppStore } from "@/stores/appStore"
 import { useAgentStore } from "@/stores/agentStore"
 import { cn } from "@/lib/utils"
+import { conditionLabel } from "@/lib/conditions"
 import type { CaseIndexEntry } from "@/api/types"
 
-const CONDITION_LABELS: Record<string, string> = {
-  alzheimers_early: "Alzheimer's (Early)",
-  bacterial_meningitis: "Bacterial Meningitis",
-  focal_epilepsy_temporal: "Focal Epilepsy",
-  functional_neurological: "FND",
-  glioblastoma: "Glioblastoma",
-  ischemic_stroke: "Ischemic Stroke",
-  multiple_sclerosis_rr: "MS (Relapsing)",
-  nmdar_encephalitis: "NMDAR Encephalitis",
-  parkinsons: "Parkinson's",
-  cardiac_syncope: "Cardiac Syncope",
-}
 
 const CONDITION_ICONS: Record<string, React.ElementType> = {
+  als: Hand,
   alzheimers_early: Brain,
+  autoimmune_encephalitis_nmdar: FlaskConical,
   bacterial_meningitis: AlertCircle,
+  brain_tumor_glioma: Microscope,
   focal_epilepsy_temporal: Zap,
-  functional_neurological: Activity,
-  glioblastoma: Microscope,
+  ftd: Brain,
+  functional_neurological_disorder: Activity,
+  guillain_barre: Hand,
+  hepatic_encephalopathy: Droplets,
   ischemic_stroke: Heart,
-  multiple_sclerosis_rr: Stethoscope,
-  nmdar_encephalitis: FlaskConical,
+  migraine_with_aura: Zap,
+  multiple_sclerosis: Stethoscope,
+  myasthenia_gravis: Activity,
+  nph: Gauge,
   parkinsons: Pill,
-  cardiac_syncope: HeartPulse,
+  status_epilepticus: Zap,
+  subarachnoid_hemorrhage: AlertCircle,
+  syncope_cardiac: HeartPulse,
+  vascular_dementia: Wind,
 }
 
 
 export function CaseBrowser() {
   const { data: cases, isLoading, isError, error, refetch } = useCases()
-  const { data: datasets } = useDatasets()
-  const activateDataset = useActivateDataset()
   const { selectedCaseId, selectCase } = useAppStore()
   const resetAgent = useAgentStore((s) => s.reset)
   const [search, setSearch] = useState("")
@@ -81,34 +78,8 @@ export function CaseBrowser() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Dataset toggle + Search */}
+      {/* Search */}
       <div className="p-3 border-b border-sidebar-border">
-        {/* Dataset selector */}
-        {datasets && datasets.length > 1 && (
-          <div className="flex gap-1 mb-2">
-            {datasets.map((d) => (
-              <button
-                key={d.version}
-                onClick={() => {
-                  if (!d.active) {
-                    activateDataset.mutate(d.version)
-                    resetAgent()
-                  }
-                }}
-                disabled={activateDataset.isPending}
-                className={cn(
-                  "flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg border text-xs font-medium transition-all",
-                  d.active
-                    ? "border-primary/30 bg-primary/10 text-primary"
-                    : "border-sidebar-border hover:bg-sidebar-accent text-muted-foreground",
-                )}
-              >
-                <Database className="h-3 w-3" />
-                {d.name}
-              </button>
-            ))}
-          </div>
-        )}
 
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -151,7 +122,7 @@ export function CaseBrowser() {
             <div key={condition}>
               <div className="sticky top-0 flex items-center gap-2 px-3 py-1.5 text-sm font-semibold uppercase tracking-wider text-muted-foreground bg-sidebar/95 backdrop-blur-sm border-b border-sidebar-border">
                 <CondIcon className="h-3.5 w-3.5" />
-                {CONDITION_LABELS[condition] ?? condition}
+                {conditionLabel(condition)}
               </div>
               {condCases.map((c) => (
                 <button

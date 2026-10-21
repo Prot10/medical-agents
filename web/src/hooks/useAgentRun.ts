@@ -1,17 +1,14 @@
 import { useCallback } from "react"
-import { streamAgentRun } from "@/api/client"
+import { useQueryClient } from "@tanstack/react-query"
+import { streamRun } from "@/api/client"
 import { useAgentStore } from "@/stores/agentStore"
 
 export function useAgentRun() {
-  const { startRun, setAbortController, appendEvent, setError, status } = useAgentStore()
+  const { startRun, setAbortController, appendFrame, setError, status } = useAgentStore()
+  const queryClient = useQueryClient()
 
   const run = useCallback(
-    async (
-      caseId: string,
-      hospital: string,
-      model: string,
-      options?: { base_url?: string; api_key?: string },
-    ) => {
+    async (caseId: string, profileId: string) => {
       // Abort any previous in-flight run (its AbortError is swallowed below)
       useAgentStore.getState().abortController?.abort()
       const controller = new AbortController()
@@ -20,15 +17,12 @@ export function useAgentRun() {
       setAbortController(controller)
 
       try {
-        await streamAgentRun(
-          caseId,
-          hospital,
-          model,
-          appendEvent,
-          (err) => setError(err.message),
-          controller.signal,
-          options,
-        )
+        await streamRun(caseId, profileId, appendFrame, controller.signal)
+        // A stream that closes without a terminal frame was cut off mid-run
+        if (useAgentStore.getState().status === "running") {
+          setError("The run stream closed before the episode finished")
+        }
+        queryClient.invalidateQueries({ queryKey: ["episodes"] })
       } catch (err) {
         if ((err as Error).name !== "AbortError") {
           setError((err as Error).message)
@@ -40,11 +34,11 @@ export function useAgentRun() {
         }
       }
     },
-    [startRun, setAbortController, appendEvent, setError],
+    [startRun, setAbortController, appendFrame, setError, queryClient],
   )
 
   const stop = useCallback(() => {
-    // Aborts the in-flight stream and moves the run to a terminal "cancelled" state
+    // Aborting the request closes the stream; the server stops the run at its next event
     useAgentStore.getState().cancel()
   }, [])
 

@@ -14,7 +14,7 @@ router = APIRouter(tags=["reviewers"])
 @router.get("/reviewers/me", response_model=ReviewerProfile)
 def get_me(reviewer: ReviewerCode = Depends(current_reviewer)) -> ReviewerProfile:
     """Validate the X-Reviewer-Code header and return the caller's profile."""
-    return ReviewerProfile(code=reviewer.code, name=reviewer.name, role=reviewer.role)
+    return ReviewerProfile.model_validate(reviewer.model_dump())
 
 
 @router.get("/reviewers", response_model=list[ReviewerProfile])
@@ -24,6 +24,6 @@ def list_reviewers(
 ) -> list[ReviewerProfile]:
     """Admin-only: list every reviewer."""
     return [
-        ReviewerProfile(code=r.code, name=r.name, role=r.role)
+        ReviewerProfile.model_validate(r.model_dump())
         for r in registry.all()
     ]

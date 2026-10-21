@@ -8,8 +8,8 @@ ignored the trigger entirely — it returned the initial output on every call an
 when it did reach the follow-up tier, served the FIRST follow-up for the tool
 regardless of what the agent asked. That shadowed ~45% of authored follow-ups.
 
-This module implements the single matching rule shared by the eval MockServer and
-the gold-trajectory generator so both resolve follow-ups identically.
+This module implements the single matching rule used by the executable patient
+runtime so every policy profile resolves follow-ups identically.
 
 Matching, in words:
 

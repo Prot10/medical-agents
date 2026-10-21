@@ -62,15 +62,12 @@ class CaseDifficulty(str, Enum):
 
 
 class ActionCategory(str, Enum):
-    """Tier of a step in `optimal_actions`.
+    """Importance of an action criterion in the clinical policy.
 
-    - REQUIRED: must be performed; missing it incurs a recall penalty.
-    - RECOMMENDED: expected workup hygiene; helpful but not penalized if skipped.
-    - OPTIONAL: defensible if performed, not penalized in either direction.
-
-    Contraindicated / harmful tool calls do NOT live in optimal_actions. Use
-    `GroundTruth.harmful_tools` (structured) or `GroundTruth.contraindicated_actions`
-    (free-text) instead.
+    Required criteria define the minimum safe workup and feed the stop rule.
+    Recommended and optional criteria capture defensible additional work without
+    prescribing one golden trajectory. Unsafe or wasteful calls belong in
+    ``GroundTruth.avoided_actions``.
     """
 
     REQUIRED = "required"

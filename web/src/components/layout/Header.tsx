@@ -1,4 +1,4 @@
-import { Play, Square, Download, Scale } from "lucide-react"
+import { Play, Square, Download, Scale, DollarSign } from "lucide-react"
 import { useAppStore } from "@/stores/appStore"
 import { useAgentStore } from "@/stores/agentStore"
 import { useAgentRun } from "@/hooks/useAgentRun"
@@ -8,37 +8,37 @@ import { TokenCounter } from "@/components/agent/TokenCounter"
 const SECTION_LABELS: Record<string, string> = {
   cases: "Patient Cases",
   dataset: "Dataset Analytics",
-  traces: "Trace Replay",
+  episodes: "Episode Replay",
   rules: "Hospital Rules",
-  settings: "Settings",
+  architecture: "Architecture",
+  profiles: "Experiment Profiles",
 }
 
 export function Header() {
-  const { selectedCaseId, selectedHospital, selectedModel, selectedEvaluatorModel, activeSection, triggerOracle } = useAppStore()
+  const { selectedCaseId, selectedProfileId, activeSection, scoreOpen, setScoreOpen } = useAppStore()
   const status = useAgentStore((s) => s.status)
   const events = useAgentStore((s) => s.events)
+  const reward = useAgentStore((s) => s.reward)
+  const episodeId = useAgentStore((s) => s.episodeId)
   const totalTokens = useAgentStore((s) => s.totalTokens)
+  const totalCost = useAgentStore((s) => s.totalCost)
   const elapsedTime = useAgentStore((s) => s.elapsedTime)
   const startedAt = useAgentStore((s) => s.startedAt)
   const { run, stop } = useAgentRun()
 
-  const canEvaluate = status === "complete" && !!selectedCaseId && !!selectedEvaluatorModel
+  const finished = status === "complete" || status === "failed"
 
   const handleRun = () => {
     if (!selectedCaseId) return
-    run(selectedCaseId, selectedHospital, selectedModel)
-  }
-
-  const handleEvaluate = () => {
-    triggerOracle()
+    run(selectedCaseId, selectedProfileId)
   }
 
   const handleExport = () => {
-    const blob = new Blob([JSON.stringify(events, null, 2)], { type: "application/json" })
+    const blob = new Blob([JSON.stringify({ schema_version: "1.0", events }, null, 2)], { type: "application/json" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = `trace_${selectedCaseId}_${Date.now()}.json`
+    a.download = `${episodeId ?? `episode_${selectedCaseId}_${Date.now()}`}.json`
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -60,33 +60,41 @@ export function Header() {
 
       {/* Metrics */}
       {events.length > 0 && (
-        <TokenCounter tokens={totalTokens} time={elapsedTime} status={status} startedAt={startedAt} />
+        <>
+          {totalCost > 0 && (
+            <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-muted/50 text-sm font-mono text-muted-foreground" title="Simulated work-up cost">
+              <DollarSign className="h-3 w-3" />
+              {totalCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+            </div>
+          )}
+          <TokenCounter tokens={totalTokens} time={elapsedTime} status={status} startedAt={startedAt} />
+        </>
       )}
 
       {/* Export button */}
-      {status === "complete" && (
+      {finished && (
         <button
           onClick={handleExport}
           className="p-1.5 rounded-lg hover:bg-accent transition-colors text-muted-foreground hover:text-foreground"
-          title="Export trace JSON"
+          title="Export episode JSON"
         >
           <Download className="h-4 w-4" />
         </button>
       )}
 
-      {/* Evaluate button */}
+      {/* Reward panel toggle */}
       <button
-        onClick={handleEvaluate}
-        disabled={!canEvaluate}
+        onClick={() => setScoreOpen(!scoreOpen)}
+        disabled={!reward && !scoreOpen}
         className={cn(
           "flex items-center gap-2 px-4 py-1.5 text-base font-medium rounded-lg transition-all",
-          canEvaluate
+          reward
             ? "bg-amber-500 text-white hover:bg-amber-500/90 shadow-sm shadow-amber-500/20"
             : "bg-muted text-muted-foreground cursor-not-allowed opacity-50",
         )}
       >
         <Scale className="h-3.5 w-3.5" />
-        Evaluate
+        {reward ? `Reward ${reward.reward.scalar.toFixed(2)}` : "Reward"}
       </button>
 
       {/* Run controls */}

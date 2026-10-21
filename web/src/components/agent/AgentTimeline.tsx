@@ -1,12 +1,20 @@
 import { useEffect, useMemo, useRef } from "react"
-import { Zap, Loader2, GitFork } from "lucide-react"
+import { Zap, Loader2, AlertTriangle, RotateCcw, Play } from "lucide-react"
 import { useAgentStore } from "@/stores/agentStore"
 import { useAppStore } from "@/stores/appStore"
 import { ThinkingBlock } from "./ThinkingBlock"
 import { ToolCallCard } from "./ToolCallCard"
-import { ReflectionBlock } from "./ReflectionBlock"
 import { AssessmentPanel } from "./AssessmentPanel"
-import { StreamingContent } from "./StreamingContent"
+import type { EpisodeEvent, ObservationReceived, SubmitAssessment, ToolAction } from "@/api/types"
+
+const REACT_NAMESPACE = "react.rationale"
+
+const FAILURE_LABELS: Record<string, string> = {
+  invalid_action: "Invalid-action budget spent",
+  budget_exhausted: "Cost budget exhausted",
+  model_error: "Model error",
+  environment_error: "Environment error",
+}
 
 // ─── Centered connector between blocks ────────────────────────────────────────
 
@@ -18,50 +26,6 @@ function Connector() {
   )
 }
 
-// ─── Live streaming block ─────────────────────────────────────────────────────
-// Isolated so that per-token delta updates only re-render this component, not
-// the whole timeline.
-
-function LiveStreamingBlock({ scrollRef, showConnector }: {
-  scrollRef: React.RefObject<HTMLDivElement | null>
-  showConnector: boolean
-}) {
-  const streamingContent = useAgentStore((s) => s.streamingContent)
-  const streamingThinkContent = useAgentStore((s) => s.streamingThinkContent)
-  const streamingTurnNumber = useAgentStore((s) => s.streamingTurnNumber)
-
-  // Follow the stream: keep the container scrolled to the bottom per token
-  useEffect(() => {
-    if ((streamingContent || streamingThinkContent) && scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
-    }
-  }, [streamingContent, streamingThinkContent, scrollRef])
-
-  if (!streamingContent && !streamingThinkContent) return null
-
-  return (
-    <div>
-      {showConnector && <Connector />}
-      <div className="space-y-2 animate-fade-in">
-        {streamingContent && (
-          <StreamingContent
-            content={streamingContent}
-            turnNumber={streamingTurnNumber}
-            streaming
-          />
-        )}
-        {streamingThinkContent && (
-          <ThinkingBlock
-            content={streamingThinkContent}
-            turnNumber={streamingTurnNumber}
-            streaming
-          />
-        )}
-      </div>
-    </div>
-  )
-}
-
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export function AgentTimeline() {
@@ -69,9 +33,6 @@ export function AgentTimeline() {
   const events = useAgentStore((s) => s.events)
   const status = useAgentStore((s) => s.status)
   const errorMessage = useAgentStore((s) => s.errorMessage)
-  // Boolean selector: only re-renders the timeline on streaming start/stop,
-  // not on every delta (LiveStreamingBlock subscribes to the buffers itself).
-  const isStreaming = useAgentStore((s) => !!(s.streamingContent || s.streamingThinkContent))
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -80,8 +41,8 @@ export function AgentTimeline() {
     }
   }, [events.length, status])
 
-  const groupedItems = useMemo(() => groupItems(buildRenderItems(events)), [events])
-  const hasContent = groupedItems.length > 0 || isStreaming || status === "running"
+  const items = useMemo(() => buildRenderItems(events), [events])
+  const awaitingModel = status === "running" && !items.some((item) => item.type === "tool" && item.pending)
 
   return (
     <div className="flex flex-col h-full noise-bg relative bg-card">
@@ -90,18 +51,19 @@ export function AgentTimeline() {
         <div className="h-6 w-6 rounded-lg bg-primary/10 flex items-center justify-center">
           <Zap className="h-3.5 w-3.5 text-primary" />
         </div>
-        <span className="text-base font-semibold">Agent Timeline</span>
+        <span className="text-base font-semibold">Episode Timeline</span>
         {status === "running" && (
           <div className="flex items-center gap-1.5 ml-2">
             <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
             <span className="text-sm text-primary">Running...</span>
           </div>
         )}
+        {status === "cancelled" && <span className="text-sm text-muted-foreground ml-2">Stopped</span>}
       </div>
 
       {/* Timeline content */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto relative z-[1]">
-        {events.length === 0 && (status === "idle" || status === "cancelled") && !isStreaming && (
+        {events.length === 0 && status !== "running" && !errorMessage && (
           <div className="flex flex-col items-center justify-center h-full text-muted-foreground/30">
             <div className="h-16 w-16 rounded-2xl bg-primary/5 flex items-center justify-center mb-4">
               <Zap className="h-8 w-8 text-primary/20" />
@@ -115,120 +77,25 @@ export function AgentTimeline() {
           </div>
         )}
 
-        {hasContent && (
+        {(items.length > 0 || status === "running") && (
           <div className="p-4">
-            {groupedItems.map((item, i) => {
-              const showConnector = i > 0
+            {items.map((item, i) => (
+              <div key={item.key}>
+                {i > 0 && <Connector />}
+                <TimelineItem item={item} />
+              </div>
+            ))}
 
-              switch (item.type) {
-                case "thinking": {
-                  const shouldCollapse = i < groupedItems.length - 1 || status === "complete"
-                  return (
-                    <div key={i}>
-                      {showConnector && <Connector />}
-                      <div className="space-y-2 animate-fade-in">
-                        {item.content && (
-                          <StreamingContent
-                            content={item.content}
-                            turnNumber={item.turnNumber}
-                            collapsed={shouldCollapse}
-                          />
-                        )}
-                        {item.thinkContent && (
-                          <ThinkingBlock content={item.thinkContent} turnNumber={item.turnNumber} />
-                        )}
-                      </div>
-                    </div>
-                  )
-                }
-                case "tool_pair":
-                  return (
-                    <div key={i}>
-                      {showConnector && <Connector />}
-                      <div className="animate-slide-up">
-                        <ToolCallCard
-                          toolName={item.toolName}
-                          arguments={item.arguments}
-                          result={item.result}
-                          success={item.success}
-                          turnNumber={item.turnNumber}
-                        />
-                      </div>
-                    </div>
-                  )
-                case "tool_call_pending":
-                  return (
-                    <div key={i}>
-                      {showConnector && <Connector />}
-                      <ToolCallCard
-                        toolName={item.toolName}
-                        arguments={item.arguments}
-                        pending
-                        turnNumber={item.turnNumber}
-                      />
-                    </div>
-                  )
-                case "tool_group":
-                  return (
-                    <div key={i}>
-                      {showConnector && <Connector />}
-                      <div className="rounded-xl border border-tool-call/20 bg-tool-call/[0.03] p-3 space-y-2">
-                        <div className="flex items-center gap-1.5 text-xs text-tool-call/60 px-1">
-                          <GitFork className="h-3 w-3 rotate-180" />
-                          <span>{item.tools.length} tools called in parallel</span>
-                        </div>
-                        {item.tools.map((tool, j) => (
-                          <div key={j} className="animate-slide-up">
-                            <ToolCallCard
-                              toolName={tool.toolName}
-                              arguments={tool.arguments}
-                              result={"result" in tool ? tool.result : undefined}
-                              success={"success" in tool ? tool.success : undefined}
-                              pending={tool.type === "tool_call_pending"}
-                              turnNumber={tool.turnNumber}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )
-                case "reflection":
-                  return (
-                    <div key={i}>
-                      {showConnector && <Connector />}
-                      <ReflectionBlock />
-                      {/* No extra connector after — next item adds its own */}
-                    </div>
-                  )
-                case "assessment":
-                  return (
-                    <div key={i}>
-                      {showConnector && <Connector />}
-                      <div className="animate-slide-up">
-                        <AssessmentPanel content={item.content} />
-                      </div>
-                    </div>
-                  )
-                default:
-                  return null
-              }
-            })}
-
-            {/* Live streaming blocks (isolated per-token subscriber) */}
-            {isStreaming && (
-              <LiveStreamingBlock scrollRef={scrollRef} showConnector={groupedItems.length > 0} />
-            )}
-
-            {/* Thinking spinner */}
-            {status === "running" && !isStreaming && (
+            {/* Waiting for the model's next action */}
+            {awaitingModel && (
               <div>
-                {(groupedItems.length > 0 || isStreaming) && <Connector />}
+                {items.length > 0 && <Connector />}
                 <div className="flex items-center justify-center gap-2 py-3">
                   <div className="relative h-2.5 w-2.5">
                     <div className="absolute inset-0 rounded-full bg-primary animate-ping opacity-30" />
                     <div className="relative h-2.5 w-2.5 rounded-full bg-primary" />
                   </div>
-                  <span className="text-sm text-muted-foreground/60">Agent is thinking...</span>
+                  <span className="text-sm text-muted-foreground/60">Waiting for the next action...</span>
                 </div>
               </div>
             )}
@@ -245,87 +112,133 @@ export function AgentTimeline() {
   )
 }
 
+function TimelineItem({ item }: { item: RenderItem }) {
+  switch (item.type) {
+    case "started":
+      return (
+        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground animate-fade-in">
+          <Play className="h-3.5 w-3.5" />
+          <span className="font-mono">{item.profileId}</span>
+          <span className="text-muted-foreground/40">·</span>
+          <span className="font-mono truncate">{item.modelId}</span>
+        </div>
+      )
+    case "rationale":
+      return (
+        <div className="animate-fade-in">
+          <ThinkingBlock content={item.content} turnNumber={item.turn} label="Rationale" />
+        </div>
+      )
+    case "tool":
+      return (
+        <div className="animate-slide-up">
+          <ToolCallCard
+            toolName={item.action.tool_name}
+            arguments={item.action.arguments}
+            observation={item.observation}
+            pending={item.pending}
+            turnNumber={item.turn}
+          />
+        </div>
+      )
+    case "rejected":
+      return (
+        <div className="flex items-start gap-2 rounded-xl border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-sm animate-fade-in">
+          <RotateCcw className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
+          <div className="min-w-0">
+            <div className="font-medium text-amber-600 dark:text-amber-400">
+              Invalid output {item.retryAllowed ? "· retried with a correction" : "· no retries left"}
+            </div>
+            <div className="text-muted-foreground break-words font-mono text-xs mt-0.5">{item.reason}</div>
+          </div>
+          <span className="ml-auto text-xs text-muted-foreground/50 font-mono bg-muted/50 px-1.5 py-0.5 rounded shrink-0">t{item.turn}</span>
+        </div>
+      )
+    case "assessment":
+      return (
+        <div className="animate-slide-up">
+          <AssessmentPanel assessment={item.assessment} />
+        </div>
+      )
+    case "failed":
+      return (
+        <div className="flex items-start gap-2 rounded-xl border border-red-500/30 bg-red-500/5 px-4 py-3 animate-fade-in">
+          <AlertTriangle className="h-4.5 w-4.5 text-red-500 mt-0.5 shrink-0" />
+          <div className="min-w-0">
+            <div className="text-base font-semibold text-red-500">Run failed · {FAILURE_LABELS[item.reason] ?? item.reason}</div>
+            {item.message && <div className="text-sm text-muted-foreground break-words mt-0.5">{item.message}</div>}
+          </div>
+        </div>
+      )
+  }
+}
+
 // ─── Data processing ──────────────────────────────────────────────────────────
 
-type ToolPairItem = { type: "tool_pair"; toolName: string; arguments: Record<string, unknown>; result: Record<string, unknown>; success: boolean; turnNumber: number }
-type ToolPendingItem = { type: "tool_call_pending"; toolName: string; arguments: Record<string, unknown>; turnNumber: number }
-
 type RenderItem =
-  | { type: "thinking"; content: string; thinkContent: string; turnNumber: number }
-  | ToolPairItem
-  | ToolPendingItem
-  | { type: "tool_group"; tools: (ToolPairItem | ToolPendingItem)[]; turnNumber: number }
-  | { type: "reflection" }
-  | { type: "assessment"; content: string }
+  | { type: "started"; key: string; profileId: string; modelId: string }
+  | { type: "rationale"; key: string; content: string; turn: number }
+  | { type: "tool"; key: string; action: ToolAction; observation?: ObservationReceived; pending: boolean; turn: number }
+  | { type: "rejected"; key: string; reason: string; retryAllowed: boolean; turn: number }
+  | { type: "assessment"; key: string; assessment: SubmitAssessment }
+  | { type: "failed"; key: string; reason: string; message: string }
 
-function buildRenderItems(events: import("@/api/types").AgentEvent[]): RenderItem[] {
+/**
+ * One typed action per turn: a tool call is answered by the observation of the same turn;
+ * observations at turn 0 belong to the direct baseline, which hands every result over upfront.
+ */
+function buildRenderItems(events: EpisodeEvent[]): RenderItem[] {
   const items: RenderItem[] = []
+  const finished = events.some((e) => e.type === "run.completed" || e.type === "run.failed")
 
-  for (let i = 0; i < events.length; i++) {
-    const ev = events[i]
-
-    if (ev.type === "thinking") {
-      items.push({
-        type: "thinking",
-        content: ev.content ?? "",
-        thinkContent: ev.think_content ?? "",
-        turnNumber: ev.turn_number ?? 0,
-      })
-    } else if (ev.type === "tool_call") {
-      const resultEvent = events.slice(i + 1).find(
-        (e) => e.type === "tool_result" && e.tool_name === ev.tool_name
-      )
-      if (resultEvent) {
-        items.push({
-          type: "tool_pair",
-          toolName: ev.tool_name!,
-          arguments: ev.arguments ?? {},
-          result: resultEvent.output ?? {},
-          success: resultEvent.success ?? true,
-          turnNumber: ev.turn_number ?? 0,
-        })
-      } else {
-        items.push({
-          type: "tool_call_pending",
-          toolName: ev.tool_name!,
-          arguments: ev.arguments ?? {},
-          turnNumber: ev.turn_number ?? 0,
-        })
-      }
-    } else if (ev.type === "reflection") {
-      items.push({ type: "reflection" })
-    } else if (ev.type === "assessment") {
-      items.push({ type: "assessment", content: ev.content ?? "" })
+  for (const ev of events) {
+    switch (ev.type) {
+      case "run.started":
+        items.push({ type: "started", key: ev.event_id, profileId: ev.profile_id, modelId: ev.model_id })
+        break
+      case "plugin.event":
+        if (ev.namespace === REACT_NAMESPACE) {
+          items.push({ type: "rationale", key: ev.event_id, content: String(ev.payload.value ?? ""), turn: ev.turn })
+        }
+        break
+      case "action.proposed":
+        if (ev.action.type === "tool") {
+          const observation = events.find(
+            (o): o is ObservationReceived => o.type === "observation.received" && o.turn === ev.turn,
+          )
+          items.push({
+            type: "tool",
+            key: ev.event_id,
+            action: ev.action,
+            observation,
+            pending: !observation && !finished,
+            turn: ev.turn,
+          })
+        }
+        break
+      case "observation.received":
+        if (ev.turn === 0) {
+          items.push({
+            type: "tool",
+            key: ev.event_id,
+            action: { type: "tool", tool_name: ev.tool_name, arguments: {} },
+            observation: ev,
+            pending: false,
+            turn: 0,
+          })
+        }
+        break
+      case "action.rejected":
+        items.push({ type: "rejected", key: ev.event_id, reason: ev.reason, retryAllowed: ev.retry_allowed, turn: ev.turn })
+        break
+      case "assessment.submitted":
+        items.push({ type: "assessment", key: ev.event_id, assessment: ev.assessment })
+        break
+      case "run.failed":
+        items.push({ type: "failed", key: ev.event_id, reason: ev.reason, message: ev.message })
+        break
     }
   }
 
   return items
-}
-
-/** Group consecutive tool items into tool_group when there are 2+. */
-function groupItems(items: RenderItem[]): RenderItem[] {
-  const result: RenderItem[] = []
-  let toolBuffer: (ToolPairItem | ToolPendingItem)[] = []
-
-  function flushTools() {
-    if (toolBuffer.length === 0) return
-    if (toolBuffer.length === 1) {
-      result.push(toolBuffer[0])
-    } else {
-      result.push({ type: "tool_group", tools: [...toolBuffer], turnNumber: toolBuffer[0].turnNumber })
-    }
-    toolBuffer = []
-  }
-
-  for (const item of items) {
-    if (item.type === "tool_pair" || item.type === "tool_call_pending") {
-      toolBuffer.push(item)
-    } else {
-      flushTools()
-      result.push(item)
-    }
-  }
-  flushTools()
-
-  return result
 }

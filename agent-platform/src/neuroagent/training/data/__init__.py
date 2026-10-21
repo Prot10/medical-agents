@@ -1,3 +1,3 @@
-"""Data preparation for GRPO training."""
+"""Typed training data."""
 
-from __future__ import annotations
+from .episodes import *

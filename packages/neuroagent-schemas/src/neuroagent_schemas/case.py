@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, model_validator
 
@@ -120,6 +120,7 @@ class FollowUpToolOutput(BaseModel):
 
 
 class NeuroBenchCase(BaseModel):
+    schema_version: Literal["2.0"]
     case_id: str
     condition: NeurologicalCondition
     difficulty: CaseDifficulty

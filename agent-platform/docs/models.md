@@ -1,130 +1,33 @@
-# Models
+# Fixed model panel
 
-> The registry holds 10 models (`agent-platform/src/neuroagent/model_registry.py`):
-> three Qwen3.5 sizes, two MedGemma sizes, two Nemotron Nano variants and three Gemma-4
-> sizes. The table below mirrors the registry; `serve_model.sh` is the authoritative
-> launcher (per-model vLLM flags live there).
+The benchmark compares exactly three open models below 10B parameters, all with native tool calling:
 
-NeuroAgent uses [vLLM](https://docs.vllm.ai/) to serve LLMs locally via an OpenAI-compatible API, one model at a time on the A100-40GB.
+| Key | Hugging Face id | Notes |
+|---|---|---|
+| `qwen3.5-9b` | `Qwen/Qwen3.5-9B` | hybrid gated-delta-net/attention; thinking disabled per request; vLLM `qwen3_coder` parser |
+| `granite-4.1-8b` | `ibm-granite/granite-4.1-8b` | dense; Apache-2.0; no thinking switch; vLLM `granite4` parser |
+| `gemma-4-e4b` | `google/gemma-4-E4B-it` | gated on Hugging Face; thinking disabled per request; vLLM `gemma4` parser |
 
-## Supported models
+Every model runs the policy, direct and ReAct-prompt conditions (nine profiles). The registry in
+`model_registry.py` is the single source for ids, adapters aliases and per-request defaults;
+`serve_model.sh` and the API load only these keys.
 
-| Shortname | HuggingFace ID | Weights | Parsers (tool / reasoning) | Notes |
-|---|---|---|---|---|
-| `qwen3.5-4b` | `Qwen/Qwen3.5-4B` | ~9 GB | `qwen3_coder` / `qwen3` | Smallest Qwen3.5. Native tool calling, fast iteration. |
-| `qwen3.5-9b` | `Qwen/Qwen3.5-9B` | ~19 GB | `qwen3_coder` / `qwen3` | **Default.** Fast (~70 tok/s on A100), good tool calling. Best for development. |
-| `qwen3.5-27b-awq` | `QuantTrio/Qwen3.5-27B-AWQ` | ~21 GB | `qwen3_coder` / `qwen3` | AWQ 4-bit via Marlin kernels (~55 tok/s). Best Qwen quality. |
-| `medgemma-4b` | `google/medgemma-1.5-4b-it` | ~8 GB | `hermes` / — | Small medical model. No native tool calling. Gated access. |
-| `medgemma-27b` | `ig1/medgemma-27b-text-it-FP8-Dynamic` | ~30 GB | `hermes` / — | Medical specialist, FP8 quantized. Tight on A100-40GB (8K context limit). No native tool calling. |
-| `nemotron-nano-9b-v2` | `nvidia/NVIDIA-Nemotron-Nano-9B-v2` | ~17 GB | `nemotron_json` (vendored plugin) / — | Hybrid Mamba/Transformer. Tool calls in `<TOOLCALL>` JSON format. |
-| `nemotron-3-nano-4b` | `nvidia/NVIDIA-Nemotron-3-Nano-4B-BF16` | ~8 GB | `qwen3_coder` / `nano_v3` (vendored plugin) | Latest Nemotron gen, smallest variant. |
-| `gemma-4-e2b` | `google/gemma-4-E2B-it` | ~10 GB | `gemma4` / `gemma4` | 5B total / 2B effective via Per-Layer Embeddings (PLE). |
-| `gemma-4-e4b` | `google/gemma-4-E4B-it` | ~15 GB | `gemma4` / `gemma4` | 8B total / 4B effective (PLE). |
-| `gemma-4-12b` | `google/gemma-4-12B-it` | ~22 GB | `gemma4` / `gemma4` | Encoder-free dense multimodal 12B. |
+Serving on one A100-40GB (vLLM 0.23, bf16, 32k context, prefix caching; measured 2026-09-02 on the
+real prompt shape of ~8k input tokens, 128 output tokens):
 
-The two vendored parser plugins (`nemotron_toolcall_parser.py`, `nano_v3_reasoning_parser.py`) live next to `serve_model.sh` in `scripts/runtime/`.
+| Model | load (RAM-staged) | weights | KV cache | 1 stream | 8 concurrent | 16 concurrent |
+|---|---:|---:|---:|---:|---:|---:|
+| Qwen3.5-9B | 137 s | 16.8 GiB | 489k tokens | 60 tok/s, TPOT 14 ms | 365 tok/s | 448 tok/s |
+| Qwen3.5-9B + MTP spec. decoding (default) | 137 s | 17.3 GiB | 425k tokens | 80 tok/s, TPOT 8.5 ms | 417 tok/s | 502 tok/s |
+| Gemma 4 E4B | 3 s | 14.3 GiB | 854k tokens | 73 tok/s, TPOT 12 ms | 427 tok/s | 786 tok/s |
+| Granite 4.1 8B | 3 s | 15.7 GiB | 124k tokens | 56 tok/s, TPOT 16 ms | 317 tok/s | 574 tok/s |
 
-## Qwen3.5 architecture
-
-Qwen3.5 is a **hybrid architecture** — not a standard transformer. It uses Gated DeltaNet (linear attention) + Gated Attention + FFN in a repeating pattern. 75% of layers use linear attention (fast, constant-memory), 25% use full attention (precise retrieval). All models are natively multimodal but we use `--language-model-only` to save VRAM.
-
-## Serving a model
+SGLang 0.5.9 was measured on the same Qwen3.5-9B workload and was slower at every concurrency
+(44 vs 60 tok/s single-stream, 277 vs 448 tok/s at 16), so vLLM is the engine.
 
 ```bash
-# Default (Qwen3.5-9B)
-./scripts/runtime/serve_model.sh
-
-# Specific model
-./scripts/runtime/serve_model.sh qwen3.5-27b-awq
-
-# Custom port
-./scripts/runtime/serve_model.sh qwen3.5-9b 8001
+HF_HOME=/dev/shm/hf agent-platform/scripts/runtime/serve_model.sh qwen3.5-9b
 ```
 
-The server exposes an OpenAI-compatible API at `http://localhost:{port}/v1`.
-
-### Key vLLM flags used
-
-| Flag | Value | Why |
-|---|---|---|
-| `--reasoning-parser qwen3` | Separates `<think>` blocks into `reasoning_content` field | Required for Qwen3.5 thinking mode |
-| `--tool-call-parser qwen3_coder` | Parses Qwen3.5 tool call format | Required for tool calling |
-| `--language-model-only` | Disables vision encoder | Saves VRAM for text-only workloads |
-| `--quantization awq_marlin` | Uses Marlin mixed-precision CUDA kernels | **10x faster** than plain `awq` GEMM |
-| `--enable-prefix-caching` | Caches KV for repeated system prompts | Free speedup for agent loop |
-| `--gpu-memory-utilization 0.95` | Uses 95% of VRAM | More KV cache capacity |
-
-### Performance: awq vs awq_marlin
-
-The `--quantization` flag matters enormously for AWQ models:
-
-| Backend | Tok/s (A100-40GB, 27B) | Notes |
-|---|---|---|
-| `awq` | ~5 tok/s | Slow GEMM kernels. **Do not use.** |
-| `awq_marlin` | ~55 tok/s | Fast Marlin kernels. **Always use this.** |
-
-### Qwen3.5-27B-AWQ
-
-The 27B dense model quantized to AWQ 4-bit (~15GB). With `awq_marlin` kernels it achieves ~55 tok/s on A100-40GB, leaving ~16GB for KV cache.
-
-If you omit `--quantization` entirely, vLLM auto-detects and uses Marlin when compatible.
-
-## Sampling parameters
-
-Qwen3.5 with thinking mode has specific recommended sampling parameters:
-
-| Parameter | Value | Rationale |
-|---|---|---|
-| `temperature` | 1.0 | Qwen3.5 docs recommend this for reasoning tasks with thinking |
-| `top_p` | 0.95 | Nucleus sampling for diverse reasoning |
-| `presence_penalty` | 1.5 | Reduces repetition in long outputs |
-| `max_tokens` | 8192 | Sufficient for medical reasoning + structured assessment |
-
-These are configured through `AgentConfig` defaults and script/API runtime overrides.
-
-## Using a different model in scripts
-
-All CLI scripts accept `--model` and `--base-url` flags:
-
-```bash
-# Run with the default 9B model
-uv run python scripts/runtime/run_single_case.py tests/fixtures/sample_case.json
-
-# Run with the 27B AWQ model
-uv run python scripts/runtime/run_single_case.py tests/fixtures/sample_case.json \
-    --model QuantTrio/Qwen3.5-27B-AWQ
-
-# Run against a remote endpoint
-uv run python scripts/runtime/run_single_case.py tests/fixtures/sample_case.json \
-    --model gpt-4o \
-    --base-url https://api.openai.com/v1 \
-    --api-key sk-...
-```
-
-## Think tag handling
-
-Qwen3.5 models generate internal chain-of-thought in `<think>...</think>` tags (thinking mode). This is handled at two levels:
-
-1. **Server-side**: `--reasoning-parser qwen3` separates thinking content into the `reasoning_content` field of the API response
-2. **Client-side**: `strip_think_tags()` in `LLMClient._parse_response()` strips any residual tags from the content field
-
-Important: Qwen3.5 does **NOT** support `/think` or `/nothink` commands in messages (that was Qwen3 only). To disable thinking mode, use the per-request API parameter:
-
-```python
-extra_body={"chat_template_kwargs": {"enable_thinking": False}}
-```
-
-For multi-turn conversations, the chat template automatically strips thinking blocks from history. If building messages manually, strip `<think>...</think>` from assistant messages before passing them back.
-
-## Downloading models
-
-```bash
-export HF_HOME=~/.cache/huggingface
-
-.venv-vllm/bin/huggingface-cli download Qwen/Qwen3.5-9B
-.venv-vllm/bin/huggingface-cli download QuantTrio/Qwen3.5-27B-AWQ
-
-# For gated models (MedGemma), login first:
-.venv-vllm/bin/huggingface-cli login
-.venv-vllm/bin/huggingface-cli download google/medgemma-1.5-4b-it
-```
+Model weights live on EOS (`/eos/project-d/diagbox/dvc/NeuroAgent/models/base/huggingface`); stage a
+copy in `/dev/shm/hf` before serving or training.

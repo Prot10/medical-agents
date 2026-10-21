@@ -1,6 +1,6 @@
 import { create } from "zustand"
 
-export type ActiveSection = "cases" | "dataset" | "traces" | "rules" | "architecture" | "settings"
+export type ActiveSection = "cases" | "dataset" | "episodes" | "rules" | "architecture" | "profiles"
 
 interface DatasetFilters {
   conditions: string[]
@@ -10,9 +10,7 @@ interface DatasetFilters {
 
 interface AppState {
   selectedCaseId: string | null
-  selectedHospital: string
-  selectedModel: string
-  selectedEvaluatorModel: string
+  selectedProfileId: string
   darkMode: boolean
   showGroundTruth: boolean
 
@@ -27,19 +25,15 @@ interface AppState {
   selectedPathwayIndex: number | null
   isCreatingPathway: boolean
 
-  // Oracle
-  oracleOpen: boolean
-  oracleTrigger: number  // increment to trigger evaluation
+  // Reward panel under the timeline
+  scoreOpen: boolean
 
   // Actions
   selectCase: (id: string) => void
-  setHospital: (id: string) => void
-  setModel: (key: string) => void
-  setEvaluatorModel: (key: string) => void
+  setProfile: (id: string) => void
   toggleDarkMode: () => void
   toggleGroundTruth: () => void
-  setOracleOpen: (open: boolean) => void
-  triggerOracle: () => void
+  setScoreOpen: (open: boolean) => void
   toggleSidebar: () => void
   setSidebarWidth: (width: number) => void
   setActiveSection: (section: ActiveSection) => void
@@ -51,25 +45,20 @@ interface AppState {
 
 export const useAppStore = create<AppState>((set) => ({
   selectedCaseId: null,
-  selectedHospital: "us_mayo",
-  selectedModel: "qwen3.5-9b",
-  selectedEvaluatorModel: "",
+  selectedProfileId: "policy-qwen3.5-9b",
   darkMode: false,
   showGroundTruth: false,
   rulesHospitalId: "us_mayo",
   selectedPathwayIndex: null,
   isCreatingPathway: false,
-  oracleOpen: false,
-  oracleTrigger: 0,
+  scoreOpen: false,
   sidebarCollapsed: false,
   sidebarWidth: 272,
   activeSection: "cases",
   datasetFilters: { conditions: [], difficulties: [], sex: null },
 
   selectCase: (id) => set({ selectedCaseId: id }),
-  setHospital: (id) => set({ selectedHospital: id }),
-  setModel: (key) => set({ selectedModel: key }),
-  setEvaluatorModel: (key) => set({ selectedEvaluatorModel: key }),
+  setProfile: (id) => set({ selectedProfileId: id }),
   toggleDarkMode: () =>
     set((s) => {
       const next = !s.darkMode
@@ -77,8 +66,7 @@ export const useAppStore = create<AppState>((set) => ({
       return { darkMode: next }
     }),
   toggleGroundTruth: () => set((s) => ({ showGroundTruth: !s.showGroundTruth })),
-  setOracleOpen: (open) => set({ oracleOpen: open }),
-  triggerOracle: () => set((s) => ({ oracleOpen: true, oracleTrigger: s.oracleTrigger + 1 })),
+  setScoreOpen: (open) => set({ scoreOpen: open }),
   toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
   setSidebarWidth: (width) => set({ sidebarWidth: width }),
   setActiveSection: (section) => set({ activeSection: section }),

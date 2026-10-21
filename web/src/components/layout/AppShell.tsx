@@ -4,7 +4,7 @@ import { Sidebar } from "./Sidebar"
 import { SidebarResizeHandle } from "./SidebarResizeHandle"
 import { PatientViewer } from "@/components/patient/PatientViewer"
 import { AgentTimeline } from "@/components/agent/AgentTimeline"
-import { OraclePanel } from "@/components/agent/OraclePanel"
+import { ScorePanel } from "@/components/agent/ScorePanel"
 import { DatasetDashboard } from "@/components/dataset/DatasetDashboard"
 import { PathwayEditorPanel } from "@/components/hospital/PathwayEditorPanel"
 import { ArchitectureExplorer } from "@/components/architecture/ArchitectureExplorer"
@@ -37,7 +37,7 @@ export function AppShell() {
   const activeSection = useAppStore((s) => s.activeSection)
   const sidebarCollapsed = useAppStore((s) => s.sidebarCollapsed)
   const sidebarWidth = useAppStore((s) => s.sidebarWidth)
-  const oracleOpen = useAppStore((s) => s.oracleOpen)
+  const scoreOpen = useAppStore((s) => s.scoreOpen)
 
   return (
     <div className="flex h-screen">
@@ -70,9 +70,9 @@ export function AppShell() {
               </div>
             </Panel>
             <HorizontalResizeHandle />
-            {/* Agent panel — optionally split with oracle */}
+            {/* Agent panel — optionally split with the reward panel */}
             <Panel defaultSize={45} minSize={25}>
-              {oracleOpen ? (
+              {scoreOpen ? (
                 <Group orientation="vertical" className="h-full">
                   <Panel defaultSize={50} minSize={20}>
                     <div className="h-full overflow-hidden">
@@ -82,7 +82,7 @@ export function AppShell() {
                   <VerticalResizeHandle />
                   <Panel defaultSize={50} minSize={20}>
                     <div className="h-full overflow-hidden">
-                      <OraclePanel />
+                      <ScorePanel />
                     </div>
                   </Panel>
                 </Group>

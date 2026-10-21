@@ -1,12 +1,8 @@
 from __future__ import annotations
 
-import logging
-from typing import Any
 
 from .base import BaseTool
-from .vocabulary import lab_panels, normalize_analyte
-
-logger = logging.getLogger(__name__)
+from .vocabulary import lab_panels
 
 
 class LabInterpreterTool(BaseTool):
@@ -50,25 +46,3 @@ class LabInterpreterTool(BaseTool):
         },
         "required": ["clinical_context"],
     }
-
-    def _validate_parameters(self, parameters: dict[str, Any]) -> None:
-        """Warn (only) when an assay is outside the priced vocabulary.
-
-        Out-of-vocabulary analytes are charged `default_panel` and cannot match a
-        ground-truth action, which is a silent scoring loss — so it must be visible in the
-        logs. Behaviour is deliberately unchanged: rejecting the call would change agent
-        behaviour mid-benchmark.
-        """
-        panels = parameters.get("panels")
-        if not isinstance(panels, (list, tuple)):
-            return
-        known = {normalize_analyte(p) for p in lab_panels()}
-        unknown = [p for p in panels if normalize_analyte(str(p)) not in known]
-        if unknown:
-            logger.warning(
-                "interpret_labs called with %d out-of-vocabulary panel(s): %s. "
-                "Proceeding unchanged — default_panel rate applies and no optimal action "
-                "can match them.",
-                len(unknown),
-                ", ".join(repr(u) for u in unknown),
-            )

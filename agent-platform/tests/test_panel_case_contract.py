@@ -2,14 +2,13 @@
 
 `dataset-generation/config/conditions.yaml` is the generation input and it feeds the tool catalog
 the clinical reviewers read. The tier the benchmark actually *measures* is
-`ground_truth.optimal_actions[].category` inside each case. For a month those two disagreed for
+`ground_truth.action_criteria[].importance` inside each case. For a month those two disagreed for
 thirteen of the reviewers' eighteen tier changes: the change had been made in the file that is read
 and not in the one that is scored, which is the same class of error as the stale review catalog.
 
-Nothing in the suite could see it. `validate_cases.py` and `check_perfect_agent.py` both check each
-case *against itself* — that its actions are answerable, that a perfect agent reaches 1.0 — and
-never against its condition's panel. The only tool that compared them was a report, and a report is
-read when someone remembers to run it.
+A policy can remain internally valid while disagreeing with the panel that authored the clinical
+requirements. These contract tests therefore compare the policy against the generation panel,
+rather than relying only on per-case schema and replay validation.
 
 Two tests, for the two failure modes actually observed:
 
@@ -73,16 +72,31 @@ def test_no_case_has_a_free_required_set(cases: list[NeuroBenchCase]) -> None:
     tracker = CostTracker()
     free: list[tuple[str, list[str]]] = []
     for case in cases:
-        required = [a for a in case.ground_truth.optimal_actions
-                    if a.category.value == "required" and a.tool_name]
+        required = [
+            criterion
+            for criterion in case.ground_truth.action_criteria
+            if criterion.importance.value == "required"
+        ]
         if not required:
             continue
         total = sum(
-            tracker.compute_cost(a.tool_name, dict(a.tool_parameters or {})).cost_usd
-            for a in required
+            min(
+                tracker.compute_cost(
+                    pattern.tool_name, dict(pattern.required_arguments)
+                ).cost_usd
+                for pattern in criterion.alternatives
+            )
+            for criterion in required
         )
         if total == 0:
-            free.append((case.case_id, sorted({a.tool_name for a in required})))
+            tools = sorted(
+                {
+                    pattern.tool_name
+                    for criterion in required
+                    for pattern in criterion.alternatives
+                }
+            )
+            free.append((case.case_id, tools))
     assert not free, (
         "cases whose required set is entirely zero-cost — an agent scores 1.0 required coverage "
         f"without a diagnostic act: {free[:10]}"
@@ -104,7 +118,11 @@ def test_panel_required_tools_are_present_or_exempted(
             for token in panel.get("required_modalities") or []
             if token in _MODALITY_TO_TOOL
         }
-        present = {a["tool_name"] for a in raw["ground_truth"]["optimal_actions"] if a["tool_name"]}
+        present = {
+            pattern["tool_name"]
+            for criterion in raw["ground_truth"]["action_criteria"]
+            for pattern in criterion["alternatives"]
+        }
         exempt = (raw.get("metadata") or {}).get("panel_required_exemptions") or {}
         for tool in sorted(required - present):
             if not str(exempt.get(tool, "")).strip():
@@ -120,7 +138,11 @@ def test_exemptions_are_not_used_for_tools_the_case_does_contain(raw_cases: list
     stale: list[tuple[str, str]] = []
     for raw in raw_cases:
         exempt = (raw.get("metadata") or {}).get("panel_required_exemptions") or {}
-        present = {a["tool_name"] for a in raw["ground_truth"]["optimal_actions"] if a["tool_name"]}
+        present = {
+            pattern["tool_name"]
+            for criterion in raw["ground_truth"]["action_criteria"]
+            for pattern in criterion["alternatives"]
+        }
         for tool in exempt:
             if tool in present:
                 stale.append((raw["case_id"], tool))

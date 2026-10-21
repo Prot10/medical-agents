@@ -1,51 +1,43 @@
 # NeuroAgent Web Dashboard
 
-Interactive web interface for visualizing the NeuroAgent clinical reasoning process. Select a patient case, choose a hospital protocol, and watch the agent reason through the diagnosis step by step.
+Dashboard for the clinical-policy harness. Pick a case and a checked experiment profile, watch the episode stream in live, replay saved episodes, and compare them with the case policy and the policy reward.
 
 ## Features
 
-- **Case Browser** — Browse NeuroBench cases across 20 neurological conditions, filter by difficulty
-- **Patient Viewer** — Full clinical data display: demographics, vitals (abnormal highlighting), HPI, medications, neurological exam
-- **Agent Execution Timeline** — Real-time visualization of the ReAct loop:
-  - Thinking/reasoning blocks with markdown rendering
-  - Collapsible tool call cards (MRI, EEG, ECG, labs, CSF, literature, drug interactions)
-  - Specialized result renderers with a generic fallback
-  - Reflection steps and final structured assessment
-- **Hospital Rules** — Select from 5 hospital protocol sets (Mayo/AAN, NHS/NICE, Charité/DGN, Todai/JSN, HC-FMUSP/ABN)
-- **Model Selection** — Switch between registered LLM backends with live status indicator
-- **Ground Truth** — Compare agent output against gold-standard diagnosis and action compliance
-- **Trace Replay** — Save and replay past agent runs without a GPU
-- **Export** — Download agent traces as JSON
+- **Case Browser**: the 600 NeuroBench cases across 20 conditions, with search and a difficulty filter.
+- **Patient Viewer**: demographics, vitals with abnormal values highlighted, history, neurological exam, the stored diagnostic outputs and the case policy.
+- **Live episode timeline**: every event of `POST /api/v1/runs/stream` as it happens: tool calls with their results and costs, rejected actions, ReAct rationales and the structured final assessment.
+- **Profiles**: the nine checked profiles (3 models × policy / direct / ReAct loops), with the model's serving state and Load / Stop controls.
+- **Case policy**: accepted diagnoses, action criteria, avoided actions, sequence, stop rule and assessment requirements, each criterion checked against the episode on screen.
+- **Policy reward**: the reward components and any safety caps applied. On a draft policy it is shown as an engineering score that is not reportable.
+- **Episode replay**: saved episodes from `data/episodes/`, replayed step by step or at once, with no GPU needed.
+- **Hospital Rules**: browse and edit the hospital pathways. Harness runs do not read them.
+- **Architecture**: an interactive map of the repository.
+- **Export**: download the episode on screen as JSON.
 
 ## Quick Start
 
 ### Prerequisites
 
-- Python 3.11+ with the `neuroagent` package installed (`uv sync --all-packages` from repo root)
-- Node.js 20+ (for frontend development)
+- Python 3.11+ with the workspace installed (`uv sync --all-packages` from the repo root)
+- Node.js 20+
 
-### 1. Start the API server
-
-```bash
-cd agent-platform
-uvicorn neuroagent.api.app:app --host 0.0.0.0 --port 8888
-```
-
-The server loads all 600 cases into memory on startup and serves both the API and the frontend.
-
-### 2. Open the dashboard
-
-Navigate to `http://localhost:8888` in your browser. The production frontend is served as static files from `web/dist/`.
-
-### 3. (Optional) Run a live agent
-
-Start a vLLM inference server first:
+### 1. Build the frontend and start the API
 
 ```bash
-./scripts/runtime/serve_model.sh qwen3.5-9b    # or qwen3.5-27b-awq, medgemma-4b, medgemma-27b
+cd web && npm ci && npm run build && cd ..
+uv run uvicorn neuroagent.api.app:app --host 127.0.0.1 --port 8888
 ```
 
-Then select a case, choose your hospital and model, and click **Run Agent**.
+When `web/dist/` exists, the API serves the dashboard at `http://localhost:8888`.
+
+### 2. (Optional) Serve a model and run a live episode
+
+```bash
+HF_HOME=/dev/shm/hf agent-platform/scripts/runtime/serve_model.sh qwen3.5-9b
+```
+
+Choose a profile whose model is ready, select a case and click **Run Agent**. You can also start the profile's model from the sidebar, which uses `POST /models/{key}/load`.
 
 ## Remote Access (CERN VM)
 
@@ -132,45 +124,34 @@ The FastAPI app automatically serves `web/dist/` as static files when the direct
 | Layer | Technology |
 |-------|-----------|
 | Frontend | Vite + React 19 + TypeScript |
-| Styling | Tailwind CSS v4 + shadcn/ui primitives |
-| State | Zustand (streaming) + TanStack Query (data fetching) |
-| Markdown | react-markdown + remark-gfm |
+| Styling | Tailwind CSS v4 |
+| State | Zustand (UI and episode state) + TanStack Query (server data) |
+| Charts | Recharts |
 | Backend | FastAPI + uvicorn |
-| Streaming | Server-Sent Events (SSE) via async queue |
-| Fonts | DM Sans + JetBrains Mono |
+| Streaming | Server-Sent Events from a worker thread through an asyncio queue |
 
 ## Project Structure
 
 ```
-web/
-├── index.html                      # Entry point (loads DM Sans + JetBrains Mono)
-├── vite.config.ts                  # Vite config with Tailwind plugin + API proxy
-├── src/
-│   ├── main.tsx                    # React root
-│   ├── App.tsx                     # QueryClientProvider + dark mode sync
-│   ├── index.css                   # Tailwind imports + theme variables + prose styles
-│   ├── api/
-│   │   ├── types.ts                # TypeScript interfaces (mirrors Pydantic models)
-│   │   └── client.ts              # fetch wrappers + SSE stream consumer
-│   ├── stores/
-│   │   ├── appStore.ts             # UI state: selected case/hospital/model, dark mode
-│   │   └── agentStore.ts           # Agent run state: events[], status, metrics
-│   ├── hooks/
-│   │   ├── useCases.ts             # TanStack Query hooks for cases, hospitals, models
-│   │   ├── useAgentRun.ts          # SSE streaming hook with abort support
-│   │   └── useReplay.ts            # Trace replay hook
-│   ├── components/
-│   │   ├── layout/                 # AppShell (3-panel), Header
-│   │   ├── cases/                  # CaseBrowser (grouped list, search, filters)
-│   │   ├── patient/                # PatientViewer (demographics, vitals, history, neuro exam)
-│   │   ├── hospital/               # HospitalPicker (select dropdown)
-│   │   ├── model/                  # ModelPicker (select + status dot)
-│   │   ├── agent/                  # AgentTimeline, ThinkingBlock, ToolCallCard,
-│   │   │                           # ReflectionBlock, AssessmentPanel, TokenCounter
-│   │   ├── results/                # Specialized renderers + GenericResult fallback
-│   │   └── ground-truth/           # GroundTruthPanel (action compliance checklist)
-│   └── lib/
-│       └── utils.ts                # cn() helper (clsx + tailwind-merge)
+web/src/
+├── api/            # types.ts (mirrors the Pydantic episode/case models), client.ts (fetch + SSE)
+├── stores/         # appStore (selection, sections, panels), agentStore (episode events, reward), modelLoadingStore
+├── hooks/          # useCases (cases, profiles, models, rules), useAgentRun (live run), useReplay (episodes)
+├── lib/            # conditions (labels, colours), policy (criterion matching, profile helpers), utils
+└── components/
+    ├── layout/       # AppShell, Sidebar (profile picker), Header (run, reward, export)
+    ├── cases/        # CaseBrowser
+    ├── patient/      # PatientViewer
+    ├── ground-truth/ # GroundTruthPanel (case policy, checked against the episode)
+    ├── agent/        # AgentTimeline, ToolCallCard, ThinkingBlock, AssessmentPanel, ScorePanel, TokenCounter
+    ├── episodes/     # EpisodeBrowser
+    ├── profiles/     # ProfilesPanel
+    ├── results/      # per-tool result renderers + GenericResult
+    ├── dataset/      # DatasetOverview, DatasetDashboard, charts
+    ├── hospital/     # HospitalRulesBrowser, PathwayEditorPanel
+    ├── architecture/ # ArchitectureExplorer
+    ├── model/        # ModelLoadingToast
+    └── ui/           # Badge, Card, DifficultyStars, SectionLabel, QueryError
 ```
 
-See [docs/api.md](docs/api.md) for the full API reference and [docs/components.md](docs/components.md) for the component architecture.
+See [docs/api.md](docs/api.md) for the endpoints the dashboard uses and [docs/components.md](docs/components.md) for the component architecture.

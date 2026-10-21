@@ -76,8 +76,11 @@ d = p.get('demographics', {})
 print(f'Patient:    {d.get(\"age\", \"?\")}yo {d.get(\"sex\", \"?\")}')
 print(f'Complaint:  {p.get(\"chief_complaint\", \"N/A\")}')
 gt = data.get('ground_truth', {})
-print(f'Diagnosis:  {gt.get(\"primary_diagnosis\", \"N/A\")}')
-print(f'ICD Code:   {gt.get(\"icd_code\", \"N/A\")}')
+diagnosis = gt.get('diagnosis', {})
+accepted = diagnosis.get('accepted') or []
+codes = diagnosis.get('icd_codes') or []
+print(f'Diagnosis:  {accepted[0] if accepted else \"N/A\"}')
+print(f'ICD Code:   {codes[0] if codes else \"N/A\"}')
 to = data.get('initial_tool_outputs', {})
 tools = [k for k, v in to.items() if v is not None]
 print(f'Tools:      {', '.join(tools) if tools else \"none\"}')

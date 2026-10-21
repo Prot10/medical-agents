@@ -6,7 +6,6 @@ from collections import Counter
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from neuroagent.datasets import normalize_dataset_version
 
 from ..dependencies import current_reviewer
 from ..schemas.reviewers import ReviewerCode
@@ -100,7 +99,6 @@ def get_methodology(
     request: Request,
     _reviewer: ReviewerCode = Depends(current_reviewer),
 ) -> dict[str, Any]:
-    version = normalize_dataset_version(version)
     all_datasets = request.app.state.all_datasets
     if version not in all_datasets:
         raise HTTPException(

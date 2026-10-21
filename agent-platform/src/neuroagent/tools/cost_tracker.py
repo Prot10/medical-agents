@@ -2,15 +2,11 @@
 
 Costs feed a reported metric (cost-efficiency in the paper), so a term missing
 from ``config/tools/costs.yaml`` fails loudly (:class:`CostConfigError`) rather
-than silently substituting a hardcoded literal.  Two kinds of lookup miss are
-deliberately NOT errors, because they depend on model behavior at run time and
-must not crash or alter an evaluation run:
-
-* an *out-of-vocabulary parameter value* (unknown panel / modality / test type)
-  falls back to the tool's **configured** default rate, exactly as before — the
-  catchall tools log a warning at execute time (see tools/vocabulary.py);
-* an *unknown tool name* costs 0 with a warning (training rewards replay raw
-  rollouts that may contain hallucinated tool names).
+than silently substituting a rate. Only executed calls are priced: the tool
+schemas are derived from this registry and `BaseTool.execute` rejects any
+argument outside them before pricing, so an unpriced value here is a
+configuration error. An *unknown tool name* costs 0 with a warning, because
+training rewards replay raw rollouts that may contain hallucinated tool names.
 """
 
 from __future__ import annotations
@@ -169,7 +165,7 @@ class CostTracker:
         return sum(e.cost_usd for e in self.entries)
 
     def get_summary(self) -> dict[str, Any]:
-        """Return cost summary for inclusion in agent trace."""
+        """Return a cost summary for the typed clinical episode."""
         by_tool: dict[str, float] = {}
         for e in self.entries:
             by_tool[e.tool_name] = by_tool.get(e.tool_name, 0) + e.cost_usd
@@ -207,15 +203,7 @@ class CostTracker:
         # The default type must always be priced — its absence is a config error.
         default_cost = float(self._require(by_type, default, tool_name))
         selected = params.get(type_key, default)
-        if selected not in by_type:
-            # Out-of-vocabulary parameter value: keep the pre-existing fallback
-            # to the default type's rate (never crash mid-run on model output).
-            logger.warning(
-                "Unpriced %s=%r for tool '%s' in %s — falling back to the "
-                "'%s' rate (%.0f).",
-                type_key, selected, tool_name, self.config_path, default, default_cost,
-            )
-        cost = float(by_type.get(selected, default_cost))
+        cost = float(self._require(by_type, selected, tool_name))
         return cost, {selected: cost}
 
     def _cost_specialized_test(
@@ -231,15 +219,8 @@ class CostTracker:
         selected = params.get("test_type", "neuropsych_battery")
         if isinstance(selected, str) and selected.startswith("genetic_panel:"):
             genetic_panels = self._require(cfg, "genetic_panels", tool_name)
-            default_panel_cost = float(self._require(cfg, "default_genetic_panel", tool_name))
             panel = selected.split(":", 1)[1]
-            if panel not in genetic_panels:
-                logger.warning(
-                    "Unpriced genetic panel %r for tool '%s' in %s — falling "
-                    "back to the configured default_genetic_panel rate (%.0f).",
-                    panel, tool_name, self.config_path, default_panel_cost,
-                )
-            cost = float(genetic_panels.get(panel, default_panel_cost))
+            cost = float(self._require(genetic_panels, panel, tool_name))
             return cost, {selected: cost}
         return self._cost_by_type(cfg, params, "test_type", "neuropsych_battery", tool_name)
 
@@ -268,14 +249,7 @@ class CostTracker:
             total = cost
         else:
             for panel in panels:
-                key = normalize_analyte(panel)
-                if key not in by_panel:
-                    logger.warning(
-                        "Unpriced lab panel %r for tool '%s' in %s — falling "
-                        "back to the configured default_panel rate (%.0f).",
-                        panel, tool_name, self.config_path, default_cost,
-                    )
-                cost = by_panel.get(key, default_cost)
+                cost = float(self._require(by_panel, normalize_analyte(panel), tool_name))
                 breakdown[panel] = cost
                 total += cost
         return total, breakdown
@@ -309,16 +283,8 @@ class CostTracker:
             cfg, params, "procedure", "stereotactic_biopsy", tool_name
         )
         by_assay = self._priced_lookup(self._require(cfg, "by_molecular_assay", tool_name))
-        default_cost = float(self._require(cfg, "default_molecular_assay", tool_name))
         for assay in _as_item_names(params.get("molecular_assays", [])):
-            key = normalize_analyte(assay)
-            if key not in by_assay:
-                logger.warning(
-                    "Unpriced molecular assay %r for tool '%s' in %s — falling back to the "
-                    "configured default_molecular_assay rate (%.0f).",
-                    assay, tool_name, self.config_path, default_cost,
-                )
-            cost = by_assay.get(key, default_cost)
+            cost = float(self._require(by_assay, normalize_analyte(assay), tool_name))
             breakdown[assay] = cost
             total += cost
         return total, breakdown
@@ -329,16 +295,8 @@ class CostTracker:
         breakdown: dict[str, float] = {"base": base}
         total = base
         by_test = self._priced_lookup(self._require(cfg, "by_special_test", tool_name))
-        default_cost = float(self._require(cfg, "default_test", tool_name))
         for test in _as_item_names(params.get("special_tests", [])):
-            key = normalize_analyte(test)
-            if key not in by_test:
-                logger.warning(
-                    "Unpriced CSF special test %r for tool '%s' in %s — falling "
-                    "back to the configured default_test rate (%.0f).",
-                    test, tool_name, self.config_path, default_cost,
-                )
-            cost = by_test.get(key, default_cost)
+            cost = float(self._require(by_test, normalize_analyte(test), tool_name))
             breakdown[test] = cost
             total += cost
         return total, breakdown

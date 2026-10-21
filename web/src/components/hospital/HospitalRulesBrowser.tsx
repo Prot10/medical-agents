@@ -31,6 +31,9 @@ export function HospitalRulesBrowser() {
     <div className="flex flex-col h-full">
       {/* Top bar */}
       <div className="p-3 border-b border-sidebar-border space-y-2">
+        <p className="text-xs text-muted-foreground/70 leading-relaxed">
+          Reference pathways only: harness runs do not read these rules, and the reward does not check them.
+        </p>
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
             <select
@@ -66,7 +69,7 @@ export function HospitalRulesBrowser() {
 
       {/* Pathway list */}
       <div className="flex-1 overflow-y-auto">
-        {filtered.map((pathway, _filteredIdx) => {
+        {filtered.map((pathway) => {
           const realIndex = pathways.indexOf(pathway)
           const isSelected = selectedPathwayIndex === realIndex
           return (

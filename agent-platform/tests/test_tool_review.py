@@ -12,7 +12,6 @@ from neuroagent.review_api.config import (
     CONDITIONS_YAML_PATH,
     TOOL_COSTS_PATH,
 )
-from neuroagent.review_api.schemas.annotations import CaseReview
 from neuroagent.review_api.schemas.tool_review import ToolReview
 from neuroagent.review_api.services.dataset_loader import load_dataset
 from neuroagent.review_api.services.annotation_store import AnnotationStore
@@ -99,12 +98,10 @@ class TestToolReviewStore:
         assert set(store.list_all_reviewers("neurobench")) == {"R-001", "R-002"}
         assert store.load("neurobench", "R-999") is None
 
-    def test_legacy_v5_alias_reads_and_canonicalizes(self, tmp_path: Path):
+    def test_rejects_unknown_dataset_version(self, tmp_path: Path):
         store = ToolReviewStore(tmp_path)
-        review = store.load_or_init("v5", "R-001")
-        assert review.dataset_version == "neurobench"
-        assert (tmp_path / "neurobench" / "R-001.json").exists()
-        assert store.load("v5", "R-001") is not None
+        with pytest.raises(ValueError, match="Unknown dataset version"):
+            store.load_or_init("v5", "R-001")
 
     def test_rejects_bad_path_segments(self, tmp_path: Path):
         store = ToolReviewStore(tmp_path)
@@ -115,27 +112,10 @@ class TestToolReviewStore:
 
 
 class TestAnnotationStore:
-    def test_legacy_v5_alias_reads_and_canonicalizes(self, tmp_path: Path):
-        legacy_dir = tmp_path / "v5" / "R-001"
-        legacy_dir.mkdir(parents=True)
-        legacy_review = CaseReview(
-            case_id="CASE-001",
-            dataset_version="v5",
-            reviewer_code="R-001",
-        )
-        (legacy_dir / "CASE-001.json").write_text(legacy_review.model_dump_json())
-
+    def test_rejects_unknown_dataset_version(self, tmp_path: Path):
         store = AnnotationStore(tmp_path)
-        loaded = store.load("neurobench", "R-001", "CASE-001")
-        assert loaded is not None
-        assert loaded.dataset_version == "neurobench"
-        assert [summary.case_id for summary in store.list_for_reviewer("neurobench", "R-001")] == [
-            "CASE-001"
-        ]
-
-        store.save(loaded)
-        assert (tmp_path / "neurobench" / "R-001" / "CASE-001.json").exists()
-        assert (tmp_path / "v5" / "R-001" / "CASE-001.json").exists()
+        with pytest.raises(ValueError, match="Unknown dataset version"):
+            store.load_or_init("v5", "R-001", "CASE-001")
 
 
 class TestConditionToolGuidance:

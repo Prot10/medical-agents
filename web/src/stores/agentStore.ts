@@ -1,17 +1,17 @@
 import { create } from "zustand"
-import type { AgentEvent } from "@/api/types"
+import type { EngineeringReward, EpisodeEvent, RunStreamFrame } from "@/api/types"
 
-export type RunStatus = "idle" | "running" | "complete" | "cancelled" | "error"
+export type RunStatus = "idle" | "running" | "complete" | "failed" | "cancelled" | "error"
 
 interface AgentState {
   status: RunStatus
-  events: AgentEvent[]
+  events: EpisodeEvent[]
   errorMessage: string | null
 
-  // Streaming buffers (accumulated from delta events)
-  streamingContent: string
-  streamingThinkContent: string
-  streamingTurnNumber: number
+  /** Persisted id of the episode on screen, once the server has saved it. */
+  episodeId: string | null
+  /** Engineering reward of the episode on screen. */
+  reward: EngineeringReward | null
 
   // Accumulated metrics
   totalTokens: number
@@ -27,101 +27,90 @@ interface AgentState {
   // Actions
   startRun: () => void
   setAbortController: (controller: AbortController | null) => void
-  appendEvent: (event: AgentEvent) => void
+  appendFrame: (frame: RunStreamFrame) => void
+  loadEpisode: (events: EpisodeEvent[], episodeId: string) => void
+  setReward: (reward: EngineeringReward | null) => void
   setError: (msg: string) => void
   cancel: () => void
   reset: () => void
 }
 
-export const useAgentStore = create<AgentState>((set, get) => ({
-  status: "idle",
-  events: [],
+const EMPTY = {
+  events: [] as EpisodeEvent[],
   errorMessage: null,
-  streamingContent: "",
-  streamingThinkContent: "",
-  streamingTurnNumber: 0,
+  episodeId: null,
+  reward: null,
   totalTokens: 0,
-  startedAt: null,
   elapsedTime: 0,
   totalCost: 0,
+}
+
+function eventMetrics(event: EpisodeEvent): { tokens: number; cost: number } {
+  if (event.type === "model.requested") return { tokens: event.prompt_tokens, cost: 0 }
+  if (event.type === "action.proposed") return { tokens: event.completion_tokens, cost: 0 }
+  if (event.type === "observation.received") return { tokens: 0, cost: event.cost_usd }
+  return { tokens: 0, cost: 0 }
+}
+
+function terminalStatus(events: EpisodeEvent[]): RunStatus {
+  return events[events.length - 1]?.type === "run.failed" ? "failed" : "complete"
+}
+
+function episodeSeconds(events: EpisodeEvent[]): number {
+  if (events.length < 2) return 0
+  return (Date.parse(events[events.length - 1].timestamp) - Date.parse(events[0].timestamp)) / 1000
+}
+
+function elapsed(startedAt: number | null): number {
+  return startedAt ? (Date.now() - startedAt) / 1000 : 0
+}
+
+export const useAgentStore = create<AgentState>((set, get) => ({
+  status: "idle",
+  ...EMPTY,
+  startedAt: null,
   abortController: null,
 
-  startRun: () =>
-    set({ status: "running", events: [], errorMessage: null, streamingContent: "", streamingThinkContent: "", streamingTurnNumber: 0, totalTokens: 0, startedAt: Date.now(), elapsedTime: 0, totalCost: 0 }),
+  startRun: () => set({ status: "running", ...EMPTY, startedAt: Date.now() }),
 
   setAbortController: (controller) => set({ abortController: controller }),
 
-  appendEvent: (event) =>
+  appendFrame: (frame) =>
     set((state) => {
-      // Delta events: accumulate into streaming buffers, skip events array
-      if (event.type === "content_delta") {
+      if (frame.type === "stream.error") {
+        return { status: "error" as const, errorMessage: frame.message, elapsedTime: elapsed(state.startedAt) }
+      }
+      if (frame.type === "stream.result") {
         return {
-          streamingContent: state.streamingContent + (event.delta ?? ""),
-          streamingTurnNumber: event.turn_number ?? state.streamingTurnNumber,
+          status: terminalStatus(state.events),
+          episodeId: frame.episode_id,
+          reward: { reward: frame.reward, policy_review_status: frame.policy_review_status },
+          elapsedTime: elapsed(state.startedAt),
         }
       }
-
-      if (event.type === "think_delta") {
-        return {
-          streamingThinkContent: state.streamingThinkContent + (event.delta ?? ""),
-          streamingTurnNumber: event.turn_number ?? state.streamingTurnNumber,
-        }
+      const { tokens, cost } = eventMetrics(frame)
+      return {
+        events: [...state.events, frame],
+        totalTokens: state.totalTokens + tokens,
+        totalCost: state.totalCost + cost,
       }
-
-      // Block events: push to events array, clear streaming buffers where appropriate
-      const newEvents = [...state.events, event]
-      let totalTokens = state.totalTokens
-      let elapsedTime = state.elapsedTime
-      let totalCost = state.totalCost
-
-      if (event.token_usage) {
-        totalTokens += event.token_usage.total_tokens || 0
-      }
-      if (event.type === "tool_result" && event.cost_usd) {
-        totalCost += event.cost_usd
-      }
-
-      if (event.type === "thinking" || event.type === "assessment") {
-        // Complete block arrived — clear streaming buffers
-        return {
-          events: newEvents,
-          totalTokens,
-          elapsedTime,
-          totalCost,
-          streamingContent: "",
-          streamingThinkContent: "",
-          streamingTurnNumber: 0,
-        }
-      }
-
-      if (event.type === "run_complete") {
-        return {
-          events: newEvents,
-          status: "complete" as const,
-          totalTokens: event.total_tokens ?? totalTokens,
-          elapsedTime: event.elapsed_time_seconds ?? elapsedTime,
-          totalCost: event.total_cost_usd ?? totalCost,
-          streamingContent: "",
-          streamingThinkContent: "",
-          streamingTurnNumber: 0,
-        }
-      }
-
-      if (event.type === "error") {
-        return {
-          events: newEvents,
-          status: "error" as const,
-          errorMessage: event.message ?? "Unknown error",
-          totalTokens,
-          elapsedTime,
-          totalCost,
-        }
-      }
-
-      return { events: newEvents, totalTokens, elapsedTime, totalCost }
     }),
 
-  setError: (msg) => set({ status: "error", errorMessage: msg }),
+  loadEpisode: (events, episodeId) =>
+    set({
+      ...EMPTY,
+      status: terminalStatus(events),
+      events,
+      episodeId,
+      startedAt: null,
+      totalTokens: events.reduce((sum, e) => sum + eventMetrics(e).tokens, 0),
+      totalCost: events.reduce((sum, e) => sum + eventMetrics(e).cost, 0),
+      elapsedTime: episodeSeconds(events),
+    }),
+
+  setReward: (reward) => set({ reward }),
+
+  setError: (msg) => set((state) => ({ status: "error", errorMessage: msg, elapsedTime: elapsed(state.startedAt) })),
 
   cancel: () => {
     const { abortController, status, startedAt } = get()
@@ -129,21 +118,13 @@ export const useAgentStore = create<AgentState>((set, get) => ({
     set({
       abortController: null,
       // Keep events collected so far; freeze the run in a terminal state
-      ...(status === "running"
-        ? {
-            status: "cancelled" as const,
-            elapsedTime: startedAt ? (Date.now() - startedAt) / 1000 : 0,
-            streamingContent: "",
-            streamingThinkContent: "",
-            streamingTurnNumber: 0,
-          }
-        : {}),
+      ...(status === "running" ? { status: "cancelled" as const, elapsedTime: elapsed(startedAt) } : {}),
     })
   },
 
   reset: () => {
     // Abort any in-flight run so a stale stream can't append into the reset store
     get().abortController?.abort()
-    set({ status: "idle", events: [], errorMessage: null, streamingContent: "", streamingThinkContent: "", streamingTurnNumber: 0, totalTokens: 0, startedAt: null, elapsedTime: 0, totalCost: 0, abortController: null })
+    set({ status: "idle", ...EMPTY, startedAt: null, abortController: null })
   },
 }))

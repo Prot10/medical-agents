@@ -3,9 +3,30 @@ import {
   ChevronRight, ChevronDown, CheckCircle2, XCircle, Loader2,
   Brain, Activity, Heart, FlaskConical, Droplets, BookOpen, Pill,
   Scan, AudioWaveform, MonitorCheck, Radiation, ClipboardCheck,
+  ScanLine, Bug, Microscope, Stethoscope,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ToolResultRenderer } from "@/components/results/ToolResultRenderer"
+import type { ObservationReceived } from "@/api/types"
+
+function ObservationBadges({ observation, preloaded }: { observation: ObservationReceived; preloaded: boolean }) {
+  return (
+    <div className="flex flex-wrap items-center gap-1.5 text-xs">
+      {preloaded && <span className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground">given upfront</span>}
+      {observation.rejected && <span className="px-1.5 py-0.5 rounded bg-red-500/10 text-red-500">rejected by schema · not placed</span>}
+      {observation.from_fallback && (
+        <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400">
+          {observation.library ? "benchmark fallback library" : "case fallback output"}
+        </span>
+      )}
+      {observation.cost_usd > 0 && (
+        <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono">
+          ${observation.cost_usd.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+        </span>
+      )}
+    </div>
+  )
+}
 
 const TOOL_META: Record<string, { icon: React.ElementType; label: string; accent: string; bgClass: string; color: string }> = {
   analyze_brain_mri: { icon: Brain, label: "Brain MRI", accent: "text-violet-500 dark:text-violet-400", bgClass: "bg-violet-500/15", color: "#8b5cf6" },
@@ -20,23 +41,29 @@ const TOOL_META: Record<string, { icon: React.ElementType; label: string; accent
   order_cardiac_monitoring: { icon: MonitorCheck, label: "Cardiac Monitoring", accent: "text-red-500 dark:text-red-400", bgClass: "bg-red-500/15", color: "#ef4444" },
   order_advanced_imaging: { icon: Radiation, label: "Advanced Imaging", accent: "text-indigo-500 dark:text-indigo-400", bgClass: "bg-indigo-500/15", color: "#6366f1" },
   order_specialized_test: { icon: ClipboardCheck, label: "Specialized Test", accent: "text-teal-500 dark:text-teal-400", bgClass: "bg-teal-500/15", color: "#14b8a6" },
+  order_body_imaging: { icon: ScanLine, label: "Body Imaging", accent: "text-sky-500 dark:text-sky-400", bgClass: "bg-sky-500/15", color: "#0ea5e9" },
+  order_microbiology: { icon: Bug, label: "Microbiology", accent: "text-lime-600 dark:text-lime-400", bgClass: "bg-lime-500/15", color: "#65a30d" },
+  obtain_tissue_diagnosis: { icon: Microscope, label: "Tissue Diagnosis", accent: "text-fuchsia-500 dark:text-fuchsia-400", bgClass: "bg-fuchsia-500/15", color: "#d946ef" },
+  perform_clinical_assessment: { icon: Stethoscope, label: "Clinical Assessment", accent: "text-stone-500 dark:text-stone-400", bgClass: "bg-stone-500/15", color: "#78716c" },
 }
 
 interface ToolCallCardProps {
   toolName: string
   arguments: Record<string, unknown>
-  result?: Record<string, unknown>
-  success?: boolean
+  observation?: ObservationReceived
   pending?: boolean
   turnNumber?: number
 }
 
-export function ToolCallCard({ toolName, arguments: args, result, success, pending }: ToolCallCardProps) {
+export function ToolCallCard({ toolName, arguments: args, observation, pending, turnNumber }: ToolCallCardProps) {
   const [expanded, setExpanded] = useState(false)
   const meta = TOOL_META[toolName] ?? {
     icon: FlaskConical, label: toolName, accent: "text-muted-foreground", bgClass: "bg-muted", color: "#888",
   }
   const Icon = meta.icon
+  const success = observation?.success
+  const result = observation?.output ?? undefined
+  const preloaded = turnNumber === 0
 
   return (
     <div className={cn(
@@ -69,6 +96,11 @@ export function ToolCallCard({ toolName, arguments: args, result, success, pendi
           {!expanded && Object.keys(args).length > 0 && (
             <div className="text-sm text-muted-foreground/60 truncate mt-0.5 font-mono">
               {Object.entries(args).map(([k, v]) => `${k}: ${typeof v === "string" ? v : JSON.stringify(v)}`).join(", ")}
+            </div>
+          )}
+          {observation && (
+            <div className="mt-1">
+              <ObservationBadges observation={observation} preloaded={preloaded} />
             </div>
           )}
         </div>
@@ -109,6 +141,13 @@ export function ToolCallCard({ toolName, arguments: args, result, success, pendi
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Error */}
+          {observation?.error_message && (
+            <div className="px-4 py-3 border-b border-border/30 text-sm text-red-500 break-words">
+              {observation.error_message}
             </div>
           )}
 

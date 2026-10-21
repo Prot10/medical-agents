@@ -1,0 +1,221 @@
+# Accepted diagnosis synonyms, keyed by ICD-10-CM code or 3-character category.
+#
+# Applied to every case whose ground-truth ICD code matches the key exactly or by category
+# (both entries apply when both exist), optionally restricted to the listed conditions. The
+# migration `scripts/validation/apply_diagnosis_synonyms.py` appends `labels` to
+# `ground_truth.diagnosis.accepted` and `codes` to `ground_truth.diagnosis.icd_codes`; the case
+# file remains the scored artefact. A submitted diagnosis matches when every token of an accepted
+# label appears in it, or when the submitted ICD-10 code is one of the accepted codes.
+#
+# STATUS: draft, authored 2026-09-02 for the migration; every entry is subject to physician review
+# together with the case policies. Entity-specific puzzles (e.g. LGI1 encephalitis filed under
+# G04.81) keep only their case-specific label and need per-case synonyms from the reviewers.
+
+G12.21:
+  labels: [amyotrophic lateral sclerosis, ALS, motor neuron disease, motor neurone disease, MND]
+  codes: [G12.2, G12.20, G12.23, G12.24, G12.25]
+
+G30:
+  labels: [alzheimer disease, alzheimer's disease, alzheimers disease, alzheimer dementia, dementia due to alzheimer]
+  codes: [G30.0, G30.1, G30.8, G30.9, F00]
+G30.0:
+  labels: [posterior cortical atrophy, benson syndrome, early onset alzheimer]
+G31.84:
+  labels: [mild cognitive impairment, MCI, amnestic mild cognitive impairment, amnestic MCI, prodromal alzheimer, mild cognitive impairment due to alzheimer, alzheimer disease, alzheimer's disease]
+  codes: [G30.0, G30.1, G30.9]
+G31.09:
+  labels: [frontotemporal dementia, FTD, behavioral variant frontotemporal dementia, behavioural variant frontotemporal dementia, bvFTD, frontotemporal lobar degeneration, pick disease, pick's disease]
+  codes: [G31.0, G31.01]
+G31.83:
+  labels: [dementia with lewy bodies, lewy body dementia, DLB]
+
+G04.81:
+  labels: [autoimmune encephalitis, antibody mediated encephalitis, autoimmune limbic encephalitis]
+  codes: [G04.8, G04.90]
+G04.81+nmdar:
+  conditions: [autoimmune_encephalitis_nmdar]
+  labels: [anti nmda receptor encephalitis, anti-nmda receptor encephalitis, anti nmdar encephalitis, anti-nmdar encephalitis, nmdar encephalitis, nmda receptor encephalitis, nmda encephalitis]
+
+G00:
+  labels: [bacterial meningitis, acute bacterial meningitis, pyogenic meningitis, community acquired bacterial meningitis]
+  codes: [G00.9]
+G00.1:
+  labels: [pneumococcal meningitis, streptococcus pneumoniae meningitis]
+G00.0:
+  labels: [haemophilus meningitis, haemophilus influenzae meningitis, hib meningitis]
+G00.2:
+  labels: [streptococcal meningitis, group b streptococcus meningitis]
+G00.3:
+  labels: [staphylococcal meningitis, post neurosurgical meningitis, healthcare associated meningitis, ventriculitis]
+G00.8:
+  labels: [listeria meningitis, listeria monocytogenes meningitis, listeria meningoencephalitis]
+A39.0:
+  labels: [meningococcal meningitis, neisseria meningitidis meningitis, bacterial meningitis]
+A17.0:
+  labels: [tuberculous meningitis, TB meningitis, tuberculosis meningitis]
+B45.1:
+  labels: [cryptococcal meningitis, cryptococcal meningoencephalitis, cryptococcus meningitis]
+
+C71:
+  labels: [glioblastoma, GBM, high grade glioma, glioma who grade 4, grade 4 glioma, malignant glioma, astrocytoma grade 4]
+  codes: [C71.9]
+C71.0:
+  labels: [diffuse midline glioma, h3 k27m altered glioma]
+C72.0:
+  labels: [spinal cord glioblastoma, spinal cord glioma, intramedullary glioma]
+C83.390:
+  labels: [primary cns lymphoma, PCNSL, cns lymphoma, primary central nervous system lymphoma]
+  codes: [C83.39, C85.80]
+
+G40:
+  labels: [focal epilepsy, temporal lobe epilepsy, mesial temporal lobe epilepsy, mesial temporal sclerosis epilepsy, focal onset seizures, focal impaired awareness seizures, focal seizures, TLE, epilepsy temporal lobe]
+  codes: [G40.2, G40.209, G40.219, G40.1, G40.109, G40.119, G40.009, G40.019, G40.9, G40.909]
+F44.5:
+  labels: [psychogenic non-epileptic seizures, psychogenic nonepileptic seizures, PNES, functional seizures, dissociative seizures, non-epileptic seizures]
+  codes: [F44.4, F44.7]
+F44:
+  conditions: [functional_neurological_disorder]
+  labels: [functional neurological disorder, functional neurological symptom disorder, conversion disorder, FND, functional movement disorder, functional weakness, psychogenic non-epileptic seizures, PNES, functional seizures]
+  codes: [F44.4, F44.5, F44.6, F44.7, F44.9]
+
+G41:
+  labels: [status epilepticus, SE]
+  codes: [G41.9, G41.0, G41.2, G41.8, G40.901, G40.911]
+G41.2:
+  labels: [non-convulsive status epilepticus, nonconvulsive status epilepticus, NCSE]
+G41.0:
+  labels: [generalized convulsive status epilepticus, convulsive status epilepticus, GCSE, tonic clonic status epilepticus]
+G41.8:
+  labels: [non-convulsive status epilepticus, nonconvulsive status epilepticus, NCSE, status epilepticus]
+A81.09:
+  labels: [creutzfeldt jakob disease, creutzfeldt-jakob disease, CJD, sporadic CJD, prion disease]
+  codes: [A81.00, A81.0]
+T37.1X1A:
+  labels: [isoniazid toxicity, isoniazid induced seizures, isoniazid poisoning, pyridoxine deficiency seizures]
+  codes: [T37.1X1]
+T60.0X1A:
+  labels: [organophosphate poisoning, organophosphate toxicity, cholinergic toxidrome, organophosphate intoxication]
+  codes: [T60.0X1]
+
+G43:
+  labels: [migraine with aura, migraine with typical aura, classic migraine, migraine aura]
+  codes: [G43.1, G43.109, G43.119, G43.909]
+G43.409:
+  labels: [hemiplegic migraine, sporadic hemiplegic migraine, migraine with motor aura]
+  codes: [G43.4, G43.419]
+E88.41:
+  labels: [MELAS, mitochondrial encephalomyopathy lactic acidosis and stroke-like episodes, mitochondrial encephalomyopathy]
+  codes: [E88.4]
+I67.850:
+  labels: [CADASIL, cerebral autosomal dominant arteriopathy with subcortical infarcts and leukoencephalopathy]
+  codes: [I67.85]
+
+G35:
+  labels: [multiple sclerosis, MS, relapsing remitting multiple sclerosis, relapsing-remitting multiple sclerosis, RRMS, demyelinating disease]
+  codes: [G35, G35.A, G35.B, G35.C, G35.D]
+
+G20:
+  labels: [parkinson disease, parkinson's disease, parkinsons disease, idiopathic parkinson disease, idiopathic parkinson's disease, PD]
+  codes: [G20, G20.A1, G20.A2, G20.B1, G20.B2, G20.C]
+G23.1:
+  labels: [progressive supranuclear palsy, PSP, richardson syndrome]
+G90.3:
+  labels: [multiple system atrophy, MSA, MSA-P, multiple system atrophy parkinsonian type]
+
+G61.0:
+  labels: [guillain barre syndrome, guillain-barre syndrome, guillain-barré syndrome, GBS, acute inflammatory demyelinating polyneuropathy, AIDP, acute inflammatory demyelinating polyradiculoneuropathy, acute motor axonal neuropathy, AMAN, miller fisher syndrome]
+
+G70:
+  labels: [myasthenia gravis, MG, generalized myasthenia gravis, generalised myasthenia gravis, ocular myasthenia gravis, autoimmune myasthenia]
+  codes: [G70.0, G70.00, G70.01]
+G73.1:
+  labels: [lambert eaton myasthenic syndrome, lambert-eaton myasthenic syndrome, LEMS, lambert eaton syndrome]
+  codes: [G73.1, G70.80]
+
+G91.2:
+  labels: [normal pressure hydrocephalus, NPH, idiopathic normal pressure hydrocephalus, iNPH]
+  codes: [G91.2, G91.0, G91.9]
+G91.0:
+  labels: [normal pressure hydrocephalus, NPH, secondary normal pressure hydrocephalus, communicating hydrocephalus]
+  codes: [G91.0, G91.2, G91.9]
+
+I60:
+  labels: [subarachnoid hemorrhage, subarachnoid haemorrhage, SAH, aneurysmal subarachnoid hemorrhage, aneurysmal subarachnoid haemorrhage, ruptured intracranial aneurysm, ruptured cerebral aneurysm]
+  codes: [I60.9, I60.7, I60.0, I60.1, I60.2, I60.3, I60.4, I60.5, I60.6, I60.8]
+I60.8:
+  labels: [perimesencephalic subarachnoid hemorrhage, perimesencephalic subarachnoid haemorrhage, non-aneurysmal subarachnoid hemorrhage]
+
+I63:
+  labels: [acute ischemic stroke, acute ischaemic stroke, ischemic stroke, ischaemic stroke, cerebral infarction, cerebral infarct, embolic stroke, cardioembolic stroke, lacunar stroke, lacunar infarct, stroke]
+  codes: [I63.9, I63.4, I63.5, I63.3, I63.2, I63.0, I63.1, I63.8, I63.81, I63.89]
+I63.011:
+  labels: [lateral medullary syndrome, wallenberg syndrome, lateral medullary infarct, vertebral artery dissection]
+I63.012:
+  labels: [vertebral artery dissection, PICA infarct, cerebellar infarct]
+I63.22:
+  labels: [basilar artery occlusion, basilar artery thrombosis, posterior circulation stroke]
+I63.232:
+  labels: [moyamoya disease, moyamoya]
+I63.231:
+  labels: [carotid stenosis stroke, internal carotid artery stenosis, large artery atherosclerotic stroke]
+I63.031:
+  labels: [watershed infarct, borderzone infarct, watershed stroke, hypoperfusion stroke]
+I63.40:
+  labels: [septic embolic stroke, septic emboli, infective endocarditis stroke, infective endocarditis]
+I63.81:
+  labels: [CADASIL, lacunar stroke, lacunar infarct]
+I77.71:
+  labels: [carotid artery dissection, internal carotid artery dissection, cervical artery dissection]
+  codes: [I77.71, I63.231]
+I97.811:
+  labels: [perioperative stroke, iatrogenic stroke, postprocedural stroke, ischemic stroke, ischaemic stroke]
+I63.4:
+  labels: [cardioembolic stroke, PCA territory infarct, ischemic stroke, ischaemic stroke]
+  codes: [I63.4, I63.43, I63.431, I63.432, I63.9]
+
+I44:
+  labels: [cardiac syncope, arrhythmic syncope, high grade av block, high-grade atrioventricular block, complete heart block, third degree av block, third-degree atrioventricular block, mobitz ii, mobitz type ii, second degree av block, bradyarrhythmia, conduction disease syncope]
+  codes: [I44.1, I44.2, I44.30, I44.39, I45.9, R55]
+I45.6:
+  labels: [cardiac syncope, wolff parkinson white, wolff-parkinson-white syndrome, WPW, pre-excitation syndrome]
+I45.81:
+  labels: [cardiac syncope, long qt syndrome, congenital long qt, LQTS]
+T46.2X5A:
+  labels: [cardiac syncope, drug induced long qt, drug-induced long qt syndrome, torsades de pointes, acquired long qt]
+  codes: [T46.2X5, I45.81]
+I47:
+  labels: [cardiac syncope, arrhythmic syncope, supraventricular tachycardia, SVT, AVNRT, ventricular tachycardia, VT, tachyarrhythmia]
+  codes: [I47.1, I47.2, I47.9, I47.20]
+I48.3:
+  labels: [cardiac syncope, atrial flutter, atrial flutter with rapid ventricular response]
+I49.5:
+  labels: [cardiac syncope, sick sinus syndrome, sinus node dysfunction, tachy brady syndrome]
+I49.8:
+  labels: [cardiac syncope, brugada syndrome, brugada]
+I42.1:
+  labels: [cardiac syncope, hypertrophic cardiomyopathy, HCM, hypertrophic obstructive cardiomyopathy, HOCM]
+I42.8:
+  labels: [cardiac syncope, arrhythmogenic right ventricular cardiomyopathy, ARVC, arrhythmogenic cardiomyopathy]
+I35.0:
+  labels: [cardiac syncope, aortic stenosis, severe aortic stenosis]
+I26.09:
+  labels: [pulmonary embolism, acute pulmonary embolism, PE, cardiac syncope]
+  codes: [I26.0, I26.9]
+D15.1:
+  labels: [cardiac myxoma, cardiac tumor, cardiac tumour, right ventricular myxoma, cardiac syncope]
+D86.85:
+  labels: [cardiac sarcoidosis, sarcoid heart block, cardiac syncope, complete heart block]
+G13.1:
+  labels: [central sleep apnea, central sleep apnoea, sleep apnea syncope, nocturnal asystole, sleep related bradyarrhythmia]
+  codes: [G47.31, G47.37]
+
+K72:
+  labels: [hepatic encephalopathy, HE, overt hepatic encephalopathy, portosystemic encephalopathy, hepatic coma]
+  codes: [K72.90, K72.91, K76.82]
+
+F01:
+  labels: [vascular dementia, vascular cognitive impairment, major vascular neurocognitive disorder, subcortical vascular dementia, multi-infarct dementia, multi infarct dementia, small vessel disease dementia, VaD]
+  codes: [F01.50, F01.51, F01.5, F01.A0, F01.B0, F01.C0, F06.7, I67.3]
+F06.7:
+  labels: [mild vascular cognitive impairment, vascular cognitive impairment, mild vascular cognitive disorder, mild neurocognitive disorder due to vascular disease, vascular mild cognitive impairment]
+  codes: [F01.50, G31.84]

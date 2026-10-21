@@ -6,55 +6,55 @@ The frontend is organized into feature-based directories under `src/components/`
 
 ```
 ┌───────────┬──────────────────────────────────────────────┐
-│           │  Header: Breadcrumb │ Metrics │ Evaluate │ Run │
+│           │  Header: Breadcrumb │ Metrics │ Reward │ Run  │
 │  Sidebar  ├───────────────────────┬──────────────────────┤
-│  (nav +   │ Content panel         │ Agent Timeline       │
+│  (nav +   │ Content panel         │ Episode Timeline     │
 │  section  │ (Patient / Dataset /  │ ──────────────────── │
-│  browser) │  Pathway Editor)      │ Oracle (optional)    │
+│  browser) │  Pathway Editor)      │ Policy Reward (opt.) │
 └───────────┴───────────────────────┴──────────────────────┘
 ```
 
-A collapsible, resizable sidebar (200–400px, or 64px collapsed) plus a main area split by `react-resizable-panels`. The sidebar's nav selects the active section (`cases` / `dataset` / `traces` / `rules` / `architecture` / `settings`); the content panel swaps accordingly, and the Architecture section takes over the full main area.
+A collapsible, resizable sidebar (200–400px, or 64px collapsed) plus a main area split by `react-resizable-panels`. The sidebar's nav selects the active section (`cases` / `dataset` / `episodes` / `rules` / `architecture` / `profiles`); the content panel swaps accordingly, and the Architecture section takes over the full main area.
 
 ### Layout (`layout/`)
 
-- **`AppShell`** — top-level layout: sidebar + header + resizable content/agent panels; optionally splits the agent panel vertically with the `OraclePanel`.
-- **`Sidebar`** — nav items, per-section browser content, and a collapsible footer with agent-model / evaluator-model / hospital pickers, model load/stop controls (consumes the `/models/{key}/load` SSE stream), and the dark-mode toggle.
-- **`Header`** — section breadcrumb + selected case ID, `TokenCounter` metrics, export-trace button, Evaluate button (triggers the Oracle), and Run/Stop controls.
-- **`SidebarResizeHandle`** — drag handle that clamps sidebar width between 200 and 400px.
+- **`AppShell`**: top-level layout with the sidebar, the header and the resizable content and timeline panels. When `appStore.scoreOpen` is set, the timeline panel is split vertically with the `ScorePanel`.
+- **`Sidebar`**: nav items, the content of each section, and a collapsible footer. The footer holds the profile picker, the profile's model with its serving state and Load / Stop controls (it consumes the `/models/{key}/load` SSE stream), the loop and turn budget, and the dark-mode toggle.
+- **`Header`**: section breadcrumb and selected case ID, simulated cost, `TokenCounter`, export of the episode JSON, the Reward toggle and the Run/Stop controls.
+- **`SidebarResizeHandle`**: drag handle that keeps the sidebar between 200 and 400px.
 
 ## Sidebar Section Panels
 
-Rendered inside the sidebar based on the active nav section:
-
-- **`CaseBrowser`** (`cases/`) — 600 cases grouped by condition, with text search (case ID / chief complaint), difficulty filter, and selection wired to `appStore.selectedCaseId`.
-- **`DatasetOverview`** (`dataset/`) — compact dataset summary (total, avg age, difficulty and condition bars) whose rows toggle `appStore.datasetFilters`.
-- **`TraceBrowser`** (`traces/`) — saved traces with search and difficulty filter; replay (streamed or instant), delete, and per-trace metadata (model, hospital, cost).
-- **`HospitalRulesBrowser`** (`hospital/`) — hospital picker + searchable pathway list; selects a pathway for the editor or starts creation of a new one.
-- **`SettingsPanel`** (`settings/`) — GitHub Copilot connection via OAuth device flow (pairing code, polling, logout).
+- **`CaseBrowser`** (`cases/`): cases grouped by condition, with text search (case ID / chief complaint) and a difficulty filter. Selection is wired to `appStore.selectedCaseId`.
+- **`DatasetOverview`** (`dataset/`): compact dataset summary (total, average age, difficulty and condition bars). Its rows toggle `appStore.datasetFilters`.
+- **`EpisodeBrowser`** (`episodes/`): saved episodes, newest first, filtered by profile. Each one can be replayed step by step or at once, or deleted.
+- **`HospitalRulesBrowser`** (`hospital/`): hospital picker and searchable pathway list. Pathways are reference material and harness runs do not read them.
+- **`ProfilesPanel`** (`profiles/`): the checked profiles with their model status, loop, turn, cost and retry budgets. Clicking one selects it for the next run.
 
 ## Content Panel
 
-- **`PatientViewer`** (`patient/`) — full clinical data for the selected case in tabs: Overview (demographics, vitals, chief complaint, HPI), History, Neuro Exam, Diagnostics (pre-generated tool outputs), and Ground Truth.
-- **`GroundTruthPanel`** (`ground-truth/`) — primary diagnosis + ICD code, differentials, and an action-compliance checklist cross-referencing `ground_truth.optimal_actions` against the agent's actual tool calls.
-- **`DatasetDashboard`** (`dataset/`) — dataset analytics: stat cards (cases, avg age, sex split, conditions), dataset switcher (`/datasets/{v}/activate`), and four charts.
-  - **`charts/ConditionChart`** — case counts per condition (bar).
-  - **`charts/DifficultyDonut`** — difficulty breakdown (donut).
-  - **`charts/AgeHistogram`** — age distribution in 10-year bins.
-  - **`charts/CaseHeatmap`** — condition × difficulty matrix.
-- **`PathwayEditorPanel`** (`hospital/`) — full CRUD editor for hospital pathways: name/description/triggers, step list (action, timing, mandatory, condition), contraindicated actions; saves via the hospitals rules POST/PUT/DELETE endpoints.
-- **`ArchitectureExplorer`** (`architecture/`) — interactive system map of the whole project (nodes with paths, files, and links) filterable by layer (Runtime, Reasoning, Tools, Data, Evaluation, Frontend, Review, Research, Fine-tuning, Deployment). Replaces the whole main area.
+- **`PatientViewer`** (`patient/`): the selected case in tabs. Overview covers demographics, vitals (`hr` / `temp` / `rr` / BP / SpO2), the chief complaint and the HPI; the other tabs are History, Neuro Exam, Diagnostics (stored tool outputs) and Ground Truth.
+- **`GroundTruthPanel`** (`ground-truth/`): the case policy, with its review status, accepted diagnoses and ICD codes, differential, action criteria, avoided actions, sequence constraints, stop rule, assessment requirements, key evidence and red herrings. When an episode is on screen, each criterion and avoided action is checked against its tool actions using the same pattern matching as the reward (`lib/policy.ts`).
+- **`DatasetDashboard`** (`dataset/`): stat cards and four charts (`ConditionChart`, `DifficultyDonut`, `AgeHistogram`, `CaseHeatmap`).
+- **`PathwayEditorPanel`** (`hospital/`): CRUD editor for hospital pathways.
+- **`ArchitectureExplorer`** (`architecture/`): interactive system map of the repository, filterable by layer.
 
 ## Agent Panel (`agent/`)
 
-- **`AgentTimeline`** — vertical auto-scrolling timeline; pairs `tool_call` + `tool_result` events into render items, groups turns, and renders live streaming deltas via `StreamingContent`.
-- **`StreamingContent`** — collapsible reasoning block that renders token deltas with Streamdown while streaming and react-markdown once complete.
-- **`ThinkingBlock`** — card for a completed reasoning turn (markdown via react-markdown + remark-gfm).
-- **`ToolCallCard`** — collapsible card per tool call: icon + args preview + status while collapsed, arguments JSON + specialized result renderer when expanded. Icon/color mappings for all 12 tools.
-- **`ReflectionBlock`** — minimal divider marking an injected reflection prompt.
-- **`AssessmentPanel`** — green-accented card for the final structured assessment, fully markdown-rendered.
-- **`OraclePanel`** — evaluation view, opened by the header's Evaluate button (`appStore.oracleTrigger`). Streams `/agent/evaluate`: rule-based metrics grid (accuracy, precision/recall, safety, efficiency) then the LLM judge's streaming output and scores.
-- **`TokenCounter`** — compact token count + elapsed time, monospace.
+- **`AgentTimeline`**: vertical timeline that scrolls itself, built from the episode events. It contains:
+  - the run header (`run.started`);
+  - ReAct rationales (`plugin.event`);
+  - a tool card for each accepted `action.proposed`, paired with its `observation.received`;
+  - rejected actions (`action.rejected`);
+  - the assessment;
+  - a failure card (`run.failed`).
+
+  In the direct loop, observations given before any action appear as turn-0 cards.
+- **`ToolCallCard`**: a collapsible card for each tool call, with its arguments and the result renderer. Badges mark results that were given upfront, rejected, or that came from the fallback library, and show the simulated cost and any error message.
+- **`ThinkingBlock`**: a labelled markdown block, used for ReAct rationales.
+- **`AssessmentPanel`**: the structured `submit_assessment`, with primary diagnosis, ICD-10 code, urgency, confidence, differential and recommendations.
+- **`ScorePanel`**: the policy reward. It shows the scalar, each component, the caps applied and the invalid actions. On a draft policy it carries a warning that the score is not reportable.
+- **`TokenCounter`**: compact token count and elapsed time. The time ticks live while a run is in flight.
 
 ## Tool Result Renderers (`results/`)
 
@@ -85,46 +85,46 @@ Rendered inside the sidebar based on the active nav section:
 ## State Management
 
 ### `appStore` (Zustand)
-UI-level state: `selectedCaseId`, `selectedHospital`, `selectedModel`, `selectedEvaluatorModel`, `darkMode`, `showGroundTruth`, sidebar state (`sidebarCollapsed`, `sidebarWidth`, `activeSection`), `datasetFilters`, rules-editor state (`rulesHospitalId`, `selectedPathwayIndex`, `isCreatingPathway`), and Oracle state (`oracleOpen`, `oracleTrigger`).
+UI-level state:
+- selection: `selectedCaseId`, `selectedProfileId` (default `policy-qwen3.5-9b`);
+- display: `darkMode`, `showGroundTruth`;
+- sidebar: `sidebarCollapsed`, `sidebarWidth`, `activeSection`;
+- `datasetFilters`;
+- rules editor: `rulesHospitalId`, `selectedPathwayIndex`, `isCreatingPathway`;
+- `scoreOpen`.
 
 ### `agentStore` (Zustand)
-Agent execution state, updated at high frequency during SSE streaming:
-- `status` — `idle` | `running` | `complete` | `error`
-- `events` — append-only array of `AgentEvent` objects
-- `streamingContent` / `streamingThinkContent` / `streamingTurnNumber` — buffers accumulated from `content_delta` / `think_delta` events
-- `totalTokens` / `elapsedTime` / `totalCost` — accumulated metrics
-- `errorMessage` — last error
+State of the episode on screen, whether live or replayed:
+- `status`: `idle` | `running` | `complete` | `failed` | `cancelled` | `error`
+- `events`: append-only `EpisodeEvent[]`, in the order the episode store recorded them
+- `episodeId` and `reward`: set by the `stream.result` frame, or by a replay together with `/episodes/{id}/reward`
+- `totalTokens`, `totalCost`, `startedAt`, `elapsedTime`: derived from the events
+- `abortController`: the in-flight stream, which any component can cancel
 
 ### `modelLoadingStore` (Zustand)
 Model-load progress from the `/models/{key}/load` SSE stream: `phase`, `progress`, `elapsed`, `expectedSeconds`, `sizeGb`, `message`.
 
 ### TanStack Query (`hooks/`)
-Server data via `useCases.ts` and `useReplay.ts`:
-- Cases list / case detail (`staleTime: Infinity`)
-- Hospitals (`staleTime: Infinity`), hospital rules (`staleTime: 30s`)
-- Datasets (`staleTime: 30s`) + `useActivateDataset` mutation
-- Models (`staleTime: 10s` — merges local models with Copilot models when authenticated)
-- Copilot status (`staleTime: 5s`)
-- Traces (`staleTime: 5s`)
+- Cases, case detail, hospitals, profiles (`staleTime: Infinity`)
+- Hospital rules (`staleTime: 30s`)
+- Models (`staleTime: 10s`)
+- Episodes (`staleTime: 5s`; invalidated when a run finishes)
 
 ## Data Flow
 
 ```
 User clicks "Run Agent"
-  → useAgentRun.run(caseId, hospital, model)
-    → agentStore.startRun() — resets state
-    → fetch POST /api/v1/agent/run (SSE stream)
-      → Backend: orchestrator.run_streaming() yields events
-      → async queue passes events to SSE response
-    → consumeSSEStream() parses "data: {...}\n\n" lines
-      → agentStore.appendEvent(event) for each
-        → think_delta / content_delta accumulate into streaming buffers
-        → AgentTimeline re-renders; buildRenderItems() pairs tool_call + tool_result
-        → auto-scroll to bottom
-    → on run_complete: status → "complete"
-    → trace auto-saved to data/traces/ on backend
-User clicks "Evaluate"
-  → appStore.triggerOracle() opens OraclePanel
-    → streamEvaluation() POSTs the run's events to /api/v1/agent/evaluate
-    → metrics event renders the score grid; judge_delta streams the LLM judge
+  → useAgentRun.run(caseId, profileId)
+    → agentStore.startRun()
+    → streamRun() POSTs /api/v1/runs/stream
+      → backend: the harness loop runs in a worker thread; every episode_store.append
+        is handed to the event loop and written as one SSE frame
+    → consumeSSEStream() parses "data: {...}\n\n" frames
+      → agentStore.appendFrame(frame): episode events are appended, and the timeline
+        re-renders and scrolls
+      → stream.result: episodeId and reward are set; the episode is already saved in data/episodes/
+    → the episodes query is invalidated, so the new episode appears in the Episodes section
+User clicks "Replay" in Episodes
+  → GET /episodes/{id} and /episodes/{id}/reward
+  → useReplay feeds the events into agentStore every 450 ms (or all at once with "Skip to End")
 ```

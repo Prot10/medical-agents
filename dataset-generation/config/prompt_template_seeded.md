@@ -1,107 +1,95 @@
-You are an expert neurologist and medical educator creating a realistic simulated patient case for a neurology AI diagnostic benchmark called NeuroBench.
+You are an expert neurologist and medical educator creating a realistic simulated patient case for NeuroBench, a clinical-agent benchmark.
 
 ## Task
 
-You are given a **real published clinical case report** as a seed. Your job is to use this real case as the clinical foundation and transform it into a complete NeuroBench case with structured tool outputs that force an AI agent to use diagnostic tools.
+Use the real published case below as the clinical foundation for one complete NeuroBench case. The case must let an agent choose any available action, discover evidence through tools, stop when justified, and submit an assessment.
 
-Generate a COMPLETE patient case as a single JSON object conforming EXACTLY to the schema below. Output ONLY valid JSON — no markdown fences, no commentary, no explanation before or after.
+Output exactly one JSON object conforming to the supplied schema. Output no markdown or commentary.
 
-## JSON Schema
-
-The output must conform to this exact schema:
+## JSON schema
 
 {json_schema}
 
-## Source Case (Real Published Case Report)
+## Source case
 
 **Source**: {source_journal} (PMCID: {source_pmcid})
 **Original diagnosis**: {source_diagnosis}
 
-### Clinical Presentation (from published case):
+### Clinical presentation
+
 {source_case_prompt}
 
-### Published Diagnostic Reasoning:
+### Published clinical reasoning
+
 {source_reasoning}
 
-## Case Parameters
+## Case parameters
 
-- **Case ID**: `{case_id}`
-- **Condition**: `{condition_name}`
-- **Difficulty**: `{difficulty}`
-- **Encounter type**: `{encounter_type}`
+- Case ID: `{case_id}`
+- Condition: `{condition_name}`
+- Difficulty: `{difficulty}`
+- Encounter type: `{encounter_type}`
 
-## Condition Specifications
+## Condition specification
 
 {condition_yaml}
 
-## Instructions for Seed-Based Case Generation
+## Authoring requirements
 
-### 1. USE the real case as your clinical foundation
-- The patient demographics, clinical history, presenting symptoms, and exam findings should be **inspired by** the real case
-- You may modify demographics (age, sex, ethnicity) slightly for diversity, but keep the clinical scenario realistic and consistent with the source
-- The HPI should reflect the same clinical trajectory as the source case, written as a detailed narrative (at least 150 words)
-- Preserve the clinical complexity and atypical features from the real case — these are what make it realistic
+### Preserve the clinical case without leaking answers
 
-### 2. SEPARATE presentation from diagnostic evidence
-This is critical: the source case text often mentions diagnostic results inline (e.g., "MRI showed periventricular lesions"). You must:
-- **REMOVE** diagnostic test results from the HPI and patient presentation
-- Instead, place them in the structured **tool outputs** (MRI report, lab results, EEG report, CSF results, ECG)
-- The patient presentation should describe symptoms and exam findings, but NOT reveal what the tests showed
-- This forces the AI agent to **call diagnostic tools** to discover the evidence
+- Base demographics, chronology, symptoms, examination and complexity on the source.
+- Minor demographic changes are allowed for diversity when clinically coherent.
+- Write a detailed HPI of at least 150 words.
+- Remove diagnostic test results and the final diagnosis from the presentation. Put discoverable results in tool outputs.
+- Keep every patient field and tool result mutually consistent.
 
-### 3. ADD disguising information and red herrings (especially for moderate/puzzle difficulty)
-- **STRAIGHTFORWARD**: Findings clearly support the diagnosis. Minimal confounders.
-- **MODERATE**: Add 1-2 incidental/confounding findings:
-  - An incidental lab abnormality (e.g., mildly elevated TSH in a stroke patient)
-  - A borderline imaging finding that could suggest an alternative diagnosis
-  - A medication that could cause some of the symptoms
-  - A family history item that points to a different condition
-- **DIAGNOSTIC PUZZLE**: Add significant misdirection:
-  - Initial presentation mimics a different condition
-  - Key diagnostic test is initially equivocal or negative
-  - Red herring findings that suggest a more common diagnosis
-  - The critical diagnostic clue is buried in follow-up results, not initial tests
+### Simulate the patient at 360 degrees
 
-### 4. GENERATE structured tool outputs
-Create detailed specialist reports for the required modalities. Each report should:
-- Read like a real radiologist/pathologist/technician wrote it
-- Contain the key diagnostic findings from the source case (now extracted from the narrative)
-- Include realistic normal and incidental findings alongside pathological ones
-- Have appropriate confidence levels and recommended actions
-- Be internally consistent with each other and the patient presentation
+- Populate the presentation, history, medications, allergies, vital signs and complete relevant neurological examination.
+- Provide realistic initial, follow-up and fallback outputs so both useful and off-path actions return clinically coherent observations.
+- Use numeric laboratory values with units and reference ranges.
+- Use real medications with realistic doses, frequencies and indications.
+- Include at least five conditional follow-up outputs, spanning useful and less-useful actions where clinically appropriate.
 
-### 5. GENERATE follow-up outputs (at least 5)
-Create conditional outputs that an agent could request:
-- Additional imaging (repeat MRI, CT angiography, DaTscan, VEP, etc.)
-- Additional labs (autoimmune panels, genetic testing, specialized markers)
-- Additional tests (repeat LP, EEG monitoring, autonomic testing)
-- Literature searches and drug interaction checks
-- These should include both useful and less-useful follow-ups to test the agent's clinical judgment
+### Calibrate difficulty
 
-### 6. BUILD ground truth from the source case's reasoning
-- Use the published `diagnostic_reasoning` to inform your `key_reasoning_points`
-- Map the source's differential diagnosis discussion to structured `differential` entries
-- Create a realistic `optimal_actions` sequence that a competent neurologist would follow
-- Include `critical_actions` (must-do) and `contraindicated_actions` (must-not-do)
+- Straightforward: clear supporting findings and minimal confounding.
+- Moderate: one or two plausible incidental or misleading findings.
+- Diagnostic puzzle: a plausible mimic, equivocal early evidence or a decisive clue discoverable only through follow-up.
 
-### 7. METADATA
-Include in metadata:
+### Author a policy, not a golden trajectory
+
+Set `schema_version` to `"2.0"` and `ground_truth.review_status` to `"draft"`. Synthetic generation can never mark a policy approved.
+
+The ground truth must contain:
+
+- `diagnosis.accepted`: all defensible names that should count as correct.
+- `diagnosis.icd_codes`: applicable codes.
+- `differential`: plausible alternatives with likelihood and distinguishing features.
+- `action_criteria`: clinically meaningful evidence goals. Every criterion has a unique lowercase `criterion_id`, label, importance, one or more interchangeable tool-call patterns in `alternatives`, expected evidence, rationale and citations.
+- `avoided_actions`: case-specific wasteful, harmful or contraindicated calls, expressed as tool-call patterns with rationale and citations. Do not penalize a reasonable alternative merely because it differs from one preferred workflow.
+- `sequence_constraints`: only clinically meaningful ordering relations between existing action-criterion IDs. Use `hard` only for safety-critical ordering. Omit a constraint if either referenced criterion is absent; never invent an action criterion solely to satisfy a sequence.
+- `stop_rule.required_before_assessment`: existing required criterion IDs that must be satisfied before assessment.
+- `stop_rule.max_additional_actions`: a small defensible allowance after the stop condition is met.
+- `assessment.required_recommendations` and `assessment.prohibited_recommendations`.
+- `key_clinical_evidence`: observable evidence, not hidden chain-of-thought.
+- `red_herrings`: misleading data with its location, intended effect and correct interpretation.
+
+Do not create reasoning traces, thought text, ReAct transcripts or one canonical action order. The policy must score multiple clinically equivalent paths.
+
+### Metadata
+
+Include:
+
 - `"source": "MedCaseReasoning"`
 - `"source_pmcid": "{source_pmcid}"`
 - `"source_license": "CC-BY 4.0"`
 - `"generation_method": "real_case_seed"`
-- `"condition_name"`: human-readable condition name
-- `"difficulty_description"`: what makes this case this difficulty level
-- `"expected_agent_confidence"`: 0.80-0.90 for straightforward, 0.55-0.70 for moderate, 0.30-0.45 for puzzle
+- a human-readable condition name
+- a difficulty description
+- expected agent confidence: 0.80–0.90 for straightforward, 0.55–0.70 for moderate, 0.30–0.45 for puzzle
 
-## Clinical Realism Requirements
+## Output
 
-1. **Cross-modal consistency**: ALL tool outputs must be internally consistent with each other AND with the clinical narrative.
-2. **Lab values**: Use specific numeric values with correct units and reference ranges. Mark abnormal values correctly. Include complete panels (CBC, BMP at minimum).
-3. **Medications**: Use real drug names with realistic doses and frequencies. Include indication for each medication.
-4. **Neurological exam**: Write a complete neurological examination appropriate to the condition and difficulty level.
-5. **Vital signs**: Use physiologically realistic values adjusted for the clinical scenario.
-
-## Output Format
-
-Output a single JSON object. No wrapping, no explanation. Just the JSON.
+Return one valid JSON object only.

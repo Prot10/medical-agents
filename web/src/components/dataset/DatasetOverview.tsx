@@ -3,32 +3,9 @@ import { useCases } from "@/hooks/useCases"
 import { useAppStore } from "@/stores/appStore"
 import { DifficultyStars } from "@/components/ui/DifficultyStars"
 import { cn } from "@/lib/utils"
+import { CONDITION_COLORS, conditionLabel } from "@/lib/conditions"
 
-const CONDITION_LABELS: Record<string, string> = {
-  alzheimers_early: "Alzheimer's",
-  bacterial_meningitis: "Meningitis",
-  focal_epilepsy_temporal: "Epilepsy",
-  functional_neurological: "FND",
-  glioblastoma: "Glioblastoma",
-  ischemic_stroke: "Stroke",
-  multiple_sclerosis_rr: "MS",
-  nmdar_encephalitis: "NMDAR Enc.",
-  parkinsons: "Parkinson's",
-  cardiac_syncope: "Syncope",
-}
 
-const CONDITION_COLORS: Record<string, string> = {
-  alzheimers_early: "bg-purple-500",
-  bacterial_meningitis: "bg-red-500",
-  focal_epilepsy_temporal: "bg-blue-500",
-  functional_neurological: "bg-gray-500",
-  glioblastoma: "bg-rose-500",
-  ischemic_stroke: "bg-orange-500",
-  multiple_sclerosis_rr: "bg-cyan-500",
-  nmdar_encephalitis: "bg-emerald-500",
-  parkinsons: "bg-amber-500",
-  cardiac_syncope: "bg-indigo-500",
-}
 
 export function DatasetOverview() {
   const { data: cases } = useCases()
@@ -128,12 +105,12 @@ export function DatasetOverview() {
                     isActive ? "bg-primary/10" : "hover:bg-sidebar-accent",
                   )}
                 >
-                  <div className={cn("h-2 w-2 rounded-full shrink-0", CONDITION_COLORS[condition] ?? "bg-gray-500")} />
-                  <span className="text-sm truncate flex-1">{CONDITION_LABELS[condition] ?? condition}</span>
+                  <div className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: CONDITION_COLORS[condition] ?? "#6b7280" }} />
+                  <span className="text-sm truncate flex-1">{conditionLabel(condition)}</span>
                   <div className="flex items-center gap-1.5">
                     <div className="w-16 h-1.5 rounded-full bg-border overflow-hidden">
                       <div
-                        className={cn("h-full rounded-full transition-all", CONDITION_COLORS[condition] ?? "bg-gray-500")}
+                        className="h-full rounded-full transition-all"
                         style={{ width: `${(count / stats.maxCondCount) * 100}%` }}
                       />
                     </div>

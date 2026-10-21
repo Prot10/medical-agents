@@ -1,12 +1,8 @@
 from __future__ import annotations
 
-import logging
-from typing import Any
 
 from .base import BaseTool
-from .vocabulary import is_valid_mri_protocol, mri_protocols
-
-logger = logging.getLogger(__name__)
+from .vocabulary import mri_protocols
 
 
 class MRIAnalyzerTool(BaseTool):
@@ -45,15 +41,3 @@ class MRIAnalyzerTool(BaseTool):
         },
         "required": ["clinical_context"],
     }
-
-    def _validate_parameters(self, parameters: dict[str, Any]) -> None:
-        """Warn (only) when `protocol` is outside the closed vocabulary."""
-        protocol = parameters.get("protocol")
-        if isinstance(protocol, str) and not is_valid_mri_protocol(protocol):
-            logger.warning(
-                "analyze_brain_mri called with out-of-vocabulary protocol %r (known: %s). "
-                "Proceeding unchanged — the protocol does not change billing, but no "
-                "optimal action pinning a protocol can match.",
-                protocol,
-                ", ".join(mri_protocols()),
-            )

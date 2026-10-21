@@ -95,7 +95,7 @@ rsync -az agent-platform/src/neuroagent/__init__.py \
   "$VPS_HOST:$VPS_PATH/agent-platform/src/neuroagent/__init__.py"
 
 # Shared dataset registry — review_api's config/routes/services all import
-# from neuroagent.datasets (dataset version resolution + legacy aliases).
+# from neuroagent.datasets (strict dataset registry and loader).
 # It lives outside review_api/ so it must be shipped explicitly.
 rsync -az agent-platform/src/neuroagent/datasets.py \
   "$VPS_HOST:$VPS_PATH/agent-platform/src/neuroagent/datasets.py"

@@ -10,13 +10,12 @@ export function TokenCounter({ tokens, time, status, startedAt }: {
   // Tick the live timer while a run is in flight
   useEffect(() => {
     if (status !== "running" || startedAt == null) return
-    setNow(Date.now())
     const id = window.setInterval(() => setNow(Date.now()), 100)
     return () => window.clearInterval(id)
   }, [status, startedAt])
 
   const elapsed =
-    status === "running" && startedAt != null ? (now - startedAt) / 1000 : time
+    status === "running" && startedAt != null ? Math.max(0, now - startedAt) / 1000 : time
 
   return (
     <div className="flex items-center gap-3 text-sm font-mono text-muted-foreground">

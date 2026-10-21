@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useModelLoadingStore } from "@/stores/modelLoadingStore"
 import { X, Loader2, CheckCircle2, AlertCircle, Cpu } from "lucide-react"
 
@@ -21,8 +21,6 @@ export function ModelLoadingToast() {
     if (phase === "starting" || (phase === "loading" && startTimeRef.current === 0)) {
       startTimeRef.current = performance.now()
       lastServerElapsed.current = 0
-      setSmoothProgress(0)
-      setSmoothElapsed(0)
     }
     if (phase === "idle") {
       startTimeRef.current = 0
@@ -40,37 +38,30 @@ export function ModelLoadingToast() {
   }, [elapsed])
 
   // Smooth animation loop
-  const animate = useCallback(() => {
-    if (!startTimeRef.current || phase === "idle" || phase === "ready" || phase === "error") return
-
-    const localElapsed = (performance.now() - startTimeRef.current) / 1000
-    const clampedElapsed = Math.max(0, localElapsed)
-    const expected = expectedSeconds || 60
-    // Smooth progress: asymptotic curve that approaches 95% but never reaches it
-    const t = clampedElapsed / expected
-    const smoothP = Math.min(95, t * 90 / (1 + t * 0.1))
-
-    setSmoothElapsed(Math.round(clampedElapsed))
-    setSmoothProgress(Math.round(smoothP))
-
-    rafRef.current = requestAnimationFrame(animate)
-  }, [phase, expectedSeconds])
-
   useEffect(() => {
-    const isActive = phase !== "idle" && phase !== "ready" && phase !== "error"
-    if (isActive) {
+    if (phase === "idle" || phase === "ready" || phase === "error") return
+
+    const animate = () => {
+      if (!startTimeRef.current) {
+        rafRef.current = requestAnimationFrame(animate)
+        return
+      }
+      const localElapsed = (performance.now() - startTimeRef.current) / 1000
+      const clampedElapsed = Math.max(0, localElapsed)
+      const expected = expectedSeconds || 60
+      // Smooth progress: asymptotic curve that approaches 95% but never reaches it
+      const t = clampedElapsed / expected
+      const smoothP = Math.min(95, t * 90 / (1 + t * 0.1))
+
+      setSmoothElapsed(Math.round(clampedElapsed))
+      setSmoothProgress(Math.round(smoothP))
+
       rafRef.current = requestAnimationFrame(animate)
     }
-    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
-  }, [phase, animate])
 
-  // Snap to 100% on ready
-  useEffect(() => {
-    if (phase === "ready") {
-      setSmoothProgress(100)
-      setSmoothElapsed(elapsed)
-    }
-  }, [phase, elapsed])
+    rafRef.current = requestAnimationFrame(animate)
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
+  }, [phase, expectedSeconds])
 
   // Auto-dismiss
   useEffect(() => {

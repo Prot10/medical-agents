@@ -9,7 +9,7 @@ currency" — currently EUR.
 
 import pytest
 
-from neuroagent.tools.cost_tracker import CostTracker, ToolCostEntry
+from neuroagent.tools.cost_tracker import CostConfigError, CostTracker, ToolCostEntry
 
 
 @pytest.fixture
@@ -104,9 +104,10 @@ class TestCostTrackerLabs:
         assert entry.cost_usd == 23.0  # default_panel
         assert "unspecified" in entry.cost_breakdown
 
-    def test_unknown_panel_uses_default(self, tracker: CostTracker):
-        entry = tracker.compute_cost("interpret_labs", {"panels": ["custom_panel"]})
-        assert entry.cost_usd == 23.0  # default_panel cost
+    def test_unknown_panel_is_a_configuration_error(self, tracker: CostTracker):
+        # The tool schema rejects unpriced panels before pricing, so reaching here is a config bug.
+        with pytest.raises(CostConfigError):
+            tracker.compute_cost("interpret_labs", {"panels": ["custom_panel"]})
 
 
 class TestCostTrackerCSF:

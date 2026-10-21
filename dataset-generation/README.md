@@ -107,23 +107,14 @@ uv run --project dataset-generation python dataset-generation/scripts/dataset_st
 - Real-seeded cases: `{ABBREV}-R{S|M|P}{NUMBER}` — e.g., `ISCH-STR-RS01`, `MS-RR-RP03` (R = real-seeded)
 - Difficulty: S = straightforward, M = moderate, P = diagnostic puzzle
 
-## Dataset Versions
+## Dataset contract
 
-- **v1** — fully synthetic (Pipeline 1), enhanced tool outputs. 10 conditions × 10 cases (4S + 3M + 3P).
-- **v2** — real-case-seeded (Pipeline 2), enhanced tool outputs. Same 10 conditions and per-condition distribution.
-- **v3** — v1 + v2 combined with their original IDs; tool outputs stripped to "realistic" mode (interpretive fields removed to match real clinical reports).
-- **v4** — migrated from v3 to the 12-tool schema + cost tracking (`order_advanced_imaging`, `order_specialized_test`, etc.; see `docs/benchmark/tool-contract.md`).
-- **v5** — **current default**: 600 cases across 20 conditions (30 per condition, mixed synthetic + real-seeded), in `data/neurobench/cases/`. Generated via per-condition criteria packs (`criteria_packs/`) + real-case seeds (`seeds/`). Split into 500 train / 100 test (`data/neurobench/splits/`; the test set includes 2 held-out conditions).
-  - **Composition change, August 2026 (clinical tool review).** `peripheral_neuropathy` was
-    retired — both reviewers judged it too broad a category to score — and **vascular dementia**
-    (`VASC-DEM`, 30 synthetic cases) took its place, completing the four major dementias so the
-    differential among them becomes scoreable. The split was rebuilt with
-    `make_train_test_split --preserve <previous manifest>`, which keeps every surviving case on
-    the side it was already on: only the 30 new cases were placed (28 train, 2 test), so
-    published numbers stay comparable and existing gold trajectories stay valid. The 28 new
-    train cases have no gold trajectory yet and are listed in
-    `tests/test_sft_inference_parity.py::AWAITING_DISTILLATION` until the corpus is regenerated.
+The only supported dataset key is `neurobench`. It contains 600 schema-v2 cases across 20
+conditions (30 per condition) in `data/neurobench/cases/`, with the fixed train/test manifests
+in `data/neurobench/splits/`. Each case defines acceptable clinical criteria, explicitly avoided
+actions, sequence constraints and stopping conditions. It does not prescribe a single action
+trajectory or expose chain-of-thought.
 
-## External Data Sources
-
-See `docs/archive/dataset-generation/external_case_sources.md` (historical) for the research on 22+ medical case datasets evaluated for NeuroBench expansion, including licensing, access methods, and mapping potential.
+The current composition includes vascular dementia and excludes the former broad
+`peripheral_neuropathy` category. All cases must pass the strict schema validator; invalid cases
+are never silently skipped.

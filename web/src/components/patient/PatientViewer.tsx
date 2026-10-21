@@ -47,8 +47,8 @@ function VitalCard({ label, value, unit, icon: Icon, abnormal }: {
 function isVitalAbnormal(key: string, value: number): boolean {
   const ranges: Record<string, [number, number]> = {
     bp_systolic: [90, 140], bp_diastolic: [60, 90],
-    heart_rate: [60, 100], temperature: [36.1, 37.5],
-    respiratory_rate: [12, 20], spo2: [95, 100],
+    hr: [60, 100], temp: [36.1, 37.5],
+    rr: [12, 20], spo2: [95, 100],
   }
   const range = ranges[key]
   return range ? value < range[0] || value > range[1] : false
@@ -63,14 +63,14 @@ function VitalsGrid({ vitals }: { vitals: Vitals }) {
       abnormal: isVitalAbnormal("bp_systolic", vitals.bp_systolic) || isVitalAbnormal("bp_diastolic", vitals.bp_diastolic),
     })
   }
-  if (vitals.heart_rate) {
-    vitalEntries.push({ label: "Heart Rate", value: vitals.heart_rate, unit: "bpm", icon: Heart, abnormal: isVitalAbnormal("heart_rate", vitals.heart_rate) })
+  if (vitals.hr) {
+    vitalEntries.push({ label: "Heart Rate", value: vitals.hr, unit: "bpm", icon: Heart, abnormal: isVitalAbnormal("hr", vitals.hr) })
   }
-  if (vitals.temperature) {
-    vitalEntries.push({ label: "Temperature", value: vitals.temperature, unit: "°C", icon: Thermometer, abnormal: isVitalAbnormal("temperature", vitals.temperature) })
+  if (vitals.temp) {
+    vitalEntries.push({ label: "Temperature", value: vitals.temp, unit: "°C", icon: Thermometer, abnormal: isVitalAbnormal("temp", vitals.temp) })
   }
-  if (vitals.respiratory_rate) {
-    vitalEntries.push({ label: "Respiratory Rate", value: vitals.respiratory_rate, unit: "/min", icon: Wind, abnormal: isVitalAbnormal("respiratory_rate", vitals.respiratory_rate) })
+  if (vitals.rr) {
+    vitalEntries.push({ label: "Respiratory Rate", value: vitals.rr, unit: "/min", icon: Wind, abnormal: isVitalAbnormal("rr", vitals.rr) })
   }
   if (vitals.spo2) {
     vitalEntries.push({ label: "SpO2", value: vitals.spo2, unit: "%", icon: Droplets, abnormal: isVitalAbnormal("spo2", vitals.spo2) })

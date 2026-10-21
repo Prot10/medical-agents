@@ -1,51 +1,53 @@
 import { useEffect, useRef, useCallback, useState } from "react"
-import { Stethoscope, BarChart3, History, PanelLeftClose, PanelLeft, Moon, Sun, ChevronDown, ChevronUp, Hospital, Settings, Shield, Play, Square, Network } from "lucide-react"
+import { Stethoscope, BarChart3, History, PanelLeftClose, PanelLeft, Moon, Sun, ChevronDown, ChevronUp, Hospital, SlidersHorizontal, Shield, Play, Square, Network } from "lucide-react"
 import { useQueryClient } from "@tanstack/react-query"
 import { useAppStore } from "@/stores/appStore"
-import { useModels, useHospitals } from "@/hooks/useCases"
+import { useModels, useProfiles } from "@/hooks/useCases"
 import { api, consumeSSEStream } from "@/api/client"
 import { useModelLoadingStore } from "@/stores/modelLoadingStore"
 import type { LoadEvent } from "@/stores/modelLoadingStore"
 import { cn } from "@/lib/utils"
+import { LOOP_LABELS, profileLoop, profileModelKey } from "@/lib/policy"
 import { CaseBrowser } from "@/components/cases/CaseBrowser"
 import { DatasetOverview } from "@/components/dataset/DatasetOverview"
-import { TraceBrowser } from "@/components/traces/TraceBrowser"
-import { SettingsPanel } from "@/components/settings/SettingsPanel"
+import { EpisodeBrowser } from "@/components/episodes/EpisodeBrowser"
+import { ProfilesPanel } from "@/components/profiles/ProfilesPanel"
 import { HospitalRulesBrowser } from "@/components/hospital/HospitalRulesBrowser"
 
 const NAV_ITEMS = [
   { id: "cases" as const, label: "Cases", icon: Stethoscope },
   { id: "dataset" as const, label: "Dataset", icon: BarChart3 },
-  { id: "traces" as const, label: "Traces", icon: History },
+  { id: "episodes" as const, label: "Episodes", icon: History },
   { id: "rules" as const, label: "Rules", icon: Shield },
   { id: "architecture" as const, label: "Architecture", icon: Network },
-  { id: "settings" as const, label: "Settings", icon: Settings },
+  { id: "profiles" as const, label: "Profiles", icon: SlidersHorizontal },
 ]
 
 export function Sidebar() {
   const {
     sidebarCollapsed, toggleSidebar, activeSection, setActiveSection,
     darkMode, toggleDarkMode,
-    selectedModel, setModel, selectedEvaluatorModel, setEvaluatorModel,
-    selectedHospital, setHospital,
+    selectedProfileId, setProfile,
   } = useAppStore()
   const { data: models } = useModels()
-  const { data: hospitals } = useHospitals()
+  const { data: profiles } = useProfiles()
   const { isLoading, modelKey: loadingKey, startLoading, handleEvent, reset: resetLoading } = useModelLoadingStore()
   const queryClient = useQueryClient()
   const abortRef = useRef<AbortController | null>(null)
 
-  // Auto-select first ready model only on initial load (not on every selection change)
+  const currentProfile = profiles?.find((p) => p.profile_id === selectedProfileId)
+  const modelKey = profileModelKey(currentProfile)
+  const currentModel = models?.find((m) => m.key === modelKey)
+
+  // Auto-select a profile whose model is already served, only on initial load
   const hasAutoSelected = useRef(false)
   useEffect(() => {
-    if (!models || hasAutoSelected.current) return
+    if (!models || !profiles || hasAutoSelected.current) return
     hasAutoSelected.current = true
-    const current = models.find((m) => m.key === selectedModel)
-    if (!current || current.status !== "ready") {
-      const firstReady = models.find((m) => m.status === "ready")
-      if (firstReady) setModel(firstReady.key)
-    }
-  }, [models, selectedModel, setModel])
+    if (currentModel?.status === "ready") return
+    const ready = profiles.find((p) => models.find((m) => m.key === profileModelKey(p))?.status === "ready")
+    if (ready) setProfile(ready.profile_id)
+  }, [models, profiles, currentModel, setProfile])
 
   const triggerLoad = useCallback(async (key: string) => {
     const model = models?.find((m) => m.key === key)
@@ -94,15 +96,13 @@ export function Sidebar() {
 
   const [footerExpanded, setFooterExpanded] = useState(false)
 
-  const currentModel = models?.find((m) => m.key === selectedModel)
-  const currentHospital = hospitals?.find((h) => h.id === selectedHospital)
   const statusColor = {
     ready: "bg-emerald-500",
     loading: "bg-amber-500",
     offline: "bg-zinc-500",
   }[currentModel?.status ?? "offline"]
   const canLoad = currentModel && currentModel.status !== "ready" && !isLoading
-  const isLoadingThis = isLoading && loadingKey === selectedModel
+  const isLoadingThis = isLoading && loadingKey === modelKey
 
   return (
     <aside
@@ -159,14 +159,14 @@ export function Sidebar() {
           <div className="h-full overflow-y-auto">
             {activeSection === "cases" && <CaseBrowser />}
             {activeSection === "dataset" && <DatasetOverview />}
-            {activeSection === "traces" && <TraceBrowser />}
+            {activeSection === "episodes" && <EpisodeBrowser />}
             {activeSection === "rules" && <HospitalRulesBrowser />}
-            {activeSection === "settings" && <SettingsPanel />}
+            {activeSection === "profiles" && <ProfilesPanel />}
           </div>
         )}
       </div>
 
-      {/* Footer: Collapsible config + Dark mode */}
+      {/* Footer: Collapsible profile picker + Dark mode */}
       <div className={cn("border-t border-sidebar-border", sidebarCollapsed ? "px-2 py-2" : "")}>
         {!sidebarCollapsed ? (
           <>
@@ -176,45 +176,41 @@ export function Sidebar() {
               className="w-full flex items-center gap-2 px-3 py-2 hover:bg-sidebar-accent transition-colors text-sm"
             >
               <span className={cn("h-2 w-2 rounded-full shrink-0", statusColor, isLoadingThis && "animate-pulse")} />
-              <span className="truncate text-sidebar-foreground font-medium">
-                {currentModel?.name ?? selectedModel}
-              </span>
-              <span className="text-muted-foreground truncate">
-                {currentHospital?.name?.split("(")[0]?.split(",")[0]?.trim() ?? selectedHospital}
+              <span className="truncate text-sidebar-foreground font-medium font-mono">
+                {selectedProfileId}
               </span>
               <span className="ml-auto shrink-0 text-muted-foreground">
                 {footerExpanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
               </span>
             </button>
 
-            {/* Expanded pickers */}
+            {/* Expanded picker */}
             {footerExpanded && (
               <div className="px-3 pb-3 space-y-2">
-                {/* Agent Model picker */}
                 <div className="space-y-1">
-                  <label className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">Agent Model</label>
-                  <div className="flex gap-1.5">
-                    <div className="relative flex-1">
-                      <select
-                        value={selectedModel}
-                        onChange={(e) => setModel(e.target.value)}
-                        className="w-full text-sm bg-sidebar-accent border border-sidebar-border rounded-lg pl-6 pr-7 py-1.5 text-sidebar-foreground focus:outline-none focus:ring-1 focus:ring-ring appearance-none"
-                      >
-                        {models?.filter((m) => m.provider !== "copilot").map((m) => (
-                          <option key={m.key} value={m.key}>
-                            {m.name} {m.status !== "ready" ? `(${m.status})` : ""}
-                          </option>
-                        ))}
-                        {models?.some((m) => m.provider === "copilot") && (
-                          <optgroup label="GitHub Copilot">
-                            {models?.filter((m) => m.provider === "copilot").map((m) => (
-                              <option key={m.key} value={m.key}>{m.name}</option>
-                            ))}
-                          </optgroup>
-                        )}
-                      </select>
-                      <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground pointer-events-none" />
-                      <span className={`absolute left-2 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full ${statusColor} ${isLoadingThis ? "animate-pulse" : ""}`} />
+                  <label className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">Profile</label>
+                  <div className="relative">
+                    <select
+                      value={selectedProfileId}
+                      onChange={(e) => setProfile(e.target.value)}
+                      className="w-full text-sm bg-sidebar-accent border border-sidebar-border rounded-lg pl-2.5 pr-7 py-1.5 text-sidebar-foreground focus:outline-none focus:ring-1 focus:ring-ring appearance-none font-mono"
+                    >
+                      {profiles?.map((p) => (
+                        <option key={p.profile_id} value={p.profile_id}>{p.profile_id}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground pointer-events-none" />
+                  </div>
+                </div>
+
+                {/* The profile's model and its serving state */}
+                <div className="space-y-1">
+                  <label className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">Model</label>
+                  <div className="flex items-center gap-1.5">
+                    <div className="flex-1 min-w-0 flex items-center gap-2 text-sm bg-sidebar-accent border border-sidebar-border rounded-lg px-2.5 py-1.5">
+                      <span className={cn("h-2 w-2 rounded-full shrink-0", statusColor, isLoadingThis && "animate-pulse")} />
+                      <span className="truncate text-sidebar-foreground">{currentModel?.name ?? modelKey ?? "—"}</span>
+                      <span className="ml-auto text-xs text-muted-foreground shrink-0">{currentModel?.status ?? "offline"}</span>
                     </div>
                     {isLoadingThis ? (
                       <button
@@ -224,9 +220,9 @@ export function Sidebar() {
                       >
                         <Square className="h-3.5 w-3.5 fill-current" />
                       </button>
-                    ) : canLoad ? (
+                    ) : canLoad && modelKey ? (
                       <button
-                        onClick={() => triggerLoad(selectedModel)}
+                        onClick={() => triggerLoad(modelKey)}
                         className="px-2.5 py-1.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-lg hover:bg-emerald-500/15 transition-colors shrink-0 flex items-center gap-1"
                         title="Load this model"
                       >
@@ -235,49 +231,9 @@ export function Sidebar() {
                       </button>
                     ) : null}
                   </div>
-                </div>
-
-                {/* Evaluator Model picker */}
-                <div className="space-y-1">
-                  <label className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">Evaluator Model</label>
-                  <div className="relative">
-                    <select
-                      value={selectedEvaluatorModel}
-                      onChange={(e) => setEvaluatorModel(e.target.value)}
-                      className="w-full text-sm bg-sidebar-accent border border-sidebar-border rounded-lg px-2.5 py-1.5 text-sidebar-foreground focus:outline-none focus:ring-1 focus:ring-ring appearance-none pr-7"
-                    >
-                      <option value="">Select evaluator...</option>
-                      {models?.filter((m) => m.provider !== "copilot").map((m) => (
-                        <option key={m.key} value={m.key}>
-                          {m.name} {m.status !== "ready" ? `(${m.status})` : ""}
-                        </option>
-                      ))}
-                      {models?.some((m) => m.provider === "copilot") && (
-                        <optgroup label="GitHub Copilot">
-                          {models?.filter((m) => m.provider === "copilot").map((m) => (
-                            <option key={m.key} value={m.key}>{m.name}</option>
-                          ))}
-                        </optgroup>
-                      )}
-                    </select>
-                    <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground pointer-events-none" />
-                  </div>
-                </div>
-
-                {/* Hospital picker */}
-                <div className="space-y-1">
-                  <label className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">Hospital</label>
-                  <div className="relative">
-                    <select
-                      value={selectedHospital}
-                      onChange={(e) => setHospital(e.target.value)}
-                      className="w-full text-sm bg-sidebar-accent border border-sidebar-border rounded-lg px-2.5 py-1.5 text-sidebar-foreground focus:outline-none focus:ring-1 focus:ring-ring appearance-none pr-7"
-                    >
-                      {hospitals?.map((h) => (
-                        <option key={h.id} value={h.id}>{h.name}</option>
-                      ))}
-                    </select>
-                    <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground pointer-events-none" />
+                  <div className="text-xs text-muted-foreground">
+                    {LOOP_LABELS[profileLoop(currentProfile) ?? ""] ?? profileLoop(currentProfile)} loop
+                    {currentProfile && ` · ${currentProfile.max_turns} turns`}
                   </div>
                 </div>
               </div>

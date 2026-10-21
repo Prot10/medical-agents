@@ -1,77 +1,77 @@
 import { useCallback } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { api, replayTrace } from "@/api/client"
+import { api } from "@/api/client"
 import { useAgentStore } from "@/stores/agentStore"
 import { useAppStore } from "@/stores/appStore"
+import type { ClinicalEpisode, EpisodeEvent } from "@/api/types"
 
-export function useTraces() {
+/** Delay between replayed events, so a saved episode unfolds like a live run. */
+const REPLAY_STEP_MS = 450
+
+export function useEpisodes() {
   return useQuery({
-    queryKey: ["traces"],
-    queryFn: api.getTraces,
+    queryKey: ["episodes"],
+    queryFn: api.getEpisodes,
     staleTime: 5_000,
   })
 }
 
+function caseIdOf(episode: ClinicalEpisode): string | undefined {
+  const started = episode.events.find((e) => e.type === "run.started")
+  return started?.type === "run.started" ? started.case_id : undefined
+}
+
 export function useReplay() {
-  const { startRun, setAbortController, appendEvent, setError } = useAgentStore()
+  const { startRun, setAbortController, appendFrame, loadEpisode, setReward, setError } = useAgentStore()
+
+  const fetchEpisode = useCallback(async (episodeId: string) => {
+    const [episode, reward] = await Promise.all([
+      api.getEpisode(episodeId),
+      api.getEpisodeReward(episodeId).catch(() => null),
+    ])
+    const caseId = caseIdOf(episode)
+    if (caseId) useAppStore.getState().selectCase(caseId)
+    return { events: episode.events, reward }
+  }, [])
 
   const replay = useCallback(
-    async (traceId: string) => {
+    async (episodeId: string) => {
       useAgentStore.getState().abortController?.abort()
       const controller = new AbortController()
-
-      startRun()
-      setAbortController(controller)
-
       try {
-        await replayTrace(
-          traceId,
-          (event) => {
-            // Set selectedCaseId from the run_started event
-            if (event.type === "run_started" && event.case_id) {
-              useAppStore.getState().selectCase(event.case_id)
-            }
-            appendEvent(event)
-          },
-          (err) => setError(err.message),
-          controller.signal,
-        )
-      } catch (err) {
-        if ((err as Error).name !== "AbortError") {
-          setError((err as Error).message)
+        const { events, reward } = await fetchEpisode(episodeId)
+        startRun()
+        setAbortController(controller)
+        for (const event of events as EpisodeEvent[]) {
+          await new Promise((resolve) => setTimeout(resolve, REPLAY_STEP_MS))
+          if (controller.signal.aborted) return
+          appendFrame(event)
         }
+        loadEpisode(events, episodeId)
+        setReward(reward)
+      } catch (err) {
+        setError((err as Error).message)
       } finally {
         if (useAgentStore.getState().abortController === controller) {
           setAbortController(null)
         }
       }
     },
-    [startRun, setAbortController, appendEvent, setError],
+    [fetchEpisode, startRun, setAbortController, appendFrame, loadEpisode, setReward, setError],
   )
 
   const replayInstant = useCallback(
-    async (traceId: string) => {
-      // Fetch the trace JSON directly and load all events at once
+    async (episodeId: string) => {
+      useAgentStore.getState().abortController?.abort()
       try {
-        const traceData = await api.getTrace(traceId)
-        const events = traceData.events ?? []
-        const caseId = traceData.case_id
-
-        if (caseId) {
-          useAppStore.getState().selectCase(caseId)
-        }
-
-        startRun()
-
-        // Append all events immediately (no streaming delays)
-        for (const event of events) {
-          appendEvent(event)
-        }
+        const { events, reward } = await fetchEpisode(episodeId)
+        loadEpisode(events, episodeId)
+        setReward(reward)
       } catch (err) {
         setError((err as Error).message)
       }
     },
-    [startRun, appendEvent, setError],
+    [fetchEpisode, loadEpisode, setReward, setError],
   )
 
   const stop = useCallback(() => {

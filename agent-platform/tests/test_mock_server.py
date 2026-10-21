@@ -46,9 +46,10 @@ def test_followup_eeg(mock_server):
     assert result2.success
 
 
-def test_ecg_not_available(mock_server):
+def test_ecg_without_case_data_comes_from_the_library(mock_server):
     result = mock_server.get_output("analyze_ecg", {})
-    assert not result.success
+    assert result.success and result.from_fallback and result.library
+    assert result.output["interpretation"]
 
 
 class TestFollowUpOutputResolution:

@@ -4,7 +4,7 @@
 expected to use and which are required. Those lists are a **generation input**, not a per-case
 contract: a case may legitimately require a tool the panel calls optional (a mimic whose
 differential turns on it), and may legitimately omit one the panel calls required (an
-intercurrent reason not to do it). `validate_cases.py` therefore does not gate on the
+intercurrent reason not to do it). The schema validator therefore does not gate on the
 difference, and should not.
 
 But nothing surfaced it either, and that is how a real contradiction survived. The clinical
@@ -24,18 +24,15 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 from collections import Counter, defaultdict
 from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from validate_cases import CASES_DIR  # noqa: E402
 
 from neuroagent.review_api.services.tool_catalog import (  # noqa: E402
     _CONDITION_ALIAS,
     _MODALITY_TO_TOOL,
 )
 
+CASES_DIR = Path("data/neurobench/cases")
 CONDITIONS_YAML = Path("dataset-generation/config/conditions.yaml")
 
 
@@ -61,9 +58,9 @@ def build_report(cases_dir: Path, conditions_path: Path) -> dict:
         required = _tools(entry.get("required_modalities"))
         optional = _tools(entry.get("optional_modalities"))
         tiers: dict[str, set[str]] = defaultdict(set)
-        for action in case["ground_truth"]["optimal_actions"]:
-            if action.get("tool_name"):
-                tiers[action["tool_name"]].add(action["category"])
+        for criterion in case["ground_truth"]["action_criteria"]:
+            for pattern in criterion["alternatives"]:
+                tiers[pattern["tool_name"]].add(criterion["importance"])
         for tool in sorted(required):
             if "required" not in tiers.get(tool, set()):
                 missing[condition][tool] += 1

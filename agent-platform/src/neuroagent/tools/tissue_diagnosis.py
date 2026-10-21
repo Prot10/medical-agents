@@ -22,18 +22,12 @@ inadequate for molecular work-up, and the molecular panel is meaningless without
 
 from __future__ import annotations
 
-import logging
-from typing import Any
 
 from .base import BaseTool
 from .vocabulary import (
-    is_valid_molecular_assay,
-    is_valid_tissue_procedure,
     molecular_assays,
     tissue_procedures,
 )
-
-logger = logging.getLogger(__name__)
 
 
 class TissueDiagnosisTool(BaseTool):
@@ -90,25 +84,3 @@ class TissueDiagnosisTool(BaseTool):
         },
         "required": ["clinical_context", "procedure"],
     }
-
-    def _validate_parameters(self, parameters: dict[str, Any]) -> None:
-        """Warn (only) on out-of-vocabulary procedure or assay."""
-        procedure = parameters.get("procedure")
-        if isinstance(procedure, str) and not is_valid_tissue_procedure(procedure):
-            logger.warning(
-                "obtain_tissue_diagnosis called with out-of-vocabulary procedure %r "
-                "(known: %s). Proceeding unchanged — fallback output/cost will apply.",
-                procedure,
-                ", ".join(tissue_procedures()),
-            )
-        assays = parameters.get("molecular_assays")
-        if isinstance(assays, (list, tuple)):
-            unknown = [a for a in assays if not is_valid_molecular_assay(str(a))]
-            if unknown:
-                logger.warning(
-                    "obtain_tissue_diagnosis called with %d out-of-vocabulary molecular "
-                    "assay(s): %s. Proceeding unchanged — default rate applies and no "
-                    "optimal action can match them.",
-                    len(unknown),
-                    ", ".join(repr(u) for u in unknown),
-                )

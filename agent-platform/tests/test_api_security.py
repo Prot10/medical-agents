@@ -1,17 +1,12 @@
 """Tests for the audited API security/robustness fixes.
 
-Covers: SSE bridge thread-safety and disconnect handling, trace-id path
-traversal validation, CORS allowlist, copilot error status codes and token
-file permissions, hospital rules mutation serialization, review-API rate
-limiter keying, and annotation-store write locking.
+Covers episode-id path traversal validation, the CORS allowlist, hospital-rule
+mutation serialization, review-API rate-limiter keying, and annotation-store
+write locking.
 """
 
 from __future__ import annotations
 
-import asyncio
-import json
-import os
-import stat
 import threading
 
 import pytest
@@ -19,104 +14,37 @@ from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 from starlette.requests import Request as StarletteRequest
 
-from neuroagent.api.routes.traces import validate_trace_id
-from neuroagent.api.services.sse_bridge import SSEBridge
+from neuroagent.api.routes.episodes import validate_episode_id
 from neuroagent.datasets import CANONICAL_DATASET_VERSION
 from neuroagent.review_api.services.annotation_store import AnnotationStore
 from neuroagent.review_api.services.rate_limit import AuthRateLimiter
 
 
 # ---------------------------------------------------------------------------
-# Fix 4: trace_id path traversal
+# Persisted episode path traversal
 
 
-@pytest.mark.parametrize("trace_id", ["TIA-S001_123456", "CASE_1-RS002_999", "abc"])
-def test_validate_trace_id_accepts_real_ids(trace_id):
-    assert validate_trace_id(trace_id) == trace_id
+@pytest.mark.parametrize("episode_id", ["TIA-S001_123456", "CASE_1-RS002_999", "abc"])
+def test_validate_episode_id_accepts_real_ids(episode_id):
+    assert validate_episode_id(episode_id) == episode_id
 
 
 @pytest.mark.parametrize(
-    "trace_id",
-    ["", "..", "../secrets", "a/b", "a\\b", "..\\..\\x", "x/../y", "a.json", "a b"],
+    "episode_id",
+    ["", "..", "../secrets", "a/b", "a\\\\b", "..\\\\..\\\\x", "x/../y", "a.json", "a b"],
 )
-def test_validate_trace_id_rejects_traversal(trace_id):
+def test_validate_episode_id_rejects_traversal(episode_id):
     with pytest.raises(HTTPException) as exc:
-        validate_trace_id(trace_id)
+        validate_episode_id(episode_id)
     assert exc.value.status_code == 400
 
 
-def test_trace_endpoints_reject_traversal():
+def test_episode_endpoints_reject_traversal():
     from neuroagent.api.app import app
 
     client = TestClient(app)
-    resp = client.post("/api/v1/agent/replay", json={"trace_id": "../../etc/passwd"})
+    resp = client.get("/api/v1/episodes/..%5C..%5Cx")
     assert resp.status_code == 400
-
-    resp = client.get("/api/v1/traces/..%5C..%5Cx")
-    assert resp.status_code == 400
-
-
-# ---------------------------------------------------------------------------
-# Fixes 1-2: SSE bridge
-
-
-def test_sse_bridge_forwards_events_from_worker_thread():
-    async def scenario():
-        bridge = SSEBridge()
-        loop = asyncio.get_running_loop()
-
-        def worker():
-            for i in range(200):
-                bridge.put_from_thread({"type": "event", "i": i})
-            bridge.put_from_thread(None)
-
-        fut = loop.run_in_executor(None, worker)
-        received = [e async for e in bridge.events()]
-        await fut
-        assert [e["i"] for e in received] == list(range(200))
-
-    asyncio.run(scenario())
-
-
-def test_sse_bridge_drops_events_after_disconnect_but_terminates():
-    async def scenario():
-        bridge = SSEBridge()
-        bridge.mark_disconnected()
-        bridge.put_from_thread({"type": "event"})
-        bridge.put_from_thread(None)  # sentinel is never dropped
-        await asyncio.sleep(0.05)
-        events = [e async for e in bridge.events()]
-        assert events == []
-
-    asyncio.run(scenario())
-
-
-def test_sse_bridge_marks_disconnect_when_consumer_abandons():
-    async def scenario():
-        bridge = SSEBridge()
-        bridge.put_from_thread({"type": "a"})
-        await asyncio.sleep(0.05)
-        agen = bridge.events()
-        first = await agen.__anext__()
-        assert first == {"type": "a"}
-        await agen.aclose()  # simulates the SSE client disconnecting
-        assert bridge.client_disconnected
-
-    asyncio.run(scenario())
-
-
-def test_sse_bridge_full_queue_drops_events_but_keeps_sentinel():
-    async def scenario():
-        bridge = SSEBridge(maxsize=2)
-        for i in range(5):
-            bridge.put_from_thread({"type": "event", "i": i})
-        bridge.put_from_thread(None)
-        await asyncio.sleep(0.05)
-        # e0/e1 queued, e2-e4 dropped, sentinel evicted e0.
-        events = [e async for e in bridge.events()]
-        assert events == [{"type": "event", "i": 1}]
-
-    asyncio.run(scenario())
 
 
 # ---------------------------------------------------------------------------
@@ -128,7 +56,7 @@ def test_cors_origins_env_extension(monkeypatch):
 
     monkeypatch.delenv("NEUROAGENT_CORS_ORIGINS", raising=False)
     origins = _cors_origins()
-    assert "http://localhost:5173" in origins
+    assert "http://localhost:8888" in origins
     assert "*" not in origins
 
     monkeypatch.setenv(
@@ -146,48 +74,16 @@ def test_cors_rejects_unknown_origin_allows_localhost():
     preflight = {"Access-Control-Request-Method": "GET"}
 
     resp = client.options(
-        "/api/v1/traces", headers={"Origin": "http://evil.example", **preflight}
+        "/api/v1/episodes", headers={"Origin": "http://evil.example", **preflight}
     )
     assert "access-control-allow-origin" not in resp.headers
 
     resp = client.options(
-        "/api/v1/traces", headers={"Origin": "http://localhost:5173", **preflight}
+        "/api/v1/episodes", headers={"Origin": "http://localhost:8888", **preflight}
     )
-    assert resp.headers.get("access-control-allow-origin") == "http://localhost:5173"
+    assert resp.headers.get("access-control-allow-origin") == "http://localhost:8888"
     # Credentials must not be allowed with the browser-facing API.
     assert resp.headers.get("access-control-allow-credentials") != "true"
-
-
-# ---------------------------------------------------------------------------
-# Fix 7: copilot
-
-
-def test_copilot_poll_token_missing_device_code_is_400():
-    from neuroagent.api.routes import copilot
-
-    app = FastAPI()
-    app.include_router(copilot.router, prefix="/api/v1")
-    client = TestClient(app)
-
-    resp = client.post("/api/v1/copilot/poll-token", json={})
-    assert resp.status_code == 400
-    # Body shape preserved for the frontend flow.
-    assert resp.json() == {"status": "error", "error": "device_code required"}
-
-
-def test_copilot_token_file_is_owner_only(tmp_path, monkeypatch):
-    from neuroagent.api.routes import copilot
-
-    token_file = tmp_path / ".copilot_token.json"
-    # Simulate a pre-existing world-readable token file: it must be tightened.
-    token_file.write_text("{}")
-    os.chmod(token_file, 0o644)
-    monkeypatch.setattr(copilot, "_TOKEN_FILE", token_file)
-
-    copilot._save_token("ghu_secret")
-
-    assert stat.S_IMODE(token_file.stat().st_mode) == 0o600
-    assert json.loads(token_file.read_text()) == {"github_token": "ghu_secret"}
 
 
 # ---------------------------------------------------------------------------
@@ -285,13 +181,20 @@ def test_rate_limiter_lockout_not_bypassable_by_header_rotation():
 # Fix 10: annotation store locking
 
 
-def test_annotation_store_lock_is_shared_across_version_aliases(tmp_path):
-    store = AnnotationStore(tmp_path)
-    lock_alias = store.lock_for("v5", "REV-1", "TIA-RS001")
-    lock_canonical = store.lock_for(CANONICAL_DATASET_VERSION, "REV-1", "TIA-RS001")
-    assert lock_alias is lock_canonical
-    other = store.lock_for(CANONICAL_DATASET_VERSION, "REV-2", "TIA-RS001")
-    assert other is not lock_alias
+def test_annotation_store_lock_is_shared_across_store_instances(tmp_path):
+    first_store = AnnotationStore(tmp_path)
+    second_store = AnnotationStore(tmp_path)
+    first_lock = first_store.lock_for(
+        CANONICAL_DATASET_VERSION, "REV-1", "TIA-RS001"
+    )
+    second_lock = second_store.lock_for(
+        CANONICAL_DATASET_VERSION, "REV-1", "TIA-RS001"
+    )
+    assert first_lock is second_lock
+    other = first_store.lock_for(
+        CANONICAL_DATASET_VERSION, "REV-2", "TIA-RS001"
+    )
+    assert other is not first_lock
 
 
 def test_annotation_store_concurrent_init_is_consistent(tmp_path):
@@ -302,7 +205,7 @@ def test_annotation_store_concurrent_init_is_consistent(tmp_path):
 
     def worker():
         barrier.wait()
-        results.append(store.load_or_init("v5", "REV-1", "CASE-1"))
+        results.append(store.load_or_init(CANONICAL_DATASET_VERSION, "REV-1", "CASE-1"))
 
     threads = [threading.Thread(target=worker) for _ in range(n)]
     for t in threads:
@@ -316,7 +219,7 @@ def test_annotation_store_concurrent_init_is_consistent(tmp_path):
 
 def test_annotation_store_concurrent_writes_do_not_lose_updates(tmp_path):
     store = AnnotationStore(tmp_path)
-    version, code, case_id = "v5", "REV-1", "CASE-2"
+    version, code, case_id = CANONICAL_DATASET_VERSION, "REV-1", "CASE-2"
     store.load_or_init(version, code, case_id)
 
     n_threads, n_iters = 8, 25

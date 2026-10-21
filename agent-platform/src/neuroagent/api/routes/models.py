@@ -18,10 +18,7 @@ from neuroagent.model_registry import AVAILABLE_MODELS, HF_TO_KEY, KEY_TO_MODEL
 router = APIRouter(tags=["models"])
 logger = logging.getLogger(__name__)
 
-_LLM_BACKENDS = [
-    ("http://localhost:8000", "vllm"),
-    ("http://localhost:11434", "ollama"),
-]
+_LLM_BACKENDS = [("http://localhost:8000", "vllm")]
 
 # Module-level state. All mutation of these globals (kill/spawn/assign) must
 # happen while holding _models_lock, otherwise two concurrent load requests can
@@ -34,7 +31,7 @@ _SERVE_SCRIPT = Path(__file__).resolve().parents[4] / "scripts" / "runtime" / "s
 
 
 async def _get_active_models() -> list[dict]:
-    """Probe vLLM and Ollama to find which models are currently loaded."""
+    """Probe the local vLLM server for a registered model."""
     active: list[dict] = []
     async with httpx.AsyncClient(timeout=3.0) as client:
         for base_url, backend in _LLM_BACKENDS:
@@ -44,19 +41,21 @@ async def _get_active_models() -> list[dict]:
                     data = resp.json()
                     for m in data.get("data", []):
                         model_id = m.get("id", "")
-                        active.append({
-                            "key": HF_TO_KEY.get(model_id, model_id),
-                            "model_id": model_id,
-                            "backend": backend,
-                            "base_url": f"{base_url}/v1",
-                        })
+                        key = HF_TO_KEY.get(model_id)
+                        if key is not None:
+                            active.append({
+                                "key": key,
+                                "model_id": model_id,
+                                "backend": backend,
+                                "base_url": f"{base_url}/v1",
+                            })
             except Exception:
                 continue
     return active
 
 
 async def _kill_vllm() -> None:
-    """Kill any running vLLM processes."""
+    """Stop the vLLM process started by this API instance, if any."""
     global _vllm_process
 
     if _vllm_process is not None:
@@ -73,16 +72,6 @@ async def _kill_vllm() -> None:
             except (ProcessLookupError, OSError):
                 pass
         _vllm_process = None
-
-    # Also pkill in case started externally — kill serve script, vllm_serve,
-    # and any orphaned EngineCore workers that hold GPU memory
-    for pattern in ["vllm_serve.py", "serve_model.sh", "VLLM::EngineCore"]:
-        proc = await asyncio.create_subprocess_exec(
-            "pkill", "-9", "-f", pattern,
-            stdout=asyncio.subprocess.DEVNULL,
-            stderr=asyncio.subprocess.DEVNULL,
-        )
-        await proc.wait()
 
 
 @router.get("/models")
@@ -110,20 +99,6 @@ async def list_models() -> list[dict]:
             "status": status,
         })
 
-    # Add Ollama models not in our static list
-    static_keys = {m["key"] for m in AVAILABLE_MODELS}
-    for am in active_models:
-        if am["key"] not in static_keys:
-            result.append({
-                "key": am["key"],
-                "name": am["model_id"],
-                "hf_model_id": am["model_id"],
-                "description": f"Ollama model ({am['backend']})",
-                "size_gb": 0,
-                "expected_load_seconds": 60,
-                "supports_tools": True,
-                "status": "ready",
-            })
     return result
 
 
@@ -159,9 +134,30 @@ async def load_model(model_key: str) -> StreamingResponse:
                 vllm_active = [m for m in active if m["backend"] == "vllm"]
 
                 if vllm_active:
+                    active_key = vllm_active[0]["key"]
+                    if active_key == model_key:
+                        yield sse({
+                            "phase": "ready",
+                            "model": model_key,
+                            "model_name": model_name,
+                            "message": f"{model_name} is already ready",
+                            "elapsed": 0,
+                            "progress": 100,
+                        })
+                        return
+                    if _vllm_process is None:
+                        yield sse({
+                            "phase": "error",
+                            "message": (
+                                f"Cannot replace externally managed model {active_key}; "
+                                "stop its vLLM server first"
+                            ),
+                            "progress": 0,
+                        })
+                        return
                     yield sse({
                         "phase": "unloading",
-                        "message": f"Stopping {vllm_active[0]['key']}...",
+                        "message": f"Stopping {active_key}...",
                         "progress": 0,
                     })
                     await _kill_vllm()
@@ -305,9 +301,9 @@ async def load_model(model_key: str) -> StreamingResponse:
 
 @router.post("/models/unload")
 async def unload_model() -> dict:
-    """Stop any running vLLM model server."""
+    """Stop the vLLM server managed by this API instance, if any."""
     global _loading_model
     async with _models_lock:
         _loading_model = None
         await _kill_vllm()
-    return {"status": "ok", "message": "Model server stopped"}
+    return {"status": "ok", "message": "Managed model server stopped"}

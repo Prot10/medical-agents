@@ -1,13 +1,13 @@
 import { useMemo } from "react"
-import { BarChart3, Users, Activity, Brain, Database } from "lucide-react"
-import { useCases, useDatasets, useActivateDataset } from "@/hooks/useCases"
+import { BarChart3, Users, Activity, Brain } from "lucide-react"
+import { useCases } from "@/hooks/useCases"
 import { Card, CardTitle } from "@/components/ui/Card"
 import { QueryError } from "@/components/ui/QueryError"
 import { ConditionChart } from "./charts/ConditionChart"
 import { DifficultyDonut } from "./charts/DifficultyDonut"
 import { AgeHistogram } from "./charts/AgeHistogram"
 import { CaseHeatmap } from "./charts/CaseHeatmap"
-import { cn } from "@/lib/utils"
+import { conditionLabel } from "@/lib/conditions"
 import type { CaseIndexEntry } from "@/api/types"
 
 function StatCard({ icon: Icon, label, value, sub }: {
@@ -29,10 +29,6 @@ function StatCard({ icon: Icon, label, value, sub }: {
 
 export function DatasetDashboard() {
   const { data: cases, isLoading, isError, error, refetch } = useCases()
-  const { data: datasets } = useDatasets()
-  const activateDataset = useActivateDataset()
-
-  const activeDataset = datasets?.find((d) => d.active)
 
   const stats = useMemo(() => {
     if (!cases) return null
@@ -57,39 +53,16 @@ export function DatasetDashboard() {
   return (
     <div className="h-full overflow-y-auto">
       <div className="p-6 space-y-6 max-w-5xl mx-auto">
-        {/* Header + dataset selector */}
+        {/* Header */}
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 className="text-xl font-bold tracking-tight">
-              {activeDataset?.name ?? "NeuroBench"} Dataset
+              NeuroBench Dataset
             </h2>
             <p className="text-base text-muted-foreground mt-1">
-              {activeDataset?.description ?? `${stats.total} neurological cases across ${stats.conditionCount} conditions and 3 difficulty levels`}
+              {`${stats.total} neurological cases across ${stats.conditionCount} conditions and 3 difficulty levels`}
             </p>
           </div>
-          {datasets && datasets.length > 1 && (
-            <div className="flex gap-2 shrink-0">
-              {datasets.map((d) => (
-                <button
-                  key={d.version}
-                  onClick={() => {
-                    if (!d.active) activateDataset.mutate(d.version)
-                  }}
-                  disabled={activateDataset.isPending}
-                  className={cn(
-                    "flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-medium transition-all",
-                    d.active
-                      ? "border-primary/30 bg-primary/10 text-primary"
-                      : "border-border hover:bg-accent text-muted-foreground hover:text-foreground",
-                  )}
-                >
-                  <Database className="h-3.5 w-3.5" />
-                  {d.name}
-                  <span className="text-xs opacity-60">{d.case_count}</span>
-                </button>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* Stat cards */}
@@ -128,18 +101,6 @@ export function DatasetDashboard() {
   )
 }
 
-const CONDITION_LABELS: Record<string, string> = {
-  alzheimers_early: "Alzheimer's",
-  bacterial_meningitis: "Meningitis",
-  focal_epilepsy_temporal: "Epilepsy",
-  functional_neurological: "FND",
-  glioblastoma: "Glioblastoma",
-  ischemic_stroke: "Stroke",
-  multiple_sclerosis_rr: "MS",
-  nmdar_encephalitis: "NMDAR Enc.",
-  parkinsons: "Parkinson's",
-  cardiac_syncope: "Syncope",
-}
 
 function computeStats(cases: CaseIndexEntry[]) {
   const conditions: Record<string, number> = {}
@@ -177,9 +138,9 @@ function computeStats(cases: CaseIndexEntry[]) {
     maleCount,
     femaleCount,
     conditionCount: Object.keys(conditions).length,
-    topConditionLabel: CONDITION_LABELS[topCondition[0]] ?? topCondition[0],
+    topConditionLabel: conditionLabel(topCondition[0]),
     conditionData: Object.entries(conditions)
-      .map(([name, count]) => ({ name: CONDITION_LABELS[name] ?? name, count, key: name }))
+      .map(([name, count]) => ({ name: conditionLabel(name), count, key: name }))
       .sort((a, b) => b.count - a.count),
     difficultyData: [
       { name: "Straightforward", value: diffCounts.straightforward, key: "straightforward" },
@@ -190,7 +151,7 @@ function computeStats(cases: CaseIndexEntry[]) {
       .map(([range, count]) => ({ range, count }))
       .sort((a, b) => parseInt(a.range) - parseInt(b.range)),
     heatmapData: Object.entries(heatmap).map(([condition, diffs]) => ({
-      condition: CONDITION_LABELS[condition] ?? condition,
+      condition: conditionLabel(condition),
       straightforward: diffs.straightforward || 0,
       moderate: diffs.moderate || 0,
       diagnostic_puzzle: diffs.diagnostic_puzzle || 0,

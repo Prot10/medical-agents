@@ -6,9 +6,8 @@ bottles and their `susceptibility` block listed its MICs. An agent reading the i
 cultures are negative and cannot narrow therapy; an agent reading the findings concludes the opposite.
 The judge reads the impression, so the correct decision would have been scored as unsupported.
 
-Nothing in the suite could see it. `validate_cases.py` checks that an action has *somewhere to land*
-and `check_perfect_agent.py` checks that the gold trajectory scores 1.0 — neither reads a report
-against itself.
+Schema validation proves that an action has somewhere to land, but it does not compare a
+report's narrative fields against one another. This regression test performs that semantic check.
 
 The same shape is checked for CSF, where a "no growth" or "no organism" statement alongside a named
 isolate would be the identical defect.
