@@ -15,6 +15,7 @@ Start with the repository `README.md` and the executable contract in
 | `agent-platform/docs/hospital-rules.md` | Hospital policy configuration |
 | `agent-platform/docs/patient-data.md` | Patient and case data handling |
 | `benchmark/tool-contract.md` | Tool vocabulary and cost invariants |
+| `research/external-datasets-2026-10.md` | MIMIC-IV, MedLoCoMo, MedMemoryBench and CPRD as case sources (Oct 2026) |
 
 ## Authoritative sources
 
