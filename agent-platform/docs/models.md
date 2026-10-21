@@ -29,5 +29,7 @@ SGLang 0.5.9 was measured on the same Qwen3.5-9B workload and was slower at ever
 HF_HOME=/dev/shm/hf agent-platform/scripts/runtime/serve_model.sh qwen3.5-9b
 ```
 
-Model weights live on EOS (`/eos/project-d/diagbox/dvc/NeuroAgent/models/base/huggingface`); stage a
-copy in `/dev/shm/hf` before serving or training.
+Model weights live on EOS (`/eos/project-d/diagbox/dvc/aprotani/models/hf`), a cache shared by
+Andrea's projects (local-cloud-agents uses it too); the old path
+`dvc/NeuroAgent/models/base/huggingface` is a symlink to it since 22 Oct 2026. Stage a copy in
+`/dev/shm/hf` before serving or training.

@@ -19,7 +19,7 @@
 set -euo pipefail
 
 export CUDA_MODULE_LOADING=LAZY
-export HF_HOME="${HF_HOME:-/eos/project-d/diagbox/dvc/NeuroAgent/models/base/huggingface}"
+export HF_HOME="${HF_HOME:-/eos/project-d/diagbox/dvc/aprotani/models/hf}"
 # Tool-call syntax is sampled freely, not grammar-constrained (the default flipped to strict in
 # vLLM 0.26). GRPO rollouts pin the same value so training and serving sample the same way.
 export VLLM_ENFORCE_STRICT_TOOL_CALLING=0
