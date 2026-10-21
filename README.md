@@ -12,6 +12,7 @@ NeuroBench is a physician-validated, 360-degree simulated-patient dataset and an
 - Structured independent physician review and adjudication.
 - LoRA SFT over typed episodes and a backend-neutral GRPO coordinator.
 - A JSON API for profiles, runs, models, cases, hospitals and persisted episodes.
+- A dashboard in `web` for cases, policies, live and replayed episodes and the engineering reward.
 - A dedicated physician-review application in `web-review`.
 
 The architecture and experimental boundaries are documented in [agent-platform/docs/clinical-policy-harness.md](agent-platform/docs/clinical-policy-harness.md).
@@ -38,7 +39,17 @@ The run API exposes the same path over HTTP:
 uv run uvicorn neuroagent.api.app:app --host 127.0.0.1 --port 8888
 ```
 
-List `GET /api/v1/profiles`, then submit a case to `POST /api/v1/runs`.
+List `GET /api/v1/profiles`, then submit a case to `POST /api/v1/runs` (or `POST /api/v1/runs/stream` for the episode events as Server-Sent Events).
+
+## Dashboard
+
+```bash
+cd web
+npm ci
+npm run dev        # http://localhost:5173, proxies /api to port 8888
+```
+
+`npm run build` writes `web/dist`, which the run API then serves at `/`. The dashboard picks a checked profile, streams a run live, replays saved episodes and shows the policy reward; on draft policies that reward is an engineering check, never a reportable number.
 
 ## Physician review
 

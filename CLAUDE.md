@@ -18,7 +18,7 @@ See README.md for setup, `docs/README.md` for the documentation index,
   action), `loops.py` (policy / direct / ReAct), `environment.py`, `plugins.py`, `profile.py`
 - `agent-platform/src/neuroagent/evaluation/policy_reward.py` — the reward; `evaluation/benchmark.py`
   is the batch runner CLI
-- `agent-platform/src/neuroagent/api/` — run API (port 8888): profiles, runs, episodes, models, cases
+- `agent-platform/src/neuroagent/api/` — run API (port 8888): profiles, runs (+ SSE stream), episodes, models, cases
 - `agent-platform/src/neuroagent/review_api/` — physician review API (port 8889, separate startup)
 - `agent-platform/src/neuroagent/training/` — `train_sft.py` (LoRA SFT, one sequence per episode,
   sparse-logits loss), `train_grpo.py` (RLVR: benchmark loop as rollout on a colocated vLLM engine,
@@ -42,6 +42,8 @@ See README.md for setup, `docs/README.md` for the documentation index,
 - `packages/neuroagent-schemas/` — shared Pydantic models: cases, actions, episodes, policies
 - `data/neurobench/cases/` — 600 cases across 20 conditions; `data/neurobench/splits/` 500/100
 - `data/review/annotations/{version}/{reviewer_code}/{case_id}.json` — annotation runtime data (gitignored)
+- `web/` — dashboard (port 5173 in dev, or `web/dist` served by the run API at `/`): profile picker,
+  live runs over `POST /runs/stream`, episode replay, case policy and reward panels
 - `web-review/` — review UI (port 5174); `outputs/`, `data/episodes/`, `training_data/` are gitignored
 
 ## Common commands
@@ -57,6 +59,7 @@ uv run python -m neuroagent.evaluation.benchmark --profile policy-qwen3.5-9b \
   --cases FEPI-TEMP-M01 SAH-M01 --output outputs/smoke/policy-qwen --allow-draft-policies
 uv run uvicorn neuroagent.api.app:app --host 127.0.0.1 --port 8888          # run API
 uv run uvicorn neuroagent.review_api.app:app --host 0.0.0.0 --port 8889     # review API
+cd web && npm ci && npm run dev                                              # dashboard
 cd web-review && npm ci && npm run dev:remote                                # review UI
 
 # SFT (needs --extra training); --output must be on EOS (weights never go on the local disk);
@@ -73,7 +76,7 @@ HF_HOME=/dev/shm/hf uv run python -m neuroagent.training.train_grpo --model qwen
 ## Conventions
 
 - Python: Pydantic v2 models, dataclasses for config, `from __future__ import annotations`
-- Frontend (web-review): `@/` alias, named exports only, Zustand for UI state, TanStack Query for data
+- Frontend (web, web-review): `@/` alias, named exports only, Zustand for UI state, TanStack Query for data
 - Commit style: conventional commits (`feat:`, `fix:`, `docs:`, `chore:`)
 - Case IDs: `{CONDITION}-{S|M|P}{NUMBER}` (v1) or `{CONDITION}-R{S|M|P}{NUMBER}` (v2)
 - Every policy is `draft` until two independent physicians approve all dimensions; the reward
