@@ -20,6 +20,33 @@ project repository. Read them on demand, not for routine code work here. The mem
 snapshot: verify statuses before stating them as current. Facts that matter beyond NeuroAgent
 belong in `MEMORIA_PHD.md` (with date and source); NeuroAgent-specific details stay here.
 
+## CERN compute and inference
+
+Besides the A100 VM, CERN offers GPUs on ml.cern.ch and an LLM gateway. The tested guide (21 Oct
+2026) is `~/Documents/PhD/CERN/CERN_ML_ACCESS.md`, the single source: read it before using either,
+and re-check anything time-sensitive (availability, model list). On Andrea's Mac the `cern`
+command wraps both (`cern help`). In short, to choose:
+
+- **ml.cern.ch (Kubeflow)**: H100 NVL 94 GB (46 CPU, 127 GB RAM), H100 47 GB MIG slice, A100 40 GB,
+  RTX PRO 6000 96 GB, T4, V100S. One GPU unit per user at a time, a queued request included; at
+  the test the full H100s were all taken (request pending) while the 47 GB slice started in
+  seconds. Sessions (`cern up NAME h100`, then `ssh NAME@ml.cern.ch`) are for development and stop
+  after 8 h idle per the docs; long SFT/GRPO runs go in a batch Job (`cern job`, no deadline
+  imposed). Storage: `/scratch` node NVMe (lost at the end), `/shared` 10 GiB, EOS/AFS/CVMFS
+  mounted, home on EOS. Internet and sudo work; install with uv into `/scratch` with
+  `UV_NO_MODIFY_PATH=1`. Not yet checked from a session: write access to
+  `/eos/project-d/diagbox` and a vLLM serve of the panel models.
+- **AI gateway aigw.cern.ch** (OpenAI and Anthropic APIs, key in `~/.config/cern-ml/aigw.key`):
+  CERN-hosted gpt-oss-20b, glm-5.3-flash-int4, gemma-4-12b-it-qat-w4a16-ct, hf-qwen3-32b-awq,
+  qwen3.8-27b-fp16 and two embedding models; `GLM-5.3-FP8-VERTEX` and
+  `MIMO-V2.6-FLASH-MOPD-VERTEX` run on Google Vertex AI (europe-west4), so prompts leave CERN.
+  None of the panel models (Qwen3.5-9B, Granite 4.1 8B, Gemma 4 E4B) is served there, and CERN IT
+  changes the list over time (6 months notice, 2 weeks for previews). Every model returns
+  logprobs with top-5 alternatives; tool calling works on all seven.
+- **Network**: on site or on eduVPN everything is direct from the Mac. Off site without VPN the
+  gateway, ml.cern.ch SSH and kubectl are firewalled; `~/.ssh/config` and `cern` then go through
+  lxtunnel (2FA once per 12 h).
+
 ## Key paths
 
 - `agent-platform/src/neuroagent/harness/` — the harness: `context.py` (prompts and the single
