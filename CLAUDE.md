@@ -6,6 +6,15 @@ NeuroAgent: tool-augmented LLM agent for neurological clinical decision support.
 
 See README.md for setup, and `docs/README.md` for the documentation index.
 
+## PhD context
+
+This is one project of Andrea's PhD. The PhD hub lives in `~/Documents/PhD`: read
+`MEMORIA_PHD.md` there (and `DIREZIONE_PHD.md` for the research direction) when a task touches
+the PhD narrative, supervisors, paper positioning or other projects; its `AGENTS.md` maps every
+project repository. Read them on demand, not for routine code work here. The memory is a dated
+snapshot: verify statuses before stating them as current. Facts that matter beyond NeuroAgent
+belong in `MEMORIA_PHD.md` (with date and source); NeuroAgent-specific details stay here.
+
 ## Key paths
 
 - `agent-platform/src/neuroagent/` — main Python package
