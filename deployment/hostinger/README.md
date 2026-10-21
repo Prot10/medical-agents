@@ -13,7 +13,7 @@ Deployment target for the NeuroBench dataset review platform on the shared Hosti
 | Process supervisor | systemd unit `neurobench-review.service` |
 | Reverse proxy | nginx, vhost `/etc/nginx/conf.d/review.andreaprotani.com.conf` |
 | TLS | Let's Encrypt via `certbot --nginx`, auto-renewed (`certbot-renew.timer`) |
-| Backups | systemd timer `neurobench-review-backup.timer`, daily 03:15 UTC |
+| Backups | systemd timer `neurobench-review-backup.timer`, daily 03:15 UTC; pulled to the Mac daily by a launchd agent |
 | "Database" | Per-reviewer JSON files at `data/review/annotations/{version}/{reviewer_code}/{case_id}.json` — file-based, no DB server. |
 
 ## Isolation from Kosmico
@@ -140,7 +140,7 @@ ssh hostinger 'pm2 status'
 
 ## Backups
 
-`data/review/annotations/` is the only state worth preserving — the schema files come from the deploy and the case fleet is in git. Backups are handled by a systemd timer.
+`data/review/annotations/` (case reviews) and `data/review/tool_reviews/` (tool-output reviews) are the only state worth preserving — the schema files come from the deploy and the case fleet is in git. A systemd timer snapshots both on the VPS, and the Mac pulls the snapshots every day.
 
 ### Schedule
 
@@ -148,7 +148,7 @@ ssh hostinger 'pm2 status'
 
 ### What it does
 
-`/home/neuroreview/bin/backup-annotations.sh` tars `data/review/annotations/` into `data/review/backups/annotations-YYYY-MM-DD.tar.gz`. Tarballs older than **365 days** are pruned automatically (override with `KEEP_DAYS=N` in the systemd unit's `Environment=` if needed). At ~3 MB per worst-case tarball that's ~1 GB of disk over a full year — negligible against 45 GB free.
+`/home/neuroreview/bin/backup-annotations.sh` tars `data/review/annotations/` and `data/review/tool_reviews/` into `data/review/backups/review-data-YYYY-MM-DD.tar.gz`, and refuses to publish an archive that does not hold every file on disk. Snapshots made before 21 Oct 2026 are named `annotations-YYYY-MM-DD.tar.gz` and hold annotations only. Tarballs older than **365 days** are pruned automatically (override with `KEEP_DAYS=N` in the systemd unit's `Environment=` if needed). At ~3 MB per worst-case tarball that's ~1 GB of disk over a full year — negligible against 45 GB free.
 
 The script is atomic (`.tar.gz.tmp` → `mv` rename) and idempotent — running it twice on the same day overwrites that day's snapshot rather than failing.
 
@@ -175,19 +175,30 @@ To restore a specific day's snapshot (this wipes whatever's currently on the VPS
 ```bash
 ssh hostinger 'sudo -u neuroreview bash -lc "
     cd /home/neuroreview/medical-agents/data/review &&
-    mv annotations annotations.before-restore-$(date -u +%Y%m%dT%H%M%SZ) &&
-    tar -xzf backups/annotations-YYYY-MM-DD.tar.gz
+    stamp=$(date -u +%Y%m%dT%H%M%SZ) &&
+    mv annotations annotations.before-restore-$stamp &&
+    mv tool_reviews tool_reviews.before-restore-$stamp &&
+    tar -xzf backups/review-data-YYYY-MM-DD.tar.gz
 "'
 ssh hostinger 'systemctl restart neurobench-review'
 ```
 
-The pre-restore copy of `annotations/` is kept under `annotations.before-restore-<timestamp>/` so you can roll back the rollback.
+The pre-restore copies are kept under `annotations.before-restore-<timestamp>/` and `tool_reviews.before-restore-<timestamp>/` so you can roll back the rollback.
 
-### Off-VPS copy (optional, manual)
+### Off-VPS copy (daily, on the Mac)
 
-Local snapshots protect against application bugs and accidental deletes but not VPS-level loss. Pull a copy to your laptop when paranoia spikes:
+Local snapshots protect against application bugs and accidental deletes but not VPS-level loss. The Mac pulls `data/review/backups/` every day into `~/Backups/neurobench-review-backups/server-backups/` with `pull-review-backups.sh`, run by the launchd agent `com.andreaprotani.neurobench-review-backups` (09:30 local time and at login; a run missed while the Mac slept fires on wake). It never deletes on the Mac, checks the newest archive, and raises a macOS notification if the pull fails or the newest VPS snapshot is more than two days old. The VPS holds no credentials for the Mac. The folder sits outside `~/Documents` on purpose: macOS privacy protection (TCC) blocks launchd jobs from reading or writing `~/Documents`, `~/Desktop` and `~/Downloads`.
 
 ```bash
-rsync -az hostinger:/home/neuroreview/medical-agents/data/review/backups/ \
-    ./data/review/vps-backups/
+# Install or update on the Mac (from the repo root).
+D=~/Backups/neurobench-review-backups
+mkdir -p $D && install -m 700 deployment/hostinger/pull-review-backups.sh $D/
+sed "s#__HOME__#$HOME#g" deployment/hostinger/com.andreaprotani.neurobench-review-backups.plist \
+    > ~/Library/LaunchAgents/com.andreaprotani.neurobench-review-backups.plist
+launchctl bootout gui/$(id -u)/com.andreaprotani.neurobench-review-backups 2>/dev/null || true
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.andreaprotani.neurobench-review-backups.plist
+
+# Pull now, and read the log.
+launchctl kickstart gui/$(id -u)/com.andreaprotani.neurobench-review-backups
+tail -3 ~/Backups/neurobench-review-backups/pull.log
 ```
