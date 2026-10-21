@@ -182,6 +182,7 @@ export function CaseDetail({ caseId }: { caseId: string }) {
         <div className="xl:sticky xl:top-20 xl:self-start space-y-4 xl:max-h-[calc(100vh-6rem)] xl:overflow-y-auto xl:pr-1">
           {isAdmin && <ReviewerAnnotationsPanel version={version} caseId={caseId} />}
           <AnnotationSidebar
+            caseData={caseDetail.data}
             status={status}
             statusPending={setStatus.isPending}
             onSetStatus={async (s, policyVerdict) => {

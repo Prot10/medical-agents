@@ -1,20 +1,24 @@
-import { ArrowRight, MessageSquarePlus, Pencil, Send, Trash2 } from "lucide-react"
+import { ArrowRight, CheckCircle2, MessageSquarePlus, Pencil, RotateCcw, Send, Trash2, Unlink } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 
 import type {
   CaseIndexEntry,
   CaseReviewSummary,
   DimensionDecision,
+  FieldAnnotation,
   PolicyReviewVerdict,
   ReviewStatus,
   Severity,
 } from "@/api/types"
 import { cn } from "@/lib/utils"
+import { fieldExists } from "@/lib/fieldPath"
 import { Button } from "@/components/ui/Button"
 import { SeverityPill } from "@/components/ui/SeverityPill"
 import { useAnnotationContext } from "./AnnotationContext"
 
 interface AnnotationSidebarProps {
+  /** The case on screen; annotations whose field_path it no longer contains are flagged. */
+  caseData: unknown
   status: ReviewStatus
   onSetStatus: (s: ReviewStatus, verdict?: PolicyReviewVerdict) => Promise<void>
   statusPending: boolean
@@ -38,6 +42,7 @@ function generateId(): string {
 }
 
 export function AnnotationSidebar({
+  caseData,
   status,
   onSetStatus,
   statusPending,
@@ -146,57 +151,11 @@ export function AnnotationSidebar({
         ) : (
           <ul className="space-y-2">
             {filtered.map((annotation) => (
-              <li
+              <AnnotationListItem
                 key={annotation.id}
-                className="border border-border rounded-lg p-3 text-xs space-y-1.5 bg-background/40"
-              >
-                <div className="flex items-center justify-between gap-2 flex-wrap">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const el = document.querySelector(
-                        `[data-annotatable-path="${cssEscape(annotation.field_path)}"]`,
-                      )
-                      if (el instanceof HTMLElement) {
-                        el.scrollIntoView({ behavior: "smooth", block: "center" })
-                        el.classList.add("attention-pulse")
-                        window.setTimeout(
-                          () => el.classList.remove("attention-pulse"),
-                          800,
-                        )
-                      }
-                    }}
-                    className="font-mono text-[10px] tracking-wider text-muted-foreground hover:text-foreground"
-                  >
-                    {annotation.field_path}
-                  </button>
-                  <div className="flex items-center gap-1">
-                    <SeverityPill severity={annotation.severity} />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const el = document.querySelector(
-                          `[data-annotatable-path="${cssEscape(annotation.field_path)}"]`,
-                        )
-                        if (el instanceof HTMLElement) {
-                          ctx.setOpenPopover({
-                            fieldPath: annotation.field_path,
-                            anchor: el,
-                            annotationId: annotation.id,
-                          })
-                        }
-                      }}
-                      className="w-6 h-6 rounded hover:bg-secondary/60 text-muted-foreground flex items-center justify-center"
-                      title="Edit annotation"
-                    >
-                      <Pencil className="w-3 h-3" />
-                    </button>
-                  </div>
-                </div>
-                <p className="text-foreground/90 leading-relaxed whitespace-pre-wrap">
-                  {annotation.comment}
-                </p>
-              </li>
+                annotation={annotation}
+                fieldMissing={!fieldExists(caseData, annotation.field_path)}
+              />
             ))}
           </ul>
         )}
@@ -205,6 +164,137 @@ export function AnnotationSidebar({
   )
 }
 
+
+/**
+ * One field annotation. The edit popover anchors to the field when it is on screen and to
+ * this row otherwise, so an annotation on a field the case no longer has (written against an
+ * earlier schema) can still be read, edited, resolved or deleted.
+ */
+function AnnotationListItem({
+  annotation,
+  fieldMissing,
+}: {
+  annotation: FieldAnnotation
+  fieldMissing: boolean
+}) {
+  const ctx = useAnnotationContext()
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const fieldElement = () => {
+    const el = document.querySelector(
+      `[data-annotatable-path="${cssEscape(annotation.field_path)}"]`,
+    )
+    return el instanceof HTMLElement ? el : null
+  }
+
+  const toggleResolved = async () => {
+    setSaving(true)
+    setError(null)
+    try {
+      await ctx.updateAnnotation(annotation.id, { resolved: !annotation.resolved })
+    } catch (exc) {
+      setError(exc instanceof Error ? exc.message : "Could not update the annotation.")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <li
+      className={cn(
+        "border border-border rounded-lg p-3 text-xs space-y-1.5 bg-background/40",
+        annotation.resolved && "opacity-60",
+      )}
+    >
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <button
+          type="button"
+          onClick={() => {
+            const el = fieldElement()
+            if (el) {
+              el.scrollIntoView({ behavior: "smooth", block: "center" })
+              el.classList.add("attention-pulse")
+              window.setTimeout(() => el.classList.remove("attention-pulse"), 800)
+            }
+          }}
+          className={cn(
+            "font-mono text-[10px] tracking-wider text-muted-foreground hover:text-foreground text-left break-all",
+            fieldMissing && "line-through decoration-muted-foreground/50",
+          )}
+        >
+          {annotation.field_path}
+        </button>
+        <div className="flex items-center gap-1">
+          <SeverityPill severity={annotation.severity} />
+          <button
+            type="button"
+            onClick={(event) => {
+              const anchor = fieldElement() ?? event.currentTarget.closest("li")
+              if (anchor instanceof HTMLElement) {
+                ctx.setOpenPopover({
+                  fieldPath: annotation.field_path,
+                  anchor,
+                  annotationId: annotation.id,
+                })
+              }
+            }}
+            className="w-6 h-6 rounded hover:bg-secondary/60 text-muted-foreground flex items-center justify-center"
+            title="Edit annotation"
+          >
+            <Pencil className="w-3 h-3" />
+          </button>
+        </div>
+      </div>
+      {fieldMissing && (
+        <div className="flex items-start gap-1.5 rounded-md border border-amber-500/30 bg-amber-500/5 px-2 py-1.5 text-[11px] text-amber-700 dark:text-amber-300">
+          <Unlink className="w-3 h-3 mt-0.5 shrink-0" />
+          <span>
+            This field is no longer in the case (it was written against an earlier version of
+            the case).
+            {annotation.field_snippet && (
+              <>
+                {" "}It read: <span className="italic">“{annotation.field_snippet}”</span>
+              </>
+            )}
+          </span>
+        </div>
+      )}
+      <p className="text-foreground/90 leading-relaxed whitespace-pre-wrap">
+        {annotation.comment}
+      </p>
+      <div className="flex items-center justify-between gap-2 pt-0.5">
+        {annotation.resolved ? (
+          <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400">
+            <CheckCircle2 className="w-3 h-3" />
+            Resolved
+          </span>
+        ) : (
+          <span />
+        )}
+        <button
+          type="button"
+          onClick={toggleResolved}
+          disabled={saving}
+          className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-foreground disabled:opacity-50"
+        >
+          {annotation.resolved ? (
+            <>
+              <RotateCcw className="w-3 h-3" />
+              Reopen
+            </>
+          ) : (
+            <>
+              <CheckCircle2 className="w-3 h-3" />
+              Mark resolved
+            </>
+          )}
+        </button>
+      </div>
+      {error && <p className="text-[11px] text-rose-500">{error}</p>}
+    </li>
+  )
+}
 
 type DimensionKey =
   | "scenario_plausibility"
@@ -251,14 +341,20 @@ function PolicyReviewPanel({
   const [decisions, setDecisions] =
     useState<Record<DimensionKey, DimensionDecision>>(DEFAULT_DECISIONS)
   const [comment, setComment] = useState("")
+  // A case judged before the per-dimension verdict existed has a terminal status but no
+  // verdict; start from that status (all "Revise" for needs_changes) so the earlier judgment
+  // is not shown as an approval.
+  const legacyTerminal = existing === null && (status === "approved" || status === "needs_changes")
   useEffect(() => {
     const next = { ...DEFAULT_DECISIONS }
     if (existing) {
       for (const [key] of POLICY_DIMENSIONS) next[key] = existing[key]
+    } else if (status === "needs_changes") {
+      for (const [key] of POLICY_DIMENSIONS) next[key] = "needs_revision"
     }
     setDecisions(next)
     setComment(existing?.comment ?? "")
-  }, [existing])
+  }, [existing, status])
 
   const allApproved = Object.values(decisions).every((value) => value === "approve")
   const submit = async () => {
@@ -275,6 +371,13 @@ function PolicyReviewPanel({
         Judge each scoring dimension independently. Two concordant physician approvals are
         required; disagreement triggers a third review.
       </p>
+      {legacyTerminal && (
+        <p className="mb-3 rounded-md border border-amber-500/30 bg-amber-500/5 px-2 py-1.5 text-[11px] text-amber-700 dark:text-amber-300">
+          You marked this case “{status === "approved" ? "approved" : "needs changes"}” before
+          the per-dimension review existed. The dimensions start from that judgment: check each
+          one and submit to record it.
+        </p>
+      )}
       <div className="space-y-2">
         {POLICY_DIMENSIONS.map(([key, label]) => (
           <div key={key} className="flex items-center justify-between gap-2 text-xs">
