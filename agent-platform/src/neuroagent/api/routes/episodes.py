@@ -16,6 +16,8 @@ from neuroagent_schemas import (
     ToolAction,
 )
 
+from .runs import engineering_reward
+
 router = APIRouter(tags=["episodes"])
 _EPISODE_ID_PATTERN = re.compile(r"^[A-Za-z0-9_\-]+$")
 
@@ -96,6 +98,22 @@ def get_episode(episode_id: str, request: Request) -> dict:
         raise HTTPException(status_code=404, detail=f"Episode {episode_id!r} not found")
     episode = ClinicalEpisode.model_validate_json(path.read_text())
     return episode.model_dump(mode="json")
+
+
+@router.get("/episodes/{episode_id}/reward")
+def get_episode_reward(episode_id: str, request: Request) -> dict:
+    """Engineering reward of one persisted episode against its case policy."""
+
+    validate_episode_id(episode_id)
+    path = request.app.state.episodes_dir / f"{episode_id}.json"
+    if not path.exists():
+        raise HTTPException(status_code=404, detail=f"Episode {episode_id!r} not found")
+    episode = ClinicalEpisode.model_validate_json(path.read_text())
+    started = next(event for event in episode.events if isinstance(event, RunStarted))
+    case = request.app.state.case_objects.get(started.case_id)
+    if case is None:
+        raise HTTPException(status_code=404, detail=f"case {started.case_id!r} not found")
+    return engineering_reward(episode, case)
 
 
 @router.delete("/episodes/{episode_id}", status_code=204)

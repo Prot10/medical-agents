@@ -8,6 +8,7 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from neuroagent.datasets import DATASETS, DEFAULT_DATASET_VERSION, load_dataset
 
@@ -20,6 +21,7 @@ DATA_ROOT = Path(__file__).resolve().parents[4] / "data"
 RULES_DIR = Path(__file__).resolve().parents[3] / "config" / "hospital_rules"
 PROFILES_DIR = Path(__file__).resolve().parents[3] / "config" / "profiles"
 EPISODES_DIR = DATA_ROOT / "episodes"
+WEB_DIST = Path(__file__).resolve().parents[4] / "web" / "dist"
 
 # CORS: explicit allowlist instead of `*` (which, combined with credentials,
 # would let any origin drive the API from a browser). Extra origins (e.g. a
@@ -64,6 +66,10 @@ def create_app() -> FastAPI:
     app.include_router(models.router, prefix="/api/v1")
     app.include_router(runs.router, prefix="/api/v1")
     app.include_router(episodes.router, prefix="/api/v1")
+
+    # The dashboard build, when present, is served from the same origin as the API it calls.
+    if WEB_DIST.is_dir():
+        app.mount("/", StaticFiles(directory=WEB_DIST, html=True), name="web")
 
     return app
 
