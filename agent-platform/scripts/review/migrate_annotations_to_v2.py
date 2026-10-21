@@ -11,7 +11,8 @@ Standard library only, so it runs with the server's system Python while the revi
 stopped:
 
     python3 migrate_annotations_to_v2.py --annotations data/review/annotations \\
-        --old-cases /path/to/v1/cases --new-cases data/neurobench/cases --manifest out.json [--apply]
+        --tool-reviews data/review/tool_reviews --old-cases /path/to/v1/cases \\
+        --new-cases data/neurobench/cases --manifest out.json [--apply]
 
 Without --apply it only reports. It is idempotent: a path that already names a v2 field and is
 absent from v1 is left alone.
@@ -164,6 +165,38 @@ def _write_atomically(path: Path, text: str) -> None:
     tmp.replace(path)
 
 
+# The v1 app read `neurobench` records and fell back to the legacy `v5` directory; the v2 app reads
+# only `neurobench`. Copying each fallback record under the canonical name keeps what reviewers see.
+LEGACY_ALIASES = {"v5": "neurobench"}
+
+
+def promote_legacy_aliases(root: Path, pattern: str, apply: bool) -> list[dict]:
+    """Copy alias records with no canonical counterpart into the canonical directory.
+
+    `pattern` locates records under one version directory: `*/*.json` for case reviews
+    (reviewer/case), `*.json` for tool reviews (reviewer). The alias files are left in place.
+    """
+    promoted = []
+    for alias, canonical in LEGACY_ALIASES.items():
+        for source in sorted((root / alias).glob(pattern)):
+            target = root / canonical / source.relative_to(root / alias)
+            if target.exists():
+                continue
+            text = source.read_text(encoding="utf-8")
+            record = json.loads(text)
+            if record.get("dataset_version") != alias:
+                raise RuntimeError(f"{source}: dataset_version is {record.get('dataset_version')!r}")
+            copied = text.replace(f'"dataset_version": "{alias}"', f'"dataset_version": "{canonical}"', 1)
+            if json.loads(copied) != {**record, "dataset_version": canonical}:
+                raise RuntimeError(f"{source}: promotion changed more than dataset_version")
+            promoted.append({"from": str(source.relative_to(root)), "to": str(target.relative_to(root))})
+            if apply:
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text(copied, encoding="utf-8")
+                os.chmod(target, source.stat().st_mode & 0o777)
+    return promoted
+
+
 def migrate(annotations: Path, old_cases: Path, new_cases: Path, apply: bool) -> dict:
     changes: list[dict] = []
     unresolved: list[dict] = []
@@ -226,12 +259,17 @@ def main() -> int:
     parser.add_argument("--annotations", type=Path, required=True)
     parser.add_argument("--old-cases", type=Path, required=True)
     parser.add_argument("--new-cases", type=Path, required=True)
+    parser.add_argument("--tool-reviews", type=Path, help="tool-review root, for the legacy alias step")
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--apply", action="store_true")
     args = parser.parse_args()
+    promoted = promote_legacy_aliases(args.annotations, "*/*.json", args.apply)
+    if args.tool_reviews:
+        promoted += promote_legacy_aliases(args.tool_reviews, "*.json", args.apply)
     report = migrate(args.annotations, args.old_cases, args.new_cases, args.apply)
+    report["promoted"] = promoted
     args.manifest.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n")
-    print(json.dumps({"applied": report["applied"], "outcome": report["outcome"]}))
+    print(json.dumps({"applied": report["applied"], "outcome": report["outcome"], "promoted": len(promoted)}))
     return 0
 
 

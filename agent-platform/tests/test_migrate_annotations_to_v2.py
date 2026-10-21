@@ -124,3 +124,23 @@ def test_apply_changes_only_field_path_and_is_idempotent(tmp_path):
     assert after == before
     again = migration.migrate(annotations, old_cases, new_cases, apply=True)
     assert again["changes"] == [] and json.loads(review.read_text()) == before
+
+
+def test_legacy_alias_records_are_copied_only_where_the_canonical_one_is_missing(tmp_path):
+    root = tmp_path / "annotations"
+    for version, case_id in (("v5", "ONLY-V5"), ("v5", "BOTH"), ("neurobench", "BOTH")):
+        file = root / version / "NB-TEST-REVW-AAAA" / f"{case_id}.json"
+        file.parent.mkdir(parents=True, exist_ok=True)
+        file.write_text(json.dumps({"case_id": case_id, "dataset_version": version, "time_spent_seconds": 30}, indent=2))
+    canonical_before = (root / "neurobench" / "NB-TEST-REVW-AAAA" / "BOTH.json").read_text()
+
+    assert migration.promote_legacy_aliases(root, "*/*.json", apply=False)
+    assert not (root / "neurobench" / "NB-TEST-REVW-AAAA" / "ONLY-V5.json").exists()
+
+    promoted = migration.promote_legacy_aliases(root, "*/*.json", apply=True)
+    assert [p["to"] for p in promoted] == ["neurobench/NB-TEST-REVW-AAAA/ONLY-V5.json"]
+    copied = json.loads((root / "neurobench" / "NB-TEST-REVW-AAAA" / "ONLY-V5.json").read_text())
+    assert copied == {"case_id": "ONLY-V5", "dataset_version": "neurobench", "time_spent_seconds": 30}
+    assert (root / "v5" / "NB-TEST-REVW-AAAA" / "ONLY-V5.json").exists()
+    assert (root / "neurobench" / "NB-TEST-REVW-AAAA" / "BOTH.json").read_text() == canonical_before
+    assert migration.promote_legacy_aliases(root, "*/*.json", apply=True) == []
