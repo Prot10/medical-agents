@@ -52,9 +52,9 @@ export function AnnotatableField({
   const wrapperRef = useRef<HTMLDivElement>(null)
   const annotations = ctx.annotationsByPath.get(path) ?? []
   const hasAnnotations = annotations.length > 0
-  const top = hasAnnotations
-    ? topSeverity(annotations.map((a) => a.severity))
-    : null
+  // Resolved annotations keep the marker but no longer colour the field.
+  const open = annotations.filter((a) => !a.resolved)
+  const top = open.length > 0 ? topSeverity(open.map((a) => a.severity)) : null
   const Icon = top ? SEVERITY_ICON[top] : MessageCircle
 
   const isActive =
