@@ -3,6 +3,13 @@ from .base import BaseTool
 from .vocabulary import GENETIC_PANEL_PREFIX, genetic_panels, specialized_test_types
 
 
+def type_enum(packs: tuple[str, ...] = ()) -> list[str]:
+    """The fixed test types plus one `genetic_panel:<panel>` member per priced panel."""
+    return specialized_test_types(packs=packs) + [
+        GENETIC_PANEL_PREFIX + panel for panel in genetic_panels(packs=packs)
+    ]
+
+
 class SpecializedTestTool(BaseTool):
     name = "order_specialized_test"
     description = (
@@ -30,7 +37,7 @@ class SpecializedTestTool(BaseTool):
             # plus one `genetic_panel:<panel>` member per priced panel.
             "test_type": {
                 "type": "string",
-                "enum": specialized_test_types() + [GENETIC_PANEL_PREFIX + panel for panel in genetic_panels()],
+                "enum": type_enum(),
                 "description": (
                     "Type of specialized test; targeted gene panels are 'genetic_panel:<panel>'. "
                     "'emg_ncs': nerve conduction + needle EMG. 'emg_single_fiber' and "
@@ -43,4 +50,21 @@ class SpecializedTestTool(BaseTool):
             },
         },
         "required": ["clinical_context", "test_type"],
+    }
+    vocabulary = {"test_type": type_enum}
+    pack_notes = {
+        "general_medicine": {
+            "": (
+                "In general medicine it also orders endoscopy, pulmonary function tests, "
+                "ambulatory blood pressure monitoring and bone densitometry."
+            ),
+            "test_type": (
+                "'upper_endoscopy', 'colonoscopy': direct inspection of the upper "
+                "gastrointestinal tract or the colon; histology of any biopsy is ordered "
+                "through obtain_tissue_diagnosis with procedure 'endoscopic_biopsy'. "
+                "'pulmonary_function_tests': spirometry, lung volumes and DLCO, not the bedside "
+                "'respiratory_function'. 'ABPM': 24-hour ambulatory blood pressure. 'DXA': bone "
+                "densitometry."
+            ),
+        },
     }

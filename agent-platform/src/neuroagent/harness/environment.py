@@ -10,6 +10,7 @@ from ..tools.base import ToolCall, ToolResult
 from ..tools.cost_tracker import CostTracker
 from ..tools.mock_server import MockServer
 from ..tools.tool_registry import ToolRegistry
+from ..tools.vocabulary import DOMAIN_PACKS
 
 
 _INITIAL_OUTPUT_TO_TOOL = {
@@ -42,7 +43,10 @@ class NeuroBenchEnvironment:
     ) -> None:
         self.case = case
         self.mock_server = MockServer(case)
-        self.registry = registry or ToolRegistry.create_default_registry(mock_server=self.mock_server)
+        # The case's domain decides the catalogue: NeuroBench sees its own vocabulary only.
+        self.registry = registry or ToolRegistry.create_default_registry(
+            mock_server=self.mock_server, packs=DOMAIN_PACKS[case.domain]
+        )
         self.cost_tracker = cost_tracker or CostTracker()
 
     def tool_definitions(self) -> list[dict[str, Any]]:

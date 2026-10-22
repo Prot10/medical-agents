@@ -42,24 +42,29 @@ class NeurologicalExam(BaseModel):
 
 
 class Vitals(BaseModel):
-    bp_systolic: int
-    bp_diastolic: int
-    hr: int
-    temp: float
-    rr: int
-    spo2: int
+    # Every NeuroBench case records all six. A recorded case may not (MIMIC-IV-ED triage leaves
+    # some blank), and a missing vital is reported as missing, never filled with a normal value.
+    bp_systolic: int | None = None
+    bp_diastolic: int | None = None
+    hr: int | None = None
+    temp: float | None = None
+    rr: int | None = None
+    spo2: int | None = None
 
 
 class PatientProfile(BaseModel):
     patient_id: str
     demographics: Demographics
     clinical_history: ClinicalHistory
-    neurological_exam: NeurologicalExam
+    # Every NeuroBench case has one. A general-medicine case may leave it empty and carry its
+    # neurological findings, if any, as the `neurological` system of `physical_exam`.
+    neurological_exam: NeurologicalExam = NeurologicalExam()
     # General physical exam findings, keyed by system (general, chest, abdomen, etc.).
-    # Empty in most cases; populated for inpatient/ICU presentations (e.g., bulbar
+    # Empty in most NeuroBench cases; populated for inpatient/ICU presentations (e.g., bulbar
     # MG crisis, MG-RM15) where non-neurological physical findings are diagnostically
-    # relevant. The `neurological` key, when present, is the same content as
-    # `neurological_exam` expressed in a different free-text framing.
+    # relevant, and the whole examination of a general-medicine case. The `neurological` key,
+    # when present alongside `neurological_exam`, is the same content in a different
+    # free-text framing.
     physical_exam: dict[str, str] = {}
     vitals: Vitals
     chief_complaint: str

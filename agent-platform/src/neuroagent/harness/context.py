@@ -77,17 +77,40 @@ def format_patient_info(case: NeuroBenchCase) -> str:
         )
         if value
     ]
-    parts.append("Neurological examination:\n" + "\n".join(f"  {item}" for item in exam_parts))
+    # Every NeuroBench case has a neurological exam; a general-medicine case may carry its whole
+    # examination, neurological findings included, as `physical_exam` systems instead.
+    if exam_parts:
+        parts.append("Neurological examination:\n" + "\n".join(f"  {item}" for item in exam_parts))
     if patient.physical_exam:
         parts.append(
             "Physical examination:\n"
             + "\n".join(f"  {system}: {finding}" for system, finding in patient.physical_exam.items())
         )
-    parts.append(
-        f"Vitals: BP {vitals.bp_systolic}/{vitals.bp_diastolic} mmHg, "
-        f"HR {vitals.hr} bpm, Temp {vitals.temp}°C, RR {vitals.rr}, SpO2 {vitals.spo2}%"
-    )
+    parts.append(format_vitals(vitals))
     return "\n".join(parts)
+
+
+def format_vitals(vitals: Any) -> str:
+    """The vitals line. A vital the record left blank is named as not recorded, never filled in."""
+    recorded, missing = [], []
+    if vitals.bp_systolic is not None and vitals.bp_diastolic is not None:
+        recorded.append(f"BP {vitals.bp_systolic}/{vitals.bp_diastolic} mmHg")
+    else:
+        missing.append("BP")
+    for label, value, unit in (
+        ("HR", vitals.hr, " bpm"),
+        ("Temp", vitals.temp, "°C"),
+        ("RR", vitals.rr, ""),
+        ("SpO2", vitals.spo2, "%"),
+    ):
+        if value is None:
+            missing.append(label)
+        else:
+            recorded.append(f"{label} {value}{unit}")
+    line = "Vitals: " + (", ".join(recorded) if recorded else "none recorded")
+    if recorded and missing:
+        line += f" (not recorded: {', '.join(missing)})"
+    return line
 
 
 def observation_payload(event: ObservationReceived) -> dict[str, Any]:

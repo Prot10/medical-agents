@@ -502,3 +502,65 @@ tools:
 
   check_drug_interactions:
     base: 0
+
+# --- Vocabulary packs ---------------------------------------------------------------------------
+# Rows a case sees only through its domain (`NeuroBenchCase.domain`, `tools/vocabulary.py::
+# DOMAIN_PACKS`). A pack adds terms to the blocks above and never re-prices one
+# (`vocabulary.merge_packs` refuses a clash), so the NeuroBench catalogue, its prices and its
+# 600 cases are untouched by anything below. The cost registry prices every pack.
+packs:
+  # Studies general medicine orders and neurology never needed, so that a recorded admission
+  # (MIMIC-IV) or a general-medicine case can be ordered, priced and scored step by step.
+  # PROVISIONAL rates: EUR from 2024 Medicare national amounts at 0.92, read from memory of
+  # the fee schedule rather than looked up, pending the same coding sign-off as the rest of this
+  # file. Check them against the CMS PFS / CLFS look-up before any cost result is reported.
+  general_medicine:
+    tools:
+      interpret_labs:
+        by_panel:
+          lipase: 8                  # CPT 83690
+          amylase: 8                 # CPT 82150
+          hepatitis_panel_acute: 60  # CPT 80074: HAV IgM, HBsAg, anti-HBc IgM, anti-HCV
+          uric_acid: 6               # CPT 84550
+          cortisol: 20               # CPT 82533
+          CEA: 23                    # CPT 82378
+          CA_19_9: 25                # CPT 86301
+          CA_125: 25                 # CPT 86304
+          AFP: 21                    # CPT 82105
+          PSA: 23                    # CPT 84153
+          fecal_occult_blood: 18     # CPT 82274, immunochemical
+      order_body_imaging:
+        by_type:
+          chest_xray: 28                     # CPT 71046, two views
+          abdomen_xray: 32                   # CPT 74019, two views (obstruction, free air)
+          extremity_xray: 30                 # CPT 73030 / 73560 / 73610, two to three views
+          hepatobiliary_ultrasound: 87       # CPT 76705, limited abdomen (right upper quadrant)
+          renal_ultrasound: 106              # CPT 76770
+          neck_ultrasound: 101               # CPT 76536, thyroid and cervical soft tissue
+          lower_extremity_venous_duplex: 170 # CPT 93970, bilateral
+      order_microbiology:
+        by_type:
+          sputum: 18                    # CPT 87070 culture + 87205 Gram stain
+          stool: 46                     # CPT 87493 C. difficile toxin PCR
+          wound_swab: 12                # CPT 87070
+          synovial_fluid: 92            # CPT 20610 arthrocentesis + cell count, crystals, culture
+          pleural_fluid: 193            # CPT 32555 image-guided thoracentesis + fluid studies
+          nasopharyngeal_swab: 129      # CPT 87636 / 87631 respiratory pathogen PCR
+          bronchoalveolar_lavage: 368   # CPT 31624 bronchoscopy with lavage + culture, cytology
+      order_specialized_test:
+        by_type:
+          upper_endoscopy: 322          # CPT 43235 / 43239, professional + facility estimate
+          colonoscopy: 368              # CPT 45378 / 45380
+          pulmonary_function_tests: 138 # CPT 94010 + 94726 + 94729: spirometry, volumes, DLCO
+          ABPM: 55                      # CPT 93784, 24-hour ambulatory blood pressure
+          DXA: 37                       # CPT 77080
+      obtain_tissue_diagnosis:
+        by_type:
+          image_guided_core_biopsy: 644 # CPT 10005-10012 / 20206 / 47000 + 88305
+          endoscopic_biopsy: 64         # CPT 88305 histology only; the endoscopy bills itself
+          skin_biopsy: 156              # CPT 11102 + 88305
+          bone_marrow_biopsy: 276       # CPT 38222 + 88305
+      order_advanced_imaging:
+        by_type:
+          VQ_scan: 230                  # CPT 78582
+          HIDA_scan: 258                # CPT 78226

@@ -37,11 +37,14 @@ class ToolRegistry:
     @staticmethod
     def create_default_registry(
         mock_server=None,
+        packs: tuple[str, ...] = (),
     ) -> "ToolRegistry":
         """Create a registry with all diagnostic tools.
 
         Args:
             mock_server: MockServer for evaluation mode (pre-generated outputs).
+            packs: costs.yaml vocabulary packs to advertise on top of the NeuroBench
+                vocabulary (`vocabulary.DOMAIN_PACKS` maps a case domain to its packs).
 
         Returns:
             ToolRegistry with the 16 diagnostic tools.
@@ -82,6 +85,6 @@ class ToolRegistry:
             TissueDiagnosisTool,
             ClinicalAssessmentTool,
         ]:
-            registry.register(tool_cls(mock_server=mock_server))
+            registry.register(tool_cls(mock_server=mock_server, packs=packs))
 
         return registry

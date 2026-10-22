@@ -102,13 +102,14 @@ def convert(args) -> tuple[dict, dict]:
     vitals = None
     if not tri.empty:
         r = tri.iloc[0]
-        num = lambda v: int(v) if pd.notna(v) else 0
+        # A vital left blank at triage stays None: the prompt names it as not recorded.
+        num = lambda v: int(v) if pd.notna(v) else None
         vitals = {
             "bp_systolic": num(r.sbp), "bp_diastolic": num(r.dbp), "hr": num(r.heartrate),
-            "temp": round((float(r.temperature) - 32) * 5 / 9, 1) if pd.notna(r.temperature) else 0.0,
+            "temp": round((float(r.temperature) - 32) * 5 / 9, 1) if pd.notna(r.temperature) else None,
             "rr": num(r.resprate), "spo2": num(r.o2sat),
         }
-        missing = [k for k, v in vitals.items() if not v]
+        missing = [k for k, v in vitals.items() if v is None]
         if missing:
             gaps["vitals"] = f"not recorded at triage: {', '.join(missing)}"
     else:
@@ -140,7 +141,7 @@ def convert(args) -> tuple[dict, dict]:
             "allergies": [s.strip() for s in sec.get("Allergies", "").split(",") if s.strip()],
         },
         "neurological_exam": {"additional": physical_exam(note)} if note else {},
-        "vitals": vitals or {"bp_systolic": 0, "bp_diastolic": 0, "hr": 0, "temp": 0.0, "rr": 0, "spo2": 0},
+        "vitals": vitals or {},
         "chief_complaint": tri.chiefcomplaint.iloc[0] if not tri.empty else sec.get("Chief Complaint", ""),
         "history_present_illness": sec.get("History of Present Illness", ""),
     }
@@ -240,6 +241,8 @@ def convert(args) -> tuple[dict, dict]:
     case = {
         "schema_version": "2.0",
         "case_id": f"MIMIC-{template['case_id'].split('-')[0]}-{args.hadm}",
+        # A real admission: orders the clinicians did not place are answered "not available".
+        "provenance": "record",
         "condition": template["condition"],
         "difficulty": "moderate",
         "encounter_type": "emergency" if not ed.empty else "inpatient",

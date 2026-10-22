@@ -84,3 +84,18 @@ class TissueDiagnosisTool(BaseTool):
         },
         "required": ["clinical_context", "procedure"],
     }
+    vocabulary = {"procedure": tissue_procedures, "molecular_assays": molecular_assays}
+    pack_notes = {
+        "general_medicine": {
+            "": (
+                "In general medicine it also covers percutaneous, endoscopic, skin and bone "
+                "marrow biopsies."
+            ),
+            "procedure": (
+                "'image_guided_core_biopsy': percutaneous needle biopsy of a liver, lung, bone "
+                "or soft-tissue lesion under CT or ultrasound guidance. 'endoscopic_biopsy': "
+                "histology of biopsies taken at an endoscopy ordered separately. 'skin_biopsy': "
+                "punch biopsy of a skin lesion. 'bone_marrow_biopsy': aspirate and trephine."
+            ),
+        },
+    }

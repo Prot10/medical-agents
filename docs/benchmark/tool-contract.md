@@ -75,6 +75,32 @@ some cases). Library answers carry `from_fallback` and `library` on the observat
 `status: draft` until physicians have reviewed it; `tests/test_fallback_library.py` proves every
 legal order is answered in every case.
 
+### Recorded cases: "not available"
+
+A case with `provenance: record` (a real admission, e.g. MIMIC-IV) holds the results of what
+the clinicians ordered and nothing else. It may not carry `fallback_tool_outputs` (the schema
+refuses it), and the library tier is skipped: an order with no recorded result fails with
+`Not available: <tool> (<parameter>=<value>) was not performed during this recorded encounter`,
+flagged `unavailable` on the observation. A normal library report would invent the patient's
+data. The price is that the agent learns the study was not done, which a synthetic case hides on
+purpose; that is a property of real records, and analyses of recorded cases should say so. The
+order is still placed and billed. `search_medical_literature` and `check_drug_interactions` read
+no patient data and are answered by the library as in any case.
+
+### Vocabulary packs
+
+`costs.yaml` has a `packs:` block below `tools:`. A pack adds rows to the vocabularies above and
+may not re-price a term under any spelling (`vocabulary.merge_packs` raises). The case's
+`domain` picks the packs its catalogue advertises (`vocabulary.DOMAIN_PACKS`): a `neurology`
+case (every NeuroBench case) sees `tools:` alone, so its catalogue is unchanged by any pack; a
+`general_medicine` case also sees the `general_medicine` pack (chest and abdominal X-ray,
+endoscopy, sputum, stool and pleural-fluid microbiology, percutaneous and endoscopic biopsy,
+lipase, ...). A tool declares which schema properties are vocabularies (`BaseTool.vocabulary`)
+and what to tell the agent about each pack's terms (`BaseTool.pack_notes`). The cost registry
+prices every pack. The review app's mirror covers the NeuroBench catalogue only. The pack's
+rates are provisional (see the comment in `costs.yaml`): verify them before a cost result on
+general-medicine cases is reported. `tests/test_general_medicine_harness.py` pins all of this.
+
 ### Execution-time validation
 
 The catalogue the agent sees is the contract. `BaseTool.execute` validates every call against

@@ -9,6 +9,7 @@ from .base import ToolCall, ToolResult
 from .fallback_library import FallbackLibrary, default_library
 from .followup_matcher import resolve_followup
 from .vocabulary import (
+    DOMAIN_PACKS,
     advanced_imaging_modalities,
     assessment_types,
     body_imaging_studies,
@@ -30,6 +31,9 @@ class MockServer:
     def __init__(self, case: NeuroBenchCase, library: FallbackLibrary | None = None):
         self.case = case
         self.library = library or default_library()
+        # The vocabulary this case's catalogue advertises, so a stored report naming a pack term
+        # (a recorded `chest_xray`) is adjudicated like any other study.
+        self.packs = DOMAIN_PACKS[case.domain]
         self.call_log: list[ToolCall] = []
         # Trigger slugs of follow-ups already served this session. Lets distinct
         # re-orders of the same tool escalate through distinct follow-ups.
@@ -49,7 +53,8 @@ class MockServer:
         # passed as prose and was served for an `emg_ncs` order whose context mentioned ALS.
         "order_specialized_test": (
             "test_type",
-            lambda: specialized_test_types() + [f"genetic_panel:{p}" for p in genetic_panels()],
+            lambda packs=(): specialized_test_types(packs=packs)
+            + [f"genetic_panel:{p}" for p in genetic_panels(packs=packs)],
         ),
         "obtain_tissue_diagnosis": ("procedure", tissue_procedures),
         "perform_clinical_assessment": ("assessment_type", assessment_types),
@@ -99,11 +104,11 @@ class MockServer:
         if got in (None, ""):
             return True
         folded = self._fold(got)
-        if folded not in {self._fold(term) for term in vocabulary()}:
+        if folded not in {self._fold(term) for term in vocabulary(packs=self.packs)}:
             return True  # the report names the study in prose; not ours to adjudicate
         return folded == self._fold(wanted)
 
-    _BODY_MODALITIES = frozenset({"ct", "cta", "mri", "ultrasound"})
+    _BODY_MODALITIES = frozenset({"ct", "cta", "mri", "ultrasound", "xray", "duplex"})
 
     @classmethod
     def _body_study_matches(cls, wanted: str, output: Any) -> bool:
@@ -282,6 +287,20 @@ class MockServer:
                 tool_name=tool_name, success=True, from_fallback=True,
                 output=output.model_dump() if isinstance(output, BaseModel) else output,
             )
+        # A recorded case holds what the clinicians ordered and nothing else. Any other order has
+        # no result, and a normal report from the library would invent the patient's data. The
+        # agent therefore learns that the study was not done, which a synthetic case hides: a
+        # property of real records, stated in docs/benchmark/tool-contract.md. The order is still
+        # placed and billed. Literature and drug-interaction look-ups read no patient data, so
+        # they are answered as in any case.
+        if self.case.provenance == "record" and tool_name not in self._KNOWLEDGE_TOOLS:
+            return ToolResult(
+                tool_name=tool_name, success=False, output=None, unavailable=True,
+                error_message=(
+                    f"Not available: {self._study_label(tool_name, parameters)} was not "
+                    "performed during this recorded encounter, so there is no result."
+                ),
+            )
         # Last tier: the benchmark-level library, the same normal report in every case, so an
         # off-pathway order never reveals that it was off-pathway.
         output = self.library.resolve(tool_name, parameters)
@@ -291,6 +310,15 @@ class MockServer:
             tool_name=tool_name, success=False, output=None,
             error_message=f"No {tool_name} data available for this patient.",
         )
+
+    _KNOWLEDGE_TOOLS = frozenset({"search_medical_literature", "check_drug_interactions"})
+
+    def _study_label(self, tool_name: str, parameters: dict[str, Any]) -> str:
+        """`order_body_imaging (study=chest_xray)`: the tool, and the study the call names."""
+        spec = self._DISCRIMINATOR.get(tool_name)
+        if spec is not None and parameters.get(spec[0]) is not None:
+            return f"{tool_name} ({spec[0]}={parameters[spec[0]]})"
+        return tool_name
 
     def _match_initial_output(self, tool_name: str, parameters: dict[str, Any]) -> BaseModel | None:
         mapping = {

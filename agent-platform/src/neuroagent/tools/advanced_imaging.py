@@ -51,3 +51,13 @@ class AdvancedImagingTool(BaseTool):
         },
         "required": ["clinical_context", "modality"],
     }
+    vocabulary = {"modality": advanced_imaging_modalities}
+    pack_notes = {
+        "general_medicine": {
+            "modality": (
+                "'VQ_scan': ventilation-perfusion lung scan for pulmonary embolism when CT "
+                "angiography is contraindicated. 'HIDA_scan': hepatobiliary scintigraphy for "
+                "acute cholecystitis."
+            ),
+        },
+    }

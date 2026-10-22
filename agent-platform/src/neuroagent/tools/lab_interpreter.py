@@ -46,3 +46,13 @@ class LabInterpreterTool(BaseTool):
         },
         "required": ["clinical_context"],
     }
+    vocabulary = {"panels": lab_panels}
+    pack_notes = {
+        "general_medicine": {
+            "panels": (
+                "Also pancreatic enzymes ('lipase', 'amylase'), 'hepatitis_panel_acute', "
+                "'uric_acid', 'cortisol', 'fecal_occult_blood' and tumour markers ('CEA', "
+                "'CA_19_9', 'CA_125', 'AFP', 'PSA')."
+            ),
+        },
+    }

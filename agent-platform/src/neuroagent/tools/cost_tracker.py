@@ -18,7 +18,7 @@ from typing import Any
 import yaml
 from pydantic import BaseModel, Field
 
-from .vocabulary import normalize_analyte
+from .vocabulary import merge_packs, normalize_analyte
 
 logger = logging.getLogger(__name__)
 
@@ -90,7 +90,9 @@ class CostTracker:
             )
         with open(path) as f:
             data = yaml.safe_load(f) or {}
-        return data.get("tools", {})
+        # Every vocabulary pack is priced: which terms a case may order is the catalogue's
+        # business (its domain's packs), what an order costs is the same for every case.
+        return merge_packs(data, tuple(data.get("packs", {})))
 
     def _require(self, cfg: dict[str, Any], key: str, tool_name: str) -> Any:
         """Fetch a required cost entry; missing keys fail loudly."""

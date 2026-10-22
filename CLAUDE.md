@@ -134,6 +134,11 @@ HF_HOME=/dev/shm/hf uv run python -m neuroagent.training.train_grpo --model qwen
   mirror drifts
 - Read `docs/benchmark/tool-contract.md` before editing a case or a tool schema; a change to the
   policies must keep the perfect-agent check clean (every required action served by the MockServer)
+- External cases are opt-in through two case fields, both defaulting to NeuroBench:
+  `domain: general_medicine` adds the `general_medicine` vocabulary pack of `costs.yaml` to the
+  catalogue (provisional prices), `provenance: record` answers an order with no recorded result
+  "not available" instead of a library normal report. NeuroBench's catalogue and prompts must
+  stay byte-identical (`tests/test_general_medicine_harness.py`)
 
 ## Architecture notes
 

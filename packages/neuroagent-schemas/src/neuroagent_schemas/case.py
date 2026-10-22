@@ -119,9 +119,22 @@ class FollowUpToolOutput(BaseModel):
         return data
 
 
+# The clinical domain decides the tool catalogue: a general-medicine case also advertises the
+# `general_medicine` vocabulary pack (chest X-ray, endoscopy, sputum culture, ...), a neurology
+# case sees exactly the NeuroBench catalogue.
+CaseDomain = Literal["neurology", "general_medicine"]
+# Where the case comes from. A synthetic case was authored as a whole, so an order off its
+# pathway is answered by a normal report (case fallback, then the benchmark library). A
+# recorded case (MIMIC-IV, ...) holds only what the clinicians actually ordered: any other
+# order has no result, and inventing a normal one would be fabricating the patient's data.
+CaseProvenance = Literal["synthetic", "record"]
+
+
 class NeuroBenchCase(BaseModel):
     schema_version: Literal["2.0"]
     case_id: str
+    domain: CaseDomain = "neurology"
+    provenance: CaseProvenance = "synthetic"
     condition: NeurologicalCondition
     difficulty: CaseDifficulty
     encounter_type: EncounterType
@@ -134,3 +147,13 @@ class NeuroBenchCase(BaseModel):
     fallback_tool_outputs: ToolOutputSet | None = None
     ground_truth: GroundTruth
     metadata: dict[str, Any] = {}
+
+    @model_validator(mode="after")
+    def _record_has_no_authored_fallback(self) -> NeuroBenchCase:
+        """A recorded case cannot carry authored normal reports: they would be invented data."""
+        if self.provenance == "record" and self.fallback_tool_outputs is not None:
+            raise ValueError(
+                f"{self.case_id}: a recorded case has no fallback_tool_outputs; an order the "
+                "clinicians did not place is answered 'not available'"
+            )
+        return self

@@ -73,3 +73,16 @@ class MicrobiologyTool(BaseTool):
         },
         "required": ["clinical_context", "specimen"],
     }
+    vocabulary = {"specimen": microbiology_specimens}
+    pack_notes = {
+        "general_medicine": {
+            "specimen": (
+                "'sputum': Gram stain and culture. 'stool': C. difficile toxin PCR, with "
+                "culture or ova and parasites on request. 'wound_swab': culture of a wound or "
+                "ulcer. 'synovial_fluid': arthrocentesis with cell count, crystals and culture. "
+                "'pleural_fluid': thoracentesis with cell count, protein, LDH, pH and culture. "
+                "'nasopharyngeal_swab': respiratory pathogen PCR (influenza, SARS-CoV-2, RSV). "
+                "'bronchoalveolar_lavage': bronchoscopy with lavage for culture, cytology and PCR."
+            ),
+        },
+    }

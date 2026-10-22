@@ -1,8 +1,10 @@
 from __future__ import annotations
+import copy
 from abc import ABC
+from collections.abc import Callable
 from functools import cached_property
 from pydantic import BaseModel, ConfigDict, Field
-from typing import Any, TYPE_CHECKING
+from typing import Any, ClassVar, TYPE_CHECKING
 
 from jsonschema import Draft202012Validator
 
@@ -35,6 +37,7 @@ class ToolResult(BaseModel):
     from_fallback: bool = False  # True if served from the off-pathway fallback tier
     library: bool = False  # True if the fallback came from the benchmark-level library, not the case
     rejected: bool = False  # True when the call violated the tool's schema and was never placed
+    unavailable: bool = False  # True when a recorded case holds no result for this order
 
 
 class BaseTool(ABC):
@@ -55,9 +58,35 @@ class BaseTool(ABC):
     name: str
     description: str
     parameter_schema: dict[str, Any]
+    # Properties whose enum is a costs.yaml vocabulary, and the accessor that lists it. A tool
+    # built with vocabulary packs advertises, and so accepts, the packs' terms as well; built
+    # without, it is exactly the class-level schema, which is the NeuroBench catalogue.
+    vocabulary: ClassVar[dict[str, Callable[..., list[str]]]] = {}
+    # Per pack, text appended to a property's description (or, under "", to the tool's) so the
+    # agent is told what the added terms are.
+    pack_notes: ClassVar[dict[str, dict[str, str]]] = {}
 
-    def __init__(self, mock_server: MockServer | None = None):
+    def __init__(self, mock_server: MockServer | None = None, packs: tuple[str, ...] = ()):
         self.mock_server = mock_server
+        self.packs = tuple(packs)
+        if self.packs:
+            self.description, self.parameter_schema = self._with_packs(self.packs)
+
+    @classmethod
+    def _with_packs(cls, packs: tuple[str, ...]) -> tuple[str, dict[str, Any]]:
+        description = cls.description
+        schema = copy.deepcopy(cls.parameter_schema)
+        for key, accessor in cls.vocabulary.items():
+            prop = schema["properties"][key]
+            target = prop["items"] if prop.get("type") == "array" else prop
+            target["enum"] = accessor(packs=packs)
+        for pack in packs:
+            for key, note in cls.pack_notes.get(pack, {}).items():
+                if key:
+                    schema["properties"][key]["description"] += " " + note
+                else:
+                    description += " " + note
+        return description, schema
 
     def execute(self, parameters: dict[str, Any]) -> ToolResult:
         """Execute the tool and return a result."""

@@ -71,3 +71,15 @@ class BodyImagingTool(BaseTool):
         },
         "required": ["clinical_context", "study"],
     }
+    vocabulary = {"study": body_imaging_studies}
+    pack_notes = {
+        "general_medicine": {
+            "study": (
+                "'chest_xray', 'abdomen_xray', 'extremity_xray': plain radiographs, the "
+                "first-line image of the chest, the abdomen (obstruction, free air) and a limb. "
+                "'hepatobiliary_ultrasound': gallbladder and bile ducts. 'renal_ultrasound': "
+                "hydronephrosis, kidney size. 'neck_ultrasound': thyroid and cervical nodes. "
+                "'lower_extremity_venous_duplex': deep vein thrombosis."
+            ),
+        },
+    }
