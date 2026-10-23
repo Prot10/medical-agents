@@ -651,22 +651,17 @@ bacterial_meningitis:
     diagnostic_puzzle:
       presentation: "35-year-old with 3-day headache, mild neck stiffness, and subjective fevers. Afebrile in ED. Recent URI. Lumbar puncture shows mixed pleocytosis — viral vs early bacterial unclear."
       expected_agent_confidence: 0.40
+  # October 2026 review round: request_repeat_lp (a post-treatment repeat LP served to every LP
+  # call), request_pcr_panel (CSF PCR is part of the index CSF report) and request_audiometry
+  # (filed under interpret_labs; hearing assessment is a must, not a tool call) removed: they
+  # generated classes C1 and C8 of plans/BACT-MEN.md
   common_followups:
-    - trigger_action: "request_repeat_lp"
-      tool_name: "analyze_csf"
-      description: "Repeat LP at 48h to assess treatment response"
     - trigger_action: "request_ct_head"
       tool_name: "order_ct_scan"
-      description: "CT head before LP if focal deficits or papilledema"
+      description: "CT head before LP only when a WHO 2025 Annex A.4 criterion is present (GCS <10, focal signs, cranial nerve deficit, papilloedema, new-onset seizure, severe immunocompromise)"
     - trigger_action: "request_blood_cultures"
       tool_name: "order_microbiology"
       description: "Blood cultures drawn before antibiotics"
-    - trigger_action: "request_pcr_panel"
-      tool_name: "analyze_csf"
-      description: "CSF meningitis/encephalitis PCR panel (FilmArray)"
-    - trigger_action: "request_audiometry"
-      tool_name: "interpret_labs"
-      description: "Audiometry to assess for sensorineural hearing loss (complication)"
 
 parkinsons:
   name: "Parkinson's disease"
@@ -1839,22 +1834,19 @@ hepatic_encephalopathy:
     diagnostic_puzzle:
       presentation: "45-year-old with Child-Pugh B cirrhosis presenting with new confusion. Ammonia only mildly elevated (68 μmol/L). CT normal. EEG shows non-specific slowing. Concurrent benzodiazepine use and mild hyponatremia — multiple contributing factors."
       expected_agent_confidence: 0.38
+  # October 2026 review round (plans/HEP-ENC.md CENTRAL 3): request_lactulose_rifaximin,
+  # request_sbp_paracentesis (under interpret_labs), request_continuous_eeg (benzodiazepine
+  # challenge), request_thiamine_empiric and request_liver_transplant_evaluation removed: they
+  # delivered treatment, consults and treatment response through diagnostic tools (class C1) in all
+  # 30 cases. Treatment is a must, never a tool call. The paracentesis and urine follow-ups below
+  # follow plan section 3.2
   common_followups:
-    - trigger_action: "request_lactulose_rifaximin"
-      tool_name: "interpret_labs"
-      description: "Lactulose and rifaximin for ammonia reduction; monitor bowel movements and ammonia trend"
-    - trigger_action: "request_sbp_paracentesis"
-      tool_name: "interpret_labs"
-      description: "Diagnostic paracentesis to exclude spontaneous bacterial peritonitis (PMN >250/mm3)"
-    - trigger_action: "request_continuous_eeg"
-      tool_name: "analyze_eeg"
-      description: "Continuous EEG monitoring to distinguish HE from NCSE (benzodiazepine challenge)"
-    - trigger_action: "request_thiamine_empiric"
-      tool_name: "interpret_labs"
-      description: "Empiric IV thiamine before glucose in alcoholic patients (Wernicke prophylaxis)"
-    - trigger_action: "request_liver_transplant_evaluation"
-      tool_name: "interpret_labs"
-      description: "MELD score calculation and transplant center referral for recurrent or severe HE"
+    - trigger_action: "request_diagnostic_paracentesis"
+      tool_name: "order_microbiology"
+      description: "Diagnostic paracentesis (specimen ascitic_fluid) only when ascites is present: cell count with differential, total protein and albumin, Gram stain and culture; SBP is PMN 250 cells/mm3 or more"
+    - trigger_action: "request_urine_specimen"
+      tool_name: "order_microbiology"
+      description: "Urinalysis and urine culture (specimen urine), one specimen and one time point per report"
 
 amyotrophic_lateral_sclerosis:
   name: "Amyotrophic lateral sclerosis (motor neuron disease)"
