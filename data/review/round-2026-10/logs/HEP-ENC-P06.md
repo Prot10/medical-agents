@@ -45,3 +45,10 @@ The policy now requires the core labs with the levetiracetam level, the CT, the 
 ## Verification
 
 Adversarial check, 23 Oct 2026. Read the log, the diff and the whole final case. Recomputed: Child-Pugh C (bilirubin 3.6 3, albumin 2.4 3, INR 2.0 2, no ascites 1, HE 2 or 3), MELD 21, MELD-Na 23 (Na 134); label, key evidence and transplant must agree. Notes: the CK partial decline is sound (convulsion about 30 minutes before EMS arrival, so sampling within roughly an hour; CK peaks at 24-72 hours, Brigo 2015) and the case now gives a numeric CK with the explanatory pearl; ethanol appears once; the paracentesis output and the ammonia trend are deleted; cultures are recommended with the post-ictal WBC explained. The EEG is required and in the stop rule, and its initial report (continuous 2.5-3.5 Hz generalized spike-and-wave with evolution) meets the Salzburg criteria. Checked the musts against AES 2016 (lorazepam 0.1 mg/kg up to 4 mg, levetiracetam 60 mg/kg up to 4500 mg) and the lacosamide hepatic limit (300 mg/day in mild to moderate impairment, not recommended in severe): correct. PROHIB-BZD-SZ replaces the haloperidol line, so no prohibition contradicts the benzodiazepine must. Found nothing to change. `perfect_agent.py` and `case_io.py check` clean.
+
+## Open questions resolved (24 Oct 2026)
+
+- Leak guard (Andrea, 24 Oct 2026: any-query outputs must not repeat any criterion's expected evidence, including their own): `ground_truth.action_criteria[action-4-check-drug-interactions].expected_evidence` reworded as the conclusion a grader checks, in words not shared with the stored `check_drug_interactions` follow-up, whose report text is unchanged; clinical content unchanged.
+- Q2 edge case: blood and urine cultures kept recommended (WBC 11.2 drawn about an hour after a generalised seizure, afebrile; post-ictal demargination); the pack's tier rule now names this exception.
+
+Checks: `perfect_agent.py` pass; `case_io.py check` schema and synonym guard OK, no test failure names this case; leak guard clean.

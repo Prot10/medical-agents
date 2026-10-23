@@ -60,3 +60,10 @@ Synonym table scoped (October 2026, `diagnosis_synonyms.yaml`, applied with `app
 - labels removed: "hepatic coma"
 - codes removed: K72.91
 - `case_io.py validate` OK; `perfect_agent.py` passes.
+
+## Open questions resolved (24 Oct 2026)
+
+- Leak guard (Andrea, 24 Oct 2026: any-query outputs must not repeat any criterion's expected evidence, including their own): `ground_truth.action_criteria[action-4-check-drug-interactions].expected_evidence` reworded as the conclusion a grader checks, in words not shared with the stored `check_drug_interactions` follow-up, whose report text is unchanged; clinical content unchanged.
+- No transplant must added: the Lille must already sets the next decision while the response to prednisolone is pending (auditor flag, decided keep).
+
+Checks: `perfect_agent.py` pass; `case_io.py check` schema and synonym guard OK, no test failure names this case; leak guard clean.

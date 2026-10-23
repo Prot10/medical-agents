@@ -54,7 +54,7 @@ check last.
 - `order_microbiology` (`{"specimen": "ascitic_fluid"}`): **required whenever ascites is present**: diagnostic paracentesis in every hospitalised cirrhotic with ascites who has encephalopathy, GI bleeding, infection, or worsening liver or renal function (cell count with differential, total protein and albumin, Gram stain and culture in blood-culture bottles). SBP is an ascitic PMN count of 250 cells/mm3 or more. No criterion and no output without ascites; never filed under `interpret_labs` [EASL_decomp_2018] [AASLD_ascites_2021]
 
 **Cultures (tier rule):** `order_microbiology` `{"specimen": "blood_culture"}` and `{"specimen": "urine"}` (arguments are the specimen only; no `before_antimicrobials`, no `tests` list):
-- **Required** when the temperature is 38.0 °C or more, the WBC is above 11 x10^9/L, or an infective precipitant is in the label or HPI. Infection is the commonest precipitant of overt HE and can be occult [EASL_HE_2022]
+- **Required** when the temperature is 38.0 °C or more, the WBC is above 11 x10^9/L, or an infective precipitant is in the label or HPI. Infection is the commonest precipitant of overt HE and can be occult [EASL_HE_2022]. One exception: a WBC just above 11 drawn within hours of a generalised seizure in an afebrile patient (post-ictal demargination) leaves the screen recommended, and the rationale says so (P06)
 - **Recommended** otherwise, as an infection screen for an occult precipitant
 - One specimen and one time point per output: either a final organism with its susceptibility, or "no growth at 48 hours" with the organism null; no culture result in the admission panel
 
@@ -124,7 +124,7 @@ required ids; `max_additional_actions` 0.
 
 ## 8. Allowed citations
 
-- `[ACG_HE_2026]`: Bajaj JS, Jakab SS, Jesudian AB, et al. ACG Clinical Guideline: Hepatic Encephalopathy. Am J Gastroenterol 2026;121:588-618
+- `[ACG_HE_2026]`: Bajaj JS, Jakab SS, Jesudian AB, et al. ACG Clinical Guideline: Hepatic Encephalopathy. Am J Gastroenterol 2026;121:588-618, doi:10.14309/ajg.0000000000003899
 - `[EASL_HE_2022]`: Montagnese S et al. EASL Clinical Practice Guidelines on the management of hepatic encephalopathy. J Hepatol 2022;77:807-824
 - `[AASLD_2014]`: Vilstrup H et al. Hepatic encephalopathy in chronic liver disease: 2014 Practice Guideline by AASLD and EASL. Hepatology 2014;60:715-735 (West Haven grades; ACG 2026 and EASL 2022 govern where they differ)
 - `[Ferenci_2002]`: Ferenci P et al. Hepatic encephalopathy: definition, nomenclature, diagnosis, and quantification. Hepatology 2002;35:716-721
@@ -135,13 +135,14 @@ required ids; `max_additional_actions` 0.
 - `[Lille_2007]`: Louvet A et al. The Lille model. Hepatology 2007;45:1348-1354
 - `[EFNS_Wernicke_2010]`: Galvin R et al. EFNS guidelines for diagnosis, therapy and prevention of Wernicke encephalopathy. Eur J Neurol 2010;17:1408-1418
 - `[AES_2016]`: Glauser T et al. Evidence-based guideline: treatment of convulsive status epilepticus (AES). Epilepsy Curr 2016;16:48-61
-- `[Brigo_2015]`: Brigo F et al. J Neurol 2015;262:251-257 (post-ictal CK)
+- `[Brigo_2015]`: Brigo F, et al. Postictal serum creatine kinase for the differential diagnosis of epileptic seizures and psychogenic non-epileptic seizures: a systematic review. J Neurol 2015;262:251-257, doi:10.1007/s00415-014-7369-9 (post-ictal CK)
 - `[AASLD_Wilson_2022]`: Schilsky ML et al. A multidisciplinary approach to the diagnosis and management of Wilson disease: 2022 AASLD practice guidance. Hepatology 2023;77:1428-1455 (executive summary verified for P04)
 - `[Kim_MELDNa_2008]`: Kim WR et al. Hyponatremia and mortality among patients on the liver-transplant waiting list. NEJM 2008;359:1018-1026
 - `[Wijdicks_2016]`: Wijdicks EF. Hepatic encephalopathy. NEJM 2016;375:1660-1670 (background)
-- `[EXTRIP_lithium_2015]`: EXTRIP workgroup recommendations for extracorporeal treatment in lithium poisoning, 2015 (proposed key for P02, cited in free text so far; reference to confirm)
-- `[EASL_PBC_2017]`: EASL Clinical Practice Guidelines on primary biliary cholangitis, 2017 (proposed key for M05, cited in free text so far; reference to confirm)
-- `[AASLD_IDSA_HCV]`: AASLD-IDSA HCV guidance (proposed key for S07, cited in free text so far; edition and reference to confirm)
+- `[EXTRIP_lithium_2015]`: Decker BS, Goldfarb DS, Dargan PI, et al. Extracorporeal treatment for lithium poisoning: systematic review and recommendations from the EXTRIP Workgroup. Clin J Am Soc Nephrol 2015;10:875-887 (P02; verified 24 Oct 2026)
+- `[EASL_PBC_2017]`: European Association for the Study of the Liver. EASL Clinical Practice Guidelines: the diagnosis and management of patients with primary biliary cholangitis. J Hepatol 2017;67:145-172 (M05, cholestatic pruritus; verified 24 Oct 2026)
+- `[AASLD_IDSA_HCV_2023]`: Bhattacharya D, et al.; AASLD-IDSA HCV Guidance Panel. Hepatitis C Guidance 2023 Update: AASLD-IDSA recommendations for testing, managing, and treating hepatitis C virus infection. Clin Infect Dis 2023 (online 25 May 2023), doi:10.1093/cid/ciad319; living version at hcvguidelines.org (S07, decompensated cirrhosis regimens; verified 24 Oct 2026)
+- `[EASL_HBV_2025]`: European Association for the Study of the Liver. EASL Clinical Practice Guidelines on the management of hepatitis B virus infection. J Hepatol 2025, doi:10.1016/j.jhep.2025.03.018 (S05; supersedes the 2017 EASL HBV guideline; verified 24 Oct 2026)
 
 **Superseded (do not cite; kept for traceability):**
 - `[EASL_2010]`: EASL Clinical Practice Guidelines on the management of ascites, spontaneous bacterial peritonitis, and hepatorenal syndrome in cirrhosis. J Hepatol 2010. Superseded by `[EASL_decomp_2018]`

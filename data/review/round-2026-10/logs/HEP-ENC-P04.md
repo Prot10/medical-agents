@@ -57,3 +57,11 @@ Synonym table scoped (October 2026, `diagnosis_synonyms.yaml`, applied with `app
 - labels removed: "hepatic coma"
 - codes removed: K72.91
 - `case_io.py validate` OK; `perfect_agent.py` passes.
+
+## Open questions resolved (24 Oct 2026)
+
+- Leak guard (Andrea, 24 Oct 2026: any-query outputs must not repeat any criterion's expected evidence, including their own): `ground_truth.action_criteria[action-5-check-drug-interactions].expected_evidence` reworded as the conclusion a grader checks, in words not shared with the stored `check_drug_interactions` follow-up, whose report text is unchanged; clinical content unchanged.
+- `ground_truth.diagnosis.icd_codes` changed from [K72.90, K76.82] to [E83.01]; `accepted[1:]` re-derived from the new `E83.01` entry of `diagnosis_synonyms.yaml` (cases: [HEP-ENC-P04]) with `apply_diagnosis_synonyms.py --prune`: the generic HE labels and codes are gone, the accepted labels require Wilson disease and HE together. Reason: Wilson disease is the missing diagnosis the case is built on, and the generic labels let an answer of "hepatic encephalopathy" alone, or the code K72.90, score full diagnosis credit. `accepted[0]` unchanged.
+- `fallback_tool_outputs.mri` set to null: a normal template ("appropriate for age") that is never served, because `initial_tool_outputs.mri` always answers `analyze_brain_mri`; it contradicted the case's MRI.
+
+Checks: `perfect_agent.py` pass; `case_io.py check` schema and synonym guard OK, no test failure names this case; leak guard clean.

@@ -71,3 +71,9 @@ Synonym table scoped (October 2026, `diagnosis_synonyms.yaml`, applied with `app
 - labels removed: "hepatic coma"
 - codes removed: K72.91
 - `case_io.py validate` OK; `perfect_agent.py` passes.
+
+## Open questions resolved (24 Oct 2026)
+
+- `ground_truth.key_clinical_evidence[0]`: inserted the canonical pearl "HE is a clinical diagnosis: West Haven grade, evidence of liver disease and exclusion of other causes of altered mental status (ACG 2026; EASL 2022)." carried by the other 28 cases (auditor flag).
+
+Checks: `perfect_agent.py` pass; `case_io.py check` schema and synonym guard OK, no test failure names this case; leak guard clean.

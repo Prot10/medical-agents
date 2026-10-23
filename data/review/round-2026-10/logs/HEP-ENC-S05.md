@@ -70,3 +70,9 @@ Synonym table scoped (October 2026, `diagnosis_synonyms.yaml`, applied with `app
 - labels removed: "hepatic coma"
 - codes removed: K72.91
 - `case_io.py validate` OK; `perfect_agent.py` passes.
+
+## Open questions resolved (24 Oct 2026)
+
+- HBV must: citation updated from "EASL 2017 hepatitis B guideline" to "EASL 2025 hepatitis B guideline" (`[EASL_HBV_2025]`, J Hepatol 2025, doi:10.1016/j.jhep.2025.03.018), which supersedes 2017; the content (tenofovir disoproxil interval by creatinine clearance or a switch to tenofovir alafenamide or entecavir) is consistent with it. Criterion order (required renal ultrasound before the optional CT) kept: obstructed pyelonephritis needs source control before an optional head CT.
+
+Checks: `perfect_agent.py` pass; `case_io.py check` schema and synonym guard OK, no test failure names this case; leak guard clean.

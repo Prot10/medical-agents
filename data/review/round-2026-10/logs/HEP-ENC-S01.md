@@ -73,3 +73,10 @@ Synonym table scoped (October 2026, `diagnosis_synonyms.yaml`, applied with `app
 - labels removed: "hepatic coma"
 - codes removed: K72.90
 - `case_io.py validate` OK; `perfect_agent.py` passes.
+
+## Open questions resolved (24 Oct 2026)
+
+- `ground_truth.diagnosis.icd_codes[0]` K72.91 (hepatic failure with coma) to K72.90: grade III (GCS 10, rousable) is not coma; only S06 (grade IV) keeps K72.91. Synonym check clean.
+- `required_recommendations`: added an alcohol-withdrawal must (ethanol 168 mg/dL, heavy daily drinking; symptom-triggered lorazepam or oxazepam if withdrawal develops, EASL ALD 2018) and MUST-TX (transplant assessment once bleed and SBP are controlled, MELD-Na 38, with alcohol use disorder treatment). Both were lost when the round deleted the case's transplant panel under C1 without the replacement must C16 requires; the other actively drinking Child-Pugh C cases (S04, S06, S08) carry them. PROHIB-BZD kept: it forbids benzodiazepines for agitation or sleep, which remains right; the new must covers withdrawal. Approved case: changed for a regression introduced this round.
+
+Checks: `perfect_agent.py` pass; `case_io.py check` schema and synonym guard OK, no test failure names this case; leak guard clean.

@@ -78,3 +78,9 @@ Synonym table scoped (October 2026, `diagnosis_synonyms.yaml`, applied with `app
 - labels removed: "hepatic coma"
 - codes removed: K72.91
 - `case_io.py validate` OK; `perfect_agent.py` passes.
+
+## Open questions resolved (24 Oct 2026)
+
+- `ground_truth.key_clinical_evidence[0]`: inserted the canonical "HE is a clinical diagnosis" pearl carried by the other 28 cases (auditor flag). M10 no pre-emptive TIPS at Child-Pugh C 14 confirmed (Baveno VII: pre-emptive TIPS for Child-Pugh C 10-13 or B 8-9 with active bleeding).
+
+Checks: `perfect_agent.py` pass; `case_io.py check` schema and synonym guard OK, no test failure names this case; leak guard clean.

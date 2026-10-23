@@ -56,3 +56,9 @@ Synonym table scoped (October 2026, `diagnosis_synonyms.yaml`, applied with `app
 - labels removed: "hepatic coma"
 - codes removed: K72.91
 - `case_io.py validate` OK; `perfect_agent.py` passes.
+
+## Open questions resolved (24 Oct 2026)
+
+- `fallback_tool_outputs.ecg.rate` 65 to 88, to match the recorded heart rate (vitals HR 88); the rest of the normal fallback ECG unchanged. Approved case: a real internal inconsistency. "uV" and pre-existing em dashes left (typographic, not errors).
+
+Checks: `perfect_agent.py` pass; `case_io.py check` schema and synonym guard OK, no test failure names this case; leak guard clean.
