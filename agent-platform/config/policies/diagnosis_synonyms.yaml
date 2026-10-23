@@ -18,7 +18,7 @@
 
 # Labels the table granted once and no longer grants; `--prune` strips them from every case.
 RETIRED:
-  retired_labels: [stroke, carotid stenosis stroke, internal carotid artery stenosis, large artery atherosclerotic stroke]
+  retired_labels: [stroke, carotid stenosis stroke, internal carotid artery stenosis, large artery atherosclerotic stroke, perioperative stroke, postprocedural stroke]
 
 G12.21:
   labels: [amyotrophic lateral sclerosis, ALS, motor neuron disease, motor neurone disease, MND]
@@ -26,8 +26,16 @@ G12.21:
 # ALS-P02: the ALS mimic is the diagnosis (relabelled October 2026).
 E05.90:
   conditions: [als]
-  labels: [thyrotoxicosis, levothyroxine over-replacement, iatrogenic thyrotoxicosis, levothyroxine induced thyrotoxicosis, exogenous thyrotoxicosis]
-  codes: [E05.9]
+  # 24 Oct 2026: thyroid hormone excess is the decisive finding; TSI stays positive after radioiodine,
+  # so residual Graves activity cannot be excluded from the case data and is credited too.
+  labels: [thyrotoxicosis, levothyroxine over-replacement, iatrogenic thyrotoxicosis, levothyroxine induced thyrotoxicosis, exogenous thyrotoxicosis, hyperthyroidism, graves disease, graves hyperthyroidism]
+  codes: [E05.9, E05.00, T38.1X5A]
+# ALS-P08: SOD1 A4V carrier with suspected early ALS, Gold Coast not met (recoded October 2026, so a
+# plain "ALS" answer is an overcall); cautious labels only.
+Z15.89:
+  conditions: [als]
+  cases: [ALS-P08]
+  labels: [suspected ALS, prodromal ALS, possible ALS, suspected motor neuron disease, mild motor impairment]
 
 G30:
   labels: [alzheimer disease, alzheimer's disease, alzheimers disease, alzheimer dementia, dementia due to alzheimer]
@@ -62,7 +70,14 @@ G00.1:
 G00.0:
   labels: [haemophilus meningitis, haemophilus influenzae meningitis, hib meningitis]
 G00.2:
-  labels: [streptococcal meningitis, group b streptococcus meningitis]
+  labels: [streptococcal meningitis]
+# Organism labels scoped to their case (October 2026): RS01 is group B streptococcus, RM04 S. suis
+G00.2+gbs:
+  cases: [BACT-MEN-RS01]
+  labels: [group b streptococcus meningitis, group b streptococcal meningitis, streptococcus agalactiae meningitis]
+G00.2+suis:
+  cases: [BACT-MEN-RM04]
+  labels: [streptococcus suis meningitis]
 G00.3:
   labels: [staphylococcal meningitis, post neurosurgical meningitis, healthcare associated meningitis, ventriculitis]
 G00.8:
@@ -199,7 +214,7 @@ I63.232+moyamoya:
   cases: [ISCH-STR-P02]
   labels: [moyamoya disease, moyamoya]
 I63.232+dissection:
-  cases: [ISCH-STR-RM01]
+  cases: [ISCH-STR-RM01, ISCH-STR-RS02]
   labels: [carotid artery dissection, internal carotid artery dissection, cervical artery dissection]
 I63.231:
   codes: [I63.2, I63.23]
@@ -233,8 +248,6 @@ I63.81+cadasil:
   labels: [CADASIL]
 I77.71:
   labels: [carotid artery dissection, internal carotid artery dissection, cervical artery dissection]
-I97.811:
-  labels: [perioperative stroke, iatrogenic stroke, postprocedural stroke, ischemic stroke, ischaemic stroke]
 I63.4:
   labels: [cardioembolic stroke, PCA territory infarct, ischemic stroke, ischaemic stroke]
   codes: [I63.4, I63.43, I63.431, I63.432, I63.9]
@@ -291,6 +304,11 @@ K72.91+coma:
   # West Haven grade IV
   cases: [HEP-ENC-S06]
   labels: [hepatic coma]
+# HEP-ENC-P04 (October 2026): HE revealing unrecognised Wilson disease. Wilson disease is the
+# missing diagnosis the case scores, so the case is coded E83.01 and an answer must name both.
+E83.01:
+  cases: [HEP-ENC-P04]
+  labels: [wilson disease hepatic encephalopathy, wilson disease HE, wilsons disease hepatic encephalopathy, hepatolenticular degeneration hepatic encephalopathy]
 
 F01:
   labels: [vascular dementia, vascular cognitive impairment, major vascular neurocognitive disorder, subcortical vascular dementia, multi-infarct dementia, multi infarct dementia, small vessel disease dementia, VaD]

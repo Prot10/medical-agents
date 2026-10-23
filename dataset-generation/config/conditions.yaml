@@ -165,10 +165,12 @@ ischemic_stroke:
       description: "Transthoracic or transesophageal echocardiogram"
     - trigger_action: "request_holter_monitor"
       tool_name: "order_cardiac_monitoring"
-      description: "24-72h Holter monitor for paroxysmal AF"
-    - trigger_action: "request_hypercoagulability_panel"
-      tool_name: "interpret_labs"
-      description: "Factor V Leiden, protein C/S, antiphospholipid antibodies"
+      description: "Inpatient telemetry or 24-48 h Holter on the stroke unit, after vessel imaging, for paroxysmal AF (monitor type matches its duration)"
+    # October 2026 review (plan C9): no default thrombophilia panel. It produced orphan follow-ups
+    # and contradictory results in 19 of 30 cases. Write an aetiological panel (antiphospholipid
+    # antibodies, Factor V Leiden, ADAMTS13, ...) only when the case itself indicates it (young
+    # cryptogenic stroke, PFO with venous thrombosis, prior thrombosis or pregnancy loss, pregnancy,
+    # prior TTP) and only together with the action criterion that orders it.
 
 autoimmune_encephalitis_nmdar:
   name: "Anti-NMDA receptor encephalitis"
@@ -580,7 +582,8 @@ bacterial_meningitis:
   encounter_type: "emergency"
   # MRI is the late-imaging modality in bacterial meningitis (assess
   # complications: abscess, ventriculitis, empyema, cerebritis, venous sinus
-  # thrombosis) but is not first-line — CT-then-LP-then-empirics is. Practice
+  # thrombosis) but is not first-line: blood cultures and empirical antibiotics come first,
+  # then LP without routine imaging (CT first only for a WHO 2025 section A.4 feature). Practice
   # supports demoting MRI to optional rather than treating it as mandatory.
   # Clinical tool review, July 2026: non-CSF microbiology added as REQUIRED (blood cultures,
   # whole-blood PCR, throat swab; WHO 2025); ECG removed — neither source assigns it a role in
@@ -594,7 +597,7 @@ bacterial_meningitis:
         - "Opening pressure elevated (>25 cmH2O)"
         - "WBC 1000-5000, >90% neutrophils"
         - "Protein markedly elevated (>200 mg/dL)"
-        - "Glucose very low (<20 mg/dL), ratio <0.4"
+        - "Glucose very low (<20 mg/dL), CSF:blood ratio 0.4 or less"
         - "Gram stain positive (gram-positive diplococci = pneumococcus)"
         - "CSF culture: Streptococcus pneumoniae"
       moderate:
@@ -658,10 +661,13 @@ bacterial_meningitis:
   common_followups:
     - trigger_action: "request_ct_head"
       tool_name: "order_ct_scan"
-      description: "CT head before LP only when a WHO 2025 Annex A.4 criterion is present (GCS <10, focal signs, cranial nerve deficit, papilloedema, new-onset seizure, severe immunocompromise)"
+      description: "Non-contrast CT head before LP only where readily accessible and a WHO 2025 section A.4 feature is present at presentation (GCS below 10, focal neurological signs, cranial nerve deficits, papilloedema, new-onset seizures in adults, severe immunocompromised state); obtained after blood cultures and the first antibiotic dose, never delaying treatment; otherwise only for a parameningeal or skull-base source, after the LP"
     - trigger_action: "request_blood_cultures"
       tool_name: "order_microbiology"
-      description: "Blood cultures drawn before antibiotics"
+      description: "Blood cultures drawn before antibiotics (collected_before_antimicrobials false if any antimicrobial was taken in the previous 7 days)"
+    - trigger_action: "request_lumbar_puncture"
+      tool_name: "analyze_csf"
+      description: "Index LP (never an initial output): opening pressure, cells, glucose with paired blood glucose, protein, lactate, Gram stain, multiplex PCR; culture pending in the index report, deferred while shock, a bleeding diathesis or spreading purpura is uncorrected (WHO 2025 A.1.1)"
 
 parkinsons:
   name: "Parkinson's disease"
@@ -1758,7 +1764,7 @@ hepatic_encephalopathy:
   key_findings:
     labs:
       straightforward:
-        - "Ammonia: markedly elevated (>150 μmol/L in acute liver failure; >80-100 μmol/L in cirrhosis)"
+        - "Ammonia: one admission value, often elevated (reference 11-51 μmol/L); it neither grades nor confirms HE and is never repeated to judge response (ACG 2026; EASL 2022)"
         - "LFTs: ALT/AST markedly elevated (>1000 U/L in acute hepatitis), or low/normal in end-stage cirrhosis"
         - "Total bilirubin: markedly elevated"
         - "PT/INR: markedly prolonged (INR >2.0) — hepatic synthetic dysfunction"
@@ -1766,10 +1772,10 @@ hepatic_encephalopathy:
         - "BMP: hyponatremia (dilutional), hypokalemia, hypomagnesemia"
         - "Glucose: hypoglycemia (acute liver failure)"
         - "CBC: thrombocytopenia (hypersplenism in cirrhosis), leukocytosis (infection precipitant)"
-        - "Blood cultures: positive (spontaneous bacterial peritonitis or bacteremia as precipitant)"
+        - "Infective precipitant when present: ascitic PMN 250 cells/mm3 or more (SBP) or a positive blood or urine culture, reported by microbiology, not in the admission panel"
         - "Toxicology: benzodiazepines, opiates (precipitants in cirrhosis)"
       moderate:
-        - "Ammonia: moderately elevated (50-100 μmol/L)"
+        - "Ammonia: mildly to moderately elevated; poor correlation with grade"
         - "LFTs: elevated but not markedly (AST/ALT 100-300 U/L)"
         - "INR: mildly prolonged (1.5-2.0)"
         - "Identifiable precipitant: GI bleed (elevated BUN), infection, medication, constipation"
@@ -1789,7 +1795,7 @@ hepatic_encephalopathy:
         - "Background disorganization proportional to grade 2-3 HE"
       diagnostic_puzzle:
         - "Triphasic waves also seen in uremic encephalopathy, Wernicke's, septic encephalopathy — non-specific"
-        - "NCSE cannot be excluded without benzodiazepine challenge"
+        - "NCSE is excluded by the EEG itself (no evolving or rhythmic epileptiform discharges), never by a benzodiazepine challenge"
         - "Normal EEG in minimal/covert HE"
     ct:
       straightforward:
@@ -1824,15 +1830,17 @@ hepatic_encephalopathy:
       key_distinguishing: "Fever, meningism, CSF pleocytosis, positive cultures, no liver disease history"
     - diagnosis: "Hyponatremia (severe)"
       key_distinguishing: "Na+ <120 mEq/L, osmotic demyelination risk, responds to Na+ correction, no liver failure marker"
+  # October 2026 review round: presentations describe the clinical picture only. Ammonia, EEG, CT
+  # and other results of scored studies belong in the tool outputs, never in the generated HPI.
   difficulty_variants:
     straightforward:
-      presentation: "58-year-old with known alcoholic cirrhosis found confused and combative. Ammonia 187 μmol/L. INR 2.8. GI bleed one day prior. EEG shows classic triphasic waves. CT head normal."
+      presentation: "58-year-old with known alcohol-related cirrhosis found confused and combative, with black tarry stools since the previous day; asterixis on examination."
       expected_agent_confidence: 0.88
     moderate:
-      presentation: "52-year-old with NAFLD-cirrhosis, admitted with confusion grade 2-3 HE. Ammonia 95 μmol/L. Precipitant unclear. Concurrent hyponatremia. EEG shows generalized slowing without classic triphasic waves."
+      presentation: "52-year-old with NAFLD-related cirrhosis on diuretics, admitted with lethargy, disorientation to time and asterixis; no precipitant evident from the history."
       expected_agent_confidence: 0.62
     diagnostic_puzzle:
-      presentation: "45-year-old with Child-Pugh B cirrhosis presenting with new confusion. Ammonia only mildly elevated (68 μmol/L). CT normal. EEG shows non-specific slowing. Concurrent benzodiazepine use and mild hyponatremia — multiple contributing factors."
+      presentation: "45-year-old with known Child-Pugh B cirrhosis presenting with new fluctuating confusion while taking a nightly benzodiazepine and a thiazide diuretic; several possible contributors to separate."
       expected_agent_confidence: 0.38
   # October 2026 review round (plans/HEP-ENC.md CENTRAL 3): request_lactulose_rifaximin,
   # request_sbp_paracentesis (under interpret_labs), request_continuous_eeg (benzodiazepine
@@ -1843,7 +1851,7 @@ hepatic_encephalopathy:
   common_followups:
     - trigger_action: "request_diagnostic_paracentesis"
       tool_name: "order_microbiology"
-      description: "Diagnostic paracentesis (specimen ascitic_fluid) only when ascites is present: cell count with differential, total protein and albumin, Gram stain and culture; SBP is PMN 250 cells/mm3 or more"
+      description: "Diagnostic paracentesis (specimen ascitic_fluid) only when ascites is present: cell count with differential, total protein and albumin, Gram stain and culture inoculated into blood-culture bottles at the bedside; SBP is PMN 250 cells/mm3 or more (EASL 2018; AASLD 2021)"
     - trigger_action: "request_urine_specimen"
       tool_name: "order_microbiology"
       description: "Urinalysis and urine culture (specimen urine), one specimen and one time point per report"
@@ -1877,7 +1885,7 @@ amyotrophic_lateral_sclerosis:
         - "Fasciculation potentials: complex morphology (distinguishes from benign fasciculations)"
         - "Motor NCS: reduced CMAP amplitudes (axonal loss), normal or near-normal conduction velocities"
         - "Sensory NCS: NORMAL — critical feature (pure motor involvement)"
-        - "Awaji criteria: fasciculations count as denervation in ≥3 body regions"
+        - "Awaji 2008: fasciculation potentials count as active denervation only in a muscle that also shows chronic neurogenic change"
       moderate:
         - "EMG: denervation in only 2 body regions — requires clinical correlation for UMN signs in other regions"
         - "Possible early median or ulnar entrapment neuropathy (confounding)"
@@ -1903,7 +1911,7 @@ amyotrophic_lateral_sclerosis:
       all_difficulties:
         - "CBC: normal"
         - "BMP: normal"
-        - "CK: mildly to moderately elevated (500-2000 U/L) — myopathic overlap"
+        - "CK: normal or mildly to moderately elevated (denervation); above 5x ULN is higher than usual in ALS, so name a myopathic contributor (statin myopathy on a statin)"
         - "Thyroid function: normal (rules out thyrotoxic myopathy)"
         - "Vitamin B12: normal"
         - "Targeted anti-GM1 only for an MMN phenotype; paraprotein studies only when clinically suggested"
@@ -1934,19 +1942,17 @@ amyotrophic_lateral_sclerosis:
     diagnostic_puzzle:
       presentation: "52-year-old with 6-month right arm weakness and fasciculations only. EMG shows denervation in cervical and lumbosacral regions but no clear UMN signs on examination. Flail arm variant possible but other diagnoses not fully excluded."
       expected_agent_confidence: 0.40
+  # October 2026 review round (ruling 4): the MDT clinic referral is management and lives in the
+  # assessment musts, never in a tool; the genetic panel is an order_specialized_test
+  # (genetic_panel:ALS) after the EMG; a repeat EMG months later is a must, not a follow-up (no tool
+  # output may report the future); CSF neurofilament is not a routine ALS study (EFNS 2012).
   common_followups:
-    - trigger_action: "request_repeat_emg_3months"
-      tool_name: "order_specialized_test"
-      description: "Repeat EMG at 3-6 months to detect spread to additional body regions (diagnostic evolution)"
     - trigger_action: "request_pulmonary_function_als"
       tool_name: "order_specialized_test"
-      description: "FVC, sniff nasal inspiratory pressure (SNIP), NIF for respiratory involvement and NIV timing"
+      description: "Respiratory function (test_type respiratory_function): FVC and SNIP, with MIP where available; staging and NIV timing once ALS is supported, never diagnostic"
     - trigger_action: "request_genetic_als_panel"
-      tool_name: "interpret_labs"
-      description: "ALS genetic panel: SOD1, C9orf72 repeat expansion, TARDBP, FUS (especially family history or young-onset)"
-    - trigger_action: "request_als_multidisciplinary_clinic"
-      tool_name: "interpret_labs"
-      description: "ALS multidisciplinary clinic referral (neurology, pulmonology, PT/OT, speech, nutrition, palliative care)"
-    - trigger_action: "request_csf_nfl"
-      tool_name: "analyze_csf"
-      description: "CSF neurofilament light chain for prognostic stratification and monitoring"
+      tool_name: "order_specialized_test"
+      description: "ALS genetic panel (test_type genetic_panel:ALS): C9orf72 repeat expansion plus SOD1, TARDBP, FUS and TBK1, after the EMG and pre-test counselling; recommended in familial cases, optional otherwise"
+    - trigger_action: "check_riluzole_interactions"
+      tool_name: "check_drug_interactions"
+      description: "Riluzole against the patient's own medicines, alcohol use and liver function, after the diagnosis is established (SmPC monitoring schedule)"

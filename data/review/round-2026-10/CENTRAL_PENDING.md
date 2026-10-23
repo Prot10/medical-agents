@@ -10,11 +10,30 @@ lands.
 - `analyze_csf.source`: an EVD sample is billed as a lumbar puncture; only shunt/EVD criteria may
   name `source`. (vocabulary agent, 24 Oct)
 
+## Batch-1 cases waiting on vocabulary
+- The terms now in core (beta2_transferrin, serum_cryptococcal_antigen, CD4_count,
+  HIV_viral_load, CSF mycobacterial_panel / fungal_culture / india_ink / ADA, wound_swab, sputum,
+  audiometry, chest_xray, temporal artery ultrasound and biopsy) must be wired into the batch-1
+  criteria and outputs that logged them BLOCKED (e.g. BACT-MEN-RP04 beta-2 transferrin).
+- Missing term: blood meningococcal PCR, so BACT-MEN-S05 can score its diagnostic test while the
+  LP is deferred.
+- Other conditions citing "WHO 2025 Annex A.4" should read "section A.4" (the guideline has no
+  Annex A.4).
+
 ## Synonym prune effects on later batches
 - `apply_diagnosis_synonyms --prune` would change MIG-AURA-P03, MIG-AURA-P07, SE-P04 (lose "stroke"
   and mechanism labels) and SE-P07 (loses "hepatic coma", K72.91); `--check` adds I63.5/I63.51 to
   SE-P04. Apply when those conditions run.
 - ALZ-EARLY prune diffs predate the batch-1 synonym change.
+
+## For the physicians at re-review
+- ISCH-STR-RS02: thrombolysis reversed to "give" (its CTA excludes aortic extension, R2's own
+  condition for withholding). Tell R2.
+- ISCH-STR-S06 was never physician-reviewed.
+- AHA/ASA 2026 contraindication table is paywalled: confirm the class of prior ischaemic stroke
+  within 3 months (ISCH-STR-RM01) and aPTT > 40 s without anticoagulant (ISCH-STR-RP04).
+- Scoring changes: ALS-P08 rejects a plain "ALS" (Z15.89), ALS-P02 credits Graves, HEP-ENC-P04
+  coded as Wilson disease.
 
 ## Guard failures left in later batches (24 Oct)
 - Leak guard: VASC-DEM 30, GBS 25, NMDAR-ENC 18, MIG-AURA 13, SE 10, SYNC-CARD 10, NPH 9, SAH 7,
