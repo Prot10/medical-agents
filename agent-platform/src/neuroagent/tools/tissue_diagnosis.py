@@ -59,7 +59,9 @@ class TissueDiagnosisTool(BaseTool):
                     "feasible; serial samples along the trajectory avoid sampling bias. "
                     "'lymph_node_biopsy': endobronchial needle aspiration or surgical nodal "
                     "sampling — the low-risk route to histological confirmation of a systemic "
-                    "disease when the accessible node is not the symptomatic organ."
+                    "disease when the accessible node is not the symptomatic organ. "
+                    "'temporal_artery_biopsy': a segment of the superficial temporal artery, "
+                    "the histological test for giant cell arteritis."
                 ),
             },
             "site": {
@@ -78,7 +80,10 @@ class TissueDiagnosisTool(BaseTool):
                     "'chr7_gain_chr10_loss' in IDH-wildtype astrocytic gliomas lacking "
                     "microvascular proliferation and necrosis; 'H3K27_status' for midline "
                     "tumours; 'MGMT_methylation' in glioblastoma (by PCR, pyrosequencing or "
-                    "array — NOT immunocytochemistry); 'BRAF_V600' in IDH-wildtype tumours."
+                    "array — NOT immunocytochemistry); 'BRAF_V600' in IDH-wildtype tumours. "
+                    "'CD20_IHC' and 'EBER_ISH': B-cell lineage and Epstein-Barr virus in a suspected "
+                    "primary CNS or EBV-associated lymphoma. 'SOX10_IHC' and 'Melan_A_HMB45_IHC': "
+                    "melanocytic markers, to exclude a metastatic melanoma."
                 ),
             },
         },

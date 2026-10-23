@@ -19,11 +19,12 @@ class SpecializedTestTool(BaseTool):
         "(neuropsych_battery), sleep studies (polysomnography), autonomic and "
         "cardiac workup (tilt_table, autonomic_testing, exercise_stress_test), "
         "ophthalmic tests (optical_coherence_tomography, visual_field_perimetry), "
-        "respiratory_function (FVC/MIP/MEP, for ALS and MG), ice_pack_test, "
+        "respiratory_function (FVC/MIP/MEP, for ALS and MG), ice_pack_test, audiometry, "
         # `mslt` and `pure_tone_audiometry` were retired 2026-08-05: priced and orderable
         # but referenced by zero cases and never requested in the clinical tool review, so
-        # they were unreviewed action-space surface. Reinstate with a case that needs them
-        # (pure-tone audiometry has a WHO 2025 indication for post-meningitis hearing loss).
+        # they were unreviewed action-space surface. Audiometry came back on 2026-10-24 as
+        # `audiometry`, requested by the October 2026 review of bacterial meningitis (WHO
+        # 2025 post-meningitis hearing test); `mslt` stays retired.
         "and targeted gene panels via 'genetic_panel:<panel>'."
     )
     parameter_schema = {
@@ -45,7 +46,9 @@ class SpecializedTestTool(BaseTool):
                     "'respiratory_function': FVC, MIP/MEP, NIF (ALS monitoring, MG crisis "
                     "risk). 'neuropsych_battery': comprehensive cognitive testing. "
                     "'vep'/'ssep'/'baep': evoked potentials. 'tilt_table': syncope. "
-                    "'optical_coherence_tomography': retinal RNFL (MS, optic neuritis)."
+                    "'optical_coherence_tomography': retinal RNFL (MS, optic neuritis). "
+                    "'audiometry': pure-tone and speech audiometry with tympanometry "
+                    "(hearing loss after bacterial meningitis)."
                 ),
             },
         },

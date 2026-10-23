@@ -33,12 +33,12 @@ list, which reported legal values as illegal:
 
 | Tool | Parameter | Values |
 | --- | --- | --- |
-| `order_advanced_imaging` | `modality` | 17 (`amyloid_PET`, `tau_PET`, `FDG_PET`, `amino_acid_PET`, `cardiac_FDG_PET`, `DaTscan`, `MIBG_scan`, `perfusion_MRI`, `CT_perfusion`, `cardiac_MRI`, `coronary_CTA`, `coronary_angiography`, `MR_spectroscopy`, `MR_angiography`, `MR_venography`, `carotid_duplex`, `transcranial_doppler`) |
-| `order_specialized_test` | `test_type` | 21, plus `genetic_panel:<panel>` for 15 panels |
-| `order_body_imaging` | `study` | 12 (`<region>_<modality>` over pelvis/abdomen, chest, chest-abdomen-pelvis, mediastinum, spine, peripheral nerve) |
-| `order_microbiology` | `specimen` | 5 |
-| `obtain_tissue_diagnosis` | `procedure` | 3 (`resection`, `stereotactic_biopsy`, `lymph_node_biopsy`), plus 11 molecular assays |
-| `perform_clinical_assessment` | `assessment_type` | 4 |
+| `order_advanced_imaging` | `modality` | 21 (`amyloid_PET`, `tau_PET`, `FDG_PET`, `perfusion_SPECT`, `amino_acid_PET`, `cardiac_FDG_PET`, `DaTscan`, `MIBG_scan`, `perfusion_MRI`, `CT_perfusion`, `cardiac_MRI`, `coronary_CTA`, `coronary_angiography`, `cerebral_angiography`, `MR_spectroscopy`, `MR_angiography`, `MR_venography`, `carotid_duplex`, `transcranial_doppler`, `functional_MRI`, `DTI_tractography`) |
+| `order_specialized_test` | `test_type` | 20, plus `genetic_panel:<panel>` for 16 panels |
+| `order_body_imaging` | `study` | 16 (`<region>_<modality>` over pelvis/abdomen, testis, chest, chest-abdomen-pelvis, mediastinum, spine, peripheral nerve, leg veins, temporal arteries) |
+| `order_microbiology` | `specimen` | 8 |
+| `obtain_tissue_diagnosis` | `procedure` | 4 (`resection`, `stereotactic_biopsy`, `lymph_node_biopsy`, `temporal_artery_biopsy`), plus 15 molecular assays |
+| `perform_clinical_assessment` | `assessment_type` | 5 |
 
 `order_ct_scan` images the **head and neck only** and has no region parameter, so its
 discriminators (`contrast`, `angiography`) cannot distinguish a head-and-neck CTA from a
@@ -93,8 +93,8 @@ no patient data and are answered by the library as in any case.
 may not re-price a term under any spelling (`vocabulary.merge_packs` raises). The case's
 `domain` picks the packs its catalogue advertises (`vocabulary.DOMAIN_PACKS`): a `neurology`
 case (every NeuroBench case) sees `tools:` alone, so its catalogue is unchanged by any pack; a
-`general_medicine` case also sees the `general_medicine` pack (chest and abdominal X-ray,
-endoscopy, sputum, stool and pleural-fluid microbiology, percutaneous and endoscopic biopsy,
+`general_medicine` case also sees the `general_medicine` pack (abdominal and limb X-ray,
+endoscopy, pleural, synovial and bronchoalveolar microbiology, percutaneous and endoscopic biopsy,
 lipase, ...). A tool declares which schema properties are vocabularies (`BaseTool.vocabulary`)
 and what to tell the agent about each pack's terms (`BaseTool.pack_notes`). The cost registry
 prices every pack. The review app's mirror covers the NeuroBench catalogue only. The pack's
@@ -121,6 +121,12 @@ fallback rates: an unpriced value that reaches it is a configuration error.
 `analyze_csf.base`, and bills each entry of `special_tests` separately. Put the always-done
 panel in the `basic` annotation and only billable assays in `special_tests`. Merging them
 charges the basics a second time.
+
+`source` says where the fluid was drawn: `lumbar_puncture` (the default), `shunt_tap` or
+`external_ventricular_drain`. It is an enum from the `analyze_csf.sources` block, priced at 0
+like the MRI protocols, so the bill is the same `base` for each. A criterion names it only when
+the sample is not a lumbar puncture: a criterion that requires `source: lumbar_puncture` would
+fail an agent that leaves the default implicit.
 
 ## Useless and harmful tools are parameter-scoped
 

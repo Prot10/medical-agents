@@ -40,7 +40,14 @@ Two rules the whole laboratory vocabulary rests on:
 `analyze_csf` deserves a note: `costs.yaml` prices the LP procedure together with cell count,
 protein and glucose inside `analyze_csf.base`, and bills each entry of `special_tests`
 separately. Put the always-done panel in the `basic` annotation and only billable assays in
-`special_tests`, or the basics get charged a second time.
+`special_tests`, or the basics get charged a second time. Its optional `source` is
+`lumbar_puncture` (default), `shunt_tap` or `external_ventricular_drain`, from the
+`analyze_csf.sources` block (priced at 0); a criterion names it only for a shunt tap or an EVD
+sample. The October 2026 review added `mycobacterial_panel` (AFB smear, Xpert MTB/RIF Ultra,
+mycobacterial culture), `fungal_culture`, `india_ink` and `ADA` to `special_tests`, and
+`HIV_viral_load`, `CD4_count`, `beta2_transferrin`, `serum_cryptococcal_antigen` and `AFP` to the
+laboratory panels (serum CrAg stays apart from the CSF `cryptococcal_antigen`: one specimen, one
+tool).
 
 A policy pattern's `required_arguments` is the minimum executable subset needed to match a
 call. A missing optional runtime argument is expected; an unknown key is not.
@@ -72,6 +79,7 @@ call. A missing optional runtime argument is expected; an unknown key is not.
 | `ice_pack_test` | Bedside ice-pack ptosis test | MG (rapid screen) |
 | `respiratory_function` | FVC, MIP/MEP, NIF | ALS respiratory monitoring, MG crisis risk |
 | `minor_salivary_gland_biopsy` | Lip biopsy, focus score | Sjögren's confirmation |
+| `audiometry` | Pure-tone and speech audiometry, tympanometry | Hearing loss after bacterial meningitis (WHO 2025, NICE NG240) |
 | `genetic_panel:<panel>` | Targeted gene panel | See panel list below |
 
 **Allowed genetic panels** (only these `<panel>` suffix values are valid):
@@ -93,6 +101,7 @@ call. A missing optional runtime argument is expected; an unknown key is not.
 | `porphyria` | Acute intermittent porphyria | HMBS, ALAS1, CPOX, PPOX |
 | `small_fiber_neuropathy` | Hereditary small-fibre neuropathy | SCN9A, SCN10A, SCN11A |
 | `PD` | Young-onset / monogenic Parkinson's | PRKN, PINK1, DJ-1, LRRK2, GBA, SNCA |
+| `hereditary_paraganglioma` | Hereditary paraganglioma-phaeochromocytoma | SDHA/B/C/D, SDHAF2, VHL, RET, NF1, TMEM127, MAX, FH |
 
 ---
 
@@ -119,6 +128,8 @@ call. A missing optional runtime argument is expected; an unknown key is not.
 | `cardiac_FDG_PET` | 18F-FDG PET/CT, cardiac, with dietary suppression of myocardial glucose uptake | Active myocardial inflammation — cardiac sarcoidosis, myocarditis. A different study from `FDG_PET`, not the same scan read differently |
 | `coronary_CTA` | Coronary CT angiography | Non-invasive coronary anatomy when ischaemia is suspected |
 | `coronary_angiography` | Invasive catheter coronary angiography | Suspected myocardial ischaemia or infarction (ESC 2018 Class IIa in syncope). An angiographic finding alone does not establish the cause of a symptom |
+| `functional_MRI` | BOLD fMRI, motor and language paradigms | Pre-surgical mapping and language lateralisation near eloquent cortex (high-grade glioma) |
+| `DTI_tractography` | Diffusion tensor tractography | Corticospinal tract, arcuate fasciculus, optic radiations before resection |
 
 ---
 
@@ -144,6 +155,9 @@ studies at different prices.
 | `mediastinum_CT` / `_MRI` | Anterior mediastinum | Thymoma / thymic hyperplasia in myasthenia gravis — chest radiograph does not substitute |
 | `spine_MRI` / `_CT` | Spinal cord and column | Cord compression, transverse myelitis, spinal tumour — the mimics of ascending flaccid weakness |
 | `peripheral_nerve_MRI` / `_ultrasound` | Nerve / nerve root | Root enhancement, nerve enlargement (GBS vs acute-onset CIDP) |
+| `lower_extremity_venous_duplex` | Compression and Doppler ultrasound of the leg veins | Deep vein thrombosis as the venous source of a paradoxical embolism (stroke with a PFO) |
+| `chest_xray` | Two-view chest radiograph | First-line chest image, e.g. pneumonia in the infection screen of hepatic encephalopathy |
+| `temporal_artery_ultrasound` | Temporal (and axillary) artery ultrasound | Halo sign in suspected giant cell arteritis |
 
 `contrast` is a boolean modifier, as for brain MRI and CT.
 
@@ -156,20 +170,26 @@ studies at different prices.
 | `throat_swab` | Meningococcal culture | Suspected meningococcal disease |
 | `urine` | Urinalysis + culture | Infection screen as an HE precipitant |
 | `ascitic_fluid` | Diagnostic paracentesis: PMN count, protein, culture | Every patient with ascites and altered mental status |
+| `sputum` | Gram stain and culture (AFB smear, mycobacterial culture on request) | Pneumonia as an infective precipitant; pulmonary TB with tuberculous meningitis |
+| `stool` | C. difficile toxin PCR | Diarrhoea in the infection screen (hepatic encephalopathy on lactulose) |
+| `wound_swab` | Culture of a wound or ulcer | A skin portal of entry (bacterial meningitis) |
 
 `before_antimicrobials` is a boolean: yield collapses once treatment has started, and the
 report must state it rather than leave it inferred.
 
 ### `obtain_tissue_diagnosis`
 
-`procedure` is `resection`, `stereotactic_biopsy` or `lymph_node_biopsy` (endobronchial needle
+`procedure` is `resection`, `stereotactic_biopsy`, `temporal_artery_biopsy` (giant cell
+arteritis) or `lymph_node_biopsy` (endobronchial needle
 aspiration or surgical nodal sampling — the low-risk route to histological confirmation of a
 systemic disease when the accessible node is not the symptomatic organ, e.g. hilar nodes in
 cardiac sarcoidosis rather than an endomyocardial biopsy). A purely histological pattern needs
 no molecular assay. `molecular_assays` is a list drawn from
 `IDH1_IHC`, `IDH1_IDH2_sequencing`, `ATRX_IHC`, `1p_19q_codeletion`, `CDKN2A_B_deletion`,
 `TERT_promoter`, `EGFR_amplification`, `chr7_gain_chr10_loss`, `H3K27_status`,
-`MGMT_methylation`, `BRAF_V600`. Each assay is in the list because it changes management, not
+`MGMT_methylation`, `BRAF_V600`, and for the mimics of a glioma `CD20_IHC` and `EBER_ISH`
+(primary CNS or EBV-associated lymphoma) and `SOX10_IHC` and `Melan_A_HMB45_IHC` (metastatic
+melanoma). Each assay is in the list because it changes management, not
 to complete a taxonomy. MGMT must not be assessed by immunocytochemistry.
 
 ### `perform_clinical_assessment.assessment_type`
@@ -185,6 +205,7 @@ ground truth.
 | `structured_headache_history_ichd3` | Headache and aura features against ICHD-3 | Migraine with aura — the actual confirmatory step |
 | `gait_and_balance_timed` | Timed Up and Go, timed walk | NPH, before *and* after the CSF tap test (two assessments) |
 | `functional_neuro_signs` | Hoover's sign, entrainment | Functional neurological disorder — a positive clinical diagnosis |
+| `performance_status` | Karnofsky and ECOG at the visit | Treatment planning in high-grade glioma (KPS < 70 unfavourable) |
 
 ---
 

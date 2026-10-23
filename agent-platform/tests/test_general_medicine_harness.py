@@ -65,16 +65,16 @@ def test_a_general_medicine_case_advertises_and_accepts_the_pack():
     assert set(neuro) == set(general)
     for key, members in neuro.items():
         assert members <= general[key]  # the pack only adds
-    assert "chest_xray" in general[("order_body_imaging", "study")]
-    assert "sputum" in general[("order_microbiology", "specimen")]
+    assert "abdomen_xray" in general[("order_body_imaging", "study")]
+    assert "pleural_fluid" in general[("order_microbiology", "specimen")]
     assert "upper_endoscopy" in general[("order_specialized_test", "test_type")]
     assert "lipase" in general[("interpret_labs", "panels")]
     tool = environment.registry.get_tool("order_body_imaging")
-    assert tool.validation_error({"clinical_context": "cough", "study": "chest_xray"}) is None
-    assert "chest_xray" in tool.parameter_schema["properties"]["study"]["description"]
+    assert tool.validation_error({"clinical_context": "cough", "study": "abdomen_xray"}) is None
+    assert "abdomen_xray" in tool.parameter_schema["properties"]["study"]["description"]
     neuro_tool = ToolRegistry.create_default_registry().get_tool("order_body_imaging")
     assert "not in the tool's vocabulary" in neuro_tool.validation_error(
-        {"clinical_context": "cough", "study": "chest_xray"}
+        {"clinical_context": "cough", "study": "abdomen_xray"}
     )
 
 
@@ -109,11 +109,11 @@ def test_a_pack_may_not_reprice_an_existing_term():
 def test_a_recorded_case_answers_an_unplaced_order_not_available_and_bills_it():
     environment = NeuroBenchEnvironment(_case(domain="general_medicine", provenance="record"))
     result = environment.execute(
-        ToolAction(tool_name="order_body_imaging", arguments={"clinical_context": "cough", "study": "chest_xray"})
+        ToolAction(tool_name="order_body_imaging", arguments={"clinical_context": "cough", "study": "abdomen_xray"})
     )
     assert not result.success and result.unavailable and not result.from_fallback
     assert result.output is None
-    assert "Not available" in result.error_message and "study=chest_xray" in result.error_message
+    assert "Not available" in result.error_message and "study=abdomen_xray" in result.error_message
     assert result.cost_usd > 0  # the order was placed
 
 
@@ -172,7 +172,7 @@ def test_the_unavailable_flag_reaches_the_episode():
     loop = ClinicalPolicyLoop()
     model = _Scripted([
         ModelTurn(action=ToolAction(
-            tool_name="order_microbiology", arguments={"clinical_context": "cough", "specimen": "sputum"},
+            tool_name="order_microbiology", arguments={"clinical_context": "cough", "specimen": "pleural_fluid"},
         )),
         ModelTurn(action=SubmitAssessment(
             primary_diagnosis="pneumonia", confidence=0.6, urgency="urgent", recommendations=["treat"],

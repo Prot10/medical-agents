@@ -61,7 +61,9 @@ class ClinicalAssessmentTool(BaseTool):
                     "red flags. 'gait_and_balance_timed': Timed Up and Go and timed walk; "
                     "run before and after a CSF tap test in suspected NPH. "
                     "'functional_neuro_signs': Hoover's sign, entrainment and the other "
-                    "positive signs of a functional disorder."
+                    "positive signs of a functional disorder. "
+                    "'performance_status': Karnofsky and ECOG scored at the visit, on which treatment "
+                    "planning in a brain tumour depends."
                 ),
             },
             "timing": {

@@ -126,6 +126,11 @@ class CTReport(BaseModel):
 
 
 class EchoReport(BaseModel):
+    # TTE, TEE, bubble_study, exercise_echo: the study this report is. The MockServer's
+    # discriminator reads it, so a TTE order is not answered with a stored TEE or bubble study.
+    # Missing until the October 2026 review (ISCH-STR P02, P05, RP03, RS02): values written into
+    # case outputs were dropped on load and the guard never fired.
+    echo_type: str = ""
     chambers: dict[str, str] = {}  # LV, RV, LA, RA dimensions and function
     valves: dict[str, str] = {}  # mitral, aortic, tricuspid, pulmonic
     ejection_fraction: float | None = None

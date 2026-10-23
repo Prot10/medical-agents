@@ -45,7 +45,11 @@ class AdvancedImagingTool(BaseTool):
                     "'coronary_CTA': non-invasive coronary anatomy. 'coronary_angiography': "
                     "invasive catheter study, indicated by suspected myocardial ischaemia; "
                     "an angiographic finding alone does not establish the cause of a symptom. "
-                    "'carotid_duplex': carotid stenosis. 'transcranial_doppler': vasospasm."
+                    "'carotid_duplex': carotid stenosis. 'transcranial_doppler': vasospasm. "
+                    "'functional_MRI': BOLD motor and language mapping and hemispheric language "
+                    "lateralisation, before surgery near eloquent cortex. 'DTI_tractography': "
+                    "diffusion tractography of the corticospinal tract, arcuate fasciculus and optic "
+                    "radiations, for resection planning."
                 ),
             },
         },

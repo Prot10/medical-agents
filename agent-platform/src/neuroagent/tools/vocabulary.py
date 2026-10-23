@@ -234,6 +234,16 @@ def csf_special_tests(costs_path: Path = DEFAULT_COSTS_PATH, packs: tuple[str, .
     )
 
 
+def csf_sources(costs_path: Path = DEFAULT_COSTS_PATH, packs: tuple[str, ...] = ()) -> list[str]:
+    """The closed `analyze_csf.source` vocabulary: where the fluid was drawn.
+
+    Read from the `sources` block, priced at 0 like the MRI `protocols`: the sampling is billed
+    in `base`. Added on the October 2026 review so that a shunt tap or an EVD sample can be
+    told apart from a lumbar puncture.
+    """
+    return sorted(_load_tools(costs_path, tuple(packs)).get("analyze_csf", {}).get("sources", {}))
+
+
 def by_type_values(
     tool_name: str, costs_path: Path = DEFAULT_COSTS_PATH, packs: tuple[str, ...] = ()
 ) -> list[str]:

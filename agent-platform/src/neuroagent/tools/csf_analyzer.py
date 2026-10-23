@@ -2,16 +2,16 @@ from __future__ import annotations
 
 
 from .base import BaseTool
-from .vocabulary import csf_special_tests
+from .vocabulary import csf_sources, csf_special_tests
 
 
 class CSFAnalyzerTool(BaseTool):
     name = "analyze_csf"
     description = (
-        "Analyze cerebrospinal fluid from a lumbar puncture. Cell count, protein and "
-        "glucose are always reported; name the additional assays you want in "
-        "`special_tests`, each of which is priced and scored separately. Returns "
-        "interpretation and clinical correlation."
+        "Analyze cerebrospinal fluid from a lumbar puncture, a shunt tap or an external "
+        "ventricular drain. Cell count, protein and glucose are always reported; name the "
+        "additional assays you want in `special_tests`, each of which is priced and scored "
+        "separately. Returns interpretation and clinical correlation."
     )
     parameter_schema = {
         "type": "object",
@@ -35,6 +35,21 @@ class CSFAnalyzerTool(BaseTool):
                     "panel). Order the assay the differential calls for — 14-3-3 and "
                     "RT_QuIC answer a prion question, HSV_PCR an encephalitis question."
                 ),
+            },
+            # Optional, so every existing call and criterion means a lumbar puncture as before.
+            # Added on the October 2026 review: ventricular CSF from a shunt or a drain is a
+            # different sample with different reference values, and a healthcare-associated
+            # ventriculitis is diagnosed on it, so a case must be able to require it.
+            "source": {
+                "type": "string",
+                "enum": csf_sources(),
+                "description": (
+                    "Where the CSF is drawn. 'lumbar_puncture' (default). 'shunt_tap': "
+                    "aspiration from the reservoir of a ventricular shunt, for suspected "
+                    "shunt infection or malfunction. 'external_ventricular_drain': a sample "
+                    "from the drain's sampling port in a patient with an EVD in place."
+                ),
+                "default": "lumbar_puncture",
             },
         },
         "required": ["clinical_context"],

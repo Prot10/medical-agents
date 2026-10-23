@@ -28,8 +28,8 @@ from .vocabulary import microbiology_specimens
 class MicrobiologyTool(BaseTool):
     name = "order_microbiology"
     description = (
-        "Culture, stain or PCR a specimen other than CSF: blood, urine, throat swab, or "
-        "ascitic fluid via diagnostic paracentesis. Use this to identify a pathogen or an "
+        "Culture, stain or PCR a specimen other than CSF: blood, urine, throat swab, "
+        "ascitic fluid via diagnostic paracentesis, sputum, stool or a wound swab. Use this to identify a pathogen or an "
         "infectious precipitant outside the cerebrospinal compartment. Sampling should not "
         "delay empirical antimicrobial therapy — draw, then treat."
     )
@@ -50,7 +50,10 @@ class MicrobiologyTool(BaseTool):
                     "principal meningeal pathogens. 'throat_swab': meningococcal culture. "
                     "'urine': urinalysis and culture. 'ascitic_fluid': diagnostic "
                     "paracentesis with PMN count, protein and culture — indicated in every "
-                    "patient with ascites and altered mental status."
+                    "patient with ascites and altered mental status. 'sputum': Gram stain and "
+                    "culture (acid-fast smear and mycobacterial culture on request). 'stool': "
+                    "C. difficile toxin PCR. 'wound_swab': culture of a wound or ulcer, a "
+                    "possible portal of entry."
                 ),
             },
             "tests": {
@@ -77,9 +80,7 @@ class MicrobiologyTool(BaseTool):
     pack_notes = {
         "general_medicine": {
             "specimen": (
-                "'sputum': Gram stain and culture. 'stool': C. difficile toxin PCR, with "
-                "culture or ova and parasites on request. 'wound_swab': culture of a wound or "
-                "ulcer. 'synovial_fluid': arthrocentesis with cell count, crystals and culture. "
+                "'synovial_fluid': arthrocentesis with cell count, crystals and culture. "
                 "'pleural_fluid': thoracentesis with cell count, protein, LDH, pH and culture. "
                 "'nasopharyngeal_swab': respiratory pathogen PCR (influenza, SARS-CoV-2, RSV). "
                 "'bronchoalveolar_lavage': bronchoscopy with lavage for culture, cytology and PCR."

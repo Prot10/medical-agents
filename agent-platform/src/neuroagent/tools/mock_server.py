@@ -32,7 +32,7 @@ class MockServer:
         self.case = case
         self.library = library or default_library()
         # The vocabulary this case's catalogue advertises, so a stored report naming a pack term
-        # (a recorded `chest_xray`) is adjudicated like any other study.
+        # (a recorded `abdomen_xray`) is adjudicated like any other study.
         self.packs = DOMAIN_PACKS[case.domain]
         self.call_log: list[ToolCall] = []
         # Trigger slugs of follow-ups already served this session. Lets distinct
@@ -314,7 +314,7 @@ class MockServer:
     _KNOWLEDGE_TOOLS = frozenset({"search_medical_literature", "check_drug_interactions"})
 
     def _study_label(self, tool_name: str, parameters: dict[str, Any]) -> str:
-        """`order_body_imaging (study=chest_xray)`: the tool, and the study the call names."""
+        """`order_body_imaging (study=abdomen_xray)`: the tool, and the study the call names."""
         spec = self._DISCRIMINATOR.get(tool_name)
         if spec is not None and parameters.get(spec[0]) is not None:
             return f"{tool_name} ({spec[0]}={parameters[spec[0]]})"

@@ -120,7 +120,7 @@ class FollowUpToolOutput(BaseModel):
 
 
 # The clinical domain decides the tool catalogue: a general-medicine case also advertises the
-# `general_medicine` vocabulary pack (chest X-ray, endoscopy, sputum culture, ...), a neurology
+# `general_medicine` vocabulary pack (abdominal X-ray, endoscopy, pleural fluid, ...), a neurology
 # case sees exactly the NeuroBench catalogue.
 CaseDomain = Literal["neurology", "general_medicine"]
 # Where the case comes from. A synthetic case was authored as a whole, so an order off its

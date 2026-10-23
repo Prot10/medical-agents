@@ -65,6 +65,8 @@ _COSTS_DERIVED_ENUMS: dict[tuple[str, str], tuple[str, str]] = {
     # are collapsed so one assay is advertised once (see tools/vocabulary.py).
     ("interpret_labs", "panels"): ("interpret_labs", "by_panel"),
     ("analyze_csf", "special_tests"): ("analyze_csf", "by_special_test"),
+    # Scalar, priced at 0 like the MRI protocols (October 2026 review: shunt tap / EVD sample).
+    ("analyze_csf", "source"): ("analyze_csf", "sources"),
     # Tools added after the July 2026 clinical tool review.
     ("order_body_imaging", "study"): ("order_body_imaging", "by_type"),
     ("order_microbiology", "specimen"): ("order_microbiology", "by_type"),
@@ -260,6 +262,16 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                     "RT_QuIC answer a prion question, HSV_PCR an encephalitis question."
                 ),
             },
+            "source": {
+                "type": "string",
+                "description": (
+                    "Where the CSF is drawn. 'lumbar_puncture' (default). 'shunt_tap': "
+                    "aspiration from the reservoir of a ventricular shunt, for suspected "
+                    "shunt infection or malfunction. 'external_ventricular_drain': a sample "
+                    "from the drain's sampling port in a patient with an EVD in place."
+                ),
+                "default": "lumbar_puncture",
+            },
         },
         "required": ["clinical_context"],
     },
@@ -357,7 +369,11 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                     "'coronary_CTA': non-invasive coronary anatomy. 'coronary_angiography': "
                     "invasive catheter study, indicated by suspected myocardial ischaemia; "
                     "an angiographic finding alone does not establish the cause of a symptom. "
-                    "'carotid_duplex': carotid stenosis. 'transcranial_doppler': vasospasm."
+                    "'carotid_duplex': carotid stenosis. 'transcranial_doppler': vasospasm. "
+                    "'functional_MRI': BOLD motor and language mapping and hemispheric language "
+                    "lateralisation, before surgery near eloquent cortex. 'DTI_tractography': "
+                    "diffusion tractography of the corticospinal tract, arcuate fasciculus and optic "
+                    "radiations, for resection planning."
                 ),
             },
         },
@@ -381,7 +397,9 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                     "'respiratory_function': FVC, MIP/MEP, NIF (ALS monitoring, MG crisis "
                     "risk). 'neuropsych_battery': comprehensive cognitive testing. "
                     "'vep'/'ssep'/'baep': evoked potentials. 'tilt_table': syncope. "
-                    "'optical_coherence_tomography': retinal RNFL (MS, optic neuritis)."
+                    "'optical_coherence_tomography': retinal RNFL (MS, optic neuritis). "
+                    "'audiometry': pure-tone and speech audiometry with tympanometry "
+                    "(hearing loss after bacterial meningitis)."
                 ),
             },
         },
@@ -417,7 +435,12 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                     "thymoma in myasthenia gravis. 'spine_MRI'/'_CT': cord compression, "
                     "transverse myelitis, spinal tumour — the mimics of an ascending "
                     "flaccid weakness. 'peripheral_nerve_MRI'/'_ultrasound': nerve root "
-                    "enhancement, nerve enlargement."
+                    "enhancement, nerve enlargement. "
+                    "'lower_extremity_venous_duplex': compression and Doppler ultrasound of the leg "
+                    "veins for deep vein thrombosis, the venous source of a paradoxical embolism. "
+                    "'chest_xray': two-view chest radiograph, the first-line chest image "
+                    "(pneumonia in an infection screen). 'temporal_artery_ultrasound': halo "
+                    "sign and stenosis of the temporal arteries in suspected giant cell arteritis."
                 ),
             },
             "contrast": {
@@ -442,8 +465,11 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                     "testing. 'whole_blood_pcr': meningococcus / pneumococcus and other "
                     "principal meningeal pathogens. 'throat_swab': meningococcal culture. "
                     "'urine': urinalysis and culture. 'ascitic_fluid': diagnostic "
-                    "paracentesis with PMN count, protein and culture — indicated in "
-                    "every patient with ascites and altered mental status."
+                    "paracentesis with PMN count, protein and culture — indicated in every "
+                    "patient with ascites and altered mental status. 'sputum': Gram stain and "
+                    "culture (acid-fast smear and mycobacterial culture on request). 'stool': "
+                    "C. difficile toxin PCR. 'wound_swab': culture of a wound or ulcer, a "
+                    "possible portal of entry."
                 ),
             },
             "tests": {
@@ -480,10 +506,11 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                     "feasible given site and clinical condition; also therapeutic. "
                     "'stereotactic_biopsy': where microsurgical resection is not safely "
                     "feasible; serial samples along the trajectory avoid sampling bias. "
-                    "'lymph_node_biopsy': endobronchial needle aspiration or surgical "
-                    "nodal sampling — the low-risk route to histological confirmation of "
-                    "a systemic disease when the accessible node is not the symptomatic "
-                    "organ."
+                    "'lymph_node_biopsy': endobronchial needle aspiration or surgical nodal "
+                    "sampling — the low-risk route to histological confirmation of a systemic "
+                    "disease when the accessible node is not the symptomatic organ. "
+                    "'temporal_artery_biopsy': a segment of the superficial temporal artery, "
+                    "the histological test for giant cell arteritis."
                 ),
             },
             "site": {
@@ -502,7 +529,10 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                     "microvascular proliferation and necrosis; 'H3K27_status' for midline "
                     "tumours; 'MGMT_methylation' in glioblastoma (by PCR, pyrosequencing "
                     "or array — NOT immunocytochemistry); 'BRAF_V600' in IDH-wildtype "
-                    "tumours."
+                    "tumours. "
+                    "'CD20_IHC' and 'EBER_ISH': B-cell lineage and Epstein-Barr virus in a suspected "
+                    "primary CNS or EBV-associated lymphoma. 'SOX10_IHC' and 'Melan_A_HMB45_IHC': "
+                    "melanocytic markers, to exclude a metastatic melanoma."
                 ),
             },
         },
@@ -527,7 +557,9 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                     "duration, red flags. 'gait_and_balance_timed': Timed Up and Go and "
                     "timed walk; run before and after a CSF tap test in suspected NPH. "
                     "'functional_neuro_signs': Hoover's sign, entrainment and the other "
-                    "positive signs of a functional disorder."
+                    "positive signs of a functional disorder. "
+                    "'performance_status': Karnofsky and ECOG scored at the visit, on which treatment "
+                    "planning in a brain tumour depends."
                 ),
             },
             "timing": {

@@ -28,7 +28,8 @@ class BodyImagingTool(BaseTool):
     description = (
         "Image a region OUTSIDE the brain and skull: pelvis/abdomen (occult tumour search, "
         "portosystemic shunts), chest (pulmonary embolism, aortic dissection, an intrathoracic "
-        "mass), mediastinum (thymoma), spine (cord compression, myelitis), or peripheral nerve "
+        "mass, a chest radiograph), mediastinum (thymoma), temporal arteries (giant cell "
+        "arteritis), spine (cord compression, myelitis), or peripheral nerve "
         "(nerve root enlargement). Use this when the question is about an organ the brain "
         "imaging tools cannot see — order_ct_scan images the head and neck only. `study` fuses "
         "region and modality because a CT and an MRI of the same region are different studies."
@@ -60,7 +61,12 @@ class BodyImagingTool(BaseTool):
                     "gravis. 'spine_MRI'/'_CT': cord compression, transverse myelitis, "
                     "spinal tumour — the mimics of an ascending flaccid weakness. "
                     "'peripheral_nerve_MRI'/'_ultrasound': nerve root enhancement, nerve "
-                    "enlargement."
+                    "enlargement. "
+                    "'lower_extremity_venous_duplex': compression and Doppler ultrasound of the leg "
+                    "veins for deep vein thrombosis, the venous source of a paradoxical embolism. "
+                    "'chest_xray': two-view chest radiograph, the first-line chest image "
+                    "(pneumonia in an infection screen). 'temporal_artery_ultrasound': halo "
+                    "sign and stenosis of the temporal arteries in suspected giant cell arteritis."
                 ),
             },
             "contrast": {
@@ -75,11 +81,10 @@ class BodyImagingTool(BaseTool):
     pack_notes = {
         "general_medicine": {
             "study": (
-                "'chest_xray', 'abdomen_xray', 'extremity_xray': plain radiographs, the "
-                "first-line image of the chest, the abdomen (obstruction, free air) and a limb. "
+                "'abdomen_xray', 'extremity_xray': plain radiographs, the first-line image of "
+                "the abdomen (obstruction, free air) and a limb. "
                 "'hepatobiliary_ultrasound': gallbladder and bile ducts. 'renal_ultrasound': "
-                "hydronephrosis, kidney size. 'neck_ultrasound': thyroid and cervical nodes. "
-                "'lower_extremity_venous_duplex': deep vein thrombosis."
+                "hydronephrosis, kidney size. 'neck_ultrasound': thyroid and cervical nodes."
             ),
         },
     }
