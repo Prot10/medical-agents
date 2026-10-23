@@ -49,3 +49,11 @@ Adversarial check, 23 October 2026. Read the log, the full `git diff`, the whole
 - EMG impression matches the findings (large MUPs only in FDI; "reduced median CMAP amplitudes" agrees with the motor NCS finding on the wasted thenar muscles). MUST-DX and K-GC claim UMN plus LMN involvement only in the cervical region, which meets Gold Coast. No bulbar must follows the plan (tongue fasciculations without atrophy, dysarthria or dysphagia); the worker's open question on this stands. CK ratio 760/174 = 4.4 checked. No banned text left.
 - Found nothing to change.
 - `perfect_agent.py ALS-S05 -v` ok; `case_io.py check` clean for the case.
+
+## Open questions resolved (24 Oct 2026)
+
+Decisions recorded in `data/review/round-2026-10/plans/ALS-decisions.md` (Andrea's ruling of 24 Oct 2026: resolve every open point for dataset quality).
+
+- waste citations: [AAN_2009] -> [EFNS_ALS_2012] on 8 waste avoided actions (ground_truth.avoided_actions[*].citations). EFNS 2012 is the guideline on diagnostic investigations in ALS; AAN 2009 Part 1 covers drug, nutritional and respiratory therapy (ALS summary CENTRAL 8).
+- required_recommendations: must added (subclinical bulbar involvement).
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, ALS case guards pass.

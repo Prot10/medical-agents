@@ -61,3 +61,13 @@ The case is labelled thyrotoxicosis from levothyroxine over-replacement (E05.90)
 - codes removed: G12.2, G12.20, G12.23, G12.24, G12.25
 - codes added: E05.9
 - `case_io.py validate` OK; `perfect_agent.py` passes.
+
+## Open questions resolved (24 Oct 2026)
+
+Decisions recorded in `data/review/round-2026-10/plans/ALS-decisions.md` (Andrea's ruling of 24 Oct 2026: resolve every open point for dataset quality).
+
+- waste citations: [AAN_2009] -> [EFNS_ALS_2012] on 8 waste avoided actions (ground_truth.avoided_actions[*].citations). EFNS 2012 is the guideline on diagnostic investigations in ALS; AAN 2009 Part 1 covers drug, nutritional and respiratory therapy (ALS summary CENTRAL 8).
+- action-8-order-specialized-test (genetic panel) importance recommended -> required; added to stop_rule.required_before_assessment (the label names the genotype).
+- levothyroxine dose 100 -> 150 mcg (patient.clinical_history.medications) so the labelled over-replacement is supported; Graves differential key_features updated.
+- synonyms: E05.90 entry now also credits hyperthyroidism, graves disease, graves hyperthyroidism and codes E05.00, T38.1X5A (TSI positive: residual Graves activity cannot be excluded from the case data); applied by apply_diagnosis_synonyms.py.
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, ALS case guards pass.

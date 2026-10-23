@@ -53,3 +53,12 @@ Adversarial re-read of the whole final case against `git show HEAD`, the plan (s
 ## Condition audit, second pass (ALS auditor, 23 Oct 2026)
 - C, minor, `ground_truth.assessment.required_recommendations[0]` (MUST-DX) and `ground_truth.key_clinical_evidence[0]` (K-GC): both claimed lower motor neuron involvement in the thoracic region (and in some cases other regions) "on examination and EMG", but the tongue shows fibrillations and fasciculations without chronic change or wasting, thoracic paraspinals show fibrillations only, and the right tibialis anterior shows sparse fibrillations and fasciculations only. Regions now: cervical, with active denervation also in bulbar, thoracic and lumbosacral muscles. Gold Coast 2020 counts lower motor neuron dysfunction in a region only with clinical weakness and wasting, or with EMG chronic neurogenic change plus active denervation in that region. The S-series and RS11 verifiers applied this to MUST-DX and K-GC; this case still claimed regions that rest on active denervation alone, so the same wording is now used across all 30 ALS cases. No stored result changed; Gold Coast stays met (upper and lower motor neuron dysfunction in the cervical region, or lower motor neuron dysfunction in two regions). FIXED.
 - `perfect_agent.py` and `case_io.py check` re-run on all 30 ALS cases after the change: clean.
+
+## Open questions resolved (24 Oct 2026)
+
+Decisions recorded in `data/review/round-2026-10/plans/ALS-decisions.md` (Andrea's ruling of 24 Oct 2026: resolve every open point for dataset quality).
+
+- Leak guard (Andrea, 24 Oct 2026: any-query outputs must not repeat any criterion's expected_evidence): action-2-check-drug-interactions.expected_evidence reworded in policy voice and the riluzole check output (followup_outputs, check_drug_interactions: the case-specific interactions line and summary) rewritten in report voice, so neither copies the other; clinical content unchanged. `test_case_guards.py -k ALS-RM11` passes.
+- waste citations: [AAN_2009] -> [EFNS_ALS_2012] on 8 waste avoided actions (ground_truth.avoided_actions[*].citations). EFNS 2012 is the guideline on diagnostic investigations in ALS; AAN 2009 Part 1 covers drug, nutritional and respiratory therapy (ALS summary CENTRAL 8).
+- required_recommendations: must added (alcohol, as in M03).
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, ALS case guards pass.

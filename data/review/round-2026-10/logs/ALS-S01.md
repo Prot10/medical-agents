@@ -45,3 +45,11 @@ Adversarial check, 23 October 2026. Read the log, the full `git diff`, the whole
 - Found and fixed (B, minor): the EMG impression and the EMG criterion's `expected_evidence` claimed chronic reinnervation in all four regions, and MUST-DX and K-GC claimed LMN involvement in the thoracic region, but the thoracic finding is fibrillations and fasciculations only. Rewritten to active denervation in four regions with chronic neurogenic change (large MUPs or reduced recruitment) in the bulbar, cervical and lumbosacral regions; MUST-DX and K-GC now add "with active denervation also in thoracic paraspinal muscles". Consistent with the worker's own correction in S03-S05.
 - Found and fixed (B, minor): SOD1 result string harmonised with the other genes and the impression ("No pathogenic or likely pathogenic variant detected").
 - `perfect_agent.py ALS-S01 -v` ok; `case_io.py check` clean for the case.
+
+## Open questions resolved (24 Oct 2026)
+
+Decisions recorded in `data/review/round-2026-10/plans/ALS-decisions.md` (Andrea's ruling of 24 Oct 2026: resolve every open point for dataset quality).
+
+- waste citations: [AAN_2009] -> [EFNS_ALS_2012] on 8 waste avoided actions (ground_truth.avoided_actions[*].citations). EFNS 2012 is the guideline on diagnostic investigations in ALS; AAN 2009 Part 1 covers drug, nutritional and respiratory therapy (ALS summary CENTRAL 8).
+- required_recommendations: must added (statin review for CK 5.3x ULN on atorvastatin).
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, ALS case guards pass.

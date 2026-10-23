@@ -49,3 +49,11 @@ Adversarial check, 23 October 2026. Read the log, the full `git diff`, the whole
 
 ## Condition audit (ALS lead, 23 Oct 2026)
 - `ground_truth.key_clinical_evidence[2]` (K-NCS): "or SBMA" removed. SBMA is X-linked and affects men; the plan's C8 already drops the Kennedy entry in women, so the pearl named a mimic that cannot apply (flagged by the S02, S04, S07 and S09 verifiers as a class).
+
+## Open questions resolved (24 Oct 2026)
+
+Decisions recorded in `data/review/round-2026-10/plans/ALS-decisions.md` (Andrea's ruling of 24 Oct 2026: resolve every open point for dataset quality).
+
+- Leak guard (Andrea, 24 Oct 2026: any-query outputs must not repeat any criterion's expected_evidence): action-2-check-drug-interactions.expected_evidence reworded in policy voice and the riluzole check output (followup_outputs, check_drug_interactions: the case-specific interactions line and summary) rewritten in report voice, so neither copies the other; clinical content unchanged. `test_case_guards.py -k ALS-S02` passes.
+- waste citations: [AAN_2009] -> [EFNS_ALS_2012] on 8 waste avoided actions (ground_truth.avoided_actions[*].citations). EFNS 2012 is the guideline on diagnostic investigations in ALS; AAN 2009 Part 1 covers drug, nutritional and respiratory therapy (ALS summary CENTRAL 8).
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, ALS case guards pass.

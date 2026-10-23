@@ -60,3 +60,12 @@ Adversarial re-read of the whole final case against `git show HEAD`, the plan (C
 - Clinical facts checked: SOD1 A4V aggressive, LMN-predominant; tofersen FDA accelerated approval April 2023 and EU authorisation 2024 for SOD1-ALS only; presymptomatic carrier treatment only in trials (ATLAS); Kennedy disease cannot pass from a paternal uncle through the father to a son (X-linked). Correct.
 - Found: nothing to change.
 - Checks run after verification: `perfect_agent.py -v` ok (every required and recommended criterion answered by the case's own data; the "<- ?" source marker for brain MRI, spine MRI and labs is the same in every ALS case and is not a fallback), `case_io.py check` schema OK, synonym guard OK, no test failure names the case. Grep for AMX0035, Relyvrio, edaravone, grapefruit, serotonergic, "July 2026", El Escorial, "Exclusion studies", "Reviewer baseline" and JSON dumps: none in the case (QTc appears only in the fallback ECG). No new em or en dash in the diff. Citations are bracketed allow-list keys only. Lab `is_abnormal` flags agree with every numeric reference range; ESR 8, CRP 2, B12 420 and folate 10 were already identical at HEAD in P05-P09 and RM11 (kept per plan C13, flagged by the worker).
+
+## Open questions resolved (24 Oct 2026)
+
+Decisions recorded in `data/review/round-2026-10/plans/ALS-decisions.md` (Andrea's ruling of 24 Oct 2026: resolve every open point for dataset quality).
+
+- waste citations: [AAN_2009] -> [EFNS_ALS_2012] on 8 waste avoided actions (ground_truth.avoided_actions[*].citations). EFNS 2012 is the guideline on diagnostic investigations in ALS; AAN 2009 Part 1 covers drug, nutritional and respiratory therapy (ALS summary CENTRAL 8).
+- action-8-order-specialized-test (genetic panel) importance recommended -> required; added to stop_rule.required_before_assessment (the label names the genotype).
+- icd_codes[0] G12.21 -> Z15.89 (accepted[0] unchanged: 'Suspected early ALS .. Gold Coast criteria not yet met'); new synonym entry Z15.89 scoped to ALS-P08 (suspected ALS, prodromal ALS, possible ALS, suspected motor neuron disease, mild motor impairment); G12.21 synonyms pruned with apply_diagnosis_synonyms.py --prune --conditions als, so a plain 'ALS' answer no longer scores as correct for a carrier who does not meet Gold Coast.
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, ALS case guards pass.

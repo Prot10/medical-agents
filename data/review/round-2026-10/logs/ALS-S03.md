@@ -45,3 +45,10 @@ Adversarial check, 23 October 2026. Read the log, the full `git diff`, the whole
 - The rewritten EMG impression matches the findings (large MUPs only in FDI); MUST-DX and K-GC claim LMN involvement only where the exam or EMG shows it (bulbar: tongue atrophy and fasciculations; cervical: thenar wasting with active and chronic denervation). The new exam `additional` text (fasciculations in tongue, deltoids and calves) restates findings already in the cranial nerve and motor fields; nothing invented. Former smoker who quit 5 years ago: no current CYP1A2 induction, so no smoking point is needed in the riluzole output. CK ratio 840/174 = 4.8 checked. No banned text left.
 - Found nothing to change.
 - `perfect_agent.py ALS-S03 -v` ok; `case_io.py check` clean for the case.
+
+## Open questions resolved (24 Oct 2026)
+
+Decisions recorded in `data/review/round-2026-10/plans/ALS-decisions.md` (Andrea's ruling of 24 Oct 2026: resolve every open point for dataset quality).
+
+- waste citations: [AAN_2009] -> [EFNS_ALS_2012] on 8 waste avoided actions (ground_truth.avoided_actions[*].citations). EFNS 2012 is the guideline on diagnostic investigations in ALS; AAN 2009 Part 1 covers drug, nutritional and respiratory therapy (ALS summary CENTRAL 8).
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, ALS case guards pass.
