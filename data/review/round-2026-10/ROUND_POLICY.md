@@ -5,6 +5,11 @@ case by case, slowly and properly, with no shortcuts. This file is the shared co
 whole before touching a case. `PATTERNS.md` next to it is the catalogue of error classes the two
 physician reviewers found; apply it to every case, reviewed or not.
 
+Andrea, 24 Oct 2026: open questions are to be resolved "nel modo migliore per la qualità del
+dataset". Decide every judgment call yourself, with current guidelines and verified sources, apply
+it, and record the decision and its reason. Leave a question for Andrea only when the decision
+needs information only Andrea has, and say exactly what is missing.
+
 ## What you are working on
 
 - Cases: `data/neurobench/cases/{CASE_ID}.json`, schema v2
