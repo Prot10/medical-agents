@@ -58,6 +58,70 @@
   "followup_outputs": [
     {
       "output": {
+        "additional_observations": [
+          "No proximal vascular occlusion in the anterior or posterior circulation",
+          "No cervical arterial dissection",
+          "No fibromuscular dysplasia pattern",
+          "Aortic arch: normal type I morphology; no dissection"
+        ],
+        "angiography_findings": null,
+        "contrast_used": true,
+        "findings": [
+          {
+            "density": null,
+            "description": "CTA: Bilateral ICA, MCA M1 and M2 segments, ACA, PCA, vertebral arteries, and basilar artery are all patent without occlusion or flow-limiting stenosis. No proximal thrombus or occlusion identified. No aneurysm.",
+            "location": "Circle of Willis and major intracranial branch vessels",
+            "size": null,
+            "type": "Patent intracranial vasculature"
+          },
+          {
+            "density": null,
+            "description": "CTA neck: Bilateral internal carotid arteries normal in caliber and course without stenosis, dissection, or intimal irregularity. No vertebral artery dissection. Mild atherosclerotic calcification at the bilateral carotid bifurcations without hemodynamically significant stenosis (<20% by NASCET criteria).",
+            "location": "Bilateral internal and common carotid arteries, vertebral arteries",
+            "size": null,
+            "type": "Normal cervical vasculature"
+          }
+        ],
+        "impression": "Normal CTA of the head and neck. No proximal vascular occlusion, dissection, stenosis, or aneurysm. Minor bilateral carotid bifurcation calcification without hemodynamic significance",
+        "recommended_actions": []
+      },
+      "tool_name": "order_ct_scan",
+      "tool_parameters": {
+        "angiography": true,
+        "contrast": true
+      },
+      "trigger_action": "request_ct_angiography"
+    },
+    {
+      "output": {
+        "alternatives": [
+          "Tenecteplase 0.25 mg/kg (maximum 25 mg) as a single bolus, equivalent to alteplase"
+        ],
+        "contraindications": [
+          "No anticoagulant exposure: she takes no warfarin, DOAC or heparin, and INR is 0.94.",
+          "Platelets 138 x10^9/L, above the 100 x10^9/L threshold.",
+          "Isolated aPTT 46 s with no anticoagulant and no bleeding history: not by itself a reason to withhold thrombolysis."
+        ],
+        "formulary_status": "Alteplase, tenecteplase and warfarin available on formulary",
+        "interactions": [
+          "Levothyroxine: no interaction with thrombolysis.",
+          "Sumatriptan: no pharmacokinetic interaction with thrombolysis, but triptans are vasoconstrictors and are contraindicated after ischemic stroke; do not give it now and stop it permanently.",
+          "Ibuprofen: adds antiplatelet effect and bleeding risk; do not give it within 24 hours of thrombolysis and stop it with any later antithrombotic therapy."
+        ],
+        "proposed": "IV thrombolysis for acute ischemic stroke (alteplase 0.9 mg/kg, maximum 90 mg, or tenecteplase 0.25 mg/kg, maximum 25 mg)",
+        "summary": "",
+        "warnings": [
+          "An isolated prolonged aPTT without anticoagulant exposure or bleeding history, in a woman with a prior miscarriage and a mother with SLE, suggests a lupus anticoagulant, which prolongs phospholipid-dependent clotting tests without causing bleeding. Antiphospholipid testing takes hours to days: decide thrombolysis on the values available now and send the antibodies before any anticoagulant is started.",
+          "Keep blood pressure below 185/110 mmHg before thrombolysis and below 180/105 mmHg for 24 hours after.",
+          "No antiplatelet, anticoagulant or NSAID for 24 hours after thrombolysis, until follow-up imaging excludes hemorrhage.",
+          "If antiphospholipid syndrome is confirmed, warfarin (INR 2 to 3) is the anticoagulant; DOACs are not used (rivaroxaban was inferior to warfarin in triple-positive APS)."
+        ]
+      },
+      "tool_name": "check_drug_interactions",
+      "trigger_action": "check_drug_interactions_thrombolysis"
+    },
+    {
+      "output": {
         "chambers": {
           "Left Atrial Volume Index": "24 mL/m2",
           "Left Ventricular Wall Thickness": "Normal (septal thickness 0.9 cm)",
@@ -66,20 +130,23 @@
         },
         "ejection_fraction": 65.0,
         "findings": [
-          "Interatrial Septum: Intact. Bubble study: No right-to-left shunt identified with Valsalva maneuver \u2014 no patent foramen ovale or atrial septal defect demonstrated",
+          "Interatrial septum intact; agitated saline with Valsalva shows no right-to-left shunt (no patent foramen ovale or atrial septal defect)",
           "No intracardiac thrombus",
-          "No valvular vegetations",
-          "Pericardium: No pericardial effusion"
+          "No valvular vegetations or leaflet thickening",
+          "Pericardium: no pericardial effusion"
         ],
-        "impression": "Normal transthoracic echocardiogram. LVEF 65%. No structural heart disease, intracardiac thrombus, valvular pathology, or intracardiac shunt. Bubble study negative.",
+        "impression": "Normal transthoracic echocardiogram with agitated-saline study. LVEF 65%. No valvular thickening or vegetation, no intracardiac thrombus, no interatrial shunt.",
         "recommended_actions": [],
         "valves": {
           "Aortic Valve": "Trileaflet, normal morphology, no stenosis or regurgitation",
           "Mitral Valve": "Normal morphology without stenosis or regurgitation"
         },
-        "wall_motion": null
+        "wall_motion": "No regional wall motion abnormality"
       },
       "tool_name": "order_echocardiogram",
+      "tool_parameters": {
+        "echo_type": "TTE"
+      },
       "trigger_action": "request_echocardiogram"
     },
     {
@@ -129,31 +196,34 @@
           "max": 104,
           "min": 52
         },
-        "impression": "Forty-eight hour Holter monitoring reveals entirely normal sinus rhythm with no arrhythmia. No atrial fibrillation or flutter detected. Low ectopic burden.",
-        "monitor_type": "holter_24h",
+        "impression": "Recorded on the stroke unit after admission, 48 hours. Sinus rhythm throughout with no atrial fibrillation or flutter; low atrial and ventricular ectopic burden; no pauses.",
+        "monitor_type": "holter_48h",
         "recommended_actions": [],
         "rhythm_summary": "Normal sinus rhythm throughout"
       },
       "tool_name": "order_cardiac_monitoring",
+      "tool_parameters": {
+        "monitor_type": "holter_48h"
+      },
       "trigger_action": "request_holter_monitor"
     },
     {
       "output": {
         "abnormal_values_summary": [
-          "Lupus anticoagulant: positive (confirmed on two assays; dRVVT ratio 1.92 and 1.97)",
-          "Anticardiolipin IgG 90.9 GPL units (markedly elevated)",
-          "Anticardiolipin IgM 23.7 MPL units (elevated)",
-          "Anti-B2GP1 IgG 21.0 U/mL (elevated)",
-          "Anti-B2GP1 IgM 10.0 U/mL (elevated)"
+          "Lupus anticoagulant: positive (dRVVT screen ratio 1.92; screen-to-confirm normalized ratio 1.97)",
+          "Anticardiolipin IgG 90.9 GPL units (H)",
+          "Anticardiolipin IgM 23.7 MPL units (H)",
+          "Anti-beta-2-glycoprotein I IgG 21.0 U/mL (H)",
+          "Anti-beta-2-glycoprotein I IgM 10.0 U/mL (H)"
         ],
-        "interpretation": "Abnormal values: Lupus Anticoagulant dRVVT ratio 1.92 (H), Lupus Anticoagulant confirmatory ratio 1.97 (H), Anticardiolipin IgG 90.9 GPL units (H), Anticardiolipin IgM 23.7 MPL units (H), Anti-Beta-2-Glycoprotein-I IgG 21.0 U/mL (H), Anti-Beta-2-Glycoprotein-I IgM 10.0 U/mL (H). ANA, anti-dsDNA, ANCA negative. Complements normal. Lupus anticoagulant confirmed positive on two independent assays. Antiphospholipid antibodies reported at high-positive titer for IgG anticardiolipin and IgG anti-beta-2-glycoprotein-I; IgM fractions also positive at moderate titer. Note: antiphospholipid antibody results on a single determination; confirmation at 12 weeks is required per classification criteria.",
+        "interpretation": "Abnormal values: Lupus Anticoagulant dRVVT screen ratio 1.92 (H), screen-to-confirm normalized ratio 1.97 (H), Anticardiolipin IgG 90.9 GPL units (H), Anticardiolipin IgM 23.7 MPL units (H), Anti-Beta-2-Glycoprotein-I IgG 21.0 U/mL (H), Anti-Beta-2-Glycoprotein-I IgM 10.0 U/mL (H). ANA, anti-dsDNA and ANCA negative. Complement C3 and C4 normal. Homocysteine normal. Lupus anticoagulant positive on screening and confirmation. Anticardiolipin IgG at high titer (above 80 GPL units); anticardiolipin IgM and both anti-beta-2-glycoprotein I isotypes above the laboratory reference range. Single determination: classification requires the antibodies to persist on repeat testing at least 12 weeks apart.",
         "panels": {
           "Antiphospholipid and Autoimmune Panel": [
             {
               "clinical_significance": null,
               "is_abnormal": true,
               "reference_range": "<1.2",
-              "test": "Lupus Anticoagulant (dilute Russell viper venom time ratio)",
+              "test": "Lupus Anticoagulant dRVVT screen ratio",
               "unit": "ratio",
               "value": 1.92
             },
@@ -161,7 +231,7 @@
               "clinical_significance": null,
               "is_abnormal": true,
               "reference_range": "<1.2",
-              "test": "Lupus Anticoagulant confirmatory ratio",
+              "test": "Lupus Anticoagulant dRVVT screen-to-confirm normalized ratio",
               "unit": "ratio",
               "value": 1.97
             },
@@ -257,102 +327,38 @@
         }
       },
       "tool_name": "interpret_labs",
-      "trigger_action": "request_antiphospholipid_panel"
+      "trigger_action": "request_antiphospholipid_lupus_anticoagulant_anticardiolipin_cardiolipin_beta2_glycoprotein_panel"
     },
     {
       "output": {
-        "query": "antiphospholipid syndrome ischemic stroke young adults diagnosis management APS classification criteria",
+        "query": "antiphospholipid syndrome ischemic stroke classification and secondary prevention",
         "results": [
           {
-            "authors": "Miyakis S, Lockshin MD, et al.",
+            "authors": "Miyakis S, Lockshin MD, Atsumi T, et al.",
             "journal": "Journal of Thrombosis and Haemostasis",
-            "key_finding": "APS is defined by the co-occurrence of at least one clinical criterion (vascular thrombosis or obstetric complication) and at least one laboratory criterion (lupus anticoagulant, anticardiolipin IgG/IgM \u226540 GPL/MPL or above the 99th percentile, or anti-beta-2-glycoprotein-I IgG/IgM above the 99th percentile) confirmed on two separate occasions at least 12 weeks apart.",
-            "title": "Updated Sapporo/Sydney Classification Criteria for Antiphospholipid Syndrome",
+            "key_finding": "Classification requires at least one clinical criterion (vascular thrombosis or defined pregnancy morbidity) and at least one laboratory criterion (lupus anticoagulant; anticardiolipin IgG or IgM above 40 GPL or MPL or the 99th percentile; or anti-beta-2-glycoprotein I IgG or IgM above the 99th percentile) present on two occasions at least 12 weeks apart.",
+            "title": "International consensus statement on an update of the classification criteria for definite antiphospholipid syndrome (APS)",
             "year": "2006"
           },
           {
-            "authors": "Levine SR, Brey RL, et al.",
-            "journal": "Stroke",
-            "key_finding": "In patients with stroke attributable to APS, long-term anticoagulation with warfarin (INR 2-3) is preferred over antiplatelet therapy alone; triple-positive APS (lupus anticoagulant + anticardiolipin + anti-beta-2-glycoprotein-I) confers the highest recurrence risk and mandates anticoagulation.",
-            "title": "Antiphospholipid Syndrome: AHA/ASA Statement on Stroke Prevention",
-            "year": "2004"
+            "authors": "Tektonidou MG, Andreoli L, Limper M, et al.",
+            "journal": "Annals of the Rheumatic Diseases",
+            "key_finding": "After a first arterial thrombosis in definite APS, treatment with a vitamin K antagonist is recommended over low-dose aspirin alone; rivaroxaban should not be used in triple-positive patients, and DOACs are not recommended after arterial events.",
+            "title": "EULAR recommendations for the management of antiphospholipid syndrome in adults",
+            "year": "2019"
           },
           {
-            "authors": "Andreoli L, et al.",
-            "journal": "Rheumatology",
-            "key_finding": "Antiphospholipid antibodies are found in 10-20% of ischemic strokes in adults under age 50, compared to approximately 2-4% in older cohorts. Lupus anticoagulant is the strongest individual predictor of thrombotic risk. Triple-positive profiles carry the highest annual recurrence rate of thrombosis.",
-            "title": "Antiphospholipid Antibodies and Stroke in Young Adults \u2014 Systematic Review",
-            "year": "2013"
+            "authors": "Pengo V, Denas G, Zoppellaro G, et al.",
+            "journal": "Blood",
+            "key_finding": "In triple-positive APS, rivaroxaban was associated with more thromboembolic events (mostly arterial, including stroke) and major bleeding than warfarin, and the trial stopped early.",
+            "title": "Rivaroxaban vs warfarin in high-risk patients with antiphospholipid syndrome",
+            "year": "2018"
           }
         ],
-        "summary": ""
+        "summary": "APS is classified on clinical events plus antiphospholipid antibodies that persist at 12 weeks. After an arterial event in definite APS, a vitamin K antagonist is the recommended anticoagulant, and DOACs are avoided, particularly in triple-positive patients."
       },
       "tool_name": "search_medical_literature",
       "trigger_action": "search_antiphospholipid_syndrome_stroke"
-    },
-    {
-      "output": {
-        "alternatives": [
-          "Aspirin 325 mg if tPA is contraindicated or declined",
-          "Warfarin (VKA) with INR 2-3 for secondary prevention if APS confirmed \u2014 preferred over DOACs based on current evidence in APS"
-        ],
-        "contraindications": [
-          "Thrombocytopenia: platelet count 138 x10^9/L \u2014 above the absolute contraindication threshold of <100,000 (100 x10^9/L); tPA is not contraindicated at this level but monitor closely",
-          "Prolonged PTT 46 s: if this reflects exogenous anticoagulant use, tPA is contraindicated; if attributable to lupus anticoagulant (an antibody causing in vitro PTT prolongation without in vivo anticoagulant effect), thrombolysis is not automatically contraindicated \u2014 clinical judgment required",
-          "Standard absolute contraindications per AHA/ASA: recent intracranial surgery, stroke <3 months, active internal bleeding, severe uncontrolled hypertension"
-        ],
-        "formulary_status": "IV alteplase and warfarin available on formulary",
-        "interactions": [
-          "Levothyroxine: no significant interaction with alteplase; continue as scheduled",
-          "Sumatriptan: no interaction with alteplase; triptans are not a contraindication to thrombolysis",
-          "Ibuprofen (NSAID): NSAIDs have mild antiplatelet effects; not a contraindication to tPA but may mildly increase mucosal bleeding risk \u2014 monitor"
-        ],
-        "proposed": "IV alteplase (tPA) 0.9 mg/kg for acute ischemic stroke; subsequent transition to warfarin",
-        "warnings": [
-          "Lupus anticoagulant prolongs PTT in vitro but does NOT confer bleeding risk in vivo \u2014 it is a pro-thrombotic antibody. PTT prolongation from lupus anticoagulant alone is not a contraindication to IV tPA.",
-          "Ensure current BP is below 185/110 mmHg before tPA administration",
-          "If APS is confirmed, long-term anticoagulation with warfarin (INR 2-3) is preferred over DOAC \u2014 rivaroxaban and apixaban have shown higher failure rates in APS thrombosis",
-          "Post-stroke anticoagulation timing should account for infarct size and hemorrhagic transformation risk"
-        ]
-      },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "check_drug_interactions_tpa_anticoagulation"
-    },
-    {
-      "output": {
-        "additional_observations": [
-          "No proximal vascular occlusion in the anterior or posterior circulation",
-          "No cervical arterial dissection",
-          "No fibromuscular dysplasia pattern",
-          "Aortic arch: normal type I morphology; no dissection"
-        ],
-        "angiography_findings": null,
-        "contrast_used": true,
-        "findings": [
-          {
-            "density": null,
-            "description": "CTA: Bilateral ICA, MCA M1 and M2 segments, ACA, PCA, vertebral arteries, and basilar artery are all patent without occlusion or flow-limiting stenosis. No proximal thrombus or occlusion identified. No aneurysm.",
-            "location": "Circle of Willis and major intracranial branch vessels",
-            "size": null,
-            "type": "Patent intracranial vasculature"
-          },
-          {
-            "density": null,
-            "description": "CTA neck: Bilateral internal carotid arteries normal in caliber and course without stenosis, dissection, or intimal irregularity. No vertebral artery dissection. Mild atherosclerotic calcification at the bilateral carotid bifurcations without hemodynamically significant stenosis (<20% by NASCET criteria).",
-            "location": "Bilateral internal and common carotid arteries, vertebral arteries",
-            "size": null,
-            "type": "Normal cervical vasculature"
-          }
-        ],
-        "impression": "Normal CTA of the head and neck. No proximal vascular occlusion, dissection, stenosis, or aneurysm. Minor bilateral carotid bifurcation calcification without hemodynamic significance",
-        "recommended_actions": []
-      },
-      "tool_name": "order_ct_scan",
-      "tool_parameters": {
-        "angiography": true,
-        "contrast": true
-      },
-      "trigger_action": "request_ct_angiography"
     }
   ],
   "ground_truth": {
@@ -368,34 +374,13 @@
           }
         ],
         "citations": [
-          "[AHA_ASA_Stroke_2026]",
-          "AHA/ASA acute ischemic stroke guideline 2026"
+          "[AHA_ASA_Stroke_2026]"
         ],
         "criterion_id": "action-1-order-ct-scan",
-        "expected_evidence": "No hemorrhage; early ischemic change/ASPECTS may be normal or subtle. NCCT alone is sufficient for most thrombolysis decisions",
+        "expected_evidence": "No haemorrhage, no established infarct, no hyperdense vessel; ASPECTS 10.",
         "importance": "required",
-        "label": "Obtain emergent noncontrast head CT first to exclude intracranial hemorrhage and assess ischemic burden before reperfusion therapy",
-        "rationale": "Obtain emergent noncontrast head CT first to exclude intracranial hemorrhage and assess ischemic burden before reperfusion therapy"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "angiography": true,
-              "contrast": true
-            },
-            "tool_name": "order_ct_scan"
-          }
-        ],
-        "citations": [
-          "[AHA_ASA_Stroke_2026]",
-          "AHA/ASA acute ischemic stroke guideline 2026"
-        ],
-        "criterion_id": "action-2-order-ct-scan",
-        "expected_evidence": "Occlusion/stenosis/dissection anatomy or absence of an LVO; this is subsequent to and not a substitute for NCCT",
-        "importance": "required",
-        "label": "Obtain a separate rapid CTA of the cervical and intracranial vessels for large-vessel-occlusion assessment and thrombectomy planning; do not wait for serum creatinine",
-        "rationale": "Obtain a separate rapid CTA of the cervical and intracranial vessels for large-vessel-occlusion assessment and thrombectomy planning; do not wait for serum creatinine"
+        "label": "Non-contrast head CT on arrival",
+        "rationale": "Excludes haemorrhage before the thrombolysis decision in a patient inside the 4.5-hour window."
       },
       {
         "alternatives": [
@@ -413,63 +398,13 @@
           }
         ],
         "citations": [
-          "[AHA_ASA_Stroke_2026]",
-          "AHA/ASA acute ischemic stroke guideline 2026"
+          "[AHA_ASA_Stroke_2026]"
         ],
         "criterion_id": "action-3-interpret-labs",
-        "expected_evidence": "Identify a glucose mimic and relevant safety abnormalities; baseline troponin/ECG do not delay reperfusion",
+        "expected_evidence": "Glucose 88 mg/dL; platelets 138 x10^9/L; INR 0.94 with an isolated aPTT of 46 s and no anticoagulant exposure; creatinine 0.72 mg/dL; troponin I 0.01 ng/mL.",
         "importance": "required",
-        "label": "Check glucose before thrombolysis and obtain CBC, coagulation, renal function and baseline troponin, but do not delay thrombolysis for routine results or CTA/CTP for creatinine",
-        "rationale": "Check glucose before thrombolysis and obtain CBC, coagulation, renal function and baseline troponin, but do not delay thrombolysis for routine results or CTA/CTP for creatinine"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "contrast": false,
-              "protocol": "stroke"
-            },
-            "tool_name": "analyze_brain_mri"
-          }
-        ],
-        "citations": [
-          "[AHA_ASA_Stroke_2026]",
-          "AHA/ASA acute ischemic stroke guideline 2026"
-        ],
-        "criterion_id": "action-4-analyze-brain-mri",
-        "expected_evidence": "DWI lesion with ADC reduction; DWI-FLAIR mismatch may support selected unknown-onset treatment. MRI is not routine mandatory imaging",
-        "importance": "optional",
-        "label": "Consider brain MRI only when immediately available without delaying reperfusion, especially for wake-up/unknown-onset stroke, posterior circulation, paediatric stroke or a difficult mimic",
-        "rationale": "Consider brain MRI only when immediately available without delaying reperfusion, especially for wake-up/unknown-onset stroke, posterior circulation, paediatric stroke or a difficult mimic"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "panels": [
-                "lupus anticoagulant",
-                "anticardiolipin IgG",
-                "anticardiolipin IgM",
-                "anti-beta-2-glycoprotein-I IgG",
-                "anti-beta-2-glycoprotein-I IgM",
-                "ANA",
-                "anti-dsDNA",
-                "complement",
-                "homocysteine"
-              ]
-            },
-            "tool_name": "interpret_labs"
-          }
-        ],
-        "citations": [
-          "[AHA_ASA_2014]",
-          "[AHA_ASA_2014]"
-        ],
-        "criterion_id": "action-5-interpret-labs",
-        "expected_evidence": "Triple-positive APS: lupus anticoagulant confirmed positive, anticardiolipin IgG markedly elevated (90.9 GPL), IgM positive, anti-B2GP1 IgG and IgM elevated \u2014 explains paradoxical PTT prolongation and identifies pro-thrombotic mechanism",
-        "importance": "recommended",
-        "label": "After reperfusion decisions, hypercoagulability and autoimmune workup \u2014 antiphospholipid panel (lupus anticoagulant, anticardiolipin igg/igm, anti-beta-2-glycoprotein-i igg/igm), ana, anti-dsdna, complements \u2014 essential in young cryptogenic stroke with family history of sle",
-        "rationale": "After reperfusion decisions, hypercoagulability and autoimmune workup \u2014 antiphospholipid panel (lupus anticoagulant, anticardiolipin igg/igm, anti-beta-2-glycoprotein-i igg/igm), ana, anti-dsdna, complements \u2014 essential in young cryptogenic stroke with family history of sle"
+        "label": "Admission bloods: glucose, CBC, coagulation, renal function and troponin",
+        "rationale": "Glucose must be known before thrombolysis; here the coagulation result is already back and its isolated aPTT prolongation has to be interpreted, not waited on."
       },
       {
         "alternatives": [
@@ -479,116 +414,189 @@
           }
         ],
         "citations": [
-          "[AHA_ASA_2019]",
-          "[AHA_ASA_2019]"
+          "[AHA_ASA_Stroke_2026]"
         ],
         "criterion_id": "action-6-analyze-ecg",
-        "expected_evidence": "Normal sinus rhythm \u2014 no AF; excludes arrhythmic cardioembolic source on this tracing",
+        "expected_evidence": "Sinus rhythm 71/min, normal intervals, no ischaemic change.",
         "importance": "required",
-        "label": "Obtain 12-lead ECG to assess for atrial fibrillation and concurrent cardiac ischemia",
-        "rationale": "Obtain 12-lead ECG to assess for atrial fibrillation and concurrent cardiac ischemia"
+        "label": "12-lead ECG",
+        "rationale": "Baseline rhythm; atrial fibrillation would change the mechanism and the antithrombotic plan. It does not delay thrombolysis."
       },
       {
         "alternatives": [
           {
             "required_arguments": {
-              "query": "antiphospholipid syndrome ischemic stroke young adults classification criteria lupus anticoagulant PTT prolongation tPA management"
+              "angiography": true,
+              "contrast": true
             },
-            "tool_name": "search_medical_literature"
+            "tool_name": "order_ct_scan"
           }
         ],
         "citations": [
-          "[AHA_ASA_2019]",
-          "[AHA_ASA_2019]"
+          "[AHA_ASA_Stroke_2026]"
         ],
-        "criterion_id": "action-7-search-medical-literature",
-        "expected_evidence": "APS classification criteria (Sydney 2006); APS stroke management (anticoagulation vs antiplatelet); PTT prolongation from lupus anticoagulant is not a contraindication to IV tPA",
-        "importance": "recommended",
-        "label": "Review current AHA/ASA guidelines for IV thrombolysis windows, mechanical thrombectomy eligibility, and thrombophilia workup in young cryptogenic stroke",
-        "rationale": "Review current AHA/ASA guidelines for IV thrombolysis windows, mechanical thrombectomy eligibility, and thrombophilia workup in young cryptogenic stroke"
+        "criterion_id": "action-2-order-ct-scan",
+        "expected_evidence": "No occlusion, stenosis or dissection in the head and neck; minor carotid bifurcation calcification.",
+        "importance": "required",
+        "label": "CT angiography of the head and neck",
+        "rationale": "Decides thrombectomy (no occlusion) and excludes dissection in a young adult. Do not wait for creatinine."
       },
       {
         "alternatives": [
           {
-            "required_arguments": {
-              "drug": "alteplase"
-            },
+            "required_arguments": {},
+            "tool_name": "analyze_brain_mri"
+          }
+        ],
+        "citations": [
+          "[AHA_ASA_Stroke_2026]"
+        ],
+        "criterion_id": "action-4-analyze-brain-mri",
+        "expected_evidence": "Acute cortical infarct of the left superior parietal lobule and posterior insula (2.1 x 1.8 cm), no hemorrhage, patent MCA branches.",
+        "importance": "optional",
+        "label": "MRI brain with DWI",
+        "rationale": "Confirms the infarct and settles the migraine question, but does not delay thrombolysis."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
             "tool_name": "check_drug_interactions"
           }
         ],
         "citations": [
-          "[AHA_ASA_2019]",
-          "[AHA_ASA_2019]"
+          "[AHA_ASA_Stroke_2026]"
         ],
         "criterion_id": "action-8-check-drug-interactions",
-        "expected_evidence": "tPA contraindications screened; PTT prolongation from lupus anticoagulant does not contraindicate tPA; sumatriptan/ibuprofen interactions reviewed \u2014 no prohibitive interaction identified",
+        "expected_evidence": "No anticoagulant exposure; the isolated aPTT does not contraindicate thrombolysis; sumatriptan contraindicated after ischemic stroke; ibuprofen avoided for 24 hours and with later antithrombotics.",
         "importance": "required",
-        "label": "Confirm absence of contraindications to IV thrombolysis; evaluate whether PTT prolongation represents lupus anticoagulant (pro-thrombotic, NOT a bleeding risk) versus exogenous anticoagulant",
-        "rationale": "Confirm absence of contraindications to IV thrombolysis; evaluate whether PTT prolongation represents lupus anticoagulant (pro-thrombotic, NOT a bleeding risk) versus exogenous anticoagulant"
+        "label": "Check thrombolysis against her medicines and the prolonged aPTT",
+        "rationale": "The prolonged aPTT, sumatriptan and ibuprofen each bear on the thrombolysis decision and on what she takes afterwards."
       },
       {
         "alternatives": [
           {
             "required_arguments": {
-              "bubble_study": true,
               "echo_type": "TTE"
+            },
+            "tool_name": "order_echocardiogram"
+          },
+          {
+            "required_arguments": {
+              "echo_type": "bubble_study"
             },
             "tool_name": "order_echocardiogram"
           }
         ],
         "citations": [
-          "[AHA_ASA_2019]",
-          "[AHA_ASA_2019]"
+          "[AHA_ASA_2021_secondary]"
         ],
         "criterion_id": "action-9-order-echocardiogram",
-        "expected_evidence": "Normal cardiac structure and function; bubble study negative for PFO \u2014 excludes paradoxical embolism as the mechanism",
+        "expected_evidence": "Normal heart, LVEF 65%; no valvular thickening or vegetation (no Libman-Sacks lesion), no thrombus, no shunt on agitated saline.",
         "importance": "required",
-        "label": "TTE with agitated-saline bubble study to evaluate for structural heart disease, intracardiac thrombus, valvular pathology, and patent foramen ovale",
-        "rationale": "TTE with agitated-saline bubble study to evaluate for structural heart disease, intracardiac thrombus, valvular pathology, and patent foramen ovale"
+        "label": "Transthoracic echocardiogram with agitated-saline study",
+        "rationale": "Looks for Libman-Sacks valve lesions, thrombus and a right-to-left shunt in a young adult with an embolic-appearing cortical infarct."
       },
       {
         "alternatives": [
           {
             "required_arguments": {
+              "monitor_type": "holter_48h"
+            },
+            "tool_name": "order_cardiac_monitoring"
+          },
+          {
+            "required_arguments": {
               "monitor_type": "holter_24h"
+            },
+            "tool_name": "order_cardiac_monitoring"
+          },
+          {
+            "required_arguments": {
+              "monitor_type": "telemetry"
             },
             "tool_name": "order_cardiac_monitoring"
           }
         ],
         "citations": [
-          "[Sanna_2014]",
-          "[Sanna_2014]"
+          "[AHA_ASA_Stroke_2026]"
         ],
         "criterion_id": "action-10-order-cardiac-monitoring",
-        "expected_evidence": "Normal sinus rhythm throughout \u2014 no paroxysmal AF; confirms negative arrhythmic workup",
+        "expected_evidence": "Sinus rhythm throughout 48 hours; no atrial fibrillation.",
+        "importance": "recommended",
+        "label": "Inpatient cardiac rhythm monitoring",
+        "rationale": "Excludes atrial fibrillation as an alternative mechanism during admission."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "antiphospholipid"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          },
+          {
+            "required_arguments": {
+              "panels": [
+                "lupus anticoagulant"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          },
+          {
+            "required_arguments": {
+              "panels": [
+                "anti_cardiolipin"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[AHA_ASA_2021_secondary]"
+        ],
+        "criterion_id": "action-5-interpret-labs",
+        "expected_evidence": "Lupus anticoagulant positive (dRVVT ratios 1.92 and 1.97), anticardiolipin IgG 90.9 GPL and IgM 23.7 MPL, anti-beta-2-glycoprotein I IgG 21.0 and IgM 10.0 U/mL: triple positive, explaining the aPTT; ANA, anti-dsDNA and ANCA negative, complement normal; persistence must be confirmed at 12 weeks.",
         "importance": "required",
-        "label": "Prolonged cardiac monitoring (48-hour Holter; escalate to 30-day event monitor if Holter negative) to detect occult paroxysmal atrial fibrillation",
-        "rationale": "Prolonged cardiac monitoring (48-hour Holter; escalate to 30-day event monitor if Holter negative) to detect occult paroxysmal atrial fibrillation"
+        "label": "Antiphospholipid antibodies (lupus anticoagulant, anticardiolipin, anti-beta-2-glycoprotein I) with an autoimmune screen",
+        "rationale": "An unexplained isolated aPTT prolongation, a prior miscarriage and a mother with SLE in a young woman with a cortical infarct and normal vessels and heart point to antiphospholipid syndrome, which changes long-term antithrombotic therapy. Drawn before any anticoagulant, and it does not delay thrombolysis."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[AHA_ASA_2021_secondary]"
+        ],
+        "criterion_id": "action-7-search-medical-literature",
+        "expected_evidence": "General evidence on APS classification and anticoagulation after arterial events.",
+        "importance": "optional",
+        "label": "Literature on antiphospholipid syndrome and stroke",
+        "rationale": "Optional background; not a clinical step."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not administer IV tPA before non-contrast CT excludes intracranial hemorrhage",
-        "Do not withhold IV tPA solely on the basis of an elevated PTT when lupus anticoagulant is the suspected cause \u2014 lupus anticoagulant is a pro-thrombotic, not a hemorrhagic, state",
-        "Do not give IV tPA if INR >1.7, platelet count <100,000 (100 x10^9/L), recent major surgery, or other AHA/ASA-listed contraindications",
-        "Do not aggressively lower blood pressure below 140/90 mmHg in the acute phase outside the tPA window",
-        "Do not delay non-contrast CT for additional imaging or labs in a stroke alert presentation",
-        "Do not diagnose complicated migraine or hemiplegic migraine without DWI MRI excluding acute infarction \u2014 new persistent focal deficits in a migraineur require full stroke workup",
-        "Do not initiate DOAC (rivaroxaban, apixaban, dabigatran) as long-term secondary prevention if APS is confirmed \u2014 VKA (warfarin) with INR 2-3 is recommended",
-        "Do not skip antiphospholipid workup in young cryptogenic stroke \u2014 APS is the underlying mechanism in 10-20% of ischemic strokes in adults under 50"
+        "Do not withhold IV thrombolysis because of the isolated aPTT of 46 s, or wait for antiphospholipid results: she takes no anticoagulant, INR is 0.94 and platelets are 138 x10^9/L.",
+        "Do not give sumatriptan, now or later: triptans are contraindicated after ischemic stroke and in antiphospholipid syndrome.",
+        "Do not diagnose complicated or hemiplegic migraine and send her home: persistent aphasia and arm weakness that began as the aura faded, with a headache unlike her usual one, are a stroke until imaging shows otherwise.",
+        "Do not use a DOAC for secondary prevention if antiphospholipid syndrome is confirmed: warfarin (INR 2 to 3) is the anticoagulant."
       ],
       "required_recommendations": [
-        "Establish time of last known well (LKW) and apply NIHSS to determine acute treatment eligibility",
-        "Obtain non-contrast CT head FIRST to exclude intracranial hemorrhage before any thrombolytic decision",
-        "Recognize that a prolonged PTT in the absence of exogenous anticoagulant or hemophilia may reflect lupus anticoagulant \u2014 a pro-thrombotic antibody that does NOT confer bleeding risk and does NOT contraindicate IV tPA",
-        "Achieve door-to-needle time <60 minutes if IV thrombolysis is indicated",
-        "Maintain blood pressure <185/110 mmHg prior to IV tPA and <180/105 mmHg for 24 hours after",
-        "Verify glucose to exclude hypoglycemia as a stroke mimic",
-        "Initiate continuous telemetry and obtain prolonged cardiac monitoring to detect paroxysmal atrial fibrillation",
-        "Order antiphospholipid panel (lupus anticoagulant, anticardiolipin IgG/IgM, anti-B2GP1 IgG/IgM) in any young patient with cryptogenic stroke, particularly with personal history of miscarriage or family history of autoimmune disease",
-        "Confirm antiphospholipid antibody results on a second determination at 12 weeks to satisfy Sydney classification criteria for APS diagnosis",
-        "Plan long-term anticoagulation with warfarin (INR 2-3) if APS is confirmed \u2014 avoid DOACs (rivaroxaban, apixaban) which have shown higher rates of recurrent thrombosis in APS compared to VKA",
-        "Refer to rheumatology for APS classification, SLE screening, and long-term secondary prevention planning"
+        "Establish last known well (onset of the visual aura, about 70 minutes before arrival; the aphasia and right arm weakness followed about 20 minutes later as the aura faded) and the NIHSS (6: facial palsy 1, visual 1 for extinction, right arm 1, sensory 1, language 1, extinction 1).",
+        "IV thrombolysis: give (alteplase 0.9 mg/kg, maximum 90 mg, or tenecteplase 0.25 mg/kg, maximum 25 mg), because she is within 4.5 hours with a disabling deficit (aphasia and right arm weakness) and no contraindication: glucose 88 mg/dL, INR 0.94, platelets 138 x10^9/L, no anticoagulant exposure. The isolated aPTT of 46 s, with no anticoagulant and no bleeding history, does not justify withholding it or waiting for antiphospholipid results. Thrombectomy: not indicated (no occlusion on CTA).",
+        "Achieve a door-to-needle time under 60 minutes; keep blood pressure below 185/110 mmHg before thrombolysis (152/74 on arrival) and below 180/105 mmHg for 24 hours after.",
+        "Admit to a stroke unit with continuous cardiac monitoring (telemetry) for at least the first 24 hours; give no antiplatelet, anticoagulant or NSAID for 24 hours after thrombolysis, until follow-up imaging excludes hemorrhage.",
+        "Stop sumatriptan permanently (contraindicated after ischemic stroke and in antiphospholipid syndrome) and stop ibuprofen; use paracetamol for headache and review migraine prophylaxis with a non-vasoconstrictive agent.",
+        "Send antiphospholipid antibodies (lupus anticoagulant, anticardiolipin and anti-beta-2-glycoprotein I) before any anticoagulant is started, and repeat them at 12 weeks to confirm persistence (Sydney criteria).",
+        "Once 24-hour imaging excludes hemorrhage, start aspirin; if antiphospholipid syndrome is confirmed at 12 weeks, switch to warfarin with a target INR of 2 to 3 (AHA/ASA 2021); do not use a DOAC (rivaroxaban was inferior to warfarin in triple-positive APS).",
+        "Refer to rheumatology and hematology for APS management and SLE screening (mother with SLE; ANA, anti-dsDNA and complement normal now), and counsel that estrogen-containing contraception is contraindicated and that warfarin is teratogenic, so any pregnancy needs specialist planning.",
+        "Increase levothyroxine for the TSH of 8.3 mIU/L and recheck thyroid function in 6 to 8 weeks."
       ]
     },
     "avoided_actions": [
@@ -600,7 +608,7 @@
           }
         ],
         "citations": [
-          "[AHA_ASA_2019]"
+          "[AHA_ASA_Stroke_2026]"
         ],
         "criterion_id": "avoid-waste-1-analyze-eeg",
         "rationale": "No seizure activity witnessed or clinically suspected; EEG is not part of acute ischemic stroke or APS workup unless post-stroke seizure occurs",
@@ -614,10 +622,10 @@
           }
         ],
         "citations": [
-          "[AHA_ASA_2019]"
+          "[AHA_ASA_Stroke_2026]"
         ],
         "criterion_id": "avoid-waste-2-analyze-csf",
-        "rationale": "No SAH, meningitis, or CNS vasculitis features; LP is not indicated in this acute cortical infarct presentation with a confirmed embolic mechanism",
+        "rationale": "No features of subarachnoid hemorrhage, meningitis or CNS vasculitis; lumbar puncture adds nothing to an acute cortical infarct and is unsafe within 24 hours of thrombolysis.",
         "severity": "waste"
       },
       {
@@ -630,7 +638,7 @@
           }
         ],
         "citations": [
-          "[AHA_ASA_2019]"
+          "[AHA_ASA_Stroke_2026]"
         ],
         "criterion_id": "avoid-waste-3-order-specialized-test",
         "rationale": "EMG/NCS evaluates peripheral nerve and muscle disease; not applicable to central ischemic stroke",
@@ -645,100 +653,85 @@
         "ischemic stroke",
         "ischaemic stroke",
         "cerebral infarction",
-        "cerebral infarct",
-        "embolic stroke",
-        "cardioembolic stroke",
-        "lacunar stroke",
-        "lacunar infarct",
-        "stroke"
+        "cerebral infarct"
       ],
       "icd_codes": [
-        "I63.9",
-        "I63.4",
-        "I63.5",
-        "I63.3",
-        "I63.2",
-        "I63.0",
-        "I63.1",
-        "I63.8",
-        "I63.81",
-        "I63.89"
+        "I63.9"
       ]
     },
     "differential": [
       {
         "diagnosis": "Complicated migraine (hemiplegic migraine / migrainous aura with prolonged neurological symptoms)",
         "icd_code": null,
-        "key_features": "Known migraine with aura; typical aura prodrome with visual scotoma; DWI-confirmed infarct excludes pure migrainous aura as the definitive explanation",
-        "likelihood": "moderate"
+        "key_features": "Known migraine with aura and a typical scotoma at onset, but the aphasia and weakness persisted, the headache was mild and unlike her usual one, and DWI shows an acute infarct.",
+        "likelihood": "very_low"
       },
       {
         "diagnosis": "Cervical arterial dissection (left ICA or MCA)",
         "icd_code": null,
-        "key_features": "Young active woman; CTA/MRA assesses for dissection flap \u2014 common stroke mechanism in young adults without traditional risk factors",
-        "likelihood": "moderate"
+        "key_features": "A common mechanism in young adults, but there was no neck pain and CTA and MRA show normal cervical and intracranial arteries.",
+        "likelihood": "very_low"
       },
       {
         "diagnosis": "Cardioembolic stroke from paroxysmal atrial fibrillation",
         "icd_code": null,
-        "key_features": "No structural heart disease, no AF on Holter; less likely at age 43 without cardiac history; cardiac monitoring required to exclude occult paroxysmal AF",
+        "key_features": "Structurally normal heart and sinus rhythm throughout 48 hours of monitoring.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Libman-Sacks (nonbacterial thrombotic) endocarditis",
+        "icd_code": null,
+        "key_features": "Associated with antiphospholipid antibodies and SLE, but TTE shows no valvular thickening or vegetation; TEE is more sensitive if the mechanism remains uncertain.",
         "likelihood": "low"
       },
       {
         "diagnosis": "Paradoxical embolism through patent foramen ovale",
         "icd_code": null,
-        "key_features": "Reasonable consideration in young cryptogenic stroke; TTE with bubble study is negative for PFO \u2014 effectively excluded",
-        "likelihood": "low"
+        "key_features": "Considered in a young adult, but the agitated-saline study shows no shunt.",
+        "likelihood": "very_low"
       },
       {
-        "diagnosis": "Primary CNS vasculitis or systemic vasculitis",
+        "diagnosis": "Primary CNS vasculitis or SLE-related vasculitis",
         "icd_code": null,
-        "key_features": "ANA and ANCA negative; normal complement; no systemic inflammatory features; imaging pattern not beaded \u2014 vasculitis less likely but autoimmune context warrants consideration",
-        "likelihood": "low"
+        "key_features": "Mother with SLE, but ANA, anti-dsDNA and ANCA are negative, complement is normal, there are no systemic features and the arteries are normal on CTA and MRA.",
+        "likelihood": "very_low"
       },
       {
         "diagnosis": "Todd's paralysis following an occult seizure",
         "icd_code": null,
-        "key_features": "DWI-confirmed acute cortical infarction excludes pure post-ictal Todd's paralysis; no witnessed seizure",
+        "key_features": "No witnessed seizure, and DWI shows an acute cortical infarct.",
         "likelihood": "very_low"
       }
     ],
     "key_clinical_evidence": [
-      "Acute ischemic stroke is a clinical syndrome plus neuroimaging diagnosis; non-contrast CT first excludes hemorrhage and clears the tPA pathway",
-      "The migraine-with-aura history creates the central diagnostic trap: new focal deficits (hemiparesis, aphasia) in a migraineur must be treated as stroke until DWI MRI proves otherwise \u2014 complicated migraine cannot be diagnosed in the ED acutely",
-      "Lupus anticoagulant paradoxically prolongs the PTT in vitro by interfering with phospholipid-dependent coagulation assays \u2014 it is a pro-thrombotic antibody and does NOT cause bleeding; a prolonged PTT from this cause is not a contraindication to IV tPA",
-      "Mild thrombocytopenia (138 x10^9/L) in APS reflects platelet consumption by antiphospholipid antibodies \u2014 the platelet count is above the tPA threshold (<100 x10^9/L) and does not preclude thrombolysis",
-      "Triple-positive APS (lupus anticoagulant + both anticardiolipin fractions + both anti-B2GP1 fractions) carries the highest annual thrombosis recurrence risk and requires indefinite anticoagulation with warfarin",
-      "The prior miscarriage at age 38 was an obstetric criterion for APS that was never investigated \u2014 a classic missed diagnostic opportunity that this presentation forces clinicians to identify in retrospect",
-      "TOAST classification: ISCH-STR-RP04 is a stroke of other determined etiology (APS-related) \u2014 changes secondary prevention from antiplatelet to anticoagulation",
-      "Normal sinus rhythm on initial ECG does NOT exclude paroxysmal AF \u2014 prolonged cardiac monitoring is required regardless of APS diagnosis",
-      "MRA/CTA of intracranial and cervical vessels is normal \u2014 excludes large-artery atherosclerosis, dissection, and LVO, all of which must be ruled out before attributing the stroke to APS",
-      "Antiphospholipid antibody testing must be confirmed at 12 weeks to meet Sydney classification criteria \u2014 a single positive result is insufficient for definitive APS diagnosis",
-      "Off-pathway modality for order_advanced_imaging (modality=amyloid_PET): Amyloid PET has no role in acute ischemic stroke evaluation",
-      "Off-pathway modality for order_advanced_imaging (modality=DaTscan): Dopamine transporter SPECT is indicated for parkinsonian syndromes, not vascular stroke workup",
-      "Off-pathway modality for order_advanced_imaging (modality=FDG_PET): FDG-PET has no role in routine ischemic stroke workup",
-      "Tier per the July 2026 clinical review: Non-contrast CT is the required first-line study in the acute window; MRI adds tissue-based selection and is not mandatory for the diagnosis.",
-      "AHA/ASA 2026 sequencing: glucose is checked before thrombolysis, but routine CBC/coagulation results are not awaited without a reason to expect abnormality; ECG/troponin do not delay reperfusion, and CTA/CTP do not wait for creatinine."
+      "The migraine history is the trap: her usual aura is followed by a severe headache after it resolves, whereas this time aphasia and right arm weakness began as the scotoma faded and persisted with only a mild headache. Persistent focal deficits in a migraineur are a stroke until imaging shows otherwise.",
+      "Last known well is the onset of the aura, about 70 minutes before arrival. NIHSS 6 (facial palsy 1, visual 1, right arm 1, sensory 1, language 1, extinction 1) with aphasia and arm weakness is a disabling deficit within 4.5 hours, and CT shows no haemorrhage: she is a thrombolysis candidate. CTA shows no occlusion, so thrombectomy does not apply.",
+      "The aPTT of 46 s is isolated (INR 0.94, platelets 138 x10^9/L) in a woman who takes no anticoagulant and has no bleeding history. The thrombolysis decision is made on those values, without waiting for antiphospholipid tests that take hours to days; a lupus anticoagulant, suspected from the prior miscarriage and the mother's SLE, prolongs the aPTT in vitro without causing bleeding.",
+      "The antiphospholipid panel then shows triple positivity (lupus anticoagulant, anticardiolipin IgG 90.9 GPL and IgM 23.7 MPL, anti-beta-2-glycoprotein I IgG and IgM), which explains the aPTT and is the highest-risk antibody profile; with ANA, anti-dsDNA and complement normal, primary APS is the provisional mechanism.",
+      "Classification requires the antibodies to persist at 12 weeks. A single first-trimester miscarriage does not meet the obstetric criterion, but with the family history it should have prompted testing earlier.",
+      "Normal CTA, a normal echocardiogram without Libman-Sacks lesions or shunt, and sinus rhythm on 48-hour monitoring exclude the competing mechanisms.",
+      "Secondary prevention: aspirin after 24-hour imaging, then warfarin (INR 2 to 3) once APS is confirmed; DOACs are avoided after arterial events in APS (TRAPS). Starting warfarin first would also interfere with lupus anticoagulant testing at 12 weeks.",
+      "Sumatriptan is a vasoconstrictor and is contraindicated after ischemic stroke and in antiphospholipid syndrome; she wanted to take it for this event."
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "Migraine with aura does NOT cause persistent focal deficits lasting >60 minutes or DWI-confirmed cortical infarction; new focal weakness and aphasia in a migraineur require immediate stroke evaluation",
-        "data_point": "Known migraine with visual aura \u2014 patient initially insisted she was having 'another migraine'",
+        "correct_interpretation": "Migraine aura does not cause persistent aphasia and weakness or a DWI-positive infarct; deficits that begin as the aura fades, with a headache unlike her usual one, require immediate stroke evaluation.",
+        "data_point": "Known migraine with visual aura; the patient initially insisted she was having 'another migraine'",
         "field_path": "patient.clinical_history.past_medical_history[0]",
         "intended_effect": "Anchor on complicated migraine / hemiplegic migraine and defer stroke workup or withhold tPA",
         "location": "past medical history and history of present illness"
       },
       {
-        "correct_interpretation": "Lupus anticoagulant prolongs PTT in vitro via phospholipid interference but confers a pro-thrombotic, not hemorrhagic, state in vivo; this PTT elevation does not contraindicate thrombolysis",
+        "correct_interpretation": "With no anticoagulant exposure, no bleeding history, a normal INR and platelets above 100 x10^9/L, the isolated aPTT of 46 s does not justify withholding thrombolysis; a lupus anticoagulant is the likely cause, confirmed later by antiphospholipid testing.",
         "data_point": "PTT 46 seconds (elevated above reference range of 25-35 s)",
         "field_path": "initial_tool_outputs.labs.panels.Coagulation[2]",
         "intended_effect": "Interpret elevated PTT as evidence of exogenous anticoagulant use or coagulopathy, leading to unnecessary delay or withholding of IV tPA",
         "location": "initial labs, coagulation panel"
       },
       {
-        "correct_interpretation": "Platelet count 138 x10^9/L is above the tPA absolute contraindication threshold (<100 x10^9/L); mild thrombocytopenia in APS reflects platelet consumption by antiphospholipid antibodies and is consistent with the underlying diagnosis",
-        "data_point": "Mild thrombocytopenia \u2014 platelets 138 x10^9/L",
-        "field_path": "initial_tool_outputs.labs.panels.CBC[2]",
+        "correct_interpretation": "Platelets of 138 x10^9/L are above the thrombolysis threshold of 100 x10^9/L; mild thrombocytopenia is common in antiphospholipid syndrome and does not suggest TTP without hemolysis.",
+        "data_point": "Mild thrombocytopenia: platelets 138 x10^9/L",
+        "field_path": "initial_tool_outputs.labs.panels.CBC[3]",
         "intended_effect": "Misinterpret mild thrombocytopenia as a contraindication to IV tPA or trigger evaluation for TTP/HUS as the stroke mechanism",
         "location": "initial labs, CBC"
       }
@@ -746,25 +739,43 @@
     "review_status": "draft",
     "sequence_constraints": [
       {
-        "after_criterion_id": "action-8-check-drug-interactions",
+        "after_criterion_id": "action-2-order-ct-scan",
         "before_criterion_id": "action-1-order-ct-scan",
         "citations": [
           "[AHA_ASA_Stroke_2026]"
         ],
-        "reason": "Review NCCT for hemorrhage while evaluating thrombolytic eligibility; routine laboratory, ECG, MRI and advanced imaging must not delay reperfusion.",
-        "severity": "hard"
+        "reason": "Non-contrast CT excludes haemorrhage before vessel imaging and the reperfusion decision.",
+        "severity": "soft"
+      },
+      {
+        "after_criterion_id": "action-9-order-echocardiogram",
+        "before_criterion_id": "action-2-order-ct-scan",
+        "citations": [
+          "[AHA_ASA_Stroke_2026]"
+        ],
+        "reason": "Vessel imaging decides reperfusion; cardiac aetiology is studied after the acute decisions.",
+        "severity": "soft"
+      },
+      {
+        "after_criterion_id": "action-10-order-cardiac-monitoring",
+        "before_criterion_id": "action-2-order-ct-scan",
+        "citations": [
+          "[AHA_ASA_Stroke_2026]"
+        ],
+        "reason": "Vessel imaging decides reperfusion; cardiac aetiology is studied after the acute decisions.",
+        "severity": "soft"
       }
     ],
     "stop_rule": {
-      "max_additional_actions": 0,
+      "max_additional_actions": 1,
       "required_before_assessment": [
         "action-1-order-ct-scan",
-        "action-2-order-ct-scan",
         "action-3-interpret-labs",
         "action-6-analyze-ecg",
+        "action-2-order-ct-scan",
         "action-8-check-drug-interactions",
         "action-9-order-echocardiogram",
-        "action-10-order-cardiac-monitoring"
+        "action-5-interpret-labs"
       ]
     }
   },
@@ -773,16 +784,16 @@
     "csf": null,
     "ct": {
       "additional_observations": [
-        "No established territorial hypodensity in left MCA; a hyperacute infarct is commonly occult on non-contrast CT, so a normal study does not exclude ischaemia and does not justify withholding treatment",
         "No intraparenchymal, subarachnoid, subdural or extradural blood",
         "No mass lesion, no midline shift and no effacement of the basal cisterns",
-        "Grey-white differentiation preserved; insular ribbon and lentiform nuclei normal in attenuation",
-        "Posterior-fossa review specifically: no cerebellar hypodensity with mass effect, no fourth ventricular effacement and no tonsillar herniation \u2014 the findings that would mandate neurosurgical consultation rather than thrombolysis"
+        "Left hemisphere: grey-white differentiation preserved; insular ribbon, parietal cortex and lentiform nucleus normal in attenuation",
+        "No hyperdense middle cerebral artery or branch sign",
+        "Posterior fossa: no cerebellar or brainstem hypodensity; fourth ventricle normal"
       ],
       "angiography_findings": null,
       "contrast_used": false,
       "findings": [],
-      "impression": "1. No acute intracranial haemorrhage. 2. No established infarct and no mass lesion; the study is not diagnostic of the clinically suspected event in left MCA, which is the expected appearance in the hyperacute window. 3. Nothing on this study contraindicates intravenous thrombolysis. The purpose of the scan is exclusion, not confirmation: the diagnosis remains clinical and vessel imaging is the next step.",
+      "impression": "1. No acute intracranial haemorrhage. 2. No established infarct, no hyperdense vessel sign and no mass lesion. ASPECTS 10.",
       "recommended_actions": []
     },
     "drug_interactions": null,
@@ -812,12 +823,12 @@
     "eeg": null,
     "labs": {
       "abnormal_values_summary": [
-        "Hemoglobin 11.8 g/dL (mild normocytic anemia)",
-        "Hematocrit 35.4 % (mild)",
-        "Platelets 138 x10^9/L (mild thrombocytopenia)",
-        "PTT 46 seconds (elevated \u2014 does not resolve with mixing study; consistent with inhibitor)",
-        "TSH 8.3 mIU/L (elevated \u2014 undertreated hypothyroidism)",
-        "LDL 110 mg/dL (mildly elevated)"
+        "Hemoglobin 11.8 g/dL (L)",
+        "Hematocrit 35.4 % (L)",
+        "Platelets 138 x10^9/L (L)",
+        "PTT 46 seconds (H)",
+        "TSH 8.3 mIU/L (H)",
+        "LDL 110 mg/dL (H)"
       ],
       "interpretation": "Abnormal values: Hemoglobin 11.8 g/dL (L), Hematocrit 35.4 % (L), Platelets 138 x10^9/L (L), PTT 46 seconds (H), TSH 8.3 mIU/L (H), LDL 110 mg/dL (H). Remaining indices within normal limits.",
       "panels": {
@@ -1030,10 +1041,10 @@
       "additional_observations": [
         "No intracranial hemorrhage",
         "No prior ischemic changes or white matter hyperintensities beyond expected for age",
-        "MRA of the intracranial circulation: bilateral ACA, MCA (M1 and M2 segments), ACA, PCA, and basilar artery patent without occlusion or significant flow-limiting stenosis",
+        "MRA of the intracranial circulation: bilateral ACA, MCA (M1 and M2 segments), PCA, and basilar artery patent without occlusion or significant flow-limiting stenosis",
         "No proximal vascular occlusion identified",
         "No evidence of cerebral venous sinus thrombosis on standard sequences",
-        "Mild mucosal thickening in bilateral maxillary sinuses \u2014 incidental"
+        "Mild mucosal thickening in bilateral maxillary sinuses, incidental"
       ],
       "findings": [
         {
@@ -1043,7 +1054,7 @@
           "signal_characteristics": {
             "ADC": "Corresponding hypointensity confirming true restricted diffusion",
             "DWI": "Hyperintense signal with restricted diffusion in the left superior parietal lobule and posterior insular cortex",
-            "FLAIR": "Subtle hyperintensity in the affected cortex, slightly less conspicuous than DWI, consistent with early acute infarct (likely <12 hours)",
+            "FLAIR": "Faint hyperintensity in the affected cortex, less conspicuous than the DWI abnormality",
             "T1": "No definite signal abnormality",
             "T2": "Subtle hyperintensity in the left parietal and insular cortex"
           },
@@ -1146,12 +1157,12 @@
     },
     "history_present_illness": "Ms. Elena Vargas is a 43-year-old left-handed Hispanic woman with a history of migraine with visual aura and hypothyroidism who presents to the emergency department with acute-onset word-finding difficulty and right arm weakness of approximately 50 minutes duration. She was at home grading papers when she noticed a zig-zag visual scotoma in her right visual field, which she recognized as her typical migraine aura. Approximately 20 minutes later, as the visual symptoms were fading, she noticed she was unable to retrieve common words \u2014 she reached for a pen but could not name it and instead said 'the thing you write with.' Simultaneously, she noticed her right arm felt heavy and clumsy, with difficulty gripping her pen. Unlike her usual migraine headache (which begins after the aura resolves and is severe and throbbing), the current headache is mild \u2014 rated 3/10. Her husband, who has witnessed her prior migraines, became alarmed because her previous auras have never caused arm weakness or speech changes and called 911. En route to hospital, EMS documented mild word-finding difficulty and right arm drift. The patient insisted she 'just needs to take her sumatriptan.' She explicitly denies chest pain, palpitations, diplopia, vertigo, dysphagia, facial numbness, loss of consciousness, or prior episodes of arm weakness. She has had no recent illness, fever, or trauma. She reports one prior first-trimester miscarriage at age 38 that was never investigated. Her mother was diagnosed with systemic lupus erythematosus at age 45. A maternal aunt had a deep vein thrombosis at age 40. The patient takes sumatriptan for migraines and levothyroxine for hypothyroidism. She is a non-smoker, consumes minimal alcohol, is physically active, and has no known cardiovascular risk factors. She is not on oral contraceptives.",
     "neurological_exam": {
-      "additional": "NIHSS score: 5. Breakdown: best language 1 (anomic aphasia), right arm motor 1, right hand grip 1, sensory 1, extinction/neglect 1. Onset was approximately 50 minutes before emergency department arrival; husband reports patient was 'talking oddly and couldn't find words' before complaining of right arm heaviness. Patient states the symptoms feel 'like a bad version of her aura but different \u2014 the headache is mild and the arm thing isn't going away.' She specifically says the headache preceded the arm weakness by 20 minutes \u2014 consistent with her aura pattern \u2014 and initially insisted she was having 'another migraine.'",
+      "additional": "NIHSS 6 (facial palsy 1, visual fields 1 for visual extinction, right arm 1, sensory 1, language 1, extinction and inattention 1; level of consciousness, gaze, right leg, limb ataxia and dysarthria 0). The patient states the symptoms feel 'like a bad version of her aura but different: the headache is mild and the arm thing isn't going away.' She confirms that the word-finding difficulty and the right arm heaviness began together as the zig-zag scotoma was fading, about 20 minutes after it started, and that the mild headache came later; she initially insisted she was having 'another migraine.'",
       "coordination": "Right finger-to-nose intact but slightly slow. Left finger-to-nose normal. Heel-to-shin intact bilaterally.",
-      "cranial_nerves": "Pupils 3 mm bilaterally, equal and reactive to light and accommodation. Visual fields: left visual field full to confrontation; right visual field \u2014 subtle neglect of right lower quadrant on double simultaneous stimulation, not a clear hemianopia. No gaze deviation at rest; no nystagmus. Mild right-sided central facial droop (forehead-sparing). Hearing grossly intact bilaterally. Palate elevates symmetrically. Tongue midline on protrusion. No fundoscopic abnormalities identified.",
+      "cranial_nerves": "Pupils 3 mm bilaterally, equal and reactive to light and accommodation. Visual fields: left visual field full to confrontation; right visual field \u2014 full to single stimuli, but she extinguishes the right lower quadrant stimulus on double simultaneous visual stimulation; no hemianopia. No gaze deviation at rest; no nystagmus. Mild right-sided central facial droop (forehead-sparing). Hearing grossly intact bilaterally. Palate elevates symmetrically. Tongue midline on protrusion. No fundoscopic abnormalities identified.",
       "gait": "Ambulates with mild right foot scuffing. No ataxia. Able to tandem walk with minor difficulty.",
-      "mental_status": "Alert and oriented to person, place, time, and situation. Mild anomic aphasia \u2014 word-finding difficulty with circumlocution; comprehension intact for simple commands but impaired for complex two-step instructions. Able to repeat short phrases with mild effort. No dysarthria at the time of full neurological assessment (approximately 40 minutes after symptom onset). MMSE not formally completed in the acute setting.",
-      "motor": "Right upper extremity: shoulder abduction 4/5, elbow flexion 4/5, wrist extension 4+/5, grip 4/5. Right lower extremity: hip flexion 4+/5, knee extension 5/5, ankle dorsiflexion 5/5. Left upper and lower extremities: 5/5 throughout. Mild right pronator drift present.",
+      "mental_status": "Alert and oriented to person, place, time, and situation. Mild anomic aphasia \u2014 word-finding difficulty with circumlocution; comprehension intact for simple commands but impaired for complex two-step instructions. Able to repeat short phrases with mild effort. No dysarthria at the time of full neurological assessment on arrival. MMSE not formally completed in the acute setting.",
+      "motor": "Right upper extremity: shoulder abduction 4/5, elbow flexion 4/5, wrist extension 4+/5, grip 4/5. Right lower extremity: hip flexion 4+/5, knee extension 5/5, ankle dorsiflexion 5/5. Left upper and lower extremities: 5/5 throughout. Mild right pronator drift present; no right leg drift.",
       "reflexes": "Right biceps 2+, triceps 2+, brachioradialis 2+, patellar 2+, Achilles 2+. Left biceps 2+, triceps 2+, brachioradialis 2+, patellar 2+, Achilles 2+. Right plantar response equivocal (possible extensor). Left plantar response flexor.",
       "sensory": "Light touch and pinprick mildly diminished over right forearm and dorsum of right hand. Proprioception intact at right thumb and great toe. Left-sided sensation fully intact."
     },

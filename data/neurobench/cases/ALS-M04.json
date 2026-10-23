@@ -102,49 +102,32 @@
   "followup_outputs": [
     {
       "output": {
-        "alternatives": [
-          "AMX0035 \u2014 may be preferable if liver toxicity concern",
-          "Edaravone IV if FVC >80% and early stage"
-        ],
-        "contraindications": [],
-        "formulary_status": "Covered with prior authorisation",
-        "interactions": [
-          "Tamoxifen: both metabolized via CYP pathway; riluzole primarily CYP1A2. Tamoxifen is CYP2D6 substrate. No direct pharmacokinetic interaction expected. Hepatic monitoring needed for both agents."
-        ],
-        "proposed": "Riluzole 50 mg twice daily",
-        "warnings": [
-          "Tamoxifen and riluzole both potentially hepatotoxic \u2014 monitor LFTs closely (monthly x3 months, then quarterly)",
-          "Sertraline is a moderate CYP2D6 inhibitor \u2014 may reduce tamoxifen active metabolite (endoxifen) levels \u2014 already on therapy, no change needed but document"
-        ]
-      },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "check_riluzole_tamoxifen_interaction"
-    },
-    {
-      "output": {
         "findings": [
           {
+            "is_abnormal": "false",
             "panel": "PFT",
-            "reference_range": ">80%",
+            "reference_range": ">=80% predicted",
             "result": "84",
-            "test": "FVC"
+            "test": "FVC (% predicted)"
           },
           {
+            "is_abnormal": "false",
             "panel": "PFT",
-            "reference_range": ">70 cmH2O women",
+            "reference_range": ">=60 cmH2O (women)",
             "result": "76",
             "test": "SNIP"
           },
           {
+            "is_abnormal": "false",
             "panel": "PFT",
-            "reference_range": ">-70 cmH2O",
+            "reference_range": "-60 cmH2O or more negative",
             "result": "-78",
             "test": "NIF"
           }
         ],
-        "impression": "All values within normal limits.",
+        "impression": "FVC 84% predicted and SNIP 76 cmH2O are within normal limits, with NIF -78 cmH2O; baseline for serial monitoring.",
         "quantitative_data": {
-          "FVC": "84",
+          "FVC (% predicted)": "84",
           "NIF": "-78",
           "SNIP": "76"
         },
@@ -187,14 +170,22 @@
             "reference_range": "No pathogenic variant",
             "result": "No pathogenic variant",
             "test": "FUS"
+          },
+          {
+            "interpretation": "",
+            "panel": "Neurodegenerative_Genetic_Panel",
+            "reference_range": "No pathogenic variant",
+            "result": "No pathogenic or likely pathogenic variant detected",
+            "test": "TBK1"
           }
         ],
-        "impression": "All values within normal limits.",
+        "impression": "No pathogenic C9orf72 repeat expansion. No pathogenic or likely pathogenic variant in SOD1, TARDBP, FUS or TBK1. A negative result does not exclude a genetic contribution; post-test counselling recommended.",
         "quantitative_data": {
           "C9orf72": "Negative",
           "FUS": "No pathogenic variant",
           "SOD1": "No pathogenic variant",
-          "TARDBP": "No pathogenic variant"
+          "TARDBP": "No pathogenic variant",
+          "TBK1": "No pathogenic or likely pathogenic variant detected"
         },
         "recommended_actions": [],
         "test_type": "genetic_panel:ALS"
@@ -204,118 +195,31 @@
         "test_type": "genetic_panel:ALS"
       },
       "trigger_action": "offer_als_genetic_panel_after_counselling"
+    },
+    {
+      "output": {
+        "alternatives": [],
+        "contraindications": [],
+        "formulary_status": "Covered with prior authorisation",
+        "interactions": [
+          "Tamoxifen: no pharmacokinetic interaction expected (tamoxifen is metabolised mainly by CYP2D6 and CYP3A4); tamoxifen can also raise transaminases, so share the scheduled liver tests with oncology.",
+          "Sertraline: no clinically significant interaction with riluzole expected.",
+          "Ferrous sulfate: no clinically significant interaction expected."
+        ],
+        "proposed": "Riluzole 50 mg twice daily",
+        "summary": "No interaction requires a change to riluzole 50 mg twice daily; tamoxifen can also raise transaminases, so share the liver tests with oncology. Measure liver transaminases before the first dose, monthly for the first 3 months, every 3 months for the rest of the first year and periodically thereafter; stop riluzole if ALT exceeds 5x ULN. Report any febrile illness (check the white cell count for neutropenia).",
+        "warnings": [
+          "Hepatotoxicity: measure ALT and AST before the first dose, monthly for the first 3 months, every 3 months for the rest of the first year and periodically thereafter; stop riluzole if ALT exceeds 5x ULN.",
+          "Neutropenia (rare): the patient should report any febrile illness, and the white cell count should then be checked.",
+          "Existing regimen: sertraline is a moderate CYP2D6 inhibitor and can lower endoxifen, the active metabolite of tamoxifen; flag to oncology."
+        ]
+      },
+      "tool_name": "check_drug_interactions",
+      "trigger_action": "check_riluzole_tamoxifen_interaction"
     }
   ],
   "ground_truth": {
     "action_criteria": [
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "query": "ALS diagnostic criteria Awaji Gold Coast AAN practice parameter"
-            },
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Awaji_2008]",
-          "Awaji_2008"
-        ],
-        "criterion_id": "action-1-search-medical-literature",
-        "expected_evidence": "Awaji-Shima 2008 / Gold Coast 2020 diagnostic criteria; AAN 2009 practice parameter on ALS care",
-        "importance": "recommended",
-        "label": "Search the medical literature to confirm Awaji and Gold Coast diagnostic thresholds and AAN practice-parameter recommendations relevant to this presentation",
-        "rationale": "Search the medical literature to confirm Awaji and Gold Coast diagnostic thresholds and AAN practice-parameter recommendations relevant to this presentation"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "drug": "riluzole"
-            },
-            "tool_name": "check_drug_interactions"
-          }
-        ],
-        "citations": [
-          "[AAN_2009]",
-          "AAN_2009"
-        ],
-        "criterion_id": "action-2-check-drug-interactions",
-        "expected_evidence": "No major interactions for typical chronic medications; advise alcohol and grapefruit-juice avoidance (CYP1A2 modulators); monthly LFTs for first 3 months",
-        "importance": "recommended",
-        "label": "Check interactions before initiating riluzole 50 mg twice daily; review baseline LFTs and CBC and counsel on monitoring",
-        "rationale": "Check interactions before initiating riluzole 50 mg twice daily; review baseline LFTs and CBC and counsel on monitoring"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "contrast": true,
-              "protocol": "standard"
-            },
-            "tool_name": "analyze_brain_mri"
-          }
-        ],
-        "citations": [
-          "[EAN_ALS_2024]",
-          "Gold Coast; EAN 2024; NICE NG42"
-        ],
-        "criterion_id": "action-3-analyze-brain-mri",
-        "expected_evidence": "No better structural explanation for progressive upper and lower motor-neuron findings",
-        "importance": "required",
-        "label": "Obtain brain MRI to exclude structural, brainstem, inflammatory, demyelinating or neoplastic ALS mimics",
-        "rationale": "Obtain brain MRI to exclude structural, brainstem, inflammatory, demyelinating or neoplastic ALS mimics"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "contrast": false,
-              "study": "spine_MRI"
-            },
-            "tool_name": "order_body_imaging"
-          }
-        ],
-        "citations": [
-          "[EAN_ALS_2024]",
-          "Gold Coast; EAN 2024; NICE NG42"
-        ],
-        "criterion_id": "action-4-order-body-imaging",
-        "expected_evidence": "No compressive, neoplastic, inflammatory or demyelinating cord mimic",
-        "importance": "required",
-        "label": "Obtain cervical and thoracic spinal-cord MRI to exclude compressive myelopathy and other cord lesions",
-        "rationale": "Obtain cervical and thoracic spinal-cord MRI to exclude compressive myelopathy and other cord lesions"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "panels": [
-                "CBC",
-                "CMP",
-                "calcium",
-                "TSH",
-                "vitamin_B12",
-                "folate",
-                "CK",
-                "ESR",
-                "CRP",
-                "paraneoplastic"
-              ]
-            },
-            "tool_name": "interpret_labs"
-          }
-        ],
-        "citations": [
-          "[EAN_ALS_2024]",
-          "Gold Coast; EAN 2024; NICE NG42"
-        ],
-        "criterion_id": "action-5-interpret-labs",
-        "expected_evidence": "Exclude common hematologic, renal/hepatic, electrolyte, calcium, thyroid, B12/folate, muscle and inflammatory alternatives; tests do not confirm ALS",
-        "importance": "required",
-        "label": "Order a baseline treatable-mimic panel, adding only phenotype-specific infectious, immune, paraprotein or metabolic tests",
-        "rationale": "Order a baseline treatable-mimic panel, adding only phenotype-specific infectious, immune, paraprotein or metabolic tests"
-      },
       {
         "alternatives": [
           {
@@ -326,52 +230,98 @@
           }
         ],
         "citations": [
-          "[EAN_ALS_2024]",
-          "Gold Coast; EAN 2024; NICE NG42"
+          "[Gold_Coast_2020]",
+          "[Awaji_2008]"
         ],
         "criterion_id": "action-6-order-specialized-test",
-        "expected_evidence": "Active and chronic neurogenic change in multiple regions with preserved sensory studies and no conduction block",
+        "expected_evidence": "Active denervation with chronic neurogenic change in cervical and lumbosacral limb muscles, fibrillation potentials in cervical and thoracic paraspinals, and tongue fasciculation potentials; reduced CMAPs with normal conduction velocities and no conduction block; normal sensory studies.",
         "importance": "required",
-        "label": "Perform EMG/NCS across bulbar, cervical, thoracic and lumbosacral regions using ALS electrodiagnostic criteria",
-        "rationale": "Perform EMG/NCS across bulbar, cervical, thoracic and lumbosacral regions using ALS electrodiagnostic criteria"
+        "label": "EMG and nerve conduction studies of the bulbar, cervical, thoracic and lumbosacral regions to document lower motor neuron involvement and exclude conduction block and neuropathy",
+        "rationale": "EMG/NCS confirms lower motor neuron involvement beyond the clinically affected muscles and excludes the main treatable mimics: multifocal motor neuropathy with conduction block, demyelinating or sensorimotor neuropathy and myopathy. Gold Coast 2020 accepts EMG evidence of lower motor neuron dysfunction, and Awaji 2008 counts fasciculation potentials as active denervation in muscles with chronic neurogenic change."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_brain_mri"
+          }
+        ],
+        "citations": [
+          "[EFNS_ALS_2012]",
+          "[Gold_Coast_2020]"
+        ],
+        "criterion_id": "action-3-analyze-brain-mri",
+        "expected_evidence": "No intracranial metastasis and no leptomeningeal or dural enhancement after gadolinium; nonspecific corticospinal tract and motor cortex signal change is supportive only.",
+        "importance": "required",
+        "label": "Brain MRI to exclude structural, vascular, demyelinating, inflammatory or neoplastic causes of the upper motor neuron or bulbar signs",
+        "rationale": "MRI does not confirm ALS. It excludes brain and brainstem lesions that can cause upper motor neuron or bulbar signs; including metastasis or leptomeningeal disease after breast cancer; corticospinal tract signal change, when present, is supportive only."
       },
       {
         "alternatives": [
           {
             "required_arguments": {
-              "test_type": "respiratory_function"
+              "study": "spine_MRI"
             },
-            "tool_name": "order_specialized_test"
+            "tool_name": "order_body_imaging"
           }
         ],
         "citations": [
-          "[EAN_ALS_2024]",
-          "Gold Coast; EAN 2024; NICE NG42"
+          "[EFNS_ALS_2012]",
+          "[Gold_Coast_2020]"
         ],
-        "criterion_id": "action-7-order-specialized-test",
-        "expected_evidence": "Quantify respiratory involvement and need for surveillance or non-invasive ventilation",
-        "importance": "recommended",
-        "label": "Obtain baseline FVC/VC and SNIP or MIP after suspected ALS is established; this is a safety and management assessment, not a diagnostic confirmation",
-        "rationale": "Obtain baseline FVC/VC and SNIP or MIP after suspected ALS is established; this is a safety and management assessment, not a diagnostic confirmation"
+        "criterion_id": "action-4-order-body-imaging",
+        "expected_evidence": "No cord compression, epidural disease, vertebral metastasis, intramedullary lesion or leptomeningeal enhancement after gadolinium; normal cord signal.",
+        "importance": "required",
+        "label": "Spine MRI of the cervical and thoracic cord, and of the lumbosacral spine when lower limb signs need it, to exclude compressive myelopathy, radiculopathy and other cord lesions",
+        "rationale": "Cervical spondylotic myelopathy with radiculopathy is the commonest structural mimic of combined upper and lower motor neuron signs in the limbs. Spine MRI excludes it, but incidental spondylosis does not explain bulbar signs or denervation in other regions and must not delay the ALS work-up."
       },
       {
         "alternatives": [
           {
             "required_arguments": {
-              "test_type": "genetic_panel:ALS"
+              "panels": [
+                "CBC",
+                "CK",
+                "TSH",
+                "vitamin_B12",
+                "paraneoplastic_panel"
+              ]
             },
-            "tool_name": "order_specialized_test"
+            "tool_name": "interpret_labs"
+          },
+          {
+            "required_arguments": {
+              "panels": [
+                "CBC",
+                "CK",
+                "TSH",
+                "vitamin_B12",
+                "paraneoplastic"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          },
+          {
+            "required_arguments": {
+              "panels": [
+                "CBC",
+                "CK",
+                "TSH",
+                "vitamin_B12",
+                "paraneoplastic_antibodies"
+              ]
+            },
+            "tool_name": "interpret_labs"
           }
         ],
         "citations": [
-          "[EAN_ALS_2024]",
-          "Gold Coast; EAN 2024; NICE NG42"
+          "[EFNS_ALS_2012]"
         ],
-        "criterion_id": "action-8-order-specialized-test",
-        "expected_evidence": "A pathogenic result can affect counselling, family risk and gene-targeted therapy/trial eligibility; a negative result does not exclude ALS",
-        "importance": "optional",
-        "label": "Offer an ALS gene panel including C9orf72 and SOD1 after pre-test counselling; do not embed genetics in a routine blood panel",
-        "rationale": "Offer an ALS gene panel including C9orf72 and SOD1 after pre-test counselling; do not embed genetics in a routine blood panel"
+        "criterion_id": "action-5-interpret-labs",
+        "expected_evidence": "CK 542 U/L (3.2x ULN); paraneoplastic antibodies negative; blood count, renal and liver function, electrolytes, calcium, thyroid function, vitamin B12, folate, ESR and CRP normal.",
+        "importance": "required",
+        "label": "Blood tests for treatable mimics and a pre-treatment baseline: full blood count, renal and liver function, electrolytes and calcium, CK, thyroid function, vitamin B12 and folate, ESR and CRP; plus a paraneoplastic antibody panel",
+        "rationale": "These tests exclude metabolic, endocrine, nutritional and inflammatory mimics and give the liver and blood-count baseline needed before riluzole; phenotype-specific tests are added only when the case raises that mimic: a paraneoplastic antibody panel because of the breast cancer history."
       },
       {
         "alternatives": [
@@ -386,31 +336,86 @@
           }
         ],
         "citations": [
-          "[EAN_ALS_2024]",
-          "Gold Coast; EAN 2024; NICE NG42"
+          "[EFNS_ALS_2012]"
         ],
         "criterion_id": "action-9-analyze-csf",
-        "expected_evidence": "Answer the named mimic question; CSF and neurofilaments do not diagnose routine ALS",
+        "expected_evidence": "Acellular CSF with mildly raised protein (48 mg/dL), normal glucose, negative cytology and no clonal population on flow cytometry.",
         "importance": "optional",
-        "label": "Consider CSF only because this atypical case raises a specific inflammatory, infectious or neoplastic mimic",
-        "rationale": "Consider CSF only because this atypical case raises a specific inflammatory, infectious or neoplastic mimic"
+        "label": "CSF with cytology and flow cytometry, only because the breast cancer history raises a leptomeningeal or paraneoplastic question",
+        "rationale": "CSF is not part of the routine ALS work-up. Here the breast cancer history raises a leptomeningeal or paraneoplastic question; CSF does not diagnose ALS."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "respiratory_function"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[AAN_2009]",
+          "[EAN_ALS_2024]",
+          "[NICE_NG42]"
+        ],
+        "criterion_id": "action-7-order-specialized-test",
+        "expected_evidence": "FVC 84% predicted, SNIP 76 cmH2O and NIF -78 cmH2O are within normal limits: baseline for 3-monthly monitoring.",
+        "importance": "recommended",
+        "label": "Baseline respiratory function (FVC and SNIP, with MIP where available) to stage respiratory muscle involvement and plan monitoring and NIV",
+        "rationale": "Respiratory function does not diagnose ALS. Once ALS is supported it stages respiratory muscle weakness, sets the baseline for 3-monthly monitoring and identifies patients who need early referral for NIV."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "genetic_panel:ALS"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[ALS_genetics_2023]",
+          "[EAN_ALS_2024]"
+        ],
+        "criterion_id": "action-8-order-specialized-test",
+        "expected_evidence": "No pathogenic variant on the ALS gene panel; a negative result does not exclude a genetic contribution.",
+        "importance": "optional",
+        "label": "ALS gene panel (C9orf72 repeat expansion; SOD1, TARDBP, FUS and TBK1) after pre-test genetic counselling, once the clinical and electrodiagnostic assessment is complete",
+        "rationale": "Genetic testing does not make the diagnosis. It is offered with counselling to people with ALS because a pathogenic variant changes counselling for relatives and may open gene-targeted treatment or trials."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "drug": "riluzole"
+            },
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [
+          "[Riluzole_SmPC]",
+          "[EAN_ALS_2024]"
+        ],
+        "criterion_id": "action-2-check-drug-interactions",
+        "expected_evidence": "No pharmacokinetic interaction with tamoxifen, sertraline or ferrous sulfate; tamoxifen can also raise transaminases, so liver tests are shared with oncology; the existing sertraline and tamoxifen (CYP2D6, endoxifen) point is flagged to oncology.",
+        "importance": "recommended",
+        "label": "Check riluzole against the current medicines, alcohol use and liver function before the first dose, once the diagnosis is established",
+        "rationale": "Riluzole is metabolised by CYP1A2 and can raise liver transaminases, so the medicine list, alcohol use and baseline liver function are reviewed before treatment. Tamoxifen can also raise transaminases, so liver test results are shared with oncology."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not commit the patient to cervical spine surgery on the basis of incidental spondylotic changes when EMG findings extend beyond the cervical cord.",
-        "Do not start chronic immunosuppression (steroids, IVIG, plasma exchange) for ALS \u2014 there is no benefit and treatment delays correct diagnosis.",
-        "Do not defer respiratory assessment in a symptomatic patient \u2014 even mild FVC reduction warrants close monitoring and NIV planning.",
-        "Do not dismiss bulbar or progressive symptoms as functional / psychiatric without a complete neurological workup."
+        "Do not treat ALS with corticosteroids, IVIG or plasma exchange: they have no benefit.",
+        "Do not stop respiratory monitoring because the baseline values are normal.",
+        "Do not attribute the progressive weakness, wasting or bulbar signs to anxiety or a functional disorder."
       ],
       "required_recommendations": [
-        "Perform EMG/NCS sampling the bulbar region plus \u22652 spinal regions to document lower-motor-neuron involvement and exclude conduction block.",
-        "Obtain brain MRI to exclude structural mimics (cervical myelopathy, demyelinating disease, brainstem tumor).",
-        "Order a mimic-exclusion lab panel (CK, B12, TSH, HIV, RPR, SPEP, anti-GM1 IgM, androgen receptor CAG repeat in males).",
-        "Measure baseline respiratory function (FVC, MIP/MEP, SNIP) to inform NIV timing.",
-        "Apply Awaji-Shima 2008 / Gold Coast 2020 criteria to confirm the diagnosis.",
-        "Initiate riluzole 50 mg twice daily after baseline LFTs unless contraindicated; arrange monthly LFT monitoring for the first 3 months.",
-        "Refer to a multidisciplinary ALS clinic for SLP, dietetics, respiratory, and social-work input."
+        "Make and explain the diagnosis of ALS by Gold Coast 2020 criteria: progressive bilateral hand weakness spreading to the legs with upper motor neuron signs (brisk jaw jerk, limb hyperreflexia, bilateral Hoffman signs, a right Babinski sign and a spastic gait) and lower motor neuron involvement in the bulbar (tongue atrophy and fasciculations), cervical and lumbosacral regions on examination and EMG, with active denervation also in thoracic paraspinal muscles, with mimics excluded by MRI and blood tests; disclose it in a planned face-to-face discussion with the patient and family.",
+        "Repeat FVC and SNIP about every 3 months and ask at each review about orthopnoea, morning headache, daytime sleepiness and unrefreshing sleep, referring for NIV assessment when these appear or values fall.",
+        "Arrange a speech and language therapy assessment of speech and swallowing, with communication support, and monitor weight and swallowing at each review.",
+        "Offer riluzole 50 mg twice daily. Measure liver transaminases before the first dose, monthly for 3 months, every 3 months for the rest of the first year and periodically thereafter; stop riluzole if ALT exceeds 5x the upper limit of normal, and ask the patient to report any febrile illness so that neutropenia can be excluded.",
+        "Refer to a specialist ALS multidisciplinary team (neurologist, specialist nurse, respiratory, speech and language therapy, dietetics, physiotherapy, occupational therapy and palliative care), reviewed about every 2 to 3 months, with an early, patient-paced discussion of advance care planning.",
+        "Offer genetic counselling and, if the patient wishes, ALS genetic testing, explaining the implications for relatives."
       ]
     },
     "avoided_actions": [
@@ -555,46 +560,84 @@
       {
         "diagnosis": "Paraneoplastic motor neuronopathy",
         "icd_code": null,
-        "key_features": "Prior breast cancer raises suspicion; paraneoplastic antibodies negative and EMG pattern is classic ALS",
-        "likelihood": "moderate"
+        "key_features": "supports: breast cancer treated 4 years ago; against: no recurrence on oncology review, negative paraneoplastic antibodies, acellular CSF with negative cytology, and widespread anterior horn cell denervation with upper motor neuron signs.",
+        "likelihood": "low"
       },
       {
-        "diagnosis": "Cervical radiculopathy",
+        "diagnosis": "Leptomeningeal metastasis",
         "icd_code": null,
-        "key_features": "Multifocal EMG denervation crosses root distributions",
-        "likelihood": "low"
+        "key_features": "supports: breast cancer history, multifocal lower motor neuron signs and mildly raised CSF protein (48 mg/dL); against: no leptomeningeal or root enhancement on gadolinium brain and spine MRI, negative CSF cytology and flow cytometry, normal CSF cells and glucose, and upper motor neuron signs.",
+        "likelihood": "very_low"
       },
       {
         "diagnosis": "Multifocal motor neuropathy (MMN)",
         "icd_code": null,
-        "key_features": "Anti-GM1 negative; no conduction block",
+        "key_features": "supports: hand-predominant weakness with wasting and fasciculations; against: upper motor neuron signs, normal motor conduction velocities and no conduction block, bulbar involvement.",
         "likelihood": "low"
+      },
+      {
+        "diagnosis": "Cervical radiculopathy",
+        "icd_code": null,
+        "key_features": "supports: bilateral hand weakness and wasting; against: normal cervical spine MRI, normal sensory studies, denervation in thoracic and lumbosacral muscles and upper motor neuron signs.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Radiation-induced brachial plexopathy",
+        "icd_code": null,
+        "key_features": "supports: breast and chest radiation 4 years ago with hand weakness; against: bilateral involvement, leg and thoracic denervation, upper motor neuron signs and normal sensory responses.",
+        "likelihood": "very_low"
       },
       {
         "diagnosis": "Myasthenia gravis",
         "icd_code": null,
-        "key_features": "No fatigability; EMG denervation rather than decrement",
+        "key_features": "against: no fatigability or ocular signs; wasting, fasciculations and EMG denervation.",
         "likelihood": "low"
       },
       {
         "diagnosis": "Inclusion body myositis",
         "icd_code": null,
-        "key_features": "Fasciculations and UMN signs argue against IBM",
+        "key_features": "supports: hand weakness with raised CK; against: fasciculations, upper motor neuron signs and a neurogenic EMG.",
         "likelihood": "very_low"
       }
     ],
     "key_clinical_evidence": [
-      "Diagnosis requires evidence of both upper-motor-neuron involvement (hyperreflexia, Babinski, Hoffman, brisk jaw jerk, spasticity) and lower-motor-neuron involvement (atrophy, fasciculations, EMG denervation) with progressive spread, while excluding mimics \u2014 Awaji 2008 / Gold Coast 2020.",
-      "EMG in bulbar plus \u22652 spinal regions documenting fibrillations, positive sharp waves, complex fasciculation potentials, and large-amplitude long-duration polyphasic MUPs with reduced recruitment satisfies the electrodiagnostic criterion.",
-      "Normal sensory NCS and absence of conduction block are pivotal: they exclude common mimics including multifocal motor neuropathy, CIDP, and Kennedy disease.",
-      "Mild-to-moderate CK elevation (2\u20135\u00d7 ULN) is consistent with ALS and does not itself indicate a primary myopathy.",
-      "Cervical spondylotic changes on MRI are common incidental findings in the at-risk age group; bulbar findings or multi-region EMG denervation cannot be attributed to cervical disease.",
-      "Baseline FVC, MIP/MEP, and SNIP/NIF inform NIV timing \u2014 NIV initiation at FVC <50% predicted or SNIP <40 cmH\u2082O prolongs survival and improves quality of life.",
-      "July 2026 review applied end to end: EMG/NCS is the required ALS-specific test; brain and cord MRI and targeted labs exclude mimics; respiratory function is a recommended safety baseline; genetics is separately offered after counselling; CSF is absent except in five atypical mimic work-ups."
+      "Gold Coast 2020: ALS needs progressive motor impairment with upper and lower motor neuron dysfunction in at least one body region, or lower motor neuron dysfunction in at least two, after other diseases are excluded. Here: brisk jaw jerk, limb hyperreflexia, bilateral Hoffman signs, a right Babinski sign and a spastic gait with lower motor neuron involvement in the bulbar (tongue atrophy and fasciculations), cervical and lumbosacral regions, with active denervation also in thoracic paraspinal muscles (limb-onset ALS phenotype).",
+      "EMG lower motor neuron evidence is chronic neurogenic change with active denervation; by Awaji 2008 fasciculation potentials count as active denervation in a muscle with chronic neurogenic change.",
+      "Normal motor conduction velocities without conduction block argue against multifocal motor neuropathy, and normal sensory responses argue against a sensorimotor neuropathy.",
+      "CK 542 U/L (3.2x ULN): mild to moderate elevation is common in ALS from denervation and does not by itself suggest a myopathy.",
+      "FVC 84% predicted and SNIP 76 cmH2O are normal at baseline. AAN 2009 markers that prompt NIV discussion are orthopnoea, FVC below 50% predicted, SNIP below 40 cmH2O, MIP weaker than -60 cmH2O or abnormal overnight oximetry; NIV prolongs survival and improves quality of life (Bourke 2006).",
+      "After treated breast cancer, gadolinium MRI of the brain and spine, CSF cytology with flow cytometry and paraneoplastic antibodies answer the leptomeningeal and paraneoplastic question; all are negative here, and paraneoplastic motor neuron disease is rare."
     ],
-    "red_herrings": [],
+    "red_herrings": [
+      {
+        "correct_interpretation": "The cancer is in remission; gadolinium MRI shows no metastatic or leptomeningeal disease, CSF cytology and flow cytometry are negative, paraneoplastic antibodies are negative, and the upper motor neuron signs with multi-region denervation show a primary motor neuron disorder.",
+        "data_point": "Stage I breast cancer treated 4 years ago, on adjuvant tamoxifen",
+        "field_path": "patient.clinical_history.past_medical_history[0]",
+        "intended_effect": "Tempts the agent to diagnose a paraneoplastic or metastatic process",
+        "location": "Past medical history"
+      }
+    ],
     "review_status": "draft",
-    "sequence_constraints": [],
+    "sequence_constraints": [
+      {
+        "after_criterion_id": "action-8-order-specialized-test",
+        "before_criterion_id": "action-6-order-specialized-test",
+        "citations": [
+          "[ALS_genetics_2023]"
+        ],
+        "reason": "Genetic testing follows the clinical and electrodiagnostic assessment and pre-test counselling; it does not make the diagnosis.",
+        "severity": "soft"
+      },
+      {
+        "after_criterion_id": "action-2-check-drug-interactions",
+        "before_criterion_id": "action-6-order-specialized-test",
+        "citations": [
+          "[EAN_ALS_2024]"
+        ],
+        "reason": "Riluzole is considered only after the clinical and electrodiagnostic assessment supports ALS.",
+        "severity": "soft"
+      }
+    ],
     "stop_rule": {
       "max_additional_actions": 0,
       "required_before_assessment": [
@@ -608,19 +651,29 @@
   "initial_tool_outputs": {
     "advanced_imaging": null,
     "body_imaging": {
-      "contrast": false,
+      "contrast": true,
       "findings": [
         {
-          "description": "Spine: no cord compression, no epidural disease",
-          "location": "spine",
-          "type": "additional_observation"
+          "description": "Normal cervical and thoracic cord signal and calibre. Conus medullaris normal. No intramedullary lesion.",
+          "location": "Cervical and thoracic cord",
+          "type": "Normal"
+        },
+        {
+          "description": "No epidural disease, cord or cauda equina compression, or vertebral marrow lesion to suggest metastasis.",
+          "location": "Cervical, thoracic and lumbosacral spine",
+          "type": "Normal"
+        },
+        {
+          "description": "No leptomeningeal, nerve root or cauda equina enhancement after gadolinium.",
+          "location": "Spinal meninges, nerve roots and cauda equina",
+          "type": "Normal"
         }
       ],
-      "impression": "No brain or leptomeningeal metastases. No spinal cord compression or epidural disease. No treatment-related changes from prior radiation (chest radiation only)",
+      "impression": "1. No spinal cord compression, epidural disease or vertebral metastasis. 2. No intramedullary lesion and no leptomeningeal, nerve root or cauda equina enhancement after gadolinium. 3. Normal cervical and thoracic cord signal.",
       "measurements": null,
       "modality": "MRI",
       "recommended_actions": [],
-      "region": "cervical and thoracic spine"
+      "region": "cervical, thoracic and lumbosacral spine"
     },
     "csf": {
       "appearance": "Clear, colorless",
@@ -630,7 +683,7 @@
       },
       "glucose": "60 mg/dL",
       "glucose_ratio": "0.68",
-      "interpretation": "WBC {'WBC': '1 cell/uL', 'RBC': '0'}; protein 48 mg/dL; glucose 60 mg/dL. Targeted mimic studies: {'cytology': 'No malignant cells identified', 'flow_cytometry': 'No clonal lymphoid population'}. CSF does not confirm ALS.",
+      "interpretation": "Acellular CSF (WBC 1 cell/uL, RBC 0) with mildly raised protein (48 mg/dL) and normal glucose (60 mg/dL; CSF/serum ratio 0.68). Cytology negative for malignant cells; flow cytometry without a clonal lymphoid population. A single negative cytology does not exclude leptomeningeal disease; clinical correlation recommended.",
       "opening_pressure": "13 cmH2O",
       "protein": "48 mg/dL",
       "special_tests": {
@@ -638,39 +691,18 @@
         "flow_cytometry": "No clonal lymphoid population"
       }
     },
+    "drug_interactions": null,
     "ecg": null,
     "eeg": null,
     "labs": {
       "abnormal_values_summary": [
-        "CK: 542"
+        "CK 542 U/L (reference 24-170 U/L)"
       ],
-      "interpretation": "Rule-out studies do not confirm ALS. Targeted abnormalities are listed above.",
+      "interpretation": "Abnormal: CK 542 U/L (3.2x ULN). All other results are within reference ranges.",
       "panels": {
-        "BMP": [
+        "Complete blood count": [
           {
-            "is_abnormal": false,
-            "reference_range": "136-145",
-            "test": "Sodium",
-            "unit": "mEq/L",
-            "value": 138
-          },
-          {
-            "is_abnormal": false,
-            "reference_range": "0.5-1.1",
-            "test": "Creatinine",
-            "unit": "mg/dL",
-            "value": 0.7
-          },
-          {
-            "is_abnormal": false,
-            "reference_range": "70-100",
-            "test": "Glucose",
-            "unit": "mg/dL",
-            "value": 88
-          }
-        ],
-        "CBC": [
-          {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "4.5-11.0",
             "test": "WBC",
@@ -678,6 +710,7 @@
             "value": 5.8
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "12.0-16.0",
             "test": "Hemoglobin",
@@ -685,6 +718,7 @@
             "value": 12.8
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "80-100",
             "test": "MCV",
@@ -692,6 +726,7 @@
             "value": 86
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "150-400",
             "test": "Platelets",
@@ -699,50 +734,99 @@
             "value": 245
           }
         ],
-        "Exclusion studies": [
-          {
-            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on",
-            "is_abnormal": false,
-            "reference_range": "",
-            "test": "Free T4",
-            "unit": "",
-            "value": "Within reference range"
-          }
-        ],
-        "Neuromuscular_Panel": [
+        "Comprehensive metabolic panel": [
           {
             "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "136-145",
+            "test": "Sodium",
+            "unit": "mEq/L",
+            "value": 138
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.5-5.0",
+            "test": "Potassium",
+            "unit": "mEq/L",
+            "value": 4.0
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.5-1.1",
+            "test": "Creatinine",
+            "unit": "mg/dL",
+            "value": 0.7
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "70-100",
+            "test": "Glucose",
+            "unit": "mg/dL",
+            "value": 88
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "8.5-10.5",
+            "test": "Calcium",
+            "unit": "mg/dL",
+            "value": 9.6
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.5-5.0",
+            "test": "Albumin",
+            "unit": "g/dL",
+            "value": 4.2
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "7-56",
+            "test": "ALT",
+            "unit": "U/L",
+            "value": 24
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "10-40",
+            "test": "AST",
+            "unit": "U/L",
+            "value": 27
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "44-147",
+            "test": "Alkaline Phosphatase",
+            "unit": "U/L",
+            "value": 69
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.1-1.2",
+            "test": "Total Bilirubin",
+            "unit": "mg/dL",
+            "value": 0.5
+          }
+        ],
+        "Creatine kinase": [
+          {
+            "clinical_significance": "Above reference range",
             "is_abnormal": true,
             "reference_range": "24-170",
             "test": "CK",
             "unit": "U/L",
             "value": 542
-          },
-          {
-            "is_abnormal": false,
-            "reference_range": "0.4-4.0",
-            "test": "TSH",
-            "unit": "mIU/L",
-            "value": 1.9
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": false,
-            "reference_range": "Negative",
-            "test": "Anti-Hu (ANNA-1)",
-            "unit": "titer",
-            "value": "Negative"
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": false,
-            "reference_range": "Negative",
-            "test": "Anti-Yo (PCA-1)",
-            "unit": "titer",
-            "value": "Negative"
           }
         ],
-        "Reviewer baseline rule-out additions": [
+        "Inflammatory markers": [
           {
             "clinical_significance": null,
             "is_abnormal": false,
@@ -758,7 +842,69 @@
             "test": "CRP",
             "unit": "mg/L",
             "value": 2
+          }
+        ],
+        "Paraneoplastic antibodies": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Negative",
+            "test": "Anti-Hu (ANNA-1)",
+            "unit": "titer",
+            "value": "Negative"
           },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Negative",
+            "test": "Anti-Yo (PCA-1)",
+            "unit": "titer",
+            "value": "Negative"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Negative",
+            "test": "Anti-Ri (ANNA-2)",
+            "unit": "titer",
+            "value": "Negative"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Negative",
+            "test": "Anti-amphiphysin",
+            "unit": "titer",
+            "value": "Negative"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Negative",
+            "test": "Anti-CV2/CRMP5",
+            "unit": "titer",
+            "value": "Negative"
+          }
+        ],
+        "Thyroid function": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.4-4.0",
+            "test": "TSH",
+            "unit": "mIU/L",
+            "value": 1.9
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.8-1.8",
+            "test": "Free T4",
+            "unit": "ng/dL",
+            "value": 1.3
+          }
+        ],
+        "Vitamins": [
           {
             "clinical_significance": null,
             "is_abnormal": false,
@@ -778,24 +924,12 @@
         ]
       }
     },
-    "literature_search": {
-      "ALS diagnostic criteria Awaji Gold Coast AAN practice parameter": {
-        "query": "ALS diagnostic criteria Awaji Gold Coast AAN practice parameter",
-        "results": [
-          {
-            "evidence_level": "guideline recommendation",
-            "finding": "Awaji-Shima 2008 / Gold Coast 2020 diagnostic criteria; AAN 2009 practice parameter on ALS care",
-            "source": "Awaji_2008"
-          }
-        ],
-        "summary": "Awaji-Shima 2008 / Gold Coast 2020 diagnostic criteria; AAN 2009 practice parameter on ALS care"
-      }
-    },
+    "literature_search": null,
     "mri": {
       "additional_observations": [
+        "Post-gadolinium T1 sequences acquired",
         "No brain metastases",
-        "No leptomeningeal disease",
-        "No evidence of radiation-related changes (radiation to chest 4 years ago \u2014 not head)",
+        "No leptomeningeal or dural enhancement",
         "Motor cortex borderline low T2 signal bilaterally"
       ],
       "findings": [
@@ -812,16 +946,16 @@
         },
         {
           "borders": null,
-          "location": "Entire neuraxis",
+          "location": "Brain parenchyma, meninges and cranial nerves",
           "mass_effect": null,
           "signal_characteristics": {
-            "T1Gd": "No enhancement"
+            "T1Gd": "No parenchymal, dural or leptomeningeal enhancement"
           },
           "size": null,
-          "type": "No leptomeningeal enhancement"
+          "type": "No abnormal enhancement"
         }
       ],
-      "impression": "No brain or leptomeningeal metastases. No spinal cord compression or epidural disease. No treatment-related changes from prior radiation (chest radiation only)",
+      "impression": "1. No intracranial metastasis and no leptomeningeal or dural enhancement after gadolinium. 2. Mild symmetric T2 hyperintensity along the corticospinal tracts in the posterior limbs of the internal capsules and borderline low T2 signal in both motor cortices; nonspecific, may reflect corticospinal tract degeneration. 3. No infarct, hemorrhage or demyelinating lesion.",
       "recommended_actions": [],
       "volumetrics": null
     },
@@ -844,7 +978,7 @@
           "region": "Bulbar"
         },
         {
-          "finding": "All sensory studies normal \u2014 median, ulnar, sural, superficial peroneal SNAPs within normal limits bilaterally.",
+          "finding": "All sensory studies normal: median, ulnar, sural and superficial peroneal SNAPs within normal limits bilaterally.",
           "finding_type": "Sensory NCS"
         },
         {
@@ -852,14 +986,12 @@
           "finding_type": "Motor NCS"
         }
       ],
-      "impression": "Active denervation (fibrillations, positive sharp waves) and chronic reinnervation (large amplitude, long duration, polyphasic MUPs, severely reduced recruitment) are present in the cervical, thoracic, and lumbosacral body regions. Bulbar region shows fasciculation potentials without definite fibrillations on this study. Sensory NCS entirely normal. Reduced CMAP amplitudes with preserved conduction velocities; no conduction block. Findings indicate a widespread disorder of anterior horn cells",
+      "impression": "1. Active denervation (fibrillation potentials, positive sharp waves) and chronic reinnervation (large, long-duration, polyphasic MUPs with severely reduced recruitment) in cervical and lumbosacral limb muscles, with fibrillation potentials in the cervical (C6-C8) and thoracic (T6-T8) paraspinal muscles. 2. Fasciculation potentials in the tongue without fibrillation potentials on this study. 3. Reduced median and ulnar CMAP amplitudes with normal conduction velocities; no conduction block. 4. Normal sensory nerve conduction studies. The findings indicate a widespread disorder of anterior horn cells.",
       "quantitative_data": {
         "criteria": "LMN denervation in 3 body regions by EMG",
-        "regions_involved": "3 definite (cervical, thoracic, lumbosacral); bulbar early/possible"
+        "regions_involved": "cervical, thoracic, lumbosacral; bulbar fasciculation potentials only"
       },
-      "recommended_actions": [
-        "Pulmonary function testing recommended."
-      ],
+      "recommended_actions": [],
       "test_type": "emg_ncs"
     }
   },
@@ -868,7 +1000,7 @@
     "case_body_concerns": [],
     "citation_gap": [],
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "4 required tools, breast-cancer history adds paraneoplastic consideration; ruled out by negative paraneoplastic panel and Mn-typical EMG",
+    "difficulty_rationale": "4 required tools, breast-cancer history adds paraneoplastic consideration; ruled out by negative paraneoplastic panel and an EMG typical of motor neuron disease",
     "fallback_tool_kinds": {
       "advanced_imaging": "normal",
       "cardiac_monitoring": "incidental",
@@ -936,7 +1068,7 @@
       "handedness": "right",
       "sex": "female"
     },
-    "history_present_illness": "Ms. C is a 55-year-old right-handed woman with a history of stage I breast cancer treated 4 years ago, presenting with a 10-month history of progressive bilateral hand weakness and muscle twitching. She first noticed difficulty typing and clicking a computer mouse approximately 10 months ago, initially thinking this was repetitive strain injury or carpal tunnel syndrome related to her demanding desk job.\n\nOver the following months, the weakness clearly progressed beyond what would be expected for entrapment neuropathy. She noticed wasting of the muscles between her fingers and at the base of her thumbs. She has developed frequent cramps in her hands and forearms, particularly at night. Her family has noticed muscle twitching in her forearms and calves, which she describes as spontaneous and not triggered by activity.\n\nApproximately 4-5 months ago, she developed mild bilateral ankle dorsiflexor weakness, noticing her feet beginning to scuff the floor. She denies any sensory symptoms, bladder changes, or swallowing difficulties. She has no back or neck pain.\n\nGiven her breast cancer history, her primary oncologist was concerned about paraneoplastic syndrome or leptomeningeal metastasis as a potential etiology and ordered brain and spine MRI. The MRI showed no evidence of cancer recurrence or leptomeningeal disease but did show subtle bilateral corticospinal tract signal changes, prompting urgent neurology referral. CT chest and breast exam confirmed remission. Paraneoplastic antibody panel was ordered and results are pending. Her oncologist and neurologist are discussing whether this represents a new primary neurological disorder or a paraneoplastic process.",
+    "history_present_illness": "Ms. C is a 55-year-old right-handed woman with a history of stage I breast cancer treated 4 years ago, presenting with a 10-month history of progressive bilateral hand weakness and muscle twitching. She first noticed difficulty typing and clicking a computer mouse approximately 10 months ago, initially thinking this was repetitive strain injury or carpal tunnel syndrome related to her demanding desk job.\n\nOver the following months, the weakness clearly progressed beyond what would be expected for entrapment neuropathy. She noticed wasting of the muscles between her fingers and at the base of her thumbs. She has developed frequent cramps in her hands and forearms, particularly at night. Her family has noticed muscle twitching in her forearms and calves, which she describes as spontaneous and not triggered by activity.\n\nApproximately 4-5 months ago, she developed mild bilateral ankle dorsiflexor weakness, noticing her feet beginning to scuff the floor. She denies any sensory symptoms, bladder changes, or swallowing difficulties. She has no back or neck pain.\n\nHer most recent oncology review, including CT chest and breast examination, showed no recurrence. Given her breast cancer history, her oncologist was concerned about a paraneoplastic syndrome or leptomeningeal metastasis and referred her urgently to neurology.",
     "neurological_exam": {
       "additional": "Fasciculations visible in bilateral forearms and bilateral gastrocnemii at rest.",
       "coordination": "Intact cerebellar examination. Dysmetria on finger-nose mild \u2014 related to hand weakness.",

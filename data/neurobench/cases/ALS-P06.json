@@ -104,60 +104,28 @@
   "followup_outputs": [
     {
       "output": {
-        "query": "IgM MGUS ALS association motor neuron disease paraproteinemic neuropathy",
-        "results": [
-          {
-            "finding": "IgM MGUS occurs in approximately 2-3% of adults over age 50. Motor neuron disease is a separate neurodegenerative process. Their co-occurrence is expected by chance in this age group. MGUS does not cause motor neuron disease.",
-            "title": "Paraproteinemia and motor neuron disease: chance co-occurrence"
-          },
-          {
-            "finding": "Anti-MAG neuropathy: slowly progressive, sensory-predominant, large fiber sensory loss, distal muscle weakness late, marked distal latency prolongation and velocity slowing on NCS. UMN signs and fasciculations are not features.",
-            "title": "Anti-MAG neuropathy features"
-          }
-        ],
-        "summary": ""
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_mgus_als_association"
-    },
-    {
-      "output": {
-        "alternatives": [
-          "AMX0035"
-        ],
-        "contraindications": [],
-        "formulary_status": "Covered with PA",
-        "interactions": [
-          "Lisinopril: no interaction"
-        ],
-        "proposed": "Riluzole 50 mg twice daily",
-        "warnings": [
-          "Monthly LFT monitoring"
-        ]
-      },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "check_riluzole_interactions"
-    },
-    {
-      "output": {
         "findings": [
           {
-            "panel": "PFT",
-            "reference_range": ">80%",
+            "is_abnormal": "false",
+            "panel": "Respiratory function",
+            "reference_range": ">=80% predicted",
             "result": "80",
-            "test": "FVC"
+            "test": "FVC",
+            "unit": "% predicted"
           },
           {
-            "panel": "PFT",
-            "reference_range": ">70 cmH2O men",
+            "is_abnormal": "false",
+            "panel": "Respiratory function",
+            "reference_range": ">=70 cmH2O (men)",
             "result": "70",
-            "test": "SNIP"
+            "test": "SNIP",
+            "unit": "cmH2O"
           }
         ],
-        "impression": "All values within normal limits.",
+        "impression": "FVC 80% predicted and SNIP 70 cmH2O are at the lower limit of normal.",
         "quantitative_data": {
-          "FVC": "80",
-          "SNIP": "70"
+          "FVC": "80 % predicted",
+          "SNIP": "70 cmH2O"
         },
         "recommended_actions": [],
         "test_type": "respiratory_function"
@@ -173,23 +141,47 @@
         "findings": [
           {
             "interpretation": "",
-            "panel": "Neurodegenerative_Genetic_Panel",
+            "panel": "ALS gene panel",
             "reference_range": "<30 repeats",
-            "result": "Negative",
-            "test": "C9orf72"
+            "result": "Not expanded (5 and 8 repeats)",
+            "test": "C9orf72 hexanucleotide repeat expansion (repeat-primed PCR)"
           },
           {
             "interpretation": "",
-            "panel": "Neurodegenerative_Genetic_Panel",
+            "panel": "ALS gene panel",
             "reference_range": "No pathogenic variant",
-            "result": "No pathogenic variant",
-            "test": "SOD1"
+            "result": "No pathogenic or likely pathogenic variant detected",
+            "test": "SOD1 sequencing"
+          },
+          {
+            "interpretation": "",
+            "panel": "ALS gene panel",
+            "reference_range": "No pathogenic variant",
+            "result": "No pathogenic or likely pathogenic variant detected",
+            "test": "TARDBP sequencing"
+          },
+          {
+            "interpretation": "",
+            "panel": "ALS gene panel",
+            "reference_range": "No pathogenic variant",
+            "result": "No pathogenic or likely pathogenic variant detected",
+            "test": "FUS sequencing"
+          },
+          {
+            "interpretation": "",
+            "panel": "ALS gene panel",
+            "reference_range": "No pathogenic variant",
+            "result": "No pathogenic or likely pathogenic variant detected",
+            "test": "TBK1 sequencing"
           }
         ],
-        "impression": "All values within normal limits.",
+        "impression": "No pathogenic C9orf72 repeat expansion. No pathogenic or likely pathogenic variant in SOD1, TARDBP, FUS or TBK1. A negative result does not exclude a genetic contribution; post-test counselling recommended.",
         "quantitative_data": {
-          "C9orf72": "Negative",
-          "SOD1": "No pathogenic variant"
+          "C9orf72": "Not expanded (5 and 8 repeats)",
+          "FUS": "No pathogenic or likely pathogenic variant",
+          "SOD1": "No pathogenic or likely pathogenic variant",
+          "TARDBP": "No pathogenic or likely pathogenic variant",
+          "TBK1": "No pathogenic or likely pathogenic variant"
         },
         "recommended_actions": [],
         "test_type": "genetic_panel:ALS"
@@ -199,120 +191,27 @@
         "test_type": "genetic_panel:ALS"
       },
       "trigger_action": "offer_als_genetic_panel_after_counselling"
+    },
+    {
+      "output": {
+        "alternatives": [],
+        "contraindications": [],
+        "formulary_status": "Covered with prior authorisation",
+        "interactions": [
+          "Lisinopril: no clinically significant interaction expected."
+        ],
+        "proposed": "Riluzole 50 mg twice daily",
+        "summary": "No interaction requires a change to riluzole 50 mg twice daily. Measure liver transaminases before the first dose, monthly for the first 3 months, every 3 months for the rest of the first year and periodically thereafter; stop riluzole if ALT exceeds 5x ULN. Report any febrile illness (check the white cell count for neutropenia).",
+        "warnings": [
+          "Riluzole can raise liver transaminases: baseline and scheduled liver-function monitoring."
+        ]
+      },
+      "tool_name": "check_drug_interactions",
+      "trigger_action": "check_riluzole_interactions"
     }
   ],
   "ground_truth": {
     "action_criteria": [
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "query": "ALS diagnostic criteria Awaji Gold Coast AAN practice parameter"
-            },
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Awaji_2008]",
-          "Awaji_2008"
-        ],
-        "criterion_id": "action-1-search-medical-literature",
-        "expected_evidence": "Awaji-Shima 2008 / Gold Coast 2020 diagnostic criteria; AAN 2009 practice parameter on ALS care",
-        "importance": "recommended",
-        "label": "Search the medical literature to confirm Awaji and Gold Coast diagnostic thresholds and AAN practice-parameter recommendations relevant to this presentation",
-        "rationale": "Search the medical literature to confirm Awaji and Gold Coast diagnostic thresholds and AAN practice-parameter recommendations relevant to this presentation"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "drug": "riluzole"
-            },
-            "tool_name": "check_drug_interactions"
-          }
-        ],
-        "citations": [
-          "[AAN_2009]",
-          "AAN_2009"
-        ],
-        "criterion_id": "action-2-check-drug-interactions",
-        "expected_evidence": "No major interactions for typical chronic medications; advise alcohol and grapefruit-juice avoidance (CYP1A2 modulators); monthly LFTs for first 3 months",
-        "importance": "recommended",
-        "label": "Check interactions before initiating riluzole 50 mg twice daily; review baseline LFTs and CBC and counsel on monitoring",
-        "rationale": "Check interactions before initiating riluzole 50 mg twice daily; review baseline LFTs and CBC and counsel on monitoring"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "contrast": true,
-              "protocol": "standard"
-            },
-            "tool_name": "analyze_brain_mri"
-          }
-        ],
-        "citations": [
-          "[EAN_ALS_2024]",
-          "Gold Coast; EAN 2024; NICE NG42"
-        ],
-        "criterion_id": "action-3-analyze-brain-mri",
-        "expected_evidence": "No better structural explanation for progressive upper and lower motor-neuron findings",
-        "importance": "required",
-        "label": "Obtain brain MRI to exclude structural, brainstem, inflammatory, demyelinating or neoplastic ALS mimics",
-        "rationale": "Obtain brain MRI to exclude structural, brainstem, inflammatory, demyelinating or neoplastic ALS mimics"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "contrast": false,
-              "study": "spine_MRI"
-            },
-            "tool_name": "order_body_imaging"
-          }
-        ],
-        "citations": [
-          "[EAN_ALS_2024]",
-          "Gold Coast; EAN 2024; NICE NG42"
-        ],
-        "criterion_id": "action-4-order-body-imaging",
-        "expected_evidence": "No compressive, neoplastic, inflammatory or demyelinating cord mimic",
-        "importance": "required",
-        "label": "Obtain cervical and thoracic spinal-cord MRI to exclude compressive myelopathy and other cord lesions",
-        "rationale": "Obtain cervical and thoracic spinal-cord MRI to exclude compressive myelopathy and other cord lesions"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "panels": [
-                "CBC",
-                "CMP",
-                "calcium",
-                "TSH",
-                "vitamin_B12",
-                "folate",
-                "CK",
-                "ESR",
-                "CRP",
-                "SPEP",
-                "IFE",
-                "serum_free_light_chains"
-              ]
-            },
-            "tool_name": "interpret_labs"
-          }
-        ],
-        "citations": [
-          "[EAN_ALS_2024]",
-          "Gold Coast; EAN 2024; NICE NG42"
-        ],
-        "criterion_id": "action-5-interpret-labs",
-        "expected_evidence": "Exclude common hematologic, renal/hepatic, electrolyte, calcium, thyroid, B12/folate, muscle and inflammatory alternatives; tests do not confirm ALS",
-        "importance": "required",
-        "label": "Order a baseline treatable-mimic panel, adding only phenotype-specific infectious, immune, paraprotein or metabolic tests",
-        "rationale": "Order a baseline treatable-mimic panel, adding only phenotype-specific infectious, immune, paraprotein or metabolic tests"
-      },
       {
         "alternatives": [
           {
@@ -323,52 +222,77 @@
           }
         ],
         "citations": [
-          "[EAN_ALS_2024]",
-          "Gold Coast; EAN 2024; NICE NG42"
+          "[Gold_Coast_2020]",
+          "[Awaji_2008]"
         ],
         "criterion_id": "action-6-order-specialized-test",
-        "expected_evidence": "Active and chronic neurogenic change in multiple regions with preserved sensory studies and no conduction block",
+        "expected_evidence": "Active and chronic denervation in cervical muscles with active denervation in thoracic and lumbosacral muscles and tongue fasciculation potentials; normal distal motor latencies and conduction velocities, no conduction block; normal sensory studies.",
         "importance": "required",
-        "label": "Perform EMG/NCS across bulbar, cervical, thoracic and lumbosacral regions using ALS electrodiagnostic criteria",
-        "rationale": "Perform EMG/NCS across bulbar, cervical, thoracic and lumbosacral regions using ALS electrodiagnostic criteria"
+        "label": "EMG and nerve conduction studies of the bulbar, cervical, thoracic and lumbosacral regions to document lower motor neuron involvement and exclude conduction block and neuropathy",
+        "rationale": "EMG/NCS confirms lower motor neuron involvement beyond the clinically affected muscles and excludes the main treatable mimics: multifocal motor neuropathy with conduction block, demyelinating or sensorimotor neuropathy and myopathy. Gold Coast 2020 accepts EMG evidence of lower motor neuron dysfunction, and Awaji 2008 counts fasciculation potentials as active denervation in muscles with chronic neurogenic change."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_brain_mri"
+          }
+        ],
+        "citations": [
+          "[EFNS_ALS_2012]",
+          "[Gold_Coast_2020]"
+        ],
+        "criterion_id": "action-3-analyze-brain-mri",
+        "expected_evidence": "No mass, infiltrative or enhancing lesion and no leptomeningeal enhancement on post-gadolinium MRI; subtle symmetric corticospinal tract T2 hyperintensity, supportive only.",
+        "importance": "required",
+        "label": "Brain MRI to exclude structural, vascular, demyelinating, inflammatory or neoplastic causes of the upper motor neuron or bulbar signs",
+        "rationale": "MRI does not confirm ALS. It excludes brain and brainstem lesions that can cause upper motor neuron or bulbar signs; including, with an IgM paraprotein, lymphoproliferative infiltration of the brain or meninges, for which gadolinium is given; corticospinal tract signal change, when present, is supportive only."
       },
       {
         "alternatives": [
           {
             "required_arguments": {
-              "test_type": "respiratory_function"
+              "study": "spine_MRI"
             },
-            "tool_name": "order_specialized_test"
+            "tool_name": "order_body_imaging"
           }
         ],
         "citations": [
-          "[EAN_ALS_2024]",
-          "Gold Coast; EAN 2024; NICE NG42"
+          "[EFNS_ALS_2012]",
+          "[Gold_Coast_2020]"
         ],
-        "criterion_id": "action-7-order-specialized-test",
-        "expected_evidence": "Quantify respiratory involvement and need for surveillance or non-invasive ventilation",
-        "importance": "recommended",
-        "label": "Obtain baseline FVC/VC and SNIP or MIP after suspected ALS is established; this is a safety and management assessment, not a diagnostic confirmation",
-        "rationale": "Obtain baseline FVC/VC and SNIP or MIP after suspected ALS is established; this is a safety and management assessment, not a diagnostic confirmation"
+        "criterion_id": "action-4-order-body-imaging",
+        "expected_evidence": "Normal cervical and thoracic spine MRI: no cord signal change or compression, normal vertebral marrow signal.",
+        "importance": "required",
+        "label": "Spine MRI of the cervical and thoracic cord, and of the lumbosacral spine when lower limb signs need it, to exclude compressive myelopathy, radiculopathy and other cord lesions",
+        "rationale": "Cervical spondylotic myelopathy with radiculopathy is the commonest structural mimic of combined upper and lower motor neuron signs in the limbs. Spine MRI excludes it, but incidental spondylosis does not explain bulbar signs or denervation in other regions and must not delay the ALS work-up."
       },
       {
         "alternatives": [
           {
             "required_arguments": {
-              "test_type": "genetic_panel:ALS"
+              "panels": [
+                "CBC",
+                "CK",
+                "TSH",
+                "vitamin_B12",
+                "SPEP",
+                "IFE",
+                "serum_free_light_chains",
+                "anti_MAG"
+              ]
             },
-            "tool_name": "order_specialized_test"
+            "tool_name": "interpret_labs"
           }
         ],
         "citations": [
-          "[EAN_ALS_2024]",
-          "Gold Coast; EAN 2024; NICE NG42"
+          "[EFNS_ALS_2012]"
         ],
-        "criterion_id": "action-8-order-specialized-test",
-        "expected_evidence": "A pathogenic result can affect counselling, family risk and gene-targeted therapy/trial eligibility; a negative result does not exclude ALS",
-        "importance": "optional",
-        "label": "Offer an ALS gene panel including C9orf72 and SOD1 after pre-test counselling; do not embed genetics in a routine blood panel",
-        "rationale": "Offer an ALS gene panel including C9orf72 and SOD1 after pre-test counselling; do not embed genetics in a routine blood panel"
+        "criterion_id": "action-5-interpret-labs",
+        "expected_evidence": "IgM kappa paraprotein 0.4 g/dL with a normal free light chain ratio; anti-MAG and anti-GM1 negative; CK 740 U/L (4.3x ULN); blood count, renal and liver function, calcium, thyroid function, vitamin B12, folate, ESR and CRP normal.",
+        "importance": "required",
+        "label": "Blood tests for treatable mimics and a pre-treatment baseline: full blood count, renal and liver function, electrolytes and calcium, CK, thyroid function, vitamin B12 and folate, ESR and CRP; plus serum protein electrophoresis with immunofixation, serum free light chains and anti-MAG antibodies",
+        "rationale": "These tests exclude metabolic, endocrine, nutritional and inflammatory mimics and give the liver and blood-count baseline needed before riluzole; phenotype-specific tests are added only when the case raises that mimic: with a known IgM paraprotein, immunofixation, free light chains and anti-MAG antibodies test for a paraproteinemic neuropathy."
       },
       {
         "alternatives": [
@@ -383,31 +307,86 @@
           }
         ],
         "citations": [
-          "[EAN_ALS_2024]",
-          "Gold Coast; EAN 2024; NICE NG42"
+          "[EFNS_ALS_2012]"
         ],
         "criterion_id": "action-9-analyze-csf",
-        "expected_evidence": "Answer the named mimic question; CSF and neurofilaments do not diagnose routine ALS",
+        "expected_evidence": "Normal cell count, mildly raised protein (52 mg/dL), normal glucose; no malignant cells and no clonal lymphoid population.",
         "importance": "optional",
-        "label": "Consider CSF only because this atypical case raises a specific inflammatory, infectious or neoplastic mimic",
-        "rationale": "Consider CSF only because this atypical case raises a specific inflammatory, infectious or neoplastic mimic"
+        "label": "CSF cytology and flow cytometry, only because the IgM paraprotein raises a lymphoproliferative infiltration question; CSF does not diagnose ALS",
+        "rationale": "CSF is not part of the routine ALS work-up. With an IgM paraprotein it answers a specific question, infiltration of the nervous system by a lymphoproliferative disorder; it does not diagnose ALS."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "respiratory_function"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[AAN_2009]",
+          "[EAN_ALS_2024]",
+          "[NICE_NG42]"
+        ],
+        "criterion_id": "action-7-order-specialized-test",
+        "expected_evidence": "FVC 80% predicted and SNIP 70 cmH2O, at the lower limit of normal: repeat within 3 months.",
+        "importance": "recommended",
+        "label": "Baseline respiratory function (FVC and SNIP, with MIP where available) to stage respiratory muscle involvement and plan monitoring and NIV",
+        "rationale": "Respiratory function does not diagnose ALS. Once ALS is supported it stages respiratory muscle weakness, sets the baseline for 3-monthly monitoring and identifies patients who need early referral for NIV."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "genetic_panel:ALS"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[ALS_genetics_2023]",
+          "[EAN_ALS_2024]"
+        ],
+        "criterion_id": "action-8-order-specialized-test",
+        "expected_evidence": "No pathogenic C9orf72 expansion and no pathogenic variant in SOD1, TARDBP, FUS or TBK1; a negative result does not exclude a genetic contribution.",
+        "importance": "optional",
+        "label": "ALS gene panel (C9orf72 repeat expansion; SOD1, TARDBP, FUS and TBK1) after pre-test genetic counselling, once the clinical and electrodiagnostic assessment is complete",
+        "rationale": "Genetic testing does not make the diagnosis. It is offered with counselling to people with ALS because a pathogenic variant changes counselling for relatives and may open gene-targeted treatment or trials."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "drug": "riluzole"
+            },
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [
+          "[Riluzole_SmPC]",
+          "[EAN_ALS_2024]"
+        ],
+        "criterion_id": "action-2-check-drug-interactions",
+        "expected_evidence": "No clinically significant interaction with lisinopril; liver-function monitoring schedule for riluzole.",
+        "importance": "recommended",
+        "label": "Check riluzole against the current medicines, alcohol use and liver function before the first dose, once the diagnosis is established",
+        "rationale": "Riluzole is metabolised by CYP1A2 and can raise liver transaminases, so the medicine list, alcohol use and baseline liver function are reviewed before treatment. No current medicine interacts with it."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not commit the patient to cervical spine surgery on the basis of incidental spondylotic changes when EMG findings extend beyond the cervical cord.",
-        "Do not start chronic immunosuppression (steroids, IVIG, plasma exchange) for ALS \u2014 there is no benefit and treatment delays correct diagnosis.",
-        "Do not defer respiratory assessment in a symptomatic patient \u2014 even mild FVC reduction warrants close monitoring and NIV planning.",
-        "Do not dismiss bulbar or progressive symptoms as functional / psychiatric without a complete neurological workup."
+        "Do not treat ALS with corticosteroids, IVIG or plasma exchange: they have no benefit.",
+        "Do not start rituximab or other immunotherapy directed at the IgM paraprotein: anti-MAG and anti-GM1 are negative and there is no paraproteinemic neuropathy.",
+        "Do not stop respiratory monitoring because the baseline values are normal."
       ],
       "required_recommendations": [
-        "Perform EMG/NCS sampling the bulbar region plus \u22652 spinal regions to document lower-motor-neuron involvement and exclude conduction block.",
-        "Obtain brain MRI to exclude structural mimics (cervical myelopathy, demyelinating disease, brainstem tumor).",
-        "Order a mimic-exclusion lab panel (CK, B12, TSH, HIV, RPR, SPEP, anti-GM1 IgM, androgen receptor CAG repeat in males).",
-        "Measure baseline respiratory function (FVC, MIP/MEP, SNIP) to inform NIV timing.",
-        "Apply Awaji-Shima 2008 / Gold Coast 2020 criteria to confirm the diagnosis.",
-        "Initiate riluzole 50 mg twice daily after baseline LFTs unless contraindicated; arrange monthly LFT monitoring for the first 3 months.",
-        "Refer to a multidisciplinary ALS clinic for SLP, dietetics, respiratory, and social-work input."
+        "Make and explain the diagnosis of ALS by Gold Coast 2020 criteria: progressive upper limb weakness with upper motor neuron signs (hyperreflexia, bilateral Hoffman signs, a right Babinski sign and spastic gait) and lower motor neuron involvement in the cervical region on examination and EMG, with active denervation also in thoracic and lumbosacral muscles, with mimics excluded by MRI and blood tests; disclose it in a planned face-to-face discussion with the patient and family.",
+        "FVC 80% predicted and SNIP 70 cmH2O are at the lower limit of normal: repeat them within 3 months and ask about orthopnoea and sleep-related symptoms of hypoventilation.",
+        "Offer riluzole 50 mg twice daily. Measure liver transaminases before the first dose, monthly for 3 months, every 3 months for the rest of the first year and periodically thereafter; stop riluzole if ALT exceeds 5x the upper limit of normal, and ask the patient to report any febrile illness so that neutropenia can be excluded.",
+        "Refer to a specialist ALS multidisciplinary team (neurologist, specialist nurse, respiratory, speech and language therapy, dietetics, physiotherapy, occupational therapy and palliative care), reviewed about every 2 to 3 months, with an early, patient-paced discussion of advance care planning.",
+        "Offer genetic counselling and, if the patient wishes, ALS genetic testing, explaining the implications for relatives.",
+        "Continue haematology surveillance of the IgM MGUS; it does not explain the motor syndrome."
       ]
     },
     "avoided_actions": [
@@ -550,56 +529,80 @@
     },
     "differential": [
       {
-        "diagnosis": "MGUS-associated motor neuropathy",
+        "diagnosis": "MGUS-associated (anti-MAG) paraproteinemic neuropathy",
         "icd_code": null,
-        "key_features": "M-spike present; anti-MAG and anti-GM1 negative, sensory NCS normal, UMN signs argue against",
-        "likelihood": "moderate"
+        "key_features": "supports: IgM kappa paraprotein; against: anti-MAG and anti-GM1 negative, normal sensory examination and sensory studies, normal distal motor latencies and conduction velocities without conduction block, upper motor neuron signs and multi-region denervation",
+        "likelihood": "low"
       },
       {
         "diagnosis": "POEMS syndrome",
         "icd_code": null,
-        "key_features": "No polyneuropathy, organomegaly, endocrinopathy, or skin changes",
-        "likelihood": "low"
+        "key_features": "against: no demyelinating polyneuropathy on NCS, kappa rather than lambda light chain, normal TSH",
+        "likelihood": "very_low"
+      },
+      {
+        "diagnosis": "Waldenstrom-related neuropathy or Bing-Neel syndrome",
+        "icd_code": null,
+        "key_features": "against: stable small paraprotein with a normal free light chain ratio and blood count, no neuropathy on NCS, no infiltrative or enhancing lesion on MRI, CSF cytology and flow cytometry negative",
+        "likelihood": "very_low"
       },
       {
         "diagnosis": "Lymphoma-associated motor neuronopathy",
         "icd_code": null,
-        "key_features": "No lymphadenopathy or systemic features; hematology consult appropriate",
-        "likelihood": "low"
+        "key_features": "against: normal blood count, CSF cytology and flow cytometry negative, no infiltrative lesion on MRI; the association is rare",
+        "likelihood": "very_low"
       },
       {
         "diagnosis": "Multifocal motor neuropathy",
         "icd_code": null,
-        "key_features": "No conduction block, anti-GM1 negative",
+        "key_features": "against: upper motor neuron signs, normal motor conduction velocities and no conduction block, anti-GM1 negative",
         "likelihood": "low"
       },
       {
         "diagnosis": "Inclusion body myositis",
         "icd_code": null,
-        "key_features": "Neurogenic EMG pattern argues against IBM",
+        "key_features": "against: neurogenic EMG with fasciculations and upper motor neuron signs",
         "likelihood": "very_low"
       }
     ],
     "key_clinical_evidence": [
-      "Diagnosis requires evidence of both upper-motor-neuron involvement (hyperreflexia, Babinski, Hoffman, brisk jaw jerk, spasticity) and lower-motor-neuron involvement (atrophy, fasciculations, EMG denervation) with progressive spread, while excluding mimics \u2014 Awaji 2008 / Gold Coast 2020.",
-      "EMG in bulbar plus \u22652 spinal regions documenting fibrillations, positive sharp waves, complex fasciculation potentials, and large-amplitude long-duration polyphasic MUPs with reduced recruitment satisfies the electrodiagnostic criterion.",
-      "Normal sensory NCS and absence of conduction block are pivotal: they exclude common mimics including multifocal motor neuropathy, CIDP, and Kennedy disease.",
-      "Mild-to-moderate CK elevation (2\u20135\u00d7 ULN) is consistent with ALS and does not itself indicate a primary myopathy.",
-      "Cervical spondylotic changes on MRI are common incidental findings in the at-risk age group; bulbar findings or multi-region EMG denervation cannot be attributed to cervical disease.",
-      "Baseline FVC, MIP/MEP, and SNIP/NIF inform NIV timing \u2014 NIV initiation at FVC <50% predicted or SNIP <40 cmH\u2082O prolongs survival and improves quality of life.",
-      "July 2026 review applied end to end: EMG/NCS is the required ALS-specific test; brain and cord MRI and targeted labs exclude mimics; respiratory function is a recommended safety baseline; genetics is separately offered after counselling; CSF is absent except in five atypical mimic work-ups."
+      "Gold Coast 2020: ALS needs progressive motor impairment with upper and lower motor neuron dysfunction in at least one body region, or lower motor neuron dysfunction in at least two, after other diseases are excluded. Here: hyperreflexia, bilateral Hoffman signs and a right Babinski sign with lower motor neuron involvement in the cervical region, with active denervation also in thoracic and lumbosacral muscles.",
+      "EMG lower motor neuron evidence is chronic neurogenic change with active denervation; by Awaji 2008 fasciculation potentials count as active denervation in a muscle with chronic neurogenic change.",
+      "Normal motor conduction velocities without conduction block argue against multifocal motor neuropathy, and normal sensory responses argue against a sensorimotor neuropathy or SBMA.",
+      "CK 740 U/L (4.3x ULN): mild to moderate elevation is common in ALS from denervation and does not by itself suggest a myopathy.",
+      "FVC 80% predicted and SNIP 70 cmH2O are at the lower limit of normal. AAN 2009 markers that prompt NIV discussion are orthopnoea, FVC below 50% predicted, SNIP below 40 cmH2O, MIP weaker than -60 cmH2O or abnormal overnight oximetry; NIV prolongs survival and improves quality of life (Bourke 2006).",
+      "IgM anti-MAG neuropathy is a slowly progressive, sensory-predominant demyelinating neuropathy with prolonged distal motor latencies; normal sensory studies, normal distal latencies and conduction velocities, negative anti-MAG and anti-GM1 and upper motor neuron signs make the IgM MGUS a coexisting finding, not the cause."
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "IgM MGUS prevalence ~3% in this age group is high; anti-MAG/anti-GM1 negative, sensory NCS normal, and UMN signs make MGUS-associated neuropathy unlikely",
-        "data_point": "IgM monoclonal protein on SPEP",
-        "field_path": "initial_tool_outputs.labs.panels.Paraprotein_Panel",
-        "intended_effect": "Suggests paraproteinemic motor neuropathy (anti-MAG, CANOMAD, MGUS-associated)",
+        "correct_interpretation": "MGUS is found in about 3% of people over 50 and is a confounder here: anti-MAG and anti-GM1 are negative, the sensory examination and sensory studies are normal, distal motor latencies and conduction velocities are normal without conduction block, and upper motor neuron signs with multi-region denervation are not features of a paraproteinemic neuropathy.",
+        "data_point": "IgM kappa monoclonal protein (known MGUS)",
+        "field_path": "initial_tool_outputs.labs.panels.Serum protein electrophoresis and immunofixation[1]",
+        "intended_effect": "Suggests a paraproteinemic motor neuropathy (anti-MAG, CANOMAD, MGUS-associated) or a lymphoproliferative cause",
         "location": "Labs"
       }
     ],
     "review_status": "draft",
-    "sequence_constraints": [],
+    "sequence_constraints": [
+      {
+        "after_criterion_id": "action-8-order-specialized-test",
+        "before_criterion_id": "action-6-order-specialized-test",
+        "citations": [
+          "[ALS_genetics_2023]"
+        ],
+        "reason": "Genetic testing follows the clinical and electrodiagnostic assessment and pre-test counselling; it does not make the diagnosis.",
+        "severity": "soft"
+      },
+      {
+        "after_criterion_id": "action-2-check-drug-interactions",
+        "before_criterion_id": "action-6-order-specialized-test",
+        "citations": [
+          "[EAN_ALS_2024]"
+        ],
+        "reason": "Riluzole is considered only after the clinical and electrodiagnostic assessment supports ALS.",
+        "severity": "soft"
+      }
+    ],
     "stop_rule": {
       "max_additional_actions": 0,
       "required_before_assessment": [
@@ -616,12 +619,22 @@
       "contrast": false,
       "findings": [
         {
-          "description": "No cord compression or myeloma-related cord changes",
-          "location": "spine",
-          "type": "additional_observation"
+          "description": "Normal calibre and signal. No cord compression.",
+          "location": "Cervical and thoracic cord",
+          "type": "Spinal cord"
+        },
+        {
+          "description": "No disc protrusion or canal stenosis compressing the cord or roots.",
+          "location": "Cervical and thoracic spine",
+          "type": "Spinal canal and roots"
+        },
+        {
+          "description": "Normal vertebral marrow signal; no focal marrow lesion.",
+          "location": "Cervical and thoracic vertebrae",
+          "type": "Bone marrow"
         }
       ],
-      "impression": "No myeloma-related cord compression or infiltration",
+      "impression": "Normal MRI of the cervical and thoracic spine: no cord signal change or compression, and normal vertebral marrow signal.",
       "measurements": null,
       "modality": "MRI",
       "recommended_actions": [],
@@ -634,7 +647,7 @@
       },
       "glucose": "64 mg/dL",
       "glucose_ratio": "0.64",
-      "interpretation": "WBC {'WBC': '1 cell/uL'}; protein 52 mg/dL; glucose 64 mg/dL. Targeted mimic studies: {'cytology': 'No malignant cells identified', 'flow_cytometry': 'No clonal lymphoid population'}. CSF does not confirm ALS.",
+      "interpretation": "Normal cell count (WBC 1 cell/uL), protein mildly raised at 52 mg/dL and normal glucose (CSF/serum ratio 0.64). Cytology: no malignant cells. Flow cytometry: no clonal lymphoid population. Clinical correlation recommended.",
       "opening_pressure": "15 cmH2O",
       "protein": "52 mg/dL",
       "special_tests": {
@@ -642,41 +655,145 @@
         "flow_cytometry": "No clonal lymphoid population"
       }
     },
+    "drug_interactions": null,
     "ecg": null,
     "eeg": null,
     "labs": {
       "abnormal_values_summary": [
-        "SPEP M-protein: 0.4 g/dL IgM kappa",
-        "CK: 740"
+        "SPEP M-protein 0.4 g/dL; immunofixation IgM kappa monoclonal protein",
+        "CK 740 U/L (reference 38-174 U/L)"
       ],
-      "interpretation": "Rule-out studies do not confirm ALS. Targeted abnormalities are listed above.",
+      "interpretation": "Abnormal: IgM kappa monoclonal protein 0.4 g/dL; CK 740 U/L (4.3x ULN). All other results are within reference ranges.",
       "panels": {
-        "Paraprotein_Panel": [
+        "Anti-MAG and anti-GM1 antibodies": [
           {
             "clinical_significance": null,
-            "is_abnormal": true,
-            "reference_range": "No M-protein",
-            "test": "SPEP M-protein",
-            "unit": "g/dL",
-            "value": "0.4 g/dL IgM kappa"
+            "is_abnormal": false,
+            "reference_range": "<1000",
+            "test": "Anti-MAG IgM",
+            "unit": "BTU",
+            "value": 380
           },
           {
             "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "Negative",
+            "reference_range": "<1:100",
             "test": "Anti-GM1 IgM",
-            "unit": "titer",
-            "value": "Negative"
-          },
+            "unit": "titre",
+            "value": "<1:100"
+          }
+        ],
+        "Complete blood count": [
           {
+            "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "0.4-4.0",
-            "test": "TSH (POEMS endocrinopathy)",
-            "unit": "mIU/L",
-            "value": 2.1
+            "reference_range": "13.5-17.5",
+            "test": "Haemoglobin",
+            "unit": "g/dL",
+            "value": 14.6
           },
           {
             "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "4.0-11.0",
+            "test": "White cell count",
+            "unit": "x10^9/L",
+            "value": 6.4
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "150-400",
+            "test": "Platelets",
+            "unit": "x10^9/L",
+            "value": 231
+          }
+        ],
+        "Comprehensive metabolic panel": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "135-145",
+            "test": "Sodium",
+            "unit": "mmol/L",
+            "value": 140
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.5-5.1",
+            "test": "Potassium",
+            "unit": "mmol/L",
+            "value": 4.6
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.7-1.3",
+            "test": "Creatinine",
+            "unit": "mg/dL",
+            "value": 1.0
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "70-140 (random)",
+            "test": "Glucose",
+            "unit": "mg/dL",
+            "value": 100
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "8.5-10.5",
+            "test": "Calcium",
+            "unit": "mg/dL",
+            "value": 9.6
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.5-5.0",
+            "test": "Albumin",
+            "unit": "g/dL",
+            "value": 4.3
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "10-50",
+            "test": "ALT",
+            "unit": "U/L",
+            "value": 26
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "10-40",
+            "test": "AST",
+            "unit": "U/L",
+            "value": 31
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "40-129",
+            "test": "ALP",
+            "unit": "U/L",
+            "value": 68
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.1-1.2",
+            "test": "Total bilirubin",
+            "unit": "mg/dL",
+            "value": 0.7
+          }
+        ],
+        "Creatine kinase": [
+          {
+            "clinical_significance": "Above reference range",
             "is_abnormal": true,
             "reference_range": "38-174",
             "test": "CK",
@@ -684,7 +801,7 @@
             "value": 740
           }
         ],
-        "Reviewer baseline rule-out additions": [
+        "Inflammatory markers": [
           {
             "clinical_significance": null,
             "is_abnormal": false,
@@ -700,7 +817,69 @@
             "test": "CRP",
             "unit": "mg/L",
             "value": 2
+          }
+        ],
+        "Serum protein electrophoresis and immunofixation": [
+          {
+            "clinical_significance": "Monoclonal protein present",
+            "is_abnormal": true,
+            "reference_range": "None detected",
+            "test": "SPEP M-protein",
+            "unit": "g/dL",
+            "value": 0.4
           },
+          {
+            "clinical_significance": "Monoclonal protein present",
+            "is_abnormal": true,
+            "reference_range": "No monoclonal protein",
+            "test": "Immunofixation",
+            "unit": "",
+            "value": "IgM kappa monoclonal protein"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.3-19.4",
+            "test": "Serum free kappa light chain",
+            "unit": "mg/L",
+            "value": 18.5
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "5.7-26.3",
+            "test": "Serum free lambda light chain",
+            "unit": "mg/L",
+            "value": 14.2
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.26-1.65",
+            "test": "Free kappa/lambda ratio",
+            "unit": "",
+            "value": 1.3
+          }
+        ],
+        "Thyroid function": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.4-4.0",
+            "test": "TSH",
+            "unit": "mIU/L",
+            "value": 2.1
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.8-1.8",
+            "test": "Free T4",
+            "unit": "ng/dL",
+            "value": 1.3
+          }
+        ],
+        "Vitamins": [
           {
             "clinical_significance": null,
             "is_abnormal": false,
@@ -720,10 +899,13 @@
         ]
       }
     },
+    "literature_search": null,
     "mri": {
       "additional_observations": [
-        "No plasmacytoma or marrow infiltration on brain MRI",
-        "No leptomeningeal disease"
+        "Technique: multiplanar T1, T2, FLAIR and DWI, with post-gadolinium T1.",
+        "No parenchymal mass or enhancing lesion. No restricted diffusion.",
+        "No dural, meningeal or leptomeningeal enhancement.",
+        "Calvarial marrow signal normal."
       ],
       "findings": [
         {
@@ -731,28 +913,29 @@
           "location": "Bilateral corticospinal tracts",
           "mass_effect": null,
           "signal_characteristics": {
+            "T1 post-gadolinium": "No enhancement",
             "T2": "Subtle bilateral symmetric hyperintensity"
           },
           "size": null,
-          "type": "T2 signal"
+          "type": "T2 signal change"
         }
       ],
-      "impression": "No myeloma-related cord compression or infiltration",
+      "impression": "1. Subtle symmetric T2 hyperintensity of the corticospinal tracts, a non-specific finding. 2. No mass, infiltrative or enhancing lesion and no meningeal or leptomeningeal enhancement.",
       "recommended_actions": [],
       "volumetrics": null
     },
     "specialized_test": {
       "findings": [
         {
-          "finding": "Bilateral FDI, APB: fibrillations +2, complex fasciculation potentials, large MUPs, reduced recruitment. Cervical paraspinals: fibrillations +1.",
+          "finding": "Bilateral first dorsal interosseous and abductor pollicis brevis: fibrillation potentials 2+, complex fasciculation potentials, large motor unit potentials with reduced recruitment. Cervical paraspinals: fibrillation potentials 1+.",
           "region": "Cervical"
         },
         {
-          "finding": "Bilateral TA, vastus medialis: fibrillations +1, fasciculations.",
+          "finding": "Bilateral tibialis anterior and vastus medialis: fibrillation potentials 1+, fasciculation potentials.",
           "region": "Lumbosacral"
         },
         {
-          "finding": "T6-T8 paraspinals: fibrillations +1.",
+          "finding": "T6-T8 paraspinals: fibrillation potentials 1+.",
           "region": "Thoracic"
         },
         {
@@ -760,22 +943,20 @@
           "region": "Bulbar"
         },
         {
-          "finding": "Reduced CMAP amplitudes bilaterally. Normal conduction velocities, without distal latency prolongation or conduction slowing. No conduction block.",
+          "finding": "Median, ulnar, peroneal and tibial motor studies: CMAP amplitudes reduced bilaterally; distal latencies and conduction velocities normal; no conduction block and no temporal dispersion.",
           "finding_type": "Motor NCS"
         },
         {
-          "finding": "All sensory studies normal. The abnormalities are purely motor.",
+          "finding": "Median, ulnar, radial and sural sensory responses normal in amplitude and conduction velocity.",
           "finding_type": "Sensory NCS"
         }
       ],
-      "impression": "Active denervation (fibrillations +2, positive sharp waves) and chronic reinnervation (large amplitude, polyphasic MUPs, reduced recruitment) in the cervical, lumbosacral, and thoracic body regions; bulbar region shows fasciculation potentials without definite fibrillations. Sensory NCS entirely normal. Motor NCS show reduced CMAP amplitudes with preserved conduction velocities; no conduction block. Findings indicate a widespread disorder of anterior horn cells",
+      "impression": "1. Active denervation with chronic neurogenic change and complex fasciculation potentials in cervical-segment muscles bilaterally, with cervical paraspinal fibrillation potentials. 2. Active denervation with fasciculation potentials in lumbosacral muscles (tibialis anterior, vastus medialis) and thoracic paraspinals (T6-T8). 3. Fasciculation potentials in the tongue without fibrillation potentials. 4. Reduced CMAP amplitudes with normal distal latencies and conduction velocities; no conduction block. 5. Normal sensory studies. Findings indicate a widespread disorder of anterior horn cells.",
       "quantitative_data": {
-        "pattern": "Pure motor denervation; no distal latency prolongation, no conduction slowing, no sensory abnormalities",
-        "regions": "Cervical, lumbosacral, and thoracic active denervation; bulbar fasciculations"
+        "pattern": "Pure motor denervation; normal distal motor latencies and conduction velocities; no conduction block; normal sensory studies",
+        "regions": "Cervical active and chronic denervation; thoracic and lumbosacral active denervation; tongue fasciculation potentials"
       },
-      "recommended_actions": [
-        "Pulmonary function testing recommended."
-      ],
+      "recommended_actions": [],
       "test_type": "emg_ncs"
     }
   },
@@ -784,7 +965,7 @@
     "case_body_concerns": [],
     "citation_gap": [],
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "IgM monoclonal gammopathy raises MAG-neuropathy / paraproteinemic motor neuronopathy DDx; literature search needed; 5 required tools",
+    "difficulty_rationale": "The IgM monoclonal gammopathy raises anti-MAG paraproteinemic neuropathy, POEMS and lymphoproliferative mimics that the labs, nerve conduction studies, MRI and CSF must exclude.",
     "fallback_tool_kinds": {
       "advanced_imaging": "normal",
       "cardiac_monitoring": "normal",
@@ -834,7 +1015,7 @@
       "handedness": "right",
       "sex": "male"
     },
-    "history_present_illness": "Mr. H is a 53-year-old man with known IgM MGUS (diagnosed 2 years ago on routine SPEP screening) presenting with 8-month progressive bilateral arm and leg weakness. He noticed progressive arm weakness initially, with bilateral thenar wasting and hand cramping. Over the past 4 months he has developed bilateral leg weakness with muscle twitching in thighs and calves.\n\nHis hematologist identified MGUS 2 years ago and has been monitoring with serial SPEP. The M-protein level has been stable at 0.4 g/dL (IgM kappa). The hematologist noted the new neurological symptoms and referred to neurology given concern for paraproteinemic neuropathy. Anti-MAG and anti-GM1 antibodies are pending. Examination shows combined upper and lower motor neuron signs with a normal sensory examination.",
+    "history_present_illness": "Mr. H is a 53-year-old man with an IgM kappa monoclonal gammopathy of undetermined significance (MGUS), found 2 years ago on routine serum protein electrophoresis, who presents with 8 months of progressive weakness of both arms and legs. The weakness began in the arms, with wasting of both thenar eminences and hand cramping. Over the past 4 months he has developed weakness of both legs with muscle twitching in the thighs and calves.\n\nHis hematologist has followed the paraprotein with serial electrophoresis, and it has remained stable. When the neurological symptoms appeared, the hematologist referred him to neurology because of concern for a paraproteinemic neuropathy.",
     "neurological_exam": {
       "additional": "Known IgM MGUS with progressive motor weakness and a normal sensory examination.",
       "coordination": "Normal.",

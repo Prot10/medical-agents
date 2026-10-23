@@ -10,10 +10,24 @@
 # STATUS: draft, authored 2026-09-02 for the migration; every entry is subject to physician review
 # together with the case policies. Entity-specific puzzles (e.g. LGI1 encephalitis filed under
 # G04.81) keep only their case-specific label and need per-case synonyms from the reviewers.
+#
+# Scoping (October 2026 review round): a category entry carries only generic labels and codes.
+# A label naming a specific organism, mechanism, variant, grade or another disease goes on the
+# specific code, or is scoped with `cases: [...]`, so it is accepted only where the case is that
+# thing; `except_cases: [...]` removes a generic label from the cases it contradicts.
+
+# Labels the table granted once and no longer grants; `--prune` strips them from every case.
+RETIRED:
+  retired_labels: [stroke, carotid stenosis stroke, internal carotid artery stenosis, large artery atherosclerotic stroke]
 
 G12.21:
   labels: [amyotrophic lateral sclerosis, ALS, motor neuron disease, motor neurone disease, MND]
   codes: [G12.2, G12.20, G12.23, G12.24, G12.25]
+# ALS-P02: the ALS mimic is the diagnosis (relabelled October 2026).
+E05.90:
+  conditions: [als]
+  labels: [thyrotoxicosis, levothyroxine over-replacement, iatrogenic thyrotoxicosis, levothyroxine induced thyrotoxicosis, exogenous thyrotoxicosis]
+  codes: [E05.9]
 
 G30:
   labels: [alzheimer disease, alzheimer's disease, alzheimers disease, alzheimer dementia, dementia due to alzheimer]
@@ -37,8 +51,12 @@ G04.81+nmdar:
   labels: [anti nmda receptor encephalitis, anti-nmda receptor encephalitis, anti nmdar encephalitis, anti-nmdar encephalitis, nmdar encephalitis, nmda receptor encephalitis, nmda encephalitis]
 
 G00:
-  labels: [bacterial meningitis, acute bacterial meningitis, pyogenic meningitis, community acquired bacterial meningitis]
+  labels: [bacterial meningitis, acute bacterial meningitis, pyogenic meningitis]
   codes: [G00.9]
+G00+community:
+  # healthcare-associated (M05 post-neurosurgical, RS04) and post-traumatic CSF-leak (RP02) cases
+  except_cases: [BACT-MEN-M05, BACT-MEN-RS04, BACT-MEN-RP02]
+  labels: [community acquired bacterial meningitis]
 G00.1:
   labels: [pneumococcal meningitis, streptococcus pneumoniae meningitis]
 G00.0:
@@ -48,7 +66,14 @@ G00.2:
 G00.3:
   labels: [staphylococcal meningitis, post neurosurgical meningitis, healthcare associated meningitis, ventriculitis]
 G00.8:
-  labels: [listeria meningitis, listeria monocytogenes meningitis, listeria meningoencephalitis]
+  labels: [other bacterial meningitis]
+G00.8+gram-negative:
+  cases: [BACT-MEN-RP05, BACT-MEN-RS04]
+  labels: [gram negative bacillary meningitis, gram-negative bacillary meningitis, gram negative meningitis]
+A32:
+  conditions: [bacterial_meningitis]
+  labels: [listeria meningitis, listeria monocytogenes meningitis, listeria meningoencephalitis, listerial meningitis, bacterial meningitis, acute bacterial meningitis, community acquired bacterial meningitis]
+  codes: [A32.1, A32.11, A32.12, G00.9]
 A39.0:
   labels: [meningococcal meningitis, neisseria meningitidis meningitis, bacterial meningitis]
 A17.0:
@@ -145,28 +170,69 @@ I60:
 I60.8:
   labels: [perimesencephalic subarachnoid hemorrhage, perimesencephalic subarachnoid haemorrhage, non-aneurysmal subarachnoid hemorrhage]
 
+# I63 category: generic labels and the unspecified code only; mechanism labels (embolic,
+# lacunar, dissection, moyamoya) and the mechanism code families sit on the specific codes.
 I63:
-  labels: [acute ischemic stroke, acute ischaemic stroke, ischemic stroke, ischaemic stroke, cerebral infarction, cerebral infarct, embolic stroke, cardioembolic stroke, lacunar stroke, lacunar infarct, stroke]
-  codes: [I63.9, I63.4, I63.5, I63.3, I63.2, I63.0, I63.1, I63.8, I63.81, I63.89]
+  labels: [acute ischemic stroke, acute ischaemic stroke, ischemic stroke, ischaemic stroke, cerebral infarction, cerebral infarct]
+  codes: [I63.9]
+I63.9+paradoxical:
+  cases: [ISCH-STR-P05, ISCH-STR-RP03]
+  labels: [paradoxical embolism, paradoxical embolic stroke, embolic stroke]
 I63.011:
-  labels: [lateral medullary syndrome, wallenberg syndrome, lateral medullary infarct, vertebral artery dissection]
+  labels: [vertebral artery dissection]
+  codes: [I63.0, I63.01]
+I63.011+wallenberg:
+  cases: [ISCH-STR-M04]
+  labels: [lateral medullary syndrome, wallenberg syndrome, lateral medullary infarct]
+I63.011+pica:
+  cases: [ISCH-STR-RM04]
+  labels: [PICA infarct, cerebellar infarct]
 I63.012:
   labels: [vertebral artery dissection, PICA infarct, cerebellar infarct]
+  codes: [I63.0, I63.01]
 I63.22:
   labels: [basilar artery occlusion, basilar artery thrombosis, posterior circulation stroke]
+  codes: [I63.2]
 I63.232:
+  codes: [I63.2, I63.23]
+I63.232+moyamoya:
+  cases: [ISCH-STR-P02]
   labels: [moyamoya disease, moyamoya]
+I63.232+dissection:
+  cases: [ISCH-STR-RM01]
+  labels: [carotid artery dissection, internal carotid artery dissection, cervical artery dissection]
 I63.231:
-  labels: [carotid stenosis stroke, internal carotid artery stenosis, large artery atherosclerotic stroke]
+  codes: [I63.2, I63.23]
+I63.231+dissection:
+  cases: [ISCH-STR-RP02]
+  labels: [carotid artery dissection, internal carotid artery dissection, cervical artery dissection]
 I63.031:
   labels: [watershed infarct, borderzone infarct, watershed stroke, hypoperfusion stroke]
+  codes: [I63.0, I63.03]
 I63.40:
-  labels: [septic embolic stroke, septic emboli, infective endocarditis stroke, infective endocarditis]
+  labels: [septic embolic stroke, septic emboli, infective endocarditis stroke, infective endocarditis, embolic stroke]
+  codes: [I63.4]
+I63.411:
+  labels: [cardioembolic stroke, embolic stroke]
+  codes: [I63.4, I63.41]
+I63.412:
+  labels: [cardioembolic stroke, embolic stroke]
+  codes: [I63.4, I63.41]
+I63.431:
+  labels: [cardioembolic stroke, embolic stroke]
+  codes: [I63.4, I63.43]
+I63.511:
+  codes: [I63.5, I63.51]
+I63.512:
+  codes: [I63.5, I63.51]
 I63.81:
-  labels: [CADASIL, lacunar stroke, lacunar infarct]
+  labels: [lacunar stroke, lacunar infarct, small vessel stroke]
+  codes: [I63.8]
+I63.81+cadasil:
+  cases: [ISCH-STR-RP05]
+  labels: [CADASIL]
 I77.71:
   labels: [carotid artery dissection, internal carotid artery dissection, cervical artery dissection]
-  codes: [I77.71, I63.231]
 I97.811:
   labels: [perioperative stroke, iatrogenic stroke, postprocedural stroke, ischemic stroke, ischaemic stroke]
 I63.4:
@@ -209,9 +275,22 @@ G13.1:
   labels: [central sleep apnea, central sleep apnoea, sleep apnea syncope, nocturnal asystole, sleep related bradyarrhythmia]
   codes: [G47.31, G47.37]
 
+# K72: grade-specific labels and codes are scoped. K72.90/K72.91 split hepatic failure without/with
+# coma; K76.82 is hepatic encephalopathy itself and is the generic code.
 K72:
-  labels: [hepatic encephalopathy, HE, overt hepatic encephalopathy, portosystemic encephalopathy, hepatic coma]
-  codes: [K72.90, K72.91, K76.82]
+  labels: [hepatic encephalopathy, HE, portosystemic encephalopathy]
+  codes: [K76.82]
+K72+overt:
+  # every West Haven grade II-IV case; HEP-ENC-P07 is covert
+  except_cases: [HEP-ENC-P07]
+  labels: [overt hepatic encephalopathy]
+K72+covert:
+  cases: [HEP-ENC-P07]
+  labels: [covert hepatic encephalopathy, minimal hepatic encephalopathy]
+K72.91+coma:
+  # West Haven grade IV
+  cases: [HEP-ENC-S06]
+  labels: [hepatic coma]
 
 F01:
   labels: [vascular dementia, vascular cognitive impairment, major vascular neurocognitive disorder, subcortical vascular dementia, multi-infarct dementia, multi infarct dementia, small vessel disease dementia, VaD]
