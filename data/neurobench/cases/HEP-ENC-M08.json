@@ -171,6 +171,63 @@
     },
     {
       "output": {
+        "contrast": false,
+        "findings": [
+          {
+            "finding": "clear lung fields without consolidation, mass or nodule",
+            "interpretation": "normal",
+            "region": "lungs"
+          },
+          {
+            "finding": "sharp costophrenic angles; no effusion; both hemidiaphragms mildly elevated",
+            "interpretation": "no effusion; diaphragmatic elevation in keeping with ascites",
+            "region": "pleura and diaphragm"
+          },
+          {
+            "finding": "normal cardiac size (cardiothoracic ratio below 0.5); normal mediastinal contour",
+            "interpretation": "normal",
+            "region": "heart and mediastinum"
+          }
+        ],
+        "impression": "No consolidation or effusion. Mildly elevated hemidiaphragms.",
+        "measurements": null,
+        "modality": "xray",
+        "recommended_actions": [],
+        "region": "chest"
+      },
+      "tool_name": "order_body_imaging",
+      "trigger_action": "request_chest_xray"
+    },
+    {
+      "output": {
+        "cell_counts": null,
+        "collected_before_antimicrobials": null,
+        "findings": [
+          {
+            "result": "negative",
+            "test": "C. difficile GDH antigen"
+          },
+          {
+            "result": "not detected",
+            "test": "C. difficile toxin B gene PCR"
+          }
+        ],
+        "gram_stain": null,
+        "impression": "Stool negative for Clostridioides difficile antigen and toxin gene.",
+        "organism": null,
+        "recommended_actions": [],
+        "specimen": "stool",
+        "susceptibility": null,
+        "tests": [
+          "Clostridioides difficile glutamate dehydrogenase antigen",
+          "Clostridioides difficile toxin B gene PCR"
+        ]
+      },
+      "tool_name": "order_microbiology",
+      "trigger_action": "request_stool_c_difficile"
+    },
+    {
+      "output": {
         "alternatives": [],
         "contraindications": [
           "Sorafenib in Child-Pugh C cirrhosis: not recommended (limited data, poor tolerance and survival)"
@@ -291,6 +348,42 @@
       {
         "alternatives": [
           {
+            "required_arguments": {
+              "study": "chest_xray"
+            },
+            "tool_name": "order_body_imaging"
+          }
+        ],
+        "citations": [
+          "[EASL_HE_2022]"
+        ],
+        "criterion_id": "action-chest-xray",
+        "expected_evidence": "No consolidation or effusion",
+        "importance": "recommended",
+        "label": "Chest radiograph in the fever source search",
+        "rationale": "Fever 38.2 \u00b0C without a source on paracentesis, urinalysis and cultures: the chest is the next common source of infection, the commonest precipitant of overt HE [EASL_HE_2022]"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "specimen": "stool"
+            },
+            "tool_name": "order_microbiology"
+          }
+        ],
+        "citations": [
+          "[EASL_HE_2022]"
+        ],
+        "criterion_id": "action-stool-c-difficile",
+        "expected_evidence": "C. difficile GDH antigen negative and toxin B gene PCR not detected",
+        "importance": "recommended",
+        "label": "Stool Clostridioides difficile testing: three weeks of watery diarrhoea with fever on a proton pump inhibitor",
+        "rationale": "Three to five watery stools a day for three weeks with fever, on omeprazole and lactulose: C. difficile infection must be excluded before the diarrhoea is attributed to sorafenib; PPIs are associated with C. difficile infection in cirrhosis [EASL_HE_2022]"
+      },
+      {
+        "alternatives": [
+          {
             "required_arguments": {},
             "tool_name": "order_ct_scan"
           }
@@ -348,7 +441,7 @@
         "Identify and treat the precipitant: sorafenib-induced diarrhea with hypokalemia (K 2.8), hypomagnesemia (Mg 1.5) and pre-renal AKI (creatinine 1.5), and the fever.",
         "Replace potassium to 4.0 mmol/L or more and replace magnesium, because hypokalemia increases renal ammoniagenesis and hypomagnesemia impedes potassium repletion; monitor the ECG during IV potassium and hold spironolactone while creatinine is raised.",
         "Treat the pre-renal AKI: stop spironolactone, replace the diarrheal volume losses, and give albumin 1 g/kg if creatinine does not improve after diuretic withdrawal (EASL 2018).",
-        "Search for the source of the fever: chest radiograph, examination, and stool Clostridioides difficile testing (diarrhea with fever on a proton pump inhibitor); start empirical antibiotics if the fever persists without a source.",
+        "Fever without a source on the cultures, urinalysis, chest radiograph and stool C. difficile testing: re-examine for a source, and start empirical antibiotics if the fever persists without one.",
         "Blood, urine and ascitic cultures are drawn before the first antibiotic dose, which is not delayed for them.",
         "Continue lactulose titrated to 2-3 soft bowel movements per day (ACG 2026 recommendation 10; EASL 2022); with 3-5 watery stools a day already, do not give loading doses, and adjust as the diarrhea settles; avoid over-titration, which causes dehydration, hypokalemia and kidney injury. Continue rifaximin 550 mg twice daily.",
         "Hold sorafenib until the diarrhea settles, then decide with oncology whether to resume it at a reduced dose; avoid loperamide while lactulose treats HE.",
@@ -411,7 +504,7 @@
       {
         "diagnosis": "Sepsis-associated encephalopathy from another source",
         "icd_code": "G93.41",
-        "key_features": "Fever and CRP 38 mg/L; blood and urine cultures and urinalysis negative; no hypotension or raised lactate; asterixis favours HE. Chest and stool sources still to be checked.",
+        "key_features": "Fever and CRP 38 mg/L; blood and urine cultures, urinalysis, chest radiograph and stool C. difficile testing negative; no hypotension or raised lactate; asterixis favours HE.",
         "likelihood": "low"
       },
       {
@@ -456,7 +549,7 @@
         "location": "patient.clinical_history.past_medical_history"
       },
       {
-        "correct_interpretation": "Fever with ascites needs paracentesis (PMN 188 excludes SBP), cultures, urinalysis, a chest radiograph and stool testing; start empirical antibiotics if the fever persists without a source.",
+        "correct_interpretation": "Fever with ascites needs paracentesis (PMN 188 excludes SBP), cultures, urinalysis, a chest radiograph and stool C. difficile testing (all negative here); start empirical antibiotics if the fever persists without a source.",
         "data_point": "Low-grade fever 38.2\u00b0C",
         "field_path": "patient.vitals.temp",
         "intended_effect": "Attribute the fever to the HCC or to sorafenib and skip the infection work-up.",

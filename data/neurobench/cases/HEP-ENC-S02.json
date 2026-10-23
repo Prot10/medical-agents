@@ -181,6 +181,63 @@
     },
     {
       "output": {
+        "contrast": false,
+        "findings": [
+          {
+            "finding": "clear lung fields without consolidation, mass or nodule",
+            "interpretation": "normal",
+            "region": "lungs"
+          },
+          {
+            "finding": "sharp costophrenic angles; no effusion; both hemidiaphragms mildly elevated",
+            "interpretation": "no effusion; diaphragmatic elevation in keeping with ascites",
+            "region": "pleura and diaphragm"
+          },
+          {
+            "finding": "normal cardiac size (cardiothoracic ratio below 0.5); normal mediastinal contour",
+            "interpretation": "normal",
+            "region": "heart and mediastinum"
+          }
+        ],
+        "impression": "No consolidation or effusion. Mildly elevated hemidiaphragms.",
+        "measurements": null,
+        "modality": "xray",
+        "recommended_actions": [],
+        "region": "chest"
+      },
+      "tool_name": "order_body_imaging",
+      "trigger_action": "request_chest_xray"
+    },
+    {
+      "output": {
+        "cell_counts": null,
+        "collected_before_antimicrobials": null,
+        "findings": [
+          {
+            "result": "negative",
+            "test": "C. difficile GDH antigen"
+          },
+          {
+            "result": "not detected",
+            "test": "C. difficile toxin B gene PCR"
+          }
+        ],
+        "gram_stain": null,
+        "impression": "Stool negative for Clostridioides difficile antigen and toxin gene.",
+        "organism": null,
+        "recommended_actions": [],
+        "specimen": "stool",
+        "susceptibility": null,
+        "tests": [
+          "Clostridioides difficile glutamate dehydrogenase antigen",
+          "Clostridioides difficile toxin B gene PCR"
+        ]
+      },
+      "tool_name": "order_microbiology",
+      "trigger_action": "request_stool_c_difficile"
+    },
+    {
+      "output": {
         "alternatives": [],
         "contraindications": [],
         "formulary_status": "Rifaximin and lactulose on formulary.",
@@ -294,6 +351,42 @@
       {
         "alternatives": [
           {
+            "required_arguments": {
+              "study": "chest_xray"
+            },
+            "tool_name": "order_body_imaging"
+          }
+        ],
+        "citations": [
+          "[EASL_HE_2022]"
+        ],
+        "criterion_id": "action-chest-xray",
+        "expected_evidence": "No consolidation or effusion",
+        "importance": "recommended",
+        "label": "Chest radiograph: fever after a respiratory illness two weeks earlier",
+        "rationale": "Fever 38.2 \u00b0C with WBC 13.6 after a respiratory illness two weeks earlier and no source on paracentesis, urinalysis and cultures: pneumonia must be excluded, since infection is the commonest precipitant of overt HE [EASL_HE_2022]"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "specimen": "stool"
+            },
+            "tool_name": "order_microbiology"
+          }
+        ],
+        "citations": [
+          "[EASL_HE_2022]"
+        ],
+        "criterion_id": "action-stool-c-difficile",
+        "expected_evidence": "C. difficile GDH antigen negative and toxin B gene PCR not detected",
+        "importance": "recommended",
+        "label": "Stool Clostridioides difficile testing: five days of diarrhoea with fever in cirrhosis",
+        "rationale": "Four to five loose stools a day for five days with fever and leucocytosis: C. difficile colitis must be excluded before the diarrhoea is attributed to lactulose [EASL_HE_2022]"
+      },
+      {
+        "alternatives": [
+          {
             "required_arguments": {},
             "tool_name": "order_ct_scan"
           }
@@ -348,9 +441,9 @@
       ],
       "required_recommendations": [
         "Restart rifaximin 550 mg twice daily with lactulose to prevent recurrence (ACG 2026; EASL 2022), and secure the supply before discharge (prior-authorization appeal, patient-assistance program or social work) so that the insurance gap does not recur.",
-        "Reduce lactulose to the dose that gives 2-3 soft bowel movements per day (currently 4-5 loose stools per day with potassium 3.2 mEq/L); correct potassium and volume, and investigate persisting diarrhea rather than attributing it to lactulose, including stool testing for Clostridioides difficile toxin (cirrhosis and recent rifaximin).",
+        "Reduce lactulose to the dose that gives 2-3 soft bowel movements per day (currently 4-5 loose stools per day with potassium 3.2 mEq/L); correct potassium and volume, and investigate persisting diarrhea rather than attributing it to lactulose.",
         "Replace potassium to 4.0 mEq/L or more, because hypokalemia increases renal ammoniagenesis, and replace magnesium (1.5 mg/dL); hold spironolactone while overt HE, the diarrhea and the creatinine of 1.3 mg/dL persist (EASL 2018).",
-        "Fever 38.2 \u00b0C with leukocytosis and no source after paracentesis (PMN 124), urinalysis and cultures: obtain a chest radiograph (respiratory illness two weeks ago) and start empirical antibiotic cover after cultures, narrowed or stopped according to the radiograph, the stool test and the cultures (EASL 2018).",
+        "Fever 38.2 \u00b0C with leukocytosis and no source on paracentesis (PMN 124), urinalysis, chest radiograph and stool C. difficile testing: start empirical antibiotic cover after cultures, and narrow or stop it according to the cultures at 48 hours (EASL 2018).",
         "Blood, urine and ascitic cultures are drawn before the first antibiotic dose, which is not delayed for them.",
         "Give parenteral thiamine before any glucose (prior heavy alcohol use).",
         "Refer for liver transplant assessment: decompensated cirrhosis with overt HE, MELD-Na 30 (EASL 2018); support continued abstinence."
@@ -443,8 +536,8 @@
       {
         "diagnosis": "Other infection (pneumonia, Clostridioides difficile colitis, bacteremia)",
         "icd_code": "A41.9",
-        "key_features": "Fever 38.2 \u00b0C, WBC 13.6 and CRP 52 with no source after paracentesis, urinalysis and sterile blood and urine cultures; pneumonia after the respiratory illness and C. difficile colitis with five days of diarrhea remain to be excluded by chest radiograph and stool testing.",
-        "likelihood": "moderate"
+        "key_features": "Fever 38.2 \u00b0C, WBC 13.6 and CRP 52 with no source after paracentesis and urinalysis; blood and urine cultures sterile, chest radiograph without consolidation after the respiratory illness, and stool negative for C. difficile despite five days of diarrhea. An occult infection is not excluded by early sterile cultures, so empirical cover continues until they are final.",
+        "likelihood": "low"
       },
       {
         "diagnosis": "Acute alcohol intoxication / withdrawal",
@@ -469,7 +562,7 @@
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "Fever 38.2 \u00b0C with leucocytosis after a recent respiratory illness may be attributed to a viral infection; with ascites and HE, SBP must still be excluded by paracentesis. Here the PMN of 124 excludes it, and the fever then needs a chest radiograph and stool testing.",
+        "correct_interpretation": "Fever 38.2 \u00b0C with leucocytosis after a recent respiratory illness may be attributed to a viral infection; with ascites and HE, SBP must still be excluded by paracentesis. Here the PMN of 124 excludes it, and the fever then needs a chest radiograph and stool C. difficile testing.",
         "data_point": "Fever 38.2 \u00b0C with leukocytosis (WBC 13.6) after a respiratory illness two weeks earlier",
         "field_path": "patient.vitals.temp",
         "intended_effect": "Attribute the fever to a resolving viral respiratory infection and skip the diagnostic paracentesis.",

@@ -462,8 +462,11 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                 "type": "string",
                 "description": (
                     "What to sample. 'blood_culture': two sets, with susceptibility "
-                    "testing. 'whole_blood_pcr': meningococcus / pneumococcus and other "
-                    "principal meningeal pathogens. 'throat_swab': meningococcal culture. "
+                    "testing. 'whole_blood_pcr': EDTA whole-blood PCR for Neisseria "
+                    "meningitidis (with pneumococcus and the other principal meningeal "
+                    "pathogens), the organism test of suspected meningococcal disease when "
+                    "lumbar puncture is delayed or contraindicated. 'throat_swab': "
+                    "meningococcal culture. "
                     "'urine': urinalysis and culture. 'ascitic_fluid': diagnostic "
                     "paracentesis with PMN count, protein and culture — indicated in every "
                     "patient with ascites and altered mental status. 'sputum': Gram stain and "

@@ -54,3 +54,13 @@ Andrea's ruling of 24 Oct 2026 (resolve open points for dataset quality); decisi
 - Index LP made optional and removed from the stop rule; the 'proceed to LP' must and its prohibition replaced by deferral until the purpura stops spreading, she is stable and coagulation is corrected (NICE NG240 1.4.11, 1.4.12: no LP with extensive or rapidly spreading purpura; WHO 2025 A.1.1: no LP with a bleeding diathesis or haemodynamic compromise); blood cultures and blood PCR carry the diagnosis; differential key features no longer depend on the CSF
 
 Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN case guards pass; synonym `--check` clean.
+
+## Central vocabulary wired (24 Oct 2026)
+
+Blood meningococcal PCR is the existing core term `order_microbiology` `specimen: whole_blood_pcr` (EDTA whole-blood PCR for N. meningitidis, S. pneumoniae and H. influenzae); its description in the tool, the `tool_io.py` mirror, `costs.yaml` and `TOOL_PARAMETER_VOCABULARY.md` now names it as the meningococcal blood PCR. No second spelling was added (one study, one term).
+
+- `ground_truth.action_criteria`: new `action-6-order-microbiology-blood-pcr` (recommended, `{specimen: whole_blood_pcr}`, `[NICE_NG240]`), placed after the blood cultures, so the deferred-LP pathway scores the organism test (plan decisions CENTRAL 2). Not in the stop rule: blood cultures remain the required organism test.
+- `followup_outputs[1]`: new `request_whole_blood_meningococcal_pcr`, N. meningitidis (ctrA) detected at 6 hours, S. pneumoniae and H. influenzae not detected, collected before antimicrobials (as the blood cultures).
+- Musts and key evidence unchanged: they already say "Blood cultures and blood meningococcal PCR establish the organism meanwhile".
+
+Re-run: `perfect_agent.py BACT-MEN-S05 -v` ok (action-6 receives `followup[1]`); `case_io.py check` schema OK, synonym guard OK, no failure names the case.

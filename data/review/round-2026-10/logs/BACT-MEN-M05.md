@@ -62,3 +62,7 @@ Synonym table scoped (October 2026, `diagnosis_synonyms.yaml`, applied with `app
 "community acquired bacterial meningitis" removed: healthcare-associated post-neurosurgical case (`except_cases` on `G00+community`).
 - labels removed: "community acquired bacterial meningitis"
 - `case_io.py validate` OK; `perfect_agent.py` passes.
+
+## Central vocabulary wired (24 Oct 2026)
+- Core term `analyze_csf.source` `external_ventricular_drain`: `action-3-analyze-csf` now requires `source: external_ventricular_drain`, since the index CSF is the EVD port sample the reviewer ruled (33d97134) and a lumbar puncture is not the intended act with an EVD in situ. Follow-up trigger renamed `request_evd_csf_sample` -> `request_external_ventricular_drain_csf_sample` so the call's source tokens route to it (`-v` confirms). Billing caveat (EVD sample billed as an LP) is in CENTRAL_PENDING; cost efficiency is relative to the case's own required work-up, so it is neutral here.
+- Re-run: `perfect_agent.py -v` ok; `case_io.py check`: schema OK, synonym guard OK, no test failure names the case.

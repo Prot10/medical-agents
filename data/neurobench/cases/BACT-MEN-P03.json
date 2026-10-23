@@ -164,10 +164,10 @@
           "CSF_lactate": "3.2 mmol/L (local laboratory reference <3.5 mmol/L)",
           "Cryptococcal_antigen_CSF": "Positive, titer 1:2048",
           "Cytology": "No malignant cells identified",
-          "Fungal_culture": "Pending (inoculated on Sabouraud dextrose agar and BHI agar)",
           "Gram_stain": "No organisms seen",
-          "India_ink": "Positive: encapsulated budding yeast forms identified",
-          "Multiplex_PCR_meningitis_encephalitis_panel": "Cryptococcus neoformans/gattii detected; no other panel target detected (targets: Escherichia coli K1, Haemophilus influenzae, Listeria monocytogenes, Neisseria meningitidis, Streptococcus agalactiae, Streptococcus pneumoniae, cytomegalovirus, enterovirus, HSV-1, HSV-2, HHV-6, human parechovirus, varicella zoster virus, Cryptococcus neoformans/gattii)"
+          "Multiplex_PCR_meningitis_encephalitis_panel": "Cryptococcus neoformans/gattii detected; no other panel target detected (targets: Escherichia coli K1, Haemophilus influenzae, Listeria monocytogenes, Neisseria meningitidis, Streptococcus agalactiae, Streptococcus pneumoniae, cytomegalovirus, enterovirus, HSV-1, HSV-2, HHV-6, human parechovirus, varicella zoster virus, Cryptococcus neoformans/gattii)",
+          "fungal_culture": "Pending (inoculated on Sabouraud dextrose agar and BHI agar)",
+          "india_ink": "Positive: encapsulated budding yeast forms identified"
         }
       },
       "tool_name": "analyze_csf",
@@ -217,6 +217,39 @@
       },
       "tool_name": "analyze_brain_mri",
       "trigger_action": "request_mri_brain_contrast"
+    },
+    {
+      "output": {
+        "abnormal_values_summary": [
+          "HIV-1 RNA 284,000 copies/mL (log10 5.45) (H)",
+          "Serum cryptococcal antigen positive, titre 1:1024"
+        ],
+        "interpretation": "Abnormal values: HIV-1 RNA 284,000 copies/mL (log10 5.45) (H); serum cryptococcal antigen (lateral flow assay) positive, titre 1:1024.",
+        "panels": {
+          "HIV_viral_load": [
+            {
+              "clinical_significance": null,
+              "is_abnormal": true,
+              "reference_range": "Not detected (< 20)",
+              "test": "HIV-1 RNA (quantitative PCR)",
+              "unit": "copies/mL",
+              "value": "284,000 (log10 5.45)"
+            }
+          ],
+          "serum_cryptococcal_antigen": [
+            {
+              "clinical_significance": null,
+              "is_abnormal": true,
+              "reference_range": "Negative",
+              "test": "Cryptococcal antigen, serum (lateral flow assay)",
+              "unit": "",
+              "value": "Positive, titre 1:1024"
+            }
+          ]
+        }
+      },
+      "tool_name": "interpret_labs",
+      "trigger_action": "request_hiv_viral_load_serum_cryptococcal_antigen"
     },
     {
       "output": {
@@ -277,7 +310,8 @@
                 "procalcitonin",
                 "glucose",
                 "coagulation",
-                "HIV"
+                "HIV",
+                "CD4_count"
               ]
             },
             "tool_name": "interpret_labs"
@@ -289,8 +323,8 @@
         "criterion_id": "action-1-interpret-labs",
         "expected_evidence": "Inflammation/sepsis and LP safety context; blood values neither confirm nor exclude bacterial meningitis",
         "importance": "required",
-        "label": "Obtain CBC with differential, CRP (or procalcitonin), paired blood glucose, coagulation, renal/liver function and HIV testing; results must not delay LP or empirical therapy",
-        "rationale": "Obtain CBC with differential, CRP (or procalcitonin), paired blood glucose, coagulation, renal/liver function and HIV testing; results must not delay LP or empirical therapy"
+        "label": "Obtain CBC with differential, CRP (or procalcitonin), paired blood glucose, coagulation, renal/liver function, HIV testing and, with HIV reactive, the CD4 count; results must not delay LP or empirical therapy",
+        "rationale": "Obtain CBC with differential, CRP (or procalcitonin), paired blood glucose, coagulation, renal/liver function, HIV testing and, with HIV reactive, the CD4 count; results must not delay LP or empirical therapy"
       },
       {
         "alternatives": [
@@ -385,6 +419,24 @@
         "importance": "recommended",
         "label": "Contrast-enhanced brain MRI in advanced HIV with raised intracranial pressure, to characterize the hydrocephalus and parenchymal involvement and to exclude focal lesions such as toxoplasmosis or lymphoma; it does not replace or delay the lumbar puncture.",
         "rationale": "Contrast-enhanced brain MRI in advanced HIV with raised intracranial pressure, to characterize the hydrocephalus and parenchymal involvement and to exclude focal lesions such as toxoplasmosis or lymphoma; it does not replace or delay the lumbar puncture."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "HIV_viral_load"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-7-interpret-labs-hiv-viral-load",
+        "expected_evidence": "HIV-1 RNA 284,000 copies/mL: untreated HIV infection, the baseline for antiretroviral therapy.",
+        "importance": "recommended",
+        "label": "HIV-1 viral load as the baseline for antiretroviral therapy in the new HIV diagnosis; it does not delay antifungal induction",
+        "rationale": "The viral load does not diagnose the meningitis. It is the pre-treatment baseline against which the response to antiretroviral therapy, started 4 to 6 weeks after antifungal induction, is judged."
       },
       {
         "alternatives": [
@@ -728,6 +780,24 @@
             "value": 92.5
           }
         ],
+        "CD4_count": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "500-1500",
+            "test": "CD4 count",
+            "unit": "cells/uL",
+            "value": 45
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "30-60",
+            "test": "CD4 percentage",
+            "unit": "%",
+            "value": 4
+          }
+        ],
         "Coagulation": [
           {
             "clinical_significance": null,
@@ -754,7 +824,7 @@
             "value": 31
           }
         ],
-        "HIV and Immunology": [
+        "HIV": [
           {
             "clinical_significance": null,
             "is_abnormal": true,
@@ -770,22 +840,6 @@
             "test": "HIV-1 confirmatory (differentiation immunoassay)",
             "unit": "",
             "value": "HIV-1 positive"
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": true,
-            "reference_range": "500-1500",
-            "test": "CD4 count",
-            "unit": "cells/uL",
-            "value": 45
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": true,
-            "reference_range": "30-60",
-            "test": "CD4 percentage",
-            "unit": "%",
-            "value": 4
           }
         ],
         "Hepatic Panel": [

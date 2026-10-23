@@ -74,3 +74,13 @@ Andrea's ruling of 24 Oct 2026 (resolve open points for dataset quality); decisi
 - Contrast MRI downgraded from required to recommended and removed from the stop rule: WHO 2022 bases the diagnosis on CSF opening pressure and CrAg and requires no MRI; the required pre-LP CT already screens for a mass
 
 Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN case guards pass; synonym `--check` clean.
+
+## Central vocabulary wired (24 Oct 2026)
+
+`CD4_count`, `HIV_viral_load` and `serum_cryptococcal_antigen` (`interpret_labs`) and `fungal_culture`, `india_ink` (`analyze_csf`) are now core terms (CENTRAL request above).
+- `ground_truth.action_criteria[action-1-interpret-labs]`: `CD4_count` added to `required_arguments.panels`; label and rationale now end "HIV testing and, with HIV reactive, the CD4 count". The label rests on advanced HIV (CD4 45).
+- `initial_tool_outputs.labs.panels`: "HIV and Immunology" split into `HIV` (Ag/Ab reactive, differentiation assay HIV-1 positive) and `CD4_count` (45 cells/uL, 4%). Values, summary and interpretation unchanged.
+- New `followup_outputs` entry `interpret_labs` `request_hiv_viral_load_serum_cryptococcal_antigen` (placed before the drug check): `HIV_viral_load` HIV-1 RNA 284,000 copies/mL (log10 5.45), and `serum_cryptococcal_antigen` positive, titre 1:1024 (the value the case carried before the first-panel leak was removed). Both were removed in the round only because they could not be ordered; now an order for either returns this patient's result instead of the library's negative.
+- New criterion `action-7-interpret-labs-hiv-viral-load` (recommended, before the drug check): `interpret_labs {panels: [HIV_viral_load]}`, the pre-ART baseline the must "obtain the HIV viral load" asks for. Serum CrAg has no criterion: once CSF CrAg is positive WHO 2022 needs no serum test, so it is answered but not scored.
+- `followup_outputs[request_lumbar_puncture].output.special_tests`: `Fungal_culture` renamed `fungal_culture`, `India_ink` renamed `india_ink`; values unchanged. The CSF criterion is unchanged (CSF CrAg establishes the diagnosis).
+- Checks: `perfect_agent.py BACT-MEN-P03 -v` ok (action-7 served by the new follow-up; the first full panel still gets the initial labs); `case_io.py check` schema OK, synonym guard OK, no failure names the case; case guards pass.

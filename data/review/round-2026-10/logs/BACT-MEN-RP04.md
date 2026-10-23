@@ -65,3 +65,9 @@ Andrea's ruling of 24 Oct 2026 (resolve open points for dataset quality); decisi
 - Immunoglobulin and complement criterion cites [Tebruegge_2008] (Tebruegge M, Curtis N, Clin Microbiol Rev 2008;21:519-537: 36% of recurrent bacterial meningitis is due to immunodeficiency, chiefly complement and antibody defects)
 
 Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN case guards pass; synonym `--check` clean.
+
+## Central vocabulary wired (24 Oct 2026)
+- Note 8f75c86a part 1, BLOCKED -> FIXED with the new core term `interpret_labs` `beta2_transferrin`: new required criterion `action-9-interpret-labs-beta2-transferrin` (`panels: [beta2_transferrin]`), placed after the contrast MRI and before the immunoglobulins; follow-up `request_beta2_transferrin` (`followup_outputs[4]`, after the MRI): "Beta-2 transferrin, nasal secretion (left), immunofixation: Detected", send-out, reported at 3 days; added to `stop_rule.required_before_assessment`.
+- `required_recommendations[5]` no longer stands in for the order: "Confirm the CSF leak with beta-2 transferrin on the left nasal secretion, collected while the rhinorrhea is active; it is a send-out assay reported in about 3 days, so antibiotics, dexamethasone and the skull-base imaging proceed without waiting for it."
+- `differential[0].key_features`: "beta-2 transferrin detected in the left nasal secretion confirms that the rhinorrhea is CSF" (was "confirms CSF when it returns"). `metadata.difficulty_rationale`: 6 required actions.
+- Re-run: `perfect_agent.py -v` ok; `case_io.py check`: schema OK, synonym guard OK, no test failure names the case.

@@ -10,13 +10,13 @@ lands.
 - `analyze_csf.source`: an EVD sample is billed as a lumbar puncture; only shunt/EVD criteria may
   name `source`. (vocabulary agent, 24 Oct)
 
-## Batch-1 cases waiting on vocabulary
-- The terms now in core (beta2_transferrin, serum_cryptococcal_antigen, CD4_count,
-  HIV_viral_load, CSF mycobacterial_panel / fungal_culture / india_ink / ADA, wound_swab, sputum,
-  audiometry, chest_xray, temporal artery ultrasound and biopsy) must be wired into the batch-1
-  criteria and outputs that logged them BLOCKED (e.g. BACT-MEN-RP04 beta-2 transferrin).
-- Missing term: blood meningococcal PCR, so BACT-MEN-S05 can score its diagnostic test while the
-  LP is deferred.
+## Guidance claims
+- `test_guidance_claims`: the ALZ-EARLY (CSF, amyloid PET, FDG) and GBS (brain MRI) claims fail
+  until those conditions finish; update the response in
+  `agent-platform/scripts/review/build_condition_tool_guidance.py`, regenerate with `--write`,
+  and update the claim table in the same change. (24 Oct)
+
+## Vocabulary follow-ups
 - Other conditions citing "WHO 2025 Annex A.4" should read "section A.4" (the guideline has no
   Annex A.4).
 

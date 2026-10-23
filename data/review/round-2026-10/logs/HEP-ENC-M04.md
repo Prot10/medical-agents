@@ -67,3 +67,12 @@ Synonym table scoped (October 2026, `diagnosis_synonyms.yaml`, applied with `app
 - No transplant must added: the Lille must already sets the next decision while the response to prednisolone is pending (auditor flag, decided keep).
 
 Checks: `perfect_agent.py` pass; `case_io.py check` schema and synonym guard OK, no test failure names this case; leak guard clean.
+
+## Central vocabulary wired (24 Oct 2026)
+
+`chest_xray` is now a core `order_body_imaging` study, so the chest radiograph named in the infection must is a scored action.
+- New criterion `action-chest-xray` (recommended), `order_body_imaging {"study": "chest_xray"}`, placed after the urine culture; citations `[EASL_HE_2022]`, `[EASL_ALD_2018]`; expected evidence "No consolidation or effusion".
+- New `followup_outputs[1]` `request_chest_xray` (region chest, modality xray): clear lungs, no effusion or pneumothorax, normal heart size; impression findings only. Placed after the urine culture, before the drug check.
+- `assessment.required_recommendations[5]`: the radiograph is no longer listed as a step inside the must; antibiotics are reviewed at 48 hours "with the culture and chest radiograph results".
+- `differential[3].key_features`: "a chest source is not yet excluded" replaced by the radiograph result; the entry stays moderate (occult infection on corticosteroids not excluded by early cultures).
+- Re-run: `perfect_agent.py HEP-ENC-M04 -v` ok (action-chest-xray <- followup[1]); `case_io.py check` schema OK, synonym guard OK, no test failure names the case.

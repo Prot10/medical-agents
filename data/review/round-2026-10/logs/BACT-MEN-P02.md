@@ -79,3 +79,11 @@ Andrea's ruling of 24 Oct 2026 (resolve open points for dataset quality); decisi
 - 'WHO 2025 Annex A.4' renamed 'WHO 2025 section A.4' (4 strings): the cranial imaging recommendations are section A.4 of chapter 3 of the guideline, not an annex
 
 Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN case guards pass; synonym `--check` clean.
+
+## Central vocabulary wired (24 Oct 2026)
+
+`mycobacterial_panel` and `ADA` are now core `analyze_csf` special tests (CENTRAL request above).
+- `ground_truth.action_criteria[action-3-analyze-csf].alternatives[0].required_arguments.special_tests`: `mycobacterial_panel` and `ADA` added (now meningitis_panel, ACE_CSF, cytology, mycobacterial_panel, ADA). The diagnosis rests on them; the label already named them.
+- `followup_outputs[request_lumbar_puncture].output.special_tests`: `AFB_smear`, `Xpert_MTB_RIF_Ultra` and `Mycobacterial_culture` merged into one `mycobacterial_panel` entry with the same three results (rare AFB; M. tuberculosis complex detected, rifampicin resistance not detected; culture pending, MGIT, up to 6 weeks); `Adenosine_deaminase` renamed `ADA` (18 U/L, reference <10); `India_ink` renamed `india_ink`. No value changed.
+- Sputum not wired: she denies cough, haemoptysis and any pulmonary symptom and the case has no chest image, so a scored sputum order has no clinical anchor; chest imaging with sputum stays the screening must.
+- Checks: `perfect_agent.py BACT-MEN-P02 -v` ok (CSF criterion served by `request_lumbar_puncture`); `case_io.py check` schema OK, synonym guard OK, no failure names the case; case guards pass.

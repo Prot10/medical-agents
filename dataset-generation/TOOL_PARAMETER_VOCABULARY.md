@@ -166,7 +166,7 @@ studies at different prices.
 | Value | Specimen | When |
 |---|---|---|
 | `blood_culture` | Two sets, with susceptibility | Suspected bacterial meningitis, sepsis, SBP |
-| `whole_blood_pcr` | Meningococcus / pneumococcus PCR | Meningitis where culture may be negative |
+| `whole_blood_pcr` | EDTA whole-blood PCR: N. meningitidis, S. pneumoniae, H. influenzae | Suspected meningococcal disease (NICE NG240), above all when the LP is deferred; meningitis where culture may be negative |
 | `throat_swab` | Meningococcal culture | Suspected meningococcal disease |
 | `urine` | Urinalysis + culture | Infection screen as an HE precipitant |
 | `ascitic_fluid` | Diagnostic paracentesis: PMN count, protein, culture | Every patient with ascites and altered mental status |

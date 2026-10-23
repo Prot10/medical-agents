@@ -55,3 +55,6 @@ Andrea's ruling of 24 Oct 2026 (resolve open points for dataset quality); decisi
 - Pre-LP CT made neutral (no criterion, no waste penalty): prednisolone 30 mg for about 2 weeks meets the IDSA 2013 high-level immunosuppression threshold while WHO 2025 gives no steroid threshold; the no-imaging must, its prohibition and the CT waste avoided action replaced by a must that accepts either course with antibiotics first
 
 Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN case guards pass; synonym `--check` clean.
+
+## Central vocabulary wired (24 Oct 2026)
+- DECLINED: no temporal artery ultrasound or biopsy criterion. Giant cell arteritis is not a competing explanation of the presentation (the neutrophilic CSF with S. pneumoniae in CSF and blood excludes it as the cause; `differential` GCA low), but a comorbid question the plan assigns to after the acute phase. A stored result would either add an unscored second diagnosis (a halo sign) or a negative that does not exclude GCA after two weeks of prednisolone 30 mg; the GCA must (ultrasound or biopsy with rheumatology review, glucocorticoid dose if confirmed) carries it. No case change.

@@ -66,3 +66,12 @@ Synonym table scoped (October 2026, `diagnosis_synonyms.yaml`, applied with `app
 - labels removed: "hepatic coma"
 - codes removed: K72.91
 - `case_io.py validate` OK; `perfect_agent.py` passes.
+
+## Central vocabulary wired (24 Oct 2026)
+
+`chest_xray` and the `stool` specimen are now core terms, so note dd9192d8 (previously FIXED as musts) becomes scored actions.
+- New criteria after the urine culture, both recommended, `[EASL_HE_2022]`: `action-chest-xray` `{"study": "chest_xray"}` (respiratory illness two weeks earlier; expected "No consolidation or effusion") and `action-stool-c-difficile` `{"specimen": "stool"}` (five days of diarrhoea with fever; expected both assays negative).
+- New `followup_outputs[2]` `request_chest_xray` (no consolidation or effusion, mildly elevated hemidiaphragms from ascites) and `[3]` `request_stool_c_difficile` (negative), before the drug check.
+- `assessment.required_recommendations[1]`: the C. difficile clause removed (now an action); the must is the MUST-LACT-OVERUSE text. `[3]`: "no source on paracentesis (PMN 124), urinalysis, chest radiograph and stool C. difficile testing: start empirical antibiotic cover after cultures, and narrow or stop it according to the cultures at 48 hours (EASL 2018)".
+- `differential[1]` (other infection) moderate -> low, key features now give the negative radiograph and stool test; `red_herrings[0].correct_interpretation` names "stool C. difficile testing". Both results were chosen negative because the label rests on the rifaximin gap and diarrhoea-associated hypokalaemia.
+- Re-run: `perfect_agent.py HEP-ENC-S02 -v` ok; `case_io.py check` schema OK, synonym guard OK, no test failure names the case.

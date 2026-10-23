@@ -187,9 +187,10 @@ SPEC: list[dict[str, object]] = [
     # === ischaemic stroke (reviewer 2) ===
     dict(cond="ischemic_stroke", filed="order_ct_scan", tool="order_ct_scan",
          reviewer=2, tier="required", status="applied",
-         response="Applied: all 30 cases have explicitly discriminated first-line NCCT and a "
-                  "separate subsequent CTA as 60 required actions. CTA is never represented as "
-                  "a substitute for NCCT and its call text states that creatinine must not delay it."),
+         response="Applied: all 30 cases have an explicitly discriminated first-line NCCT, and 29 a "
+                  "separate subsequent CTA, as 59 required actions; in the pregnant ISCH-STR-RP02 "
+                  "an MRI with MR angiography replaces the CTA. CTA is never represented as a "
+                  "substitute for NCCT and its call text states that creatinine must not delay it."),
     dict(cond="ischemic_stroke", filed="analyze_eeg", tool="analyze_eeg",
          reviewer=2, tier="optional", status="applied",
          response="Applied: no case requires EEG. One case retains it as optional for a witnessed "
@@ -198,15 +199,21 @@ SPEC: list[dict[str, object]] = [
     dict(cond="ischemic_stroke", filed="analyze_brain_mri", tool="analyze_brain_mri",
          reviewer=2, tier="optional", status="applied",
          seg=(None, "NEW ITEM OPTIONAL"),
-         response="Applied: brain MRI is optional in all 30 cases."),
+         response="Applied: brain MRI is optional in 23 cases. It is recommended in 6 where it "
+                  "answers a question the CT cannot (fat-saturated T1 for dissection in M04, P01, "
+                  "RM03 and RM04, DWI in RM02, small vessel disease in RP05) and required in 1, "
+                  "RP02, where it replaces the CTA in pregnancy."),
     dict(cond="ischemic_stroke", filed="analyze_brain_mri", tool="order_advanced_imaging",
          reviewer=2, tier="optional", status="applied",
          seg=("NEW ITEM OPTIONAL", None),
-         response="Applied end to end rather than only adding vocabulary: CT_perfusion is optional "
-                  "and reachable in the 2 wake-up/extended-window cases where an authored core/"
-                  "penumbra report changes selection. Four reports formerly misrouted through "
-                  "ordinary head CT were audited; three routine-window/non-selection uses were "
-                  "removed. Blanket MRA, TCD and carotid-duplex duplication is also removed."),
+         response="Applied end to end rather than only adding vocabulary: CT_perfusion is reachable "
+                  "in the 5 wake-up/extended-window cases where an authored core/penumbra report "
+                  "changes selection, recommended in 4 and required in 1 (P04, where it selects "
+                  "thrombectomy at 8 hours). Four reports formerly misrouted through ordinary head "
+                  "CT were audited; three routine-window/non-selection uses were removed. Blanket "
+                  "MRA, TCD and carotid-duplex duplication is also removed: the only separate "
+                  "vascular study left is an optional MRA in RP02, if it was not acquired with "
+                  "the brain MRI."),
     dict(cond="ischemic_stroke", filed="interpret_labs", tool="interpret_labs",
          reviewer=2, tier="unchanged", status="applied",
          response="Applied in all 30 cases: glucose, CBC, coagulation, creatinine and baseline "
@@ -219,7 +226,8 @@ SPEC: list[dict[str, object]] = [
          reviewer=2, tier="required", status="applied",
          seg=(None, "Item\nLaboratory studies"),
          response="Applied: blood culture with susceptibility is required and reachable in all 30 "
-                  "cases. Every action and trajectory states collection before antimicrobials when "
+                  "cases; EDTA whole-blood meningococcal PCR is recommended in BACT-MEN-S05, whose "
+                  "lumbar puncture is deferred, and an ulcer swab in RS01. Every action and trajectory states collection before antimicrobials when "
                   "possible, while making explicit that sampling, LP or imaging never delays "
                   "empirical therapy."),
     dict(cond="bacterial_meningitis", filed="interpret_labs", tool="interpret_labs",
@@ -232,14 +240,18 @@ SPEC: list[dict[str, object]] = [
          reviewer=2, tier="unchanged", status="applied",
          response="Applied: every LP action explicitly names opening pressure, appearance, total and "
                   "differential cells, RBC, protein, paired glucose, Gram stain, culture with "
-                  "susceptibility and relevant PCR, with pre/post-antibiotic timing. Unrelated CSF "
-                  "OCB, prion and autoimmune carry-over assays are absent."),
+                  "susceptibility and relevant PCR, with pre/post-antibiotic timing. The LP is "
+                  "required in 29 cases; in 1, BACT-MEN-S05 (rapidly spreading purpura with an "
+                  "uncorrected coagulopathy), it is optional and deferred (NICE NG240; WHO 2025), "
+                  "and blood cultures and blood PCR carry the organism. Unrelated CSF OCB, prion "
+                  "and autoimmune carry-over assays are absent."),
     dict(cond="bacterial_meningitis", filed="analyze_brain_mri", tool="analyze_brain_mri",
          reviewer=2, tier="unchanged", status="applied",
-         response="Corrected after re-reading the cases: MRI is absent from the 20 uncomplicated "
-                  "initial pathways, recommended only in 1 non-response/hydrocephalus case, and "
-                  "required in 9 cases with an authored abscess, ventriculitis, hydrocephalus, "
-                  "brainstem, shunt, skull-base or other structural-complication question."),
+         response="Corrected after re-reading the cases: MRI is absent from the 18 uncomplicated "
+                  "initial pathways, recommended in 2 (hydrocephalus in advanced HIV; "
+                  "complications in an immunosuppressed patient), and required in 10 cases with an "
+                  "authored abscess, ventriculitis, hydrocephalus, brainstem, shunt, skull-base or "
+                  "other structural-complication question."),
     dict(cond="bacterial_meningitis", filed="analyze_ecg", tool="analyze_ecg",
          reviewer=2, tier="unchanged", status="applied",
          response="Applied: electrocardiography is no longer part of this condition's panel and no "
@@ -249,9 +261,13 @@ SPEC: list[dict[str, object]] = [
     dict(cond="hepatic_encephalopathy", filed="interpret_labs", tool="order_microbiology",
          reviewer=2, tier="required", status="applied",
          seg=(None, "Item\nLaboratory studies."),
-         response="Applied: blood cultures in all 30 cases, urine in all 30, and diagnostic "
-                  "paracentesis in the 13 with ascites — 73 required microbiology actions where "
-                  "before there was no tool able to sample anything outside the CNS."),
+         response="Applied, and tiered case by case in the October 2026 review: blood and urine "
+                  "cultures are required in the 12 cases with a suspected infection and "
+                  "recommended in 16 as a screen for an occult precipitant (afebrile, normal white "
+                  "cell count, no focal source; EASL 2022); in the covert-HE case P07 both are "
+                  "optional, and P08 has optional blood cultures only. Diagnostic paracentesis is "
+                  "required in the 21 with ascites, and C. difficile stool testing is recommended "
+                  "in 2. Before this there was no tool able to sample anything outside the CNS."),
     dict(cond="hepatic_encephalopathy", filed="interpret_labs", tool="interpret_labs",
          reviewer=2, tier="unchanged", status="applied",
          seg=("Item\nLaboratory studies.", None),
@@ -260,10 +276,13 @@ SPEC: list[dict[str, object]] = [
     dict(cond="hepatic_encephalopathy", filed="analyze_brain_mri", tool="order_body_imaging",
          reviewer=2, tier="optional", status="applied",
          seg=(None, "Item\nBrain MRI."),
-         response="Applied: HEP-ENC-M06 now uses optional abdominal Doppler through "
-                  "order_body_imaging to assess the pre-existing TIPS in new post-TIPS overt HE. "
-                  "The report was already authored in that case; it was attached to the wrong, "
-                  "brain-oriented tool. No blanket abdominal imaging was added: the reviewers' "
+         response="Applied: HEP-ENC-M06 now uses abdominal Doppler through order_body_imaging, "
+                  "required since the October 2026 review, to assess the pre-existing TIPS in new "
+                  "post-TIPS overt HE. The report was already authored in that case; it was "
+                  "attached to the wrong, brain-oriented tool. Abdominal ultrasound is also "
+                  "required in S05 (obstruction, collection, portal vein) and contrast abdominal "
+                  "imaging of the splenorenal shunt recommended in P08; a chest radiograph is "
+                  "recommended in 4 cases as part of the infection screen. No blanket abdominal imaging was added: the reviewers' "
                   "trigger remains recurrent/persistent or refractory HE, including a specific "
                   "shunt/TIPS question or failure to recover after 48-72 hours."),
     dict(cond="hepatic_encephalopathy", filed="analyze_brain_mri", tool="analyze_brain_mri",
@@ -276,40 +295,43 @@ SPEC: list[dict[str, object]] = [
          response="No change requested and none made."),
     dict(cond="hepatic_encephalopathy", filed="analyze_eeg", tool="analyze_eeg",
          reviewer=2, tier="optional", status="applied",
-         response="Applied: EEG is no longer required in any case (recommended in 23, optional "
-                  "in 1)."),
+         response="Applied: EEG is recommended in 24 cases and absent in 5. It is required in 1, "
+                  "HEP-ENC-P06, unresponsive after a witnessed seizure, where non-convulsive status "
+                  "must be excluded."),
     dict(cond="hepatic_encephalopathy", filed="order_ct_scan", tool="order_ct_scan",
          reviewer=2, tier="optional", status="applied",
          response="Applied. We had left it REQUIRED in all 30 cases and put the question back to "
                   "you; that was wrong twice over. First on the facts: the reason we gave — that we "
                   "do not drop an exclusion step before an invasive procedure — was carried over "
-                  "from bacterial meningitis, and here the gold standard performs a lumbar puncture "
-                  "in 1 of the 30 cases; and your meningitis annotations are on CSF, laboratory, "
+                  "from bacterial meningitis, and here no gold standard performs a lumbar puncture "
+                  "(the one in HEP-ENC-M01 was removed in the October 2026 review); and your meningitis annotations are on CSF, laboratory, "
                   "MRI and ECG, so the CT there was never contested. Second on method: a first "
                   "attempt assigned tiers per case from a keyword scan, which matched \"seizure\" "
                   "and \"fall\" in all 30 because those words live in the differentials and in "
                   "negated history, and missed HEP-ENC-P05, whose ataxia and ophthalmoparesis are "
                   "Wernicke encephalopathy. All 30 cases were then read in full.\n\n"
-                  "Two facts from that reading: **29 of the 30 CT reports are normal** — the only "
-                  "positive one is HEP-ENC-P09, a 9 mm chronic subdural with 3 mm midline shift — "
-                  "and **no case has a focal deficit except that same P09**; every other "
+                  "Two facts from that reading: **28 of the 30 CT reports show no acute "
+                  "abnormality** — the exceptions are HEP-ENC-P09, a 9 mm chronic subdural with 3 "
+                  "mm midline shift, and P04, bilateral symmetric putaminal hypodensity — and **no "
+                  "case has a lateralised deficit except that same P09**; every other "
                   "examination reads \"no focal weakness\" or \"no focal paresis\", and the "
                   "bilateral Babinski signs and asterixis present in most of them are the metabolic "
                   "picture, not focal signs.\n\n"
-                  "So the tier is now **optional in 25 of the 30 cases**, as you asked. Five stay "
+                  "So the tier is now **optional in 24 of the 30 cases**, as you asked. Six stay "
                   "required, on a textual rule rather than a judgement of ours — the case's own "
                   "text states the CT is mandatory, urgent or necessary, or one of your listed "
-                  "triggers appears verbatim in the presentation: P09 (focal right-sided signs; "
+                  "triggers appears in the presentation: P09 (focal right-sided signs; "
                   "\"mandate imaging\"), P06 (\"unresponsive after a witnessed seizure\"), M10 "
                   "and S11 (\"mandatory given coagulopathy and thrombocytopenia\" — your "
-                  "\"clinical suspicion of intracranial bleeding\"), and P08 (\"necessary given "
-                  "repeated TIA framing\"). P08 is the one of the five that does not match your "
-                  "list word for word, and we are flagging it as such. Overruling any of the five "
-                  "means reading five sentences. Mandatory CT spend across the condition falls from "
-                  "5520 to 920 EUR. The imaging-before-puncture rule is untouched except in "
-                  "HEP-ENC-M01, the single case whose gold standard includes a puncture, where it "
-                  "is softened from hard to soft so that following your guidance cannot be "
-                  "penalised."),
+                  "\"clinical suspicion of intracranial bleeding\"), S06 (found down in coma "
+                  "with nobody to exclude a fall, INR 3.4 and platelets 48: possible head trauma, "
+                  "added in the October 2026 review), and P08 (\"necessary given repeated TIA "
+                  "framing\"). P08 is the one of the six that does not match your list word for "
+                  "word, and we are flagging it as such. Overruling any of the six means reading "
+                  "six sentences. Mandatory CT spend across the condition falls from 5520 to 1104 "
+                  "EUR. No case now has an imaging-before-puncture rule: HEP-ENC-M01, the single "
+                  "case whose gold standard included a puncture, lost the puncture in the October "
+                  "2026 review."),
 
     # === high-grade glioma (reviewer 2) ===
     dict(cond="brain_tumor_glioma", filed="analyze_brain_mri", tool="obtain_tissue_diagnosis",
@@ -733,12 +755,14 @@ SPEC += [
     # === amyotrophic lateral sclerosis (reviewer 1) ===
     dict(cond="als", filed="order_specialized_test", tool="order_specialized_test",
          reviewer=1, tier="required", status="applied",
-         response="Applied and corrected case by case: EMG/NCS is the only ALS-specific required "
-                  "specialized study in all 30. Respiratory function is recommended in all 30 as "
-                  "a post-diagnostic safety/staging baseline, not diagnostic confirmation. An ALS "
-                  "gene panel is separately optional/offered after counselling in all 30, consistent "
-                  "with the 2023 consensus guideline; it is never embedded in routine labs or required. "
-                  "No RNS, biopsy, unrelated evoked potential, autonomic or tilt action remains."),
+         response="Applied and corrected case by case: EMG/NCS is required in all 30. "
+                  "Respiratory function is recommended in 28 as a post-diagnostic safety/staging "
+                  "baseline, not diagnostic confirmation, and optional in the 2 carrier cases that "
+                  "do not meet ALS criteria (P02, P08). An ALS gene panel is optional/offered after "
+                  "counselling in 26, consistent with the 2023 consensus guideline, and required in "
+                  "the 4 familial cases whose label or counselling rests on the result (P02, P08, "
+                  "P09, S10); it always follows EMG and is never embedded in routine labs. No RNS, "
+                  "biopsy, unrelated evoked potential, autonomic or tilt action remains."),
     dict(cond="als", filed="analyze_brain_mri", tool="analyze_brain_mri",
          reviewer=1, tier="required", status="applied",
          response="Applied: required in all 30."),

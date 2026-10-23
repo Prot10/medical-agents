@@ -45,3 +45,7 @@ Andrea's ruling of 24 Oct 2026 (resolve open points for dataset quality); decisi
 - Hearing must cites WHO 2025 (strong recommendation: formal audiological screening before discharge, or within four weeks of discharge), which covers every adult with acute meningitis, instead of NICE NG240, which excludes immunocompromised and neurosurgical patients
 
 Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN case guards pass; synonym `--check` clean.
+
+## Central vocabulary wired (24 Oct 2026)
+- Core term `analyze_csf.source` `shunt_tap`: new recommended criterion `action-7-analyze-csf-shunt-tap` (`source: shunt_tap`, IDSA 2017 rationale) after the contrast MRI, served by the existing follow-up `request_shunt_tap` (`source` is not a MockServer discriminator; the trigger tokens route it, confirmed by `-v`). The neurosurgical shunt-assessment must is kept unchanged.
+- Re-run: `perfect_agent.py -v` ok; `case_io.py check`: schema OK, synonym guard OK, no test failure names the case.

@@ -66,3 +66,10 @@ Decisions recorded in `data/review/round-2026-10/plans/ALS-decisions.md` (Andrea
 - waste citations: [AAN_2009] -> [EFNS_ALS_2012] on 8 waste avoided actions (ground_truth.avoided_actions[*].citations). EFNS 2012 is the guideline on diagnostic investigations in ALS; AAN 2009 Part 1 covers drug, nutritional and respiratory therapy (ALS summary CENTRAL 8).
 - HPI: prior viral load and CD4 values removed (current values are scored through the labs criterion).
 - Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, ALS case guards pass.
+
+## Central vocabulary wired (24 Oct 2026)
+
+`HIV_viral_load` and `CD4_count` are now core `interpret_labs` terms (CENTRAL request above, plan section 5.4).
+- `ground_truth.action_criteria[action-5-interpret-labs].alternatives[0].required_arguments.panels`: `HIV` replaced by `HIV_viral_load` and `CD4_count` (now CBC, CK, TSH, vitamin_B12, HIV_viral_load, CD4_count). She has known HIV, so the screen was never the question; the current viral load and CD4 are.
+- `initial_tool_outputs.labs.panels`: the `HIV` panel split into `HIV_viral_load` (plasma HIV-1 RNA <20, not detected) and `CD4_count` (520 cells/uL). Values, flags, summary and interpretation unchanged.
+- Checks: `perfect_agent.py ALS-P05 -v` ok; `case_io.py check` schema OK, synonym guard OK, no failure names the case; case guards pass.

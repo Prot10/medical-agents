@@ -54,3 +54,8 @@ Andrea's ruling of 24 Oct 2026 (resolve open points for dataset quality); decisi
 - Synonyms: the G00.2 category entry now carries only 'streptococcal meningitis'; the group B labels moved to a case-scoped entry (G00.2+gbs) so they are no longer offered to the S. suis case RM04; RS01 gains 'group b streptococcal meningitis' and 'streptococcus agalactiae meningitis' (synonym script, --prune)
 
 Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN case guards pass; synonym `--check` clean.
+
+## Central vocabulary wired (24 Oct 2026)
+- Core term `order_microbiology` `wound_swab`: new recommended criterion `action-8-order-microbiology-ulcer-swab` (`specimen: wound_swab, tests: [culture]`) after the spine MRI; follow-up `request_ulcer_swab_culture` (`followup_outputs[3]`): deep swab of the cleaned right leg ulcer bed, heavy growth of Streptococcus agalactiae at 24 hours with the blood isolate's susceptibilities (penicillin 0.03, ampicillin 0.06, ceftriaxone <=0.5 mcg/mL), scanty coagulase-negative staphylococci; collected before antimicrobials.
+- Ulcer must (`required_recommendations[8]`) now "Treat the right lower-extremity venous stasis ulcer as the portal of entry: inspect it, culture the cleaned ulcer bed, and arrange wound care and debridement as needed for source control."
+- Re-run: `perfect_agent.py -v` ok; `case_io.py check`: schema OK, synonym guard OK, no test failure names the case.

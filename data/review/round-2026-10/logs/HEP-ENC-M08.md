@@ -74,3 +74,13 @@ Synonym table scoped (October 2026, `diagnosis_synonyms.yaml`, applied with `app
 - labels removed: "hepatic coma"
 - codes removed: K72.91
 - `case_io.py validate` OK; `perfect_agent.py` passes.
+
+## Central vocabulary wired (24 Oct 2026)
+
+`chest_xray` (`order_body_imaging`) and `stool` (`order_microbiology`, C. difficile GDH antigen and toxin B PCR) are now core terms, so the fever-source must (note 391bf9ac) becomes two scored actions.
+- New criteria after the urine culture, both recommended, `[EASL_HE_2022]`: `action-chest-xray` `{"study": "chest_xray"}` (expected "No consolidation or effusion") and `action-stool-c-difficile` `{"specimen": "stool"}` (expected "C. difficile GDH antigen negative and toxin B gene PCR not detected"; rationale: three weeks of watery diarrhoea with fever on omeprazole and lactulose).
+- New `followup_outputs[2]` `request_chest_xray` (no consolidation or effusion, mildly elevated hemidiaphragms from ascites) and `[3]` `request_stool_c_difficile` (both assays negative), before the drug check.
+- `assessment.required_recommendations[3]` now: "Fever without a source on the cultures, urinalysis, chest radiograph and stool C. difficile testing: re-examine for a source, and start empirical antibiotics if the fever persists without one."
+- `differential[1].key_features`: "Chest and stool sources still to be checked" replaced by the negative results. `red_herrings[1].correct_interpretation` adds "(all negative here)".
+- AFP (plan CENTRAL 5, optional): not made a criterion. HCC surveillance is not part of the HE work-up, the AFP sits in its own panel of the core labs as a result (no leak of the HE diagnosis), and the AFP rise is handled by the oncology must. No change.
+- Re-run: `perfect_agent.py HEP-ENC-M08 -v` ok (both new criteria served by their follow-ups); `case_io.py check` schema OK, synonym guard OK, no test failure names the case.

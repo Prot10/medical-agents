@@ -80,3 +80,7 @@ Andrea's ruling of 24 Oct 2026 (resolve open points for dataset quality); decisi
 - Syphilis criterion cites [CDC_STI_2021] (Workowski KA et al., MMWR Recomm Rep 2021;70(4)), which recommends syphilis testing in people with HIV and CSF evaluation for neurological signs
 
 Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN case guards pass; synonym `--check` clean.
+
+## Central vocabulary wired (24 Oct 2026)
+- Index CSF (`request_lumbar_puncture`) `special_tests` keyed by the new core terms: `AFB_stain` and `Xpert_MTB_RIF_Ultra` merged into `mycobacterial_panel` ("Acid-fast bacilli smear: no acid-fast bacilli seen; Xpert MTB/RIF Ultra: Mycobacterium tuberculosis not detected; mycobacterial culture: pending (final at up to 6 weeks)"); `India_ink` -> `india_ink` ("No encapsulated yeasts seen"). Interpretation ends "Bacterial and mycobacterial cultures pending." No criterion change: the plan keeps these results answering the CSF must, not scored as separate steps.
+- Re-run: `perfect_agent.py -v` ok; `case_io.py check`: schema OK, synonym guard OK, no test failure names the case.

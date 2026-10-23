@@ -71,3 +71,11 @@ Andrea's ruling of 24 Oct 2026 (resolve open points for dataset quality); decisi
 - Ward weight 44 kg (height 160 cm, BMI 17.2) recorded; meropenem must states the first dose in full and 2 g every 12 hours at a Cockcroft-Gault clearance of about 43 mL/min, reviewed daily
 
 Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN case guards pass; synonym `--check` clean.
+
+## Central vocabulary wired (24 Oct 2026)
+
+`CD4_count`, `HIV_viral_load`, `serum_cryptococcal_antigen` (`interpret_labs`) and `mycobacterial_panel` (`analyze_csf`) are now core terms (CENTRAL request above).
+- `initial_tool_outputs.labs.panels`: the `HIV` panel split into `HIV` (Ag/Ab reactive, known), `CD4_count` (68, admission) and `HIV_viral_load` (137 copies/mL, admission); the serum cryptococcal antigen (positive, 1:4) moved from "Infection screen" to its own `serum_cryptococcal_antigen` panel. Values, summary and interpretation unchanged. No new lab criterion: these are earlier results of this admission, stated in the HPI, and the musts act on them.
+- `ground_truth.action_criteria[action-3-analyze-csf]`: `required_arguments.special_tests` now meningitis_panel, mycobacterial_panel, cryptococcal_antigen; label, rationale and expected evidence name the mycobacterial studies and the repeat CSF CrAg on the same specimen, which the must already required (recently treated tuberculous meningitis; antigenaemia at CD4 68).
+- `followup_outputs[request_lumbar_puncture].output.special_tests`: `CSF_AFB_stain`, `CSF_GeneXpert_MTB_RIF` and `CSF_mycobacterial_culture` merged into `mycobacterial_panel` ("AFB smear negative; Xpert MTB/RIF Ultra: M. tuberculosis not detected; mycobacterial culture pending, final at up to 6 weeks"); `CSF_cryptococcal_antigen` renamed `cryptococcal_antigen`. Interpretation and `differential[0].key_features` say "AFB smear negative ... Xpert MTB/RIF Ultra not detected", matching the must's assay.
+- Checks: `perfect_agent.py BACT-MEN-RS04 -v` ok; `case_io.py check` schema OK, synonym guard OK, no failure names the case; case guards pass.
