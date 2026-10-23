@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+import copy
+from functools import lru_cache
+from typing import Any
+
 from pydantic import BaseModel, ConfigDict, Field
 
 from neuroagent_schemas import (
@@ -13,9 +17,12 @@ from neuroagent_schemas import (
     NeuroBenchCase,
     PolicyReviewStatus,
     SequenceSeverity,
+    ToolAction,
 )
+from neuroagent_schemas.evaluation import _contains_required
 
 from ..tools.cost_tracker import CostTracker
+from ..tools.vocabulary import analyte_class_members, normalize_analyte
 
 # Completion tokens per episode at which token efficiency halves. Prompt tokens are dictated
 # by the harness (case, tools, observations), not by the policy, so they are not scored.
@@ -62,7 +69,7 @@ class ClinicalPolicyReward:
 
         matched: dict[str, list[int]] = {
             criterion.criterion_id: [
-                index for index, action in enumerate(actions) if criterion.matches(action)
+                index for index, action in enumerate(actions) if criterion_matches(criterion, action)
             ]
             for criterion in policy.action_criteria
         }
@@ -78,7 +85,7 @@ class ClinicalPolicyReward:
         unclaimed = list(policy.action_criteria)
         positive = []
         for action in actions:
-            claimed = next((c for c in unclaimed if c.matches(action)), None)
+            claimed = next((c for c in unclaimed if criterion_matches(c, action)), None)
             if claimed is not None:
                 unclaimed.remove(claimed)
             positive.append(claimed is not None)
@@ -88,7 +95,7 @@ class ClinicalPolicyReward:
             criterion
             for criterion in policy.avoided_actions
             for action in actions
-            if criterion.matches(action)
+            if criterion_matches(criterion, action)
         ]
         harmful = sum(
             item.severity in {AvoidanceSeverity.HARM, AvoidanceSeverity.CONTRAINDICATED}
@@ -203,3 +210,114 @@ def _assessment_score(assessment, criteria) -> float:
     required_score = sum(required) / len(required) if required else 1.0
     prohibited_score = 1.0 - (sum(prohibited) / len(prohibited) if prohibited else 0.0)
     return 0.5 * required_score + 0.5 * prohibited_score
+
+
+# ---------------------------------------------------------------------------------------
+# Criterion matching.
+#
+# The schema-level `ToolCallPattern.matches` compares folded strings, which is right for every
+# argument but two kinds. (1) Assay lists: `LFT` and `LFTs`, `toxicology` and `tox_screen` name
+# one assay (`vocabulary._ANALYTE_SYNONYMS`), and a comprehensive metabolic panel *is* a basic
+# metabolic panel plus the liver panel, so an agent ordering `CMP` has ordered what a criterion
+# asking `BMP` + `LFTs` wants. (2) Defaulted arguments: a call that omits
+# `before_antimicrobials` is executed with the schema default (true), so a criterion requiring
+# `before_antimicrobials: true` must be met by it. The reward compares the call the tool
+# actually executed, with its vocabulary resolved, against the criterion.
+
+# Array-of-assay arguments, per tool, whose members compare through `normalize_analyte`.
+_ASSAY_ARGUMENTS: dict[str, tuple[str, ...]] = {
+    "interpret_labs": ("panels",),
+    "analyze_csf": ("special_tests",),
+    "obtain_tissue_diagnosis": ("molecular_assays",),
+}
+
+# Panels whose ordered content is fixed and contains other orderable or criterion terms.
+# Deliberately one-directional and limited to exact laboratory definitions: a CMP is the BMP
+# (Na, K, Cl, CO2, BUN, creatinine, glucose, calcium) plus albumin, total protein, ALP, ALT, AST
+# and bilirubin, i.e. the hepatic function panel; a BMP does not contain the liver panel, and a
+# coagulation screen (PT/INR, aPTT) satisfies an INR criterion while an INR alone does not
+# satisfy a coagulation screen. Keys and members are `normalize_analyte` keys.
+_PANEL_CONTENTS: dict[str, frozenset[str]] = {
+    "cmp": frozenset({
+        "bmp", "lfts", "sodium", "potassium", "glucose", "calcium", "creatinine", "bun",
+        "bilirubin", "albumin",
+    }),
+    "bmp": frozenset({"sodium", "potassium", "glucose", "calcium", "creatinine", "bun"}),
+    "lfts": frozenset({"bilirubin", "albumin"}),
+    "coagulation": frozenset({"inr", "pt", "pt_inr", "pt/inr", "aptt", "ptt"}),
+}
+
+
+@lru_cache(maxsize=1)
+def _schema_defaults() -> dict[str, dict[str, Any]]:
+    """Top-level `default` of every advertised tool argument, per tool."""
+    from ..tools.tool_registry import ToolRegistry
+
+    return {
+        name: {
+            key: prop["default"]
+            for key, prop in tool.parameter_schema.get("properties", {}).items()
+            if "default" in prop
+        }
+        for name, tool in ToolRegistry.create_default_registry().tools.items()
+    }
+
+
+def _ordered_assays(items: list[Any]) -> set[str]:
+    """Normalised assays an order covers, with fixed panel contents expanded."""
+    ordered = {normalize_analyte(item) for item in items if isinstance(item, str)}
+    pending = list(ordered)
+    while pending:
+        for member in _PANEL_CONTENTS.get(pending.pop(), ()):
+            if member not in ordered:
+                ordered.add(member)
+                pending.append(member)
+    return ordered
+
+
+def _assays_satisfied(actual: Any, required: Any) -> bool:
+    if not isinstance(required, list):
+        required = [required]
+    if isinstance(actual, str):
+        actual = [actual]
+    if not isinstance(actual, list):
+        return False
+    ordered = _ordered_assays(actual)
+    for item in required:
+        if not isinstance(item, str):
+            return False
+        key = normalize_analyte(item)
+        # A class term (`AED_levels`) is met by any member; never the reverse.
+        if key not in ordered and not (analyte_class_members(item) & ordered):
+            return False
+    return True
+
+
+def executed_arguments(action: ToolAction) -> dict[str, Any]:
+    """The call's arguments as the tool executes them: advertised schema defaults filled in."""
+    arguments = copy.deepcopy(action.arguments) if isinstance(action.arguments, dict) else {}
+    for key, value in _schema_defaults().get(action.tool_name, {}).items():
+        arguments.setdefault(key, copy.deepcopy(value))
+    return arguments
+
+
+def pattern_matches(pattern, action: ToolAction) -> bool:
+    """`ToolCallPattern.matches` with assay vocabulary and schema defaults resolved."""
+    if action.tool_name != pattern.tool_name:
+        return False
+    actual = executed_arguments(action)
+    assay_keys = _ASSAY_ARGUMENTS.get(action.tool_name, ())
+    for key, wanted in pattern.required_arguments.items():
+        if key not in actual:
+            return False
+        if key in assay_keys:
+            if not _assays_satisfied(actual[key], wanted):
+                return False
+        elif not _contains_required(actual[key], wanted):
+            return False
+    return True
+
+
+def criterion_matches(criterion, action: ToolAction) -> bool:
+    """Does the action satisfy an action criterion or an avoided-action criterion?"""
+    return any(pattern_matches(pattern, action) for pattern in criterion.alternatives)

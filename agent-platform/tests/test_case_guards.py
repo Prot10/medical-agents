@@ -1,0 +1,258 @@
+"""Corpus guards from the October 2026 dataset review round.
+
+Each guard is parametrized by case id, so one condition runs alone with e.g.
+`pytest agent-platform/tests/test_case_guards.py -k "ALS-"`.
+
+1. Answer-key leakage: `search_medical_literature` and `check_drug_interactions` are served for any
+   query or drug, so a stored output of theirs that repeats a criterion's `expected_evidence` hands
+   the scoring key to every agent that calls them.
+2. Follow-up trigger hygiene: the index (first) order of a study must be answered with the index
+   study, not with a repeat-study follow-up that shares a token with it.
+3. Banned strings per condition: superseded drugs, criteria and phrasings the reviewers removed.
+   Data-driven (`BANNED`), so later conditions add rows rather than tests.
+"""
+
+from __future__ import annotations
+
+import json
+import re
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Iterator
+
+import pytest
+
+ROOT = Path(__file__).resolve().parents[2]
+CASES = ROOT / "data/neurobench/cases"
+CASE_IDS = sorted(path.stem for path in CASES.glob("*.json"))
+
+
+def condition_of(case_id: str) -> str:
+    return re.sub(r"-R?[SMP]\d+$", "", case_id)
+
+
+def _raw(case_id: str) -> dict[str, Any]:
+    return json.loads((CASES / f"{case_id}.json").read_text())
+
+
+def _strings(value: Any) -> Iterator[str]:
+    if isinstance(value, str):
+        yield value
+    elif isinstance(value, dict):
+        for item in value.values():
+            yield from _strings(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from _strings(item)
+
+
+def _normalize(text: str) -> str:
+    return " ".join(re.sub(r"[^a-z0-9]+", " ", text.lower()).split())
+
+
+# ---------------------------------------------------------------------------------------
+# 1. Literature and drug-interaction outputs must not carry the scoring key.
+
+_ANY_QUERY_TOOLS = {
+    "search_medical_literature": "literature_search",
+    "check_drug_interactions": "drug_interactions",
+}
+_LEAK_WINDOW = 60
+
+
+def _any_query_outputs(case: dict[str, Any]) -> Iterator[tuple[str, Any]]:
+    for block in ("initial_tool_outputs", "fallback_tool_outputs"):
+        outputs = case.get(block) or {}
+        for field in _ANY_QUERY_TOOLS.values():
+            for key, output in (outputs.get(field) or {}).items():
+                yield f"{block}.{field}[{key!r}]", output
+    for index, followup in enumerate(case.get("followup_outputs") or []):
+        if followup.get("tool_name") in _ANY_QUERY_TOOLS:
+            yield f"followup_outputs[{index}] {followup.get('trigger_action')}", followup.get("output")
+
+
+def leaks(case: dict[str, Any]) -> list[str]:
+    found = []
+    criteria = (case.get("ground_truth") or {}).get("action_criteria") or []
+    outputs = [(where, _normalize(" ".join(_strings(output)))) for where, output in _any_query_outputs(case)]
+    for criterion in criteria:
+        evidence = _normalize(criterion.get("expected_evidence") or "")
+        if len(evidence) < _LEAK_WINDOW:
+            continue
+        windows = {evidence[i : i + _LEAK_WINDOW] for i in range(len(evidence) - _LEAK_WINDOW + 1)}
+        for where, text in outputs:
+            hit = next((w for w in windows if w in text), None)
+            if hit:
+                found.append(f"{where} repeats expected_evidence of {criterion.get('criterion_id')}: {hit!r}")
+    return found
+
+
+@pytest.mark.parametrize("case_id", CASE_IDS)
+def test_any_query_outputs_do_not_leak_expected_evidence(case_id):
+    assert not leaks(_raw(case_id))
+
+
+# ---------------------------------------------------------------------------------------
+# 2. A repeat-study follow-up must not answer the index order of its study.
+
+# Tokens that mark a follow-up as a later study or a later report of one.
+_REPEAT_MARKERS = {"repeat", "repeated", "serial", "recheck", "final", "followup", "rerun"}
+
+
+def _tokens(value: Any) -> set[str]:
+    return set(re.sub(r"[^a-z0-9]+", " ", " ".join(_strings(value)).lower()).split())
+
+
+def _is_repeat(trigger: str) -> bool:
+    return bool(set(re.split(r"[^a-z0-9]+", trigger.lower())) & _REPEAT_MARKERS)
+
+
+def hijacked_index_orders(case_id: str) -> list[str]:
+    """Index orders answered by a repeat follow-up, through the real MockServer resolver.
+
+    For each required/recommended criterion that is not itself a repeat order, the criterion's first
+    alternative is placed as the first call to its tool in a fresh environment (the index study, as
+    the perfect agent orders it). It must not be answered with a repeat-study follow-up.
+    """
+    from neuroagent.harness.environment import NeuroBenchEnvironment
+    from neuroagent_schemas import NeuroBenchCase, ToolAction
+
+    case = NeuroBenchCase.model_validate_json((CASES / f"{case_id}.json").read_text())
+    repeats = [fu for fu in case.followup_outputs if _is_repeat(fu.trigger_action)]
+    if not repeats:
+        return []
+    problems = []
+    for criterion in case.ground_truth.action_criteria:
+        if criterion.importance.value not in ("required", "recommended"):
+            continue
+        pattern = criterion.alternatives[0]
+        if _tokens(pattern.required_arguments) & _REPEAT_MARKERS:
+            continue  # the criterion is itself the repeat order
+        candidates = [fu for fu in repeats if fu.tool_name == pattern.tool_name]
+        if not candidates:
+            continue
+        environment = NeuroBenchEnvironment(case)
+        schema = environment.registry.get_tool(pattern.tool_name).parameter_schema
+        arguments = dict(pattern.required_arguments)
+        for name in schema.get("required", []):
+            # A neutral context, so only the study identity can select a follow-up.
+            arguments.setdefault(name, "index order")
+        result = environment.execute(ToolAction(tool_name=pattern.tool_name, arguments=arguments))
+        if not result.success:
+            continue  # the perfect-agent check reports rejected calls
+        for followup in candidates:
+            if followup.output.model_dump() == result.output:
+                problems.append(
+                    f"{criterion.criterion_id} {pattern.tool_name} {pattern.required_arguments} "
+                    f"answered by repeat follow-up {followup.trigger_action!r}"
+                )
+    return problems
+
+
+@pytest.mark.parametrize("case_id", CASE_IDS)
+def test_index_order_is_not_answered_by_a_repeat_followup(case_id):
+    assert not hijacked_index_orders(case_id)
+
+
+# ---------------------------------------------------------------------------------------
+# 3. Banned strings per condition.
+
+
+@dataclass(frozen=True)
+class Banned:
+    """A phrase a condition's cases must not contain, matched per sentence of every string field.
+
+    `pattern` must match the sentence; `unless`, when given, exempts a sentence it also matches
+    (e.g. a criterion named as superseded); `tools`, when given, limits the row to the stored
+    outputs of those tools (initial, follow-up and fallback).
+    """
+
+    condition: str
+    label: str
+    pattern: str
+    unless: str | None = None
+    tools: tuple[str, ...] = ()
+
+
+BANNED: tuple[Banned, ...] = (
+    Banned("ALS", "AMX0035 (withdrawn 2024)", r"\bAMX0035\b"),
+    Banned("ALS", "Relyvrio (withdrawn 2024)", r"\bRelyvrio\b"),
+    Banned("ALS", "grapefruit as a CYP1A2 modulator (it inhibits CYP3A4)",
+           r"grapefruit.*CYP1A2|CYP1A2.*grapefruit"),
+    Banned("ALS", "reference to the July 2026 review", r"July 2026 review"),
+    Banned("ALS", "El Escorial presented as the current criteria (Gold Coast 2020)",
+           r"El Escorial",
+           unless=r"Gold Coast|supersed|replac|older|former|historic|previous|no longer|rather than|instead of"),
+    Banned("BACT-MEN", "CSF/serum glucose ratio 'normal >0.6'", r"normal\s*>\s*0\.6"),
+    Banned("BACT-MEN", "'age >50' as the ampicillin/Listeria criterion",
+           r"(age\s*>\s*50.*(ampicillin|listeria))|((ampicillin|listeria).*age\s*>\s*50)"),
+    Banned("HEP-ENC", "'2-4 soft' signs", r"\b2\s*[-–]\s*4\s+soft"),
+    Banned("HEP-ENC", "'the finding the lumbar puncture is gated on'",
+           r"the finding the lumbar puncture is gated on"),
+    Banned("HEP-ENC", "a CT report claiming restricted diffusion", r"restricted diffusion",
+           tools=("order_ct_scan",)),
+)
+
+_TOOL_FIELDS = {"order_ct_scan": "ct"}
+_SENTENCE = re.compile(r"(?<=[.;!?])\s+|\n+")
+
+
+def _scoped_strings(case: dict[str, Any], tools: tuple[str, ...]) -> Iterator[str]:
+    if not tools:
+        yield from _strings(case)
+        return
+    for block in ("initial_tool_outputs", "fallback_tool_outputs"):
+        for tool in tools:
+            yield from _strings((case.get(block) or {}).get(_TOOL_FIELDS.get(tool, tool)))
+    for followup in case.get("followup_outputs") or []:
+        if followup.get("tool_name") in tools:
+            yield from _strings(followup.get("output"))
+
+
+def banned_hits(case_id: str, case: dict[str, Any] | None = None) -> list[str]:
+    case = case if case is not None else _raw(case_id)
+    hits = []
+    for row in BANNED:
+        if condition_of(case_id) != row.condition:
+            continue
+        for text in _scoped_strings(case, row.tools):
+            for sentence in _SENTENCE.split(text):
+                if re.search(row.pattern, sentence, re.IGNORECASE) and not (
+                    row.unless and re.search(row.unless, sentence, re.IGNORECASE)
+                ):
+                    hits.append(f"{row.label}: {sentence.strip()[:200]!r}")
+    return hits
+
+
+@pytest.mark.parametrize("case_id", [c for c in CASE_IDS if condition_of(c) in {row.condition for row in BANNED}])
+def test_condition_banned_strings(case_id):
+    assert not banned_hits(case_id)
+
+
+def test_banned_table_rows_fire():
+    """Each row catches its own phrasing and spares the exempt one."""
+    def case(text: str, field: str = "notes") -> dict[str, Any]:
+        return {"metadata": {field: text}}
+
+    assert banned_hits("ALS-S01", case("Started on AMX0035 last year."))
+    assert banned_hits("ALS-S01", case("Grapefruit juice inhibits CYP1A2."))
+    assert banned_hits("ALS-S01", case("Meets revised El Escorial criteria for definite ALS."))
+    assert not banned_hits("ALS-S01", case("Gold Coast criteria met (El Escorial is superseded)."))
+    assert banned_hits("BACT-MEN-S01", case("Add ampicillin for Listeria if age >50."))
+    assert banned_hits("BACT-MEN-S01", case("CSF:serum glucose ratio 0.2 (normal >0.6)."))
+    assert banned_hits("HEP-ENC-S01", case("Two to four: 2-4 soft signs present."))
+    ct = {"initial_tool_outputs": {"ct": {"findings": "Hypodensity with restricted diffusion."}}}
+    assert banned_hits("HEP-ENC-S01", ct)
+    assert not banned_hits("HEP-ENC-S01", {"initial_tool_outputs": {"mri": {"findings": "restricted diffusion"}}})
+    assert not banned_hits("ISCH-STR-S01", case("AMX0035"))
+
+
+def test_leak_detector_fires():
+    evidence = "Gold Coast criteria are met with upper and lower motor neuron signs in two regions and progression."
+    case = {
+        "ground_truth": {"action_criteria": [{"criterion_id": "c", "expected_evidence": evidence}]},
+        "initial_tool_outputs": {"literature_search": {"q": {"summary": "Review: " + evidence.upper()}}},
+    }
+    assert leaks(case)
+    case["initial_tool_outputs"]["literature_search"]["q"]["summary"] = "Unrelated guideline summary."
+    assert not leaks(case)
