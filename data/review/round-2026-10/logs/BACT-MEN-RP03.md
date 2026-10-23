@@ -68,3 +68,15 @@ HIV, the plausibility margin of 3 cells, and the condition-wide `before_antimicr
 
 ## Condition audit (23 October 2026)
 - Condition-wide decision on the open `before_antimicrobials` question raised in this log: the argument is required only where the blood culture report flag `collected_before_antimicrobials` is true, and absent where it is false. This case already follows the rule (argument absent, flag false); no change to the case for it.
+
+## Open questions resolved (24 Oct 2026)
+
+Andrea's ruling of 24 Oct 2026 (resolve open points for dataset quality); decisions and sources in `plans/BACT-MEN-decisions.md`.
+
+- 'WHO 2025 Annex A.4' renamed 'WHO 2025 section A.4' (6 strings): the cranial imaging recommendations are section A.4 of chapter 3 of the guideline, not an annex
+- Hearing must cites WHO 2025 (strong recommendation: formal audiological screening before discharge, or within four weeks of discharge), which covers every adult with acute meningitis, instead of NICE NG240, which excludes immunocompromised and neurosurgical patients
+- Dexamethasone must reversed: WHO 2025 applies adjunctive corticosteroids in HIV only on ART with an undetectable viral load (his is 4850 copies/mL) and reports no proven benefit in advanced HIV disease; regimen, drug check, constraint and key evidence no longer give dexamethasone
+- Unexplained left-sided chest pain removed from the chief complaint and HPI (no finding, study or diagnosis in the case explained it)
+- Syphilis criterion cites [CDC_STI_2021] (Workowski KA et al., MMWR Recomm Rep 2021;70(4)), which recommends syphilis testing in people with HIV and CSF evaluation for neurological signs
+
+Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN case guards pass; synonym `--check` clean.

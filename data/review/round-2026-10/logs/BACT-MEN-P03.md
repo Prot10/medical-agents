@@ -65,3 +65,12 @@ Found and changed:
 Left as is: CD4 count and the HIV differentiation assay are reported with the first panel (no CD4 vocabulary yet, worker's CENTRAL entry); the MRI tier (required) stays the worker's open question.
 
 After the edits: `perfect_agent.py BACT-MEN-P03 -v` passes; `case_io.py check` clean for the case.
+
+## Open questions resolved (24 Oct 2026)
+
+Andrea's ruling of 24 Oct 2026 (resolve open points for dataset quality); decisions and sources in `plans/BACT-MEN-decisions.md`.
+
+- 'WHO 2025 Annex A.4' renamed 'WHO 2025 section A.4' (4 strings): the cranial imaging recommendations are section A.4 of chapter 3 of the guideline, not an annex
+- Contrast MRI downgraded from required to recommended and removed from the stop rule: WHO 2022 bases the diagnosis on CSF opening pressure and CrAg and requires no MRI; the required pre-LP CT already screens for a mass
+
+Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN case guards pass; synonym `--check` clean.

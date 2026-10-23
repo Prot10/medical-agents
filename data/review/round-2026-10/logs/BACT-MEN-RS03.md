@@ -45,3 +45,13 @@ The pathway is now blood cultures, then lumbar puncture without prior CT (GCS 14
 ## Verification
 Adversarial check (23 October 2026) of the log against the case file, the plan (4.0 row RS03: imaging C per Q5, Listeria yes) and note 779f9ec1. Read the whole final case. Confirmed: canonical base and Listeria musts (age 74, prednisolone), Listeria in the differential; GCA declared as a red herring, in the differential (low) and as a must, with the visual-loss warning; prednisolone plan (hold during dexamethasone, then resume or taper, never abruptly) in a must, the drug check and key evidence, and the old "discontinue prednisolone" advice gone; red-herring block with PMR/GCA, IgA MGUS and intrathecal IgA; literature criterion and follow-up deleted (plan C9), no "age >50"; CT criterion, constraint and follow-up deleted with C must, prohibition and waste action. Index CSF served to action-3 by `request_lumbar_puncture`; preliminary culture growth carries its interval (18 hours); blood culture `collected_before_antimicrobials` true is correct (no antimicrobials); HPI timeline (prednisolone about 2 weeks, review at day 10, 48 hours of deterioration) is consistent; CBC differential 100%; anion gap 12; eGFR about 58 (creatinine 1.3, man, 74) as stated; differential all low with the excluding results.
 Found: nothing that needed a change. `perfect_agent.py -v` passes with action-3 served by `request_lumbar_puncture`; `case_io.py check` clean for the case.
+
+## Open questions resolved (24 Oct 2026)
+
+Andrea's ruling of 24 Oct 2026 (resolve open points for dataset quality); decisions and sources in `plans/BACT-MEN-decisions.md`.
+
+- 'WHO 2025 Annex A.4' renamed 'WHO 2025 section A.4' (4 strings): the cranial imaging recommendations are section A.4 of chapter 3 of the guideline, not an annex
+- Hearing must cites WHO 2025 (strong recommendation: formal audiological screening before discharge, or within four weeks of discharge), which covers every adult with acute meningitis, instead of NICE NG240, which excludes immunocompromised and neurosurgical patients
+- Pre-LP CT made neutral (no criterion, no waste penalty): prednisolone 30 mg for about 2 weeks meets the IDSA 2013 high-level immunosuppression threshold while WHO 2025 gives no steroid threshold; the no-imaging must, its prohibition and the CT waste avoided action replaced by a must that accepts either course with antibiotics first
+
+Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN case guards pass; synonym `--check` clean.

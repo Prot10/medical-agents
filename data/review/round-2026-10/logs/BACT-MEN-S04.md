@@ -47,3 +47,15 @@ Open questions added for Andrea:
 - The values (platelets 95, PT 2.8 s above the upper limit, fibrinogen 139 mg/dL, D-dimer 4.4) give an ISTH overt-DIC score of about 3 to 4, below the cut-off of 5. "Overt DIC" follows Reviewer 2's ruling and the plan's canonical must; the S05 worker raised the same point.
 - Lumbar puncture in septic shock with a spreading petechial rash and platelets below 100: NICE meningitis guidance (NG240, as in the earlier CG102) lists shock, extensive or spreading purpura and a platelet count below 100 x 10^9/L among reasons to delay LP. The case requires the LP (action-3) and its must says to proceed. I did not restructure the pathway; the lead should decide, for S04, S05 and any other case with shock or purpura, whether the LP is deferred until stabilisation (with the diagnosis carried by blood culture and PCR) and how the scoring reflects it. I could not check the exact NG240 recommendation number.
 Re-run: `perfect_agent.py BACT-MEN-S04 -v` ok; `case_io.py check` clean for the case.
+
+## Open questions resolved (24 Oct 2026)
+
+Andrea's ruling of 24 Oct 2026 (resolve open points for dataset quality); decisions and sources in `plans/BACT-MEN-decisions.md`.
+
+- 'WHO 2025 Annex A.4' renamed 'WHO 2025 section A.4' (5 strings): the cranial imaging recommendations are section A.4 of chapter 3 of the guideline, not an annex
+- Hearing must cites WHO 2025 (strong recommendation: formal audiological screening before discharge, or within four weeks of discharge), which covers every adult with acute meningitis, instead of NICE NG240, which excludes immunocompromised and neurosurgical patients
+- D-dimer 4.4 -> 6.2 ug/mL FEU (more than 10 times the upper limit) so the stored values give an ISTH overt-DIC score of 5, matching Reviewer 2's ruling of overt DIC (46d5c362); the key evidence states the score
+- Lumbar puncture must adds stabilisation of shock and correction of the coagulopathy before the LP (WHO 2025 A.1.1; NICE NG240 1.4.11)
+- Meningococcal disease likelihood high -> low: the differential is the assessment-time view (ruling 7) and the key features already state the exclusion (N. meningitidis not detected, S. pneumoniae in blood and CSF); the entry and its bedside role stay as Reviewer 2 asked (db9626f9)
+
+Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN case guards pass; synonym `--check` clean.

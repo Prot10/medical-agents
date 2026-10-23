@@ -43,3 +43,13 @@ Found and changed:
 - `ground_truth.assessment.required_recommendations` (sepsis must): the labs show platelets 147, fibrinogen 179 mg/dL (low), INR 1.3 and D-dimer 4.0 in a hypotensive patient, and nothing in the case addressed it (class of note 46d5c362 in S04: a falling fibrinogen is the discriminating value). Added to the existing must: repeat platelets, fibrinogen, INR and D-dimer, naming a sepsis-associated coagulopathy that may progress to DIC. Not called overt DIC: the ISTH overt-DIC score is about 2.
 Not changed (judgment, noted for the lead): ampicillin 2 g every 4 hours with creatinine 1.5 mg/dL (eGFR about 45 by CKD-EPI 2021). Full dosing in the first 24 hours of meningitis is usual and the drug step says to review it if renal function worsens.
 Re-run: `perfect_agent.py BACT-MEN-S02 -v` ok; `case_io.py check` clean for the case.
+
+## Open questions resolved (24 Oct 2026)
+
+Andrea's ruling of 24 Oct 2026 (resolve open points for dataset quality); decisions and sources in `plans/BACT-MEN-decisions.md`.
+
+- 'WHO 2025 Annex A.4' renamed 'WHO 2025 section A.4' (6 strings): the cranial imaging recommendations are section A.4 of chapter 3 of the guideline, not an annex
+- Hearing must cites WHO 2025 (strong recommendation: formal audiological screening before discharge, or within four weeks of discharge), which covers every adult with acute meningitis, instead of NICE NG240, which excludes immunocompromised and neurosurgical patients
+- Must added: resuscitate the hypotension before the lumbar puncture (WHO 2025 A.1.1: no LP with haemodynamic compromise requiring stabilisation)
+
+Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN case guards pass; synonym `--check` clean.

@@ -46,3 +46,12 @@ Found and changed:
 - `patient.neurological_exam.sensory`: "Withdraws to pain symmetrically" sat beside GCS 12 with M5 (localises), the same contradiction the worker fixed in S02 and S03's class (plan C12). Now "Responds to painful stimuli symmetrically in all four extremities."
 Accepted as logged: the NICE "progressive fall in consciousness" open question (the reviewer ruled no criterion; WHO governs).
 Re-run: `perfect_agent.py BACT-MEN-S01 -v` ok; `case_io.py check` clean for the case.
+
+## Open questions resolved (24 Oct 2026)
+
+Andrea's ruling of 24 Oct 2026 (resolve open points for dataset quality); decisions and sources in `plans/BACT-MEN-decisions.md`.
+
+- 'WHO 2025 Annex A.4' renamed 'WHO 2025 section A.4' (5 strings): the cranial imaging recommendations are section A.4 of chapter 3 of the guideline, not an annex
+- Hearing must cites WHO 2025 (strong recommendation: formal audiological screening before discharge, or within four weeks of discharge), which covers every adult with acute meningitis, instead of NICE NG240, which excludes immunocompromised and neurosurgical patients
+
+Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN case guards pass; synonym `--check` clean.

@@ -63,3 +63,13 @@ condition-wide `before_antimicrobials` decision (see RM03 verification for the l
 ## Condition audit (23 October 2026)
 - Condition-wide decision on the open `before_antimicrobials` question raised in this log: the argument is required only where the blood culture report flag `collected_before_antimicrobials` is true, and absent where it is false. This case already follows the rule (argument absent, flag false); no change to the case for it.
 - Deleted `ground_truth.key_clinical_evidence` template line "WHO 2025: obtain cultures promptly, but neither LP nor cranial imaging may delay empirical antimicrobials when the pathway requires treatment first." It duplicates the C17 timing line already present and reads as authoring text; the RM01 and RM02 verifiers deleted the same line there.
+
+## Open questions resolved (24 Oct 2026)
+
+Andrea's ruling of 24 Oct 2026 (resolve open points for dataset quality); decisions and sources in `plans/BACT-MEN-decisions.md`.
+
+- 'WHO 2025 Annex A.4' renamed 'WHO 2025 section A.4' (4 strings): the cranial imaging recommendations are section A.4 of chapter 3 of the guideline, not an annex
+- Hearing must cites WHO 2025 (strong recommendation: formal audiological screening before discharge, or within four weeks of discharge), which covers every adult with acute meningitis, instead of NICE NG240, which excludes immunocompromised and neurosurgical patients
+- Serotype-specific pneumococcal antibody result made pending with a realistic send-out turnaround (about 2 weeks) instead of returning with the immunoglobulins; the immunology must no longer relies on it
+
+Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN case guards pass; synonym `--check` clean.

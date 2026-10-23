@@ -43,3 +43,14 @@ Found and changed:
 - DIC must, `differential[0]` and `[3]`, `key_clinical_evidence`: the case called her state "septic shock" and "hypotension", but her pressure is 102/62 after 500 mL (EMS 98/60), with no vasopressor need; Sepsis-3 shock requires vasopressors for MAP 65 mmHg or more with lactate above 2. The must now reads "Treat as meningococcal sepsis with overt DIC: fluid resuscitation guided by perfusion (heart rate 124, blood lactate 3.6 mmol/L), vasopressors to a mean arterial pressure of at least 65 mmHg if hypotension develops, ..., assess for adrenal haemorrhage (Waterhouse-Friderichsen) if shock develops." The differential entries cite "raised lactate" and "coagulopathy" instead of "shock"; the key evidence line says "spreading purpura, tachycardia and a raised lactate". The HPI's "hypotensive at 98/60" (the paramedics' description) is unchanged.
 Open question added for Andrea: spreading purpura with platelets 94 is among NICE's reasons to delay lumbar puncture (see the S04 verification); the LP stays required here pending the lead's decision.
 Re-run: `perfect_agent.py BACT-MEN-S05 -v` ok; `case_io.py check` clean for the case.
+
+## Open questions resolved (24 Oct 2026)
+
+Andrea's ruling of 24 Oct 2026 (resolve open points for dataset quality); decisions and sources in `plans/BACT-MEN-decisions.md`.
+
+- 'WHO 2025 Annex A.4' renamed 'WHO 2025 section A.4' (4 strings): the cranial imaging recommendations are section A.4 of chapter 3 of the guideline, not an annex
+- Hearing must cites WHO 2025 (strong recommendation: formal audiological screening before discharge, or within four weeks of discharge), which covers every adult with acute meningitis, instead of NICE NG240, which excludes immunocompromised and neurosurgical patients
+- PT 14.1 -> 15.6 s and INR 1.3 -> 1.4 so the stored values give an ISTH overt-DIC score of 5, matching Reviewer 2's ruling that DIC is present (45c01665)
+- Index LP made optional and removed from the stop rule; the 'proceed to LP' must and its prohibition replaced by deferral until the purpura stops spreading, she is stable and coagulation is corrected (NICE NG240 1.4.11, 1.4.12: no LP with extensive or rapidly spreading purpura; WHO 2025 A.1.1: no LP with a bleeding diathesis or haemodynamic compromise); blood cultures and blood PCR carry the diagnosis; differential key features no longer depend on the CSF
+
+Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN case guards pass; synonym `--check` clean.

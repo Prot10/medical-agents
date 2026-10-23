@@ -52,3 +52,13 @@ Adversarial verifier, 23 October 2026. Read the whole final case, the notes file
 
 ## Condition audit (23 October 2026)
 - Removed the stale `metadata.case_body_concerns[0]` ("check_drug_interactions was marked required with empty tool_parameters and no stored output ... reclassified to recommended"): the case now has a stored drug-check output, so the note is false; P02 and P03 verifiers removed the equivalent stale notes. No clinical field changed.
+
+## Open questions resolved (24 Oct 2026)
+
+Andrea's ruling of 24 Oct 2026 (resolve open points for dataset quality); decisions and sources in `plans/BACT-MEN-decisions.md`.
+
+- 'WHO 2025 Annex A.4' renamed 'WHO 2025 section A.4' (4 strings): the cranial imaging recommendations are section A.4 of chapter 3 of the guideline, not an annex
+- Hearing must cites WHO 2025 (strong recommendation: formal audiological screening before discharge, or within four weeks of discharge), which covers every adult with acute meningitis, instead of NICE NG240, which excludes immunocompromised and neurosurgical patients
+- Random blood glucose 102 mg/dL no longer flagged high: reference 70-140 mg/dL for a non-fasting sample
+
+Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN case guards pass; synonym `--check` clean.
